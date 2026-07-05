@@ -1,0 +1,18 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+SQLAlchemy>=2.0
+pydantic-settings>=2.2
+# MySQL 连接器
+pymysql>=1.1
+# SQL Server 连接器
+pyodbc>=5.0
+# PostgreSQL 连接器（当前应用库已使用）
+psycopg[binary]>=3.1
+python-dotenv>=1.0
+alembic>=1.13
+pytest>=8.0
+httpx>=0.27
+# 定时调度
+apscheduler>=3.10
+# 频率限制
+slowapi>=0.1

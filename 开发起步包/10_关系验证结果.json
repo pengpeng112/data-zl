@@ -1,0 +1,332 @@
+{
+  "generated_at": "2026-07-02 16:58:38",
+  "db": "10.10.8.216/orcl",
+  "results": [
+    {
+      "id": "R01",
+      "domain": "就诊",
+      "relation": "HIS.PAT_VISIT -> HIS.PAT_MASTER_INDEX by PATIENT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 1.5,
+      "metrics": {
+        "total": 575487,
+        "orphan": 3
+      }
+    },
+    {
+      "id": "R02",
+      "domain": "诊断",
+      "relation": "HIS.DIAGNOSIS -> HIS.PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 1.37,
+      "metrics": {
+        "total": 3330051,
+        "orphan": 210
+      }
+    },
+    {
+      "id": "R03",
+      "domain": "科室",
+      "relation": "PAT_VISIT.DEPT_ADMISSION_TO -> DEPT_DICT.DEPT_CODE",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.71,
+      "metrics": {
+        "total": 575487,
+        "orphan": 1
+      }
+    },
+    {
+      "id": "R04",
+      "domain": "科室",
+      "relation": "PAT_VISIT.DEPT_DISCHARGE_FROM -> DEPT_DICT.DEPT_CODE",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.28,
+      "metrics": {
+        "total": 575487,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "R05",
+      "domain": "人员",
+      "relation": "PAT_VISIT.DOCTOR_IN_CHARGE -> STAFF_DICT.EMP_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.42,
+      "metrics": {
+        "total": 575487,
+        "orphan": 3193
+      }
+    },
+    {
+      "id": "R06",
+      "domain": "床位",
+      "relation": "HIS.PATS_IN_HOSPITAL -> HIS.PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.05,
+      "metrics": {
+        "total": 1216,
+        "orphan": 3
+      }
+    },
+    {
+      "id": "R07",
+      "domain": "住院费用",
+      "relation": "INP_SETTLE_MASTER -> PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.48,
+      "metrics": {
+        "total": 622182,
+        "orphan": 52
+      }
+    },
+    {
+      "id": "R08",
+      "domain": "住院费用",
+      "relation": "INP_BILL_DETAIL sampled by first 2000 PAT_VISIT keys",
+      "mode": "bounded",
+      "note": "用2000个PAT_VISIT键限定巨表，验证键可连通，不做全表扫描",
+      "status": "ok",
+      "seconds": 2.89,
+      "metrics": {
+        "detail_rows": 768942,
+        "matched_visit_keys": 1996
+      }
+    },
+    {
+      "id": "R09",
+      "domain": "医嘱",
+      "relation": "ORDERS sampled by first 2000 PAT_VISIT keys",
+      "mode": "bounded",
+      "note": "用2000个PAT_VISIT键限定ORDERS巨表",
+      "status": "ok",
+      "seconds": 0.32,
+      "metrics": {
+        "order_rows": 130734,
+        "matched_visit_keys": 1999
+      }
+    },
+    {
+      "id": "R10",
+      "domain": "手术",
+      "relation": "SM.MED_OPERATION_MASTER -> PAT_VISIT",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.12,
+      "metrics": {
+        "total": 138551,
+        "orphan": 406
+      }
+    },
+    {
+      "id": "R11",
+      "domain": "手术",
+      "relation": "SM.MED_OPERATION_NAME -> SM.MED_OPERATION_MASTER",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.06,
+      "metrics": {
+        "total": 144894,
+        "orphan": 96
+      }
+    },
+    {
+      "id": "R12",
+      "domain": "手术",
+      "relation": "HIS.OPERATION.OPER_ID null check",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.22,
+      "metrics": {
+        "total": 528693,
+        "null_oper_id": 528693
+      }
+    },
+    {
+      "id": "R13",
+      "domain": "检查",
+      "relation": "HIS.EXAM_MASTER -> PAT_VISIT",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 2.67,
+      "metrics": {
+        "total": 3415127,
+        "orphan": 1402517
+      }
+    },
+    {
+      "id": "R14",
+      "domain": "检查",
+      "relation": "HIS.EXAM_REPORT -> HIS.EXAM_MASTER by EXAM_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 1.15,
+      "metrics": {
+        "total": 1336893,
+        "orphan": 55
+      }
+    },
+    {
+      "id": "R15",
+      "domain": "检查",
+      "relation": "EXAM_REPORT has PATIENT_ID column?",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.04,
+      "metrics": {
+        "has_patient_id_col": 0
+      }
+    },
+    {
+      "id": "R16",
+      "domain": "检验",
+      "relation": "LAB_TEST_MASTER -> PAT_MASTER_INDEX by PATIENT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 2.28,
+      "metrics": {
+        "total": 9142446,
+        "orphan_patient": 63
+      }
+    },
+    {
+      "id": "R17",
+      "domain": "检验",
+      "relation": "LAB_TEST_MASTER visit_id distribution/match",
+      "mode": "full",
+      "note": "",
+      "status": "ok_manual_rerun",
+      "seconds": null,
+      "metrics": {
+        "total": 9142446,
+        "visit_null_or_zero": 3339952,
+        "exact_visit_match": 5800092,
+        "nonzero_visit_unmatched": 2402
+      }
+    },
+    {
+      "id": "R18",
+      "domain": "检验",
+      "relation": "LAB_TEST_ITEMS -> LAB_TEST_MASTER by TEST_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 6.89,
+      "metrics": {
+        "total": 9610054,
+        "orphan": 1710
+      }
+    },
+    {
+      "id": "R19",
+      "domain": "检验",
+      "relation": "LAB_RESULT bounded by first 2000 LAB_TEST_MASTER.TEST_NO",
+      "mode": "bounded",
+      "note": "用2000个TEST_NO限定LAB_RESULT巨表",
+      "status": "ok",
+      "seconds": 0.01,
+      "metrics": {
+        "result_rows": 22721,
+        "matched_test_no": 1367
+      }
+    },
+    {
+      "id": "R20",
+      "domain": "旧EMR",
+      "relation": "MTL.EPR_INPATIENT_DOCINDEX -> PAT_MASTER_INDEX by INP_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.68,
+      "metrics": {
+        "total": 239863,
+        "orphan_inp_no": 817
+      }
+    },
+    {
+      "id": "R21",
+      "domain": "旧EMR",
+      "relation": "MTL.EPR_INPATIENT -> MTL.EPR_INPATIENT_DOCINDEX by UHID (sampled)",
+      "mode": "sample",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.64,
+      "metrics": {
+        "sample_rows": 50000,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "R22",
+      "domain": "旧EMR",
+      "relation": "MTL.EMRSD_CONTENT -> EPR_INPATIENT by UHID+段落编号 (sampled)",
+      "mode": "sample",
+      "note": "",
+      "status": "ok",
+      "seconds": 8.54,
+      "metrics": {
+        "sample_rows": 50000,
+        "orphan": 29
+      }
+    },
+    {
+      "id": "R23",
+      "domain": "新EMR",
+      "relation": "JHEMR.JHMR_FILE_CONTENT_TEXT -> JHMR_FILE_INDEX by FILE_UNIQUE_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 7.52,
+      "metrics": {
+        "total": 1149248,
+        "orphan": 1051
+      }
+    },
+    {
+      "id": "R24",
+      "domain": "移动护理",
+      "relation": "YDHL.MCS_ASSESS_FORM -> YDHL.INPATIENTS by PATIENT_UID=PAT_INDEX_NO",
+      "mode": "sample",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.18,
+      "metrics": {
+        "total": 200000,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "R25",
+      "domain": "诊断字典",
+      "relation": "DIAGNOSIS_CODE -> CDA_DICTIONARY ICD-10 mapping",
+      "mode": "sample",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.16,
+      "metrics": {
+        "sample_rows": 50000,
+        "mapped_rows": 47091
+      }
+    }
+  ]
+}

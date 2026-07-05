@@ -1,0 +1,184 @@
+{
+  "generated_at": "2026-07-03",
+  "database": "10.10.10.15:1521/his",
+  "basis": [
+    "用户确认口径",
+    "16_hisuser业务库元数据快照.json",
+    "21_HIS主业务owner关系补验结果.json",
+    "22_HIS源端字段主题与ODS覆盖差异结果.json",
+    "本次只读补验 SQL 聚合结果"
+  ],
+  "user_decisions": {
+    "include_comm_medadm": true,
+    "exclude_operation_log": true,
+    "include_order_execution_facts": ["ORDADM.ORDERS_EXECUTE_DETAILS", "DRUG_USER.INP_ORDER_EXECDATA"],
+    "include_prepayment_rcpt": true,
+    "visit_id_zero_or_null_lab_exam_scope": "门诊数据；HIS 系统没有体检数据",
+    "exclude_statistics_logs_interface_tables_in_first_version": true
+  },
+  "verified_results": [
+    {
+      "id": "A01",
+      "domain": "COMM",
+      "relation": "COMM active table statistics",
+      "mode": "metadata",
+      "metrics": {"table_count": 382, "row_count_stats_sum": 67999941, "max_last_analyzed": "2026-07-02 22:01:51", "log_like_tables": 13, "st_like_tables": 0},
+      "decision": "纳入第一版候选，但排除日志类表；字典/基础资料优先。"
+    },
+    {
+      "id": "A02",
+      "domain": "MEDADM",
+      "relation": "MEDADM active table statistics",
+      "mode": "metadata",
+      "metrics": {"table_count": 73, "row_count_stats_sum": 93720954, "max_last_analyzed": "2026-07-02 22:03:59", "log_like_tables": 0, "st_like_tables": 15},
+      "decision": "纳入第一版候选，但排除 ST_* 和统计类表；保留床位/在院/管理字典候选。"
+    },
+    {
+      "id": "A03",
+      "domain": "COMM",
+      "relation": "COMM.DEPT_DICT create_date profile",
+      "mode": "full",
+      "metrics": {"total": 815, "min_create_date": "2025-03-27 11:03:23", "max_create_date": "2026-06-18 10:40:10", "rows_last_12m": 65},
+      "decision": "科室字典有近期维护，纳入基础字典。"
+    },
+    {
+      "id": "A06",
+      "domain": "COMM",
+      "relation": "COMM.PRICE_LIST active profile",
+      "mode": "full",
+      "metrics": {"total": 101423, "min_start": "2012-11-12 14:48:06", "max_start": "2026-07-02 16:30:29", "min_enter": "2012-11-12 14:48:06", "max_enter": "2026-07-02 16:30:28", "rows_last_12m": 9858},
+      "decision": "价表持续维护，纳入基础价格/收费字典候选。"
+    },
+    {
+      "id": "A07",
+      "domain": "COMM",
+      "relation": "COMM.STAFF_DICT active profile",
+      "mode": "full",
+      "metrics": {"total": 4219, "min_create": "2012-11-27 14:12:35", "max_create": "2026-07-03 09:12:29", "min_status": "2024-11-27 16:04:38", "max_status": "2024-11-27 16:04:38", "rows_last_12m": 882},
+      "decision": "人员字典持续维护，纳入基础人员字典。"
+    },
+    {
+      "id": "A08",
+      "domain": "COMM",
+      "relation": "COMM.DIAGNOSIS_DICT active profile",
+      "mode": "full",
+      "metrics": {"total": 50220, "min_create": "2021-08-10 14:23:22", "max_create": "2026-02-12 15:55:01", "rows_last_12m": 4},
+      "decision": "诊断字典有近期维护，纳入诊断字典。"
+    },
+    {
+      "id": "A09",
+      "domain": "MEDADM",
+      "relation": "MEDADM.BEDPATS_IN_HOSPITAL full max dates",
+      "mode": "full",
+      "metrics": {"total": 4854018, "min_stat": "2013-12-06 00:00:00", "max_stat": "2026-07-02 00:00:00", "min_adm": "2013-11-21 14:35:25", "max_adm": "2026-07-02 22:48:25", "stat_rows_last_12m": 433555},
+      "decision": "在院床位日快照仍持续产生，作为住院管理候选事实纳入。"
+    },
+    {
+      "id": "A05",
+      "domain": "COMM",
+      "relation": "COMM.OPERATION_LOG excluded log profile",
+      "mode": "sample",
+      "metrics": {"sample_rows": 200000, "min_oper_date": "2023-03-31 11:04:09", "max_oper_date": "2023-08-25 12:13:34", "rows_last_12m": 0},
+      "decision": "用户确认操作日志不纳入业务关系图谱主线。"
+    },
+    {
+      "id": "OED01",
+      "domain": "ORDADM",
+      "relation": "ORDERS_EXECUTE_DETAILS -> ORDERS by patient/order",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "matched": 199973, "orphan": 27, "min_exec_time": "2022-03-14 00:16:38", "max_exec_time": "2026-06-30 16:00:00"},
+      "decision": "纳入医嘱执行事实。"
+    },
+    {
+      "id": "OED02",
+      "domain": "DRUG_USER",
+      "relation": "INP_ORDER_EXECDATA -> ORDERS by patient/order",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "matched": 199306, "orphan": 694, "min_start_time": "2025-05-09 18:13:00", "max_start_time": "2025-11-30 12:05:47", "min_disp_date": "2025-07-04 00:00:00", "max_disp_date": "2025-11-30 12:05:47"},
+      "decision": "纳入住院用药/医嘱执行事实。"
+    },
+    {
+      "id": "OED03",
+      "domain": "DRUG_USER",
+      "relation": "INP_ORDER_EXECDATA -> PHA_INP_REQUEST_DRUG by patient/order",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "matched": 199305, "orphan": 695},
+      "decision": "可衔接住院发药申请链路。"
+    },
+    {
+      "id": "P01",
+      "domain": "INPBILL",
+      "relation": "PREPAYMENT_RCPT -> PAT_MASTER_INDEX by PATIENT_ID",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "matched": 199945, "orphan": 55, "min_transact_date": "2014-01-01 00:46:32", "max_transact_date": "2015-04-29 16:48:19"},
+      "decision": "纳入患者缴费/预交金事实。"
+    },
+    {
+      "id": "P02",
+      "domain": "INPBILL",
+      "relation": "PREPAYMENT_RCPT -> PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "visit_null_or_zero": 140796, "matched_nonzero": 59131, "orphan_nonzero": 73},
+      "decision": "非零 VISIT_ID 子集可挂住院；VISIT_ID 为空/0 的记录仍作为患者级缴费事实。"
+    },
+    {
+      "id": "P03",
+      "domain": "INPBILL",
+      "relation": "PREPAYMENT_RCPT refund self-reference",
+      "mode": "sample",
+      "sample_size": 200000,
+      "metrics": {"sample_rows": 200000, "refund_key_nonnull": 202, "matched_refund": 202, "orphan_refund": 0},
+      "decision": "退款收据自关联成立。"
+    },
+    {
+      "id": "P04",
+      "domain": "INPBILL",
+      "relation": "PREPAYMENT_RCPT active profile",
+      "mode": "full",
+      "metrics": {"total": 27480767, "min_transact_date": "2014-01-01 00:46:32", "max_transact_date": "2026-07-03 10:18:09", "rows_last_12m": 2996173, "rows_last_1m": 251006},
+      "decision": "预交金记录持续产生，必须纳入费用闭环。"
+    },
+    {
+      "id": "V01",
+      "domain": "LAB",
+      "relation": "LAB_TEST_MASTER VISIT_ID=0/NULL -> OUTPADM.CLINIC_MASTER by PATIENT_ID and requested date",
+      "mode": "sample",
+      "sample_size": 50000,
+      "metrics": {"sample_rows": 50000, "matched_same_day_clinic": 46707, "matched_near_day_clinic": 47217, "min_requested": "2014-01-01 00:18:31", "max_requested": "2026-07-02 14:04:11"},
+      "decision": "按用户确认口径归为门诊检验；患者+申请日期可作为门诊候选关联，但非唯一强键。"
+    },
+    {
+      "id": "V02",
+      "domain": "EXAM",
+      "relation": "EXAM_MASTER VISIT_ID=0/NULL -> OUTPADM.CLINIC_MASTER by PATIENT_ID and req date",
+      "mode": "sample",
+      "sample_size": 50000,
+      "metrics": {"sample_rows": 50000, "matched_same_day_clinic": 49894, "matched_near_day_clinic": 49997, "min_req": "2014-01-01 01:52:49", "max_req": "2014-12-16 14:13:52"},
+      "decision": "按用户确认口径归为门诊检查；患者+申请日期可作为门诊候选关联，但非唯一强键。"
+    }
+  ],
+  "first_version_asset_scope": {
+    "include_owners": ["MEDREC", "INPADM", "ORDADM", "LAB", "EXAM", "INPBILL", "OUTPBILL", "OUTPADM", "DRUG_USER", "PHARMACY", "COMM", "MEDADM"],
+    "exclude_table_patterns": ["ST_*", "*_LOG", "*LOG*", "接口中间表", "临时/备份表", "纯统计汇总表"],
+    "force_include_tables": ["ORDADM.ORDERS_EXECUTE_DETAILS", "DRUG_USER.INP_ORDER_EXECDATA", "INPBILL.PREPAYMENT_RCPT", "MEDADM.BEDPATS_IN_HOSPITAL", "COMM.DEPT_DICT", "COMM.STAFF_DICT", "COMM.PRICE_LIST", "COMM.DIAGNOSIS_DICT"],
+    "exclude_tables": ["COMM.OPERATION_LOG"],
+    "outpatient_lab_exam_rule": "LAB/EXAM 中 VISIT_ID=0/NULL 的记录按门诊口径归类；当前可用 PATIENT_ID+申请日期挂 OUTPADM.CLINIC_MASTER 候选，后续继续寻找 RCPT_NO/ORDER_ID/门诊号强键。"
+  },
+  "next_plan": [
+    "生成独立 HIS 源端资产包草案：tables/columns/relationships，增加 source_db/source_owner/table_role/include_status/exclude_reason。",
+    "对纳入范围打标签：core_fact、dimension、execution_fact、payment_fact、candidate、excluded。",
+    "补验 ORDERS_EXECUTE_DETAILS、INP_ORDER_EXECDATA、PREPAYMENT_RCPT 的正式关系并写入 HIS 源端关系清单。",
+    "继续寻找门诊检验/检查与 OUTPADM.CLINIC_MASTER 的强关联键，优先检查 RCPT_NO、ORDER_ID、CLINIC_NO、VISIT_DATE/VISIT_NO 相关链路。",
+    "将 ST_*、*_LOG、接口中间表从第一版业务事实图谱排除，但在资产目录中可保留为 excluded/candidate。"
+  ],
+  "remaining_uncertainties": [
+    "门诊检验/检查目前只有患者+日期候选关联，不能当作唯一强键；还需继续找门诊号、收费号或医嘱号桥接。",
+    "接口中间表的识别目前依赖命名规则和少量业务判断，需要后续在资产包中保留可人工调整的 include_status。",
+    "MEDADM 中非 ST_* 的管理表是否全部纳入，还需按表名和字段再做一次裁剪。"
+  ]
+}

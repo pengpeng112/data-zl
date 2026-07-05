@@ -1,0 +1,866 @@
+{
+  "summary": {
+    "business_app_table_count": 2253,
+    "business_app_column_count": 35593,
+    "doc_union_tables": 435,
+    "doc_matched_tables": 415,
+    "doc_missing_tables": 20,
+    "core_doc_tables": 368,
+    "core_doc_matched": 348,
+    "drug_doc_tables": 67,
+    "drug_doc_matched": 67,
+    "doc_matched_also_in_ods_his": 65,
+    "doc_matched_not_in_ods_his": 350,
+    "ods_his_tables": 273,
+    "ods_his_in_doc_or_business_match": 65
+  },
+  "doc_match_owner_counts": {
+    "COMM": 151,
+    "DRUG_USER": 71,
+    "PHARMACY": 40,
+    "MEDADM": 38,
+    "MEDREC": 19,
+    "EXAM": 19,
+    "INPBILL": 19,
+    "OUTPBILL": 15,
+    "ACCT": 13,
+    "LAB": 13,
+    "OUTPADM": 7,
+    "INPADM": 6,
+    "ORDADM": 5,
+    "OUTPDOCT": 3,
+    "PORTAL_SSO": 2,
+    "PORTAL_USER": 2,
+    "HISUSER": 1
+  },
+  "critical_status": [
+    {
+      "table": "PAT_MASTER_INDEX",
+      "owners": [
+        {
+          "owner": "MEDREC",
+          "num_rows_stats": 1905243,
+          "column_count": 113,
+          "primary_key": [
+            "PATIENT_ID"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "PAT_VISIT",
+      "owners": [
+        {
+          "owner": "MEDREC",
+          "num_rows_stats": 574677,
+          "column_count": 268,
+          "primary_key": [
+            "PATIENT_ID",
+            "VISIT_ID"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "DIAGNOSIS",
+      "owners": [
+        {
+          "owner": "MEDREC",
+          "num_rows_stats": 3298728,
+          "column_count": 23,
+          "primary_key": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "DIAGNOSIS_TYPE",
+            "DIAGNOSIS_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "ORDERS",
+      "owners": [
+        {
+          "owner": "ORDADM",
+          "num_rows_stats": 41033928,
+          "column_count": 88,
+          "primary_key": []
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "LAB_TEST_MASTER",
+      "owners": [
+        {
+          "owner": "LAB",
+          "num_rows_stats": 9137516,
+          "column_count": 49,
+          "primary_key": [
+            "TEST_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "LAB_TEST_ITEMS",
+      "owners": [
+        {
+          "owner": "LAB",
+          "num_rows_stats": 9336684,
+          "column_count": 16,
+          "primary_key": [
+            "TEST_NO",
+            "ITEM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "LAB_RESULT",
+      "owners": [
+        {
+          "owner": "LAB",
+          "num_rows_stats": 93669749,
+          "column_count": 26,
+          "primary_key": [
+            "TEST_NO",
+            "ITEM_NO",
+            "PRINT_ORDER"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "EXAM_MASTER",
+      "owners": [
+        {
+          "owner": "EXAM",
+          "num_rows_stats": 3401210,
+          "column_count": 58,
+          "primary_key": [
+            "EXAM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "EXAM_REPORT",
+      "owners": [
+        {
+          "owner": "EXAM",
+          "num_rows_stats": 1336968,
+          "column_count": 14,
+          "primary_key": [
+            "EXAM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "OPERATION",
+      "owners": [
+        {
+          "owner": "MEDREC",
+          "num_rows_stats": 527828,
+          "column_count": 31,
+          "primary_key": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "OPERATION_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "CLINIC_MASTER",
+      "owners": [
+        {
+          "owner": "OUTPADM",
+          "num_rows_stats": 5642159,
+          "column_count": 94,
+          "primary_key": [
+            "VISIT_DATE",
+            "VISIT_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "OUTP_RCPT_MASTER",
+      "owners": [
+        {
+          "owner": "OUTPBILL",
+          "num_rows_stats": 9802063,
+          "column_count": 56,
+          "primary_key": [
+            "RCPT_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "OUTP_BILL_ITEMS",
+      "owners": [
+        {
+          "owner": "OUTPBILL",
+          "num_rows_stats": 30509143,
+          "column_count": 64,
+          "primary_key": [
+            "VISIT_DATE",
+            "VISIT_NO",
+            "ITEM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "INP_SETTLE_MASTER",
+      "owners": [
+        {
+          "owner": "INPBILL",
+          "num_rows_stats": 603455,
+          "column_count": 20,
+          "primary_key": [
+            "RCPT_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "INP_BILL_DETAIL",
+      "owners": [
+        {
+          "owner": "INPBILL",
+          "num_rows_stats": 218921398,
+          "column_count": 74,
+          "primary_key": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ITEM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "DRUG_DICT",
+      "owners": [
+        {
+          "owner": "COMM",
+          "num_rows_stats": 5962,
+          "column_count": 21,
+          "primary_key": [
+            "DRUG_CODE",
+            "DRUG_SPEC",
+            "DRUG_INDICATOR"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "DRUG_PRESC_MASTER",
+      "owners": [
+        {
+          "owner": "PHARMACY",
+          "num_rows_stats": 6686034,
+          "column_count": 60,
+          "primary_key": [
+            "PRESC_DATE",
+            "PRESC_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "DRUG_PRESC_DETAIL",
+      "owners": [
+        {
+          "owner": "PHARMACY",
+          "num_rows_stats": 16531160,
+          "column_count": 35,
+          "primary_key": [
+            "PRESC_DATE",
+            "PRESC_NO",
+            "ITEM_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "DRUG_DISPENSE_REC",
+      "owners": [
+        {
+          "owner": "PHARMACY",
+          "num_rows_stats": 45392994,
+          "column_count": 30,
+          "primary_key": [
+            "DISPENSING_DATE_TIME",
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ORDER_NO",
+            "ORDER_SUB_NO"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "MED_DICT_BASEINFO",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 6040,
+          "column_count": 102,
+          "primary_key": [
+            "DRUG_CODE"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "MED_DICT_PRICE",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 8488,
+          "column_count": 47,
+          "primary_key": [
+            "DRUG_PRI"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "MED_DICT_FACTORY",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 1569,
+          "column_count": 48,
+          "primary_key": [
+            "FACTORY_ID"
+          ]
+        }
+      ],
+      "in_ods_his": true
+    },
+    {
+      "table": "PHA_INP_DISPMASTER",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 336816,
+          "column_count": 22,
+          "primary_key": [
+            "DIS_RECORDNO"
+          ]
+        }
+      ],
+      "in_ods_his": false
+    },
+    {
+      "table": "PHA_INP_DISPDETAIL",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 4729145,
+          "column_count": 55,
+          "primary_key": [
+            "ORG_CODE",
+            "RECORD_NO"
+          ]
+        }
+      ],
+      "in_ods_his": false
+    },
+    {
+      "table": "PHA_CLI_REQUEST_DRUG",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 2044542,
+          "column_count": 127,
+          "primary_key": [
+            "ID"
+          ]
+        }
+      ],
+      "in_ods_his": false
+    },
+    {
+      "table": "PHA_VISIT_DISPMASTER",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 0,
+          "column_count": 14,
+          "primary_key": [
+            "ORG_CODE",
+            "PHA_CODE",
+            "PRESC_NO"
+          ]
+        }
+      ],
+      "in_ods_his": false
+    },
+    {
+      "table": "PHA_VISIT_DISPDETAIL",
+      "owners": [
+        {
+          "owner": "DRUG_USER",
+          "num_rows_stats": 2095101,
+          "column_count": 43,
+          "primary_key": [
+            "RECORD_NO"
+          ]
+        }
+      ],
+      "in_ods_his": false
+    }
+  ],
+  "doc_missing_tables": [
+    "ALERGY_DRUGS",
+    "CLINIC_DIAGNOSIS",
+    "CURRENT_PRICE_LIST",
+    "DEPT_ADT",
+    "DEPT_EFFCIENCY",
+    "DIET_DICT",
+    "DRUG_ALERGY_SEVERITY_DICT",
+    "DRUG_PURCHASE_PLAN",
+    "EQUIP_VS_FEE_DICT",
+    "EXAM_ITEM_DICT",
+    "FINAL_CHIEF_DIAGNOSIS",
+    "INP_BILL_CHECKED",
+    "ITEM_CLASS_VS_OTHER_CLASS",
+    "LAB_ITEM_DICT",
+    "LAB_ITEM_NAME_DICT",
+    "NURSING_DICT",
+    "PAY_STYLE_DICT",
+    "QUALITY_GRAND_DICT",
+    "TREAT_ITEM_DICT",
+    "TREAT_ITEM_NAME_DICT"
+  ],
+  "doc_matched_not_in_ods_his_sample": [
+    "ACCIDENT_REC",
+    "ACCI_CLASS_DICT",
+    "ACCI_REASON_DICT",
+    "ACCI_RESULTED_DICT",
+    "ACCI_TYPE_DICT",
+    "ACCT_SNO",
+    "ADMISSION_CAUSE_DICT",
+    "ALERGY_DRUGS_DICT",
+    "ANCI_EXAM_ITEM_DICT",
+    "ANCI_TREAT_ITEM_DICT",
+    "APP_GRANTS",
+    "ARMED_SERVICES_DICT",
+    "ASST_PLAN_INDEX",
+    "AUTO_SETTING",
+    "BACKUP_PATIENT",
+    "BACKUP_STUDY",
+    "BED_APPROVED_TYPE_DICT",
+    "BED_CLASS_DICT",
+    "BED_STATUS_DICT",
+    "BED_TYPE_DICT",
+    "BILLING_GROUP_DICT",
+    "BILL_DEPT_CONFIG",
+    "BILL_ITEM_CLASS_DICT",
+    "BILL_MISC_ITEM",
+    "BILL_PATTERN_DETAIL",
+    "BILL_PATTERN_MASTER",
+    "BILL_UNITS_DICT",
+    "BLOOD_TRANSFUSION",
+    "CASHER_NO_REC",
+    "CASHER_WORKING_LOG",
+    "CDIAG_ITEM_DICT",
+    "CDRUG_PROJECT_ITEMS",
+    "CDRUG_PROJECT_MASTER",
+    "CHARGE_PRICE_SCHEDULE",
+    "CHARGE_REDUCE_DETAIL",
+    "CHARGE_REDUCE_MASTER",
+    "CHARGE_SPECIAL_EXCEPT_DICT",
+    "CHARGE_SPECIAL_ITEM_DICT",
+    "CHARGE_TYPE_VS_IDENTITY",
+    "CHECK_LABEL_DICT",
+    "CLASS_CODING_CONFIG",
+    "CLASS_CODING_RULE",
+    "CLIENT_INSTALLATION",
+    "CLINICAL_DEPT_CONFIG",
+    "CLINIC_APPOINTS",
+    "CLINIC_FOR_REGIST",
+    "CLINIC_ITEM_CLASS_DICT",
+    "CLINIC_ITEM_NAME_DICT",
+    "CLINIC_MASTER_DAYNUMBER_TEMP",
+    "CLINIC_OPER_LOG",
+    "CLINIC_SCHEDULE",
+    "CLINIC_TYPE_CHARGE_DICT",
+    "CLINIC_TYPE_SETTING",
+    "DATAWINDOW_UI_CONTROL",
+    "DAY_OF_WEEK_DICT",
+    "DEPT_ASST_DAY",
+    "DEPT_CLASS_FOR_ACCT_DICT",
+    "DEPT_CODE_VS_FACTID",
+    "DEPT_EMPTY_BED",
+    "DEPT_EXAM_DAY",
+    "DEPT_IS_ATTR_DICT",
+    "DEPT_LOAD_DAY",
+    "DEPT_OI_ATTR_DICT",
+    "DEPT_OUTP_NUM_DAY",
+    "DEPT_TEST_DAY",
+    "DEPT_VS_CLASS_FOR_ACCT",
+    "DIAGNOSTIC_CATEGORY",
+    "DIAG_COMPARING",
+    "DIAG_COMP_GROUP_DICT",
+    "DIAG_CORR_DICT",
+    "DIET_PROVIDER_DICT",
+    "DISE_CLASS_STAT_DICT",
+    "DISE_QUERY_CONDITION",
+    "DOCTOR_ORDERS",
+    "DOCTOR_TITLE_DICT",
+    "DOSAGE_UNITS_DICT",
+    "DRUG_CLASS_DICT",
+    "DRUG_CODING_RULE",
+    "DRUG_DISPENSE_PRE",
+    "DRUG_DISPENSE_REQ",
+    "DRUG_DISPENS_PROPERTY",
+    "DRUG_DISP_PROPERTY_DICT",
+    "DRUG_EXPORT_CLASS_DICT",
+    "DRUG_EXPORT_DETAIL",
+    "DRUG_EXPORT_MASTER",
+    "DRUG_FORM_DICT",
+    "DRUG_IMPORT_CLASS_DICT",
+    "DRUG_IMPORT_DETAIL",
+    "DRUG_IMPORT_MASTER",
+    "DRUG_INCOMPATIBILITY",
+    "DRUG_INFO",
+    "DRUG_MATERIAL_TALLY_REC",
+    "DRUG_NAME_DICT",
+    "DRUG_PACKAGES",
+    "DRUG_PRESC_ATTR_DICT",
+    "DRUG_PRESC_DETAIL_TEMP",
+    "DRUG_PRESC_MASTER_TEMP",
+    "DRUG_PROVIDE_APPLICATION",
+    "DRUG_PROVIDE_NOTICE",
+    "DRUG_STOCK",
+    "DRUG_STOCK_BALANCE",
+    "DRUG_STOCK_LOCATION",
+    "DRUG_STORAGE_DEPT",
+    "DRUG_STORAGE_PROFILE",
+    "DRUG_SUB_STORAGE_DICT",
+    "DRUG_SUPPLIER_CATALOG",
+    "DRUG_TOXI_PROPERTY_DICT",
+    "DUTY_DICT",
+    "ECON_DESC",
+    "ECON_REPORT_PATTERN",
+    "EMERGENCY_DAY",
+    "EMP_DICT",
+    "EXAM_APPOINTS",
+    "EXAM_BILL_ITEMS",
+    "EXAM_DIAG_DICT",
+    "EXAM_GROUP_DICT",
+    "EXAM_IMAGE_INDEX",
+    "EXAM_INQUIRY",
+    "EXAM_INTERVAL",
+    "EXAM_PAT_MI",
+    "EXAM_SCHEDULE",
+    "EXAM_SUBDEPT_DICT",
+    "EXAM_USER",
+    "EXAM_WORKING_PLAN",
+    "EXTRA_COSTS_DICT",
+    "FAMILY_DICT",
+    "FORMULAR_DICT",
+    "HEAL_DICT",
+    "HELP_MSG",
+    "HOSPITAL_CONFIG",
+    "IDENTITY_DICT",
+    "INIT_ACCOUNT_LOG",
+    "INPUT_CODE_DICT",
+    "INPUT_SETTING",
+    "INP_ACCT_DETAIL",
+    "INP_ACCT_MASTER",
+    "INP_ACCT_MONEY",
+    "INP_BILL_DETAIL_BACK",
+    "INP_DIET_COSTS",
+    "INP_PAYMENTS_MONEY",
+    "INP_RCPT_FEE_DICT",
+    "INP_SETTLE_DETAIL",
+    "INSTRUMENT_CONFIG",
+    "JOB_CLASS_DICT",
+    "LAB_DEPT_TEST_DAY",
+    "LAB_DEPT_TEST_MONTH",
+    "LAB_ITEM_VS_CLASS",
+    "LAB_LIST_RESULT_DICT",
+    "LAB_ORDER_VS_REPORT",
+    "LAB_REPORT_ITEM_DICT",
+    "LAB_REPORT_VS_ORDER",
+    "LAB_RESULT_TEMP",
+    "LAB_RESULT_TYPE_VS_VALUES",
+    "LAB_SHEET_ITEMS",
+    "LAB_SHEET_MASTER",
+    "LIVE_BILL_DETAIL",
+    "LOCAL_ID_CLASS_DICT",
+    "MANAGED_DRUG_CATALOG",
+    "MANAGED_DRUG_CLASS_DICT",
+    "MEASURES_DICT",
+    "MEDCARD_PRIVILEGE_DICT",
+    "MEDICAL_COSTS",
+    "MED_ADJUST_PRICE_DETAIL",
+    "MED_ADJUST_PRICE_LIST",
+    "MED_ADJUST_PRICE_MASTER",
+    "MED_CARE_DETAIL",
+    "MED_CARE_MASTER",
+    "MED_CHECK_DETAIL",
+    "MED_CHECK_MASTER",
+    "MED_CODE_GENERATE_RULE",
+    "MED_CODE_MASTER",
+    "MED_DETAIL_STORAGE",
+    "MED_DICT_BASEINFO_RECORD",
+    "MED_DICT_DEPT",
+    "MED_DICT_INTYPE",
+    "MED_DICT_LOC",
+    "MED_DICT_LOCRULE",
+    "MED_DICT_OUTTYPE",
+    "MED_DICT_PRICE_RECORD",
+    "MED_DICT_SUPPLIER",
+    "MED_DRUG_LOC",
+    "MED_FIN_DAYDETAIL",
+    "MED_FIN_DAYSETTLE",
+    "MED_FIN_MONTHDETAIL",
+    "MED_FIN_MONTHSETTLE",
+    "MED_INIT_ACCOUNT",
+    "MED_IN_DETAIL",
+    "MED_IN_MASTER",
+    "MED_IN_PAY",
+    "MED_IN_PAYDETAIL",
+    "MED_IN_PLAN",
+    "MED_IN_PLAN_DETAIL",
+    "MED_OUT_DETAIL",
+    "MED_OUT_MASTER",
+    "MED_PHARMACY",
+    "MED_STORAGE",
+    "MED_TRACE_RECORD",
+    "MED_TRACE_STORGE",
+    "MESSAGE_CENTER",
+    "META_DATA"
+  ],
+  "ods_his_not_in_doc_match_sample": [
+    "11111",
+    "ACT监测大于1次",
+    "ADMINISTRATION_DICT",
+    "BEDPATS_IN_HOSPITAL",
+    "BED_REC_LOG",
+    "BED_TRANS_LOG",
+    "BI_INP_BILL_DAY_DOCTOR_SUM",
+    "BI_OUTP_FEE_DAY_SUM",
+    "BNP",
+    "CA_LOGIN_INFO",
+    "CA_STAMPSIGN_LOG",
+    "CDA_DICTIONARY",
+    "CHARGE_TYPE_DICT_ZDY",
+    "CHARGE_TYPE_DICT_ZDY_BX",
+    "CLINIC_RETURNED_ACCT",
+    "CONSULTATION_DOCTOR_DETAIL",
+    "CONSULTATION_DOCTOR_MASTER",
+    "CONSULTATION_MDT_DETAIL",
+    "CONSULTATION_MDT_MASTER",
+    "C反应蛋白",
+    "D07_EXAM_ITEM_MAP",
+    "DATA_EXT_TEMP",
+    "DEPT_VS_WARD_NEW",
+    "DIAGNOSIS_EMR",
+    "DIAGNOSIS_GB",
+    "DIAGNOSIS_JH",
+    "DIM_AREA_MAPPING",
+    "DISPOSAL_LOG",
+    "DOCTOR_GROUP",
+    "DRUG_DISPENSE_REC_MASTER",
+    "DW_PROJECT_DOWNLOAD_LOG",
+    "DW_PROJECT_DOWNLOAD_LOG0401",
+    "DW_PROJECT_INFO",
+    "DW_PROJECT_INFO0401",
+    "DW_PROJECT_INFO_ONE",
+    "EMPLCODELIST",
+    "EMPL_LEVE",
+    "EXAM_CLASS_DICT_NEW",
+    "EXP_DICT_1",
+    "EXP_DICT_Z",
+    "EXP_DICT_ZZ",
+    "EXP_DICT_ZZD",
+    "FLJL",
+    "FLJL_copy1",
+    "HIS_VS_HRP_DEPT",
+    "INP_BILL_DETAIL20260324",
+    "INP_SETTLE_MASTER_YB",
+    "INP_SETTLE_MASTER_YB_0122",
+    "INSUR_CATALOG_NEW",
+    "INSUR_VSH_CENTER_ITEM_NEW",
+    "INSUR_VSH_CENTER_ITEM_NEW0401",
+    "INSUR_VSH_CENTER_ITEM_NEW_TEMP",
+    "LAB_RESULT_MAPPING",
+    "LAB_TEST_ITEMS_DETAIL",
+    "LIS_EXAMINE_ITEM_MAP",
+    "LS",
+    "LS2",
+    "LS3",
+    "LS4",
+    "LS5",
+    "MR_AREA_DICT",
+    "MR_BASE_DICT",
+    "MR_BILL_CLASS_DICT",
+    "MR_BILL_COSTS",
+    "MR_BILL_COSTS_PATIENTINF",
+    "MR_COMM_VS_HIS_COMM",
+    "NEWBORN_REC",
+    "NURSING_DEPT_REL",
+    "OPERATION_GB",
+    "OPERATION_MASTER",
+    "OPERATION_YB",
+    "OPS_CLINIC_DEPT_VS",
+    "OPS_CLINIC_INFO_PROVINCE",
+    "OPS_EMERGENCY_TRIAGE_INFO",
+    "OPS_TREAT_NARCOTISM",
+    "ORDERS00507543",
+    "ORDERS_COSTS_TEST",
+    "ORDERS_EXECUTE_DETAILS_TEST",
+    "ORDERS_TEST",
+    "ORDER_BILLING_LOG",
+    "ORDER_BILLING_LOG_TEST",
+    "ORDER_BILLING_TYPE_LOG",
+    "ORDER_BILLING_TYPE_LOG_TEST",
+    "ORDER_CLASS_DICT",
+    "ORDER_SPLIT_LOG",
+    "ORDER_SPLIT_LOG_TEST",
+    "OUTP_MR",
+    "OUTP_MR_DIAG_DESC",
+    "OUTP_ORDERS",
+    "OUTP_PRESC_T",
+    "OUTP_TREAT_REC",
+    "PATS_IN_HOSPITAL_TEST",
+    "PAT_MASTER_RENAME_LOG",
+    "PH_SS",
+    "PORTAL_SYS_DICT",
+    "PUB_DICTIONARY",
+    "PUB_SKIN_TEST",
+    "REJECT_ITEM",
+    "SETTLE_ZY_REC",
+    "SPECIAL_CONSUL_NOFEE_SETTING",
+    "SPECIAL_DURG_RECORD",
+    "STAT_VS_CHARGE_TYPE",
+    "STAT_WARD_MODIFYFIX",
+    "SYS_EMPLOYEE",
+    "SYS_ROLE",
+    "SYS_ROLE_PERMISSION",
+    "SYS_USER_ROLE",
+    "TEMP20260211",
+    "TEMP_ORDER_FEE_DIAG_OPER",
+    "TEST_ONE",
+    "TMEP1",
+    "WAED_ADT_DAY",
+    "WARD_TRANSFER",
+    "XHAAA",
+    "YYXMBM",
+    "YYXMBM0401",
+    "ZJH",
+    "py_temp",
+    "zy_register_log",
+    "七叶皂苷注射液",
+    "不得收取麻醉中监测费用",
+    "不得重复收取一般专项护理",
+    "不得重复收取气管切开护理",
+    "中长链脂肪乳注射液",
+    "乳腺肿物切除术",
+    "乳腺肿物穿刺术计价为次",
+    "住院诊查费",
+    "作业疗法每日支付不超过1次",
+    "冠状动脉成像时同时收取增强扫描",
+    "单方",
+    "同一手术两个切口",
+    "咽鼓管压力测定",
+    "基础护理费",
+    "复方氨基酸注射液",
+    "复杂模拟定位",
+    "大关节松动训练单日计费大于1",
+    "妇科特殊治疗限女性",
+    "孕酮测定限女性",
+    "居民住院",
+    "开展关节置换术同时收取",
+    "开展断指再植术同时收取肌腱",
+    "异地出院",
+    "心外科收取手术项下ACT监测费用",
+    "心电监测费用",
+    "快速石蜡切片检查住院",
+    "快速石蜡切片检查住院_新",
+    "快速石蜡切片检查门诊",
+    "手术标本检查与诊断单切",
+    "收取一次性使用呼吸过滤器费用",
+    "收取一次性使用麻醉穿刺包费用",
+    "收取一次性床垫费用住院",
+    "收取一次性床垫费用门诊",
+    "收取临床操作的彩色多普勒",
+    "收取冷光源治疗费用",
+    "收取单胎顺产接生费用同时收取宫",
+    "收取尿常规检查加沉渣费用住院",
+    "收取尿常规检查加沉渣费用门诊",
+    "收取心肺复苏术费用同时收气管",
+    "收取机械辅助排痰费用同时收取",
+    "收取疼痛综合评估费用",
+    "收取疾病健康教育费用",
+    "收取粪便常规费用同时收取隐血试",
+    "收取高流量湿化氧疗费用同时收取",
+    "收取高频电刀使用费用",
+    "收取高频电刀使用费用同时收取双",
+    "收取麻醉中监测费用同时收",
+    "收射频消融术同时收彩色多普勒超",
+    "整蛋白型肠内营养剂",
+    "日常生活能力评定",
+    "日常生活能力评定一个疾病过程",
+    "未使用双极电凝镊收取费用住院",
+    "未使用双极电凝镊收取费用门诊",
+    "术中体温监测",
+    "氧气吸入费用",
+    "水合氯醛糖浆组合包装违规记录表",
+    "游离前列腺特异性抗原测定",
+    "病房床位费",
+    "病种数据",
+    "盐酸坦索罗辛缓释胶囊女用男药",
+    "稳态诱听",
+    "纤维结肠镜检查住院",
+    "纤维结肠镜检查住院_新",
+    "纤维结肠镜检查门诊",
+    "纤维胃十二指肠镜检查住院",
+    "纤维胃十二指肠镜检查住院_新",
+    "纤维胃十二指肠镜检查门诊",
+    "经同一切口进行的两种不同疾病",
+    "编码33手术项目中项目名称带腹腔",
+    "职工住院",
+    "肠切除术费用同时收取肠粘连松解",
+    "肩外展功能重建术",
+    "肺癌根治术收取肺楔形切除术",
+    "肿瘤标志物",
+    "胃肠减压费用",
+    "胸腔闭式引流",
+    "脊柱椎间融合器植入植骨融合术时",
+    "血栓弹力图试验TEG",
+    "血氧饱和度监测",
+    "血清天门冬氨酸氨基转移酶测定",
+    "血清总蛋白测定超1次收费"
+  ]
+}

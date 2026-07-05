@@ -1,0 +1,1595 @@
+{
+  "meta": {
+    "source_meta": "08_数据中心元数据快照.json",
+    "relation_validation": "10_关系验证报告.md / 10_关系验证结果.json",
+    "generated_by": "tools/build_asset_package.py",
+    "note": "tables/columns 来自活元数据(全量);relationships 为已确认关系，并追加数据库实测验证等级"
+  },
+  "tables": [
+    {
+      "schema": "HIS",
+      "table": "PAT_MASTER_INDEX",
+      "comment": "病人主索引",
+      "row_count_stats": 1939319,
+      "domain": "患者主数据",
+      "grain": "一名患者",
+      "pk": [
+        "PATIENT_ID"
+      ],
+      "confidence": "A",
+      "note": "患者主索引;含 INP_NO 住院号用于关联 EMR 文书"
+    },
+    {
+      "schema": "HIS",
+      "table": "PAT_VISIT",
+      "comment": "病人住院主记录",
+      "row_count_stats": 575041,
+      "domain": "就诊",
+      "grain": "一名患者一次住院",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": "住院就诊事实主表;出院时间常用于上报范围"
+    },
+    {
+      "schema": "HIS",
+      "table": "DIAGNOSIS",
+      "comment": "诊断记录 ",
+      "row_count_stats": 3324186,
+      "domain": "诊断",
+      "grain": "一次住院×一条诊断",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "DIAGNOSIS_TYPE",
+        "DIAGNOSIS_NO"
+      ],
+      "confidence": "A",
+      "note": "DIAGNOSIS_TYPE: 2入院3出院8病理7损伤1门急诊"
+    },
+    {
+      "schema": "HIS",
+      "table": "DIAGNOSIS_TYPE_DICT",
+      "comment": "诊断类别字典",
+      "row_count_stats": 12,
+      "domain": "诊断字典",
+      "grain": "一个诊断类型",
+      "pk": [
+        "DIAGNOSIS_TYPE_CODE"
+      ],
+      "confidence": "A",
+      "note": "诊断类型字典"
+    },
+    {
+      "schema": "HIS",
+      "table": "DEPT_DICT",
+      "comment": "科室字典",
+      "row_count_stats": 815,
+      "domain": "科室字典",
+      "grain": "一个科室",
+      "pk": [
+        "DEPT_CODE"
+      ],
+      "confidence": "A",
+      "note": "含院内 DEPT_CODE/NAME;QMPT 为平台标准(如有)"
+    },
+    {
+      "schema": "HIS",
+      "table": "STAFF_DICT",
+      "comment": "工作人员字典",
+      "row_count_stats": 4216,
+      "domain": "人员字典",
+      "grain": "一名职工",
+      "pk": [
+        "EMP_NO"
+      ],
+      "confidence": "A",
+      "note": "医师工号/姓名/身份证"
+    },
+    {
+      "schema": "HIS",
+      "table": "DOC_REGISTER_EMP_MATCH",
+      "comment": "",
+      "row_count_stats": -1,
+      "domain": "人员字典",
+      "grain": "医师执业注册匹配",
+      "pk": [
+        "EMP_NO"
+      ],
+      "confidence": "A",
+      "note": "取医师执业证书号 PRACTICE_CERT_CODE"
+    },
+    {
+      "schema": "HIS",
+      "table": "PATS_IN_HOSPITAL",
+      "comment": "在院病人记录",
+      "row_count_stats": 1250,
+      "domain": "就诊",
+      "grain": "在院床位兜底",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": "病区/床号兜底"
+    },
+    {
+      "schema": "HIS",
+      "table": "ORDERS",
+      "comment": "医嘱",
+      "row_count_stats": 41033865,
+      "domain": "医嘱",
+      "grain": "一次住院×医嘱",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "ORDER_NO"
+      ],
+      "confidence": "B",
+      "note": "状态1新开2执行3停止有效/4作废无效"
+    },
+    {
+      "schema": "HIS",
+      "table": "CLINIC_MASTER",
+      "comment": "就诊记录",
+      "row_count_stats": 5642875,
+      "domain": "门诊",
+      "grain": "门诊就诊主记录",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_DATE",
+        "VISIT_NO"
+      ],
+      "confidence": "B",
+      "note": "门诊主线"
+    },
+    {
+      "schema": "HIS",
+      "table": "OUTP_MR",
+      "comment": "门诊病历记录",
+      "row_count_stats": 5684755,
+      "domain": "门诊",
+      "grain": "门诊病历",
+      "pk": [],
+      "confidence": "B",
+      "note": "与门诊就诊关联"
+    },
+    {
+      "schema": "HIS",
+      "table": "OUTP_RCPT_MASTER",
+      "comment": "门诊医疗收据记录",
+      "row_count_stats": 9819756,
+      "domain": "门诊费用",
+      "grain": "门诊收据主表",
+      "pk": [
+        "RCPT_NO"
+      ],
+      "confidence": "B",
+      "note": ""
+    },
+    {
+      "schema": "HIS",
+      "table": "OUTP_BILL_ITEMS",
+      "comment": "门诊病人诊疗费用项目",
+      "row_count_stats": 28614987,
+      "domain": "门诊费用",
+      "grain": "门诊收费明细",
+      "pk": [
+        "RCPT_NO",
+        "ITEM_NO"
+      ],
+      "confidence": "B",
+      "note": ""
+    },
+    {
+      "schema": "HIS",
+      "table": "INP_SETTLE_MASTER",
+      "comment": "住院病人结算主记录",
+      "row_count_stats": 622182,
+      "domain": "住院费用",
+      "grain": "住院结算主表",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": ""
+    },
+    {
+      "schema": "HIS",
+      "table": "INP_BILL_DETAIL",
+      "comment": "住院病人费用明细记录",
+      "row_count_stats": 215721688,
+      "domain": "住院费用",
+      "grain": "住院费用明细",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": "巨表(约2亿行),查询必限定"
+    },
+    {
+      "schema": "HIS",
+      "table": "LAB_TEST_MASTER",
+      "comment": "检验主记录",
+      "row_count_stats": 9134900,
+      "domain": "检验",
+      "grain": "一份检验报告",
+      "pk": [
+        "TEST_NO"
+      ],
+      "confidence": "A",
+      "note": "检验主表;住院 VISIT_ID 或 0/NULL=门诊"
+    },
+    {
+      "schema": "HIS",
+      "table": "LAB_TEST_ITEMS",
+      "comment": "检验项目",
+      "row_count_stats": 9602577,
+      "domain": "检验",
+      "grain": "报告×项目",
+      "pk": [
+        "TEST_NO",
+        "ITEM_NO"
+      ],
+      "confidence": "A",
+      "note": "PK_LAB_TEST_ITEMS2=ORDER_ID+ORDER_ITEM_ID"
+    },
+    {
+      "schema": "HIS",
+      "table": "LAB_RESULT",
+      "comment": "检验结果",
+      "row_count_stats": 96312418,
+      "domain": "检验",
+      "grain": "报告×项目×结果",
+      "pk": [
+        "TEST_NO",
+        "ITEM_NO",
+        "PRINT_ORDER"
+      ],
+      "confidence": "A",
+      "note": "约1亿行,查询必用 TEST_NO 限定"
+    },
+    {
+      "schema": "HIS",
+      "table": "LIS_EXAMINE_ITEM_MAP",
+      "comment": "LIS本地检验项目与平台检验项目值域对照表",
+      "row_count_stats": 4698,
+      "domain": "检验",
+      "grain": "检验项目平台值域映射",
+      "pk": [],
+      "confidence": "B",
+      "note": ""
+    },
+    {
+      "schema": "HIS",
+      "table": "EXAM_MASTER",
+      "comment": "检查主记录 ",
+      "row_count_stats": 3385322,
+      "domain": "检查",
+      "grain": "一份检查",
+      "pk": [
+        "EXAM_NO"
+      ],
+      "confidence": "A",
+      "note": "EXAM_CLASS 存中文(CT/磁共振),非字典内码"
+    },
+    {
+      "schema": "HIS",
+      "table": "EXAM_REPORT",
+      "comment": "检查报告",
+      "row_count_stats": 1314456,
+      "domain": "检查",
+      "grain": "检查报告",
+      "pk": [
+        "EXAM_NO"
+      ],
+      "confidence": "A",
+      "note": "无 PATIENT_ID,必经 EXAM_NO 关联 EXAM_MASTER"
+    },
+    {
+      "schema": "HIS",
+      "table": "OPERATION",
+      "comment": "手术记录",
+      "row_count_stats": 527895,
+      "domain": "手术",
+      "grain": "HIS侧手术/操作",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPERATION_NO"
+      ],
+      "confidence": "B",
+      "note": "OPER_ID 全为 NULL,不要用它关联手麻"
+    },
+    {
+      "schema": "MTL",
+      "table": "EPR_INPATIENT_DOCINDEX",
+      "comment": "存储住院病历索引信息，包括病历的状态",
+      "row_count_stats": 239860,
+      "domain": "电子病历(旧)",
+      "grain": "住院文书索引",
+      "pk": [
+        "UHID"
+      ],
+      "confidence": "A",
+      "note": "P_INPATIENT_NO=INP_NO, P_INPATIENT_TIMES=VISIT_ID"
+    },
+    {
+      "schema": "MTL",
+      "table": "EPR_INPATIENT",
+      "comment": "住院病历段落信息表。该表存储住院病历内容信息，以DATE_VALIDATED按年度进行分区存储。",
+      "row_count_stats": 3948751,
+      "domain": "电子病历(旧)",
+      "grain": "文书主表",
+      "pk": [
+        "UHID",
+        "ID"
+      ],
+      "confidence": "A",
+      "note": "DOC_TYPE_NAME like '%出院记录%' 等"
+    },
+    {
+      "schema": "MTL",
+      "table": "EMRSD_CONTENT",
+      "comment": "",
+      "row_count_stats": 3946778,
+      "domain": "电子病历(旧)",
+      "grain": "文书段落内容",
+      "pk": [
+        "UHID",
+        "段落编号"
+      ],
+      "confidence": "A",
+      "note": "段落内容为 CLOB;段落编号=EPR_INPATIENT.ID"
+    },
+    {
+      "schema": "JHEMR",
+      "table": "JHMR_FILE_INDEX",
+      "comment": "病历文书-业务类-新版本病历文件索引",
+      "row_count_stats": 1119370,
+      "domain": "电子病历(新)",
+      "grain": "文书索引",
+      "pk": [
+        "FILE_UNIQUE_ID"
+      ],
+      "confidence": "A",
+      "note": "FILE_FLAG<>'T' 有效;TOPIC like '%手术记录%'"
+    },
+    {
+      "schema": "JHEMR",
+      "table": "JHMR_FILE_CONTENT_DG",
+      "comment": "病历内容表-业务类-文档中节点内容存放表",
+      "row_count_stats": 2836299,
+      "domain": "电子病历(新)",
+      "grain": "文书打散内容",
+      "pk": [
+        "FILE_UNIQUE_ID"
+      ],
+      "confidence": "A",
+      "note": "含 PATIENT_ID+VISIT_ID，可直接挂 HIS 住院"
+    },
+    {
+      "schema": "JHEMR",
+      "table": "JHMR_FILE_CONTENT_TEXT",
+      "comment": "",
+      "row_count_stats": 1141816,
+      "domain": "电子病历(新)",
+      "grain": "文书正文",
+      "pk": [
+        "FILE_UNIQUE_ID"
+      ],
+      "confidence": "A",
+      "note": "MR_CONTENT 正文"
+    },
+    {
+      "schema": "JHEMR",
+      "table": "PAT_DIAGNOSIS",
+      "comment": "病历诊断-业务类-诊断录入诊断",
+      "row_count_stats": 772618,
+      "domain": "电子病历(新)",
+      "grain": "新 EMR 诊断",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": "按 PATIENT_ID+VISIT_ID 挂 HIS 住院"
+    },
+    {
+      "schema": "JHEMR",
+      "table": "FIRST_PAGE_COSTS",
+      "comment": "病案首页-业务类-首页费用(接口同步)",
+      "row_count_stats": 101225,
+      "domain": "电子病历(新)",
+      "grain": "病案首页费用",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "confidence": "A",
+      "note": "按 PATIENT_ID+VISIT_ID 挂 HIS 住院"
+    },
+    {
+      "schema": "SM",
+      "table": "MED_OPERATION_MASTER",
+      "comment": "病人手术主记录",
+      "row_count_stats": 138005,
+      "domain": "手术",
+      "grain": "手术主记录",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "confidence": "A",
+      "note": "手麻主表;不建议用 HIS.OPERATION.OPER_ID"
+    },
+    {
+      "schema": "SM",
+      "table": "MED_OPERATION_NAME",
+      "comment": "",
+      "row_count_stats": 141167,
+      "domain": "手术",
+      "grain": "手术操作明细",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID",
+        "OPERATION_NO"
+      ],
+      "confidence": "A",
+      "note": "一台手术多条操作"
+    },
+    {
+      "schema": "SM",
+      "table": "MED_ANESTHESIA_PLAN",
+      "comment": "",
+      "row_count_stats": 128978,
+      "domain": "手术/麻醉",
+      "grain": "麻醉计划",
+      "pk": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "confidence": "A",
+      "note": "可按 PATIENT_ID+VISIT_ID+OPER_ID 挂 SM.MED_OPERATION_MASTER"
+    },
+    {
+      "schema": "CDA",
+      "table": "CDA_DICTIONARY",
+      "comment": "",
+      "row_count_stats": 79031,
+      "domain": "字典",
+      "grain": "院内码↔国标码映射",
+      "pk": [],
+      "confidence": "A",
+      "note": "被所有 V_EMR_* 依赖;ICD-10: 字典名称='ICD-10诊断编码' 系统标识='HIS'"
+    },
+    {
+      "schema": "PORTAL_EMPI",
+      "table": "PATIENT_INFO",
+      "comment": "",
+      "row_count_stats": 1684177,
+      "domain": "患者主数据",
+      "grain": "EMPI患者主索引",
+      "pk": [],
+      "confidence": "B",
+      "note": "跨系统患者主索引;关联键待确认"
+    },
+    {
+      "schema": "YDHL",
+      "table": "MCS_ASSESS_FORM",
+      "comment": "全息评估记录主表",
+      "row_count_stats": 2382672,
+      "domain": "护理",
+      "grain": "护理评估主表",
+      "pk": [],
+      "confidence": "B",
+      "note": "PATIENT_UID 关联 INPATIENTS;GENERATOR_TYPE='manul' IS_VALID='1'"
+    },
+    {
+      "schema": "YDHL",
+      "table": "INPATIENTS",
+      "comment": "",
+      "row_count_stats": 276069,
+      "domain": "护理",
+      "grain": "住院患者表",
+      "pk": [],
+      "confidence": "B",
+      "note": "PAT_INDEX_NO=MCS_ASSESS_FORM.PATIENT_UID"
+    },
+    {
+      "schema": "YDHL",
+      "table": "MCS_DOC_FORM",
+      "comment": "文书表单",
+      "row_count_stats": 11637762,
+      "domain": "护理",
+      "grain": "护理文书表单",
+      "pk": [
+        "ID"
+      ],
+      "confidence": "A",
+      "note": "PATIENT_UID 关联 INPATIENTS"
+    },
+    {
+      "schema": "YDHL",
+      "table": "MCS_ASSESS_FORM_RECORD",
+      "comment": "全息评估记录副表--明细表",
+      "row_count_stats": 38220934,
+      "domain": "护理",
+      "grain": "护理评估明细",
+      "pk": [
+        "ID"
+      ],
+      "confidence": "A",
+      "note": "FORM_ID 关联 MCS_ASSESS_FORM.ID"
+    },
+    {
+      "schema": "PACS",
+      "table": "PATIENTINFO",
+      "comment": "",
+      "row_count_stats": 474243,
+      "domain": "影像",
+      "grain": "PACS 患者信息",
+      "pk": [
+        "PatientIntraID"
+      ],
+      "confidence": "A",
+      "note": "PACS 内部患者表；与 HIS 检查无直接同键"
+    },
+    {
+      "schema": "PACS",
+      "table": "EXAMINFO",
+      "comment": "",
+      "row_count_stats": 1218872,
+      "domain": "影像",
+      "grain": "PACS 检查主表",
+      "pk": [
+        "ExamID"
+      ],
+      "confidence": "A",
+      "note": "PACS 内部检查主表；ReportID 挂 REPORT"
+    },
+    {
+      "schema": "PACS",
+      "table": "REPORT",
+      "comment": "InnoDB free: 175104 kB",
+      "row_count_stats": 1099400,
+      "domain": "影像",
+      "grain": "PACS 报告",
+      "pk": [
+        "ReportID"
+      ],
+      "confidence": "A",
+      "note": "PACS 内部报告表"
+    },
+    {
+      "schema": "LIS",
+      "table": "REQ_MASTER",
+      "comment": "",
+      "row_count_stats": 2782059,
+      "domain": "检验",
+      "grain": "LIS 申请主表",
+      "pk": [
+        "BARCODE"
+      ],
+      "confidence": "A",
+      "note": "LIS 内部申请主表"
+    },
+    {
+      "schema": "LIS",
+      "table": "REQ_DETAIL",
+      "comment": "",
+      "row_count_stats": 3083064,
+      "domain": "检验",
+      "grain": "LIS 申请明细",
+      "pk": [
+        "BARCODE"
+      ],
+      "confidence": "A",
+      "note": "按 BARCODE 挂 REQ_MASTER"
+    },
+    {
+      "schema": "LIS",
+      "table": "LAB_REPORT",
+      "comment": "",
+      "row_count_stats": 2914665,
+      "domain": "检验",
+      "grain": "LIS 报告主表",
+      "pk": [
+        "REPORTID"
+      ],
+      "confidence": "A",
+      "note": "REPORTID 挂 LAB_RESULT；BARCODE 与 HIS.TEST_NO 需按时间拆分"
+    }
+  ],
+  "relationships": [
+    {
+      "id": 1,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID"
+      ],
+      "to": "HIS.PAT_MASTER_INDEX",
+      "to_columns": [
+        "PATIENT_ID"
+      ],
+      "join": "PAT_VISIT.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=575487; orphan=3; orphan_rate=0.0005%",
+      "note": "患者基本信息",
+      "validation_note": "数据库全量验证：患者主索引关系成立"
+    },
+    {
+      "id": 2,
+      "domain": "诊断",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.DIAGNOSIS",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PAT_VISIT.PATIENT_ID=DIAGNOSIS.PATIENT_ID AND PAT_VISIT.VISIT_ID=DIAGNOSIS.VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=3330051; orphan=210; orphan_rate=0.0063%",
+      "note": "",
+      "validation_note": "数据库全量验证：诊断挂住院关系成立"
+    },
+    {
+      "id": 3,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "DEPT_ADMISSION_TO"
+      ],
+      "to": "HIS.DEPT_DICT",
+      "to_columns": [
+        "DEPT_CODE"
+      ],
+      "join": "PAT_VISIT.DEPT_ADMISSION_TO=DEPT_DICT.DEPT_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=575487; orphan=1",
+      "note": "入院科室",
+      "validation_note": "数据库全量验证：入院科室关系成立"
+    },
+    {
+      "id": 4,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "DEPT_DISCHARGE_FROM"
+      ],
+      "to": "HIS.DEPT_DICT",
+      "to_columns": [
+        "DEPT_CODE"
+      ],
+      "join": "PAT_VISIT.DEPT_DISCHARGE_FROM=DEPT_DICT.DEPT_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=575487; orphan=0",
+      "note": "出院科室",
+      "validation_note": "数据库全量验证：出院科室关系成立"
+    },
+    {
+      "id": 5,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "DOCTOR_IN_CHARGE"
+      ],
+      "to": "HIS.STAFF_DICT",
+      "to_columns": [
+        "EMP_NO"
+      ],
+      "join": "PAT_VISIT.DOCTOR_IN_CHARGE=STAFF_DICT.EMP_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=575487; orphan=3193; orphan_rate=0.55%",
+      "note": "主管医师",
+      "validation_note": "主管医师可关联 STAFF_DICT，存在少量历史/离职/编码孤儿"
+    },
+    {
+      "id": 6,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PATS_IN_HOSPITAL",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=1216; orphan=3",
+      "note": "病区床号兜底",
+      "validation_note": "床位兜底关系成立"
+    },
+    {
+      "id": 7,
+      "domain": "住院费用",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.INP_SETTLE_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=622182; orphan=52; orphan_rate=0.0084%",
+      "note": "",
+      "validation_note": "住院结算关系成立"
+    },
+    {
+      "id": 8,
+      "domain": "住院费用",
+      "from": "HIS.INP_SETTLE_MASTER",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.INP_BILL_DETAIL",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "bounded",
+      "validation_metrics": "detail_rows=768942; matched_visit_keys=1996/2000",
+      "note": "",
+      "validation_note": "INP_BILL_DETAIL 巨表；用 2000 个住院键限定验证，键关系可用，禁止全表扫描"
+    },
+    {
+      "id": 9,
+      "domain": "医嘱",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.ORDERS",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "bounded",
+      "validation_metrics": "order_rows=130734; matched_visit_keys=1999/2000",
+      "note": "",
+      "validation_note": "ORDERS 巨表；用 2000 个住院键限定验证，键关系可用"
+    },
+    {
+      "id": 10,
+      "domain": "门诊费用",
+      "from": "HIS.CLINIC_MASTER",
+      "from_columns": [
+        "RCPT_NO"
+      ],
+      "to": "HIS.OUTP_RCPT_MASTER",
+      "to_columns": [
+        "RCPT_NO"
+      ],
+      "join": "CLINIC_MASTER->OUTP_RCPT_MASTER",
+      "cardinality": "one-to-many",
+      "confidence": "B",
+      "validation_level": "not_tested",
+      "validation_status": "not_tested",
+      "validation_metrics": "",
+      "note": "门诊主线",
+      "validation_note": "门诊主线未在本轮验证，需单独按门诊键复核"
+    },
+    {
+      "id": 11,
+      "domain": "门诊费用",
+      "from": "HIS.OUTP_RCPT_MASTER",
+      "from_columns": [
+        "RCPT_NO"
+      ],
+      "to": "HIS.OUTP_BILL_ITEMS",
+      "to_columns": [
+        "RCPT_NO"
+      ],
+      "join": "OUTP_RCPT_MASTER.RCPT_NO=OUTP_BILL_ITEMS.RCPT_NO",
+      "cardinality": "one-to-many",
+      "confidence": "B",
+      "validation_level": "not_tested",
+      "validation_status": "not_tested",
+      "validation_metrics": "",
+      "note": "",
+      "validation_note": "门诊费用明细未在本轮验证，需单独按 RCPT_NO 复核"
+    },
+    {
+      "id": 12,
+      "domain": "手术",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "SM.MED_OPERATION_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=138551; orphan=406; orphan_rate=0.29%",
+      "note": "手麻主表",
+      "validation_note": "手麻主记录可挂住院，少量历史孤儿"
+    },
+    {
+      "id": 13,
+      "domain": "手术",
+      "from": "SM.MED_OPERATION_MASTER",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "to": "SM.MED_OPERATION_NAME",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID+OPER_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=144894; orphan=96; orphan_rate=0.066%",
+      "note": "一台手术多条操作",
+      "validation_note": "手术主从关系成立"
+    },
+    {
+      "id": 14,
+      "domain": "检查",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.EXAM_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "C",
+      "validation_status": "needs_split",
+      "validation_metrics": "total=3415127; orphan=1402517; orphan_rate=41.1%",
+      "note": "",
+      "validation_note": "EXAM_MASTER 混合住院/门诊/体检/历史来源；仅住院子集可按 PATIENT_ID+VISIT_ID 挂 PAT_VISIT"
+    },
+    {
+      "id": 15,
+      "domain": "检查",
+      "from": "HIS.EXAM_MASTER",
+      "from_columns": [
+        "EXAM_NO"
+      ],
+      "to": "HIS.EXAM_REPORT",
+      "to_columns": [
+        "EXAM_NO"
+      ],
+      "join": "EXAM_MASTER.EXAM_NO=EXAM_REPORT.EXAM_NO",
+      "cardinality": "one-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=1336893; orphan=55; EXAM_REPORT.PATIENT_ID column=0",
+      "note": "报告无PATIENT_ID",
+      "validation_note": "检查报告必须经 EXAM_NO 关联 EXAM_MASTER"
+    },
+    {
+      "id": 16,
+      "domain": "检验",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "PATIENT_ID"
+      ],
+      "to": "HIS.LAB_TEST_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "TEST_NO"
+      ],
+      "join": "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND (VISIT_ID 相同 OR 0/NULL 按门诊)",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "C",
+      "validation_status": "needs_split",
+      "validation_metrics": "total=9142446; visit_null_or_zero=3339952; exact_visit_match=5800092; nonzero_visit_unmatched=2402",
+      "note": "住院+同患者门诊检验",
+      "validation_note": "LAB_TEST_MASTER 需拆住院检验与 VISIT_ID=0/NULL 的门诊/其他检验"
+    },
+    {
+      "id": 17,
+      "domain": "检验",
+      "from": "HIS.LAB_TEST_MASTER",
+      "from_columns": [
+        "TEST_NO"
+      ],
+      "to": "HIS.LAB_TEST_ITEMS",
+      "to_columns": [
+        "TEST_NO"
+      ],
+      "join": "TEST_NO",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=9610054; orphan=1710; orphan_rate=0.018%",
+      "note": "",
+      "validation_note": "LAB_TEST_ITEMS 按 TEST_NO 挂 LAB_TEST_MASTER 成立"
+    },
+    {
+      "id": 18,
+      "domain": "检验",
+      "from": "HIS.LAB_TEST_ITEMS",
+      "from_columns": [
+        "TEST_NO",
+        "ITEM_NO"
+      ],
+      "to": "HIS.LAB_RESULT",
+      "to_columns": [
+        "TEST_NO",
+        "ITEM_NO"
+      ],
+      "join": "TEST_NO+ITEM_NO",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "bounded",
+      "validation_metrics": "result_rows=22721; matched_test_no=1367/2000",
+      "note": "",
+      "validation_note": "LAB_RESULT 巨表；用 2000 个 TEST_NO 限定验证，TEST_NO 关系可用，禁止全表扫描"
+    },
+    {
+      "id": 19,
+      "domain": "检验",
+      "from": "HIS.LAB_TEST_MASTER",
+      "from_columns": [
+        "TEST_NO"
+      ],
+      "to": "HIS.LAB_RESULT",
+      "to_columns": [
+        "TEST_NO"
+      ],
+      "join": "TEST_NO",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "bounded",
+      "validation_metrics": "result_rows=22721; matched_test_no=1367/2000",
+      "note": "",
+      "validation_note": "LAB_RESULT 巨表；用 2000 个 TEST_NO 限定验证，TEST_NO 关系可用，禁止全表扫描"
+    },
+    {
+      "id": 20,
+      "domain": "诊断",
+      "from": "HIS.DIAGNOSIS",
+      "from_columns": [
+        "DIAGNOSIS_CODE"
+      ],
+      "to": "CDA.CDA_DICTIONARY",
+      "to_columns": [
+        "院标编码"
+      ],
+      "join": "CDA_DICTIONARY.字典名称='ICD-10诊断编码' AND 系统标识='HIS' AND 院标编码=DIAGNOSIS.DIAGNOSIS_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "sample_rows=50000; mapped_rows=47091; map_rate=94.18%",
+      "note": "ICD-10 标准化;关联前按院标编码聚合防爆行",
+      "validation_note": "ICD-10 映射可用，但需保留未命中回退 HIS 原始编码/名称"
+    },
+    {
+      "id": 21,
+      "domain": "诊断",
+      "from": "HIS.DIAGNOSIS",
+      "from_columns": [
+        "DIAGNOSIS_TYPE"
+      ],
+      "to": "HIS.DIAGNOSIS_TYPE_DICT",
+      "to_columns": [
+        "DIAGNOSIS_TYPE_CODE"
+      ],
+      "join": "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "not_tested",
+      "validation_status": "not_tested",
+      "validation_metrics": "",
+      "note": "",
+      "validation_note": "DIAGNOSIS_TYPE_DICT 未在本轮单独验证，可按字典小表后续补验"
+    },
+    {
+      "id": 22,
+      "domain": "电子病历(旧)",
+      "from": "HIS.PAT_MASTER_INDEX",
+      "from_columns": [
+        "INP_NO"
+      ],
+      "to": "MTL.EPR_INPATIENT_DOCINDEX",
+      "to_columns": [
+        "P_INPATIENT_NO",
+        "P_INPATIENT_TIMES"
+      ],
+      "join": "PAT_MASTER_INDEX.INP_NO=EPR_INPATIENT_DOCINDEX.P_INPATIENT_NO AND PAT_VISIT.VISIT_ID=P_INPATIENT_TIMES",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=239863; orphan=817; orphan_rate=0.34%",
+      "note": "",
+      "validation_note": "旧 EMR 文书索引可通过住院号挂患者"
+    },
+    {
+      "id": 23,
+      "domain": "电子病历(旧)",
+      "from": "MTL.EPR_INPATIENT_DOCINDEX",
+      "from_columns": [
+        "UHID"
+      ],
+      "to": "MTL.EPR_INPATIENT",
+      "to_columns": [
+        "UHID"
+      ],
+      "join": "UHID",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "sample_verified",
+      "validation_metrics": "sample_rows=50000; orphan=0",
+      "note": "",
+      "validation_note": "旧 EMR 文书主表按 UHID 可挂 DOCINDEX"
+    },
+    {
+      "id": 24,
+      "domain": "电子病历(旧)",
+      "from": "MTL.EPR_INPATIENT",
+      "from_columns": [
+        "UHID",
+        "ID"
+      ],
+      "to": "MTL.EMRSD_CONTENT",
+      "to_columns": [
+        "UHID",
+        "段落编号"
+      ],
+      "join": "UHID AND EPR_INPATIENT.ID=EMRSD_CONTENT.段落编号",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "sample_rows=50000; orphan=29; orphan_rate=0.058%",
+      "note": "",
+      "validation_note": "旧 EMR 段落内容按 UHID+段落编号可挂文书主表"
+    },
+    {
+      "id": 25,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.JHMR_FILE_INDEX",
+      "from_columns": [
+        "FILE_UNIQUE_ID"
+      ],
+      "to": "JHEMR.JHMR_FILE_CONTENT_TEXT",
+      "to_columns": [
+        "FILE_UNIQUE_ID"
+      ],
+      "join": "FILE_UNIQUE_ID",
+      "cardinality": "one-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=1149248; orphan=1051; orphan_rate=0.092%",
+      "note": "",
+      "validation_note": "新 EMR 内部文书索引与正文关系成立"
+    },
+    {
+      "id": 26,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.JHMR_FILE_INDEX",
+      "from_columns": [
+        "DEPT_CODE"
+      ],
+      "to": "HIS.DEPT_DICT",
+      "to_columns": [
+        "DEPT_CODE"
+      ],
+      "join": "DEPT_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "not_tested",
+      "validation_status": "not_tested",
+      "validation_metrics": "",
+      "note": "",
+      "validation_note": "JHEMR 文书按 DEPT_CODE 关联科室未在本轮验证；JHEMR 到住院键仍未确认"
+    },
+    {
+      "id": 27,
+      "domain": "就诊",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": [
+        "DOCTOR_IN_CHARGE"
+      ],
+      "to": "HIS.DOC_REGISTER_EMP_MATCH",
+      "to_columns": [
+        "EMP_NO"
+      ],
+      "join": "EMP_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "external",
+      "validation_status": "missing_in_8216",
+      "validation_metrics": "",
+      "note": "医师执业证书号",
+      "validation_note": "HIS.DOC_REGISTER_EMP_MATCH 在 8.216 缺失，仅 HIS 生产库，待接入生产库验证"
+    },
+    {
+      "id": 28,
+      "domain": "护理",
+      "from": "YDHL.MCS_ASSESS_FORM",
+      "from_columns": [
+        "PATIENT_UID"
+      ],
+      "to": "YDHL.INPATIENTS",
+      "to_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "join": "MCS_ASSESS_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "sample_verified",
+      "validation_metrics": "sample_rows=200000; orphan=0",
+      "note": "",
+      "validation_note": "移动护理评估按 PATIENT_UID=PAT_INDEX_NO 抽样成立"
+    },
+    {
+      "id": 29,
+      "domain": "电子病历(旧)",
+      "from": "MTL.EPR_INPATIENT_DOCINDEX",
+      "from_columns": [
+        "P_CLINIC_ID",
+        "P_INPATIENT_TIMES"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "EPR_INPATIENT_DOCINDEX.P_CLINIC_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(P_INPATIENT_TIMES)=TO_CHAR(VISIT_ID)",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=239863; orphan=2876; orphan_rate=1.20%",
+      "note": "候选关系验证后提升",
+      "validation_note": "旧 EMR 文书索引可按 P_CLINIC_ID+P_INPATIENT_TIMES 直连住院，少量历史孤儿"
+    },
+    {
+      "id": 30,
+      "domain": "电子病历(旧)",
+      "from": "MTL.EMRSD_CONTENT",
+      "from_columns": [
+        "UHID"
+      ],
+      "to": "MTL.EPR_INPATIENT_DOCINDEX",
+      "to_columns": [
+        "UHID"
+      ],
+      "join": "UHID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "sample_verified",
+      "validation_metrics": "sample_rows=100000; orphan=1",
+      "note": "段落内容可直接追溯文书索引",
+      "validation_note": "旧 EMR 段落内容可按 UHID 直接追溯文书索引"
+    },
+    {
+      "id": 31,
+      "domain": "手术/麻醉",
+      "from": "SM.MED_ANESTHESIA_PLAN",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "to": "SM.MED_OPERATION_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID+OPER_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=132818; orphan=1052; orphan_rate=0.79%",
+      "note": "麻醉计划挂手术主记录",
+      "validation_note": "麻醉计划可按 PATIENT_ID+VISIT_ID+OPER_ID 挂手术主记录"
+    },
+    {
+      "id": 32,
+      "domain": "电子病历(旧)",
+      "from": "MTL.EPR_INPATIENT_DOCINDEX",
+      "from_columns": [
+        "P_DEPT_CODE"
+      ],
+      "to": "HIS.DEPT_DICT",
+      "to_columns": [
+        "DEPT_CODE"
+      ],
+      "join": "EPR_INPATIENT_DOCINDEX.P_DEPT_CODE=DEPT_DICT.DEPT_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=239863; orphan=0",
+      "note": "旧 EMR 文书科室",
+      "validation_note": "旧 EMR 文书科室可直接挂 HIS 科室字典"
+    },
+    {
+      "id": 33,
+      "domain": "手术",
+      "from": "HIS.OPERATION",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PATIENT_ID+VISIT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=528729; orphan=16",
+      "note": "HIS 侧手术可挂住院，但不可与 SM 手术一一对应",
+      "validation_note": "HIS 侧手术可按 PATIENT_ID+VISIT_ID 挂住院；但不可与 SM 手术一一对应"
+    },
+    {
+      "id": 34,
+      "domain": "门诊",
+      "from": "HIS.CLINIC_MASTER",
+      "from_columns": [
+        "VISIT_DEPT"
+      ],
+      "to": "HIS.DEPT_DICT",
+      "to_columns": [
+        "DEPT_CODE"
+      ],
+      "join": "CLINIC_MASTER.VISIT_DEPT=DEPT_DICT.DEPT_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=5704241; orphan=0",
+      "note": "门诊就诊科室",
+      "validation_note": "门诊就诊科室强关系"
+    },
+    {
+      "id": 35,
+      "domain": "手术",
+      "from": "SM.MED_OPERATION_MASTER",
+      "from_columns": [
+        "PATIENT_ID"
+      ],
+      "to": "HIS.PAT_MASTER_INDEX",
+      "to_columns": [
+        "PATIENT_ID"
+      ],
+      "join": "MED_OPERATION_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=138551; orphan=267; orphan_rate=0.19%",
+      "note": "手麻患者主索引",
+      "validation_note": "手麻手术主记录可挂 HIS 患者主索引"
+    },
+    {
+      "id": 36,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.JHMR_FILE_INDEX",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "JHMR_FILE_INDEX.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_INDEX.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=1140268; matched=1139718; orphan=550; orphan_rate=0.048%",
+      "note": "新 EMR 文书索引挂 HIS 住院",
+      "validation_note": "新 EMR 文书索引按 PATIENT_ID+VISIT_ID 可挂 HIS 住院"
+    },
+    {
+      "id": 37,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.JHMR_FILE_CONTENT_DG",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "JHMR_FILE_CONTENT_DG.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_CONTENT_DG.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=2902663; matched=2900782; orphan=1881; orphan_rate=0.065%",
+      "note": "新 EMR 文书打散内容挂 HIS 住院",
+      "validation_note": "新 EMR 文书打散内容按 PATIENT_ID+VISIT_ID 可挂 HIS 住院"
+    },
+    {
+      "id": 38,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.PAT_DIAGNOSIS",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PAT_DIAGNOSIS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(PAT_DIAGNOSIS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=787965; matched=787694; orphan=271; orphan_rate=0.034%",
+      "note": "新 EMR 诊断挂 HIS 住院",
+      "validation_note": "新 EMR 诊断按 PATIENT_ID+VISIT_ID 可挂 HIS 住院"
+    },
+    {
+      "id": 39,
+      "domain": "电子病历(新)",
+      "from": "JHEMR.FIRST_PAGE_COSTS",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "FIRST_PAGE_COSTS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(FIRST_PAGE_COSTS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=103318; matched=103287; orphan=31; orphan_rate=0.030%",
+      "note": "病案首页费用挂 HIS 住院",
+      "validation_note": "病案首页费用按 PATIENT_ID+VISIT_ID 可挂 HIS 住院"
+    },
+    {
+      "id": 40,
+      "domain": "影像",
+      "from": "PACS.EXAMINFO",
+      "from_columns": [
+        "PatientIntraID"
+      ],
+      "to": "PACS.PATIENTINFO",
+      "to_columns": [
+        "PatientIntraID"
+      ],
+      "join": "EXAMINFO.PatientIntraID=PATIENTINFO.PatientIntraID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=1219575; matched=1219575; orphan=0",
+      "note": "PACS 内部患者-检查关系；注意 Oracle 大小写引号列",
+      "validation_note": "PACS 内部患者-检查关系成立"
+    },
+    {
+      "id": 41,
+      "domain": "影像",
+      "from": "PACS.EXAMINFO",
+      "from_columns": [
+        "ReportID"
+      ],
+      "to": "PACS.REPORT",
+      "to_columns": [
+        "ReportID"
+      ],
+      "join": "EXAMINFO.ReportID=REPORT.ReportID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": "total=1219575; matched=1149006; orphan=70569; orphan_rate=5.79%",
+      "note": "PACS 内部检查-报告关系，少量缺报告孤儿",
+      "validation_note": "PACS 内部检查-报告关系可用，但存在较多无报告/历史孤儿"
+    },
+    {
+      "id": 42,
+      "domain": "检验",
+      "from": "LIS.REQ_DETAIL",
+      "from_columns": [
+        "BARCODE"
+      ],
+      "to": "LIS.REQ_MASTER",
+      "to_columns": [
+        "BARCODE"
+      ],
+      "join": "REQ_DETAIL.BARCODE=REQ_MASTER.BARCODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=3085565; matched=3085562; orphan=3",
+      "note": "LIS 内部申请明细挂申请主表",
+      "validation_note": "LIS 申请明细按 BARCODE 挂申请主表成立"
+    },
+    {
+      "id": 43,
+      "domain": "检验",
+      "from": "LIS.REQ_MASTER",
+      "from_columns": [
+        "REPORT_ID"
+      ],
+      "to": "LIS.LAB_REPORT",
+      "to_columns": [
+        "REPORTID"
+      ],
+      "join": "REQ_MASTER.REPORT_ID=LAB_REPORT.REPORTID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=2784257; key_nonnull=2113642; matched=2113467; orphan=175",
+      "note": "LIS 申请主表挂报告主表",
+      "validation_note": "LIS 申请主表按 REPORT_ID 挂报告主表成立；未出报告记录 REPORT_ID 为空"
+    },
+    {
+      "id": 44,
+      "domain": "护理",
+      "from": "YDHL.INPATIENTS",
+      "from_columns": [
+        "MRN",
+        "SERIES"
+      ],
+      "to": "HIS.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "INPATIENTS.MRN=PAT_MASTER_INDEX.INP_NO AND INPATIENTS.SERIES=PAT_VISIT.VISIT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "verified",
+      "validation_metrics": "total=276199; matched=274279; orphan=1920; orphan_rate=0.70%",
+      "note": "经 HIS.PAT_MASTER_INDEX.INP_NO 桥接 HIS 住院；不要用 YDHL.PATIENT_ID",
+      "validation_note": "移动护理住院患者通过 MRN=HIS.INP_NO + SERIES=VISIT_ID 挂 HIS 住院；YDHL.PATIENT_ID 不是 HIS.PATIENT_ID"
+    },
+    {
+      "id": 45,
+      "domain": "护理",
+      "from": "YDHL.MCS_ASSESS_FORM",
+      "from_columns": [
+        "PATIENT_UID"
+      ],
+      "to": "YDHL.INPATIENTS",
+      "to_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "join": "MCS_ASSESS_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=2550149; matched=2550139; orphan=10",
+      "note": "护理评估主表挂移动护理住院患者",
+      "validation_note": "移动护理评估主表按 PATIENT_UID 挂 INPATIENTS 成立"
+    },
+    {
+      "id": 46,
+      "domain": "护理",
+      "from": "YDHL.MCS_DOC_FORM",
+      "from_columns": [
+        "PATIENT_UID"
+      ],
+      "to": "YDHL.INPATIENTS",
+      "to_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "join": "MCS_DOC_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=11987629; matched=11987601; orphan=28",
+      "note": "护理文书主表挂移动护理住院患者",
+      "validation_note": "移动护理文书主表按 PATIENT_UID 挂 INPATIENTS 成立"
+    },
+    {
+      "id": 47,
+      "domain": "护理",
+      "from": "YDHL.MCS_ASSESS_FORM_RECORD",
+      "from_columns": [
+        "FORM_ID"
+      ],
+      "to": "YDHL.MCS_ASSESS_FORM",
+      "to_columns": [
+        "ID"
+      ],
+      "join": "MCS_ASSESS_FORM_RECORD.FORM_ID=MCS_ASSESS_FORM.ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": "total=41832099; matched=41832099; orphan=0",
+      "note": "护理评估明细挂评估主表",
+      "validation_note": "移动护理评估明细按 FORM_ID 挂评估主表成立"
+    }
+  ]
+}

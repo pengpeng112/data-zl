@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-07-03",
+  "database": "10.10.10.15:1521/his",
+  "account": "hisuser",
+  "scope": ["MEDREC", "INPADM", "ORDADM", "LAB", "EXAM", "INPBILL", "OUTPBILL", "OUTPADM"],
+  "safety": {
+    "mode": "SELECT only",
+    "large_table_policy": "大表仅抽样验证或按父键限定，未做全表画像",
+    "pii_policy": "仅输出聚合计数，不输出患者、证件、电话、姓名明细"
+  },
+  "summary": {
+    "relations_verified": 21,
+    "full_count_relations": 15,
+    "sampled_relations": 6,
+    "main_conclusion": "HIS 业务库源端主线与数据中心 ODS 的核心口径一致：患者 PATIENT_ID、住院 PATIENT_ID+VISIT_ID、检验 TEST_NO、检查 EXAM_NO、医嘱 ORDER_NO+ORDER_SUB_NO、费用 RCPT_NO 均可作为主关联键。",
+    "do_not_overwrite_ods_asset_package": true,
+    "reason": "本专题验证的是 10.10.10.15/his 多 owner 源端关系，现有正式资产包以 8.216 数据中心 ODS 资产为主；需后续决定是否建立独立 HIS 源端资产包或扩展多源关系层。"
+  },
+  "results": [
+    {"id":"M01","domain":"MEDREC","relation":"MEDREC.PAT_VISIT.PATIENT_ID -> MEDREC.PAT_MASTER_INDEX.PATIENT_ID","mode":"full","status":"ok","metrics":{"total":575563,"key_nonnull":575563,"matched":575560,"orphan":3},"validation_status":"pass"},
+    {"id":"M02","domain":"MEDREC","relation":"MEDREC.DIAGNOSIS(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"full","status":"ok","metrics":{"total":3330805,"matched":3330597,"orphan":208},"validation_status":"pass"},
+    {"id":"M03","domain":"MEDREC","relation":"MEDREC.OPERATION(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"full","status":"ok","metrics":{"total":528803,"matched":528787,"orphan":16,"oper_id_null":528803},"validation_status":"pass_with_note","note":"OPER_ID 全为空，与数据中心 ODS 结论一致；只能按住院主线挂接，不能用 OPER_ID 关联手麻。"},
+    {"id":"M04","domain":"INPADM","relation":"INPADM.PATS_IN_HOSPITAL(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"full","status":"ok","metrics":{"total":1262,"matched":1260,"orphan":2},"validation_status":"pass"},
+    {"id":"M05","domain":"INPADM","relation":"INPADM.ADT_LOG(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":199983,"orphan":17},"validation_status":"sample_pass"},
+    {"id":"O01","domain":"ORDADM","relation":"ORDADM.ORDERS(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":199929,"orphan":71},"validation_status":"sample_pass","note":"ORDERS 约 4100 万行，限定样本验证。"},
+    {"id":"O02","domain":"ORDADM","relation":"ORDADM.ORDERS_COSTS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO) -> ORDADM.ORDERS","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":199980,"orphan":20},"validation_status":"sample_pass"},
+    {"id":"L01","domain":"LAB","relation":"LAB.LAB_TEST_MASTER(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID), nonzero VISIT_ID only","mode":"full","status":"ok","metrics":{"total":9143658,"visit_null_or_zero":3340477,"matched_nonzero":5800779,"orphan_nonzero":2402},"validation_status":"pass_with_subset","note":"VISIT_ID 为 NULL/0 的检验需按门诊或其他来源拆分，不能强挂住院。"},
+    {"id":"L02","domain":"LAB","relation":"LAB.LAB_TEST_ITEMS.TEST_NO -> LAB.LAB_TEST_MASTER.TEST_NO","mode":"full","status":"ok","metrics":{"total":9611257,"matched":9609547,"orphan":1710},"validation_status":"pass"},
+    {"id":"L03","domain":"LAB","relation":"LAB.LAB_RESULT.TEST_NO -> LAB.LAB_TEST_MASTER.TEST_NO","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":199996,"orphan":4},"validation_status":"sample_pass","note":"LAB_RESULT 约 9400 万行，限定样本验证，禁止全表扫描。"},
+    {"id":"L04","domain":"LAB","relation":"LAB.LAB_TEST_ITEMS_DETAIL(TEST_NO,ITEM_NO) -> LAB.LAB_TEST_ITEMS(TEST_NO,ITEM_NO)","mode":"full","status":"ok","metrics":{"total":4224849,"matched_by_item":4105965,"matched_master":4123350,"orphan_master":101499},"validation_status":"partial","note":"明细表存在部分不能按 ITEM_NO 精确挂项目或不能挂主单的记录，入图时建议先作为 LAB_TEST_MASTER 下游弱关系或补充分期口径。"},
+    {"id":"E01","domain":"EXAM","relation":"EXAM.EXAM_MASTER(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID), nonzero VISIT_ID only","mode":"full","status":"ok","metrics":{"total":3415735,"visit_null_or_zero":1402424,"matched_nonzero":2012933,"orphan_nonzero":378},"validation_status":"pass_with_subset","note":"VISIT_ID 为 NULL/0 的检查需拆分门诊/体检/其他口径，不能强挂住院。"},
+    {"id":"E02","domain":"EXAM","relation":"EXAM.EXAM_REPORT.EXAM_NO -> EXAM.EXAM_MASTER.EXAM_NO","mode":"full","status":"ok","metrics":{"total":1337247,"matched":1337192,"orphan":55},"validation_status":"pass"},
+    {"id":"E03","domain":"EXAM","relation":"EXAM.EXAM_ITEMS.EXAM_NO -> EXAM.EXAM_MASTER.EXAM_NO","mode":"full","status":"ok","metrics":{"total":4410757,"matched":3893397,"orphan":517360},"validation_status":"partial","note":"EXAM_ITEMS 存在较多挂不上 EXAM_MASTER 的记录，不宜作为无条件强关系。"},
+    {"id":"E04","domain":"EXAM","relation":"EXAM.EXAM_BILL_ITEMS.EXAM_NO -> EXAM.EXAM_MASTER.EXAM_NO","mode":"full","status":"ok","metrics":{"total":5808197,"matched":5804520,"orphan":3677},"validation_status":"pass"},
+    {"id":"B01","domain":"INPBILL","relation":"INPBILL.INP_SETTLE_MASTER(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"full","status":"ok","metrics":{"total":626085,"matched":626033,"orphan":52},"validation_status":"pass"},
+    {"id":"B02","domain":"INPBILL","relation":"INPBILL.INP_BILL_DETAIL(PATIENT_ID,VISIT_ID) -> MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":200000,"orphan":0},"validation_status":"sample_pass","note":"INP_BILL_DETAIL 约 2.2 亿行，限定样本验证。"},
+    {"id":"B03","domain":"INPBILL","relation":"INPBILL.INP_BILL_DETAIL.RCPT_NO -> INPBILL.INP_SETTLE_MASTER.RCPT_NO","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"key_nonnull":199966,"matched":199966,"orphan":0},"validation_status":"sample_pass"},
+    {"id":"B04","domain":"OUTPADM","relation":"OUTPADM.CLINIC_MASTER.PATIENT_ID -> MEDREC.PAT_MASTER_INDEX.PATIENT_ID","mode":"full","status":"ok","metrics":{"total":5704923,"key_nonnull":5704923,"matched":5704870,"orphan":53},"validation_status":"pass"},
+    {"id":"B05","domain":"OUTPBILL","relation":"OUTPBILL.OUTP_BILL_ITEMS.RCPT_NO -> OUTPBILL.OUTP_RCPT_MASTER.RCPT_NO","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":200000,"orphan":0},"validation_status":"sample_pass","note":"OUTP_BILL_ITEMS 约 3000 万行，限定样本验证。"},
+    {"id":"B06","domain":"OUTPBILL","relation":"OUTPBILL.OUTP_RCPT_MASTER.PATIENT_ID -> MEDREC.PAT_MASTER_INDEX.PATIENT_ID","mode":"sample","sample_size":200000,"status":"ok","metrics":{"sample_rows":200000,"matched":199941,"orphan":59},"validation_status":"sample_pass"}
+  ]
+}

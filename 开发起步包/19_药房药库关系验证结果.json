@@ -1,0 +1,382 @@
+{
+  "generated_at": "2026-07-03 09:13:27",
+  "db": "10.10.10.15:1521/his",
+  "scope": [
+    "DRUG_USER",
+    "PHARMACY"
+  ],
+  "note": "HISUSER业务库药房药库专题验证；只读SELECT；大表使用样本验证。",
+  "results": [
+    {
+      "id": "D01",
+      "domain": "DRUG_USER",
+      "relation": "MED_DICT_PRICE.DRUG_CODE -> MED_DICT_BASEINFO.DRUG_CODE",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.01,
+      "note": "",
+      "metrics": {
+        "total": 8493,
+        "key_nonnull": 8493,
+        "matched": 8493,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D02",
+      "domain": "DRUG_USER",
+      "relation": "MED_IN_DETAIL.IN_BILLNO -> MED_IN_MASTER.IN_BILLNO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.13,
+      "note": "",
+      "metrics": {
+        "total": 118418,
+        "key_nonnull": 118418,
+        "matched": 118418,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D03",
+      "domain": "DRUG_USER",
+      "relation": "MED_IN_DETAIL.DRUG_PRI -> MED_DICT_PRICE.DRUG_PRI",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.14,
+      "note": "",
+      "metrics": {
+        "total": 118418,
+        "key_nonnull": 118418,
+        "matched": 118418,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D04",
+      "domain": "DRUG_USER",
+      "relation": "MED_OUT_DETAIL.OUT_BILLNO -> MED_OUT_MASTER.OUT_BILLNO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.11,
+      "note": "",
+      "metrics": {
+        "total": 135093,
+        "key_nonnull": 135093,
+        "matched": 134833,
+        "orphan": 260
+      }
+    },
+    {
+      "id": "D05",
+      "domain": "DRUG_USER",
+      "relation": "MED_OUT_DETAIL.DRUG_PRI -> MED_DICT_PRICE.DRUG_PRI",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.17,
+      "note": "",
+      "metrics": {
+        "total": 135093,
+        "key_nonnull": 135093,
+        "matched": 135093,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D06",
+      "domain": "DRUG_USER",
+      "relation": "MED_STORAGE.DRUG_PRI -> MED_DICT_PRICE.DRUG_PRI",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.01,
+      "note": "",
+      "metrics": {
+        "total": 13804,
+        "key_nonnull": 13804,
+        "matched": 13804,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D07",
+      "domain": "DRUG_USER",
+      "relation": "MED_DETAIL_STORAGE.RECORD_NO -> MED_STORAGE.RECORD_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.17,
+      "note": "",
+      "metrics": {
+        "total": 100838,
+        "key_nonnull": 100838,
+        "matched": 100815,
+        "orphan": 23
+      }
+    },
+    {
+      "id": "D08",
+      "domain": "DRUG_USER",
+      "relation": "PHA_ALOOCAT_DETAIL.REQUEST_NO -> PHA_ALLOCAT_MASTER.REQUEST_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.04,
+      "note": "",
+      "metrics": {
+        "total": 14324,
+        "key_nonnull": 14324,
+        "matched": 14324,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D09",
+      "domain": "DRUG_USER",
+      "relation": "PHA_INP_DISPDETAIL.DIS_RECORDNO -> PHA_INP_DISPMASTER.DIS_RECORDNO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 3.84,
+      "note": "",
+      "metrics": {
+        "total": 4968617,
+        "key_nonnull": 4968617,
+        "matched": 4968617,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D10",
+      "domain": "DRUG_USER",
+      "relation": "PHA_INP_DISPDETAIL.REQUEST_NO -> PHA_INP_REQUEST_DRUG.REQUEST_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 12.1,
+      "note": "",
+      "metrics": {
+        "total": 4968617,
+        "key_nonnull": 4968617,
+        "matched": 4968617,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "D11",
+      "domain": "DRUG_USER",
+      "relation": "PHA_INP_REQUEST_DRUG.PAT_ID+IN_COUNT -> MEDREC.PAT_VISIT",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 0.38,
+      "note": "",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 199884,
+        "orphan": 116
+      }
+    },
+    {
+      "id": "D12",
+      "domain": "DRUG_USER",
+      "relation": "PHA_CLI_REQUEST_DRUG.PRESC_NO+PRESC_DETAIL_ID -> PHA_VISIT_DISPDETAIL.PRESC_NO+PRESC_DETAILID",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 1.18,
+      "note": "",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 199957,
+        "orphan": 43
+      }
+    },
+    {
+      "id": "D13",
+      "domain": "DRUG_USER",
+      "relation": "PHA_CLI_REQUEST_DRUG.PAT_ID -> MEDREC.PAT_MASTER_INDEX.PATIENT_ID",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 0.07,
+      "note": "",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 200000,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "P01",
+      "domain": "PHARMACY",
+      "relation": "DRUG_PRESC_DETAIL.PRESC_DATE+PRESC_NO -> DRUG_PRESC_MASTER",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 26.34,
+      "note": "",
+      "metrics": {
+        "total": 16532041,
+        "matched": 16509274,
+        "orphan": 22767
+      }
+    },
+    {
+      "id": "P02",
+      "domain": "PHARMACY",
+      "relation": "DRUG_PRESC_MASTER.PATIENT_ID -> MEDREC.PAT_MASTER_INDEX.PATIENT_ID",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 14.67,
+      "note": "",
+      "metrics": {
+        "total": 6707687,
+        "key_nonnull": 6706978,
+        "matched": 6706929,
+        "orphan": 49
+      }
+    },
+    {
+      "id": "P03",
+      "domain": "PHARMACY",
+      "relation": "DOCT_DRUG_PRESC_DETAIL -> DOCT_DRUG_PRESC_MASTER by PRESC_DATE+PRESC_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 3.47,
+      "note": "",
+      "metrics": {
+        "total": 3858898,
+        "matched": 3858710,
+        "orphan": 188
+      }
+    },
+    {
+      "id": "P04",
+      "domain": "PHARMACY",
+      "relation": "DRUG_DISPENSE_REC -> MEDREC.PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 0.08,
+      "note": "DRUG_DISPENSE_REC 约4500万，限定20万行",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 200000,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "P05",
+      "domain": "PHARMACY",
+      "relation": "DRUG_DISPENSE_REC -> ORDADM.ORDERS by patient/order",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 0.23,
+      "note": "DRUG_DISPENSE_REC/ORDERS 均为大表，限定20万行",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 200000,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "P06",
+      "domain": "PHARMACY",
+      "relation": "DRUG_DISPENSE_REC -> DRUG_DISPENSE_REC_MASTER by DISPENSING_DATE_TIME+DISPENSARY+WARD_CODE",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 11.86,
+      "note": "",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 199796,
+        "orphan": 204
+      }
+    },
+    {
+      "id": "P07",
+      "domain": "PHARMACY",
+      "relation": "DRUG_IMPORT_DETAIL.DOCUMENT_NO -> DRUG_IMPORT_MASTER.DOCUMENT_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 1.22,
+      "note": "",
+      "metrics": {
+        "total": 874144,
+        "matched": 873872,
+        "orphan": 272
+      }
+    },
+    {
+      "id": "P08",
+      "domain": "PHARMACY",
+      "relation": "DRUG_EXPORT_DETAIL.DOCUMENT_NO -> DRUG_EXPORT_MASTER.DOCUMENT_NO",
+      "mode": "full",
+      "status": "ok",
+      "seconds": 0.62,
+      "note": "",
+      "metrics": {
+        "total": 720182,
+        "matched": 720176,
+        "orphan": 6
+      }
+    },
+    {
+      "id": "X01",
+      "domain": "DRUG_USER",
+      "relation": "PHA_INP_REQUEST_DRUG -> ORDADM.ORDERS by PAT_ID+IN_COUNT+MO_ORDER+ORDER_SUB_NO",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 0.77,
+      "note": "",
+      "metrics": {
+        "sample_rows": 200000,
+        "matched": 199869,
+        "orphan": 131
+      }
+    },
+    {
+      "id": "X02",
+      "domain": "DRUG_USER",
+      "relation": "PHA_INP_DISPDETAIL.ADVICE_ID -> ORDADM.ORDERS.ORDER_NO?",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 1.25,
+      "note": "候选验证，可能不是医嘱号",
+      "metrics": {
+        "sample_rows": 0,
+        "matched": null,
+        "orphan": null
+      }
+    },
+    {
+      "id": "X03",
+      "domain": "DRUG_USER_vs_PHARMACY",
+      "relation": "DRUG_USER.PHA_INP_REQUEST_DRUG vs PHARMACY.DRUG_DISPENSE_REC by patient/order",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 1.53,
+      "note": "判断新发药申请与旧住院发药记录是否同源/同步",
+      "metrics": {
+        "sample_rows": 100000,
+        "matched": 27065,
+        "orphan": 72935
+      }
+    },
+    {
+      "id": "X04",
+      "domain": "DRUG_USER_vs_PHARMACY",
+      "relation": "DRUG_USER.PHA_CLI_REQUEST_DRUG vs PHARMACY.DRUG_PRESC_DETAIL by PRESC_NO+ITEM/DETAIL",
+      "mode": "sample",
+      "status": "ok",
+      "seconds": 68.54,
+      "note": "判断新门诊发药申请与旧门诊处方明细是否同源/同步",
+      "metrics": {
+        "sample_rows": 100000,
+        "matched": 0,
+        "orphan": 100000
+      }
+    },
+    {
+      "id": "X05",
+      "domain": "PHARMACY",
+      "relation": "DRUG_PRESC_DETAIL.ORDER_ID+ORDER_ITEM_ID -> ORDADM.ORDERS?",
+      "mode": "sample",
+      "status": "error",
+      "seconds": 180.03,
+      "note": "门诊处方可能不挂住院医嘱，仅候选验证",
+      "error": "DatabaseError: DPY-4024: call timeout of 180000 ms exceeded\nDPI-1067: call timeout of 180000 ms exceeded with ORA-03156\nORA-03156: OCI call timed out"
+    }
+  ]
+}

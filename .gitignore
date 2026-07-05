@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.*
+node_modules/
+dist/
+.DS_Store
+*.log
+.idea/
+.vscode/
+.pytest_cache/
+dev.log
+dev.err
+.eslintcache
+.agents/

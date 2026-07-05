@@ -1,0 +1,162 @@
+{
+  "generated_at": "2026-07-02 17:56:26",
+  "db": "10.10.8.216/orcl",
+  "results": [
+    {
+      "id": "C01",
+      "relation": "MTL.EPR_INPATIENT_DOCINDEX -> HIS.PAT_VISIT by P_CLINIC_ID/P_INPATIENT_TIMES",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.41,
+      "metrics": {
+        "total": 239863,
+        "orphan": 2876
+      }
+    },
+    {
+      "id": "C02",
+      "relation": "MTL.EMRSD_CONTENT -> MTL.EPR_INPATIENT_DOCINDEX by UHID",
+      "mode": "sample",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.18,
+      "metrics": {
+        "sample_rows": 100000,
+        "orphan": 1
+      }
+    },
+    {
+      "id": "C03",
+      "relation": "SM.MED_ANESTHESIA_PLAN -> SM.MED_OPERATION_MASTER by PATIENT_ID+VISIT_ID+OPER_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.07,
+      "metrics": {
+        "total": 132818,
+        "orphan": 1052
+      }
+    },
+    {
+      "id": "C04",
+      "relation": "SM.MED_OPERATION_MASTER.SURGEON -> HIS.STAFF_DICT.EMP_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.14,
+      "metrics": {
+        "total": 138551,
+        "orphan": 92300
+      }
+    },
+    {
+      "id": "C05",
+      "relation": "SM.MED_OPERATION_MASTER.ANESTHESIA_DOCTOR -> HIS.STAFF_DICT.EMP_NO",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.07,
+      "metrics": {
+        "total": 138551,
+        "orphan": 23554
+      }
+    },
+    {
+      "id": "C06",
+      "relation": "MTL.EPR_INPATIENT_DOCINDEX.P_DEPT_CODE -> HIS.DEPT_DICT.DEPT_CODE",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.09,
+      "metrics": {
+        "total": 239863,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "C07",
+      "relation": "SM.MED_OPERATION_SCHEDULE -> SM.MED_OPERATION_MASTER by PATIENT_ID+VISIT_ID+OPER_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.32,
+      "metrics": {
+        "total": 192538,
+        "orphan": 74699
+      }
+    },
+    {
+      "id": "C08",
+      "relation": "SM.MED_CUSTOM_DATA -> SM.MED_OPERATION_MASTER by bounded operation keys",
+      "mode": "bounded",
+      "note": "MED_CUSTOM_DATA 约3300万行，使用5000个手术主表键限定",
+      "status": "ok",
+      "seconds": 3.44,
+      "metrics": {
+        "custom_rows": 1030763,
+        "matched_operation_keys": 4178
+      }
+    },
+    {
+      "id": "C09",
+      "relation": "HIS.OPERATION -> HIS.PAT_VISIT by PATIENT_ID+VISIT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.31,
+      "metrics": {
+        "total": 528729,
+        "orphan": 16
+      }
+    },
+    {
+      "id": "C10",
+      "relation": "HIS.OPERATION has any SM.MED_OPERATION_MASTER by PATIENT_ID+VISIT_ID",
+      "mode": "full",
+      "note": "仅验证同住院是否存在手麻手术，不代表一条HIS.OPERATION可唯一对应SM手术",
+      "status": "ok",
+      "seconds": 0.3,
+      "metrics": {
+        "total": 528729,
+        "has_sm_operation": 247724
+      }
+    },
+    {
+      "id": "C11",
+      "relation": "HIS.DIAGNOSIS -> HIS.PAT_MASTER_INDEX by PATIENT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 1.62,
+      "metrics": {
+        "total": 3330143,
+        "orphan": 81
+      }
+    },
+    {
+      "id": "C12",
+      "relation": "HIS.CLINIC_MASTER.VISIT_DEPT -> HIS.DEPT_DICT.DEPT_CODE",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 3.72,
+      "metrics": {
+        "total": 5704241,
+        "orphan": 0
+      }
+    },
+    {
+      "id": "C13",
+      "relation": "SM.MED_OPERATION_MASTER -> HIS.PAT_MASTER_INDEX by PATIENT_ID",
+      "mode": "full",
+      "note": "",
+      "status": "ok",
+      "seconds": 0.18,
+      "metrics": {
+        "total": 138551,
+        "orphan": 267
+      }
+    }
+  ]
+}

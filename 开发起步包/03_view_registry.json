@@ -1,0 +1,253 @@
+{
+  "schema_version": 3,
+  "purpose": "relationship_seed_registry",
+  "authority_note": "用于关系图谱的视图种子注册表。旧 sql_file/DataX/部署字段已移除；source_view 已按 08_数据中心元数据快照.json 校验。",
+  "views": [
+    {
+      "id": 1,
+      "name": "入院记录",
+      "table": "EMR_ADMISSION_RECORD",
+      "source_view": "V_EMR_ADMISSION_RECORD",
+      "time_column": "ADMISSION_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [],
+      "id_generation_rule": "49557032X|PATIENT_ID|VISIT_ID",
+      "clob_fields": [
+        "CHIEF_COMPLAINT"
+      ],
+      "number_precision_fields": [
+        "WEIGHT",
+        "TEMPERATURE",
+        "BREATHING_RATE",
+        "PULSE_RATE",
+        "PRESSURE_H",
+        "PRESSURE_L"
+      ],
+      "value_domain_fields": [
+        {
+          "field": "SEX_CODE",
+          "standard": "GBT2261-2003"
+        },
+        {
+          "field": "OTHER_ID_TYPE",
+          "standard": "CV02.01.101"
+        },
+        {
+          "field": "NATION_CODE",
+          "standard": "GBT3304-1991"
+        },
+        {
+          "field": "MARITAL_STATUS_CODE",
+          "standard": "GBT4766-1984"
+        },
+        {
+          "field": "OCCUPATION_CODE",
+          "standard": "GBT6565-1999"
+        },
+        {
+          "field": "DEP_CODE",
+          "standard": "CS_SECTION"
+        },
+        {
+          "field": "LINKMAN_RELATION_CODE",
+          "standard": "DMA-09"
+        },
+        {
+          "field": "ADMISSION_TYPE_CODE",
+          "standard": "CV09.00.403"
+        },
+        {
+          "field": "INSU_TYPE_CODE",
+          "standard": "DMB-47"
+        },
+        {
+          "field": "ADM_WAY_CODE",
+          "standard": "CV09.00.403"
+        }
+      ],
+      "notes": "历史抽取状态已移除；保留为关系图谱种子。2024-02 起 RECORD_TIME/EFFECTIVE_TIME 存在非法日期，抽取时暂置 NULL。"
+    },
+    {
+      "id": 2,
+      "name": "入院记录-体格检查",
+      "table": "EMR_ADMISSION_RECORD_EXAM",
+      "source_view": "V_EMR_ADMISSION_RECORD_EXAM",
+      "time_column": "ADMISSION_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [
+        {
+          "field": "AR_ID",
+          "references_table": "EMR_ADMISSION_RECORD",
+          "references_field": "ID"
+        }
+      ],
+      "notes": "值域风险：EXAM_TYPE 硬编码、EXAM_TIME_CODE 院内码。"
+    },
+    {
+      "id": 3,
+      "name": "入院诊断",
+      "table": "EMR_ADMISSION_DIAGNOSIS",
+      "source_view": "V_EMR_ADMISSION_DIAGNOSIS",
+      "time_column": "ADMISSION_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [
+        {
+          "field": "ADMISSION_ID",
+          "references_table": "EMR_ADMISSION_RECORD",
+          "references_field": "ID"
+        }
+      ],
+      "notes": "可确定修复：DIAGNOSIS_TYPE_CODE 应补充 '2' -> '2'。"
+    },
+    {
+      "id": 4,
+      "name": "出院记录",
+      "table": "EMR_DISCHARGE_RECORD",
+      "source_view": "V_EMR_DISCHARGE_RECORD",
+      "time_column": "DISCHARGE_DATE",
+      "notes": "需重点核查主键重复、医生身份证号覆盖、离院方式值域。"
+    },
+    {
+      "id": 5,
+      "name": "出院记录-诊断",
+      "table": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+      "source_view": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+      "time_column": "DISCHARGE_DATE",
+      "notes": "需核查 DR_ID 外键与出院记录主表 ID 一致性。；08实测ODS视图名无V_前缀，已修正为 EMR_DISCHARGE_RECORD_DIAGNOSIS。"
+    },
+    {
+      "id": 6,
+      "name": "住院医嘱-药品类",
+      "table": "EMR_DOC_ORDER_DRUG",
+      "source_view": "V_EMR_DOC_ORDER_DRUG",
+      "time_column": "START_DATE_TIME",
+      "notes": "需确认 ADMINISTRATION 中文到 CV06.00.102 映射、药品分类、用药目的。"
+    },
+    {
+      "id": 7,
+      "name": "住院医嘱-非药品类",
+      "table": "EMR_DOC_ORDER_CHECK",
+      "source_view": "V_EMR_DOC_ORDER_CHECK",
+      "time_column": "START_DATE_TIME",
+      "notes": "需确认医嘱状态、执行频次、检查检验项目字段语义。"
+    },
+    {
+      "id": 8,
+      "name": "门诊处方",
+      "table": "EMR_OUTPATIENT_RECIPE",
+      "source_view": "V_EMR_OUTPATIENT_RECIPE",
+      "time_column": "RECIPE_DATE",
+      "notes": "需改显式 JOIN，医生代码应取身份证号，CASE_NUM 不应直接等于 patient_id。"
+    },
+    {
+      "id": 9,
+      "name": "门诊处方明细",
+      "table": "EMR_OUTPATIENT_RECIPE_ITEM",
+      "source_view": "V_EMR_OUTPATIENT_RECIPE_ITEM",
+      "time_column": "RECIPE_DATE",
+      "notes": "需核查 OR_ID 与处方主表 ID 一致性、用药途径/剂型/皮试结果。"
+    },
+    {
+      "id": 36,
+      "name": "术后首次病程记录",
+      "table": "EMR_HOS_POSTOPER_RECORD",
+      "source_view": "V_EMR_HOS_POSTOPER_RECORD",
+      "time_column": "RECORD_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "notes": "第二批视图，尚未系统核查。"
+    },
+    {
+      "id": 37,
+      "name": "术前讨论与小结",
+      "table": "EMR_HOS_PREOP_DISCUSS",
+      "source_view": "V_EMR_HOS_PREOP_DISCUSS",
+      "time_column": "DISCUSS_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [],
+      "id_generation_rule": "49557032X|PATIENT_ID|VISIT_ID|UHID|EPR_INPATIENT.ID",
+      "notes": "视图已部署，80,375行。HIS_BEFOPER_DNAME目标表有但源视图无，抽取时置NULL。DISCUSS_DATE/PERFORM_OPERATION_DATE源为DATE目标为CLOB/VARCHAR2类型不完全匹配。"
+    },
+    {
+      "id": 38,
+      "name": "死亡病历讨论记录",
+      "table": "EMR_HOS_DND_RECORD",
+      "source_view": "V_EMR_HOS_DND_RECORD",
+      "time_column": "DISCUSS_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [],
+      "id_generation_rule": "49557032X|UHID|EPR_INPATIENT.ID",
+      "notes": "视图已部署，DISCUSS_DATE 为 DATE 类型，来源CLOB正则提取+doc_create_date兜底。0225年异常记录1条（DISCUSS_DATE=0225-06-03），抽取时2021-2024范围自然排除。"
+    },
+    {
+      "id": 39,
+      "name": "疑难病例讨论记录",
+      "table": "EMR_HOS_DIFFIC_CASE_DISCUSS",
+      "source_view": "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+      "time_column": "DISCUSS_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "fk_fields": [],
+      "id_generation_rule": "49557032X|UHID|EPR_INPATIENT.ID",
+      "notes": "视图已部署，DISCUSS_DATE 为 DATE 类型，CLOB多格式正则提取+Createon兜底。HOET_NAME/DISCUSS_OPINION 原存在NOT NULL违规已修复。"
+    },
+    {
+      "id": 40,
+      "name": "转科记录",
+      "table": "EMR_HOS_CHANGE_MAJOR_RECORD",
+      "source_view": "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+      "time_column": "ROLL_OUT_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "notes": "视图已部署，37/37字段全覆盖。"
+    },
+    {
+      "id": 41,
+      "name": "转诊院记录",
+      "table": "EMR_REFERRAL_HOS_RECORD",
+      "source_view": "V_EMR_REFERRAL_HOS_RECORD",
+      "time_column": "RECORD_TIME",
+      "notes": "第二批视图，尚未系统核查。"
+    },
+    {
+      "id": 42,
+      "name": "会诊记录",
+      "table": "EMR_HOS_CONSUL_RECORD",
+      "source_view": "V_EMR_HOS_CONSUL_RECORD",
+      "time_column": "CONSULTATION_DATE",
+      "pk_fields": [
+        "ID"
+      ],
+      "notes": "视图已部署，171,770行。"
+    },
+    {
+      "id": 43,
+      "name": "住院医师交接班记录",
+      "table": "EMR_HOS_SUCCESSION_RECORD",
+      "source_view": "V_EMR_HOS_SUCCESSION_RECORD",
+      "time_column": "RECORD_TIME",
+      "notes": "第二批视图，尚未系统核查。"
+    },
+    {
+      "id": 44,
+      "name": "抢救记录",
+      "table": "EMR_HOS_SAVE_RECORD",
+      "source_view": "V_EMR_HOS_SAVE_RECORD",
+      "time_column": "RECORD_TIME",
+      "notes": "第二批视图，尚未系统核查。"
+    }
+  ]
+}

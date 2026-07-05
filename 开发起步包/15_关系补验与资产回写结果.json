@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-07-03 08:39:15",
+  "db": "10.10.8.216/orcl",
+  "relationships_before": 35,
+  "relationships_after": 47,
+  "promoted_relationship_ids": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+  "summary": {
+    "jhemr": "PATIENT_ID+VISIT_ID 全量验证可挂 HIS.PAT_VISIT；HIS_VISIT_ID 全空。",
+    "pacs": "PACS 内部 PATIENTINFO->EXAMINFO->REPORT 成立；未发现检查级字段可直接挂 HIS.EXAM_MASTER。PACS 患者身份可弱匹配 HIS 患者主索引，但不是检查级关系。",
+    "lis": "LIS 内部申请/报告关系成立；BARCODE=HIS.TEST_NO 需按时间/接口口径拆分，暂不无条件入正式关系。",
+    "ydhl": "YDHL 通过 MRN=HIS.INP_NO + SERIES=VISIT_ID 挂 HIS 住院；护理事实表通过 PATIENT_UID 挂 INPATIENTS。"
+  }
+}

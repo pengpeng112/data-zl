@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-07-03",
+  "asset_package_dir": "数据资产_HIS源端资产包/",
+  "generator": "tools/build_his_source_asset_package.py",
+  "source_db": "10.10.10.15:1521/his",
+  "source_metadata": "16_hisuser业务库元数据快照.json",
+  "scope_basis": [
+    "22_HIS源端字段主题与ODS覆盖差异结果.json",
+    "23_HIS源端资产范围复核与下一步计划结果.json"
+  ],
+  "outputs": {
+    "tables": "数据资产_HIS源端资产包/his_source_tables.csv",
+    "columns": "数据资产_HIS源端资产包/his_source_columns.csv",
+    "relationships": "数据资产_HIS源端资产包/his_source_relationships.csv",
+    "catalog": "数据资产_HIS源端资产包/his_source_catalog.json"
+  },
+  "summary": {
+    "table_count": 1234,
+    "column_count": 19831,
+    "relationship_count": 33,
+    "ods_same_name_covered_count": 105,
+    "include_status_counts": {
+      "included": 473,
+      "excluded": 201,
+      "candidate": 560
+    },
+    "table_role_counts": {
+      "dimension": 443,
+      "excluded": 201,
+      "candidate": 560,
+      "execution_fact": 2,
+      "core_fact": 26,
+      "payment_fact": 1,
+      "inpatient_management_fact": 1
+    },
+    "owner_counts": {
+      "COMM": 382,
+      "DRUG_USER": 123,
+      "EXAM": 39,
+      "INPADM": 26,
+      "INPBILL": 67,
+      "LAB": 137,
+      "MEDADM": 73,
+      "MEDREC": 163,
+      "ORDADM": 55,
+      "OUTPADM": 36,
+      "OUTPBILL": 31,
+      "PHARMACY": 102
+    }
+  },
+  "confirmed_rules": {
+    "include_owners": ["MEDREC", "INPADM", "ORDADM", "LAB", "EXAM", "INPBILL", "OUTPBILL", "OUTPADM", "DRUG_USER", "PHARMACY", "COMM", "MEDADM"],
+    "exclude_patterns": ["ST_*", "*_LOG", "*LOG*", "接口中间表", "临时/备份/测试表", "纯统计日/月表"],
+    "force_include_tables": ["ORDADM.ORDERS_EXECUTE_DETAILS", "DRUG_USER.INP_ORDER_EXECDATA", "INPBILL.PREPAYMENT_RCPT", "MEDADM.BEDPATS_IN_HOSPITAL", "COMM.DEPT_DICT", "COMM.STAFF_DICT", "COMM.PRICE_LIST", "COMM.DIAGNOSIS_DICT"],
+    "force_exclude_tables": ["COMM.OPERATION_LOG"],
+    "outpatient_lab_exam_rule": "LAB/EXAM 中 VISIT_ID=0/NULL 的记录按门诊口径归类；当前 PATIENT_ID+申请日期仅为候选关联。"
+  },
+  "next_steps": [
+    "人工复核 candidate 表，优先 DRUG_USER/PHARMACY 药品扩展、MEDADM 非 ST_* 管理表、COMM 非字典表。",
+    "继续寻找门诊检验/检查强关联键：RCPT_NO、ORDER_ID、CLINIC_NO、VISIT_DATE/VISIT_NO。",
+    "将 his_source_* 导入资产系统测试库，验证字段映射与关系导入。",
+    "如资产系统支持多源血缘，将 HIS 源端 105 张同名覆盖表与 ODS.HIS 表建立跨源映射。"
+  ]
+}
