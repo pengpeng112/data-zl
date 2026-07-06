@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-07-05T21:40:00+08:00",
+  "source_db": "10.10.10.15:1521/his",
+  "via_jump_host": "10.10.8.53:40022",
+  "mode": "readonly_select_only",
+  "reference_docs": [
+    "开发起步包/系统表结构/HIS系统数据库表结构.md",
+    "开发起步包/系统表结构/HIS系统药房药库表设计文档.md"
+  ],
+  "sample_limit_default": 10000,
+  "summary": {
+    "tested_relations": 17,
+    "formal_import_recommended": 10,
+    "review_recommended": 1,
+    "not_import_recommended": 3,
+    "superseded_query_errors": 3
+  },
+  "formal_import_recommended": [
+    "CAND0545",
+    "CAND0546_STRICT",
+    "CAND0556",
+    "CAND0561",
+    "CAND0562",
+    "CAND0526",
+    "CAND0551",
+    "CAND0552_STRICT",
+    "CAND0234",
+    "CAND0495"
+  ],
+  "review_recommended": [
+    "CAND0025"
+  ],
+  "not_import_recommended": [
+    "CAND0029",
+    "CAND0231",
+    "CAND0524_VIA_MASTER"
+  ],
+  "results": [
+    {"id":"CAND0545","domain":"药房摆药","from_table":"PHARMACY.DRUG_DISPENSE_REC","from_cols":["PATIENT_ID","VISIT_ID"],"to_table":"MEDREC.PAT_VISIT","to_cols":["PATIENT_ID","VISIT_ID"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0546_STRICT","domain":"药房摆药","from_table":"PHARMACY.DRUG_DISPENSE_REC","from_cols":["PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0556","domain":"药品处方明细","from_table":"PHARMACY.DRUG_PRESC_DETAIL","from_cols":["ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["ORDER_NO","ORDER_SUB_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0561","domain":"药品处方主记录","from_table":"PHARMACY.DRUG_PRESC_MASTER","from_cols":["PATIENT_ID","VISIT_ID"],"to_table":"MEDREC.PAT_VISIT","to_cols":["PATIENT_ID","VISIT_ID"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0562","domain":"药品处方收费","from_table":"PHARMACY.DRUG_PRESC_MASTER","from_cols":["RCPT_NO"],"to_table":"OUTPBILL.OUTP_RCPT_MASTER","to_cols":["RCPT_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0526","domain":"待发药住院处方主记录","from_table":"PHARMACY.DOCT_DRUG_PRESC_MASTER","from_cols":["PATIENT_ID","VISIT_ID"],"to_table":"MEDREC.PAT_VISIT","to_cols":["PATIENT_ID","VISIT_ID"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0551","domain":"摆药按发药日期分表","from_table":"PHARMACY.DRUG_DISPENSE_REC_DISPDATE","from_cols":["PATIENT_ID","VISIT_ID"],"to_table":"MEDREC.PAT_VISIT","to_cols":["PATIENT_ID","VISIT_ID"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0552_STRICT","domain":"摆药按发药日期分表","from_table":"PHARMACY.DRUG_DISPENSE_REC_DISPDATE","from_cols":["PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0234","domain":"检验收费","from_table":"LAB.LAB_TEST_MASTER","from_cols":["RCPT_NO"],"to_table":"OUTPBILL.OUTP_RCPT_MASTER","to_cols":["RCPT_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0495","domain":"门诊收费明细","from_table":"OUTPBILL.OUTP_BILL_ITEMS","from_cols":["RCPT_NO"],"to_table":"OUTPBILL.OUTP_RCPT_MASTER","to_cols":["RCPT_NO"],"total_count":10000,"matched_count":10000,"orphan_count":0,"match_rate":1.0,"validation_status":"sample_pass","recommended_import_action":"import_formal"},
+    {"id":"CAND0025","domain":"检查收费","from_table":"EXAM.EXAM_BILL_ITEMS","from_cols":["EXAM_NO"],"to_table":"EXAM.EXAM_MASTER","to_cols":["EXAM_NO"],"total_count":10000,"matched_count":9994,"orphan_count":6,"match_rate":0.9994,"validation_status":"sample_pass_with_orphans","recommended_import_action":"import_review"},
+    {"id":"CAND0029","domain":"检查项目","from_table":"EXAM.EXAM_ITEMS","from_cols":["EXAM_NO"],"to_table":"EXAM.EXAM_MASTER","to_cols":["EXAM_NO"],"total_count":10000,"matched_count":8090,"orphan_count":1910,"match_rate":0.809,"validation_status":"sample_fail","recommended_import_action":"keep_candidate"},
+    {"id":"CAND0231","domain":"检验项目明细","from_table":"LAB.LAB_TEST_ITEMS_DETAIL","from_cols":["TEST_NO"],"to_table":"LAB.LAB_TEST_MASTER","to_cols":["TEST_NO"],"total_count":10000,"matched_count":9560,"orphan_count":440,"match_rate":0.956,"validation_status":"sample_fail","recommended_import_action":"keep_candidate"},
+    {"id":"CAND0524_VIA_MASTER","domain":"待发药住院处方明细","from_table":"PHARMACY.DOCT_DRUG_PRESC_DETAIL + DOCT_DRUG_PRESC_MASTER","from_cols":["PRESC_NO","PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["PATIENT_ID","VISIT_ID","ORDER_NO","ORDER_SUB_NO"],"total_count":1000,"matched_count":143,"orphan_count":857,"match_rate":0.143,"validation_status":"sample_fail","recommended_import_action":"keep_candidate"},
+    {"id":"CAND0546","domain":"药房摆药","from_table":"PHARMACY.DRUG_DISPENSE_REC","from_cols":["ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["ORDER_NO","ORDER_SUB_NO"],"validation_status":"query_error","recommended_import_action":"superseded_by_CAND0546_STRICT"},
+    {"id":"CAND0552","domain":"摆药按发药日期分表","from_table":"PHARMACY.DRUG_DISPENSE_REC_DISPDATE","from_cols":["ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["ORDER_NO","ORDER_SUB_NO"],"validation_status":"query_error","recommended_import_action":"superseded_by_CAND0552_STRICT"},
+    {"id":"CAND0524","domain":"待发药住院处方明细","from_table":"PHARMACY.DOCT_DRUG_PRESC_DETAIL","from_cols":["ORDER_NO","ORDER_SUB_NO"],"to_table":"ORDADM.ORDERS","to_cols":["ORDER_NO","ORDER_SUB_NO"],"validation_status":"query_error","recommended_import_action":"superseded_by_CAND0524_VIA_MASTER"}
+  ]
+}

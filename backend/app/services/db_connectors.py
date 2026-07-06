@@ -348,9 +348,20 @@ class SqlServerConnector(DatabaseConnector):
             self.close()
 
 
+class VastbaseConnector(PostgresConnector):
+    """海量数据 Vastbase G100 连接器。
+
+    Vastbase G100 兼容 PostgreSQL 协议，复用 psycopg 驱动。
+    JDBC 驱动 (Vastbase-G100-2.15_pg) 存档于 drivers/ 供 Java 程序使用。
+    """
+
+    db_type = "vastbase"
+
+
 DB_CONNECTOR_MAP = {
     "oracle": OracleConnector,
     "postgresql": PostgresConnector,
+    "vastbase": VastbaseConnector,
     "mysql": MysqlConnector,
     "sqlserver": SqlServerConnector,
 }

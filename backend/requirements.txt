@@ -8,6 +8,8 @@ pymysql>=1.1
 pyodbc>=5.0
 # PostgreSQL 连接器（当前应用库已使用）
 psycopg[binary]>=3.1
+# Oracle 连接器（HIS 源库 10.10.10.15 / 数据中心 10.10.8.216）
+oracledb>=2.0
 python-dotenv>=1.0
 alembic>=1.13
 pytest>=8.0

@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-07-06T14:32:53",
+  "source": "secondary rechecked HIS_READY assets",
+  "system_code": "HIS_SOURCE",
+  "source_code": "his_ready_10_10_10_15",
+  "inputs": {
+    "core_tables": "secondary_core_tables_rechecked.csv",
+    "excluded_tables": "secondary_excluded_tables_rechecked.csv",
+    "relationships_A": "secondary_relationships_A_rechecked.csv",
+    "columns_base": "governance_columns.csv"
+  },
+  "outputs": {
+    "tables": "governance_tables_final.csv",
+    "columns": "governance_columns_final.csv",
+    "formal_relations": "governance_relations_formal_final.csv",
+    "excluded_tables": "governance_excluded_tables_final.csv",
+    "deferred_relations": "governance_deferred_relations_final.csv"
+  },
+  "counts": {
+    "input_core_tables": 659,
+    "output_tables": 659,
+    "input_excluded_tables": 575,
+    "output_excluded_tables": 575,
+    "output_columns": 8875,
+    "input_A_relations": 34,
+    "added_outpatient_strong_key_relations": 2,
+    "output_formal_relations": 36,
+    "output_deferred_relations": 0
+  },
+  "acceptance": {
+    "table_count_matches_core_input": true,
+    "excluded_count_matches_input": true,
+    "relation_count_matches_A_plus_outpatient": true,
+    "outpatient_strong_keys_present": true,
+    "tables_without_columns_in_base_snapshot": 0
+  },
+  "tables_without_columns_in_base_snapshot": []
+}

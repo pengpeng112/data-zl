@@ -1,0 +1,124 @@
+{
+  "generated_at": "2026-07-05",
+  "scope": {
+    "jump_host": "10.10.8.53:40022",
+    "live_verified_db": "10.10.8.216:1521/orcl",
+    "his_source_asset_package": "数据资产_HIS源端资产包/",
+    "safety": "metadata SELECT only; no DML/DDL; no sensitive row data exported"
+  },
+  "jump_host_check": {
+    "ssh_ok": true,
+    "oracle_client": "/opt/oracle/instantclient_21",
+    "oracledb_python_module": true
+  },
+  "ods_live_metadata_check": {
+    "version_banner": "Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production",
+    "tables_by_owner": [
+      {"owner": "CDA", "table_count": 86, "stats_rows": 112982799},
+      {"owner": "HIS", "table_count": 273, "stats_rows": 619986694},
+      {"owner": "JHEMR", "table_count": 31, "stats_rows": 6558291},
+      {"owner": "LIS", "table_count": 11, "stats_rows": 59292892},
+      {"owner": "MTL", "table_count": 34, "stats_rows": 13716707},
+      {"owner": "ODS", "table_count": 19, "stats_rows": 19099652},
+      {"owner": "PACS", "table_count": 18, "stats_rows": 4944559},
+      {"owner": "PORTAL_EMPI", "table_count": 10, "stats_rows": 1822323},
+      {"owner": "SM", "table_count": 25, "stats_rows": 40054193},
+      {"owner": "YDHL", "table_count": 31, "stats_rows": 355783485}
+    ],
+    "views_by_owner": [
+      {"owner": "CDA", "view_count": 149},
+      {"owner": "HIS", "view_count": 28},
+      {"owner": "JHEMR", "view_count": 9},
+      {"owner": "LIS", "view_count": 1},
+      {"owner": "MTL", "view_count": 1},
+      {"owner": "ODS", "view_count": 120},
+      {"owner": "YDHL", "view_count": 1}
+    ],
+    "key_table_checks": [
+      {"owner": "HIS", "table": "LAB_RESULT", "column_count": 26, "num_rows_stats": 96312418, "last_analyzed": "2026-01-09T11:19:27"},
+      {"owner": "HIS", "table": "EXAM_MASTER", "column_count": 58, "num_rows_stats": 3385322, "last_analyzed": "2026-06-13T18:00:34"},
+      {"owner": "HIS", "table": "EXAM_REPORT", "column_count": 14, "num_rows_stats": 1314456, "last_analyzed": "2026-06-12T10:07:43"},
+      {"owner": "HIS", "table": "PAT_VISIT", "column_count": 268, "num_rows_stats": 575041, "last_analyzed": "2026-06-30T10:04:40"},
+      {"owner": "CDA", "table": "CDA_DICTIONARY", "column_count": 7, "num_rows_stats": 79031, "last_analyzed": "2026-06-09T10:00:12"}
+    ],
+    "ods_registered_style_views": 95,
+    "finding": "ODS owner now has 120 views; earlier documentation recorded 119. Re-harvest and diff are recommended."
+  },
+  "his_source_asset_import_check": {
+    "table_count": 1234,
+    "column_count": 19831,
+    "relationship_count": 33,
+    "duplicate_table_keys": 0,
+    "duplicate_column_keys": 0,
+    "missing_relationship_endpoint_count": 0,
+    "include_status_counts": {
+      "included": 473,
+      "candidate": 560,
+      "excluded": 201
+    },
+    "relationship_status_counts": {
+      "full_pass": 8,
+      "full_pass_with_note": 1,
+      "sample_pass": 13,
+      "pass_with_subset": 3,
+      "partial": 2,
+      "candidate": 2,
+      "verified": 4
+    },
+    "included_without_primary_key": 106,
+    "included_without_primary_key_by_role": {
+      "dimension": 103,
+      "core_fact": 2,
+      "execution_fact": 1
+    },
+    "candidate_by_owner": {
+      "LAB": 123,
+      "MEDREC": 97,
+      "DRUG_USER": 96,
+      "PHARMACY": 60,
+      "INPBILL": 41,
+      "ORDADM": 33,
+      "EXAM": 29,
+      "OUTPADM": 26,
+      "MEDADM": 24,
+      "OUTPBILL": 21,
+      "INPADM": 10
+    },
+    "relationships_need_manual_review": [
+      {"relationship_id": "R003", "validation_status": "full_pass_with_note"},
+      {"relationship_id": "R011", "validation_status": "pass_with_subset"},
+      {"relationship_id": "R014", "validation_status": "partial"},
+      {"relationship_id": "R015", "validation_status": "candidate"},
+      {"relationship_id": "R016", "validation_status": "pass_with_subset"},
+      {"relationship_id": "R018", "validation_status": "partial"},
+      {"relationship_id": "R020", "validation_status": "candidate"},
+      {"relationship_id": "R025", "validation_status": "pass_with_subset"}
+    ]
+  },
+  "governance_import_recommendation": {
+    "import_as_source_system": "HIS_SOURCE",
+    "do_not_merge_directly_into_ods_assets": true,
+    "table_status_mapping": {
+      "included": "active",
+      "candidate": "pending_review",
+      "excluded": "excluded"
+    },
+    "relationship_mapping": {
+      "full_pass": "formal_relation",
+      "verified": "formal_relation",
+      "sample_pass": "formal_relation_with_sample_validation",
+      "full_pass_with_note": "relation_review",
+      "pass_with_subset": "relation_review",
+      "partial": "relation_review",
+      "candidate": "relation_review"
+    },
+    "required_followups": [
+      "Implement 8.53 jump-host/worker metadata collection mode",
+      "Resolve credential_ref without storing plaintext passwords",
+      "Re-harvest ODS metadata and diff the additional ODS view",
+      "Import his_source_* into a governance test database",
+      "Create primary-key governance tasks for 106 included tables without primary_key",
+      "Route 8 non-strong relationships into asset_relation_reviews"
+    ]
+  }
+}

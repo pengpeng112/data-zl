@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-07-05",
+  "input": [
+    "数据资产_HIS_READY复核包/",
+    "23_HIS源端资产范围复核与下一步计划结果.json",
+    "25_HIS源端资产包生成结果.json"
+  ],
+  "output_dir": "数据资产_HIS_READY治理导入包/",
+  "summary": {
+    "system_code": "HIS_SOURCE",
+    "source_code": "his_ready_10_10_10_15",
+    "tables": 1234,
+    "columns": 24726,
+    "formal_relations": 7,
+    "review_relations": 15,
+    "ranked_candidate_relations": 578,
+    "validate_next_candidates": 203,
+    "include_status_counts": {
+      "included": 473,
+      "excluded": 201,
+      "candidate": 560
+    },
+    "table_role_counts": {
+      "dimension": 443,
+      "excluded": 201,
+      "candidate": 560,
+      "execution_fact": 2,
+      "core_fact": 26,
+      "payment_fact": 1,
+      "inpatient_management_fact": 1
+    },
+    "primary_key_status_counts": {
+      "present": 881,
+      "missing": 353
+    },
+    "included_without_primary_key": 106
+  },
+  "outputs": [
+    "governance_tables.csv",
+    "governance_columns.csv",
+    "governance_relations_formal.csv",
+    "governance_relation_reviews.csv",
+    "governance_candidate_relations_ranked.csv",
+    "governance_import_summary.json"
+  ],
+  "recommended_import_order": [
+    "AssetSystem / AssetDataSource",
+    "AssetTable",
+    "AssetColumn",
+    "AssetRelation formal",
+    "AssetRelationReview",
+    "Candidate validation task pool"
+  ]
+}

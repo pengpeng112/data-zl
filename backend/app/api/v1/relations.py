@@ -12,6 +12,20 @@ from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
 
 router = APIRouter(prefix="/api/v1/relations", tags=["relations"])
+LEGACY_TABLE_ALIASES = {
+    "HIS.PAT_VISIT": "MEDREC.PAT_VISIT",
+    "HIS.PAT_MASTER_INDEX": "MEDREC.PAT_MASTER_INDEX",
+}
+CANONICAL_TO_LEGACY = {v: k for k, v in LEGACY_TABLE_ALIASES.items()}
+
+
+def _aliases_for(table: str) -> set[str]:
+    names = {table}
+    if table in LEGACY_TABLE_ALIASES:
+        names.add(LEGACY_TABLE_ALIASES[table])
+    if table in CANONICAL_TO_LEGACY:
+        names.add(CANONICAL_TO_LEGACY[table])
+    return names
 
 
 def _load_edges(db: Session) -> dict[str, list[tuple[str, dict]]]:
@@ -30,7 +44,11 @@ def _load_edges(db: Session) -> dict[str, list[tuple[str, dict]]]:
             "from_columns": r.from_columns,
             "to_columns": r.to_columns,
         }
-        edges.setdefault(r.from_table or "", []).append((r.to_table or "", meta))
+        src = r.from_table or ""
+        tgt = r.to_table or ""
+        for src_name in _aliases_for(src):
+            for tgt_name in _aliases_for(tgt):
+                edges.setdefault(src_name, []).append((tgt_name, meta))
     return edges
 
 

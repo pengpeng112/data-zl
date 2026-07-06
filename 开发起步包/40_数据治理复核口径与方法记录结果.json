@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-07-06T10:10:00+08:00",
+  "document": "40_数据治理复核口径与方法记录.md",
+  "purpose": "记录用户确认的数据治理复核口径，供后续 AI 继续分析 HIS、数据中心及其他系统资产时复用。",
+  "captured_rules": [
+    "有中文名、业务备注、近 30 天有数据的表优先保留。",
+    "日期快照、备份、临时、日志、测试、中文手工结果表优先排除。",
+    "当前待确认池中总行数 5 行以内的表直接排除，除非用户明确保留。",
+    "PUB_CONFIG、VIEW_SHOWDATA、INP_BILL_DETAIL_CANCEL、LAB_SHARINGCENTER_DETAIL、ORDERS_EXECUTE 明确保留。",
+    "原 B/C 级关系按用户确认可采用，合并到 A_rechecked。",
+    "D 级关系作为跨系统后续分析任务，当前不纳入 HIS_READY 图谱。"
+  ],
+  "related_outputs": [
+    "38_secondary_manual_confirm_tables复核修订报告.md",
+    "39_secondary_relationships分级修订报告.md",
+    "数据资产_HIS_READY二次优化包/secondary_core_tables_rechecked.csv",
+    "数据资产_HIS_READY二次优化包/secondary_relationships_A_rechecked.csv"
+  ]
+}

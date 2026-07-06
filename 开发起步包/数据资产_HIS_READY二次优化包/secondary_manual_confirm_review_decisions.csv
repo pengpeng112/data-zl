@@ -1,0 +1,579 @@
+﻿Schema,表名,表中文名,总行数,原确认状态,复核动作,复核理由,候选时间字段,是否仍需人工确认
+COMM,DIAGNOSIS_DICT_BK_20210209,,27599,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+COMM,DIAGNOSIS_DICT_BK_20210808,,25924,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+COMM,DIAGNOSIS_DICT_BK_20220822,,27546,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+COMM,DIAGNOSIS_DICT_TEMP,疾病字典,38145,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+COMM,DICT_EXCEL_TEMPLATE,,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,,?
+COMM,DRUG_SUPPLIER_CATALOG,药品供应商目录,1452,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：LICENCEISSUEDATE，需后续只读 SQL 补近30天活跃度,LICENCEISSUEDATE,?
+COMM,EXP_DICT_BK,,37,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+COMM,EXP_NAME_DICT_BK,,181,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+COMM,EXP_SUPPLIER_CATALOG,,3505,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 4 ??????,LICENCE_DATE,?
+COMM,HIS_VS_BJYB_CATALOG,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+COMM,NURSE_TEMPERATURE_CLASS_DICT,体温单护理类别表,0,待人工确认,remain_manual,规则未能确定,,?
+COMM,NURSE_TEMPERATURE_ITEM_DICT,体温单护理项目表,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+COMM,OFFICIAL_DRUG_CATALOG,公费用药目录,0,待人工确认,remain_manual,规则未能确定,ENTERED_DATETIME,?
+COMM,OFFICIAL_DRUG_CATALOG_CLASS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+COMM,OPERATION_DICT_BK_20210219,,15594,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+COMM,OPERATION_DICT_BK_20210808,,13617,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_DATE,?
+DRUG_USER,2025-07-17MED_DICT_PRICE,药品产地价格表,7589,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,20260325MED_DICT_BASEINFO,药品目录表,5949,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,6.30MED_DICT_BASEINFO,药品目录表,5565,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,6.30MED_DICT_PRICE,药品产地价格表,7361,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,7月出院患者,,5361,待人工确认,exclude,表名含中文临时/手工结果语义，按用户规则排除,入院时间,?
+DRUG_USER,CS_SECTION,,226,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,DATAPRESCRIPTIONDETAIL_DATA,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PRESTIME,?
+DRUG_USER,DATAPRESCRIPTION_DATA,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PRESTIME,?
+DRUG_USER,DOCUMENT_UPLOAD_RECORD,单据上传记录表,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,CREATE_TIME,?
+DRUG_USER,DRUG_EXPORT_DETAIL,药品出库明细记录,427342,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,DRUG_EXPORT_MASTER,药品出库主记录,92763,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPORT_DATE，需后续只读 SQL 补近30天活跃度,EXPORT_DATE,?
+DRUG_USER,DRUG_IMPORT_DETAIL,药品入库明细记录,522665,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,DRUG_IMPORT_MASTER,药品入库主记录,172382,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：IMPORT_DATE，需后续只读 SQL 补近30天活跃度,IMPORT_DATE,?
+DRUG_USER,DRUG_OTHER_INFO,,2494,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,生效时间,?
+DRUG_USER,DRUG_SUPPLY_GUARANTEE,药品供应保障监测数据,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,SYSTEM_TIME,?
+DRUG_USER,DS_EXCLOUD_DRUG,,303,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,GJZXBZDW,,3485,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,INIT_ACCOUNT_LOG,,13,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,INP_PATIENT_LOG,,157701,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,ADMISSION_DATE_TIME,?
+DRUG_USER,MED_ADJUST_PRICE_DETAIL,调价明细表,784,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+DRUG_USER,MED_ADJUST_PRICE_LIST,调价盈亏记录表,1693,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_ADJUST_PRICE_MASTER,调价主表,442,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ADJST_DATE，需后续只读 SQL 补近30天活跃度,ADJST_DATE,?
+DRUG_USER,MED_CARE_DETAIL,药品养护记录明细表,0,待人工确认,remain_manual,规则未能确定,PRODUCT_DATE,?
+DRUG_USER,MED_CARE_MASTER,药品养护记录主表,0,待人工确认,remain_manual,规则未能确定,CARE_DATE,?
+DRUG_USER,MED_CHECK_DETAIL,盘点明细表,28540,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_CHECK_DETAIL_2025-9-1,盘点明细表,5274,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,EXPIRE_DATE,?
+DRUG_USER,MED_CHECK_MASTER,盘点主表,37,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CHECK_DATE，需后续只读 SQL 补近30天活跃度,CHECK_DATE,?
+DRUG_USER,MED_CODE_GENERATE_RULE,单号生成规则表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,DATE_FORMAT,?
+DRUG_USER,MED_CODE_MASTER,单号主表,0,待人工确认,remain_manual,规则未能确定,WORK_TIME,?
+DRUG_USER,MED_DETAIL_STORAGE,药品结存记录,96569,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_DICT_BASEINFO,药品目录表,6040,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_BASEINFO_RECORD,药品修改记录表,1484,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DRUG_UPDATE_RECORD_ID，需后续只读 SQL 补近30天活跃度,DRUG_UPDATE_RECORD_ID,?
+DRUG_USER,MED_DICT_DEPT,药房药库名称编码表,20,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_TIME，需后续只读 SQL 补近30天活跃度,CREATE_TIME,?
+DRUG_USER,MED_DICT_FACTORY,药品字典厂商,1569,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_INTYPE,药品字典入库类型,17,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_LOC,药品字典库位编码,1500,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+DRUG_USER,MED_DICT_LOCRULE,药品字典库位编码规则,20,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+DRUG_USER,MED_DICT_OUTTYPE,药品字典出库类型,21,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_PRICE,药品产地价格表,8488,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_PRICE_20250822,药品产地价格表,7623,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_PRICE_20250826,药品产地价格表,7626,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_PRICE_20260616,药品产地价格表,8488,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,CREATE_USER_ID,?
+DRUG_USER,MED_DICT_PRICE_RECORD,药品产地价格修改记录表,119,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：UPDATE_PRICE_ID，需后续只读 SQL 补近30天活跃度,UPDATE_PRICE_ID,?
+DRUG_USER,MED_DICT_SUPPLIER,药品字典供货商,70,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_DRUG_LOC,药品库位对照表,8509,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+DRUG_USER,MED_DRUG_LOC_2025-10-30,药品库位对照表,12364,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+DRUG_USER,MED_FIN_DAYDETAIL,财务月结明细表,0,待人工确认,remain_manual,规则未能确定,SETTLE_DAY,?
+DRUG_USER,MED_FIN_DAYSETTLE,财务月结主表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,SETTLE_DAY,?
+DRUG_USER,MED_FIN_MONTHDETAIL,财务月结明细表,890,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,MED_FIN_MONTHSETTLE,财务月结主表,2,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：START_TIME，需后续只读 SQL 补近30天活跃度,START_TIME,?
+DRUG_USER,MED_INIT_ACCOUNT,药库初始化建账表,1222,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PRODUCT_DATE，需后续只读 SQL 补近30天活跃度,PRODUCT_DATE,?
+DRUG_USER,MED_IN_DETAIL,采购入库明细表,116288,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_IN_DETAIL_2025-9-1,采购入库明细表,18717,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,EXPIRE_DATE,?
+DRUG_USER,MED_IN_MASTER,采购入库主表,42788,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：IN_DATE，需后续只读 SQL 补近30天活跃度,IN_DATE,?
+DRUG_USER,MED_IN_PAY,财务验收付款主表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,PAY_DATE,?
+DRUG_USER,MED_IN_PAYDETAIL,财务验收付款明细表,0,待人工确认,remain_manual,规则未能确定,CREATE_USER_ID,?
+DRUG_USER,MED_IN_PLAN,采购计划主表,40,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PLAN_DATE，需后续只读 SQL 补近30天活跃度,PLAN_DATE,?
+DRUG_USER,MED_IN_PLAN_DETAIL,采购计划明细表,40031,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CHECK_QUANTITY，需后续只读 SQL 补近30天活跃度,CHECK_QUANTITY,?
+DRUG_USER,MED_OUT_DETAIL,出库信息明细表,133386,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_OUT_MASTER,出库信息主表,25856,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：REQUEST_DATE，需后续只读 SQL 补近30天活跃度,REQUEST_DATE,?
+DRUG_USER,MED_PHARMACY,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+DRUG_USER,MED_STORAGE,药品库存信息,13904,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_STORAGE_DAY,药库库存日结信息,2620393,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,MED_SUPPLIER_INFO,码上放心对应供应商信息表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,AUDIT_STATUS,?
+DRUG_USER,OPS_PRESC_DATA,,4569270,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 87288 ??????,PRESC_DATE,?
+DRUG_USER,PHA_ALLOCAT_MASTER,药房调拨主表,10439,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：REQUEST_NO，需后续只读 SQL 补近30天活跃度,REQUEST_NO,?
+DRUG_USER,PHA_ALOOCAT_DETAIL,药房调拨明细表,13970,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：REQUEST_NO，需后续只读 SQL 补近30天活跃度,REQUEST_NO,?
+DRUG_USER,PHA_BALANCE,药房价格差额表（平账表）,652,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：BALANCE_DATE，需后续只读 SQL 补近30天活跃度,BALANCE_DATE,?
+DRUG_USER,PHA_CHECK_DETAIL,药房盘点明细表,154531,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PRODUCT_DATE，需后续只读 SQL 补近30天活跃度,PRODUCT_DATE,?
+DRUG_USER,PHA_CHECK_MASTER,药房盘点主表,391,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CHECK_DATE，需后续只读 SQL 补近30天活跃度,CHECK_DATE,?
+DRUG_USER,PHA_DETAIL_STORAGE,药房库存结存信息,6790589,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,PHA_DICT_MEDINFO,药品字典药房药品,165860,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,PHA_FALSE_STORAGE,药房库存信息,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,REQ_PRI,?
+DRUG_USER,PHA_FIN_DAYDETAIL,财务月结明细表,0,待人工确认,remain_manual,规则未能确定,,?
+DRUG_USER,PHA_FIN_DAYSETTLE,财务月结主表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,SETTLE_DAY,?
+DRUG_USER,PHA_FIN_MONTHDETAIL,财务月结明细表,4200,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_USER_ID，需后续只读 SQL 补近30天活跃度,CREATE_USER_ID,?
+DRUG_USER,PHA_FIN_MONTHSETTLE,财务月结主表,10,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：START_TIME，需后续只读 SQL 补近30天活跃度,START_TIME,?
+DRUG_USER,PHA_INIT_ACCOUNT,药房初始化建账表,3880,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PRODUCT_DATE，需后续只读 SQL 补近30天活跃度,PRODUCT_DATE,?
+DRUG_USER,PHA_INP_DISPMASTER,药房发药住院记录主表,336816,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DISP_DATE，需后续只读 SQL 补近30天活跃度,DISP_DATE,?
+DRUG_USER,PHA_INP_REQUEST_DRUG_DISPDATE,,1587680,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,PREFORM_DATETIME_LIST,?
+DRUG_USER,PHA_MEDICAL_ADVICE_REVIEW,,3564,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 87 ??????,EXEC_SQN,?
+DRUG_USER,PHA_SPECIAL_DRUG_REVIEW,特殊药品审核记录表,44380,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_TIME，需后续只读 SQL 补近30天活跃度,CREATE_TIME,?
+DRUG_USER,PHA_STORAGE,药房库存信息,35423,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,PHA_STORAGE_DAY,药房库存日结信息,7081114,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+DRUG_USER,PHA_VISIT_DISPDETAIL,门诊发药申请详情?,2095101,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PRODUCT_DATE，需后续只读 SQL 补近30天活跃度,PRODUCT_DATE,?
+DRUG_USER,PHA_VISIT_DISPMASTER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,CHECK_DATE,?
+DRUG_USER,PUB_CONFIG,系统配置表,15,待人工确认,force_keep_by_user,有中文名/备注且有数据，但业务域/表类型仍不够明确??????用户指定保留：系统配置表,CREATE_TIME,?
+DRUG_USER,PUB_CONFIG_SET,系统配置选项设置表,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,CREATE_TIME,?
+DRUG_USER,SUPPLIER_IN_DETAIL,采购入库明细,0,待人工确认,remain_manual,规则未能确定,EXPIRE_DATE,?
+DRUG_USER,SUPPLIER_IN_MASTER,采购入库主表对象,0,待人工确认,remain_manual,规则未能确定,IN_DATE,?
+DRUG_USER,SYSTEM_CONFIG,系统配置项,3,待人工确认,remain_manual,有中文名/备注且有数据，但业务域/表类型仍不够明确,CREATE_TIME,?
+DRUG_USER,SYSTEM_ORDER_GENER,,52881,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 4718 ??????,DATE_CODE,?
+DRUG_USER,Sheet1,,1994,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,TEMP_DRUG_INFO,,,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+DRUG_USER,TMP_PREV_YEAR_STAT,,,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+DRUG_USER,VIEW_SHOWDATA,预览报表数据,473258,待人工确认,force_keep_by_user,有中文名/备注且有数据，但业务域/表类型仍不够明确??????用户指定保留：预览/报表数据仍需作为资产线索,CREATE_TIME,?
+DRUG_USER,sheet_drug,,3478,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,zsm,,1200,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+DRUG_USER,更改厂家,,347,待人工确认,exclude,表名含中文临时/手工结果语义，按用户规则排除,,?
+EXAM,EXAM_APPOINTS,检查预约记录,1559327,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXAM_NO，需后续只读 SQL 补近30天活跃度,EXAM_NO,?
+EXAM,EXAM_EXP_LIST,科室耗材使用分类记录,455,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+EXAM,EXAM_EXP_LIST_CLASS_NO,科室耗材使用分类字典,18,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+EXAM,EXAM_IMAGE_INDEX,检查图象索引,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,EXAM_NO,?
+EXAM,EXAM_INQUIRY,检查随访记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,EXAM_NO,?
+EXAM,EXAM_INTERVAL,检查时间间隔,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+EXAM,EXAM_MASTER_NEWPACS,新PACS接口记录,0,待人工确认,remain_manual,规则未能确定,EXAM_DATE_TIME,?
+EXAM,EXAM_PAT_MI,检查病人主索引,1060526,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DATE_OF_BIRTH，需后续只读 SQL 补近30天活跃度,DATE_OF_BIRTH,?
+EXAM,EXAM_SCHEDULE,检查病人时间安排,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,SCHEDULED_DATE_TIME,?
+EXAM,EXAM_SHARINGCENTER_DETAIL,,8842,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 254 ??????,AUDITOR,?
+EXAM,EXAM_SHARINGCENTER_MASTER,检查互认数据,8894,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPER_TIME，需后续只读 SQL 补近30天活跃度,OPER_TIME,?
+EXAM,EXAM_USER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,EXAM_WORKING_PLAN,检查工作时间安排,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,MORN_BEGIN,?
+EXAM,GAOXIANG,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,MODALITY_VS_LOCAL_ID_CLASS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,PACSPATIENT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,PACSSTUDY,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,SDATE,?
+EXAM,PACSUPDATE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,PBCATCOL,,0,待人工确认,exclude,PBCAT 类 PowerBuilder 元数据表且当前为空，按用户规则直接排除,,?
+EXAM,PBCATEDT,,0,待人工确认,exclude,PBCAT 类 PowerBuilder 元数据表且当前为空，按用户规则直接排除,,?
+EXAM,PBCATFMT,,0,待人工确认,exclude,PBCAT 类 PowerBuilder 元数据表且当前为空，按用户规则直接排除,,?
+EXAM,PBCATTBL,,0,待人工确认,exclude,PBCAT 类 PowerBuilder 元数据表且当前为空，按用户规则直接排除,,?
+EXAM,PBCATVLD,,0,待人工确认,exclude,PBCAT 类 PowerBuilder 元数据表且当前为空，按用户规则直接排除,,?
+EXAM,SQLEXPERT_PLAN1,,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,TIMESTAMP,?
+EXAM,STOREUID,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,STUDYDATE,?
+EXAM,SUBSERVER_VS_DEPT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+EXAM,TREAT_APPOINT,治疗预约记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,TREAT_NO,?
+EXAM,TREAT_ITEMS,检查项目记录,0,待人工确认,remain_manual,规则未能确定,EXAM_NO,?
+EXAM,TSMARCHIVE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ARCHIVE_DATE,?
+INPADM,CEQ$PATS_IN_HOSPITAL,,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,ADMISSION_DATE_TIME,?
+INPADM,CLG$PATS_IN_HOSPITAL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+INPADM,CVR$PATS_IN_HOSPITAL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+INPADM,MEDICAL_QC_MSG,质控信息病人信息表,430946,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ISSUED_DATE_TIME，需后续只读 SQL 补近30天活跃度,ISSUED_DATE_TIME,?
+INPADM,ORDERS_GROUP_REC,12.8 经管医生记录,1103,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPADM,PATS_IN_HOSPITAL_C0525325,,1,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,ADMISSION_DATE_TIME,?
+INPADM,PATS_IN_HOSPITAL_TEST,在院病人记录,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,ADMISSION_DATE_TIME,?
+INPADM,PATS_IN_TRANSFERRING,转科病人记录,51,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：TRANSFER_DATE_TIME，需后续只读 SQL 补近30天活跃度,TRANSFER_DATE_TIME,?
+INPADM,PRE_DISCHGED_PATS,准备出院病人记录,132,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DISCHARGE_DATE_EXPCTED，需后续只读 SQL 补近30天活跃度,DISCHARGE_DATE_EXPCTED,?
+INPADM,PRE_TRANSFERRING_PATS,,3558,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 314 ??????,TRANSFER_DATE_TIME,?
+INPBILL,ACCT_STAFF_GROUP,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+INPBILL,BANK_TRANS_LISTS,对账记录,414177,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：BANKTRANDATE，需后续只读 SQL 补近30天活跃度,BANKTRANDATE,?
+INPBILL,BILL_DEPT_CONFIG,自动计价科室配置,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+INPBILL,BILL_MISC_ITEM,自动计价杂费项目,0,待人工确认,remain_manual,规则未能确定,,?
+INPBILL,BILL_MISC_ITEM_PATCH,,315,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,START_DATE,?
+INPBILL,CASHER_NO_REC,JU?nT1:E1m,308,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,DISPENSE_MEDICINE_APPLICATION,,4804,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 843 ??????,CREATE_TIME,?
+INPBILL,INPBILL_ITEMPRICE_CHANGES_LOG,,54918,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,BILLING_DATE_TIME,?
+INPBILL,INP_ACCT_DETAIL,住院收费结帐明细记录,802945,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,INP_ACCT_MASTER,住院收费结帐记录,65337,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+INPBILL,INP_ACCT_MONEY,住院收费结帐金额分类,348899,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,INP_BILL_DETAILQ,住院病人费用明细记录,1167169,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PERFORMED_BY，需后续只读 SQL 补近30天活跃度,PERFORMED_BY,?
+INPBILL,INP_BILL_DETAIL_1123,住院病人费用明细记录,173,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PERFORMED_BY，需后续只读 SQL 补近30天活跃度,PERFORMED_BY,?
+INPBILL,INP_BILL_DETAIL_112302,住院病人费用明细记录,55,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PERFORMED_BY，需后续只读 SQL 补近30天活跃度,PERFORMED_BY,?
+INPBILL,INP_BILL_DETAIL_20241231,,10810,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,BILLING_DATE_TIME,?
+INPBILL,INP_BILL_DETAIL_BACK,住院病人费用明细记录,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,PERFORMED_BY,?
+INPBILL,INP_BILL_DETAIL_C0525325,,21,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,BILLING_DATE_TIME,?
+INPBILL,INP_BILL_DETAIL_CANCEL,,5557,待人工确认,force_keep_by_user,有数据但缺中文名/备注/验证关系，需人工确认??????用户指定保留：住院费用取消/冲销明细,,?
+INPBILL,INP_BILL_DETAIL_HRP,住院病人费用明细HRP条码表,362053,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,INP_BILL_DETAIL_JZ,住院病人费用明细记录(急诊转费),140,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PERFORMED_BY，需后续只读 SQL 补近30天活跃度,PERFORMED_BY,?
+INPBILL,INP_BILL_DETAIL_TEST,住院病人费用明细记录,929021,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,PERFORMED_BY,?
+INPBILL,INP_CASH_SJG,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,ACCT_DATE,?
+INPBILL,INP_DIET_COSTS,住院病人伙食费明细,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,BILLING_DATE_TIME,?
+INPBILL,INP_OVERDRAFT_REG_DETAIL,透支记录明细,2129962,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ENTERED_DATE，需后续只读 SQL 补近30天活跃度,ENTERED_DATE,?
+INPBILL,INP_OVERDRAFT_REG_MASTER,,468218,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,ENABLED_DATE,?
+INPBILL,INP_PAYMENTS_MONEY,住院病人支付方式记录,2466520,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,INP_SETTLE_DETAIL,住院病人结算明细记录,5779211,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,INP_SETTLE_INVOICE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+INPBILL,INP_SETTLE_MASTER_C0525325,,1,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,SETTLING_DATE,?
+INPBILL,INP_SETTLE_MASTER_YB,省、市医保结算记录,436516,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：BRJSH，需后续只读 SQL 补近30天活跃度,BRJSH,?
+INPBILL,INP_SETTLE_MASTER_YB_0122,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+INPBILL,INP_SETTLE_MASTER_YD,,4971,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,STATUS,?
+INPBILL,LIVE_BILL_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BILLING_DATE_TIME,?
+INPBILL,NEED_BILLING_PATS,待计价病人,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,BILLING_DATE_TIME,?
+INPBILL,PREPAYMENT_RCPT_ADD,,4520603,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 71144 ??????,TRANSACT_DATE,?
+INPBILL,PREPAYMENT_RCPT_ADD_C0525325,,1,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,TRANSACT_DATE,?
+INPBILL,PREPAYMENT_RCPT_C0525325,,12,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,TRANSACT_DATE,?
+INPBILL,PREPAY_ACCT,预交金结帐记录,190868,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+INPBILL,PREPAY_ACCT_MONEY,预交金结帐金额分类,400480,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+INPBILL,RELIEF_ACCOUNTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ACCT_DATE,?
+INPBILL,UNSETTLE_REC,欠费病人记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,ENTER_DATE,?
+LAB,ABNORMAL_NIGHT_WORK,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,STARTTIME,?
+LAB,ANR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ANR_DATE,?
+LAB,ANTIBIO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,ANTI_QC,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,AN_RLT1,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ANR_DATE,?
+LAB,AN_RLT2,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ANR_DATE,?
+LAB,AN_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ANR_DATE,?
+LAB,AN_SSTD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,AN_STYPE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,ARB1999,,214,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,ANR_DATE,?
+LAB,ATTEN_REC,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,BACTERI,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,BAR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BAR_DATE,?
+LAB,BA_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BAR_DATE,?
+LAB,BA_SCR,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BAR_DATE,?
+LAB,BD_DONOR,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BD_DATE,?
+LAB,BD_LIB,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BL_DATE,?
+LAB,BD_PRIS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,BD_RECIP,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BR_DATE,?
+LAB,BSC1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BAR_DATE,?
+LAB,BSCRIPE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,BSR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BSR_DATE,?
+LAB,BS_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BSR_DATE,?
+LAB,BTYPE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,CDSS_LAB_DETAIL,,20,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+LAB,CDSS_LAB_MASTER,,83,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+LAB,CHECKB,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,CH_TYPE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,CL_ITEM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,COMBINE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,COM_CHG,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,CSR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BSR_DATE,?
+LAB,CS_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,BSR_DATE,?
+LAB,CUR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,CVR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,CV_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,DEPART,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,DIAGNOS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,DIARY,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,DIA_E_DATE,?
+LAB,DOCTOR,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,DYR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,EXAM,审核,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,CONDITION,?
+LAB,HOLI_REC,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,HOL_START_DATE,?
+LAB,IMM1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,IMR_DATE,?
+LAB,IMM_CAL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_DEF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,IMD_DATE,?
+LAB,IMM_DEF1,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_DEF2,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_ECD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_ITM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_JUDGE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_MED,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,IMM_DATE,?
+LAB,IMM_MOD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_PLACE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_PLACE1,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,IMM_RESULTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,IMR_DATE,?
+LAB,IMM_R_MOD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,INSPECT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,INSTRMT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,INSTRUMENT_CONFIG,检验仪器检验项目配置,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,REPORT_ITEM_CODE,?
+LAB,ITEM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ITM_SDATE,?
+LAB,ITEM_PROP,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,ITEM_UGR,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,LAB_BILL_ITEMS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,LAB_DEVICE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,DEV_OUT_DATE,?
+LAB,LAB_ITEM_VS_RULES,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,LAB_REJECT_ITEM,检验互斥项目,21,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPER_DATE，需后续只读 SQL 补近30天活跃度,OPER_DATE,?
+LAB,LAB_REPORT_RULES,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,LAB_REPORT_RULES_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,TIME1,?
+LAB,LAB_RESULT_ITEM,,5252,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+LAB,LAB_RESULT_MAPPING,,119,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+LAB,LAB_RESULT_TYPE_VS_VALUES,检验结果描述与结果值对照表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+LAB,LAB_SHARINGCENTER_DETAIL,,215223,待人工确认,force_keep_by_user,有数据但缺中文名/备注/验证关系，需人工确认??????用户指定保留：检验互认/共享中心明细,MX_ID,?
+LAB,LAB_SHARINGCENTER_MASTER,检验平台报告互认数据,24675,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPER_TIME，需后续只读 SQL 补近30天活跃度,OPER_TIME,?
+LAB,METHOD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,METHOD_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,MET_DATE,?
+LAB,MITM_NO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,NIGHTWORK_DEF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,STARTTIME,?
+LAB,NOBACT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,NORMAL_NIGHT_WORK,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,STARTTIME,?
+LAB,ONLINE_DATA,检验联机采集数据,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,ASSAY_DATE,?
+LAB,PAT1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PAT_DATE,?
+LAB,PATIENTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PAT_DATE,?
+LAB,QC_MEA,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,QCM_DATE,?
+LAB,QC_REF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,QCR_SDATE,?
+LAB,QC_SAM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,QCM_DATE,?
+LAB,QUALITY_CON_LIST,质控数据,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,QC_DATE,?
+LAB,QUALITY_CON_PARAMETER_LIST,质控参数,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+LAB,REAGDICT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,REAGENT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REAG_OUT_DATE,?
+LAB,REAGENT_OUT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REAG_DATE,?
+LAB,REAGOUT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REAG_DATE,?
+LAB,REAGPITM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,REAGPLAN,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PLAN_DATE,?
+LAB,RED_ITM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,RED_ITMS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,REP_DIARY,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REP_CONNECT_DATE,?
+LAB,RESULTO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,RESULTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,RES_CURO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,RES_CURS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,RES_DYY,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,RES_PICTURE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,RLT1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,SAMPLE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,STAFF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,STA_BRITH_DATE,?
+LAB,STAFF_ATTEND_IN,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ATT_SDATE,?
+LAB,STAFF_AWARD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,AWD_TIME,?
+LAB,STAFF_EDUCATE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,EDU_TIME,?
+LAB,STAFF_PAPER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PAP_TIME,?
+LAB,STAFF_POST,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PST_SDATE,?
+LAB,STATIST,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,STATIST_T,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ST_DATE,?
+LAB,STATIST_TCOM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ST_DATE,?
+LAB,S_STATE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,UGR1999,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,UG_RLTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,RES_DATE,?
+LAB,WEEKTAB,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,W_START_DATE,?
+LAB,WEEKTABS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,W_START_DATE,?
+LAB,WEEKTAB_GROUP,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,W_START_DATE,?
+LAB,WORKTAB,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+LAB,ZM_TABLEDEF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDADM,ACCIDENT_REC,医疗事故差错记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,OCCUR_DATE,?
+MEDADM,ASST_PLAN_INDEX,医技科室工作数量计划指标,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,BEDPATS_IN_HOSPITAL_C0525325,,5,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,ADMISSION_DATE_TIME,?
+MEDADM,CANCEL_DISCHARGE_PAT,,1487,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,ST_DATE,?
+MEDADM,DEPT_EXAM_DAY_NEW,,873608,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,ST_DATE,?
+MEDADM,DISE_QUERY_CONDITION,单病种查询条件字典,0,待人工确认,remain_manual,规则未能确定,,?
+MEDADM,PLAN_INDEX,临床医疗工作计划指标,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QUALITY_INDEX_STANDARD,医院等级评审质量指标标准,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_ACCOUNT_INDEP,独立核算科室医疗收入月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_ACCOUNT_ITEM,核算项目医疗收入月统计记录,0,待人工确认,remain_manual,规则未能确定,,?
+MEDADM,QU_EMERGENCY_NUM,急诊工作月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_EXAM_DEPT,特诊检查工作量月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_OPERATION_DEPT,手术科室数质量月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_OUTP_CLINIC_NUM,门诊工作量月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_OUTP_SYNTHESIZE,门诊综合数据月统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,QU_PLAN_COMPLETED,医院医疗工作计划完成情况统计记录,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDADM,QU_QUALITY_COMPLETED,医院等级评审质量指标完成情况统计记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDADM,SINGLE_DIAG_OPER_FIRST,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDADM,SINGLE_DIAG_OPER_SECOND,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDADM,SINGLE_DIAG_OPER_THIRD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDADM,STAT_CONFIG,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDADM,STAT_OPERCLASS_CONDITION,统计条件,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,A_JBYINGSHE,,2956,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,A_SSYINGSHE,,3005,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,A_SSYINGSHE2,,3012,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,A_ZDYINGSHE,,2956,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,BLOOD_TRANSFUSION,病人输血记录,476684,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,CARD_ALTER_INFO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ALTER_DATE,?
+MEDREC,CARE_UNIT_USAGE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ENTER_TIME,?
+MEDREC,DIAGNOSIS_C0525325,,5,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,DIAGNOSIS_DATE,?
+MEDREC,DIAGNOSIS_EMR,,1599,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,DIAGNOSIS_DATE,?
+MEDREC,DIAGNOSTIC_CATEGORY,诊断分类记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,DIAG_COMPARING,诊断对照记录,1366478,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,DISEASE_SOURCE_REC,病源病谱记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,LAPSE_TIME,?
+MEDREC,GJFXJC,,64442,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,INNER_ICD_VS_PUB_ICD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,INP_DISCHARGED_ARREAR_REC,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,INP_MR_REC,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,MR_CREATE_DATE,?
+MEDREC,JH_OPERATION,手术记录,6626,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPERATING_DATE，需后续只读 SQL 补近30天活跃度,OPERATING_DATE,?
+MEDREC,MDC_CASE_RECORD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MEDCARD_ADDRESS_REC,卡地址描述表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MEDCARD_CONFIG,医疗卡门诊就医系统运行配置表,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CARD_EXPIRATION_DATE，需后续只读 SQL 补近30天活跃度,CARD_EXPIRATION_DATE,?
+MEDREC,MEDICALSYS_FIRST_DIAGNOSE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,VISIT_DATE,?
+MEDREC,MEDICAL_ADDITION_COSTS,住院病人附页费用记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MEDICAL_CARD_EHEALTH,健康卡,94292,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_DATE，需后续只读 SQL 补近30天活跃度,CREATE_DATE,?
+MEDREC,MEDICAL_CARD_MEMO,医疗卡说明,1988498,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRATION_DATE，需后续只读 SQL 补近30天活跃度,EXPIRATION_DATE,?
+MEDREC,MEDICAL_CARD_NUM_RECORD,办卡数量,360895,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+MEDREC,MEDICAL_CARD_VS_IDNO,,1104607,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 14358 ??????,OPERATE_DATE,?
+MEDREC,MEDICAL_CARD_VS_IDNO_DEL_BK,,1271,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,OPERATE_DATE,?
+MEDREC,MEDICAL_COSTS,住院病人费用记录,6040776,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MEDICAL_RECORD_REVIEW_TABLE,病案首页审核记录表,285494,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：MR_STATUS，需后续只读 SQL 补近30天活跃度,MR_STATUS,?
+MEDREC,MODEL_ITEMS,公共模板制作,10953,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MODEL_ITEMS_SELECT,门诊病历模板选择,36466,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_BILL_COSTS,2011版病案首页住院病人费用记录,6777511,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_BILL_COSTS1,2011版病案首页住院病人费用记录,901644,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_BILL_COSTSAA,,112933,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,MR_BILL_COSTS_PATIENTINF,,4917,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,MR_CATALOGER_VS_DEPT,病案编码员质控科室,668,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_COMM_VS_HIS_COMM,2011版病案首页国家基础数据与HIS对照字典,81,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_DIAGNOSIS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,DIAGNOSIS_DATE,?
+MEDREC,MR_DIAG_COMPARING,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_FILE_INDEX,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,CREATOR_NAME,?
+MEDREC,MR_HOSPITAL_OPN_RECORD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,MR_DATE,?
+MEDREC,MR_INDEX,病案索引,530030,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：LAST_ACCESS_DATE_TIME，需后续只读 SQL 补近30天活跃度,LAST_ACCESS_DATE_TIME,?
+MEDREC,MR_ON_LINE,联机病历描述,47534,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：REQUEST_DATE_TIME，需后续只读 SQL 补近30天活跃度,REQUEST_DATE_TIME,?
+MEDREC,MR_OPERATION,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,OPERATING_DATE,?
+MEDREC,MR_PAPER_DESC,病案纸张描述,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_PAT_VISIT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ADMISSION_DATE_TIME,?
+MEDREC,MR_QUERY_CONDITION,病案查询条件记录（病案复合检索窗口专用）,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MR_RCD_BABY,妇婴首页之婴儿信息,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,VISIT_ID,?
+MEDREC,MR_RCD_MOM,妇婴首页之孕妇信息,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MR_REC,病案记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,MR_CREATE_DATE,?
+MEDREC,MR_REPORT_BJ01,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_BJ02,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_BJ03,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_BJ04,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_BJ05,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_BJ10,卫统5接口表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,S0109,?
+MEDREC,MR_REPORT_DATA,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_REPORT_DEPT,报表用科室,50,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_REPORT_DIAG,统计病种字典,276,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_REPORT_ITEM,报表用费用分类,0,待人工确认,remain_manual,规则未能确定,,?
+MEDREC,MR_REPORT_PRTST,打印参数,60,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_REPORT_SORTSET,打印参数,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MR_REPORT_SQL,报表用SQL语句,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,MR_REPORT_SYNTAX,数据窗口语法,2,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_RETURN_TERM,,15,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,MR_SYSPARM,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,MR_TRANSFER,,609234,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 5138 ??????,ADMISSION_DATE_TIME,?
+MEDREC,MR_WORK_PATH,当前病历路径描述,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,MR_WT_TWO_THREE,卫统报表2-3部分数据记录表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,MR_DATE,?
+MEDREC,NEWBORN_EVAL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,EVAL_DATE,?
+MEDREC,NEWBORN_REC,,8520,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,DATE_OF_BIRTH,?
+MEDREC,ONLY_ID,,5068,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,OPERATION_1,手术记录,161744,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPERATING_DATE，需后续只读 SQL 补近30天活跃度,OPERATING_DATE,?
+MEDREC,OPER_SETTLE_CARD,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,START_DATE,?
+MEDREC,PATIENT_CARD_INFO,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REGISTER_DATE,?
+MEDREC,PAT_ICU_RECORD,住院重症监护记录,4539,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：INTO_ICU_DATE，需后续只读 SQL 补近30天活跃度,INTO_ICU_DATE,?
+MEDREC,PAT_VISIT_ATTACHED,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,COMA_TIME_BEFORE_ADMIT,?
+MEDREC,PAT_VISIT_BIS,,5378,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+MEDREC,PAT_VISIT_CANCEL,病人住院主记录,3922,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DEPT_ADMISSION_TO，需后续只读 SQL 补近30天活跃度,DEPT_ADMISSION_TO,?
+MEDREC,PAT_VISIT_EXTEND,住院信息延伸表用于病案信息新增字段的升级,28608,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PLAN_ADMISSION，需后续只读 SQL 补近30天活跃度,PLAN_ADMISSION,?
+MEDREC,PAT_VISIT_INSURE,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,OCCUR_DATE,?
+MEDREC,PAT_VISIT_NEW,住院登记扩展,214217,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CR_DATE_TIME，需后续只读 SQL 补近30天活跃度,CR_DATE_TIME,?
+MEDREC,PAT_VISIT_PDF,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,ADMISSION_DATE_TIME,?
+MEDREC,PAT_VISIT_PDF_DETAIL,,5,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,CREATE_DATE,?
+MEDREC,PERSON,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,STAT_ICU_VS_HIS_ICU,卫统重症监护室代码和HIS重症监护室科室对照字典,0,待人工确认,remain_manual,规则未能确定,,?
+MEDREC,STAT_SINGLE_DIAGNOSIS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,STAT_VS_CHARGE_TYPE,卫统5医保接口用医疗付款方式(停用，启用新表),16,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,STAT_VS_CHARGE_TYPE_NEW,新医保接口用医疗付款方式2020,20,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+MEDREC,STAT_VS_HIS_ANAESTHESIA,卫统麻醉方式和HIS麻醉方式对照字典,0,待人工确认,remain_manual,规则未能确定,,?
+MEDREC,STAT_VS_HIS_DISCHARGE,卫统离院方式和HIS离院方式对照字典,0,待人工确认,remain_manual,规则未能确定,,?
+MEDREC,STAT_VS_HIS_RELATION,卫统联系人关系代码和HIS关系对照字典,0,待人工确认,remain_manual,规则未能确定,,?
+MEDREC,TONGREN_PAT_VISIT,同仁向北京市卫生局上报的病案号表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,TRANSFER,病人在科记录,612266,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ADMISSION_DATE_TIME，需后续只读 SQL 补近30天活跃度,ADMISSION_DATE_TIME,?
+MEDREC,TRANSFER_C0525325,,6,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,ADMISSION_DATE_TIME,?
+MEDREC,TRANSFER_VS_HLHT,病人在科记录,40172,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DISCHARGE_DATE_TIME，需后续只读 SQL 补近30天活跃度,DISCHARGE_DATE_TIME,?
+MEDREC,ZLKM_VS_HIS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+MEDREC,ZY_VS_HIS,卫统5职业与HIS职业对照,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+MEDREC,结果,,43682,待人工确认,exclude,表名含中文临时/手工结果语义，按用户规则排除,DIAGNOSISDATE,?
+ORDADM,CEQ$ORDERS,,0,待人工确认,exclude,技术配置/工具表且为空，不进入治理资产,START_DATE_TIME,?
+ORDADM,CLG$ORDERS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+ORDADM,CONSULTATION_MDT_DETAIL,,9,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,AFFIRM_DATE_TIME,?
+ORDADM,CONSULTATION_MDT_MASTER,,7,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,APPLY_DATE_TIME,?
+ORDADM,CURE_APPOINTS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REQ_DATE_TIME,?
+ORDADM,CURE_PROJECT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,CURE_DATE_NUMBER,?
+ORDADM,CURE_REPORT,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REPORT_DATE,?
+ORDADM,CVR$ORDERS,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+ORDADM,DOCTOR_ORDERS,医生医嘱,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,START_DATE_TIME,?
+ORDADM,GROUP_ORDER_ITEMS,成组医嘱模板明细,78221,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：FREQUENCY，需后续只读 SQL 补近30天活跃度,FREQUENCY,?
+ORDADM,GROUP_ORDER_MASTER,成组医嘱模板主记录,11191,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_DATE_TIME，需后续只读 SQL 补近30天活跃度,CREATE_DATE_TIME,?
+ORDADM,GROUP_ORDER_SELECTION,医生级医嘱模板对应表,3255,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+ORDADM,ORDERS_ANTI_DRUG,抗菌药使用登记表,561709,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PREVENTION_TIME，需后续只读 SQL 补近30天活跃度,PREVENTION_TIME,?
+ORDADM,ORDERS_C0525325,,16,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,START_DATE_TIME,?
+ORDADM,ORDERS_COSTS_C0525325,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,START_DATE,?
+ORDADM,ORDERS_COSTS_TEST,医嘱计价项目,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,START_DATE,?
+ORDADM,ORDERS_EXECUTE,,722,待人工确认,force_keep_by_user,有数据但缺中文名/备注/验证关系，需人工确认??????用户指定保留：医嘱执行记录表，执行一次生成一条记录,CONVERSION_DATE_TIME,?
+ORDADM,ORDERS_EXECUTE_DETAILSC0525325,,3,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,EXEC_DATE_TIME,?
+ORDADM,ORDERS_LIMIT_OPER_DRUGLIST,,17,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+ORDADM,ORDERS_SHEET_IMAGE,医嘱记录单影象,40034545,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_DATE，需后续只读 SQL 补近30天活跃度,CREATE_DATE,?
+ORDADM,ORDERS_SPECIAL_ANTI_REQUEST,特抗药申请使用会诊专家名单,21,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+ORDADM,ORDERS_TEST,医嘱,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,DURATION,?
+ORDADM,PUB_IPM_BILL,综合执行单主表,2835,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：BILL_CODE，需后续只读 SQL 补近30天活跃度,BILL_CODE,?
+ORDADM,PUB_IPM_BILLDETAIL,综合执行单明细表,28264,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：BILL_CODE，需后续只读 SQL 补近30天活跃度,BILL_CODE,?
+ORDADM,PUB_IPM_BILL_POWER,公共分类执行单科室停用权限,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,BILL_ID,?
+ORDADM,SPECIALTIES_CURE_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,CURE_START_DATE,?
+ORDADM,SPECIALTIES_CURE_MASTER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,CURE_DATE_TIME,?
+ORDADM,TJJKHLYY_XML,,1146497,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,CREATEDATE,?
+ORDADM,VITAL_SIGNS_REC,病人体症记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,RECORDING_DATE,?
+ORDADM,hp_appointment,预约记录表,1439387,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：APPOINT_DATE，需后续只读 SQL 补近30天活跃度,APPOINT_DATE,?
+OUTPADM,APPOINTINFOVIEW,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REGISTERTIME,?
+OUTPADM,CLINIC_APPOINTS,门诊预约记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,VISIT_DATE_APPTED,?
+OUTPADM,CLINIC_APPOINTS_SIGN,门诊预约记录,12383,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,CLINIC_BILL_ITEMS,挂号收费费用明细,872700,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,CLINIC_FOR_REGIST,门诊号表,7329870,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CLINIC_DATE，需后续只读 SQL 补近30天活跃度,CLINIC_DATE,?
+OUTPADM,CLINIC_INDEX,门诊号别定义,917,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPADM,CLINIC_INDEX_HSJC,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+OUTPADM,CLINIC_MASTER_REFERRAL,转诊记录,36,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,CLINIC_PAYMENTS_MONEY,挂号支付方式记录,2979693,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,CLINIC_PRICE,诊疗费价表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+OUTPADM,CLINIC_RETURNED_ACCT,挂号结帐主记录,88177,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,CLINIC_RETURN_RECORD,,4,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,RETURN_DATE,?
+OUTPADM,CLINIC_SCHEDULE,门诊安排记录,6888,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：TIME_DESC，需后续只读 SQL 补近30天活跃度,TIME_DESC,?
+OUTPADM,FEVER_STATE,发热状态,5779,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,MR_REQUEST_QUEUE,挂号结帐主记录,3,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,REGISTRATION_DATE,?
+OUTPADM,OUTP_COUNSELED_CLIPAT,待诊病人信息,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,VISIT_DATE,?
+OUTPADM,OUTP_COUNSELED_EXAMPAT,已分诊的特诊病人,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,EXAM_NO,?
+OUTPADM,OUTP_COUNSEL_PATIENT_SOURCE,分诊申请信息,5462694,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPADM,OUTP_COUNSEL_PRIORITY,分诊优先原因字典,0,待人工确认,remain_manual,规则未能确定,,?
+OUTPADM,OUTP_COUNSEL_REQUEST_INFO,分诊申请信息,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,REQUEST_TIME,?
+OUTPADM,REGIST_ACCT_DETAIL,挂号结帐明细记录,76553,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPADM,REGIST_ACCT_MASTER,挂号结帐主记录,74243,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+OUTPADM,REGIST_ACCT_MONEY,挂号结帐主记录,230655,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPADM,SPECIAL_REGIST_PRICE,特殊挂号费价表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+OUTPBILL,CHARGE_REDUCE_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+OUTPBILL,CHARGE_REDUCE_MASTER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,OPER_DATE_TIME,?
+OUTPBILL,EINV_COMM_DATA,,221,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+OUTPBILL,EINV_RCPT_MASTER,,5554372,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 130624 ??????,SETTLE_DATE,?
+OUTPBILL,OPERATOR_CHECK_USE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,START_DATE_TIME,?
+OUTPBILL,OUTP_ACCT_DETAIL,门诊收费结帐明细记录,442774,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPBILL,OUTP_ACCT_MASTER,门诊收费结帐主记录,93561,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+OUTPBILL,OUTP_ACCT_MONEY,门诊收费结帐金额分类,327292,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPBILL,OUTP_BILL_ITEMS_BACK,,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,VISIT_DATE,?
+OUTPBILL,OUTP_BILL_ITEMS_BK,,58,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,VISIT_DATE,?
+OUTPBILL,OUTP_BILL_ITEMS_HRP,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+OUTPBILL,OUTP_BILL_ITEMS_TEMP,门诊病人诊疗费用项目,1046,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,VISIT_DATE,?
+OUTPBILL,OUTP_CARD_RCPT_MASTER,门诊卡收据记录,5553243,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPBILL,OUTP_ORDER_DESC,开单记录,13035231,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：VISIT_DATE，需后续只读 SQL 补近30天活跃度,VISIT_DATE,?
+OUTPBILL,OUTP_ORDER_DESC_BACK,开单记录,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,VISIT_DATE,?
+OUTPBILL,OUTP_PAYMENTS_MONEY,门诊病人支付方式记录,11080146,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+OUTPBILL,OUTP_PAYMENTS_MONEY_BACK,门诊病人支付方式记录,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+OUTPBILL,OUTP_RCPT_MASTER_YD,,95224,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,BRJSH,?
+OUTPBILL,OUTP_RCPT_MASTER_YD_RE,,16,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,JSHID,?
+OUTPBILL,OUTP_REFUND_INVOICE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,REFUND_DATE,?
+OUTPBILL,PREPAYMENT_RCPT_20210418,,12,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,TRANSACT_DATE,?
+OUTPBILL,RCPT_VS_CHECK,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,VISIT_DATE,?
+PHARMACY,BINDING_PRESC_DETAIL,协定处方子表,1932,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,BINDING_PRESC_MASTER,协定处方主表,232,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CREATE_DATE_TIME，需后续只读 SQL 补近30天活跃度,CREATE_DATE_TIME,?
+PHARMACY,BINDING_PRESC_SELECTION,用户与协定处方关系表,700,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,BUY_DRUG_PLAN,采购信息表,14332,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：CHECK_NUMBER，需后续只读 SQL 补近30天活跃度,CHECK_NUMBER,?
+PHARMACY,DATAPRESCRIPTIONDETAIL_DATA,,357343,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 2371 ??????,PRESTIME,?
+PHARMACY,DATAPRESCRIPTION_DATA,,26191,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 181 ??????,PRESTIME,?
+PHARMACY,DRUG_APPLICATION_LIST_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,LIST_DATE,?
+PHARMACY,DRUG_APPLICATION_LIST_MASTER,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,LIST_DATE,?
+PHARMACY,DRUG_BETCH_PROVIDER_NO,,1,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+PHARMACY,DRUG_DISPENSE_LABLE,,706,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,DISPENSING_DATE_TIME,?
+PHARMACY,DRUG_DISPENSE_LABLE_COUNT,,2,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,OPERATOR_DATE,?
+PHARMACY,DRUG_DISPENSE_PRE,,409057,待人工确认,promote_core_activity_verified,有数据但缺中文名/备注/验证关系，需人工确认??? SQL ???30? 369741 ??????,DISPENSING_DATE_TIME_PRE,?
+PHARMACY,DRUG_DISPENSE_PRE_BACKUP2025,,5,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,DISPENSING_DATE_TIME_PRE,?
+PHARMACY,DRUG_DISPENSE_PRE_BK,,468,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,DISPENSING_DATE_TIME_PRE,?
+PHARMACY,DRUG_DISPENSE_REC_BK,,457,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,DISPENSING_DATE_TIME,?
+PHARMACY,DRUG_DISPENSE_REC_MASTER,医嘱打印记录表,2624202,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DISPENSING_DATE_TIME，需后续只读 SQL 补近30天活跃度,DISPENSING_DATE_TIME,?
+PHARMACY,DRUG_DISPENSE_REQ,摆药请求,29320,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：DISPENSARY，需后续只读 SQL 补近30天活跃度,DISPENSARY,?
+PHARMACY,DRUG_DISPENSE_REQ_BACKUP2025,,5,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,POST_DATE_TIME,?
+PHARMACY,DRUG_DISPENS_PROPERTY,药品摆药分类定义,13188,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,DRUG_EXPORT_DETAIL,药品出库明细记录,714949,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+PHARMACY,DRUG_EXPORT_MASTER,药品出库主记录,158652,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPORT_DATE，需后续只读 SQL 补近30天活跃度,EXPORT_DATE,?
+PHARMACY,DRUG_IMPORT_DETAIL,药品入库明细记录,849427,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+PHARMACY,DRUG_IMPORT_DETAIL_DEL20170523,,12,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,EXPIRE_DATE,?
+PHARMACY,DRUG_IMPORT_MASTER,药品入库主记录,279037,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：IMPORT_DATE，需后续只读 SQL 补近30天活跃度,IMPORT_DATE,?
+PHARMACY,DRUG_IMPORT_MASTER_DEL20170523,,3,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,IMPORT_DATE,?
+PHARMACY,DRUG_INVENTORY_BALANCE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+PHARMACY,DRUG_INVENTORY_CHECK,盘点表,6810666,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,DRUG_INVENTORY_CHECK_BACK,,7128,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,,?
+PHARMACY,DRUG_LEDGER,药品总账,13384,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACCT_DATE，需后续只读 SQL 补近30天活跃度,ACCT_DATE,?
+PHARMACY,DRUG_PACKAGES,药局药品分装记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+PHARMACY,DRUG_PRESC_DETAIL_BACKUP2025,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PRESC_DATE,?
+PHARMACY,DRUG_PRESC_DETAIL_TEMP,待发药处方明细记录,67589,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,PRESC_DATE,?
+PHARMACY,DRUG_PRESC_MASTER_BACKUP2025,,72,待人工确认,exclude_activity_or_backup_corrected,有数据但缺中文名/备注/验证关系，需人工确认????? BACKUP/DEL/C0525325/??????,PRESC_DATE,?
+PHARMACY,DRUG_PRESC_MASTER_TEMP,待发药处方主记录,12347,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,PRESC_DATE,?
+PHARMACY,DRUG_PRESC_QUEUE,,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,PRESC_DATE,?
+PHARMACY,DRUG_PRICE_MODIFY,药品调价记录,10660,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：NOTICE_EFFICIENT_DATE，需后续只读 SQL 补近30天活跃度,NOTICE_EFFICIENT_DATE,?
+PHARMACY,DRUG_PRICE_MODIFY_PROFIT,药品调价盈亏表,17099,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ACTUAL_EFFICIENT_DATE，需后续只读 SQL 补近30天活跃度,ACTUAL_EFFICIENT_DATE,?
+PHARMACY,DRUG_PRICE_PROFIT,药品调价盈亏记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,PRICE_ADJUSTED_DATE,?
+PHARMACY,DRUG_PROVIDE_APPLICATION,药品发放申请,1231,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：ENTER_DATE_TIME，需后续只读 SQL 补近30天活跃度,ENTER_DATE_TIME,?
+PHARMACY,DRUG_PROVIDE_NOTICE,药品发放通知,186,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PROVIDE_DATE，需后续只读 SQL 补近30天活跃度,PROVIDE_DATE,?
+PHARMACY,DRUG_PROVIDE_NOTICE_NEW,药品发放通知,3028,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：PROVIDE_DATE，需后续只读 SQL 补近30天活跃度,PROVIDE_DATE,?
+PHARMACY,DRUG_PURCHASE,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,PLAN_DATE,?
+PHARMACY,DRUG_STOCK,药品库存,122601,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+PHARMACY,DRUG_STOCK_0930,财务要的数据,99196,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+PHARMACY,DRUG_STOCK_BALANCE,药品结转记录,262740,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：OPERATE_DATE，需后续只读 SQL 补近30天活跃度,OPERATE_DATE,?
+PHARMACY,DRUG_STOCK_BALANCE_COMPARE,药品结转记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,OPERATE_DATE,?
+PHARMACY,DRUG_STOCK_BEGINNING,药品库存期初数,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,EXPIRE_DATE,?
+PHARMACY,DRUG_STOCK_DETAIL,,0,待人工确认,exclude,空表且无中文名/数据库备注/明确业务用途,,?
+PHARMACY,DRUG_STOCK_LOCATION,库存盘点货位,5812,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：EXPIRE_DATE，需后续只读 SQL 补近30天活跃度,EXPIRE_DATE,?
+PHARMACY,DRUG_STOCK_LOG,药品库存快照 按天,6444719,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,EXPIRE_DATE,?
+PHARMACY,DRUG_STORAGE_DEPT,药品库存单位字典,20,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,DRUG_STORAGE_PROFILE,药品库存定义,24570,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留,,?
+PHARMACY,DRUG_YPID,,1842,待人工确认,remain_manual,有数据但缺中文名/备注/验证关系，需人工确认,,?
+PHARMACY,MANAGED_DRUG_CATALOG,特殊管理药品目录,0,待人工确认,remain_manual,规则未能确定,,?
+PHARMACY,NEW_DRUG_MESSAGE,新药发布,1,待人工确认,promote_core,有中文名/业务备注且非备份临时，存在数据，按用户规则优先保留；存在候选时间字段：RELEASE_DATE，需后续只读 SQL 补近30天活跃度,RELEASE_DATE,?
+PHARMACY,PREPARATION_COST,制剂成本,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+PHARMACY,PREPARATION_DEPT_DESC,制剂室配置表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+PHARMACY,PREPARATION_MASTER,制剂配制记录,0,待人工确认,remain_manual,规则未能确定,PREPARATION_DATE,?
+PHARMACY,PREPARATION_OPERATING_RULE,制剂配制规范,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,ENTER_DATE,?
+PHARMACY,PREPARATION_PRESC,制剂处方,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+PHARMACY,PREPARATION_PRICE_LIST,制剂价表,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,START_DATE,?
+PHARMACY,PREPARATION_PROBLEM,制剂配制问题记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,ENTER_DATE,?
+PHARMACY,PREPARATION_RAW_MATERIAL,制剂配制投料记录,0,待人工确认,remain_manual,空表但有中文名或业务域，需人工确认是否历史保留,,?
+PHARMACY,PREPARATION_TEST,制剂检验记录,0,待人工确认,exclude,表名含备份/临时/测试/日志/日期快照特征，按用户规则排除,TEST_REPORT_NO,?

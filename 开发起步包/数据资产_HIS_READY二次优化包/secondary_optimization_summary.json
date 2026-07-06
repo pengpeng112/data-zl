@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-07-06T06:32:50",
+  "core_tables": 477,
+  "excluded_tables": 179,
+  "manual_confirm_tables": 578,
+  "all_tables": 1234,
+  "time_field_candidates": 1810,
+  "candidate_key_checks_planned": 1008,
+  "quality_field_tasks": 3556,
+  "relationship_A": 16,
+  "relationship_B": 16,
+  "relationship_C": 3,
+  "relationship_D": 4,
+  "doc_actual_differences": 6867,
+  "finalized_at": "2026-07-06T06:33:51"
+}

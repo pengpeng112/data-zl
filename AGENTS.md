@@ -32,8 +32,9 @@
 - ✅ **HIS 源端字段主题与 ODS 覆盖差异已梳理**：`22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json`（12 个 owner、1234 张表、19831 字段；105 张源端表与 ODS.HIS 同名覆盖，1129 张未按同名表覆盖）。
 - ✅ **HIS 源端资产范围已复核**：`23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json`（用户确认 `COMM/MEDADM` 纳入；`ST_*`、日志、接口中间表排除；医嘱执行、预交金纳入；`VISIT_ID=0/NULL` 检验/检查按门诊口径）。
 - ✅ **独立 HIS 源端资产包草案已生成**：`25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `数据资产_HIS源端资产包/`（1234 表、19831 字段、33 条关系；含 `source_owner/table_role/include_status/exclude_reason/ods_same_name_covered`）。
-- ✅ **已核查**：`28_核查与整改计划.md` 对 27 计划全项核查完成——后端模型/API 95%，前端页面仅 35%（缺运维/人员/字典/变更模块），发现 4 个 Bug（B4 防自审需立即修复）。下一阶段以 `28` 的整改优先级路线图为准。
-- ⏭ **下一步**：按 `28` 优先级路线图执行整改——第一优先级补前端 4 个新模块页面 + 系统总览/数据源/关系复核；第二优先级补后端业务逻辑（连通性检测、采集、定时调度）；第三优先级安全加固。
+- ✅ **应用整改入口已更新**：原 `27/28` 已归档到 `开发起步包/_archive/`，当前应用整改以 `29_系统功能对照复核与整改计划.md` 为主；后续交接以 `42_下一步工作与整改交接说明.md` 为准。
+- ✅ **用户治理口径已沉淀**：`40_数据治理复核口径与方法记录.md` 记录表清洗、待确认表收敛、强制保留表、B/C 关系采纳、D 关系跨系统延后等用户确认规则；后续 HIS/数据中心/周边系统治理分析必须优先沿用。
+- ⏭ **下一步**：HIS_READY 最终治理导入包、质量执行器和前端层级图谱基础整改已完成；后续按 `42_下一步工作与整改交接说明.md` 继续执行真实 HIS 源库连通复核、核心表质量分析、数据中心二次优化与 D 类跨系统关系。
 
 **关键捷径**：`03_view_registry.json` + `08` 里的 `V_EMR_*`/`CDR_*` 视图 SQL **本身就是关系样本**——它们编码了 HIS 表如何用 `PATIENT_ID+VISIT_ID`、`TEST_NO`、`EXAM_NO` 等关联。关系图谱以这些视图为种子扩展，不要从零推断。
 
@@ -56,7 +57,9 @@
 | HIS 源端字段主题与 ODS 覆盖差异 | `22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json` |
 | HIS 源端资产范围复核与下一步计划 | `23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json` |
 | HIS 源端资产包 | `25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `开发起步包/数据资产_HIS源端资产包/` |
-| **核查与整改计划（当前主入口）** | `28_核查与整改计划.md`（含第 10 节复核补充）/ `28_执行提示词.md`（给执行 AI 的纯文本清单） |
+| **应用整改主入口** | `29_系统功能对照复核与整改计划.md`（原 `27/28` 已归档，仅作历史参考） |
+| **用户确认的数据治理复核口径** | `40_数据治理复核口径与方法记录.md`（表清洗、强制保留、待确认清零、B/C 关系采纳、D 跨系统延后） |
+| **未完成工作与接手说明** | `41_未完成工作与目录整理计划.md` / `42_下一步工作与整改交接说明.md` |
 | 机器可读资产包（导入资产系统） | `开发起步包/数据资产_资产包/`（tables/columns/relationships.csv + catalog.json，关系含数据库实测验证等级） |
 | **实测全量元数据（关系图谱底座）** | `开发起步包/08_数据中心元数据快照.json` |
 | 现有视图→HIS 表关系（图谱种子） | `03_view_registry.json` |
@@ -145,6 +148,7 @@ nvl((SELECT zd.国标编码 FROM cda.cda_dictionary zd
 6. **大表禁全扫**：`HIS.LAB_RESULT` 等大表必须用 `ROWNUM <= N` 或子查询限定。
 7. **保留旧表**：`asset_api_keys`/`asset_table_owners`/`asset_business_terms`/`asset_metadata_snapshots` 是旧 MVP 表，保留不删。
 8. **前端不改现有路径**：`/relations/{id}/review`、`/dict-medical/*` 等现有路径保留不变。
+9. **前端技术栈与约定**：基于 `pure-admin-thin` 模板，Vue3 + Element Plus + Pinia + Tailwind + Vite + TypeScript。typecheck 同时跑 `tsc --noEmit` 和 `vue-tsc`，必须两者都过。API 层在 `src/api/*.ts`，按模块分文件（asset/dict/identity/metadata/ops/routes/user）；新增接口优先扩展现有文件而非新建。路由模块在 `src/router/modules/`，视图在 `src/views/<模块>/`。
 
 ### 验收命令
 
@@ -155,9 +159,10 @@ cd F:\python\数据资产\backend
 .\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
-前端：
+前端（**必须用 pnpm**，仓库 `package.json` 有 `preinstall: only-allow pnpm`，锁文件为 `pnpm-lock.yaml`，用 npm/yarn 会失败或引入幻影依赖）：
 ```powershell
 cd F:\python\数据资产\frontend
-npm.cmd run typecheck
-npm.cmd run build
+pnpm install
+pnpm run typecheck
+pnpm run build
 ```

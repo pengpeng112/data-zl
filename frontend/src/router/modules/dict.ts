@@ -14,9 +14,9 @@ export default {
     {
       path: "/dict/medical",
       name: "DictMedical",
-      component: () => import("@/views/dict/medical/index.vue"),
+      component: () => import("@/views/dict/mappings/index.vue"),
       meta: {
-        title: "诊断与手术",
+        title: "诊断手术维护",
         showLink: true
       }
     },
@@ -25,7 +25,7 @@ export default {
       name: "DictMappings",
       component: () => import("@/views/dict/mappings/index.vue"),
       meta: {
-        title: "编码对照",
+        title: "编码关系明细",
         showLink: true
       }
     },

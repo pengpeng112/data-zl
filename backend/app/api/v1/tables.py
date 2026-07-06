@@ -57,6 +57,9 @@ def summary(db: Session = Depends(get_db)) -> ApiResponse[SummaryOut]:
 def _build_table_query(
     keyword: str | None = None,
     domain: str | None = None,
+    system_code: str | None = None,
+    source_code: str | None = None,
+    schema_name: str | None = None,
 ):
     stmt = select(AssetTable)
     if keyword:
@@ -68,6 +71,12 @@ def _build_table_query(
         )
     if domain:
         stmt = stmt.where(AssetTable.domain == domain)
+    if system_code:
+        stmt = stmt.where(AssetTable.system_code == system_code)
+    if source_code:
+        stmt = stmt.where(AssetTable.source_code == source_code)
+    if schema_name:
+        stmt = stmt.where(AssetTable.schema_name == schema_name)
     return stmt
 
 
@@ -75,12 +84,15 @@ def _build_table_query(
 def list_tables(
     keyword: str | None = Query(None, description="按 schema/table/comment 模糊匹配"),
     domain: str | None = None,
+    system_code: str | None = None,
+    source_code: str | None = None,
+    schema_name: str | None = None,
     sort: str | None = Query(None, description="排序字段: schema_name/table_name/column_count/domain，前缀 - 表示降序"),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=1, le=200, description="每页条数"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[PageData[TableBrief]]:
-    base = _build_table_query(keyword, domain)
+    base = _build_table_query(keyword, domain, system_code, source_code, schema_name)
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     order = _parse_sort(sort, TABLE_SORT_COLUMNS)
     stmt = base.order_by(order) if order is not None else base.order_by(AssetTable.schema_name, AssetTable.table_name)

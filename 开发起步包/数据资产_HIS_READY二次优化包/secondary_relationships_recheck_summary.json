@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-07-06T10:04:16+08:00",
+  "user_decision": "B、C 当前可采用；D 为其他系统/周边表关系，等待其他系统数据库信息后再分析",
+  "before": {
+    "A": 16,
+    "B": 16,
+    "C": 3,
+    "D": 4,
+    "all": 39
+  },
+  "after": {
+    "A_rechecked_current_usable": 34,
+    "B_rechecked_pending": 0,
+    "C_rechecked_pending": 0,
+    "D_deferred": 4,
+    "all_rechecked": 38
+  },
+  "outputs": [
+    "secondary_relationships_A_rechecked.csv",
+    "secondary_relationships_B_rechecked.csv",
+    "secondary_relationships_C_rechecked.csv",
+    "secondary_relationships_D_rechecked.csv",
+    "secondary_relationships_all_graded_rechecked.csv"
+  ],
+  "notes": [
+    "原始 A/B/C/D 文件保留作为历史证据，不覆盖。",
+    "A_rechecked 为当前 HIS_READY 可用于治理导入/关系图谱的关系清单。",
+    "B/C_rechecked 为空，表示原 B/C 已被用户确认采纳并合并到 A_rechecked。",
+    "D_rechecked 仅记录后续跨系统分析任务，当前不进入 HIS_READY 图谱。",
+    "A_rechecked 为 34 条：原 A+B+C 中有 1 条重复关系已去重。"
+  ]
+}

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -46,6 +46,12 @@ def list_items(
     keyword: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
+    status: str | None = Query(None, description="active/inactive"),
+    has_infectious: bool | None = Query(None, description="是否传染病诊断"),
+    minimally_invasive_flag: str | None = Query(None, description="绩效微创标识"),
+    performance_level4_flag: str | None = Query(None, description="绩效四级标识"),
+    restricted_tech_flag: str | None = Query(None, description="限制技术标识"),
+    operation_level: str | None = Query(None, description="院内手术等级"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == code_set_code)
@@ -74,6 +80,12 @@ def list_mappings(
     review_status: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
+    status: str | None = Query(None, description="active/inactive"),
+    has_infectious: bool | None = Query(None, description="是否传染病诊断"),
+    minimally_invasive_flag: str | None = Query(None, description="绩效微创标识"),
+    performance_level4_flag: str | None = Query(None, description="绩效四级标识"),
+    restricted_tech_flag: str | None = Query(None, description="限制技术标识"),
+    operation_level: str | None = Query(None, description="院内手术等级"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     stmt = select(DictMedicalCodeMapping)
@@ -99,6 +111,227 @@ def list_mappings(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
+
+def _mapping_row_extra(local: DictMedicalCodeItem) -> dict:
+    return local.extra or {}
+
+
+@router.get("/mapping-rows", summary="按院内编码展示诊断/手术完整映射宽表")
+def list_mapping_rows(
+    category_code: str = Query("diagnosis", description="diagnosis/operation"),
+    keyword: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    status: str | None = Query(None, description="active/inactive"),
+    has_infectious: bool | None = Query(None, description="是否传染病诊断"),
+    minimally_invasive_flag: str | None = Query(None, description="绩效微创标识"),
+    performance_level4_flag: str | None = Query(None, description="绩效四级标识"),
+    restricted_tech_flag: str | None = Query(None, description="限制技术标识"),
+    operation_level: str | None = Query(None, description="院内手术等级"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    if category_code == "operation":
+        local_code_set = "operation_local_clinical"
+        national_code_set = "operation_national_clinical_v3"
+        insurance_code_set = "operation_insurance_v2"
+    else:
+        local_code_set = "diagnosis_local_clinical"
+        national_code_set = "diagnosis_national_clinical_v2"
+        insurance_code_set = "diagnosis_insurance_v2"
+
+    stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == local_code_set)
+    if status:
+        stmt = stmt.where(DictMedicalCodeItem.status == status)
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(
+            DictMedicalCodeItem.item_code.ilike(like)
+            | DictMedicalCodeItem.item_name_cn.ilike(like)
+        )
+    if category_code == "diagnosis" and has_infectious is not None:
+        infectious_expr = func.coalesce(DictMedicalCodeItem.extra.op("->>")("infectious_disease_name"), "")
+        stmt = stmt.where(infectious_expr != "" if has_infectious else infectious_expr == "")
+    if category_code == "operation":
+        def flag_value(value: str | None) -> str | None:
+            return "" if value == "__empty" else value
+
+        if minimally_invasive_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_minimally_invasive_flag"), "") == flag_value(minimally_invasive_flag))
+        if performance_level4_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_level4_flag"), "") == flag_value(performance_level4_flag))
+        if restricted_tech_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("restricted_tech_flag"), "") == flag_value(restricted_tech_flag))
+        if operation_level:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("operation_level"), "") == operation_level)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    local_items = db.scalars(
+        stmt.order_by(DictMedicalCodeItem.item_code)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    local_codes = [r.item_code for r in local_items]
+
+    mapping_rows = db.scalars(select(DictMedicalCodeMapping).where(
+        DictMedicalCodeMapping.category_code == category_code,
+        DictMedicalCodeMapping.from_code_set == local_code_set,
+        DictMedicalCodeMapping.from_item_code.in_(local_codes),
+    )).all() if local_codes else []
+    mapping_by_key = {(m.from_item_code, m.to_code_set): m.to_item_code for m in mapping_rows}
+
+    target_codes = [m.to_item_code for m in mapping_rows if m.to_item_code]
+    target_items = db.scalars(select(DictMedicalCodeItem).where(
+        DictMedicalCodeItem.code_set_code.in_([national_code_set, insurance_code_set]),
+        DictMedicalCodeItem.item_code.in_(target_codes),
+    )).all() if target_codes else []
+    target_name = {(i.code_set_code, i.item_code): i.item_name_cn for i in target_items}
+
+    items = []
+    for local in local_items:
+        extra = _mapping_row_extra(local)
+        national_code = mapping_by_key.get((local.item_code, national_code_set)) or extra.get("national_clinical_code")
+        insurance_code = mapping_by_key.get((local.item_code, insurance_code_set)) or extra.get("insurance_raw_code")
+        items.append({
+            "id": local.id,
+            "category_code": category_code,
+            "local_code_set": local_code_set,
+            "local_code": local.item_code,
+            "local_name": local.item_name_cn,
+            "dict_attribute": extra.get("dict_attribute"),
+            "national_code_set": national_code_set,
+            "national_code": national_code,
+            "national_name": target_name.get((national_code_set, national_code)) or extra.get("national_clinical_name"),
+            "insurance_code_set": insurance_code_set,
+            "insurance_code": insurance_code,
+            "insurance_name": target_name.get((insurance_code_set, insurance_code)) or extra.get("insurance_raw_name"),
+            "operation_level": extra.get("operation_level"),
+            "operation_category": extra.get("operation_category"),
+            "performance_level4_flag": extra.get("performance_level4_flag"),
+            "performance_minimally_invasive_flag": extra.get("performance_minimally_invasive_flag"),
+            "restricted_tech_flag": extra.get("restricted_tech_flag"),
+            "special_disease_name": extra.get("special_disease_name"),
+            "low_risk_category_code": extra.get("low_risk_category_code"),
+            "low_risk_disease_name": extra.get("low_risk_disease_name"),
+            "infectious_disease_name": extra.get("infectious_disease_name"),
+            "source_file": extra.get("source_file"),
+            "source_sheet": extra.get("source_sheet"),
+            "status": local.status,
+        })
+    return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+class MappingRowUpsert(BaseModel):
+    category_code: str
+    local_code: str
+    local_name: str
+    dict_attribute: str | None = None
+    national_code: str | None = None
+    national_name: str | None = None
+    insurance_code: str | None = None
+    insurance_name: str | None = None
+    operation_level: str | None = None
+    operation_category: str | None = None
+    performance_level4_flag: str | None = None
+    performance_minimally_invasive_flag: str | None = None
+    restricted_tech_flag: str | None = None
+    special_disease_name: str | None = None
+    low_risk_category_code: str | None = None
+    low_risk_disease_name: str | None = None
+    infectious_disease_name: str | None = None
+    status: str | None = "active"
+
+
+def _code_sets_for_category(category_code: str) -> tuple[str, str, str]:
+    if category_code == "operation":
+        return "operation_local_clinical", "operation_national_clinical_v3", "operation_insurance_v2"
+    return "diagnosis_local_clinical", "diagnosis_national_clinical_v2", "diagnosis_insurance_v2"
+
+
+def _upsert_code_item(db: Session, code_set_code: str, item_code: str | None, item_name: str | None, category_code: str, extra: dict | None = None, status: str | None = None, update_name: bool = True) -> None:
+    item_code = (item_code or "").strip()
+    item_name = (item_name or "").strip()
+    if not item_code:
+        return
+    item = db.scalar(select(DictMedicalCodeItem).where(
+        DictMedicalCodeItem.code_set_code == code_set_code,
+        DictMedicalCodeItem.item_code == item_code,
+    ))
+    if item:
+        if update_name and item_name:
+            item.item_name_cn = item_name
+        if extra is not None:
+            item.extra = extra
+        if status:
+            item.status = status
+        else:
+            item.status = item.status or "active"
+    else:
+        db.add(DictMedicalCodeItem(
+            code_set_code=code_set_code,
+            item_code=item_code,
+            item_name_cn=item_name or item_code,
+            category_code=category_code,
+            status=status or "active",
+            extra=extra,
+        ))
+
+
+def _replace_mapping(db: Session, category_code: str, from_code_set: str, from_code: str, to_code_set: str, to_code: str | None) -> None:
+    db.execute(delete(DictMedicalCodeMapping).where(
+        DictMedicalCodeMapping.category_code == category_code,
+        DictMedicalCodeMapping.from_code_set == from_code_set,
+        DictMedicalCodeMapping.from_item_code == from_code,
+        DictMedicalCodeMapping.to_code_set == to_code_set,
+    ))
+    to_code = (to_code or "").strip()
+    if not to_code:
+        return
+    db.add(DictMedicalCodeMapping(
+        category_code=category_code,
+        from_code_set=from_code_set,
+        from_item_code=from_code,
+        to_code_set=to_code_set,
+        to_item_code=to_code,
+        mapping_type="equivalent",
+        mapping_cardinality="many_to_one",
+        confidence="high",
+        review_status="approved",
+    ))
+
+
+@router.put("/mapping-rows", summary="按院内编码新增/更新诊断手术映射宽表行")
+def upsert_mapping_row(req: MappingRowUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    local_code = (req.local_code or "").strip()
+    local_name = (req.local_name or "").strip()
+    if not local_code or not local_name:
+        raise HTTPException(status_code=400, detail="院内编码和院内名称不能为空")
+
+    local_code_set, national_code_set, insurance_code_set = _code_sets_for_category(req.category_code)
+    extra = {
+        "dict_attribute": req.dict_attribute,
+        "national_clinical_code": req.national_code,
+        "national_clinical_name": req.national_name,
+        "insurance_raw_code": req.insurance_code,
+        "insurance_raw_name": req.insurance_name,
+        "operation_level": req.operation_level,
+        "operation_category": req.operation_category,
+        "performance_level4_flag": req.performance_level4_flag,
+        "performance_minimally_invasive_flag": req.performance_minimally_invasive_flag,
+        "restricted_tech_flag": req.restricted_tech_flag,
+        "special_disease_name": req.special_disease_name,
+        "low_risk_category_code": req.low_risk_category_code,
+        "low_risk_disease_name": req.low_risk_disease_name,
+        "infectious_disease_name": req.infectious_disease_name,
+        "source_file": "系统页面维护",
+        "source_sheet": "编码映射维护",
+    }
+
+    _upsert_code_item(db, local_code_set, local_code, local_name, req.category_code, extra, status=req.status or "active", update_name=False)
+    _upsert_code_item(db, national_code_set, req.national_code, req.national_name, req.category_code)
+    _upsert_code_item(db, insurance_code_set, req.insurance_code, req.insurance_name, req.category_code)
+    _replace_mapping(db, req.category_code, local_code_set, local_code, national_code_set, req.national_code)
+    _replace_mapping(db, req.category_code, local_code_set, local_code, insurance_code_set, req.insurance_code)
+    db.commit()
+    return ApiResponse(data={"local_code": local_code, "category_code": req.category_code})
 class MappingUpsert(BaseModel):
     category_code: str
     from_code_set: str

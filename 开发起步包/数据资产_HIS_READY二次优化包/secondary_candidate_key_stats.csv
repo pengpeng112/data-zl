@@ -1,0 +1,53 @@
+﻿系统,库名,表名,业务对象,候选主键,总数,去重数,重复数,空值数,是否可作为主键,是否可跨系统关联,风险说明,验证口径
+HIS_SOURCE,his_ready_10_10_10_15,MEDREC.PAT_MASTER_INDEX,,PATIENT_ID,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,MEDREC.PAT_VISIT,,PATIENT_ID+VISIT_ID,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPADM.CLINIC_MASTER,,VISIT_DATE+VISIT_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPADM.CLINIC_MASTER,,PATIENT_ID,100000,9521,90479,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,MEDREC.DIAGNOSIS,,PATIENT_ID+VISIT_ID+DIAGNOSIS_TYPE+DIAGNOSIS_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,ORDADM.ORDERS,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,ORDADM.ORDERS_COSTS,,PATIENT_ID+VISIT_ID+ORDER_NO+ITEM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,ORDADM.ORDERS_COSTS,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO,100000,59973,40027,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,ORDADM.ORDERS_EXECUTE_DETAILS,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO+EXEC_DATE_TIME,100000,69154,30846,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,DRUG_USER.INP_ORDER_EXECDATA,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO,100000,75385,24615,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,EXAM.EXAM_MASTER,,EXAM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,EXAM.EXAM_MASTER,,PATIENT_ID+VISIT_ID,100000,52801,47199,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,EXAM.EXAM_REPORT,,EXAM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,EXAM.EXAM_BILL_ITEMS,,EXAM_NO+EXAM_ITEM_NO+CHARGE_ITEM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,EXAM.EXAM_ITEMS,,EXAM_NO,100000,91332,8668,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,LAB.LAB_TEST_MASTER,,TEST_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,LAB.LAB_TEST_MASTER,,PATIENT_ID+VISIT_ID,100000,12737,87263,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,LAB.LAB_TEST_ITEMS,,TEST_NO+ITEM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,LAB.LAB_TEST_ITEMS_DETAIL,,ID,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,LAB.LAB_TEST_ITEMS_DETAIL,,TEST_NO,100000,19193,80807,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPADM.PATS_IN_HOSPITAL,,PATIENT_ID+VISIT_ID,1127,1127,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPADM.ADT_LOG,,PATIENT_ID+VISIT_ID+LOG_DATE_TIME,100000,92487,7513,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPBILL.INP_SETTLE_MASTER,,PATIENT_ID+VISIT_ID,100000,97789,2211,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPBILL.INP_BILL_DETAIL,,PATIENT_ID+VISIT_ID+ITEM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPBILL.PREPAYMENT_RCPT,,PATIENT_ID+VISIT_ID,100000,16061,83939,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,INPBILL.PREPAYMENT_RCPT,,RCPT_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPBILL.OUTP_RCPT_MASTER,,RCPT_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPBILL.OUTP_RCPT_MASTER,,PATIENT_ID,100000,5630,94370,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPBILL.OUTP_BILL_ITEMS,,RCPT_NO+ITEM_NO,100000,87704,12296,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,OUTPBILL.OUTP_BILL_ITEMS,,RCPT_NO,100000,29862,70138,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,DRUG_USER.PHA_INP_REQUEST_DRUG,,REQUEST_NO,100000,7367,92633,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,DRUG_USER.PHA_INP_REQUEST_DRUG,,PAT_ID+IN_COUNT,100000,2626,97374,1448,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,DRUG_USER.PHA_INP_DISPDETAIL,,REQUEST_NO,100000,7330,92670,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,DRUG_USER.PHA_INP_DISPDETAIL,,ORG_CODE+RECORD_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_PRESC_MASTER,,PRESC_DATE+PRESC_NO,100000,99436,564,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_PRESC_MASTER,,PATIENT_ID+VISIT_ID,100000,35872,64128,80448,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_PRESC_MASTER,,RCPT_NO,100000,52739,47261,33164,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_PRESC_DETAIL,,PRESC_DATE+PRESC_NO+ITEM_NO,100000,98578,1422,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_PRESC_DETAIL,,ORDER_NO+ORDER_SUB_NO,100000,55,99945,99992,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_DISPENSE_REC,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO,100000,24122,75878,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DRUG_DISPENSE_REC_DISPDATE,,PATIENT_ID+VISIT_ID+ORDER_NO+ORDER_SUB_NO,100000,30155,69845,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DOCT_DRUG_PRESC_MASTER,,PRESC_DATE+PRESC_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DOCT_DRUG_PRESC_MASTER,,PATIENT_ID+VISIT_ID,100000,24183,75817,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DOCT_DRUG_PRESC_DETAIL,,PRESC_DATE+PRESC_NO+ITEM_NO,100000,100000,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,PHARMACY.DOCT_DRUG_PRESC_DETAIL,,ORDER_NO+ORDER_SUB_NO,100000,6,99994,100000,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.DEPT_DICT,,DEPT_CODE,816,816,0,0,是,待确认,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.STAFF_DICT,,STAFF_ID,,,,,待确认,待确认,"query_error: DatabaseError: ORA-00904: ""STAFF_ID"": invalid identifier",sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.STAFF_DICT,,NAME,4220,3958,262,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.DRUG_DICT,,DRUG_CODE,6042,6041,1,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.CLINIC_ITEM_DICT,,ITEM_CODE,19069,19051,18,0,否,否,本轮为前 100000 行样本唯一性验证；正式入库前建议全量或按索引复核,sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.EXAM_ITEM_DICT,,EXAM_ITEM_CODE,,,,,待确认,待确认,"query_error: DatabaseError: ORA-00904: ""EXAM_ITEM_CODE"": invalid identifier",sample_first_100000
+HIS_SOURCE,his_ready_10_10_10_15,COMM.LAB_ITEM_DICT,,LAB_ITEM_CODE,,,,,待确认,待确认,"query_error: DatabaseError: ORA-00904: ""LAB_ITEM_CODE"": invalid identifier",sample_first_100000

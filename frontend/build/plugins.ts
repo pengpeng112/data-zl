@@ -28,10 +28,12 @@ export function getPluginsList(
      * Windows 默认组合键 Alt + Shift
      * 更多用法看 https://inspector.fe-dev.cn/guide/start.html
      */
-    codeInspectorPlugin({
-      bundler: "vite",
-      hideConsole: true
-    }),
+    lifecycle === "dev" || lifecycle === "serve"
+      ? codeInspectorPlugin({
+          bundler: "vite",
+          hideConsole: true
+        })
+      : null,
     viteBuildInfo(),
     /**
      * 开发环境下移除非必要的vue-router动态路由警告No match found for location with path

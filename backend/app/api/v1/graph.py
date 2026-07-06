@@ -11,6 +11,28 @@ from ...schemas.graph import GraphData, GraphEdge, GraphNode, GraphOptions
 
 router = APIRouter(prefix="/api/v1/graph", tags=["graph"])
 
+
+LEGACY_TABLE_ALIASES = {
+    "HIS.PAT_VISIT": "MEDREC.PAT_VISIT",
+    "HIS.PAT_MASTER_INDEX": "MEDREC.PAT_MASTER_INDEX",
+}
+CANONICAL_TO_LEGACY = {v: k for k, v in LEGACY_TABLE_ALIASES.items()}
+
+
+def _aliases_for(table: str) -> set[str]:
+    names = {table}
+    if table in LEGACY_TABLE_ALIASES:
+        names.add(LEGACY_TABLE_ALIASES[table])
+    if table in CANONICAL_TO_LEGACY:
+        names.add(CANONICAL_TO_LEGACY[table])
+    return names
+
+
+def _display_name(table: str, requested: str | None = None) -> str:
+    if requested and table == LEGACY_TABLE_ALIASES.get(requested):
+        return requested
+    return table
+
 SCHEMA_COLORS: dict[str, str] = {
     "HIS": "#409EFF",
     "LIS": "#67C23A",
@@ -201,7 +223,7 @@ def neighbors(
 ) -> ApiResponse[GraphData]:
     collected_edges: list[AssetRelation] = []
     seen: set[int] = set()
-    current_tables: set[str] = {table}
+    current_tables: set[str] = _aliases_for(table)
 
     for _ in range(depth):
         if not current_tables:
@@ -239,13 +261,15 @@ def neighbors(
     for r in collected_edges:
         src = r.from_table or ""
         tgt = r.to_table or ""
-        table_set.add(src)
-        table_set.add(tgt)
+        src_display = _display_name(src, table)
+        tgt_display = _display_name(tgt, table)
+        table_set.add(src_display)
+        table_set.add(tgt_display)
         edges.append(
             GraphEdge(
-                id=f"{src}->{tgt}#{r.rel_id}",
-                source=src,
-                target=tgt,
+                id=f"{src_display}->{tgt_display}#{r.rel_id}",
+                source=src_display,
+                target=tgt_display,
                 label=r.from_columns + "->" + r.to_columns if r.from_columns and r.to_columns else (r.join_condition or ""),
                 relation_type="formal",
                 rel_id=r.rel_id,
@@ -328,7 +352,7 @@ def options(db: Session = Depends(get_db)) -> ApiResponse[GraphOptions]:
         data=GraphOptions(
             schemas=sorted([s for s in schemas_rows if s]),
             domains=sorted([d for d in domains_rows if d]),
-            validation_statuses=sorted([s for s in statuses_rows if s]),
+            validation_statuses=sorted(set([s for s in statuses_rows if s] + ["verified"])),
             confidences=sorted([c for c in confidences_rows if c]),
             relation_types=["formal", "candidate", "dependency"],
         )

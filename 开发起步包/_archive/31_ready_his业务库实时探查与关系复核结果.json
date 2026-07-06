@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-07-05",
+  "source": {
+    "db": "10.10.10.15:1521/his",
+    "account": "ready_his",
+    "access_path": "Windows -> 10.10.8.53:40022 -> Oracle",
+    "safety": "read-only SELECT; no DML/DDL; no sensitive row data exported"
+  },
+  "code_alignment": {
+    "system_code": "HIS_SOURCE",
+    "source_code": "his_ready_10_10_10_15",
+    "table_model": "AssetTable",
+    "column_model": "AssetColumn",
+    "relation_model": "AssetRelation",
+    "review_model": "AssetRelationReview"
+  },
+  "metadata_summary": {
+    "db_version": "Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production",
+    "table_count": 1234,
+    "column_count": 24726,
+    "previous_column_count": 19831,
+    "added_columns_vs_previous": 4895,
+    "removed_columns_vs_previous": 0,
+    "declared_fk_count": 2,
+    "candidate_relation_count": 578,
+    "include_status_counts": {
+      "included": 467,
+      "excluded": 158,
+      "candidate": 609
+    }
+  },
+  "owner_summary": [
+    {"owner": "COMM", "table_count": 382, "included": 357, "candidate": 0, "excluded": 25, "stats_rows": 67999941},
+    {"owner": "DRUG_USER", "table_count": 123, "included": 0, "candidate": 114, "excluded": 9, "stats_rows": 107537124},
+    {"owner": "EXAM", "table_count": 39, "included": 6, "candidate": 31, "excluded": 2, "stats_rows": 17353624},
+    {"owner": "INPADM", "table_count": 26, "included": 4, "candidate": 10, "excluded": 12, "stats_rows": 3979866},
+    {"owner": "INPBILL", "table_count": 67, "included": 2, "candidate": 49, "excluded": 16, "stats_rows": 267281815},
+    {"owner": "LAB", "table_count": 137, "included": 7, "candidate": 126, "excluded": 4, "stats_rows": 139111479},
+    {"owner": "MEDADM", "table_count": 73, "included": 25, "candidate": 32, "excluded": 16, "stats_rows": 93720986},
+    {"owner": "MEDREC", "table_count": 163, "included": 39, "candidate": 98, "excluded": 26, "stats_rows": 32979306},
+    {"owner": "ORDADM", "table_count": 55, "included": 7, "candidate": 35, "excluded": 13, "stats_rows": 379766675},
+    {"owner": "OUTPADM", "table_count": 36, "included": 5, "candidate": 26, "excluded": 5, "stats_rows": 22783496},
+    {"owner": "OUTPBILL", "table_count": 31, "included": 2, "candidate": 22, "excluded": 7, "stats_rows": 76507062},
+    {"owner": "PHARMACY", "table_count": 102, "included": 13, "candidate": 66, "excluded": 23, "stats_rows": 217829125}
+  ],
+  "relationship_validation": {
+    "validated_count": 22,
+    "status_counts": {
+      "sample_pass": 7,
+      "sample_pass_with_orphans": 15
+    },
+    "all_match_rate_ge_99_percent": true,
+    "validated_file": "数据资产_HIS_READY复核包/his_ready_validated_relationships.csv"
+  },
+  "asset_package": {
+    "directory": "数据资产_HIS_READY复核包/",
+    "files": [
+      "his_ready_tables.csv",
+      "his_ready_columns.csv",
+      "his_ready_relationships.csv",
+      "his_ready_validated_relationships.csv",
+      "his_ready_summary.json",
+      "his_ready_validated_relationships.json"
+    ]
+  },
+  "next_steps": [
+    "Use his_ready_columns.csv as the current field-level source for HIS_SOURCE",
+    "Reapply scope decisions from documents 23 and 25 before final governance import",
+    "Import sample_pass relationships into AssetRelation",
+    "Route sample_pass_with_orphans relationships into AssetRelationReview if zero-orphan policy is required",
+    "Rank and filter 578 name-inferred candidate relationships before expanding the graph"
+  ]
+}

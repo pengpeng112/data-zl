@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-07-06T06:33:51+08:00",
+  "source_db": "10.10.10.15:1521/his",
+  "mode": "secondary_optimization_no_full_rescan",
+  "asset_dir": "开发起步包/数据资产_HIS_READY二次优化包",
+  "inputs": [
+    "31_ready_his业务库实时探查与关系复核结果.json",
+    "32_ready_his治理导入包生成结果.json",
+    "33_ready_his候选关系补验与旧文档对照结果.json",
+    "系统表结构/HIS系统数据库表结构.md",
+    "系统表结构/HIS系统药房药库表设计文档.md",
+    "数据资产_HIS_READY治理导入包/*.csv",
+    "数据资产_HIS源端资产包/*.csv"
+  ],
+  "summary": {
+    "all_tables": 1234,
+    "core_tables": 477,
+    "excluded_tables": 179,
+    "manual_confirm_tables": 578,
+    "activity_checked_tables": 36,
+    "activity_active_tables": 22,
+    "activity_historical_tables": 2,
+    "activity_unknown_tables": 12,
+    "candidate_key_checks": 52,
+    "candidate_key_sample_pass": 20,
+    "candidate_key_sample_fail": 29,
+    "candidate_key_pending": 3,
+    "relationship_A": 16,
+    "relationship_B": 16,
+    "relationship_C": 3,
+    "relationship_D": 4,
+    "doc_actual_differences": 6867,
+    "quality_field_tasks": 3556
+  },
+  "outputs": [
+    "secondary_all_tables_decision.csv",
+    "secondary_core_tables.csv",
+    "secondary_excluded_tables.csv",
+    "secondary_manual_confirm_tables.csv",
+    "secondary_activity_stats.csv",
+    "secondary_candidate_key_stats.csv",
+    "secondary_relationships_A.csv",
+    "secondary_relationships_B.csv",
+    "secondary_relationships_C.csv",
+    "secondary_relationships_D.csv",
+    "secondary_relationships_all_graded.csv",
+    "secondary_doc_actual_differences.csv",
+    "secondary_quality_field_plan.csv",
+    "secondary_optimization_summary.json"
+  ],
+  "important_corrections": [
+    "业务目录/供应商/医保目录类表不因 CATALOG 包含 LOG 而排除，已转入待人工确认或保留。",
+    "PHARMACY.DRUG_DISPENSE_REC 和 DRUG_DISPENSE_REC_DISPDATE 当前按 DISPENSING_DATE_TIME 判断为历史表，但仍保留历史查询价值。",
+    "PHARMACY.DOCT_DRUG_PRESC_MASTER/DETAIL 当前活跃，住院待发药处方链路需优先治理。",
+    "A 级关系已去重，B/C/D 不进入正式 ER 图。",
+    "LAB.LAB_RESULT 未做全表活跃度扫描，后续必须用 TEST_NO 或分区限定。"
+  ]
+}

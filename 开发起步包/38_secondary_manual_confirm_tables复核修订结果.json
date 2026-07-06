@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-07-06T09:30:00+08:00",
+  "source": "secondary_manual_confirm_tables.csv",
+  "asset_dir": "开发起步包/数据资产_HIS_READY二次优化包",
+  "before": {
+    "core_tables": 477,
+    "excluded_tables": 179,
+    "manual_confirm_tables": 578
+  },
+  "after": {
+    "core_tables": 659,
+    "excluded_tables": 575,
+    "manual_confirm_tables": 0
+  },
+  "activity_sql_recheck": {
+    "checked_tables": 80,
+    "recent_30_positive": 15,
+    "promoted_after_activity": 14,
+    "excluded_after_activity": 15,
+    "kept_manual_active_technical": 1
+  },
+  "outputs": [
+    "secondary_core_tables_rechecked.csv",
+    "secondary_excluded_tables_rechecked.csv",
+    "secondary_manual_confirm_tables_rechecked.csv",
+    "secondary_all_tables_decision_rechecked.csv",
+    "secondary_manual_confirm_review_decisions.csv",
+    "secondary_manual_activity_recheck.csv",
+    "secondary_manual_activity_recheck_results.json",
+    "secondary_manual_confirm_recheck_summary.json",
+    "secondary_manual_confirm_user_scope_correction.csv"
+  ],
+  "user_scope_correction": {
+    "rule_total_rows_lte_5_excluded_from_manual_pool": 102,
+    "force_keep_tables": [
+      "PUB_CONFIG",
+      "VIEW_SHOWDATA",
+      "INP_BILL_DETAIL_CANCEL",
+      "LAB_SHARINGCENTER_DETAIL",
+      "ORDERS_EXECUTE"
+    ],
+    "manual_pool_other_marked_not_governance_scope": 39,
+    "final_manual_confirm_tables": 0
+  },
+  "notes": [
+    "PBCAT* 空表已排除。",
+    "中文临时/手工结果表、日期快照/备份表已排除。",
+    "近 30 天只读 SQL 补查命中的业务表已转入保留。",
+    "用户指定保留表已全部纳入核心清单并进入治理系统。",
+    "待人工确认表已清零，未指定保留的剩余表暂不纳入治理范围。"
+  ]
+}

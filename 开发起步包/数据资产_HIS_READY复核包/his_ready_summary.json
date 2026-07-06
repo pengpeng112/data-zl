@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-07-05T20:45:27",
+  "source_db": "10.10.10.15:1521/his",
+  "account": "ready_his",
+  "db_version": "Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production",
+  "owners": [
+    "COMM",
+    "DRUG_USER",
+    "EXAM",
+    "INPADM",
+    "INPBILL",
+    "LAB",
+    "MEDADM",
+    "MEDREC",
+    "ORDADM",
+    "OUTPADM",
+    "OUTPBILL",
+    "PHARMACY"
+  ],
+  "table_count": 1234,
+  "column_count": 24726,
+  "declared_fk_count": 2,
+  "candidate_relation_count": 578,
+  "include_status_counts": {
+    "included": 467,
+    "excluded": 158,
+    "candidate": 609
+  },
+  "table_role_counts": {
+    "dimension": 450,
+    "excluded": 158,
+    "candidate": 609,
+    "core_fact": 17
+  },
+  "owner_summary": [
+    {
+      "owner": "COMM",
+      "table_count": 382,
+      "included": 357,
+      "candidate": 0,
+      "excluded": 25,
+      "stats_rows": 67999941,
+      "max_last_analyzed": "2026-07-05 18:02:30"
+    },
+    {
+      "owner": "DRUG_USER",
+      "table_count": 123,
+      "included": 0,
+      "candidate": 114,
+      "excluded": 9,
+      "stats_rows": 107537124,
+      "max_last_analyzed": "2026-07-05 14:02:13"
+    },
+    {
+      "owner": "EXAM",
+      "table_count": 39,
+      "included": 6,
+      "candidate": 31,
+      "excluded": 2,
+      "stats_rows": 17353624,
+      "max_last_analyzed": "2026-07-02 22:04:27"
+    },
+    {
+      "owner": "INPADM",
+      "table_count": 26,
+      "included": 4,
+      "candidate": 10,
+      "excluded": 12,
+      "stats_rows": 3979866,
+      "max_last_analyzed": "2026-07-05 18:02:32"
+    },
+    {
+      "owner": "INPBILL",
+      "table_count": 67,
+      "included": 2,
+      "candidate": 49,
+      "excluded": 16,
+      "stats_rows": 267281815,
+      "max_last_analyzed": "2026-07-04 22:05:02"
+    },
+    {
+      "owner": "LAB",
+      "table_count": 137,
+      "included": 7,
+      "candidate": 126,
+      "excluded": 4,
+      "stats_rows": 139111479,
+      "max_last_analyzed": "2026-07-05 18:02:33"
+    },
+    {
+      "owner": "MEDADM",
+      "table_count": 73,
+      "included": 25,
+      "candidate": 32,
+      "excluded": 16,
+      "stats_rows": 93720986,
+      "max_last_analyzed": "2026-07-04 06:01:28"
+    },
+    {
+      "owner": "MEDREC",
+      "table_count": 163,
+      "included": 39,
+      "candidate": 98,
+      "excluded": 26,
+      "stats_rows": 32979306,
+      "max_last_analyzed": "2026-07-04 14:04:41"
+    },
+    {
+      "owner": "ORDADM",
+      "table_count": 55,
+      "included": 7,
+      "candidate": 35,
+      "excluded": 13,
+      "stats_rows": 379766675,
+      "max_last_analyzed": "2026-07-05 18:02:54"
+    },
+    {
+      "owner": "OUTPADM",
+      "table_count": 36,
+      "included": 5,
+      "candidate": 26,
+      "excluded": 5,
+      "stats_rows": 22783496,
+      "max_last_analyzed": "2026-06-29 22:01:51"
+    },
+    {
+      "owner": "OUTPBILL",
+      "table_count": 31,
+      "included": 2,
+      "candidate": 22,
+      "excluded": 7,
+      "stats_rows": 76507062,
+      "max_last_analyzed": "2026-07-03 22:07:13"
+    },
+    {
+      "owner": "PHARMACY",
+      "table_count": 102,
+      "included": 13,
+      "candidate": 66,
+      "excluded": 23,
+      "stats_rows": 217829125,
+      "max_last_analyzed": "2026-07-05 18:02:32"
+    }
+  ]
+}

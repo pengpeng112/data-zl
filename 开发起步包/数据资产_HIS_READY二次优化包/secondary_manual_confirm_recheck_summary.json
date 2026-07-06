@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-07-06T09:23:16+08:00",
+  "source": "secondary_manual_confirm_tables.csv",
+  "rules": [
+    "近30天内仍有新数据的表应保留；本轮未做全库扫描，对有候选时间字段的待确认表标记补验任务",
+    "中文临时/手工结果表、日期后缀/前缀快照表、BK/TEMP/TEST/LOG 类技术表转排除",
+    "PBCAT* 空表转排除；如非空需先找关联关系，找不到再排除",
+    "有中文名/数据库备注且非备份临时、存在数据的业务表优先保留"
+  ],
+  "before": {
+    "core_tables": 477,
+    "excluded_tables": 179,
+    "manual_confirm_tables": 578
+  },
+  "changes": {
+    "promoted_to_core": 163,
+    "moved_to_excluded": 240,
+    "still_manual_confirm": 175
+  },
+  "after": {
+    "core_tables": 659,
+    "excluded_tables": 575,
+    "manual_confirm_tables": 0
+  },
+  "outputs": [
+    "secondary_core_tables_rechecked.csv",
+    "secondary_excluded_tables_rechecked.csv",
+    "secondary_manual_confirm_tables_rechecked.csv",
+    "secondary_all_tables_decision_rechecked.csv",
+    "secondary_manual_confirm_review_decisions.csv",
+    "secondary_manual_confirm_recheck_summary.json",
+    "secondary_manual_activity_recheck.csv",
+    "secondary_manual_activity_recheck_results.json",
+    "secondary_manual_confirm_user_scope_correction.csv"
+  ],
+  "activity_sql_recheck": {
+    "checked_tables": 80,
+    "recent_30_positive": 15,
+    "promoted_after_activity": 14,
+    "excluded_after_activity": 15,
+    "kept_manual_active_technical": 1,
+    "result_file": "secondary_manual_activity_recheck.csv"
+  },
+  "user_scope_correction": {
+    "generated_at": "2026-07-06T09:51:10+08:00",
+    "rule_total_rows_lte_5_excluded_from_manual_pool": 102,
+    "force_keep_tables": [
+      "INP_BILL_DETAIL_CANCEL",
+      "LAB_SHARINGCENTER_DETAIL",
+      "ORDERS_EXECUTE",
+      "PUB_CONFIG",
+      "VIEW_SHOWDATA"
+    ],
+    "force_keep_count": 5,
+    "manual_pool_other_marked_not_governance_scope": 39,
+    "result_file": "secondary_manual_confirm_user_scope_correction.csv"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-07-06T06:56:43+08:00",
+  "source_db": "10.10.10.15:1521/his",
+  "mode": "readonly_select_only",
+  "asset_dir": "开发起步包/数据资产_HIS_READY专项核查包",
+  "summary": {
+    "relation_checks": 14,
+    "relation_pass": 5,
+    "relation_pass_with_orphans": 7,
+    "relation_need_split_or_review": 2,
+    "pat_visit_total_rows": 575841,
+    "pat_visit_to_pat_master_orphans": 3,
+    "pat_visit_negative_los_rows": 3,
+    "pat_visit_avg_los_days": 8.72,
+    "pat_visit_value_distribution_rows": 112
+  },
+  "outputs": [
+    "important_relation_consistency.csv",
+    "pat_visit_value_distribution.csv",
+    "relation_value_audit_summary.json"
+  ],
+  "important_findings": [
+    "PAT_VISIT 到 PAT_MASTER_INDEX 全量匹配率 99.9995%，有 3 条孤儿记录。",
+    "DIAGNOSIS、LAB_TEST_ITEMS、LAB_RESULT、INP_BILL_DETAIL、OUTP_BILL_ITEMS 等关系覆盖率良好。",
+    "ORDERS、ORDERS_COSTS、ORDERS_EXECUTE_DETAILS、处方主表存在少量孤儿，建议进入质量监控或人工复核。",
+    "EXAM_MASTER 和 LAB_TEST_MASTER 不能全量按 PATIENT_ID+VISIT_ID 挂 PAT_VISIT，需拆分住院/门诊口径。",
+    "PAT_VISIT 存在 3 条负住院日记录，应建立质量规则。"
+  ]
+}

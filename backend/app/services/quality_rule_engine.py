@@ -63,7 +63,37 @@ def run_metadata_rule(rule: QualityRule, db: Session) -> list[QualityFinding]:
 
 
 def run_sql_rule(rule: QualityRule, db: Session) -> list[QualityFinding]:
-    """执行 sql_template 规则——调用 quality_sql_runner 对源库执行 SQL。
-    当前为占位实现，返回空列表。源库连接打通后由 Q2-2 替换。
-    """
-    return []
+    """Execute a sql_template quality rule against its configured source."""
+    from ..services.quality_sql_runner import execute_quality_sql
+
+    result = execute_quality_sql(
+        rule_code=rule.rule_code,
+        sql=rule.check_sql or "",
+        source_code=rule.source_code or "",
+        sample_limit=rule.sample_limit or 20,
+        db=db,
+    )
+    if result.get("error_cnt", 0) <= 0:
+        return []
+
+    return [
+        QualityFinding(
+            rule_code=rule.rule_code,
+            target_type=rule.target_type or "table",
+            target_ref=f"{rule.namespace_name or ''}.{rule.target_table or ''}.{rule.target_field or ''}",
+            system_code=rule.system_code,
+            source_code=rule.source_code,
+            namespace_name=rule.namespace_name,
+            table_name=rule.target_table,
+            column_name=rule.target_field,
+            severity=rule.error_level or "minor",
+            status="open",
+            rectification_status="open",
+            metric_value=f"error_rate={result.get('error_rate', 0)}%",
+            total_cnt=result.get("total_cnt", 0),
+            error_cnt=result.get("error_cnt", 0),
+            error_rate=result.get("error_rate", 0),
+            sample_data=result.get("sample_data", []),
+            detail={"sql": rule.check_sql, "execution_result": result},
+        )
+    ]

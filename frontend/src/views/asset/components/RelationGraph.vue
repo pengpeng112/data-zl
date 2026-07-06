@@ -1,11 +1,13 @@
 <template>
-  <div ref="chartEl" :style="{ width: '100%', height: height }" />
+  <div class="graph-shell">
+    <div ref="chartEl" class="graph-canvas" :style="{ height }" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onBeforeUnmount } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as echarts from "echarts";
-import type { GraphNode, GraphEdge } from "@/api/asset";
+import type { GraphEdge, GraphNode } from "@/api/asset";
 
 const props = withDefaults(
   defineProps<{
@@ -26,113 +28,150 @@ const chartEl = ref<HTMLElement>();
 let chart: echarts.ECharts | null = null;
 
 const SCHEMA_COLORS: Record<string, string> = {
-  HIS: "#409EFF",
-  LIS: "#67C23A",
-  PACS: "#9B59B6",
-  YDHL: "#E6A23C",
-  SM: "#F56C6C",
-  MTL: "#909399",
-  JHEMR: "#01A6A0",
-  ODS: "#B8860B"
+  MEDREC: "#2f7de1",
+  ORDADM: "#19a974",
+  LAB: "#8b5cf6",
+  EXAM: "#f59e0b",
+  OUTPBILL: "#ef4444",
+  INPBILL: "#06b6d4",
+  COMM: "#64748b",
+  DRUG_USER: "#10b981",
+  PHARMACY: "#ec4899",
+  HIS: "#2f7de1",
+  DATA_CENTER: "#334155",
+  ODS: "#475569",
+  LIS: "#8b5cf6",
+  PACS: "#f59e0b",
+  SM: "#dc2626",
+  YDHL: "#0f766e"
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  verified: "#67C23A",
-  bounded: "#E6A23C",
-  needs_split: "#F56C6C",
-  not_tested: "#909399",
-  sample_verified: "#67C23A",
-  missing_in_8216: "#909399"
+  verified: "#16a34a",
+  sample_pass: "#16a34a",
+  manual_reviewed: "#2563eb",
+  bounded: "#d97706",
+  needs_split: "#dc2626",
+  rejected: "#991b1b",
+  not_tested: "#94a3b8"
 };
 
-const RELATION_TYPE_STYLE: Record<
-  string,
-  { color: string; lineWidth: number; type: string }
-> = {
-  candidate: { color: "#E6A23C", lineWidth: 1.2, type: "dashed" },
-  dependency: { color: "#909399", lineWidth: 1, type: "dotted" },
-  formal: { color: "#409EFF", lineWidth: 1.2, type: "solid" }
-};
-
-function getSchemaColor(schemaName?: string | null): string {
-  return SCHEMA_COLORS[schemaName ?? ""] || "#909399";
+function schemaOf(node: GraphNode) {
+  return node.category || node.schema_name || node.id.split(".")[0] || "UNKNOWN";
 }
 
-function getStatusColor(status?: string | null): string {
-  return STATUS_COLORS[status ?? ""] || "#909399";
+function colorOfSchema(schema?: string | null) {
+  return SCHEMA_COLORS[schema || ""] || "#64748b";
+}
+
+function colorOfStatus(status?: string | null) {
+  return STATUS_COLORS[status || ""] || "#94a3b8";
+}
+
+function edgeWidth(edge: GraphEdge) {
+  if (edge.validation_status === "sample_pass" || edge.validation_status === "verified") return 2.8;
+  if (edge.confidence === "A") return 2.2;
+  return 1.4;
+}
+
+function edgeType(edge: GraphEdge) {
+  if (edge.relation_type === "candidate") return "dashed";
+  if (edge.relation_type === "dependency") return "dotted";
+  return "solid";
 }
 
 function buildOption() {
-  const schemas = Array.from(
-    new Set(props.nodes.map(n => n.category ?? n.schema_name ?? "?"))
-  );
-  const categories = schemas.map(s => ({
-    name: s,
-    itemStyle: { color: getSchemaColor(s) }
+  const schemas = Array.from(new Set(props.nodes.map(schemaOf))).sort();
+  const categories = schemas.map(name => ({
+    name,
+    itemStyle: { color: colorOfSchema(name) }
   }));
 
-  const chartNodes = props.nodes.map(n => {
-    const isCenter = props.centerTable && n.id === props.centerTable;
+  const chartNodes = props.nodes.map(node => {
+    const schema = schemaOf(node);
+    const isCenter = props.centerTable && node.id === props.centerTable;
+    const degree = props.edges.filter(edge => edge.source === node.id || edge.target === node.id).length;
     return {
-      id: n.id,
-      name: n.label || n.table_name || n.id,
-      category: n.category ?? n.schema_name ?? "?",
-      symbolSize: isCenter ? 52 : 36,
-      itemStyle: isCenter ? { borderColor: "#E6A23C", borderWidth: 3 } : {},
-      ...n,
-      tooltip: {
-        formatter: `${n.id}<br/>域：${n.domain || "-"}<br/>字段：${n.column_count || "-"}`
+      ...node,
+      id: node.id,
+      name: node.table_name || node.label || node.id,
+      category: schema,
+      symbol: isCenter ? "diamond" : "roundRect",
+      symbolSize: isCenter ? 62 : Math.min(54, 32 + degree * 3),
+      itemStyle: {
+        color: colorOfSchema(schema),
+        borderColor: isCenter ? "#111827" : "#ffffff",
+        borderWidth: isCenter ? 3 : 1.5,
+        shadowBlur: isCenter ? 18 : 8,
+        shadowColor: "rgba(15, 23, 42, 0.18)"
+      },
+      label: {
+        show: true,
+        formatter: node.table_name || node.label || node.id,
+        color: "#1f2937",
+        fontSize: isCenter ? 12 : 11,
+        fontWeight: isCenter ? 700 : 500
       }
     };
   });
 
-  const chartEdges = props.edges.map(e => {
-    const rt = e.relation_type || "formal";
-    const style = RELATION_TYPE_STYLE[rt] || RELATION_TYPE_STYLE.formal;
-    return {
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      label: { show: false },
-      lineStyle: {
-        color:
-          rt === "formal" ? getStatusColor(e.validation_status) : style.color,
-        curveness: 0.2,
-        opacity: rt === "formal" ? 0.75 : 0.5,
-        width:
-          rt === "formal" && e.validation_status === "verified"
-            ? 2
-            : style.lineWidth,
-        type: style.type
-      },
-      ...e
-    };
-  });
+  const chartEdges = props.edges.map(edge => ({
+    ...edge,
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    lineStyle: {
+      color: edge.relation_type === "formal" ? colorOfStatus(edge.validation_status) : "#94a3b8",
+      width: edgeWidth(edge),
+      type: edgeType(edge),
+      opacity: edge.relation_type === "dependency" ? 0.45 : 0.78,
+      curveness: 0.18
+    },
+    label: { show: false },
+    emphasis: {
+      lineStyle: { width: edgeWidth(edge) + 2, opacity: 1 }
+    }
+  }));
 
   return {
+    backgroundColor: "#f8fafc",
+    animationDuration: 900,
+    animationEasingUpdate: "quinticInOut",
     tooltip: {
+      confine: true,
+      borderWidth: 0,
+      backgroundColor: "rgba(15, 23, 42, 0.92)",
+      textStyle: { color: "#fff" },
       formatter(params: any) {
         if (params.dataType === "node") {
-          const d = params.data;
-          return `<b>${d.id}</b><br/>域：${d.domain || "-"}<br/>字段数：${d.column_count || "-"}`;
+          const node = params.data as GraphNode;
+          return [
+            `<strong>${node.id}</strong>`,
+            `业务域：${node.domain || "-"}`,
+            `字段数：${node.column_count ?? "-"}`,
+            `来源：${node.source || "-"}`
+          ].join("<br/>");
         }
-        const e = params.data;
-        const typeLabel =
-          e.relation_type === "candidate"
-            ? "候选"
-            : e.relation_type === "dependency"
-              ? "视图依赖"
-              : "正式";
-        return `<b>${e.source} → ${e.target}</b><br/>类型：${typeLabel}<br/>${e.join_condition || ""}<br/>状态：${e.validation_status || "-"}<br/>指标：${e.validation_metrics || "-"}`;
+        const edge = params.data as GraphEdge;
+        return [
+          `<strong>${edge.source} -> ${edge.target}</strong>`,
+          `字段：${edge.from_columns || "-"} -> ${edge.to_columns || "-"}`,
+          `状态：${edge.validation_status || "-"}`,
+          `级别：${edge.confidence || "-"}`,
+          edge.join_condition || ""
+        ].filter(Boolean).join("<br/>");
       }
     },
-    legend: [
-      {
-        data: categories.map(c => c.name),
-        bottom: 0,
-        textStyle: { fontSize: 11 }
-      }
-    ],
+    legend: {
+      type: "scroll",
+      bottom: 8,
+      left: 16,
+      right: 16,
+      itemWidth: 12,
+      itemHeight: 12,
+      textStyle: { color: "#475569", fontSize: 12 },
+      data: categories.map(item => item.name)
+    },
     series: [
       {
         type: "graph",
@@ -142,25 +181,19 @@ function buildOption() {
         categories,
         data: chartNodes,
         links: chartEdges,
+        edgeSymbol: ["none", "arrow"],
+        edgeSymbolSize: 8,
         force: {
-          repulsion: 280,
-          edgeLength: [80, 200],
-          gravity: 0.08
+          repulsion: 420,
+          edgeLength: [110, 230],
+          gravity: 0.045,
+          friction: 0.38
         },
-        label: {
-          show: true,
-          position: "right",
-          fontSize: 11,
-          formatter: "{b}"
-        },
-        lineStyle: {
-          curveness: 0.2,
-          opacity: 0.7
-        },
+        label: { position: "right", distance: 8 },
         emphasis: {
           focus: "adjacency",
-          itemStyle: { borderWidth: 2, borderColor: "#333" },
-          lineStyle: { width: 4 }
+          blurScope: "coordinateSystem",
+          itemStyle: { shadowBlur: 24, shadowColor: "rgba(37, 99, 235, 0.35)" }
         }
       }
     ]
@@ -170,30 +203,34 @@ function buildOption() {
 function renderChart() {
   if (!chartEl.value) return;
   if (!chart) {
-    chart = echarts.init(chartEl.value);
+    chart = echarts.init(chartEl.value, undefined, { renderer: "canvas" });
+    chart.on("click", params => {
+      if (params.dataType === "node") emit("node-click", params.data as GraphNode);
+      if (params.dataType === "edge") emit("edge-click", params.data as GraphEdge);
+    });
   }
-  chart.setOption(buildOption(), true);
+  chart.setOption(buildOption() as any, true);
 }
 
-function handleClick(params: any) {
-  if (params.dataType === "node") {
-    emit("node-click", params.data as GraphNode);
-  } else if (params.dataType === "edge") {
-    emit("edge-click", params.data as GraphEdge);
-  }
+function resizeChart() {
+  chart?.resize();
 }
 
-watch(() => [props.nodes, props.edges], renderChart, { deep: true });
+watch(() => [props.nodes, props.edges, props.centerTable], renderChart, { deep: true });
 
 onMounted(() => {
   renderChart();
-  chart?.on("click", handleClick);
-  window.addEventListener("resize", () => chart?.resize());
+  window.addEventListener("resize", resizeChart);
 });
 
 onBeforeUnmount(() => {
-  chart?.off("click", handleClick);
+  window.removeEventListener("resize", resizeChart);
   chart?.dispose();
-  window.removeEventListener("resize", () => chart?.resize());
+  chart = null;
 });
 </script>
+
+<style scoped>
+.graph-shell { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #f8fafc; }
+.graph-canvas { width: 100%; min-height: 360px; }
+</style>

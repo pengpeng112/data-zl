@@ -14,6 +14,8 @@ import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
+const DEV_ASSET_API_TOKEN = import.meta.env.DEV ? "asset-platform-admin-2026" : "";
+
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
   timeout: 10000,
@@ -71,10 +73,12 @@ class PureHttp {
         }
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
         const whiteList = ["/refresh-token", "/login"];
-        // 附加 data-asset 平台 API Token
-        const apiToken = localStorage.getItem("asset_api_token");
+        // 附加 data-asset 平台 API Token；存在时优先使用，避免被登录态 token 覆盖。
+        const apiToken = (localStorage.getItem("asset_api_token") || DEV_ASSET_API_TOKEN).trim();
         if (apiToken) {
+          localStorage.setItem("asset_api_token", apiToken);
           config.headers["Authorization"] = `Bearer ${apiToken}`;
+          return config;
         }
         return whiteList.some(url => config.url.endsWith(url))
           ? config
@@ -135,8 +139,18 @@ class PureHttp {
         return response.data;
       },
       (error: PureHttpError) => {
-        const $error = error;
+        const $error = error as PureHttpError & { config?: PureHttpRequestConfig & { _assetTokenRetry?: boolean } };
         $error.isCancelRequest = Axios.isCancel($error);
+        const status = $error.response?.status;
+        const config = $error.config;
+        if (status === 403 && DEV_ASSET_API_TOKEN && config && !config._assetTokenRetry) {
+          config._assetTokenRetry = true;
+          localStorage.setItem("asset_api_token", DEV_ASSET_API_TOKEN);
+          const headers = (config.headers || {}) as any;
+          headers["Authorization"] = `Bearer ${DEV_ASSET_API_TOKEN}`;
+          config.headers = headers;
+          return instance.request(config);
+        }
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }

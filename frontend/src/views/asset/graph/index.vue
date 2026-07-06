@@ -1,239 +1,122 @@
 <template>
   <div class="asset-graph-page">
-    <el-card shadow="never">
-      <div class="filter-bar">
-        <el-select
-          v-model="filters.schema"
-          placeholder="Schema"
-          clearable
-          style="width: 110px"
-          @change="loadData"
-        >
-          <el-option
-            v-for="s in options.schemas"
-            :key="s"
-            :label="s"
-            :value="s"
-          />
+    <el-card shadow="never" class="toolbar-card">
+      <div class="filter-grid">
+        <el-select v-model="filters.schema" placeholder="表空间" clearable filterable @change="loadData">
+          <el-option v-for="item in options.schemas" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select
-          v-model="filters.domain"
-          placeholder="业务域"
-          clearable
-          style="width: 130px; margin-left: 8px"
-          @change="loadData"
-        >
-          <el-option
-            v-for="d in options.domains"
-            :key="d"
-            :label="d"
-            :value="d"
-          />
+        <el-select v-model="filters.domain" placeholder="业务域" clearable filterable @change="loadData">
+          <el-option v-for="item in options.domains" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select
-          v-model="filters.validation_status"
-          placeholder="验证状态"
-          clearable
-          style="width: 110px; margin-left: 8px"
-          @change="loadData"
-        >
-          <el-option
-            v-for="s in options.validation_statuses"
-            :key="s"
-            :label="statusLabel(s)"
-            :value="s"
-          />
+        <el-select v-model="filters.validation_status" placeholder="验证状态" clearable @change="loadData">
+          <el-option v-for="item in options.validation_statuses" :key="item" :label="statusLabel(item)" :value="item" />
         </el-select>
-        <el-select
-          v-model="filters.confidence"
-          placeholder="置信度"
-          clearable
-          style="width: 90px; margin-left: 8px"
-          @change="loadData"
-        >
-          <el-option
-            v-for="c in options.confidences"
-            :key="c"
-            :label="c"
-            :value="c"
-          />
+        <el-select v-model="filters.confidence" placeholder="关系级别" clearable @change="loadData">
+          <el-option v-for="item in options.confidences" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-input
-          v-model="filters.keyword"
-          placeholder="输入表名，如 PAT_VISIT"
-          clearable
-          style="width: 200px; margin-left: 8px"
-          @keyup.enter="loadData"
-        />
-        <el-button
-          type="primary"
-          :loading="loading"
-          style="margin-left: 8px"
-          @click="loadData"
-          >查询</el-button
-        >
-        <el-button style="margin-left: 4px" @click="setVerified"
-          >只看已验证</el-button
-        >
-        <el-button style="margin-left: 4px" @click="resetFilters"
-          >重置</el-button
-        >
-        <el-checkbox
-          v-model="filters.include_candidates"
-          style="margin-left: 12px"
-          @change="loadData"
-        >
-          候选关系
-        </el-checkbox>
-        <el-checkbox
-          v-model="filters.include_dependencies"
-          style="margin-left: 8px"
-          @change="loadData"
-        >
-          视图依赖
-        </el-checkbox>
+        <el-input v-model="filters.keyword" placeholder="搜索表名或关系端点" clearable @keyup.enter="loadData" />
+        <el-input-number v-model="filters.limit" :min="20" :max="500" :step="20" controls-position="right" />
+        <el-button type="primary" :loading="loading" @click="loadData">查询</el-button>
+        <el-button @click="resetFilters">重置</el-button>
       </div>
-      <div v-if="!loading && graphData.edges.length > 0" class="stats-bar">
+      <div class="switch-row">
+        <el-checkbox v-model="filters.include_candidates" @change="loadData">候选关系</el-checkbox>
+        <el-checkbox v-model="filters.include_dependencies" @change="loadData">视图依赖</el-checkbox>
+        <el-button text type="success" @click="showSamplePass">只看通过关系</el-button>
+      </div>
+      <div class="stats-row">
         <el-tag>节点 {{ graphData.nodes.length }}</el-tag>
-        <el-tag type="primary">边 {{ graphData.edges.length }}</el-tag>
-        <el-tag type="success">已验证 {{ verifiedCount }}</el-tag>
-        <el-tag v-if="candidateCount > 0" type="warning"
-          >候选 {{ candidateCount }}</el-tag
-        >
-        <el-tag v-if="depCount > 0" type="info">依赖 {{ depCount }}</el-tag>
-        <el-tag v-if="needsSplitCount > 0" type="danger"
-          >需拆分 {{ needsSplitCount }}</el-tag
-        >
+        <el-tag type="primary">关系 {{ graphData.edges.length }}</el-tag>
+        <el-tag type="success">通过 {{ passCount }}</el-tag>
+        <el-tag type="warning">候选 {{ candidateCount }}</el-tag>
+        <el-tag type="info">依赖 {{ dependencyCount }}</el-tag>
       </div>
     </el-card>
 
-    <div v-loading="loading" style="margin-top: 8px">
+    <div v-loading="loading" class="graph-wrap">
       <RelationGraph
-        v-if="graphData.nodes.length > 0"
+        v-if="graphData.nodes.length"
         :nodes="graphData.nodes"
         :edges="graphData.edges"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 280px)"
         @node-click="goTable"
         @edge-click="showEdge"
       />
-      <el-empty v-else description="无匹配关系" />
+      <el-empty v-else description="暂无可展示关系" />
     </div>
 
-    <el-drawer v-model="drawerVisible" title="关系详情" size="500px">
+    <el-drawer v-model="drawerVisible" title="关系详情" size="560px">
       <el-descriptions v-if="selectedEdge" :column="1" border size="small">
-        <el-descriptions-item label="rel_id">{{
-          selectedEdge.rel_id
-        }}</el-descriptions-item>
-        <el-descriptions-item label="来源表">{{
-          selectedEdge.source
-        }}</el-descriptions-item>
-        <el-descriptions-item label="目标表">{{
-          selectedEdge.target
-        }}</el-descriptions-item>
-        <el-descriptions-item label="关联条件">{{
-          selectedEdge.join_condition || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="来源字段">{{
-          selectedEdge.from_columns || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="目标字段">{{
-          selectedEdge.to_columns || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="基数">{{
-          selectedEdge.cardinality || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="置信度">{{
-          selectedEdge.confidence || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="验证等级">{{
-          selectedEdge.validation_level || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="指标">{{
-          selectedEdge.validation_metrics || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="备注">{{
-          selectedEdge.note || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="验证备注">{{
-          selectedEdge.validation_note || "-"
-        }}</el-descriptions-item>
+        <el-descriptions-item label="来源表">{{ selectedEdge.source }}</el-descriptions-item>
+        <el-descriptions-item label="来源字段">{{ selectedEdge.from_columns || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="目标表">{{ selectedEdge.target }}</el-descriptions-item>
+        <el-descriptions-item label="目标字段">{{ selectedEdge.to_columns || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="关系类型">{{ selectedEdge.relation_type || 'formal' }}</el-descriptions-item>
+        <el-descriptions-item label="关系级别">{{ selectedEdge.confidence || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="验证状态">
+          <el-tag size="small" :type="statusTagType(selectedEdge.validation_status)">{{ statusLabel(selectedEdge.validation_status || '') }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="验证级别">{{ selectedEdge.validation_level || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="关联条件">{{ selectedEdge.join_condition || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="验证指标">{{ selectedEdge.validation_metrics || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="依据/备注">{{ selectedEdge.note || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="风险说明">{{ selectedEdge.validation_note || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
-import {
-  getGraph,
-  getGraphOptions,
-  type GraphData,
-  type GraphEdge,
-  type GraphNode,
-  type GraphOptionsData
-} from "@/api/asset";
+import { getGraph, getGraphOptions, type GraphData, type GraphEdge, type GraphNode, type GraphOptionsData } from "@/api/asset";
 
 const router = useRouter();
 const loading = ref(false);
 const drawerVisible = ref(false);
 const selectedEdge = ref<GraphEdge | null>(null);
 const graphData = ref<GraphData>({ nodes: [], edges: [] });
-const options = reactive<GraphOptionsData>({
-  schemas: [],
-  domains: [],
-  validation_statuses: [],
-  confidences: [],
-  relation_types: []
-});
+const options = reactive<GraphOptionsData>({ schemas: [], domains: [], validation_statuses: [], confidences: [], relation_types: [] });
 
 const filters = reactive({
   schema: "",
   domain: "",
   validation_status: "",
-  confidence: "",
+  confidence: "A",
   keyword: "",
-  limit: 80,
+  limit: 120,
   include_candidates: false,
   include_dependencies: false
 });
 
-const verifiedCount = computed(
-  () =>
-    graphData.value.edges.filter(e => e.validation_status === "verified").length
-);
-const needsSplitCount = computed(
-  () =>
-    graphData.value.edges.filter(e => e.validation_status === "needs_split")
-      .length
-);
-const candidateCount = computed(
-  () =>
-    graphData.value.edges.filter(e => e.relation_type === "candidate").length
-);
-const depCount = computed(
-  () =>
-    graphData.value.edges.filter(e => e.relation_type === "dependency").length
-);
+const passCount = computed(() => graphData.value.edges.filter(edge => ["sample_pass", "verified"].includes(edge.validation_status || "")).length);
+const candidateCount = computed(() => graphData.value.edges.filter(edge => edge.relation_type === "candidate").length);
+const dependencyCount = computed(() => graphData.value.edges.filter(edge => edge.relation_type === "dependency").length);
 
-function statusLabel(s: string): string {
+function statusLabel(status: string) {
   const map: Record<string, string> = {
-    verified: "已验证",
-    bounded: "有界",
+    sample_pass: "样本通过",
+    verified: "已审核",
+    manual_reviewed: "人工复核",
+    bounded: "有边界",
     needs_split: "需拆分",
-    not_tested: "未测试"
+    not_tested: "未验证",
+    rejected: "已拒绝"
   };
-  return map[s] || s;
+  return map[status] || status || "-";
+}
+
+function statusTagType(status?: string | null) {
+  if (["sample_pass", "verified"].includes(status || "")) return "success";
+  if (["bounded", "manual_reviewed"].includes(status || "")) return "warning";
+  if (["needs_split", "rejected"].includes(status || "")) return "danger";
+  return "info";
 }
 
 async function loadOptions() {
-  try {
-    const res = await getGraphOptions();
-    Object.assign(options, res.data);
-  } catch {
-    /* */
-  }
+  const res = await getGraphOptions();
+  Object.assign(options, res.data);
 }
 
 async function loadData() {
@@ -250,15 +133,14 @@ async function loadData() {
       include_dependencies: filters.include_dependencies
     });
     graphData.value = res.data;
-  } catch {
-    graphData.value = { nodes: [], edges: [] };
   } finally {
     loading.value = false;
   }
 }
 
-function setVerified() {
-  filters.validation_status = "verified";
+function showSamplePass() {
+  filters.validation_status = "sample_pass";
+  filters.confidence = "A";
   loadData();
 }
 
@@ -266,16 +148,17 @@ function resetFilters() {
   filters.schema = "";
   filters.domain = "";
   filters.validation_status = "";
-  filters.confidence = "";
+  filters.confidence = "A";
   filters.keyword = "";
-  filters.limit = 80;
+  filters.limit = 120;
+  filters.include_candidates = false;
+  filters.include_dependencies = false;
   loadData();
 }
 
 function goTable(node: GraphNode) {
   const parts = node.id.split(".");
-  if (parts.length >= 2)
-    router.push(`/asset/tables/${parts[0]}/${parts.slice(1).join(".")}`);
+  if (parts.length >= 2) router.push(`/asset/tables/${parts[0]}/${parts.slice(1).join(".")}`);
 }
 
 function showEdge(edge: GraphEdge) {
@@ -285,21 +168,16 @@ function showEdge(edge: GraphEdge) {
 
 onMounted(async () => {
   await loadOptions();
-  loadData();
+  await loadData();
 });
 </script>
 
 <style scoped>
-.filter-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.stats-bar {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.asset-graph-page { min-height: calc(100vh - 120px); }
+.toolbar-card { margin-bottom: 10px; }
+.filter-grid { display: grid; grid-template-columns: 130px 150px 140px 110px minmax(180px, 1fr) 110px 76px 76px; gap: 8px; align-items: center; }
+.switch-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+.stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.graph-wrap { min-height: calc(100vh - 280px); }
+@media (max-width: 1200px) { .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>

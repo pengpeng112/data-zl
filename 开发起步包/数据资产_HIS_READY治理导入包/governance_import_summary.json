@@ -1,0 +1,36 @@
+{
+  "source": "ready_his",
+  "system_code": "HIS_SOURCE",
+  "source_code": "his_ready_10_10_10_15",
+  "tables": 1234,
+  "columns": 24726,
+  "formal_relations": 7,
+  "review_relations": 15,
+  "ranked_candidate_relations": 578,
+  "validate_next_candidates": 203,
+  "include_status_counts": {
+    "included": 473,
+    "excluded": 201,
+    "candidate": 560
+  },
+  "table_role_counts": {
+    "dimension": 443,
+    "excluded": 201,
+    "candidate": 560,
+    "execution_fact": 2,
+    "core_fact": 26,
+    "payment_fact": 1,
+    "inpatient_management_fact": 1
+  },
+  "primary_key_status_counts": {
+    "present": 881,
+    "missing": 353
+  },
+  "outputs": [
+    "governance_tables.csv",
+    "governance_columns.csv",
+    "governance_relations_formal.csv",
+    "governance_relation_reviews.csv",
+    "governance_candidate_relations_ranked.csv"
+  ]
+}

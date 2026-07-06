@@ -21,8 +21,14 @@ export interface PageData<T> {
 }
 
 export interface TableBrief {
+  id?: number;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
   schema_name: string;
   table_name: string;
+  table_name_cn?: string | null;
+  table_role?: string | null;
   comment: string | null;
   column_count: number | null;
   domain: string | null;
@@ -32,6 +38,8 @@ export interface TableBrief {
 export interface TableDetail {
   schema_name: string;
   table_name: string;
+  table_name_cn?: string | null;
+  table_role?: string | null;
   comment: string | null;
   column_count: number | null;
   column_count_actual: number | null;
@@ -46,8 +54,17 @@ export interface TableDetail {
 }
 
 export interface ColumnInfo {
+  id?: number;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
+  schema_name?: string | null;
+  table_name?: string | null;
   column_id: number | null;
   column_name: string | null;
+  column_name_cn?: string | null;
+  business_desc_cn?: string | null;
+  value_desc_cn?: string | null;
   data_type: string | null;
   length: number | null;
   nullable: string | null;
@@ -110,6 +127,9 @@ export const getSummary = () => {
 export const getTables = (params: {
   keyword?: string;
   domain?: string;
+  system_code?: string;
+  source_code?: string;
+  schema_name?: string;
   page?: number;
   page_size?: number;
 }) => {
@@ -170,6 +190,33 @@ export const exportContext = (data: {
   );
 };
 
+export interface AssetTreeTable {
+  id: number;
+  table_name: string;
+  table_name_cn?: string | null;
+  column_count?: number | null;
+  domain?: string | null;
+}
+
+export interface AssetTreeSchema {
+  namespace: string;
+  table_count: number;
+  tables: AssetTreeTable[];
+}
+
+export interface AssetTreeNode {
+  source_code: string;
+  source_name_cn: string;
+  system_code: string;
+  table_count: number;
+  schemas: AssetTreeSchema[];
+}
+
+export const getAssetTree = (params?: { system_code?: string }) => {
+  return http.get<ApiResponse<AssetTreeNode[]>, object>("/api/v1/assets/tree", {
+    params
+  });
+};
 // --- P1.5 关系图谱 ---
 
 export interface GraphNode {

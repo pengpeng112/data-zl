@@ -39,6 +39,9 @@
       "@pureadmin/descriptions/volar"
     ]
   },
+  "vueCompilerOptions": {
+    "globalTypesPath": "../../../tmp/vue-global-types.d.ts"
+  },
   "include": [
     "mock/*.ts",
     "src/**/*.ts",

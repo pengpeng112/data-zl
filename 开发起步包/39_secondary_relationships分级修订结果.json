@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-07-06T16:20:00+08:00",
+  "updated_at": "2026-07-06T16:20:00+08:00",
+  "source_files": [
+    "secondary_relationships_A.csv",
+    "secondary_relationships_B.csv",
+    "secondary_relationships_C.csv",
+    "secondary_relationships_D.csv",
+    "secondary_relationships_A_rechecked.csv",
+    "governance_relations_formal_final.csv"
+  ],
+  "user_decision": "B、C 当前可采用；D 为其他系统/周边表关系，等待其他系统数据库信息后再分析。",
+  "before": {
+    "A": 16,
+    "B": 16,
+    "C": 3,
+    "D": 4,
+    "all": 39
+  },
+  "after": {
+    "A_rechecked_current_usable": 34,
+    "B_rechecked_pending": 0,
+    "C_rechecked_pending": 0,
+    "D_deferred": 4,
+    "all_rechecked": 38,
+    "added_outpatient_strong_key_relations": 2,
+    "formal_relations_final": 36
+  },
+  "outpatient_strong_keys": [
+    {
+      "relationship_id": "OUT_LAB_RCPT",
+      "domain": "检验",
+      "from_table": "LAB.LAB_TEST_MASTER",
+      "from_columns": "PATIENT_ID+RCPT_NO",
+      "to_table": "OUTPBILL.OUTP_ORDER_DESC",
+      "to_columns": "PATIENT_ID+RCPT_NO",
+      "validation_level": "sample_100k",
+      "validation_status": "sample_pass",
+      "has_rcpt_ratio": 0.941,
+      "matched_count": 94795,
+      "sample_limit": 100000,
+      "orphan_count": 2,
+      "match_rate": 0.99998
+    },
+    {
+      "relationship_id": "OUT_EXAM_RCPT",
+      "domain": "检查",
+      "from_table": "EXAM.EXAM_MASTER",
+      "from_columns": "PATIENT_ID+RCPT_NO",
+      "to_table": "OUTPBILL.OUTP_ORDER_DESC",
+      "to_columns": "PATIENT_ID+RCPT_NO",
+      "validation_level": "sample_100k",
+      "validation_status": "sample_pass",
+      "has_rcpt_ratio": 0.9999,
+      "matched_count": 99975,
+      "sample_limit": 100000,
+      "orphan_count": 3,
+      "match_rate": 0.99997
+    }
+  ],
+  "deferred_tasks": [
+    "剩余约 6% 无收据门诊检验需验证 PATIENT_ID + TRUNC(BUSINESS_DATE) + CLINIC_NO_CNT=1 条件挂接。",
+    "D 类跨系统关系等待用户提供其他系统数据库后再验证。"
+  ],
+  "outputs": [
+    "secondary_relationships_A_rechecked.csv",
+    "secondary_relationships_B_rechecked.csv",
+    "secondary_relationships_C_rechecked.csv",
+    "secondary_relationships_D_rechecked.csv",
+    "secondary_relationships_all_graded_rechecked.csv",
+    "secondary_relationships_recheck_summary.json",
+    "governance_relations_formal_final.csv"
+  ]
+}
