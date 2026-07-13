@@ -33,6 +33,7 @@ backend/scripts/_seed_remote.py
 backend/scripts/_sync_two.py
 backend/scripts/_post_sync_verify.py
 backend/scripts/_deploy_*.py
+backend/scripts/_rerun_*.py
 backend/scripts/_hotfix_*.py
 backend/scripts/_finish_*.py
 backend/scripts/_fix_*.py
