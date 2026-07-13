@@ -44,7 +44,12 @@ backend/scripts/_ensure_*.py
 backend/scripts/_upload_*.py
 backend/scripts/_verify_*.py
 
-# 大体积本地缓存/导出
+# 大体积本地缓存/导出 / 离线构建产物（不进 Git，仅随发布包传输）
 *.dump
 wheelhouse/
+**/wheels*/
+**/*wheels*/
 frontend/dist/
+deploy/offline/*.tar.gz
+deploy/offline/*.zip
+deploy/offline/SHA256SUMS
