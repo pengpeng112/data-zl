@@ -1,0 +1,22 @@
+[Unit]
+Description=Data Asset Platform API
+After=network-online.target postgresql-14.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dataasset
+Group=dataasset
+WorkingDirectory=/opt/data-asset/backend
+EnvironmentFile=/etc/data-asset/backend.env
+ExecStart=/opt/data-asset/backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/data-asset
+
+[Install]
+WantedBy=multi-user.target

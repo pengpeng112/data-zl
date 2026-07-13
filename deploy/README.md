@@ -1,5 +1,41 @@
 # 数据资产管理平台 — 部署指南
 
+> 状态：本文件保留环境与 Nginx 参考。**可复现的离线部署流程以 `deploy/offline/README.md` 为唯一执行入口。**  
+> 发布门禁与凭据轮换清单见 `开发起步包/65_发布门禁与凭据轮换清单.md`、`58_发布部署与代码同步整改计划.md`。  
+> 未完成：人工凭据轮换签字、TLS、Linux 离线 wheelhouse 干净演练前，不得宣称「正式生产封板」。
+
+## 0. Docker 运行时硬要求（8.83 当前形态）
+
+容器 `data-asset-api` 必须：
+
+1. **挂载凭据目录（只读）**，避免重建丢账号：
+
+```bash
+-v /etc/data-asset/credentials:/etc/data-asset/credentials:ro
+```
+
+2. **Oracle Instant Client thick**：目录内 `libclntsh.so` 必须指向 **19.1+**（不要 11.2）。  
+   可在镜像构建或 entrypoint 中执行：
+
+```bash
+ln -sfn libclntsh.so.19.1 /opt/oracle/libclntsh.so
+```
+
+3. 环境文件：`/etc/data-asset/backend.env`（0640），**不进 Git**。生产建议：
+
+```bash
+APP_ENV=production
+APP_RBAC_REQUIRE_BOUND_TOKEN=true
+APP_OPS_WRITE_ENABLED=false
+APP_AUTH_COOKIE_SECURE=false   # 仅当全站 HTTPS 时改为 true
+```
+
+4. 重建容器后执行一次（若未写入镜像）：
+
+```bash
+bash /etc/data-asset/ensure_oracle_ro_runtime.sh   # 若已安装该辅助脚本
+```
+
 ## 目标环境
 
 | 项目 | 配置 |
@@ -30,8 +66,8 @@ nginx -v
 cd backend
 pip download -r requirements.txt -d ../offline-pkgs/backend-pip
 
-# 前端依赖已随项目提交 node_modules，无需额外下载
-# 离线 node 二进制可从内网 dev 机复制
+# 前端依赖使用 pnpm store 离线缓存，构建机执行 pnpm fetch
+pnpm fetch
 ```
 
 ### 2.2 文件传输 (经跳板机 10.10.8.53)
@@ -58,7 +94,7 @@ cd /opt/data-asset
 tar -xzf /tmp/data-asset-deploy.tar.gz
 ```
 
-## 3. 数据库初始化 (8.83)
+## 3. 数据库初始化 (8.83，历史示例，执行前按 offline README 修订)
 
 ```sql
 -- 以 postgres 用户执行
@@ -66,9 +102,10 @@ CREATE USER asset_app WITH PASSWORD '<安全密码>';
 CREATE DATABASE data_asset OWNER asset_app;
 GRANT ALL PRIVILEGES ON DATABASE data_asset TO asset_app;
 
--- 授权 public schema
+-- 所有应用表都在 asset schema，不能只授权 public
 \c data_asset
-GRANT ALL ON SCHEMA public TO asset_app;
+CREATE SCHEMA IF NOT EXISTS asset AUTHORIZATION asset_app;
+GRANT USAGE, CREATE ON SCHEMA asset TO asset_app;
 ```
 
 ## 4. 后端部署 (8.83)
@@ -104,7 +141,8 @@ After=network.target postgresql-14.service
 
 [Service]
 Type=simple
-User=root
+User=dataasset
+Group=dataasset
 WorkingDirectory=/opt/data-asset/backend
 EnvironmentFile=/opt/data-asset/backend/.env
 ExecStart=/opt/data-asset/backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
@@ -114,6 +152,16 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+首次生成管理员 Token：
+
+```bash
+cd /opt/data-asset/backend
+venv/bin/python -m scripts.create_admin_token --key-name platform-admin
+```
+
+Token 不通过 HTTP 初始化接口暴露；生产跳板连接必须预置专用 SSH 用户和
+`known_hosts`，应用不会自动接受未知主机指纹。
 
 ```bash
 systemctl daemon-reload
@@ -126,9 +174,7 @@ systemctl start data-asset-api
 ```bash
 cd /opt/data-asset/frontend
 
-# 安装依赖 & 构建 (开发机做或 8.83 上有 node)
-pnpm install
-pnpm build
+# 目标机无外网。使用 deploy/offline/README.md 的 pnpm 离线 store，或直接上传开发机构建的 dist。
 
 # 部署产物
 mkdir -p /opt/data-asset/frontend-dist
