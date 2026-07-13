@@ -86,10 +86,7 @@ onMounted(() => {
         <template #dropdown>
           <el-dropdown-menu class="logout">
             <el-dropdown-item @click="logout">
-              <IconifyIconOffline
-                :icon="LogoutCircleRLine"
-                style="margin: 5px"
-              />
+              <IconifyIconOffline :icon="LogoutCircleRLine" class="logout-icon" />
               退出系统
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -107,6 +104,10 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.logout-icon {
+  margin: 5px;
+}
+
 :deep(.el-loading-mask) {
   opacity: 0.45;
 }

@@ -1,40 +1,14 @@
 <template>
-  <div>
-    <h2 class="page-title">治理管理</h2>
+  <div class="admin-page">
+    <RePageHeader title="治理管理" subtitle="维护 API Token、表 Owner、业务术语和元数据快照等平台治理基础配置。" />
 
     <el-card class="mb20">
       <template #header>
         <span>API Token</span>
-        <el-button
-          type="primary"
-          size="small"
-          style="margin-left: 12px"
-          @click="initToken"
-          >初始化默认 Token</el-button
-        >
-        <el-button size="small" style="margin-left: 8px" @click="createKey"
+        <el-button size="small" class="ml8" @click="createKey"
           >创建新 Token</el-button
         >
       </template>
-      <div v-if="tokenInput" style="margin-bottom: 10px">
-        <span>当前 Token：</span>
-        <el-input
-          v-model="tokenInput"
-          readonly
-          style="width: 260px"
-          size="small"
-        />
-        <el-button
-          size="small"
-          type="success"
-          style="margin-left: 8px"
-          @click="saveToken"
-          >使用此 Token</el-button
-        >
-        <span style="margin-left: 8px; color: #909399; font-size: 12px"
-          >Token 保存在浏览器，仅用于当前会话</span
-        >
-      </div>
       <el-table :data="keys" stripe size="small">
         <el-table-column prop="key_name" label="名称" width="180" />
         <el-table-column label="Token" width="150" show-overflow-tooltip>
@@ -68,7 +42,7 @@
         <el-button
           type="primary"
           size="small"
-          style="margin-left: 12px"
+          class="ml12"
           @click="openOwnerDialog()"
           >新增</el-button
         >
@@ -79,7 +53,7 @@
             v-model="ownerKeyword"
             placeholder="搜索表名"
             clearable
-            style="width: 250px"
+            class="search-input"
             @clear="loadOwners"
           />
         </el-form-item>
@@ -125,7 +99,7 @@
         <el-button
           type="primary"
           size="small"
-          style="margin-left: 12px"
+          class="ml12"
           @click="openTermDialog()"
           >新增术语</el-button
         >
@@ -136,7 +110,7 @@
             v-model="termKeyword"
             placeholder="搜索术语或映射"
             clearable
-            style="width: 250px"
+            class="search-input"
             @clear="loadTerms"
           />
         </el-form-item>
@@ -205,7 +179,7 @@
         <el-button
           type="primary"
           size="small"
-          style="margin-left: 12px"
+          class="ml12"
           @click="createSnapshot"
           >新建快照</el-button
         >
@@ -231,7 +205,7 @@
         </el-button>
         <el-button
           size="small"
-          style="margin-left: 8px"
+          class="ml8"
           @click="
             compareIds = [];
             compareResult = null;
@@ -239,7 +213,7 @@
           >清除</el-button
         >
       </div>
-      <div class="mt15" style="display: flex; gap: 8px">
+      <div class="mt15 action-row">
         <el-button type="info" size="small" @click="goToChanges">
           查看变更事件
         </el-button>
@@ -314,6 +288,7 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { http } from "@/utils/http";
@@ -339,7 +314,6 @@ interface OwnerItem {
   note: string | null;
 }
 
-const tokenInput = ref(localStorage.getItem("asset_api_token") || "");
 const keys = ref<KeyItem[]>([]);
 const owners = ref<OwnerItem[]>([]);
 const ownersLoading = ref(false);
@@ -364,20 +338,15 @@ function loadKeys() {
   });
 }
 
-function initToken() {
-  http.get<any, any>("/api/v1/admin/init").then(d => {
-    tokenInput.value = d.data.token;
-    localStorage.setItem("asset_api_token", d.data.token);
-    ElMessage.success("Token 已生成并保存");
-    loadKeys();
-  });
-}
-
 function createKey() {
   const name = prompt("Token 名称：");
   if (!name) return;
+  const userIdentifier = prompt("绑定的平台用户标识：");
+  if (!userIdentifier) return;
   http
-    .post<any, any>("/api/v1/admin/keys", { data: { key_name: name } })
+    .post<any, any>("/api/v1/admin/keys", {
+      data: { key_name: name, user_identifier: userIdentifier }
+    })
     .then(d => {
       ElMessage.success(`新 Token: ${d.data.token}`);
       loadKeys();
@@ -388,11 +357,6 @@ function toggleKey(row: KeyItem) {
   http
     .patch<any, any>(`/api/v1/admin/keys/${row.id}?enabled=${!row.enabled}`)
     .then(() => loadKeys());
-}
-
-function saveToken() {
-  localStorage.setItem("asset_api_token", tokenInput.value);
-  ElMessage.success("Token 已保存，刷新页面生效");
 }
 
 function loadOwners() {
@@ -584,8 +548,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-title {
-  margin-bottom: 20px;
+.admin-page {
+  padding: 4px;
 }
 .mb20 {
   margin-bottom: 20px;
@@ -603,6 +567,11 @@ onMounted(() => {
 .compare-result {
   padding: 8px 0;
 }
+.token-hint {
+  margin-left: 8px;
+  color: var(--re-text-secondary);
+  font-size: 12px;
+}
 .mr5 {
   margin-right: 5px;
 }
@@ -611,5 +580,24 @@ onMounted(() => {
 }
 .mt10 {
   margin-top: 10px;
+}
+.ml12 {
+  margin-left: 12px;
+}
+.ml8 {
+  margin-left: 8px;
+}
+.token-row {
+  margin-bottom: 10px;
+}
+.token-input {
+  width: 260px;
+}
+.search-input {
+  width: 250px;
+}
+.action-row {
+  display: flex;
+  gap: 8px;
 }
 </style>

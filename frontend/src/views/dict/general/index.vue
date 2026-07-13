@@ -1,16 +1,18 @@
 <template>
   <div class="dict-general">
-    <el-card shadow="never">
-      <template #header>
-        <span>通用字典管理</span>
-      </template>
+    <RePageHeader
+      title="通用字典管理"
+      subtitle="维护平台通用分类、标准项、系统项和编码映射。"
+    />
+
+    <el-card class="dict-card" shadow="never">
 
       <el-tabs v-model="activeTab" @tab-change="onTabChange">
         <el-tab-pane label="字典分类" name="categories">
           <div class="toolbar">
             <el-button type="primary" size="small" @click="openCategoryDialog()">新增分类</el-button>
           </div>
-          <el-table v-loading="catLoading" :data="categories" stripe style="margin-top: 8px" size="small">
+          <el-table v-loading="catLoading" :data="categories" stripe class="tab-table" size="small">
             <el-table-column prop="category_code" label="分类编码" width="180" />
             <el-table-column prop="category_name_cn" label="分类名称" min-width="200" show-overflow-tooltip />
             <el-table-column prop="standard_system" label="标准系统" width="140" align="center" />
@@ -35,14 +37,14 @@
               v-model="stdItemParams.keyword"
               placeholder="搜索编码/名称"
               clearable
-              style="width: 240px"
+              class="keyword-input"
               @keyup.enter="doSearchStdItems"
             />
             <el-select
               v-model="stdItemParams.category_code"
               placeholder="分类"
               clearable
-              style="width: 180px"
+              class="category-select"
               @change="doSearchStdItems"
             >
               <el-option
@@ -55,7 +57,7 @@
             <el-button type="primary" size="small" @click="doSearchStdItems">搜索</el-button>
             <el-button size="small" @click="openStdItemDialog()">新增标准项</el-button>
           </div>
-          <el-table v-loading="stdItemLoading" :data="stdItems" stripe style="margin-top: 8px" size="small">
+          <el-table v-loading="stdItemLoading" :data="stdItems" stripe class="tab-table" size="small">
             <el-table-column prop="category_code" label="分类" width="140" />
             <el-table-column prop="item_code" label="编码" width="160" />
             <el-table-column prop="item_name_cn" label="名称" min-width="200" show-overflow-tooltip />
@@ -80,7 +82,7 @@
             layout="total, prev, pager, next, sizes"
             :page-sizes="[10, 20, 50, 100]"
             size="small"
-            style="margin-top: 12px; justify-content: flex-end"
+            class="pager"
             @change="loadStdItems"
           />
         </el-tab-pane>
@@ -91,7 +93,7 @@
               v-model="sysItemParams.target_system"
               placeholder="目标系统"
               clearable
-              style="width: 180px"
+              class="category-select"
               @change="loadSysItems"
             >
               <el-option label="HIS" value="HIS" />
@@ -103,13 +105,13 @@
               v-model="sysItemParams.keyword"
               placeholder="搜索编码/名称"
               clearable
-              style="width: 240px; margin-left: 8px"
+              class="keyword-input"
               @keyup.enter="loadSysItems"
             />
-            <el-button type="primary" size="small" style="margin-left: 8px" @click="loadSysItems">搜索</el-button>
-            <el-button size="small" style="margin-left: 8px" @click="openImportDialog()">导入系统字典</el-button>
+            <el-button type="primary" size="small" class="inline-gap" @click="loadSysItems">搜索</el-button>
+            <el-button size="small" class="inline-gap" @click="openImportDialog()">导入系统字典</el-button>
           </div>
-          <el-table v-loading="sysItemLoading" :data="sysItems" stripe style="margin-top: 8px" size="small">
+          <el-table v-loading="sysItemLoading" :data="sysItems" stripe class="tab-table" size="small">
             <el-table-column prop="target_system" label="目标系统" width="100" align="center" />
             <el-table-column prop="category_code" label="分类" width="140" />
             <el-table-column prop="system_code" label="系统编码" width="160" />
@@ -130,7 +132,7 @@
               v-model="mapParams.category_code"
               placeholder="分类"
               clearable
-              style="width: 180px"
+              class="category-select"
               @change="doSearchMappings"
             >
               <el-option
@@ -140,9 +142,9 @@
                 :value="cat.category_code"
               />
             </el-select>
-            <el-button type="primary" size="small" style="margin-left: 8px" @click="openMapDialog()">新增映射</el-button>
+            <el-button type="primary" size="small" class="inline-gap" @click="openMapDialog()">新增映射</el-button>
           </div>
-          <el-table v-loading="mapLoading" :data="mapItems" stripe style="margin-top: 8px" size="small">
+          <el-table v-loading="mapLoading" :data="mapItems" stripe class="tab-table" size="small">
             <el-table-column prop="category_code" label="分类" width="140" />
             <el-table-column prop="standard_code" label="标准编码" width="160" />
             <el-table-column prop="system_code" label="系统编码" width="160" />
@@ -175,7 +177,7 @@
             layout="total, prev, pager, next, sizes"
             :page-sizes="[10, 20, 50, 100]"
             size="small"
-            style="margin-top: 12px; justify-content: flex-end"
+            class="pager"
             @change="loadMappings"
           />
         </el-tab-pane>
@@ -218,7 +220,7 @@
     >
       <el-form ref="stdItemFormRef" :model="stdItemDialog.form" label-width="100px">
         <el-form-item label="分类" prop="category_code">
-          <el-select v-model="stdItemDialog.form.category_code" style="width: 100%">
+          <el-select v-model="stdItemDialog.form.category_code" class="full-width">
             <el-option
               v-for="cat in categories"
               :key="cat.category_code"
@@ -237,7 +239,7 @@
           <el-input v-model="stdItemDialog.form.standard_system" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="stdItemDialog.form.status" style="width: 100%">
+          <el-select v-model="stdItemDialog.form.status" class="full-width">
             <el-option label="启用" value="active" />
             <el-option label="停用" value="inactive" />
           </el-select>
@@ -258,7 +260,7 @@
     >
       <el-form ref="mapFormRef" :model="mapDialog.form" label-width="100px">
         <el-form-item label="分类" prop="category_code">
-          <el-select v-model="mapDialog.form.category_code" style="width: 100%">
+          <el-select v-model="mapDialog.form.category_code" class="full-width">
             <el-option
               v-for="cat in categories"
               :key="cat.category_code"
@@ -274,7 +276,7 @@
           <el-input v-model="mapDialog.form.system_code" />
         </el-form-item>
         <el-form-item label="目标系统" prop="target_system">
-          <el-select v-model="mapDialog.form.target_system" style="width: 100%">
+          <el-select v-model="mapDialog.form.target_system" class="full-width">
             <el-option label="HIS" value="HIS" />
             <el-option label="EMR" value="EMR" />
             <el-option label="LIS" value="LIS" />
@@ -282,7 +284,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="映射类型" prop="mapping_type">
-          <el-select v-model="mapDialog.form.mapping_type" style="width: 100%">
+          <el-select v-model="mapDialog.form.mapping_type" class="full-width">
             <el-option label="等价" value="equivalent" />
             <el-option label="上位" value="broader" />
             <el-option label="下位" value="narrower" />
@@ -290,7 +292,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="置信度" prop="confidence">
-          <el-select v-model="mapDialog.form.confidence" style="width: 100%">
+          <el-select v-model="mapDialog.form.confidence" class="full-width">
             <el-option label="高" value="high" />
             <el-option label="中" value="medium" />
             <el-option label="低" value="low" />
@@ -307,7 +309,7 @@
     <el-dialog v-model="importDialog.visible" title="导入系统字典" width="480px" destroy-on-close>
       <el-form ref="importFormRef" :model="importDialog.form" label-width="100px">
         <el-form-item label="目标系统" prop="target_system">
-          <el-select v-model="importDialog.form.target_system" style="width: 100%">
+          <el-select v-model="importDialog.form.target_system" class="full-width">
             <el-option label="HIS" value="HIS" />
             <el-option label="EMR" value="EMR" />
             <el-option label="LIS" value="LIS" />
@@ -315,7 +317,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="分类" prop="category_code">
-          <el-select v-model="importDialog.form.category_code" style="width: 100%">
+          <el-select v-model="importDialog.form.category_code" class="full-width">
             <el-option
               v-for="cat in categories"
               :key="cat.category_code"
@@ -634,6 +636,30 @@ onMounted(loadCategories);
 </script>
 
 <style scoped>
+.dict-general {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.dict-card {
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-md);
+  box-shadow: var(--re-shadow-sm);
+}
+
+.dict-general {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.dict-card {
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-md);
+  box-shadow: var(--re-shadow-sm);
+}
+
 .toolbar {
   display: flex;
   align-items: center;
@@ -644,5 +670,30 @@ onMounted(loadCategories);
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.tab-table {
+  margin-top: 8px;
+}
+
+.pager {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.keyword-input {
+  width: 240px;
+}
+
+.category-select {
+  width: 180px;
+}
+
+.inline-gap {
+  margin-left: 8px;
+}
+
+.full-width {
+  width: 100%;
 }
 </style>

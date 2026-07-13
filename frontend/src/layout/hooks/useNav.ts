@@ -72,10 +72,18 @@ export function useNav() {
     return $config.Title;
   });
 
+  /** 系统副标题（平台名） */
+  const subTitle = computed(() => {
+    return $config?.SubTitle ?? "数据资产平台";
+  });
+
   /** 动态title */
   function changeTitle(meta: routeMetaType) {
-    const Title = getConfig().Title;
-    if (Title) document.title = `${meta.title} | ${Title}`;
+    const cfg = getConfig();
+    const Title = cfg.Title;
+    const SubTitle = cfg.SubTitle;
+    const platformName = Title && SubTitle ? `${Title} - ${SubTitle}` : (Title ?? "");
+    if (platformName) document.title = `${meta.title} | ${platformName}`;
     else document.title = meta.title;
   }
 
@@ -126,9 +134,20 @@ export function useNav() {
     return new URL("/logo.svg", import.meta.url).href;
   }
 
+  /** 获取医院院徽（侧栏用，裁掉右侧文字） */
+  function getHospitalEmblem() {
+    return new URL("@/assets/logo-hospital-sidebar.png", import.meta.url).href;
+  }
+
+  /** 获取医院完整 Logo（登录页用，含院徽+医院名） */
+  function getHospitalFullLogo() {
+    return new URL("@/assets/logo-hospital-login.png", import.meta.url).href;
+  }
+
   return {
     route,
     title,
+    subTitle,
     device,
     layout,
     logout,
@@ -147,6 +166,8 @@ export function useNav() {
     handleResize,
     resolvePath,
     getLogo,
+    getHospitalEmblem,
+    getHospitalFullLogo,
     isCollapse,
     pureApp,
     username,

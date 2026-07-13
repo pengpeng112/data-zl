@@ -2,13 +2,12 @@
   <div class="dict-mappings">
     <el-card shadow="never" class="page-card">
       <template #header>
-        <div class="header-row">
-          <div>
-            <div class="title">诊断手术映射维护</div>
-            <div class="subtitle">按 Excel 维护表展示，一行一个院内编码；院内编码和名称作为主键口径，编辑时不可修改</div>
-          </div>
-          <el-button type="primary" @click="openDialog()">新增映射</el-button>
-        </div>
+        <RePageHeader title="诊断手术映射维护" subtitle="按 Excel 维护表展示，一行一个院内编码；院内编码和名称作为主键口径，编辑时不可修改。">
+          <template #actions>
+            <el-button :loading="exporting" @click="exportExcel">导出 Excel</el-button>
+            <el-button type="primary" @click="openDialog()">新增映射</el-button>
+          </template>
+        </RePageHeader>
       </template>
 
       <div class="filter-panel">
@@ -55,7 +54,7 @@
         </template>
 
         <el-button type="primary" @click="doSearch">查询</el-button>
-        <el-button @click="resetFilters">重置</el-button>
+        <el-button @click="() => resetFilters()">重置</el-button>
         <el-alert v-if="authHint" :title="authHint" type="warning" show-icon :closable="false" class="auth-alert" />
       </div>
 
@@ -73,7 +72,7 @@
         height="calc(100vh - 330px)"
         row-key="local_code"
         :row-class-name="tableRowClassName"
-        style="width: 100%"
+        class="full-width"
         empty-text="暂无映射数据，请确认已完成导入或调整筛选条件"
       >
         <el-table-column label="状态" width="76" fixed="left" align="center">
@@ -93,7 +92,8 @@
         <el-table-column prop="insurance_name" :label="insuranceNameLabel" min-width="230" show-overflow-tooltip />
 
         <template v-if="isDiagnosis">
-          <el-table-column prop="special_disease_name" label="病种名称" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="special_disease_code" label="门诊慢特病编码" width="150" show-overflow-tooltip />
+          <el-table-column prop="special_disease_name" label="门诊慢特病名称" min-width="170" show-overflow-tooltip />
           <el-table-column prop="low_risk_category_code" label="ICD低风险编码类目" width="160" show-overflow-tooltip />
           <el-table-column prop="low_risk_disease_name" label="ICD低风险病种名称" min-width="190" show-overflow-tooltip />
           <el-table-column prop="infectious_disease_name" label="传染病诊断" min-width="160" show-overflow-tooltip />
@@ -147,7 +147,8 @@
         <el-form-item :label="insuranceNameLabel"><el-input v-model="dialog.form.insurance_name" /></el-form-item>
 
         <template v-if="isDiagnosis">
-          <el-form-item label="病种名称"><el-input v-model="dialog.form.special_disease_name" /></el-form-item>
+          <el-form-item label="门诊慢特病编码"><el-input v-model="dialog.form.special_disease_code" /></el-form-item>
+          <el-form-item label="门诊慢特病名称"><el-input v-model="dialog.form.special_disease_name" /></el-form-item>
           <el-form-item label="ICD低风险编码类目"><el-input v-model="dialog.form.low_risk_category_code" /></el-form-item>
           <el-form-item label="ICD低风险病种名称"><el-input v-model="dialog.form.low_risk_disease_name" /></el-form-item>
           <el-form-item label="传染病诊断"><el-input v-model="dialog.form.infectious_disease_name" /></el-form-item>
@@ -169,11 +170,13 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import { computed, reactive, ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import { getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
+import { exportMedicalMappingRows, getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
 
 const loading = ref(false);
+const exporting = ref(false);
 const items = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
@@ -196,8 +199,8 @@ const categoryOptions = [
 const isDiagnosis = computed(() => categoryCode.value === "diagnosis");
 const isOperation = computed(() => categoryCode.value === "operation");
 const categoryText = computed(() => isDiagnosis.value ? "诊断" : "手术");
-const localCodeLabel = computed(() => isDiagnosis.value ? "院内临床诊断疾病编码" : "院内临床手术编码");
-const localNameLabel = computed(() => isDiagnosis.value ? "院内临床诊断疾病名称" : "院内临床手术名称");
+const localCodeLabel = computed(() => isDiagnosis.value ? "院内临床诊断编码" : "院内临床手术编码");
+const localNameLabel = computed(() => isDiagnosis.value ? "院内临床诊断名称" : "院内临床手术名称");
 const nationalCodeLabel = computed(() => isDiagnosis.value ? "国家临床版2.0疾病编码" : "国家临床版3.0手术编码");
 const nationalNameLabel = computed(() => isDiagnosis.value ? "国家临床版2.0疾病名称" : "国家临床版3.0手术名称");
 const insuranceCodeLabel = computed(() => isDiagnosis.value ? "国家医保版2.0疾病编码" : "国家医保版2.0手术代码");
@@ -217,6 +220,7 @@ const emptyForm = () => ({
   performance_level4_flag: "",
   performance_minimally_invasive_flag: "",
   restricted_tech_flag: "",
+  special_disease_code: "",
   special_disease_name: "",
   low_risk_category_code: "",
   low_risk_disease_name: "",
@@ -283,30 +287,59 @@ function tableRowClassName({ row }: { row: any }) {
   return row.status === "inactive" ? "row-inactive" : "";
 }
 
+function buildQueryParams(withPage = true) {
+  const params: Record<string, any> = {
+    category_code: categoryCode.value
+  };
+  if (withPage) {
+    params.page = page.value;
+    params.page_size = pageSize.value;
+  }
+  if (keyword.value.trim()) params.keyword = keyword.value.trim();
+  if (statusFilter.value) params.status = statusFilter.value;
+  if (isDiagnosis.value && hasInfectious.value !== "") params.has_infectious = hasInfectious.value;
+  if (isOperation.value) {
+    if (operationLevel.value) params.operation_level = operationLevel.value;
+    if (minimallyInvasiveFlag.value !== "") params.minimally_invasive_flag = minimallyInvasiveFlag.value;
+    if (performanceLevel4Flag.value !== "") params.performance_level4_flag = performanceLevel4Flag.value;
+    if (restrictedTechFlag.value !== "") params.restricted_tech_flag = restrictedTechFlag.value;
+  }
+  return params;
+}
+
+async function exportExcel() {
+  exporting.value = true;
+  authHint.value = "";
+  try {
+    const blob = await exportMedicalMappingRows(buildQueryParams(false));
+    const url = window.URL.createObjectURL(blob as Blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${categoryText.value}映射维护.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    ElMessage.success("导出完成");
+  } catch (error: any) {
+    if (error?.response?.status === 401) authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
+    else if (error?.response?.status === 403) authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
+    else ElMessage.error("导出失败");
+  } finally {
+    exporting.value = false;
+  }
+}
+
 async function loadData() {
   loading.value = true;
   authHint.value = "";
   try {
-    const params: Record<string, any> = {
-      category_code: categoryCode.value,
-      page: page.value,
-      page_size: pageSize.value
-    };
-    if (keyword.value.trim()) params.keyword = keyword.value.trim();
-    if (statusFilter.value) params.status = statusFilter.value;
-    if (isDiagnosis.value && hasInfectious.value !== "") params.has_infectious = hasInfectious.value;
-    if (isOperation.value) {
-      if (operationLevel.value) params.operation_level = operationLevel.value;
-      if (minimallyInvasiveFlag.value !== "") params.minimally_invasive_flag = minimallyInvasiveFlag.value;
-      if (performanceLevel4Flag.value !== "") params.performance_level4_flag = performanceLevel4Flag.value;
-      if (restrictedTechFlag.value !== "") params.restricted_tech_flag = restrictedTechFlag.value;
-    }
-    const res = await getMedicalMappingRows(params);
+    const res = await getMedicalMappingRows(buildQueryParams(true));
     items.value = (res as any).data.items || [];
     total.value = (res as any).data.total || 0;
   } catch (error: any) {
-    if (error?.response?.status === 401) authHint.value = "接口未授权：请先设置 asset_api_token，或重新登录后刷新。";
-    else if (error?.response?.status === 403) authHint.value = "API Token 无效或已禁用：请清理浏览器中的 asset_api_token 后重新设置有效 Token。";
+    if (error?.response?.status === 401) authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
+    else if (error?.response?.status === 403) authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
   } finally {
     loading.value = false;
   }
@@ -316,8 +349,10 @@ onMounted(loadData);
 </script>
 
 <style scoped>
-.page-card { min-height: calc(100vh - 130px); }
+.dict-mappings { padding: 4px; }
+.page-card { min-height: calc(100vh - 130px); border-color: var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
 .header-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
 .title { font-size: 16px; font-weight: 600; color: var(--el-text-color-primary); }
 .subtitle { margin-top: 4px; font-size: 12px; color: var(--el-text-color-secondary); }
 .filter-panel { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
@@ -328,4 +363,6 @@ onMounted(loadData);
 .hint { color: var(--el-text-color-secondary); }
 .pager { margin-top: 16px; justify-content: flex-end; }
 :deep(.row-inactive) { color: var(--el-text-color-secondary); background: var(--el-fill-color-lighter); }
+
+.full-width { width: 100%; }
 </style>

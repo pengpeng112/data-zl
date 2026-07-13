@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { initRouter } from "@/router/utils";
 import { storageLocal } from "@pureadmin/utils";
-import { type CSSProperties, ref, computed } from "vue";
+import { ref } from "vue";
 import { useUserStoreHook } from "@/store/modules/user";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 
@@ -9,14 +9,8 @@ defineOptions({
   name: "PermissionPage"
 });
 
-const elStyle = computed((): CSSProperties => {
-  return {
-    width: "85vw",
-    justifyContent: "start"
-  };
-});
-
 const username = ref(useUserStoreHook()?.username);
+const password = ref("");
 
 const options = [
   {
@@ -31,7 +25,7 @@ const options = [
 
 function onChange() {
   useUserStoreHook()
-    .loginByUsername({ username: username.value, password: "admin123" })
+    .loginByUsername({ username: username.value, password: password.value })
     .then(res => {
       if (res.success) {
         storageLocal().removeItem("async-routes");
@@ -43,11 +37,12 @@ function onChange() {
 </script>
 
 <template>
-  <div>
-    <p class="mb-2!">
-      模拟后台根据不同角色返回对应路由，观察左侧菜单变化（管理员角色可查看系统管理菜单、普通角色不可查看系统管理菜单）
-    </p>
-    <el-card shadow="never" :style="elStyle">
+  <div class="permission-page">
+    <RePageHeader
+      title="页面权限示例"
+      subtitle="模拟后台根据不同角色返回对应路由，观察左侧菜单变化。"
+    />
+    <el-card shadow="never" class="role-card">
       <template #header>
         <div class="card-header">
           <span>当前角色：{{ username }}</span>
@@ -64,3 +59,21 @@ function onChange() {
     </el-card>
   </div>
 </template>
+
+
+<style scoped>
+.permission-page {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.role-card {
+  width: min(85vw, 960px);
+}
+
+.role-card :deep(.el-card__body) {
+  display: flex;
+  justify-content: flex-start;
+}
+</style>

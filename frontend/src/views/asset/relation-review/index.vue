@@ -45,7 +45,7 @@ const editId = ref(0);
 const form = ref({ from_table: "", from_columns: "", to_table: "", to_columns: "", join_condition: "", cardinality: "", confidence: "", note: "" });
 
 const systemOptions = ref<SystemOption[]>([]);
-const filters = reactive({ system_code: "", confidence: "", validation_status: "", keyword: "" });
+const filters = reactive({ system_code: "", confidence: "", review_status: "", keyword: "" });
 
 const mappingsDrawerVisible = ref(false);
 const mappings = ref<FieldMapping[]>([]);
@@ -67,8 +67,8 @@ function applyFilters() {
   if (filters.confidence) {
     result = result.filter(r => r.confidence === filters.confidence);
   }
-  if (filters.validation_status) {
-    result = result.filter(r => r.validation_status === filters.validation_status);
+  if (filters.review_status) {
+    result = result.filter(r => r.validation_status === filters.review_status);
   }
   if (filters.keyword) {
     const kw = filters.keyword.toLowerCase();
@@ -85,7 +85,7 @@ function applyFilters() {
 function resetFilters() {
   filters.system_code = "";
   filters.confidence = "";
-  filters.validation_status = "";
+  filters.review_status = "";
   filters.keyword = "";
   relations.value = [...allRelations.value];
 }
@@ -96,10 +96,10 @@ async function loadRelations() {
     const params: Record<string, string> = {};
     if (filters.system_code) params.system_code = filters.system_code;
     if (filters.confidence) params.confidence = filters.confidence;
-    if (filters.validation_status) params.validation_status = filters.validation_status;
+    if (filters.review_status) params.review_status = filters.review_status;
     if (filters.keyword) params.keyword = filters.keyword;
     const res = await http.request<any>("get", "/api/v1/relations/list", { params });
-    allRelations.value = res.data || [];
+    allRelations.value = res.data?.items || [];
     relations.value = [...allRelations.value];
   } finally {
     loading.value = false;
@@ -197,23 +197,28 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <el-card style="margin-bottom:16px">
+  <div class="relation-review-page">
+    <RePageHeader
+      title="关系复核工作台"
+      subtitle="审核关系证据、置信度和业务口径"
+    />
+
+    <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filters" size="small">
         <el-form-item label="所属系统">
-          <el-select v-model="filters.system_code" placeholder="全部" clearable style="width:160px" @change="applyFilters">
+          <el-select v-model="filters.system_code" placeholder="全部" clearable class="system-filter" @change="applyFilters">
             <el-option v-for="s in systemOptions" :key="s.system_code" :label="s.system_name_cn || s.system_code" :value="s.system_code" />
           </el-select>
         </el-form-item>
         <el-form-item label="置信度">
-          <el-select v-model="filters.confidence" placeholder="全部" clearable style="width:100px" @change="applyFilters">
+          <el-select v-model="filters.confidence" placeholder="全部" clearable class="confidence-filter" @change="applyFilters">
             <el-option label="A - 高" value="A" />
             <el-option label="B - 中" value="B" />
             <el-option label="C - 低" value="C" />
           </el-select>
         </el-form-item>
         <el-form-item label="验证状态">
-          <el-select v-model="filters.validation_status" placeholder="全部" clearable style="width:130px" @change="applyFilters">
+          <el-select v-model="filters.review_status" placeholder="全部" clearable class="status-filter" @change="applyFilters">
             <el-option label="已验证" value="verified" />
             <el-option label="未验证" value="unverified" />
             <el-option label="已批准" value="approved" />
@@ -221,7 +226,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item label="关键词">
-          <el-input v-model="filters.keyword" placeholder="搜索表名/字段/条件" clearable style="width:220px" @input="applyFilters" @clear="applyFilters" />
+          <el-input v-model="filters.keyword" placeholder="搜索表名/字段/条件" clearable class="keyword-filter" @input="applyFilters" @clear="applyFilters" />
         </el-form-item>
         <el-form-item>
           <el-button @click="resetFilters">重置</el-button>
@@ -269,7 +274,7 @@ onMounted(() => {
         <el-form-item label="关联条件"><el-input v-model="form.join_condition" type="textarea" /></el-form-item>
         <el-form-item label="基数"><el-input v-model="form.cardinality" placeholder="1:1/1:N/N:M" /></el-form-item>
         <el-form-item label="置信度">
-          <el-select v-model="form.confidence" style="width:100%">
+          <el-select v-model="form.confidence" class="full-width">
             <el-option label="A - 高" value="A" />
             <el-option label="B - 中" value="B" />
             <el-option label="C - 低" value="C" />
@@ -286,7 +291,7 @@ onMounted(() => {
     <el-drawer v-model="mappingsDrawerVisible" title="字段映射" size="600px">
       <template #header>
         <span>字段映射</span>
-        <span v-if="currentMappingRel" style="color:#909399;font-size:13px;margin-left:12px">
+        <span v-if="currentMappingRel" class="mapping-subtitle">
           {{ currentMappingRel.from_table }} &rarr; {{ currentMappingRel.to_table }}
         </span>
       </template>
@@ -305,3 +310,35 @@ onMounted(() => {
     </el-drawer>
   </div>
 </template>
+
+
+<style scoped>
+.relation-review-page {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.filter-card,
+.review-card {
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-md);
+  box-shadow: var(--re-shadow-sm);
+}
+
+.filter-card {
+  margin-bottom: 16px;
+}
+
+.mapping-subtitle {
+  margin-left: 12px;
+  color: var(--re-text-secondary);
+  font-size: 13px;
+}
+
+.system-filter { width: 160px; }
+.confidence-filter { width: 100px; }
+.status-filter { width: 130px; }
+.keyword-filter { width: 220px; }
+.full-width { width: 100%; }
+</style>

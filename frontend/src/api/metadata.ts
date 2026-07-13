@@ -34,6 +34,6 @@ export function getChangeImpact(id: number) {
   return http.request<ApiResponse<any>>("get", `/api/v1/metadata-changes/${id}/impact`);
 }
 // diff 对比
-export function runMetadataDiff(params: Record<string, any>) {
+export function runMetadataDiff(params: { snapshot_id_from: number; snapshot_id_to: number }) {
   return http.request<ApiResponse<any>>("post", "/api/v1/metadata-changes/diff", { params });
 }

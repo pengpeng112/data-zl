@@ -1,5 +1,12 @@
 <template>
   <div class="identity-departments">
+    <RePageHeader title="科室基线" subtitle="查看平台科室主数据、来源系统编码和启停状态，支撑人员科室关系与权限授权。" />
+
+    <section class="dept-stat-grid">
+      <ReStatCard label="科室总数" :value="items.length" tone="primary" />
+      <ReStatCard label="启用科室" :value="activeDeptCount" tone="accent" />
+      <ReStatCard label="停用/待确认" :value="inactiveDeptCount" tone="warning" />
+    </section>
     <el-card shadow="never">
       <template #header>
         <span>科室基线列表</span>
@@ -28,7 +35,7 @@
     </el-card>
 
     <el-dialog v-model="dialogVisible" title="科室详情" width="600px" destroy-on-close>
-      <div v-if="detailLoading" style="text-align:center;padding:40px">
+      <div v-if="detailLoading" class="detail-loading">
         <el-icon class="is-loading"><i-ep-loading /></el-icon>
       </div>
       <el-descriptions v-else-if="detail" :column="2" border>
@@ -50,12 +57,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
+import { computed, ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { getDepartments, getDepartmentDetail } from "@/api/identity";
 
 const items = ref<any[]>([]);
 const loading = ref(false);
+const activeDeptCount = computed(() => items.value.filter(item => item.status === "active").length);
+const inactiveDeptCount = computed(() => items.value.length - activeDeptCount.value);
 
 const dialogVisible = ref(false);
 const detailLoading = ref(false);
@@ -89,3 +100,35 @@ async function showDetail(row: any) {
 
 onMounted(loadData);
 </script>
+
+<style scoped>
+.identity-departments {
+  padding: 4px;
+}
+.dept-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.identity-departments :deep(.el-card) {
+  border-color: var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+.identity-departments :deep(.el-table) {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+  font-size: 13px;
+}
+.detail-loading {
+  padding: 40px;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .dept-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

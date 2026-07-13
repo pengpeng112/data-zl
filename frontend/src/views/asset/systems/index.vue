@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted } from "vue";
 import { http } from "@/utils/http";
 import { ElMessage } from "element-plus";
@@ -81,23 +82,23 @@ onMounted(loadSystems);
 </script>
 
 <template>
-  <div>
-    <el-card>
-      <template #header>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span>系统总览</span>
-          <el-button type="primary" @click="openCreate">新增系统</el-button>
-        </div>
+  <div class="systems-page">
+    <RePageHeader title="系统总览" subtitle="维护资产系统编码、类型和启停状态，作为数据源、表目录和图谱分类的顶层口径。">
+      <template #actions>
+        <el-button type="primary" @click="openCreate">新增系统</el-button>
       </template>
+    </RePageHeader>
+
+    <el-card class="systems-card">
       <el-row :gutter="16">
-        <el-col v-for="s in systems" :key="s.id" :span="6" style="margin-bottom:16px">
-          <el-card shadow="hover" :body-style="{ padding: '16px' }">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <el-col v-for="s in systems" :key="s.id" :xs="24" :sm="12" :lg="6">
+          <el-card shadow="hover" class="system-tile">
+            <div class="system-tile-main">
               <div>
-                <h4 style="margin:0 0 8px">{{ s.system_name_cn }}</h4>
-                <p style="margin:0 0 4px;color:#909399;font-size:13px">{{ s.system_code }}</p>
+                <h4 class="system-title">{{ s.system_name_cn }}</h4>
+                <p class="system-code">{{ s.system_code }}</p>
                 <el-tag v-if="s.system_type" :type="getTypeColor(s.system_type)" size="small">{{ s.system_type }}</el-tag>
-                <el-tag :type="s.status === 'active' ? 'success' : 'info'" size="small" style="margin-left:4px">{{ s.status === 'active' ? '启用' : '禁用' }}</el-tag>
+                <el-tag :type="s.status === 'active' ? 'success' : 'info'" size="small" class="status-tag">{{ s.status === 'active' ? '启用' : '禁用' }}</el-tag>
               </div>
               <div>
                 <el-button size="small" text @click="openEdit(s)">编辑</el-button>
@@ -119,7 +120,7 @@ onMounted(loadSystems);
           <el-input v-model="form.system_name_cn" />
         </el-form-item>
         <el-form-item label="系统类型">
-          <el-select v-model="form.system_type" clearable style="width:100%">
+          <el-select v-model="form.system_type" clearable class="full-width">
             <el-option v-for="t in typeOptions" :key="t" :label="t" :value="t" />
           </el-select>
         </el-form-item>
@@ -140,3 +141,49 @@ onMounted(loadSystems);
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.systems-page {
+  padding: 4px;
+}
+.systems-card {
+  border-color: var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+.systems-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.system-tile :deep(.el-card__body) {
+  padding: 16px;
+}
+.system-tile-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.system-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+.system-code {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.status-tag {
+  margin-left: 4px;
+}
+@media (max-width: 1200px) {
+  .systems-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .systems-grid { grid-template-columns: 1fr; }
+}
+
+.full-width { width: 100%; }
+</style>

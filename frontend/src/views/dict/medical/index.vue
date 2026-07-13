@@ -2,16 +2,14 @@
   <div class="dict-medical">
     <el-card shadow="never">
       <template #header>
-        <div class="header-row">
-          <div>
-            <div class="title">诊断与手术编码体系</div>
-            <div class="subtitle">维护院内编码、国家临床版、医保版及后续同步基础数据</div>
-          </div>
-          <el-radio-group v-model="categoryCode" @change="onCategoryChange">
-            <el-radio-button value="diagnosis">诊断</el-radio-button>
-            <el-radio-button value="operation">手术</el-radio-button>
-          </el-radio-group>
-        </div>
+        <RePageHeader title="诊断与手术编码体系" subtitle="维护院内编码、国家临床版、医保版及后续同步基础数据。">
+          <template #actions>
+            <el-radio-group v-model="categoryCode" @change="onCategoryChange">
+              <el-radio-button value="diagnosis">诊断</el-radio-button>
+              <el-radio-button value="operation">手术</el-radio-button>
+            </el-radio-group>
+          </template>
+        </RePageHeader>
       </template>
 
       <div class="toolbar">
@@ -30,7 +28,7 @@
         v-loading="loading"
         :data="codeSets"
         stripe
-        style="margin-top: 12px"
+        class="items-table"
         row-key="code_set_code"
         empty-text="暂无编码体系，请确认已设置 API Token 并完成导入"
       >
@@ -72,7 +70,7 @@
                 :total="row._itemsTotal"
                 layout="total, prev, pager, next"
                 size="small"
-                style="margin-top: 8px; justify-content: flex-end"
+                class="pager"
                 @change="loadItems(row)"
               />
             </div>
@@ -114,14 +112,14 @@
           <el-input v-model="codeSetDialog.form.code_set_name_cn" />
         </el-form-item>
         <el-form-item label="类型" prop="code_set_type">
-          <el-select v-model="codeSetDialog.form.code_set_type" style="width: 100%">
+          <el-select v-model="codeSetDialog.form.code_set_type" class="full-width">
             <el-option label="院内" value="clinical" />
             <el-option label="国标" value="national" />
             <el-option label="医保" value="insurance" />
           </el-select>
         </el-form-item>
         <el-form-item label="分类" prop="category_code">
-          <el-select v-model="codeSetDialog.form.category_code" style="width: 100%">
+          <el-select v-model="codeSetDialog.form.category_code" class="full-width">
             <el-option label="诊断" value="diagnosis" />
             <el-option label="手术" value="operation" />
           </el-select>
@@ -151,7 +149,7 @@
           <el-input v-model="itemDialog.form.item_name_alias" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="itemDialog.form.status" style="width: 100%">
+          <el-select v-model="itemDialog.form.status" class="full-width">
             <el-option label="启用" value="active" />
             <el-option label="停用" value="inactive" />
           </el-select>
@@ -166,6 +164,7 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, type FormInstance } from "element-plus";
 import { getMedicalCodeSets, upsertMedicalCodeSet, getMedicalItems, upsertMedicalItem } from "@/api/dict";
@@ -196,9 +195,9 @@ async function loadCodeSets() {
     codeSets.value = ((res as any).data || []).map(normalizeCodeSet);
   } catch (error: any) {
     if (error?.response?.status === 401) {
-      authHint.value = "接口未授权：请先在资产管理/平台管理中设置 asset_api_token，或重新登录后刷新。";
+      authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
     } else if (error?.response?.status === 403) {
-      authHint.value = "API Token 无效或已禁用：请清理浏览器中的 asset_api_token 后重新设置有效 Token。";
+      authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
     }
   } finally {
     loading.value = false;
@@ -334,12 +333,15 @@ onMounted(loadCodeSets);
 </script>
 
 <style scoped>
-.header-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.title { font-size: 16px; font-weight: 600; color: var(--el-text-color-primary); }
-.subtitle { margin-top: 4px; font-size: 12px; color: var(--el-text-color-secondary); }
+.dict-medical { padding: 4px; }
+.dict-medical :deep(.el-card) { border-color: var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
 .toolbar { display: flex; align-items: center; gap: 8px; }
 .auth-alert { flex: 1; }
 .sub-table-wrap { padding: 8px 40px 12px; }
 .sub-toolbar { margin-bottom: 8px; }
 .sub-count { color: var(--el-text-color-secondary); font-size: 12px; }
+
+.items-table { margin-top: 12px; }
+.pager { justify-content: flex-end; margin-top: 8px; }
+.full-width { width: 100%; }
 </style>

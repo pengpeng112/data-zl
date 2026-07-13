@@ -1,5 +1,11 @@
-<template>
+﻿<template>
   <div class="asset-tables-page">
+    <RePageHeader title="资产表目录" subtitle="按系统、数据源、Schema、表、字段五层浏览资产结构，支持表字段联动预览。">
+      <template #icon><TableIcon /></template>
+      <template #actions>
+        <el-button :icon="RefreshIcon" :loading="treeLoading || loading" @click="reloadAll">刷新目录</el-button>
+      </template>
+    </RePageHeader>
     <div class="layout-grid">
       <el-card class="tree-panel" shadow="never">
         <template #header>
@@ -11,10 +17,11 @@
         <el-input
           v-model="treeKeyword"
           clearable
-          placeholder="搜索系统、库名、Schema"
+          placeholder="搜索系统、库、Schema、表或字段"
           class="tree-search"
         />
         <el-tree
+          ref="treeRef"
           v-loading="treeLoading"
           :data="treeData"
           node-key="id"
@@ -23,7 +30,6 @@
           default-expand-all
           highlight-current
           @node-click="handleTreeClick"
-          ref="treeRef"
         >
           <template #default="{ data }">
             <span class="tree-node">
@@ -46,7 +52,8 @@
               <el-button type="primary" @click="doSearch">查询</el-button>
             </div>
           </template>
-          <div class="filter-bar">
+          <ReToolbar title="表资产筛选" class="table-toolbar">
+            <div class="filter-bar">
             <el-input
               v-model="params.keyword"
               placeholder="搜索库名、表名、中文名或备注"
@@ -59,12 +66,13 @@
               clearable
               @keyup.enter="doSearch"
             />
-            <el-select v-model="params.page_size" style="width: 110px" @change="loadData">
+            <el-select v-model="params.page_size" class="page-size-select" @change="loadData">
               <el-option :value="20" label="20 条" />
               <el-option :value="50" label="50 条" />
               <el-option :value="100" label="100 条" />
             </el-select>
           </div>
+          </ReToolbar>
 
           <el-table
             v-loading="loading"
@@ -72,12 +80,15 @@
             stripe
             height="430"
             highlight-current-row
+            class="medical-data-table"
             @row-click="selectTable"
             @row-dblclick="goDetail"
           >
-            <el-table-column prop="system_code" label="系统" width="110" show-overflow-tooltip />
-            <el-table-column prop="source_code" label="库名/数据源" width="170" show-overflow-tooltip />
-            <el-table-column prop="schema_name" label="表空间" width="110" />
+            <el-table-column prop="system_code" label="系统" width="120" show-overflow-tooltip>
+              <template #default="{ row }">{{ systemDisplayName(row.system_code) }}</template>
+            </el-table-column>
+            <el-table-column prop="source_code" label="库/数据源" width="170" show-overflow-tooltip />
+            <el-table-column prop="schema_name" label="Schema/Owner" width="130" />
             <el-table-column prop="table_name" label="表名" min-width="190" show-overflow-tooltip />
             <el-table-column prop="table_name_cn" label="表中文名" min-width="160" show-overflow-tooltip>
               <template #default="{ row }">{{ row.table_name_cn || row.comment || '-' }}</template>
@@ -105,7 +116,7 @@
               <span class="header-subtitle">{{ selectedTableName || '请选择一张表' }}</span>
             </div>
           </template>
-          <el-table :data="columns" v-loading="columnsLoading" stripe height="260">
+          <el-table :data="columns" v-loading="columnsLoading" stripe height="260" class="medical-data-table">
             <el-table-column prop="column_id" label="#" width="60" align="right" />
             <el-table-column prop="column_name" label="字段名" min-width="180" show-overflow-tooltip />
             <el-table-column prop="column_name_cn" label="字段中文名" min-width="160" show-overflow-tooltip>
@@ -129,6 +140,8 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import type { ElTree } from "element-plus";
 import { useRouter } from "vue-router";
@@ -137,11 +150,14 @@ import {
   getTableColumns,
   getTables,
   type AssetTreeNode,
+  type AssetTreeTable,
   type ColumnInfo,
   type TableBrief
 } from "@/api/asset";
+import RefreshIcon from "~icons/ri/refresh-line";
+import TableIcon from "~icons/ri/table-line";
 
-type TreeKind = "system" | "source" | "schema";
+type TreeKind = "system" | "source" | "schema" | "table" | "column";
 interface TreeItem {
   id: string;
   label: string;
@@ -150,6 +166,9 @@ interface TreeItem {
   system_code?: string;
   source_code?: string;
   schema_name?: string;
+  table_name?: string;
+  table?: TableBrief;
+  column?: ColumnInfo;
   children?: TreeItem[];
 }
 
@@ -160,6 +179,7 @@ const treeLoading = ref(false);
 const loading = ref(false);
 const columnsLoading = ref(false);
 const rawTree = ref<AssetTreeNode[]>([]);
+const columnChildren = ref<Record<string, TreeItem[]>>({});
 const items = ref<TableBrief[]>([]);
 const columns = ref<ColumnInfo[]>([]);
 const total = ref(0);
@@ -170,25 +190,57 @@ const params = reactive({ keyword: "", domain: "", page: 1, page_size: 20 });
 
 const treeProps = { label: "label", children: "children" };
 
+function systemGroupCode(systemCode?: string | null) {
+  const code = (systemCode || "").toUpperCase();
+  if (code.includes("HIS")) return "HIS_SOURCE";
+  return "DATA_CENTER";
+}
+
+function systemDisplayName(systemCode?: string | null) {
+  return systemGroupCode(systemCode) === "HIS_SOURCE" ? "HIS 系统" : "ODS 数据中心系统";
+}
+
+function tableNodeKey(sourceCode: string, schemaName: string, tableName: string) {
+  return `${sourceCode}::${schemaName}::${tableName}`;
+}
+
+function toTableBrief(source: AssetTreeNode, schemaName: string, table: AssetTreeTable): TableBrief {
+  return {
+    id: table.id,
+    system_code: source.system_code,
+    source_code: source.source_code,
+    namespace_name: schemaName,
+    schema_name: schemaName,
+    table_name: table.table_name,
+    table_name_cn: table.table_name_cn,
+    table_role: null,
+    comment: null,
+    column_count: table.column_count ?? null,
+    domain: table.domain ?? null,
+    source: source.source_name_cn
+  };
+}
+
 const treeData = computed<TreeItem[]>(() => {
   const systemMap = new Map<string, TreeItem>();
   for (const source of rawTree.value) {
-    const sysCode = source.system_code || "未分组系统";
+    const sysCode = systemGroupCode(source.system_code);
     if (!systemMap.has(sysCode)) {
       systemMap.set(sysCode, {
         id: `system:${sysCode}`,
-        label: sysCode,
+        label: systemDisplayName(sysCode),
         kind: "system",
         system_code: sysCode,
         count: 0,
         children: []
       });
     }
+
     const systemNode = systemMap.get(sysCode)!;
     systemNode.count = (systemNode.count || 0) + (source.table_count || 0);
     systemNode.children!.push({
       id: `source:${source.source_code}`,
-      label: `${source.source_name_cn || source.source_code}（${source.source_code}）`,
+      label: source.source_name_cn ? `${source.source_name_cn} (${source.source_code})` : source.source_code,
       kind: "source",
       system_code: sysCode,
       source_code: source.source_code,
@@ -200,15 +252,32 @@ const treeData = computed<TreeItem[]>(() => {
         system_code: sysCode,
         source_code: source.source_code,
         schema_name: schema.namespace,
-        count: schema.table_count
+        count: schema.table_count,
+        children: schema.tables.map(table => {
+          const key = tableNodeKey(source.source_code, schema.namespace, table.table_name);
+          return {
+            id: `table:${key}`,
+            label: table.table_name_cn ? `${table.table_name} - ${table.table_name_cn}` : table.table_name,
+            kind: "table",
+            system_code: sysCode,
+            source_code: source.source_code,
+            schema_name: schema.namespace,
+            table_name: table.table_name,
+            table: toTableBrief(source, schema.namespace, table),
+            count: table.column_count ?? undefined,
+            children: columnChildren.value[key]
+          };
+        })
       }))
     });
   }
-  return Array.from(systemMap.values());
+  return ["DATA_CENTER", "HIS_SOURCE"]
+    .map(code => systemMap.get(code))
+    .filter(Boolean) as TreeItem[];
 });
 
 const selectedScopeText = computed(() => {
-  const parts = [scope.system_code, scope.source_code, scope.schema_name].filter(Boolean);
+  const parts = [scope.system_code ? systemDisplayName(scope.system_code) : "", scope.source_code, scope.schema_name].filter(Boolean);
   return parts.length ? ` / ${parts.join(" / ")}` : " / 全部资产";
 });
 const selectedTableName = computed(() => selectedTable.value ? `${selectedTable.value.schema_name}.${selectedTable.value.table_name}` : "");
@@ -217,15 +286,32 @@ watch(treeKeyword, value => treeRef.value?.filter(value));
 
 function filterTreeNode(value: string, data: TreeItem) {
   if (!value) return true;
-  return data.label.toLowerCase().includes(value.toLowerCase()) || data.id.toLowerCase().includes(value.toLowerCase());
+  const keyword = value.toLowerCase();
+  return [data.label, data.id, data.system_code, data.source_code, data.schema_name, data.table_name, data.column?.column_name]
+    .filter(Boolean)
+    .some(item => String(item).toLowerCase().includes(keyword));
 }
 
 function kindLabel(kind: TreeKind) {
-  return kind === "system" ? "系统" : kind === "source" ? "库" : "表空间";
+  const labels: Record<TreeKind, string> = {
+    system: "系统",
+    source: "库",
+    schema: "Schema",
+    table: "表",
+    column: "字段"
+  };
+  return labels[kind];
 }
 
 function kindTagType(kind: TreeKind) {
-  return kind === "system" ? "primary" : kind === "source" ? "success" : "info";
+  const types: Record<TreeKind, "primary" | "success" | "info" | "warning" | "danger"> = {
+    system: "primary",
+    source: "success",
+    schema: "info",
+    table: "warning",
+    column: "danger"
+  };
+  return types[kind];
 }
 
 async function loadTree() {
@@ -238,10 +324,44 @@ async function loadTree() {
   }
 }
 
-function handleTreeClick(node: TreeItem) {
+async function hydrateColumnChildren(table: TableBrief) {
+  const key = tableNodeKey(table.source_code || "", table.schema_name, table.table_name);
+  if (columnChildren.value[key]) return;
+  const list = columns.value.length && selectedTable.value?.schema_name === table.schema_name && selectedTable.value?.table_name === table.table_name
+    ? columns.value
+    : (await getTableColumns(table.schema_name, table.table_name)).data || [];
+  columnChildren.value = {
+    ...columnChildren.value,
+    [key]: list.map(col => ({
+      id: `column:${key}:${col.column_name || col.column_id}`,
+      label: col.column_name_cn ? `${col.column_name} - ${col.column_name_cn}` : col.column_name || `字段 ${col.column_id}`,
+      kind: "column",
+      system_code: table.system_code || undefined,
+      source_code: table.source_code || undefined,
+      schema_name: table.schema_name,
+      table_name: table.table_name,
+      table,
+      column: col
+    }))
+  };
+}
+
+async function handleTreeClick(node: TreeItem) {
   scope.system_code = node.system_code || "";
-  scope.source_code = node.kind === "source" || node.kind === "schema" ? node.source_code || "" : "";
-  scope.schema_name = node.kind === "schema" ? node.schema_name || "" : "";
+  scope.source_code = ["source", "schema", "table", "column"].includes(node.kind) ? node.source_code || "" : "";
+  scope.schema_name = ["schema", "table", "column"].includes(node.kind) ? node.schema_name || "" : "";
+  if (node.kind === "table" && node.table) {
+    await selectTable(node.table);
+    await hydrateColumnChildren(node.table);
+    return;
+  }
+  if (node.kind === "column" && node.schema_name && node.table_name) {
+    const table = selectedTable.value?.schema_name === node.schema_name && selectedTable.value?.table_name === node.table_name
+      ? selectedTable.value
+      : node.table;
+    if (table) await selectTable(table);
+    return;
+  }
   params.page = 1;
   loadData();
 }
@@ -286,6 +406,11 @@ function doSearch() {
   loadData();
 }
 
+function reloadAll() {
+  loadTree();
+  loadData();
+}
+
 function goDetail(row: TableBrief) {
   router.push(`/asset/tables/${row.schema_name}/${row.table_name}`);
 }
@@ -297,19 +422,115 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-.asset-tables-page { min-height: calc(100vh - 120px); }
-.layout-grid { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 12px; align-items: start; }
-.tree-panel { min-height: calc(100vh - 150px); }
-.content-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.header-subtitle { color: #909399; font-size: 12px; margin-left: 8px; }
-.tree-search { margin-bottom: 10px; }
-.tree-node { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
-.tree-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tree-count { color: #909399; font-size: 12px; }
-.filter-bar { display: grid; grid-template-columns: minmax(240px, 1fr) 180px 110px; gap: 8px; margin-bottom: 10px; }
-.pager { margin-top: 12px; justify-content: flex-end; }
-.field-panel { min-height: 320px; }
-@media (max-width: 1100px) { .layout-grid { grid-template-columns: 1fr; } .tree-panel { min-height: auto; } }
+<style scoped lang="scss">
+.asset-tables-page {
+  min-height: calc(100vh - 120px);
+  padding: 4px;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.tree-panel,
+.content-panel :deep(.el-card) {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.tree-panel {
+  min-height: calc(100vh - 210px);
+}
+
+.content-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.panel-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-subtitle {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tree-search {
+  margin-bottom: 12px;
+}
+
+.tree-node {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  max-width: 330px;
+}
+
+.tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.table-toolbar {
+  margin-bottom: 12px;
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 180px 110px;
+  gap: 8px;
+  width: 100%;
+}
+
+.medical-data-table {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+  font-size: 13px;
+}
+
+.pager {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.field-panel {
+  min-height: 320px;
+}
+
+@media (max-width: 1100px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tree-panel {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .filter-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.page-size-select { width: 110px; }
 </style>

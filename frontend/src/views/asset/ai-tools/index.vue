@@ -1,18 +1,18 @@
 <template>
-  <div>
-    <h2 class="page-title">AI 工具与协作</h2>
+  <div class="ai-tools-page">
+    <RePageHeader title="AI 工具与协作" subtitle="集中管理 AI 可调工具、系统上下文、SQL 草稿审核和调用审计。" />
 
     <el-card class="mb20">
       <template #header>
         <span>系统上下文</span>
       </template>
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px">
+      <div class="context-filter">
         <span>选择系统：</span>
         <el-select
           v-model="systemCode"
           placeholder="请选择系统"
           clearable
-          style="width: 240px"
+          class="system-select"
           @change="loadSystemContext"
         >
           <el-option
@@ -23,38 +23,23 @@
           />
         </el-select>
       </div>
-      <el-row v-if="systemContext" :gutter="16">
-        <el-col :span="8">
-          <el-card shadow="hover" class="ctx-card">
-            <div class="ctx-num">{{ systemContext.total_tables }}</div>
-            <div class="ctx-label">总表数</div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card shadow="hover" class="ctx-card">
-            <div class="ctx-num">{{ systemContext.total_columns }}</div>
-            <div class="ctx-label">总字段数</div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card shadow="hover" class="ctx-card">
-            <div class="ctx-num">{{ systemContext.total_relations }}</div>
-            <div class="ctx-label">总关系数</div>
-          </el-card>
-        </el-col>
-      </el-row>
+      <section v-if="systemContext" class="context-stat-grid">
+        <ReStatCard label="总表数" :value="systemContext.total_tables" tone="primary" />
+        <ReStatCard label="总字段数" :value="systemContext.total_columns" tone="accent" />
+        <ReStatCard label="总关系数" :value="systemContext.total_relations" tone="info" />
+      </section>
       <el-empty v-if="!systemContext" description="选择系统后显示上下文摘要" :image-size="60" />
     </el-card>
 
     <el-card class="mb20">
       <template #header>
         <span>可调用工具（{{ tools.length }}）</span>
-        <el-tag type="info" size="small" style="margin-left: 12px"
+        <el-tag type="info" size="small" class="header-tag"
           >Dify / MCP / 外部 AI</el-tag
         >
       </template>
       <div class="policy-note">{{ policy }}</div>
-      <el-table :data="tools" stripe size="small" style="margin-top: 8px">
+      <el-table :data="tools" stripe size="small" class="tools-table">
         <el-table-column prop="name" label="工具名" width="200" />
         <el-table-column prop="description" label="说明" min-width="250" />
         <el-table-column label="参数" min-width="200">
@@ -79,7 +64,7 @@
           placeholder="状态"
           clearable
           size="small"
-          style="margin-left: 12px; width: 110px"
+          class="draft-status-filter"
           @change="loadDrafts"
         >
           <el-option label="草稿" value="draft" />
@@ -160,6 +145,8 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
 import { ref, onMounted } from "vue";
 import { http } from "@/utils/http";
 import { getAiTools, getDrafts, getToolCalls, reviewDraft } from "@/api/asset";
@@ -288,9 +275,6 @@ onMounted(loadAll);
 </script>
 
 <style scoped>
-.page-title {
-  margin-bottom: 20px;
-}
 .mb20 {
   margin-bottom: 20px;
 }
@@ -302,20 +286,21 @@ onMounted(loadAll);
   font-size: 12px;
 }
 .policy-note {
-  color: #909399;
+  color: var(--text-secondary);
   font-size: 13px;
   padding: 4px 0;
 }
-.ctx-card {
-  text-align: center;
+.ai-tools-page {
+  padding: 4px;
 }
-.ctx-num {
-  font-size: 28px;
-  font-weight: 700;
+.context-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
-.ctx-label {
-  font-size: 13px;
-  color: #909399;
-  margin-top: 4px;
+@media (max-width: 760px) {
+  .context-stat-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -1,0 +1,205 @@
+import type { GraphEdge, GraphNode } from "@/api/asset";
+import { findGraphPath, matchesTableSearch } from "@/views/asset/graph/graphTransform";
+
+export type GraphGroupBy = "system" | "source" | "schema" | "domain";
+
+export interface NormalizedGraphOptions {
+  groupBy: GraphGroupBy;
+  focusKeyword?: string;
+  centerTable?: string;
+  selectedNodeId?: string;
+  showReviewLayer?: boolean;
+}
+
+export interface NormalizedGraph {
+  categories: { name: string; itemStyle: { color: string } }[];
+  nodes: any[];
+  edges: any[];
+  topGroups: { name: string; count: number }[];
+  passCount: number;
+  candidateCount: number;
+  dependencyCount: number;
+  reviewHiddenCount: number;
+}
+
+const GRAPH_COLOR_NEUTRAL = "#475569";
+const GROUP_COLORS = ["#0f3a66", "#00a6b8", GRAPH_COLOR_NEUTRAL, "#d97706", "#7c6aa6", "#1f766e", "#334155", "#b45309"];
+
+const STATUS_COLORS: Record<string, string> = {
+  verified: "#00a6b8",
+  sample_pass: "#00a6b8",
+  manual_reviewed: "#0f3a66",
+  bounded: "#d97706",
+  needs_split: "#ef4444",
+  rejected: "#991b1b",
+  not_tested: "#94a3b8"
+};
+
+function displayName(node: GraphNode) {
+  return node.table_name || node.label || node.id;
+}
+
+function groupName(node: GraphNode, groupBy: GraphGroupBy) {
+  if (groupBy === "system") return node.system_code || "未分系统";
+  if (groupBy === "source") return node.source_code || node.source || "未分数据源";
+  if (groupBy === "domain") return node.business_domain || node.domain || "未分业务域";
+  return node.schema_name || node.namespace_name || node.category || node.id.split(".")[0] || "UNKNOWN";
+}
+
+function matchesKeyword(node: GraphNode, keyword?: string) {
+  const key = keyword?.trim().toLowerCase();
+  if (!key) return false;
+  return [node.id, node.label, node.table_name, node.table_name_cn, node.business_domain, node.domain, node.system_code, node.source_code, node.source]
+    .filter(Boolean)
+    .some(item => String(item).toLowerCase().includes(key));
+}
+
+function isReviewOnly(edge: GraphEdge) {
+  const confidence = (edge.confidence || "").toUpperCase();
+  return Boolean(edge.is_deferred) || confidence === "D" || edge.relation_type === "candidate";
+}
+
+function edgeLineType(edge: GraphEdge) {
+  const confidence = (edge.confidence || "").toUpperCase();
+  if (edge.is_deferred || confidence === "D") return "dashed";
+  if (edge.relation_type === "candidate") return "dashed";
+  if (edge.relation_type === "dependency") return "dotted";
+  if (confidence && confidence !== "A") return "dashed";
+  return "solid";
+}
+
+function edgeColor(edge: GraphEdge) {
+  const confidence = (edge.confidence || "").toUpperCase();
+  if (edge.is_deferred || confidence === "D") return "#7c6aa6";
+  if (edge.relation_type === "candidate") return "#7c6aa6";
+  if (edge.relation_type === "dependency") return "#94a3b8";
+  if (edge.validation_status) return STATUS_COLORS[edge.validation_status] || GRAPH_COLOR_NEUTRAL;
+  if (confidence === "A") return "#0f3a66";
+  if (confidence === "B" || confidence === "C") return "#d97706";
+  return GRAPH_COLOR_NEUTRAL;
+}
+
+function edgeWidth(edge: GraphEdge) {
+  const confidence = (edge.confidence || "").toUpperCase();
+  if (["verified", "sample_pass"].includes(edge.validation_status || "")) return 3;
+  if (confidence === "A") return 2.4;
+  if (confidence === "B" || confidence === "C") return 1.8;
+  return 1.2;
+}
+
+function isHighlightedNode(nodeId: string, adjacent: Set<string>, pathNodes: Set<string>, selected?: string) {
+  if (!selected) return true;
+  if (pathNodes.size) return pathNodes.has(nodeId);
+  return nodeId === selected || adjacent.has(nodeId);
+}
+
+export function normalizeGraphData(
+  nodes: GraphNode[],
+  edges: GraphEdge[],
+  options: NormalizedGraphOptions
+): NormalizedGraph {
+  const showReviewLayer = Boolean(options.showReviewLayer);
+  const visibleEdges = edges.filter(edge => showReviewLayer || !isReviewOnly(edge));
+  const reviewHiddenCount = edges.length - visibleEdges.length;
+  const nodeIds = new Set<string>();
+  visibleEdges.forEach(edge => {
+    nodeIds.add(edge.source);
+    nodeIds.add(edge.target);
+  });
+  const visibleNodes = nodes.filter(node => nodeIds.has(node.id) || visibleEdges.length === 0);
+  const groups = Array.from(new Set(visibleNodes.map(node => groupName(node, options.groupBy)))).sort();
+  const categories = groups.map((name, index) => ({
+    name,
+    itemStyle: { color: GROUP_COLORS[index % GROUP_COLORS.length] }
+  }));
+  const colorByGroup = new Map(categories.map(item => [item.name, item.itemStyle.color]));
+
+  const degreeMap = new Map<string, number>();
+  const adjacent = new Set<string>();
+  for (const edge of visibleEdges) {
+    degreeMap.set(edge.source, (degreeMap.get(edge.source) || 0) + 1);
+    degreeMap.set(edge.target, (degreeMap.get(edge.target) || 0) + 1);
+    if (options.selectedNodeId && (edge.source === options.selectedNodeId || edge.target === options.selectedNodeId)) {
+      adjacent.add(edge.source);
+      adjacent.add(edge.target);
+    }
+  }
+  const highlightedPath = options.centerTable && options.selectedNodeId
+    ? findGraphPath({ edges: visibleEdges }, options.centerTable, options.selectedNodeId)
+    : { nodeIds: [], edgeIds: [] };
+  const pathNodes = new Set(highlightedPath.nodeIds);
+  const pathEdges = new Set(highlightedPath.edgeIds);
+
+  const normalizedNodes = visibleNodes.map(node => {
+    const group = groupName(node, options.groupBy);
+    const focused = matchesKeyword(node, options.focusKeyword);
+    const isCenter = Boolean(options.centerTable && node.id === options.centerTable);
+    const selected = Boolean(options.selectedNodeId && node.id === options.selectedNodeId);
+    const active = isHighlightedNode(node.id, adjacent, pathNodes, options.selectedNodeId);
+    const degree = degreeMap.get(node.id) || 0;
+    return {
+      ...node,
+      id: node.id,
+      name: displayName(node),
+      category: group,
+      symbol: isCenter || focused || selected ? "diamond" : "roundRect",
+      symbolSize: isCenter || focused || selected ? 70 : Math.min(58, 32 + degree * 3),
+      itemStyle: {
+        color: colorByGroup.get(group) || GRAPH_COLOR_NEUTRAL,
+        opacity: active ? 1 : 0.22,
+        borderColor: isCenter || focused || selected ? "#00d5ff" : "#ffffff",
+        borderWidth: isCenter || focused || selected ? 3 : 1.5,
+        shadowBlur: isCenter || focused || selected ? 26 : 10,
+        shadowColor: isCenter || focused || selected ? "rgba(0, 166, 184, 0.42)" : "rgba(15, 23, 42, 0.18)"
+      },
+      label: {
+        show: true,
+        formatter: displayName(node),
+        color: "#0f172a",
+        fontSize: isCenter || focused || selected ? 12 : 11,
+        fontWeight: isCenter || focused || selected ? 700 : 500,
+        overflow: "truncate",
+        width: 124,
+        opacity: active ? 1 : 0.35
+      }
+    };
+  });
+
+  const normalizedEdges = visibleEdges.map(edge => {
+    const pathSelected = pathEdges.has(edge.id);
+    const selected = pathSelected || Boolean(!pathEdges.size && options.selectedNodeId && (edge.source === options.selectedNodeId || edge.target === options.selectedNodeId));
+    const dimmed = Boolean(options.selectedNodeId && !selected);
+    return {
+      ...edge,
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      lineStyle: {
+        color: edgeColor(edge),
+        width: selected ? edgeWidth(edge) + (pathSelected ? 2.8 : 2) : edgeWidth(edge),
+        type: edgeLineType(edge),
+        opacity: dimmed ? 0.1 : pathSelected ? 1 : edge.relation_type === "dependency" ? 0.46 : 0.86,
+        curveness: 0.18
+      },
+      label: { show: selected, formatter: edge.label || edge.from_columns || "", color: pathSelected ? "#0f3a66" : "#0f172a", fontSize: 11, fontWeight: pathSelected ? 700 : 500 },
+      emphasis: { lineStyle: { width: edgeWidth(edge) + 2, opacity: 1 } }
+    };
+  });
+
+  const groupCount = new Map<string, number>();
+  for (const node of visibleNodes) {
+    const group = groupName(node, options.groupBy);
+    groupCount.set(group, (groupCount.get(group) || 0) + 1);
+  }
+
+  return {
+    categories,
+    nodes: normalizedNodes,
+    edges: normalizedEdges,
+    topGroups: Array.from(groupCount.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 6),
+    passCount: visibleEdges.filter(edge => ["sample_pass", "verified"].includes(edge.validation_status || "")).length,
+    candidateCount: visibleEdges.filter(edge => edge.relation_type === "candidate").length,
+    dependencyCount: visibleEdges.filter(edge => edge.relation_type === "dependency").length,
+    reviewHiddenCount
+  };
+}

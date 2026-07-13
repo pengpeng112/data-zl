@@ -7,8 +7,11 @@ defineOptions({
 </script>
 
 <template>
-  <div>
-    <p class="mb-2!">当前拥有的code列表：{{ getAuths() }}</p>
+  <div class="permission-button-page">
+    <RePageHeader
+      title="按钮权限示例"
+      :subtitle="`当前拥有的 code 列表：${getAuths()}`"
+    />
 
     <el-card shadow="never" class="mb-2">
       <template #header>
@@ -97,3 +100,12 @@ defineOptions({
     </el-card>
   </div>
 </template>
+
+
+<style scoped>
+.permission-button-page {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+</style>

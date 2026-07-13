@@ -41,13 +41,15 @@ export function getPluginsList(
      * vite-plugin-router-warn只在开发环境下启用，只处理vue-router文件并且只在服务启动或重启时运行一次，性能消耗可忽略不计
      */
     removeNoMatch(),
-    // mock支持
-    vitePluginFakeServer({
-      logger: false,
-      include: "mock",
-      infixName: false,
-      enableProd: true
-    }),
+    // mock支持：仅在开发环境启用，生产构建（build/build:staging）禁用，避免伪登录令牌进入生产
+    lifecycle === "dev" || lifecycle === "serve"
+      ? vitePluginFakeServer({
+          logger: false,
+          include: "mock",
+          infixName: false,
+          enableProd: false
+        })
+      : null,
     // svg组件化支持
     svgLoader(),
     // 自动按需加载图标

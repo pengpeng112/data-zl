@@ -40,7 +40,7 @@
     ]
   },
   "vueCompilerOptions": {
-    "globalTypesPath": "../../../tmp/vue-global-types.d.ts"
+    "globalTypesPath": "./.vue-global-types/vue-global-types.d.ts"
   },
   "include": [
     "mock/*.ts",

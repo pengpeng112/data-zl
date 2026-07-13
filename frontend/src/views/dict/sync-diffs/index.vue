@@ -1,60 +1,90 @@
-<template>
+﻿<template>
   <div class="dict-sync-diffs">
-    <el-card shadow="never">
-      <template #header>
-        <span>字典同步差异</span>
+    <RePageHeader title="医学编码同步差异" subtitle="对诊断、手术等医学编码做来源同步比对，生成差异并支持人工处理。">
+      <template #icon><CodeIcon /></template>
+      <template #actions>
+        <el-button type="primary" :icon="SyncIcon" :loading="syncLoading" @click="doSync">执行同步</el-button>
       </template>
+    </RePageHeader>
 
-      <div class="filter-bar">
-        <el-select
-          v-model="statusFilter"
-          placeholder="差异状态"
-          clearable
-          style="width: 160px"
-          @change="doSearch"
-        >
-          <el-option label="待处理" value="open" />
-          <el-option label="已确认" value="acknowledged" />
-          <el-option label="已解决" value="resolved" />
-        </el-select>
-        <el-input
-          v-model="keyword"
-          placeholder="搜索编码/名称"
-          clearable
-          style="width: 240px; margin-left: 8px"
-          @keyup.enter="doSearch"
-        />
-        <el-button type="primary" style="margin-left: 8px" @click="doSearch">搜索</el-button>
-      </div>
+    <section class="diff-stats">
+      <ReStatCard label="当前页差异" :value="items.length" tone="primary" helper="按筛选条件展示">
+        <template #icon><CodeIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="未处理" :value="openCount" tone="warning" helper="当前页统计">
+        <template #icon><OpenIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="已解决" :value="resolvedCount" tone="accent" helper="当前页统计">
+        <template #icon><CheckIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="忽略" :value="ignoredCount" tone="info" helper="当前页统计">
+        <template #icon><IgnoreIcon /></template>
+      </ReStatCard>
+    </section>
 
-      <el-table v-loading="loading" :data="items" stripe style="margin-top: 12px">
-        <el-table-column prop="category_code" label="类别" width="140" />
-        <el-table-column prop="target_system" label="目标系统" width="100" align="center" />
-        <el-table-column label="差异类型" width="120" align="center">
+    <el-card shadow="never" class="diff-card">
+      <ReToolbar title="同步参数" class="diff-toolbar">
+        <div class="action-bar">
+          <el-input v-model="syncForm.source_system" placeholder="source_code" clearable class="control source" />
+          <el-select v-model="syncForm.category_code" placeholder="编码类别" clearable class="control category">
+            <el-option label="全部" value="" />
+            <el-option label="诊断" value="diagnosis" />
+            <el-option label="手术" value="operation" />
+          </el-select>
+          <el-input-number v-model="syncForm.max_rows" :min="1" :max="50000" :step="100" class="rows" />
+        </div>
+      </ReToolbar>
+
+      <ReToolbar title="差异筛选" class="diff-toolbar" dense>
+        <div class="filter-bar">
+          <el-select v-model="statusFilter" placeholder="处理状态" clearable class="control status" @change="doSearch">
+            <el-option label="未处理" value="open" />
+            <el-option label="已解决" value="resolved" />
+            <el-option label="已忽略" value="ignored" />
+          </el-select>
+          <el-input v-model="keyword" placeholder="编码或名称" clearable class="control keyword" @keyup.enter="doSearch" />
+        </div>
+        <template #actions>
+          <el-button type="primary" :icon="SearchIcon" @click="doSearch">查询</el-button>
+        </template>
+      </ReToolbar>
+
+      <el-alert v-if="lastResult" type="success" :closable="false" class="result-alert">
+        <template #title>
+          {{ lastResult.status }}：扫描 {{ lastResult.scanned ?? 0 }}，生成差异 {{ lastResult.diffs_created ?? 0 }}
+        </template>
+      </el-alert>
+
+      <el-table v-loading="loading" :data="items" stripe class="medical-data-table">
+        <el-table-column prop="category_code" label="类别" width="130">
+          <template #default="{ row }">{{ categoryLabel(row.category_code) }}</template>
+        </el-table-column>
+        <el-table-column prop="target_system" label="目标系统" width="110" />
+        <el-table-column prop="diff_type" label="差异类型" width="150">
           <template #default="{ row }">
-            <el-tag :type="diffTypeTag(row.diff_type)" size="small">
-              {{ row.diff_type === 'missing_source' ? '缺少来源' : row.diff_type === 'mismatch' ? '不匹配' : row.diff_type === 'extra_source' ? '多余来源' : row.diff_type || '-' }}
-            </el-tag>
+            <el-tag :type="diffTypeTag(row.diff_type)" size="small">{{ diffTypeLabel(row.diff_type) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="code_set" label="编码体系" width="140" />
-        <el-table-column prop="item_code" label="编码" width="160" />
-        <el-table-column prop="item_name_cn" label="名称" min-width="200" show-overflow-tooltip />
-        <el-table-column label="严重程度" width="90" align="center">
+        <el-table-column prop="code_set_code" label="编码集" min-width="190" show-overflow-tooltip />
+        <el-table-column prop="item_code" label="编码" width="160" show-overflow-tooltip />
+        <el-table-column prop="item_name" label="名称" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="severity" label="严重度" width="110">
           <template #default="{ row }">
-            <el-tag :type="severityTag(row.severity)" size="small">
-              {{ row.severity === 'critical' ? '严重' : row.severity === 'major' ? '重要' : row.severity === 'minor' ? '一般' : '提示' }}
-            </el-tag>
+            <el-tag :type="severityTag(row.severity)" size="small">{{ severityLabel(row.severity) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="90" align="center">
+        <el-table-column prop="status" label="状态" width="110">
           <template #default="{ row }">
-            <el-tag :type="syncStatusTag(row.status)" size="small">
-              {{ row.status === 'open' ? '待处理' : row.status === 'acknowledged' ? '已确认' : '已解决' }}
-            </el-tag>
+            <el-tag :type="syncStatusTag(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="found_at" label="发现时间" width="170" />
+        <el-table-column label="操作" width="230" fixed="right">
+          <template #default="{ row }">
+            <el-button v-if="row.status !== 'resolved'" link type="success" :loading="updatingId === row.id" @click="updateStatus(row, 'resolved')">解决</el-button>
+            <el-button v-if="row.status !== 'ignored'" link type="info" :loading="updatingId === row.id" @click="updateStatus(row, 'ignored')">忽略</el-button>
+            <el-button v-if="row.status !== 'open'" link type="warning" :loading="updatingId === row.id" @click="updateStatus(row, 'open')">重开</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <el-pagination
@@ -63,148 +93,173 @@
         :total="total"
         layout="total, prev, pager, next, sizes"
         :page-sizes="[10, 20, 50, 100]"
-        style="margin-top: 16px; justify-content: flex-end"
+        class="pager"
         @change="loadData"
-      />
-    </el-card>
-
-    <el-card shadow="never" style="margin-top: 16px">
-      <template #header>
-        <div class="header-row">
-          <span>字典版本记录</span>
-          <el-button size="small" @click="loadVersions">刷新</el-button>
-        </div>
-      </template>
-      <el-table v-loading="verLoading" :data="versions" stripe size="small">
-        <el-table-column prop="category_code" label="类别" width="140" />
-        <el-table-column prop="target_system" label="目标系统" width="100" align="center" />
-        <el-table-column prop="version" label="版本号" width="160" />
-        <el-table-column prop="item_count" label="条目数" width="100" align="center" />
-        <el-table-column prop="sync_at" label="同步时间" width="170" />
-        <el-table-column prop="status" label="状态" width="90" align="center">
-          <template #default="{ row }">
-            <el-tag
-              :type="row.status === 'success' ? 'success' : 'warning'"
-              size="small"
-            >
-              {{ row.status === 'success' ? '成功' : row.status || '-' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="diff_count" label="差异数" width="80" align="center" />
-        <el-table-column prop="note" label="备注" min-width="160" show-overflow-tooltip />
-      </el-table>
-      <el-pagination
-        v-if="verTotal > 0"
-        v-model:current-page="verPage"
-        v-model:page-size="verPageSize"
-        :total="verTotal"
-        layout="total, prev, pager, next"
-        size="small"
-        style="margin-top: 8px; justify-content: flex-end"
-        @change="loadVersions"
       />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { getMedicalSyncDiffs, getDictVersions } from "@/api/dict";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
+import ReToolbar from "@/components/ReToolbar/index.vue";
+import { computed, onMounted, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { getMedicalSyncDiffs, runMedicalSync, updateMedicalSyncDiff } from "@/api/dict";
+import CheckIcon from "~icons/ri/checkbox-circle-line";
+import CodeIcon from "~icons/ri/code-box-line";
+import IgnoreIcon from "~icons/ri/forbid-2-line";
+import OpenIcon from "~icons/ri/error-warning-line";
+import SearchIcon from "~icons/ri/search-line";
+import SyncIcon from "~icons/ri/git-branch-line";
 
-// --- 同步差异 ---
 const loading = ref(false);
+const syncLoading = ref(false);
+const updatingId = ref<number | null>(null);
 const items = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
 const pageSize = ref(20);
 const statusFilter = ref("");
 const keyword = ref("");
+const lastResult = ref<any>(null);
+const syncForm = reactive({ source_system: "his_ready_10_10_10_15", target_system: "asset", category_code: "", max_rows: 5000 });
+const openCount = computed(() => items.value.filter(item => item.status === "open").length);
+const resolvedCount = computed(() => items.value.filter(item => item.status === "resolved").length);
+const ignoredCount = computed(() => items.value.filter(item => item.status === "ignored").length);
 
-function doSearch() {
-  page.value = 1;
-  loadData();
-}
-
-function diffTypeTag(diffType: string): any {
-  const map: Record<string, string> = { missing_source: "danger", mismatch: "warning" }
-  return map[diffType] || "info"
-}
-
-function severityTag(sev: string): any {
-  const map: Record<string, string> = { critical: "danger", major: "warning", minor: "info" }
-  return map[sev] || ""
-}
-
-function syncStatusTag(status: string): any {
-  const map: Record<string, string> = { open: "danger", acknowledged: "warning", resolved: "success" }
-  return map[status] || "info"
-}
+function doSearch() { page.value = 1; loadData(); }
+function diffTypeTag(diffType: string): "danger" | "warning" | "info" { return diffType === "missing_target" ? "danger" : diffType === "name_mismatch" ? "warning" : "info"; }
+function severityTag(severity: string): "danger" | "warning" | "info" { return severity === "high" ? "danger" : severity === "medium" ? "warning" : "info"; }
+function syncStatusTag(status: string): "success" | "warning" | "info" { return status === "resolved" ? "success" : status === "ignored" ? "info" : "warning"; }
+function categoryLabel(value: string) { return ({ diagnosis: "诊断", operation: "手术" } as Record<string, string>)[value] || value || "-"; }
+function diffTypeLabel(value: string) { return ({ missing_target: "目标缺失", name_mismatch: "名称不一致", extra_target: "目标多余" } as Record<string, string>)[value] || value || "-"; }
+function severityLabel(value: string) { return ({ high: "高", medium: "中", low: "低" } as Record<string, string>)[value] || value || "-"; }
+function statusLabel(value: string) { return ({ open: "未处理", resolved: "已解决", ignored: "已忽略" } as Record<string, string>)[value] || value || "-"; }
 
 async function loadData() {
   loading.value = true;
   try {
-    const params: Record<string, any> = {
-      page: page.value,
-      page_size: pageSize.value
-    };
+    const params: Record<string, any> = { page: page.value, page_size: pageSize.value };
     if (statusFilter.value) params.status = statusFilter.value;
     if (keyword.value) params.keyword = keyword.value;
     const res = await getMedicalSyncDiffs(params);
-    items.value = (res as any).data.items;
-    total.value = (res as any).data.total;
-  } catch {
-    // handled by interceptor
+    items.value = res.data.items ?? [];
+    total.value = res.data.total ?? 0;
   } finally {
     loading.value = false;
   }
 }
-
-// --- 版本记录 ---
-const versions = ref<any[]>([]);
-const verLoading = ref(false);
-const verTotal = ref(0);
-const verPage = ref(1);
-const verPageSize = ref(20);
-
-async function loadVersions() {
-  verLoading.value = true;
+async function doSync() {
+  syncLoading.value = true;
   try {
-    const res = await getDictVersions({
-      page: verPage.value,
-      page_size: verPageSize.value
-    });
-    const data = (res as any).data;
-    if (Array.isArray(data)) {
-      versions.value = data;
-      verTotal.value = data.length;
-    } else if (data && data.items) {
-      versions.value = data.items;
-      verTotal.value = data.total;
-    }
+    const payload = { ...syncForm, category_code: syncForm.category_code || undefined };
+    const res = await runMedicalSync(payload);
+    lastResult.value = res.data;
+    ElMessage.success("医学编码同步完成");
+    loadData();
   } catch {
-    // handled
+    ElMessage.error("医学编码同步失败");
   } finally {
-    verLoading.value = false;
+    syncLoading.value = false;
+  }
+}
+async function updateStatus(row: any, status: "open" | "resolved" | "ignored") {
+  updatingId.value = row.id;
+  try {
+    await updateMedicalSyncDiff(row.id, { status, handled_by: "frontend", note: "manual status update" });
+    ElMessage.success("状态已更新");
+    loadData();
+  } catch {
+    ElMessage.error("状态更新失败");
+  } finally {
+    updatingId.value = null;
   }
 }
 
-onMounted(() => {
-  loadData();
-  loadVersions();
-});
+onMounted(loadData);
 </script>
 
-<style scoped>
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+<style scoped lang="scss">
+.dict-sync-diffs {
+  padding: 4px;
 }
+
+.diff-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.diff-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+
+  :deep(.el-card__body) {
+    display: grid;
+    gap: 12px;
+  }
+}
+
+.action-bar,
 .filter-bar {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.control.source {
+  width: 260px;
+}
+
+.control.category,
+.control.status {
+  width: 150px;
+}
+
+.control.keyword {
+  width: 220px;
+}
+
+.rows {
+  width: 150px;
+}
+
+.medical-data-table {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+  font-size: 13px;
+}
+
+.pager {
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+@media (max-width: 1180px) {
+  .diff-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .diff-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .control.source,
+  .control.category,
+  .control.status,
+  .control.keyword,
+  .rows {
+    width: 100%;
+  }
 }
 </style>
+

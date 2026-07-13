@@ -1,4 +1,4 @@
-@layer theme, base, components, utilities;
+﻿@layer theme, base, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
@@ -7,8 +7,20 @@
 @theme {
   --color-bg_color: var(--el-bg-color);
   --color-primary: var(--el-color-primary);
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-accent: var(--accent-500);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --color-text_color_primary: var(--el-text-color-primary);
   --color-text_color_regular: var(--el-text-color-regular);
+  --color-text_secondary: var(--text-secondary);
+  --color-bg_page: var(--bg-page);
+  --color-bg_card: var(--bg-card);
+  --color-border_light: var(--border-light);
 }
 
 /*
@@ -44,3 +56,4 @@
 @utility navbar-bg-hover {
   @apply dark:text-white dark:hover:bg-[#242424]!;
 }
+

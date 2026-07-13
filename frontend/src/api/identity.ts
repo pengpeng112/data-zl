@@ -38,8 +38,17 @@ export function bindAccount(data: Record<string, any>) {
 export function getSyncDiffs(params?: Record<string, any>) {
   return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/identity/sync-diffs", { params });
 }
-export function collectSources() {
-  return http.request<ApiResponse<any>>("post", "/api/v1/identity/collect-sources");
+export function collectSources(data?: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/collect-sources", { data });
+}
+export function runIdentitySync(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync/run", { data });
+}
+export function updateIdentitySyncDiff(id: number, data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("patch", `/api/v1/identity/sync-diffs/${id}`, { data });
+}
+export function syncHisIdentity(params?: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync/his", { params });
 }
 // 变更请求 (复用 asset_govern_change_requests, module='identity')
 export function createIdentityChangeRequest(data: Record<string, any>) {
@@ -57,3 +66,4 @@ export function executeIdentityChangeRequest(id: number) {
 export function getInconsistencies(params?: Record<string, any>) {
   return http.request<ApiResponse<any[]>>("get", "/api/v1/identity/inconsistencies", { params });
 }
+

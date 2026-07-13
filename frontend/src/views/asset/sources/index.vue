@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted } from "vue";
 import { http } from "@/utils/http";
 import { ElMessage } from "element-plus";
@@ -146,14 +147,14 @@ onMounted(() => { loadSources(); loadTree(); });
 </script>
 
 <template>
-  <div>
-    <el-card style="margin-bottom:16px">
-      <template #header>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span>数据源管理</span>
-          <el-button type="primary" @click="openCreate">新增数据源</el-button>
-        </div>
+  <div class="sources-page">
+    <RePageHeader title="数据源管理" subtitle="管理源库连接、元数据采集和快照记录，支撑资产树和后续治理导入。">
+      <template #actions>
+        <el-button type="primary" @click="openCreate">新增数据源</el-button>
       </template>
+    </RePageHeader>
+    <el-card class="section-card">
+      <template #header><span>数据源列表</span></template>
       <el-table :data="sources" v-loading="false" size="small" highlight-current-row @row-click="selectSource">
         <el-table-column prop="source_code" label="数据源编码" width="160" />
         <el-table-column prop="source_name_cn" label="名称" width="140" />
@@ -180,12 +181,12 @@ onMounted(() => { loadSources(); loadTree(); });
       </el-table>
     </el-card>
 
-    <el-card style="margin-bottom:16px">
+    <el-card class="section-card">
       <template #header><span>资产树（系统→数据源→Schema→表）</span></template>
-      <div v-for="node in tree" :key="node.source_code" style="margin-bottom:16px">
-        <h4 style="margin:0 0 8px">{{ node.source_name_cn }} <el-tag size="small">{{ node.system_code }}</el-tag> <span style="color:#909399;font-size:13px">{{ node.table_count }} 张表</span></h4>
-        <div v-for="s in node.schemas" :key="s.namespace" style="margin-left:16px;margin-bottom:8px">
-          <p style="margin:0;color:#409EFF">{{ s.namespace || '(default)' }} <span style="color:#909399;font-size:12px">({{ s.table_count }} 表)</span></p>
+      <div v-for="node in tree" :key="node.source_code" class="tree-source">
+        <h4 class="tree-source-title">{{ node.source_name_cn }} <el-tag size="small">{{ node.system_code }}</el-tag> <span class="tree-count">{{ node.table_count }} 张表</span></h4>
+        <div v-for="s in node.schemas" :key="s.namespace" class="tree-schema">
+          <p class="tree-schema-name">{{ s.namespace || '(default)' }} <span class="tree-schema-count">({{ s.table_count }} 表)</span></p>
         </div>
       </div>
       <el-empty v-if="tree.length === 0" description="暂无资产树数据" />
@@ -195,7 +196,7 @@ onMounted(() => { loadSources(); loadTree(); });
       <template #header>
         <span>快照记录 - {{ selectedSource.source_name_cn }}</span>
       </template>
-      <div v-if="collectResult" style="margin-bottom:12px">
+      <div v-if="collectResult" class="collect-result">
         <el-alert type="success" :closable="false" show-icon>
           <template #title>
             最近采集结果：快照ID #{{ collectResult.snapshot_id }}，{{ collectResult.table_count }} 张表，{{ collectResult.column_count }} 个字段
@@ -224,7 +225,7 @@ onMounted(() => { loadSources(); loadTree(); });
           <el-input v-model="form.source_name_cn" />
         </el-form-item>
         <el-form-item label="数据库类型">
-          <el-select v-model="form.db_type" clearable style="width:100%">
+          <el-select v-model="form.db_type" clearable class="full-width">
             <el-option v-for="t in dbTypes" :key="t" :label="t" :value="t" />
           </el-select>
         </el-form-item>
@@ -235,7 +236,7 @@ onMounted(() => { loadSources(); loadTree(); });
           <el-input-number v-model="form.port" :min="1" :max="65535" />
         </el-form-item>
         <el-form-item label="连接模式">
-          <el-select v-model="form.connection_mode" style="width:100%">
+          <el-select v-model="form.connection_mode" class="full-width">
             <el-option v-for="m in connModes" :key="m" :label="m" :value="m" />
           </el-select>
         </el-form-item>
@@ -257,3 +258,46 @@ onMounted(() => { loadSources(); loadTree(); });
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.sources-page {
+  padding: 4px;
+}
+.section-card {
+  margin-bottom: 16px;
+  border-color: var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+.tree-source {
+  margin-bottom: 16px;
+}
+.tree-source-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.tree-count,
+.tree-schema-count {
+  color: var(--text-secondary);
+}
+.tree-count {
+  font-size: 13px;
+}
+.tree-schema {
+  margin-bottom: 8px;
+  margin-left: 16px;
+}
+.tree-schema-name {
+  margin: 0;
+  color: var(--primary-600);
+}
+.tree-schema-count {
+  font-size: 12px;
+}
+.collect-result {
+  margin-bottom: 12px;
+}
+
+.full-width { width: 100%; }
+</style>

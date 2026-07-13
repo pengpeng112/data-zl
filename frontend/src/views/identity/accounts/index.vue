@@ -1,5 +1,13 @@
 <template>
   <div class="identity-accounts">
+    <RePageHeader title="跨系统账号" subtitle="维护 HIS、EMR、LIS、PACS 等系统账号与平台人员主数据的绑定关系。" />
+
+    <section class="account-stat-grid">
+      <ReStatCard label="账号总数" :value="items.length" tone="primary" />
+      <ReStatCard label="已关联人员" :value="linkedCount" tone="accent" />
+      <ReStatCard label="未关联账号" :value="unlinkedCount" tone="warning" />
+    </section>
+
     <el-card shadow="never">
       <template #header>
         <div class="header-row">
@@ -12,7 +20,7 @@
           v-model="params.system_code"
           placeholder="选择系统"
           clearable
-          style="width: 180px"
+          class="system-filter"
           @change="loadData"
         >
           <el-option label="HIS" value="HIS" />
@@ -22,9 +30,9 @@
           <el-option label="YDHL" value="YDHL" />
           <el-option label="SM" value="SM" />
         </el-select>
-        <el-button style="margin-left: 12px" @click="loadData">刷新</el-button>
+        <el-button class="refresh-button" @click="loadData">刷新</el-button>
       </div>
-      <el-table v-loading="loading" :data="items" stripe style="margin-top: 12px">
+      <el-table v-loading="loading" :data="items" stripe class="accounts-table">
         <el-table-column prop="system_code" label="系统" width="100">
           <template #default="{ row }">
             <el-tag size="small">{{ row.system_code }}</el-tag>
@@ -51,7 +59,7 @@
     <el-dialog v-model="bindVisible" title="绑定账号" width="500px" destroy-on-close @closed="resetBindForm">
       <el-form ref="bindFormRef" :model="bindForm" :rules="bindRules" label-width="100px">
         <el-form-item label="系统" prop="system_code">
-          <el-select v-model="bindForm.system_code" placeholder="选择系统" style="width:100%">
+          <el-select v-model="bindForm.system_code" placeholder="选择系统" class="full-width">
             <el-option label="HIS" value="HIS" />
             <el-option label="EMR" value="EMR" />
             <el-option label="LIS" value="LIS" />
@@ -76,12 +84,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
+import { computed, ref, reactive, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { getAccounts, bindAccount } from "@/api/identity";
 
 const items = ref<any[]>([]);
 const loading = ref(false);
+const linkedCount = computed(() => items.value.filter(item => !!item.person_code).length);
+const unlinkedCount = computed(() => items.value.length - linkedCount.value);
 
 const params = reactive({
   system_code: ""
@@ -150,6 +162,20 @@ onMounted(loadData);
 </script>
 
 <style scoped>
+.identity-accounts {
+  padding: 4px;
+}
+.account-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .account-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .header-row {
   display: flex;
   justify-content: space-between;
@@ -161,4 +187,9 @@ onMounted(loadData);
   flex-wrap: wrap;
   gap: 8px;
 }
+
+.system-filter { width: 180px; }
+.refresh-button { margin-left: 12px; }
+.accounts-table { margin-top: 12px; }
+.full-width { width: 100%; }
 </style>

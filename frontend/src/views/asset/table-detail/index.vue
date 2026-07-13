@@ -1,12 +1,17 @@
 <template>
   <div v-loading="loading" class="asset-table-detail">
-    <el-card v-if="detail" shadow="never">
-      <template #header>
-        <el-page-header
-          :content="`${detail.schema_name}.${detail.table_name}`"
-          @back="goBack"
-        />
+    <RePageHeader
+      v-if="detail"
+      :title="`${detail.schema_name}.${detail.table_name}`"
+      :subtitle="detail.comment || '资产表详情、字段结构与直接关联关系。'"
+    >
+      <template #actions>
+        <el-button @click="goBack">返回表清单</el-button>
+        <el-button type="primary" @click="openAnnotDialog">编辑注释</el-button>
       </template>
+    </RePageHeader>
+
+    <el-card v-if="detail" class="detail-card" shadow="never">
       <el-descriptions :column="3" border size="small">
         <el-descriptions-item label="Schema">{{
           detail.schema_name
@@ -39,12 +44,9 @@
           detail.source || "-"
         }}</el-descriptions-item>
       </el-descriptions>
-      <div style="margin-top: 12px">
-        <el-button type="primary" @click="openAnnotDialog">编辑注释</el-button>
-      </div>
     </el-card>
 
-    <el-card shadow="never" style="margin-top: 12px">
+    <el-card class="detail-card section-card" shadow="never">
       <template #header>当前表关系图</template>
       <RelationGraph
         v-if="neighborGraph.nodes.length > 0 && !neighborLoading"
@@ -60,33 +62,33 @@
         description="暂无直接关联"
         :image-size="80"
       />
-      <div v-if="neighborLoading" style="text-align: center; padding: 40px">
+      <div v-if="neighborLoading" class="graph-loading">
         加载中...
       </div>
     </el-card>
 
-    <el-card shadow="never" style="margin-top: 12px">
+    <el-card class="detail-card section-card" shadow="never">
       <template #header>
         字段列表 ({{ filteredColumns.length }})
         <span
           v-if="filteredColumns.length !== columns.length"
-          style="color: #909399; font-size: 12px"
+          class="muted-count"
         >
           / 共 {{ columns.length }}
         </span>
       </template>
-      <div style="margin-bottom: 8px; display: flex; gap: 8px">
+      <div class="column-filter">
         <el-input
           v-model="colFilter.keyword"
           placeholder="搜索字段名或注释"
           clearable
-          style="width: 240px"
+          class="column-keyword"
         />
         <el-select
           v-model="colFilter.nullable"
           placeholder="可空"
           clearable
-          style="width: 90px"
+          class="nullable-select"
         >
           <el-option label="是" value="Y" />
           <el-option label="否" value="N" />
@@ -121,7 +123,7 @@
       </el-table>
     </el-card>
 
-    <el-card shadow="never" style="margin-top: 12px">
+    <el-card class="detail-card section-card" shadow="never">
       <template #header>关联关系 ({{ relations.length }})</template>
       <el-table :data="relations" stripe>
         <el-table-column
@@ -239,16 +241,16 @@
           <el-input v-model="annotForm.table_role" />
         </el-form-item>
       </el-form>
-      <div style="text-align: right; margin-bottom: 12px">
+      <div class="dialog-action-row">
         <el-button type="primary" @click="saveTableAnnot">保存表注释</el-button>
       </div>
       <el-divider />
       <div
         v-for="col in columns"
         :key="col.column_id"
-        style="margin-bottom: 10px; padding: 8px; border: 1px solid #ebeef5; border-radius: 4px"
+        class="column-annot-item"
       >
-        <div style="font-weight: 600; margin-bottom: 6px">
+        <div class="column-annot-title">
           {{ col.column_name }}
         </div>
         <el-row :gutter="8">
@@ -274,7 +276,7 @@
             />
           </el-col>
         </el-row>
-        <div style="text-align: right; margin-top: 6px">
+        <div class="column-annot-actions">
           <el-button
             size="small"
             type="primary"
@@ -440,3 +442,69 @@ function saveColumnAnnot(colId: number) {
 
 onMounted(loadAll);
 </script>
+
+
+<style scoped>
+.asset-table-detail {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.detail-card {
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-md);
+  box-shadow: var(--re-shadow-sm);
+}
+
+.section-card {
+  margin-top: 12px;
+}
+
+.muted-count {
+  color: var(--re-text-secondary);
+  font-size: 12px;
+}
+
+.column-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.column-keyword { width: 240px; }
+.nullable-select { width: 90px; }
+
+.graph-loading {
+  padding: 40px;
+  color: var(--re-text-secondary);
+  text-align: center;
+}
+
+.dialog-action-row,
+.column-annot-actions {
+  text-align: right;
+}
+
+.dialog-action-row {
+  margin-bottom: 12px;
+}
+
+.column-annot-item {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-sm);
+  background: var(--re-card-bg);
+}
+
+.column-annot-title {
+  margin-bottom: 6px;
+  color: var(--re-text-primary);
+  font-weight: 600;
+}
+
+.column-annot-actions {
+  margin-top: 6px;
+}
+</style>

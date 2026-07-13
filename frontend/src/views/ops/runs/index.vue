@@ -1,216 +1,421 @@
 <template>
-  <div class="ops-runs-container">
-    <div class="page-header">
-      <h2>运维任务申请与执行</h2>
-      <el-button type="primary" @click="handleCreate">创建任务</el-button>
-    </div>
+  <div class="ops-runs-page">
+    <RePageHeader title="运维执行申请" subtitle="提交申请、审批、dry-run 预览、执行和审计查询；正式执行必须先完成二次确认。">
+      <template #icon><RunIcon /></template>
+      <template #actions>
+        <el-button type="primary" :icon="AddIcon" @click="handleCreate">创建申请</el-button>
+      </template>
+    </RePageHeader>
 
-    <div class="filter-bar">
-      <el-select v-model="filterStatus" placeholder="审批状态筛选" clearable style="width: 200px" @change="fetchData">
-        <el-option label="待审批" value="待审批" />
-        <el-option label="已通过" value="已通过" />
-        <el-option label="已拒绝" value="已拒绝" />
-        <el-option label="已执行" value="已执行" />
+    <ReWorkflow :steps="pipelineSteps" class="runs-workflow" />
+
+    <ReToolbar title="申请筛选" class="runs-toolbar">
+      <el-select v-model="filterStatus" clearable placeholder="审批状态" class="status-filter" @change="fetchData">
+        <el-option label="draft" value="draft" />
+        <el-option label="submitted" value="submitted" />
+        <el-option label="pending" value="pending" />
+        <el-option label="approved" value="approved" />
+        <el-option label="rejected" value="rejected" />
+        <el-option label="executing" value="executing" />
+        <el-option label="succeeded" value="succeeded" />
+        <el-option label="executed" value="executed" />
+        <el-option label="failed" value="failed" />
       </el-select>
-      <el-button @click="filterStatus = ''; fetchData()">重置</el-button>
-    </div>
+      <template #actions>
+        <el-button @click="resetFilter">重置</el-button>
+      </template>
+    </ReToolbar>
 
-    <el-table :data="tableData" border stripe v-loading="loading" style="width: 100%">
-      <el-table-column prop="id" label="任务ID" width="80" />
-      <el-table-column prop="tool_code" label="工具编码" min-width="150" />
+    <el-table v-loading="loading" :data="tableData" border stripe class="medical-data-table">
+      <el-table-column prop="id" label="编号" width="80" />
+      <el-table-column prop="tool_code" label="工具编码" min-width="180" />
       <el-table-column prop="requested_by" label="申请人" width="120" />
-      <el-table-column prop="approval_status" label="审批状态" width="100">
+      <el-table-column prop="approved_by" label="审批人" width="120" />
+      <el-table-column prop="approval_status" label="状态" width="110">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.approval_status)" effect="dark">
             {{ row.approval_status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="180" />
-      <el-table-column label="操作" width="260" fixed="right">
+      <el-table-column prop="affected_count" label="影响行数" width="100" />
+      <el-table-column prop="created_at" label="创建时间" min-width="170" />
+      <el-table-column label="操作" width="310" fixed="right">
         <template #default="{ row }">
           <el-button
-            v-if="row.approval_status === '待审批'"
-            type="success" link size="small"
+            v-if="row.approval_status === 'draft'"
+            type="primary"
+            link
+            size="small"
+            @click="handleSubmitRun(row)"
+          >提交</el-button>
+          <el-button
+            v-if="['submitted', 'pending'].includes(row.approval_status)"
+            type="success"
+            link
+            size="small"
             @click="handleApprove(row)"
-          >审批通过</el-button>
+          >审批</el-button>
           <el-button
-            v-if="row.approval_status === '待审批'"
-            type="danger" link size="small"
+            v-if="['submitted', 'pending'].includes(row.approval_status)"
+            type="danger"
+            link
+            size="small"
             @click="handleReject(row)"
-          >审批拒绝</el-button>
+          >驳回</el-button>
           <el-button
-            v-if="row.approval_status === '已通过'"
-            type="primary" link size="small"
+            v-if="row.approval_status === 'approved'"
+            type="warning"
+            link
+            size="small"
+            @click="handleDryRun(row)"
+          >Dry-run</el-button>
+          <el-button
+            v-if="row.approval_status === 'approved'"
+            type="primary"
+            link
+            size="small"
             @click="handleExecute(row)"
           >执行</el-button>
+          <el-button type="info" link size="small" @click="handleAudit(row)">审计</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" title="创建运维任务" width="520px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" title="创建运维申请" width="620px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
         <el-form-item label="工具编码" prop="tool_code">
-          <el-input v-model="form.tool_code" placeholder="请输入工具编码" />
+          <el-input v-model="form.tool_code" placeholder="已启用的工具编码" />
         </el-form-item>
         <el-form-item label="申请人" prop="requested_by">
-          <el-input v-model="form.requested_by" placeholder="请输入申请人" />
+          <el-input v-model="form.requested_by" placeholder="申请人账号" />
         </el-form-item>
         <el-form-item label="输入参数">
           <el-input
             v-model="form.input_params"
             type="textarea"
-            :rows="4"
-            placeholder='JSON 格式参数, 如: {"sql": "SELECT 1 FROM DUAL"}'
+            :rows="8"
+            placeholder='{"target_tool_code":"demo","description":"new value"}'
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">确定</el-button>
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">提交</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="dryRunVisible" title="Dry-run 预览" width="760px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="预览可用">{{ dryRunResult?.preview_available ? '是' : '否' }}</el-descriptions-item>
+        <el-descriptions-item label="预计行数">{{ dryRunResult?.estimated_count ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item label="SQL 校验" :span="2">
+          <el-tag :type="dryRunResult?.risk_scan?.valid ? 'success' : 'danger'">
+            {{ dryRunResult?.risk_scan?.valid ? '通过' : '拒绝' }}
+          </el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+      <pre class="json-preview">{{ formatJson(dryRunResult) }}</pre>
+    </el-dialog>
+
+    <ReDetailDrawer v-model="auditVisible" title="执行审计" subtitle="按时间线展示申请、审批、执行和数据变更证据。" size="56vw">
+      <el-timeline>
+        <el-timeline-item v-for="item in auditLogs" :key="item.id" :timestamp="item.created_at || ''">
+          <div class="audit-title">{{ item.action }} / {{ item.operator || '-' }}</div>
+          <div v-if="item.reason" class="audit-reason">{{ item.reason }}</div>
+          <pre class="json-preview">{{ formatJson({ before_data: item.before_data, after_data: item.after_data }) }}</pre>
+        </el-timeline-item>
+      </el-timeline>
+      <ReEmptyState v-if="!auditLogs.length" title="暂无审计记录" description="该执行申请尚未产生审计事件。" />
+    </ReDetailDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue"
-import { http } from "@/utils/http"
-import { getOpsRuns, createOpsRun, approveOpsRun, rejectOpsRun, executeOpsRun } from "@/api/ops"
-import { ElMessage, ElMessageBox } from "element-plus"
+import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
+import ReEmptyState from "@/components/ReEmptyState/index.vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReToolbar from "@/components/ReToolbar/index.vue";
+import ReWorkflow from "@/components/ReWorkflow/index.vue";
+import { onMounted, reactive, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  approveOpsRun,
+  createOpsRun,
+  dryRunOpsRun,
+  executeOpsRun,
+  getOpsRunAudit,
+  getOpsRuns,
+  rejectOpsRun,
+  submitOpsRun,
+  type OpsRun
+} from "@/api/ops";
+import AddIcon from "~icons/ri/add-line";
+import RunIcon from "~icons/ri/play-list-add-line";
 
-interface OpsRun {
-  id: number
-  tool_code: string
-  requested_by: string
-  approval_status: string
-  input_params?: string
-  created_at: string
-}
+const tableData = ref<OpsRun[]>([]);
+const loading = ref(false);
+const filterStatus = ref("");
+const dialogVisible = ref(false);
+const dryRunVisible = ref(false);
+const auditVisible = ref(false);
+const submitting = ref(false);
+const formRef = ref();
+const dryRunResult = ref<Record<string, any> | null>(null);
+const auditLogs = ref<any[]>([]);
 
-const tableData = ref<OpsRun[]>([])
-const loading = ref(false)
-const filterStatus = ref("")
-const dialogVisible = ref(false)
-const submitting = ref(false)
-const formRef = ref()
+const pipelineSteps = [
+  { title: "申请", desc: "填写工具与参数" },
+  { title: "审批", desc: "人工确认范围" },
+  { title: "Dry-run", desc: "预览影响行数" },
+  { title: "执行", desc: "二次确认后执行" },
+  { title: "审计", desc: "留存前后证据" }
+];
 
 const form = reactive({
   tool_code: "",
   requested_by: "",
-  input_params: ""
-})
+  input_params: "{}"
+});
 
 const formRules = {
   tool_code: [{ required: true, message: "请输入工具编码", trigger: "blur" }],
   requested_by: [{ required: true, message: "请输入申请人", trigger: "blur" }]
+};
+
+type ElTagType = "primary" | "success" | "warning" | "danger" | "info";
+
+function statusTagType(status: string): ElTagType {
+  const map: Record<string, ElTagType> = {
+    draft: "warning",
+    pending: "warning",
+    submitted: "warning",
+    executing: "warning",
+    succeeded: "success",
+    approved: "success",
+    rejected: "danger",
+    executed: "info",
+    failed: "danger"
+  };
+  return map[status] || "info";
 }
 
-function statusTagType(status: string): any {
-  const map: Record<string, string> = {
-    "待审批": "warning",
-    "已通过": "success",
-    "已拒绝": "danger",
-    "已执行": "info"
-  }
-  return map[status] || "info"
+function formatJson(value: unknown) {
+  return JSON.stringify(value ?? {}, null, 2);
 }
 
 async function fetchData() {
-  loading.value = true
+  loading.value = true;
   try {
-    const params: any = {}
-    if (filterStatus.value) params.approval_status = filterStatus.value
-    const res = await getOpsRuns(params)
-    tableData.value = res.data?.items || []
+    const params: Record<string, any> = {};
+    if (filterStatus.value) params.approval_status = filterStatus.value;
+    const res = await getOpsRuns(params);
+    tableData.value = res.data?.items || [];
   } catch {
-    ElMessage.error("获取任务列表失败")
+    ElMessage.error("获取执行申请失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
+}
+
+function resetFilter() {
+  filterStatus.value = "";
+  fetchData();
 }
 
 function handleCreate() {
-  form.tool_code = ""
-  form.requested_by = ""
-  form.input_params = ""
-  dialogVisible.value = true
+  form.tool_code = "";
+  form.requested_by = "";
+  form.input_params = "{}";
+  dialogVisible.value = true;
 }
 
 async function handleSubmit() {
-  const valid = await formRef.value?.validate().catch(() => false)
-  if (!valid) return
-  submitting.value = true
+  const valid = await formRef.value?.validate().catch(() => false);
+  if (!valid) return;
+
+  let inputParams: Record<string, any> = {};
   try {
-    await createOpsRun({ ...form })
-    ElMessage.success("任务创建成功")
-    dialogVisible.value = false
-    fetchData()
+    inputParams = form.input_params.trim() ? JSON.parse(form.input_params) : {};
   } catch {
-    ElMessage.error("创建任务失败")
+    ElMessage.error("输入参数必须是合法 JSON");
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    await createOpsRun({
+      tool_code: form.tool_code,
+      requested_by: form.requested_by,
+      input_params: inputParams
+    });
+    ElMessage.success("申请已创建");
+    dialogVisible.value = false;
+    await fetchData();
+  } catch {
+    ElMessage.error("创建申请失败");
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
 }
 
+async function promptOperator(title: string, field: string) {
+  const { value } = await ElMessageBox.prompt(field, title, {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    inputPattern: /\S+/,
+    inputErrorMessage: "不能为空"
+  });
+  return value;
+}
+
+async function handleSubmitRun(row: OpsRun) {
+  try {
+    const submittedBy = await promptOperator("提交审批", "提交人账号");
+    await submitOpsRun(row.id, { submitted_by: submittedBy, note: "submitted from ops console" });
+    ElMessage.success("已提交审批");
+    await fetchData();
+  } catch {
+    // user cancelled
+  }
+}
 async function handleApprove(row: OpsRun) {
   try {
-    await ElMessageBox.confirm(`确认审批通过任务 ${row.id}？`, "审批确认", { type: "warning" })
-    await approveOpsRun(row.id, { approved_by: "admin" })
-    ElMessage.success("审批通过")
-    fetchData()
+    const approvedBy = await promptOperator("审批确认", "审批人账号");
+    await approveOpsRun(row.id, { approved_by: approvedBy, note: "approved from ops console" });
+    ElMessage.success("已审批");
+    await fetchData();
   } catch {
-    // 取消操作
+    // user cancelled
   }
 }
 
 async function handleReject(row: OpsRun) {
   try {
-    await ElMessageBox.confirm(`确认拒绝任务 ${row.id}？`, "审批确认", { type: "warning" })
-    await rejectOpsRun(row.id, { approved_by: "admin" })
-    ElMessage.success("已拒绝")
-    fetchData()
+    const approvedBy = await promptOperator("驳回确认", "审批人账号");
+    await rejectOpsRun(row.id, { approved_by: approvedBy, note: "rejected from ops console" });
+    ElMessage.success("已驳回");
+    await fetchData();
   } catch {
-    // 取消操作
+    // user cancelled
+  }
+}
+
+async function handleDryRun(row: OpsRun) {
+  try {
+    const executedBy = await promptOperator("Dry-run", "操作人账号");
+    const res = await dryRunOpsRun(row.id, {
+      dry_run: true,
+      second_confirm: true,
+      executed_by: executedBy
+    });
+    dryRunResult.value = res.data;
+    dryRunVisible.value = true;
+  } catch {
+    // user cancelled or request failed
   }
 }
 
 async function handleExecute(row: OpsRun) {
   try {
-    await ElMessageBox.confirm(`确认执行任务 ${row.id}？此操作不可撤销。`, "执行确认", { type: "warning" })
-    await executeOpsRun(row.id)
-    ElMessage.success("执行成功")
-    fetchData()
+    const executedBy = await promptOperator("执行确认", "执行人账号");
+    await ElMessageBox.confirm(
+      `确认执行申请 ${row.id}？执行前请先完成 dry-run 并核对影响范围。`,
+      "二次确认",
+      { type: "warning", confirmButtonText: "确认执行" }
+    );
+    await executeOpsRun(row.id, {
+      second_confirm: true,
+      dry_run: false,
+      executed_by: executedBy
+    });
+    ElMessage.success("执行完成");
+    await fetchData();
   } catch {
-    // 取消操作
+    // user cancelled or request failed
   }
 }
 
-onMounted(fetchData)
+async function handleAudit(row: OpsRun) {
+  try {
+    const res = await getOpsRunAudit(row.id);
+    auditLogs.value = res.data || [];
+    auditVisible.value = true;
+  } catch {
+    ElMessage.error("获取审计失败");
+  }
+}
+
+onMounted(fetchData);
 </script>
 
-<style scoped>
-.ops-runs-container {
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
+<style scoped lang="scss">
+.ops-runs-page {
   min-height: calc(100vh - 84px);
+  padding: 4px;
 }
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+
+
+.pipeline-step strong {
+  font-size: 14px;
+  color: var(--text-primary);
 }
-.page-header h2 {
-  margin: 0;
-  font-size: 18px;
+
+.pipeline-step small {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.runs-workflow,
+.runs-toolbar {
+  margin-bottom: 14px;
+}
+
+.medical-data-table {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+  width: 100%;
+  font-size: 13px;
+  border-radius: var(--radius-base);
+}
+
+.json-preview {
+  max-height: 360px;
+  padding: 12px;
+  margin: 12px 0 0;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-regular);
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+}
+
+.audit-title {
   font-weight: 600;
+  color: var(--text-primary);
 }
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 16px;
+
+.audit-reason {
+  margin-top: 4px;
+  color: var(--text-secondary);
 }
+
+@media (max-width: 1180px) {
+  .run-pipeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .run-pipeline {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-filter { width: 180px; }
 </style>

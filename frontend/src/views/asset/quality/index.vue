@@ -1,73 +1,40 @@
 <template>
-  <div>
-    <h2 class="page-title">数据质量</h2>
+  <div class="quality-page">
+    <RePageHeader title="数据质量" subtitle="集中查看质量问题、规则库、执行任务、整改状态和质量看板。">
+      <template #icon><QualityIcon /></template>
+    </RePageHeader>
 
     <el-tabs v-model="activeTab" @tab-change="onTabChange">
       <!-- ============================================================ -->
       <!-- Tab 1: 质量总览 -->
       <!-- ============================================================ -->
       <el-tab-pane label="质量总览" name="overview" lazy>
-        <el-row :gutter="16" class="mb20">
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-num">{{ summary.total_findings }}</div>
-              <div class="stat-label">总问题数</div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card stat-open">
-              <div class="stat-num">{{ summary.open_count }}</div>
-              <div class="stat-label">待处理</div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card stat-resolved">
-              <div class="stat-num">{{ summary.resolved_count }}</div>
-              <div class="stat-label">已解决</div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card stat-critical">
-              <div class="stat-num">{{ summary.critical_count }}</div>
-              <div class="stat-label">严重</div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card stat-major">
-              <div class="stat-num">{{ summary.major_count }}</div>
-              <div class="stat-label">重要</div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-num">{{ summary.minor_count }}</div>
-              <div class="stat-label">一般</div>
-            </el-card>
-          </el-col>
-        </el-row>
+        <section class="quality-stat-grid mb20">
+          <ReStatCard label="总问题数" :value="summary.total_findings" tone="primary">
+            <template #icon><IssueIcon /></template>
+          </ReStatCard>
+          <ReStatCard label="待处理" :value="summary.open_count" tone="danger">
+            <template #icon><AlertIcon /></template>
+          </ReStatCard>
+          <ReStatCard label="已解决" :value="summary.resolved_count" tone="accent">
+            <template #icon><CheckIcon /></template>
+          </ReStatCard>
+          <ReStatCard label="严重" :value="summary.critical_count" tone="danger">
+            <template #icon><ErrorIcon /></template>
+          </ReStatCard>
+          <ReStatCard label="重要" :value="summary.major_count" tone="warning">
+            <template #icon><WarningIcon /></template>
+          </ReStatCard>
+          <ReStatCard label="一般" :value="summary.minor_count" tone="info">
+            <template #icon><InfoIcon /></template>
+          </ReStatCard>
+        </section>
 
-        <el-row :gutter="16" class="mb20">
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-num" style="color: #409eff">{{ metrics.total_rules }}</div>
-              <div class="stat-label">规则总数</div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-num" style="color: #67c23a">{{ metrics.sql_rules }}</div>
-              <div class="stat-label">SQL 规则数</div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-num" style="color: #e6a23c">
-                {{ formatPercent(metrics.pass_rate) }}
-              </div>
-              <div class="stat-label">通过率</div>
-            </el-card>
-          </el-col>
-        </el-row>
+        <section class="quality-metric-grid mb20">
+          <ReStatCard label="规则总数" :value="metrics.total_rules" tone="primary" />
+          <ReStatCard label="SQL 规则数" :value="metrics.sql_rules" tone="accent" />
+          <ReStatCard label="通过率" :value="formatPercent(metrics.pass_rate)" tone="warning" />
+        </section>
 
         <el-card class="mb20">
           <template #header>
@@ -78,7 +45,7 @@
             stripe
             size="small"
             @row-click="filterBySystem"
-            style="cursor: pointer"
+            class="clickable-row"
           >
             <el-table-column prop="system_code" label="系统编码" width="160" />
             <el-table-column prop="total_findings" label="问题总数" width="100" align="center" />
@@ -86,7 +53,7 @@
             <el-table-column prop="resolved_count" label="已解决" width="100" align="center" />
             <el-table-column prop="critical_count" label="严重问题数" width="120" align="center">
               <template #default="{ row }">
-                <span :style="{ color: row.critical_count > 0 ? '#f56c6c' : '' }">
+                <span :class="{ 'metric-danger': row.critical_count > 0 }">
                   {{ row.critical_count }}
                 </span>
               </template>
@@ -102,7 +69,7 @@
         <el-card>
           <template #header>
             <span>质量规则</span>
-            <el-button type="primary" size="small" style="margin-left: 12px" @click="openRuleDialog()">
+            <el-button type="primary" size="small" class="ml12" @click="openRuleDialog()">
               新增规则
             </el-button>
           </template>
@@ -113,7 +80,7 @@
                 v-model="ruleFilters.rule_category"
                 placeholder="全部分类"
                 clearable
-                style="width: 130px"
+                class="filter-md"
                 @change="loadRules(1)"
               >
                 <el-option label="唯一性" value="UNIQUE" />
@@ -128,7 +95,7 @@
                 v-model="ruleFilters.check_scope"
                 placeholder="全部范围"
                 clearable
-                style="width: 130px"
+                class="filter-md"
                 @change="loadRules(1)"
               >
                 <el-option label="表内" value="TABLE_INNER" />
@@ -142,7 +109,7 @@
                 v-model="ruleFilters.constraint_level"
                 placeholder="全部级别"
                 clearable
-                style="width: 130px"
+                class="filter-md"
                 @change="loadRules(1)"
               >
                 <el-option label="硬约束" value="HARD" />
@@ -154,7 +121,7 @@
                 v-model="ruleFilters.enabled"
                 placeholder="全部状态"
                 clearable
-                style="width: 110px"
+                class="filter-sm"
                 @change="loadRules(1)"
               >
                 <el-option label="启用" :value="true" />
@@ -245,7 +212,7 @@
               <el-input v-model="ruleForm.rule_name" placeholder="规则中文名称" />
             </el-form-item>
             <el-form-item label="规则分类">
-              <el-select v-model="ruleForm.rule_category" style="width: 100%">
+              <el-select v-model="ruleForm.rule_category" class="full-width">
                 <el-option label="唯一性" value="UNIQUE" />
                 <el-option label="完整性" value="COMPLETE" />
                 <el-option label="规范性" value="STANDARD" />
@@ -254,7 +221,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="检查范围">
-              <el-select v-model="ruleForm.check_scope" style="width: 100%">
+              <el-select v-model="ruleForm.check_scope" class="full-width">
                 <el-option label="表内" value="TABLE_INNER" />
                 <el-option label="表间" value="TABLE_RELATION" />
                 <el-option label="跨系统" value="SYSTEM_CROSS" />
@@ -262,7 +229,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="约束级别">
-              <el-select v-model="ruleForm.constraint_level" style="width: 100%">
+              <el-select v-model="ruleForm.constraint_level" class="full-width">
                 <el-option label="硬约束" value="HARD" />
                 <el-option label="软约束" value="SOFT" />
                 <el-option label="提醒" value="WARN" />
@@ -273,7 +240,7 @@
               <el-input v-model="ruleForm.business_domain" placeholder="如 住院、门诊" />
             </el-form-item>
             <el-form-item label="执行模式">
-              <el-select v-model="ruleForm.execution_mode" style="width: 100%">
+              <el-select v-model="ruleForm.execution_mode" class="full-width">
                 <el-option label="元数据检查" value="metadata_only" />
                 <el-option label="SQL模板" value="sql_template" />
                 <el-option label="源库探查" value="source_probe" />
@@ -341,7 +308,7 @@
               <el-descriptions-item label="发现问题数">{{ checkResult.total_findings }}</el-descriptions-item>
               <el-descriptions-item label="扫描记录数">{{ checkResult.total_records }}</el-descriptions-item>
               <el-descriptions-item label="通过率">
-                <span :style="{ color: (checkResult.pass_rate ?? 0) >= 95 ? '#67c23a' : '#f56c6c' }">
+                <span :class="passRateClass(checkResult.pass_rate)">
                   {{ formatPercent(checkResult.pass_rate) }}
                 </span>
               </el-descriptions-item>
@@ -363,7 +330,7 @@
             <el-table-column prop="error_records" label="异常记录" width="100" align="center" />
             <el-table-column label="通过率" width="100" align="center">
               <template #default="{ row }">
-                <span v-if="row.pass_rate != null" :style="{ color: row.pass_rate >= 95 ? '#67c23a' : '#f56c6c' }">
+                <span v-if="row.pass_rate != null" :class="passRateClass(row.pass_rate)">
                   {{ formatPercent(row.pass_rate) }}
                 </span>
                 <span v-else>-</span>
@@ -406,7 +373,7 @@
                 v-model="filters.rule_code"
                 placeholder="规则编码"
                 clearable
-                style="width: 160px"
+                class="filter-lg"
                 @clear="loadFindings(1)"
               />
             </el-form-item>
@@ -415,7 +382,7 @@
                 v-model="filters.severity"
                 placeholder="全部"
                 clearable
-                style="width: 110px"
+                class="filter-sm"
                 @change="loadFindings(1)"
               >
                 <el-option label="严重" value="critical" />
@@ -429,27 +396,15 @@
                 v-model="filters.status"
                 placeholder="全部"
                 clearable
-                style="width: 110px"
+                class="filter-sm"
                 @change="loadFindings(1)"
               >
                 <el-option label="待处理" value="open" />
+                <el-option label="已分派" value="assigned" />
                 <el-option label="已确认" value="acknowledged" />
                 <el-option label="已解决" value="resolved" />
                 <el-option label="已忽略" value="ignored" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="整改状态">
-              <el-select
-                v-model="filters.rectification_status"
-                placeholder="全部"
-                clearable
-                style="width: 130px"
-                @change="loadFindings(1)"
-              >
-                <el-option label="待整改" value="pending" />
-                <el-option label="整改中" value="in_progress" />
-                <el-option label="已完成" value="done" />
-                <el-option label="无需整改" value="not_needed" />
+                <el-option label="规则错误" value="rule_error" />
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -457,7 +412,7 @@
                 v-model="filters.keyword"
                 placeholder="搜索表名/系统"
                 clearable
-                style="width: 200px"
+                class="filter-xl"
                 @clear="loadFindings(1)"
               />
             </el-form-item>
@@ -475,7 +430,7 @@
           >
             <el-table-column type="expand">
               <template #default="{ row }">
-                <div style="padding: 8px 20px">
+                <div class="sample-panel">
                   <strong>样本数据：</strong>
                   <pre class="sample-json">{{ formatSampleData(row.sample_data) }}</pre>
                 </div>
@@ -490,16 +445,9 @@
                 <el-tag :type="sevTag(row.severity)" size="small">{{ severityLabel(row.severity) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="状态" width="80">
+            <el-table-column label="状态" width="100">
               <template #default="{ row }">
                 <el-tag :type="statusTag(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="整改状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="rectificationTag(row.rectification_status)" size="small">
-                  {{ rectificationLabel(row.rectification_status) }}
-                </el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="error_cnt" label="异常数" width="80" align="center" />
@@ -515,7 +463,7 @@
             <el-table-column label="操作" width="220" fixed="right">
               <template #default="{ row }">
                 <el-button size="small" @click="openAssignDialog(row)">分派</el-button>
-                <el-dropdown style="margin-left: 4px" @command="(cmd: string) => recheckFinding(row, cmd)">
+                <el-dropdown class="ml4" @command="(cmd: string) => recheckFinding(row, cmd)">
                   <el-button size="small">
                     复核<el-icon class="el-icon--right"><ArrowDown /></el-icon>
                   </el-button>
@@ -528,7 +476,7 @@
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
-                <el-button size="small" type="info" style="margin-left: 4px" @click="openFindingStatusDialog(row)">
+                <el-button size="small" type="info" class="ml4" @click="openFindingStatusDialog(row)">
                   编辑状态
                 </el-button>
               </template>
@@ -565,19 +513,12 @@
         <el-dialog v-model="findingStatusDialogVisible" title="编辑问题状态" width="400px">
           <el-form>
             <el-form-item label="状态">
-              <el-select v-model="findingStatusForm.status" style="width: 100%">
+              <el-select v-model="findingStatusForm.status" class="full-width">
                 <el-option label="待处理" value="open" />
+                <el-option label="已分派" value="assigned" />
                 <el-option label="已确认" value="acknowledged" />
                 <el-option label="已解决" value="resolved" />
                 <el-option label="已忽略" value="ignored" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="整改状态">
-              <el-select v-model="findingStatusForm.rectification_status" style="width: 100%">
-                <el-option label="待整改" value="pending" />
-                <el-option label="整改中" value="in_progress" />
-                <el-option label="已完成" value="done" />
-                <el-option label="无需整改" value="not_needed" />
               </el-select>
             </el-form-item>
             <el-form-item label="备注">
@@ -610,7 +551,7 @@
             <el-table-column prop="error_records" label="异常记录" width="100" align="center" />
             <el-table-column label="通过率" width="100" align="center">
               <template #default="{ row }">
-                <span v-if="row.pass_rate != null" :style="{ color: passRateColor(row.pass_rate) }">
+                <span v-if="row.pass_rate != null" :class="passRateClass(row.pass_rate)">
                   {{ formatPercent(row.pass_rate) }}
                 </span>
                 <span v-else>-</span>
@@ -644,51 +585,39 @@
       <!-- ============================================================ -->
       <el-tab-pane label="质量看板" name="dashboard" lazy>
         <div v-if="dashboardReady">
-          <el-row :gutter="16" class="mb20">
-            <el-col :span="6">
-              <el-card shadow="hover" class="stat-card">
-                <div class="stat-num" style="color: #409eff">{{ metrics.total_rules }}</div>
-                <div class="stat-label">总规则数</div>
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card shadow="hover" class="stat-card">
-                <div class="stat-num" style="color: #67c23a">{{ metrics.sql_rules }}</div>
-                <div class="stat-label">启用规则数</div>
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card shadow="hover" class="stat-card">
-                <div class="stat-num" style="color: #f56c6c">{{ summary.total_findings }}</div>
-                <div class="stat-label">问题总数</div>
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card shadow="hover" class="stat-card">
-                <div class="stat-num" style="color: #e6a23c">
-                  {{ formatPercent(metrics.pass_rate) }}
-                </div>
-                <div class="stat-label">通过率</div>
-              </el-card>
-            </el-col>
-          </el-row>
+          <section class="quality-metric-grid mb20">
+            <ReStatCard label="总规则数" :value="metrics.total_rules" tone="primary" />
+            <ReStatCard label="SQL 规则数" :value="metrics.sql_rules" tone="accent" />
+            <ReStatCard label="问题总数" :value="summary.total_findings" tone="danger" />
+            <ReStatCard label="通过率" :value="formatPercent(metrics.pass_rate)" :tone="passRateTone(metrics.pass_rate)" />
+          </section>
 
-          <el-row :gutter="16">
-            <el-col :span="12">
+          <el-row :gutter="16" class="chart-row">
+            <el-col :xs="24" :lg="12">
               <el-card>
                 <template #header>
                   <span>规则分类分布</span>
-                  <el-button size="small" style="float: right" @click="refreshDashboard">刷新</el-button>
+                  <el-button size="small" class="float-right" @click="refreshDashboard">刷新</el-button>
                 </template>
-                <div ref="pieChartRef" style="height: 360px" />
+                <ReChart
+                  height="360px"
+                  :dark="false"
+                  :option="ruleCategoryChartOption"
+                  :empty="!metrics.rule_categories?.length"
+                />
               </el-card>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :lg="12">
               <el-card>
                 <template #header>
                   <span>问题 Top 5 表</span>
                 </template>
-                <div ref="barChartRef" style="height: 360px" />
+                <ReChart
+                  height="360px"
+                  :dark="false"
+                  :option="topTablesChartOption"
+                  :empty="!metrics.top_tables?.length"
+                />
               </el-card>
             </el-col>
           </el-row>
@@ -699,8 +628,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from "vue";
-import * as echarts from "echarts";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
+import ReChart from "@/components/ReChart/index.vue";
+import { computed, ref, reactive, onMounted } from "vue";
+
 import { http } from "@/utils/http";
 import {
   getQualitySummary,
@@ -709,7 +641,14 @@ import {
   runQualityCheck,
   type QualitySummary
 } from "@/api/asset";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
+import AlertIcon from "~icons/ri/alarm-warning-line";
+import CheckIcon from "~icons/ri/checkbox-circle-line";
+import ErrorIcon from "~icons/ri/error-warning-line";
+import InfoIcon from "~icons/ri/information-line";
+import IssueIcon from "~icons/ri/file-warning-line";
+import QualityIcon from "~icons/ri/shield-check-line";
+import WarningIcon from "~icons/ri/alert-line";
 
 // ============================================================
 // Types
@@ -775,7 +714,6 @@ interface FindingItem {
   column_name: string;
   severity: string;
   status: string;
-  rectification_status: string;
   error_cnt: number;
   error_rate: number | null;
   assigned_to: string;
@@ -1045,12 +983,19 @@ function validateRuleSql(row: RuleItem) {
 }
 
 function deleteRule(row: RuleItem) {
-  if (!confirm(`确定删除规则 "${row.rule_code}"？`)) return;
-  http
-    .delete<any, any>(`/api/v1/quality/rules/${row.id}`)
+  ElMessageBox.confirm(`确定删除规则 "${row.rule_code}"？`, "删除规则", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning"
+  })
     .then(() => {
-      ElMessage.success("已删除");
-      loadRules();
+      http
+        .delete<any, any>(`/api/v1/quality/rules/${row.id}`)
+        .then(() => {
+          ElMessage.success("已删除");
+          loadRules();
+        })
+        .catch(() => {});
     })
     .catch(() => {});
 }
@@ -1114,7 +1059,6 @@ const filters = reactive({
   rule_code: "",
   severity: "",
   status: "",
-  rectification_status: "",
   keyword: ""
 });
 
@@ -1124,7 +1068,7 @@ const assignForm = reactive({ assigned_to: "", note: "" });
 
 const findingStatusDialogVisible = ref(false);
 const findingStatusFindingId = ref<number | null>(null);
-const findingStatusForm = reactive({ status: "", rectification_status: "", note: "" });
+const findingStatusForm = reactive({ status: "", note: "" });
 
 function sevTag(s: string | null): TagType {
   const m: Record<string, TagType> = {
@@ -1149,9 +1093,14 @@ function severityLabel(s: string | null): string {
 function statusLabel(s: string | null): string {
   const m: Record<string, string> = {
     open: "待处理",
+    assigned: "已分派",
+    confirmed: "已确认",
+    fixed: "已修复",
+    rechecked: "已复核",
     acknowledged: "已确认",
     resolved: "已解决",
-    ignored: "已忽略"
+    ignored: "已忽略",
+    rule_error: "规则错误",
   };
   return m[s ?? ""] || s || "";
 }
@@ -1159,29 +1108,14 @@ function statusLabel(s: string | null): string {
 function statusTag(s: string | null): TagType {
   const m: Record<string, TagType> = {
     open: "danger",
+    assigned: "warning",
+    confirmed: "primary",
+    fixed: "success",
+    rechecked: "success",
     acknowledged: "warning",
     resolved: "success",
-    ignored: "info"
-  };
-  return m[s ?? ""] || "info";
-}
-
-function rectificationLabel(s: string | null): string {
-  const m: Record<string, string> = {
-    pending: "待整改",
-    in_progress: "整改中",
-    done: "已完成",
-    not_needed: "无需整改"
-  };
-  return m[s ?? ""] || s || "";
-}
-
-function rectificationTag(s: string | null): TagType {
-  const m: Record<string, TagType> = {
-    pending: "danger",
-    in_progress: "warning",
-    done: "success",
-    not_needed: "info"
+    ignored: "info",
+    rule_error: "danger",
   };
   return m[s ?? ""] || "info";
 }
@@ -1249,7 +1183,6 @@ function recheckFinding(row: FindingItem, status: string) {
 function openFindingStatusDialog(row: FindingItem) {
   findingStatusFindingId.value = row.id;
   findingStatusForm.status = row.status || "";
-  findingStatusForm.rectification_status = row.rectification_status || "";
   findingStatusForm.note = "";
   findingStatusDialogVisible.value = true;
 }
@@ -1258,7 +1191,6 @@ function submitFindingStatus() {
   if (!findingStatusFindingId.value) return;
   const body: any = {
     status: findingStatusForm.status,
-    rectification_status: findingStatusForm.rectification_status,
     note: findingStatusForm.note
   };
   http
@@ -1280,11 +1212,6 @@ const recordsPage = ref(1);
 const recordsPageSize = ref(20);
 const recordsTotal = ref(0);
 
-function passRateColor(rate: number): string {
-  if (rate >= 95) return "#67c23a";
-  if (rate >= 80) return "#e6a23c";
-  return "#f56c6c";
-}
 
 function loadRecords(page?: number) {
   if (page) recordsPage.value = page;
@@ -1303,98 +1230,78 @@ function loadRecords(page?: number) {
 // Tab 6: 质量看板
 // ============================================================
 const dashboardReady = ref(false);
-const pieChartRef = ref<HTMLElement>();
-const barChartRef = ref<HTMLElement>();
 
-let pieChart: echarts.ECharts | null = null;
-let barChart: echarts.ECharts | null = null;
+function passRateTone(rate: number | null | undefined): "accent" | "warning" | "danger" {
+  if (rate == null) return "warning";
+  if (rate >= 95) return "accent";
+  if (rate >= 80) return "warning";
+  return "danger";
+}
 
-function initPieChart() {
-  if (!pieChartRef.value) return;
-  if (pieChart) pieChart.dispose();
-  pieChart = echarts.init(pieChartRef.value);
-  const cats = metrics.value.rule_categories || [];
-  pieChart.setOption({
+function passRateClass(rate: number | null | undefined): string {
+  return `metric-${passRateTone(rate)}`;
+}
+
+const ruleCategoryChartOption = computed(() => {
+  const categories = metrics.value.rule_categories || [];
+  return {
     tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
     legend: { orient: "vertical", left: 10, top: 20 },
     series: [
       {
         type: "pie",
-        radius: ["40%", "70%"],
-        center: ["55%", "55%"],
-        data: cats.map(c => ({
+        radius: ["42%", "70%"],
+        center: ["58%", "55%"],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 8, borderColor: "#fff", borderWidth: 2 },
+        data: categories.map(c => ({
           name: ruleCategoryLabel(c.category),
           value: c.count
         })),
-        label: { show: true, formatter: "{b}: {c}" },
-        emphasis: {
-          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: "rgba(0,0,0,0.5)" }
-        }
+        label: { formatter: "{b}: {c}" }
       }
     ]
-  });
-}
+  };
+});
 
-function initBarChart() {
-  if (!barChartRef.value) return;
-  if (barChart) barChart.dispose();
-  barChart = echarts.init(barChartRef.value);
-  const tables = (metrics.value.top_tables || []).slice(0, 5);
-  barChart.setOption({
+const topTablesChartOption = computed(() => {
+  const tables = (metrics.value.top_tables || []).slice(0, 5).reverse();
+  return {
     tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-    grid: { left: 120 },
+    grid: { left: 120, right: 24, top: 28, bottom: 28, containLabel: true },
     xAxis: { type: "value", name: "问题数" },
     yAxis: {
       type: "category",
-      data: tables.map(t => t.table).reverse(),
+      data: tables.map(t => t.table),
       axisLabel: { width: 100, overflow: "truncate" }
     },
     series: [
       {
         type: "bar",
-        data: tables.map(t => t.count).reverse(),
+        barWidth: 14,
+        data: tables.map(t => t.count),
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-            { offset: 0, color: "#f56c6c" },
-            { offset: 1, color: "#e6a23c" }
-          ])
+          borderRadius: [0, 8, 8, 0],
+          color: "#0EA5E9"
         }
       }
     ]
-  });
-}
+  };
+});
 
 async function loadDashboardData() {
   loadSummary();
-  loadMetrics();
+  await loadMetrics();
 }
 
 async function initDashboard() {
   dashboardReady.value = true;
   await loadDashboardData();
-  await nextTick();
-  initPieChart();
-  initBarChart();
 }
 
 function refreshDashboard() {
-  loadMetrics().then(() => {
-    initPieChart();
-    initBarChart();
-  });
+  loadDashboardData();
 }
-
-function disposeCharts() {
-  if (pieChart) {
-    pieChart.dispose();
-    pieChart = null;
-  }
-  if (barChart) {
-    barChart.dispose();
-    barChart = null;
-  }
-}
-
 // ============================================================
 // Tab change handler
 // ============================================================
@@ -1433,57 +1340,74 @@ onMounted(() => {
   loadMetrics();
 });
 
-// Clean up charts when leaving the component
-onBeforeUnmount(() => {
-  disposeCharts();
-});
 </script>
 
 <style scoped>
-.page-title {
-  margin-bottom: 20px;
+.quality-page {
+  padding: 4px;
 }
-.mb20 {
-  margin-bottom: 20px;
+.quality-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
 }
-.mt15 {
-  margin-top: 15px;
+.quality-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
-.mt10 {
-  margin-top: 10px;
+.quality-page :deep(.el-card) {
+  border-color: var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
 }
-.stat-card {
-  text-align: center;
+.quality-page :deep(.el-table) {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+  font-size: 13px;
 }
-.stat-num {
-  font-size: 28px;
+@media (max-width: 1280px) {
+  .quality-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .quality-stat-grid,
+  .quality-metric-grid { grid-template-columns: 1fr; }
+}
+.metric-accent {
+  color: var(--accent-500);
   font-weight: 700;
 }
-.stat-label {
-  font-size: 13px;
-  color: #909399;
-  margin-top: 4px;
+.metric-warning {
+  color: var(--warning);
+  font-weight: 700;
 }
-.stat-open .stat-num {
-  color: #f56c6c;
+.metric-danger {
+  color: var(--danger);
+  font-weight: 700;
 }
-.stat-resolved .stat-num {
-  color: #67c23a;
+.sample-panel {
+  padding: 8px 20px;
 }
-.stat-critical .stat-num {
-  color: #f56c6c;
-}
-.stat-major .stat-num {
-  color: #e6a23c;
-}
+.clickable-row { cursor: pointer; }
+.ml12 { margin-left: 12px; }
+.ml4 { margin-left: 4px; }
+.float-right { float: right; }
+.filter-sm { width: 110px; }
+.filter-md { width: 130px; }
+.filter-lg { width: 160px; }
+.filter-xl { width: 200px; }
+.full-width { width: 100%; }
 .sample-json {
-  background: #f5f7fa;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 12px;
   max-height: 300px;
+  padding: 10px;
   overflow: auto;
-  white-space: pre-wrap;
+  font-size: 12px;
+  color: var(--text-regular);
   word-break: break-all;
+  white-space: pre-wrap;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
 }
 </style>

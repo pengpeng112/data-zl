@@ -649,7 +649,7 @@ onBeforeUnmount(() => {
         <div
           v-for="(item, key) in tagsViews.slice(0, 6)"
           :key="key"
-          style="display: flex; align-items: center"
+          class="contextmenu-row"
         >
           <li v-if="item.show" @click="selectTag(key, item)">
             <IconifyIconOffline :icon="item.icon" />
@@ -687,4 +687,9 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 @import url("./index.scss");
+
+.contextmenu-row {
+  display: flex;
+  align-items: center;
+}
 </style>

@@ -1,6 +1,8 @@
 <template>
   <div class="metadata-diff">
-    <el-card shadow="never">
+    <RePageHeader title="快照对比" subtitle="选择同一数据源的两个元数据快照，识别表、字段和关联质量影响。" />
+
+    <el-card shadow="never" class="diff-card">
       <template #header>
         <span>快照对比</span>
       </template>
@@ -10,7 +12,7 @@
           v-model="fromId"
           placeholder="源快照"
           clearable
-          style="width: 260px"
+          class="snapshot-select"
           filterable
         >
           <el-option
@@ -20,12 +22,12 @@
             :value="sn.id"
           />
         </el-select>
-        <span style="margin: 0 12px; font-size: 16px; color: #409eff">→</span>
+        <span class="diff-arrow">→</span>
         <el-select
           v-model="toId"
           placeholder="目标快照"
           clearable
-          style="width: 260px"
+          class="snapshot-select"
           filterable
         >
           <el-option
@@ -39,7 +41,7 @@
           type="primary"
           :loading="diffRunning"
           :disabled="!fromId || !toId || fromId === toId"
-          style="margin-left: 12px"
+          class="run-button"
           @click="runDiff"
         >
           执行对比
@@ -47,12 +49,12 @@
       </div>
 
       <div class="snapshot-selector-hint">
-        <span style="font-size: 12px; color: #909399">提示：</span>
+        <span class="hint-label">提示：</span>
         <el-select
           v-model="sourceCode"
           placeholder="先选择数据源，加载快照列表"
           clearable
-          style="width: 220px; margin-left: 8px"
+          class="source-select"
           @change="loadSnapshots"
         >
           <el-option label="HIS (8.216)" value="his_8216" />
@@ -66,20 +68,12 @@
     </el-card>
 
     <template v-if="diffResult">
-      <el-row :gutter="16" style="margin-top: 16px">
-        <el-col :span="12">
-          <el-card shadow="never">
-            <el-statistic title="变更事件数" :value="diffResult.total_changes ?? 0" />
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card shadow="never">
-            <el-statistic title="关联质量问题数" :value="diffResult.linked_to_quality_findings ?? 0" />
-          </el-card>
-        </el-col>
-      </el-row>
+      <section class="diff-stat-grid">
+        <ReStatCard label="变更事件数" :value="diffResult.total_changes ?? 0" tone="primary" />
+        <ReStatCard label="关联质量问题数" :value="diffResult.linked_to_quality_findings ?? 0" tone="warning" />
+      </section>
 
-      <el-card v-if="diffResult.changes && diffResult.changes.length > 0" shadow="never" style="margin-top: 16px">
+      <el-card v-if="diffResult.changes && diffResult.changes.length > 0" shadow="never" class="result-card">
         <template #header>
           <span>对比结果 — 变更事件</span>
         </template>
@@ -114,19 +108,21 @@
       <el-empty
         v-else-if="diffResult && (!diffResult.changes || diffResult.changes.length === 0)"
         description="两个快照之间未检测到变更"
-        style="margin-top: 16px"
+        class="empty-block"
       />
     </template>
 
     <el-empty
       v-if="!diffResult"
       description="选择两个快照并执行对比"
-      style="margin-top: 16px"
+      class="empty-block"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import {
@@ -162,8 +158,8 @@ async function runDiff() {
   diffRunning.value = true;
   try {
     const res = await runMetadataDiff({
-      from_id: fromId.value,
-      to_id: toId.value
+      snapshot_id_from: fromId.value,
+      snapshot_id_to: toId.value
     });
     diffResult.value = res.data;
     ElMessage.success("对比完成");
@@ -230,6 +226,12 @@ function statusTagType(s: string): any {
 </script>
 
 <style scoped>
+.metadata-diff { padding: 4px; }
+.diff-card, .result-card { border-color: var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
+.diff-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.diff-arrow { margin: 0 12px; font-size: 16px; color: var(--primary-500); font-weight: 700; }
+.hint-label { font-size: 12px; color: var(--text-secondary); }
+@media (max-width: 760px) { .diff-stat-grid { grid-template-columns: 1fr; } }
 .diff-form {
   display: flex;
   align-items: center;
@@ -240,4 +242,9 @@ function statusTagType(s: string): any {
   display: flex;
   align-items: center;
 }
+
+.snapshot-select { width: 260px; }
+.source-select { width: 220px; margin-left: 8px; }
+.run-button { margin-left: 12px; }
+.empty-block { margin-top: 16px; }
 </style>

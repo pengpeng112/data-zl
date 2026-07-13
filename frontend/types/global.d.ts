@@ -84,6 +84,8 @@ declare global {
   interface PlatformConfigs {
     Version?: string;
     Title?: string;
+    /** 系统副标题（平台名），与 Title（医院主标题）配合展示 */
+    SubTitle?: string;
     FixedHeader?: boolean;
     HiddenSideBar?: boolean;
     MultiTagsCache?: boolean;

@@ -44,6 +44,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       exclude
     },
     build: {
+      // Deployment must never retain stale bundles that may contain retired configuration.
+      emptyOutDir: true,
       // https://cn.vitejs.dev/guide/build.html#browser-compatibility
       target: "es2015",
       sourcemap: false,

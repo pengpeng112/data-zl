@@ -1,32 +1,20 @@
-<template>
+﻿<template>
   <div class="asset-relations">
-    <el-card shadow="never">
-      <template #header>关系路径查询</template>
-      <div class="filter-bar">
-        <el-input
-          v-model="fromTable"
-          placeholder="来源表 (如 HIS.PAT_VISIT)"
-          clearable
-          style="width: 280px"
-        />
-        <span style="margin: 0 12px">→</span>
-        <el-input
-          v-model="toTable"
-          placeholder="目标表 (如 HIS.PAT_MASTER_INDEX)"
-          clearable
-          style="width: 280px"
-        />
-        <el-button
-          type="primary"
-          :loading="loading"
-          style="margin-left: 12px"
-          @click="doQuery"
-        >
-          查询路径
-        </el-button>
-      </div>
-      <div style="margin-top: 8px">
-        <span style="font-size: 12px; color: #909399">快捷示例：</span>
+    <RePageHeader title="关系路径查询" subtitle="查询两张表之间的可达关系路径，查看每一跳的关联条件、验证等级和指标证据。">
+      <template #icon><RelationIcon /></template>
+    </RePageHeader>
+
+    <el-card shadow="never" class="query-card">
+      <ReToolbar title="查询条件">
+        <div class="filter-bar">
+          <el-input v-model="fromTable" placeholder="来源表 (如 HIS.PAT_VISIT)" clearable />
+          <span class="arrow-text">→</span>
+          <el-input v-model="toTable" placeholder="目标表 (如 HIS.PAT_MASTER_INDEX)" clearable />
+          <el-button type="primary" :loading="loading" @click="doQuery">查询路径</el-button>
+        </div>
+      </ReToolbar>
+      <div class="quick-examples">
+        <span>快捷示例：</span>
         <el-button
           v-for="ex in examples"
           :key="ex.label"
@@ -40,13 +28,11 @@
       </div>
     </el-card>
 
-    <el-card v-if="result" shadow="never" style="margin-top: 16px">
+    <el-card v-if="result" shadow="never" class="result-card">
       <template #header>
         结果：{{ result.from }} → {{ result.to }}
-        <el-tag v-if="result.path" style="margin-left: 12px">
-          {{ result.hops.length }} 跳
-        </el-tag>
-        <el-tag v-else type="danger">未找到路径</el-tag>
+        <el-tag v-if="result.path" class="result-tag">{{ result.hops.length }} 跳</el-tag>
+        <el-tag v-else type="danger" class="result-tag">未找到路径</el-tag>
       </template>
 
       <div v-if="result.path && pathGraph.nodes.length > 0">
@@ -59,90 +45,63 @@
         />
       </div>
 
-      <div v-if="result.path" class="path-display" style="margin-top: 12px">
+      <div v-if="result.path" class="path-display">
         <div v-for="(hop, idx) in result.hops" :key="idx" class="hop-card">
-          <div class="hop-header">
-            第 {{ idx + 1 }} 跳：{{ hop.from }} → {{ hop.to }}
-          </div>
+          <div class="hop-header">第 {{ idx + 1 }} 跳：{{ hop.from }} → {{ hop.to }}</div>
           <el-descriptions :column="2" border size="small">
-            <el-descriptions-item label="关联条件">{{
-              hop.join_condition || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="基数">{{
-              hop.cardinality || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="置信度">{{
-              hop.confidence || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="验证等级">{{
-              hop.validation_level || "-"
-            }}</el-descriptions-item>
+            <el-descriptions-item label="关联条件">{{ hop.join_condition || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="基数">{{ hop.cardinality || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="置信度">{{ hop.confidence || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="验证等级">{{ hop.validation_level || "-" }}</el-descriptions-item>
             <el-descriptions-item label="验证状态">
-              <el-tag
-                :type="
-                  hop.validation_status === 'verified'
-                    ? 'success'
-                    : hop.validation_status === 'bounded'
-                      ? 'warning'
-                      : 'info'
-                "
-                size="small"
-              >
+              <el-tag :type="relationStatusTag(hop.validation_status)" size="small">
                 {{ hop.validation_status || "-" }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="指标">{{
-              hop.validation_metrics || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="来源字段">{{
-              hop.from_columns || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="目标字段">{{
-              hop.to_columns || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="备注" :span="2">{{
-              hop.note || "-"
-            }}</el-descriptions-item>
+            <el-descriptions-item label="指标">{{ hop.validation_metrics || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="来源字段">{{ hop.from_columns || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="目标字段">{{ hop.to_columns || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="备注" :span="2">{{ hop.note || "-" }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
 
-      <el-empty v-else description="两张表之间未找到关联路径" />
+      <ReEmptyState v-else title="未找到关联路径" description="当前关系包中没有发现这两张表之间的可达路径。" />
     </el-card>
 
-    <el-drawer v-model="drawerVisible" title="关系详情" size="500px">
+    <ReDetailDrawer
+      v-model="drawerVisible"
+      title="关系详情"
+      :subtitle="selectedEdge ? `${selectedEdge.source} → ${selectedEdge.target}` : ''"
+      size="560px"
+    >
       <el-descriptions v-if="selectedEdge" :column="1" border size="small">
-        <el-descriptions-item label="来源">{{
-          selectedEdge.source
-        }}</el-descriptions-item>
-        <el-descriptions-item label="目标">{{
-          selectedEdge.target
-        }}</el-descriptions-item>
-        <el-descriptions-item label="关联条件">{{
-          selectedEdge.join_condition || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{
-          selectedEdge.validation_status || "-"
-        }}</el-descriptions-item>
-        <el-descriptions-item label="指标">{{
-          selectedEdge.validation_metrics || "-"
-        }}</el-descriptions-item>
+        <el-descriptions-item label="来源">{{ selectedEdge.source }}</el-descriptions-item>
+        <el-descriptions-item label="目标">{{ selectedEdge.target }}</el-descriptions-item>
+        <el-descriptions-item label="关联条件">{{ selectedEdge.join_condition || "-" }}</el-descriptions-item>
+        <el-descriptions-item label="状态">{{ selectedEdge.validation_status || "-" }}</el-descriptions-item>
+        <el-descriptions-item label="指标">{{ selectedEdge.validation_metrics || "-" }}</el-descriptions-item>
       </el-descriptions>
-    </el-drawer>
+    </ReDetailDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
+import ReEmptyState from "@/components/ReEmptyState/index.vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReToolbar from "@/components/ReToolbar/index.vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import {
   getRelationPath,
-  type PathResult,
   type GraphData,
+  type GraphEdge,
   type GraphNode,
-  type GraphEdge
+  type PathResult
 } from "@/api/asset";
+import RelationIcon from "~icons/ri/git-branch-line";
 
 const router = useRouter();
 const fromTable = ref("");
@@ -153,32 +112,16 @@ const drawerVisible = ref(false);
 const selectedEdge = ref<GraphEdge | null>(null);
 
 const examples = [
-  {
-    label: "PAT_VISIT → PAT_MASTER_INDEX",
-    from: "HIS.PAT_VISIT",
-    to: "HIS.PAT_MASTER_INDEX"
-  },
-  {
-    label: "PAT_VISIT → LAB_TEST_MASTER",
-    from: "HIS.PAT_VISIT",
-    to: "HIS.LAB_TEST_MASTER"
-  },
-  {
-    label: "PAT_VISIT → EXAM_MASTER",
-    from: "HIS.PAT_VISIT",
-    to: "HIS.EXAM_MASTER"
-  }
+  { label: "PAT_VISIT → PAT_MASTER_INDEX", from: "HIS.PAT_VISIT", to: "HIS.PAT_MASTER_INDEX" },
+  { label: "PAT_VISIT → LAB_TEST_MASTER", from: "HIS.PAT_VISIT", to: "HIS.LAB_TEST_MASTER" },
+  { label: "PAT_VISIT → EXAM_MASTER", from: "HIS.PAT_VISIT", to: "HIS.EXAM_MASTER" }
 ];
 
 const pathGraph = computed<GraphData>(() => {
-  if (!result.value?.path || result.value.path.length < 2) {
-    return { nodes: [], edges: [] };
-  }
-  const path = result.value.path;
-  const hops = result.value.hops;
+  if (!result.value?.path || result.value.path.length < 2) return { nodes: [], edges: [] };
   const nodeSet = new Set<string>();
   const nodes: GraphNode[] = [];
-  for (const tableName of path) {
+  for (const tableName of result.value.path) {
     if (!nodeSet.has(tableName)) {
       nodeSet.add(tableName);
       const parts = tableName.split(".");
@@ -191,21 +134,27 @@ const pathGraph = computed<GraphData>(() => {
       });
     }
   }
-  const edges: GraphEdge[] = hops.map((h, i) => ({
-    id: `${h.from}->${h.to}#${i}`,
-    source: h.from,
-    target: h.to,
-    label: h.join_condition,
-    join_condition: h.join_condition,
-    validation_status: h.validation_status,
-    validation_metrics: h.validation_metrics
+  const edges: GraphEdge[] = result.value.hops.map((hop, index) => ({
+    id: `${hop.from}->${hop.to}#${index}`,
+    source: hop.from,
+    target: hop.to,
+    label: hop.join_condition,
+    join_condition: hop.join_condition,
+    validation_status: hop.validation_status,
+    validation_metrics: hop.validation_metrics
   }));
   return { nodes, edges };
 });
 
-function setExample(ex: { from: string; to: string }) {
-  fromTable.value = ex.from;
-  toTable.value = ex.to;
+function relationStatusTag(status?: string | null): "success" | "warning" | "info" {
+  if (status === "verified") return "success";
+  if (status === "bounded") return "warning";
+  return "info";
+}
+
+function setExample(example: { from: string; to: string }) {
+  fromTable.value = example.from;
+  toTable.value = example.to;
   doQuery();
 }
 
@@ -224,9 +173,7 @@ async function doQuery() {
 
 function goTable(node: GraphNode) {
   const parts = node.id.split(".");
-  if (parts.length >= 2) {
-    router.push(`/asset/tables/${parts[0]}/${parts.slice(1).join(".")}`);
-  }
+  if (parts.length >= 2) router.push(`/asset/tables/${parts[0]}/${parts.slice(1).join(".")}`);
 }
 
 function showEdge(edge: GraphEdge) {
@@ -235,21 +182,77 @@ function showEdge(edge: GraphEdge) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.asset-relations {
+  padding: 4px;
+}
+
+.query-card,
+.result-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.result-card {
+  margin-top: 16px;
+}
+
+.result-tag {
+  margin-left: 12px;
+}
+
 .filter-bar {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
 }
+
+.filter-bar :deep(.el-input) {
+  width: 280px;
+}
+
+.arrow-text {
+  color: var(--text-secondary);
+}
+
+.quick-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+
+  span {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+}
+
+.path-display {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
 .hop-card {
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
+  padding: 14px;
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-base);
 }
+
 .hop-header {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #409eff;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+@media (max-width: 760px) {
+  .filter-bar :deep(.el-input) {
+    width: 100%;
+  }
 }
 </style>

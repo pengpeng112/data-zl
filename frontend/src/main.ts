@@ -1,4 +1,4 @@
-import App from "./App.vue";
+﻿import App from "./App.vue";
 import router from "./router";
 import { setupStore } from "@/store";
 import { getPlatformConfig } from "./config";
@@ -20,6 +20,8 @@ import "./style/tailwind.css";
 import "element-plus/dist/index.css";
 // 导入字体图标
 import "./assets/iconfont/iconfont.css";
+// 注册数据资产平台 ECharts 主题
+import "./plugins/echarts-theme";
 
 const app = createApp(App);
 
@@ -61,3 +63,4 @@ getPlatformConfig(app).then(async config => {
   // .use(useEcharts);
   app.mount("#app");
 });
+

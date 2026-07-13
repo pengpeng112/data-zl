@@ -37,12 +37,25 @@ export function getMedicalMappingRows(params?: Record<string, any>) {
 export function upsertMedicalMappingRow(data: Record<string, any>) {
   return http.request<ApiResponse<any>>("put", "/api/v1/dict-medical/mapping-rows", { data });
 }
+export function exportMedicalMappingRows(params?: Record<string, any>) {
+  return http.request<Blob>("get", "/api/v1/dict-medical/mapping-rows/export", {
+    params,
+    responseType: "blob",
+    timeout: 120000
+  });
+}
 export function upsertMedicalMapping(data: Record<string, any>) {
   return http.request<ApiResponse<any>>("put", "/api/v1/dict-medical/mappings", { data });
 }
 // 同步差异
 export function getMedicalSyncDiffs(params?: Record<string, any>) {
   return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/dict-medical/sync-diffs", { params });
+}
+export function runMedicalSync(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/dict-medical/sync/run", { data });
+}
+export function updateMedicalSyncDiff(id: number, data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("patch", `/api/v1/dict-medical/sync-diffs/${id}`, { data });
 }
 // 版本
 export function getDictVersions(params?: Record<string, any>) {
@@ -81,3 +94,4 @@ export function upsertDictItemMapping(data: Record<string, any>) {
 export function importSystemDict(data: Record<string, any>) {
   return http.request<ApiResponse<any>>("post", "/api/v1/dictionaries/import", { data });
 }
+

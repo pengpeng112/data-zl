@@ -1,87 +1,75 @@
-<template>
+﻿<template>
   <div class="asset-overview">
-    <el-row :gutter="16" class="stat-cards">
-      <el-col :xs="12" :sm="6">
-        <el-card shadow="hover" class="stat-card">
-          <el-statistic title="数据表" :value="summary.tables" />
-        </el-card>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <el-card shadow="hover" class="stat-card">
-          <el-statistic title="字段" :value="summary.columns" />
-        </el-card>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <el-card shadow="hover" class="stat-card">
-          <el-statistic title="关联关系" :value="summary.relations" />
-        </el-card>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <el-card shadow="hover" class="stat-card">
-          <el-statistic title="业务域" :value="summary.domains" />
-        </el-card>
-      </el-col>
-    </el-row>
+    <RePageHeader
+      title="资产总览"
+      subtitle="按业务域、关系状态、Schema 与核心表热度汇总当前治理资产。"
+    >
+      <template #icon><DashboardIcon /></template>
+      <template #actions>
+        <el-button :icon="RefreshIcon" :loading="chartsLoading" @click="reloadAll">
+          刷新
+        </el-button>
+      </template>
+    </RePageHeader>
 
-    <el-row :gutter="16">
-      <el-col :xs="24" :md="12">
-        <el-card
-          v-loading="chartsLoading"
-          shadow="never"
-          style="margin-top: 16px"
-        >
-          <template #header>业务域分布</template>
-          <div ref="domainChartRef" style="width: 100%; height: 340px" />
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :md="12">
-        <el-card
-          v-loading="chartsLoading"
-          shadow="never"
-          style="margin-top: 16px"
-        >
-          <template #header>关系验证状态分布</template>
-          <div ref="statusChartRef" style="width: 100%; height: 340px" />
-        </el-card>
-      </el-col>
-    </el-row>
+    <section class="stat-grid">
+      <ReStatCard label="数据表" :value="summary.tables" tone="primary" helper="纳入资产目录">
+        <template #icon><TableIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="字段" :value="summary.columns" tone="accent" helper="结构与语义字段">
+        <template #icon><ListIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="关联关系" :value="summary.relations" tone="info" helper="正式与候选关系">
+        <template #icon><RelationIcon /></template>
+      </ReStatCard>
+      <ReStatCard label="业务域" :value="summary.domains" tone="warning" helper="主题分类覆盖">
+        <template #icon><PieIcon /></template>
+      </ReStatCard>
+    </section>
 
-    <el-row :gutter="16">
-      <el-col :xs="24" :md="12">
-        <el-card
-          v-loading="chartsLoading"
-          shadow="never"
-          style="margin-top: 16px"
-        >
-          <template #header>Schema 关系数 Top 10</template>
-          <div ref="schemaRelChartRef" style="width: 100%; height: 340px" />
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :md="12">
-        <el-card
-          v-loading="chartsLoading"
-          shadow="never"
-          style="margin-top: 16px"
-        >
-          <template #header>核心表 Top 10（按关联关系数）</template>
-          <div ref="coreTableChartRef" style="width: 100%; height: 340px" />
-        </el-card>
-      </el-col>
-    </el-row>
+    <section class="chart-grid">
+      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
+        <template #header>业务域分布</template>
+        <ReChart :option="domainChartOption" :empty="!domainRows.length" height="340px" :dark="false" />
+      </el-card>
+      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
+        <template #header>关系验证状态分布</template>
+        <ReChart :option="statusChartOption" :empty="!statusRows.length" height="340px" :dark="false" />
+      </el-card>
+      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
+        <template #header>Schema 关系数 Top 10</template>
+        <ReChart :option="schemaRelChartOption" :empty="!schemaRows.length" height="340px" :dark="false" />
+      </el-card>
+      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
+        <template #header>核心表 Top 10（按关联关系数）</template>
+        <ReChart :option="coreTableChartOption" :empty="!coreTableRows.length" height="340px" :dark="false" />
+      </el-card>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
-import * as echarts from "echarts";
+import ReChart from "@/components/ReChart/index.vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
+import { computed, onMounted, ref } from "vue";
 import {
-  getSummary,
   getGraph,
+  getSummary,
   getTables,
-  type SummaryData,
   type GraphEdge,
+  type SummaryData,
   type TableBrief
 } from "@/api/asset";
+import type { EChartsCoreOption } from "echarts/core";
+import DashboardIcon from "~icons/ri/dashboard-3-line";
+import ListIcon from "~icons/ri/list-check-2";
+import PieIcon from "~icons/ri/pie-chart-2-line";
+import RefreshIcon from "~icons/ri/refresh-line";
+import RelationIcon from "~icons/ri/git-branch-line";
+import TableIcon from "~icons/ri/table-line";
+
+defineOptions({ name: "AssetOverview" });
 
 const summary = ref<SummaryData>({
   tables: 0,
@@ -90,10 +78,10 @@ const summary = ref<SummaryData>({
   domains: 0
 });
 const chartsLoading = ref(true);
-const domainChartRef = ref<HTMLElement>();
-const statusChartRef = ref<HTMLElement>();
-const schemaRelChartRef = ref<HTMLElement>();
-const coreTableChartRef = ref<HTMLElement>();
+const domainRows = ref<[string, number][]>([]);
+const statusRows = ref<[string, number][]>([]);
+const schemaRows = ref<[string, number][]>([]);
+const coreTableRows = ref<[string, number][]>([]);
 
 const statusLabels: Record<string, string> = {
   verified: "已验证",
@@ -101,16 +89,70 @@ const statusLabels: Record<string, string> = {
   needs_split: "需拆分",
   not_tested: "未测试",
   sample_verified: "抽样验证",
+  sample_pass: "抽样通过",
+  A_rechecked: "A 级复核",
   missing_in_8216: "8.216缺失"
 };
+
+const barItemStyle = { borderRadius: [0, 8, 8, 0] };
+
+const domainChartOption = computed<EChartsCoreOption>(() => ({
+  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+  grid: { left: 132, right: 20, top: 24, bottom: 24 },
+  yAxis: {
+    type: "category",
+    data: domainRows.value.map(v => v[0]).reverse(),
+    axisLabel: { width: 116, overflow: "truncate" }
+  },
+  xAxis: { type: "value", name: "表数量" },
+  series: [{ type: "bar", data: domainRows.value.map(v => v[1]).reverse(), itemStyle: barItemStyle }]
+}));
+
+const statusChartOption = computed<EChartsCoreOption>(() => ({
+  tooltip: { trigger: "item" },
+  legend: { orient: "vertical", right: 12, top: 20 },
+  series: [
+    {
+      type: "pie",
+      radius: ["46%", "72%"],
+      center: ["36%", "52%"],
+      itemStyle: { borderRadius: 8, borderColor: "#fff", borderWidth: 2 },
+      data: statusRows.value.map(([name, value]) => ({ name, value })),
+      label: { show: true, formatter: "{b}: {c}" }
+    }
+  ]
+}));
+
+const schemaRelChartOption = computed<EChartsCoreOption>(() => ({
+  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+  xAxis: { type: "category", data: schemaRows.value.map(v => v[0]), axisLabel: { rotate: 30 } },
+  yAxis: { type: "value", name: "关系数" },
+  series: [{ type: "bar", data: schemaRows.value.map(v => v[1]), itemStyle: { borderRadius: [8, 8, 0, 0] } }]
+}));
+
+const coreTableChartOption = computed<EChartsCoreOption>(() => ({
+  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+  grid: { left: 178, right: 20, top: 24, bottom: 24 },
+  yAxis: {
+    type: "category",
+    data: coreTableRows.value.map(v => v[0]).reverse(),
+    axisLabel: { width: 158, overflow: "truncate" }
+  },
+  xAxis: { type: "value", name: "关系数" },
+  series: [{ type: "bar", data: coreTableRows.value.map(v => v[1]).reverse(), itemStyle: barItemStyle }]
+}));
 
 async function loadSummary() {
   try {
     const res = await getSummary();
     summary.value = res.data;
   } catch {
-    /* */
+    /* keep default summary */
   }
+}
+
+function topEntries(map: Record<string, number>, limit: number) {
+  return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
 async function loadCharts() {
@@ -123,136 +165,89 @@ async function loadCharts() {
     const edges: GraphEdge[] = graphRes.data.edges;
     const tables: TableBrief[] = tablesRes.data.items;
 
-    // 1. Domain distribution from tables
     const domainMap: Record<string, number> = {};
-    for (const t of tables) {
-      const d = t.domain || "未分类";
-      domainMap[d] = (domainMap[d] || 0) + 1;
+    for (const table of tables) {
+      const domain = table.domain || "未分类";
+      domainMap[domain] = (domainMap[domain] || 0) + 1;
     }
-    const sortedDomains = Object.entries(domainMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 15);
-    if (domainChartRef.value) {
-      const chart = echarts.init(domainChartRef.value);
-      chart.setOption({
-        tooltip: { trigger: "axis" },
-        grid: { left: 140 },
-        yAxis: {
-          type: "category",
-          data: sortedDomains.map(v => v[0]).reverse(),
-          axisLabel: { width: 120, overflow: "truncate" }
-        },
-        xAxis: { type: "value", name: "表数量" },
-        series: [
-          {
-            type: "bar",
-            data: sortedDomains.map(v => v[1]).reverse(),
-            itemStyle: { color: "#409EFF" }
-          }
-        ]
-      });
-    }
+    domainRows.value = topEntries(domainMap, 15);
 
-    // 2. Status distribution from edges
     const statusMap: Record<string, number> = {};
-    for (const e of edges) {
-      const s = e.validation_status || "unknown";
-      statusMap[s] = (statusMap[s] || 0) + 1;
-    }
-    if (statusChartRef.value) {
-      const chart = echarts.init(statusChartRef.value);
-      chart.setOption({
-        tooltip: { trigger: "item" },
-        legend: { orient: "vertical", right: 10, top: 20 },
-        series: [
-          {
-            type: "pie",
-            radius: ["40%", "70%"],
-            center: ["35%", "50%"],
-            data: Object.entries(statusMap).map(([k, v]) => ({
-              name: statusLabels[k] || k,
-              value: v
-            })),
-            label: { show: true, formatter: "{b}: {c}" }
-          }
-        ]
-      });
-    }
-
-    // 3. Schema relation TopN from edges
     const schemaMap: Record<string, number> = {};
-    for (const e of edges) {
-      const sch = e.source?.split(".")[0] || "?";
-      schemaMap[sch] = (schemaMap[sch] || 0) + 1;
-    }
-    const sortedSchemas = Object.entries(schemaMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-    if (schemaRelChartRef.value) {
-      const chart = echarts.init(schemaRelChartRef.value);
-      chart.setOption({
-        tooltip: { trigger: "axis" },
-        xAxis: {
-          type: "category",
-          data: sortedSchemas.map(v => v[0]),
-          axisLabel: { rotate: 30 }
-        },
-        yAxis: { type: "value", name: "关系数" },
-        series: [
-          {
-            type: "bar",
-            data: sortedSchemas.map(v => v[1]),
-            itemStyle: { color: "#409EFF" }
-          }
-        ]
-      });
-    }
-
-    // 4. Core table TopN from edges
     const tableRelMap: Record<string, number> = {};
-    for (const e of edges) {
-      if (e.source) tableRelMap[e.source] = (tableRelMap[e.source] || 0) + 1;
-      if (e.target) tableRelMap[e.target] = (tableRelMap[e.target] || 0) + 1;
+    for (const edge of edges) {
+      const status = edge.validation_status || "unknown";
+      statusMap[statusLabels[status] || status] = (statusMap[statusLabels[status] || status] || 0) + 1;
+      const schema = edge.source?.split(".")[0] || "?";
+      schemaMap[schema] = (schemaMap[schema] || 0) + 1;
+      if (edge.source) tableRelMap[edge.source] = (tableRelMap[edge.source] || 0) + 1;
+      if (edge.target) tableRelMap[edge.target] = (tableRelMap[edge.target] || 0) + 1;
     }
-    const sortedTables = Object.entries(tableRelMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-    if (coreTableChartRef.value) {
-      const chart = echarts.init(coreTableChartRef.value);
-      chart.setOption({
-        tooltip: { trigger: "axis" },
-        grid: { left: 180 },
-        yAxis: {
-          type: "category",
-          data: sortedTables.map(v => v[0]).reverse(),
-          axisLabel: { width: 160, overflow: "truncate" }
-        },
-        xAxis: { type: "value", name: "关系数" },
-        series: [
-          {
-            type: "bar",
-            data: sortedTables.map(v => v[1]).reverse(),
-            itemStyle: { color: "#67C23A" }
-          }
-        ]
-      });
-    }
+    statusRows.value = topEntries(statusMap, 12);
+    schemaRows.value = topEntries(schemaMap, 10);
+    coreTableRows.value = topEntries(tableRelMap, 10);
   } catch {
-    /* */
+    domainRows.value = [];
+    statusRows.value = [];
+    schemaRows.value = [];
+    coreTableRows.value = [];
   } finally {
     chartsLoading.value = false;
   }
 }
 
-onMounted(async () => {
-  await loadSummary();
-  await nextTick();
+function reloadAll() {
+  loadSummary();
   loadCharts();
-});
+}
+
+onMounted(reloadAll);
 </script>
 
-<style scoped>
-.stat-cards .stat-card {
-  text-align: center;
+<style scoped lang="scss">
+.asset-overview {
+  padding: 4px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.overview-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+
+  :deep(.el-card__header) {
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border-bottom-color: var(--border-light);
+  }
+}
+
+@media (max-width: 1200px) {
+  .stat-grid,
+  .chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .stat-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

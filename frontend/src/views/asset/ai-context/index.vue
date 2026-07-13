@@ -1,24 +1,29 @@
 <template>
   <div class="asset-ai-context">
-    <el-card shadow="never">
-      <template #header>AI 上下文导出</template>
-      <p style="color: #909399; margin-bottom: 16px">
-        选择表，导出脱敏的元数据（表名、字段、关系），提供给外网 AI 做
-        SQL/视图生成参考。
-        <strong>导出内容不含患者数据。</strong>
-      </p>
+    <RePageHeader
+      title="AI 上下文导出"
+      subtitle="选择表，导出脱敏的元数据（表名、字段、关系），提供给外网 AI 做 SQL/视图生成参考。"
+    />
+
+    <el-card class="context-card" shadow="never">
+      <el-alert
+        title="导出内容不含患者数据"
+        type="info"
+        :closable="false"
+        show-icon
+      />
 
       <div class="filter-bar">
         <el-input
           v-model="keyword"
           placeholder="搜索表名加入列表"
           clearable
-          style="width: 320px"
+          class="search-input"
           @keyup.enter="searchTables"
         />
         <el-button
           type="primary"
-          style="margin-left: 12px"
+          class="search-button"
           @click="searchTables"
         >
           搜索
@@ -29,7 +34,7 @@
         v-loading="searching"
         :data="searchResults"
         stripe
-        style="margin-top: 12px"
+        class="result-table"
         max-height="300"
         @selection-change="onSelect"
       >
@@ -57,13 +62,13 @@
       </el-table>
     </el-card>
 
-    <el-card shadow="never" style="margin-top: 16px">
+    <el-card class="context-card selected-card" shadow="never">
       <template #header> 已选表 ({{ selectedTables.length }}) </template>
       <el-tag
         v-for="t in selectedTables"
         :key="`${t.schema_name}.${t.table_name}`"
         closable
-        style="margin-right: 8px; margin-bottom: 8px"
+        class="selected-tag"
         @close="removeTable(t)"
       >
         {{ t.schema_name }}.{{ t.table_name }}
@@ -74,14 +79,14 @@
         :image-size="80"
       />
 
-      <div v-if="selectedTables.length > 0" style="margin-top: 16px">
+      <div v-if="selectedTables.length > 0" class="action-row">
         <el-button type="success" :loading="exporting" @click="doExport">
           导出上下文
         </el-button>
         <el-button
           v-if="exported"
           type="primary"
-          style="margin-left: 8px"
+          class="secondary-action"
           @click="copyJson"
         >
           复制 JSON
@@ -89,14 +94,14 @@
         <el-button
           v-if="exported"
           type="info"
-          style="margin-left: 8px"
+          class="secondary-action"
           @click="downloadJson"
         >
           下载 JSON
         </el-button>
       </div>
 
-      <div v-if="exported" style="margin-top: 16px">
+      <div v-if="exported" class="action-row">
         <el-alert title="导出成功" type="success" :closable="false" show-icon>
           <template #default>
             已导出 {{ exportedTables }} 张表、{{ exportedColumns }} 个字段、{{
@@ -194,8 +199,50 @@ function downloadJson() {
 </script>
 
 <style scoped>
+.asset-ai-context {
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  background: var(--re-page-bg);
+}
+
+.context-card {
+  border: 1px solid var(--re-border-color);
+  border-radius: var(--re-radius-md);
+  box-shadow: var(--re-shadow-sm);
+}
+
+.selected-card {
+  margin-top: 16px;
+}
+
 .filter-bar {
   display: flex;
   align-items: center;
+  margin-top: 14px;
+}
+
+.action-row {
+  margin-top: 16px;
+}
+
+.search-input {
+  width: 320px;
+}
+
+.search-button {
+  margin-left: 12px;
+}
+
+.result-table {
+  margin-top: 12px;
+}
+
+.selected-tag {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.secondary-action {
+  margin-left: 8px;
 }
 </style>

@@ -1,43 +1,25 @@
-<h1>vue-pure-admin精简版（非国际化版本）</h1>
+# 数据资产平台前端
 
-[![license](https://img.shields.io/github/license/pure-admin/vue-pure-admin.svg)](LICENSE)
+Vue 3 + TypeScript + Element Plus + Vite，基于 `pure-admin-thin` 模板二次开发。平台功能状态和开发优先级以根 `AGENTS.md`、`开发起步包/README.md`、`开发起步包/55_系统未完成事项统一执行计划.md` 为准。
 
-**中文** | [English](./README.en-US.md)
+## 启动与验收
 
-## 介绍
+```powershell
+cd F:\python\数据资产\frontend
+pnpm install
+pnpm run dev
+pnpm run typecheck
+pnpm run build
+```
 
-精简版是基于 [vue-pure-admin](https://github.com/pure-admin/vue-pure-admin) 提炼出的架子，包含主体功能，更适合实际项目开发，打包后的大小在全局引入 [element-plus](https://element-plus.org) 的情况下仍然低于 `2.3MB`，并且会永久同步完整版的代码。开启 `brotli` 压缩和 `cdn` 替换本地库模式后，打包大小低于 `350kb`
+开发代理指向本机后端 `/api`。本地开发 Token 只能通过未跟踪 `.env.local` 或进程环境变量配置，禁止硬编码、写入 localStorage 自动回填或提交到 git。
 
-## 版本选择
+## 约定
 
-当前是非国际化版本，如果您需要国际化版本 [请点击](https://github.com/pure-admin/pure-admin-thin/tree/i18n)
+- API 定义在 `src/api/`，路由在 `src/router/modules/`，页面在 `src/views/`。
+- 后端权限是唯一授权边界；前端路由和按钮权限只改善体验。
+- 新增页面或接口契约必须补类型、验收和 README 目录更新。
 
-## 配套视频
+## 上游来源
 
-[点我查看 UI 设计](https://www.bilibili.com/video/BV17g411T7rq)  
-[点我查看快速开发教程](https://www.bilibili.com/video/BV1kg411v7QT)
-
-## 配套保姆级文档
-
-[点我查看 vue-pure-admin 文档](https://pure-admin.cn/)  
-[点我查看 @pureadmin/utils 文档](https://pure-admin-utils.netlify.app)
-
-## 高级服务
-
-[点我查看详情](https://pure-admin.cn/pages/service/)
-
-## 预览
-
-[查看预览](https://pure-admin-thin.netlify.app/#/login)
-
-## 维护者
-
-[xiaoxian521](https://github.com/xiaoxian521)
-
-## ⚠️ 注意
-
-精简版不接受任何 `issues` 和 `pr`，如果有问题请到完整版 [issues](https://github.com/pure-admin/vue-pure-admin/issues/new/choose) 去提，谢谢！
-
-## 许可证
-
-[MIT © 2020-present, pure-admin](./LICENSE)
+模板源自 [vue-pure-admin](https://github.com/pure-admin/vue-pure-admin)，许可证见 `LICENSE`；上游英文说明保留于 `README.en-US.md`。

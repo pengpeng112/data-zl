@@ -88,6 +88,11 @@ export interface RelationInfo {
   validation_note: string | null;
 }
 
+export interface RelationListItem extends RelationInfo {
+  id: number;
+  rel_id: number | null;
+}
+
 export interface HopInfo {
   from: string;
   to: string;
@@ -222,29 +227,67 @@ export const getAssetTree = (params?: { system_code?: string }) => {
 export interface GraphNode {
   id: string;
   label: string;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
   schema_name?: string | null;
   table_name?: string | null;
+  table_name_cn?: string | null;
+  table_role?: string | null;
   domain?: string | null;
+  business_domain?: string | null;
   column_count?: number | null;
   source?: string | null;
   category?: string | null;
+  row_count_stats?: string | null;
+  grain?: string | null;
+  pk?: string | null;
+  confidence?: string | null;
+  include_status?: string | null;
+  review_status?: string | null;
+  note?: string | null;
+}
+
+export interface GraphFieldMapping {
+  from_column?: string | null;
+  from_column_name_cn?: string | null;
+  to_column?: string | null;
+  to_column_name_cn?: string | null;
 }
 
 export interface GraphEdge {
   id: string;
   source: string;
   target: string;
+  from_system_code?: string | null;
+  from_source_code?: string | null;
+  from_schema_name?: string | null;
+  from_table_name?: string | null;
+  from_table_name_cn?: string | null;
+  from_table_role?: string | null;
+  from_include_status?: string | null;
+  to_system_code?: string | null;
+  to_source_code?: string | null;
+  to_schema_name?: string | null;
+  to_table_name?: string | null;
+  to_table_name_cn?: string | null;
+  to_table_role?: string | null;
+  to_include_status?: string | null;
   label?: string | null;
   relation_type?: string | null;
   rel_id?: number | null;
   join_condition?: string | null;
   from_columns?: string | null;
   to_columns?: string | null;
+  field_mappings?: GraphFieldMapping[];
   cardinality?: string | null;
+  business_domain?: string | null;
   confidence?: string | null;
   validation_level?: string | null;
   validation_status?: string | null;
   validation_metrics?: string | null;
+  is_deferred?: boolean | null;
+  deferred_reason?: string | null;
   note?: string | null;
   validation_note?: string | null;
 }
@@ -254,15 +297,34 @@ export interface GraphData {
   edges: GraphEdge[];
 }
 
+export interface GraphViewMode {
+  code: string;
+  label: string;
+  description?: string | null;
+  group_by: "system" | "source" | "schema" | "domain";
+  layout_mode: "layered" | "grouped" | "radial";
+  confidence?: string | null;
+  validation_status?: string | null;
+  include_candidates: boolean;
+  include_dependencies: boolean;
+  show_review_layer: boolean;
+  requires_table: boolean;
+}
+
 export interface GraphOptionsData {
+  systems: string[];
+  sources: string[];
   schemas: string[];
   domains: string[];
   validation_statuses: string[];
   confidences: string[];
   relation_types: string[];
+  view_modes: GraphViewMode[];
 }
 
 export const getGraph = (params: {
+  system_code?: string;
+  source_code?: string;
   schema?: string;
   domain?: string;
   validation_status?: string;

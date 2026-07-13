@@ -1,33 +1,15 @@
 <template>
   <div class="metadata-changes">
-    <el-row :gutter="16" class="summary-row">
-      <el-col :span="6">
-        <el-card shadow="never">
-          <el-statistic title="全部变更" :value="summary.total ?? 0" />
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="never">
-          <el-statistic title="待处理" :value="summary.open ?? 0">
-            <template #suffix>
-              <el-tag type="danger" size="small">NEW</el-tag>
-            </template>
-          </el-statistic>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="never">
-          <el-statistic title="已确认" :value="summary.acknowledged ?? 0" />
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="never">
-          <el-statistic title="已解决" :value="summary.resolved ?? 0" />
-        </el-card>
-      </el-col>
-    </el-row>
+    <RePageHeader title="元数据变更事件" subtitle="跟踪源端表、字段和结构变更，支持分配、确认和闭环处理。" />
 
-    <el-card shadow="never" style="margin-top: 16px">
+    <section class="change-stat-grid">
+      <ReStatCard label="全部变更" :value="summary.total ?? 0" tone="primary" />
+      <ReStatCard label="待处理" :value="summary.open ?? 0" tone="danger" />
+      <ReStatCard label="已确认" :value="summary.acknowledged ?? 0" tone="warning" />
+      <ReStatCard label="已解决" :value="summary.resolved ?? 0" tone="accent" />
+    </section>
+
+    <el-card shadow="never" class="event-card">
       <template #header>
         <span>变更事件列表</span>
       </template>
@@ -37,7 +19,7 @@
           v-model="filters.system_code"
           placeholder="所属系统"
           clearable
-          style="width: 160px"
+          class="system-select"
           @change="doSearch"
         >
           <el-option label="HIS" value="HIS" />
@@ -53,7 +35,7 @@
           v-model="filters.change_type"
           placeholder="变更类型"
           clearable
-          style="width: 160px; margin-left: 12px"
+          class="type-select"
           @change="doSearch"
         >
           <el-option label="新增表" value="table_added" />
@@ -68,7 +50,7 @@
           v-model="filters.severity"
           placeholder="严重程度"
           clearable
-          style="width: 140px; margin-left: 12px"
+          class="compact-select"
           @change="doSearch"
         >
           <el-option label="提示" value="info" />
@@ -82,7 +64,7 @@
           v-model="filters.status"
           placeholder="状态"
           clearable
-          style="width: 140px; margin-left: 12px"
+          class="compact-select"
           @change="doSearch"
         >
           <el-option label="待处理" value="open" />
@@ -95,7 +77,7 @@
           v-model="filters.keyword"
           placeholder="搜索表名/字段名"
           clearable
-          style="width: 220px; margin-left: 12px"
+          class="keyword-input"
           @keyup.enter="doSearch"
         />
       </div>
@@ -104,7 +86,7 @@
         v-loading="loading"
         :data="items"
         stripe
-        style="margin-top: 12px"
+        class="event-table"
         @row-click="showDetail"
       >
         <el-table-column prop="id" label="ID" width="70" align="center" />
@@ -183,7 +165,7 @@
         :total="pagination.total"
         layout="total, prev, pager, next, sizes"
         :page-sizes="[10, 20, 50, 100]"
-        style="margin-top: 16px; justify-content: flex-end"
+        class="pager"
         @change="loadData"
       />
     </el-card>
@@ -235,6 +217,8 @@
 </template>
 
 <script setup lang="ts">
+import RePageHeader from "@/components/RePageHeader/index.vue";
+import ReStatCard from "@/components/ReStatCard/index.vue";
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import {
@@ -445,6 +429,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.metadata-changes { padding: 4px; }
+.change-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.event-card { border-color: var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
+@media (max-width: 960px) { .change-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .change-stat-grid { grid-template-columns: 1fr; } }
 .summary-row .el-card {
   text-align: center;
 }
@@ -465,4 +454,11 @@ onMounted(() => {
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+.system-select { width: 160px; }
+.type-select { width: 160px; margin-left: 12px; }
+.compact-select { width: 140px; margin-left: 12px; }
+.keyword-input { width: 220px; margin-left: 12px; }
+.event-table { margin-top: 12px; }
+.pager { justify-content: flex-end; margin-top: 16px; }
 </style>
