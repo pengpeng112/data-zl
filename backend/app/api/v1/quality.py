@@ -367,14 +367,16 @@ def list_rules(db: Session = Depends(get_db)) -> ApiResponse[list[QualityRuleIte
     return ApiResponse(data=[QualityRuleItem.model_validate(r) for r in rows])
 
 
-@router.post("/checks/run", summary="手动触发质量检查")
-def run_quality_check(
-    rule_codes: list[str] | None = Query(None),
-    db: Session = Depends(get_db),
-) -> ApiResponse[dict]:
+def run_quality_check_core(
+    db: Session,
+    *,
+    rule_codes: list[str] | None = None,
+    triggered_by: str = "manual",
+) -> dict:
+    """Shared entry for manual API and nightly scheduler (L15)."""
     seed_rules(db)
 
-    rules_q = select(QualityRule).where(QualityRule.enabled == True)
+    rules_q = select(QualityRule).where(QualityRule.enabled == True)  # noqa: E712
     if rule_codes:
         rules_q = rules_q.where(QualityRule.rule_code.in_(rule_codes))
     rules = db.scalars(rules_q).all()
@@ -384,7 +386,7 @@ def run_quality_check(
 
     run = QualityCheckRun(
         started_at=datetime.now(timezone.utc),
-        triggered_by="manual",
+        triggered_by=triggered_by,
         total_rules=len(rules),
         status="running",
         system_code=system_codes[0] if len(system_codes) == 1 else None,
@@ -423,6 +425,7 @@ def run_quality_check(
                     sql=rule.check_sql or "",
                     source_code=rule.source_code or "",
                     sample_limit=rule.sample_limit or 20,
+                    db=db,
                 )
                 total_records += result.get("total_cnt", 0)
                 error_records += result.get("error_cnt", 0)
@@ -470,6 +473,14 @@ def run_quality_check(
             new_findings = runner(db)
             deduped = 0
             for f in new_findings:
+                f.run_id = run.id
+                if isinstance(f.sample_data, list):
+                    f.sample_data = [
+                        mask_sensitive(item) if isinstance(item, dict) else item
+                        for item in f.sample_data
+                    ]
+                elif isinstance(f.sample_data, dict):
+                    f.sample_data = mask_sensitive(f.sample_data)
                 existing = db.scalar(
                     select(QualityFinding).where(
                         QualityFinding.rule_code == f.rule_code,
@@ -481,6 +492,8 @@ def run_quality_check(
                 if existing:
                     existing.metric_value = f.metric_value
                     existing.detail = f.detail
+                    existing.sample_data = f.sample_data
+                    existing.run_id = run.id
                     existing.found_at = datetime.now(timezone.utc)
                     deduped += 1
                 else:
@@ -508,17 +521,24 @@ def run_quality_check(
         db.commit()
         raise
 
-    return ApiResponse(
-        data={
-            "run_id": run.id,
-            "total_rules": run.total_rules,
-            "total_findings": total_findings,
-            "total_records": total_records,
-            "error_records": error_records,
-            "pass_rate": pass_rate,
-            "status": run.status,
-        }
-    )
+    return {
+        "run_id": run.id,
+        "total_rules": run.total_rules,
+        "total_findings": total_findings,
+        "total_records": total_records,
+        "error_records": error_records,
+        "pass_rate": pass_rate,
+        "status": run.status,
+        "triggered_by": triggered_by,
+    }
+
+
+@router.post("/checks/run", summary="手动触发质量检查")
+def run_quality_check(
+    rule_codes: list[str] | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    return ApiResponse(data=run_quality_check_core(db, rule_codes=rule_codes, triggered_by="manual"))
 
 
 @router.get("/checks/runs", summary="质量检查历史")
@@ -545,6 +565,7 @@ def list_findings(
     severity: str | None = Query(None),
     status: str | None = Query(None),
     rule_code: str | None = Query(None),
+    run_id: int | None = Query(None),
     keyword: str | None = Query(None),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
@@ -555,6 +576,8 @@ def list_findings(
         stmt = stmt.where(QualityFinding.status == status)
     if rule_code:
         stmt = stmt.where(QualityFinding.rule_code == rule_code)
+    if run_id is not None:
+        stmt = stmt.where(QualityFinding.run_id == run_id)
     if keyword:
         like = f"%{keyword}%"
         stmt = stmt.where(QualityFinding.target_ref.ilike(like))

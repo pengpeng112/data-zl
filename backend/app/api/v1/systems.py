@@ -87,6 +87,20 @@ def upsert_system(req: SystemUpsert, db: Session = Depends(get_db)) -> ApiRespon
     return ApiResponse(data={"id": sys.id, "system_code": sys.system_code})
 
 
+@router.post("/sources/peripheral/bootstrap", summary="L14 登记周边系统并可选活库元数据采集（只读）")
+def bootstrap_peripheral_sources(
+    collect: bool = Query(True, description="是否立即对各 owner 做 live 元数据采集"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    from ...services.peripheral_sources import collect_peripheral_metadata, ensure_peripheral_registry
+
+    reg = ensure_peripheral_registry(db)
+    out: dict = {"registry": reg, "collect": None}
+    if collect:
+        out["collect"] = collect_peripheral_metadata(db)
+    return ApiResponse(data=out)
+
+
 @router.delete("/systems/{system_code}", summary="删除系统")
 def delete_system(system_code: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     sys = db.scalar(select(AssetSystem).where(AssetSystem.system_code == system_code))
@@ -221,11 +235,80 @@ def delete_source(source_code: str, db: Session = Depends(get_db)) -> ApiRespons
     return ApiResponse(data={"deleted": source_code})
 
 
-# ── 资产树（五层结构） ──
+# ── 资产树（五层：系统大类 -> 系统/库 -> schema -> 表 -> 字段） ──
 
-@router.get("/assets/tree", summary="系统 -> 数据源 -> schema -> 表 树")
+_CATEGORY_CN = {
+    "ods_center": "ODS 数据中心系统",
+    "his_source": "HIS 源端系统",
+    "hrp_source": "HRP 源端系统",
+    "external_business": "其他业务系统",
+    "platform_asset": "平台元数据系统",
+}
+
+_SOURCE_SYSTEM_CN = {
+    "ods_his": "HIS 抽取区",
+    "ods_lis": "LIS 抽取区",
+    "ods_pacs": "PACS 抽取区",
+    "ods_emr": "EMR/病历抽取区",
+    "ods_ydhl": "移动护理抽取区",
+    "ods_sm": "手麻抽取区",
+    "ods_cda": "CDA/标准字典区",
+    "ods_other": "其他抽取区",
+    "his_prod": "HIS 业务库",
+    "hrp": "HRP 源端",
+    "lis": "检验 LIS",
+    "pacs": "影像 PACS",
+    "emr": "电子病历",
+    "mobile_nursing": "移动护理",
+    "sm": "手麻",
+    "platform": "平台 asset",
+}
+
+
+def _classify_asset_source(system_code: str | None, source_code: str | None) -> tuple[str, str, str, str]:
+    """Return (system_category, category_cn, source_system, source_system_cn)."""
+    sc = (system_code or "").upper()
+    src = (source_code or "").lower()
+
+    if sc == "HIS_SOURCE" or "his_source" in src or src.startswith("his_"):
+        return "his_source", _CATEGORY_CN["his_source"], "his_prod", _SOURCE_SYSTEM_CN["his_prod"]
+    if sc == "HRP" or "hrp" in src:
+        return "hrp_source", _CATEGORY_CN["hrp_source"], "hrp", _SOURCE_SYSTEM_CN["hrp"]
+    if sc == "LIS" or src.endswith("_lis") or src == "ods_lis":
+        cat = "external_business" if sc == "LIS" else "ods_center"
+        if cat == "ods_center":
+            return cat, _CATEGORY_CN[cat], "ods_lis", _SOURCE_SYSTEM_CN["ods_lis"]
+        return cat, _CATEGORY_CN[cat], "lis", _SOURCE_SYSTEM_CN["lis"]
+    if sc == "PACS" or src.endswith("_pacs") or src == "ods_pacs":
+        if sc == "PACS":
+            return "external_business", _CATEGORY_CN["external_business"], "pacs", _SOURCE_SYSTEM_CN["pacs"]
+        return "ods_center", _CATEGORY_CN["ods_center"], "ods_pacs", _SOURCE_SYSTEM_CN["ods_pacs"]
+    if sc == "EMR" or src.endswith("_emr") or src == "ods_emr":
+        if sc == "EMR":
+            return "external_business", _CATEGORY_CN["external_business"], "emr", _SOURCE_SYSTEM_CN["emr"]
+        return "ods_center", _CATEGORY_CN["ods_center"], "ods_emr", _SOURCE_SYSTEM_CN["ods_emr"]
+    if sc in ("MOBILE_NURSING", "YDHL") or "ydhl" in src:
+        if sc in ("MOBILE_NURSING", "YDHL"):
+            return "external_business", _CATEGORY_CN["external_business"], "mobile_nursing", _SOURCE_SYSTEM_CN["mobile_nursing"]
+        return "ods_center", _CATEGORY_CN["ods_center"], "ods_ydhl", _SOURCE_SYSTEM_CN["ods_ydhl"]
+    if sc == "SM" or src.endswith("_sm") or src == "ods_sm":
+        if sc == "SM":
+            return "external_business", _CATEGORY_CN["external_business"], "sm", _SOURCE_SYSTEM_CN["sm"]
+        return "ods_center", _CATEGORY_CN["ods_center"], "ods_sm", _SOURCE_SYSTEM_CN["ods_sm"]
+    if sc == "DATA_CENTER" or src.startswith("ods") or "8_216" in src:
+        if "cda" in src:
+            return "ods_center", _CATEGORY_CN["ods_center"], "ods_cda", _SOURCE_SYSTEM_CN["ods_cda"]
+        # 主 ODS 汇聚源：按表 namespace 在前端再分；树节点先标 his 抽取区为主入口
+        if src in ("ods_8_216",) or "ods" in src:
+            return "ods_center", _CATEGORY_CN["ods_center"], "ods_his", _SOURCE_SYSTEM_CN["ods_his"]
+        return "ods_center", _CATEGORY_CN["ods_center"], "ods_other", _SOURCE_SYSTEM_CN["ods_other"]
+    return "platform_asset", _CATEGORY_CN["platform_asset"], "platform", _SOURCE_SYSTEM_CN["platform"]
+
+
+@router.get("/assets/tree", summary="系统大类 -> 系统/库 -> schema -> 表 树（字段在前端懒加载）")
 def assets_tree(
     system_code: str | None = Query(None),
+    system_category: str | None = Query(None),
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
     sources_stmt = select(AssetDataSource)
@@ -243,20 +326,62 @@ def assets_tree(
             grouped[sc] = {"schemas": {}}
         if ns not in grouped[sc]["schemas"]:
             grouped[sc]["schemas"][ns] = []
+        # ODS 主源按 owner 再映射 source_system，便于五层第二层拆分
+        owner_hint = (ns or "").upper()
         grouped[sc]["schemas"][ns].append({
-            "id": t.id, "table_name": t.table_name,
+            "id": t.id,
+            "table_name": t.table_name,
             "table_name_cn": t.table_name_cn,
             "column_count": t.column_count,
             "domain": t.domain,
+            "owner_hint": owner_hint,
         })
 
     tree = []
     for sc, sc_data in sorted(grouped.items()):
         ds = sources.get(sc)
+        sys_code = ds.system_code if ds else "DATA_CENTER"
+        cat, cat_cn, src_sys, src_sys_cn = _classify_asset_source(sys_code, sc)
+        # 主 ODS 汇聚：按 namespace 拆分到抽取区
+        if sc in ("ods_8_216",) or (sys_code == "DATA_CENTER" and "216" in sc):
+            by_zone: dict[str, dict] = {}
+            for ns, tbls in sc_data["schemas"].items():
+                zone = _ods_owner_zone(ns)
+                if zone not in by_zone:
+                    by_zone[zone] = {"schemas": {}}
+                by_zone[zone]["schemas"][ns] = tbls
+            for zone, zdata in sorted(by_zone.items()):
+                z_cn = _SOURCE_SYSTEM_CN.get(zone, zone)
+                node = {
+                    "source_code": sc,
+                    "source_name_cn": (ds.source_name_cn if ds else sc) + f" / {z_cn}",
+                    "system_code": sys_code,
+                    "system_category": cat,
+                    "system_category_cn": cat_cn,
+                    "source_system": zone,
+                    "source_system_cn": z_cn,
+                    "schemas": [],
+                    "table_count": sum(len(v) for v in zdata["schemas"].values()),
+                }
+                for ns, tbls in sorted(zdata["schemas"].items()):
+                    node["schemas"].append({
+                        "namespace": ns,
+                        "tables": tbls,
+                        "table_count": len(tbls),
+                    })
+                if system_category and node["system_category"] != system_category:
+                    continue
+                tree.append(node)
+            continue
+
         node = {
             "source_code": sc,
             "source_name_cn": ds.source_name_cn if ds else sc,
-            "system_code": ds.system_code if ds else "DATA_CENTER",
+            "system_code": sys_code,
+            "system_category": cat,
+            "system_category_cn": cat_cn,
+            "source_system": src_sys,
+            "source_system_cn": src_sys_cn,
             "schemas": [],
             "table_count": sum(len(v) for v in sc_data["schemas"].values()),
         }
@@ -266,6 +391,27 @@ def assets_tree(
                 "tables": tbls,
                 "table_count": len(tbls),
             })
+        if system_category and node["system_category"] != system_category:
+            continue
         tree.append(node)
 
     return ApiResponse(data=tree)
+
+
+def _ods_owner_zone(namespace: str) -> str:
+    owner = (namespace or "").upper()
+    if owner in ("HIS",) or owner.startswith("HIS"):
+        return "ods_his"
+    if owner == "LIS":
+        return "ods_lis"
+    if owner == "PACS":
+        return "ods_pacs"
+    if owner in ("JHEMR", "MTL", "YBEMR"):
+        return "ods_emr"
+    if owner == "YDHL":
+        return "ods_ydhl"
+    if owner == "SM":
+        return "ods_sm"
+    if owner == "CDA":
+        return "ods_cda"
+    return "ods_other"

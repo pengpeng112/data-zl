@@ -55,17 +55,28 @@
       <el-checkbox v-model="filters.include_candidates" @change="emit('load-data')">候选关系</el-checkbox>
       <el-checkbox v-model="filters.include_dependencies" @change="emit('load-data')">视图依赖</el-checkbox>
       <el-checkbox v-model="filters.aggregate_groups" @change="emit('refresh')">节点聚合</el-checkbox>
-      <el-checkbox v-model="filters.show_review_layer" :disabled="!currentViewMode?.show_review_layer" @change="emit('refresh')">显示 D 类待分析层</el-checkbox>
+      <el-checkbox
+        v-model="filters.show_review_layer"
+        :disabled="!currentViewMode?.show_review_layer"
+        @change="emit('refresh')"
+      >显示 D 类跨系统（虚线灰紫）</el-checkbox>
       <el-button text type="success" @click="emit('sample-pass')">只看通过关系</el-button>
+    </div>
+
+    <div class="legend-row" aria-label="关系图例">
+      <span class="legend-item"><i class="swatch solid-a" />A 类高置信（实线）</span>
+      <span class="legend-item"><i class="swatch dashed-bc" />B/C 类（虚线琥珀）</span>
+      <span class="legend-item"><i class="swatch dashed-d" />D 类跨系统待验证（虚线灰紫）</span>
+      <span class="legend-item"><i class="swatch dashed-cand" />候选关系</span>
     </div>
 
     <el-alert
       v-if="filters.show_review_layer"
       class="review-layer-alert"
-      type="error"
+      type="warning"
       show-icon
       :closable="false"
-      title="跨系统关系待验证，不能作为正式血缘/ER 依据。D 类关系仅作为待分析层展示。"
+      title="D 类可进入图谱展示，但必须保留「跨系统待验证」标识，不可当作 A 类正式血缘依据。"
     />
 
     <div class="stats-row">
@@ -74,7 +85,7 @@
       <el-tag type="success">通过 {{ normalized.passCount }}</el-tag>
       <el-tag type="warning">候选 {{ normalized.candidateCount }}</el-tag>
       <el-tag type="info">依赖 {{ normalized.dependencyCount }}</el-tag>
-      <el-tag v-if="normalized.reviewHiddenCount" type="danger" effect="plain">已隐藏待分析 {{ normalized.reviewHiddenCount }}</el-tag>
+      <el-tag v-if="normalized.reviewHiddenCount" type="danger" effect="plain">已隐藏 D/待分析 {{ normalized.reviewHiddenCount }}</el-tag>
       <el-tag v-if="selectedNodeId" type="success" effect="dark">已聚焦 {{ selectedNodeId }}</el-tag>
       <el-tag v-for="item in normalized.topGroups" :key="item.name" effect="plain">{{ item.name }} {{ item.count }}</el-tag>
     </div>
@@ -169,6 +180,30 @@ function statusLabel(status: string) {
 .direction-segmented { width: 190px; }
 .filter-grid { display: grid; grid-template-columns: 130px 150px 130px 150px 140px 110px minmax(220px, 1fr) 110px 76px 76px; gap: 8px; align-items: center; }
 .switch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 10px; }
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgb(14 165 233 / 4%);
+  border: 1px solid var(--border-light, #f1f5f9);
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top-width: 3px;
+  border-top-style: solid;
+}
+.swatch.solid-a { border-top-color: #0f3a66; }
+.swatch.dashed-bc { border-top-style: dashed; border-top-color: #d97706; }
+.swatch.dashed-d { border-top-style: dashed; border-top-color: #7c6aa6; }
+.swatch.dashed-cand { border-top-style: dashed; border-top-color: #94a3b8; }
 .review-layer-alert { margin-top: 10px; }
 .stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 @media (max-width: 1200px) { .filter-grid, .locate-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -13,6 +13,52 @@ export interface SummaryData {
   domains: number;
 }
 
+export interface DashboardNamedCount {
+  name: string;
+  count: number;
+}
+
+export interface DashboardActivity {
+  title: string;
+  desc: string;
+  status: string;
+  tone: string;
+  href?: string;
+}
+
+export interface DashboardSummary {
+  generated_at?: string;
+  assets: SummaryData;
+  systems: number;
+  sources_enabled: number;
+  sources_total: number;
+  persons: number;
+  departments: number;
+  identity_diffs_open: number;
+  quality_rules: number;
+  quality_findings_open: number;
+  quality_last_run: {
+    id: number;
+    status?: string | null;
+    total_rules?: number | null;
+    total_findings?: number | null;
+    pass_rate?: number | null;
+    triggered_by?: string | null;
+    finished_at?: string | null;
+  } | null;
+  metadata_snapshots: number;
+  domain_top: DashboardNamedCount[];
+  relation_by_confidence: DashboardNamedCount[];
+  schema_top: DashboardNamedCount[];
+  quality_run_trend: {
+    id: number;
+    label: string;
+    findings: number;
+    pass_rate: number;
+  }[];
+  activities: DashboardActivity[];
+}
+
 export interface PageData<T> {
   total: number;
   page: number;
@@ -128,6 +174,13 @@ export const getSummary = () => {
   return http.get<ApiResponse<SummaryData>, object>("/api/v1/summary");
 };
 
+/** 首页指挥中心聚合指标 */
+export const getDashboardSummary = () => {
+  return http.get<ApiResponse<DashboardSummary>, object>(
+    "/api/v1/dashboard/summary"
+  );
+};
+
 /** 表清单 */
 export const getTables = (params: {
   keyword?: string;
@@ -213,11 +266,20 @@ export interface AssetTreeNode {
   source_code: string;
   source_name_cn: string;
   system_code: string;
+  /** 51 号：系统大类 */
+  system_category?: string | null;
+  system_category_cn?: string | null;
+  /** 51 号：系统/库或 ODS 抽取区 */
+  source_system?: string | null;
+  source_system_cn?: string | null;
   table_count: number;
   schemas: AssetTreeSchema[];
 }
 
-export const getAssetTree = (params?: { system_code?: string }) => {
+export const getAssetTree = (params?: {
+  system_code?: string;
+  system_category?: string;
+}) => {
   return http.get<ApiResponse<AssetTreeNode[]>, object>("/api/v1/assets/tree", {
     params
   });
@@ -533,6 +595,7 @@ export const getQualityFindings = (params: {
   severity?: string;
   status?: string;
   rule_code?: string;
+  run_id?: number;
   keyword?: string;
 }) => {
   return http.get<ApiResponse<PageData<QualityFindingItem>>, object>(

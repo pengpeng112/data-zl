@@ -2,7 +2,7 @@
   <div class="asset-graph-page">
     <RePageHeader
       title="关系图谱"
-      subtitle="按系统、数据源、Schema 和业务域查看表间关系、血缘链路和复核证据。"
+      subtitle="按系统大类 / 数据源 / Schema / 业务域浏览；A 类实线，D 类跨系统虚线灰紫并单独图例。"
     />
     <GraphToolbar
       :filters="filters"

@@ -1,10 +1,17 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import ReChart from "@/components/ReChart/index.vue";
 import ReDataCard from "@/components/ReDataCard/index.vue";
 import ReKpiPanel from "@/components/ReKpiPanel/index.vue";
 import ReTrendBadge from "@/components/ReTrendBadge/index.vue";
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import type { EChartsCoreOption } from "echarts/core";
+import {
+  getDashboardSummary,
+  type DashboardActivity,
+  type DashboardSummary
+} from "@/api/asset";
+import { http } from "@/utils/http";
 import DatabaseIcon from "~icons/ri/database-2-line";
 import TableIcon from "~icons/ri/table-line";
 import FieldIcon from "~icons/ri/list-check-2";
@@ -12,6 +19,7 @@ import RelationIcon from "~icons/ri/git-branch-line";
 import ShieldIcon from "~icons/ri/shield-check-line";
 import AlertIcon from "~icons/ri/error-warning-line";
 import RefreshIcon from "~icons/ri/refresh-line";
+import UserIcon from "~icons/ri/user-3-line";
 
 interface KpiItem {
   label: string;
@@ -22,183 +30,355 @@ interface KpiItem {
   trendDirection: "up" | "down" | "flat";
   tone: "primary" | "accent" | "info" | "warning" | "danger";
   icon: object;
+  href?: string;
 }
+
+defineOptions({ name: "Welcome" });
+
+const router = useRouter();
+const loading = ref(false);
+const loadError = ref("");
+const healthOk = ref<boolean | null>(null);
+const healthDetail = ref("检测中…");
+const dash = ref<DashboardSummary | null>(null);
 
 const now = ref(new Date());
 const timer = window.setInterval(() => {
   now.value = new Date();
 }, 1000 * 30);
-
 onBeforeUnmount(() => window.clearInterval(timer));
 
-defineOptions({
-  name: "Welcome"
-});
-
-const currentTime = computed(() => {
-  return now.value.toLocaleString("zh-CN", {
+const currentTime = computed(() =>
+  now.value.toLocaleString("zh-CN", {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit"
-  });
+  })
+);
+
+function fmt(n: number | null | undefined): string {
+  const v = Number(n || 0);
+  if (v >= 10000) return `${(v / 10000).toFixed(v >= 100000 ? 0 : 1)}`;
+  return String(v);
+}
+
+function fmtUnit(n: number | null | undefined): string | undefined {
+  return Number(n || 0) >= 10000 ? "万" : undefined;
+}
+
+const kpis = computed<KpiItem[]>(() => {
+  const d = dash.value;
+  if (!d) {
+    return [
+      {
+        label: "系统与数据源",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "primary",
+        icon: DatabaseIcon
+      },
+      {
+        label: "资产表",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "accent",
+        icon: TableIcon
+      },
+      {
+        label: "字段资产",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "info",
+        icon: FieldIcon
+      },
+      {
+        label: "正式关系",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "primary",
+        icon: RelationIcon
+      },
+      {
+        label: "人员主档",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "accent",
+        icon: UserIcon
+      },
+      {
+        label: "待人工复核",
+        value: "—",
+        helper: "加载中…",
+        trend: "…",
+        trendDirection: "flat",
+        tone: "danger",
+        icon: AlertIcon
+      }
+    ];
+  }
+
+  const last = d.quality_last_run;
+  const lastHint = last
+    ? `最近 run #${last.id} · findings ${last.total_findings ?? 0}`
+    : "尚无质量跑批记录";
+
+  return [
+    {
+      label: "系统与数据源",
+      value: String(d.systems),
+      helper: `启用数据源 ${d.sources_enabled}/${d.sources_total}`,
+      trend: "登记",
+      trendDirection: "flat" as const,
+      tone: "primary" as const,
+      icon: DatabaseIcon,
+      href: "/asset/sources"
+    },
+    {
+      label: "资产表",
+      value: fmt(d.assets.tables),
+      unit: fmtUnit(d.assets.tables),
+      helper: `业务域 ${d.assets.domains} · 快照 ${d.metadata_snapshots}`,
+      trend: "目录",
+      trendDirection: "flat" as const,
+      tone: "accent" as const,
+      icon: TableIcon,
+      href: "/asset/tables"
+    },
+    {
+      label: "字段资产",
+      value: fmt(d.assets.columns),
+      unit: fmtUnit(d.assets.columns),
+      helper: "asset_columns 实计",
+      trend: "结构",
+      trendDirection: "flat" as const,
+      tone: "info" as const,
+      icon: FieldIcon,
+      href: "/asset/tables"
+    },
+    {
+      label: "正式关系",
+      value: String(d.assets.relations),
+      helper: d.relation_by_confidence
+        .slice(0, 3)
+        .map(x => `${x.name}:${x.count}`)
+        .join(" · ") || "暂无分级统计",
+      trend: "图谱",
+      trendDirection: "flat" as const,
+      tone: "primary" as const,
+      icon: RelationIcon,
+      href: "/asset/graph"
+    },
+    {
+      label: "人员主档",
+      value: String(d.persons),
+      helper: `科室 ${d.departments} · 规则 ${d.quality_rules}`,
+      trend: last ? `质量open ${d.quality_findings_open}` : "HIS",
+      trendDirection: "flat" as const,
+      tone: "accent" as const,
+      icon: UserIcon,
+      href: "/identity/persons"
+    },
+    {
+      label: "待人工复核",
+      value: String(d.identity_diffs_open),
+      helper: lastHint,
+      trend: d.identity_diffs_open > 0 ? "待处理" : "清空",
+      trendDirection: d.identity_diffs_open > 0 ? ("up" as const) : ("flat" as const),
+      tone: "danger" as const,
+      icon: AlertIcon,
+      href: "/identity/sync-diffs"
+    }
+  ];
 });
 
-const kpis: KpiItem[] = [
-  {
-    label: "系统与数据源",
-    value: "12",
-    helper: "ODS / HIS / HRP 已纳入治理视图",
-    trend: "+2",
-    trendDirection: "up",
-    tone: "primary",
-    icon: DatabaseIcon
-  },
-  {
-    label: "资产表",
-    value: "8.6",
-    unit: "万",
-    helper: "含 HRP 首版资产包与 HIS_READY",
-    trend: "+76057",
-    trendDirection: "up",
-    tone: "accent",
-    icon: TableIcon
-  },
-  {
-    label: "字段资产",
-    value: "502",
-    unit: "万",
-    helper: "HRP 字段仍需夜间分段补采",
-    trend: "待复核",
-    trendDirection: "flat",
-    tone: "info",
-    icon: FieldIcon
-  },
-  {
-    label: "正式关系",
-    value: "47",
-    helper: "A/B/C 当前可用，D 类独立标识",
-    trend: "稳定",
-    trendDirection: "flat",
-    tone: "primary",
-    icon: RelationIcon
-  },
-  {
-    label: "质量执行",
-    value: "10",
-    helper: "核心表质量规则已跑通",
-    trend: "3 findings",
-    trendDirection: "down",
-    tone: "warning",
-    icon: ShieldIcon
-  },
-  {
-    label: "待人工确认",
-    value: "4",
-    helper: "人员唯一键、科室编码等需确认",
-    trend: "人工复核",
-    trendDirection: "flat",
-    tone: "danger",
-    icon: AlertIcon
+const healthTrendOption = computed<EChartsCoreOption>(() => {
+  const trend = dash.value?.quality_run_trend || [];
+  if (!trend.length) {
+    return {
+      title: {
+        text: "暂无质量跑批趋势",
+        left: "center",
+        top: "middle",
+        textStyle: { color: "#94a3b8", fontSize: 13 }
+      }
+    };
   }
-];
-
-const healthTrendOption: EChartsCoreOption = {
-  tooltip: { trigger: "axis" },
-  legend: { data: ["元数据", "关系", "质量"] },
-  xAxis: {
-    type: "category",
-    boundaryGap: false,
-    data: ["07-02", "07-03", "07-04", "07-05", "07-06", "07-07", "07-08"]
-  },
-  yAxis: { type: "value" },
-  series: [
-    {
-      name: "元数据",
-      type: "line",
-      smooth: true,
-      symbolSize: 6,
-      areaStyle: { opacity: 0.16 },
-      data: [62, 68, 75, 81, 88, 91, 94]
+  return {
+    tooltip: { trigger: "axis" },
+    legend: { data: ["findings", "pass_rate%"] },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: trend.map(t => t.label)
     },
-    {
-      name: "关系",
-      type: "line",
-      smooth: true,
-      symbolSize: 6,
-      areaStyle: { opacity: 0.12 },
-      data: [42, 48, 56, 64, 72, 78, 82]
+    yAxis: [{ type: "value", name: "findings" }, { type: "value", name: "%", max: 100 }],
+    series: [
+      {
+        name: "findings",
+        type: "line",
+        smooth: true,
+        symbolSize: 6,
+        areaStyle: { opacity: 0.16 },
+        data: trend.map(t => t.findings)
+      },
+      {
+        name: "pass_rate%",
+        type: "line",
+        smooth: true,
+        yAxisIndex: 1,
+        symbolSize: 6,
+        data: trend.map(t => t.pass_rate)
+      }
+    ]
+  };
+});
+
+const domainOption = computed<EChartsCoreOption>(() => {
+  const rows = dash.value?.domain_top || [];
+  if (!rows.length) {
+    return {
+      title: {
+        text: "暂无业务域分布（表目录可能未导入）",
+        left: "center",
+        top: "middle",
+        textStyle: { color: "#94a3b8", fontSize: 13 }
+      }
+    };
+  }
+  return {
+    tooltip: { trigger: "item" },
+    legend: { bottom: 0 },
+    series: [
+      {
+        name: "业务域",
+        type: "pie",
+        radius: ["52%", "76%"],
+        center: ["50%", "44%"],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 8, borderColor: "#0B1120", borderWidth: 2 },
+        label: { color: "#CBD5E1" },
+        data: rows.map(r => ({ value: r.count, name: r.name }))
+      }
+    ]
+  };
+});
+
+const relationRankOption = computed<EChartsCoreOption>(() => {
+  const rows = [...(dash.value?.schema_top || [])].reverse();
+  if (!rows.length) {
+    return {
+      title: {
+        text: "暂无 Schema 表量统计",
+        left: "center",
+        top: "middle",
+        textStyle: { color: "#94a3b8", fontSize: 13 }
+      }
+    };
+  }
+  return {
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+    grid: { left: 96, right: 20, top: 20, bottom: 24 },
+    xAxis: { type: "value" },
+    yAxis: {
+      type: "category",
+      data: rows.map(r => r.name)
     },
-    {
-      name: "质量",
-      type: "line",
-      smooth: true,
-      symbolSize: 6,
-      areaStyle: { opacity: 0.1 },
-      data: [28, 34, 43, 52, 61, 68, 73]
-    }
-  ]
-};
+    series: [
+      {
+        name: "表数量",
+        type: "bar",
+        barWidth: 12,
+        itemStyle: { borderRadius: [0, 8, 8, 0] },
+        data: rows.map(r => r.count)
+      }
+    ]
+  };
+});
 
-const domainOption: EChartsCoreOption = {
-  tooltip: { trigger: "item" },
-  legend: { bottom: 0 },
-  series: [
+const activities = computed<DashboardActivity[]>(() => {
+  const list = dash.value?.activities || [];
+  if (list.length) return list;
+  return [
     {
-      name: "业务域",
-      type: "pie",
-      radius: ["52%", "76%"],
-      center: ["50%", "44%"],
-      avoidLabelOverlap: true,
-      itemStyle: { borderRadius: 8, borderColor: "#0B1120", borderWidth: 2 },
-      label: { color: "#CBD5E1" },
-      data: [
-        { value: 31, name: "临床主线" },
-        { value: 22, name: "运营财务" },
-        { value: 18, name: "人员组织" },
-        { value: 14, name: "物资供应" },
-        { value: 15, name: "字典编码" }
-      ]
+      title: "等待指标加载",
+      desc: loadError.value || "请点击右上角刷新，或确认已登录且后端可用",
+      status: loadError.value ? "异常" : "空",
+      tone: "info"
     }
-  ]
-};
+  ];
+});
 
-const relationRankOption: EChartsCoreOption = {
-  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-  grid: { left: 96, right: 20, top: 20, bottom: 24 },
-  xAxis: { type: "value" },
-  yAxis: {
-    type: "category",
-    data: ["MEDREC", "COMM", "ORDADM", "LAB", "EXAM", "HRP", "ODS"].reverse()
-  },
-  series: [
-    {
-      name: "关系数",
-      type: "bar",
-      barWidth: 12,
-      itemStyle: { borderRadius: [0, 8, 8, 0] },
-      data: [47, 35, 28, 24, 22, 18, 16].reverse()
-    }
-  ]
-};
+const healthText = computed(() => {
+  if (healthOk.value === null) return "检测中…";
+  return healthOk.value ? "运行正常" : healthDetail.value || "异常";
+});
 
-const activities = [
-  { title: "HRP 源端资产包已生成", desc: "表/字段/索引/约束资产已输出，字段需分段补采", status: "待复核", tone: "warning" },
-  { title: "HIS_READY 待确认表清零", desc: "按 40 号治理口径完成核心/排除/保留收敛", status: "已完成", tone: "success" },
-  { title: "图谱高级交互已落地", desc: "支持分层、泳道、环形布局与边证据详情", status: "稳定", tone: "primary" },
-  { title: "D 类跨系统关系延后验证", desc: "等待更多系统源端元数据后再纳入正式验证", status: "待启动", tone: "info" }
-];
+async function checkHealth() {
+  try {
+    const res = await http.request<any>("get", "/api/v1/health");
+    // 兼容 ApiResponse 或裸对象
+    const data = res?.data ?? res;
+    const db = data?.database ?? data?.db ?? data?.status;
+    healthOk.value = true;
+    healthDetail.value =
+      typeof db === "string" ? `DB: ${db}` : data?.message || "API 可达";
+  } catch (e: any) {
+    healthOk.value = false;
+    healthDetail.value = e?.response?.status
+      ? `HTTP ${e.response.status}`
+      : "健康检查失败";
+  }
+}
+
+async function loadDashboard() {
+  loading.value = true;
+  loadError.value = "";
+  try {
+    const [sumRes] = await Promise.all([getDashboardSummary(), checkHealth()]);
+    dash.value = sumRes.data;
+  } catch (e: any) {
+    loadError.value =
+      e?.response?.data?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      "加载失败";
+    dash.value = null;
+  } finally {
+    loading.value = false;
+  }
+}
+
+function go(href?: string) {
+  if (href) router.push(href);
+}
+
+onMounted(loadDashboard);
 </script>
 
 <template>
-  <main class="welcome-dashboard asset-shell-dark">
+  <main v-loading="loading" class="welcome-dashboard asset-shell-dark">
     <section class="dashboard-hero">
       <div>
         <p class="dashboard-eyebrow">Data Asset Command Center</p>
         <h1>数据资产指挥中心</h1>
         <p class="dashboard-subtitle">
-          聚合源库探查、资产治理、关系验证与质量执行状态，优先暴露风险与下一步复核入口。
+          指标来自平台库实时聚合（系统/表/关系/人员/质量/复核），点击卡片可跳转对应工作台。
         </p>
+        <p v-if="dash?.generated_at" class="generated-at">
+          数据时间 {{ new Date(dash.generated_at).toLocaleString("zh-CN") }}
+        </p>
+        <p v-if="loadError" class="load-error">{{ loadError }}</p>
       </div>
       <div class="status-panel">
         <div>
@@ -207,41 +387,63 @@ const activities = [
         </div>
         <div>
           <span>系统健康</span>
-          <strong class="is-ok">运行正常</strong>
+          <strong :class="{ 'is-ok': healthOk === true, 'is-bad': healthOk === false }">
+            {{ healthText }}
+          </strong>
         </div>
-        <el-button type="primary" :icon="RefreshIcon" plain>刷新视图</el-button>
+        <el-button
+          type="primary"
+          :icon="RefreshIcon"
+          plain
+          :loading="loading"
+          @click="loadDashboard"
+        >
+          刷新视图
+        </el-button>
       </div>
     </section>
 
     <section class="kpi-grid">
-      <ReKpiPanel
+      <div
         v-for="item in kpis"
         :key="item.label"
-        :label="item.label"
-        :value="item.value"
-        :unit="item.unit"
-        :helper="item.helper"
-        :trend="item.trend"
-        :trend-direction="item.trendDirection"
-        :tone="item.tone"
+        class="kpi-click"
+        :class="{ clickable: !!item.href }"
+        @click="go(item.href)"
       >
-        <template #icon><component :is="item.icon" /></template>
-      </ReKpiPanel>
+        <ReKpiPanel
+          :label="item.label"
+          :value="item.value"
+          :unit="item.unit"
+          :helper="item.helper"
+          :trend="item.trend"
+          :trend-direction="item.trendDirection"
+          :tone="item.tone"
+        >
+          <template #icon><component :is="item.icon" /></template>
+        </ReKpiPanel>
+      </div>
     </section>
 
     <section class="dashboard-grid">
-      <ReDataCard title="资产健康趋势" subtitle="近 7 日治理覆盖与质量执行进度" glow>
+      <ReDataCard title="质量跑批趋势" subtitle="最近质量检查 run（findings / pass_rate）" glow>
         <ReChart :option="healthTrendOption" height="320px" />
       </ReDataCard>
-      <ReDataCard title="业务域分布" subtitle="按资产主题粗分布" glow>
+      <ReDataCard title="业务域分布" subtitle="按 asset_tables.domain 实计" glow>
         <ReChart :option="domainOption" height="320px" />
       </ReDataCard>
-      <ReDataCard title="Schema 关系热度" subtitle="按已验证与候选关系汇总" glow>
+      <ReDataCard title="Schema/Owner 表量 Top" subtitle="按 namespace/schema 聚合" glow>
         <ReChart :option="relationRankOption" height="310px" />
       </ReDataCard>
-      <ReDataCard title="最近工作台" subtitle="需要关注的资产与治理动作" glow>
+      <ReDataCard title="最近工作台" subtitle="根据当前库状态生成的关注项" glow>
         <div class="activity-list">
-          <article v-for="item in activities" :key="item.title" class="activity-item">
+          <article
+            v-for="item in activities"
+            :key="item.title"
+            class="activity-item"
+            :class="{ clickable: !!item.href }"
+            @click="go(item.href)"
+          >
             <div>
               <h3>{{ item.title }}</h3>
               <p>{{ item.desc }}</p>
@@ -297,6 +499,18 @@ h1 {
   color: var(--dark-text-regular);
 }
 
+.generated-at {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--dark-text-secondary);
+}
+
+.load-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #fb7185;
+}
+
 .status-panel {
   display: flex;
   flex-wrap: wrap;
@@ -336,11 +550,23 @@ h1 {
   color: var(--accent-400);
 }
 
+.status-panel .is-bad {
+  color: #fb7185;
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(160px, 1fr));
   gap: 14px;
   margin-bottom: 16px;
+}
+
+.kpi-click.clickable {
+  cursor: pointer;
+}
+
+.kpi-click.clickable:hover {
+  filter: brightness(1.05);
 }
 
 .dashboard-grid {
@@ -365,6 +591,14 @@ h1 {
   background: rgb(15 23 42 / 48%);
   border: 1px solid rgb(148 163 184 / 12%);
   border-radius: var(--radius-base);
+}
+
+.activity-item.clickable {
+  cursor: pointer;
+}
+
+.activity-item.clickable:hover {
+  border-color: rgb(14 165 233 / 35%);
 }
 
 .activity-item h3 {

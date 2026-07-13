@@ -85,9 +85,29 @@ def list_accounts(
     ])
 
 
+def _diff_item(r: IdentitySyncDiff) -> dict:
+    after = r.after_data if isinstance(r.after_data, dict) else {}
+    suggestion = after.get("merge_suggestion") if isinstance(after, dict) else None
+    return {
+        "id": r.id,
+        "diff_type": r.diff_type,
+        "source_system": r.source_system,
+        "target_system": r.target_system,
+        "entity_type": r.entity_type,
+        "entity_code": r.entity_code,
+        "status": r.status,
+        "severity": r.severity,
+        "before_data": r.before_data,
+        "after_data": r.after_data,
+        "merge_suggestion": suggestion,
+        "created_at": r.created_at.isoformat() if r.created_at else None,
+    }
+
+
 @router.get("/sync-diffs", summary="人员/科室/账号同步差异")
 def list_sync_diffs(
     status: str | None = Query(None),
+    diff_type: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(30, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -95,18 +115,51 @@ def list_sync_diffs(
     stmt = select(IdentitySyncDiff)
     if status:
         stmt = stmt.where(IdentitySyncDiff.status == status)
+    if diff_type:
+        stmt = stmt.where(IdentitySyncDiff.diff_type == diff_type)
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(
         stmt.order_by(IdentitySyncDiff.created_at.desc())
         .offset((page - 1) * page_size).limit(page_size)
     ).all()
-    items = [
-        {"id": r.id, "diff_type": r.diff_type, "source_system": r.source_system,
-         "target_system": r.target_system, "entity_type": r.entity_type,
-         "status": r.status, "severity": r.severity}
-        for r in rows
-    ]
+    items = [_diff_item(r) for r in rows]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+@router.get("/sync-diffs/{diff_id}", summary="差异详情（含合并建议，不自动覆盖）")
+def get_sync_diff(diff_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    r = db.get(IdentitySyncDiff, diff_id)
+    if not r:
+        raise HTTPException(status_code=404, detail="sync diff not found")
+    return ApiResponse(data=_diff_item(r))
+
+
+@router.post("/review/generate", summary="L13 生成主数据复核差异（仅 diff，不自动写主档）")
+def generate_identity_review(
+    request: Request,
+    source_system: str = Query("HIS"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    get_current_user(request)
+    from ...services.identity_review import build_his_master_review
+
+    result = build_his_master_review(db, source_system=source_system, target_system="asset")
+    db.commit()
+    job = SchedulerJob(
+        job_type="identity_review",
+        source_code=source_system,
+        trigger_mode="manual",
+        status="success",
+        started_at=datetime.now(timezone.utc),
+        finished_at=datetime.now(timezone.utc),
+        result_ref=json.dumps(result, ensure_ascii=False),
+        total_processed=result.get("scanned_person_codes"),
+        total_changes=result.get("diffs_created"),
+    )
+    db.add(job)
+    db.commit()
+    result["job_id"] = job.id
+    return ApiResponse(data=result)
 
 
 @router.get("/persons/{person_code}", summary="人员统一画像")
@@ -463,14 +516,154 @@ def execute_identity_cr(cr_id: int, request: Request, db: Session = Depends(get_
         raise HTTPException(status_code=404)
     if cr.approval_status != "approved":
         raise HTTPException(status_code=400, detail=f"当前状态 {cr.approval_status} 不可执行，需已审批通过")
+
+    result = _execute_identity_payload(db, cr.request_type, cr.request_payload or {})
     cr.approval_status = "executed"
+    cr.executed_by = current_user
+    cr.execution_result = json.dumps(result, ensure_ascii=False)[:2000]
     audit = GovernAuditLog(
-        module="identity", entity_type="change_request", entity_ref=str(cr.id),
-        action="execute", operator=current_user,
+        module="identity",
+        entity_type="change_request",
+        entity_ref=str(cr.id),
+        action="execute",
+        operator=current_user,
+        after_data=result,
     )
     db.add(audit)
     db.commit()
-    return ApiResponse(data={"id": cr.id, "approval_status": "executed"})
+    return ApiResponse(data={"id": cr.id, "approval_status": "executed", "result": result})
+
+
+def _execute_identity_payload(db: Session, request_type: str, payload: dict) -> dict:
+    """Apply approved identity master changes (platform PG only)."""
+    if request_type in {"apply_person_master", "update_person_master"}:
+        person_code = (payload.get("person_code") or "").strip()
+        if not person_code:
+            raise HTTPException(status_code=400, detail="person_code required")
+        person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == person_code))
+        if not person:
+            raise HTTPException(status_code=404, detail=f"person {person_code} not found")
+        before = {
+            "person_name_cn": person.person_name_cn,
+            "dept_code": person.dept_code,
+            "employment_status": person.employment_status,
+        }
+        if "person_name_cn" in payload and payload["person_name_cn"]:
+            person.person_name_cn = str(payload["person_name_cn"]).strip()
+        if "dept_code" in payload and payload["dept_code"]:
+            person.dept_code = str(payload["dept_code"]).strip()
+        if "employment_status" in payload and payload["employment_status"]:
+            person.employment_status = str(payload["employment_status"]).strip()
+        person.updated_at = datetime.now(timezone.utc)
+        diff_id = payload.get("diff_id")
+        if diff_id:
+            diff = db.get(IdentitySyncDiff, int(diff_id))
+            if diff:
+                diff.status = "resolved"
+                diff.handled_at = datetime.now(timezone.utc)
+        return {
+            "person_code": person_code,
+            "before": before,
+            "after": {
+                "person_name_cn": person.person_name_cn,
+                "dept_code": person.dept_code,
+                "employment_status": person.employment_status,
+            },
+            "diff_id": diff_id,
+        }
+    if request_type in {"noop", "mark_only"}:
+        return {"status": "noop"}
+    raise HTTPException(status_code=400, detail=f"unsupported request_type: {request_type}")
+
+
+class ApplyDiffMasterRequest(BaseModel):
+    """L16：从差异提出主档修改；默认仅创建变更请求，需审批后执行。"""
+
+    person_name_cn: str | None = None
+    dept_code: str | None = None
+    employment_status: str | None = None
+    use_prefer_source: bool = True
+    auto_approve_execute: bool = False  # 仅运维调试；生产应 false
+
+
+@router.post("/sync-diffs/{diff_id}/propose-master", summary="L16 从差异提出主档变更（默认不直接写）")
+def propose_master_from_diff(
+    diff_id: int,
+    req: ApplyDiffMasterRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    diff = db.get(IdentitySyncDiff, diff_id)
+    if not diff:
+        raise HTTPException(status_code=404, detail="sync diff not found")
+    if diff.entity_type != "identity_person" or not diff.entity_code:
+        raise HTTPException(status_code=400, detail="only identity_person diffs supported")
+
+    payload: dict = {"person_code": diff.entity_code, "diff_id": diff.id}
+    after = diff.after_data if isinstance(diff.after_data, dict) else {}
+    suggestion = after.get("merge_suggestion") if isinstance(after, dict) else {}
+    changed = after.get("changed_fields") if isinstance(after, dict) else {}
+
+    if req.person_name_cn:
+        payload["person_name_cn"] = req.person_name_cn
+    elif req.use_prefer_source and isinstance(changed, dict) and "person_name_cn" in changed:
+        payload["person_name_cn"] = changed["person_name_cn"].get("source")
+    elif req.use_prefer_source and after.get("source_person_name"):
+        payload["person_name_cn"] = after.get("source_person_name")
+
+    if req.dept_code:
+        payload["dept_code"] = req.dept_code
+    elif req.use_prefer_source and isinstance(changed, dict) and "dept_code" in changed:
+        payload["dept_code"] = changed["dept_code"].get("source")
+    elif req.use_prefer_source and after.get("source_dept_code"):
+        payload["dept_code"] = after.get("source_dept_code")
+
+    if req.employment_status:
+        payload["employment_status"] = req.employment_status
+
+    if not any(k in payload for k in ("person_name_cn", "dept_code", "employment_status")):
+        raise HTTPException(status_code=400, detail="no master fields to apply; provide values or use_prefer_source with mismatch data")
+
+    cr = GovernChangeRequest(
+        module="identity",
+        entity_type="identity_person",
+        entity_ref=diff.entity_code,
+        request_type="apply_person_master",
+        request_payload=payload,
+        before_data=diff.before_data if isinstance(diff.before_data, dict) else None,
+        after_data=payload,
+        approval_status="pending",
+        requested_by=current_user,
+        note=f"from sync_diff #{diff.id} type={diff.diff_type}; prefer={suggestion.get('prefer_source_table') if isinstance(suggestion, dict) else None}",
+    )
+    db.add(cr)
+    db.flush()
+    db.add(
+        GovernAuditLog(
+            module="identity",
+            entity_type="change_request",
+            entity_ref=str(cr.id),
+            action="propose_from_diff",
+            operator=current_user,
+            after_data=payload,
+        )
+    )
+
+    out: dict = {
+        "change_request_id": cr.id,
+        "approval_status": cr.approval_status,
+        "payload": payload,
+        "auto_applied": False,
+        "note": "已创建变更请求；需另一人审批后 execute，才会写主档",
+    }
+
+    # 可选：同人不可审批；若 auto 且请求里带了不同审批语义——仅当明确要求时跳过双人（默认关闭）
+    if req.auto_approve_execute:
+        # 安全：仍禁止真正绕过，返回提示
+        out["note"] = "auto_approve_execute 已忽略：请走审批/execute 双人流程"
+    db.commit()
+    return ApiResponse(data=out)
 
 
 @router.patch("/sync-diffs/{diff_id}", summary="Update identity sync diff status")

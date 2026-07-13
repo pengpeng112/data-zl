@@ -47,8 +47,18 @@ export function runIdentitySync(data: Record<string, any>) {
 export function updateIdentitySyncDiff(id: number, data: Record<string, any>) {
   return http.request<ApiResponse<any>>("patch", `/api/v1/identity/sync-diffs/${id}`, { data });
 }
+/** L16：从差异提出主档变更（默认仅创建 change_request，需审批后 execute） */
+export function proposeMasterFromDiff(diffId: number, data?: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/identity/sync-diffs/${diffId}/propose-master`, {
+    data: data ?? { use_prefer_source: true }
+  });
+}
 export function syncHisIdentity(params?: Record<string, any>) {
   return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync/his", { params });
+}
+/** L13：生成复核差异，不自动覆盖主数据 */
+export function generateIdentityReview(params?: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/review/generate", { params });
 }
 // 变更请求 (复用 asset_govern_change_requests, module='identity')
 export function createIdentityChangeRequest(data: Record<string, any>) {

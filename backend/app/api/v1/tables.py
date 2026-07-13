@@ -54,6 +54,173 @@ def summary(db: Session = Depends(get_db)) -> ApiResponse[SummaryOut]:
     )
 
 
+@router.get("/dashboard/summary", summary="首页指挥中心真实指标（聚合只读）")
+def dashboard_summary(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Aggregate live counts for /welcome KPI cards and lightweight charts."""
+    from ...models.asset_system import AssetDataSource, AssetSystem
+    from ...models.governance import MetadataSnapshot
+    from ...models.identity import IdentityDepartment, IdentityPerson, IdentitySyncDiff
+    from ...models.quality import QualityCheckRun, QualityFinding, QualityRule
+
+    tables = db.scalar(select(func.count()).select_from(AssetTable)) or 0
+    columns = db.scalar(select(func.count()).select_from(AssetColumn)) or 0
+    relations = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
+    domains = db.scalar(
+        select(func.count(func.distinct(AssetTable.domain))).where(AssetTable.domain.isnot(None))
+    ) or 0
+    systems = db.scalar(select(func.count()).select_from(AssetSystem)) or 0
+    sources_enabled = db.scalar(
+        select(func.count()).select_from(AssetDataSource).where(AssetDataSource.enabled.is_(True))
+    ) or 0
+    sources_total = db.scalar(select(func.count()).select_from(AssetDataSource)) or 0
+    persons = db.scalar(select(func.count()).select_from(IdentityPerson)) or 0
+    departments = db.scalar(select(func.count()).select_from(IdentityDepartment)) or 0
+    identity_diffs_open = db.scalar(
+        select(func.count()).select_from(IdentitySyncDiff).where(IdentitySyncDiff.status == "open")
+    ) or 0
+    quality_rules = db.scalar(
+        select(func.count()).select_from(QualityRule).where(QualityRule.enabled.is_(True))
+    ) or 0
+    quality_findings_open = db.scalar(
+        select(func.count())
+        .select_from(QualityFinding)
+        .where(QualityFinding.status.in_(["open", "acknowledged"]))
+    ) or 0
+    snapshots = db.scalar(select(func.count()).select_from(MetadataSnapshot)) or 0
+
+    last_run = db.scalar(select(QualityCheckRun).order_by(QualityCheckRun.id.desc()).limit(1))
+    quality_last_run = None
+    if last_run:
+        quality_last_run = {
+            "id": last_run.id,
+            "status": last_run.status,
+            "total_rules": last_run.total_rules,
+            "total_findings": last_run.total_findings,
+            "pass_rate": last_run.pass_rate,
+            "triggered_by": last_run.triggered_by,
+            "finished_at": last_run.finished_at.isoformat() if last_run.finished_at else None,
+        }
+
+    # domain distribution (top 12)
+    domain_rows = db.execute(
+        select(AssetTable.domain, func.count())
+        .where(AssetTable.domain.isnot(None), AssetTable.domain != "")
+        .group_by(AssetTable.domain)
+        .order_by(func.count().desc())
+        .limit(12)
+    ).all()
+    domain_top = [{"name": r[0] or "未分类", "count": int(r[1])} for r in domain_rows]
+    if not domain_top and tables:
+        domain_top = [{"name": "未分类", "count": tables}]
+
+    # relation confidence breakdown
+    conf_rows = db.execute(
+        select(AssetRelation.confidence, func.count())
+        .group_by(AssetRelation.confidence)
+        .order_by(func.count().desc())
+    ).all()
+    relation_by_confidence = [
+        {"name": (r[0] or "未分级"), "count": int(r[1])} for r in conf_rows
+    ]
+
+    # schema heat by table count
+    schema_rows = db.execute(
+        select(
+            func.coalesce(AssetTable.namespace_name, AssetTable.schema_name, "?"),
+            func.count(),
+        )
+        .group_by(func.coalesce(AssetTable.namespace_name, AssetTable.schema_name, "?"))
+        .order_by(func.count().desc())
+        .limit(10)
+    ).all()
+    schema_top = [{"name": str(r[0]), "count": int(r[1])} for r in schema_rows]
+
+    # recent quality runs for mini trend (up to 7)
+    runs = db.scalars(select(QualityCheckRun).order_by(QualityCheckRun.id.desc()).limit(7)).all()
+    quality_run_trend = [
+        {
+            "id": r.id,
+            "label": (r.finished_at or r.started_at).strftime("%m-%d")
+            if (r.finished_at or r.started_at)
+            else str(r.id),
+            "findings": r.total_findings or 0,
+            "pass_rate": r.pass_rate or 0,
+        }
+        for r in reversed(list(runs))
+    ]
+
+    activities: list[dict] = []
+    if identity_diffs_open:
+        activities.append(
+            {
+                "title": "人员主数据待复核",
+                "desc": f"open 差异 {identity_diffs_open} 条（不自动覆盖主档）",
+                "status": "待处理",
+                "tone": "warning",
+                "href": "/identity/sync-diffs",
+            }
+        )
+    if quality_last_run:
+        activities.append(
+            {
+                "title": f"最近质量检查 #{quality_last_run['id']}",
+                "desc": f"findings={quality_last_run.get('total_findings') or 0}，pass_rate={quality_last_run.get('pass_rate') or 0}%",
+                "status": quality_last_run.get("status") or "-",
+                "tone": "primary",
+                "href": "/asset/quality",
+            }
+        )
+    if sources_enabled:
+        activities.append(
+            {
+                "title": "数据源登记",
+                "desc": f"启用 {sources_enabled}/{sources_total} 个数据源",
+                "status": "运行中",
+                "tone": "success",
+                "href": "/asset/sources",
+            }
+        )
+    if snapshots:
+        activities.append(
+            {
+                "title": "元数据快照",
+                "desc": f"共 {snapshots} 份 live/缓存快照",
+                "status": "可对比",
+                "tone": "info",
+                "href": "/metadata-changes/snapshots",
+            }
+        )
+
+    return ApiResponse(
+        data={
+            "generated_at": __import__("datetime").datetime.now(
+                __import__("datetime").timezone.utc
+            ).isoformat(),
+            "assets": {
+                "tables": tables,
+                "columns": columns,
+                "relations": relations,
+                "domains": domains,
+            },
+            "systems": systems,
+            "sources_enabled": sources_enabled,
+            "sources_total": sources_total,
+            "persons": persons,
+            "departments": departments,
+            "identity_diffs_open": identity_diffs_open,
+            "quality_rules": quality_rules,
+            "quality_findings_open": quality_findings_open,
+            "quality_last_run": quality_last_run,
+            "metadata_snapshots": snapshots,
+            "domain_top": domain_top,
+            "relation_by_confidence": relation_by_confidence,
+            "schema_top": schema_top,
+            "quality_run_trend": quality_run_trend,
+            "activities": activities,
+        }
+    )
+
+
 def _build_table_query(
     keyword: str | None = None,
     domain: str | None = None,

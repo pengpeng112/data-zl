@@ -368,6 +368,24 @@
           </template>
 
           <el-form :inline="true">
+            <el-form-item label="检查批次">
+              <el-select
+                v-model="filters.run_id"
+                placeholder="全部批次"
+                clearable
+                filterable
+                class="filter-lg"
+                @change="loadFindings(1)"
+                @focus="ensureRunOptions"
+              >
+                <el-option
+                  v-for="run in findingRunOptions"
+                  :key="run.id"
+                  :label="`#${run.id} · ${run.status} · findings ${run.total_findings ?? 0}`"
+                  :value="run.id"
+                />
+              </el-select>
+            </el-form-item>
             <el-form-item label="规则编码">
               <el-input
                 v-model="filters.rule_code"
@@ -1055,11 +1073,13 @@ const fLoading = ref(false);
 const findingsPage = ref(1);
 const findingsPageSize = ref(30);
 const findingsTotal = ref(0);
+const findingRunOptions = ref<CheckRunItem[]>([]);
 const filters = reactive({
   rule_code: "",
   severity: "",
   status: "",
-  keyword: ""
+  keyword: "",
+  run_id: undefined as number | undefined
 });
 
 const assignDialogVisible = ref(false);
@@ -1129,16 +1149,29 @@ function formatSampleData(data: any): string {
   }
 }
 
+function ensureRunOptions() {
+  if (findingRunOptions.value.length) return;
+  getQualityCheckRuns({ page: 1, page_size: 50 })
+    .then(({ data }) => {
+      findingRunOptions.value = (data.items || []) as any;
+    })
+    .catch(() => {
+      findingRunOptions.value = [];
+    });
+}
+
 function loadFindings(page?: number) {
   if (page) findingsPage.value = page;
   fLoading.value = true;
+  ensureRunOptions();
   getQualityFindings({
     page: findingsPage.value,
     page_size: findingsPageSize.value,
     severity: filters.severity || undefined,
     status: filters.status || undefined,
     rule_code: filters.rule_code || undefined,
-    keyword: filters.keyword || undefined
+    keyword: filters.keyword || undefined,
+    run_id: filters.run_id || undefined
   })
     .then(({ data }) => {
       findings.value = data.items as any;

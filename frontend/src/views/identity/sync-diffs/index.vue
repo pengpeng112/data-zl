@@ -3,6 +3,7 @@
     <RePageHeader title="人员同步差异" subtitle="采集 HIS/HRP 等来源人员与科室数据，生成差异并进行人工处理；默认 HIS dry-run 不写入。">
       <template #icon><DiffIcon /></template>
       <template #actions>
+        <el-button :loading="reviewLoading" type="warning" :icon="DiffIcon" @click="doReview">生成复核差异</el-button>
         <el-button :loading="hisSyncLoading" type="success" :icon="HisIcon" @click="doHisSync">HIS 预同步</el-button>
         <el-button :loading="collectLoading" :icon="CollectIcon" @click="doCollect">采集来源</el-button>
         <el-button type="primary" :loading="syncLoading" :icon="DiffIcon" @click="doSync">生成差异</el-button>
@@ -44,6 +45,14 @@
           <el-option label="已解决" value="resolved" />
           <el-option label="已忽略" value="ignored" />
         </el-select>
+        <el-select v-model="params.diff_type" placeholder="差异类型" clearable class="control diff-type" @change="doSearch">
+          <el-option label="多源冲突" value="multi_source_conflict" />
+          <el-option label="工号仅源有" value="staff_only_supplement" />
+          <el-option label="字段不一致" value="field_mismatch" />
+          <el-option label="源未匹配" value="source_unmatched" />
+          <el-option label="主档缺人员" value="missing_master_person" />
+          <el-option label="主档缺科室" value="missing_master_department" />
+        </el-select>
       </ReToolbar>
 
       <el-alert v-if="lastResult" :type="lastResult.dry_run ? 'warning' : 'success'" :closable="false" class="result-alert">
@@ -53,33 +62,68 @@
       <el-table v-loading="loading" :data="items" stripe class="medical-data-table">
         <el-table-column prop="diff_type" label="差异类型" width="160">
           <template #default="{ row }">
-            <el-tag size="small" type="info">{{ row.diff_type }}</el-tag>
+            <el-tag size="small" type="info">{{ diffTypeLabel(row.diff_type) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="source_system" label="来源系统" width="140" />
         <el-table-column prop="target_system" label="目标系统" width="120" />
-        <el-table-column prop="entity_type" label="实体类型" width="150">
+        <el-table-column prop="entity_type" label="实体类型" width="120">
           <template #default="{ row }">{{ entityTypeLabel(row.entity_type) }}</template>
         </el-table-column>
-        <el-table-column prop="entity_code" label="实体编码" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="severity" label="严重度" width="110">
+        <el-table-column prop="entity_code" label="实体编码" min-width="120" show-overflow-tooltip />
+        <el-table-column label="合并建议" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">
+            {{ row.merge_suggestion?.note || row.merge_suggestion?.action || "—" }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="severity" label="严重度" width="90">
           <template #default="{ row }">
             <el-tag size="small" :type="severityTag(row.severity)">{{ severityLabel(row.severity) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="110">
+        <el-table-column prop="status" label="状态" width="90">
           <template #default="{ row }">
             <el-tag size="small" :type="statusTag(row.status)">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="230" fixed="right">
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
+            <el-button link type="primary" @click="openDetail(row)">详情</el-button>
+            <el-button
+              v-if="row.status === 'open' && row.entity_type === 'identity_person'"
+              link
+              type="danger"
+              :loading="proposingId === row.id"
+              @click="doProposeMaster(row)"
+            >
+              提出主档变更
+            </el-button>
             <el-button v-if="row.status !== 'resolved'" link type="success" :loading="updatingId === row.id" @click="updateStatus(row, 'resolved')">解决</el-button>
             <el-button v-if="row.status !== 'ignored'" link type="info" :loading="updatingId === row.id" @click="updateStatus(row, 'ignored')">忽略</el-button>
             <el-button v-if="row.status !== 'open'" link type="warning" :loading="updatingId === row.id" @click="updateStatus(row, 'open')">重开</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+      <el-drawer v-model="detailVisible" title="差异详情（不自动覆盖主数据）" size="40%">
+        <template v-if="detailRow">
+          <p><b>类型</b>：{{ diffTypeLabel(detailRow.diff_type) }}</p>
+          <p><b>编码</b>：{{ detailRow.entity_code }}</p>
+          <p><b>建议</b>：{{ detailRow.merge_suggestion?.note || "—" }}</p>
+          <p><b>prefer</b>：{{ detailRow.merge_suggestion?.prefer_source_table || "—" }}</p>
+          <el-divider />
+          <p class="muted">before_data</p>
+          <pre class="json-box">{{ formatJson(detailRow.before_data) }}</pre>
+          <p class="muted">after_data</p>
+          <pre class="json-box">{{ formatJson(detailRow.after_data) }}</pre>
+          <div v-if="detailRow.status === 'open' && detailRow.entity_type === 'identity_person'" class="drawer-actions">
+            <el-button type="primary" :loading="proposingId === detailRow.id" @click="doProposeMaster(detailRow)">
+              按源优先提出主档变更（L16）
+            </el-button>
+            <p class="muted">仅创建变更请求，需另一人审批后执行才会写主档。</p>
+          </div>
+        </template>
+      </el-drawer>
 
       <el-pagination
         v-model:current-page="params.page"
@@ -91,6 +135,47 @@
         @change="loadData"
       />
     </el-card>
+
+    <el-card shadow="never" class="diff-card cr-card">
+      <ReToolbar title="L16 主档变更请求（审批后执行）" class="diff-toolbar">
+        <el-button size="small" :loading="crLoading" @click="loadChangeRequests">刷新</el-button>
+      </ReToolbar>
+      <el-table v-loading="crLoading" :data="changeRequests" stripe size="small" class="medical-data-table">
+        <el-table-column prop="id" label="ID" width="70" />
+        <el-table-column prop="entity_ref" label="人员编码" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="request_type" label="类型" width="160" />
+        <el-table-column prop="approval_status" label="状态" width="110">
+          <template #default="{ row }">
+            <el-tag size="small" :type="crStatusTag(row.approval_status)">{{ crStatusLabel(row.approval_status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="requested_by" label="申请人" width="120" />
+        <el-table-column prop="approved_by" label="审批人" width="120" />
+        <el-table-column prop="created_at" label="创建时间" width="170" />
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              v-if="row.approval_status === 'pending' || row.approval_status === 'draft'"
+              link
+              type="success"
+              :loading="crActingId === row.id"
+              @click="doApproveCr(row)"
+            >
+              审批
+            </el-button>
+            <el-button
+              v-if="row.approval_status === 'approved'"
+              link
+              type="danger"
+              :loading="crActingId === row.id"
+              @click="doExecuteCr(row)"
+            >
+              执行写主档
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
@@ -100,7 +185,18 @@ import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
-import { collectSources, getSyncDiffs, runIdentitySync, syncHisIdentity, updateIdentitySyncDiff } from "@/api/identity";
+import {
+  approveIdentityChangeRequest,
+  collectSources,
+  executeIdentityChangeRequest,
+  generateIdentityReview,
+  getSyncDiffs,
+  listIdentityChangeRequests,
+  proposeMasterFromDiff,
+  runIdentitySync,
+  syncHisIdentity,
+  updateIdentitySyncDiff
+} from "@/api/identity";
 import CheckIcon from "~icons/ri/checkbox-circle-line";
 import CollectIcon from "~icons/ri/download-cloud-2-line";
 import DiffIcon from "~icons/ri/git-branch-line";
@@ -114,11 +210,23 @@ const loading = ref(false);
 const collectLoading = ref(false);
 const syncLoading = ref(false);
 const hisSyncLoading = ref(false);
+const reviewLoading = ref(false);
 const updatingId = ref<number | null>(null);
+const proposingId = ref<number | null>(null);
 const lastResult = ref<any>(null);
+const detailVisible = ref(false);
+const detailRow = ref<any>(null);
+const changeRequests = ref<any[]>([]);
+const crLoading = ref(false);
+const crActingId = ref<number | null>(null);
 
-const params = reactive({ status: "", page: 1, page_size: 20 });
-const collectForm = reactive({ source_code: "his_ready_10_10_10_15", source_system: "HIS", entity_type: "identity_all", max_rows: 5000 });
+const params = reactive({ status: "open", diff_type: "" as string, page: 1, page_size: 20 });
+const collectForm = reactive({
+  source_code: "his_source_10_10_10_15",
+  source_system: "HIS",
+  entity_type: "identity_all",
+  max_rows: 5000
+});
 const hisSyncForm = reactive({ dry_run: true });
 const openCount = computed(() => items.value.filter(item => item.status === "open").length);
 const resolvedCount = computed(() => items.value.filter(item => item.status === "resolved").length);
@@ -156,15 +264,58 @@ function entityTypeLabel(value: string) {
   const map: Record<string, string> = { identity_department: "科室", identity_person: "人员", identity_all: "全部" };
   return map[value] || value || "-";
 }
+function diffTypeLabel(value: string) {
+  const map: Record<string, string> = {
+    multi_source_conflict: "多源冲突",
+    staff_only_supplement: "工号仅源有",
+    field_mismatch: "字段不一致",
+    source_unmatched: "源未匹配",
+    missing_master_person: "主档缺人员",
+    missing_master_department: "主档缺科室"
+  };
+  return map[value] || value || "-";
+}
+function crStatusLabel(value: string) {
+  const map: Record<string, string> = {
+    draft: "草稿",
+    pending: "待审批",
+    approved: "已审批",
+    executed: "已执行",
+    rejected: "已驳回"
+  };
+  return map[value] || value || "-";
+}
+function crStatusTag(value: string): "success" | "warning" | "info" | "danger" {
+  if (value === "executed") return "success";
+  if (value === "approved") return "warning";
+  if (value === "pending" || value === "draft") return "danger";
+  return "info";
+}
 
 async function loadData() {
   loading.value = true;
   try {
-    const res = await getSyncDiffs({ status: params.status || undefined, page: params.page, page_size: params.page_size });
+    const res = await getSyncDiffs({
+      status: params.status || undefined,
+      diff_type: params.diff_type || undefined,
+      page: params.page,
+      page_size: params.page_size
+    });
     items.value = res.data.items ?? [];
     total.value = res.data.total ?? 0;
   } finally {
     loading.value = false;
+  }
+}
+async function loadChangeRequests() {
+  crLoading.value = true;
+  try {
+    const res = await listIdentityChangeRequests({ page: 1, page_size: 30 });
+    changeRequests.value = res.data.items ?? [];
+  } catch {
+    changeRequests.value = [];
+  } finally {
+    crLoading.value = false;
   }
 }
 function doSearch() {
@@ -215,6 +366,30 @@ async function doHisSync() {
     hisSyncLoading.value = false;
   }
 }
+async function doReview() {
+  reviewLoading.value = true;
+  try {
+    const res = await generateIdentityReview({ source_system: collectForm.source_system });
+    lastResult.value = res.data;
+    ElMessage.success(`复核差异已生成：${res.data?.diffs_created ?? 0} 条（不自动覆盖）`);
+    loadData();
+  } catch {
+    ElMessage.error("生成复核差异失败");
+  } finally {
+    reviewLoading.value = false;
+  }
+}
+function openDetail(row: any) {
+  detailRow.value = row;
+  detailVisible.value = true;
+}
+function formatJson(v: unknown) {
+  try {
+    return JSON.stringify(v ?? {}, null, 2);
+  } catch {
+    return String(v);
+  }
+}
 async function updateStatus(row: any, status: "open" | "resolved" | "ignored") {
   updatingId.value = row.id;
   try {
@@ -228,7 +403,50 @@ async function updateStatus(row: any, status: "open" | "resolved" | "ignored") {
   }
 }
 
-onMounted(loadData);
+async function doProposeMaster(row: any) {
+  proposingId.value = row.id;
+  try {
+    const res = await proposeMasterFromDiff(row.id, { use_prefer_source: true });
+    ElMessage.success(`已创建变更请求 #${res.data?.change_request_id}（待另一人审批）`);
+    await loadChangeRequests();
+  } catch {
+    ElMessage.error("提出主档变更失败（需人员差异且有可合并字段）");
+  } finally {
+    proposingId.value = null;
+  }
+}
+
+async function doApproveCr(row: any) {
+  crActingId.value = row.id;
+  try {
+    await approveIdentityChangeRequest(row.id, { note: "frontend approve" });
+    ElMessage.success("审批通过（审批人须与申请人不同）");
+    await loadChangeRequests();
+  } catch {
+    ElMessage.error("审批失败：需另一账号，且状态为 pending");
+  } finally {
+    crActingId.value = null;
+  }
+}
+
+async function doExecuteCr(row: any) {
+  crActingId.value = row.id;
+  try {
+    await executeIdentityChangeRequest(row.id);
+    ElMessage.success("已执行写主档，关联差异将标记为已解决");
+    await loadChangeRequests();
+    await loadData();
+  } catch {
+    ElMessage.error("执行失败：需已审批通过");
+  } finally {
+    crActingId.value = null;
+  }
+}
+
+onMounted(() => {
+  loadData();
+  loadChangeRequests();
+});
 </script>
 
 <style scoped lang="scss">
@@ -254,6 +472,14 @@ onMounted(loadData);
   }
 }
 
+.cr-card {
+  margin-top: 16px;
+}
+
+.drawer-actions {
+  margin-top: 12px;
+}
+
 .action-bar {
   display: flex;
   flex-wrap: wrap;
@@ -266,12 +492,29 @@ onMounted(loadData);
   width: 260px;
 }
 
+.json-box {
+  max-height: 240px;
+  overflow: auto;
+  padding: 8px;
+  background: var(--el-fill-color-light, #f5f7fa);
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.muted {
+  color: var(--el-text-color-secondary);
+  margin: 8px 0 4px;
+}
 .control.entity {
   width: 180px;
 }
 
 .control.status {
   width: 160px;
+}
+
+.control.diff-type {
+  width: 180px;
 }
 
 .rows {

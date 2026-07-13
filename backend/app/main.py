@@ -55,12 +55,59 @@ def _start_scheduler():
                     args=[j.source_code],
                     id=f"scheduler_{j.id}", replace_existing=True,
                 )
+            elif j.job_type == "quality_check":
+                scheduler.add_job(
+                    _run_quality_nightly,
+                    trigger=trigger,
+                    id=f"scheduler_{j.id}",
+                    replace_existing=True,
+                )
         if jobs:
             scheduler.start()
             logger.info(f"APScheduler started with {len(jobs)} scheduled jobs in %s", settings.scheduler_timezone)
         db.close()
     except ImportError:
         logger.warning("apscheduler not installed, scheduling disabled")
+
+
+def _run_quality_nightly():
+    """L15 夜间质量：执行已启用规则，写 run/finding（只读源库 SQL 规则经 validate）。"""
+    db = SessionLocal()
+    from datetime import datetime, timezone
+    from .models.governance_ops import SchedulerJob
+
+    job = SchedulerJob(
+        job_type="quality_check",
+        source_code="platform",
+        trigger_mode="scheduled",
+        status="running",
+        started_at=datetime.now(timezone.utc),
+        total_processed=0,
+        total_changes=0,
+    )
+    try:
+        db.add(job)
+        db.commit()
+        from .api.v1.quality import run_quality_check_core
+
+        result = run_quality_check_core(db, triggered_by="nightly_scheduler")
+        job.status = "success"
+        job.finished_at = datetime.now(timezone.utc)
+        job.total_processed = result.get("total_rules", 0)
+        job.total_changes = result.get("total_findings", 0)
+        job.result_ref = str(result)
+        db.commit()
+        logger.info("Nightly quality check completed: %s", result)
+    except Exception as e:
+        db.rollback()
+        job.status = "failed"
+        job.finished_at = datetime.now(timezone.utc)
+        job.error_message = str(e)[:500]
+        db.add(job)
+        db.commit()
+        logger.error("Nightly quality check failed: %s", e)
+    finally:
+        db.close()
 
 
 def _run_metadata_collect(source_code: str):
@@ -239,6 +286,7 @@ def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
         "/api/v1/lineage",
         "/api/v1/candidates",
         "/api/v1/summary",
+        "/api/v1/dashboard/summary",
         "/api/v1/columns",
     )
     if method_u in write_methods and any(path.startswith(p) for p in readonly_prefixes):

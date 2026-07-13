@@ -18,7 +18,7 @@ const loading = ref(false);
 const dialogVisible = ref(false);
 const dialogTitle = ref("新增系统");
 const form = ref({ system_code: "", system_name_cn: "", system_type: "", description_cn: "", status: "active" });
-const typeOptions = ["HIS", "EMR", "LIS", "PACS", "NURSING", "ODS", "OTHER"];
+const typeOptions = ["ODS", "HIS", "EMR", "LIS", "PACS", "NURSING", "HRP", "OTHER"];
 
 async function loadSystems() {
   loading.value = true;
@@ -83,7 +83,10 @@ onMounted(loadSystems);
 
 <template>
   <div class="systems-page">
-    <RePageHeader title="系统总览" subtitle="维护资产系统编码、类型和启停状态，作为数据源、表目录和图谱分类的顶层口径。">
+    <RePageHeader
+      title="系统总览"
+      subtitle="维护系统编码与类型；表目录五层导航的「系统大类」由此映射（ODS / HIS 源端 / 周边业务 / HRP / 平台）。"
+    >
       <template #actions>
         <el-button type="primary" @click="openCreate">新增系统</el-button>
       </template>
