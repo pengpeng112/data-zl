@@ -320,7 +320,14 @@
           <template #header>
             <span>最近检查记录</span>
           </template>
-          <el-table v-loading="tasksLoading" :data="checkRuns" stripe size="small">
+          <el-table
+            v-loading="tasksLoading"
+            :data="checkRuns"
+            stripe
+            size="small"
+            class="clickable-row"
+            @row-click="openFindingsForRun"
+          >
             <el-table-column prop="id" label="ID" width="60" />
             <el-table-column prop="started_at" label="开始时间" width="170" />
             <el-table-column prop="triggered_by" label="触发方式" width="80" />
@@ -1040,6 +1047,12 @@ function runCheck() {
     .finally(() => {
       checking.value = false;
     });
+}
+
+function openFindingsForRun(row: CheckRunItem) {
+  filters.run_id = row.id;
+  activeTab.value = "findings";
+  loadFindings(1);
 }
 
 function loadCheckRuns(page?: number) {

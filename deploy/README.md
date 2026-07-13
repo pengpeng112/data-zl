@@ -33,7 +33,18 @@ APP_AUTH_COOKIE_SECURE=false   # 仅当全站 HTTPS 时改为 true
 4. 重建容器后执行一次（若未写入镜像）：
 
 ```bash
-bash /etc/data-asset/ensure_oracle_ro_runtime.sh   # 若已安装该辅助脚本
+bash /etc/data-asset/scripts/ensure_oracle_ro_runtime.sh
+```
+
+5. **推荐重建命令**（挂载凭据 + Oracle 目录，脚本在仓库 `deploy/scripts/`）：
+
+```bash
+# 将 deploy/scripts 同步到服务器后：
+bash /etc/data-asset/scripts/run_data_asset_api.sh
+# 或手动 docker run 时务必带：
+#   -v /etc/data-asset/credentials:/etc/data-asset/credentials:ro
+#   -v /opt/oracle:/opt/oracle:ro
+#   并在启动命令中先执行 ensure_oracle_ro_runtime.sh
 ```
 
 ## 目标环境

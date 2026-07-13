@@ -534,6 +534,26 @@ def execute_identity_cr(cr_id: int, request: Request, db: Session = Depends(get_
     return ApiResponse(data={"id": cr.id, "approval_status": "executed", "result": result})
 
 
+def _resolve_diff_after(diff: IdentitySyncDiff) -> tuple[dict, dict, dict]:
+    after = diff.after_data if isinstance(diff.after_data, dict) else {}
+    suggestion = after.get("merge_suggestion") if isinstance(after, dict) else {}
+    if not isinstance(suggestion, dict):
+        suggestion = {}
+    changed = after.get("changed_fields") if isinstance(after, dict) else {}
+    if not isinstance(changed, dict):
+        changed = {}
+    return after, suggestion, changed
+
+
+def _mark_diff_resolved(db: Session, diff_id) -> None:
+    if not diff_id:
+        return
+    diff = db.get(IdentitySyncDiff, int(diff_id))
+    if diff:
+        diff.status = "resolved"
+        diff.handled_at = datetime.now(timezone.utc)
+
+
 def _execute_identity_payload(db: Session, request_type: str, payload: dict) -> dict:
     """Apply approved identity master changes (platform PG only)."""
     if request_type in {"apply_person_master", "update_person_master"}:
@@ -556,11 +576,7 @@ def _execute_identity_payload(db: Session, request_type: str, payload: dict) -> 
             person.employment_status = str(payload["employment_status"]).strip()
         person.updated_at = datetime.now(timezone.utc)
         diff_id = payload.get("diff_id")
-        if diff_id:
-            diff = db.get(IdentitySyncDiff, int(diff_id))
-            if diff:
-                diff.status = "resolved"
-                diff.handled_at = datetime.now(timezone.utc)
+        _mark_diff_resolved(db, diff_id)
         return {
             "person_code": person_code,
             "before": before,
@@ -568,6 +584,41 @@ def _execute_identity_payload(db: Session, request_type: str, payload: dict) -> 
                 "person_name_cn": person.person_name_cn,
                 "dept_code": person.dept_code,
                 "employment_status": person.employment_status,
+            },
+            "diff_id": diff_id,
+        }
+    if request_type in {"apply_department_master", "update_department_master"}:
+        dept_code = (payload.get("dept_code") or "").strip()
+        if not dept_code:
+            raise HTTPException(status_code=400, detail="dept_code required")
+        dept = db.scalar(select(IdentityDepartment).where(IdentityDepartment.dept_code == dept_code))
+        if not dept:
+            raise HTTPException(status_code=404, detail=f"department {dept_code} not found")
+        before = {
+            "dept_name_cn": dept.dept_name_cn,
+            "dept_type": dept.dept_type,
+            "parent_dept_code": dept.parent_dept_code,
+            "status": dept.status,
+        }
+        if "dept_name_cn" in payload and payload["dept_name_cn"]:
+            dept.dept_name_cn = str(payload["dept_name_cn"]).strip()
+        if "dept_type" in payload and payload["dept_type"]:
+            dept.dept_type = str(payload["dept_type"]).strip()
+        if "parent_dept_code" in payload and payload["parent_dept_code"] is not None:
+            dept.parent_dept_code = str(payload["parent_dept_code"]).strip() or None
+        if "status" in payload and payload["status"]:
+            dept.status = str(payload["status"]).strip()
+        dept.updated_at = datetime.now(timezone.utc)
+        diff_id = payload.get("diff_id")
+        _mark_diff_resolved(db, diff_id)
+        return {
+            "dept_code": dept_code,
+            "before": before,
+            "after": {
+                "dept_name_cn": dept.dept_name_cn,
+                "dept_type": dept.dept_type,
+                "parent_dept_code": dept.parent_dept_code,
+                "status": dept.status,
             },
             "diff_id": diff_id,
         }
@@ -581,7 +632,11 @@ class ApplyDiffMasterRequest(BaseModel):
 
     person_name_cn: str | None = None
     dept_code: str | None = None
+    dept_name_cn: str | None = None
+    dept_type: str | None = None
+    parent_dept_code: str | None = None
     employment_status: str | None = None
+    status: str | None = None
     use_prefer_source: bool = True
     auto_approve_execute: bool = False  # 仅运维调试；生产应 false
 
@@ -597,45 +652,87 @@ def propose_master_from_diff(
     diff = db.get(IdentitySyncDiff, diff_id)
     if not diff:
         raise HTTPException(status_code=404, detail="sync diff not found")
-    if diff.entity_type != "identity_person" or not diff.entity_code:
-        raise HTTPException(status_code=400, detail="only identity_person diffs supported")
+    if not diff.entity_code:
+        raise HTTPException(status_code=400, detail="diff missing entity_code")
+    if diff.entity_type not in {"identity_person", "identity_department"}:
+        raise HTTPException(status_code=400, detail="only identity_person / identity_department diffs supported")
 
-    payload: dict = {"person_code": diff.entity_code, "diff_id": diff.id}
-    after = diff.after_data if isinstance(diff.after_data, dict) else {}
-    suggestion = after.get("merge_suggestion") if isinstance(after, dict) else {}
-    changed = after.get("changed_fields") if isinstance(after, dict) else {}
+    after, suggestion, changed = _resolve_diff_after(diff)
 
-    if req.person_name_cn:
-        payload["person_name_cn"] = req.person_name_cn
-    elif req.use_prefer_source and isinstance(changed, dict) and "person_name_cn" in changed:
-        payload["person_name_cn"] = changed["person_name_cn"].get("source")
-    elif req.use_prefer_source and after.get("source_person_name"):
-        payload["person_name_cn"] = after.get("source_person_name")
+    if diff.entity_type == "identity_person":
+        payload: dict = {"person_code": diff.entity_code, "diff_id": diff.id}
+        if req.person_name_cn:
+            payload["person_name_cn"] = req.person_name_cn
+        elif req.use_prefer_source and "person_name_cn" in changed:
+            payload["person_name_cn"] = changed["person_name_cn"].get("source")
+        elif req.use_prefer_source and after.get("source_person_name"):
+            payload["person_name_cn"] = after.get("source_person_name")
 
-    if req.dept_code:
-        payload["dept_code"] = req.dept_code
-    elif req.use_prefer_source and isinstance(changed, dict) and "dept_code" in changed:
-        payload["dept_code"] = changed["dept_code"].get("source")
-    elif req.use_prefer_source and after.get("source_dept_code"):
-        payload["dept_code"] = after.get("source_dept_code")
+        if req.dept_code:
+            payload["dept_code"] = req.dept_code
+        elif req.use_prefer_source and "dept_code" in changed:
+            payload["dept_code"] = changed["dept_code"].get("source")
+        elif req.use_prefer_source and after.get("source_dept_code"):
+            payload["dept_code"] = after.get("source_dept_code")
 
-    if req.employment_status:
-        payload["employment_status"] = req.employment_status
+        if req.employment_status:
+            payload["employment_status"] = req.employment_status
+        elif req.use_prefer_source and "employment_status" in changed:
+            payload["employment_status"] = changed["employment_status"].get("source")
 
-    if not any(k in payload for k in ("person_name_cn", "dept_code", "employment_status")):
-        raise HTTPException(status_code=400, detail="no master fields to apply; provide values or use_prefer_source with mismatch data")
+        if not any(k in payload for k in ("person_name_cn", "dept_code", "employment_status")):
+            raise HTTPException(
+                status_code=400,
+                detail="no master fields to apply; provide values or use_prefer_source with mismatch data",
+            )
+        entity_type = "identity_person"
+        request_type = "apply_person_master"
+    else:
+        payload = {"dept_code": diff.entity_code, "diff_id": diff.id}
+        if req.dept_name_cn:
+            payload["dept_name_cn"] = req.dept_name_cn
+        elif req.use_prefer_source and "dept_name_cn" in changed:
+            payload["dept_name_cn"] = changed["dept_name_cn"].get("source")
+        elif req.use_prefer_source and after.get("source_dept_name"):
+            payload["dept_name_cn"] = after.get("source_dept_name")
+
+        if req.dept_type:
+            payload["dept_type"] = req.dept_type
+        elif req.use_prefer_source and "dept_type" in changed:
+            payload["dept_type"] = changed["dept_type"].get("source")
+
+        if req.parent_dept_code is not None:
+            payload["parent_dept_code"] = req.parent_dept_code
+        elif req.use_prefer_source and "parent_dept_code" in changed:
+            payload["parent_dept_code"] = changed["parent_dept_code"].get("source")
+
+        if req.status:
+            payload["status"] = req.status
+        elif req.use_prefer_source and "status" in changed:
+            payload["status"] = changed["status"].get("source")
+
+        if not any(k in payload for k in ("dept_name_cn", "dept_type", "parent_dept_code", "status")):
+            raise HTTPException(
+                status_code=400,
+                detail="no department master fields to apply; provide values or use_prefer_source with mismatch data",
+            )
+        entity_type = "identity_department"
+        request_type = "apply_department_master"
 
     cr = GovernChangeRequest(
         module="identity",
-        entity_type="identity_person",
+        entity_type=entity_type,
         entity_ref=diff.entity_code,
-        request_type="apply_person_master",
+        request_type=request_type,
         request_payload=payload,
         before_data=diff.before_data if isinstance(diff.before_data, dict) else None,
         after_data=payload,
         approval_status="pending",
         requested_by=current_user,
-        note=f"from sync_diff #{diff.id} type={diff.diff_type}; prefer={suggestion.get('prefer_source_table') if isinstance(suggestion, dict) else None}",
+        note=(
+            f"from sync_diff #{diff.id} type={diff.diff_type}; "
+            f"prefer={suggestion.get('prefer_source_table')}"
+        ),
     )
     db.add(cr)
     db.flush()
@@ -654,6 +751,8 @@ def propose_master_from_diff(
         "change_request_id": cr.id,
         "approval_status": cr.approval_status,
         "payload": payload,
+        "entity_type": entity_type,
+        "request_type": request_type,
         "auto_applied": False,
         "note": "已创建变更请求；需另一人审批后 execute，才会写主档",
     }

@@ -90,7 +90,7 @@
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">详情</el-button>
             <el-button
-              v-if="row.status === 'open' && row.entity_type === 'identity_person'"
+              v-if="row.status === 'open' && (row.entity_type === 'identity_person' || row.entity_type === 'identity_department')"
               link
               type="danger"
               :loading="proposingId === row.id"
@@ -116,11 +116,14 @@
           <pre class="json-box">{{ formatJson(detailRow.before_data) }}</pre>
           <p class="muted">after_data</p>
           <pre class="json-box">{{ formatJson(detailRow.after_data) }}</pre>
-          <div v-if="detailRow.status === 'open' && detailRow.entity_type === 'identity_person'" class="drawer-actions">
+          <div
+            v-if="detailRow.status === 'open' && (detailRow.entity_type === 'identity_person' || detailRow.entity_type === 'identity_department')"
+            class="drawer-actions"
+          >
             <el-button type="primary" :loading="proposingId === detailRow.id" @click="doProposeMaster(detailRow)">
               按源优先提出主档变更（L16）
             </el-button>
-            <p class="muted">仅创建变更请求，需另一人审批后执行才会写主档。</p>
+            <p class="muted">仅创建变更请求，需另一人审批后执行才会写主档（人员/科室）。</p>
           </div>
         </template>
       </el-drawer>
