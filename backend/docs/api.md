@@ -1,6 +1,6 @@
 # 数据资产平台 API 文档
 
-> 版本：0.2.0 | 更新：2026-07-04 | P1–P5 全能力
+> 更新：2026-07-13。本文件是接口说明摘要；完整、实时的契约以运行中的 `/docs` 和 `/openapi.json` 为准。新增接口、参数或响应变更必须同步更新本文件或由 OpenAPI 导出替代。
 
 ## 统一响应格式
 
@@ -31,14 +31,29 @@
 
 ## 鉴权
 
-- 全局 Bearer Token 鉴权（公开路径除外）。
-- 首次使用：`GET /api/v1/admin/init` 获取默认 Token（仅首次可用，再次调用返回 403）。
-- 后续请求加 `Authorization: Bearer <token>`。
+支持两套 Bearer 凭据（中间件先尝试验 JWT，失败再回退 ApiKey）：
+
+1. **人类登录（JWT）**：`POST /api/v1/auth/login` 签发短期 Access Token；Refresh Token 仅 HttpOnly Cookie（`Path=/api/v1/auth`）。
+2. **机器/部署（ApiKey）**：`python -m scripts.create_admin_token --user-identifier <id>`；网页管理员用 `python -m scripts.create_local_admin`（兼容别名 `create_platform_admin`）。
+
+- 后续请求加 `Authorization: Bearer <access_token_or_api_key>`。
+- 高权限模块（admin/identity/permissions/ops/…）默认拒绝未绑定角色的 Token。
 - 公开路径（无需 Token）：
   - `/` `/health` `/docs` `/openapi.json` `/redoc`
   - `/api/v1/health`
   - `/api/v1/ai/tools`
-  - `/api/v1/admin/init`
+  - `/api/v1/auth/login` `/api/v1/auth/refresh`
+
+### 本地登录（摘要）
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/api/v1/auth/login` | 用户名密码登录；返回 accessToken + success；Set-Cookie refresh |
+| POST | `/api/v1/auth/refresh` | Cookie 刷新 Access Token（需 `X-Requested-With`） |
+| POST | `/api/v1/auth/logout` | 撤销会话并清 Cookie |
+| GET | `/api/v1/auth/me` | 当前账号/角色/权限 |
+| POST | `/api/v1/auth/change-password` | 改密并撤销全部会话 |
+| GET/POST/PATCH | `/api/v1/auth/users` | 本地账号管理（platform_admin/identity_admin） |
 
 ## 分页参数
 
@@ -182,8 +197,8 @@ AI 提交 SQL/视图草稿（仅保存，不执行）。自动做静态风险扫
 
 ## 治理管理 API（P5）
 
-### GET /api/v1/admin/init
-初始化默认 API Token（首次使用一次性，再次调用返回 403）。
+### Token 初始化
+在受信任的部署机执行 `python -m scripts.create_admin_token --key-name platform-admin`，原始 Token 只在命令行输出一次。
 
 ### GET /api/v1/admin/keys
 API Key 列表。

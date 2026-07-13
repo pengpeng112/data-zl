@@ -2,6 +2,8 @@ import { http } from "@/utils/http";
 
 export type UserResult = {
   success: boolean;
+  code?: number;
+  message?: string;
   data: {
     /** 头像 */
     avatar: string;
@@ -13,33 +15,94 @@ export type UserResult = {
     roles: Array<string>;
     /** 按钮级别权限 */
     permissions: Array<string>;
-    /** `token` */
+    /** Access Token（短期，仅内存） */
     accessToken: string;
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
+    /** Refresh 由 HttpOnly Cookie 承载；body 通常为空 */
     refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
+    /** accessToken 过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
+    expires: Date | string;
+    must_change_password?: boolean;
+    user_identifier?: string;
   };
 };
 
 export type RefreshTokenResult = {
   success: boolean;
+  code?: number;
+  message?: string;
   data: {
-    /** `token` */
     accessToken: string;
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
     refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
+    expires: Date | string;
+    username?: string;
+    nickname?: string;
+    roles?: Array<string>;
+    permissions?: Array<string>;
+    must_change_password?: boolean;
+    user_identifier?: string;
   };
 };
 
-/** 登录 */
-export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/login", { data });
+export type AuthMeResult = {
+  code: number;
+  message: string;
+  data: {
+    username: string;
+    user_identifier: string;
+    person_name?: string | null;
+    roles: string[];
+    permissions: string[];
+    must_change_password?: boolean;
+    enabled?: boolean;
+  };
 };
 
-/** 刷新`token` */
-export const refreshTokenApi = (data?: object) => {
-  return http.request<RefreshTokenResult>("post", "/refresh-token", { data });
+/** 登录（Refresh 写入 HttpOnly Cookie） */
+export const getLogin = (data?: object) => {
+  return http.request<UserResult>("post", "/api/v1/auth/login", {
+    data,
+    withCredentials: true,
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  });
+};
+
+/** 刷新 Access Token（依赖 Cookie） */
+export const refreshTokenApi = (_data?: object) => {
+  return http.request<RefreshTokenResult>("post", "/api/v1/auth/refresh", {
+    data: {},
+    withCredentials: true,
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  });
+};
+
+/** 登出并撤销会话 */
+export const logoutApi = () => {
+  return http.request<{ code: number; data: { logged_out: boolean } }>(
+    "post",
+    "/api/v1/auth/logout",
+    {
+      data: {},
+      withCredentials: true,
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    }
+  );
+};
+
+/** 当前账号摘要 */
+export const getAuthMe = () => {
+  return http.request<AuthMeResult>("get", "/api/v1/auth/me", {
+    withCredentials: true
+  });
+};
+
+/** 修改密码 */
+export const changePasswordApi = (data: {
+  old_password?: string;
+  new_password: string;
+}) => {
+  return http.request<{ code: number; message: string }>(
+    "post",
+    "/api/v1/auth/change-password",
+    { data }
+  );
 };

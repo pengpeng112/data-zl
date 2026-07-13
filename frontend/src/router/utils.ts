@@ -156,34 +156,35 @@ function addPathMatch() {
 
 /** 处理动态路由（后端返回的路由） */
 function handleAsyncRoutes(routeList) {
-  if (routeList.length === 0) {
-    usePermissionStoreHook().handleWholeMenus(routeList);
+  const list = Array.isArray(routeList) ? routeList : [];
+  if (list.length === 0) {
+    usePermissionStoreHook().handleWholeMenus(list);
   } else {
-    formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
-      (v: RouteRecordRaw) => {
-        // 防止重复添加路由
-        if (
-          router.options.routes[0].children.findIndex(
-            value => value.path === v.path
-          ) !== -1
-        ) {
-          return;
-        } else {
-          // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
-          router.options.routes[0].children.push(v);
-          // 最终路由进行升序
-          ascending(router.options.routes[0].children);
-          if (!router.hasRoute(v?.name)) router.addRoute(v);
-          const flattenRouters: any = router
-            .getRoutes()
-            .find(n => n.path === "/");
-          // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
+    formatFlatteningRoutes(addAsyncRoutes(list)).map((v: RouteRecordRaw) => {
+      // 防止重复添加路由
+      if (
+        router.options.routes[0].children.findIndex(
+          value => value.path === v.path
+        ) !== -1
+      ) {
+        return;
+      } else {
+        // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+        router.options.routes[0].children.push(v);
+        // 最终路由进行升序
+        ascending(router.options.routes[0].children);
+        if (!router.hasRoute(v?.name)) router.addRoute(v);
+        const flattenRouters: any = router
+          .getRoutes()
+          .find(n => n.path === "/");
+        // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
+        if (flattenRouters) {
           flattenRouters.children = router.options.routes[0].children;
           router.addRoute(flattenRouters);
         }
       }
-    );
-    usePermissionStoreHook().handleWholeMenus(routeList);
+    });
+    usePermissionStoreHook().handleWholeMenus(list);
   }
   if (!useMultiTagsStoreHook().getMultiTagsCache) {
     useMultiTagsStoreHook().handleTags("equal", [
@@ -208,21 +209,28 @@ function initRouter() {
         resolve(router);
       });
     } else {
-      return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageLocal().setItem(key, data);
-          resolve(router);
+      return getAsyncRoutes()
+        .then(({ data }) => {
+          const routes = Array.isArray(data) ? data : [];
+          handleAsyncRoutes(cloneDeep(routes));
+          storageLocal().setItem(key, routes);
+          return router;
+        })
+        .catch(() => {
+          handleAsyncRoutes([]);
+          return router;
         });
-      });
     }
   } else {
-    return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
-        resolve(router);
+    return getAsyncRoutes()
+      .then(({ data }) => {
+        handleAsyncRoutes(cloneDeep(Array.isArray(data) ? data : []));
+        return router;
+      })
+      .catch(() => {
+        handleAsyncRoutes([]);
+        return router;
       });
-    });
   }
 }
 
@@ -388,10 +396,15 @@ function handleTopMenu(route) {
 
 /** 获取所有菜单中的第一个菜单（顶级菜单）*/
 function getTopMenu(tag = false): menuType {
-  const topMenu = handleTopMenu(
-    usePermissionStoreHook().wholeMenus[0]?.children[0]
-  );
-  tag && useMultiTagsStoreHook().handleTags("push", topMenu);
+  const menus = usePermissionStoreHook().wholeMenus || [];
+  const first =
+    menus[0]?.children?.[0] ||
+    menus[0] ||
+    ({ path: "/welcome", name: "Welcome", meta: { title: "首页" } } as menuType);
+  const topMenu = handleTopMenu(first) || first;
+  if (tag && topMenu?.path) {
+    useMultiTagsStoreHook().handleTags("push", topMenu);
+  }
   return topMenu;
 }
 

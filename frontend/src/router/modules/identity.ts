@@ -34,8 +34,19 @@ export default {
       name: "IdentityAccounts",
       component: () => import("@/views/identity/accounts/index.vue"),
       meta: {
-        title: "账号管理",
+        title: "跨系统账号",
         showLink: true
+      }
+    },
+    {
+      path: "/identity/local-accounts",
+      name: "IdentityLocalAccounts",
+      component: () => import("@/views/identity/local-accounts/index.vue"),
+      meta: {
+        title: "本地账号",
+        showLink: true,
+        roles: ["identity_admin", "platform_admin"],
+        auths: ["identity.local_account.manage", "identity.role.manage"]
       }
     },
     {
@@ -45,6 +56,28 @@ export default {
       meta: {
         title: "同步差异",
         showLink: true
+      }
+    },
+    {
+      path: "/identity/roles",
+      name: "IdentityRoles",
+      component: () => import("@/views/identity/roles/index.vue"),
+      meta: {
+        title: "角色权限",
+        showLink: true,
+        roles: ["identity_admin", "platform_admin"],
+        auths: ["identity.role.manage", "identity.role.grant"]
+      }
+    },
+    {
+      path: "/identity/authorizations",
+      name: "IdentityAuthorizations",
+      component: () => import("@/views/identity/authorizations/index.vue"),
+      meta: {
+        title: "人员授权",
+        showLink: true,
+        roles: ["identity_admin", "platform_admin"],
+        auths: ["identity.role.grant"]
       }
     }
   ]
