@@ -260,6 +260,7 @@ export interface AssetTreeSchema {
   namespace: string;
   table_count: number;
   tables: AssetTreeTable[];
+  tables_loaded?: boolean;
 }
 
 export interface AssetTreeNode {
@@ -274,15 +275,52 @@ export interface AssetTreeNode {
   source_system_cn?: string | null;
   table_count: number;
   schemas: AssetTreeSchema[];
+  tables_embedded?: boolean;
 }
 
 export const getAssetTree = (params?: {
   system_code?: string;
   system_category?: string;
+  /** 默认 false：仅骨架+schema 计数，表走 getAssetTreeTables */
+  include_tables?: boolean;
+  max_tables_per_schema?: number;
 }) => {
   return http.get<ApiResponse<AssetTreeNode[]>, object>("/api/v1/assets/tree", {
     params
   });
+};
+
+/** 懒加载某 schema 下的表 */
+export const getAssetTreeTables = (params: {
+  source_code: string;
+  schema_name?: string;
+  keyword?: string;
+  page?: number;
+  page_size?: number;
+}) => {
+  return http.get<
+    ApiResponse<{
+      source_code: string;
+      schema_name: string;
+      total: number;
+      page: number;
+      page_size: number;
+      items: AssetTreeTable[];
+    }>,
+    object
+  >("/api/v1/assets/tree/tables", { params });
+};
+
+/** 按表名搜索（返回路径） */
+export const searchAssetTree = (params: {
+  keyword: string;
+  system_category?: string;
+  limit?: number;
+}) => {
+  return http.get<
+    ApiResponse<{ keyword: string; total: number; items: AssetTreeTable[] }>,
+    object
+  >("/api/v1/assets/tree/search", { params });
 };
 // --- P1.5 关系图谱 ---
 

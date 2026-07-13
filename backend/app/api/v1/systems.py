@@ -305,10 +305,38 @@ def _classify_asset_source(system_code: str | None, source_code: str | None) -> 
     return "platform_asset", _CATEGORY_CN["platform_asset"], "platform", _SOURCE_SYSTEM_CN["platform"]
 
 
-@router.get("/assets/tree", summary="系统大类 -> 系统/库 -> schema -> 表 树（字段在前端懒加载）")
+def _table_brief(t: AssetTable) -> dict:
+    ns = t.namespace_name or t.schema_name or ""
+    return {
+        "id": t.id,
+        "table_name": t.table_name,
+        "table_name_cn": t.table_name_cn,
+        "column_count": t.column_count,
+        "domain": t.domain,
+        "owner_hint": (ns or "").upper(),
+        "schema_name": ns,
+        "source_code": t.source_code,
+        "system_code": t.system_code,
+    }
+
+
+@router.get(
+    "/assets/tree",
+    summary="系统大类 -> 系统/库 -> schema 树（默认不含表清单，表按需加载）",
+)
 def assets_tree(
     system_code: str | None = Query(None),
     system_category: str | None = Query(None),
+    include_tables: bool = Query(
+        False,
+        description="true 时内嵌全量表（仅调试/小库）；默认 false 仅返回 schema 计数，表走 /assets/tree/tables",
+    ),
+    max_tables_per_schema: int = Query(
+        0,
+        ge=0,
+        le=500,
+        description="include_tables=true 时每 schema 最多内嵌表数；0 表示不截断",
+    ),
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
     sources_stmt = select(AssetDataSource)
@@ -316,41 +344,47 @@ def assets_tree(
         sources_stmt = sources_stmt.where(AssetDataSource.system_code == system_code)
     sources = {s.source_code: s for s in db.scalars(sources_stmt).all()}
 
-    tables = db.scalars(select(AssetTable)).all()
+    # 骨架：仅聚合 (source_code, schema) 计数，避免一次序列化 2000+ 表
+    # PG GROUP BY 必须与 SELECT 表达式同一引用（勿重复写两遍 coalesce）
+    ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+    count_rows = db.execute(
+        select(
+            AssetTable.source_code,
+            ns_key.label("ns"),
+            func.count().label("cnt"),
+        ).group_by(AssetTable.source_code, ns_key)
+    ).all()
 
-    grouped: dict[str, dict] = {}
-    for t in tables:
-        sc = t.source_code or "DATA_CENTER"
-        ns = t.namespace_name or t.schema_name or ""
-        if sc not in grouped:
-            grouped[sc] = {"schemas": {}}
-        if ns not in grouped[sc]["schemas"]:
-            grouped[sc]["schemas"][ns] = []
-        # ODS 主源按 owner 再映射 source_system，便于五层第二层拆分
-        owner_hint = (ns or "").upper()
-        grouped[sc]["schemas"][ns].append({
-            "id": t.id,
-            "table_name": t.table_name,
-            "table_name_cn": t.table_name_cn,
-            "column_count": t.column_count,
-            "domain": t.domain,
-            "owner_hint": owner_hint,
-        })
+    grouped: dict[str, dict[str, int]] = {}
+    for sc, ns, cnt in count_rows:
+        sc_key = sc or "DATA_CENTER"
+        ns_key = ns or ""
+        grouped.setdefault(sc_key, {})[ns_key] = int(cnt)
+
+    tables_by_schema: dict[tuple[str, str], list[dict]] = {}
+    if include_tables:
+        tables = db.scalars(select(AssetTable)).all()
+        for t in tables:
+            sc = t.source_code or "DATA_CENTER"
+            ns = t.namespace_name or t.schema_name or ""
+            key = (sc, ns)
+            bucket = tables_by_schema.setdefault(key, [])
+            if max_tables_per_schema and len(bucket) >= max_tables_per_schema:
+                continue
+            bucket.append(_table_brief(t))
 
     tree = []
-    for sc, sc_data in sorted(grouped.items()):
+    for sc, schema_counts in sorted(grouped.items()):
         ds = sources.get(sc)
         sys_code = ds.system_code if ds else "DATA_CENTER"
         cat, cat_cn, src_sys, src_sys_cn = _classify_asset_source(sys_code, sc)
         # 主 ODS 汇聚：按 namespace 拆分到抽取区
         if sc in ("ods_8_216",) or (sys_code == "DATA_CENTER" and "216" in sc):
-            by_zone: dict[str, dict] = {}
-            for ns, tbls in sc_data["schemas"].items():
+            by_zone: dict[str, dict[str, int]] = {}
+            for ns, cnt in schema_counts.items():
                 zone = _ods_owner_zone(ns)
-                if zone not in by_zone:
-                    by_zone[zone] = {"schemas": {}}
-                by_zone[zone]["schemas"][ns] = tbls
-            for zone, zdata in sorted(by_zone.items()):
+                by_zone.setdefault(zone, {})[ns] = cnt
+            for zone, zschemas in sorted(by_zone.items()):
                 z_cn = _SOURCE_SYSTEM_CN.get(zone, zone)
                 node = {
                     "source_code": sc,
@@ -361,13 +395,16 @@ def assets_tree(
                     "source_system": zone,
                     "source_system_cn": z_cn,
                     "schemas": [],
-                    "table_count": sum(len(v) for v in zdata["schemas"].values()),
+                    "table_count": sum(zschemas.values()),
+                    "tables_embedded": include_tables,
                 }
-                for ns, tbls in sorted(zdata["schemas"].items()):
+                for ns, cnt in sorted(zschemas.items()):
+                    tbls = tables_by_schema.get((sc, ns), []) if include_tables else []
                     node["schemas"].append({
                         "namespace": ns,
                         "tables": tbls,
-                        "table_count": len(tbls),
+                        "table_count": cnt,
+                        "tables_loaded": include_tables,
                     })
                 if system_category and node["system_category"] != system_category:
                     continue
@@ -383,19 +420,107 @@ def assets_tree(
             "source_system": src_sys,
             "source_system_cn": src_sys_cn,
             "schemas": [],
-            "table_count": sum(len(v) for v in sc_data["schemas"].values()),
+            "table_count": sum(schema_counts.values()),
+            "tables_embedded": include_tables,
         }
-        for ns, tbls in sorted(sc_data["schemas"].items()):
+        for ns, cnt in sorted(schema_counts.items()):
+            tbls = tables_by_schema.get((sc, ns), []) if include_tables else []
             node["schemas"].append({
                 "namespace": ns,
                 "tables": tbls,
-                "table_count": len(tbls),
+                "table_count": cnt,
+                "tables_loaded": include_tables,
             })
         if system_category and node["system_category"] != system_category:
             continue
         tree.append(node)
 
     return ApiResponse(data=tree)
+
+
+@router.get("/assets/tree/tables", summary="懒加载：某 source+schema 下的表清单（分页）")
+def assets_tree_tables(
+    source_code: str = Query(..., min_length=1),
+    schema_name: str = Query("", description="Owner/schema；空串表示无 namespace"),
+    keyword: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(200, ge=1, le=500),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    ns = schema_name or ""
+    ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+    stmt = select(AssetTable).where(
+        AssetTable.source_code == source_code,
+        ns_key == ns,
+    )
+    if keyword:
+        like = f"%{keyword.strip()}%"
+        stmt = stmt.where(
+            (AssetTable.table_name.ilike(like))
+            | (AssetTable.table_name_cn.ilike(like))
+            | (AssetTable.domain.ilike(like))
+        )
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(AssetTable.table_name)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    return ApiResponse(
+        data={
+            "source_code": source_code,
+            "schema_name": ns,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "items": [_table_brief(t) for t in rows],
+        }
+    )
+
+
+@router.get("/assets/tree/search", summary="按表名/中文名搜索（返回路径，限量）")
+def assets_tree_search(
+    keyword: str = Query(..., min_length=1),
+    system_category: str | None = Query(None),
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    like = f"%{keyword.strip()}%"
+    stmt = (
+        select(AssetTable)
+        .where(
+            (AssetTable.table_name.ilike(like))
+            | (AssetTable.table_name_cn.ilike(like))
+        )
+        .order_by(AssetTable.schema_name, AssetTable.table_name)
+        .limit(limit)
+    )
+    rows = db.scalars(stmt).all()
+    sources = {
+        s.source_code: s
+        for s in db.scalars(select(AssetDataSource)).all()
+    }
+    items = []
+    for t in rows:
+        sc = t.source_code or "DATA_CENTER"
+        ds = sources.get(sc)
+        sys_code = ds.system_code if ds else (t.system_code or "DATA_CENTER")
+        cat, cat_cn, src_sys, src_sys_cn = _classify_asset_source(sys_code, sc)
+        ns = t.namespace_name or t.schema_name or ""
+        if sc in ("ods_8_216",) or (sys_code == "DATA_CENTER" and "216" in sc):
+            src_sys = _ods_owner_zone(ns)
+            src_sys_cn = _SOURCE_SYSTEM_CN.get(src_sys, src_sys)
+        if system_category and cat != system_category:
+            continue
+        items.append({
+            **_table_brief(t),
+            "system_category": cat,
+            "system_category_cn": cat_cn,
+            "source_system": src_sys,
+            "source_system_cn": src_sys_cn,
+            "source_name_cn": ds.source_name_cn if ds else sc,
+        })
+    return ApiResponse(data={"keyword": keyword, "total": len(items), "items": items})
 
 
 def _ods_owner_zone(namespace: str) -> str:

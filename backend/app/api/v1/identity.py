@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ...core.db import get_db
 from ...core.security import get_current_user
@@ -641,21 +641,29 @@ class ApplyDiffMasterRequest(BaseModel):
     auto_approve_execute: bool = False  # 仅运维调试；生产应 false
 
 
-@router.post("/sync-diffs/{diff_id}/propose-master", summary="L16 从差异提出主档变更（默认不直接写）")
-def propose_master_from_diff(
-    diff_id: int,
+class BatchDiffIdsRequest(BaseModel):
+    """批量差异操作，默认上限 50。"""
+
+    diff_ids: list[int] = Field(default_factory=list)
+    use_prefer_source: bool = True
+    status: str | None = None  # for batch status update: resolved/ignored/open
+    note: str | None = None
+
+
+class BatchChangeRequestIds(BaseModel):
+    ids: list[int] = Field(default_factory=list)
+    note: str | None = None
+
+
+def _build_master_payload_from_diff(
+    diff: IdentitySyncDiff,
     req: ApplyDiffMasterRequest,
-    request: Request,
-    db: Session = Depends(get_db),
-) -> ApiResponse[dict]:
-    current_user = get_current_user(request)
-    diff = db.get(IdentitySyncDiff, diff_id)
-    if not diff:
-        raise HTTPException(status_code=404, detail="sync diff not found")
+) -> tuple[dict, str, str, dict]:
+    """Return (payload, entity_type, request_type, suggestion). Raises ValueError on validation."""
     if not diff.entity_code:
-        raise HTTPException(status_code=400, detail="diff missing entity_code")
+        raise ValueError("diff missing entity_code")
     if diff.entity_type not in {"identity_person", "identity_department"}:
-        raise HTTPException(status_code=400, detail="only identity_person / identity_department diffs supported")
+        raise ValueError("only identity_person / identity_department diffs supported")
 
     after, suggestion, changed = _resolve_diff_after(diff)
 
@@ -681,44 +689,44 @@ def propose_master_from_diff(
             payload["employment_status"] = changed["employment_status"].get("source")
 
         if not any(k in payload for k in ("person_name_cn", "dept_code", "employment_status")):
-            raise HTTPException(
-                status_code=400,
-                detail="no master fields to apply; provide values or use_prefer_source with mismatch data",
-            )
-        entity_type = "identity_person"
-        request_type = "apply_person_master"
-    else:
-        payload = {"dept_code": diff.entity_code, "diff_id": diff.id}
-        if req.dept_name_cn:
-            payload["dept_name_cn"] = req.dept_name_cn
-        elif req.use_prefer_source and "dept_name_cn" in changed:
-            payload["dept_name_cn"] = changed["dept_name_cn"].get("source")
-        elif req.use_prefer_source and after.get("source_dept_name"):
-            payload["dept_name_cn"] = after.get("source_dept_name")
+            raise ValueError("no master fields to apply; provide values or use_prefer_source with mismatch data")
+        return payload, "identity_person", "apply_person_master", suggestion
 
-        if req.dept_type:
-            payload["dept_type"] = req.dept_type
-        elif req.use_prefer_source and "dept_type" in changed:
-            payload["dept_type"] = changed["dept_type"].get("source")
+    payload = {"dept_code": diff.entity_code, "diff_id": diff.id}
+    if req.dept_name_cn:
+        payload["dept_name_cn"] = req.dept_name_cn
+    elif req.use_prefer_source and "dept_name_cn" in changed:
+        payload["dept_name_cn"] = changed["dept_name_cn"].get("source")
+    elif req.use_prefer_source and after.get("source_dept_name"):
+        payload["dept_name_cn"] = after.get("source_dept_name")
 
-        if req.parent_dept_code is not None:
-            payload["parent_dept_code"] = req.parent_dept_code
-        elif req.use_prefer_source and "parent_dept_code" in changed:
-            payload["parent_dept_code"] = changed["parent_dept_code"].get("source")
+    if req.dept_type:
+        payload["dept_type"] = req.dept_type
+    elif req.use_prefer_source and "dept_type" in changed:
+        payload["dept_type"] = changed["dept_type"].get("source")
 
-        if req.status:
-            payload["status"] = req.status
-        elif req.use_prefer_source and "status" in changed:
-            payload["status"] = changed["status"].get("source")
+    if req.parent_dept_code is not None:
+        payload["parent_dept_code"] = req.parent_dept_code
+    elif req.use_prefer_source and "parent_dept_code" in changed:
+        payload["parent_dept_code"] = changed["parent_dept_code"].get("source")
 
-        if not any(k in payload for k in ("dept_name_cn", "dept_type", "parent_dept_code", "status")):
-            raise HTTPException(
-                status_code=400,
-                detail="no department master fields to apply; provide values or use_prefer_source with mismatch data",
-            )
-        entity_type = "identity_department"
-        request_type = "apply_department_master"
+    if req.status:
+        payload["status"] = req.status
+    elif req.use_prefer_source and "status" in changed:
+        payload["status"] = changed["status"].get("source")
 
+    if not any(k in payload for k in ("dept_name_cn", "dept_type", "parent_dept_code", "status")):
+        raise ValueError("no department master fields to apply; provide values or use_prefer_source with mismatch data")
+    return payload, "identity_department", "apply_department_master", suggestion
+
+
+def _create_cr_from_diff(
+    db: Session,
+    diff: IdentitySyncDiff,
+    req: ApplyDiffMasterRequest,
+    current_user: str,
+) -> dict:
+    payload, entity_type, request_type, suggestion = _build_master_payload_from_diff(diff, req)
     cr = GovernChangeRequest(
         module="identity",
         entity_type=entity_type,
@@ -746,8 +754,8 @@ def propose_master_from_diff(
             after_data=payload,
         )
     )
-
-    out: dict = {
+    out = {
+        "diff_id": diff.id,
         "change_request_id": cr.id,
         "approval_status": cr.approval_status,
         "payload": payload,
@@ -756,13 +764,202 @@ def propose_master_from_diff(
         "auto_applied": False,
         "note": "已创建变更请求；需另一人审批后 execute，才会写主档",
     }
-
-    # 可选：同人不可审批；若 auto 且请求里带了不同审批语义——仅当明确要求时跳过双人（默认关闭）
     if req.auto_approve_execute:
-        # 安全：仍禁止真正绕过，返回提示
         out["note"] = "auto_approve_execute 已忽略：请走审批/execute 双人流程"
+    return out
+
+
+@router.post("/sync-diffs/{diff_id}/propose-master", summary="L16 从差异提出主档变更（默认不直接写）")
+def propose_master_from_diff(
+    diff_id: int,
+    req: ApplyDiffMasterRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    diff = db.get(IdentitySyncDiff, diff_id)
+    if not diff:
+        raise HTTPException(status_code=404, detail="sync diff not found")
+    try:
+        out = _create_cr_from_diff(db, diff, req, current_user)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     db.commit()
     return ApiResponse(data=out)
+
+
+@router.post("/sync-diffs/batch-propose-master", summary="L16 批量提出主档变更（默认上限 50）")
+def batch_propose_master_from_diffs(
+    req: BatchDiffIdsRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    ids = list(dict.fromkeys(int(i) for i in (req.diff_ids or []) if i is not None))
+    if not ids:
+        raise HTTPException(status_code=400, detail="diff_ids required")
+    if len(ids) > 50:
+        raise HTTPException(status_code=400, detail="batch size max 50")
+    apply_req = ApplyDiffMasterRequest(use_prefer_source=req.use_prefer_source)
+    ok: list[dict] = []
+    failed: list[dict] = []
+    for diff_id in ids:
+        diff = db.get(IdentitySyncDiff, diff_id)
+        if not diff:
+            failed.append({"diff_id": diff_id, "error": "not found"})
+            continue
+        try:
+            out = _create_cr_from_diff(db, diff, apply_req, current_user)
+            ok.append(out)
+        except ValueError as e:
+            failed.append({"diff_id": diff_id, "error": str(e)})
+    db.commit()
+    return ApiResponse(
+        data={
+            "requested": len(ids),
+            "created": len(ok),
+            "failed": len(failed),
+            "items": ok,
+            "errors": failed,
+            "note": "仅创建 change_request，不写主档；需另一人审批后 execute",
+        }
+    )
+
+
+@router.post("/sync-diffs/batch-status", summary="批量更新差异状态 open/resolved/ignored")
+def batch_update_sync_diff_status(
+    req: BatchDiffIdsRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    if req.status not in {"open", "resolved", "ignored"}:
+        raise HTTPException(status_code=400, detail="status must be open/resolved/ignored")
+    ids = list(dict.fromkeys(int(i) for i in (req.diff_ids or []) if i is not None))
+    if not ids:
+        raise HTTPException(status_code=400, detail="diff_ids required")
+    if len(ids) > 100:
+        raise HTTPException(status_code=400, detail="batch size max 100")
+    updated = 0
+    missing = 0
+    for diff_id in ids:
+        diff = db.get(IdentitySyncDiff, diff_id)
+        if not diff:
+            missing += 1
+            continue
+        before = {"status": diff.status}
+        diff.status = req.status
+        diff.handled_at = None if req.status == "open" else datetime.now(timezone.utc)
+        db.add(
+            GovernAuditLog(
+                module="identity",
+                entity_type="sync_diff",
+                entity_ref=str(diff.id),
+                action="batch_update_status",
+                before_data=before,
+                after_data={"status": diff.status},
+                operator=current_user,
+                reason=req.note,
+            )
+        )
+        updated += 1
+    db.commit()
+    return ApiResponse(data={"requested": len(ids), "updated": updated, "missing": missing, "status": req.status})
+
+
+@router.post("/change-requests/batch-approve", summary="批量审批身份变更请求")
+def batch_approve_identity_cr(
+    req: BatchChangeRequestIds,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    ids = list(dict.fromkeys(int(i) for i in (req.ids or []) if i is not None))
+    if not ids:
+        raise HTTPException(status_code=400, detail="ids required")
+    if len(ids) > 50:
+        raise HTTPException(status_code=400, detail="batch size max 50")
+    ok, failed = [], []
+    for cr_id in ids:
+        cr = db.get(GovernChangeRequest, cr_id)
+        if not cr or cr.module != "identity":
+            failed.append({"id": cr_id, "error": "not found"})
+            continue
+        if cr.approval_status not in ("draft", "pending"):
+            failed.append({"id": cr_id, "error": f"status {cr.approval_status}"})
+            continue
+        if current_user == cr.requested_by:
+            failed.append({"id": cr_id, "error": "same requester cannot approve"})
+            continue
+        cr.approval_status = "approved"
+        cr.approved_by = current_user
+        db.add(
+            GovernAuditLog(
+                module="identity",
+                entity_type="change_request",
+                entity_ref=str(cr.id),
+                action="batch_approve",
+                operator=current_user,
+                reason=req.note,
+            )
+        )
+        ok.append({"id": cr.id, "approval_status": "approved"})
+    db.commit()
+    return ApiResponse(data={"requested": len(ids), "approved": len(ok), "failed": len(failed), "items": ok, "errors": failed})
+
+
+@router.post("/change-requests/batch-execute", summary="批量执行已审批身份变更（写平台主档）")
+def batch_execute_identity_cr(
+    req: BatchChangeRequestIds,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    ids = list(dict.fromkeys(int(i) for i in (req.ids or []) if i is not None))
+    if not ids:
+        raise HTTPException(status_code=400, detail="ids required")
+    if len(ids) > 50:
+        raise HTTPException(status_code=400, detail="batch size max 50")
+    ok, failed = [], []
+    for cr_id in ids:
+        cr = db.get(GovernChangeRequest, cr_id)
+        if not cr or cr.module != "identity":
+            failed.append({"id": cr_id, "error": "not found"})
+            continue
+        if cr.approval_status != "approved":
+            failed.append({"id": cr_id, "error": f"status {cr.approval_status}"})
+            continue
+        try:
+            result = _execute_identity_payload(db, cr.request_type, cr.request_payload or {})
+            cr.approval_status = "executed"
+            cr.executed_by = current_user
+            cr.execution_result = json.dumps(result, ensure_ascii=False)[:2000]
+            db.add(
+                GovernAuditLog(
+                    module="identity",
+                    entity_type="change_request",
+                    entity_ref=str(cr.id),
+                    action="batch_execute",
+                    operator=current_user,
+                    after_data=result,
+                )
+            )
+            ok.append({"id": cr.id, "approval_status": "executed", "result": result})
+        except HTTPException as e:
+            failed.append({"id": cr_id, "error": e.detail})
+        except Exception as e:
+            failed.append({"id": cr_id, "error": str(e)[:200]})
+    db.commit()
+    return ApiResponse(
+        data={
+            "requested": len(ids),
+            "executed": len(ok),
+            "failed": len(failed),
+            "items": ok,
+            "errors": failed,
+            "note": "仅写平台 identity 主档，不写 HIS/ODS/HRP",
+        }
+    )
 
 
 @router.patch("/sync-diffs/{diff_id}", summary="Update identity sync diff status")

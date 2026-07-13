@@ -45,6 +45,7 @@
           :default-expanded-keys="defaultExpandedKeys"
           highlight-current
           @node-click="handleTreeClick"
+          @node-expand="handleTreeExpand"
         >
           <template #default="{ data }">
             <span class="tree-node">
@@ -165,8 +166,10 @@ import type { ElTree } from "element-plus";
 import { useRouter } from "vue-router";
 import {
   getAssetTree,
+  getAssetTreeTables,
   getTableColumns,
   getTables,
+  searchAssetTree,
   type AssetTreeNode,
   type AssetTreeTable,
   type ColumnInfo,
@@ -193,6 +196,9 @@ interface TreeItem {
   source_code?: string;
   schema_name?: string;
   table_name?: string;
+  /** schema 表是否已懒加载 */
+  tablesLoaded?: boolean;
+  tablesLoading?: boolean;
   table?: TableBrief & {
     system_category_cn?: string;
     source_system_cn?: string;
@@ -208,7 +214,11 @@ const treeLoading = ref(false);
 const loading = ref(false);
 const columnsLoading = ref(false);
 const rawTree = ref<AssetTreeNode[]>([]);
+/** schemaId -> 已加载的表节点 */
+const schemaTableChildren = ref<Record<string, TreeItem[]>>({});
+const schemaTablesLoading = ref<Record<string, boolean>>({});
 const columnChildren = ref<Record<string, TreeItem[]>>({});
+const searchHits = ref<TreeItem[]>([]);
 const items = ref<(TableBrief & { system_category_cn?: string; source_system_cn?: string })[]>([]);
 const columns = ref<ColumnInfo[]>([]);
 const total = ref(0);
@@ -330,29 +340,75 @@ const treeData = computed<TreeItem[]>(() => {
         schemaNode.count = (schemaNode.count || 0) + schema.table_count;
       }
 
-      for (const table of schema.tables) {
-        const key = tableNodeKey(source.source_code, schema.namespace, table.table_name);
-        schemaNode.children!.push({
-          id: `table:${key}`,
-          label: table.table_name_cn
-            ? `${table.table_name} · ${table.table_name_cn}`
-            : table.table_name,
-          kind: "table",
-          system_category: cat,
-          system_code: source.system_code,
-          source_system: source.source_system || undefined,
-          source_code: source.source_code,
-          schema_name: schema.namespace,
-          table_name: table.table_name,
-          table: toTableBrief(source, schema.namespace, table),
-          count: table.column_count ?? undefined,
-          children: columnChildren.value[key]
-        });
+      // 默认不内嵌表：懒加载后注入；include_tables 时仍可渲染
+      const lazyTables = schemaTableChildren.value[schemaId];
+      if (lazyTables?.length) {
+        schemaNode.children = lazyTables.map(t => ({
+          ...t,
+          children: t.table
+            ? columnChildren.value[
+                tableNodeKey(t.source_code || "", t.schema_name || "", t.table_name || "")
+              ]
+            : undefined
+        }));
+        schemaNode.tablesLoaded = true;
+      } else if (schema.tables_loaded || (schema.tables && schema.tables.length)) {
+        for (const table of schema.tables || []) {
+          const key = tableNodeKey(source.source_code, schema.namespace, table.table_name);
+          schemaNode.children!.push({
+            id: `table:${key}`,
+            label: table.table_name_cn
+              ? `${table.table_name} · ${table.table_name_cn}`
+              : table.table_name,
+            kind: "table",
+            system_category: cat,
+            system_code: source.system_code,
+            source_system: source.source_system || undefined,
+            source_code: source.source_code,
+            schema_name: schema.namespace,
+            table_name: table.table_name,
+            table: toTableBrief(source, schema.namespace, table),
+            count: table.column_count ?? undefined,
+            children: columnChildren.value[key]
+          });
+        }
+        schemaNode.tablesLoaded = true;
+      } else {
+        // 占位：显示「点击展开加载表」提示节点（可点）
+        schemaNode.tablesLoaded = false;
+        if ((schema.table_count || 0) > 0) {
+          schemaNode.children = [
+            {
+              id: `placeholder:${schemaId}`,
+              label: schemaTablesLoading.value[schemaId]
+                ? "加载中…"
+                : `共 ${schema.table_count} 张表（展开/点击加载）`,
+              kind: "table",
+              system_category: cat,
+              system_code: source.system_code,
+              source_code: source.source_code,
+              schema_name: schema.namespace
+            }
+          ];
+        }
       }
     }
   }
 
-  return CATEGORY_ORDER.map(code => categoryMap.get(code)).filter(Boolean) as TreeItem[];
+  const base = CATEGORY_ORDER.map(code => categoryMap.get(code)).filter(Boolean) as TreeItem[];
+  if (searchHits.value.length && treeKeyword.value.trim()) {
+    return [
+      {
+        id: "search-hits",
+        label: `搜索结果（${searchHits.value.length}）`,
+        kind: "category",
+        count: searchHits.value.length,
+        children: searchHits.value
+      },
+      ...base
+    ];
+  }
+  return base;
 });
 
 const defaultExpandedKeys = computed(() =>
@@ -373,10 +429,23 @@ const selectedTableName = computed(() =>
     : ""
 );
 
-watch(treeKeyword, value => treeRef.value?.filter(value));
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+watch(treeKeyword, value => {
+  treeRef.value?.filter(value);
+  if (searchTimer) clearTimeout(searchTimer);
+  const kw = (value || "").trim();
+  if (!kw) {
+    searchHits.value = [];
+    return;
+  }
+  // 服务端表名搜索（骨架树不含表节点时本地 filter 不够）
+  searchTimer = setTimeout(() => runTreeSearch(kw), 300);
+});
 
 function filterTreeNode(value: string, data: TreeItem): boolean {
   if (!value) return true;
+  // 搜索结果分区始终展示
+  if (data.id === "search-hits") return true;
   const keyword = value.toLowerCase();
   const selfMatch = [
     data.label,
@@ -408,10 +477,106 @@ function setCategoryFilter(code: string) {
 async function loadTree() {
   treeLoading.value = true;
   try {
-    const res = await getAssetTree();
+    // 默认不内嵌表，显著减小首包
+    const res = await getAssetTree({ include_tables: false });
     rawTree.value = res.data || [];
+    schemaTableChildren.value = {};
   } finally {
     treeLoading.value = false;
+  }
+}
+
+async function loadSchemaTables(node: TreeItem) {
+  if (node.kind !== "schema" || !node.source_code) return;
+  const sid = node.id;
+  if (schemaTableChildren.value[sid]?.length || schemaTablesLoading.value[sid]) return;
+  schemaTablesLoading.value = { ...schemaTablesLoading.value, [sid]: true };
+  try {
+    const res = await getAssetTreeTables({
+      source_code: node.source_code,
+      schema_name: node.schema_name || "",
+      page: 1,
+      page_size: 500
+    });
+    const sourceStub: AssetTreeNode = {
+      source_code: node.source_code,
+      source_name_cn: node.source_code,
+      system_code: node.system_code || "",
+      system_category: node.system_category,
+      source_system: node.source_system,
+      table_count: res.data.total,
+      schemas: []
+    };
+    schemaTableChildren.value = {
+      ...schemaTableChildren.value,
+      [sid]: (res.data.items || []).map(table => {
+        const key = tableNodeKey(node.source_code || "", node.schema_name || "", table.table_name);
+        return {
+          id: `table:${key}`,
+          label: table.table_name_cn
+            ? `${table.table_name} · ${table.table_name_cn}`
+            : table.table_name,
+          kind: "table" as const,
+          system_category: node.system_category,
+          system_code: node.system_code,
+          source_system: node.source_system,
+          source_code: node.source_code,
+          schema_name: node.schema_name,
+          table_name: table.table_name,
+          table: toTableBrief(sourceStub, node.schema_name || "", table),
+          count: table.column_count ?? undefined
+        };
+      })
+    };
+  } finally {
+    schemaTablesLoading.value = { ...schemaTablesLoading.value, [sid]: false };
+  }
+}
+
+async function handleTreeExpand(node: TreeItem) {
+  if (node.kind === "schema") {
+    await loadSchemaTables(node);
+  }
+}
+
+async function runTreeSearch(keyword: string) {
+  try {
+    const res = await searchAssetTree({
+      keyword,
+      system_category: categoryFilter.value || undefined,
+      limit: 40
+    });
+    searchHits.value = (res.data.items || []).map(table => {
+      const schema = (table as any).schema_name || "";
+      const sourceCode = (table as any).source_code || "";
+      const key = tableNodeKey(sourceCode, schema, table.table_name);
+      const stub: AssetTreeNode = {
+        source_code: sourceCode,
+        source_name_cn: (table as any).source_name_cn || sourceCode,
+        system_code: (table as any).system_code || "",
+        system_category: (table as any).system_category,
+        source_system: (table as any).source_system,
+        table_count: 1,
+        schemas: []
+      };
+      return {
+        id: `search-table:${key}`,
+        label: table.table_name_cn
+          ? `${schema}.${table.table_name} · ${table.table_name_cn}`
+          : `${schema}.${table.table_name}`,
+        kind: "table" as const,
+        system_category: (table as any).system_category,
+        system_code: (table as any).system_code,
+        source_system: (table as any).source_system,
+        source_code: sourceCode,
+        schema_name: schema,
+        table_name: table.table_name,
+        table: toTableBrief(stub, schema, table),
+        count: table.column_count ?? undefined
+      };
+    });
+  } catch {
+    searchHits.value = [];
   }
 }
 
@@ -438,6 +603,17 @@ async function hydrateColumnChildren(table: TableBrief) {
 }
 
 async function handleTreeClick(node: TreeItem) {
+  if (node.id === "search-hits") return;
+  // 占位节点：触发 schema 加载
+  if (node.id.startsWith("placeholder:")) {
+    const schemaLike: TreeItem = {
+      ...node,
+      id: node.id.replace(/^placeholder:/, ""),
+      kind: "schema"
+    };
+    await loadSchemaTables(schemaLike);
+    return;
+  }
   scope.system_category = node.system_category || "";
   // 列表过滤用真实 system_code / source_code，不用大类伪编码
   scope.system_code =
@@ -448,6 +624,9 @@ async function handleTreeClick(node: TreeItem) {
   scope.schema_name = ["schema", "table", "column"].includes(node.kind)
     ? node.schema_name || ""
     : "";
+  if (node.kind === "schema") {
+    await loadSchemaTables(node);
+  }
   if (node.kind === "table" && node.table) {
     await selectTable(node.table);
     await hydrateColumnChildren(node.table);

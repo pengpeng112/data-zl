@@ -53,6 +53,33 @@ export function proposeMasterFromDiff(diffId: number, data?: Record<string, any>
     data: data ?? { use_prefer_source: true }
   });
 }
+/** L16 批量提出（最多 50） */
+export function batchProposeMasterFromDiffs(data: {
+  diff_ids: number[];
+  use_prefer_source?: boolean;
+}) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync-diffs/batch-propose-master", {
+    data: { use_prefer_source: true, ...data }
+  });
+}
+/** 批量更新差异状态 */
+export function batchUpdateSyncDiffStatus(data: {
+  diff_ids: number[];
+  status: "open" | "resolved" | "ignored";
+  note?: string;
+}) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync-diffs/batch-status", { data });
+}
+export function batchApproveIdentityChangeRequests(data: { ids: number[]; note?: string }) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/change-requests/batch-approve", {
+    data
+  });
+}
+export function batchExecuteIdentityChangeRequests(data: { ids: number[] }) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/identity/change-requests/batch-execute", {
+    data
+  });
+}
 export function syncHisIdentity(params?: Record<string, any>) {
   return http.request<ApiResponse<any>>("post", "/api/v1/identity/sync/his", { params });
 }

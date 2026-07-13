@@ -59,7 +59,46 @@
         <template #title>{{ resultTitle }}</template>
       </el-alert>
 
-      <el-table v-loading="loading" :data="items" stripe class="medical-data-table">
+      <div class="batch-bar">
+        <span class="batch-hint">已选 {{ selectedDiffs.length }} 条（批量最多 50）</span>
+        <el-button
+          size="small"
+          type="danger"
+          :disabled="!selectedDiffs.length"
+          :loading="batchLoading"
+          @click="batchPropose"
+        >
+          批量提出主档变更
+        </el-button>
+        <el-button
+          size="small"
+          type="success"
+          :disabled="!selectedDiffs.length"
+          :loading="batchLoading"
+          @click="batchSetStatus('resolved')"
+        >
+          批量解决
+        </el-button>
+        <el-button
+          size="small"
+          type="info"
+          :disabled="!selectedDiffs.length"
+          :loading="batchLoading"
+          @click="batchSetStatus('ignored')"
+        >
+          批量忽略
+        </el-button>
+      </div>
+
+      <el-table
+        v-loading="loading"
+        :data="items"
+        stripe
+        class="medical-data-table"
+        row-key="id"
+        @selection-change="onDiffSelectionChange"
+      >
+        <el-table-column type="selection" width="48" reserve-selection />
         <el-table-column prop="diff_type" label="差异类型" width="160">
           <template #default="{ row }">
             <el-tag size="small" type="info">{{ diffTypeLabel(row.diff_type) }}</el-tag>
@@ -143,8 +182,35 @@
     <el-card shadow="never" class="diff-card cr-card">
       <ReToolbar title="L16 主档变更请求（审批后执行）" class="diff-toolbar">
         <el-button size="small" :loading="crLoading" @click="loadChangeRequests">刷新</el-button>
+        <el-button
+          size="small"
+          type="success"
+          :disabled="!selectedCrs.length"
+          :loading="batchLoading"
+          @click="batchApproveCrs"
+        >
+          批量审批（{{ selectedCrs.length }}）
+        </el-button>
+        <el-button
+          size="small"
+          type="danger"
+          :disabled="!selectedCrs.length"
+          :loading="batchLoading"
+          @click="batchExecuteCrs"
+        >
+          批量执行写主档
+        </el-button>
       </ReToolbar>
-      <el-table v-loading="crLoading" :data="changeRequests" stripe size="small" class="medical-data-table">
+      <el-table
+        v-loading="crLoading"
+        :data="changeRequests"
+        stripe
+        size="small"
+        class="medical-data-table"
+        row-key="id"
+        @selection-change="onCrSelectionChange"
+      >
+        <el-table-column type="selection" width="48" />
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="entity_ref" label="人员编码" min-width="120" show-overflow-tooltip />
         <el-table-column prop="request_type" label="类型" width="160" />
@@ -191,6 +257,10 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import {
   approveIdentityChangeRequest,
+  batchApproveIdentityChangeRequests,
+  batchExecuteIdentityChangeRequests,
+  batchProposeMasterFromDiffs,
+  batchUpdateSyncDiffStatus,
   collectSources,
   executeIdentityChangeRequest,
   generateIdentityReview,
@@ -223,6 +293,9 @@ const detailRow = ref<any>(null);
 const changeRequests = ref<any[]>([]);
 const crLoading = ref(false);
 const crActingId = ref<number | null>(null);
+const selectedDiffs = ref<any[]>([]);
+const selectedCrs = ref<any[]>([]);
+const batchLoading = ref(false);
 
 const params = reactive({ status: "open", diff_type: "" as string, page: 1, page_size: 20 });
 const collectForm = reactive({
@@ -424,6 +497,101 @@ async function doProposeMaster(row: any) {
   }
 }
 
+function onDiffSelectionChange(rows: any[]) {
+  selectedDiffs.value = rows;
+}
+function onCrSelectionChange(rows: any[]) {
+  selectedCrs.value = rows;
+}
+
+async function batchPropose() {
+  const ids = selectedDiffs.value
+    .filter(
+      r =>
+        r.status === "open" &&
+        (r.entity_type === "identity_person" || r.entity_type === "identity_department")
+    )
+    .map(r => r.id)
+    .slice(0, 50);
+  if (!ids.length) {
+    ElMessage.warning("请勾选 open 状态的人员/科室差异（最多 50）");
+    return;
+  }
+  batchLoading.value = true;
+  try {
+    const res = await batchProposeMasterFromDiffs({ diff_ids: ids, use_prefer_source: true });
+    const d = res.data || {};
+    ElMessage.success(`批量提出：成功 ${d.created ?? 0}，失败 ${d.failed ?? 0}`);
+    await loadChangeRequests();
+  } catch {
+    ElMessage.error("批量提出失败");
+  } finally {
+    batchLoading.value = false;
+  }
+}
+
+async function batchSetStatus(status: "resolved" | "ignored") {
+  const ids = selectedDiffs.value.map(r => r.id).slice(0, 100);
+  if (!ids.length) return;
+  batchLoading.value = true;
+  try {
+    const res = await batchUpdateSyncDiffStatus({
+      diff_ids: ids,
+      status,
+      note: "batch status update"
+    });
+    ElMessage.success(`已更新 ${res.data?.updated ?? 0} 条为 ${status}`);
+    await loadData();
+  } catch {
+    ElMessage.error("批量更新状态失败");
+  } finally {
+    batchLoading.value = false;
+  }
+}
+
+async function batchApproveCrs() {
+  const ids = selectedCrs.value
+    .filter(r => r.approval_status === "pending" || r.approval_status === "draft")
+    .map(r => r.id)
+    .slice(0, 50);
+  if (!ids.length) {
+    ElMessage.warning("请勾选待审批请求（须与申请人不同账号）");
+    return;
+  }
+  batchLoading.value = true;
+  try {
+    const res = await batchApproveIdentityChangeRequests({ ids, note: "batch approve" });
+    ElMessage.success(`批量审批：成功 ${res.data?.approved ?? 0}，失败 ${res.data?.failed ?? 0}`);
+    await loadChangeRequests();
+  } catch {
+    ElMessage.error("批量审批失败");
+  } finally {
+    batchLoading.value = false;
+  }
+}
+
+async function batchExecuteCrs() {
+  const ids = selectedCrs.value
+    .filter(r => r.approval_status === "approved")
+    .map(r => r.id)
+    .slice(0, 50);
+  if (!ids.length) {
+    ElMessage.warning("请勾选已审批、待执行的请求");
+    return;
+  }
+  batchLoading.value = true;
+  try {
+    const res = await batchExecuteIdentityChangeRequests({ ids });
+    ElMessage.success(`批量执行：成功 ${res.data?.executed ?? 0}，失败 ${res.data?.failed ?? 0}`);
+    await loadChangeRequests();
+    await loadData();
+  } catch {
+    ElMessage.error("批量执行失败");
+  } finally {
+    batchLoading.value = false;
+  }
+}
+
 async function doApproveCr(row: any) {
   crActingId.value = row.id;
   try {
@@ -482,6 +650,19 @@ onMounted(() => {
 
 .cr-card {
   margin-top: 16px;
+}
+
+.batch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.batch-hint {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  margin-right: 4px;
 }
 
 .drawer-actions {
