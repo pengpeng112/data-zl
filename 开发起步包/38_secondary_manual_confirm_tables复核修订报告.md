@@ -1,5 +1,8 @@
 > 类别：关系验证
 
+> ✅状态：🟢已完成 | 负责AI/人：— | 结论：最新复核汇总 `manual_confirm_tables=0`，待确认表已按用户规则清零 | 最后更新：2026-07-07
+> 📌多AI协作：本文件作为表清洗复核证据引用；后续判断以 `README.md`、`40_数据治理复核口径与方法记录.md` 和 `secondary_manual_confirm_recheck_summary.json` 为准。
+
 # secondary_manual_confirm_tables 复核修订报告
 
 ## 1. 复核范围

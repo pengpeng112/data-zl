@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-07-08T06:44:22+08:00",
+  "source_system": "HRP",
+  "source_db": "10.10.10.23:1521/hrpdb",
+  "inputs": {
+    "tables": "hrp_source_tables.csv",
+    "columns": "hrp_source_columns.csv",
+    "constraints": "hrp_source_constraints.csv",
+    "indexes": "hrp_source_indexes.csv"
+  },
+  "counts": {
+    "total_tables": 76057,
+    "core_candidates": 1207,
+    "exclude_candidates": 56378,
+    "review_candidates": 18472,
+    "field_heavy_tables": 20590,
+    "views": 149,
+    "view_dependency_edges": 947
+  },
+  "table_flags": {
+    "num_rows_zero": 18414,
+    "num_rows_missing": 36359,
+    "date_like": 95,
+    "backup_like": 250,
+    "log_like": 117,
+    "temp_query_like": 38242
+  },
+  "domain_counts": {
+    "其他": 73542,
+    "字典/编码": 342,
+    "科室/组织": 301,
+    "用户账号": 124,
+    "财务": 514,
+    "供应商/物资": 718,
+    "人员": 427,
+    "岗位/职务": 72,
+    "薪酬/绩效/考勤": 17
+  },
+  "constraint_type_counts": {
+    "P": 30439,
+    "C": 44262,
+    "U": 22
+  },
+  "pii_flag_counts_in_current_columns": {
+    "none": 4988878,
+    "medium": 10579,
+    "high": 543
+  },
+  "field_capture_warning": "hrp_source_columns.csv contains 5000000 rows and reached previous capture cap; field counts are lower-bound estimates for tables not fully reached.",
+  "view_dependency_errors": [],
+  "outputs": [
+    "hrp_tables_core_candidates.csv",
+    "hrp_tables_exclude_candidates.csv",
+    "hrp_tables_review_candidates.csv",
+    "hrp_view_relationship_seeds.csv",
+    "hrp_field_heavy_tables.csv",
+    "hrp_cleanup_summary.json"
+  ]
+}

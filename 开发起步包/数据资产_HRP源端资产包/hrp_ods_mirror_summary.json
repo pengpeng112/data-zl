@@ -1,0 +1,24 @@
+{
+  "status": "partial",
+  "direct_hrp_host": "10.10.10.23:1521/hrpdb",
+  "direct_hrp_port_from_8_83": "OPEN",
+  "direct_hrp_credential": "missing (need HRP_USER/HRP_PASSWORD or /etc/data-asset/credentials/hrp_10_10_10_23)",
+  "jump_8_53_from_8_83": "Permission denied (no key/password)",
+  "fallback_mirror": "ODS.HRP@10.10.8.216",
+  "table_count": 21,
+  "column_count": 928,
+  "wa_tables_in_ods_hrp": [],
+  "core_has_row": {
+    "BD_PSNDOC": 1,
+    "HI_PSNJOB": 1,
+    "ORG_DEPT": 1,
+    "SM_USER": 1,
+    "BD_PSNCL": 1,
+    "HI_PSNDOC_EDU": 1
+  },
+  "files": [
+    "hrp_ods_mirror_tables.csv",
+    "hrp_ods_mirror_columns.csv"
+  ],
+  "note": "WA_* 薪酬表不在 ODS.HRP 镜像中，需直连 HRP 源库补采"
+}

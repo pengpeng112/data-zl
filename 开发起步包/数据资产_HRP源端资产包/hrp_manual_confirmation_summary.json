@@ -1,0 +1,15 @@
+{
+  "manual_confirmation_tables": 200,
+  "p0_count": 58,
+  "p1_count": 142,
+  "suggested_action_counts": {
+    "KEEP_CORE": 41,
+    "AUDIT_EXCLUDED": 20,
+    "REVIEW_INCLUDE": 139
+  },
+  "notes": [
+    "KEEP_CORE: recommended to include in first HRP_READY package unless user rejects.",
+    "AUDIT_EXCLUDED: currently excluded by rules but referenced by views or has large row count; user should confirm.",
+    "REVIEW_INCLUDE: likely business table; user should confirm whether included in HRP_READY."
+  ]
+}

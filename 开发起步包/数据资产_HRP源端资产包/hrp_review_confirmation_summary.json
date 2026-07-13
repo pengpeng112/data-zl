@@ -1,0 +1,185 @@
+{
+  "generated_at": "2026-07-08T14:00:24+08:00",
+  "source_system": "HRP",
+  "source_db": "10.10.10.23:1521/hrpdb",
+  "object_type_counts": {
+    "business": 5851,
+    "report": 23688,
+    "excluded": 61,
+    "temp_query": 38242,
+    "dict_print": 8215
+  },
+  "real_business_tables": 5851,
+  "refined_domain_counts": {
+    "人员": 373,
+    "科室/组织": 282,
+    "岗位/职务": 59,
+    "用户账号": 110,
+    "薪酬/绩效": 68,
+    "供应商/物资": 186,
+    "采购/请购": 13,
+    "库存/出入库": 47,
+    "财务/总账": 191,
+    "财务/辅助账": 73,
+    "财务": 241,
+    "固定资产/设备": 204,
+    "字典/编码": 306,
+    "其他": 3644,
+    "财务/成本": 41,
+    "薪酬/绩效/考勤": 13
+  },
+  "priority_counts": {
+    "P0": 75,
+    "P1": 668,
+    "P2": 900,
+    "P3": 4208
+  },
+  "suggested_action_counts": {
+    "KEEP_CORE": 63,
+    "NEED_FIELDS": 8,
+    "KEEP_CORE_EMPTY": 4,
+    "REVIEW_INCLUDE": 1568,
+    "REVIEW_EMPTY": 1472,
+    "EXCLUDE_EMPTY": 2736
+  },
+  "total_in_pack": 5851,
+  "force_keep_tables_count": 75,
+  "fields_missing_tables": 423,
+  "view_relationship_seeds": 149,
+  "view_dependency_edges": 788,
+  "low_row_filter": {
+    "threshold": 10,
+    "rule": "num_rows<10 且非字典 -> drop；保护：强制白名单/被视图引用/HI_PSNDOC_子表/维度根表(CLASS/TYPE/PERIOD/GRADE/SERIES/LEVEL/CATEGORY)",
+    "counts": {
+      "not_applied": 1511,
+      "keep": 415,
+      "drop": 3925
+    },
+    "decided_keep": 1926,
+    "decided_drop": 3925,
+    "drop_sample": [
+      {
+        "table": "BD_PSNDOC_C",
+        "rows": "4",
+        "domain": "人员"
+      },
+      {
+        "table": "HI_PSNJOB_000204",
+        "rows": "4",
+        "domain": "人员"
+      },
+      {
+        "table": "BD_ASSIGN_TEMP",
+        "rows": "2",
+        "domain": "人员"
+      },
+      {
+        "table": "HI_PSNJOB_002392",
+        "rows": "2",
+        "domain": "人员"
+      },
+      {
+        "table": "OAKM_PSNDISKSET",
+        "rows": "1",
+        "domain": "人员"
+      },
+      {
+        "table": "ORG_FUNRELATION",
+        "rows": "9",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "UAPBD_DEPTATR",
+        "rows": "8",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_ASSOCIATEDEF",
+        "rows": "7",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_OPERATE",
+        "rows": "6",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "BD_ACCCTRLORG",
+        "rows": "5",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_RELATION",
+        "rows": "5",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_RELVALIDATOR",
+        "rows": "5",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "HR_RELATION_ORG",
+        "rows": "4",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_ACCOUNTINGBOOK",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_CORP",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_CORP_V",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_FINANCEORG",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_FINANCEORG_V",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_REPORTMANASTRUMEMBER_V",
+        "rows": "3",
+        "domain": "科室/组织"
+      },
+      {
+        "table": "ORG_RMSMEMBER",
+        "rows": "3",
+        "domain": "科室/组织"
+      }
+    ]
+  },
+  "corrections_applied": [
+    "1. 真实表口径修正：76057 -> 剔除 TEMQ_(38242)/IUFO_(23688)/ZDP_(8215) 后真实业务表约 5912 张",
+    "2. 域分类修正：FA_/PAM_/ZC_ -> 固定资产/设备；PO_ -> 采购/请购；IC_出入库 -> 库存/出入库；GL_/IA_/COST_ -> 财务/总账/辅助/成本；WA_ -> 薪酬/绩效",
+    "3. 强制保留白名单扩展：从 27 张扩展到 80 张，覆盖人员档案全系列/采购/固定资产/薪酬/辅助账",
+    "4. need_fields 标注：WA_DATA/WA_ITEM/WA_WACLASS 等字段未覆盖但行数>0 的核心表标 need_fields",
+    "5. 视图种子提升：被视图引用>=3次且行数>0 的表提升为 P0",
+    "6. 低行数清洗：num_rows<10 且非字典剔除，保护关系种子/人员档案子表/维度根表；剔除 3925 张，保留 1926 张"
+  ],
+  "notes": [
+    "KEEP_CORE: 建议第一版直接纳入 HRP_READY，除非否定",
+    "NEED_FIELDS: 核心表但字段未覆盖（500万行上限截断），先补采字段再确认",
+    "AUDIT_EXCLUDED: 当前排除但可能误排，需复核",
+    "REVIEW_INCLUDE: 业务表，建议确认是否纳入",
+    "EXCLUDE_EMPTY: 空表且非核心域，建议排除",
+    "manual_decision 填写值: include / exclude / review_later / need_fields"
+  ],
+  "output_files": [
+    "hrp_review_confirmation_pack.csv",
+    "hrp_decided_keep_list.csv",
+    "hrp_decided_drop_list.csv",
+    "hrp_review_confirmation_summary.json"
+  ]
+}

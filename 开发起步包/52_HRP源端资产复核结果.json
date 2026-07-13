@@ -1,0 +1,159 @@
+{
+  "review_id": "52_HRP_source_review",
+  "status": "completed",
+  "generated_at": "2026-07-08T10:52:32+08:00",
+  "reviewer": "AI review based on 49 号探查已采集 CSV（只读，未连库）",
+  "source_system": "HRP",
+  "source_db": "10.10.10.23:1521/hrpdb",
+  "system_identification": {
+    "vendor": "用友 NC (UFIDA NC) ERP",
+    "evidence": [
+      "表名前缀遵循 NC 标准模块：BD_/HI_/ORG_/OM_/SM_/IC_/PO_/GL_/IA_/FA_/WA_/PAM_/COST_/SCM_",
+      "主键命名 PK_<实体>、通用字段 PK_GROUP/PK_ORG/TS/DR/CREATIONTIME/MODIFIEDTIME/DATAORIGINFLAG",
+      "多语言字段 NAME2~NAME6、扩展位 DEF1~DEF20",
+      "TEMQ_/IUFO_/ZDP_ 为 NC 平台临时查询/报表/打印对象特征"
+    ]
+  },
+  "key_findings": {
+    "table_count_correction": {
+      "original_49": 76057,
+      "corrected": 5851,
+      "breakdown": {
+        "business_tables": 5851,
+        "temq_temp_query": 38242,
+        "iufo_report": 23688,
+        "zdp_dict_print": 8215,
+        "system_or_recyclebin": 61
+      },
+      "impact": "人工确认规模从 76057 降为 5851，其中 P0+P1=743 张需人工看"
+    },
+    "domain_classification_corrections": {
+      "original_domains": 9,
+      "corrected_domains": 16,
+      "new_domains_added": [
+        "固定资产/设备 (FA_/PAM_/ZC_，原'其他')",
+        "采购/请购 (PO_，原'财务'误判)",
+        "库存/出入库 (IC_出入库，原'其他')",
+        "财务/总账 (GL_)",
+        "财务/辅助账 (IA_，原'其他')",
+        "财务/成本 (COST_，原'其他')"
+      ],
+      "wa_salary_fix": "WA_ 从'其他'修正为'薪酬/绩效'（49 号 infer_domain 未匹配 WA_ 前缀）"
+    },
+    "constraint_analysis": {
+      "total": 74723,
+      "primary_keys_P": 30439,
+      "check_constraints_C": 44262,
+      "unique_U": 22,
+      "foreign_keys_R": 0,
+      "finding": "NC 不建物理外键，所有关系靠应用层+视图DDL编码；视图依赖是关系图谱唯一权威种子"
+    },
+    "field_coverage_gap": {
+      "capture_cap": 5000000,
+      "hit_cap": true,
+      "business_tables_missing_columns": 423,
+      "core_tables_missing_columns": 8,
+      "core_missing_list": [
+        "WA_DATA (124520 rows, 薪酬)",
+        "WA_PSNTAX (109984 rows, 薪酬)",
+        "WA_CLASSITEM (9955 rows, 薪酬)",
+        "WA_ITEMPOWER (2230 rows, 薪酬)",
+        "WA_WACLASS (8 rows, 薪酬)",
+        "WA_PSNHI_B (199 rows, 薪酬)",
+        "WA_ITEM (86 rows, 薪酬)",
+        "WA_PSNHI (6 rows, 薪酬)"
+      ],
+      "remediation": "harvest_hrp_source_assets.py 增加 WHERE c.table_name LIKE 'WA_%' 分段查询"
+    },
+    "force_keep_whitelist_expansion": {
+      "original_49": 27,
+      "corrected": 75,
+      "added_categories": [
+        "人员档案全系列 (HI_PSNDOC_CERT/PSNCHG/TITLE/CTRT/LANGABILITY/PSNTRANSTER)",
+        "采购主线 (PO_INVOICE/PO_PRAYBILL_B/BD_PROJECT)",
+        "固定资产全系列 (FA_CARD/CARDHISTORY/CARDSUB/CATEGORY/PAM_EQUIP/CATEGORY/STATUS)",
+        "薪酬全系列 (WA_DATA/ITEM/WACLASS/CLASSITEM/PSNTAX/PSNHI/ITEMPOWER)",
+        "辅助账 (IA_DETAILLEDGER/IA_ASSISTANTLEDGER)",
+        "组织扩展 (ORG_ORGS/ORG_ORGTYPE)",
+        "账号 (BD_ACCOUNT)",
+        "财务基础 (BD_FUNDSOURCE/BD_ACCPERIODMONTH)"
+      ]
+    }
+  },
+  "relationship_seeds": {
+    "views_count": 149,
+    "dependency_edges": 947,
+    "seed_reference_edges": 788,
+    "top_referenced_tables": [
+      {"table": "BD_PSNDOC", "dep_count": 72, "domain": "人员"},
+      {"table": "ORG_DEPT", "dep_count": 77, "domain": "科室/组织"},
+      {"table": "BD_MATERIAL", "dep_count": 31, "domain": "供应商/物资"},
+      {"table": "BD_DEFDOC", "dep_count": 26, "domain": "字典/编码"},
+      {"table": "BD_STORDOC", "dep_count": 20, "domain": "其他"},
+      {"table": "BD_MARBASCLASS", "dep_count": 19, "domain": "字典/编码"},
+      {"table": "BD_MEASDOC", "dep_count": 17, "domain": "其他"},
+      {"table": "BD_SUPPLIER", "dep_count": 15, "domain": "供应商/物资"},
+      {"table": "ORG_ADMINORG", "dep_count": 13, "domain": "科室/组织"},
+      {"table": "IC_ONHANDDIM", "dep_count": 12, "domain": "库存/出入库"},
+      {"table": "IC_ONHANDNUM", "dep_count": 12, "domain": "库存/出入库"},
+      {"table": "SCM_BATCHCODE", "dep_count": 11, "domain": "供应商/物资"},
+      {"table": "HI_PSNJOB", "dep_count": 11, "domain": "人员"},
+      {"table": "FA_CARD", "dep_count": 61, "domain": "固定资产/设备"},
+      {"table": "FA_CARDHISTORY", "dep_count": 60, "domain": "固定资产/设备"},
+      {"table": "FA_CARDSUB", "dep_count": 59, "domain": "固定资产/设备"},
+      {"table": "FA_CATEGORY", "dep_count": 44, "domain": "固定资产/设备"}
+    ],
+    "his_bridge_views": [
+      "CDA_SECTION_MAP (院内科室↔CS_SECTION标准科室, 205行)",
+      "V_SEY_MATERIALINFOTOHIS (物料信息同步HIS)",
+      "V_SEY_SCSTOHIS / V_LYYY_SCSTOHIS (供应商同步HIS)",
+      "V_LYYY_MATERIALPRICETOHIS (物料价格同步HIS)",
+      "EMR_HOS_INFORMATION / EMR_HOS_PRACTITIONER (人员信息供EMR)",
+      "HRP_HIS_HCCKXX / SEY_HCCK / SEY_WZCK (耗材出库同步HIS)"
+    ]
+  },
+  "priority_distribution": {
+    "P0": 75,
+    "P0_empty": 4,
+    "P1": 668,
+    "P2": 900,
+    "P3": 4208,
+    "total_business_tables": 5851
+  },
+  "suggested_action_distribution": {
+    "KEEP_CORE": 63,
+    "NEED_FIELDS": 8,
+    "KEEP_CORE_EMPTY": 4,
+    "REVIEW_INCLUDE": 1568,
+    "REVIEW_EMPTY": 1472,
+    "EXCLUDE_EMPTY": 2736
+  },
+  "exclusion_audit": {
+    "temp_fa_assetsd": {
+      "tables": ["TEMP_FA_ASSETSD", "TEMP_FA_CAPTIALSOURCE"],
+      "dep_count": 59,
+      "recommendation": "exclude (TEMP_前缀确认临时表,引用来自TEMQ临时查询非业务视图)"
+    },
+    "hstf_zero_row": {
+      "tables": ["HSTF_INSTOCKDATA", "HSTF_INSTOCKDATAB", "HSTF_OUTSTOCKDATA", "HSTF_OUTSTOCKDATA_B"],
+      "recommendation": "exclude (0行废弃, IC_MATERIAL_H/B已覆盖出入库主线)"
+    },
+    "hi_psndoc_zero_row": {
+      "tables": ["HI_PSNDOC_CTRT", "HI_PSNDOC_TITLE", "HI_PSNDOC_LANGABILITY", "HI_PSNTRANSTER"],
+      "recommendation": "keep_as_empty (人员档案子表,结构属人员主线,可能未启用)"
+    }
+  },
+  "outputs": [
+    "开发起步包/52_HRP源端资产复核报告.md",
+    "开发起步包/52_HRP源端资产复核结果.json",
+    "开发起步包/数据资产_HRP源端资产包/hrp_review_confirmation_pack.csv",
+    "开发起步包/数据资产_HRP源端资产包/hrp_review_confirmation_summary.json",
+    "开发起步包/tools/build_hrp_review_pack.py"
+  ],
+  "next_steps": [
+    "1. 用户确认 hrp_review_confirmation_pack.csv 中 P0 的 75 张表 (填 manual_decision 列)",
+    "2. WA_ 系列 8 张表先补采字段 (夜间执行 harvest_hrp_source_assets.py 分段查询)",
+    "3. 补采字段后重跑 build_hrp_review_pack.py 更新确认包",
+    "4. 后续 DB 连接验证: 人员唯一键/CDA_SECTION_MAP 映射/HI_PSNJOB 一人多科室"
+  ]
+}

@@ -1,0 +1,126 @@
+[
+  {
+    "recipe_id": "V_INP_EXAM_REPORTS_EXAM_OUTPATIENT_INPATIENT",
+    "status": "user_confirmed",
+    "domain": "exam_imaging_report",
+    "source_system": "HISUSER/HIS",
+    "recommended_view_name": "V_INP_EXAM_REPORTS",
+    "description": "山东省第二人民医院检查/影像报告视图关系口径：住院按 PAT_VISIT，门诊按 OUTP_TREAT_REC.APPOINT_NO 聚合回填 CLINIC_MASTER。",
+    "primary_tables": [
+      {"alias": "em", "table": "EXAM.EXAM_MASTER", "role": "exam_master"},
+      {"alias": "er", "table": "EXAM.EXAM_REPORT", "role": "exam_report"},
+      {"alias": "pv", "table": "MEDREC.PAT_VISIT", "role": "inpatient_visit"},
+      {"alias": "pmi", "table": "MEDREC.PAT_MASTER_INDEX", "role": "patient_master"},
+      {"alias": "a", "table": "OUTP_TREAT_REC", "role": "outpatient_treat_charge_detail"},
+      {"alias": "b", "table": "CLINIC_MASTER", "role": "outpatient_visit_master"},
+      {"alias": "req_dept", "table": "COMM.DEPT_DICT", "role": "request_department"},
+      {"alias": "exec_dept", "table": "COMM.DEPT_DICT", "role": "execute_department"}
+    ],
+    "joins": [
+      {
+        "join_id": "exam_report_to_master",
+        "type": "left_join",
+        "from": "EXAM.EXAM_REPORT er",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "er.EXAM_NO = em.EXAM_NO",
+        "validation_level": "business_confirmed",
+        "note": "EXAM_REPORT 无 PATIENT_ID，必须经 EXAM_NO 挂 EXAM_MASTER。"
+      },
+      {
+        "join_id": "inpatient_visit",
+        "type": "left_join",
+        "from": "MEDREC.PAT_VISIT pv",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "pv.PATIENT_ID = em.PATIENT_ID AND pv.VISIT_ID = em.VISIT_ID",
+        "validation_level": "business_confirmed",
+        "note": "住院部分基本可用，不要轻易修改。"
+      },
+      {
+        "join_id": "patient_master",
+        "type": "left_join",
+        "from": "MEDREC.PAT_MASTER_INDEX pmi",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "pmi.PATIENT_ID = em.PATIENT_ID",
+        "validation_level": "business_confirmed",
+        "note": "用于补姓名、住院号等基础信息。"
+      },
+      {
+        "join_id": "outpatient_exam_appointment_aggregated",
+        "type": "left_join_aggregated_subquery",
+        "from": "OUTP_TREAT_REC a JOIN CLINIC_MASTER b",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "e_or.APPOINT_NO = TO_CHAR(em.EXAM_NO) AND e_or.PATIENT_ID = TO_CHAR(em.PATIENT_ID)",
+        "validation_level": "user_verified",
+        "note": "门诊检查正式主口径；必须先按 APPOINT_NO 聚合并取 rn=1，避免明细行放大。"
+      },
+      {
+        "join_id": "request_department",
+        "type": "left_join",
+        "from": "COMM.DEPT_DICT req_dept",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "req_dept.DEPT_CODE = em.REQ_DEPT",
+        "validation_level": "business_confirmed"
+      },
+      {
+        "join_id": "execute_department",
+        "type": "left_join",
+        "from": "COMM.DEPT_DICT exec_dept",
+        "to": "EXAM.EXAM_MASTER em",
+        "condition": "exec_dept.DEPT_CODE = em.PERFORMED_BY",
+        "validation_level": "business_confirmed"
+      }
+    ],
+    "outpatient_subquery": {
+      "alias": "e_or",
+      "main_key": "OUTP_TREAT_REC.APPOINT_NO = EXAM_MASTER.EXAM_NO",
+      "mandatory_filters": [
+        "a.ITEM_CLASS = 'D'",
+        "a.CHARGE_INDICATOR = '1'",
+        "a.APPOINT_NO IS NOT NULL"
+      ],
+      "recommended_date_filter": "b.VISIT_DATE >= DATE '2026-01-01'",
+      "dedup_strategy": "GROUP BY TO_CHAR(a.APPOINT_NO), TO_CHAR(b.PATIENT_ID), TO_CHAR(b.CLINIC_NO), b.VISIT_DATE; then ROW_NUMBER() OVER (PARTITION BY TO_CHAR(a.APPOINT_NO) ORDER BY b.VISIT_DATE, MIN(b.VISIT_NO), TO_CHAR(b.CLINIC_NO)) = 1",
+      "sql_fragment": "LEFT JOIN (\n    SELECT\n        appoint_no,\n        patient_id,\n        clinic_no,\n        visit_date,\n        visit_no\n    FROM (\n        SELECT\n            TO_CHAR(a.appoint_no) AS appoint_no,\n            TO_CHAR(b.patient_id) AS patient_id,\n            TO_CHAR(b.clinic_no)  AS clinic_no,\n            b.visit_date          AS visit_date,\n            TO_CHAR(MIN(b.visit_no)) AS visit_no,\n            ROW_NUMBER() OVER (\n                PARTITION BY TO_CHAR(a.appoint_no)\n                ORDER BY b.visit_date, MIN(b.visit_no), TO_CHAR(b.clinic_no)\n            ) AS rn\n        FROM outp_treat_rec a\n        JOIN clinic_master b\n          ON a.visit_date = b.visit_date\n         AND a.visit_no   = b.visit_no\n        WHERE a.item_class = 'D'\n          AND a.charge_indicator = '1'\n          AND a.appoint_no IS NOT NULL\n          AND b.visit_date >= DATE '2026-01-01'\n        GROUP BY\n            TO_CHAR(a.appoint_no),\n            TO_CHAR(b.patient_id),\n            TO_CHAR(b.clinic_no),\n            b.visit_date\n    )\n    WHERE rn = 1\n) e_or\n       ON e_or.appoint_no = TO_CHAR(em.exam_no)\n      AND e_or.patient_id = TO_CHAR(em.patient_id)"
+    },
+    "field_logic": {
+      "visit_serial_no": "NVL(CASE WHEN pv.patient_id IS NOT NULL THEN pv.patient_id || '_' || TO_CHAR(pv.visit_id) ELSE NULL END, NVL(e_or.clinic_no, em.patient_id || '_' || TO_CHAR(em.visit_id)))",
+      "inp_no": "NVL(pv.inp_no, pmi.inp_no)",
+      "visit_id_or_no": "NVL(TO_CHAR(pv.visit_id), NVL(e_or.visit_no, TO_CHAR(em.visit_id)))",
+      "visit_time": "NVL(pv.admission_date_time, NVL(e_or.visit_date, NVL(em.req_date_time, em.exam_date_time)))",
+      "report_time": "NVL(er.report_time, em.report_date_time)"
+    },
+    "do_not_use_as_primary_join": [
+      {
+        "condition": "EXAM_MASTER.ORDER_ID = OUTP_TREAT_REC.ORDER_ID",
+        "reason": "2026 年后检查数据中 ORDER_ID 覆盖低，无独有命中，存在患者不一致和一对多风险。"
+      }
+    ],
+    "validation_evidence": {
+      "exam_total_after_2026": 298043,
+      "order_id_nonnull": 7223,
+      "appoint_no_matched": 141450,
+      "order_id_matched": 7223,
+      "both_matched": 7223,
+      "clinic_no_same": 7222,
+      "clinic_no_diff": 1,
+      "appoint_only_matched": 134227,
+      "order_only_matched": 0,
+      "both_unmatched": 156593,
+      "appoint_no_one_to_many_risk": 0,
+      "order_id_one_to_many_risk": 1,
+      "appoint_no_patient_mismatch": 0,
+      "order_id_patient_mismatch": 1,
+      "fixed_view_total_rows": 298048,
+      "fixed_view_distinct_rows": 298048,
+      "fixed_view_duplicate_rows": 0
+    },
+    "hard_rules": [
+      "住院部分优先沿用 MEDREC.PAT_VISIT 的 PATIENT_ID + VISIT_ID 关联。",
+      "门诊部分必须先聚合 OUTP_TREAT_REC，不允许直接明细表关联。",
+      "正式视图不要使用 EXAM_MASTER.ORDER_ID = OUTP_TREAT_REC.ORDER_ID 作为主关联口径。",
+      "查询 2026 年以后的检查数据时，门诊 e_or 子查询建议限制 b.VISIT_DATE >= DATE '2026-01-01'。",
+      "EXAM.EXAM_REPORT 不含 PATIENT_ID，必须经 EXAM_NO 关联 EXAM.EXAM_MASTER。"
+    ],
+    "human_readable_doc": "开发起步包/53_检查影像报告视图关系口径.md"
+  }
+]

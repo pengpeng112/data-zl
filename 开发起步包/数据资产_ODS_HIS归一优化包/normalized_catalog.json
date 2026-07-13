@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "generated_at": "2026-07-12",
+    "generated_by": "tools/build_normalized_package.py",
+    "sources": [
+      "数据资产_资产包/ (ODS center)",
+      "数据资产_HIS源端资产包/ (HIS source)"
+    ],
+    "classification_basis": {
+      "system_categories": "51_ODS_HIS大类归一与数据中心二次优化改造计划.md §2.2",
+      "ods_internal_split": "51 §2.3",
+      "relationship_class": "39_secondary_relationships分级修订报告.md / 40_数据治理复核口径与方法记录.md",
+      "d_class_rule": "D 类跨系统关系仅进 cross_system_pending 图层，不参与正式治理导入和自动推导"
+    }
+  },
+  "summary": {
+    "table_count": 2099,
+    "column_count": 46725,
+    "relationship_count": 33,
+    "d_class_pending_count": 47,
+    "system_category_counts": {
+      "ods_center": 865,
+      "his_source": 1234
+    },
+    "ods_source_system_counts": {
+      "ods_his": 273,
+      "ods_emr": 79,
+      "ods_other": 182,
+      "ods_cda": 86,
+      "ods_lis": 11,
+      "ods_pacs": 18,
+      "ods_portal": 139,
+      "ods_hrp": 21,
+      "ods_ydhl": 31,
+      "ods_sm": 25
+    }
+  },
+  "navigation": {
+    "level1_system_category": {
+      "ods_center": "ODS 数据中心系统",
+      "his_source": "HIS 源端系统",
+      "hrp_source": "HRP 源端系统 (暂未入包)",
+      "external_business": "其他业务系统 (暂未入包)",
+      "platform_asset": "平台元数据系统 (暂未入包)"
+    },
+    "ods_internal_split": {
+      "ods_his": "HIS 抽取区",
+      "ods_lis": "LIS 抽取区",
+      "ods_pacs": "PACS 抽取区",
+      "ods_emr": "EMR/病历抽取区",
+      "ods_ydhl": "移动护理抽取区",
+      "ods_sm": "手麻抽取区",
+      "ods_cda": "CDA/标准字典区",
+      "ods_other": "其他抽取区"
+    }
+  }
+}

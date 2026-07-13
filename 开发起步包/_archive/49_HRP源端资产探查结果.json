@@ -1,0 +1,2670 @@
+{
+  "status": "success",
+  "generated_at": "2026-07-07T23:22:50+08:00",
+  "source_system": "HRP",
+  "source_db": "10.10.10.23:1521/hrpdb",
+  "output_dir": "数据资产_HRP源端资产包",
+  "report": "49_HRP源端资产探查报告.md",
+  "catalog_summary": {
+    "generated_at": "2026-07-07T23:22:07+08:00",
+    "source_system": "HRP",
+    "source_db": "10.10.10.23:1521/hrpdb",
+    "owners_count": 1,
+    "tables_count": 76057,
+    "columns_count": 5000000,
+    "indexes_count": 37165,
+    "constraints_count": 74723,
+    "views_count": 149,
+    "core_candidate_tables": [
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNBANKACC",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 9046
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNCL",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 19
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNDOC",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3279
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNDOC20230903",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 2909
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNDOC_20241220",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3124
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNDOC_C",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 4
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNIDTYPE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 8
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNJOB",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 4098
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNJOB_20241220",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3558
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "BD_PSNJOB_C",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "COPRO_FLOW_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "COPRO_PSNCOSTFLOW",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "CP_APPSNODE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 391
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "CP_PSNDOC",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 2181
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "CP_PSNDOC_FILESYSTEM",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 12919
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "CP_PSNJOB",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 4167
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "CP_RELAPPSNODE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 222
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "DC_PSNINTER_B",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "DC_PSNINTER_H",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "DC_PSNREPORT_B",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "DC_PSNREPORT_H",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "EMM_REPAIR_PLAN_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "EWM_WO_ACTUAL_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "EWM_WO_PLAN_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_KEYPSN_GROUP",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ABROAD",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ASS",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_BAD",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_BMINFO",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_CAPA",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_CERT",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3216
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_CTRT",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_EDU",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3824
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_EDUCATION",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_EGENGAGE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ENC",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ENTERQUALCERT",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_FAMILY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_GLBDEF1",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 1393
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_GLBDEF2",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3567
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_GLBDEF3",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 184
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_GLBDEF4",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 466
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_HRHAATTEND",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_KEYPSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LANGABILITY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LEARNPAPER",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LEARNPARTIME",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LEARNTALK",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LEARNTREATISE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_LINKMAN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_NATIONDUTY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 2
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_NATURAL",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ORGPSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_OTHERCERT",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_PERPEXAMINE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_PERPMEDATA",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_PSNCHG",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3287
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_PUN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_QULIFY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_REQ",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_RETIRE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 197
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_ROTATE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_SCIENTASK",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_SCIENTPATENT",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_SPEITEM",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_TITLE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_TRAIN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_TRAINCERTFILE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_TRIAL",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_WA",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_WADOC",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_WAINFO",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_WORK",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 1249
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNDOC_YEAREXAMINE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 5
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNJOB",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 5460
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNJOB_000204",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 4
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNJOB_002392",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 2
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNJOB_20241220",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 4620
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNORG",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3287
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNORG_20241220",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 3129
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HI_PSNTRANSTER",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HPF_CHERGEPERSON",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRCP_EVA_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRC_CAND_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRC_TALENTPSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRC_TALNPSN_ASS",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRC_TALNPSN_TN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRJQ_AUTHENPSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRPOM_PSNOUTLAY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRPOM_PSNOUTLAYQUERY",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRPOM_PSNOUTLAYQUERY_B",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRPOM_PSNOUTLAY_B",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRPOM_TOPICPSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRRP_PSNBUDGET",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRRP_PSNBUDGET_B",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HRSS_PSNMAP",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HR_PSNCLINFOSET",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 581
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HR_PSNCLRULE",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 19
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HR_PSNGROUP",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      },
+      {
+        "owner": "HRPSEY656",
+        "table_name": "HR_PSNGROUP_PSN",
+        "table_comment": "",
+        "inferred_domain": "人员",
+        "num_rows_stats": 0
+      }
+    ],
+    "pii_columns_summary": {
+      "by_flag": {
+        "medium": 10579,
+        "high": 543
+      },
+      "tables_count": 3181,
+      "columns": [
+        {
+          "table": "HRPSEY656.AAM_APPASSET",
+          "columns": [
+            "ASSETNAME",
+            "ASSETNAME2",
+            "ASSETNAME3",
+            "ASSETNAME4",
+            "ASSETNAME5",
+            "ASSETNAME6",
+            "DATAIDNAME",
+            "DATAIDNAME2",
+            "DATAIDNAME3",
+            "DATAIDNAME4",
+            "DATAIDNAME5",
+            "DATAIDNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AAM_APPASSETVERSION",
+          "columns": [
+            "VNAME",
+            "VNAME2",
+            "VNAME3",
+            "VNAME4",
+            "VNAME5",
+            "VNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AAM_ASSETTYPE",
+          "columns": [
+            "ASSETTYPENAME",
+            "ASSETTYPENAME2",
+            "ASSETTYPENAME3",
+            "ASSETTYPENAME4",
+            "ASSETTYPENAME5",
+            "ASSETTYPENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AAM_COUNTRYZONE",
+          "columns": [
+            "COUNTRYZONENAME",
+            "COUNTRYZONENAME2",
+            "COUNTRYZONENAME3",
+            "COUNTRYZONENAME4",
+            "COUNTRYZONENAME5",
+            "COUNTRYZONENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AAM_DEVELOPER",
+          "columns": [
+            "DEVELOPERNAME",
+            "DEVELOPERNAME2",
+            "DEVELOPERNAME3",
+            "DEVELOPERNAME4",
+            "DEVELOPERNAME5",
+            "DEVELOPERNAME6",
+            "PHONE"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AAM_DEVELOPORG",
+          "columns": [
+            "ORGADDRESS",
+            "ORGNAME",
+            "ORGNAME2",
+            "ORGNAME3",
+            "ORGNAME4",
+            "ORGNAME5",
+            "ORGNAME6",
+            "ORGPHONE"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_BUSIRESPACK",
+          "columns": [
+            "FILENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_LISTENERREG",
+          "columns": [
+            "CLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_PKGLOGINFO",
+          "columns": [
+            "PACKNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_RECEIPTPACK",
+          "columns": [
+            "TRANSPACKNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_RECEIVERRULE",
+          "columns": [
+            "RELATIONNAME",
+            "RELATIONNAME2",
+            "RELATIONNAME3",
+            "RELATIONNAME4",
+            "RELATIONNAME5",
+            "RELATIONNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_RESPROP",
+          "columns": [
+            "PROPNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_RESTYPECATALOG",
+          "columns": [
+            "CATALOGNAME",
+            "CATALOGNAME2",
+            "CATALOGNAME3",
+            "CATALOGNAME4",
+            "CATALOGNAME5",
+            "CATALOGNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_RESTYPREGISTER",
+          "columns": [
+            "MODULENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_SCHTRANSTASK",
+          "columns": [
+            "TASKNAME",
+            "TASKNAME2",
+            "TASKNAME3",
+            "TASKNAME4",
+            "TASKNAME5",
+            "TASKNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_SYSCATALOG",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_SYS_PARAMS",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ADP_T_PACK",
+          "columns": [
+            "PACKNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_META_DRIVER",
+          "columns": [
+            "DRIVERNAME",
+            "DSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_CUBE",
+          "columns": [
+            "CUBENAME",
+            "FACTNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_DIM",
+          "columns": [
+            "DIMNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_FLT",
+          "columns": [
+            "FILTERNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_HCY",
+          "columns": [
+            "AGG_MEMBER_NAME",
+            "DIMTABLENAME",
+            "HIERARCHYNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_LVL",
+          "columns": [
+            "LEVELNAME",
+            "NAMECOLUMN"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_LVLP",
+          "columns": [
+            "PROPNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_MEA",
+          "columns": [
+            "MEASURENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_MEAP",
+          "columns": [
+            "PROPNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_PARAM",
+          "columns": [
+            "PARAMNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_OLAP_RLN",
+          "columns": [
+            "MODELNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AE_QUALITYCHECK",
+          "columns": [
+            "DEFNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_CONTRACT",
+          "columns": [
+            "CONTRACT_NAME",
+            "CONTRACT_NAME2",
+            "CONTRACT_NAME3",
+            "CONTRACT_NAME4",
+            "CONTRACT_NAME5",
+            "CONTRACT_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_CONTRACT_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_CONTRACT_EQ",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_CONT_ALTER_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_EXPENSE_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_LEASE_IN_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_RENT_CALC_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_RENT_CALC_C",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_RENT_SETTLE_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_RESTORE_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_STOPRENT_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_TEMPORARY_B",
+          "columns": [
+            "EQUIP_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_TEMP_SETTLE_B",
+          "columns": [
+            "EQUIP_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALI_WORKLOAD_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALO_CONTRACT",
+          "columns": [
+            "CONTRACT_NAME",
+            "CONTRACT_NAME2",
+            "CONTRACT_NAME3",
+            "CONTRACT_NAME4",
+            "CONTRACT_NAME5",
+            "CONTRACT_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALO_CONTRACT_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALO_CONT_ALTER_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALO_EXPENSE_B",
+          "columns": [
+            "ATTRNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ALO_LEASE_OUT_B",
+          "columns": [
+            "EQUIP_NAME",
+            "EQUIP_NAME2",
+            "EQUIP_NAME3",
+            "EQUIP_NAME4",
+            "EQUIP_NAME5",
+            "EQUIP_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AM_PLUGINS",
+          "columns": [
+            "MODULENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_DSTLCASE",
+          "columns": [
+            "NAME",
+            "SUBNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_DSTLCASE_B",
+          "columns": [
+            "SUBNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_DSTLFACTOR",
+          "columns": [
+            "NAME",
+            "NAMEKEY",
+            "REFNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_GOLDTAXFOMAT",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_NOTICE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_PARAM",
+          "columns": [
+            "PARAM_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.ARAP_VERIFY_FA",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.AREACL_TEMP",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BAP_FS_HEADER",
+          "columns": [
+            "EXT_TABLENAME",
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_CONTRACT",
+          "columns": [
+            "CONTRACTNAME",
+            "CONTSTATUSNAME",
+            "DEBITCORPNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DAILYOFCASHBANK",
+          "columns": [
+            "BANKNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DAYSTYPE",
+          "columns": [
+            "DAYSTYPENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DCFORM",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DCTYPE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DEPOSITTYPE",
+          "columns": [
+            "DEPOSITTYPENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_DETAIL_COUNTER",
+          "columns": [
+            "ACTIONNAME",
+            "BILLTYPENAME",
+            "INVOICEUNITNAME",
+            "KEEPUNITNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_FINANCING_VARIETY",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_FINANCING_WAY",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_GUACONTRACT",
+          "columns": [
+            "CREDITORNAME",
+            "CREDITORNAME2",
+            "CREDITORNAME3",
+            "CREDITORNAME4",
+            "CREDITORNAME5",
+            "CREDITORNAME6",
+            "WARRANTORNAME",
+            "WARRANTORNAME2",
+            "WARRANTORNAME3",
+            "WARRANTORNAME4",
+            "WARRANTORNAME5",
+            "WARRANTORNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_GUACONTRACTDAYS",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BATM_LCM_LCSTATUS",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_ATTRCLASS",
+          "columns": [
+            "ATTRCLASSNAME",
+            "ATTRCLASSNAME2",
+            "ATTRCLASSNAME3",
+            "ATTRCLASSNAME4",
+            "ATTRCLASSNAME5",
+            "ATTRCLASSNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_ATTRMAP",
+          "columns": [
+            "REFOBJATTRNAME",
+            "REFOBJATTRNAME2",
+            "REFOBJATTRNAME3",
+            "REFOBJATTRNAME4",
+            "REFOBJATTRNAME5",
+            "REFOBJATTRNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARAPPOBJECT",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARAPPOBJECT_ITEM",
+          "columns": [
+            "MDFULLNAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARCODEDICT",
+          "columns": [
+            "BAPPOBJNAME",
+            "BCDICTNAME",
+            "BCDICTNAME2",
+            "BCDICTNAME3",
+            "BCDICTNAME4",
+            "BCDICTNAME5",
+            "BCDICTNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARCODEDICT_B",
+          "columns": [
+            "BUSIOBJNAME",
+            "BUSIOBJNAME2",
+            "BUSIOBJNAME3",
+            "BUSIOBJNAME4",
+            "BUSIOBJNAME5",
+            "BUSIOBJNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARCODERULE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARCODERULE_V",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BARTYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_BTCHECKRULE",
+          "columns": [
+            "CLASSNAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_REFEROBJ",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BCBD_STRATEGYREG",
+          "columns": [
+            "CLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BC_BARCODELABEL",
+          "columns": [
+            "VNAME",
+            "VNAME2",
+            "VNAME3",
+            "VNAME4",
+            "VNAME5",
+            "VNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BC_SENDRULE",
+          "columns": [
+            "CBILLTYPENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BC_SENDRULE_B",
+          "columns": [
+            "VDESTNAME",
+            "VSENDFILEDNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCASOA",
+          "columns": [
+            "DISPNAME",
+            "DISPNAME2",
+            "DISPNAME3",
+            "DISPNAME4",
+            "DISPNAME5",
+            "DISPNAME6",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCASOA20230101",
+          "columns": [
+            "DISPNAME",
+            "DISPNAME2",
+            "DISPNAME3",
+            "DISPNAME4",
+            "DISPNAME5",
+            "DISPNAME6",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCASOAHISTORY",
+          "columns": [
+            "DISPNAME",
+            "DISPNAME2",
+            "DISPNAME3",
+            "DISPNAME4",
+            "DISPNAME5",
+            "DISPNAME6",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCASSITEM",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "REFNODENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCCHART",
+          "columns": [
+            "DISPNAMEMODEL",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCCTRLRULE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCFIELDCTTEMP",
+          "columns": [
+            "ACCFIELDNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCID",
+          "columns": [
+            "ACCIDNAME",
+            "ACCIDNAME2",
+            "ACCIDNAME3",
+            "ACCIDNAME4",
+            "ACCIDNAME5",
+            "ACCIDNAME6",
+            "CONCERTEDMONEY"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCID_TEMP",
+          "columns": [
+            "ACCIDNAME",
+            "ACCIDNAME2",
+            "ACCIDNAME3",
+            "ACCIDNAME4",
+            "ACCIDNAME5",
+            "ACCIDNAME6",
+            "CONCERTEDMONEY"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCOUNT",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCOUNT20230101",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCPERIODSCHEME",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCSYSTEM",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACCTYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ACTIVITY",
+          "columns": [
+            "VACTIVITYNAME",
+            "VACTIVITYNAME2",
+            "VACTIVITYNAME3",
+            "VACTIVITYNAME4",
+            "VACTIVITYNAME5",
+            "VACTIVITYNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ADDRESS",
+          "columns": [
+            "PK_ADDRESS"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ADDRESSDOC",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "PK_ADDRESSDOC",
+            "SIMPLE_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ADDRLINKMAN",
+          "columns": [
+            "PK_ADDRESSDOC",
+            "PK_ADDRLINKMAN"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_AREACL",
+          "columns": [
+            "ENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ASSIGN_TAB",
+          "columns": [
+            "MODULENAME",
+            "TABNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ASSIGN_TEMP",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_ASSLINENUM",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "TELEPHONE"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_AUDITMODULE",
+          "columns": [
+            "DLGCLASSNAME",
+            "MODULENAME",
+            "MODULENAME2",
+            "MODULENAME3",
+            "MODULENAME4",
+            "MODULENAME5",
+            "MODULENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_AUDITTABLE",
+          "columns": [
+            "DESTTABLENAME",
+            "IMPLCLASSNAME",
+            "SOURCEVOFULLNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_AUDITTABLEDETAIL",
+          "columns": [
+            "OUTPUTCOLNAME",
+            "SOURCECOLNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BALATYPE",
+          "columns": [
+            "ENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKACCBAS",
+          "columns": [
+            "ACCNAME",
+            "ADDRESS",
+            "COMBINEACCNAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "TEL"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKACCBAS_BAK250721",
+          "columns": [
+            "ACCNAME",
+            "ADDRESS",
+            "COMBINEACCNAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "TEL"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKACCSUB",
+          "columns": [
+            "ACCNAME",
+            "CONCERTEDMNY",
+            "ISCONCERTED",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKACCSUB_BAK250721",
+          "columns": [
+            "ACCNAME",
+            "CONCERTEDMNY",
+            "ISCONCERTED",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKDOC",
+          "columns": [
+            "ADDRESS",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "PCOMBINENAME",
+            "PCOMBINENAME2",
+            "PCOMBINENAME3",
+            "PCOMBINENAME4",
+            "PCOMBINENAME5",
+            "PCOMBINENAME6",
+            "SHORTNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BANKTYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BATCHUPDATEATTR",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BATCHUPDATETAB",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BATCHUPRULETEAM",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BILLTYPE",
+          "columns": [
+            "BILLTYPENAME",
+            "BILLTYPENAME2",
+            "BILLTYPENAME3",
+            "BILLTYPENAME4",
+            "BILLTYPENAME5",
+            "BILLTYPENAME6",
+            "CHECKCLASSNAME",
+            "CLASSNAME",
+            "REFERCLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BILLTYPE2",
+          "columns": [
+            "CLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BILLTYPE20250320",
+          "columns": [
+            "BILLTYPENAME",
+            "BILLTYPENAME2",
+            "BILLTYPENAME3",
+            "BILLTYPENAME4",
+            "BILLTYPENAME5",
+            "BILLTYPENAME6",
+            "CHECKCLASSNAME",
+            "CLASSNAME",
+            "REFERCLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BIZEVENTLOG",
+          "columns": [
+            "EVENTTYPENAME",
+            "SOURCENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BRANDDOC",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BUSITYPE",
+          "columns": [
+            "BUSINAME",
+            "BUSINAME2",
+            "BUSINAME3",
+            "BUSINAME4",
+            "BUSINAME5",
+            "BUSINAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_BUSITYPECLASS",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CACHETABVERSION",
+          "columns": [
+            "CACHETABNAME",
+            "UPDATELOCK"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CASHACCOUNT",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CASHFLOW",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CBSNODE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CFGBOM",
+          "columns": [
+            "CMATERIALNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CHANNELTYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CODEEDITOR",
+          "columns": [
+            "METADATANAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_COMMONDOC",
+          "columns": [
+            "CLASSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CONTRACTBUSITYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_COSTOBJTYPE",
+          "columns": [
+            "VCBNAME",
+            "VCBNAME2",
+            "VCBNAME3",
+            "VCBNAME4",
+            "VCBNAME5",
+            "VCBNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_COUNTRYZONE",
+          "columns": [
+            "ENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "PHONECODE",
+            "WHOLENAME",
+            "WHOLENAME2",
+            "WHOLENAME3",
+            "WHOLENAME4",
+            "WHOLENAME5",
+            "WHOLENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CROSSBUSIATTR",
+          "columns": [
+            "PROPERTYNAMEPATH"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CROSSBUSIMAP",
+          "columns": [
+            "OBJ_PROPERTY_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CROSSRULE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CROSSRULESCOPE",
+          "columns": [
+            "OBJ_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CR_CONFIG",
+          "columns": [
+            "REFINFO_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CURRTYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTADDRESS",
+          "columns": [
+            "PK_ADDRESS",
+            "PK_ADDRESSDOC",
+            "PK_CUSTADDRESS"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTADDRESSREF",
+          "columns": [
+            "PK_ADDRESS",
+            "PK_ADDRESSREF",
+            "PK_CUSTADDRESS",
+            "REFFIELDNAME",
+            "REFTABLENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTAXES",
+          "columns": [
+            "CUSTTAXESNAME",
+            "CUSTTAXESNAME2",
+            "CUSTTAXESNAME3",
+            "CUSTTAXESNAME4",
+            "CUSTTAXESNAME5",
+            "CUSTTAXESNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTCLASS",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTMATERIAL",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTMERGE",
+          "columns": [
+            "SOURCE_NAME",
+            "SOURCE_NAME2",
+            "SOURCE_NAME3",
+            "SOURCE_NAME4",
+            "SOURCE_NAME5",
+            "SOURCE_NAME6",
+            "TARGET_NAME",
+            "TARGET_NAME2",
+            "TARGET_NAME3",
+            "TARGET_NAME4",
+            "TARGET_NAME5",
+            "TARGET_NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTOMER",
+          "columns": [
+            "CORPADDRESS",
+            "ENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "SHORTNAME",
+            "TEL1",
+            "TEL2",
+            "TEL3"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTOMER_PF",
+          "columns": [
+            "CUSTOMERNAME",
+            "CUSTOMERNAME2",
+            "CUSTOMERNAME3",
+            "CUSTOMERNAME4",
+            "CUSTOMERNAME5",
+            "CUSTOMERNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTSALECLASS",
+          "columns": [
+            "ENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUSTUPGRADE",
+          "columns": [
+            "DESTNAME",
+            "DESTNAME2",
+            "DESTNAME3",
+            "DESTNAME4",
+            "DESTNAME5",
+            "DESTNAME6",
+            "SOURCENAME",
+            "SOURCENAME2",
+            "SOURCENAME3",
+            "SOURCENAME4",
+            "SOURCENAME5",
+            "SOURCENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_CUST_SUPPLIER",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "SHORTNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DATATYPE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DEFDOC",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "SHORTNAME",
+            "SHORTNAME2",
+            "SHORTNAME3",
+            "SHORTNAME4",
+            "SHORTNAME5",
+            "SHORTNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DEFDOCLIST",
+          "columns": [
+            "ASSOCIATENAME",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DEFDOC_20221104",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "SHORTNAME",
+            "SHORTNAME2",
+            "SHORTNAME3",
+            "SHORTNAME4",
+            "SHORTNAME5",
+            "SHORTNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DEL_LOG",
+          "columns": [
+            "TABLENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DIFFANALYSIS",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DISTRESTRANS_LOG",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DISTRIBUTERES",
+          "columns": [
+            "SUBENTITYNAMES"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DISTSYSTEMSET",
+          "columns": [
+            "DISTNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DISTTOKENSET",
+          "columns": [
+            "TOKENNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DISTTRANSDEL_LOG",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_CROSSITEM",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_DIM",
+          "columns": [
+            "DFTMEMBERNAME",
+            "DISPLAYNAME",
+            "TYPE_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_MEA",
+          "columns": [
+            "DISPLAYNAME",
+            "TYPE_NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_ORDERITEM",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_SCHEME",
+          "columns": [
+            "DSNAMEDESIGN",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_DI_SCHEMESORT",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_EXFILETYPE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_EXRATESCHEME",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FCLASS",
+          "columns": [
+            "VFEATURECLSNAME",
+            "VFEATURECLSNAME2",
+            "VFEATURECLSNAME3",
+            "VFEATURECLSNAME4",
+            "VFEATURECLSNAME5",
+            "VFEATURECLSNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FEATURE",
+          "columns": [
+            "VFEATURENAME",
+            "VFEATURENAME2",
+            "VFEATURENAME3",
+            "VFEATURENAME4",
+            "VFEATURENAME5",
+            "VFEATURENAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FEATURECODE",
+          "columns": [
+            "CSKUNAME",
+            "CSKUNAME2",
+            "CSKUNAME3",
+            "CSKUNAME4",
+            "CSKUNAME5",
+            "CSKUNAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FEATURE_B",
+          "columns": [
+            "VFVALUENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FFILE_B",
+          "columns": [
+            "VFVALUENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FORMATDOC",
+          "columns": [
+            "EXP_ADDRESS",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FPRICE",
+          "columns": [
+            "VFEATURECLSNAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FPRICE_B",
+          "columns": [
+            "VFVALUENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FREECUSTOM",
+          "columns": [
+            "ADDRESS",
+            "BANKADDRESS",
+            "FOREIGNNAME",
+            "LINKPHONE",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6",
+            "SIMPLENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FRELATION_B",
+          "columns": [
+            "VFVALUENAME1",
+            "VFVALUENAME2"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FUNDPLAN",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_FUNDSOURCE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_GOODSCODE",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_HOLIDAY",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_IMAGESCANSETUP",
+          "columns": [
+            "BILLTYPENAME",
+            "OWNMODULENAME",
+            "TRANTYPENAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_IMAGESCANTYPE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INCOME",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INCOMEPERIOD",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INCOTERM",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INDUSTRY",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INOUTBUSICLASS",
+          "columns": [
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "NAME4",
+            "NAME5",
+            "NAME6"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INTDATA_DIM",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INTDATA_MEASURE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_INTDATA_MODULE",
+          "columns": [
+            "NAME"
+          ]
+        },
+        {
+          "table": "HRPSEY656.BD_LINKMAN",
+          "columns": [
+            "ADDRESS",
+            "NAME",
+            "NAME2",
+            "NAME3",
+            "PHONE",
+            "WEBADDRESS"
+          ]
+        }
+      ]
+    },
+    "warnings": [
+      "仅采集 Oracle 数据字典元数据与注释，未查询业务明细数据。",
+      "行数来自 ALL_TABLES.NUM_ROWS 统计值，可能不是实时行数。",
+      "PII 识别基于字段名和字段注释启发式规则，需人工复核。",
+      "视图仅采集名称、DDL 长度和前 200 字符摘要，未输出完整视图文本。",
+      "字段采集达到 HRP_COLUMNS_MAX_ROWS=5000000 上限，可能仍有未采集字段；需夜间分段补采。"
+    ]
+  },
+  "error": ""
+}

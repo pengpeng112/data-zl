@@ -1,0 +1,21 @@
+﻿review_priority,source_system,source_db,owner,table_name,table_comment,num_rows_stats,inferred_domain,column_count_in_current_file,has_primary_key,cleanup_decision,cleanup_reason,dependency_count,review_reason
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,TEMP_FA_ASSETSD,,,人员,3,false,exclude_candidate,NUM_ROWS缺失; 表名疑似备份/临时/测试,59,?????????59?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,TEMP_FA_CAPTIALSOURCE,,,人员,4,false,exclude_candidate,NUM_ROWS缺失; 表名疑似备份/临时/测试,59,?????????59?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,BD_RACK,,0,其他,28,true,exclude_candidate,NUM_ROWS=0,2,?????????2?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HI_PSNDOC_CTRT,,0,人员,47,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HI_PSNDOC_LANGABILITY,,0,人员,19,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HI_PSNDOC_TITLE,,0,人员,27,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HI_PSNTRANSTER,,0,人员,34,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HSTF_INSTOCKDATA,,0,供应商/物资,55,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HSTF_INSTOCKDATAB,,0,供应商/物资,50,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HSTF_OUTSTOCKDATA,,0,供应商/物资,56,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,HSTF_OUTSTOCKDATA_B,,0,供应商/物资,51,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P0,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,PAM_WARCONTRACT_R,,0,其他,36,true,exclude_candidate,NUM_ROWS=0,1,?????????1?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,FA_LOG,,115012,其他,17,true,exclude_candidate,日志/审计/跟踪类,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,GL_DETAIL_20220809,,101548,财务,87,false,exclude_candidate,表名含日期快照,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,IC_ONHANDDIM_20260531,,233053,其他,34,false,exclude_candidate,表名含日期快照,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,IC_ONHANDSN_20260531,,1396312,其他,19,false,exclude_candidate,表名含日期快照,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,PUB_WORKINGTASKLOG_BAK,,471830,其他,14,false,exclude_candidate,表名疑似备份/临时/测试; 日志/审计/跟踪类,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,SM_BUSILOG_DEFAULT,,339007,字典/编码,15,true,exclude_candidate,日志/审计/跟踪类,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,SM_BUSILOG_DEFAULT_20250925,,1263172,字典/编码,15,false,exclude_candidate,表名含日期快照; 日志/审计/跟踪类,0,????10?
+P1,HRP,10.10.10.23:1521/hrpdb,HRPSEY656,SM_LOG_OPERATELOG,,1078200,其他,26,true,exclude_candidate,日志/审计/跟踪类,0,????10?

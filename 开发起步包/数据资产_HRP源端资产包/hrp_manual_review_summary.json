@@ -1,0 +1,319 @@
+{
+  "core_candidates": 1207,
+  "exclude_candidates": 56378,
+  "review_candidates": 18472,
+  "core_without_columns": 50,
+  "core_empty_num_rows_0": 449,
+  "core_with_cleanup_flags": 0,
+  "relationship_seed_refs": 72,
+  "seed_refs_currently_excluded": 12,
+  "seed_refs_currently_review": 19,
+  "manual_keep_p0": 41,
+  "manual_review_needed": 18472,
+  "exclusion_audit": 20,
+  "top_seed_excluded": [
+    {
+      "table_name": "TEMP_FA_ASSETSD",
+      "dependency_count": 59,
+      "current_bucket": "exclude",
+      "num_rows_stats": "",
+      "domain": "人员",
+      "reason": "NUM_ROWS缺失; 表名疑似备份/临时/测试"
+    },
+    {
+      "table_name": "TEMP_FA_CAPTIALSOURCE",
+      "dependency_count": 59,
+      "current_bucket": "exclude",
+      "num_rows_stats": "",
+      "domain": "人员",
+      "reason": "NUM_ROWS缺失; 表名疑似备份/临时/测试"
+    },
+    {
+      "table_name": "BD_RACK",
+      "dependency_count": 2,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "其他",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HI_PSNTRANSTER",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "人员",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HI_PSNDOC_CTRT",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "人员",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HI_PSNDOC_LANGABILITY",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "人员",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HI_PSNDOC_TITLE",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "人员",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HSTF_INSTOCKDATAB",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "供应商/物资",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HSTF_INSTOCKDATA",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "供应商/物资",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HSTF_OUTSTOCKDATA_B",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "供应商/物资",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "HSTF_OUTSTOCKDATA",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "供应商/物资",
+      "reason": "NUM_ROWS=0"
+    },
+    {
+      "table_name": "PAM_WARCONTRACT_R",
+      "dependency_count": 1,
+      "current_bucket": "exclude",
+      "num_rows_stats": "0",
+      "domain": "其他",
+      "reason": "NUM_ROWS=0"
+    }
+  ],
+  "top_seed_review": [
+    {
+      "table_name": "FA_CARD",
+      "dependency_count": 61,
+      "current_bucket": "review",
+      "num_rows_stats": "115442",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "FA_CARDHISTORY",
+      "dependency_count": 60,
+      "current_bucket": "review",
+      "num_rows_stats": "1454132",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "FA_CARDSUB",
+      "dependency_count": 59,
+      "current_bucket": "review",
+      "num_rows_stats": "115832",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "FA_CATEGORY",
+      "dependency_count": 44,
+      "current_bucket": "review",
+      "num_rows_stats": "5893",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "PAM_EQUIP",
+      "dependency_count": 3,
+      "current_bucket": "review",
+      "num_rows_stats": "55337",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "BD_PROJECT",
+      "dependency_count": 2,
+      "current_bucket": "review",
+      "num_rows_stats": "1523",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "IC_PURCHASEIN_B",
+      "dependency_count": 2,
+      "current_bucket": "review",
+      "num_rows_stats": "255134",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "IC_PURCHASEIN_H",
+      "dependency_count": 2,
+      "current_bucket": "review",
+      "num_rows_stats": "68786",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "BD_ADDRESS",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "8487",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "BD_COUNTRYZONE",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "238",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "FIP_DOCVIEW_B",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "14404",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "PAM_CATEGORY",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "5926",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "PAM_STATUS",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "6",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "BD_FUNDSOURCE",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "13",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "FA_CAPITALSOURCE",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "115955",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "IC_ONHANDSN",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "1428995",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "IC_GENERALIN_B",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "324497",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "IC_GENERALIN_H",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "105990",
+      "domain": "其他",
+      "reason": ""
+    },
+    {
+      "table_name": "PAM_ADDREDUCESTYLE",
+      "dependency_count": 1,
+      "current_bucket": "review",
+      "num_rows_stats": "23",
+      "domain": "其他",
+      "reason": ""
+    }
+  ],
+  "core_no_columns_sample": [
+    "TMPUB_CCTYPE",
+    "TMPUB_ICCTYPE",
+    "TO_M5ATRANTYPE",
+    "TO_M5XTRANTYPE",
+    "UAPBD_DEPTATR",
+    "UAPBD_PROCLASS",
+    "UAPCP_EKEYUSER",
+    "UAPCP_USERSIGNS",
+    "UFOB_NODE_USER",
+    "UFOC_CVTRULEORG",
+    "UFOC_DXTYPESEQ",
+    "UFOC_PROJECTCLASS",
+    "UFOC_RULEADJORG",
+    "UW_FILETYPE",
+    "UW_TEMPLATE",
+    "UW_USERCONFIG",
+    "WA_CLASSITEM",
+    "WA_CLASSITEMDSP",
+    "WA_CLASS_FIORG",
+    "WA_CLASS_PRINT",
+    "WA_DATA",
+    "WA_INLUDECLASS",
+    "WA_ITEM",
+    "WA_ITEMPOWER",
+    "WA_PAYSLIP_CLASS",
+    "WA_PSNHI",
+    "WA_PSNHI_B",
+    "WA_PSNTAX",
+    "WA_WACLASS",
+    "WEBDBL_ENUMVALUE",
+    "WEBDBL_MDENUMTYPE",
+    "WFM_ACCEPTNCTYPE",
+    "WFM_ADDSIGNUSER",
+    "WFM_FLOWTYPE",
+    "WFM_FLWTYPE",
+    "WFM_FORMDEF",
+    "WFM_FORMTYPE",
+    "WFM_PRODEF",
+    "WFM_QUERYCLASS",
+    "WFM_REJECTNCTYPE",
+    "WFM_SERIALCODE",
+    "WFM_USERAGENT",
+    "WFM_VIRTUALROLE",
+    "XBRL_ORGMEM",
+    "XBRL_ORGMEMCODENAME",
+    "XBRL_ORGSTRUCT",
+    "YER_YERPORTALBILLCLASS",
+    "ZDP_1000000006NHCN",
+    "ZDP_100000001HPHC2",
+    "ZDP_100000001HPHC4"
+  ],
+  "core_flagged_sample": []
+}
