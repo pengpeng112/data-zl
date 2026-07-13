@@ -26,6 +26,28 @@ class IdentityDepartment(Base):
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
+class IdentityDepartmentSource(Base):
+    __tablename__ = "asset_identity_department_sources"
+    __table_args__ = (
+        UniqueConstraint("source_system", "source_table", "source_dept_id"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True)
+    dept_code = Column(Text)
+    source_system = Column(Text, nullable=False)
+    source_code = Column(Text)
+    source_table = Column(Text)
+    source_dept_id = Column(Text, nullable=False)
+    source_dept_name = Column(Text)
+    source_parent_dept_code = Column(Text)
+    source_dept_type = Column(Text)
+    source_status = Column(Text)
+    match_status = Column(Text, server_default="unmatched")
+    raw_data = Column(JSONB)
+    last_seen_at = Column(TIMESTAMP(timezone=True))
+
+
 class IdentityPerson(Base):
     __tablename__ = "asset_identity_persons"
     __table_args__ = (
@@ -66,6 +88,22 @@ class IdentityPersonSource(Base):
     match_status = Column(Text, server_default="unmatched")
     raw_data = Column(JSONB)
     last_seen_at = Column(TIMESTAMP(timezone=True))
+
+
+class IdentityPersonDepartment(Base):
+    __tablename__ = "asset_identity_person_departments"
+    __table_args__ = (
+        UniqueConstraint("person_code", "dept_code", "source_table"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True)
+    person_code = Column(Text, nullable=False)
+    dept_code = Column(Text, nullable=False)
+    is_primary = Column(Boolean, server_default="false")
+    source_table = Column(Text, nullable=False)
+    source_dept_code = Column(Text)
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
 class IdentityAccount(Base):

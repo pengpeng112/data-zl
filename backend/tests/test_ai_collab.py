@@ -109,6 +109,61 @@ def test_review_draft(client: TestClient):
         assert resp2.json()["code"] == 0
 
 
+def test_execute_draft_requires_approval(client: TestClient):
+    resp = client.post("/api/v1/ai/propose-sql", json={
+        "sql_text": "SELECT 1 AS total_cnt, 0 AS error_cnt",
+        "title": "execute guard",
+    })
+    draft_id = resp.json()["data"]["draft_id"]
+
+    exec_resp = client.post(
+        f"/api/v1/ai/drafts/{draft_id}/execute",
+        json={"source_code": "test_source"},
+    )
+    assert exec_resp.status_code == 400
+
+
+def test_execute_approved_draft(monkeypatch, client: TestClient):
+    def fake_execute_quality_sql(**kwargs):
+        assert kwargs["source_code"] == "test_source"
+        assert kwargs["max_rows"] == 10
+        return {
+            "status": "success",
+            "total_cnt": 1,
+            "error_cnt": 0,
+            "error_rate": 0,
+            "warnings": [],
+            "sample_data": [{"TOTAL_CNT": 1, "ERROR_CNT": 0}],
+        }
+
+    monkeypatch.setattr(
+        "app.services.quality_sql_runner.execute_quality_sql",
+        fake_execute_quality_sql,
+    )
+    resp = client.post("/api/v1/ai/propose-sql", json={
+        "sql_text": "SELECT 1 AS total_cnt, 0 AS error_cnt",
+        "title": "execute approved",
+        "session_key": "execute-approved-session",
+    })
+    draft_id = resp.json()["data"]["draft_id"]
+    review_resp = client.patch(
+        f"/api/v1/ai/drafts/{draft_id}",
+        json={"status": "approved", "reviewed_by": "test"},
+    )
+    assert review_resp.status_code == 200
+
+    exec_resp = client.post(
+        f"/api/v1/ai/drafts/{draft_id}/execute",
+        json={"source_code": "test_source", "max_rows": 10, "sample_limit": 5, "executed_by": "tester"},
+    )
+    assert exec_resp.status_code == 200
+    data = exec_resp.json()
+    assert data["code"] == 0
+    assert data["data"]["status"] == "executed"
+    assert data["data"]["total_cnt"] == 1
+    assert data["data"]["sample_data"] == [{"TOTAL_CNT": 1, "ERROR_CNT": 0}]
+
+
 def test_export_context(client: TestClient):
     resp = client.post("/api/v1/ai/export-context", json={
         "tables": ["HIS.PAT_VISIT"],

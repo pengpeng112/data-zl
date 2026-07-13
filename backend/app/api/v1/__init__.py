@@ -1,3 +1,3 @@
-from . import ai, governance, health, relations, systems, tables
+from . import ai, governance, health, permissions, relations, systems, tables
 
-__all__ = ["health", "tables", "relations", "ai", "governance", "systems"]
+__all__ = ["health", "tables", "relations", "ai", "governance", "permissions", "systems"]

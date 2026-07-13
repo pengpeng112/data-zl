@@ -411,7 +411,6 @@ def run_quality_check(
                         source_code=rule.source_code,
                         severity="info",
                         status="rule_error",
-                        rectification_status="open",
                         note=f"SQL validation failed: {validation.get('errors', [])}",
                     )
                     db.add(f)
@@ -450,7 +449,6 @@ def run_quality_check(
                         column_name=rule.target_field,
                         severity=rule.error_level or "minor",
                         status="open",
-                        rectification_status="open",
                         metric_value=f"error_rate={result.get('error_rate', 0)}%",
                         total_cnt=result.get("total_cnt", 0),
                         error_cnt=result.get("error_cnt", 0),
@@ -585,8 +583,6 @@ def update_finding(
         raise HTTPException(status_code=404, detail="问题不存在")
     if req.status:
         finding.status = req.status
-    if req.rectification_status:
-        finding.rectification_status = req.rectification_status
     if req.resolved_by:
         finding.resolved_by = req.resolved_by
     if req.note:
@@ -821,11 +817,11 @@ def assign_finding(finding_id: int, req: FindingAssign, db: Session = Depends(ge
     if not f:
         raise HTTPException(status_code=404)
     f.assigned_to = req.assigned_to
-    f.rectification_status = "assigned"
+    f.status = "assigned"
     if req.note:
         f.note = req.note
     db.commit()
-    return ApiResponse(data={"id": f.id, "assigned_to": f.assigned_to, "rectification_status": f.rectification_status})
+    return ApiResponse(data={"id": f.id, "assigned_to": f.assigned_to, "status": f.status})
 
 
 @router.post("/findings/{finding_id}/recheck", summary="单问题复核")
@@ -835,11 +831,11 @@ def recheck_finding(finding_id: int, status: str = Query(..., description="confi
     f = db.get(QualityFinding, finding_id)
     if not f:
         raise HTTPException(status_code=404)
-    f.rectification_status = "rechecked" if status == "rechecked" else status
+    f.status = "rechecked" if status == "rechecked" else status
     f.confirmed_by = "reviewer"
     f.resolved_at = datetime.now(timezone.utc)
     db.commit()
-    return ApiResponse(data={"id": f.id, "rectification_status": f.rectification_status})
+    return ApiResponse(data={"id": f.id, "status": f.status})
 
 
 @router.get("/metrics", summary="质量看板指标")

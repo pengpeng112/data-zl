@@ -196,3 +196,24 @@ def test_pagination_boundary(client):
     assert resp.status_code == 422
     resp = client.get("/api/v1/tables", params={"page": 1, "page_size": 1000})
     assert resp.status_code == 422
+
+def test_scheduler_job_detail(client):
+    created = client.post("/api/v1/govern/scheduler/jobs", json={
+        "job_type": "pytest_scheduler_detail",
+        "source_code": "pytest_source",
+        "trigger_mode": "manual",
+    })
+    assert created.status_code == 200
+    job_id = created.json()["data"]["id"]
+
+    detail = client.get(f"/api/v1/govern/scheduler/jobs/{job_id}")
+    assert detail.status_code == 200
+    data = detail.json()["data"]
+    assert data["id"] == job_id
+    assert data["job_type"] == "pytest_scheduler_detail"
+    assert "result_ref" in data
+
+
+def test_scheduler_job_detail_404(client):
+    resp = client.get("/api/v1/govern/scheduler/jobs/999999999")
+    assert resp.status_code == 404

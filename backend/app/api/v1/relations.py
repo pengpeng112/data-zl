@@ -1,13 +1,14 @@
 from collections import deque
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...models.asset import AssetRelation
+from ...core.security import get_current_user
+from ...models.asset import AssetRelation, AssetTable
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
 
@@ -108,6 +109,7 @@ class RelationUpdate(BaseModel):
 def list_relations(
     review_status: str | None = Query(None),
     confidence: str | None = Query(None),
+    system_code: str | None = Query(None),
     keyword: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(30, ge=1, le=200),
@@ -118,6 +120,16 @@ def list_relations(
         stmt = stmt.where(AssetRelation.validation_status == review_status)
     if confidence:
         stmt = stmt.where(AssetRelation.confidence == confidence)
+    if system_code:
+        from_match = select(AssetTable.id).where(
+            AssetTable.system_code == system_code,
+            func.concat(AssetTable.schema_name, ".", AssetTable.table_name) == AssetRelation.from_table,
+        ).exists()
+        to_match = select(AssetTable.id).where(
+            AssetTable.system_code == system_code,
+            func.concat(AssetTable.schema_name, ".", AssetTable.table_name) == AssetRelation.to_table,
+        ).exists()
+        stmt = stmt.where(from_match | to_match)
     if keyword:
         like = f"%{keyword}%"
         stmt = stmt.where(
@@ -145,7 +157,8 @@ def list_relations(
 
 
 @router.patch("/{relation_id}", summary="编辑关系（P9 复核工作台）")
-def update_relation(relation_id: int, req: RelationUpdate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def update_relation(relation_id: int, req: RelationUpdate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     r = db.get(AssetRelation, relation_id)
     if not r:
         raise HTTPException(status_code=404)
@@ -167,7 +180,7 @@ def update_relation(relation_id: int, req: RelationUpdate, db: Session = Depends
     audit = GovernAuditLog(
         module="asset", entity_type="relation", entity_ref=str(r.rel_id or r.id),
         action="update", before_data=before, after_data=changes,
-        operator="reviewer",
+        operator=current_user,
     )
     db.add(audit)
     db.commit()
@@ -183,8 +196,10 @@ def review_relation(
     relation_id: int,
     action: str = Query(..., description="approve / reject"),
     note: str | None = Query(None),
+    request: Request = None,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     r = db.get(AssetRelation, relation_id)
     if not r:
         raise HTTPException(status_code=404)
@@ -199,7 +214,7 @@ def review_relation(
         action=action,
         before_data={"validation_status": before_status},
         after_data={"validation_status": r.validation_status, "note": note},
-        operator="reviewer",
+        operator=current_user,
     )
     db.add(audit)
     db.commit()

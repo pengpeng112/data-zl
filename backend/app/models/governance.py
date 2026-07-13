@@ -10,7 +10,9 @@ class ApiKey(Base):
 
     id = Column(BigInteger, primary_key=True)
     key_name = Column(Text, nullable=False)
-    token = Column(Text, unique=True, nullable=False)
+    # Legacy plaintext tokens are migrated on their next successful use.
+    token = Column(Text, unique=True)
+    token_hash = Column(Text, unique=True, index=True)
     enabled = Column(Boolean, server_default="true")
     user_identifier = Column(Text)
     expires_at = Column(TIMESTAMP(timezone=True))
@@ -51,6 +53,7 @@ class MetadataSnapshot(Base):
     label = Column(Text)
     snapshot_time = Column(TIMESTAMP(timezone=True), server_default=func.now())
     scope = Column(Text)
+    source_code = Column(Text, index=True)
     table_count = Column(Integer)
     column_count = Column(Integer)
     relation_count = Column(Integer)

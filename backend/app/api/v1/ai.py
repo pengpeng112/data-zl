@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
+from ...core.security import get_current_user
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
 from ...models.ai_collab import AiSession, AiToolCall, ViewDraft
 from ...models.governance_base import GovernAuditLog
@@ -125,6 +126,19 @@ AVAILABLE_TOOLS = [
         },
     },
     {
+        "name": "execute_approved_sql",
+        "description": "Execute a manually approved SQL draft through the read-only runner with row limits, masking, and audit.",
+        "method": "POST",
+        "path": "/api/v1/ai/drafts/{draft_id}/execute",
+        "auth_required": True,
+        "parameters": {
+            "draft_id": {"type": "integer", "description": "Approved draft id"},
+            "source_code": {"type": "string", "description": "Registered read-only data source code"},
+            "max_rows": {"type": "integer", "description": "Maximum rows to fetch, <= 5000"},
+            "sample_limit": {"type": "integer", "description": "Maximum masked sample rows to return"},
+        },
+    },
+    {
         "name": "get_system_context",
         "description": "按系统/数据源获取全量表/字段/关系上下文（供 AI 理解系统结构）",
         "method": "GET",
@@ -177,8 +191,13 @@ class ProposeSqlRequest(BaseModel):
 
 class DraftReviewRequest(BaseModel):
     status: str = Field(..., description="approved/rejected")
-    reviewed_by: str | None = None
     feedback: str | None = None
+
+
+class DraftExecuteRequest(BaseModel):
+    source_code: str = Field(..., min_length=1)
+    max_rows: int = Field(1000, ge=1, le=5000)
+    sample_limit: int = Field(20, ge=0, le=100)
 
 
 def _audit_tool_call(
@@ -346,18 +365,102 @@ def list_drafts(
 @router.patch("/drafts/{draft_id}", summary="审核草稿（通过/拒绝）")
 def review_draft(
     draft_id: int,
-    req: DraftReviewRequest,
+    req: DraftReviewRequest, request: Request,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     draft = db.get(ViewDraft, draft_id)
     if not draft:
         raise HTTPException(status_code=404, detail="草稿不存在")
     draft.status = req.status
-    draft.reviewed_by = req.reviewed_by
+    draft.reviewed_by = current_user
     draft.reviewed_at = datetime.now(timezone.utc)
     draft.feedback = req.feedback
     db.commit()
     return ApiResponse(data={"id": draft.id, "status": draft.status, "feedback": draft.feedback})
+
+
+@router.post("/drafts/{draft_id}/execute", summary="Execute approved SQL draft in read-only mode")
+def execute_approved_draft(
+    draft_id: int,
+    req: DraftExecuteRequest, request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    from ...services import quality_sql_runner
+    from ...services.quality_rule_engine import validate_sql_safety
+
+    draft = db.get(ViewDraft, draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="SQL draft not found")
+    if draft.status != "approved":
+        raise HTTPException(status_code=400, detail="SQL draft must be approved before execution")
+
+    risk_flags = _scan_sql_risk(draft.sql_text or "")
+    if risk_flags.get("blocked"):
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "SQL risk scan blocked execution", "risk_flags": risk_flags},
+        )
+
+    validation = validate_sql_safety(draft.sql_text or "")
+    if not validation.get("valid"):
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "SQL safety validation failed", "errors": validation.get("errors", [])},
+        )
+
+    result = quality_sql_runner.execute_quality_sql(
+        rule_code=f"AI_DRAFT_{draft.id}",
+        sql=draft.sql_text or "",
+        source_code=req.source_code,
+        max_rows=req.max_rows,
+        sample_limit=req.sample_limit,
+        db=db,
+    )
+    if result.get("status") != "success":
+        raise HTTPException(status_code=400, detail={"message": "SQL execution failed", "result": result})
+
+    draft.status = "executed"
+    draft.feedback = (draft.feedback or "") + f"\nexecuted_by={current_user}; source_code={req.source_code}"
+    db.add(GovernAuditLog(
+        module="ai",
+        entity_type="sql_draft",
+        entity_ref=str(draft.id),
+        action="execute_readonly_sql",
+        before_data={"status": "approved", "source_code": req.source_code},
+        after_data={
+            "status": result.get("status"),
+            "total_cnt": result.get("total_cnt"),
+            "error_cnt": result.get("error_cnt"),
+            "error_rate": result.get("error_rate"),
+            "warnings": result.get("warnings", []),
+        },
+        operator=current_user,
+        reason=draft.purpose,
+    ))
+    db.commit()
+
+    if draft.session_key:
+        _audit_tool_call(
+            draft.session_key,
+            "execute_approved_sql",
+            {"draft_id": draft.id, "source_code": req.source_code, "max_rows": req.max_rows},
+            f"status={result.get('status')}; total_cnt={result.get('total_cnt')}; error_cnt={result.get('error_cnt')}",
+            db,
+        )
+
+    return ApiResponse(data={
+        "draft_id": draft.id,
+        "source_code": req.source_code,
+        "status": "executed",
+        "risk_flags": risk_flags,
+        "warnings": result.get("warnings", []),
+        "total_cnt": result.get("total_cnt", 0),
+        "error_cnt": result.get("error_cnt", 0),
+        "error_rate": result.get("error_rate", 0),
+        "sample_data": result.get("sample_data", []),
+    })
 
 
 @router.get("/sessions", summary="查询 AI 会话列表")

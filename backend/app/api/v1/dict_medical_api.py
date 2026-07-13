@@ -1,18 +1,26 @@
 from datetime import datetime, timezone
+import json
+from html import escape
+from io import BytesIO
+from urllib.parse import quote
+from zipfile import ZIP_DEFLATED, ZipFile
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from ...core.db import get_db
+from ...core.security import get_current_user
 from ...models.dict_medical import (
     DictMedicalCodeItem,
     DictMedicalCodeMapping,
     DictMedicalCodeSet,
     DictMedicalSyncDiff,
 )
-from ...models.governance_base import GovernChangeRequest
+from ...models.governance_base import GovernAuditLog, GovernChangeRequest
+from ...models.governance_ops import SchedulerJob
 from ...schemas.common import ApiResponse
 
 router = APIRouter(prefix="/api/v1/dict-medical", tags=["dict-medical"])
@@ -208,6 +216,7 @@ def list_mapping_rows(
             "performance_level4_flag": extra.get("performance_level4_flag"),
             "performance_minimally_invasive_flag": extra.get("performance_minimally_invasive_flag"),
             "restricted_tech_flag": extra.get("restricted_tech_flag"),
+            "special_disease_code": extra.get("special_disease_code"),
             "special_disease_name": extra.get("special_disease_name"),
             "low_risk_category_code": extra.get("low_risk_category_code"),
             "low_risk_disease_name": extra.get("low_risk_disease_name"),
@@ -217,6 +226,182 @@ def list_mapping_rows(
             "status": local.status,
         })
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+def _excel_col_name(index: int) -> str:
+    name = ""
+    while index:
+        index, rem = divmod(index - 1, 26)
+        name = chr(65 + rem) + name
+    return name
+
+
+def _xlsx_bytes(headers: list[str], rows: list[list[object]], sheet_name: str) -> bytes:
+    def cell_xml(row_index: int, col_index: int, value: object) -> str:
+        value_text = "" if value is None else str(value)
+        ref = f"{_excel_col_name(col_index)}{row_index}"
+        return f'<c r="{ref}" t="inlineStr"><is><t>{escape(value_text)}</t></is></c>'
+
+    sheet_rows = []
+    all_rows = [headers, *rows]
+    for row_index, row in enumerate(all_rows, start=1):
+        cells = "".join(cell_xml(row_index, col_index, value) for col_index, value in enumerate(row, start=1))
+        sheet_rows.append(f'<row r="{row_index}">{cells}</row>')
+    dimension = f"A1:{_excel_col_name(len(headers))}{max(len(all_rows), 1)}"
+    sheet_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="{dimension}"/>
+  <sheetViews><sheetView workbookViewId="0"/></sheetViews>
+  <sheetFormatPr defaultRowHeight="15"/>
+  <sheetData>{''.join(sheet_rows)}</sheetData>
+</worksheet>'''
+    workbook_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/></sheets>
+</workbook>'''
+    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>'''
+    rels_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>'''
+    workbook_rels_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>'''
+    buffer = BytesIO()
+    with ZipFile(buffer, "w", ZIP_DEFLATED) as zf:
+        zf.writestr("[Content_Types].xml", content_types)
+        zf.writestr("_rels/.rels", rels_xml)
+        zf.writestr("xl/workbook.xml", workbook_xml)
+        zf.writestr("xl/_rels/workbook.xml.rels", workbook_rels_xml)
+        zf.writestr("xl/worksheets/sheet1.xml", sheet_xml)
+    return buffer.getvalue()
+
+
+def _mapping_rows_for_export(
+    db: Session,
+    category_code: str,
+    keyword: str | None,
+    status: str | None,
+    has_infectious: bool | None,
+    minimally_invasive_flag: str | None,
+    performance_level4_flag: str | None,
+    restricted_tech_flag: str | None,
+    operation_level: str | None,
+) -> list[dict]:
+    if category_code == "operation":
+        local_code_set = "operation_local_clinical"
+        national_code_set = "operation_national_clinical_v3"
+        insurance_code_set = "operation_insurance_v2"
+    else:
+        local_code_set = "diagnosis_local_clinical"
+        national_code_set = "diagnosis_national_clinical_v2"
+        insurance_code_set = "diagnosis_insurance_v2"
+
+    stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == local_code_set)
+    if status:
+        stmt = stmt.where(DictMedicalCodeItem.status == status)
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(DictMedicalCodeItem.item_code.ilike(like) | DictMedicalCodeItem.item_name_cn.ilike(like))
+    if category_code == "diagnosis" and has_infectious is not None:
+        infectious_expr = func.coalesce(DictMedicalCodeItem.extra.op("->>")("infectious_disease_name"), "")
+        stmt = stmt.where(infectious_expr != "" if has_infectious else infectious_expr == "")
+    if category_code == "operation":
+        def flag_value(value: str | None) -> str | None:
+            return "" if value == "__empty" else value
+        if minimally_invasive_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_minimally_invasive_flag"), "") == flag_value(minimally_invasive_flag))
+        if performance_level4_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_level4_flag"), "") == flag_value(performance_level4_flag))
+        if restricted_tech_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("restricted_tech_flag"), "") == flag_value(restricted_tech_flag))
+        if operation_level:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("operation_level"), "") == operation_level)
+
+    local_items = db.scalars(stmt.order_by(DictMedicalCodeItem.item_code)).all()
+    local_codes = [r.item_code for r in local_items]
+    mapping_rows = db.scalars(select(DictMedicalCodeMapping).where(
+        DictMedicalCodeMapping.category_code == category_code,
+        DictMedicalCodeMapping.from_code_set == local_code_set,
+        DictMedicalCodeMapping.from_item_code.in_(local_codes),
+    )).all() if local_codes else []
+    mapping_by_key = {(m.from_item_code, m.to_code_set): m.to_item_code for m in mapping_rows}
+    target_codes = [m.to_item_code for m in mapping_rows if m.to_item_code]
+    target_items = db.scalars(select(DictMedicalCodeItem).where(
+        DictMedicalCodeItem.code_set_code.in_([national_code_set, insurance_code_set]),
+        DictMedicalCodeItem.item_code.in_(target_codes),
+    )).all() if target_codes else []
+    target_name = {(i.code_set_code, i.item_code): i.item_name_cn for i in target_items}
+
+    result = []
+    for local in local_items:
+        extra = local.extra or {}
+        national_code = mapping_by_key.get((local.item_code, national_code_set)) or extra.get("national_clinical_code") or ""
+        insurance_code = mapping_by_key.get((local.item_code, insurance_code_set)) or extra.get("insurance_raw_code") or ""
+        result.append({
+            "local_code": local.item_code,
+            "local_name": local.item_name_cn,
+            "dict_attribute": extra.get("dict_attribute"),
+            "national_code": national_code,
+            "national_name": target_name.get((national_code_set, national_code)) or extra.get("national_clinical_name") or "",
+            "insurance_code": insurance_code,
+            "insurance_name": target_name.get((insurance_code_set, insurance_code)) or extra.get("insurance_raw_name") or "",
+            "operation_level": extra.get("operation_level"),
+            "operation_category": extra.get("operation_category"),
+            "performance_level4_flag": extra.get("performance_level4_flag"),
+            "performance_minimally_invasive_flag": extra.get("performance_minimally_invasive_flag"),
+            "restricted_tech_flag": extra.get("restricted_tech_flag"),
+            "special_disease_code": extra.get("special_disease_code"),
+            "special_disease_name": extra.get("special_disease_name"),
+            "low_risk_category_code": extra.get("low_risk_category_code"),
+            "low_risk_disease_name": extra.get("low_risk_disease_name"),
+            "infectious_disease_name": extra.get("infectious_disease_name"),
+            "source_file": extra.get("source_file"),
+            "source_sheet": extra.get("source_sheet"),
+            "status": local.status,
+        })
+    return result
+
+
+@router.get("/mapping-rows/export", summary="导出诊断/手术映射宽表 Excel")
+def export_mapping_rows(
+    category_code: str = Query("diagnosis", description="diagnosis/operation"),
+    keyword: str | None = Query(None),
+    status: str | None = Query(None, description="active/inactive"),
+    has_infectious: bool | None = Query(None, description="是否传染病诊断"),
+    minimally_invasive_flag: str | None = Query(None, description="绩效微创标识"),
+    performance_level4_flag: str | None = Query(None, description="绩效四级标识"),
+    restricted_tech_flag: str | None = Query(None, description="限制技术标识"),
+    operation_level: str | None = Query(None, description="院内手术等级"),
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    rows = _mapping_rows_for_export(
+        db, category_code, keyword, status, has_infectious,
+        minimally_invasive_flag, performance_level4_flag, restricted_tech_flag, operation_level,
+    )
+    if category_code == "operation":
+        headers = ["字典属性", "院内临床手术编码", "院内临床手术名称", "院内手术等级", "国家临床版3.0手术编码", "国家临床版3.0手术名称", "手术类别", "绩效考核四级手术标识", "绩效考核微创手术标识", "限制类技术标识", "国家医保版2.0手术代码", "国家医保版2.0手术名称", "状态", "来源文件", "来源工作表"]
+        data_rows = [[r.get("dict_attribute"), r.get("local_code"), r.get("local_name"), r.get("operation_level"), r.get("national_code"), r.get("national_name"), r.get("operation_category"), r.get("performance_level4_flag"), r.get("performance_minimally_invasive_flag"), r.get("restricted_tech_flag"), r.get("insurance_code"), r.get("insurance_name"), "停用" if r.get("status") == "inactive" else "启用", r.get("source_file"), r.get("source_sheet")] for r in rows]
+        filename = "手术映射维护.xlsx"
+    else:
+        headers = ["字典属性", "院内临床诊断编码", "院内临床诊断名称", "国家临床版2.0疾病编码", "国家临床版2.0疾病名称", "国家医保版2.0疾病编码", "国家医保版2.0疾病名称", "门诊慢特病编码", "门诊慢特病名称", "ICD低风险编码类目", "ICD低风险病种名称", "传染病诊断", "状态", "来源文件", "来源工作表"]
+        data_rows = [[r.get("dict_attribute"), r.get("local_code"), r.get("local_name"), r.get("national_code"), r.get("national_name"), r.get("insurance_code"), r.get("insurance_name"), r.get("special_disease_code"), r.get("special_disease_name"), r.get("low_risk_category_code"), r.get("low_risk_disease_name"), r.get("infectious_disease_name"), "停用" if r.get("status") == "inactive" else "启用", r.get("source_file"), r.get("source_sheet")] for r in rows]
+        filename = "诊断映射维护.xlsx"
+
+    content = _xlsx_bytes(headers, data_rows, "Sheet1")
+    encoded = quote(filename)
+    return StreamingResponse(
+        BytesIO(content),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded}"},
+    )
 
 
 class MappingRowUpsert(BaseModel):
@@ -233,6 +418,7 @@ class MappingRowUpsert(BaseModel):
     performance_level4_flag: str | None = None
     performance_minimally_invasive_flag: str | None = None
     restricted_tech_flag: str | None = None
+    special_disease_code: str | None = None
     special_disease_name: str | None = None
     low_risk_category_code: str | None = None
     low_risk_disease_name: str | None = None
@@ -317,6 +503,7 @@ def upsert_mapping_row(req: MappingRowUpsert, db: Session = Depends(get_db)) -> 
         "performance_level4_flag": req.performance_level4_flag,
         "performance_minimally_invasive_flag": req.performance_minimally_invasive_flag,
         "restricted_tech_flag": req.restricted_tech_flag,
+        "special_disease_code": req.special_disease_code,
         "special_disease_name": req.special_disease_name,
         "low_risk_category_code": req.low_risk_category_code,
         "low_risk_disease_name": req.low_risk_disease_name,
@@ -396,6 +583,167 @@ def list_medical_diffs(
     ]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
+
+class MedicalSyncRunRequest(BaseModel):
+    source_system: str
+    target_system: str = "asset"
+    category_code: str | None = None
+    max_rows: int = 5000
+
+class MedicalSyncDiffUpdate(BaseModel):
+    status: str
+    note: str | None = None
+
+def _medical_sync_job_status(sync_status: str | None) -> str:
+    if sync_status == "success":
+        return "success"
+    if sync_status in {"failed", "skipped"}:
+        return "failed"
+    return "blocked"
+
+
+def _store_medical_sync_job(
+    db: Session,
+    *,
+    req: MedicalSyncRunRequest,
+    result: dict,
+) -> SchedulerJob:
+    now = datetime.now(timezone.utc)
+    job = SchedulerJob(
+        job_type="dict_medical_sync",
+        source_code=req.source_system,
+        trigger_mode="manual",
+        status=_medical_sync_job_status(result.get("status")),
+        started_at=now,
+        finished_at=now,
+        result_ref=json.dumps({
+            "source_system": req.source_system,
+            "target_system": req.target_system,
+            "category_code": req.category_code,
+            "entity_type": "medical_code",
+            "max_rows": req.max_rows,
+            "result": result,
+        }, ensure_ascii=False),
+        total_processed=result.get("scanned"),
+        total_changes=result.get("diffs_created"),
+        error_message=result.get("error") or result.get("note") if result.get("status") != "success" else None,
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return job
+
+
+@router.post("/sync/run", summary="Run diagnosis/operation dictionary sync")
+def run_medical_sync(req: MedicalSyncRunRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    get_current_user(request)
+    from ...services.medical_code_source_collector import collect_medical_code_diffs
+
+    result = collect_medical_code_diffs(
+        db,
+        source_code=req.source_system,
+        target_system=req.target_system,
+        category_code=req.category_code,
+        max_rows=req.max_rows,
+    )
+    job = _store_medical_sync_job(db, req=req, result=result)
+    db.commit()
+    return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
+
+
+@router.post("/sync/jobs/{job_id}/retry", summary="Retry diagnosis/operation dictionary sync job")
+def retry_medical_sync_job(
+    job_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    job = db.get(SchedulerJob, job_id)
+    if not job or job.job_type != "dict_medical_sync":
+        raise HTTPException(status_code=404, detail="dict medical sync job not found")
+    try:
+        payload = json.loads(job.result_ref or "{}")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="sync job result_ref is not valid JSON")
+
+    req = MedicalSyncRunRequest(
+        source_system=payload.get("source_system") or job.source_code or "",
+        target_system=payload.get("target_system") or "asset",
+        category_code=payload.get("category_code"),
+        max_rows=payload.get("max_rows") or (payload.get("result") or {}).get("max_rows") or 5000,
+    )
+    if not req.source_system:
+        raise HTTPException(status_code=400, detail="sync job is missing source_system")
+
+    from ...services.medical_code_source_collector import collect_medical_code_diffs
+
+    job.status = "running"
+    job.started_at = datetime.now(timezone.utc)
+    db.commit()
+
+    result = collect_medical_code_diffs(
+        db,
+        source_code=req.source_system,
+        target_system=req.target_system,
+        category_code=req.category_code,
+        max_rows=req.max_rows,
+    )
+    job.status = _medical_sync_job_status(result.get("status"))
+    job.finished_at = datetime.now(timezone.utc)
+    job.result_ref = json.dumps({
+        "source_system": req.source_system,
+        "target_system": req.target_system,
+        "category_code": req.category_code,
+        "entity_type": "medical_code",
+        "result": result,
+    }, ensure_ascii=False)
+    job.total_processed = result.get("scanned")
+    job.total_changes = result.get("diffs_created")
+    job.error_message = result.get("error") or result.get("note") if result.get("status") != "success" else None
+    db.add(GovernAuditLog(
+        module="dict_medical",
+        entity_type="sync_job",
+        entity_ref=str(job.id),
+        action="retry",
+        after_data={"status": job.status, "result": result},
+        operator=current_user,
+    ))
+    db.commit()
+    return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
+
+@router.patch("/sync-diffs/{diff_id}", summary="Update diagnosis/operation sync diff status")
+def update_medical_diff(
+    diff_id: int,
+    req: MedicalSyncDiffUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    if req.status not in {"open", "resolved", "ignored"}:
+        raise HTTPException(status_code=400, detail="status must be open/resolved/ignored")
+    diff = db.get(DictMedicalSyncDiff, diff_id)
+    if not diff:
+        raise HTTPException(status_code=404, detail="medical sync diff not found")
+
+    before = {"status": diff.status, "handled_at": diff.handled_at.isoformat() if diff.handled_at else None}
+    diff.status = req.status
+    diff.handled_at = None if req.status == "open" else datetime.now(timezone.utc)
+    db.add(GovernAuditLog(
+        module="dict_medical",
+        entity_type="sync_diff",
+        entity_ref=str(diff.id),
+        action="update_status",
+        before_data=before,
+        after_data={"status": diff.status, "handled_at": diff.handled_at.isoformat() if diff.handled_at else None},
+        operator=current_user,
+        reason=req.note,
+    ))
+    db.commit()
+    return ApiResponse(data={
+        "id": diff.id,
+        "status": diff.status,
+        "handled_at": diff.handled_at.isoformat() if diff.handled_at else None,
+    })
 
 class CodeSetUpsert(BaseModel):
     category_code: str
@@ -484,18 +832,18 @@ class DictCRCreate(BaseModel):
     entity_ref: str | None = None
     request_type: str
     request_payload: dict | None = None
-    requested_by: str | None = None
 
 
 @router.post("/change-requests", summary="创建字典变更请求")
-def create_dict_cr(req: DictCRCreate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def create_dict_cr(req: DictCRCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = GovernChangeRequest(
         module="dict",
         entity_type=req.entity_type,
         entity_ref=req.entity_ref,
         request_type=req.request_type,
         request_payload=req.request_payload,
-        requested_by=req.requested_by,
+        requested_by=current_user,
     )
     db.add(cr)
     db.commit()
@@ -531,21 +879,21 @@ def list_dict_crs(
 
 
 class ApproveBody(BaseModel):
-    approved_by: str
     note: str | None = None
 
 
 @router.patch("/change-requests/{cr_id}/approve", summary="审批字典变更请求")
-def approve_dict_cr(cr_id: int, req: ApproveBody, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def approve_dict_cr(cr_id: int, req: ApproveBody, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
     if not cr:
         raise HTTPException(status_code=404)
     if cr.module != "dict":
         raise HTTPException(status_code=400, detail="非字典变更请求")
-    if req.approved_by == cr.requested_by:
+    if current_user == cr.requested_by:
         raise HTTPException(status_code=400, detail="审批人与申请人不能为同一人")
     cr.approval_status = "approved"
-    cr.approved_by = req.approved_by
+    cr.approved_by = current_user
     cr.note = req.note
     cr.updated_at = datetime.now(timezone.utc)
     db.commit()
@@ -553,14 +901,15 @@ def approve_dict_cr(cr_id: int, req: ApproveBody, db: Session = Depends(get_db))
 
 
 @router.post("/change-requests/{cr_id}/execute", summary="执行字典变更请求")
-def execute_dict_cr(cr_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def execute_dict_cr(cr_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
     if not cr:
         raise HTTPException(status_code=404)
     if cr.approval_status != "approved":
         raise HTTPException(status_code=400, detail="仅已审批通过的请求可执行")
     cr.approval_status = "executed"
-    cr.executed_by = cr.approved_by
+    cr.executed_by = current_user
     cr.updated_at = datetime.now(timezone.utc)
     db.commit()
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status, "executed": True})
@@ -581,3 +930,5 @@ def list_versions(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
         }
         for r in rows
     ])
+
+

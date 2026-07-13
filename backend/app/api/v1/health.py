@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -12,8 +12,22 @@ logger = get_logger(__name__)
 router = APIRouter(tags=["health"])
 
 
-@router.get("/health", summary="健康检查")
-def health(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.get("/health/live", summary="存活检查（liveness，不依赖数据库）")
+def health_live() -> ApiResponse[dict]:
+    """进程存活即返回 200，供 systemd 判断应用是否需要重启。不检查数据库。"""
+    return ApiResponse(
+        code=0,
+        message="ok",
+        data={"status": "alive", "checked_at": datetime.now(timezone.utc).isoformat()},
+    )
+
+
+@router.get("/health", summary="就绪检查（readiness，依赖数据库）")
+def health(db: Session = Depends(get_db), response: Response = None) -> ApiResponse[dict]:
+    """数据库可用才返回 200；数据库不可用时返回 HTTP 503，供部署脚本和负载均衡判断就绪状态。
+
+    注意：systemd 仍可轮询此端点，但部署脚本必须用 `curl --fail` 才能识别 503 为未就绪。
+    """
     db_ok = False
     try:
         db.execute(text("SELECT 1"))
@@ -21,12 +35,14 @@ def health(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     except Exception as e:
         logger.error("DB health check failed: %s", e)
 
-    status = "ok" if db_ok else "degraded"
+    if not db_ok and response is not None:
+        response.status_code = 503
+
     return ApiResponse(
-        code=0,
+        code=0 if db_ok else 503,
         message="ok" if db_ok else "database unreachable",
         data={
-            "status": status,
+            "status": "ok" if db_ok else "unavailable",
             "database": "connected" if db_ok else "disconnected",
             "checked_at": datetime.now(timezone.utc).isoformat(),
         },

@@ -88,7 +88,6 @@ def run_sql_rule(rule: QualityRule, db: Session) -> list[QualityFinding]:
             column_name=rule.target_field,
             severity=rule.error_level or "minor",
             status="open",
-            rectification_status="open",
             metric_value=f"error_rate={result.get('error_rate', 0)}%",
             total_cnt=result.get("total_cnt", 0),
             error_cnt=result.get("error_cnt", 0),

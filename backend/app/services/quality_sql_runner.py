@@ -172,7 +172,6 @@ def execute_and_collect_findings(
             "column_name": rule.target_field,
             "severity": rule.error_level or "minor",
             "status": "open",
-            "rectification_status": "open",
             "total_cnt": result["total_cnt"],
             "error_cnt": result["error_cnt"],
             "error_rate": result["error_rate"],

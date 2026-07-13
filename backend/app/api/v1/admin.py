@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from datetime import datetime, timezone
 
@@ -12,11 +13,9 @@ from ...schemas.common import ApiResponse
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
-DEFAULT_TOKEN = "asset-platform-admin-2026"
-
-
 class KeyCreateRequest(BaseModel):
     key_name: str
+    user_identifier: str
 
 
 class OwnerUpsertRequest(BaseModel):
@@ -25,17 +24,6 @@ class OwnerUpsertRequest(BaseModel):
     department: str | None = None
     contact: str | None = None
     note: str | None = None
-
-
-@router.get("/init", summary="初始化默认 API Token（首次使用一次性获取）")
-def init_default_token(db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    existing = db.scalar(select(ApiKey).where(ApiKey.key_name == "default-admin"))
-    if existing:
-        raise HTTPException(status_code=403, detail="默认 Token 已存在，请使用已有 Token 或通过管理页面创建新 Key")
-    key = ApiKey(key_name="default-admin", token=DEFAULT_TOKEN)
-    db.add(key)
-    db.commit()
-    return ApiResponse(data={"token": DEFAULT_TOKEN, "message": "已创建默认 Token，请立即保存（后续不再返回）"})
 
 
 @router.get("/keys", summary="API Key 列表")
@@ -64,7 +52,11 @@ def create_key(
 
 ) -> ApiResponse[dict]:
     token = secrets.token_urlsafe(24)
-    key = ApiKey(key_name=req.key_name, token=token)
+    key = ApiKey(
+        key_name=req.key_name,
+        token_hash=hashlib.sha256(token.encode("utf-8")).hexdigest(),
+        user_identifier=req.user_identifier,
+    )
     db.add(key)
     db.commit()
     return ApiResponse(data={"id": key.id, "key_name": key.key_name, "token": token, "warning": "Token 只显示一次，请立即保存"})

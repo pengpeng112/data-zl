@@ -67,6 +67,27 @@ def list_scheduler_jobs(
 
 # ── 事件/告警 ──
 
+@router.get("/scheduler/jobs/{job_id}", summary="Scheduler job detail")
+def get_scheduler_job(job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    job = db.get(SchedulerJob, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="scheduler job not found")
+    return ApiResponse(data={
+        "id": job.id,
+        "job_type": job.job_type,
+        "source_code": job.source_code,
+        "trigger_mode": job.trigger_mode,
+        "schedule_cron": job.schedule_cron,
+        "status": job.status,
+        "started_at": job.started_at.isoformat() if job.started_at else None,
+        "finished_at": job.finished_at.isoformat() if job.finished_at else None,
+        "result_ref": job.result_ref,
+        "total_processed": job.total_processed,
+        "total_changes": job.total_changes,
+        "error_message": job.error_message,
+        "created_at": job.created_at.isoformat() if job.created_at else None,
+    })
+
 class EventCreate(BaseModel):
     event_type: str
     module: str

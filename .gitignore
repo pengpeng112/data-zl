@@ -16,3 +16,35 @@ dev.err
 .eslintcache
 .agents/
 .ssh/
+
+# 本地临时探查/运维脚本（常含环境注入默认值，禁止进发布基线）
+backend/scripts/_ro_*.py
+backend/scripts/_apply_*.py
+backend/scripts/_hrp_*.py
+backend/scripts/_readonly_*.py
+backend/scripts/_tmp_*.py
+backend/scripts/_m1m2*
+backend/scripts/*_result.json
+backend/scripts/*_pytest*.txt
+backend/scripts/_chk.py
+backend/scripts/_v.py
+backend/scripts/_ufe.py
+backend/scripts/_seed_remote.py
+backend/scripts/_sync_two.py
+backend/scripts/_post_sync_verify.py
+backend/scripts/_deploy_*.py
+backend/scripts/_hotfix_*.py
+backend/scripts/_finish_*.py
+backend/scripts/_fix_*.py
+backend/scripts/_probe_*.py
+backend/scripts/_ready_*.py
+backend/scripts/_reclone_*.py
+backend/scripts/_smoke_*.py
+backend/scripts/_ensure_*.py
+backend/scripts/_upload_*.py
+backend/scripts/_verify_*.py
+
+# 大体积本地缓存/导出
+*.dump
+wheelhouse/
+frontend/dist/

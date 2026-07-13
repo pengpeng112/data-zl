@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
+from ...core.security import get_current_user
 from ...models.governance_base import (
     AssetActionExecutor,
     AssetRole,
@@ -194,54 +195,54 @@ class ChangeRequestCreate(BaseModel):
     request_type: str
     request_payload: dict | None = None
     note: str | None = None
-    requested_by: str | None = None
 
 
 @router.post("/change-requests", summary="创建变更请求")
 def create_change_request(
-    req: ChangeRequestCreate, db: Session = Depends(get_db)
+    req: ChangeRequestCreate, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = GovernChangeRequest(
         module=req.module,
         entity_type=req.entity_type,
         entity_ref=req.entity_ref,
         request_type=req.request_type,
         request_payload=req.request_payload,
-        requested_by=req.requested_by,
+        requested_by=current_user,
         note=req.note,
     )
     db.add(cr)
     db.commit()
     db.refresh(cr)
     _write_audit(db, module=req.module, entity_type="change_request", entity_ref=str(cr.id),
-                 action="create", operator=req.requested_by)
+                  action="create", operator=current_user)
     db.commit()
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})
 
 
 class ChangeRequestApprove(BaseModel):
-    approved_by: str
     note: str | None = None
 
 
 @router.patch("/change-requests/{cr_id}/approve", summary="审批通过")
 def approve_change_request(
-    cr_id: int, req: ChangeRequestApprove, db: Session = Depends(get_db)
+    cr_id: int, req: ChangeRequestApprove, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
     if not cr:
         raise HTTPException(status_code=404)
     if cr.approval_status not in ("draft", "pending"):
         raise HTTPException(status_code=400, detail=f"当前状态 {cr.approval_status} 不可审批")
-    if req.approved_by == cr.requested_by:
+    if current_user == cr.requested_by:
         raise HTTPException(status_code=400, detail="审批人与申请人不能为同一人")
     before = {"approval_status": cr.approval_status}
     cr.approval_status = "approved"
-    cr.approved_by = req.approved_by
+    cr.approved_by = current_user
     cr.note = req.note
     cr.updated_at = datetime.now(timezone.utc)
     _write_audit(db, module=cr.module, entity_type="change_request", entity_ref=str(cr.id),
-                 action="approve", operator=req.approved_by, before=before,
+                  action="approve", operator=current_user, before=before,
                  after={"approval_status": "approved"})
     db.commit()
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})
@@ -249,20 +250,21 @@ def approve_change_request(
 
 @router.patch("/change-requests/{cr_id}/reject", summary="审批拒绝")
 def reject_change_request(
-    cr_id: int, req: ChangeRequestApprove, db: Session = Depends(get_db)
+    cr_id: int, req: ChangeRequestApprove, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
     if not cr:
         raise HTTPException(status_code=404)
-    if req.approved_by == cr.requested_by:
+    if current_user == cr.requested_by:
         raise HTTPException(status_code=400, detail="审批人与申请人不能为同一人")
     before = {"approval_status": cr.approval_status}
     cr.approval_status = "rejected"
-    cr.approved_by = req.approved_by
+    cr.approved_by = current_user
     cr.note = req.note
     cr.updated_at = datetime.now(timezone.utc)
     _write_audit(db, module=cr.module, entity_type="change_request", entity_ref=str(cr.id),
-                 action="reject", operator=req.approved_by, before=before,
+                  action="reject", operator=current_user, before=before,
                  after={"approval_status": "rejected"})
     db.commit()
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})

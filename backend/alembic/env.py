@@ -32,7 +32,9 @@ from app.models.governance_ops import ChangeRule, GovernEvent, SchedulerJob  # n
 from app.models.identity import (  # noqa: F401
     IdentityAccount,
     IdentityDepartment,
+    IdentityDepartmentSource,
     IdentityPerson,
+    IdentityPersonDepartment,
     IdentityPersonSource,
     IdentitySyncDiff,
 )

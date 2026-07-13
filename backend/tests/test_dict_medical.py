@@ -1,4 +1,10 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import delete
+
+from app.core.db import SessionLocal
+from app.models.asset_system import AssetDataSource
+from app.models.dict_medical import DictMedicalCodeItem, DictMedicalSyncDiff
+from app.models.governance_ops import SchedulerJob
 
 
 def _ensure_code_set(client: TestClient, code_set_code="test_cs"):
@@ -158,3 +164,146 @@ def test_create_change_request(client: TestClient):
     data = resp.json()["data"]
     assert data["approval_status"] == "draft"
     assert "id" in data
+
+def test_update_medical_sync_diff_status(client: TestClient):
+    db = SessionLocal()
+    try:
+        db.execute(delete(DictMedicalSyncDiff).where(DictMedicalSyncDiff.target_system == "pytest_medical_diff"))
+        diff = DictMedicalSyncDiff(
+            category_code="diagnosis",
+            target_system="pytest_medical_diff",
+            target_source_code="pytest_source",
+            diff_type="missing_target",
+            code_set_code="pytest_code_set",
+            item_code="pytest_item",
+            after_data={"item_code": "pytest_item"},
+            status="open",
+        )
+        db.add(diff)
+        db.commit()
+        db.refresh(diff)
+        diff_id = diff.id
+    finally:
+        db.close()
+
+    ignored = client.patch(f"/api/v1/dict-medical/sync-diffs/{diff_id}", json={
+        "status": "ignored",
+        "handled_by": "pytest",
+        "note": "not needed",
+    })
+    assert ignored.status_code == 200
+    assert ignored.json()["data"]["status"] == "ignored"
+    assert ignored.json()["data"]["handled_at"] is not None
+
+    reopened = client.patch(f"/api/v1/dict-medical/sync-diffs/{diff_id}", json={"status": "open"})
+    assert reopened.status_code == 200
+    assert reopened.json()["data"]["status"] == "open"
+    assert reopened.json()["data"]["handled_at"] is None
+
+    db = SessionLocal()
+    try:
+        db.execute(delete(DictMedicalSyncDiff).where(DictMedicalSyncDiff.target_system == "pytest_medical_diff"))
+        db.commit()
+    finally:
+        db.close()
+
+def test_run_medical_sync_endpoint(monkeypatch, client: TestClient):
+    from app.services import medical_code_source_collector
+
+    class FakeConnector:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+        def execute_readonly(self, sql, params=None, max_rows=1000):
+            assert params == {"max_rows": 50}
+            assert max_rows == 50
+            if "CDA.CDA_DICTIONARY" in sql:
+                return [
+                    {"LOCAL_CODE": "D_EXIST", "LOCAL_NAME": "Source Diagnosis Name", "STANDARD_CODE": "S001", "STANDARD_NAME": "Std Diagnosis"},
+                    {"LOCAL_CODE": "D_NEW", "LOCAL_NAME": "New Diagnosis", "STANDARD_CODE": "S002", "STANDARD_NAME": "Std New"},
+                ]
+            if "SM.MED_OPERATION_NAME" in sql:
+                return [
+                    {"LOCAL_CODE": "O_NEW", "LOCAL_NAME": "New Operation", "OPERATION_LEVEL": "4"},
+                ]
+            return []
+
+        def close(self):
+            pass
+
+    monkeypatch.setitem(medical_code_source_collector.DB_CONNECTOR_MAP, "pytest_medical", FakeConnector)
+
+    db = SessionLocal()
+    try:
+        db.execute(delete(DictMedicalSyncDiff).where(DictMedicalSyncDiff.target_source_code == "pytest_medical_source"))
+        db.execute(delete(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code.in_(["diagnosis_local_clinical", "operation_local_clinical"]), DictMedicalCodeItem.item_code.in_(["D_EXIST", "D_NEW", "O_NEW"])))
+        db.execute(delete(SchedulerJob).where(SchedulerJob.source_code == "pytest_medical_source"))
+        db.execute(delete(AssetDataSource).where(AssetDataSource.source_code == "pytest_medical_source"))
+        db.add(AssetDataSource(
+            system_code="PYTEST",
+            source_code="pytest_medical_source",
+            source_name_cn="pytest medical source",
+            db_type="pytest_medical",
+            host_masked="localhost",
+            port=1,
+            database_name="pytest",
+            connection_mode="direct",
+            environment="test",
+            enabled=True,
+        ))
+        db.add(DictMedicalCodeItem(
+            code_set_code="diagnosis_local_clinical",
+            item_code="D_EXIST",
+            item_name_cn="Local Diagnosis Name",
+            category_code="diagnosis",
+            status="active",
+        ))
+        db.commit()
+    finally:
+        db.close()
+
+    resp = client.post("/api/v1/dict-medical/sync/run", json={
+        "source_system": "pytest_medical_source",
+        "target_system": "asset",
+        "operator": "pytest",
+        "max_rows": 50,
+    })
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["status"] == "success"
+    assert data["job_status"] == "success"
+    assert data["scanned"] == 3
+    assert data["diffs_created"] == 3
+    assert data["by_category"]["diagnosis"]["diffs_created"] == 2
+    assert data["by_category"]["operation"]["diffs_created"] == 1
+
+    retry = client.post(f"/api/v1/dict-medical/sync/jobs/{data['job_id']}/retry", params={"operator": "pytest"})
+    assert retry.status_code == 200
+    retry_data = retry.json()["data"]
+    assert retry_data["job_id"] == data["job_id"]
+    assert retry_data["job_status"] == "success"
+    assert retry_data["diffs_created"] == 0
+    assert retry_data["diffs_skipped_existing"] == 3
+
+    db = SessionLocal()
+    try:
+        diffs = db.query(DictMedicalSyncDiff).filter(
+            DictMedicalSyncDiff.target_source_code == "pytest_medical_source"
+        ).order_by(DictMedicalSyncDiff.category_code, DictMedicalSyncDiff.item_code, DictMedicalSyncDiff.diff_type).all()
+        assert [(d.category_code, d.item_code, d.diff_type) for d in diffs] == [
+            ("diagnosis", "D_EXIST", "name_mismatch"),
+            ("diagnosis", "D_NEW", "missing_target"),
+            ("operation", "O_NEW", "missing_target"),
+        ]
+    finally:
+        db.execute(delete(DictMedicalSyncDiff).where(DictMedicalSyncDiff.target_source_code == "pytest_medical_source"))
+        db.execute(delete(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code.in_(["diagnosis_local_clinical", "operation_local_clinical"]), DictMedicalCodeItem.item_code.in_(["D_EXIST", "D_NEW", "O_NEW"])))
+        db.execute(delete(SchedulerJob).where(SchedulerJob.source_code == "pytest_medical_source"))
+        db.execute(delete(AssetDataSource).where(AssetDataSource.source_code == "pytest_medical_source"))
+        db.commit()
+        db.close()
+
+
+def test_run_medical_sync_retry_404(client: TestClient):
+    resp = client.post("/api/v1/dict-medical/sync/jobs/999999999/retry")
+    assert resp.status_code == 404

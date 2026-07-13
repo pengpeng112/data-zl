@@ -54,7 +54,6 @@ class QualityFinding(Base):
     column_name = Column(Text)
     severity = Column(Text)
     status = Column(Text, server_default="open")
-    rectification_status = Column(Text, server_default="open")
     metric_value = Column(Text)
     total_cnt = Column(Integer)
     error_cnt = Column(Integer)

@@ -1,4 +1,6 @@
+import json
 from datetime import datetime, timezone
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -12,7 +14,10 @@ from ...models.governance import MetadataSnapshot
 from ...models.governance_ops import SchedulerJob
 from ...models.metadata_change import AssetMetadataChangeEvent, AssetMetadataColumnSnapshot
 from ...models.quality import QualityFinding
+from ...services.credentials import resolve
+from ...services.db_connectors import DB_CONNECTOR_MAP
 from ...services.metadata_diff import MetadataDiff
+from ...services.metadata_collector import METADATA_COLLECTOR_MAP
 from ...schemas.common import ApiResponse
 
 router = APIRouter(prefix="/api/v1", tags=["metadata-changes"])
@@ -20,32 +25,55 @@ router = APIRouter(prefix="/api/v1", tags=["metadata-changes"])
 
 class CollectRequest(BaseModel):
     label: str | None = None
+    mode: Literal["asset_cache", "live_source"] = "asset_cache"
+    schema_filter: list[str] | None = None
 
 
-@router.post("/sources/{source_code}/collect-metadata", summary="手动触发元数据采集（P14-T5）")
-def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
-    if not ds:
-        raise HTTPException(status_code=400, detail=f"数据源 {source_code} 未注册，请先在 /api/v1/sources 创建")
+def _build_source_connector(source: AssetDataSource):
+    db_type = (source.db_type or "").lower()
+    connector_cls = DB_CONNECTOR_MAP.get(db_type)
+    if connector_cls is None:
+        raise HTTPException(status_code=400, detail=f"unsupported db_type: {source.db_type}")
+    user, password = resolve(source.credential_ref)
+    database = source.service_name or source.database_name or ""
+    return connector_cls(
+        host=source.host_masked or "",
+        port=source.port or 0,
+        database=database,
+        user=user or "",
+        password=password or "",
+        connection_mode=source.connection_mode or "direct",
+    )
 
-    label = (req.label if req else None) or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
+def _create_snapshot(source_code: str, label: str, mode: str, db: Session) -> MetadataSnapshot:
     sp = MetadataSnapshot(
         label=label,
         scope="column_level",
+        source_code=source_code,
         table_count=0,
         column_count=0,
         relation_count=0,
-        data=f'{{"source": "{source_code}", "collected_at": "{datetime.now(timezone.utc).isoformat()}"}}',
+        data=json.dumps(
+            {
+                "source": source_code,
+                "mode": mode,
+                "collected_at": datetime.now(timezone.utc).isoformat(),
+            },
+            ensure_ascii=False,
+        ),
     )
     db.add(sp)
     db.flush()
+    return sp
+
+
+def _collect_asset_cache_snapshot(source: AssetDataSource, label: str, db: Session) -> dict:
+    source_code = source.source_code
+    sp = _create_snapshot(source_code, label, "asset_cache", db)
     snapshot_id = sp.id
 
-    tables = db.scalars(
-        select(AssetTable).where(AssetTable.source_code == source_code)
-    ).all()
-
+    tables = db.scalars(select(AssetTable).where(AssetTable.source_code == source_code)).all()
     col_count = 0
     for t in tables:
         cols = db.scalars(
@@ -58,7 +86,7 @@ def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Se
         for c in cols:
             db.add(AssetMetadataColumnSnapshot(
                 snapshot_id=snapshot_id,
-                system_code=c.system_code or t.system_code or "",
+                system_code=c.system_code or t.system_code or source.system_code or "",
                 source_code=source_code,
                 namespace_name=c.namespace_name or "",
                 table_name=c.table_name or "",
@@ -73,6 +101,92 @@ def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Se
 
     sp.table_count = len(tables)
     sp.column_count = col_count
+    return {
+        "snapshot_id": snapshot_id,
+        "label": label,
+        "mode": "asset_cache",
+        "table_count": len(tables),
+        "column_count": col_count,
+    }
+
+
+def _collect_live_source_snapshot(source: AssetDataSource, label: str, schema_filter: list[str] | None, db: Session) -> dict:
+    source_code = source.source_code
+    db_type = (source.db_type or "").lower()
+    collector_cls = METADATA_COLLECTOR_MAP.get(db_type)
+    if collector_cls is None:
+        raise HTTPException(status_code=400, detail=f"unsupported metadata collector db_type: {source.db_type}")
+
+    connector = _build_source_connector(source)
+    try:
+        collector = collector_cls(connector)
+        collected = collector.collect_all(schema_filter=schema_filter)
+    finally:
+        connector.close()
+
+    sp = _create_snapshot(source_code, label, "live_source", db)
+    sp.data = json.dumps(
+        {
+            "source": source_code,
+            "mode": "live_source",
+            "schema_filter": schema_filter or [],
+            "collected_at": datetime.now(timezone.utc).isoformat(),
+        },
+        ensure_ascii=False,
+    )
+    snapshot_id = sp.id
+
+    for c in collected.get("columns", []):
+        db.add(AssetMetadataColumnSnapshot(
+            snapshot_id=snapshot_id,
+            system_code=source.system_code or "",
+            source_code=source_code,
+            namespace_name=c.get("schema_name") or c.get("owner") or "",
+            table_name=c.get("table_name") or "",
+            column_name=c.get("column_name") or "",
+            data_type=c.get("data_type"),
+            length=c.get("length") or c.get("data_length"),
+            nullable=c.get("nullable"),
+            comment=c.get("comment"),
+            is_primary_key=bool(c.get("is_primary_key")),
+        ))
+
+    table_count = len(collected.get("tables", []))
+    column_count = len(collected.get("columns", []))
+    sp.table_count = table_count
+    sp.column_count = column_count
+    return {
+        "snapshot_id": snapshot_id,
+        "label": label,
+        "mode": "live_source",
+        "schema_filter": schema_filter or [],
+        "table_count": table_count,
+        "column_count": column_count,
+    }
+
+
+def _collect_metadata_snapshot(
+    source_code: str,
+    label: str,
+    db: Session,
+    mode: str = "asset_cache",
+    schema_filter: list[str] | None = None,
+) -> dict:
+    ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
+    if not ds:
+        raise HTTPException(status_code=400, detail=f"data source {source_code} is not registered; create it under /api/v1/sources first")
+
+    if mode == "live_source":
+        return _collect_live_source_snapshot(ds, label, schema_filter, db)
+    return _collect_asset_cache_snapshot(ds, label, db)
+
+
+@router.post("/sources/{source_code}/collect-metadata", summary="手动触发元数据采集（P14-T5）")
+def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    label = (req.label if req else None) or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    mode = req.mode if req else "asset_cache"
+    schema_filter = req.schema_filter if req else None
+    result = _collect_metadata_snapshot(source_code, label, db, mode=mode, schema_filter=schema_filter)
     db.commit()
 
     job = SchedulerJob(
@@ -82,24 +196,75 @@ def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Se
         status="success",
         started_at=datetime.now(timezone.utc),
         finished_at=datetime.now(timezone.utc),
-        result_ref=str(snapshot_id),
-        total_processed=len(tables),
+        result_ref=json.dumps({
+            "snapshot_id": result["snapshot_id"],
+            "label": label,
+            "mode": mode,
+            "schema_filter": schema_filter or [],
+        }, ensure_ascii=False),
+        total_processed=result["table_count"],
         total_changes=0,
     )
     db.add(job)
     db.commit()
+    result["job_id"] = job.id
+    return ApiResponse(data=result)
 
-    return ApiResponse(data={
-        "snapshot_id": snapshot_id,
-        "label": label,
-        "table_count": len(tables),
-        "column_count": col_count,
-    })
 
+@router.post("/sources/{source_code}/metadata-jobs/{job_id}/retry", summary="重试元数据采集任务")
+def retry_metadata_collect_job(source_code: str, job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    job = db.get(SchedulerJob, job_id)
+    if not job or job.job_type != "metadata_scan" or job.source_code != source_code:
+        raise HTTPException(status_code=404, detail="metadata scan job not found")
+
+    job.status = "running"
+    job.started_at = datetime.now(timezone.utc)
+    job.error_message = None
+    db.commit()
+
+    try:
+        retry_params: dict = {}
+        try:
+            retry_params = json.loads(job.result_ref or "{}") if str(job.result_ref or "").strip().startswith("{") else {}
+        except json.JSONDecodeError:
+            retry_params = {}
+        mode = retry_params.get("mode") or "asset_cache"
+        schema_filter = retry_params.get("schema_filter") or None
+        base_label = retry_params.get("label") or "metadata collect"
+        label = f"retry {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} {base_label}"
+        result = _collect_metadata_snapshot(source_code, label, db, mode=mode, schema_filter=schema_filter)
+        job.status = "success"
+        job.finished_at = datetime.now(timezone.utc)
+        job.result_ref = json.dumps({
+            "snapshot_id": result["snapshot_id"],
+            "label": label,
+            "mode": mode,
+            "schema_filter": schema_filter or [],
+        }, ensure_ascii=False)
+        job.total_processed = result["table_count"]
+        job.total_changes = 0
+        job.error_message = None
+        db.commit()
+        result["job_id"] = job.id
+        result["job_status"] = job.status
+        return ApiResponse(data=result)
+    except HTTPException:
+        job.status = "failed"
+        job.finished_at = datetime.now(timezone.utc)
+        job.error_message = "metadata collect retry failed"
+        db.commit()
+        raise
+    except Exception as exc:
+        job.status = "failed"
+        job.finished_at = datetime.now(timezone.utc)
+        job.error_message = str(exc)[:500]
+        db.commit()
+        raise HTTPException(status_code=500, detail="metadata collect retry failed")
 
 @router.get("/metadata-changes", summary="变更事件列表（P14-T6 数据接口）")
 def list_changes(
     system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
     change_type: str | None = Query(None),
     severity: str | None = Query(None),
     status: str | None = Query(None),
@@ -110,6 +275,8 @@ def list_changes(
     stmt = select(AssetMetadataChangeEvent)
     if system_code:
         stmt = stmt.where(AssetMetadataChangeEvent.system_code == system_code)
+    if source_code:
+        stmt = stmt.where(AssetMetadataChangeEvent.source_code == source_code)
     if change_type:
         stmt = stmt.where(AssetMetadataChangeEvent.change_type == change_type)
     if severity:
@@ -127,6 +294,7 @@ def list_changes(
             "snapshot_id_from": r.snapshot_id_from,
             "snapshot_id_to": r.snapshot_id_to,
             "system_code": r.system_code,
+            "source_code": r.source_code,
             "change_type": r.change_type,
             "table_name": r.table_name,
             "column_name": r.column_name,
@@ -186,7 +354,19 @@ def run_diff(
     if not s1 or not s2:
         raise HTTPException(status_code=404, detail="快照不存在")
 
-    events = MetadataDiff.diff(db, snapshot_id_from, snapshot_id_to, system_code, source_code)
+    snapshot_source = s1.source_code
+    if s2.source_code != snapshot_source:
+        raise HTTPException(status_code=400, detail="只能对比同一 source_code 的快照")
+    if source_code and source_code != snapshot_source:
+        raise HTTPException(status_code=400, detail="source_code 与快照归属不一致")
+
+    events = MetadataDiff.diff(
+        db,
+        snapshot_id_from,
+        snapshot_id_to,
+        system_code,
+        source_code or snapshot_source,
+    )
 
     saved = 0
     linked_to_quality = 0
@@ -209,8 +389,8 @@ def run_diff(
     db.commit()
 
     return ApiResponse(data={
-        "snapshot_from": {"id": s1.id, "label": s1.label},
-        "snapshot_to": {"id": s2.id, "label": s2.label},
+        "snapshot_from": {"id": s1.id, "label": s1.label, "source_code": snapshot_source},
+        "snapshot_to": {"id": s2.id, "label": s2.label, "source_code": snapshot_source},
         "total_changes": saved,
         "linked_to_quality_findings": linked_to_quality,
     })
@@ -261,13 +441,17 @@ def source_snapshots(
 ) -> ApiResponse[list[dict]]:
     rows = db.scalars(
         select(MetadataSnapshot)
-        .where(MetadataSnapshot.scope == "column_level")
+        .where(
+            MetadataSnapshot.scope == "column_level",
+            MetadataSnapshot.source_code == source_code,
+        )
         .order_by(MetadataSnapshot.snapshot_time.desc())
         .limit(limit)
     ).all()
     return ApiResponse(data=[
         {
             "id": r.id, "label": r.label,
+            "source_code": r.source_code,
             "snapshot_time": r.snapshot_time.isoformat() if r.snapshot_time else None,
             "table_count": r.table_count, "column_count": r.column_count,
         }

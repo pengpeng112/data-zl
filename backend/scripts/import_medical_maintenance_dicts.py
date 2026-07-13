@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import re
 import sys
@@ -226,8 +226,8 @@ def build_payload() -> tuple[list[dict], list[dict]]:
     seen_diag: set[str] = set()
     duplicate_diag: list[str] = []
     for row in diagnosis_rows[1:]:
-        local_code = hcell(row, diagnosis_headers, "院内临床诊断疾病编码")
-        local_name = hcell(row, diagnosis_headers, "院内临床诊断疾病名称")
+        local_code = hcell(row, diagnosis_headers, "院内临床诊断编码", "院内临床诊断疾病编码")
+        local_name = hcell(row, diagnosis_headers, "院内临床诊断名称", "院内临床诊断疾病名称")
         national_code = hcell(row, diagnosis_headers, "国家临床版2.0映疾病编码", "国家临床版2.0疾病编码")
         national_name = hcell(row, diagnosis_headers, "对应国家临床版2.0疾病名称", "国家临床版2.0疾病名称")
         insurance_code_raw = hcell(row, diagnosis_headers, "国家医保版2.0疾病编码")
@@ -251,7 +251,8 @@ def build_payload() -> tuple[list[dict], list[dict]]:
             "insurance_source_marker_code": insurance_code_raw,
             "insurance_source_marker_name": insurance_name_raw,
             "insurance_mapping_status": "valid" if has_valid_insurance else "source_marker_not_mapping",
-            "special_disease_name": hcell(row, diagnosis_headers, "病种名称"),
+            "special_disease_code": hcell(row, diagnosis_headers, "门诊慢特病编码"),
+            "special_disease_name": hcell(row, diagnosis_headers, "门诊慢特病名称", "病种名称"),
             "low_risk_category_code": hcell(row, diagnosis_headers, "ICD低风险编码类目"),
             "low_risk_disease_name": hcell(row, diagnosis_headers, "ICD低风险病种名称"),
             "infectious_disease_name": hcell(row, diagnosis_headers, "传染病诊断"),
@@ -307,9 +308,6 @@ def build_payload() -> tuple[list[dict], list[dict]]:
             "restricted_tech_flag": hcell(row, operation_headers, "限制类技术标识"),
             "insurance_raw_code": insurance_code,
             "insurance_raw_name": insurance_name,
-            "insurance_source_marker_code": insurance_code_raw,
-            "insurance_source_marker_name": insurance_name_raw,
-            "insurance_mapping_status": "valid" if has_valid_insurance else "source_marker_not_mapping",
         }
         add_item(items, "operation_local_clinical", local_code, local_name, "operation", extra)
         add_item(items, "operation_national_clinical_v3", national_code, national_name, "operation", {"source_file": operation_path.name, "source_sheet": "手术操作字典"})
@@ -366,3 +364,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

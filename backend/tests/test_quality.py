@@ -198,7 +198,7 @@ def test_finding_assign(client: TestClient):
     })
     assert resp.status_code == 200
     assert resp.json()["data"]["assigned_to"] == "test_admin"
-    assert resp.json()["data"]["rectification_status"] == "assigned"
+    assert resp.json()["data"]["status"] == "assigned"
 
 
 def test_finding_recheck(client: TestClient):
@@ -211,7 +211,7 @@ def test_finding_recheck(client: TestClient):
         f"/api/v1/quality/findings/{finding_id}/recheck?status=confirmed"
     )
     assert resp.status_code == 200
-    assert resp.json()["data"]["rectification_status"] == "confirmed"
+    assert resp.json()["data"]["status"] == "confirmed"
 
 
 def test_finding_recheck_invalid_status(client: TestClient):

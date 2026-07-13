@@ -1,13 +1,9 @@
 from fastapi.testclient import TestClient
 
 
-def test_init_default_token_first_time(client: TestClient):
+def test_public_token_initialization_is_removed(client: TestClient):
     resp = client.get("/api/v1/admin/init")
-    assert resp.status_code in (200, 403)
-    if resp.status_code == 200:
-        data = resp.json()
-        assert data["code"] == 0
-        assert "token" in data["data"]
+    assert resp.status_code == 404
 
 
 def test_list_keys(client: TestClient):

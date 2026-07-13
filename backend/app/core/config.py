@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     his_source_user: str = "ready_his"
     his_source_password: str = ""
     his_source_connection_mode: str = "direct"
-    his_source_oracle_client_lib: str = "/opt/oracle/instantclient_21"
+    his_source_oracle_client_lib: str = "/opt/oracle"
     his_source_jump_host: str = "10.10.8.83"
     his_source_jump_port: int = 22
     his_source_jump_user: str = "root"

@@ -37,7 +37,6 @@ class QualityFindingItem(BaseModel):
     column_name: str | None = None
     severity: str | None
     status: str | None
-    rectification_status: str | None = None
     metric_value: str | None
     total_cnt: int | None = None
     error_cnt: int | None = None
@@ -83,7 +82,6 @@ class QualitySummary(BaseModel):
 
 
 class FindingUpdateRequest(BaseModel):
-    status: str | None = Field(None, description="open/acknowledged/resolved/ignored")
-    rectification_status: str | None = Field(None, description="open/assigned/confirmed/fixed/rechecked/ignored")
+    status: str | None = Field(None, description="open/assigned/confirmed/fixed/rechecked/acknowledged/resolved/ignored/rule_error")
     resolved_by: str | None = None
     note: str | None = None
