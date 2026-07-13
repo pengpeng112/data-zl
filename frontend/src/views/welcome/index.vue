@@ -326,11 +326,17 @@ const healthText = computed(() => {
 
 async function checkHealth() {
   try {
+    // 经 Nginx 只能走 /api/*；后端同时提供 /health 与 /api/v1/health
     const res = await http.request<any>("get", "/api/v1/health");
     // 兼容 ApiResponse 或裸对象
     const data = res?.data ?? res;
     const db = data?.database ?? data?.db ?? data?.status;
-    healthOk.value = true;
+    const ok =
+      data?.status === "ok" ||
+      db === "connected" ||
+      data?.status === "alive" ||
+      res?.code === 0;
+    healthOk.value = ok !== false;
     healthDetail.value =
       typeof db === "string" ? `DB: ${db}` : data?.message || "API 可达";
   } catch (e: any) {
@@ -344,9 +350,12 @@ async function checkHealth() {
 async function loadDashboard() {
   loading.value = true;
   loadError.value = "";
+  // 健康检查失败不阻塞 KPI；summary 失败才算首页失败
+  const healthPromise = checkHealth().catch(() => undefined);
   try {
-    const [sumRes] = await Promise.all([getDashboardSummary(), checkHealth()]);
+    const sumRes = await getDashboardSummary();
     dash.value = sumRes.data;
+    await healthPromise;
   } catch (e: any) {
     loadError.value =
       e?.response?.data?.message ||
@@ -354,6 +363,7 @@ async function loadDashboard() {
       e?.message ||
       "加载失败";
     dash.value = null;
+    await healthPromise;
   } finally {
     loading.value = false;
   }

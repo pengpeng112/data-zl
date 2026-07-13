@@ -12,21 +12,26 @@ logger = get_logger(__name__)
 router = APIRouter(tags=["health"])
 
 
+def _live_payload() -> dict:
+    return {"status": "alive", "checked_at": datetime.now(timezone.utc).isoformat()}
+
+
 @router.get("/health/live", summary="存活检查（liveness，不依赖数据库）")
+@router.get("/api/v1/health/live", summary="存活检查（经 Nginx /api 反代）", include_in_schema=False)
 def health_live() -> ApiResponse[dict]:
     """进程存活即返回 200，供 systemd 判断应用是否需要重启。不检查数据库。"""
-    return ApiResponse(
-        code=0,
-        message="ok",
-        data={"status": "alive", "checked_at": datetime.now(timezone.utc).isoformat()},
-    )
+    return ApiResponse(code=0, message="ok", data=_live_payload())
 
 
 @router.get("/health", summary="就绪检查（readiness，依赖数据库）")
+@router.get("/api/v1/health", summary="就绪检查（经 Nginx /api 反代，前端 SPA 使用）", include_in_schema=False)
 def health(db: Session = Depends(get_db), response: Response = None) -> ApiResponse[dict]:
     """数据库可用才返回 200；数据库不可用时返回 HTTP 503，供部署脚本和负载均衡判断就绪状态。
 
-    注意：systemd 仍可轮询此端点，但部署脚本必须用 `curl --fail` 才能识别 503 为未就绪。
+    注意：
+    - 容器内探活仍可用 `GET /health`（不经 Nginx）。
+    - 浏览器经 Nginx 只能访问 `/api/*`，因此提供 `/api/v1/health` 别名。
+    - 部署脚本须 `curl --fail` 才能识别 503 为未就绪。
     """
     db_ok = False
     try:

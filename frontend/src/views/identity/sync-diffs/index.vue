@@ -135,7 +135,8 @@
         layout="total, prev, pager, next, sizes"
         :page-sizes="[10, 20, 50, 100]"
         class="pager"
-        @change="loadData"
+        @current-change="loadData"
+        @size-change="onPageSizeChange"
       />
     </el-card>
 
@@ -322,6 +323,10 @@ async function loadChangeRequests() {
   }
 }
 function doSearch() {
+  params.page = 1;
+  loadData();
+}
+function onPageSizeChange() {
   params.page = 1;
   loadData();
 }

@@ -124,16 +124,15 @@ def dashboard_summary(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     ]
 
     # schema heat by table count
+    # PG requires the exact GROUP BY expression; bind coalesce once via label.
+    schema_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "?")
     schema_rows = db.execute(
-        select(
-            func.coalesce(AssetTable.namespace_name, AssetTable.schema_name, "?"),
-            func.count(),
-        )
-        .group_by(func.coalesce(AssetTable.namespace_name, AssetTable.schema_name, "?"))
+        select(schema_key.label("schema_key"), func.count().label("cnt"))
+        .group_by(schema_key)
         .order_by(func.count().desc())
         .limit(10)
     ).all()
-    schema_top = [{"name": str(r[0]), "count": int(r[1])} for r in schema_rows]
+    schema_top = [{"name": str(r[0] or "?"), "count": int(r[1])} for r in schema_rows]
 
     # recent quality runs for mini trend (up to 7)
     runs = db.scalars(select(QualityCheckRun).order_by(QualityCheckRun.id.desc()).limit(7)).all()

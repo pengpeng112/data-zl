@@ -122,7 +122,8 @@
             layout="total, prev, pager, next, sizes"
             :page-sizes="[20, 50, 100]"
             class="pager"
-            @change="loadData"
+            @current-change="loadData"
+            @size-change="onPageSizeChange"
           />
         </el-card>
 
@@ -374,10 +375,10 @@ const selectedTableName = computed(() =>
 
 watch(treeKeyword, value => treeRef.value?.filter(value));
 
-function filterTreeNode(value: string, data: TreeItem) {
+function filterTreeNode(value: string, data: TreeItem): boolean {
   if (!value) return true;
   const keyword = value.toLowerCase();
-  return [
+  const selfMatch = [
     data.label,
     data.id,
     data.system_category,
@@ -389,6 +390,9 @@ function filterTreeNode(value: string, data: TreeItem) {
   ]
     .filter(Boolean)
     .some(item => String(item).toLowerCase().includes(keyword));
+  if (selfMatch) return true;
+  // 子节点命中时父节点必须返回 true，否则搜索表名时整支树被裁掉
+  return (data.children || []).some(child => filterTreeNode(value, child));
 }
 
 function setCategoryFilter(code: string) {
@@ -498,6 +502,11 @@ async function selectTable(row: TableBrief) {
   } finally {
     columnsLoading.value = false;
   }
+}
+
+function onPageSizeChange() {
+  params.page = 1;
+  loadData();
 }
 
 function doSearch() {
