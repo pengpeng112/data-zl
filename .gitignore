@@ -44,6 +44,10 @@ backend/scripts/_smoke_*.py
 backend/scripts/_ensure_*.py
 backend/scripts/_upload_*.py
 backend/scripts/_verify_*.py
+backend/scripts/_browser_*.py
+backend/scripts/_debug_*.py
+backend/scripts/_hot_*.py
+backend/scripts/_continue_*.py
 
 # 大体积本地缓存/导出 / 离线构建产物（不进 Git，仅随发布包传输）
 *.dump
