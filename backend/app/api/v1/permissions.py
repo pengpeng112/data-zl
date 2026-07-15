@@ -10,7 +10,13 @@ from sqlalchemy.orm import Session
 
 from ...core.db import get_db
 from ...models.governance import ApiKey
-from ...models.governance_base import AssetRole, AssetRolePermission, AssetUserRole, GovernAuditLog
+from ...models.governance_base import (
+    AssetPermissionResource,
+    AssetRole,
+    AssetRolePermission,
+    AssetUserRole,
+    GovernAuditLog,
+)
 from ...models.identity import IdentityPerson
 from ...schemas.common import ApiResponse
 from ...services.data_masking import mask_sensitive
@@ -42,10 +48,36 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "ops.run.submit", "name_cn": "提交运维申请", "type": "button", "parent_code": "ops"},
     {"code": "ops.run.approve", "name_cn": "审批运维申请", "type": "button", "parent_code": "ops"},
     {"code": "ops.run.execute", "name_cn": "执行运维申请", "type": "button", "parent_code": "ops"},
+    {"code": "ops.sql.view", "name_cn": "SQL 工作台查看", "type": "page", "parent_code": "ops"},
+    {"code": "ops.sql.create", "name_cn": "SQL 模板创建", "type": "button", "parent_code": "ops.sql.view"},
+    {"code": "ops.sql.review", "name_cn": "SQL 模板审批", "type": "button", "parent_code": "ops.sql.view"},
+    {"code": "ops.sql.execute", "name_cn": "SQL 执行申请", "type": "button", "parent_code": "ops.sql.view"},
+    {"code": "ops.sql.audit", "name_cn": "SQL 执行审计", "type": "button", "parent_code": "ops.sql.view"},
+    {"code": "source.manage", "name_cn": "业务系统与连接维护", "type": "page", "parent_code": "asset"},
+    {"code": "source.credential_manage", "name_cn": "连接凭据维护", "type": "button", "parent_code": "source.manage"},
+    {"code": "source.collect", "name_cn": "元数据采集", "type": "button", "parent_code": "source.manage"},
     {"code": "ai", "name_cn": "AI 协作", "type": "menu", "parent_code": None},
     {"code": "ai.draft.view", "name_cn": "AI 草稿查看", "type": "page", "parent_code": "ai"},
     {"code": "ai.draft.execute", "name_cn": "AI 草稿只读执行", "type": "button", "parent_code": "ai"},
 ]
+
+
+def _resource_seed_rows() -> list[dict]:
+    rows = []
+    for index, item in enumerate(RESOURCE_CATALOG):
+        # Persist the public dot-form contract used by the frontend and role
+        # matrices.  The security matcher still accepts legacy colon codes.
+        code = item["code"]
+        parts = code.split(".")
+        rows.append({
+            "resource_code": code,
+            "resource_name_cn": item["name_cn"],
+            "module_code": parts[0],
+            "action_code": parts[-1] if len(parts) > 1 else "access",
+            "description": item.get("type"),
+            "sort_order": index,
+        })
+    return rows
 
 BUILTIN_ROLES: list[dict] = [
     {"role_code": "platform_admin", "role_name_cn": "平台管理员", "role_type": "builtin", "description": "平台最高权限角色"},
@@ -62,7 +94,16 @@ BUILTIN_ROLES: list[dict] = [
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     "platform_admin": [r["code"] for r in RESOURCE_CATALOG],
     "asset_viewer": ["asset", "asset.table.view", "asset.graph.view"],
-    "asset_editor": ["asset", "asset.table.view", "asset.graph.view", "asset.relation.review", "metadata", "metadata.snapshot.collect"],
+    "asset_editor": [
+        "asset",
+        "asset.table.view",
+        "asset.graph.view",
+        "asset.relation.review",
+        "metadata",
+        "metadata.snapshot.collect",
+        "source.manage",
+        "source.collect",
+    ],
     "quality_admin": ["quality", "quality.rule.view", "quality.rule.create", "quality.rule.execute"],
     "identity_admin": [
         "identity",
@@ -73,8 +114,29 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "identity.local_account.manage",
     ],
     "dict_admin": ["dict", "dict.medical.view", "dict.medical.edit"],
-    "ops_admin": ["ops", "ops.tool.manage", "ops.run.submit", "ops.run.approve", "ops.run.execute"],
-    "approver": ["ops", "ops.run.approve", "identity", "identity.person.view"],
+    "ops_admin": [
+        "ops",
+        "ops.tool.manage",
+        "ops.run.submit",
+        "ops.run.approve",
+        "ops.run.execute",
+        "ops.sql.view",
+        "ops.sql.create",
+        "ops.sql.review",
+        "ops.sql.execute",
+        "ops.sql.audit",
+        "source.manage",
+        "source.credential_manage",
+        "source.collect",
+    ],
+    "approver": [
+        "ops",
+        "ops.run.approve",
+        "ops.sql.view",
+        "ops.sql.review",
+        "identity",
+        "identity.person.view",
+    ],
     "ai_user": ["ai", "ai.draft.view", "ai.draft.execute", "asset", "asset.table.view", "asset.graph.view"],
 }
 
@@ -138,6 +200,19 @@ def _resource_map() -> dict[str, dict]:
     return {r["code"]: r for r in RESOURCE_CATALOG}
 
 
+def _resource_payload(row: AssetPermissionResource) -> dict:
+    return {
+        "code": row.resource_code,
+        "name_cn": row.resource_name_cn,
+        "module_code": row.module_code,
+        "action_code": row.action_code,
+        "description": row.description,
+        "enabled": row.enabled,
+        "sort_order": row.sort_order,
+        "source": "database",
+    }
+
+
 def _role_payload(role: AssetRole) -> dict:
     return {
         "id": role.id,
@@ -174,6 +249,21 @@ def seed_permissions(operator: str | None = Query("system"), db: Session = Depen
             role.role_type = role.role_type or item["role_type"]
             role.description = role.description or item.get("description")
     db.flush()
+    created_resources = 0
+    for item in _resource_seed_rows():
+        resource = db.scalar(select(AssetPermissionResource).where(
+            AssetPermissionResource.resource_code == item["resource_code"]
+        ))
+        if not resource:
+            db.add(AssetPermissionResource(**item))
+            created_resources += 1
+        else:
+            resource.resource_name_cn = item["resource_name_cn"]
+            resource.module_code = item["module_code"]
+            resource.action_code = item["action_code"]
+            resource.sort_order = item["sort_order"]
+            resource.enabled = True
+    db.flush()
     for role_code, resources in ROLE_DEFAULT_PERMISSIONS.items():
         for resource in resources:
             exists = db.scalar(select(AssetRolePermission).where(
@@ -184,14 +274,17 @@ def seed_permissions(operator: str | None = Query("system"), db: Session = Depen
             if not exists:
                 db.add(AssetRolePermission(role_code=role_code, resource=resource, action="access"))
                 created_permissions += 1
-    _audit(db, "seed", "permission_seed", "builtin", operator, after={"roles": created_roles, "permissions": created_permissions})
+    _audit(db, "seed", "permission_seed", "builtin", operator, after={"roles": created_roles, "permissions": created_permissions, "resources": created_resources})
     db.commit()
-    return ApiResponse(data={"created_roles": created_roles, "created_permissions": created_permissions})
+    return ApiResponse(data={"created_roles": created_roles, "created_permissions": created_permissions, "created_resources": created_resources})
 
 
 @router.get("/resources", summary="Permission resource catalog")
-def list_resources() -> ApiResponse[list[dict]]:
-    return ApiResponse(data=RESOURCE_CATALOG)
+def list_resources(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+    rows = db.scalars(select(AssetPermissionResource).order_by(AssetPermissionResource.sort_order, AssetPermissionResource.resource_code)).all()
+    if rows:
+        return ApiResponse(data=[_resource_payload(row) for row in rows])
+    return ApiResponse(data=[{**item, "source": "fallback"} for item in RESOURCE_CATALOG])
 
 
 @router.get("/roles", summary="Role list")
@@ -299,7 +392,7 @@ def get_user_permissions(user_identifier: str, db: Session = Depends(get_db)) ->
     person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == user_identifier))
     return ApiResponse(data={
         "user_identifier": user_identifier,
-        "person_name": person.person_name if person else None,
+        "person_name": person.person_name_cn if person else None,
         "roles": sorted(set(role_codes)),
         "permissions": permissions,
     })

@@ -25,19 +25,64 @@ class AssetUserRole(Base):
     id = Column(BigInteger, primary_key=True)
     user_identifier = Column(Text, nullable=False)
     role_code = Column(Text, nullable=False)
+    source = Column(Text, nullable=False, server_default="direct")
+    request_id = Column(BigInteger)
+    status = Column(Text, nullable=False, server_default="active")
     granted_by = Column(Text)
     granted_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    valid_from = Column(TIMESTAMP(timezone=True))
     expires_at = Column(TIMESTAMP(timezone=True))
 
 
 class AssetRolePermission(Base):
     __tablename__ = "asset_role_permissions"
-    __table_args__ = {"schema": "asset"}
+    __table_args__ = (
+        UniqueConstraint("role_code", "resource", "action"),
+        {"schema": "asset"},
+    )
 
     id = Column(BigInteger, primary_key=True)
     role_code = Column(Text, nullable=False)
     resource = Column(Text, nullable=False)
     action = Column(Text, nullable=False)
+
+
+class AssetPermissionResource(Base):
+    __tablename__ = "asset_permission_resources"
+    __table_args__ = {"schema": "asset"}
+
+    id = Column(BigInteger, primary_key=True)
+    resource_code = Column(Text, unique=True, nullable=False)
+    resource_name_cn = Column(Text, nullable=False)
+    module_code = Column(Text, nullable=False)
+    action_code = Column(Text, nullable=False)
+    description = Column(Text)
+    enabled = Column(Boolean, nullable=False, server_default="true")
+    sort_order = Column(Integer, nullable=False, server_default="0")
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class AssetUserDataScope(Base):
+    __tablename__ = "asset_user_data_scopes"
+    __table_args__ = {"schema": "asset"}
+
+    id = Column(BigInteger, primary_key=True)
+    user_identifier = Column(Text, nullable=False)
+    scope_type = Column(Text, nullable=False)
+    system_code = Column(Text)
+    source_code = Column(Text)
+    schema_name = Column(Text)
+    domain = Column(Text)
+    filter_json = Column(JSONB)
+    status = Column(Text, nullable=False, server_default="active")
+    valid_from = Column(TIMESTAMP(timezone=True))
+    valid_to = Column(TIMESTAMP(timezone=True))
+    request_id = Column(BigInteger)
+    granted_by = Column(Text)
+    revoked_by = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
 class GovernChangeRequest(Base):

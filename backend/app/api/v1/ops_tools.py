@@ -6,14 +6,21 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
+import hashlib
+import uuid
+from datetime import timedelta
+
 from ...core.config import settings
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
+from ...models.asset_system import AssetDataSource
 from ...models.governance_base import GovernAuditLog
-from ...models.ops_tool import OpsToolRun, OpsToolTemplate
+from ...models.ops_tool import OpsEventLog, OpsToolRun, OpsToolTemplate
 from ...schemas.common import ApiResponse
 from ...services.data_masking import mask_sensitive
-from ...services.ops_executor import execute_whitelist_dml
+from ...services.ops_event_log import log_event
+from ...services.ops_executor import execute_whitelist_dml, sql_template_hash
+from ...services.ops_sql_safety import validate_dry_run_sql, validate_writable_sql
 from ...services.quality_rule_engine import validate_sql_safety
 
 router = APIRouter(prefix="/api/v1/ops", tags=["ops"])
@@ -137,6 +144,9 @@ class ExecuteBody(BaseModel):
 
 def _tool_payload(r: OpsToolTemplate) -> dict:
     write_config = _write_config_from_schema(r.input_schema)
+    max_rows = getattr(r, "max_affected_rows", None)
+    if max_rows is None:
+        max_rows = int(write_config.get("max_affected_rows", 100) or 100)
     return {
         "id": r.id,
         "tool_code": r.tool_code,
@@ -152,13 +162,23 @@ def _tool_payload(r: OpsToolTemplate) -> dict:
         "allowed_operations": write_config.get("allowed_operations") or [],
         "require_audit": bool(write_config.get("require_audit", True)),
         "dry_run_sql": write_config.get("dry_run_sql"),
-        "max_affected_rows": int(write_config.get("max_affected_rows", 100) or 100),
+        "max_affected_rows": min(int(max_rows or 100), 100),
         "write_credential_ref": write_config.get("write_credential_ref"),
         "require_approval": bool(r.require_approval),
         "require_second_confirm": bool(r.require_second_confirm),
         "enabled": bool(r.enabled),
         "description_cn": r.description_cn,
         "rollback_note_cn": r.rollback_note_cn,
+        "version": getattr(r, "version", 1) or 1,
+        "status": getattr(r, "status", None) or ("approved" if r.enabled else "draft"),
+        "sql_hash": getattr(r, "sql_hash", None),
+        "created_by": getattr(r, "created_by", None),
+        "updated_by": getattr(r, "updated_by", None),
+        "reviewed_by": getattr(r, "reviewed_by", None),
+        "reviewed_at": r.reviewed_at.isoformat() if getattr(r, "reviewed_at", None) else None,
+        "target_scope": getattr(r, "target_scope", None) or "platform_asset",
+        "immutable_after_approval": bool(getattr(r, "immutable_after_approval", True)),
+        "ops_write_enabled": bool(getattr(settings, "ops_write_enabled", False)),
     }
 
 
@@ -381,7 +401,8 @@ def dry_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody(dry_r
 @router.post("/runs/{run_id}/execute", summary="Execute approved ops run")
 def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody(), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
-    run = db.get(OpsToolRun, run_id)
+    # row lock prevents double-click / concurrent execute of the same run
+    run = db.scalar(select(OpsToolRun).where(OpsToolRun.id == run_id).with_for_update())
     if not run:
         raise HTTPException(status_code=404)
     tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == run.tool_code))
@@ -412,6 +433,7 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
             raise HTTPException(status_code=400, detail="dry_run only supports whitelist_dml")
         try:
             dry_result = execute_whitelist_dml(tool, run, db, dry_run=True, executed_by=current_user)
+            run.preview_count = dry_result.get("estimated_count")
             db.add(GovernAuditLog(
                 module="ops",
                 entity_type="ops_tool_run",
@@ -426,29 +448,48 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
             raise HTTPException(status_code=400, detail=f"dry_run failed: {e}")
         return ApiResponse(data={"id": run.id, "status": "dry_run", **dry_result})
 
+    # conditional transition approved -> executing (second guard against races)
+    if run.approval_status != "approved":
+        raise HTTPException(status_code=400, detail=f"status {run.approval_status} cannot execute")
     start_time = datetime.now(timezone.utc)
     run.approval_status = "executing"
     run.started_at = start_time
+    run.template_version = getattr(tool, "version", None)
+    run.sql_hash = getattr(tool, "sql_hash", None) or sql_template_hash(tool.sql_or_endpoint_ref or "")
+    import uuid
+    run.transaction_id = str(uuid.uuid4())
     db.add(GovernAuditLog(
         module="ops",
         entity_type="ops_tool_run",
         entity_ref=str(run_id),
         action="execute_start",
         operator=current_user,
-        after_data={"execution_mode": tool.execution_mode},
+        after_data={
+            "execution_mode": tool.execution_mode,
+            "transaction_id": run.transaction_id,
+            "sql_hash": run.sql_hash,
+        },
     ))
     db.commit()
     try:
+        # re-lock after commit for execute phase
+        run = db.scalar(select(OpsToolRun).where(OpsToolRun.id == run_id).with_for_update())
+        if not run or run.approval_status != "executing":
+            raise HTTPException(status_code=409, detail="run execution state changed concurrently")
         if tool.execution_mode == "whitelist_dml":
             exec_result = execute_whitelist_dml(tool, run, db, executed_by=current_user)
         else:
             exec_result = executor(tool, run, db)
+    except HTTPException:
+        raise
     except ValueError as e:
         db.rollback()
         run = db.get(OpsToolRun, run_id)
         if run:
             run.approval_status = "failed"
             run.execution_summary = f"execution rejected: {e}"
+            run.error_code = "rejected"
+            run.error_summary_masked = str(e)[:300]
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
         raise HTTPException(status_code=400, detail=f"execute rejected: {e}")
@@ -458,6 +499,8 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
         if run:
             run.approval_status = "failed"
             run.execution_summary = f"execution failed: {e}"
+            run.error_code = "failed"
+            run.error_summary_masked = str(e)[:300]
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
         raise HTTPException(status_code=500, detail=f"execute failed: {e}")
@@ -510,3 +553,613 @@ def get_run_audit(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[lis
         }
         for l in logs
     ])
+
+
+# ── SQL 工作台（受控 INSERT/UPDATE；仅 platform asset schema）──
+
+
+class SqlValidateBody(BaseModel):
+    sql: str
+    dry_run_sql: str | None = None
+    allowed_tables: list[str] = Field(default_factory=list)
+    allowed_operations: list[str] = Field(default_factory=lambda: ["INSERT", "UPDATE"])
+    params: dict | None = None
+
+
+class SqlTemplateCreate(BaseModel):
+    tool_code: str
+    tool_name_cn: str
+    sql: str
+    dry_run_sql: str | None = None
+    allowed_tables: list[str] = Field(default_factory=list)
+    allowed_operations: list[str] = Field(default_factory=lambda: ["INSERT", "UPDATE"])
+    input_schema: dict = Field(default_factory=dict)
+    max_affected_rows: int = 100
+    description_cn: str | None = None
+    rollback_note_cn: str | None = None
+    risk_level: str = "high"
+    write_credential_ref: str | None = None
+    # plan 76: target database selection (write only platform)
+    target_source_code: str = "asset"
+    target_connection_id: int | None = None
+    target_database_key: str | None = None
+    target_schema: str = "asset"
+    admin_publish: bool = True
+
+
+class SqlTemplateReview(BaseModel):
+    note: str | None = None
+
+
+class SqlRunCreate(BaseModel):
+    tool_code: str
+    input_params: dict | None = None
+
+
+@router.post("/sql/validate", summary="校验受控 SQL（不执行）", dependencies=[Depends(require_permission("ops:sql:view"))])
+def sql_validate(req: SqlValidateBody) -> ApiResponse[dict]:
+    scan = validate_writable_sql(
+        req.sql,
+        allowed_tables=req.allowed_tables or None,
+        allowed_ops=req.allowed_operations,
+        params=req.params or {},
+    )
+    # when allowed_tables empty, still parse for guidance
+    if not req.allowed_tables and scan.get("parsed_summary"):
+        target = scan["parsed_summary"].get("target_table")
+        if target:
+            scan = validate_writable_sql(
+                req.sql,
+                allowed_tables=[target],
+                allowed_ops=req.allowed_operations,
+                params=req.params or {p: 1 for p in (scan["parsed_summary"].get("param_names") or [])},
+            )
+    dry = None
+    if req.dry_run_sql:
+        dry = validate_dry_run_sql(req.sql, req.dry_run_sql, allowed_tables=req.allowed_tables)
+    return ApiResponse(data={
+        "valid": bool(scan.get("valid")) and (dry is None or dry.get("valid")),
+        "risk_scan": scan,
+        "dry_run_scan": dry,
+        "scope": "platform_asset_only",
+        "allowed_ops": ["INSERT", "UPDATE"],
+        "forbidden": ["DELETE", "DDL", "business_source_write", "free_text_execute"],
+        "ops_write_enabled": bool(getattr(settings, "ops_write_enabled", False)),
+    })
+
+
+def _assert_platform_write_target(req: SqlTemplateCreate, db: Session) -> tuple[str, str | None, int | None]:
+    """Only platform asset may be write target. Returns (source_code, database_key, connection_id)."""
+    source_code = (req.target_source_code or "asset").strip()
+    if source_code not in {"asset", "ASSET_PLATFORM", "platform"}:
+        # explicit business source rejection
+        ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
+        if ds and (ds.write_policy or "readonly") != "platform_controlled":
+            raise HTTPException(status_code=403, detail="业务源库只读，禁止作为 INSERT/UPDATE 目标")
+        if source_code not in {"asset", "ASSET_PLATFORM"}:
+            raise HTTPException(status_code=403, detail="write templates only allow platform asset target")
+    if req.target_schema and req.target_schema.lower() not in {"asset", ""}:
+        raise HTTPException(status_code=400, detail="target_schema must be asset")
+    db_key = req.target_database_key or "postgresql://platform/database/data_asset"
+    return "asset", db_key, req.target_connection_id
+
+
+@router.post("/sql/templates", summary="保存 SQL 模板（管理员可直接发布）", dependencies=[Depends(require_permission("ops:sql:create"))])
+def sql_create_template(req: SqlTemplateCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    if not req.target_source_code:
+        raise HTTPException(status_code=400, detail="target database is required")
+    target_source, target_db_key, target_conn_id = _assert_platform_write_target(req, db)
+    max_rows = max(1, min(int(req.max_affected_rows or 100), 100))
+    import re as _re
+    param_guess = _re.findall(r"(?<!:):([A-Za-z_]\w*)", req.sql or "")
+    preview = validate_writable_sql(
+        req.sql,
+        allowed_tables=req.allowed_tables or ["asset.__placeholder__"],
+        allowed_ops=req.allowed_operations or ["INSERT", "UPDATE"],
+        params={p: 1 for p in param_guess},
+    )
+    parsed = preview.get("parsed_summary") or {}
+    tables = req.allowed_tables or ([parsed["target_table"]] if parsed.get("target_table") else [])
+    scan = validate_writable_sql(
+        req.sql,
+        allowed_tables=tables,
+        allowed_ops=req.allowed_operations or ["INSERT", "UPDATE"],
+        params={p: 1 for p in (parsed.get("param_names") or [])},
+    )
+    if not scan["valid"]:
+        raise HTTPException(status_code=400, detail="; ".join(scan["errors"]))
+    dry_run_sql = req.dry_run_sql
+    if not dry_run_sql and parsed.get("operation") == "UPDATE" and parsed.get("where_summary"):
+        dry_run_sql = f"SELECT count(*) FROM {parsed['target_table']} WHERE {parsed['where_summary']}"
+    if dry_run_sql:
+        dry = validate_dry_run_sql(req.sql, dry_run_sql, allowed_tables=tables)
+        if not dry["valid"]:
+            raise HTTPException(status_code=400, detail="; ".join(dry["errors"]))
+
+    existing = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == req.tool_code))
+    sql_hash = sql_template_hash(req.sql)
+    input_schema = dict(req.input_schema or {})
+    input_schema[OPS_WRITE_CONFIG_KEY] = {
+        "allowed_tables": tables,
+        "allowed_operations": req.allowed_operations or ["INSERT", "UPDATE"],
+        "require_audit": True,
+        "dry_run_sql": dry_run_sql,
+        "max_affected_rows": max_rows,
+        "write_credential_ref": req.write_credential_ref,
+    }
+    admin_mode = (not getattr(settings, "ops_approval_ui_enabled", True)) and req.admin_publish
+    publish = bool(admin_mode)
+
+    if existing:
+        status = getattr(existing, "status", None) or ("approved" if existing.enabled else "draft")
+        if status == "approved" and bool(getattr(existing, "immutable_after_approval", True)) and not publish:
+            raise HTTPException(
+                status_code=400,
+                detail="approved template is immutable; create a new tool_code version for changes",
+            )
+        if status == "approved" and publish:
+            # admin republish: bump version
+            existing.version = int(getattr(existing, "version", 1) or 1) + 1
+        existing.tool_name_cn = req.tool_name_cn
+        existing.sql_or_endpoint_ref = req.sql
+        existing.input_schema = input_schema
+        existing.max_affected_rows = max_rows
+        existing.sql_hash = sql_hash
+        existing.updated_by = operator
+        existing.updated_at = datetime.now(timezone.utc)
+        existing.description_cn = req.description_cn
+        existing.rollback_note_cn = req.rollback_note_cn
+        existing.risk_level = req.risk_level or "high"
+        existing.target_source_code = target_source
+        existing.target_database_key = target_db_key
+        existing.target_connection_id = target_conn_id
+        existing.target_schema = req.target_schema or "asset"
+        existing.target_scope = "platform_asset"
+        if publish:
+            existing.status = "approved"
+            existing.enabled = True
+            existing.reviewed_by = operator
+            existing.reviewed_at = datetime.now(timezone.utc)
+        else:
+            existing.status = "draft"
+            existing.enabled = False
+        tool = existing
+    else:
+        tool = OpsToolTemplate(
+            tool_code=req.tool_code,
+            tool_name_cn=req.tool_name_cn,
+            system_code="ASSET_PLATFORM",
+            source_code=target_source,
+            tool_type="sql_workbench",
+            risk_level=req.risk_level or "high",
+            input_schema=input_schema,
+            execution_mode="whitelist_dml",
+            sql_or_endpoint_ref=req.sql,
+            require_approval=not publish,
+            require_second_confirm=True,
+            enabled=publish,
+            description_cn=req.description_cn,
+            rollback_note_cn=req.rollback_note_cn,
+            version=1,
+            status="approved" if publish else "draft",
+            sql_hash=sql_hash,
+            created_by=operator,
+            updated_by=operator,
+            reviewed_by=operator if publish else None,
+            reviewed_at=datetime.now(timezone.utc) if publish else None,
+            max_affected_rows=max_rows,
+            target_scope="platform_asset",
+            immutable_after_approval=True,
+            target_source_code=target_source,
+            target_database_key=target_db_key,
+            target_connection_id=target_conn_id,
+            target_schema=req.target_schema or "asset",
+        )
+        db.add(tool)
+    action = "admin_publish" if publish else "create_or_update_draft"
+    db.add(GovernAuditLog(
+        module="ops",
+        entity_type="ops_sql_template",
+        entity_ref=req.tool_code,
+        action=action,
+        operator=operator,
+        after_data={
+            "sql_hash": sql_hash,
+            "tables": tables,
+            "max_affected_rows": max_rows,
+            "target_source_code": target_source,
+            "target_database_key": target_db_key,
+            "status": tool.status,
+        },
+    ))
+    log_event(
+        db,
+        module="ops",
+        entity_type="ops_sql_template",
+        entity_ref=req.tool_code,
+        action=action,
+        operator=operator,
+        status=tool.status,
+        target_source_code=target_source,
+        target_database_key=target_db_key,
+        summary_masked=f"{action} {req.tool_code}",
+        detail={"sql_hash": sql_hash, "tables": tables},
+    )
+    db.commit()
+    db.refresh(tool)
+    payload = _tool_payload(tool)
+    payload["approval_ui_enabled"] = bool(getattr(settings, "ops_approval_ui_enabled", False))
+    return ApiResponse(data=payload)
+
+
+@router.post("/sql/templates/{tool_code}/submit", summary="提交 SQL 模板审批", dependencies=[Depends(require_permission("ops:sql:create"))])
+def sql_submit_template(tool_code: str, req: SqlTemplateReview, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == tool_code))
+    if not tool:
+        raise HTTPException(status_code=404)
+    if (getattr(tool, "status", None) or "draft") not in ("draft", "rejected"):
+        raise HTTPException(status_code=400, detail=f"status {tool.status} cannot submit")
+    tool.status = "pending_review"
+    tool.updated_by = operator
+    tool.updated_at = datetime.now(timezone.utc)
+    db.add(GovernAuditLog(
+        module="ops", entity_type="ops_sql_template", entity_ref=tool_code,
+        action="submit", operator=operator, reason=req.note,
+    ))
+    db.commit()
+    return ApiResponse(data=_tool_payload(tool))
+
+
+@router.post("/sql/templates/{tool_code}/approve", summary="审批通过 SQL 模板", dependencies=[Depends(require_permission("ops:sql:review"))])
+def sql_approve_template(tool_code: str, req: SqlTemplateReview, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == tool_code))
+    if not tool:
+        raise HTTPException(status_code=404)
+    if (getattr(tool, "status", None) or "") != "pending_review":
+        raise HTTPException(status_code=400, detail=f"status {tool.status} cannot approve")
+    if operator == getattr(tool, "created_by", None) or operator == getattr(tool, "updated_by", None):
+        # self-review ban: creator cannot approve
+        if operator == tool.created_by:
+            raise HTTPException(status_code=400, detail="creator cannot approve own template")
+    tool.status = "approved"
+    tool.enabled = True
+    tool.reviewed_by = operator
+    tool.reviewed_at = datetime.now(timezone.utc)
+    db.add(GovernAuditLog(
+        module="ops", entity_type="ops_sql_template", entity_ref=tool_code,
+        action="approve", operator=operator, reason=req.note,
+    ))
+    db.commit()
+    return ApiResponse(data=_tool_payload(tool))
+
+
+@router.post("/sql/templates/{tool_code}/reject", summary="驳回 SQL 模板", dependencies=[Depends(require_permission("ops:sql:review"))])
+def sql_reject_template(tool_code: str, req: SqlTemplateReview, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == tool_code))
+    if not tool:
+        raise HTTPException(status_code=404)
+    if operator == tool.created_by:
+        raise HTTPException(status_code=400, detail="creator cannot reject own template")
+    tool.status = "rejected"
+    tool.enabled = False
+    tool.reviewed_by = operator
+    tool.reviewed_at = datetime.now(timezone.utc)
+    db.add(GovernAuditLog(
+        module="ops", entity_type="ops_sql_template", entity_ref=tool_code,
+        action="reject", operator=operator, reason=req.note,
+    ))
+    db.commit()
+    return ApiResponse(data=_tool_payload(tool))
+
+
+@router.post("/sql/runs", summary="基于模板创建运维 run", dependencies=[Depends(require_permission("ops:sql:execute"))])
+def sql_create_run(req: SqlRunCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == req.tool_code))
+    if not tool or not tool.enabled:
+        raise HTTPException(status_code=400, detail="tool does not exist or is disabled")
+    if getattr(tool, "status", None) not in (None, "approved"):
+        raise HTTPException(status_code=400, detail="tool template is not approved")
+    # re-validate write target snapshot is still platform
+    if (getattr(tool, "target_source_code", None) or tool.source_code or "asset") not in {
+        "asset", "ASSET_PLATFORM", "platform", None, "",
+    }:
+        raise HTTPException(status_code=403, detail="template target is not platform asset")
+    if (getattr(tool, "target_scope", None) or "platform_asset") != "platform_asset":
+        raise HTTPException(status_code=403, detail="template target_scope must be platform_asset")
+
+    admin_mode = not getattr(settings, "ops_approval_ui_enabled", True)
+    correlation_id = str(uuid.uuid4())
+    params_masked = mask_sensitive(req.input_params or {})
+    params_hash = hashlib.sha256(
+        json.dumps(params_masked, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    run = OpsToolRun(
+        tool_code=req.tool_code,
+        requested_by=current_user,
+        input_params_masked=params_masked,
+        template_version=getattr(tool, "version", 1),
+        sql_hash=getattr(tool, "sql_hash", None) or sql_template_hash(tool.sql_or_endpoint_ref or ""),
+        # admin simplified: ready for preview without run approval
+        approval_status="ready_for_preview" if admin_mode else "draft",
+        target_connection_id=getattr(tool, "target_connection_id", None),
+        target_source_code=getattr(tool, "target_source_code", None) or tool.source_code or "asset",
+        target_database_key=getattr(tool, "target_database_key", None),
+        target_schema=getattr(tool, "target_schema", None) or "asset",
+        correlation_id=correlation_id,
+        preview_params_hash=params_hash,
+    )
+    db.add(run)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="ops",
+        entity_type="ops_tool_run",
+        entity_ref=str(run.id),
+        action="create",
+        operator=current_user,
+        after_data={
+            "tool_code": req.tool_code,
+            "template_version": run.template_version,
+            "sql_hash": run.sql_hash,
+            "input_params_masked": run.input_params_masked,
+            "approval_status": run.approval_status,
+            "correlation_id": correlation_id,
+            "target_source_code": run.target_source_code,
+        },
+    ))
+    log_event(
+        db,
+        module="ops",
+        entity_type="ops_tool_run",
+        entity_ref=str(run.id),
+        action="create",
+        operator=current_user,
+        status=run.approval_status,
+        target_source_code=run.target_source_code,
+        target_database_key=run.target_database_key,
+        correlation_id=correlation_id,
+        summary_masked=f"run created for {req.tool_code}",
+    )
+    db.commit()
+    db.refresh(run)
+    return ApiResponse(data={
+        "id": run.id,
+        "approval_status": run.approval_status,
+        "template_version": run.template_version,
+        "sql_hash": run.sql_hash,
+        "correlation_id": correlation_id,
+        "target_source_code": run.target_source_code,
+        "ops_write_enabled": bool(getattr(settings, "ops_write_enabled", False)),
+        "approval_ui_enabled": bool(getattr(settings, "ops_approval_ui_enabled", False)),
+        "task_path": f"/ops/runs?run_id={run.id}",
+    })
+
+
+@router.post("/sql/runs/{run_id}/preview", summary="dry-run 影响行预览", dependencies=[Depends(require_permission("ops:sql:execute"))])
+def sql_preview_run(run_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    run = db.get(OpsToolRun, run_id)
+    if not run:
+        raise HTTPException(status_code=404)
+    tool = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == run.tool_code))
+    if not tool:
+        raise HTTPException(status_code=400, detail="tool missing")
+    try:
+        dry_result = execute_whitelist_dml(tool, run, db, dry_run=True, executed_by=current_user)
+        run.preview_count = dry_result.get("estimated_count")
+        # after successful preview, admin-mode runs become approved for second-confirm execute
+        if run.approval_status in {"ready_for_preview", "draft"} and not getattr(settings, "ops_approval_ui_enabled", True):
+            run.approval_status = "approved"
+            run.approved_by = "system:admin_mode"
+            run.confirmation_expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+        db.add(GovernAuditLog(
+            module="ops", entity_type="ops_tool_run", entity_ref=str(run_id),
+            action="preview", operator=current_user, after_data=dry_result,
+        ))
+        log_event(
+            db,
+            module="ops",
+            entity_type="ops_tool_run",
+            entity_ref=str(run_id),
+            action="preview",
+            operator=current_user,
+            status="previewed",
+            target_source_code=run.target_source_code,
+            target_database_key=run.target_database_key,
+            correlation_id=run.correlation_id,
+            affected_count=dry_result.get("estimated_count"),
+            summary_masked=f"preview estimated={dry_result.get('estimated_count')}",
+            detail={"sql_template_hash": dry_result.get("sql_template_hash")},
+        )
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"preview failed: {e}")
+    return ApiResponse(data={
+        "id": run.id,
+        "status": "preview",
+        "approval_status": run.approval_status,
+        "confirmation_expires_at": run.confirmation_expires_at.isoformat() if run.confirmation_expires_at else None,
+        "task_path": f"/ops/runs?run_id={run.id}",
+        **dry_result,
+    })
+
+
+@router.get("/sql/runs", summary="SQL 工作台任务列表", dependencies=[Depends(require_permission("ops:sql:view"))])
+def sql_list_runs(
+    status: str | None = Query(None),
+    tool_code: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    stmt = select(OpsToolRun)
+    if status:
+        stmt = stmt.where(OpsToolRun.approval_status == status)
+    if tool_code:
+        stmt = stmt.where(OpsToolRun.tool_code == tool_code)
+    # prefer workbench tools but do not exclude others when filtering
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(OpsToolRun.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    items = [
+        {
+            "id": r.id,
+            "tool_code": r.tool_code,
+            "requested_by": r.requested_by,
+            "approved_by": r.approved_by,
+            "approval_status": r.approval_status,
+            "affected_count": r.affected_count,
+            "preview_count": r.preview_count,
+            "target_source_code": r.target_source_code,
+            "target_database_key": r.target_database_key,
+            "sql_hash": r.sql_hash,
+            "template_version": r.template_version,
+            "correlation_id": r.correlation_id,
+            "error_code": r.error_code,
+            "error_summary_masked": r.error_summary_masked,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+        }
+        for r in rows
+    ]
+    return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+@router.get("/sql/runs/{run_id}", summary="SQL run 详情", dependencies=[Depends(require_permission("ops:sql:view"))])
+def sql_get_run(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    run = db.get(OpsToolRun, run_id)
+    if not run:
+        raise HTTPException(status_code=404)
+    events = db.scalars(
+        select(OpsEventLog)
+        .where(OpsEventLog.entity_type == "ops_tool_run", OpsEventLog.entity_ref == str(run_id))
+        .order_by(OpsEventLog.created_at.asc())
+    ).all()
+    return ApiResponse(data={
+        "id": run.id,
+        "tool_code": run.tool_code,
+        "requested_by": run.requested_by,
+        "approved_by": run.approved_by,
+        "approval_status": run.approval_status,
+        "input_params_masked": run.input_params_masked,
+        "affected_count": run.affected_count,
+        "preview_count": run.preview_count,
+        "risk_scan": run.risk_scan,
+        "execution_summary": run.execution_summary,
+        "sql_hash": run.sql_hash,
+        "template_version": run.template_version,
+        "target_source_code": run.target_source_code,
+        "target_database_key": run.target_database_key,
+        "target_schema": run.target_schema,
+        "correlation_id": run.correlation_id,
+        "error_code": run.error_code,
+        "error_summary_masked": run.error_summary_masked,
+        "created_at": run.created_at.isoformat() if run.created_at else None,
+        "started_at": run.started_at.isoformat() if run.started_at else None,
+        "finished_at": run.finished_at.isoformat() if run.finished_at else None,
+        "timeline": [
+            {
+                "event_id": e.event_id,
+                "action": e.action,
+                "status": e.status,
+                "operator": e.operator,
+                "summary_masked": e.summary_masked,
+                "affected_count": e.affected_count,
+                "created_at": e.created_at.isoformat() if e.created_at else None,
+            }
+            for e in events
+        ],
+    })
+
+
+@router.get("/events", summary="统一运维事件流", dependencies=[Depends(require_permission("ops:sql:audit"))])
+def list_ops_events(
+    module: str | None = Query(None),
+    action: str | None = Query(None),
+    correlation_id: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    stmt = select(OpsEventLog)
+    if module:
+        stmt = stmt.where(OpsEventLog.module == module)
+    if action:
+        stmt = stmt.where(OpsEventLog.action == action)
+    if correlation_id:
+        stmt = stmt.where(OpsEventLog.correlation_id == correlation_id)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(OpsEventLog.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": [
+            {
+                "event_id": r.event_id,
+                "module": r.module,
+                "entity_type": r.entity_type,
+                "entity_ref": r.entity_ref,
+                "action": r.action,
+                "status": r.status,
+                "operator": r.operator,
+                "target_source_code": r.target_source_code,
+                "target_database_key": r.target_database_key,
+                "correlation_id": r.correlation_id,
+                "batch_code": r.batch_code,
+                "affected_count": r.affected_count,
+                "duration_ms": r.duration_ms,
+                "error_code": r.error_code,
+                "summary_masked": r.summary_masked,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
+            for r in rows
+        ],
+    })
+
+
+@router.get("/events/{event_id}", summary="事件详情", dependencies=[Depends(require_permission("ops:sql:audit"))])
+def get_ops_event(event_id: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    row = db.scalar(select(OpsEventLog).where(OpsEventLog.event_id == event_id))
+    if not row:
+        raise HTTPException(status_code=404)
+    return ApiResponse(data={
+        "event_id": row.event_id,
+        "module": row.module,
+        "entity_type": row.entity_type,
+        "entity_ref": row.entity_ref,
+        "action": row.action,
+        "status": row.status,
+        "operator": row.operator,
+        "target_source_code": row.target_source_code,
+        "target_database_key": row.target_database_key,
+        "correlation_id": row.correlation_id,
+        "batch_code": row.batch_code,
+        "affected_count": row.affected_count,
+        "duration_ms": row.duration_ms,
+        "error_code": row.error_code,
+        "summary_masked": row.summary_masked,
+        "detail": row.detail,
+        "started_at": row.started_at.isoformat() if row.started_at else None,
+        "finished_at": row.finished_at.isoformat() if row.finished_at else None,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    })
+
+
+@router.get("/config", summary="运维前端配置（审批 UI / 写开关状态）")
+def ops_config() -> ApiResponse[dict]:
+    return ApiResponse(data={
+        "ops_write_enabled": bool(getattr(settings, "ops_write_enabled", False)),
+        "ops_approval_ui_enabled": bool(getattr(settings, "ops_approval_ui_enabled", False)),
+        "write_scope": "platform_asset_only",
+    })

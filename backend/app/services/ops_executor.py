@@ -88,9 +88,13 @@ def _resolve_write_credential(tool: OpsToolTemplate) -> tuple[str, str]:
     raise OpsExecutionError("write_credential_ref must start with env: or file://")
 
 
-def _sql_template_hash(sql: str) -> str:
+def sql_template_hash(sql: str) -> str:
     normalized = re.sub(r"\s+", " ", (sql or "").strip()).lower()
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+# backward-compatible alias
+_sql_template_hash = sql_template_hash
 
 
 def _ensure_platform_source(tool: OpsToolTemplate) -> None:

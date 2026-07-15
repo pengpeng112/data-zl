@@ -1,0 +1,279 @@
+{
+  "generated_at": "2026-07-14T11:51:12.916056+00:00",
+  "source": "10.10.10.93:1521/orcl",
+  "owner": "CDMS",
+  "safety": {
+    "transaction_read_only": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "relationship_id": "P01",
+      "child_table": "CDMS.T_MSS_MAIN",
+      "child_columns": [
+        "FBIHID",
+        "FBINCU"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.TMRDDE",
+          "columns": [
+            "FBIHID",
+            "FBINCU"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P02",
+      "child_table": "CDMS.T_MSS_SCANRECORD",
+      "child_columns": [
+        "FMAINID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_MAIN",
+          "columns": [
+            "FMAINID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P03",
+      "child_table": "CDMS.T_MSS_SCANRECORD",
+      "child_columns": [
+        "FCATEGORY"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_CATEGORY",
+          "columns": [
+            "FSERIALNUM"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P04",
+      "child_table": "CDMS.T_MSS_SCANRECORD",
+      "child_columns": [
+        "COLLECTPCID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_ITFCONFIG",
+          "columns": [
+            "FID"
+          ]
+        },
+        {
+          "table": "CDMS.T_MSS_COLLECTPC",
+          "columns": [
+            "COLLECTPCID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 0,
+      "orphan": 10000,
+      "match_rate": 0.0
+    },
+    {
+      "relationship_id": "P05",
+      "child_table": "CDMS.T_MSS_SCANRECORDHISTORY",
+      "child_columns": [
+        "FMAINID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_MAIN",
+          "columns": [
+            "FMAINID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 3230,
+      "matched": 0,
+      "orphan": 3230,
+      "match_rate": 0.0
+    },
+    {
+      "relationship_id": "P06",
+      "child_table": "CDMS.T_MSS_PRINTQUEUEDETAIL",
+      "child_columns": [
+        "FPRINTLISTQUEUEID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_PRINTLISTQUEUE",
+          "columns": [
+            "FID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P07",
+      "child_table": "CDMS.T_MSS_PRINTQUEUEDETAIL",
+      "child_columns": [
+        "FTYPE"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_ITFCONFIG",
+          "columns": [
+            "FID"
+          ]
+        },
+        {
+          "table": "CDMS.T_MSS_COLLECTPC",
+          "columns": [
+            "COLLECTPCID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 403,
+      "orphan": 9597,
+      "match_rate": 0.0403
+    },
+    {
+      "relationship_id": "P08",
+      "child_table": "CDMS.T_MSS_PRINTQUEUEDETAIL",
+      "child_columns": [
+        "COLLECTPCID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_ITFCONFIG",
+          "columns": [
+            "FID"
+          ]
+        },
+        {
+          "table": "CDMS.T_MSS_COLLECTPC",
+          "columns": [
+            "COLLECTPCID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 382,
+      "orphan": 9618,
+      "match_rate": 0.0382
+    },
+    {
+      "relationship_id": "P09",
+      "child_table": "CDMS.T_MSS_COLLECTLIST",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_COLLECTMETHOD",
+          "columns": [
+            "MID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 18,
+      "matched": 18,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P10",
+      "child_table": "CDMS.T_MSS_BBS",
+      "child_columns": [
+        "FRECORDID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_SCANRECORD",
+          "columns": [
+            "FRECORDID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 2,
+      "matched": 0,
+      "orphan": 2,
+      "match_rate": 0.0
+    },
+    {
+      "relationship_id": "P11",
+      "child_table": "CDMS.T_MSS_GROUPLIST",
+      "child_columns": [
+        "FCATGROUPID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_CATGROUP",
+          "columns": [
+            "FCATGROUPID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 19,
+      "matched": 19,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P12",
+      "child_table": "CDMS.T_MSS_COLLECTLOG",
+      "child_columns": [
+        "CID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_COLLECTLIST",
+          "columns": [
+            "CID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 0,
+      "orphan": 10000,
+      "match_rate": 0.0
+    },
+    {
+      "relationship_id": "P13",
+      "child_table": "CDMS.T_MSS_AUTHMAPPING",
+      "child_columns": [
+        "FAUTHORITYID"
+      ],
+      "parent_candidates": [
+        {
+          "table": "CDMS.T_MSS_AUTHORITY",
+          "columns": [
+            "FAUTHORITYID"
+          ]
+        }
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 26,
+      "orphan": 9974,
+      "match_rate": 0.0026
+    }
+  ]
+}

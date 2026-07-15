@@ -467,37 +467,78 @@ class MysqlConnector(DatabaseConnector):
 
 
 class SqlServerConnector(DatabaseConnector):
-    """SQL Server 数据库连接器（使用 pyodbc）。"""
+    """SQL Server 连接器：优先 pyodbc(ODBC)，无驱动时回退 pymssql（只读探测）。"""
 
     db_type = "sqlserver"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._conn = None
+        self._driver = None  # "pyodbc" | "pymssql"
 
     def connect(self):
-        import pyodbc
-        conn_str = (
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={self.host},{self.port};"
-            f"DATABASE={self.database};"
-            f"UID={self.user};PWD={self.password};"
-            f"TrustServerCertificate=yes;"
-            # SQL Server has no SET TRANSACTION READ ONLY equivalent. This
-            # routes AG connections to a readable replica; source accounts
-            # must still be granted SELECT-only permissions.
-            f"ApplicationIntent=ReadOnly;"
-            f"Connection Timeout={max(1, self._timeout_ms() // 1000)}"
-        )
-        self._conn = pyodbc.connect(conn_str)
-        cursor = self._conn.cursor()
+        timeout_s = max(1, self._timeout_ms() // 1000)
+        # 1) pyodbc + ODBC Driver 17/18
         try:
-            cursor.timeout = max(1, self._timeout_ms() // 1000)
-            cursor.execute("SET LOCK_TIMEOUT ?", (self._timeout_ms(),))
-            cursor.execute("SET TRANSACTION ISOLATION LEVEL SNAPSHOT")
-        finally:
-            cursor.close()
-        return self._conn
+            import pyodbc
+
+            drivers = [d for d in pyodbc.drivers() if "SQL Server" in d]
+            driver = drivers[0] if drivers else "ODBC Driver 17 for SQL Server"
+            conn_str = (
+                f"DRIVER={{{driver}}};"
+                f"SERVER={self.host},{self.port};"
+                f"DATABASE={self.database};"
+                f"UID={self.user};PWD={self.password};"
+                f"TrustServerCertificate=yes;"
+                f"ApplicationIntent=ReadOnly;"
+                f"Connection Timeout={timeout_s}"
+            )
+            self._conn = pyodbc.connect(conn_str)
+            self._driver = "pyodbc"
+            cursor = self._conn.cursor()
+            try:
+                cursor.timeout = timeout_s
+                try:
+                    cursor.execute("SET LOCK_TIMEOUT ?", (self._timeout_ms(),))
+                except Exception:
+                    pass
+                try:
+                    cursor.execute("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
+                except Exception:
+                    pass
+            finally:
+                cursor.close()
+            return self._conn
+        except Exception as pyodbc_err:
+            # 2) pymssql fallback for environments without ODBC (plan 85 F8)
+            try:
+                import pymssql
+
+                options = dict(
+                    server=self.host,
+                    port=str(self.port),
+                    user=self.user,
+                    password=self.password,
+                    database=self.database,
+                    login_timeout=timeout_s,
+                    timeout=timeout_s,
+                    appname="data-asset-readonly",
+                )
+                try:
+                    self._conn = pymssql.connect(**options)
+                except Exception:
+                    # Some legacy SQL Server installations only negotiate TDS 7.0.
+                    # Keep this as a narrow connectivity fallback; all executed SQL
+                    # remains subject to the same read-only validator and row limits.
+                    self._conn = pymssql.connect(**options, tds_version="7.0")
+                self._driver = "pymssql"
+                return self._conn
+            except Exception as pymssql_err:
+                raise RuntimeError(
+                    "sqlserver connector unavailable: install ODBC Driver + pyodbc "
+                    f"or pymssql. pyodbc={type(pyodbc_err).__name__}; "
+                    f"pymssql={type(pymssql_err).__name__}"
+                ) from pymssql_err
 
     def close(self) -> None:
         if self._conn:
@@ -511,10 +552,20 @@ class SqlServerConnector(DatabaseConnector):
         safe_limit = self._safe_max_rows(max_rows)
         cursor = self._conn.cursor()
         try:
-            cursor.timeout = max(1, self._timeout_ms() // 1000)
-            cursor.execute(sql, params or {})
-            rows = cursor.fetchmany(safe_limit)
-            cols = [d[0] for d in cursor.description]
+            if self._driver == "pyodbc":
+                try:
+                    cursor.timeout = max(1, self._timeout_ms() // 1000)
+                except Exception:
+                    pass
+                cursor.execute(sql, params or {})
+            else:
+                # pymssql: only simple param tuples; prefer no named params for SELECT 1
+                if params:
+                    cursor.execute(sql, tuple(params.values()))
+                else:
+                    cursor.execute(sql)
+            rows = cursor.fetchmany(safe_limit) if hasattr(cursor, "fetchmany") else cursor.fetchall()[:safe_limit]
+            cols = [d[0] for d in cursor.description] if cursor.description else []
             return [dict(zip(cols, row)) for row in rows]
         finally:
             cursor.close()
@@ -545,12 +596,20 @@ class SqlServerConnector(DatabaseConnector):
         start = time.perf_counter()
         try:
             self.connect()
-            self._conn.cursor().execute("SELECT 1")
+            cur = self._conn.cursor()
+            cur.execute("SELECT 1")
+            cur.fetchone()
+            cur.close()
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            return True, "connected", elapsed
+            return True, f"connected via {self._driver}", elapsed
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            return False, str(e)[:200], elapsed
+            msg = str(e)[:200]
+            for secret in filter(None, [self.password, self.user]):
+                if secret and secret in msg:
+                    msg = "sqlserver connectivity failed"
+                    break
+            return False, msg, elapsed
         finally:
             self.close()
 

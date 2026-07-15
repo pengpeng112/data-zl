@@ -79,6 +79,12 @@ export default {
         roles: ["identity_admin", "platform_admin"],
         auths: ["identity.role.grant"]
       }
+    },
+    {
+      path: "/identity/permission-requests",
+      name: "IdentityPermissionRequests",
+      component: () => import("@/views/identity/permission-requests/index.vue"),
+      meta: { title: "权限申请审批", showLink: true }
     }
   ]
 } satisfies RouteConfigsTable;

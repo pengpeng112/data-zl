@@ -180,6 +180,12 @@ def person_profile(person_code: str, db: Session = Depends(get_db)) -> ApiRespon
         "person_code": p.person_code, "person_name_cn": p.person_name_cn,
         "dept_code": p.dept_code, "person_type": p.person_type,
         "primary_source_system": p.primary_source_system,
+        "profile": {
+            "summary": p.profile_summary,
+            "tags": p.profile_tags or [],
+            "review_status": p.review_status or "unreviewed",
+            "updated_at": p.profile_updated_at.isoformat() if p.profile_updated_at else None,
+        },
         "accounts": [
             {"system_code": a.system_code, "account_id": a.account_id, "account_status": a.account_status}
             for a in accounts
@@ -198,6 +204,60 @@ def person_profile(person_code: str, db: Session = Depends(get_db)) -> ApiRespon
             for d in departments
         ],
     })
+
+
+class ProfileChangeRequest(BaseModel):
+    profile_summary: str | None = Field(default=None, max_length=2000)
+    profile_tags: list[str] = Field(default_factory=list, max_length=30)
+    reason: str = Field(..., min_length=2, max_length=500)
+
+
+@router.post("/persons/{person_code}/profile-change-requests", summary="提交人员画像变更审批")
+def create_profile_change_request(
+    person_code: str,
+    req: ProfileChangeRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == person_code))
+    if not person:
+        raise HTTPException(status_code=404, detail="person not found")
+    payload = {"person_code": person_code, "profile_summary": req.profile_summary, "profile_tags": req.profile_tags, "reason": req.reason}
+    cr = GovernChangeRequest(
+        module="identity",
+        entity_type="person_profile",
+        entity_ref=person_code,
+        request_type="update_profile",
+        request_payload=payload,
+        before_data={"profile_summary": person.profile_summary, "profile_tags": person.profile_tags or []},
+        requested_by=current_user,
+        approval_status="pending",
+        note=req.reason,
+    )
+    db.add(cr)
+    db.commit()
+    db.refresh(cr)
+    return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status, "requested_by": current_user})
+
+
+@router.get("/persons/{person_code}/profile-change-requests", summary="人员画像变更审批记录")
+def list_profile_change_requests(person_code: str, db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+    rows = db.scalars(
+        select(GovernChangeRequest)
+        .where(GovernChangeRequest.module == "identity", GovernChangeRequest.entity_type == "person_profile", GovernChangeRequest.entity_ref == person_code)
+        .order_by(GovernChangeRequest.created_at.desc())
+    ).all()
+    return ApiResponse(data=[{
+        "id": row.id,
+        "approval_status": row.approval_status,
+        "request_type": row.request_type,
+        "requested_by": row.requested_by,
+        "approved_by": row.approved_by,
+        "executed_by": row.executed_by,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "request_payload": row.request_payload,
+    } for row in rows])
 
 
 class AccountBind(BaseModel):
@@ -587,6 +647,25 @@ def _execute_identity_payload(db: Session, request_type: str, payload: dict) -> 
             },
             "diff_id": diff_id,
         }
+    if request_type == "update_profile":
+        person_code = (payload.get("person_code") or payload.get("entity_ref") or "").strip()
+        if not person_code:
+            raise HTTPException(status_code=400, detail="person_code required")
+        person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == person_code))
+        if not person:
+            raise HTTPException(status_code=404, detail=f"person {person_code} not found")
+        before = {"profile_summary": person.profile_summary, "profile_tags": person.profile_tags or []}
+        if "profile_summary" in payload:
+            person.profile_summary = payload.get("profile_summary")
+        if "profile_tags" in payload:
+            tags = payload.get("profile_tags") or []
+            if not isinstance(tags, list) or len(tags) > 30:
+                raise HTTPException(status_code=400, detail="profile_tags invalid")
+            person.profile_tags = [str(tag)[:80] for tag in tags]
+        person.review_status = "approved"
+        person.profile_updated_at = datetime.now(timezone.utc)
+        person.updated_at = datetime.now(timezone.utc)
+        return {"person_code": person_code, "before": before, "after": {"profile_summary": person.profile_summary, "profile_tags": person.profile_tags or []}}
     if request_type in {"apply_department_master", "update_department_master"}:
         dept_code = (payload.get("dept_code") or "").strip()
         if not dept_code:

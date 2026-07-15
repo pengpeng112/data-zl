@@ -30,7 +30,7 @@
         stripe
         class="items-table"
         row-key="code_set_code"
-        empty-text="暂无编码体系，请确认已设置 API Token 并完成导入"
+        empty-text="暂无编码体系。请管理员在平台库执行：python scripts/import_medical_maintenance_dicts.py --dry-run（确认后 --apply --confirmation IMPORT-MEDICAL-DICTS）"
       >
         <el-table-column type="expand">
           <template #default="{ row }">

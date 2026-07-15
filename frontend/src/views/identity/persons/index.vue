@@ -83,6 +83,13 @@
           <el-descriptions-item label="类型">{{ personTypeLabel(profile.person_type) }}</el-descriptions-item>
           <el-descriptions-item label="主来源">{{ profile.primary_source_system || '-' }}</el-descriptions-item>
         </el-descriptions>
+        <el-alert v-if="profile.profile" type="info" :closable="false" class="profile-block" title="画像变更需要审批后生效" />
+        <el-form v-if="profile.profile" :model="profileForm" label-width="90px" class="profile-block">
+          <el-form-item label="画像摘要"><el-input v-model="profileForm.profile_summary" type="textarea" :rows="2" maxlength="2000" show-word-limit /></el-form-item>
+          <el-form-item label="标签"><el-input v-model="profileForm.tagsText" placeholder="多个标签用逗号分隔" /></el-form-item>
+          <el-form-item label="变更原因"><el-input v-model="profileForm.reason" maxlength="500" /></el-form-item>
+          <el-button type="primary" :loading="profileSaving" @click="submitProfileChange">提交画像变更审批</el-button>
+        </el-form>
 
         <h4>科室关系</h4>
         <el-table :data="profile.departments ?? []" size="small" border class="profile-block medical-data-table">
@@ -118,7 +125,7 @@ import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
-import { getPersonProfile, getPersons } from "@/api/identity";
+import { createProfileChangeRequest, getPersonProfile, getPersons } from "@/api/identity";
 import CheckIcon from "~icons/ri/checkbox-circle-line";
 import PersonIcon from "~icons/ri/user-3-line";
 import SearchIcon from "~icons/ri/search-line";
@@ -132,6 +139,8 @@ const params = reactive({ keyword: "", person_type: "", page: 1, page_size: 20 }
 const profileVisible = ref(false);
 const profileLoading = ref(false);
 const profile = ref<any>(null);
+const profileSaving = ref(false);
+const profileForm = reactive({ profile_summary: "", tagsText: "", reason: "" });
 const activeCount = computed(() => items.value.filter(item => item.employment_status === "active").length);
 const sourceCount = computed(() => new Set(items.value.map(item => item.primary_source_system).filter(Boolean)).size);
 
@@ -165,11 +174,25 @@ async function showProfile(row: any) {
   try {
     const res = await getPersonProfile(row.person_code);
     profile.value = res.data;
+    profileForm.profile_summary = res.data?.profile?.summary || "";
+    profileForm.tagsText = (res.data?.profile?.tags || []).join(",");
+    profileForm.reason = "";
   } catch {
     ElMessage.error("加载人员档案失败");
   } finally {
     profileLoading.value = false;
   }
+}
+async function submitProfileChange() {
+  const personCode = profile.value?.person_code;
+  if (!personCode || !profileForm.reason.trim()) { ElMessage.warning("请填写变更原因"); return; }
+  profileSaving.value = true;
+  try {
+    await createProfileChangeRequest(personCode, { profile_summary: profileForm.profile_summary || null, profile_tags: profileForm.tagsText.split(",").map(item => item.trim()).filter(Boolean), reason: profileForm.reason.trim() });
+    ElMessage.success("画像变更已提交审批");
+    profileForm.reason = "";
+  } catch (e: any) { ElMessage.error(e?.response?.data?.detail || "提交失败"); }
+  finally { profileSaving.value = false; }
 }
 
 onMounted(loadData);

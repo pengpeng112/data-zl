@@ -23,7 +23,10 @@ interface AuditLog {
 
 defineOptions({ name: "OpsAudit" });
 
+const activeTab = ref("audit");
 const tableData = ref<AuditLog[]>([]);
+const eventData = ref<any[]>([]);
+const dictImportData = ref<any[]>([]);
 const loading = ref(false);
 const total = ref(0);
 const page = ref(1);
@@ -61,13 +64,27 @@ function actionLabel(action: string) {
 async function fetchData() {
   loading.value = true;
   try {
-    const res = await http.request<any>("get", "/api/v1/govern/audit-logs", {
-      params: { module: "ops", page: page.value, page_size: pageSize.value }
-    });
-    tableData.value = res.data?.items || [];
-    total.value = res.data?.total || 0;
+    if (activeTab.value === "events") {
+      const res = await http.request<any>("get", "/api/v1/ops/events", {
+        params: { page: page.value, page_size: pageSize.value }
+      });
+      eventData.value = res.data?.items || [];
+      total.value = res.data?.total || 0;
+    } else if (activeTab.value === "dict") {
+      const res = await http.request<any>("get", "/api/v1/dict-medical/import-runs", {
+        params: { page: page.value, page_size: pageSize.value }
+      });
+      dictImportData.value = res.data?.items || [];
+      total.value = res.data?.total || 0;
+    } else {
+      const res = await http.request<any>("get", "/api/v1/govern/audit-logs", {
+        params: { module: "ops", page: page.value, page_size: pageSize.value }
+      });
+      tableData.value = res.data?.items || [];
+      total.value = res.data?.total || 0;
+    }
   } catch {
-    ElMessage.error("获取审计日志失败");
+    ElMessage.error("获取日志失败");
   } finally {
     loading.value = false;
   }
@@ -75,6 +92,11 @@ async function fetchData() {
 
 function handlePageChange(p: number) {
   page.value = p;
+  fetchData();
+}
+
+function onTabChange() {
+  page.value = 1;
   fetchData();
 }
 
@@ -117,15 +139,28 @@ onMounted(fetchData);
     </section>
 
     <el-card class="audit-card" shadow="never">
-      <ReToolbar title="审计明细">
-        <el-tag type="info" effect="plain">模块：ops</el-tag>
+      <el-tabs v-model="activeTab" @tab-change="onTabChange">
+        <el-tab-pane label="治理审计" name="audit" />
+        <el-tab-pane label="执行日志" name="events" />
+        <el-tab-pane label="字典同步日志" name="dict" />
+      </el-tabs>
+
+      <ReToolbar :title="activeTab === 'dict' ? '字典导入批次' : activeTab === 'events' ? '统一执行事件' : '审计明细'">
+        <el-tag type="info" effect="plain">脱敏展示</el-tag>
         <el-tag type="primary" effect="plain">总数 {{ total }}</el-tag>
         <template #actions>
           <el-button :icon="RefreshIcon" :loading="loading" @click="fetchData">重新加载</el-button>
         </template>
       </ReToolbar>
 
-      <el-table v-loading="loading" :data="tableData" class="medical-data-table" size="small" stripe>
+      <el-table
+        v-if="activeTab === 'audit'"
+        v-loading="loading"
+        :data="tableData"
+        class="medical-data-table"
+        size="small"
+        stripe
+      >
         <el-table-column prop="id" label="日志ID" width="90" fixed="left" />
         <el-table-column prop="entity_type" label="实体类型" width="130" show-overflow-tooltip />
         <el-table-column prop="entity_ref" label="实体引用" min-width="180" show-overflow-tooltip />
@@ -138,6 +173,43 @@ onMounted(fetchData);
         </el-table-column>
         <el-table-column prop="operator" label="操作人" width="140" show-overflow-tooltip />
         <el-table-column prop="created_at" label="时间" width="190" />
+      </el-table>
+
+      <el-table
+        v-else-if="activeTab === 'events'"
+        v-loading="loading"
+        :data="eventData"
+        class="medical-data-table"
+        size="small"
+        stripe
+      >
+        <el-table-column prop="event_id" label="事件ID" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="module" label="模块" width="100" />
+        <el-table-column prop="action" label="动作" width="140" />
+        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column prop="target_source_code" label="目标" width="140" />
+        <el-table-column prop="affected_count" label="影响行" width="90" />
+        <el-table-column prop="summary_masked" label="摘要" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="operator" label="操作人" width="120" />
+        <el-table-column prop="created_at" label="时间" width="180" />
+      </el-table>
+
+      <el-table
+        v-else
+        v-loading="loading"
+        :data="dictImportData"
+        class="medical-data-table"
+        size="small"
+        stripe
+      >
+        <el-table-column prop="batch_code" label="批次" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="mode" label="模式" width="90" />
+        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column prop="operator" label="操作人" width="140" />
+        <el-table-column prop="diagnosis_file_name" label="诊断文件" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="operation_file_name" label="手术文件" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="error_summary" label="错误" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="created_at" label="时间" width="180" />
       </el-table>
 
       <div class="pagination-wrap">

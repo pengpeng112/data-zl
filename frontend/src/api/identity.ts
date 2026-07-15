@@ -27,6 +27,13 @@ export function getPersons(params?: Record<string, any>) {
 export function getPersonProfile(personCode: string) {
   return http.request<ApiResponse<any>>("get", `/api/v1/identity/persons/${personCode}`);
 }
+
+export function createProfileChangeRequest(personCode: string, data: { profile_summary?: string | null; profile_tags: string[]; reason: string }) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/identity/persons/${personCode}/profile-change-requests`, { data });
+}
+export function getProfileChangeRequests(personCode: string) {
+  return http.request<ApiResponse<any[]>>("get", `/api/v1/identity/persons/${personCode}/profile-change-requests`);
+}
 // 账号
 export function getAccounts(params?: Record<string, any>) {
   return http.request<ApiResponse<any[]>>("get", "/api/v1/identity/accounts", { params });

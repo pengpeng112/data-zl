@@ -25,17 +25,17 @@ export default {
       name: "AssetSystems",
       component: () => import("@/views/asset/systems/index.vue"),
       meta: {
-        title: "系统总览",
+        title: "业务系统与数据资源",
         showLink: true
       }
     },
     {
       path: "/asset/sources",
       name: "AssetSources",
-      component: () => import("@/views/asset/sources/index.vue"),
+      redirect: "/asset/systems?tab=connections",
       meta: {
-        title: "数据源与库",
-        showLink: true
+        title: "数据源连接（兼容入口）",
+        showLink: false
       }
     },
     {
@@ -82,6 +82,12 @@ export default {
         title: "AI上下文",
         showLink: true
       }
+    },
+    {
+      path: "/asset/relation-recipes",
+      name: "AssetRelationRecipes",
+      component: () => import("@/views/asset/relation-recipes/index.vue"),
+      meta: { title: "关系配方库", showLink: true }
     },
     {
       path: "/asset/lineage",

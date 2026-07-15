@@ -12,6 +12,15 @@ export default {
   },
   children: [
     {
+      path: "/ops/sql-workbench",
+      name: "OpsSqlWorkbench",
+      component: () => import("@/views/ops/sql-workbench/index.vue"),
+      meta: {
+        title: "SQL 工作台",
+        showLink: true
+      }
+    },
+    {
       path: "/ops/tools",
       name: "OpsTools",
       component: () => import("@/views/ops/tools/index.vue"),

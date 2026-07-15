@@ -1,0 +1,653 @@
+{
+  "generated_at": "2026-07-14T11:36:01.651777+00:00",
+  "database": "his",
+  "account_masked": "H***R",
+  "safety": {
+    "transaction_read_only": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "relations_in_baseline": 33,
+  "relations_sample_checked": 31,
+  "structure_only_relations": [
+    "R015",
+    "R020"
+  ],
+  "results": [
+    {
+      "relationship_id": "R001",
+      "from_table": "MEDREC.PAT_VISIT",
+      "to_table": "MEDREC.PAT_MASTER_INDEX",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R002",
+      "from_table": "MEDREC.DIAGNOSIS",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R003",
+      "from_table": "MEDREC.OPERATION",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R004",
+      "from_table": "INPADM.PATS_IN_HOSPITAL",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 1233,
+      "matched": 1231,
+      "orphan": 2,
+      "match_rate": 0.998378
+    },
+    {
+      "relationship_id": "R005",
+      "from_table": "INPADM.ADT_LOG",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R006",
+      "from_table": "ORDADM.ORDERS",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9994,
+      "orphan": 6,
+      "match_rate": 0.9994
+    },
+    {
+      "relationship_id": "R007",
+      "from_table": "ORDADM.ORDERS_COSTS",
+      "to_table": "ORDADM.ORDERS",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ],
+        [
+          "ORDER_NO",
+          "ORDER_NO"
+        ],
+        [
+          "ORDER_SUB_NO",
+          "ORDER_SUB_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9994,
+      "orphan": 6,
+      "match_rate": 0.9994
+    },
+    {
+      "relationship_id": "R008",
+      "from_table": "ORDADM.ORDERS_EXECUTE_DETAILS",
+      "to_table": "ORDADM.ORDERS",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ],
+        [
+          "ORDER_NO",
+          "ORDER_NO"
+        ],
+        [
+          "ORDER_SUB_NO",
+          "ORDER_SUB_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9976,
+      "orphan": 24,
+      "match_rate": 0.9976
+    },
+    {
+      "relationship_id": "R009",
+      "from_table": "DRUG_USER.INP_ORDER_EXECDATA",
+      "to_table": "ORDADM.ORDERS",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ],
+        [
+          "ORDER_NO",
+          "ORDER_NO"
+        ],
+        [
+          "ORDER_SUB_NO",
+          "ORDER_SUB_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9306,
+      "orphan": 694,
+      "match_rate": 0.9306
+    },
+    {
+      "relationship_id": "R010",
+      "from_table": "DRUG_USER.INP_ORDER_EXECDATA",
+      "to_table": "DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PAT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "IN_COUNT"
+        ],
+        [
+          "ORDER_NO",
+          "MO_ORDER"
+        ],
+        [
+          "ORDER_SUB_NO",
+          "ORDER_SUB_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9305,
+      "orphan": 695,
+      "match_rate": 0.9305
+    },
+    {
+      "relationship_id": "R011",
+      "from_table": "LAB.LAB_TEST_MASTER",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R012",
+      "from_table": "LAB.LAB_TEST_ITEMS",
+      "to_table": "LAB.LAB_TEST_MASTER",
+      "keys": [
+        [
+          "TEST_NO",
+          "TEST_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R013",
+      "from_table": "LAB.LAB_RESULT",
+      "to_table": "LAB.LAB_TEST_MASTER",
+      "keys": [
+        [
+          "TEST_NO",
+          "TEST_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9996,
+      "orphan": 4,
+      "match_rate": 0.9996
+    },
+    {
+      "relationship_id": "R014",
+      "from_table": "LAB.LAB_TEST_ITEMS_DETAIL",
+      "to_table": "LAB.LAB_TEST_ITEMS",
+      "keys": [
+        [
+          "TEST_NO",
+          "TEST_NO"
+        ],
+        [
+          "ITEM_NO",
+          "ITEM_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9977,
+      "orphan": 23,
+      "match_rate": 0.9977
+    },
+    {
+      "relationship_id": "R016",
+      "from_table": "EXAM.EXAM_MASTER",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9996,
+      "orphan": 4,
+      "match_rate": 0.9996
+    },
+    {
+      "relationship_id": "R017",
+      "from_table": "EXAM.EXAM_REPORT",
+      "to_table": "EXAM.EXAM_MASTER",
+      "keys": [
+        [
+          "EXAM_NO",
+          "EXAM_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R018",
+      "from_table": "EXAM.EXAM_ITEMS",
+      "to_table": "EXAM.EXAM_MASTER",
+      "keys": [
+        [
+          "EXAM_NO",
+          "EXAM_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 8090,
+      "orphan": 1910,
+      "match_rate": 0.809
+    },
+    {
+      "relationship_id": "R019",
+      "from_table": "EXAM.EXAM_BILL_ITEMS",
+      "to_table": "EXAM.EXAM_MASTER",
+      "keys": [
+        [
+          "EXAM_NO",
+          "EXAM_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9994,
+      "orphan": 6,
+      "match_rate": 0.9994
+    },
+    {
+      "relationship_id": "R021",
+      "from_table": "INPBILL.INP_SETTLE_MASTER",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R022",
+      "from_table": "INPBILL.INP_BILL_DETAIL",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R023",
+      "from_table": "INPBILL.INP_BILL_DETAIL",
+      "to_table": "INPBILL.INP_SETTLE_MASTER",
+      "keys": [
+        [
+          "RCPT_NO",
+          "RCPT_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9984,
+      "orphan": 16,
+      "match_rate": 0.9984
+    },
+    {
+      "relationship_id": "R024",
+      "from_table": "INPBILL.PREPAYMENT_RCPT",
+      "to_table": "MEDREC.PAT_MASTER_INDEX",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R025",
+      "from_table": "INPBILL.PREPAYMENT_RCPT",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "VISIT_ID",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9984,
+      "orphan": 16,
+      "match_rate": 0.9984
+    },
+    {
+      "relationship_id": "R026",
+      "from_table": "INPBILL.PREPAYMENT_RCPT",
+      "to_table": "INPBILL.PREPAYMENT_RCPT",
+      "keys": [
+        [
+          "REFUNDED_RCPT_NO",
+          "RCPT_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 6781,
+      "matched": 6780,
+      "orphan": 1,
+      "match_rate": 0.999853
+    },
+    {
+      "relationship_id": "R027",
+      "from_table": "OUTPADM.CLINIC_MASTER",
+      "to_table": "MEDREC.PAT_MASTER_INDEX",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R028",
+      "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+      "to_table": "OUTPBILL.OUTP_RCPT_MASTER",
+      "keys": [
+        [
+          "RCPT_NO",
+          "RCPT_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R029",
+      "from_table": "OUTPBILL.OUTP_RCPT_MASTER",
+      "to_table": "MEDREC.PAT_MASTER_INDEX",
+      "keys": [
+        [
+          "PATIENT_ID",
+          "PATIENT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9994,
+      "orphan": 6,
+      "match_rate": 0.9994
+    },
+    {
+      "relationship_id": "R030",
+      "from_table": "DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "to_table": "MEDREC.PAT_VISIT",
+      "keys": [
+        [
+          "PAT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "IN_COUNT",
+          "VISIT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9948,
+      "orphan": 52,
+      "match_rate": 0.9948
+    },
+    {
+      "relationship_id": "R031",
+      "from_table": "DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "to_table": "ORDADM.ORDERS",
+      "keys": [
+        [
+          "PAT_ID",
+          "PATIENT_ID"
+        ],
+        [
+          "IN_COUNT",
+          "VISIT_ID"
+        ],
+        [
+          "MO_ORDER",
+          "ORDER_NO"
+        ],
+        [
+          "ORDER_SUB_NO",
+          "ORDER_SUB_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9948,
+      "orphan": 52,
+      "match_rate": 0.9948
+    },
+    {
+      "relationship_id": "R032",
+      "from_table": "DRUG_USER.PHA_INP_DISPDETAIL",
+      "to_table": "DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "keys": [
+        [
+          "REQUEST_NO",
+          "REQUEST_NO"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "R033",
+      "from_table": "DRUG_USER.PHA_CLI_REQUEST_DRUG",
+      "to_table": "MEDREC.PAT_MASTER_INDEX",
+      "keys": [
+        [
+          "PAT_ID",
+          "PATIENT_ID"
+        ]
+      ],
+      "missing_columns": [],
+      "status": "sample_checked",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    }
+  ]
+}

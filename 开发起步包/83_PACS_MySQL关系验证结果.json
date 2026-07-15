@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-07-14T13:00:35.672451+00:00",
+  "source": {
+    "host": "10.10.10.191",
+    "database": "gecris"
+  },
+  "safety": {
+    "transaction_read_only": true,
+    "sample_limit": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "relationship_id": "P01",
+      "child": "gecris.OrderInfo",
+      "child_column": "PatientIntraID",
+      "parent": "gecris.PatientInfo",
+      "parent_column": "PatientIntraID",
+      "evidence": "declared_fk",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P02",
+      "child": "gecris.ExamInfo",
+      "child_column": "PatientIntraID",
+      "parent": "gecris.PatientInfo",
+      "parent_column": "PatientIntraID",
+      "evidence": "view_sql_and_model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P03",
+      "child": "gecris.ExamInfo",
+      "child_column": "OrderID",
+      "parent": "gecris.OrderInfo",
+      "parent_column": "OrderID",
+      "evidence": "model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P04",
+      "child": "gecris.ExamInfo",
+      "child_column": "ReportID",
+      "parent": "gecris.Report",
+      "parent_column": "ReportID",
+      "evidence": "view_sql_and_model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 8874,
+      "orphan": 1126,
+      "match_rate": 0.8874
+    },
+    {
+      "relationship_id": "P05",
+      "child": "gecris.ReportAction",
+      "child_column": "ReportID",
+      "parent": "gecris.Report",
+      "parent_column": "ReportID",
+      "evidence": "model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P06",
+      "child": "gecris.ReportAction",
+      "child_column": "ReportHistoryID",
+      "parent": "gecris.ReportHistory",
+      "parent_column": "ReportHistoryID",
+      "evidence": "model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P07",
+      "child": "gecris.ReportParticipant",
+      "child_column": "ReportActionID",
+      "parent": "gecris.ReportAction",
+      "parent_column": "ReportActionID",
+      "evidence": "model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P08",
+      "child": "gecris.MPPS",
+      "child_column": "ExamID",
+      "parent": "gecris.ExamInfo",
+      "parent_column": "ExamID",
+      "evidence": "view_sql",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P09",
+      "child": "gecris.exam_attach_info",
+      "child_column": "ExamID",
+      "parent": "gecris.ExamInfo",
+      "parent_column": "ExamID",
+      "evidence": "model",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P10",
+      "child": "gecris.pacsstudy",
+      "child_column": "study_instance_uid",
+      "parent": "gecris.ExamInfo",
+      "parent_column": "StudyInstanceUID",
+      "evidence": "dicom_key",
+      "sampled_nonnull_keys": 10000,
+      "matched": 9639,
+      "orphan": 361,
+      "match_rate": 0.9639
+    }
+  ]
+}

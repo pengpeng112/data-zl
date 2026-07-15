@@ -571,3 +571,24 @@ def options(db: Session = Depends(get_db)) -> ApiResponse[GraphOptions]:
             view_modes=GRAPH_VIEW_MODES,
         )
     )
+
+
+@router.get("/diagnostics", summary="关系图谱数据诊断")
+def diagnostics(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Return explicit diagnostics instead of silently rendering a blank graph."""
+    relation_count = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
+    table_count = db.scalar(select(func.count()).select_from(AssetTable)) or 0
+    missing_endpoints = db.scalar(select(func.count()).select_from(AssetRelation).where(
+        (AssetRelation.from_table.is_(None)) | (AssetRelation.to_table.is_(None))
+    )) or 0
+    duplicate_endpoints = db.scalar(select(func.count()).select_from(
+        select(AssetRelation.from_table, AssetRelation.to_table).group_by(
+            AssetRelation.from_table, AssetRelation.to_table
+        ).having(func.count() > 1).subquery()
+    )) or 0
+    warnings = []
+    if relation_count == 0: warnings.append("当前筛选范围没有关系数据")
+    if table_count == 0: warnings.append("资产表目录为空")
+    if missing_endpoints: warnings.append(f"存在 {missing_endpoints} 条关系缺少端点")
+    if duplicate_endpoints: warnings.append(f"存在 {duplicate_endpoints} 组重复端点，前端应按关系 ID 合并展示")
+    return ApiResponse(data={"table_count": table_count, "relation_count": relation_count, "missing_endpoints": missing_endpoints, "duplicate_endpoint_groups": duplicate_endpoints, "warnings": warnings, "healthy": not warnings})

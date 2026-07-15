@@ -82,6 +82,35 @@ def test_rejects_multi_statement_comments_and_unqualified_table():
     assert any("asset schema" in item for item in unqualified["errors"])
 
 
+def test_rejects_tautology_where():
+    result = validate_writable_sql(
+        "UPDATE asset.asset_table_owners SET owner_name = :owner_name WHERE 1 = 1",
+        allowed_tables=["asset.asset_table_owners"],
+        allowed_ops=["UPDATE"],
+        params={"owner_name": "x"},
+    )
+    assert result["valid"] is False
+    assert any("tautology" in e for e in result["errors"])
+
+
+def test_dry_run_must_match_update_where_params():
+    from app.services.ops_sql_safety import validate_dry_run_sql
+
+    ok = validate_dry_run_sql(
+        "UPDATE asset.asset_table_owners SET owner_name = :owner_name WHERE full_table_name = :full_table_name",
+        "SELECT count(*) FROM asset.asset_table_owners WHERE full_table_name = :full_table_name",
+        allowed_tables=["asset.asset_table_owners"],
+    )
+    assert ok["valid"] is True
+
+    bad = validate_dry_run_sql(
+        "UPDATE asset.asset_table_owners SET owner_name = :owner_name WHERE full_table_name = :full_table_name",
+        "SELECT count(*) FROM asset.asset_table_owners WHERE other_col = :other",
+        allowed_tables=["asset.asset_table_owners"],
+    )
+    assert bad["valid"] is False
+
+
 def test_rejects_non_asset_schema_and_update_without_where_bind():
     non_asset = validate_writable_sql(
         "UPDATE his.staff_dict SET name = :name WHERE emp_no = :emp_no",

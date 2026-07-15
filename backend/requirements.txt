@@ -21,6 +21,8 @@ pydantic-settings>=2.2
 pymysql>=1.1
 # SQL Server 连接器
 pyodbc>=5.0
+# SQL Server fallback when ODBC driver is unavailable in container (plan 85 F8)
+pymssql>=2.2.11
 # PostgreSQL 连接器（当前应用库已使用）
 psycopg[binary]>=3.1
 # Oracle 连接器（HIS 源库 10.10.10.15 / 数据中心 10.10.8.216）

@@ -148,8 +148,21 @@ def validate_writable_sql(
                 errors.append("UPDATE must include WHERE")
             elif ":" not in where_summary:
                 errors.append("UPDATE WHERE must use bind parameters")
+            where_norm = re.sub(r"\s+", "", where_summary.upper())
+            # reject tautology / always-true predicates
+            if where_norm in {"1=1", "TRUE", "(1=1)", "1=1AND1=1"} or re.fullmatch(r"\(?1\s*=\s*1\)?", where_summary.strip(), re.I):
+                errors.append("tautology WHERE is not allowed")
+            if re.search(r"\bOR\s+1\s*=\s*1\b", where_summary, re.I):
+                errors.append("tautology WHERE is not allowed")
+            if re.search(r"\bWHERE\s+TRUE\b", f"WHERE {where_summary}", re.I) and ":" not in where_summary:
+                errors.append("tautology WHERE is not allowed")
         if operation == "INSERT" and ":" not in (parsed.get("values_summary") or ""):
             errors.append("INSERT VALUES must use bind parameters")
+        # no CTE / subquery hints for write templates
+        if re.search(r"\bWITH\b", cleaned, re.I):
+            errors.append("CTE/WITH is not allowed in write templates")
+        if re.search(r"\bRETURNING\b", cleaned, re.I):
+            errors.append("RETURNING is not allowed in write templates")
 
     param_names = _extract_params(cleaned)
     provided_params = set((params or {}).keys())
@@ -176,4 +189,60 @@ def validate_writable_sql(
         "errors": errors,
         "warnings": warnings,
         "parsed_summary": parsed_summary,
+    }
+
+
+def validate_dry_run_sql(
+    dml_sql: str,
+    dry_run_sql: str,
+    allowed_tables: list[str] | tuple[str, ...] | None = None,
+) -> dict[str, Any]:
+    """Ensure dry-run is SELECT count(*) against the same table/WHERE params as DML."""
+    errors: list[str] = []
+    cleaned_dml = _clean_sql(dml_sql)
+    parsed_dml = _parse_statement(cleaned_dml) if cleaned_dml else None
+    tables = list(allowed_tables or [])
+    if parsed_dml and _normalize_table(parsed_dml["target_table"]) not in {_normalize_table(t) for t in tables}:
+        tables.append(parsed_dml["target_table"])
+    dml = validate_writable_sql(
+        dml_sql,
+        allowed_tables=tables,
+        allowed_ops=["INSERT", "UPDATE"],
+        params={name: 1 for name in _extract_params(cleaned_dml)},
+    )
+    cleaned = _clean_sql(dry_run_sql)
+    if not cleaned:
+        errors.append("dry_run_sql is required")
+    if ";" in cleaned:
+        errors.append("dry_run_sql must be a single statement")
+    if "--" in (dry_run_sql or "") or "/*" in (dry_run_sql or ""):
+        errors.append("dry_run_sql comments are not allowed")
+    count_match = re.match(
+        rf'^SELECT\s+COUNT\s*\(\s*\*\s*\)\s+FROM\s+({TABLE_RE})(?:\s+WHERE\s+(.+))?$',
+        cleaned,
+        re.IGNORECASE,
+    )
+    if not count_match:
+        errors.append("dry_run_sql must be SELECT count(*) FROM asset.<table> [WHERE ...]")
+    else:
+        target = _normalize_table(count_match.group(1))
+        if _table_schema(count_match.group(1)) != "asset":
+            errors.append("dry_run_sql target must be asset schema")
+        if dml.get("parsed_summary"):
+            dml_target = dml["parsed_summary"]["target_table"]
+            if target != dml_target:
+                errors.append(f"dry_run table {target} != dml table {dml_target}")
+            dml_params = set(dml["parsed_summary"].get("param_names") or [])
+            dry_params = set(_extract_params(cleaned))
+            # for UPDATE, WHERE params should match dry-run WHERE params
+            if dml["parsed_summary"]["operation"] == "UPDATE":
+                dml_where_params = set(_extract_params(dml["parsed_summary"].get("where_summary") or ""))
+                if dry_params != dml_where_params:
+                    errors.append("dry_run WHERE params must match UPDATE WHERE params")
+            elif dry_params - dml_params:
+                errors.append("dry_run has params not present in DML")
+    return {
+        "valid": not errors and dml.get("valid", False),
+        "errors": errors + (dml.get("errors") or []),
+        "dml_summary": dml.get("parsed_summary"),
     }

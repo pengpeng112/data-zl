@@ -1,0 +1,192 @@
+{
+  "generated_at": "2026-07-14T12:42:23.588540+00:00",
+  "source": "10.10.10.161:1433",
+  "safety": {
+    "isolation": "READ UNCOMMITTED",
+    "nolock": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "relationship_id": "U01",
+      "child": "MedcareUS.dbo.预约登记",
+      "parent": "AnyImage.grid.BHosCheckUS",
+      "child_columns": [
+        "AccessNo"
+      ],
+      "parent_columns": [
+        "AccessNo"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "E01",
+      "child": "MedcareES.dbo.预约登记",
+      "parent": "AnyImageSLES.grid.BHosCheckES",
+      "child_columns": [
+        "AccessionNo"
+      ],
+      "parent_columns": [
+        "AccessNo"
+      ],
+      "sampled_nonnull_keys": 0,
+      "matched": 0,
+      "orphan": 0,
+      "match_rate": null
+    },
+    {
+      "relationship_id": "E02",
+      "child": "MedcareES.dbo.预约登记",
+      "parent": "AnyImage.grid.BHosCheckES",
+      "child_columns": [
+        "AccessionNo"
+      ],
+      "parent_columns": [
+        "AccessNo"
+      ],
+      "sampled_nonnull_keys": 0,
+      "matched": 0,
+      "orphan": 0,
+      "match_rate": null
+    },
+    {
+      "relationship_id": "A01",
+      "child": "AnyImage.grid.BHosCheckUS",
+      "parent": "AnyImage.grid.BHosPatient",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "A02",
+      "child": "AnyImage.grid.BHosCheckES",
+      "parent": "AnyImage.grid.BHosPatient",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "S01",
+      "child": "AnyImageSLES.grid.BHosCheckES",
+      "parent": "AnyImageSLES.grid.BHosPatient",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P01",
+      "child": "PacsServer.grid.BHosSeries",
+      "parent": "PacsServer.grid.BHosStudy",
+      "child_columns": [
+        "StudyID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P02",
+      "child": "PacsServer.grid.BHosImages",
+      "parent": "PacsServer.grid.BHosStudy",
+      "child_columns": [
+        "StudyID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "P03",
+      "child": "PacsServer.grid.BHosImages",
+      "parent": "PacsServer.grid.BHosSeries",
+      "child_columns": [
+        "SeriesID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "M01",
+      "child": "MdcArchiveBrowse.dbo.BExamIndex",
+      "parent": "MdcArchiveBrowse.dbo.BPatientIndex",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "M02",
+      "child": "MdcArchiveBrowse.dbo.BExamDetail",
+      "parent": "MdcArchiveBrowse.dbo.BExamIndex",
+      "child_columns": [
+        "ExamID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "M03",
+      "child": "MdcArchiveBrowse.dbo.BExamDetail",
+      "parent": "MdcArchiveBrowse.dbo.BPatientIndex",
+      "child_columns": [
+        "MID"
+      ],
+      "parent_columns": [
+        "ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    }
+  ]
+}

@@ -86,3 +86,27 @@ class DictMedicalSyncDiff(Base):
     status = Column(Text, server_default="open")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     handled_at = Column(TIMESTAMP(timezone=True))
+
+
+class DictMedicalImportRun(Base):
+    """Import batch for diagnosis/operation maintenance Excel files."""
+
+    __tablename__ = "asset_dict_medical_import_runs"
+    __table_args__ = {"schema": "asset"}
+
+    id = Column(BigInteger, primary_key=True)
+    batch_code = Column(Text, unique=True, nullable=False)
+    source_dir = Column(Text)
+    diagnosis_file_name = Column(Text)
+    operation_file_name = Column(Text)
+    diagnosis_sha256 = Column(Text)
+    operation_sha256 = Column(Text)
+    status = Column(Text, server_default="draft")
+    mode = Column(Text, server_default="dry_run")
+    operator = Column(Text)
+    stats = Column(JSONB)
+    error_summary = Column(Text)
+    correlation_id = Column(Text)
+    duration_ms = Column(Integer)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    finished_at = Column(TIMESTAMP(timezone=True))

@@ -1,0 +1,252 @@
+{
+  "generated_at": "2026-07-14T12:23:22.969464+00:00",
+  "source": "10.10.10.73:1433/rmcloudlis7",
+  "safety": {
+    "isolation": "READ UNCOMMITTED",
+    "nolock": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "relationship_id": "L01",
+      "child_table": "dbo.req_master_pat",
+      "parent_table": "dbo.req_master",
+      "child_columns": [
+        "barcode"
+      ],
+      "parent_columns": [
+        "barcode"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L02",
+      "child_table": "dbo.req_detail",
+      "parent_table": "dbo.req_master",
+      "child_columns": [
+        "barcode"
+      ],
+      "parent_columns": [
+        "barcode"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9998,
+      "orphan": 2,
+      "match_rate": 0.9998
+    },
+    {
+      "relationship_id": "L03",
+      "child_table": "dbo.lab_report",
+      "parent_table": "dbo.req_master",
+      "child_columns": [
+        "reportid"
+      ],
+      "parent_columns": [
+        "report_id"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9003,
+      "orphan": 997,
+      "match_rate": 0.9003
+    },
+    {
+      "relationship_id": "L04",
+      "child_table": "dbo.lab_result",
+      "parent_table": "dbo.lab_report",
+      "child_columns": [
+        "reportid"
+      ],
+      "parent_columns": [
+        "reportid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L05",
+      "child_table": "dbo.lab_instrdata",
+      "parent_table": "dbo.lab_report",
+      "child_columns": [
+        "reportid"
+      ],
+      "parent_columns": [
+        "reportid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9982,
+      "orphan": 18,
+      "match_rate": 0.9982
+    },
+    {
+      "relationship_id": "L06",
+      "child_table": "dbo.lab_reportlog",
+      "parent_table": "dbo.lab_report",
+      "child_columns": [
+        "reportid"
+      ],
+      "parent_columns": [
+        "reportid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9889,
+      "orphan": 111,
+      "match_rate": 0.9889
+    },
+    {
+      "relationship_id": "L07",
+      "child_table": "dbo.lab_reportlogdetail",
+      "parent_table": "dbo.lab_reportlog",
+      "child_columns": [
+        "rpt_logid"
+      ],
+      "parent_columns": [
+        "rpt_logid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L08",
+      "child_table": "dbo.bact_sample",
+      "parent_table": "dbo.req_master",
+      "child_columns": [
+        "barcode"
+      ],
+      "parent_columns": [
+        "barcode"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L09",
+      "child_table": "dbo.bact_report",
+      "parent_table": "dbo.bact_sample",
+      "child_columns": [
+        "sampleid"
+      ],
+      "parent_columns": [
+        "sampleid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L10",
+      "child_table": "dbo.bact_report",
+      "parent_table": "dbo.lab_report",
+      "child_columns": [
+        "reportid"
+      ],
+      "parent_columns": [
+        "reportid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L11",
+      "child_table": "dbo.bact_culture",
+      "parent_table": "dbo.bact_sample",
+      "child_columns": [
+        "sampleid"
+      ],
+      "parent_columns": [
+        "sampleid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L12",
+      "child_table": "dbo.bact_culresult",
+      "parent_table": "dbo.bact_culture",
+      "child_columns": [
+        "cultureid"
+      ],
+      "parent_columns": [
+        "cultureid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L13",
+      "child_table": "dbo.bact_eval",
+      "parent_table": "dbo.bact_sample",
+      "child_columns": [
+        "sampleid"
+      ],
+      "parent_columns": [
+        "sampleid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L14",
+      "child_table": "dbo.bact_medresult",
+      "parent_table": "dbo.bact_eval",
+      "child_columns": [
+        "evalid"
+      ],
+      "parent_columns": [
+        "evalid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9981,
+      "orphan": 19,
+      "match_rate": 0.9981
+    },
+    {
+      "relationship_id": "L15",
+      "child_table": "dbo.bact_smear",
+      "parent_table": "dbo.bact_sample",
+      "child_columns": [
+        "sampleid"
+      ],
+      "parent_columns": [
+        "sampleid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "L16",
+      "child_table": "dbo.bact_smearresult",
+      "parent_table": "dbo.bact_smear",
+      "child_columns": [
+        "smearid"
+      ],
+      "parent_columns": [
+        "smearid"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    }
+  ]
+}

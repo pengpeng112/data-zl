@@ -1,0 +1,231 @@
+{
+  "generated_at": "2026-07-14T12:02:14.933687+00:00",
+  "source": "10.10.10.68:1521/docare",
+  "safety": {
+    "transaction_read_only": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "relationship_id": "D01",
+      "child_table": "MEDCOMM.MED_PAT_VISIT",
+      "parent_table": "MEDCOMM.MED_PAT_MASTER_INDEX",
+      "columns": [
+        "PATIENT_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D02",
+      "child_table": "MEDSURGERY.MED_OPERATION_SCHEDULE",
+      "parent_table": "MEDCOMM.MED_PAT_VISIT",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9800,
+      "orphan": 200,
+      "match_rate": 0.98
+    },
+    {
+      "relationship_id": "D03",
+      "child_table": "MEDSURGERY.MED_SCHEDULED_OPERATION_NAME",
+      "parent_table": "MEDSURGERY.MED_OPERATION_SCHEDULE",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "SCHEDULE_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9998,
+      "orphan": 2,
+      "match_rate": 0.9998
+    },
+    {
+      "relationship_id": "D04",
+      "child_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "parent_table": "MEDCOMM.MED_PAT_VISIT",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9941,
+      "orphan": 59,
+      "match_rate": 0.9941
+    },
+    {
+      "relationship_id": "D05",
+      "child_table": "MEDSURGERY.MED_OPERATION_NAME",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9956,
+      "orphan": 44,
+      "match_rate": 0.9956
+    },
+    {
+      "relationship_id": "D06",
+      "child_table": "MEDSURGERY.MED_ANESTHESIA_PLAN",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9926,
+      "orphan": 74,
+      "match_rate": 0.9926
+    },
+    {
+      "relationship_id": "D07",
+      "child_table": "MEDSURGERY.MED_ANESTHESIA_SUMMARY",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9996,
+      "orphan": 4,
+      "match_rate": 0.9996
+    },
+    {
+      "relationship_id": "D08",
+      "child_table": "MEDSURGERY.MED_ANESTHESIA_EVENT",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D09",
+      "child_table": "MEDSURGERY.MED_ANESTHESIA_EVENT_BACK",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D10",
+      "child_table": "MEDSURGERY.MED_ANESTHESIA_INPUT_DATA",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9998,
+      "orphan": 2,
+      "match_rate": 0.9998
+    },
+    {
+      "relationship_id": "D11",
+      "child_table": "MEDSURGERY.MED_PAT_MONITOR_DATA",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D12",
+      "child_table": "MEDSURGERY.MED_PATIENT_MONITOR_DATA",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D13",
+      "child_table": "MEDSURGERY.MED_PAT_MONITOR_DATA_HISTORY",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0
+    },
+    {
+      "relationship_id": "D14",
+      "child_table": "MEDSURGERY.MED_OPERATION_ANALGESIC",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9999,
+      "orphan": 1,
+      "match_rate": 0.9999
+    },
+    {
+      "relationship_id": "D15",
+      "child_table": "MEDSURGERY.MED_ANES_OPERHANDOVER",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9999,
+      "orphan": 1,
+      "match_rate": 0.9999
+    },
+    {
+      "relationship_id": "D16",
+      "child_table": "MEDSURGERY.MED_ANES_DOC_CHECK",
+      "parent_table": "MEDSURGERY.MED_OPERATION_MASTER",
+      "columns": [
+        "PATIENT_ID",
+        "VISIT_ID",
+        "OPER_ID"
+      ],
+      "sampled_nonnull_keys": 10000,
+      "matched": 9991,
+      "orphan": 9,
+      "match_rate": 0.9991
+    }
+  ]
+}

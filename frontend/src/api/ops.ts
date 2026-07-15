@@ -88,3 +88,61 @@ export function executeOpsRun(runId: number, data: Record<string, any> = {}) {
 export function getOpsRunAudit(runId: number) {
   return http.request<ApiResponse<any[]>>("get", `/api/v1/ops/runs/${runId}/audit`);
 }
+
+// ── SQL 工作台 ──
+
+export function validateOpsSql(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/ops/sql/validate", { data });
+}
+
+export function createSqlTemplate(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/ops/sql/templates", { data });
+}
+
+export function submitSqlTemplate(toolCode: string, data: Record<string, any> = {}) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/ops/sql/templates/${toolCode}/submit`, { data });
+}
+
+export function approveSqlTemplate(toolCode: string, data: Record<string, any> = {}) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/ops/sql/templates/${toolCode}/approve`, { data });
+}
+
+export function rejectSqlTemplate(toolCode: string, data: Record<string, any> = {}) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/ops/sql/templates/${toolCode}/reject`, { data });
+}
+
+export function createSqlRun(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/ops/sql/runs", { data });
+}
+
+export function previewSqlRun(runId: number) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/ops/sql/runs/${runId}/preview`);
+}
+
+export function getOpsConfig() {
+  return http.request<ApiResponse<{
+    ops_write_enabled: boolean;
+    ops_approval_ui_enabled: boolean;
+    write_scope: string;
+  }>>("get", "/api/v1/ops/config");
+}
+
+export function listConnectionTargets() {
+  return http.request<ApiResponse<any[]>>("get", "/api/v1/connections-targets");
+}
+
+export function listSqlRuns(params?: Record<string, any>) {
+  return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/ops/sql/runs", { params });
+}
+
+export function getSqlRun(runId: number) {
+  return http.request<ApiResponse<any>>("get", `/api/v1/ops/sql/runs/${runId}`);
+}
+
+export function listOpsEvents(params?: Record<string, any>) {
+  return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/ops/events", { params });
+}
+
+export function getOpsEvent(eventId: string) {
+  return http.request<ApiResponse<any>>("get", `/api/v1/ops/events/${eventId}`);
+}

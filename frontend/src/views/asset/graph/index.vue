@@ -32,6 +32,7 @@
       :closable="false"
       :title="graphLoadNotice"
     />
+    <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
     <div v-loading="loading" :element-loading-text="graphLoadingText" class="graph-wrap">
       <component
         :is="graphEngine === 'g6' ? AdvancedRelationGraph : RelationGraph"
@@ -101,7 +102,7 @@ import GraphToolbar, { type GraphEngine } from "@/views/asset/components/GraphTo
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import { normalizeGraphData } from "@/views/asset/graph/graphNormalize";
 import { decideGraphLoadPolicy } from "@/views/asset/graph/graphLoadPolicy";
-import { getGraph, getGraphNeighbors, getGraphOptions, type GraphData, type GraphEdge, type GraphNode, type GraphOptionsData, type GraphViewMode } from "@/api/asset";
+import { getGraph, getGraphDiagnostics, getGraphNeighbors, getGraphOptions, type GraphData, type GraphEdge, type GraphNode, type GraphOptionsData, type GraphViewMode } from "@/api/asset";
 
 type LayoutMode = "layered" | "grouped" | "radial";
 
@@ -116,6 +117,7 @@ const selectedNodeId = ref("");
 const centerTable = ref("");
 const graphEngine = ref<GraphEngine>("svg");
 const graphLoadNotice = ref("");
+const diagnosticWarnings = ref<string[]>([]);
 const graphData = ref<GraphData>({ nodes: [], edges: [] });
 const options = reactive<GraphOptionsData>({ systems: [], sources: [], schemas: [], domains: [], validation_statuses: [], confidences: [], relation_types: [], view_modes: [] });
 
@@ -242,6 +244,15 @@ async function loadOptions() {
   }
 }
 
+async function loadDiagnostics() {
+  try {
+    const res = await getGraphDiagnostics();
+    diagnosticWarnings.value = res.data?.warnings || [];
+  } catch {
+    diagnosticWarnings.value = ["图谱诊断接口暂时不可用"];
+  }
+}
+
 async function loadData() {
   loading.value = true;
   centerTable.value = "";
@@ -349,6 +360,7 @@ function showEdge(edge: GraphEdge) {
 
 onMounted(async () => {
   await loadOptions();
+  await loadDiagnostics();
   await loadData();
 });
 </script>

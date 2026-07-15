@@ -23,13 +23,18 @@ if docker ps -a --format '{{.Names}}' | grep -qx "${NAME}"; then
   docker rm "${NAME}" || true
 fi
 
+# credentials 卷需可写：系统连接页通过 credential_store 原子写入 *.readonly 凭据文件。
+# 业务源库仍只读；此处仅平台侧凭据文件持久化。目录权限建议 0700。
+chmod 700 "${CREDS}" 2>/dev/null || true
+
 docker run -d --name "${NAME}" --restart unless-stopped \
+  --network host \
   --env-file "${ENV_FILE}" \
-  -v "${CREDS}:/etc/data-asset/credentials:ro" \
+  -v "${CREDS}:/etc/data-asset/credentials:rw" \
   -v "${ORACLE_HOST_DIR}:/opt/oracle:ro" \
-  -p 127.0.0.1:8000:8000 \
+  -e "APP_CREDENTIAL_DIR=/etc/data-asset/credentials" \
   "${IMAGE}" \
-  bash -lc 'bash /app/deploy/scripts/ensure_oracle_ro_runtime.sh || true; uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1'
+  bash -lc 'bash /app/deploy/scripts/ensure_oracle_ro_runtime.sh || true; uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1'
 
 echo "started ${NAME}"
 docker ps --filter "name=${NAME}"

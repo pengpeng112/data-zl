@@ -322,6 +322,109 @@ export const searchAssetTree = (params: {
     object
   >("/api/v1/assets/tree/search", { params });
 };
+
+// --- 业务系统与数据连接 ---
+
+export interface AssetSystemItem {
+  id: number;
+  system_code: string;
+  system_name_cn: string;
+  system_type?: string | null;
+  status?: string | null;
+  target_host?: string | null;
+  connection_count?: number;
+  table_count?: number;
+  created_at?: string | null;
+}
+
+export interface AssetSourceItem {
+  id?: number;
+  system_code: string;
+  source_code: string;
+  source_name_cn: string;
+  db_type?: string | null;
+  db_type_label?: string | null;
+  target_host?: string | null;
+  host_masked?: string | null;
+  port?: number | null;
+  service_mode?: string | null;
+  service_name?: string | null;
+  database_name?: string | null;
+  default_schema?: string | null;
+  environment?: string | null;
+  collect_mode?: string | null;
+  write_policy?: string | null;
+  enabled?: boolean;
+  last_check_status?: string | null;
+  credential_configured?: boolean;
+  credential_status?: string | null;
+  credential_username_masked?: string | null;
+  display_order?: number;
+}
+
+export interface DbTypeMeta {
+  db_type: string;
+  label: string;
+  default_port: number;
+  service_modes: string[];
+  requires_database_name: boolean;
+  requires_service_or_sid: boolean;
+}
+
+export const listSystems = (params?: { include_merged?: boolean }) =>
+  http.request<ApiResponse<AssetSystemItem[]>>("get", "/api/v1/systems", { params });
+
+export const getSystemDetail = (systemCode: string) =>
+  http.request<ApiResponse<any>>("get", `/api/v1/systems/${systemCode}/detail`);
+
+export const upsertSystem = (data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("put", "/api/v1/systems", { data });
+
+export const createSystemWithConnections = (data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("post", "/api/v1/systems-with-connections", { data });
+
+export const listSources = (params?: { system_code?: string }) =>
+  http.request<ApiResponse<AssetSourceItem[]>>("get", "/api/v1/sources", { params });
+
+export const upsertSource = (data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("put", "/api/v1/sources", { data });
+
+export const addSystemConnection = (systemCode: string, data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("post", `/api/v1/systems/${systemCode}/connections`, { data });
+
+export const checkSource = (sourceCode: string) =>
+  http.request<ApiResponse<any>>("post", `/api/v1/sources/${sourceCode}/check`);
+
+export const updateSourceCredential = (sourceCode: string, data: { username: string; password: string }) =>
+  http.request<ApiResponse<any>>("put", `/api/v1/sources/${sourceCode}/credential`, { data });
+
+export const clearSourceCredential = (sourceCode: string) =>
+  http.request<ApiResponse<any>>("delete", `/api/v1/sources/${sourceCode}/credential`);
+
+export const disableSource = (sourceCode: string) =>
+  http.request<ApiResponse<any>>("delete", `/api/v1/sources/${sourceCode}`);
+
+export const softDisableSystem = (systemCode: string) =>
+  http.request<ApiResponse<any>>("delete", `/api/v1/systems/${systemCode}`);
+
+export const listDbTypes = () =>
+  http.request<ApiResponse<DbTypeMeta[]>>("get", "/api/v1/db-types");
+
+export const listConnections = (params?: { include_aliases?: boolean }) =>
+  http.request<ApiResponse<AssetSourceItem[]>>("get", "/api/v1/connections", { params });
+
+export const getConnection = (id: number) =>
+  http.request<ApiResponse<any>>("get", `/api/v1/connections/${id}`);
+
+export const testConnectionDraft = (data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("post", "/api/v1/connections/test-draft", { data });
+
+export const testSavedConnection = (id: number) =>
+  http.request<ApiResponse<any>>("post", `/api/v1/connections/${id}/test`);
+
+export const listConnectionTargets = () =>
+  http.request<ApiResponse<any[]>>("get", "/api/v1/connections-targets");
+
 // --- P1.5 关系图谱 ---
 
 export interface GraphNode {
@@ -454,6 +557,10 @@ export const getGraphOptions = () => {
   return http.get<ApiResponse<GraphOptionsData>, object>(
     "/api/v1/graph/options"
   );
+};
+
+export const getGraphDiagnostics = () => {
+  return http.get<ApiResponse<{ table_count: number; relation_count: number; warnings: string[]; healthy: boolean }>, object>("/api/v1/graph/diagnostics");
 };
 
 // --- P2 血缘与候选关系 ---

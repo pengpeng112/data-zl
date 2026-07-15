@@ -1,0 +1,12 @@
+{
+  "category": "evidence",
+  "collected_at": "2026-07-14T19:13:14+08:00",
+  "imported_at": "2026-07-14T19:22:00+08:00",
+  "source": {"db_type": "vastbase", "endpoint": "10.10.8.177:5432", "requested_default_database": "vastbase", "business_database": "jhemr", "source_code": "jhemr_vastbase_10_10_8_177", "system_code": "JHEMR_VASTBASE", "read_only": true, "source_writes": 0},
+  "summary": {"objects": 1421, "columns": 24697, "schemas": 6, "view_dependencies": 283, "document_tables": 542, "document_live_matches": 532, "document_missing": 10},
+  "business_schemas": ["fxcx", "jhcdr", "jhemr", "jhfile", "jhnis", "report"],
+  "document_missing_tables": ["HAUTH_USER_VS_GROUP", "HMR_PRINT_CATALOG_DICT", "JHCDR", "JHFILE", "JHGWVGATE_PARAMETER_DICT", "JHGWVGATE_TREND_DATA_MONITOR", "JHMHT_FREQ_DICT", "JMR_FILE_CALLBACK_RECORD", "REPORT", "SYS_TEMP_FBT"],
+  "relationship_semantics": {"type": "view_dependency", "validation_level": "static_view_sql", "validation_status": "candidate", "confidence": "B", "declared_foreign_keys": 0},
+  "platform_verification": {"credential_status": "configured", "connectivity": "connected", "latency_ms": 17, "health": "ok", "platform_database": "connected"},
+  "backup": {"path": "/opt/data-asset/backups/data_asset_pre_jhemr_vastbase_20260714191708.dump", "sha256": "4b70d5526134f29064000d44d4390587b159a5d59f11c0c7b14e9cec34aa41be"}
+}

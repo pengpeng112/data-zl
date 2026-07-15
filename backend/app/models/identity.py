@@ -65,6 +65,11 @@ class IdentityPerson(Base):
     employment_status = Column(Text)
     primary_source_system = Column(Text)
     source_system = Column(Text)
+    profile_summary = Column(Text)
+    profile_tags = Column(JSONB)
+    review_status = Column(Text, server_default="unreviewed")
+    profile_updated_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 

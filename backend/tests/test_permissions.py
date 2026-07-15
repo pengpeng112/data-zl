@@ -139,13 +139,15 @@ def test_unbound_token_strict_mode_blocks_protected_routes(client: TestClient):
     unbound_client = TestClient(app, headers={"Authorization": f"Bearer {token}"})
     original = settings.rbac_require_bound_token
     try:
-        settings.rbac_require_bound_token = False
-        compatible = unbound_client.get("/api/v1/identity/persons")
-        assert compatible.status_code != 403
-
         settings.rbac_require_bound_token = True
         blocked = unbound_client.get("/api/v1/identity/persons")
         assert blocked.status_code == 403
-        assert blocked.json()["message"] == "权限不足"
+        message = blocked.json()["message"]
+        assert "权限不足" in message
+        assert "未绑定" in message
+
+        # Strict binding must not break public liveness checks.
+        health = unbound_client.get("/health/live")
+        assert health.status_code == 200
     finally:
         settings.rbac_require_bound_token = original

@@ -11,6 +11,9 @@ export interface PermissionResource {
   name_cn: string;
   type: "menu" | "page" | "api" | "button" | string;
   parent_code?: string | null;
+  module_code?: string;
+  action_code?: string;
+  enabled?: boolean;
 }
 
 export interface PermissionRole {
@@ -105,4 +108,20 @@ export function getMyPermissions() {
 }
 export function getPermissionAuditLogs(params?: Record<string, any>) {
   return http.request<ApiResponse<PermissionAuditLog[]>>("get", "/api/v1/permissions/audit", { params });
+}
+
+export function createPermissionRequest(data: Record<string, any>) {
+  return http.request<ApiResponse<any>>("post", "/api/v1/permission-requests", { data });
+}
+export function getMyPermissionRequests() {
+  return http.request<ApiResponse<any[]>>("get", "/api/v1/permission-requests/mine");
+}
+export function getPendingPermissionRequests() {
+  return http.request<ApiResponse<any[]>>("get", "/api/v1/permission-requests/pending");
+}
+export function decidePermissionRequest(id: number, action: "approve" | "reject", note?: string) {
+  return http.request<ApiResponse<any>>("patch", `/api/v1/permission-requests/${id}/${action}`, { data: { note } });
+}
+export function executePermissionRequest(id: number) {
+  return http.request<ApiResponse<any>>("post", `/api/v1/permission-requests/${id}/execute`);
 }

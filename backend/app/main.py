@@ -10,7 +10,7 @@ import hashlib
 import time
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, auth, candidates, dict_general_api, dict_medical_api, governance, governance_ops, graph, health, identity, lineage, metadata_changes, ops_tools, permissions, quality, recipes, relations, systems, tables
+from .api.v1 import admin, ai, auth, candidates, dict_general_api, dict_medical_api, governance, governance_ops, graph, health, identity, lineage, metadata_changes, ops_tools, permissions, permission_requests, quality, recipes, relations, systems, tables
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -373,6 +373,7 @@ app.include_router(governance_ops.router)
 app.include_router(metadata_changes.router)
 app.include_router(ops_tools.router)
 app.include_router(permissions.router)
+app.include_router(permission_requests.router)
 app.include_router(identity.router)
 app.include_router(dict_general_api.router)
 app.include_router(dict_medical_api.router)

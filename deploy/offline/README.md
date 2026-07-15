@@ -34,7 +34,27 @@ psql "$POSTGRES_DBA_URL" -f deploy/offline/init_db.sql
 ```
 
 Inject `APP_DB_URL` and `APP_CREDENTIAL_ENCRYPT_KEY` through the target host's
-secret store or a protected environment file, then run:
+secret store or a protected environment file.
+
+### Credentials directory (plan 75)
+
+Platform data-source passwords are stored as server files (not in PostgreSQL):
+
+```bash
+sudo mkdir -p /etc/data-asset/credentials
+sudo chown dataasset:dataasset /etc/data-asset/credentials   # or the API runtime user
+sudo chmod 700 /etc/data-asset/credentials
+```
+
+- Files: `/etc/data-asset/credentials/<source_code>.readonly` (mode `0600`).
+- Content: `username:password` one line; never commit these files.
+- Set `APP_CREDENTIAL_DIR=/etc/data-asset/credentials` for the API process.
+- Container mount must be **read-write** (`:rw`) so the connection UI can rotate
+  credentials; business source databases remain SELECT-only.
+- Independent acceptance/test images should use a dedicated empty credentials
+  directory, never production secrets.
+
+Then run:
 
 ```bash
 cd /opt/data-asset/backend

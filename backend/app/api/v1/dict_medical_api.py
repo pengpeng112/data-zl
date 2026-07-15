@@ -17,6 +17,7 @@ from ...models.dict_medical import (
     DictMedicalCodeItem,
     DictMedicalCodeMapping,
     DictMedicalCodeSet,
+    DictMedicalImportRun,
     DictMedicalSyncDiff,
 )
 from ...models.governance_base import GovernAuditLog, GovernChangeRequest
@@ -930,5 +931,110 @@ def list_versions(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
         }
         for r in rows
     ])
+
+
+@router.get("/import-runs", summary="诊断手术导入批次日志")
+def list_import_runs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    status: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    stmt = select(DictMedicalImportRun)
+    if status:
+        stmt = stmt.where(DictMedicalImportRun.status == status)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(DictMedicalImportRun.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": [
+            {
+                "id": r.id,
+                "batch_code": r.batch_code,
+                "status": r.status,
+                "mode": r.mode,
+                "operator": r.operator,
+                "diagnosis_file_name": r.diagnosis_file_name,
+                "operation_file_name": r.operation_file_name,
+                "diagnosis_sha256": r.diagnosis_sha256,
+                "operation_sha256": r.operation_sha256,
+                "stats": r.stats,
+                "error_summary": r.error_summary,
+                "correlation_id": getattr(r, "correlation_id", None),
+                "duration_ms": getattr(r, "duration_ms", None),
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+            }
+            for r in rows
+        ],
+    })
+
+
+@router.get("/import-runs/{run_id}", summary="导入批次详情")
+def get_import_run(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    r = db.get(DictMedicalImportRun, run_id)
+    if not r:
+        raise HTTPException(status_code=404)
+    return ApiResponse(data={
+        "id": r.id,
+        "batch_code": r.batch_code,
+        "status": r.status,
+        "mode": r.mode,
+        "operator": r.operator,
+        "source_dir": r.source_dir,
+        "diagnosis_file_name": r.diagnosis_file_name,
+        "operation_file_name": r.operation_file_name,
+        "diagnosis_sha256": r.diagnosis_sha256,
+        "operation_sha256": r.operation_sha256,
+        "stats": r.stats,
+        "error_summary": r.error_summary,
+        "correlation_id": getattr(r, "correlation_id", None),
+        "duration_ms": getattr(r, "duration_ms", None),
+        "created_at": r.created_at.isoformat() if r.created_at else None,
+        "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+    })
+
+
+@router.get("/sync-logs", summary="字典同步差异日志摘要")
+def list_sync_logs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    status: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    stmt = select(DictMedicalSyncDiff)
+    if status:
+        stmt = stmt.where(DictMedicalSyncDiff.status == status)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(DictMedicalSyncDiff.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": [
+            {
+                "id": r.id,
+                "category_code": r.category_code,
+                "target_system": r.target_system,
+                "diff_type": r.diff_type,
+                "code_set_code": r.code_set_code,
+                "item_code": r.item_code,
+                "severity": r.severity,
+                "status": r.status,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
+            for r in rows
+        ],
+    })
 
 

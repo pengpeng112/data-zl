@@ -1,0 +1,68 @@
+{
+  "source_dir": "F:\\python\\数据资产\\开发起步包\\诊断与手术维护",
+  "diagnosis_file": "山东省第二人民医院 临床诊断字典2026.06.04（全字段标识版）.xlsx",
+  "operation_file": "山东省第二人民医院 临床手术操作字典2026.06.02（全字段标识版）.xlsx",
+  "diagnosis_size": 2985146,
+  "operation_size": 1143995,
+  "diagnosis_sha256": "34109b53ccbe2ecb010f933a693fe05d6f98d9dc5073f2e00d7af42da2f3fd22",
+  "operation_sha256": "fccba1a70341964dac60ee6b9dd757c99cc4009d75339e4f30fa889e1eea412a",
+  "diagnosis_sheets": [
+    "门诊诊断和出入院诊断",
+    "病理诊断",
+    "外部原因"
+  ],
+  "operation_sheets": [
+    "手术操作字典"
+  ],
+  "code_sets": 8,
+  "items": 130765,
+  "items_diagnosis": 104089,
+  "items_operation": 26676,
+  "mappings": 90265,
+  "mappings_diagnosis": 74691,
+  "mappings_operation": 15574,
+  "items_by_code_set": {
+    "diagnosis_local_clinical": 38174,
+    "diagnosis_national_clinical_v2": 34820,
+    "diagnosis_insurance_v2": 28709,
+    "diagnosis_local_pathology": 1544,
+    "diagnosis_external_cause_clinical_v2": 842,
+    "operation_local_clinical": 14657,
+    "operation_national_clinical_v3": 634,
+    "operation_insurance_v2": 11385
+  },
+  "parse_stats": {
+    "empty_code": 16941,
+    "empty_name": 1279,
+    "duplicate_code": 13431,
+    "same_code_diff_name": 7,
+    "input_rows_diagnosis": 38174,
+    "input_rows_operation": 14657
+  },
+  "missing_mapping_fk": 1279,
+  "error_rate": 0.34487327516041716,
+  "mode": "dry_run",
+  "platform_diff": {
+    "existing_managed_items": 130765,
+    "existing_managed_mappings": 90265,
+    "items_new": 0,
+    "items_removed": 0,
+    "items_same_key": 130765,
+    "mappings_new": 0,
+    "mappings_removed": 0,
+    "replace_scope": [
+      "diagnosis_external_cause_clinical_v2",
+      "diagnosis_insurance_v2",
+      "diagnosis_local_clinical",
+      "diagnosis_local_pathology",
+      "diagnosis_national_clinical_v2",
+      "operation_insurance_v2",
+      "operation_local_clinical",
+      "operation_national_clinical_v3"
+    ]
+  },
+  "apply_result": {
+    "status": "dry_run",
+    "writes": 0
+  }
+}

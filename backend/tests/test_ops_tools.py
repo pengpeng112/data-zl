@@ -1,4 +1,35 @@
 from fastapi.testclient import TestClient
+import hashlib
+
+from app.core.db import SessionLocal
+from app.models.governance import ApiKey
+from app.models.governance_base import AssetRole, AssetUserRole
+
+APPROVER_TOKEN = "test-ops-approver-token-2026"
+
+
+def _approver_headers():
+    db = SessionLocal()
+    try:
+        key = db.query(ApiKey).filter(ApiKey.key_name == "test-ops-approver").first()
+        digest = hashlib.sha256(APPROVER_TOKEN.encode()).hexdigest()
+        if not key:
+            db.add(ApiKey(key_name="test-ops-approver", token_hash=digest, user_identifier="test-ops-approver"))
+        else:
+            key.token_hash = digest
+            key.user_identifier = "test-ops-approver"
+            key.enabled = True
+        if not db.query(AssetRole).filter(AssetRole.role_code == "platform_admin").first():
+            db.add(AssetRole(role_code="platform_admin", role_name_cn="平台管理员", role_type="builtin"))
+        if not db.query(AssetUserRole).filter(
+            AssetUserRole.user_identifier == "test-ops-approver",
+            AssetUserRole.role_code == "platform_admin",
+        ).first():
+            db.add(AssetUserRole(user_identifier="test-ops-approver", role_code="platform_admin", status="active"))
+        db.commit()
+    finally:
+        db.close()
+    return {"Authorization": f"Bearer {APPROVER_TOKEN}"}
 
 def _enable_ops_write(monkeypatch):
     monkeypatch.setattr("app.api.v1.ops_tools.settings.ops_write_enabled", True)
@@ -44,7 +75,11 @@ def _submit_run(client: TestClient, run_id: int, submitted_by="submitter"):
 
 def _approve_run(client: TestClient, run_id: int, approved_by="approverB"):
     _submit_run(client, run_id)
-    resp = client.patch(f"/api/v1/ops/runs/{run_id}/approve", json={"approved_by": approved_by})
+    resp = client.patch(
+        f"/api/v1/ops/runs/{run_id}/approve",
+        json={"approved_by": approved_by},
+        headers=_approver_headers(),
+    )
     assert resp.status_code == 200, f"approve run failed: {resp.text}"
     return resp.json()["data"]
 
@@ -156,7 +191,7 @@ def test_approve_run(client: TestClient):
     resp = client.patch(f"/api/v1/ops/runs/{run['id']}/approve", json={
         "approved_by": "userB",
         "note": "同意执行",
-    })
+    }, headers=_approver_headers())
     assert resp.status_code == 200
     assert resp.json()["data"]["approval_status"] == "approved"
 
@@ -168,7 +203,7 @@ def test_reject_run(client: TestClient):
     resp = client.patch(f"/api/v1/ops/runs/{run['id']}/reject", json={
         "approved_by": "userB",
         "note": "拒绝执行",
-    })
+    }, headers=_approver_headers())
     assert resp.status_code == 200
     assert resp.json()["data"]["approval_status"] == "rejected"
 

@@ -292,7 +292,7 @@ def test_collect_person_sources_live_source(client: TestClient, monkeypatch):
                         "DEPTID": None,
                         "VALIDSTATE": "0",
                         "IDENNO": "secret-id2",
-                        "USERCODE": "E001",
+                        "USERID": "E001",
                         "ISDELETED": 0,
                     },
                 ]

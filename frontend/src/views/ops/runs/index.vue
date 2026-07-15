@@ -10,8 +10,9 @@
     <ReWorkflow :steps="pipelineSteps" class="runs-workflow" />
 
     <ReToolbar title="申请筛选" class="runs-toolbar">
-      <el-select v-model="filterStatus" clearable placeholder="审批状态" class="status-filter" @change="fetchData">
+      <el-select v-model="filterStatus" clearable placeholder="状态" class="status-filter" @change="fetchData">
         <el-option label="draft" value="draft" />
+        <el-option label="ready_for_preview" value="ready_for_preview" />
         <el-option label="submitted" value="submitted" />
         <el-option label="pending" value="pending" />
         <el-option label="approved" value="approved" />
@@ -64,7 +65,7 @@
             @click="handleReject(row)"
           >驳回</el-button>
           <el-button
-            v-if="row.approval_status === 'approved'"
+            v-if="['approved', 'ready_for_preview'].includes(row.approval_status)"
             type="warning"
             link
             size="small"

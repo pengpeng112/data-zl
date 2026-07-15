@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     ops_write_enabled: bool = False
     ops_write_d1_d5_confirmed: bool = False
     ops_write_confirmation_token: str = ""
+    # Plan 76: hide template/run approval UI for admin-simplified flow (API kept).
+    ops_approval_ui_enabled: bool = False
 
     # Local account auth / JWT (59 号计划)
     # 本地开发默认 HS256 + jwt_secret；生产用 RS256 + 密钥文件路径。

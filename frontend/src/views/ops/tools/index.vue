@@ -5,6 +5,7 @@
       subtitle="第一阶段仅允许平台库 asset schema 的白名单参数化 INSERT/UPDATE。"
     >
       <template #actions>
+        <el-button @click="$router.push('/ops/sql-workbench')">SQL 工作台</el-button>
         <el-button type="primary" @click="handleCreate">新建工具</el-button>
       </template>
     </RePageHeader>
@@ -14,7 +15,7 @@
       type="warning"
       show-icon
       :closable="false"
-      title="源业务库默认只读，HIS/ODS/HRP/LIS/PACS 等业务源库禁止写入；写操作必须走审批、二次确认和审计。"
+      title="源业务库默认只读，HIS/ODS/HRP/LIS/PACS 等业务源库禁止写入；写操作必须走审批、二次确认和审计。自定义 INSERT/UPDATE 请使用 SQL 工作台。"
     />
 
     <el-table v-loading="loading" :data="tableData" border stripe class="full-table">

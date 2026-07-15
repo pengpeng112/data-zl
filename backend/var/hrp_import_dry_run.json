@@ -1,0 +1,41 @@
+{
+  "mode": "dry_run",
+  "scope": "keep",
+  "package_dir": "F:\\python\\数据资产\\开发起步包\\数据资产_HRP源端资产包",
+  "package_files": {
+    "hrp_source_catalog.json": {
+      "size": 59450,
+      "sha256": "cbbc36efb2628a177cf39f91d614630e08ccd1da6e761974cbd6ba28f33e18ce"
+    },
+    "hrp_decided_keep_list.csv": {
+      "size": 163256,
+      "sha256": "60e5b07bc7f934153356a7a9e561042c14d28ad8ae4a4d1cfac054a37d84851c"
+    },
+    "hrp_source_tables.csv": {
+      "size": 11754336,
+      "sha256": "1727d126b4214f4ac1ed1b5f963b45e1bdc629660b4e5ab92f40d44d82709fd2"
+    },
+    "hrp_source_columns.csv": {
+      "size": 496052947,
+      "sha256": "skipped_large"
+    },
+    "hrp_ods_mirror_tables.csv": {
+      "size": 1011,
+      "sha256": "1cee75ec49c78aab6a902a77dd3a4a47c0995cf8759e9e705ea9f323274bd610"
+    },
+    "hrp_ods_mirror_columns.csv": {
+      "size": 58790,
+      "sha256": "3533511226eecad1e7c88a1aacea0a89b0f7eb21e4e83a88feb1341d3b16d174"
+    }
+  },
+  "keep_tables": 67,
+  "table_meta_rows": 67,
+  "columns_loaded": 841,
+  "platform_existing_hrp_tables": 0,
+  "platform_existing_hrp_columns": 0,
+  "batch_code": "hrp-import-20260714102538",
+  "apply_result": {
+    "status": "dry_run",
+    "writes": 0
+  }
+}

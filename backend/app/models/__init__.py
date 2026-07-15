@@ -3,8 +3,10 @@ from .asset_system import AssetDataSource, AssetSystem  # noqa: F401
 from .auth import AuthLoginEvent, AuthSession, AuthUser  # noqa: F401
 from .governance_base import (  # noqa: F401
     AssetActionExecutor,
+    AssetPermissionResource,
     AssetRole,
     AssetRolePermission,
+    AssetUserDataScope,
     AssetUserRole,
     GovernAuditLog,
     GovernChangeRequest,
@@ -20,4 +22,6 @@ __all__ = [
     "AuthUser",
     "AuthSession",
     "AuthLoginEvent",
+    "AssetPermissionResource",
+    "AssetUserDataScope",
 ]
