@@ -1,0 +1,666 @@
+{
+  "generated_at": "2026-07-15T01:49:40.732136+00:00",
+  "source": "10.10.10.125:1521/ewell",
+  "owner": "LUNA_MCS_SDSEY",
+  "safety": {
+    "transaction_read_only": true,
+    "sample_limit_per_relation": 10000,
+    "source_writes": 0
+  },
+  "results": [
+    {
+      "id": "R01",
+      "child_table": "MCS_DOC_FORM",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "INPATIENTS",
+      "parent_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "evidence": "view:T_ITF_HL",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R02",
+      "child_table": "MCS_DOC_FORM_RECORDS",
+      "child_columns": [
+        "FORM_ID"
+      ],
+      "parent_table": "MCS_DOC_FORM",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view/subquery",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R03",
+      "child_table": "MCS_DOC_FORM",
+      "child_columns": [
+        "TEMPLATE_CODE"
+      ],
+      "parent_table": "MCS_DOC_TEMPLATE",
+      "parent_columns": [
+        "CODE"
+      ],
+      "evidence": "view:T_ITF_HL",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R04",
+      "child_table": "MCS_EVENT_INFO",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "MCS_HIS_PATIENT",
+      "parent_columns": [
+        "PATIENT_UID"
+      ],
+      "evidence": "view:V_ESBHL_OUTPUT_ASS_GUIDE",
+      "sampled_nonnull_keys": 10000,
+      "matched": 0,
+      "orphan": 10000,
+      "match_rate": 0.0,
+      "status": "empty_or_unmatched"
+    },
+    {
+      "id": "R05",
+      "child_table": "MCS_VITAL_INFO",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "INPATIENTS",
+      "parent_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "evidence": "document/core",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R06",
+      "child_table": "MCS_DIABETES_ASSESS_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_DIABETES_ASSESS",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 9,
+      "matched": 9,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R07",
+      "child_table": "MCS_PICC_CATHETERIZATION_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_PICC_CATHETERIZATION",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 3,
+      "matched": 3,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R08",
+      "child_table": "MCS_PICC_COMPLICATION_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_PICC_COMPLICATION",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 2,
+      "matched": 2,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R09",
+      "child_table": "MCS_PICC_COMPLICATION",
+      "child_columns": [
+        "MAINTENANCE_ID"
+      ],
+      "parent_table": "MCS_PICC_MAINTENANCE_RECORD",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 2,
+      "matched": 2,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R10",
+      "child_table": "MCS_PICC_MAINTENANCE_RECORD",
+      "child_columns": [
+        "PICC_ID"
+      ],
+      "parent_table": "MCS_PICC_CATHETERIZATION",
+      "parent_columns": [
+        "PICC_ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 2,
+      "matched": 2,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R11",
+      "child_table": "MCS_PICC_ASSESSMENT_S_PICC",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_PICC_ASSESSMENT",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 2,
+      "matched": 2,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R12",
+      "child_table": "MCS_PICC_DROP_TUBE_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_PICC_DROP_TUBE",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 1,
+      "matched": 1,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R13",
+      "child_table": "MCS_STOMA_ASSESS_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_STOMA_ASSESS",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 6,
+      "matched": 4,
+      "orphan": 2,
+      "match_rate": 0.666667,
+      "status": "partial"
+    },
+    {
+      "id": "R14",
+      "child_table": "MCS_STOMA_REGISTER_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_STOMA_REGISTER",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 10,
+      "matched": 10,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R15",
+      "child_table": "MCS_WOUND_ASSESS_S",
+      "child_columns": [
+        "XFORM_SOURCE_ID"
+      ],
+      "parent_table": "MCS_WOUND_ASSESS",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "view",
+      "sampled_nonnull_keys": 20,
+      "matched": 15,
+      "orphan": 5,
+      "match_rate": 0.75,
+      "status": "partial"
+    },
+    {
+      "id": "R16",
+      "child_table": "MCS_WARDREPORT_REPORT_DETAIL",
+      "child_columns": [
+        "REPORT_ID"
+      ],
+      "parent_table": "MCS_WARDREPORT_REPORT",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "document",
+      "sampled_nonnull_keys": 0,
+      "matched": 0,
+      "orphan": 0,
+      "match_rate": null,
+      "status": "empty_or_unmatched"
+    },
+    {
+      "id": "R17",
+      "child_table": "MCS_DAILY_SETTLE_DATA",
+      "child_columns": [
+        "DETAIL_ID"
+      ],
+      "parent_table": "MCS_DAILY_SETTLE_DETAIL",
+      "parent_columns": [
+        "ID"
+      ],
+      "evidence": "document",
+      "sampled_nonnull_keys": 0,
+      "matched": 0,
+      "orphan": 0,
+      "match_rate": null,
+      "status": "empty_or_unmatched"
+    },
+    {
+      "id": "R18",
+      "child_table": "MCS_DOC_FORM_RECORDS",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "INPATIENTS",
+      "parent_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "evidence": "core",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R19",
+      "child_table": "MCS_EVENT_INFO",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "INPATIENTS",
+      "parent_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "evidence": "core",
+      "sampled_nonnull_keys": 10000,
+      "matched": 10000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "status": "verified"
+    },
+    {
+      "id": "R20",
+      "child_table": "MCS_HIS_PATIENT",
+      "child_columns": [
+        "PATIENT_UID"
+      ],
+      "parent_table": "INPATIENTS",
+      "parent_columns": [
+        "PAT_INDEX_NO"
+      ],
+      "evidence": "mirror",
+      "sampled_nonnull_keys": 0,
+      "matched": 0,
+      "orphan": 0,
+      "match_rate": null,
+      "status": "empty_or_unmatched"
+    }
+  ],
+  "metadata_summary": {
+    "tables": 508,
+    "views": 59,
+    "columns": 9981,
+    "constraint_columns": 379,
+    "index_columns": 930,
+    "source_writes": 0
+  },
+  "document_comparison": {
+    "document_tables": 113,
+    "live_matched": 73,
+    "document_missing_in_live": 40,
+    "missing_names": [
+      "MCS_DAILY_FEVER_STATS",
+      "MCS_DICT_BED_GROUP",
+      "MCS_DICT_WORKLOAD_ITEM",
+      "MCS_DICT_WORKLOAD_WARD",
+      "MCS_DOC_HEALTH_CONF",
+      "MCS_DOC_HEALTH_RECORD",
+      "MCS_DOC_JKJY",
+      "MCS_DOC_JKJY_ILLNESS",
+      "MCS_DOC_JKJY_RECORD",
+      "MCS_DOC_JKJY_RECORD_BAK",
+      "MCS_DOC_JKJY_WARD",
+      "MCS_DOC_JKJY_XMWH",
+      "MCS_DOC_TEMPLATE_NURSE",
+      "MCS_DOC_TEMPLATE_TYPE",
+      "MCS_HIS_ORDER",
+      "MCS_MANUALLY_EXECUTE_FORM",
+      "MCS_MANUALLY_EXECUTE_RECORDS",
+      "MCS_MSYS_BEDLIST_CONF",
+      "MCS_MSYS_BIG_STRING_CONF",
+      "MCS_MSYS_DOC_CONF",
+      "MCS_MSYS_URL",
+      "MCS_MSYS_XML_CONF",
+      "MCS_NM_DEPT",
+      "MCS_NM_PERSONNEL_INFO",
+      "MCS_NM_SCHEDULE",
+      "MCS_NM_SCHEDULE_REMARK",
+      "MCS_NM_WORK_SHIFT",
+      "MCS_NOTE_INFO",
+      "MCS_OUTERSTANDING_TASK",
+      "MCS_PATIENT_FOR_IN_HIS",
+      "MCS_SYS_HOSPITAL_IMAGE",
+      "MCS_SYS_HOSPITAL_VIEW",
+      "MCS_SYS_LOG",
+      "MCS_SYS_MODULES",
+      "MCS_SYS_RIGHTS",
+      "MCS_SYS_ROLES",
+      "MCS_SYS_ROLE_RIGHTS",
+      "MCS_SYS_USER_ROLES",
+      "MCS_SYS_USER_WARDS",
+      "MCS_WARD_BED_GROUP"
+    ],
+    "live_tables_not_in_document": 435
+  },
+  "view_summary": {
+    "total": 59,
+    "valid": 57,
+    "invalid": 2,
+    "invalid_names": [
+      "CONSULTATION_V_Q_RECORD",
+      "CONSULTATION_V_Q_RECORD_JUNIOR"
+    ],
+    "parsed_dependencies": 41
+  },
+  "view_dependencies": [
+    {
+      "view": "BL_DCJL",
+      "referenced_table": "MCS_DOC_FORM",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "BL_YDFMJL",
+      "referenced_table": "MCS_DOC_FORM",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "DICT_SMTZCLXM",
+      "referenced_table": "MCS_DICT_VITALSIGN_TYPE",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_CATHETERIZATIONINFO",
+      "referenced_table": "MCS_PICC_CATHETERIZATION",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_CATHETERIZATIONINFO",
+      "referenced_table": "MCS_PICC_CATHETERIZATION_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_COMPLICATIONS",
+      "referenced_table": "MCS_PICC_CATHETERIZATION",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_COMPLICATIONS",
+      "referenced_table": "MCS_PICC_COMPLICATION",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_COMPLICATIONS",
+      "referenced_table": "MCS_PICC_COMPLICATION_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_COMPLICATIONS",
+      "referenced_table": "MCS_PICC_MAINTENANCE_RECORD",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_DROPTUBE",
+      "referenced_table": "MCS_PICC_DROP_TUBE",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_DROPTUBE",
+      "referenced_table": "MCS_PICC_DROP_TUBE_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_INFUSIONTOOL",
+      "referenced_table": "MCS_PICC_ASSESSMENT",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_INFUSIONTOOL",
+      "referenced_table": "MCS_PICC_ASSESSMENT_S_CVC",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_INFUSIONTOOL",
+      "referenced_table": "MCS_PICC_ASSESSMENT_S_IP",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_INFUSIONTOOL",
+      "referenced_table": "MCS_PICC_ASSESSMENT_S_IV",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "PICC_V_Q_INFUSIONTOOL",
+      "referenced_table": "MCS_PICC_ASSESSMENT_S_PICC",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "STOMA_V_Q_ASSESS_INFO",
+      "referenced_table": "MCS_STOMA_ASSESS",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "STOMA_V_Q_ASSESS_INFO",
+      "referenced_table": "MCS_STOMA_ASSESS_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "STOMA_V_Q_REGISTER_INFO",
+      "referenced_table": "MCS_STOMA_REGISTER",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "STOMA_V_Q_REGISTER_INFO",
+      "referenced_table": "MCS_STOMA_REGISTER_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "T_ITF_HL",
+      "referenced_table": "INPATIENTS",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "T_ITF_HL",
+      "referenced_table": "MCS_DOC_FORM",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_EMR_ADMISSION_ASSESSMENT",
+      "referenced_table": "DIAGNOSIS_BASY",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_EMR_CHILDBIRTH",
+      "referenced_table": "MCS_DOC_FORM",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_ADMISSION_ASS",
+      "referenced_table": "MCS_HLHT_EMR23",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_CES_SEC_ROD",
+      "referenced_table": "MCS_HLHT_EMR16",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_DEL_ROD",
+      "referenced_table": "MCS_HLHT_EMR14",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_DEL_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR14",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_DYING_NUR_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR18",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_GEN_NUR_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR17",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_INPUT_OUTPUT_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR21",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_NUR_PLAN",
+      "referenced_table": "MCS_HLHT_EMR24",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_OPER_NUR_ROD",
+      "referenced_table": "MCS_HLHT_EMR19",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_OUTPUT_ASS_GUIDE_ZD",
+      "referenced_table": "MCS_HLHT_EMR25",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_VAGINAL_DEL_ROD",
+      "referenced_table": "MCS_DOC_FORM",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_VAGINAL_DEL_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR15",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_VS_MEASURE_ROD",
+      "referenced_table": "MCS_EVENT_INFO",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_ESBHL_VS_MEASURE_ROD_ZD",
+      "referenced_table": "MCS_HLHT_EMR20",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "V_YBHLJD",
+      "referenced_table": "MCS_DOC_NODES",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "WOUND_V_Q_ASSESS",
+      "referenced_table": "MCS_WOUND_ASSESS",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    },
+    {
+      "view": "WOUND_V_Q_ASSESS",
+      "referenced_table": "MCS_WOUND_ASSESS_S",
+      "evidence": "static_view_sql",
+      "validation_level": "B"
+    }
+  ]
+}
