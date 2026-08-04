@@ -17,7 +17,7 @@ from ...models.asset_system import AssetDataSource
 from ...models.governance_base import GovernAuditLog
 from ...models.ops_tool import OpsEventLog, OpsToolRun, OpsToolTemplate
 from ...schemas.common import ApiResponse
-from ...services.data_masking import mask_sensitive
+from ...services.data_masking import mask_sensitive, sanitize_text
 from ...services.ops_event_log import log_event
 from ...services.ops_executor import execute_whitelist_dml, sql_template_hash
 from ...services.ops_sql_safety import validate_dry_run_sql, validate_writable_sql
@@ -394,7 +394,7 @@ def dry_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody(dry_r
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"dry_run failed: {e}")
+        raise HTTPException(status_code=400, detail=f"dry_run failed: {sanitize_text(str(e))}")
     return ApiResponse(data={"id": run.id, "status": "dry_run", **dry_result})
 
 
@@ -445,7 +445,7 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
             db.commit()
         except Exception as e:
             db.rollback()
-            raise HTTPException(status_code=400, detail=f"dry_run failed: {e}")
+            raise HTTPException(status_code=400, detail=f"dry_run failed: {sanitize_text(str(e))}")
         return ApiResponse(data={"id": run.id, "status": "dry_run", **dry_result})
 
     # conditional transition approved -> executing (second guard against races)
@@ -492,7 +492,7 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
             run.error_summary_masked = str(e)[:300]
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
-        raise HTTPException(status_code=400, detail=f"execute rejected: {e}")
+        raise HTTPException(status_code=400, detail=f"execute rejected: {sanitize_text(str(e))}")
     except Exception as e:
         db.rollback()
         run = db.get(OpsToolRun, run_id)
@@ -503,7 +503,7 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
             run.error_summary_masked = str(e)[:300]
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
-        raise HTTPException(status_code=500, detail=f"execute failed: {e}")
+        raise HTTPException(status_code=500, detail=f"execute failed: {sanitize_text(str(e))}")
 
     finish_time = datetime.now(timezone.utc)
     elapsed_ms = int((finish_time - start_time).total_seconds() * 1000)
@@ -978,7 +978,7 @@ def sql_preview_run(run_id: int, request: Request, db: Session = Depends(get_db)
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"preview failed: {e}")
+        raise HTTPException(status_code=400, detail=f"preview failed: {sanitize_text(str(e))}")
     return ApiResponse(data={
         "id": run.id,
         "status": "preview",

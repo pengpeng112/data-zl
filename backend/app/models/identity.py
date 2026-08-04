@@ -1,9 +1,13 @@
-from sqlalchemy import BigInteger, Column, Integer, Text, TIMESTAMP, Boolean, UniqueConstraint
+from sqlalchemy import BigInteger, Boolean, Column, Integer, Text, TIMESTAMP, UniqueConstraint, Index
+from sqlalchemy import JSON
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
 from ..core.db import Base
 
+# Portable types for SQLite test compatibility
+PortableBigInt = BigInteger().with_variant(Integer, "sqlite")
+PortableJSON = JSON().with_variant(JSONB(), "postgresql")
 
 class IdentityDepartment(Base):
     __tablename__ = "asset_identity_departments"
@@ -12,7 +16,7 @@ class IdentityDepartment(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     dept_code = Column(Text, nullable=False)
     dept_name_cn = Column(Text, nullable=False)
     dept_type = Column(Text)
@@ -33,7 +37,7 @@ class IdentityDepartmentSource(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     dept_code = Column(Text)
     source_system = Column(Text, nullable=False)
     source_code = Column(Text)
@@ -44,7 +48,7 @@ class IdentityDepartmentSource(Base):
     source_dept_type = Column(Text)
     source_status = Column(Text)
     match_status = Column(Text, server_default="unmatched")
-    raw_data = Column(JSONB)
+    raw_data = Column(PortableJSON)
     last_seen_at = Column(TIMESTAMP(timezone=True))
 
 
@@ -55,7 +59,7 @@ class IdentityPerson(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     person_code = Column(Text, nullable=False)
     person_name_cn = Column(Text)
     dept_code = Column(Text)
@@ -66,7 +70,14 @@ class IdentityPerson(Base):
     primary_source_system = Column(Text)
     source_system = Column(Text)
     profile_summary = Column(Text)
-    profile_tags = Column(JSONB)
+    profile_tags = Column(PortableJSON)
+    source_create_date = Column(TIMESTAMP(timezone=True))
+    raw_job = Column(Text)
+    raw_title = Column(Text)
+    classification = Column(Text)
+    classification_rule_version = Column(Text)
+    is_managed = Column(Boolean, server_default="false")
+    conflict_flag = Column(Text)
     review_status = Column(Text, server_default="unreviewed")
     profile_updated_at = Column(TIMESTAMP(timezone=True))
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
@@ -80,7 +91,7 @@ class IdentityPersonSource(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     person_code = Column(Text)
     source_system = Column(Text, nullable=False)
     source_code = Column(Text)
@@ -91,7 +102,7 @@ class IdentityPersonSource(Base):
     source_status = Column(Text)
     is_temporary = Column(Boolean, server_default="false")
     match_status = Column(Text, server_default="unmatched")
-    raw_data = Column(JSONB)
+    raw_data = Column(PortableJSON)
     last_seen_at = Column(TIMESTAMP(timezone=True))
 
 
@@ -102,12 +113,14 @@ class IdentityPersonDepartment(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     person_code = Column(Text, nullable=False)
     dept_code = Column(Text, nullable=False)
     is_primary = Column(Boolean, server_default="false")
     source_table = Column(Text, nullable=False)
     source_dept_code = Column(Text)
+    # STAFF_VS_GROUP 行的组类别（如 病区医生/病区护士），用于附加科室白名单过滤
+    group_class = Column(Text)
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -118,7 +131,7 @@ class IdentityAccount(Base):
         {"schema": "asset"},
     )
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     person_code = Column(Text)
     system_code = Column(Text, nullable=False)
     source_code = Column(Text)
@@ -138,14 +151,14 @@ class IdentitySyncDiff(Base):
     __tablename__ = "asset_identity_sync_diffs"
     __table_args__ = {"schema": "asset"}
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     diff_type = Column(Text, nullable=False)
     source_system = Column(Text, nullable=False)
     target_system = Column(Text)
     entity_type = Column(Text, nullable=False)
     entity_code = Column(Text)
-    before_data = Column(JSONB)
-    after_data = Column(JSONB)
+    before_data = Column(PortableJSON)
+    after_data = Column(PortableJSON)
     severity = Column(Text, server_default="medium")
     status = Column(Text, server_default="open")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())

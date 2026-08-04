@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.candidate import AssetCandidateRelation
 from ...models.asset import AssetRelation
 from ...schemas.candidate import CandidateRelationItem, CandidatePromoteRequest, CandidateRejectRequest
@@ -47,7 +48,7 @@ def list_candidates(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.post("/{candidate_id}/promote", summary="候选关系提升为正式关系")
+@router.post("/{candidate_id}/promote", summary="候选关系提升为正式关系", dependencies=[Depends(require_permission("asset.relation.review"))])
 def promote_candidate(
     candidate_id: int,
     req: CandidatePromoteRequest,
@@ -63,6 +64,7 @@ def promote_candidate(
             AssetRelation.to_table == candidate.to_table,
             AssetRelation.from_columns == candidate.from_columns,
             AssetRelation.to_columns == candidate.to_columns,
+            AssetRelation.join_condition == candidate.join_condition,
         ).limit(1)
     ).first()
 
@@ -86,6 +88,10 @@ def promote_candidate(
         validation_note=f"来源: {candidate.source_view or candidate.source_file or 'unknown'}",
     )
 
+    # 98号 S0：候选转正式时同步填充端点四元组、业务键和分层
+    from ...services.relation_identity import populate_endpoint_fields
+    populate_endpoint_fields(db, new_rel)
+
     candidate.status = "promoted"
     candidate.reviewed_by = req.reviewer
     candidate.reviewed_at = datetime.now(timezone.utc)
@@ -104,7 +110,7 @@ def promote_candidate(
     )
 
 
-@router.post("/{candidate_id}/reject", summary="拒绝候选关系")
+@router.post("/{candidate_id}/reject", summary="拒绝候选关系", dependencies=[Depends(require_permission("asset.relation.review"))])
 def reject_candidate(
     candidate_id: int,
     req: CandidateRejectRequest,

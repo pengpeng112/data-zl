@@ -306,7 +306,7 @@ def _run_rule_column_no_cn_name(db: Session) -> list[QualityFinding]:
 
 def _run_rule_source_connectivity(db: Session) -> list[QualityFinding]:
     from ...models.asset_system import AssetDataSource
-    rows = db.scalars(select(AssetDataSource).where(AssetDataSource.enabled == True)).all()
+    rows = db.scalars(select(AssetDataSource).where(AssetDataSource.enabled.is_(True))).all()
     findings = []
     for s in rows:
         if s.last_check_status and s.last_check_status != "connected":
@@ -322,7 +322,7 @@ def _run_rule_source_connectivity(db: Session) -> list[QualityFinding]:
 
 def _run_rule_source_metadata_stale(db: Session) -> list[QualityFinding]:
     from ...models.asset_system import AssetDataSource
-    rows = db.scalars(select(AssetDataSource).where(AssetDataSource.enabled == True)).all()
+    rows = db.scalars(select(AssetDataSource).where(AssetDataSource.enabled.is_(True))).all()
     findings = []
     for s in rows:
         if not s.last_check_at:
@@ -376,7 +376,7 @@ def run_quality_check_core(
     """Shared entry for manual API and nightly scheduler (L15)."""
     seed_rules(db)
 
-    rules_q = select(QualityRule).where(QualityRule.enabled == True)  # noqa: E712
+    rules_q = select(QualityRule).where(QualityRule.enabled.is_(True))  # noqa: E712
     if rule_codes:
         rules_q = rules_q.where(QualityRule.rule_code.in_(rule_codes))
     rules = db.scalars(rules_q).all()
@@ -866,7 +866,7 @@ def quality_metrics(
     system_code: str | None = Query(None),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    rules = db.scalars(select(QualityRule).where(QualityRule.enabled == True)).all()
+    rules = db.scalars(select(QualityRule).where(QualityRule.enabled.is_(True))).all()
     total_rules = len(rules)
     sql_rules = len([r for r in rules if r.execution_mode == "sql_template"])
 

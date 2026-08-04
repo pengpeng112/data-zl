@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.asset import AssetRelation, AssetTable, AssetColumn
 from ...models.asset_system import AssetDataSource
 from ...models.governance import MetadataSnapshot
@@ -181,7 +182,7 @@ def _collect_metadata_snapshot(
     return _collect_asset_cache_snapshot(ds, label, db)
 
 
-@router.post("/sources/{source_code}/collect-metadata", summary="手动触发元数据采集（P14-T5）")
+@router.post("/sources/{source_code}/collect-metadata", summary="手动触发元数据采集（P14-T5）", dependencies=[Depends(require_permission("metadata.snapshot.collect"))])
 def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     label = (req.label if req else None) or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
     mode = req.mode if req else "asset_cache"
@@ -211,7 +212,7 @@ def collect_metadata(source_code: str, req: CollectRequest | None = None, db: Se
     return ApiResponse(data=result)
 
 
-@router.post("/sources/{source_code}/metadata-jobs/{job_id}/retry", summary="重试元数据采集任务")
+@router.post("/sources/{source_code}/metadata-jobs/{job_id}/retry", summary="重试元数据采集任务", dependencies=[Depends(require_permission("metadata.snapshot.collect"))])
 def retry_metadata_collect_job(source_code: str, job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     job = db.get(SchedulerJob, job_id)
     if not job or job.job_type != "metadata_scan" or job.source_code != source_code:
@@ -308,7 +309,7 @@ def list_changes(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.patch("/metadata-changes/{change_id}", summary="更新变更事件状态/负责人/备注")
+@router.patch("/metadata-changes/{change_id}", summary="更新变更事件状态/负责人/备注", dependencies=[Depends(require_permission("metadata.snapshot.collect"))])
 def update_change(change_id: int, status: str | None = Query(None), assigned_to: str | None = Query(None), note: str | None = Query(None), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     evt = db.get(AssetMetadataChangeEvent, change_id)
     if not evt:
@@ -341,7 +342,7 @@ def changes_summary(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     })
 
 
-@router.post("/metadata-changes/diff", summary="对比两个快照生成变更事件（P14-T2）")
+@router.post("/metadata-changes/diff", summary="对比两个快照生成变更事件（P14-T2）", dependencies=[Depends(require_permission("metadata.snapshot.collect"))])
 def run_diff(
     snapshot_id_from: int = Query(...),
     snapshot_id_to: int = Query(...),

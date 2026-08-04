@@ -1,9 +1,22 @@
-from pydantic import BaseModel, Field
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
+# 108 号契约加固：
+# - GraphNode.id 使用完整物理键 system_code|source_code|namespace_name|schema_name|table_name；
+# - display_id 仅用于界面展示（SCHEMA.TABLE），不再作为图节点唯一键；
+# - extra="forbid"：graph.py 若发送 schema 未声明的字段，序列化即报错，禁止静默丢弃
+#   physical_key / display_id / meta 等关键字段（P0-02）。
+# - 数据库自增 id / rel_id 只作为边属性，不作为图边永久身份。
 
 
 class GraphNode(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     id: str
     label: str
+    physical_key: str | None = None
+    display_id: str | None = None
     system_code: str | None = None
     source_code: str | None = None
     namespace_name: str | None = None
@@ -24,7 +37,10 @@ class GraphNode(BaseModel):
     review_status: str | None = None
     note: str | None = None
 
+
 class GraphFieldMapping(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     from_column: str | None = None
     from_column_name_cn: str | None = None
     to_column: str | None = None
@@ -32,9 +48,13 @@ class GraphFieldMapping(BaseModel):
 
 
 class GraphEdge(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     id: str
     source: str
     target: str
+    display_source: str | None = None
+    display_target: str | None = None
     from_system_code: str | None = None
     from_source_code: str | None = None
     from_schema_name: str | None = None
@@ -51,6 +71,8 @@ class GraphEdge(BaseModel):
     to_include_status: str | None = None
     label: str | None = None
     relation_type: str | None = "formal"
+    relation_layer: str | None = None
+    db_id: int | None = None
     rel_id: int | None = None
     join_condition: str | None = None
     from_columns: str | None = None
@@ -68,12 +90,30 @@ class GraphEdge(BaseModel):
     validation_note: str | None = None
 
 
+class GraphMeta(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total_relations: int = 0
+    matched_relations: int = 0
+    returned_relations: int = 0
+    truncated: bool = False
+    unresolved_endpoints: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
+    data_version: str | None = None
+    backend_build_id: str | None = None
+
+
 class GraphData(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+    meta: GraphMeta | None = None
 
 
 class GraphViewMode(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     code: str
     label: str
     description: str | None = None
@@ -88,6 +128,8 @@ class GraphViewMode(BaseModel):
 
 
 class GraphOptions(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     systems: list[str]
     sources: list[str]
     schemas: list[str]
@@ -96,3 +138,5 @@ class GraphOptions(BaseModel):
     confidences: list[str]
     relation_types: list[str]
     view_modes: list[GraphViewMode]
+    default_mode: str | None = None
+    backend_build_id: str | None = None

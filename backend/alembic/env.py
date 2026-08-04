@@ -29,6 +29,7 @@ from app.models.governance_base import (  # noqa: F401
 )
 from app.models.asset_system import AssetDataSource, AssetSystem  # noqa: F401
 from app.models.governance_ops import ChangeRule, GovernEvent, SchedulerJob  # noqa: F401
+from app.models.graph_sync import GraphSyncBatch  # noqa: F401
 from app.models.identity import (  # noqa: F401
     IdentityAccount,
     IdentityDepartment,

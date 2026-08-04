@@ -9,8 +9,27 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import inspect, text, delete, or_
 
+# 纯逻辑子进程测试子目录：不连数据库、不要求 APP_TEST_DB_URL，
+# 各自带 no-op conftest 覆盖根 conftest 的 autouse。运行这些子目录时不触发
+# 数据库门禁 exit，保证无测试库环境下仍可验证门禁/配置纯逻辑。
+_PURE_LOGIC_SUBDIRS = ("db_guard", "role_effective", "startup_check", "security_audit", "dict_sync_112")
+
+
+def _only_pure_logic_subdirs() -> bool:
+    """判断本次 pytest 命令行是否仅涉及纯逻辑子目录。"""
+    args = [a for a in sys.argv if not a.startswith("-")]
+    targets = [a for a in args if a.endswith(".py") or not a.endswith((".ini", ".cfg", ".toml"))]
+    candidates = [a for a in targets if "tests/" in a or a.endswith("tests")]
+    if not candidates:
+        return False
+    return all(
+        any(f"{sd}/" in a or a.endswith(f"{sd}") or f"{sd}\\" in a for sd in _PURE_LOGIC_SUBDIRS)
+        for a in candidates
+    )
+
+
 TEST_DB_URL = os.environ.get("APP_TEST_DB_URL", "")
-if not TEST_DB_URL or "test" not in TEST_DB_URL.lower():
+if (not TEST_DB_URL or "test" not in TEST_DB_URL.lower()) and not _only_pure_logic_subdirs():
     pytest.exit(
         "APP_TEST_DB_URL is required and must identify a test database; refusing to use APP_DB_URL",
         returncode=2,
@@ -24,22 +43,23 @@ os.environ.setdefault("APP_OPS_APPROVAL_UI_ENABLED", "false")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.main import app
-from app.core.config import settings
-from app.core.rate_limit import limiter
+if not _only_pure_logic_subdirs():
+    from app.main import app
+    from app.core.config import settings
+    from app.core.rate_limit import limiter
 
-settings.env = "test"
-settings.rate_limit_enabled = False
-settings.ops_write_enabled = False
-limiter.enabled = False
+    settings.env = "test"
+    settings.rate_limit_enabled = False
+    settings.ops_write_enabled = False
+    limiter.enabled = False
 
-from app.core.db import SessionLocal
-from app.models.governance import ApiKey
-from app.models.governance_base import AssetUserRole, AssetRole, AssetRolePermission
-from app.models.dict_medical import DictMedicalCodeItem, DictMedicalCodeMapping, DictMedicalCodeSet
-from app.models.asset import AssetTable, AssetColumn, AssetRelation
-from app.models.asset_system import AssetSystem, AssetDataSource
-from app.services.recipe_service import recipe_hash
+    from app.core.db import SessionLocal
+    from app.models.governance import ApiKey
+    from app.models.governance_base import AssetUserRole, AssetRole, AssetRolePermission
+    from app.models.dict_medical import DictMedicalCodeItem, DictMedicalCodeMapping, DictMedicalCodeSet
+    from app.models.asset import AssetTable, AssetColumn, AssetRelation
+    from app.models.asset_system import AssetSystem, AssetDataSource
+    from app.services.recipe_service import recipe_hash
 
 TEST_TOKEN = "test-token-p5-auth-2026"
 TEST_ADMIN = "test-platform-admin"
@@ -309,6 +329,24 @@ def clean_test_database():
             quoted_tables = ", ".join(f'asset."{name}"' for name in table_names)
             db.execute(text(f"TRUNCATE TABLE {quoted_tables} RESTART IDENTITY CASCADE"))
             db.commit()
+    finally:
+        db.close()
+
+
+@pytest.fixture
+def db_session():
+    """111 号 S1：测试统一通过该 fixture 获取数据库会话。
+
+    取代测试模块内直接 import SessionLocal 创建会话的做法；配合 app/core/db.py
+    的建连前门禁，确保任何测试入口都无法连接非测试库。
+    """
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()  # 先回滚避免 PendingRollbackError 掩盖原始异常
+        raise
     finally:
         db.close()
 

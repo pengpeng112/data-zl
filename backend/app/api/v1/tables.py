@@ -5,6 +5,7 @@ from sqlalchemy.sql.expression import ColumnElement
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
 from ...schemas.asset import ColumnOut, RelationOut, SummaryOut, TableBrief, TableDetail
 from ...schemas.common import ApiResponse, PageData
@@ -374,7 +375,7 @@ class ColumnAnnotationUpdate(BaseModel):
     comment: str | None = None
 
 
-@router.patch("/tables/{table_id}/annotation", summary="更新表中文名/业务说明")
+@router.patch("/tables/{table_id}/annotation", summary="更新表中文名/业务说明", dependencies=[Depends(require_permission("asset.annotation"))])
 def update_table_annotation(table_id: int, req: TableAnnotationUpdate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     t = db.get(AssetTable, table_id)
     if not t:
@@ -387,7 +388,7 @@ def update_table_annotation(table_id: int, req: TableAnnotationUpdate, db: Sessi
     return ApiResponse(data={"id": t.id, "table_name": t.table_name, "table_name_cn": t.table_name_cn})
 
 
-@router.patch("/columns/{column_id}/annotation", summary="更新字段中文名/业务说明/取值说明")
+@router.patch("/columns/{column_id}/annotation", summary="更新字段中文名/业务说明/取值说明", dependencies=[Depends(require_permission("asset.annotation"))])
 def update_column_annotation(column_id: int, req: ColumnAnnotationUpdate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     c = db.get(AssetColumn, column_id)
     if not c:
@@ -446,7 +447,7 @@ def missing_annotations(
     })
 
 
-@router.post("/ai/suggest-annotations", summary="AI 生成注释草稿（占位，待 P5.5 多数据库驱动就绪）")
+@router.post("/ai/suggest-annotations", summary="AI 生成注释草稿（占位，待 P5.5 多数据库驱动就绪）", dependencies=[Depends(require_permission("asset.annotation"))])
 def suggest_annotations(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:

@@ -17,7 +17,8 @@ from ..services.db_connectors import DB_CONNECTOR_MAP
 
 DEPARTMENT_SOURCE_TABLE = "COMM.DEPT_DICT"
 STAFF_SOURCE_TABLE = "COMM.STAFF_DICT"
-EMPLOYEE_SOURCE_TABLE = "COMM.SYS_EMPLOYEE"
+# 活库实测：SYS_EMPLOYEE 真实 owner 为 FXHIS（COMM 下不存在该表）。
+EMPLOYEE_SOURCE_TABLE = "FXHIS.SYS_EMPLOYEE"
 DOCTOR_GROUP_SOURCE_TABLE = "COMM.DOCTOR_GROUP"
 STAFF_GROUP_SOURCE_TABLE = "COMM.STAFF_VS_GROUP"
 
@@ -59,10 +60,23 @@ def _text_or_none(value: Any) -> str | None:
 
 
 def _normalize_status(stop_flag: Any) -> str:
+    """归一 DEPT_DICT.STOP_FLAG（活库实测 NULL/'0'=有效，'1'=停用）。"""
     value = (_text_or_none(stop_flag) or "").upper()
-    if value in {"", "0", "N", "ACTIVE", "ENABLED"}:
+    if value in {"", "0", "N"}:
         return "active"
-    return "inactive"
+    if value in {"1", "Y"}:
+        return "inactive"
+    return "unknown"
+
+
+def _normalize_staff_status(value: Any) -> str:
+    """归一 STAFF_DICT.STATUS / SYS_EMPLOYEE.VALIDSTATE（活库实测 1=在用，0=停用）。"""
+    text = (_text_or_none(value) or "").upper()
+    if text == "1":
+        return "active"
+    if text == "0":
+        return "inactive"
+    return "unknown"
 
 
 SENSITIVE_SOURCE_KEYS = {"ID_NO", "IDENNO", "IDCARD", "CARD_NO", "PHONE", "MOBILE", "ADDRESS"}
@@ -126,6 +140,7 @@ def _upsert_person_department(
     source_table: str,
     source_dept_code: str | None = None,
     is_primary: bool = False,
+    group_class: str | None = None,
 ) -> bool:
     if not person_code or not dept_code:
         return False
@@ -148,6 +163,8 @@ def _upsert_person_department(
         created = False
     existing.is_primary = is_primary
     existing.source_dept_code = source_dept_code or dept_code
+    if group_class is not None:
+        existing.group_class = group_class
     existing.updated_at = datetime.now(timezone.utc)
     return created
 
@@ -253,7 +270,7 @@ def collect_his_persons(
     try:
         staff_rows = connector.execute_readonly(
             """
-SELECT EMP_NO, NAME, DEPT_CODE, JOB, TITLE, STATUS, ID_NO
+SELECT EMP_NO, NAME, DEPT_CODE, JOB, TITLE, STATUS, ID_NO, CREATE_DATE
 FROM COMM.STAFF_DICT
 WHERE ROWNUM <= :max_rows
 """,
@@ -263,7 +280,7 @@ WHERE ROWNUM <= :max_rows
         employee_rows = connector.execute_readonly(
             """
 SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERID
-FROM COMM.SYS_EMPLOYEE
+FROM FXHIS.SYS_EMPLOYEE
 WHERE ROWNUM <= :max_rows
 """,
             params={"max_rows": max_rows},
@@ -278,11 +295,12 @@ WHERE ROWNUM <= :max_rows
             params={"max_rows": max_rows},
             max_rows=max_rows,
         )
+        # 活库实测：STAFF_GROUP_DICT.DEPT_CODE 全部为空；STAFF_VS_GROUP.GROUP_CODE
+        # 本身就是科室/病区编码，直接作为附加科室来源。
         staff_group_rows = connector.execute_readonly(
             """
-SELECT svg.GROUP_CLASS, svg.GROUP_CODE, svg.EMP_NO, sgd.DEPT_CODE
+SELECT svg.GROUP_CLASS, svg.GROUP_CODE, svg.EMP_NO
 FROM COMM.STAFF_VS_GROUP svg
-LEFT JOIN COMM.STAFF_GROUP_DICT sgd ON sgd.GROUP_CODE = svg.GROUP_CODE
 WHERE ROWNUM <= :max_rows
 """,
             params={"max_rows": max_rows},
@@ -310,7 +328,7 @@ WHERE ROWNUM <= :max_rows
             person_code=emp_no,
             person_name=_text_or_none(_row_value(raw, "NAME")),
             dept_code=dept_code,
-            status=_normalize_status(_row_value(raw, "STATUS")),
+            status=_normalize_staff_status(_row_value(raw, "STATUS")),
             raw=raw,
         )
         inserted_sources += ins
@@ -335,7 +353,7 @@ WHERE ROWNUM <= :max_rows
             person_code=person_code,
             person_name=_text_or_none(_row_value(raw, "EMPLNAME")),
             dept_code=dept_code,
-            status=_normalize_status(_row_value(raw, "VALIDSTATE")),
+            status=_normalize_staff_status(_row_value(raw, "VALIDSTATE")),
             raw=raw,
         )
         inserted_sources += ins
@@ -355,9 +373,10 @@ WHERE ROWNUM <= :max_rows
     for row in staff_group_rows:
         raw = dict(row)
         person_code = _text_or_none(_row_value(raw, "EMP_NO"))
-        dept_code = _text_or_none(_row_value(raw, "DEPT_CODE"))
+        dept_code = _text_or_none(_row_value(raw, "GROUP_CODE"))
         department_links_created += int(_upsert_person_department(
-            db, person_code=person_code, dept_code=dept_code, source_table=STAFF_GROUP_SOURCE_TABLE, is_primary=False
+            db, person_code=person_code, dept_code=dept_code, source_table=STAFF_GROUP_SOURCE_TABLE, is_primary=False,
+            group_class=_text_or_none(_row_value(raw, "GROUP_CLASS")),
         ))
 
     return {

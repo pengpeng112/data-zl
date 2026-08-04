@@ -11,6 +11,7 @@ class ApiResponse(BaseModel, Generic[T]):
     code: int = Field(default=0, description="0=成功，非0=错误码")
     message: str = Field(default="success", description="提示信息")
     data: T | None = Field(default=None, description="响应数据")
+    request_id: str = Field(default="", description="本次请求关联 ID（异常定位用）")
 
 
 class PageData(BaseModel, Generic[T]):

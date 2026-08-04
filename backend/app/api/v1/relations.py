@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
 from ...models.asset import AssetRelation, AssetTable
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
@@ -105,17 +105,59 @@ class RelationUpdate(BaseModel):
     review_status: str | None = Field(None, description="draft/reviewing/approved/rejected")
 
 
+class RelationBatchReview(BaseModel):
+    relation_ids: list[int] = Field(..., min_length=1, max_length=100)
+    action: str = Field(..., pattern="^(approve|reject)$")
+    note: str | None = None
+
+
 @router.get("/list", summary="关系列表（复核工作台）")
 def list_relations(
     review_status: str | None = Query(None),
     confidence: str | None = Query(None),
     system_code: str | None = Query(None),
     keyword: str | None = Query(None),
+    relation_class: str | None = Query(
+        None,
+        pattern="^(pending|confirmed|rejected|candidate|lineage|dependency)$",
+    ),
     page: int = Query(1, ge=1),
     page_size: int = Query(30, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     stmt = select(AssetRelation)
+    candidate_expr = (
+        (func.lower(func.coalesce(AssetRelation.validation_status, "")) == "candidate")
+        | (func.upper(func.coalesce(AssetRelation.confidence, "")) == "D")
+    )
+    lineage_expr = (
+        func.upper(func.coalesce(AssetRelation.domain, "")).like("%LINEAGE%")
+        | func.lower(func.coalesce(AssetRelation.validation_status, "")).in_(
+            ["verified_dependency", "user_confirmed_sync", "user_confirmed_parallel_sources", "user_confirmed_mapping"]
+        )
+    )
+    if relation_class == "candidate":
+        stmt = stmt.where(candidate_expr)
+    elif relation_class == "lineage":
+        stmt = stmt.where(lineage_expr)
+    elif relation_class == "dependency":
+        stmt = stmt.where(func.lower(func.coalesce(AssetRelation.validation_status, "")).like("%dependency%"))
+    elif relation_class == "rejected":
+        stmt = stmt.where(func.lower(func.coalesce(AssetRelation.validation_status, "")) == "rejected")
+    elif relation_class == "confirmed":
+        stmt = stmt.where(
+            func.lower(func.coalesce(AssetRelation.validation_status, "")).in_(
+                ["verified", "approved", "manual_reviewed", "user_confirmed_sync", "user_confirmed_mapping"]
+            )
+        )
+    elif relation_class == "pending":
+        stmt = stmt.where(
+            ~candidate_expr,
+            ~lineage_expr,
+            func.lower(func.coalesce(AssetRelation.validation_status, "")).notin_(
+                ["verified", "approved", "manual_reviewed", "rejected"]
+            ),
+        )
     if review_status:
         stmt = stmt.where(AssetRelation.validation_status == review_status)
     if confidence:
@@ -139,6 +181,25 @@ def list_relations(
     rows = db.scalars(
         stmt.order_by(AssetRelation.id).offset((page - 1) * page_size).limit(page_size)
     ).all()
+    qualified = {
+        f"{(t.schema_name or t.namespace_name or '').upper()}.{(t.table_name or '').upper()}": t
+        for t in db.scalars(select(AssetTable)).all()
+    }
+
+    def relation_kind(r: AssetRelation) -> str:
+        status = (r.validation_status or "").lower()
+        if status == "candidate" or (r.confidence or "").upper() == "D":
+            return "candidate"
+        if "dependency" in status:
+            return "dependency"
+        if "LINEAGE" in (r.domain or "").upper() or status.startswith("user_confirmed_"):
+            return "lineage"
+        if status == "rejected":
+            return "rejected"
+        if status in {"verified", "approved", "manual_reviewed"}:
+            return "confirmed"
+        return "pending"
+
     items = [
         {
             "id": r.id, "rel_id": r.rel_id,
@@ -150,13 +211,57 @@ def list_relations(
             "validation_status": r.validation_status,
             "validation_metrics": r.validation_metrics,
             "note": r.note, "validation_note": r.validation_note,
+            "relation_class": relation_kind(r),
+            "from_system_code": getattr(qualified.get((r.from_table or "").upper()), "system_code", None),
+            "from_source_code": getattr(qualified.get((r.from_table or "").upper()), "source_code", None),
+            "from_table_name_cn": getattr(qualified.get((r.from_table or "").upper()), "table_name_cn", None),
+            "to_system_code": getattr(qualified.get((r.to_table or "").upper()), "system_code", None),
+            "to_source_code": getattr(qualified.get((r.to_table or "").upper()), "source_code", None),
+            "to_table_name_cn": getattr(qualified.get((r.to_table or "").upper()), "table_name_cn", None),
         }
         for r in rows
     ]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.patch("/{relation_id}", summary="编辑关系（P9 复核工作台）")
+@router.post(
+    "/batch-review",
+    summary="批量审核关系（最多100条）",
+    dependencies=[Depends(require_permission("asset.relation.review"))],
+)
+def batch_review_relations(
+    req: RelationBatchReview,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    rows = db.scalars(select(AssetRelation).where(AssetRelation.id.in_(req.relation_ids))).all()
+    found = {row.id for row in rows}
+    missing = sorted(set(req.relation_ids) - found)
+    target_status = "verified" if req.action == "approve" else "rejected"
+    for row in rows:
+        before = row.validation_status
+        row.validation_status = target_status
+        row.validation_note = req.note
+        # 98号 S0：审核状态变化时刷新 layer 与 updated_at
+        from ...services.relation_identity import derive_layer
+        row.relation_layer = derive_layer(row.confidence, row.validation_status)
+        row.updated_at = datetime.now(timezone.utc)
+        db.add(GovernAuditLog(
+            module="asset", entity_type="relation", entity_ref=str(row.rel_id or row.id),
+            action=f"batch_{req.action}", before_data={"validation_status": before},
+            after_data={"validation_status": target_status, "note": req.note},
+            operator=current_user,
+        ))
+    db.commit()
+    return ApiResponse(data={"updated": len(rows), "missing_ids": missing, "status": target_status})
+
+
+@router.patch(
+    "/{relation_id}",
+    summary="编辑关系（P9 复核工作台）",
+    dependencies=[Depends(require_permission("asset.relation.review"))],
+)
 def update_relation(relation_id: int, req: RelationUpdate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     r = db.get(AssetRelation, relation_id)
@@ -176,7 +281,10 @@ def update_relation(relation_id: int, req: RelationUpdate, request: Request, db:
     if req.review_status is not None:
         r.validation_status = req.review_status
         changes["validation_status"] = req.review_status
-    db.commit()
+    # 98号 S0：端点字段/业务键/分层随 from_table/to_table/字段/状态同步刷新；updated_at 可靠刷新
+    from ...services.relation_identity import populate_endpoint_fields
+    populate_endpoint_fields(db, r)
+    r.updated_at = datetime.now(timezone.utc)
     audit = GovernAuditLog(
         module="asset", entity_type="relation", entity_ref=str(r.rel_id or r.id),
         action="update", before_data=before, after_data=changes,
@@ -191,7 +299,11 @@ def update_relation(relation_id: int, req: RelationUpdate, request: Request, db:
     })
 
 
-@router.patch("/{relation_id}/review", summary="审核关系（通过/拒绝）")
+@router.patch(
+    "/{relation_id}/review",
+    summary="审核关系（通过/拒绝）",
+    dependencies=[Depends(require_permission("asset.relation.review"))],
+)
 def review_relation(
     relation_id: int,
     action: str = Query(..., description="approve / reject"),
@@ -208,7 +320,10 @@ def review_relation(
     before_status = r.validation_status
     r.validation_status = "verified" if action == "approve" else "rejected"
     r.validation_note = note
-    db.commit()
+    # 98号 S0：审核状态变化时刷新 layer 与 updated_at
+    from ...services.relation_identity import derive_layer
+    r.relation_layer = derive_layer(r.confidence, r.validation_status)
+    r.updated_at = datetime.now(timezone.utc)
     audit = GovernAuditLog(
         module="asset", entity_type="relation", entity_ref=str(r.rel_id or r.id),
         action=action,

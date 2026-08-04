@@ -16,6 +16,8 @@ class AssetTable(Base):
     schema_name = Column(Text)
     table_name = Column(Text)
     table_name_cn = Column(Text)
+    name_cn_source = Column(Text)
+    name_cn_status = Column(Text)
     business_desc_cn = Column(Text)
     table_role = Column(Text)
     comment = Column(Text)
@@ -31,6 +33,11 @@ class AssetTable(Base):
     reviewed_at = Column(TIMESTAMP(timezone=True))
     note = Column(Text)
     source = Column(Text)
+    # plan 90: empty-table governance (no business samples)
+    row_presence_status = Column(Text)
+    row_presence_checked_at = Column(TIMESTAMP(timezone=True))
+    row_presence_method = Column(Text)
+    row_presence_error_code = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
@@ -48,6 +55,8 @@ class AssetColumn(Base):
     column_id = Column(Integer)
     column_name = Column(Text)
     column_name_cn = Column(Text)
+    name_cn_source = Column(Text)
+    name_cn_status = Column(Text)
     business_desc_cn = Column(Text)
     value_desc_cn = Column(Text)
     data_type = Column(Text)
@@ -78,6 +87,25 @@ class AssetRelation(Base):
     validation_metrics = Column(Text)
     note = Column(Text)
     validation_note = Column(Text)
+    endpoint_excluded_empty = Column(Boolean, server_default="false")
+    # 98号 S0：端点物理身份四元组（from/to），用于图节点唯一键与跨系统同名表区分
+    from_system_code = Column(Text)
+    from_source_code = Column(Text)
+    from_namespace_name = Column(Text)
+    from_schema_name = Column(Text)
+    from_table_name = Column(Text)
+    to_system_code = Column(Text)
+    to_source_code = Column(Text)
+    to_namespace_name = Column(Text)
+    to_schema_name = Column(Text)
+    to_table_name = Column(Text)
+    # 关系分层：formal/candidate/dependency/deferred/sync_mapping
+    relation_layer = Column(Text)
+    # 稳定业务幂等键（不依赖会漂移的 rel_id；导入查重用）
+    relation_business_key = Column(Text)
+    # 时间戳：updated_at 由应用层（relations.py 审核编辑）手动刷新，非 server_default 单独兜底
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
 class AssetRelationReview(Base):

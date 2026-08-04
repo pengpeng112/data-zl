@@ -26,7 +26,7 @@ async def auth_dependency(request: Request, db: Session = Depends(get_db)):
 
     token = auth_header[7:]
     key = db.scalar(
-        select(ApiKey).where(ApiKey.token == token, ApiKey.enabled == True)
+        select(ApiKey).where(ApiKey.token == token, ApiKey.enabled.is_(True))
     )
 
     if not key:

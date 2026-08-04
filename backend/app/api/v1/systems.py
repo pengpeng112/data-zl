@@ -1,4 +1,6 @@
 from datetime import datetime, timezone
+import socket
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -9,13 +11,16 @@ from pydantic import BaseModel, Field, SecretStr, field_validator
 
 from ...core.db import get_db
 from ...models.asset import AssetTable, AssetColumn
-from ...models.asset_system import AssetDataSource, AssetSystem
+from ...models.asset_system import AssetDataSource, AssetSourceSchema, AssetSystem
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
 from ...core.security import get_current_user, require_permission
+from ...core.rate_limit import limiter
 from ...services import credential_store
+from ...services.data_masking import sanitize_text
 from ...services.connection_identity import (
     ALLOWED_DB_TYPES,
+    MAX_CONNECTIVITY_TIMEOUT_MS,
     ODS_ALIAS_SOURCES,
     build_connection_identity_key,
     build_database_key,
@@ -23,10 +28,23 @@ from ...services.connection_identity import (
     default_port,
     host_masked_from_target,
     validate_connection_fields,
+    validate_ssrf_target,
 )
 from ...services.ops_event_log import log_event
+from ...services.asset_catalog import (
+    CANONICAL_SYSTEMS,
+    classify_for_tree,
+    list_first_level_systems,
+    load_system_name_map,
+    normalize_system_code,
+    owner_display_cn,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["systems"])
+_CONNECTION_TEST_SLOTS = threading.BoundedSemaphore(value=4)
+
+# Tables with confirmed zero rows must not appear in normal catalog APIs.
+_EXCLUDED_PRESENCE = ("confirmed_empty",)
 
 
 class SystemUpsert(BaseModel):
@@ -111,10 +129,20 @@ class DataSourceUpsert(BaseModel):
     password: SecretStr | None = None
 
 
+ALLOWED_WRITE_POLICIES = {"readonly", "medical_dict_push", "platform_controlled"}
+
+
 class CredentialUpdate(BaseModel):
     """Write username/password into credential store; password never echoed."""
     username: str = Field(..., min_length=1, max_length=200)
     password: SecretStr = Field(...)
+    # readonly: 探库/对账；write: 字典下发等受控写（独立 .write 文件）
+    purpose: str = Field(default="readonly", description="readonly | write")
+    # 配置写凭据时可选同步写策略（仅 purpose=write 时生效）
+    write_policy: str | None = Field(
+        default=None,
+        description="when purpose=write, optional: medical_dict_push / platform_controlled / readonly",
+    )
     # optional legacy override; ignored when username/password present
     credential_ref: str | None = Field(default=None, max_length=500)
 
@@ -174,6 +202,18 @@ def _source_public(r: AssetDataSource) -> dict:
         "credential_username_masked": r.credential_username_masked,
         "credential_updated_at": r.credential_updated_at.isoformat() if r.credential_updated_at else None,
         "credential_updated_by": r.credential_updated_by,
+        "write_credential_configured": bool(r.write_credential_ref)
+        or credential_store.status(r.source_code, writable=True) == "configured",
+        "write_credential_status": (
+            "configured"
+            if (bool(r.write_credential_ref) or credential_store.status(r.source_code, writable=True) == "configured")
+            else "unconfigured"
+        ),
+        "write_username_masked": (
+            (r.connection_options or {}).get("write_username_masked")
+            if isinstance(r.connection_options, dict)
+            else None
+        ),
         "connection_identity_key": r.connection_identity_key,
         "endpoint_key": getattr(r, "endpoint_key", None),
         "database_key": getattr(r, "database_key", None),
@@ -192,8 +232,12 @@ def _source_public(r: AssetDataSource) -> dict:
         "last_test_error_masked": getattr(r, "last_test_error_masked", None),
         "last_collect_status": getattr(r, "last_collect_status", None),
         "last_collect_at": r.last_collect_at.isoformat() if getattr(r, "last_collect_at", None) else None,
-        "is_writeable": (r.write_policy or "readonly") == "platform_controlled"
-        and (r.system_code or "").upper() in {"ASSET_PLATFORM", "PLATFORM"},
+        "is_writeable": (r.write_policy or "readonly") in {"platform_controlled", "medical_dict_push"},
+        "supports_medical_dict_push": (r.write_policy or "readonly") == "medical_dict_push"
+        and (
+            bool(r.write_credential_ref)
+            or credential_store.status(r.source_code, writable=True) == "configured"
+        ),
         "is_legacy_alias": kind == "legacy_alias",
         # never expose credential_ref or password
     }
@@ -260,34 +304,12 @@ def list_systems(
     include_merged: bool = Query(False),
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
-    rows = db.scalars(select(AssetSystem).order_by(AssetSystem.system_code)).all()
-    source_counts = {
-        sc: cnt
-        for sc, cnt in db.execute(
-            select(AssetDataSource.system_code, func.count()).group_by(AssetDataSource.system_code)
-        ).all()
-    }
-    table_counts = {
-        sc: cnt
-        for sc, cnt in db.execute(
-            select(AssetTable.system_code, func.count()).group_by(AssetTable.system_code)
-        ).all()
-    }
-    items = []
-    for r in rows:
-        if not include_merged and (r.status or "").lower() in {"merged", "deleted"}:
-            continue
-        items.append({
-            "id": r.id,
-            "system_code": r.system_code,
-            "system_name_cn": r.system_name_cn,
-            "system_type": r.system_type,
-            "status": r.status,
-            "target_host": r.target_host,
-            "connection_count": int(source_counts.get(r.system_code, 0) or 0),
-            "table_count": int(table_counts.get(r.system_code, 0) or 0),
-            "created_at": r.created_at.isoformat() if r.created_at else None,
-        })
+    """First-level systems only: ten peers from asset_systems.system_name_cn.
+
+    Plan 90: no platform_meta / external_business groups; independent sources
+    are peers; DATA_CENTER owners never appear as first-level systems.
+    """
+    items = list_first_level_systems(db, include_merged=include_merged)
     return ApiResponse(data=items)
 
 
@@ -644,7 +666,7 @@ def add_system_connection(
     return ApiResponse(data=_source_public(ds))
 
 
-@router.post("/sources/peripheral/bootstrap", summary="L14 登记周边系统并可选活库元数据采集（只读）")
+@router.post("/sources/peripheral/bootstrap", summary="L14 登记周边系统并可选活库元数据采集（只读）", dependencies=[Depends(require_permission("source:manage"))])
 def bootstrap_peripheral_sources(
     collect: bool = Query(True, description="是否立即对各 owner 做 live 元数据采集"),
     db: Session = Depends(get_db),
@@ -841,7 +863,7 @@ def upsert_source(req: DataSourceUpsert, request: Request, db: Session = Depends
             ds.credential_updated_at = datetime.now(timezone.utc)
             ds.credential_updated_by = operator
         except credential_store.CredentialStoreError as exc:
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
+            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
 
     _audit(db, action="upsert_source", operator=operator, entity_ref=req.source_code,
            after={"system_code": req.system_code, "source_code": req.source_code})
@@ -856,6 +878,21 @@ def patch_source(source_code: str, req: SourcePatch, request: Request, db: Sessi
     if not ds:
         raise HTTPException(status_code=404)
     data = req.model_dump(exclude_unset=True)
+    if "write_policy" in data and data["write_policy"] is not None:
+        policy = str(data["write_policy"]).strip().lower()
+        if policy not in ALLOWED_WRITE_POLICIES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"write_policy must be one of {sorted(ALLOWED_WRITE_POLICIES)}",
+            )
+        # platform_controlled 仅允许平台自身库；业务源允许 readonly / medical_dict_push
+        sys_code = (ds.system_code or "").upper()
+        if policy == "platform_controlled" and sys_code not in {"ASSET_PLATFORM", "PLATFORM"}:
+            raise HTTPException(
+                status_code=400,
+                detail="platform_controlled is only allowed for ASSET_PLATFORM",
+            )
+        data["write_policy"] = policy
     if "db_type" in data or "target_host" in data or "port" in data or "service_name" in data or "database_name" in data:
         payload = {
             "db_type": data.get("db_type", ds.db_type),
@@ -893,7 +930,7 @@ def patch_source(source_code: str, req: SourcePatch, request: Request, db: Sessi
     return ApiResponse(data=_source_public(ds))
 
 
-@router.post("/sources/{source_code}/check", summary="数据源连通性检测")
+@router.post("/sources/{source_code}/check", summary="数据源连通性检测", dependencies=[Depends(require_permission("source:manage"))])
 def check_source(source_code: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
     if not ds:
@@ -977,7 +1014,7 @@ def get_source(source_code: str, db: Session = Depends(get_db)) -> ApiResponse[d
 @router.put(
     "/sources/{source_code}/credential",
     dependencies=[Depends(require_permission("source:credential_manage"))],
-    summary="写入/轮换凭据（密码只写不回显）",
+    summary="写入/轮换凭据（密码只写不回显；支持只读/写账号分离）",
 )
 def update_source_credential(
     source_code: str,
@@ -989,41 +1026,109 @@ def update_source_credential(
     ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
     if not ds:
         raise HTTPException(status_code=404)
-    # business sources: only readonly credentials from this endpoint
-    if (ds.write_policy or "readonly") != "readonly" and (ds.system_code or "").upper() not in {
-        "ASSET_PLATFORM", "PLATFORM",
-    }:
-        raise HTTPException(status_code=400, detail="business sources only accept readonly credentials")
+
+    purpose = (req.purpose or "readonly").strip().lower()
+    if purpose not in {"readonly", "write"}:
+        raise HTTPException(status_code=400, detail="purpose must be readonly or write")
+
+    sys_code = (ds.system_code or "").upper()
+    is_platform = sys_code in {"ASSET_PLATFORM", "PLATFORM"}
+
+    if purpose == "readonly":
+        # 只读凭据：业务源与平台源均可配置
+        try:
+            ref = credential_store.rotate(
+                source_code,
+                req.username,
+                req.password.get_secret_value(),
+                writable=False,
+            )
+        except credential_store.CredentialStoreError as exc:
+            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+        ds.credential_ref = ref
+        ds.credential_status = "configured"
+        ds.credential_username_masked = credential_store.mask_username(req.username)
+        ds.credential_updated_at = datetime.now(timezone.utc)
+        ds.credential_updated_by = operator
+        _audit(
+            db,
+            action="credential_rotate",
+            operator=operator,
+            entity_ref=source_code,
+            after={
+                "purpose": "readonly",
+                "credential_status": "configured",
+                "credential_username_masked": ds.credential_username_masked,
+            },
+        )
+        db.commit()
+        return ApiResponse(data={
+            "source_code": source_code,
+            "purpose": "readonly",
+            "credential_configured": True,
+            "credential_status": ds.credential_status,
+            "credential_username_masked": ds.credential_username_masked,
+            "write_policy": ds.write_policy or "readonly",
+            "updated_by": operator,
+        })
+
+    # purpose == write：业务源仅允许 medical_dict_push；平台源允许 platform_controlled
+    policy = (req.write_policy or ds.write_policy or "").strip().lower()
+    if not policy or policy == "readonly":
+        policy = "medical_dict_push" if not is_platform else "platform_controlled"
+    if policy not in ALLOWED_WRITE_POLICIES or policy == "readonly":
+        raise HTTPException(
+            status_code=400,
+            detail="write credential requires write_policy medical_dict_push or platform_controlled",
+        )
+    if policy == "platform_controlled" and not is_platform:
+        raise HTTPException(
+            status_code=400,
+            detail="platform_controlled write credentials only for ASSET_PLATFORM",
+        )
+    if policy == "medical_dict_push" and is_platform:
+        # 平台库不走字典下发写
+        raise HTTPException(status_code=400, detail="medical_dict_push is for business sources only")
+
     try:
         ref = credential_store.rotate(
             source_code,
             req.username,
             req.password.get_secret_value(),
-            writable=False,
+            writable=True,
         )
     except credential_store.CredentialStoreError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    ds.credential_ref = ref
-    ds.credential_status = "configured"
-    ds.credential_username_masked = credential_store.mask_username(req.username)
+        raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+
+    ds.write_credential_ref = ref
+    ds.write_policy = policy
     ds.credential_updated_at = datetime.now(timezone.utc)
     ds.credential_updated_by = operator
+    # 不覆盖只读用户名脱敏；写账号脱敏放入 connection_options 非密字段
+    opts = dict(ds.connection_options or {}) if isinstance(ds.connection_options, dict) else {}
+    opts["write_username_masked"] = credential_store.mask_username(req.username)
+    opts["write_credential_updated_at"] = datetime.now(timezone.utc).isoformat()
+    ds.connection_options = opts
+
     _audit(
         db,
-        action="credential_rotate",
+        action="write_credential_rotate",
         operator=operator,
         entity_ref=source_code,
         after={
-            "credential_status": "configured",
-            "credential_username_masked": ds.credential_username_masked,
+            "purpose": "write",
+            "write_policy": policy,
+            "write_username_masked": opts.get("write_username_masked"),
+            "write_credential_configured": True,
         },
     )
     db.commit()
     return ApiResponse(data={
         "source_code": source_code,
-        "credential_configured": True,
-        "credential_status": ds.credential_status,
-        "credential_username_masked": ds.credential_username_masked,
+        "purpose": "write",
+        "write_policy": ds.write_policy,
+        "write_credential_configured": True,
+        "write_username_masked": opts.get("write_username_masked"),
         "updated_by": operator,
     })
 
@@ -1031,32 +1136,77 @@ def update_source_credential(
 @router.delete(
     "/sources/{source_code}/credential",
     dependencies=[Depends(require_permission("source:credential_manage"))],
-    summary="删除凭据文件并清除引用",
+    summary="删除凭据文件并清除引用（purpose=readonly|write）",
 )
-def clear_source_credential(source_code: str, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def clear_source_credential(
+    source_code: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    purpose: str = Query("readonly", description="readonly | write"),
+) -> ApiResponse[dict]:
     operator = get_current_user(request)
     ds = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
     if not ds:
         raise HTTPException(status_code=404)
+    purpose_norm = (purpose or "readonly").strip().lower()
+    if purpose_norm not in {"readonly", "write"}:
+        raise HTTPException(status_code=400, detail="purpose must be readonly or write")
+
+    if purpose_norm == "readonly":
+        try:
+            credential_store.delete(source_code, writable=False)
+        except credential_store.CredentialStoreError as exc:
+            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+        ds.credential_ref = None
+        ds.credential_status = "unconfigured"
+        ds.credential_username_masked = None
+        ds.credential_updated_at = datetime.now(timezone.utc)
+        ds.credential_updated_by = operator
+        _audit(
+            db,
+            action="credential_delete",
+            operator=operator,
+            entity_ref=source_code,
+            after={"purpose": "readonly", "credential_status": "unconfigured"},
+        )
+        db.commit()
+        return ApiResponse(data={
+            "source_code": source_code,
+            "purpose": "readonly",
+            "credential_configured": False,
+            "credential_status": ds.credential_status,
+            "updated_by": operator,
+        })
+
     try:
-        credential_store.delete(source_code)
+        credential_store.delete(source_code, writable=True)
     except credential_store.CredentialStoreError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    ds.credential_ref = None
-    ds.credential_status = "unconfigured"
-    ds.credential_username_masked = None
+        raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+    ds.write_credential_ref = None
+    # 清写凭据后回落只读策略，避免误用只读账号写
+    if (ds.write_policy or "") == "medical_dict_push":
+        ds.write_policy = "readonly"
+    opts = dict(ds.connection_options or {}) if isinstance(ds.connection_options, dict) else {}
+    opts.pop("write_username_masked", None)
+    opts.pop("write_credential_updated_at", None)
+    ds.connection_options = opts or None
     ds.credential_updated_at = datetime.now(timezone.utc)
     ds.credential_updated_by = operator
-    _audit(db, action="credential_delete", operator=operator, entity_ref=source_code,
-           after={"credential_status": "unconfigured"})
+    _audit(
+        db,
+        action="write_credential_delete",
+        operator=operator,
+        entity_ref=source_code,
+        after={"purpose": "write", "write_policy": ds.write_policy, "write_credential_configured": False},
+    )
     db.commit()
     return ApiResponse(data={
         "source_code": source_code,
-        "credential_configured": False,
-        "credential_status": ds.credential_status,
+        "purpose": "write",
+        "write_credential_configured": False,
+        "write_policy": ds.write_policy or "readonly",
         "updated_by": operator,
     })
-
 
 @router.get("/db-types", summary="支持的数据库类型与字段规则")
 def list_db_types() -> ApiResponse[list[dict]]:
@@ -1108,6 +1258,20 @@ def _run_connectivity_test(
     timeout_ms: int = 10000,
 ) -> dict:
     from ...services.db_connectors import DB_CONNECTOR_MAP
+
+    # 111 号 S5：连接测试防 SSRF —— 协议/端口/目标网段/超时全部受限。
+    ssrf_errors = validate_ssrf_target(db_type, host, port)
+    if ssrf_errors:
+        return {
+            "success": False,
+            "error_code": "ssrf_blocked",
+            "error_masked": "; ".join(ssrf_errors),
+            "latency_ms": 0,
+            "server_version": None,
+        }
+    if timeout_ms is None or int(timeout_ms) <= 0:
+        timeout_ms = 10000
+    timeout_ms = min(int(timeout_ms), MAX_CONNECTIVITY_TIMEOUT_MS)
 
     connector_cls = DB_CONNECTOR_MAP.get((db_type or "oracle").lower())
     if not connector_cls:
@@ -1203,8 +1367,9 @@ def get_connection(connection_id: int, db: Session = Depends(get_db)) -> ApiResp
     return ApiResponse(data=data)
 
 
-@router.post("/connections/test-draft", summary="测试未保存连接（密码不落库）")
-def test_connection_draft(req: ConnectionDraftTest) -> ApiResponse[dict]:
+@router.post("/connections/test-draft", summary="测试未保存连接（密码不落库）", dependencies=[Depends(require_permission("source.test"))])
+@limiter.limit("10/minute")
+def test_connection_draft(request: Request, req: ConnectionDraftTest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     port = req.port if req.port is not None else default_port(req.db_type)
     errors = validate_connection_fields({
         "db_type": req.db_type,
@@ -1220,16 +1385,20 @@ def test_connection_draft(req: ConnectionDraftTest) -> ApiResponse[dict]:
         raise HTTPException(status_code=400, detail="; ".join(errors))
     database = req.database_name or req.service_name or ""
     pwd = req.password.get_secret_value() if req.password else ""
-    result = _run_connectivity_test(
-        db_type=req.db_type,
-        host=req.target_host,
-        port=port,
-        database=database,
-        user=req.username or "",
-        password=pwd,
-        connection_mode=req.connection_mode or "direct",
-        timeout_ms=req.timeout_ms,
-    )
+    if not _CONNECTION_TEST_SLOTS.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="连接测试繁忙，请稍后重试")
+    try:
+        result = _run_connectivity_test(db_type=req.db_type, host=req.target_host, port=port,
+            database=database, user=req.username or "", password=pwd,
+            connection_mode=req.connection_mode or "direct", timeout_ms=req.timeout_ms)
+    finally:
+        _CONNECTION_TEST_SLOTS.release()
+    log_event(db, module="connection", entity_type="draft", entity_ref="unsaved",
+              action="test_success" if result["success"] else "test_failed",
+              operator=get_current_user(request), status="connected" if result["success"] else "failed",
+              duration_ms=result["latency_ms"], error_code=result.get("error_code"),
+              summary_masked=result.get("error_masked") or "ok", started_at=datetime.now(timezone.utc))
+    db.commit()
     endpoint = build_endpoint_key(req.db_type, req.target_host, port)
     return ApiResponse(data={
         "success": result["success"],
@@ -1245,7 +1414,8 @@ def test_connection_draft(req: ConnectionDraftTest) -> ApiResponse[dict]:
     })
 
 
-@router.post("/connections/{connection_id}/test", summary="测试已保存连接")
+@router.post("/connections/{connection_id}/test", summary="测试已保存连接", dependencies=[Depends(require_permission("source.test"))])
+@limiter.limit("10/minute")
 def test_saved_connection(connection_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     operator = get_current_user(request)
     ds = db.get(AssetDataSource, connection_id)
@@ -1259,15 +1429,14 @@ def test_saved_connection(connection_id: int, request: Request, db: Session = De
     port = ds.port or default_port(ds.db_type)
     database = ds.database_name or ds.service_name or ""
     started = datetime.now(timezone.utc)
-    result = _run_connectivity_test(
-        db_type=ds.db_type or "oracle",
-        host=host,
-        port=port,
-        database=database,
-        user=user or "",
-        password=pwd or "",
-        connection_mode=ds.connection_mode or "direct",
-    )
+    if not _CONNECTION_TEST_SLOTS.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="连接测试繁忙，请稍后重试")
+    try:
+        result = _run_connectivity_test(db_type=ds.db_type or "oracle", host=host, port=port,
+            database=database, user=user or "", password=pwd or "",
+            connection_mode=ds.connection_mode or "direct")
+    finally:
+        _CONNECTION_TEST_SLOTS.release()
     ds.last_test_status = "connected" if result["success"] else "failed"
     ds.last_test_at = datetime.now(timezone.utc)
     ds.last_test_latency_ms = result["latency_ms"]
@@ -1348,63 +1517,56 @@ def list_connection_targets(db: Session = Depends(get_db)) -> ApiResponse[list[d
     return ApiResponse(data=items)
 
 
-# ── 资产树（五层：系统大类 -> 系统/库 -> schema -> 表 -> 字段） ──
-
-_CATEGORY_CN = {
-    "ods_center": "ODS 数据中心系统",
-    "his_source": "HIS 源端系统",
-    "hrp_source": "HRP 源端系统",
-    "external_business": "其他业务系统",
-    "platform_asset": "平台元数据系统",
-}
-
-_SOURCE_SYSTEM_CN = {
-    "ods_his": "HIS 抽取区",
-    "ods_lis": "LIS 抽取区",
-    "ods_pacs": "PACS 抽取区",
-    "ods_emr": "EMR/病历抽取区",
-    "ods_ydhl": "移动护理抽取区",
-    "ods_sm": "手麻抽取区",
-    "ods_cda": "CDA/标准字典区",
-    "ods_other": "其他抽取区",
-    "his_prod": "HIS 业务库",
-    "hrp": "HRP 源端",
-    "lis": "检验 LIS",
-    "pacs": "影像 PACS",
-    "emr": "电子病历",
-    "mobile_nursing": "移动护理",
-    "sm": "手麻",
-    "platform": "平台 asset",
-}
+# ── 资产树（业务系统 → 连接 → schema → 表 → 字段） ──
+# Plan 90: no external_business / platform_meta category groups.
 
 
-def _classify_asset_source(system_code: str | None, source_code: str | None) -> tuple[str, str, str, str]:
-    """Return (system_category, category_cn, source_system, source_system_cn)."""
-    sc = (system_code or "").upper()
-    src = (source_code or "").lower()
+def _classify_asset_source(
+    system_code: str | None,
+    source_code: str | None,
+    source_kind: str | None = None,
+    source_name_cn: str | None = None,
+    schema_name: str | None = None,
+    system_names: dict[str, str] | None = None,
+) -> tuple[str, str, str, str]:
+    """Return (system_code, system_name_cn, connection_key, connection_label).
 
-    if sc == "HIS_SOURCE" or "his_source" in src or src.startswith("his_"):
-        return "his_source", _CATEGORY_CN["his_source"], "his_prod", _SOURCE_SYSTEM_CN["his_prod"]
-    if sc == "HRP" or "hrp" in src:
-        return "hrp_source", _CATEGORY_CN["hrp_source"], "hrp", _SOURCE_SYSTEM_CN["hrp"]
-    if sc == "LIS" or src.endswith("_lis") or src == "ods_lis":
-        return "ods_center", _CATEGORY_CN["ods_center"], "owner_lis", "数据中心 / LIS Owner"
-    if sc == "PACS" or src.endswith("_pacs") or src == "ods_pacs":
-        return "ods_center", _CATEGORY_CN["ods_center"], "owner_pacs", "数据中心 / PACS Owner"
-    if sc == "EMR" or src.endswith("_emr") or src == "ods_emr":
-        return "ods_center", _CATEGORY_CN["ods_center"], "owner_emr", "数据中心 / EMR Owner"
-    if sc in ("MOBILE_NURSING", "YDHL") or "ydhl" in src:
-        return "ods_center", _CATEGORY_CN["ods_center"], "owner_ydhl", "数据中心 / 移动护理 Owner"
-    if sc == "SM" or src.endswith("_sm") or src == "ods_sm":
-        return "ods_center", _CATEGORY_CN["ods_center"], "owner_sm", "数据中心 / 手麻 Owner"
-    if sc == "DATA_CENTER" or src.startswith("ods") or "8_216" in src:
-        if "cda" in src:
-            return "ods_center", _CATEGORY_CN["ods_center"], "ods_cda", _SOURCE_SYSTEM_CN["ods_cda"]
-        # 主 ODS 汇聚源：按表 namespace 在前端再分；树节点先标 his 抽取区为主入口
-        if src in ("ods_8_216",) or "ods" in src:
-            return "ods_center", _CATEGORY_CN["ods_center"], "ods_his", _SOURCE_SYSTEM_CN["ods_his"]
-        return "ods_center", _CATEGORY_CN["ods_center"], "ods_other", _SOURCE_SYSTEM_CN["ods_other"]
-    return "platform_asset", _CATEGORY_CN["platform_asset"], "platform", _SOURCE_SYSTEM_CN["platform"]
+    First-level identity is always a canonical business system (or catalog_anomaly).
+    DATA_CENTER mirror owners stay nested under DATA_CENTER, never first-level.
+    Independent LIS/PACS/Docare/JHEMR/移动护理 are peers, not external_business.
+    """
+    info = classify_for_tree(
+        system_code,
+        source_code,
+        source_kind=source_kind,
+        source_name_cn=source_name_cn,
+        schema_name=schema_name,
+        system_names=system_names,
+    )
+    # source_system field re-used as connection grouping key for API compatibility
+    conn_key = (source_code or "").lower() or "unknown_connection"
+    conn_label = source_name_cn or source_code or "未命名连接"
+    if not info["catalog_ok"]:
+        return (
+            info["system_code"],
+            info["system_name_cn"],
+            "catalog_anomaly",
+            "目录异常",
+        )
+    return (
+        info["system_code"],
+        info["system_name_cn"],
+        conn_key,
+        conn_label,
+    )
+
+
+def _presence_visible_clause():
+    """Exclude confirmed_empty from normal catalog; keep unknown/blocked."""
+    return (
+        (AssetTable.row_presence_status.is_(None))
+        | (AssetTable.row_presence_status != "confirmed_empty")
+    )
 
 
 def _table_brief(t: AssetTable) -> dict:
@@ -1413,22 +1575,28 @@ def _table_brief(t: AssetTable) -> dict:
         "id": t.id,
         "table_name": t.table_name,
         "table_name_cn": t.table_name_cn,
+        "name_cn_source": t.name_cn_source,
+        "name_cn_status": t.name_cn_status,
         "column_count": t.column_count,
         "domain": t.domain,
         "owner_hint": (ns or "").upper(),
         "schema_name": ns,
         "source_code": t.source_code,
         "system_code": t.system_code,
+        "row_presence_status": getattr(t, "row_presence_status", None),
     }
 
 
 @router.get(
     "/assets/tree",
-    summary="系统大类 -> 系统/库 -> schema 树（默认不含表清单，表按需加载）",
+    summary="业务系统 → 连接 → schema 树（默认不含表清单，表按需加载）",
 )
 def assets_tree(
     system_code: str | None = Query(None),
-    system_category: str | None = Query(None),
+    system_category: str | None = Query(
+        None,
+        description="兼容旧参数：现按 system_code 过滤；勿再传 external_business 等大类",
+    ),
     include_tables: bool = Query(
         False,
         description="true 时内嵌全量表（仅调试/小库）；默认 false 仅返回 schema 计数，表走 /assets/tree/tables",
@@ -1441,33 +1609,42 @@ def assets_tree(
     ),
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
-    sources_stmt = select(AssetDataSource)
-    if system_code:
-        sources_stmt = sources_stmt.where(AssetDataSource.system_code == system_code)
-    sources = {s.source_code: s for s in db.scalars(sources_stmt).all()}
+    # Load all sources so legacy aliases can always resolve their canonical
+    # physical connection; filtering is applied after canonical classification.
+    sources = {s.source_code: s for s in db.scalars(select(AssetDataSource)).all()}
+    system_names = load_system_name_map(db)
+    schema_inventory = {
+        (row.source_code, (row.schema_name or "").upper()): row
+        for row in db.scalars(select(AssetSourceSchema)).all()
+    }
 
-    # 骨架：仅聚合 (source_code, schema) 计数，避免一次序列化 2000+ 表
-    # PG GROUP BY 必须与 SELECT 表达式同一引用（勿重复写两遍 coalesce）
+    # 骨架：仅聚合 (source_code, schema) 计数；排除 confirmed_empty
     ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
     count_rows = db.execute(
         select(
             AssetTable.source_code,
+            AssetTable.system_code,
             ns_key.label("ns"),
             func.count().label("cnt"),
-        ).group_by(AssetTable.source_code, ns_key)
+        )
+        .where(_presence_visible_clause())
+        .group_by(AssetTable.source_code, AssetTable.system_code, ns_key)
     ).all()
 
     grouped: dict[str, dict[str, int]] = {}
-    for sc, ns, cnt in count_rows:
-        sc_key = sc or "DATA_CENTER"
-        ns_key = ns or ""
-        grouped.setdefault(sc_key, {})[ns_key] = int(cnt)
+    source_system_hint: dict[str, str] = {}
+    for sc, tsys, ns, cnt in count_rows:
+        sc_key = sc or "unknown"
+        ns_val = ns or ""
+        grouped.setdefault(sc_key, {})[ns_val] = grouped.get(sc_key, {}).get(ns_val, 0) + int(cnt)
+        if tsys and sc_key not in source_system_hint:
+            source_system_hint[sc_key] = tsys
 
     tables_by_schema: dict[tuple[str, str], list[dict]] = {}
     if include_tables:
-        tables = db.scalars(select(AssetTable)).all()
+        tables = db.scalars(select(AssetTable).where(_presence_visible_clause())).all()
         for t in tables:
-            sc = t.source_code or "DATA_CENTER"
+            sc = t.source_code or "unknown"
             ns = t.namespace_name or t.schema_name or ""
             key = (sc, ns)
             bucket = tables_by_schema.setdefault(key, [])
@@ -1478,66 +1655,102 @@ def assets_tree(
     tree = []
     for sc, schema_counts in sorted(grouped.items()):
         ds = sources.get(sc)
-        sys_code = ds.system_code if ds else "DATA_CENTER"
-        cat, cat_cn, src_sys, src_sys_cn = _classify_asset_source(sys_code, sc)
-        # 主 ODS 汇聚：按 namespace 拆分到抽取区
-        if sc in ("ods_8_216",) or (sys_code == "DATA_CENTER" and "216" in sc):
-            by_zone: dict[str, dict[str, int]] = {}
-            for ns, cnt in schema_counts.items():
-                zone = _ods_owner_zone(ns)
-                by_zone.setdefault(zone, {})[ns] = cnt
-            for zone, zschemas in sorted(by_zone.items()):
-                z_cn = _SOURCE_SYSTEM_CN.get(zone, zone)
-                node = {
-                    "source_code": sc,
-                    "source_name_cn": (ds.source_name_cn if ds else sc) + f" / {z_cn}",
-                    "system_code": sys_code,
-                    "system_category": cat,
-                    "system_category_cn": cat_cn,
-                    "source_system": zone,
-                    "source_system_cn": z_cn,
-                    "schemas": [],
-                    "table_count": sum(zschemas.values()),
-                    "tables_embedded": include_tables,
-                }
-                for ns, cnt in sorted(zschemas.items()):
-                    tbls = tables_by_schema.get((sc, ns), []) if include_tables else []
-                    node["schemas"].append({
-                        "namespace": ns,
-                        "tables": tbls,
-                        "table_count": cnt,
-                        "tables_loaded": include_tables,
-                    })
-                if system_category and node["system_category"] != system_category:
-                    continue
-                tree.append(node)
+        canonical_ds = (
+            sources.get(ds.canonical_source_code)
+            if ds and ds.source_kind == "legacy_alias" and ds.canonical_source_code
+            else None
+        )
+        display_ds = canonical_ds or ds
+        raw_sys = (
+            (display_ds.system_code if display_ds else None)
+            or source_system_hint.get(sc)
+            or "UNKNOWN"
+        )
+        # sample schema for DATA_CENTER mirror detection
+        sample_ns = next(iter(schema_counts.keys()), None)
+        physical_source_code = display_ds.source_code if display_ds else sc
+        sys_code, sys_name, conn_key, conn_label = _classify_asset_source(
+            raw_sys,
+            sc,
+            display_ds.source_kind if display_ds else (ds.source_kind if ds else None),
+            display_ds.source_name_cn if display_ds else (ds.source_name_cn if ds else None),
+            schema_name=sample_ns,
+            system_names=system_names,
+        )
+        # connection endpoint display
+        endpoint = None
+        if display_ds:
+            host = display_ds.host_masked or host_masked_from_target(display_ds.target_host) or display_ds.target_host
+            port = display_ds.port
+            db_or_svc = display_ds.service_name or display_ds.database_name
+            if host:
+                endpoint = f"{host}:{port or '-'}" + (f" / {db_or_svc}" if db_or_svc else "")
+        conn_display = endpoint or conn_label
+
+        # filter: system_category param now accepts system_code (compat)
+        filter_code = system_category or system_code
+        if filter_code and sys_code != filter_code.upper():
             continue
 
         node = {
             "source_code": sc,
-            "source_name_cn": ds.source_name_cn if ds else sc,
+            "physical_source_code": physical_source_code,
+            "source_name_cn": (display_ds.source_name_cn if display_ds else sc),
+            "connection_endpoint": endpoint,
             "system_code": sys_code,
-            "system_category": cat,
-            "system_category_cn": cat_cn,
-            "source_system": src_sys,
-            "source_system_cn": src_sys_cn,
+            "system_name_cn": system_names.get(sys_code) or sys_name,
+            # plan 90: category fields intentionally null for peers (no 大类)
+            "system_category": None if sys_code in CANONICAL_SYSTEMS else "catalog_anomaly",
+            "system_category_cn": None if sys_code in CANONICAL_SYSTEMS else "目录异常",
+            "source_system": conn_key,
+            "source_system_cn": conn_display,
             "schemas": [],
             "table_count": sum(schema_counts.values()),
             "tables_embedded": include_tables,
+            "empty_catalog_hint": None,
         }
         for ns, cnt in sorted(schema_counts.items()):
             tbls = tables_by_schema.get((sc, ns), []) if include_tables else []
+            inventory = schema_inventory.get((sc, (ns or "").upper()))
+            owner_cn = (
+                (inventory.schema_name_cn if inventory else None)
+                or owner_display_cn(ns, parent_system=sys_code)
+            )
             node["schemas"].append({
                 "namespace": ns,
+                "source_code": sc,
+                "namespace_name_cn": owner_cn,
+                "name_cn_source": inventory.name_cn_source if inventory else None,
+                "name_cn_status": inventory.name_cn_status if inventory else None,
                 "tables": tbls,
                 "table_count": cnt,
                 "tables_loaded": include_tables,
             })
-        if system_category and node["system_category"] != system_category:
-            continue
+        if node["table_count"] == 0:
+            node["empty_catalog_hint"] = "当前未发现非空对象"
         tree.append(node)
 
-    return ApiResponse(data=tree)
+    # 同一物理连接折叠；Schema 仍保留原 source_code
+    consolidated: dict[tuple[str, str], dict] = {}
+    for node in tree:
+        key = (node["system_code"], node.get("physical_source_code") or node["source_code"])
+        current = consolidated.get(key)
+        if not current:
+            current = {**node, "source_code": key[1], "schemas": [], "table_count": 0}
+            consolidated[key] = current
+        current["schemas"].extend(node["schemas"])
+        current["table_count"] += node["table_count"]
+        if current["table_count"] == 0:
+            current["empty_catalog_hint"] = "当前未发现非空对象"
+        else:
+            current["empty_catalog_hint"] = None
+    # stable order: canonical systems first
+    order = {c: i for i, c in enumerate(CANONICAL_SYSTEMS)}
+    result = sorted(
+        consolidated.values(),
+        key=lambda n: (order.get(n["system_code"], 999), n["system_code"], n["source_code"]),
+    )
+    return ApiResponse(data=result)
 
 
 @router.get("/assets/tree/tables", summary="懒加载：某 source+schema 下的表清单（分页）")
@@ -1554,6 +1767,7 @@ def assets_tree_tables(
     stmt = select(AssetTable).where(
         AssetTable.source_code == source_code,
         ns_key == ns,
+        _presence_visible_clause(),
     )
     if keyword:
         like = f"%{keyword.strip()}%"
@@ -1580,10 +1794,11 @@ def assets_tree_tables(
     )
 
 
-@router.get("/assets/tree/search", summary="按表名/中文名搜索（返回路径，限量）")
+@router.get("/assets/tree/search", summary="按表名/中文名搜索（返回完整路径，限量）")
 def assets_tree_search(
     keyword: str = Query(..., min_length=1),
-    system_category: str | None = Query(None),
+    system_category: str | None = Query(None, description="兼容：按 system_code 过滤"),
+    system_code: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
@@ -1591,8 +1806,9 @@ def assets_tree_search(
     stmt = (
         select(AssetTable)
         .where(
+            _presence_visible_clause(),
             (AssetTable.table_name.ilike(like))
-            | (AssetTable.table_name_cn.ilike(like))
+            | (AssetTable.table_name_cn.ilike(like)),
         )
         .order_by(AssetTable.schema_name, AssetTable.table_name)
         .limit(limit)
@@ -1602,43 +1818,41 @@ def assets_tree_search(
         s.source_code: s
         for s in db.scalars(select(AssetDataSource)).all()
     }
+    system_names = load_system_name_map(db)
+    filter_code = (system_code or system_category or "").upper() or None
     items = []
     for t in rows:
-        sc = t.source_code or "DATA_CENTER"
+        sc = t.source_code or "unknown"
         ds = sources.get(sc)
-        sys_code = ds.system_code if ds else (t.system_code or "DATA_CENTER")
-        cat, cat_cn, src_sys, src_sys_cn = _classify_asset_source(sys_code, sc)
+        raw_sys = ds.system_code if ds else (t.system_code or "UNKNOWN")
         ns = t.namespace_name or t.schema_name or ""
-        if sc in ("ods_8_216",) or (sys_code == "DATA_CENTER" and "216" in sc):
-            src_sys = _ods_owner_zone(ns)
-            src_sys_cn = _SOURCE_SYSTEM_CN.get(src_sys, src_sys)
-        if system_category and cat != system_category:
+        sys_code, sys_name, conn_key, conn_label = _classify_asset_source(
+            raw_sys,
+            sc,
+            ds.source_kind if ds else None,
+            ds.source_name_cn if ds else None,
+            schema_name=ns,
+            system_names=system_names,
+        )
+        if filter_code and sys_code != filter_code:
             continue
+        owner_cn = owner_display_cn(ns, parent_system=sys_code)
+        path_parts = [
+            system_names.get(sys_code) or sys_name,
+            conn_label,
+            f"{owner_cn}（{ns}）" if owner_cn and ns else (ns or "-"),
+            t.table_name_cn and f"{t.table_name}（{t.table_name_cn}）" or t.table_name,
+        ]
         items.append({
             **_table_brief(t),
-            "system_category": cat,
-            "system_category_cn": cat_cn,
-            "source_system": src_sys,
-            "source_system_cn": src_sys_cn,
+            "system_code": sys_code,
+            "system_name_cn": system_names.get(sys_code) or sys_name,
+            "system_category": None if sys_code in CANONICAL_SYSTEMS else "catalog_anomaly",
+            "system_category_cn": None if sys_code in CANONICAL_SYSTEMS else "目录异常",
+            "source_system": conn_key,
+            "source_system_cn": conn_label,
             "source_name_cn": ds.source_name_cn if ds else sc,
+            "path": " → ".join(str(p) for p in path_parts if p),
+            "namespace_name_cn": owner_cn,
         })
     return ApiResponse(data={"keyword": keyword, "total": len(items), "items": items})
-
-
-def _ods_owner_zone(namespace: str) -> str:
-    owner = (namespace or "").upper()
-    if owner in ("HIS",) or owner.startswith("HIS"):
-        return "ods_his"
-    if owner == "LIS":
-        return "ods_lis"
-    if owner == "PACS":
-        return "ods_pacs"
-    if owner in ("JHEMR", "MTL", "YBEMR"):
-        return "ods_emr"
-    if owner == "YDHL":
-        return "ods_ydhl"
-    if owner == "SM":
-        return "ods_sm"
-    if owner == "CDA":
-        return "ods_cda"
-    return "ods_other"

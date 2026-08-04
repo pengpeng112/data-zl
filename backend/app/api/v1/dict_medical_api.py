@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
 from ...models.dict_medical import (
     DictMedicalCodeItem,
     DictMedicalCodeMapping,
@@ -835,7 +835,7 @@ class DictCRCreate(BaseModel):
     request_payload: dict | None = None
 
 
-@router.post("/change-requests", summary="创建字典变更请求")
+@router.post("/change-requests", summary="创建字典变更请求", dependencies=[Depends(require_permission("dict.medical.plan.create"))])
 def create_dict_cr(req: DictCRCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = GovernChangeRequest(
@@ -883,7 +883,7 @@ class ApproveBody(BaseModel):
     note: str | None = None
 
 
-@router.patch("/change-requests/{cr_id}/approve", summary="审批字典变更请求")
+@router.patch("/change-requests/{cr_id}/approve", summary="审批字典变更请求", dependencies=[Depends(require_permission("dict.medical.approve"))])
 def approve_dict_cr(cr_id: int, req: ApproveBody, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
@@ -901,7 +901,7 @@ def approve_dict_cr(cr_id: int, req: ApproveBody, request: Request, db: Session 
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})
 
 
-@router.post("/change-requests/{cr_id}/execute", summary="执行字典变更请求")
+@router.post("/change-requests/{cr_id}/execute", summary="执行字典变更请求", dependencies=[Depends(require_permission("dict.medical.execute"))])
 def execute_dict_cr(cr_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
@@ -1036,5 +1036,198 @@ def list_sync_logs(
             for r in rows
         ],
     })
+
+
+# ---------------------------------------------------------------------------
+# Plan 96: medical dict push (HIS / JHEMR) — insert + single-row stop only
+# ---------------------------------------------------------------------------
+
+class MedicalPushPlanRequest(BaseModel):
+    category_code: str  # diagnosis | operation
+    targets: list[str]  # HIS_SOURCE / JHEMR_VASTBASE
+    item_codes: list[str] | None = None
+    max_items: int = 50
+    hospital_no: str | None = None
+    include_jhdict: bool = True
+    check_remote: bool = False
+    his_source_code: str | None = None
+    jhemr_source_code: str | None = None
+
+
+class MedicalPushApplyOneRequest(BaseModel):
+    action: dict
+    mode: str = "dry_run"  # dry_run | apply
+    confirmation_token: str | None = None
+    his_source_code: str | None = None
+    jhemr_source_code: str | None = None
+
+
+class MedicalPushStopOneRequest(BaseModel):
+    category_code: str
+    target_system: str
+    item_code: str
+    item_name: str | None = None
+    hospital_no: str | None = None
+    target_table: str | None = None
+    mode: str = "dry_run"
+    confirmation_token: str | None = None
+    his_source_code: str | None = None
+    jhemr_source_code: str | None = None
+
+
+class MedicalPushExportRequest(BaseModel):
+    category_code: str
+    item_codes: list[str] | None = None
+    max_items: int = 100
+
+
+@router.get("/push/config", summary="诊断手术下发开关与硬限制说明")
+def medical_push_config(request: Request) -> ApiResponse[dict]:
+    get_current_user(request)
+    from ...core.config import settings as app_settings
+    from ...services.medical_code_push import push_enabled, WHITELIST_TABLES
+
+    return ApiResponse(data={
+        "push_enabled": push_enabled(),
+        "default_hospital_no": getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002"),
+        "allowed_actions": ["insert", "stop"],
+        "hard_rules": {
+            "single_row_only": True,
+            "no_business_field_update": True,
+            "no_batch_update": True,
+            "grey_insurance_ybhm": "灰码",
+            "no_contrast_when_grey_or_empty": True,
+        },
+        "whitelist_tables": sorted(WHITELIST_TABLES),
+        "note": "apply 需 APP_DICT_MEDICAL_PUSH_ENABLED=true 且 confirmation_token 匹配",
+    })
+
+
+@router.post("/push/export-preview", summary="从平台字典导出待下发宽表（只读）")
+def medical_push_export_preview(
+    req: MedicalPushExportRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    get_current_user(request)
+    from ...services.medical_code_push import export_platform_preview
+
+    return ApiResponse(data=export_platform_preview(
+        db,
+        category_code=req.category_code,
+        item_codes=req.item_codes,
+        max_items=req.max_items,
+    ))
+
+
+@router.post("/push/plan", summary="生成诊断/手术单行新增下发计划（默认不写业务库）")
+def medical_push_plan(
+    req: MedicalPushPlanRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    from ...core.config import settings as app_settings
+    from ...services.medical_code_push import (
+        check_exists_remote,
+        plan_push_actions,
+    )
+
+    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002")
+    plan = plan_push_actions(
+        db,
+        category_code=req.category_code,
+        targets=req.targets,
+        item_codes=req.item_codes,
+        max_items=req.max_items,
+        hospital_no=hospital_no,
+        include_jhdict=req.include_jhdict,
+    )
+    if req.check_remote:
+        checked = []
+        for action in plan["actions"]:
+            checked.append(check_exists_remote(
+                db,
+                action,
+                his_source_code=req.his_source_code,
+                jhemr_source_code=req.jhemr_source_code,
+            ))
+        plan["actions"] = checked
+        plan["summary"]["skip_exists"] = sum(1 for a in checked if a.get("plan_status") == "skip_exists")
+        plan["summary"]["planned"] = sum(1 for a in checked if a.get("plan_status") == "planned")
+        plan["check_remote"] = True
+
+    db.add(GovernAuditLog(
+        module="dict_medical_push",
+        entity_type="push_plan",
+        entity_ref=req.category_code,
+        action="plan",
+        after_data={
+            "targets": req.targets,
+            "item_codes": req.item_codes,
+            "action_count": plan.get("action_count"),
+            "summary": plan.get("summary"),
+        },
+        operator=current_user,
+    ))
+    db.commit()
+    return ApiResponse(data=plan)
+
+
+@router.post("/push/apply-one", summary="单条下发（101号整改：仅 dry_run，apply 已关闭）", deprecated=True)
+def medical_push_apply_one(
+    req: MedicalPushApplyOneRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    """101号安全整改：此接口仅允许 dry_run。实际执行请使用 /push/plans 流程。"""
+    current_user = get_current_user(request)
+    from ...services.medical_code_push import apply_one_action
+
+    forced_mode = "dry_run"
+    result = apply_one_action(
+        db,
+        req.action,
+        mode=forced_mode,
+        operator=current_user,
+        confirmation_token=req.confirmation_token,
+        his_source_code=req.his_source_code,
+        jhemr_source_code=req.jhemr_source_code,
+    )
+    result["_notice"] = "apply 模式已关闭（101号整改）。本接口仅返回 dry_run 预览。实际执行请使用 /push/plans 流程。"
+    return ApiResponse(data=result)
+
+
+@router.post("/push/stop-one", summary="单条停用（唯一允许的 UPDATE 形态）")
+def medical_push_stop_one(
+    req: MedicalPushStopOneRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    current_user = get_current_user(request)
+    from ...core.config import settings as app_settings
+    from ...services.medical_code_push import apply_one_action, build_stop_action
+
+    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002")
+    action = build_stop_action(
+        category_code=req.category_code,
+        target_system=req.target_system,
+        item_code=req.item_code,
+        item_name=req.item_name or "",
+        hospital_no=hospital_no if req.target_system == "JHEMR_VASTBASE" else None,
+        target_table=req.target_table,
+    )
+    forced_mode = "dry_run"
+    result = apply_one_action(
+        db,
+        action.to_dict(),
+        mode=forced_mode,
+        operator=current_user,
+        confirmation_token=req.confirmation_token,
+        his_source_code=req.his_source_code,
+        jhemr_source_code=req.jhemr_source_code,
+    )
+    result["_notice"] = "apply 模式已关闭（101号整改）。本接口仅返回 dry_run 预览。"
+    return ApiResponse(data=result)
 
 

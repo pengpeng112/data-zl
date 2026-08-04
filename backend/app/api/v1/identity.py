@@ -862,7 +862,7 @@ def propose_master_from_diff(
     try:
         out = _create_cr_from_diff(db, diff, req, current_user)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+        raise HTTPException(status_code=400, detail="变更请求参数无效，请检查后重试") from e
     db.commit()
     return ApiResponse(data=out)
 

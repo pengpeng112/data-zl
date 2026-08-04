@@ -55,7 +55,7 @@ class FakeOracleConnector:
             ]
         if "COMM.STAFF_VS_GROUP" in sql:
             return [
-                {"GROUP_CLASS": "A", "GROUP_CODE": "G001", "EMP_NO": "E001", "DEPT_CODE": "D005"},
+                {"GROUP_CLASS": "病区医生", "GROUP_CODE": "D005", "EMP_NO": "E001"},
             ]
         return []
 
@@ -116,10 +116,17 @@ def test_his_identity_sync_upserts_bridge_sources_departments_and_audit(monkeypa
         assert person.person_name_cn == "New Name"
         assert person.dept_code == "D002"
         assert person.primary_source_system == "HIS"
+        # 活库口径：VALIDSTATE=1 在用
+        assert person.employment_status == "active"
 
         staff_only = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E002"))
         assert staff_only is not None
         assert staff_only.person_name_cn == "Staff Only"
+        # 活库口径：STAFF_DICT.STATUS=0 停用，不得归一为 active
+        assert staff_only.employment_status == "inactive"
+
+        dept = db.scalar(select(IdentityDepartment).where(IdentityDepartment.dept_code == "D001"))
+        assert dept is not None and dept.status == "active"
 
         sources = db.scalars(select(IdentityPersonSource).where(IdentityPersonSource.person_code == "E001")).all()
         assert {s.source_table for s in sources} == {"COMM.STAFF_DICT", "FXHIS.SYS_EMPLOYEE"}

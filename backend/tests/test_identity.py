@@ -302,7 +302,7 @@ def test_collect_person_sources_live_source(client: TestClient, monkeypatch):
                 ]
             if "STAFF_VS_GROUP" in sql:
                 return [
-                    {"GROUP_CLASS": "G", "GROUP_CODE": "G001", "EMP_NO": "E001", "DEPT_CODE": "D004"},
+                    {"GROUP_CLASS": "G", "GROUP_CODE": "D004", "EMP_NO": "E001"},
                 ]
             return []
 
@@ -354,6 +354,8 @@ def test_collect_person_sources_live_source(client: TestClient, monkeypatch):
         ).order_by(IdentityPersonSource.source_table).all()
         assert len(sources) == 2
         assert all("ID_NO" not in (s.raw_data or {}) and "IDENNO" not in (s.raw_data or {}) for s in sources)
+        # 活库口径：STATUS/VALIDSTATE 0=停用；两个假源行均为 0，应归一为 inactive
+        assert all(s.source_status == "inactive" for s in sources)
         links = db.query(IdentityPersonDepartment).filter(
             IdentityPersonDepartment.person_code == "E001"
         ).order_by(IdentityPersonDepartment.dept_code).all()

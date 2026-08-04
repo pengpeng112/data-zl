@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from ...core.config import settings
 from ...core.db import get_db
 from ...core.logging_config import get_logger
 from ...schemas.common import ApiResponse
@@ -12,8 +13,19 @@ logger = get_logger(__name__)
 router = APIRouter(tags=["health"])
 
 
+def _build_payload() -> dict:
+    """版本信息（脱敏，不含秘密）：build_id/git_sha/frontend_build_id。"""
+    return {
+        "build_id": settings.build_id or "dev-local",
+        "git_sha": settings.git_sha or "",
+        "frontend_build_id": settings.frontend_build_id or "",
+    }
+
+
 def _live_payload() -> dict:
-    return {"status": "alive", "checked_at": datetime.now(timezone.utc).isoformat()}
+    payload = {"status": "alive", "checked_at": datetime.now(timezone.utc).isoformat()}
+    payload.update(_build_payload())
+    return payload
 
 
 @router.get("/health/live", summary="存活检查（liveness，不依赖数据库）")
@@ -50,5 +62,6 @@ def health(db: Session = Depends(get_db), response: Response = None) -> ApiRespo
             "status": "ok" if db_ok else "unavailable",
             "database": "connected" if db_ok else "disconnected",
             "checked_at": datetime.now(timezone.utc).isoformat(),
+            **_build_payload(),
         },
     )

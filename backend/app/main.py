@@ -8,9 +8,10 @@ from slowapi import _rate_limit_exceeded_handler
 import logging
 import hashlib
 import time
+import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, auth, candidates, dict_general_api, dict_medical_api, governance, governance_ops, graph, health, identity, lineage, metadata_changes, ops_tools, permissions, permission_requests, quality, recipes, relations, systems, tables
+from .api.v1 import admin, ai, auth, candidates, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, ops_tools, permissions, permission_requests, quality, recipes, relations, systems, tables
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -20,6 +21,7 @@ from .core.exceptions import (
 )
 from .core.logging_config import setup_logging
 from .core.rate_limit import limiter
+from .core.startup_check import PROD_ALLOWED_HEADERS, PROD_ALLOWED_METHODS, run_startup_check
 from .services.auth_service import decode_access_token
 from slowapi.middleware import SlowAPIMiddleware
 
@@ -34,38 +36,44 @@ def _start_scheduler():
         from apscheduler.triggers.cron import CronTrigger
         from .models.governance_ops import SchedulerJob
         db = SessionLocal()
-        scheduler = BackgroundScheduler(timezone=settings.scheduler_timezone)
-        jobs = db.scalars(select(SchedulerJob).where(
-            SchedulerJob.trigger_mode == "scheduled",
-            SchedulerJob.schedule_cron.isnot(None),
-        )).all()
-        for j in jobs:
-            try:
-                trigger = CronTrigger.from_crontab(
-                    j.schedule_cron,
-                    timezone=settings.scheduler_timezone,
-                )
-            except ValueError:
-                logger.error("Skipping scheduler job %s: invalid cron", j.id)
-                continue
-            if j.job_type == "metadata_scan":
-                scheduler.add_job(
-                    _run_metadata_collect,
-                    trigger=trigger,
-                    args=[j.source_code],
-                    id=f"scheduler_{j.id}", replace_existing=True,
-                )
-            elif j.job_type == "quality_check":
-                scheduler.add_job(
-                    _run_quality_nightly,
-                    trigger=trigger,
-                    id=f"scheduler_{j.id}",
-                    replace_existing=True,
-                )
-        if jobs:
-            scheduler.start()
-            logger.info(f"APScheduler started with {len(jobs)} scheduled jobs in %s", settings.scheduler_timezone)
-        db.close()
+        try:
+            scheduler = BackgroundScheduler(timezone=settings.scheduler_timezone)
+            jobs = db.scalars(select(SchedulerJob).where(
+                SchedulerJob.trigger_mode == "scheduled",
+                SchedulerJob.schedule_cron.isnot(None),
+            )).all()
+            for j in jobs:
+                try:
+                    trigger = CronTrigger.from_crontab(
+                        j.schedule_cron,
+                        timezone=settings.scheduler_timezone,
+                    )
+                except ValueError:
+                    logger.error("Skipping scheduler job %s: invalid cron", j.id)
+                    continue
+                if j.job_type == "metadata_scan":
+                    scheduler.add_job(
+                        _run_metadata_collect,
+                        trigger=trigger,
+                        args=[j.source_code],
+                        id=f"scheduler_{j.id}", replace_existing=True,
+                    )
+                elif j.job_type == "quality_check":
+                    scheduler.add_job(
+                        _run_quality_nightly,
+                        trigger=trigger,
+                        id=f"scheduler_{j.id}",
+                        replace_existing=True,
+                    )
+            # Register identity nightly sync (plan 107): default OFF
+            from .services.identity_nightly_scheduler import register_nightly_job
+            register_nightly_job(scheduler)
+
+            if jobs or settings.identity_nightly_enabled:
+                scheduler.start()
+                logger.info("APScheduler started with %d scheduled jobs in %s", len(jobs), settings.scheduler_timezone)
+        finally:
+            db.close()
     except ImportError:
         logger.warning("apscheduler not installed, scheduling disabled")
 
@@ -148,18 +156,31 @@ def _run_metadata_collect(source_code: str):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # 111号 S4：production 配置失败关闭——启动前校验，不满足即拒绝启动。
+    # 生产/非生产都调用，函数内部仅 APP_ENV=production 强制校验。
+    run_startup_check()
+    # 108号 P0-02：启动输出脱敏版本号（不含任何秘密）
+    logger.info(
+        "platform start build_id=%s git_sha=%s frontend_build_id=%s",
+        settings.build_id or "dev-local",
+        settings.git_sha or "-",
+        settings.frontend_build_id or "-",
+    )
     _start_scheduler()
     yield
 
 
 app = FastAPI(title="医院数据资产平台 API", version="0.2.0", lifespan=lifespan)
 
+is_production = (settings.env or "").strip().lower() == "production"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    # 111号 S4：production 收敛 methods/headers 到最小集合（不写成通配）。
+    allow_methods=list(PROD_ALLOWED_METHODS) if is_production else ["*"],
+    allow_headers=list(PROD_ALLOWED_HEADERS) if is_production else ["*"],
 )
 
 app.state.limiter = limiter
@@ -224,7 +245,7 @@ def _check_token(db, token: str) -> tuple[bool, str | None, object | None]:
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
     key = db.scalar(
         select(ApiKey).where(
-            ApiKey.enabled == True,
+            ApiKey.enabled.is_(True),
             (ApiKey.token_hash == token_hash) | (ApiKey.token == token),
         )
     )
@@ -244,13 +265,18 @@ def _check_token(db, token: str) -> tuple[bool, str | None, object | None]:
 
 def _lookup_roles(db, user_identifier: str | None) -> list[str]:
     """Return roles for a bound user; unbound credentials have no elevated permissions."""
-    from .models.governance_base import AssetUserRole
     if not user_identifier:
         return []
-    roles = db.scalars(
-        select(AssetUserRole.role_code).where(AssetUserRole.user_identifier == user_identifier)
-    ).all()
-    return list(set(roles)) if roles else []
+    from .core.security import _effective_role_codes
+    return sorted(_effective_role_codes(db, user_identifier))
+
+
+def _resolve_jwt_roles(db, jwt_payload: dict) -> list[str]:
+    """Resolve request roles, treating JWT roles only as an unbound display cache."""
+    user_identifier = jwt_payload.get("user_identifier") or jwt_payload.get("username")
+    if user_identifier:
+        return _lookup_roles(db, user_identifier)
+    return list(jwt_payload.get("roles") or [])
 
 
 def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
@@ -297,6 +323,8 @@ def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
 
 @app.middleware("http")
 async def auth_and_logging_middleware(request: Request, call_next):
+    # 111 S6：为每个请求生成关联 ID，供异常响应对账（request_id）。
+    request.state.request_id = uuid.uuid4().hex
     start = time.perf_counter()
     path = request.url.path.rstrip("/") or "/"
 
@@ -318,11 +346,10 @@ async def auth_and_logging_middleware(request: Request, call_next):
                 request.state.auth_user_id = jwt_payload.get("sub")
                 request.state.auth_via = "jwt"
                 token_roles = list(jwt_payload.get("roles") or [])
-                # JWT 内嵌 roles 可能过期；DB 有角色则以库为准补全
+                # 可信用户的实时角色是唯一授权来源。即使数据库返回空列表，
+                # 也必须覆盖 JWT 缓存，确保撤权立即生效；查询异常由外层失败关闭。
                 if request.state.user_identifier:
-                    db_roles = _lookup_roles(db, request.state.user_identifier)
-                    if db_roles:
-                        token_roles = db_roles
+                    token_roles = _resolve_jwt_roles(db, jwt_payload)
                 request.state.roles = token_roles
             else:
                 ok, err, key = _check_token(db, token)
@@ -337,11 +364,24 @@ async def auth_and_logging_middleware(request: Request, call_next):
             rbac_err = _enforce_rbac(path, request.method, token_roles)
             if rbac_err:
                 db.close()
-                return JSONResponse(status_code=403, content={"code": 403, "message": rbac_err, "data": None})
+                return JSONResponse(status_code=403, content={
+                    "code": 403, "message": rbac_err, "data": None,
+                    "request_id": request.state.request_id,
+                })
             db.close()
-        except Exception as e:
+        except Exception:
             db.close()
-            return JSONResponse(status_code=500, content={"code": 500, "message": f"鉴权异常: {e}", "data": None})
+            # 111 S6：异常细节只进服务端日志并关联 request_id，不泄漏 str(exc)。
+            logger.exception(
+                "auth_error request_id=%s %s %s",
+                getattr(request.state, "request_id", ""),
+                request.method,
+                path,
+            )
+            return JSONResponse(status_code=500, content={
+                "code": 500, "message": "服务异常，请联系管理员", "data": None,
+                "request_id": getattr(request.state, "request_id", ""),
+            })
 
     try:
         response = await call_next(request)
@@ -360,6 +400,7 @@ app.add_exception_handler(Exception, generic_exception_handler)
 
 app.include_router(auth.router)
 app.include_router(graph.router)
+app.include_router(graph_analysis.router)
 app.include_router(health.router)
 app.include_router(tables.router)
 app.include_router(relations.router)
@@ -375,8 +416,11 @@ app.include_router(ops_tools.router)
 app.include_router(permissions.router)
 app.include_router(permission_requests.router)
 app.include_router(identity.router)
+app.include_router(identity_sync.router)
 app.include_router(dict_general_api.router)
 app.include_router(dict_medical_api.router)
+app.include_router(dict_medical_import_api.router)
+app.include_router(dict_medical_push_api.router)
 app.include_router(systems.router)
 app.include_router(recipes.router)
 

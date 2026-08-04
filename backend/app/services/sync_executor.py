@@ -345,6 +345,7 @@ def run_sync(
     target_system: str,
     entity_type: str,
     operator: str | None = None,
+    dry_run: bool = False,
 ) -> dict[str, Any]:
     """Run a sync job and persist local audit/diff records.
 
@@ -352,12 +353,16 @@ def run_sync(
     repository already contains a source staging table for person records.
     Other entity types return an actionable configuration status instead of a
     misleading stub result.
+
+    dry_run is honored by the identity_his path (previously hardcoded False);
+    audit records are still written so dry-runs remain traceable.
     """
     db = SessionLocal()
     result: dict[str, Any] = {
         "source_system": source_system,
         "target_system": target_system,
         "entity_type": entity_type,
+        "dry_run": dry_run,
         "started_at": _now_iso(),
     }
     try:
@@ -373,7 +378,7 @@ def run_sync(
             result.update(_run_identity_department_sync(db, source_system, target_system))
         elif entity_type == "identity_his":
             from .his_identity_sync import sync_his_identity
-            result.update(sync_his_identity(db, operator=operator, dry_run=False, write_audit=False))
+            result.update(sync_his_identity(db, operator=operator, dry_run=dry_run, write_audit=False))
         else:
             result.update(_needs_source_config(entity_type))
 

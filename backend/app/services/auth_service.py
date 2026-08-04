@@ -16,8 +16,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..core.config import settings
+from ..core.security import _effective_role_codes
 from ..models.auth import AuthLoginEvent, AuthSession, AuthUser
-from ..models.governance_base import AssetUserRole
 
 _ph = PasswordHasher()
 
@@ -243,10 +243,7 @@ def record_login_event(
 def lookup_roles(db: Session, user_identifier: str | None) -> list[str]:
     if not user_identifier:
         return []
-    roles = db.scalars(
-        select(AssetUserRole.role_code).where(AssetUserRole.user_identifier == user_identifier)
-    ).all()
-    return sorted(set(roles)) if roles else []
+    return sorted(_effective_role_codes(db, user_identifier))
 
 
 def _is_locked(user: AuthUser, now: datetime) -> bool:

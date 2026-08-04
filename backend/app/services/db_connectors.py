@@ -229,9 +229,17 @@ finally:
             oracledb.init_oracle_client(lib_dir=lib_dir)
         except Exception:
             pass  # 已初始化或路径无效，继续尝试连接
-        dsn = f"{self.host}:{self.port}/{self.database}"
+        # Bound the TCP handshake as well as statement execution. Without this,
+        # an unreachable business source can hang a read-only inventory run.
+        dsn = oracledb.ConnectParams(
+            host=self.host,
+            port=self.port,
+            service_name=self.database,
+            tcp_connect_timeout=max(1.0, self._timeout_ms() / 1000),
+            retry_count=0,
+        )
         self._conn = oracledb.connect(
-            user=self.user, password=self.password, dsn=dsn,
+            user=self.user, password=self.password, params=dsn,
         )
         self._conn.call_timeout = self._timeout_ms()
         return self._conn

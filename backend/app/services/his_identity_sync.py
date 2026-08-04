@@ -32,6 +32,7 @@ STAFF_TABLE = "COMM.STAFF_DICT"
 EMPLOYEE_TABLE = "FXHIS.SYS_EMPLOYEE"
 DOCTOR_GROUP_TABLE = "COMM.DOCTOR_GROUP"
 STAFF_GROUP_TABLE = "COMM.STAFF_VS_GROUP"
+# 保留常量仅作文档：活库实测该表 DEPT_CODE 全空，采集不再依赖它（见 _collect 注释）。
 STAFF_GROUP_DICT_TABLE = "COMM.STAFF_GROUP_DICT"
 
 SENSITIVE_KEYS = {"ID_NO", "IDENNO", "IDCARD", "CARD_NO", "PHONE", "MOBILE", "ADDRESS"}
@@ -59,10 +60,23 @@ def _text(value: Any) -> str | None:
 
 
 def _normalize_status(value: Any) -> str:
+    """归一 STAFF_DICT.STATUS / SYS_EMPLOYEE.VALIDSTATE（活库实测 1=在用，0=停用）。"""
     text = (_text(value) or "").upper()
-    if text in {"", "0", "1", "Y", "ACTIVE", "ENABLED", "VALID"}:
+    if text == "1":
         return "active"
-    return "inactive"
+    if text == "0":
+        return "inactive"
+    return "unknown"
+
+
+def _normalize_stop_flag(value: Any) -> str:
+    """归一 DEPT_DICT.STOP_FLAG（活库实测 NULL/'0'=有效，'1'=停用）。"""
+    text = (_text(value) or "").upper()
+    if text in {"", "0", "N"}:
+        return "active"
+    if text in {"1", "Y"}:
+        return "inactive"
+    return "unknown"
 
 
 def _hash(value: Any) -> str | None:
@@ -102,6 +116,9 @@ class PersonMaster:
     employment_status: str | None = None
     primary_source_system: str = "HIS"
     source_system: str = "HIS"
+    raw_job: str | None = None
+    raw_title: str | None = None
+    source_create_date: Any = None
 
 
 def _connector() -> OracleConnector:
@@ -174,7 +191,7 @@ FROM {DEPT_TABLE}
 WHERE ROWNUM <= :max_rows
 """, max_rows),
             "staff": _select(connector, f"""
-SELECT EMP_NO, NAME, DEPT_CODE, JOB, TITLE, STATUS, ID_NO
+SELECT EMP_NO, NAME, DEPT_CODE, JOB, TITLE, STATUS, ID_NO, CREATE_DATE
 FROM {STAFF_TABLE}
 WHERE ROWNUM <= :max_rows
 """, max_rows),
@@ -195,10 +212,11 @@ SELECT DOCTOR_USER, DEPT_CODE, DOCTOR
 FROM {DOCTOR_GROUP_TABLE}
 WHERE ROWNUM <= :max_rows
 """, max_rows),
+            # 活库实测：STAFF_GROUP_DICT.DEPT_CODE 全部为空；STAFF_VS_GROUP.GROUP_CODE
+            # 本身就是科室/病区编码（9449/9449 命中 DEPT_DICT），直接作为附加科室。
             "staff_groups": _select(connector, f"""
-SELECT svg.GROUP_CLASS, svg.GROUP_CODE, svg.EMP_NO, sgd.DEPT_CODE
+SELECT svg.GROUP_CLASS, svg.GROUP_CODE, svg.EMP_NO
 FROM {STAFF_GROUP_TABLE} svg
-LEFT JOIN {STAFF_GROUP_DICT_TABLE} sgd ON sgd.GROUP_CODE = svg.GROUP_CODE
 WHERE ROWNUM <= :max_rows
 """, max_rows),
         }
@@ -221,7 +239,7 @@ def _upsert_department(db: Session, row: dict[str, Any], source_system: str) -> 
     dept.source_system = source_system
     dept.source_table = DEPT_TABLE
     dept.source_dept_id = dept_code
-    dept.status = _normalize_status(_value(row, "STOP_FLAG"))
+    dept.status = _normalize_stop_flag(_value(row, "STOP_FLAG"))
     dept.last_source_sync_at = _now()
     dept.updated_at = _now()
     return created
@@ -269,6 +287,7 @@ def _upsert_person_department(
     source_table: str,
     is_primary: bool,
     seen: set[tuple[str, str, str]] | None = None,
+    group_class: str | None = None,
 ) -> bool:
     if not person_code or not dept_code:
         return False
@@ -290,6 +309,8 @@ def _upsert_person_department(
         seen.add(key)
     link.is_primary = is_primary if created else (bool(link.is_primary) or is_primary)
     link.source_dept_code = dept_code
+    if group_class is not None:
+        link.group_class = group_class
     link.updated_at = _now()
     return created
 
@@ -306,6 +327,13 @@ def _upsert_person(db: Session, person: PersonMaster) -> bool:
     row.employment_status = person.employment_status or row.employment_status
     row.primary_source_system = person.primary_source_system
     row.source_system = person.source_system
+    # 分类要素（103/107 纳管基线）：每次同步刷新，供分类预检使用
+    if person.raw_job is not None:
+        row.raw_job = person.raw_job
+    if person.raw_title is not None:
+        row.raw_title = person.raw_title
+    if person.source_create_date is not None:
+        row.source_create_date = person.source_create_date
     row.updated_at = _now()
     return created
 
@@ -345,6 +373,9 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
             or (_text(_value(staff, "DEPT_CODE")) if staff else None),
             job_title=(_text(_value(staff, "TITLE")) or _text(_value(staff, "JOB"))) if staff else None,
             employment_status=_normalize_status(_value(row, "VALIDSTATE")),
+            raw_job=_text(_value(staff, "JOB")) if staff else None,
+            raw_title=_text(_value(staff, "TITLE")) if staff else None,
+            source_create_date=_value(staff, "CREATE_DATE") if staff else None,
         )
 
     # 补充：仅出现在 STAFF_DICT、不在 SYS_EMPLOYEE 的人员
@@ -357,6 +388,9 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
             dept_code=_text(_value(row, "DEPT_CODE")),
             job_title=_text(_value(row, "TITLE")) or _text(_value(row, "JOB")),
             employment_status=_normalize_status(_value(row, "STATUS")),
+            raw_job=_text(_value(row, "JOB")),
+            raw_title=_text(_value(row, "TITLE")),
+            source_create_date=_value(row, "CREATE_DATE"),
         )
 
     known_person_codes = set(masters)
@@ -499,10 +533,11 @@ def sync_his_identity(
         result["upserted"]["person_departments"] += int(_upsert_person_department(
             db,
             person_code=_text(_value(row, "EMP_NO")),
-            dept_code=_text(_value(row, "DEPT_CODE")),
+            dept_code=_text(_value(row, "GROUP_CODE")),
             source_table=STAFF_GROUP_TABLE,
             is_primary=False,
             seen=pd_seen,
+            group_class=_text(_value(row, "GROUP_CLASS")),
         ))
 
     result["finished_at"] = _now().isoformat()

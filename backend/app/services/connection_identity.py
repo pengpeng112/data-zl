@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import ipaddress
+import re
+import socket
 from typing import Any
 
 ALLOWED_DB_TYPES = {
@@ -11,6 +14,21 @@ ALLOWED_DB_TYPES = {
     "vastbase": {"default_port": 5432, "service_modes": {"database"}},
     "postgresql": {"default_port": 5432, "service_modes": {"database"}},
 }
+
+# 111 号 S5：连接测试防 SSRF —— 明确禁止的目标地址
+# （回环、链路本地、云元数据、组播、广播、未指定）。业务合法内网段仍可连接。
+_SSRF_BLOCKED_NETWORKS = (
+    ipaddress.ip_network("127.0.0.0/8"),          # 回环
+    ipaddress.ip_network("0.0.0.0/8"),            # 未指定/本机
+    ipaddress.ip_network("169.254.0.0/16"),       # 链路本地（含云元数据 169.254.169.254）
+    ipaddress.ip_network("::1/128"),              # IPv6 回环
+    ipaddress.ip_network("::/128"),               # IPv6 未指定
+    ipaddress.ip_network("fe80::/10"),            # IPv6 链路本地
+    ipaddress.ip_network("224.0.0.0/4"),          # 组播
+    ipaddress.ip_network("255.255.255.255/32"),   # 广播
+    ipaddress.ip_network("ff00::/8"),             # IPv6 组播
+)
+_HOSTNAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,253}$")
 
 BUSINESS_SOURCE_SYSTEMS = {
     "HIS",
@@ -29,6 +47,72 @@ BUSINESS_SOURCE_SYSTEMS = {
 def default_port(db_type: str | None) -> int:
     meta = ALLOWED_DB_TYPES.get((db_type or "").lower())
     return int(meta["default_port"]) if meta else 1521
+
+
+# 111 号 S5：连接测试超时上限（毫秒），防慢速端口扫描拖垮服务。
+MAX_CONNECTIVITY_TIMEOUT_MS = 10000
+
+
+def validate_ssrf_target(db_type: str | None, target_host: str | None, port: int | None) -> list[str]:
+    """111 号 S5：连接测试防 SSRF。
+
+    限制：db_type 白名单、端口匹配 db_type 默认端口、目标地址不得命中禁止网段
+    （回环/链路本地/云元数据/组播/广播/未指定）、主机名仅允许规范 DNS/主机名。
+    返回错误列表（空=通过）。
+    """
+    errors: list[str] = []
+    db = (db_type or "").strip().lower()
+    if db not in ALLOWED_DB_TYPES:
+        errors.append("db_type 不受支持，禁止发起连接测试")
+        return errors
+
+    # 协议限制：端口必须等于该 db_type 的默认端口，禁止探测任意端口
+    expected = int(ALLOWED_DB_TYPES[db]["default_port"])
+    try:
+        p = int(port) if port is not None else expected
+    except (TypeError, ValueError):
+        errors.append("port 必须为整数")
+        return errors
+    if p != expected:
+        errors.append(f"连接测试仅允许 {db} 标准端口 {expected}，收到 {p}")
+
+    host = (target_host or "").strip()
+    if not host:
+        errors.append("target_host 为空")
+        return errors
+
+    # 解析为 IP；解析失败按主机名处理（仅允许规范 DNS/主机名）
+    try:
+        addr = ipaddress.ip_address(host)
+        if any(addr in net for net in _SSRF_BLOCKED_NETWORKS):
+            errors.append(f"连接测试禁止的目标地址: {host}")
+    except ValueError:
+        # 纯数字/0x 十六进制形式可被驱动解释为整数 IP（如 2130706433==127.0.0.1），
+        # 可绕过上述网段检查，必须直接拒绝；合法 DNS 主机名不可能纯数字或 0x 开头。
+        is_integer_form = host.isdigit() or host[:2].lower() == "0x"
+        if not _HOSTNAME_RE.match(host) or ".." in host or is_integer_form:
+            errors.append(f"target_host 非法: {host}")
+        elif "." not in host and host.lower() not in {"localhost"}:
+            errors.append("target_host 必须是完整域名或 IP")
+        else:
+            # DNS 解析后的每个地址都必须通过同一禁止网段检查，防止
+            # hostname 指向回环/链路本地地址或发生 DNS rebinding。
+            try:
+                resolved = {item[4][0] for item in socket.getaddrinfo(host, p, type=socket.SOCK_STREAM)}
+            except OSError:
+                # 不可解析的合法主机名交由连接器按超时策略失败；
+                # 不能因临时 DNS 故障阻断保存配置。所有实际解析结果仍必须复核。
+                pass
+            else:
+                for value in resolved:
+                    try:
+                        resolved_addr = ipaddress.ip_address(value)
+                    except ValueError:
+                        errors.append("target_host DNS 结果非法，已拒绝连接测试")
+                        continue
+                    if any(resolved_addr in net for net in _SSRF_BLOCKED_NETWORKS):
+                        errors.append("target_host DNS 结果命中禁止网段，已拒绝连接测试")
+    return errors
 
 
 def normalize_host(host: str | None) -> str:

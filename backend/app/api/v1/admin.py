@@ -35,7 +35,8 @@ def list_keys(
         {
             "id": r.id,
             "key_name": r.key_name,
-            "token": r.token[:8] + "..." if r.token else "",
+            "user_identifier": r.user_identifier,
+            "has_legacy_token": bool(r.token),
             "enabled": r.enabled,
             "created_at": r.created_at.isoformat() if r.created_at else None,
             "last_used_at": r.last_used_at.isoformat() if r.last_used_at else None,

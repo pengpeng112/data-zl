@@ -12,6 +12,22 @@ from .governance_base import (  # noqa: F401
     GovernChangeRequest,
 )
 from .governance_ops import ChangeRule, GovernEvent, SchedulerJob  # noqa: F401
+from .graph_sync import GraphSyncBatch  # noqa: F401
+from .identity_sync import (  # noqa: F401
+    IdentitySyncWatermark,
+    IdentitySyncBatch,
+    IdentitySyncAction,
+    IdentityRoleMapping,
+    IdentityProtectedAccount,
+    IdentityManagedRelation,
+    IdentitySyncCompensation,
+    IdentityClassificationRecord,
+    IdentityDistributedLock,
+    IdentitySchedulerRun,
+    IdentityCircuitBreaker,
+)
+from .dict_medical_push import DictMedicalImportRow, DictMedicalPushPlan, DictMedicalPushAction, DictMedicalPushRun  # noqa: F401
+from .dict_sync_outbox import DictSyncOutboxEvent  # noqa: F401
 
 __all__ = [
     "AssetTable",

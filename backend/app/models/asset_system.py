@@ -19,6 +19,7 @@ class AssetSystem(Base):
     owner_department = Column(Text)
     description_cn = Column(Text)
     status = Column(Text, server_default="active")
+    canonical_system_code = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
@@ -85,6 +86,9 @@ class AssetSourceSchema(Base):
     id = Column(BigInteger, primary_key=True)
     source_code = Column(Text, nullable=False)
     schema_name = Column(Text, nullable=False)
+    schema_name_cn = Column(Text)
+    name_cn_source = Column(Text)
+    name_cn_status = Column(Text)
     business_labels = Column(JSONB)
     table_count = Column(Integer, server_default="0")
     column_count = Column(Integer, server_default="0")
