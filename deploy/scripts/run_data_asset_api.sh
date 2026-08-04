@@ -25,7 +25,8 @@ fi
 
 # credentials 卷需可写：系统连接页通过 credential_store 原子写入 *.readonly 凭据文件。
 # 业务源库仍只读；此处仅平台侧凭据文件持久化。目录权限建议 0700。
-chmod 700 "${CREDS}" 2>/dev/null || true
+# 111 号 S7：权限设置失败必须失败关闭，禁止用 || true 忽略。
+chmod 700 "${CREDS}"
 
 docker run -d --name "${NAME}" --restart unless-stopped \
   --network host \
@@ -34,7 +35,7 @@ docker run -d --name "${NAME}" --restart unless-stopped \
   -v "${ORACLE_HOST_DIR}:/opt/oracle:ro" \
   -e "APP_CREDENTIAL_DIR=/etc/data-asset/credentials" \
   "${IMAGE}" \
-  bash -lc 'bash /app/deploy/scripts/ensure_oracle_ro_runtime.sh || true; uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1'
+  bash -lc 'bash /app/deploy/scripts/ensure_oracle_ro_runtime.sh; exec uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1'
 
 echo "started ${NAME}"
 docker ps --filter "name=${NAME}"

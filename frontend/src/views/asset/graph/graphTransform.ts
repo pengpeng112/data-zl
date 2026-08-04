@@ -334,7 +334,10 @@ function nodeSystem(node: ApiGraphNode) {
 }
 
 function nodeSchema(node: ApiGraphNode) {
-  return clean(node.schema_name) || clean(node.namespace_name) || clean(node.category) || node.id.split(".")[0] || UNKNOWN;
+  const physical = clean(node.schema_name) || clean(node.namespace_name) || clean(node.category);
+  if (physical) return physical;
+  const display = clean(node.display_id) || node.id;
+  return display.split(".")[0] || UNKNOWN;
 }
 
 function nodeDomain(node: ApiGraphNode) {
@@ -349,7 +352,7 @@ function toTableNode(node: ApiGraphNode): GraphNode {
     systemCode: clean(node.system_code),
     schemaName: clean(node.schema_name) || clean(node.namespace_name),
     domain: clean(node.business_domain) || clean(node.domain),
-    tableName: clean(node.table_name) || node.id.split(".").pop(),
+    tableName: clean(node.table_name) || clean(node.display_id)?.split(".").pop(),
     tableNameCn: clean(node.table_name_cn),
     role: clean(node.table_role),
     status: clean(node.include_status) || clean(node.review_status),
@@ -358,10 +361,12 @@ function toTableNode(node: ApiGraphNode): GraphNode {
 }
 
 export function buildGraphNodeKey(source: ApiGraphNode, level: GraphTransformLevel) {
-  if (level === "system") return `system:${nodeSystem(source)}`;
-  if (level === "schema") return `schema:${nodeSystem(source)}:${nodeSchema(source)}`;
-  if (level === "domain") return `domain:${nodeSystem(source)}:${nodeDomain(source)}`;
-  return `table:${nodeSystem(source)}:${nodeSchema(source)}:${clean(source.table_name) || source.id.split(".").pop() || source.id}`;
+  const system = clean(source.system_code) || clean(source.source_code) || clean(source.source) || UNKNOWN;
+  if (level === "system") return `system:${system}`;
+  if (level === "schema") return `schema:${system}:${nodeSchema(source)}`;
+  if (level === "domain") return `domain:${system}:${nodeDomain(source)}`;
+  const table = clean(source.table_name) || clean(source.display_id)?.split(".").pop() || source.id.split(".").pop() || source.id;
+  return `table:${system}:${nodeSchema(source)}:${table}`;
 }
 
 function aggregateNodeFor(source: ApiGraphNode, level: GraphTransformLevel): GraphNode {
@@ -400,10 +405,12 @@ function aggregateNodeFor(source: ApiGraphNode, level: GraphTransformLevel): Gra
 
 function endpointNode(edge: ApiGraphEdge, side: "source" | "target"): ApiGraphNode {
   if (side === "source") {
-    const schemaName = clean(edge.from_schema_name) || edge.source.split(".")[0];
-    const tableName = clean(edge.from_table_name) || edge.source.split(".").slice(1).join(".");
+    const display = clean(edge.display_source) || edge.source;
+    const schemaName = clean(edge.from_schema_name) || display.split(".")[0];
+    const tableName = clean(edge.from_table_name) || display.split(".").slice(1).join(".");
     return {
       id: edge.source,
+      display_id: clean(edge.display_source) || edge.source,
       label: clean(edge.from_table_name_cn) || tableName || edge.source,
       system_code: clean(edge.from_system_code),
       source_code: clean(edge.from_source_code),
@@ -416,10 +423,12 @@ function endpointNode(edge: ApiGraphEdge, side: "source" | "target"): ApiGraphNo
       domain: clean(edge.business_domain)
     };
   }
-  const schemaName = clean(edge.to_schema_name) || edge.target.split(".")[0];
-  const tableName = clean(edge.to_table_name) || edge.target.split(".").slice(1).join(".");
+  const display = clean(edge.display_target) || edge.target;
+  const schemaName = clean(edge.to_schema_name) || display.split(".")[0];
+  const tableName = clean(edge.to_table_name) || display.split(".").slice(1).join(".");
   return {
     id: edge.target,
+    display_id: clean(edge.display_target) || edge.target,
     label: clean(edge.to_table_name_cn) || tableName || edge.target,
     system_code: clean(edge.to_system_code),
     source_code: clean(edge.to_source_code),

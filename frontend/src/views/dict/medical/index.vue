@@ -1,5 +1,10 @@
 <template>
   <div class="dict-medical">
+    <el-tabs v-model="activeTab" class="dict-tabs">
+      <el-tab-pane label="字典总览" name="overview">
+        <OverviewPanel />
+      </el-tab-pane>
+      <el-tab-pane label="映射维护" name="mapping">
     <el-card shadow="never">
       <template #header>
         <RePageHeader title="诊断与手术编码体系" subtitle="维护院内编码、国家临床版、医保版及后续同步基础数据。">
@@ -160,15 +165,115 @@
         <el-button type="primary" :loading="itemDialog.submitting" @click="saveItem">保存</el-button>
       </template>
     </el-dialog>
+
+    <el-card shadow="never" class="push-card">
+      <template #header>
+        <RePageHeader
+          title="下发 HIS / 海量（只增 + 单条停用）"
+          subtitle="禁止改已有业务字段；禁止批量 UPDATE；医保灰码写 ybhm=灰码 且不写对照表。默认 dry_run，apply 需服务端开关。"
+        />
+      </template>
+      <el-alert
+        :title="pushConfig.push_enabled ? '写通道已开启（仍须 confirmation_token）' : '写通道关闭：仅可 plan / dry_run'"
+        :type="pushConfig.push_enabled ? 'success' : 'info'"
+        show-icon
+        :closable="false"
+        class="push-alert"
+      />
+      <el-alert
+        type="warning"
+        :closable="false"
+        show-icon
+        class="push-alert"
+        title="写账号在「业务系统与数据资源 → 数据库连接」配置：对 HIS/海量连接点「写凭据」，策略选 medical_dict_push。只读凭据与写凭据分离。"
+      />
+      <el-form :inline="true" class="push-form" label-width="100px">
+        <el-form-item label="目标">
+          <el-checkbox-group v-model="pushForm.targets">
+            <el-checkbox label="HIS_SOURCE">HIS</el-checkbox>
+            <el-checkbox label="JHEMR_VASTBASE">海量</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="编码(可选)">
+          <el-input v-model="pushForm.itemCodesText" placeholder="逗号分隔，空=按上限取平台启用项" style="width: 280px" />
+        </el-form-item>
+        <el-form-item label="上限">
+          <el-input-number v-model="pushForm.max_items" :min="1" :max="200" />
+        </el-form-item>
+        <el-form-item label="hospital_no">
+          <el-input v-model="pushForm.hospital_no" style="width: 140px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :loading="pushLoading" @click="runPushPlan">生成计划</el-button>
+          <el-button :loading="pushLoading" @click="runPushExport">导出预览</el-button>
+        </el-form-item>
+      </el-form>
+      <div v-if="pushSummary" class="push-summary">
+        计划 {{ pushSummary.action_count }} 条：planned={{ pushSummary.summary?.planned }} blocked={{ pushSummary.summary?.blocked }}
+        grey/无对照跳过={{ pushSummary.summary?.skipped_grey_or_empty_contrast }}
+      </div>
+      <el-table v-loading="pushLoading" :data="pushActions" stripe size="small" max-height="420" empty-text="先生成下发计划">
+        <el-table-column prop="action_type" label="动作" width="70" />
+        <el-table-column prop="target_system" label="系统" width="130" show-overflow-tooltip />
+        <el-table-column prop="target_table" label="表" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="item_code" label="编码" width="140" show-overflow-tooltip />
+        <el-table-column prop="item_name" label="名称" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="plan_status" label="状态" width="100" />
+        <el-table-column label="灰码" width="70" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.meta?.is_grey_insurance || row.params?.ybhm === '灰码'" type="warning" size="small">灰码</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="dryRunOne(row)">dry-run</el-button>
+            <el-button link type="danger" size="small" :disabled="!pushConfig.push_enabled" @click="applyOne(row)">apply</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="stop-box">
+        <span class="stop-label">单条停用：</span>
+        <el-select v-model="stopForm.target_system" style="width: 160px">
+          <el-option label="HIS_SOURCE" value="HIS_SOURCE" />
+          <el-option label="JHEMR_VASTBASE" value="JHEMR_VASTBASE" />
+        </el-select>
+        <el-input v-model="stopForm.item_code" placeholder="业务编码" style="width: 180px" />
+        <el-button :loading="pushLoading" @click="stopOne('dry_run')">停用 dry-run</el-button>
+        <el-button type="danger" :loading="pushLoading" :disabled="!pushConfig.push_enabled" @click="stopOne('apply')">停用 apply</el-button>
+      </div>
+      <el-input v-model="lastResultJson" type="textarea" :rows="6" readonly class="result-box" placeholder="最近一次执行结果 JSON" />
+    </el-card>
+      </el-tab-pane>
+      <el-tab-pane label="导入审核" name="import">
+        <ImportWizard />
+      </el-tab-pane>
+      <el-tab-pane label="同步下发" name="push">
+        <PushWizard />
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
+import ImportWizard from './components/ImportWizard.vue';
+import OverviewPanel from './components/OverviewPanel.vue';
+import PushWizard from './components/PushWizard.vue';
 import { ref, reactive, onMounted } from "vue";
-import { ElMessage, type FormInstance } from "element-plus";
-import { getMedicalCodeSets, upsertMedicalCodeSet, getMedicalItems, upsertMedicalItem } from "@/api/dict";
+import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
+import {
+  getMedicalCodeSets,
+  upsertMedicalCodeSet,
+  getMedicalItems,
+  upsertMedicalItem,
+  getMedicalPushConfig,
+  planMedicalPush,
+  exportMedicalPushPreview,
+  applyMedicalPushOne,
+  stopMedicalPushOne
+} from "@/api/dict";
 
+const activeTab = ref('overview');
 const categoryCode = ref("diagnosis");
 const codeSets = ref<any[]>([]);
 const loading = ref(false);
@@ -329,7 +434,161 @@ async function saveItem() {
   }
 }
 
-onMounted(loadCodeSets);
+const pushConfig = reactive<{ push_enabled: boolean; default_hospital_no?: string }>({
+  push_enabled: false
+});
+const pushLoading = ref(false);
+const pushActions = ref<any[]>([]);
+const pushSummary = ref<any>(null);
+const lastResultJson = ref("");
+const pushForm = reactive({
+  targets: ["HIS_SOURCE", "JHEMR_VASTBASE"] as string[],
+  itemCodesText: "",
+  max_items: 20,
+  hospital_no: "1110002"
+});
+const stopForm = reactive({
+  target_system: "HIS_SOURCE",
+  item_code: ""
+});
+
+function parseItemCodes() {
+  return pushForm.itemCodesText
+    .split(/[,，\s]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+async function loadPushConfig() {
+  try {
+    const res = await getMedicalPushConfig();
+    const data = (res as any).data || {};
+    pushConfig.push_enabled = !!data.push_enabled;
+    if (data.default_hospital_no) pushForm.hospital_no = data.default_hospital_no;
+  } catch {
+    pushConfig.push_enabled = false;
+  }
+}
+
+async function runPushPlan() {
+  if (!pushForm.targets.length) {
+    ElMessage.warning("请选择目标系统");
+    return;
+  }
+  pushLoading.value = true;
+  try {
+    const res = await planMedicalPush({
+      category_code: categoryCode.value,
+      targets: pushForm.targets,
+      item_codes: parseItemCodes().length ? parseItemCodes() : null,
+      max_items: pushForm.max_items,
+      hospital_no: pushForm.hospital_no,
+      include_jhdict: true
+    });
+    const data = (res as any).data;
+    pushSummary.value = data;
+    pushActions.value = data.actions || [];
+    lastResultJson.value = JSON.stringify(data.summary || {}, null, 2);
+    ElMessage.success(`已生成 ${data.action_count || 0} 条动作`);
+  } finally {
+    pushLoading.value = false;
+  }
+}
+
+async function runPushExport() {
+  pushLoading.value = true;
+  try {
+    const res = await exportMedicalPushPreview({
+      category_code: categoryCode.value,
+      item_codes: parseItemCodes().length ? parseItemCodes() : null,
+      max_items: pushForm.max_items
+    });
+    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    ElMessage.success("导出预览完成");
+  } finally {
+    pushLoading.value = false;
+  }
+}
+
+async function dryRunOne(row: any) {
+  pushLoading.value = true;
+  try {
+    const res = await applyMedicalPushOne({ action: row, mode: "dry_run" });
+    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    ElMessage.success("dry-run 完成");
+  } finally {
+    pushLoading.value = false;
+  }
+}
+
+async function applyOne(row: any) {
+  try {
+    await ElMessageBox.confirm(
+      `确认对 ${row.target_table} / ${row.item_code} 执行单条 apply？仅新增或停用，不可改业务字段。`,
+      "二次确认",
+      { type: "warning" }
+    );
+  } catch {
+    return;
+  }
+  const { value: token } = await ElMessageBox.prompt("请输入 confirmation_token", "写通道确认", {
+    inputType: "password",
+    confirmButtonText: "执行",
+    cancelButtonText: "取消"
+  }).catch(() => ({ value: "" }));
+  if (!token) return;
+  pushLoading.value = true;
+  try {
+    const res = await applyMedicalPushOne({
+      action: row,
+      mode: "apply",
+      confirmation_token: token,
+      his_source_code: "his_source_10_10_10_15",
+      jhemr_source_code: "jhemr_vastbase_10_10_8_177"
+    });
+    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    ElMessage.success("apply 已提交");
+  } finally {
+    pushLoading.value = false;
+  }
+}
+
+async function stopOne(mode: "dry_run" | "apply") {
+  if (!stopForm.item_code.trim()) {
+    ElMessage.warning("请填写要停用的编码");
+    return;
+  }
+  let token = "";
+  if (mode === "apply") {
+    const prompt = await ElMessageBox.prompt("请输入 confirmation_token", "停用确认", {
+      inputType: "password"
+    }).catch(() => null);
+    if (!prompt?.value) return;
+    token = prompt.value;
+  }
+  pushLoading.value = true;
+  try {
+    const res = await stopMedicalPushOne({
+      category_code: categoryCode.value,
+      target_system: stopForm.target_system,
+      item_code: stopForm.item_code.trim(),
+      hospital_no: pushForm.hospital_no,
+      mode,
+      confirmation_token: token || null,
+      his_source_code: "his_source_10_10_10_15",
+      jhemr_source_code: "jhemr_vastbase_10_10_8_177"
+    });
+    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    ElMessage.success(mode === "dry_run" ? "停用 dry-run 完成" : "停用 apply 已提交");
+  } finally {
+    pushLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  loadCodeSets();
+  loadPushConfig();
+});
 </script>
 
 <style scoped>
@@ -344,4 +603,11 @@ onMounted(loadCodeSets);
 .items-table { margin-top: 12px; }
 .pager { justify-content: flex-end; margin-top: 8px; }
 .full-width { width: 100%; }
+.push-card { margin-top: 16px; }
+.push-alert { margin-bottom: 12px; }
+.push-form { margin-bottom: 8px; }
+.push-summary { margin: 8px 0; font-size: 13px; color: var(--el-text-color-secondary); }
+.stop-box { display: flex; align-items: center; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.stop-label { font-size: 13px; }
+.result-box { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 12px; }
 </style>

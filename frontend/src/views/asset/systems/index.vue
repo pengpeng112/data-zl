@@ -17,6 +17,7 @@ import {
   testConnectionDraft,
   updateSourceCredential,
   clearSourceCredential,
+  patchSource,
   disableSource,
   softDisableSystem,
   type AssetTreeNode,
@@ -51,10 +52,15 @@ const connections = ref<ReturnType<typeof emptyConnection>[]>([]);
 const credForm = ref({ username: "", password: "" });
 const checkResult = ref<string>("");
 
-// credential rotate dialog
+// credential rotate dialog (readonly | write)
 const credDialog = ref(false);
 const credTarget = ref<AssetSourceItem | null>(null);
-const credRotate = ref({ username: "", password: "" });
+const credRotate = ref({
+  username: "",
+  password: "",
+  purpose: "readonly" as "readonly" | "write",
+  write_policy: "medical_dict_push"
+});
 
 // add connection to existing system
 const addConnDialog = ref(false);
@@ -282,21 +288,43 @@ async function onCollectMetadata(sourceCode: string) {
   }
 }
 
-function openCredRotate(row: AssetSourceItem) {
+function openCredRotate(row: AssetSourceItem, purpose: "readonly" | "write" = "readonly") {
   credTarget.value = row;
-  credRotate.value = { username: "", password: "" };
+  credRotate.value = {
+    username: "",
+    password: "",
+    purpose,
+    write_policy: row.write_policy === "platform_controlled" ? "platform_controlled" : "medical_dict_push"
+  };
   credDialog.value = true;
 }
 
 async function saveCredRotate() {
   if (!credTarget.value) return;
   if (!credRotate.value.username || !credRotate.value.password) {
-    ElMessage.warning("用户名和密码必填；留空表示取消");
+    ElMessage.warning("用户名和密码必填");
     return;
   }
   try {
-    await updateSourceCredential(credTarget.value.source_code, credRotate.value);
-    ElMessage.success("凭据已轮换（密码不会回显）");
+    const payload: {
+      username: string;
+      password: string;
+      purpose: "readonly" | "write";
+      write_policy?: string;
+    } = {
+      username: credRotate.value.username,
+      password: credRotate.value.password,
+      purpose: credRotate.value.purpose
+    };
+    if (credRotate.value.purpose === "write") {
+      payload.write_policy = credRotate.value.write_policy;
+    }
+    await updateSourceCredential(credTarget.value.source_code, payload);
+    ElMessage.success(
+      credRotate.value.purpose === "write"
+        ? "写凭据已保存（密码不回显）；字典下发可用 medical_dict_push"
+        : "只读凭据已轮换（密码不会回显）"
+    );
     credDialog.value = false;
     loadSources();
   } catch (e: any) {
@@ -304,15 +332,37 @@ async function saveCredRotate() {
   }
 }
 
-async function onClearCred(row: AssetSourceItem) {
+async function onClearCred(row: AssetSourceItem, purpose: "readonly" | "write" = "readonly") {
   try {
-    await ElMessageBox.confirm(`清除 ${row.source_code} 的凭据？`, "确认", { type: "warning" });
-    await clearSourceCredential(row.source_code);
+    await ElMessageBox.confirm(
+      purpose === "write"
+        ? `清除 ${row.source_code} 的写凭据？将回落 write_policy=readonly。`
+        : `清除 ${row.source_code} 的只读凭据？`,
+      "确认",
+      { type: "warning" }
+    );
+    await clearSourceCredential(row.source_code, { purpose });
     ElMessage.success("已清除");
     loadSources();
   } catch {
     /* cancel */
   }
+}
+
+async function onSetWritePolicy(row: AssetSourceItem, policy: string) {
+  try {
+    await patchSource(row.source_code, { write_policy: policy });
+    ElMessage.success(`写策略已设为 ${policy}`);
+    loadSources();
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.detail || "更新写策略失败");
+  }
+}
+
+function writePolicyLabel(policy?: string | null) {
+  if (policy === "medical_dict_push") return "字典下发写";
+  if (policy === "platform_controlled") return "平台写";
+  return "只读";
 }
 
 async function onDisableSource(row: AssetSourceItem) {
@@ -390,7 +440,7 @@ onMounted(async () => {
   <div class="systems-page">
     <RePageHeader
       title="业务系统与数据资源"
-      subtitle="唯一入口：系统、数据库连接、Schema/Owner、表与字段。密码只写不回显；业务源库只读。"
+      subtitle="系统、连接、Schema/表。只读凭据与写凭据分离；密码只写不回显。字典下发请配置 write 策略与写账号。"
     >
       <template #actions>
         <el-button type="primary" @click="openCreate">新增系统与连接</el-button>
@@ -431,6 +481,13 @@ onMounted(async () => {
 
       <el-tab-pane label="数据库连接" name="connections">
         <el-card v-loading="sourcesLoading" class="systems-card">
+          <el-alert
+            class="mb-12"
+            type="info"
+            :closable="false"
+            show-icon
+            title="只读凭据用于探库/对账；写凭据用于诊断手术字典下发（medical_dict_push）。密码不回显、不进 Git。HIS/海量请分别配置写账号后，再到字典中心做 dry-run/apply。"
+          />
           <el-table :data="sources" border stripe>
             <el-table-column prop="system_code" label="系统标签" width="110" />
             <el-table-column prop="source_code" label="连接编码" min-width="140" />
@@ -444,16 +501,33 @@ onMounted(async () => {
             <el-table-column label="库/Service" min-width="110">
               <template #default="{ row }">{{ row.service_name || row.database_name || '-' }}</template>
             </el-table-column>
-            <el-table-column label="别名" width="80">
+            <el-table-column label="写策略" width="110">
               <template #default="{ row }">
-                <el-tag v-if="(row as any).aliases?.length" size="small">{{ (row as any).aliases.length }}</el-tag>
-                <span v-else>-</span>
+                <el-tag
+                  :type="row.write_policy === 'medical_dict_push' ? 'warning' : row.write_policy === 'platform_controlled' ? 'danger' : 'info'"
+                  size="small"
+                >
+                  {{ writePolicyLabel(row.write_policy) }}
+                </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="凭据" width="120">
+            <el-table-column label="只读凭据" width="120">
               <template #default="{ row }">
                 <el-tag :type="row.credential_configured ? 'success' : 'info'" size="small">
                   {{ credStatusText(row) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="写凭据" width="120">
+              <template #default="{ row }">
+                <el-tag :type="row.write_credential_configured ? 'warning' : 'info'" size="small">
+                  {{
+                    row.write_credential_configured
+                      ? row.write_username_masked
+                        ? `已配置 (${row.write_username_masked})`
+                        : "已配置"
+                      : "未配置"
+                  }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -465,12 +539,23 @@ onMounted(async () => {
                 <el-tag :type="row.enabled ? 'success' : 'info'" size="small">{{ row.enabled ? '是' : '否' }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="320" fixed="right">
+            <el-table-column label="操作" width="420" fixed="right">
               <template #default="{ row }">
                 <el-button link type="primary" size="small" @click="onCheck(row.source_code)">测试</el-button>
                 <el-button link type="primary" size="small" @click="onCollectMetadata(row.source_code)">采集</el-button>
-                <el-button link type="primary" size="small" @click="openCredRotate(row)">轮换凭据</el-button>
-                <el-button link type="warning" size="small" @click="onClearCred(row)">清凭据</el-button>
+                <el-button link type="primary" size="small" @click="openCredRotate(row, 'readonly')">只读凭据</el-button>
+                <el-button link type="warning" size="small" @click="openCredRotate(row, 'write')">写凭据</el-button>
+                <el-dropdown trigger="click" @command="(cmd: string) => onSetWritePolicy(row, cmd)">
+                  <el-button link type="primary" size="small">写策略</el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="readonly">只读</el-dropdown-item>
+                      <el-dropdown-item command="medical_dict_push">字典下发写</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+                <el-button link type="warning" size="small" @click="onClearCred(row, 'readonly')">清只读</el-button>
+                <el-button link type="warning" size="small" @click="onClearCred(row, 'write')">清写</el-button>
                 <el-button link type="danger" size="small" @click="onDisableSource(row)">禁用</el-button>
               </template>
             </el-table-column>
@@ -487,7 +572,7 @@ onMounted(async () => {
           <el-collapse>
             <el-collapse-item v-for="node in resourceTree" :key="`${node.source_code}-${node.source_system}`" :name="`${node.source_code}-${node.source_system}`">
               <template #title>
-                <strong>{{ node.system_code }}</strong>
+                <strong>{{ node.system_name_cn || node.system_code }}</strong>
                 <span class="tree-path">{{ node.source_name_cn }} · {{ node.table_count }} 张表</span>
               </template>
               <el-collapse>
@@ -497,7 +582,7 @@ onMounted(async () => {
                   :name="`${node.source_code}:${schema.namespace}`"
                 >
                   <template #title>
-                    {{ schema.namespace || "(default)" }}
+                    {{ schema.namespace_name_cn ? `${schema.namespace_name_cn}（${schema.namespace}）` : (schema.namespace || "默认Owner") }}
                     <el-tag size="small">{{ schema.table_count }} 表</el-tag>
                   </template>
                   <div class="tree-note">表和字段按需加载，进入「表资产」完整检索。</div>
@@ -620,10 +705,32 @@ onMounted(async () => {
       </template>
     </el-drawer>
 
-    <!-- 轮换凭据 -->
-    <el-dialog v-model="credDialog" title="轮换凭据（密码不回显）" width="420px">
-      <el-form label-width="80px">
+    <!-- 轮换凭据（只读 / 写） -->
+    <el-dialog
+      v-model="credDialog"
+      :title="credRotate.purpose === 'write' ? '配置写凭据（字典下发，密码不回显）' : '轮换只读凭据（密码不回显）'"
+      width="480px"
+    >
+      <el-alert
+        v-if="credRotate.purpose === 'write'"
+        type="warning"
+        :closable="false"
+        show-icon
+        class="mb-12"
+        title="写账号与只读账号分离。默认策略 medical_dict_push：仅允许字典单行新增/停用。密码只保存到服务器凭据文件。"
+      />
+      <el-form label-width="100px">
         <el-form-item label="连接">{{ credTarget?.source_code }}</el-form-item>
+        <el-form-item v-if="credRotate.purpose === 'write'" label="写策略">
+          <el-select v-model="credRotate.write_policy" class="full-width">
+            <el-option label="字典下发写 medical_dict_push" value="medical_dict_push" />
+            <el-option
+              v-if="(credTarget?.system_code || '').toUpperCase() === 'ASSET_PLATFORM'"
+              label="平台写 platform_controlled"
+              value="platform_controlled"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="用户名" required>
           <el-input v-model="credRotate.username" autocomplete="off" />
         </el-form-item>

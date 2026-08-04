@@ -1,5 +1,10 @@
 import type { GraphEdge, GraphNode } from "@/api/asset";
 import { findGraphPath, matchesTableSearch } from "@/views/asset/graph/graphTransform";
+import {
+  nodeDisplayName,
+  nodeUniqueKey,
+  parsePhysicalKey,
+} from "@/views/asset/graph/graphPhysical";
 
 export type GraphGroupBy = "system" | "source" | "schema" | "domain";
 
@@ -20,6 +25,7 @@ export interface NormalizedGraph {
   candidateCount: number;
   dependencyCount: number;
   reviewHiddenCount: number;
+  issues: { key: string; displayKey: string; reason: string }[];
 }
 
 const GRAPH_COLOR_NEUTRAL = "#475569";
@@ -36,14 +42,14 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function displayName(node: GraphNode) {
-  return node.table_name || node.label || node.id;
+  return nodeDisplayName(node);
 }
 
 function groupName(node: GraphNode, groupBy: GraphGroupBy) {
   if (groupBy === "system") return node.system_code || "未分系统";
   if (groupBy === "source") return node.source_code || node.source || "未分数据源";
   if (groupBy === "domain") return node.business_domain || node.domain || "未分业务域";
-  return node.schema_name || node.namespace_name || node.category || node.id.split(".")[0] || "UNKNOWN";
+  return node.schema_name || node.namespace_name || node.category || (parsePhysicalKey(node.id)?.schema) || node.id.split(".")[0] || "UNKNOWN";
 }
 
 function matchesKeyword(node: GraphNode, keyword?: string) {
@@ -106,7 +112,23 @@ export function normalizeGraphData(
     nodeIds.add(edge.source);
     nodeIds.add(edge.target);
   });
-  const visibleNodes = nodes.filter(node => nodeIds.has(node.id) || visibleEdges.length === 0);
+  // 物理去重：同 display_id 的不同物理节点各自保留（108号 §四）
+  const seenKeys = new Set<string>();
+  const visibleNodes: GraphNode[] = [];
+  for (const node of nodes) {
+    if (!(nodeIds.has(node.id) || visibleEdges.length === 0)) continue;
+    const key = nodeUniqueKey(node);
+    if (!key || seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    visibleNodes.push(node);
+  }
+  // 无物理键节点不覆盖、不合并，仅计为问题（不影响正常节点渲染）
+  const issues: { key: string; displayKey: string; reason: string }[] = [];
+  for (const node of nodes) {
+    if (!nodeUniqueKey(node)) {
+      issues.push({ key: node.id, displayKey: node.display_id || node.id, reason: "missing_physical_key" });
+    }
+  }
   const groups = Array.from(new Set(visibleNodes.map(node => groupName(node, options.groupBy)))).sort();
   const categories = groups.map((name, index) => ({
     name,
@@ -200,6 +222,7 @@ export function normalizeGraphData(
     passCount: visibleEdges.filter(edge => ["sample_pass", "verified"].includes(edge.validation_status || "")).length,
     candidateCount: visibleEdges.filter(edge => edge.relation_type === "candidate").length,
     dependencyCount: visibleEdges.filter(edge => edge.relation_type === "dependency").length,
-    reviewHiddenCount
+    reviewHiddenCount,
+    issues
   };
 }

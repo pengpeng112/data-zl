@@ -246,3 +246,72 @@ curl http://10.10.8.83/
 - **alembic 报连接失败**: 检查 `.env` 中 `APP_DB_URL` 密码是否正确，`pg_hba.conf` 是否允许本地 md5 认证。
 - **前端白屏**: 检查 nginx root 指向是否正确，浏览器 DevTools 查看静态资源路径。
 - **跨域报错**: 确认 `APP_CORS_ORIGINS` 包含前端访问的完整 URL (含端口)。
+
+## 11. 108 号关系图谱专项：原子发布与回滚（P0-03）
+
+> 本节约束生产发布方式，禁止逐文件热更新后宣称完成。
+
+### 11.1 后端不可变镜像
+
+- 后端必须按**同一 Git SHA** 构建不可变镜像，禁止容器内逐文件热更作为正式发布。
+- 启动时日志输出脱敏版本号（`build_id / git_sha / frontend_build_id`）。
+- 健康接口 `/health`、`/health/live`、`/api/v1/health` 返回 `build_id / git_sha / frontend_build_id`。
+
+```bash
+# 在 8.83 构建（离线 wheelhouse 已具备）：
+cd /opt/data-asset/backend
+docker build -f ../deploy/docker/Dockerfile -t data-asset:<tag> .
+# 或用既有构建机 + deploy/offline 的 wheelhouse。
+```
+
+### 11.2 前端版本目录原子切换
+
+```bash
+# 1. 生成 dist（开发机构建后上传，或服务器离线构建）
+# 2. 完整上传版本目录并原子切换：
+BUILD_ID="<build_id>"   # 例如 frontend-20260802-108
+bash /etc/data-asset/scripts/release_frontend.sh "${BUILD_ID}" <dist目录>
+#    → 把 dist 复制到 releases/<build_id>，校验 HTML 引用资源均存在，
+#      原子切换 current 软链接，保留 previous 供回滚。
+
+# 3. Nginx root 指向 current 软链接（deploy/nginx.conf 已更新）
+nginx -t && nginx -s reload
+```
+
+### 11.3 生成发布 manifest
+
+```bash
+cd /opt/data-asset/backend
+python /opt/data-asset/deploy/scripts/release_manifest.py \
+  --backend-dir /opt/data-asset/backend \
+  --frontend-dist /opt/data-asset/frontend-dist/current \
+  --backend-image "data-asset:<tag>" \
+  --out /opt/data-asset/releases/release-manifest.json
+```
+
+manifest 包含：Git SHA、backend image、frontend build ID、Alembic head、构建时间、
+关键文件 SHA256。发布前校验 manifest 中 `git_sha` 与后端容器、`frontend_build_id`
+与 Nginx 活动目录一致。
+
+### 11.4 回滚
+
+```bash
+# 前端完整版本回滚（软链接切回 previous）：
+bash /etc/data-asset/scripts/rollback_frontend.sh
+nginx -s reload
+
+# 后端回滚：替换为上一不可变镜像标签并重建容器：
+docker tag data-asset:<上一tag> data-asset:current
+bash /etc/data-asset/scripts/run_data_asset_api.sh
+```
+
+**回滚必须同时恢复完整后端镜像与完整前端版本目录**，禁止只回滚单个文件。
+回滚触发条件见 `开发起步包/108_关系图谱无法打开专项排查整改与测试计划.md` §8.3。
+
+### 11.5 发布后烟雾验证
+
+- 匿名路由 `/`、`/asset/graph` 返回 200；
+- 认证后 `graph / options / diagnostics` 200，且默认图有节点和边；
+- `curl -H 'Cache-Control: no-cache' http://<host>/index.html` 返回新 build ID；
+- hash JS/CSS 响应头含 `immutable`，index.html 含 `no-cache`；
+- 强刷、无痕、新会话三种方式加载同一版本。

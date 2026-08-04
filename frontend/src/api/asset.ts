@@ -74,6 +74,8 @@ export interface TableBrief {
   schema_name: string;
   table_name: string;
   table_name_cn?: string | null;
+  name_cn_source?: string | null;
+  name_cn_status?: string | null;
   table_role?: string | null;
   comment: string | null;
   column_count: number | null;
@@ -109,6 +111,8 @@ export interface ColumnInfo {
   column_id: number | null;
   column_name: string | null;
   column_name_cn?: string | null;
+  name_cn_source?: string | null;
+  name_cn_status?: string | null;
   business_desc_cn?: string | null;
   value_desc_cn?: string | null;
   data_type: string | null;
@@ -252,12 +256,18 @@ export interface AssetTreeTable {
   id: number;
   table_name: string;
   table_name_cn?: string | null;
+  name_cn_source?: string | null;
+  name_cn_status?: string | null;
   column_count?: number | null;
   domain?: string | null;
 }
 
 export interface AssetTreeSchema {
   namespace: string;
+  source_code?: string | null;
+  namespace_name_cn?: string | null;
+  name_cn_source?: string | null;
+  name_cn_status?: string | null;
   table_count: number;
   tables: AssetTreeTable[];
   tables_loaded?: boolean;
@@ -265,17 +275,21 @@ export interface AssetTreeSchema {
 
 export interface AssetTreeNode {
   source_code: string;
+  physical_source_code?: string | null;
   source_name_cn: string;
+  connection_endpoint?: string | null;
   system_code: string;
-  /** 51 号：系统大类 */
+  system_name_cn?: string | null;
+  /** plan 90: 不再使用人为大类；目录异常时为 catalog_anomaly */
   system_category?: string | null;
   system_category_cn?: string | null;
-  /** 51 号：系统/库或 ODS 抽取区 */
+  /** 连接标识 / 展示 */
   source_system?: string | null;
   source_system_cn?: string | null;
   table_count: number;
   schemas: AssetTreeSchema[];
   tables_embedded?: boolean;
+  empty_catalog_hint?: string | null;
 }
 
 export const getAssetTree = (params?: {
@@ -359,6 +373,11 @@ export interface AssetSourceItem {
   credential_configured?: boolean;
   credential_status?: string | null;
   credential_username_masked?: string | null;
+  write_credential_configured?: boolean;
+  write_credential_status?: string | null;
+  write_username_masked?: string | null;
+  supports_medical_dict_push?: boolean;
+  is_writeable?: boolean;
   display_order?: number;
 }
 
@@ -395,11 +414,26 @@ export const addSystemConnection = (systemCode: string, data: Record<string, any
 export const checkSource = (sourceCode: string) =>
   http.request<ApiResponse<any>>("post", `/api/v1/sources/${sourceCode}/check`);
 
-export const updateSourceCredential = (sourceCode: string, data: { username: string; password: string }) =>
-  http.request<ApiResponse<any>>("put", `/api/v1/sources/${sourceCode}/credential`, { data });
+export const updateSourceCredential = (
+  sourceCode: string,
+  data: {
+    username: string;
+    password: string;
+    purpose?: "readonly" | "write";
+    write_policy?: string;
+  }
+) => http.request<ApiResponse<any>>("put", `/api/v1/sources/${sourceCode}/credential`, { data });
 
-export const clearSourceCredential = (sourceCode: string) =>
-  http.request<ApiResponse<any>>("delete", `/api/v1/sources/${sourceCode}/credential`);
+export const clearSourceCredential = (
+  sourceCode: string,
+  params?: { purpose?: "readonly" | "write" }
+) =>
+  http.request<ApiResponse<any>>("delete", `/api/v1/sources/${sourceCode}/credential`, {
+    params
+  });
+
+export const patchSource = (sourceCode: string, data: Record<string, any>) =>
+  http.request<ApiResponse<any>>("patch", `/api/v1/sources/${sourceCode}`, { data });
 
 export const disableSource = (sourceCode: string) =>
   http.request<ApiResponse<any>>("delete", `/api/v1/sources/${sourceCode}`);
@@ -430,6 +464,8 @@ export const listConnectionTargets = () =>
 export interface GraphNode {
   id: string;
   label: string;
+  physical_key?: string | null;
+  display_id?: string | null;
   system_code?: string | null;
   source_code?: string | null;
   namespace_name?: string | null;
@@ -462,6 +498,8 @@ export interface GraphEdge {
   id: string;
   source: string;
   target: string;
+  display_source?: string | null;
+  display_target?: string | null;
   from_system_code?: string | null;
   from_source_code?: string | null;
   from_schema_name?: string | null;
@@ -478,6 +516,8 @@ export interface GraphEdge {
   to_include_status?: string | null;
   label?: string | null;
   relation_type?: string | null;
+  relation_layer?: string | null;
+  db_id?: number | null;
   rel_id?: number | null;
   join_condition?: string | null;
   from_columns?: string | null;
@@ -495,9 +535,21 @@ export interface GraphEdge {
   validation_note?: string | null;
 }
 
+export interface GraphMeta {
+  total_relations: number;
+  matched_relations: number;
+  returned_relations: number;
+  truncated: boolean;
+  unresolved_endpoints?: number;
+  filters?: Record<string, unknown>;
+  data_version?: string | null;
+  backend_build_id?: string | null;
+}
+
 export interface GraphData {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  meta?: GraphMeta | null;
 }
 
 export interface GraphViewMode {
@@ -523,6 +575,8 @@ export interface GraphOptionsData {
   confidences: string[];
   relation_types: string[];
   view_modes: GraphViewMode[];
+  default_mode?: string | null;
+  backend_build_id?: string | null;
 }
 
 export const getGraph = (params: {
@@ -543,7 +597,11 @@ export const getGraph = (params: {
 };
 
 export const getGraphNeighbors = (params: {
-  table: string;
+  table?: string;
+  physical_key?: string;
+  system_code?: string;
+  source_code?: string;
+  schema?: string;
   depth?: number;
   direction?: "in" | "out" | "both";
   limit?: number;
@@ -551,6 +609,12 @@ export const getGraphNeighbors = (params: {
   return http.get<ApiResponse<GraphData>, object>("/api/v1/graph/neighbors", {
     params
   });
+};
+
+export const getGraphEdgeDetail = (edgeId: string) => {
+  return http.get<ApiResponse<GraphEdge>, object>(
+    `/api/v1/graph/edges/${encodeURIComponent(edgeId)}`
+  );
 };
 
 export const getGraphOptions = () => {

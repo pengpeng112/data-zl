@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { http } from "@/utils/http";
 import { ElMessage } from "element-plus";
 
@@ -19,6 +19,12 @@ interface Relation {
   validation_note: string;
   note: string;
   system_code?: string;
+  relation_class?: string;
+  from_system_code?: string;
+  to_system_code?: string;
+  from_table_name_cn?: string;
+  to_table_name_cn?: string;
+  validation_metrics?: string;
 }
 
 interface FieldMapping {
@@ -36,8 +42,11 @@ interface SystemOption {
 }
 
 const router = useRouter();
+const route = useRoute();
 const relations = ref<Relation[]>([]);
-const allRelations = ref<Relation[]>([]);
+const total = ref(0);
+const page = ref(1);
+const pageSize = ref(30);
 const loading = ref(false);
 const dialogVisible = ref(false);
 const isEdit = ref(false);
@@ -46,6 +55,17 @@ const form = ref({ from_table: "", from_columns: "", to_table: "", to_columns: "
 
 const systemOptions = ref<SystemOption[]>([]);
 const filters = reactive({ system_code: "", confidence: "", review_status: "", keyword: "" });
+const relationClass = ref(String(route.query.class || ""));
+const selectedRelations = ref<Relation[]>([]);
+const classTabs = [
+  { value: "", label: "全部关系" },
+  { value: "pending", label: "待复核" },
+  { value: "confirmed", label: "已确认" },
+  { value: "rejected", label: "已拒绝" },
+  { value: "candidate", label: "候选关系" },
+  { value: "lineage", label: "同步/镜像血缘" },
+  { value: "dependency", label: "视图依赖" }
+];
 
 const mappingsDrawerVisible = ref(false);
 const mappings = ref<FieldMapping[]>([]);
@@ -59,51 +79,37 @@ async function loadSystemOptions() {
   } catch { /* ignore */ }
 }
 
-function applyFilters() {
-  let result = [...allRelations.value];
-  if (filters.system_code) {
-    result = result.filter(r => r.system_code === filters.system_code);
-  }
-  if (filters.confidence) {
-    result = result.filter(r => r.confidence === filters.confidence);
-  }
-  if (filters.review_status) {
-    result = result.filter(r => r.validation_status === filters.review_status);
-  }
-  if (filters.keyword) {
-    const kw = filters.keyword.toLowerCase();
-    result = result.filter(r =>
-      (r.from_table && r.from_table.toLowerCase().includes(kw)) ||
-      (r.to_table && r.to_table.toLowerCase().includes(kw)) ||
-      (r.join_condition && r.join_condition.toLowerCase().includes(kw)) ||
-      (r.note && r.note.toLowerCase().includes(kw))
-    );
-  }
-  relations.value = result;
-}
-
 function resetFilters() {
   filters.system_code = "";
   filters.confidence = "";
   filters.review_status = "";
   filters.keyword = "";
-  relations.value = [...allRelations.value];
+  relationClass.value = "";
+  page.value = 1;
+  loadRelations();
 }
 
 async function loadRelations() {
   loading.value = true;
   try {
-    const params: Record<string, string> = {};
+    const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
     if (filters.system_code) params.system_code = filters.system_code;
     if (filters.confidence) params.confidence = filters.confidence;
     if (filters.review_status) params.review_status = filters.review_status;
     if (filters.keyword) params.keyword = filters.keyword;
+    if (relationClass.value) params.relation_class = relationClass.value;
     const res = await http.request<any>("get", "/api/v1/relations/list", { params });
-    allRelations.value = res.data?.items || [];
-    relations.value = [...allRelations.value];
+    relations.value = res.data?.items || [];
+    total.value = res.data?.total || 0;
   } finally {
     loading.value = false;
   }
+}
+
+function changeClass() {
+  page.value = 1;
+  router.replace({ path: "/asset/relation-review", query: relationClass.value ? { class: relationClass.value } : {} });
+  loadRelations();
 }
 
 function openEdit(row: Relation) {
@@ -171,6 +177,23 @@ async function handleReject(relId: number) {
   }
 }
 
+async function batchReview(action: "approve" | "reject") {
+  if (!selectedRelations.value.length) {
+    ElMessage.warning("请先选择关系");
+    return;
+  }
+  try {
+    await http.request("post", "/api/v1/relations/batch-review", {
+      data: { relation_ids: selectedRelations.value.map(row => row.id), action }
+    });
+    ElMessage.success(`已批量${action === "approve" ? "批准" : "驳回"} ${selectedRelations.value.length} 条关系`);
+    selectedRelations.value = [];
+    loadRelations();
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.detail || "批量处理失败");
+  }
+}
+
 async function showMappings(relId: number) {
   currentMappingRel.value = relations.value.find(r => r.id === relId) || null;
   mappingsDrawerVisible.value = true;
@@ -199,26 +222,30 @@ onMounted(() => {
 <template>
   <div class="relation-review-page">
     <RePageHeader
-      title="关系复核工作台"
-      subtitle="审核关系证据、置信度和业务口径"
+      title="关系复核中心"
+      subtitle="统一查询正式、候选、同步血缘和视图依赖关系；所有人工操作保留审计。"
     />
+
+    <el-tabs v-model="relationClass" class="relation-tabs" @change="changeClass">
+      <el-tab-pane v-for="tab in classTabs" :key="tab.value" :label="tab.label" :name="tab.value" />
+    </el-tabs>
 
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filters" size="small">
         <el-form-item label="所属系统">
-          <el-select v-model="filters.system_code" placeholder="全部" clearable class="system-filter" @change="applyFilters">
+          <el-select v-model="filters.system_code" placeholder="全部" clearable class="system-filter" @change="loadRelations">
             <el-option v-for="s in systemOptions" :key="s.system_code" :label="s.system_name_cn || s.system_code" :value="s.system_code" />
           </el-select>
         </el-form-item>
         <el-form-item label="置信度">
-          <el-select v-model="filters.confidence" placeholder="全部" clearable class="confidence-filter" @change="applyFilters">
+          <el-select v-model="filters.confidence" placeholder="全部" clearable class="confidence-filter" @change="loadRelations">
             <el-option label="A - 高" value="A" />
             <el-option label="B - 中" value="B" />
             <el-option label="C - 低" value="C" />
           </el-select>
         </el-form-item>
         <el-form-item label="验证状态">
-          <el-select v-model="filters.review_status" placeholder="全部" clearable class="status-filter" @change="applyFilters">
+          <el-select v-model="filters.review_status" placeholder="全部" clearable class="status-filter" @change="loadRelations">
             <el-option label="已验证" value="verified" />
             <el-option label="未验证" value="unverified" />
             <el-option label="已批准" value="approved" />
@@ -226,7 +253,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item label="关键词">
-          <el-input v-model="filters.keyword" placeholder="搜索表名/字段/条件" clearable class="keyword-filter" @input="applyFilters" @clear="applyFilters" />
+          <el-input v-model="filters.keyword" placeholder="搜索中英文表名/字段/条件" clearable class="keyword-filter" @keyup.enter="loadRelations" @clear="loadRelations" />
         </el-form-item>
         <el-form-item>
           <el-button @click="resetFilters">重置</el-button>
@@ -235,11 +262,12 @@ onMounted(() => {
     </el-card>
 
     <el-card>
-      <template #header><span>关系复核工作台</span></template>
-      <el-table :data="relations" v-loading="loading" size="small">
-        <el-table-column prop="from_table" label="来源表" width="180" show-overflow-tooltip />
+      <template #header><div class="review-header"><span>关系清单（{{ total }}）</span><div><el-button size="small" type="success" :disabled="!selectedRelations.length" @click="batchReview('approve')">批量批准</el-button><el-button size="small" type="danger" :disabled="!selectedRelations.length" @click="batchReview('reject')">批量驳回</el-button></div></div></template>
+      <el-table :data="relations" v-loading="loading" size="small" @selection-change="selectedRelations = $event">
+        <el-table-column type="selection" width="44" />
+        <el-table-column label="来源表" width="220" show-overflow-tooltip><template #default="{ row }"><div>{{ row.from_table_name_cn || row.from_table }}</div><small v-if="row.from_table_name_cn">{{ row.from_table }}</small></template></el-table-column>
         <el-table-column prop="from_columns" label="来源字段" width="150" show-overflow-tooltip />
-        <el-table-column prop="to_table" label="目标表" width="180" show-overflow-tooltip />
+        <el-table-column label="目标表" width="220" show-overflow-tooltip><template #default="{ row }"><div>{{ row.to_table_name_cn || row.to_table }}</div><small v-if="row.to_table_name_cn">{{ row.to_table }}</small></template></el-table-column>
         <el-table-column prop="to_columns" label="目标字段" width="150" show-overflow-tooltip />
         <el-table-column prop="join_condition" label="关联条件" width="200" show-overflow-tooltip />
         <el-table-column prop="confidence" label="置信度" width="80">
@@ -253,6 +281,7 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="note" label="备注" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="relation_class" label="关系类别" width="120" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button size="small" text type="success" @click="handleApprove(row.id)">批准</el-button>
@@ -263,6 +292,7 @@ onMounted(() => {
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 50, 100, 200]" layout="total, sizes, prev, pager, next" class="pager" @current-change="loadRelations" @size-change="loadRelations" />
     </el-card>
 
     <el-dialog v-model="dialogVisible" title="编辑关系" width="600px">
@@ -329,6 +359,9 @@ onMounted(() => {
 .filter-card {
   margin-bottom: 16px;
 }
+.relation-tabs { margin-bottom: 12px; }
+.review-header { display: flex; align-items: center; justify-content: space-between; }
+.pager { justify-content: flex-end; margin-top: 16px; }
 
 .mapping-subtitle {
   margin-left: 12px;

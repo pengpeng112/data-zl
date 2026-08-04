@@ -2,7 +2,7 @@
   <div class="asset-tables-page">
     <RePageHeader
       title="资产表目录"
-      subtitle="五层导航：系统大类 → 系统/库 → Schema/Owner → 表 → 字段。ODS 下按抽取来源分区，HIS 源端独立大类。"
+      subtitle="统一层级：业务系统 → 数据库连接 → Schema/Owner → 表 → 字段。一级名称来自系统总览，十个业务系统平行展示。"
     >
       <template #icon><TableIcon /></template>
       <template #actions>
@@ -11,28 +11,28 @@
     </RePageHeader>
     <div class="category-bar">
       <el-check-tag
-        :checked="!categoryFilter"
-        @change="() => setCategoryFilter('')"
-      >全部大类</el-check-tag>
+        :checked="!systemFilter"
+        @change="() => setSystemFilter('')"
+      >全部业务系统</el-check-tag>
       <el-check-tag
-        v-for="cat in categoryOptions"
-        :key="cat.code"
-        :checked="categoryFilter === cat.code"
-        @change="() => setCategoryFilter(cat.code)"
-      >{{ cat.label }}</el-check-tag>
+        v-for="sys in systemFilterOptions"
+        :key="sys.code"
+        :checked="systemFilter === sys.code"
+        @change="() => setSystemFilter(sys.code)"
+      >{{ sys.label }}</el-check-tag>
     </div>
     <div class="layout-grid">
       <el-card class="tree-panel" shadow="never">
         <template #header>
           <div class="panel-header">
-            <span>资产目录（五层）</span>
+            <span>资产目录</span>
             <el-button text type="primary" @click="loadTree">刷新</el-button>
           </div>
         </template>
         <el-input
           v-model="treeKeyword"
           clearable
-          placeholder="搜索大类、系统、Owner、表或字段"
+          placeholder="搜索系统、连接、Owner、表或字段"
           class="tree-search"
         />
         <el-tree
@@ -100,16 +100,22 @@
             @row-click="selectTable"
             @row-dblclick="goDetail"
           >
-            <el-table-column label="系统大类" width="130" show-overflow-tooltip>
-              <template #default="{ row }">{{ row.system_category_cn || categoryLabelOf(row) }}</template>
+            <el-table-column label="业务系统" width="140" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.system_name_cn || systemLabelOf(row) }}</template>
             </el-table-column>
-            <el-table-column label="系统/库" width="150" show-overflow-tooltip>
+            <el-table-column label="数据库连接" width="180" show-overflow-tooltip>
               <template #default="{ row }">{{ row.source_system_cn || row.source_code || "-" }}</template>
             </el-table-column>
             <el-table-column prop="schema_name" label="Schema/Owner" width="120" />
             <el-table-column prop="table_name" label="表名" min-width="190" show-overflow-tooltip />
             <el-table-column prop="table_name_cn" label="表中文名" min-width="160" show-overflow-tooltip>
               <template #default="{ row }">{{ row.table_name_cn || row.comment || '-' }}</template>
+            </el-table-column>
+            <el-table-column label="名称来源" width="120">
+              <template #default="{ row }">
+                <el-tag v-if="row.name_cn_source" size="small" :type="row.name_cn_status === 'confirmed' ? 'success' : 'warning'">{{ row.name_cn_source }}</el-tag>
+                <span v-else>-</span>
+              </template>
             </el-table-column>
             <el-table-column prop="domain" label="业务域" width="110" show-overflow-tooltip />
             <el-table-column prop="table_role" label="表类型" width="120" show-overflow-tooltip />
@@ -169,6 +175,7 @@ import {
   getAssetTreeTables,
   getTableColumns,
   getTables,
+  listSystems,
   searchAssetTree,
   type AssetTreeNode,
   type AssetTreeTable,
@@ -176,8 +183,7 @@ import {
   type TableBrief
 } from "@/api/asset";
 import {
-  CATEGORY_LABEL,
-  CATEGORY_ORDER,
+  CANONICAL_SYSTEM_CODES,
   kindLabel,
   kindTagType,
   type TreeKind
@@ -188,19 +194,23 @@ import TableIcon from "~icons/ri/table-line";
 interface TreeItem {
   id: string;
   label: string;
-  kind: TreeKind;
+  kind: TreeKind | "category";
   count?: number;
   system_category?: string;
   system_code?: string;
+  system_name_cn?: string;
   source_system?: string;
   source_code?: string;
   schema_name?: string;
+  name_cn_source?: string;
+  name_cn_status?: string;
   table_name?: string;
   /** schema 表是否已懒加载 */
   tablesLoaded?: boolean;
   tablesLoading?: boolean;
   table?: TableBrief & {
     system_category_cn?: string;
+    system_name_cn?: string;
     source_system_cn?: string;
   };
   column?: ColumnInfo;
@@ -219,11 +229,17 @@ const schemaTableChildren = ref<Record<string, TreeItem[]>>({});
 const schemaTablesLoading = ref<Record<string, boolean>>({});
 const columnChildren = ref<Record<string, TreeItem[]>>({});
 const searchHits = ref<TreeItem[]>([]);
-const items = ref<(TableBrief & { system_category_cn?: string; source_system_cn?: string })[]>([]);
+const items = ref<
+  (TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string })[]
+>([]);
 const columns = ref<ColumnInfo[]>([]);
 const total = ref(0);
-const selectedTable = ref<(TableBrief & { system_category_cn?: string; source_system_cn?: string }) | null>(null);
-const categoryFilter = ref("");
+const selectedTable = ref<
+  (TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string }) | null
+>(null);
+/** plan 90: filter by first-level system_code, not legacy category */
+const systemFilter = ref("");
+const systemNameMap = ref<Record<string, string>>({});
 
 const scope = reactive({
   system_category: "",
@@ -234,10 +250,12 @@ const scope = reactive({
 const params = reactive({ keyword: "", domain: "", page: 1, page_size: 20 });
 
 const treeProps = { label: "label", children: "children" };
-const categoryOptions = CATEGORY_ORDER.map(code => ({
-  code,
-  label: CATEGORY_LABEL[code]
-}));
+const systemFilterOptions = computed(() =>
+  (CANONICAL_SYSTEM_CODES as readonly string[]).map(code => ({
+    code,
+    label: systemNameMap.value[code] || code
+  }))
+);
 
 function tableNodeKey(sourceCode: string, schemaName: string, tableName: string) {
   return `${sourceCode}::${schemaName}::${tableName}`;
@@ -247,7 +265,7 @@ function toTableBrief(
   source: AssetTreeNode,
   schemaName: string,
   table: AssetTreeTable
-): TableBrief & { system_category_cn?: string; source_system_cn?: string } {
+): TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string } {
   return {
     id: table.id,
     system_code: source.system_code,
@@ -261,86 +279,105 @@ function toTableBrief(
     column_count: table.column_count ?? null,
     domain: table.domain ?? null,
     source: source.source_name_cn,
-    system_category_cn: source.system_category_cn || undefined,
+    system_name_cn: source.system_name_cn || systemNameMap.value[source.system_code] || undefined,
+    system_category_cn: source.system_name_cn || undefined,
     source_system_cn: source.source_system_cn || undefined
   };
 }
 
-function categoryLabelOf(row: { system_code?: string | null; source_code?: string | null }) {
-  const sc = (row.system_code || "").toUpperCase();
-  if (sc.includes("HIS")) return CATEGORY_LABEL.his_source;
-  if (sc === "HRP") return CATEGORY_LABEL.hrp_source;
-  if (["LIS", "PACS", "EMR", "MOBILE_NURSING", "SM"].includes(sc)) {
-    return CATEGORY_LABEL.external_business;
-  }
-  return CATEGORY_LABEL.ods_center;
+function systemLabelOf(row: { system_code?: string | null; system_name_cn?: string | null }) {
+  const code = (row.system_code || "").toUpperCase();
+  return row.system_name_cn || systemNameMap.value[code] || code || "-";
 }
 
 const treeData = computed<TreeItem[]>(() => {
-  const categoryMap = new Map<string, TreeItem>();
+  /** system_code → 业务系统节点（十系统平行，无「其他业务系统」大类） */
+  const systemMap = new Map<string, TreeItem>();
 
   for (const source of rawTree.value) {
-    const cat = source.system_category || "ods_center";
-    if (categoryFilter.value && cat !== categoryFilter.value) continue;
+    const sysCode = (source.system_code || "UNKNOWN").toUpperCase();
+    if (systemFilter.value && sysCode !== systemFilter.value) continue;
 
-    if (!categoryMap.has(cat)) {
-      categoryMap.set(cat, {
-        id: `category:${cat}`,
-        label: source.system_category_cn || CATEGORY_LABEL[cat] || cat,
-        kind: "category",
-        system_category: cat,
+    if (!systemMap.has(sysCode)) {
+      systemMap.set(sysCode, {
+        id: `system:${sysCode}`,
+        label:
+          source.system_name_cn ||
+          systemNameMap.value[sysCode] ||
+          sysCode,
+        kind: "system",
+        system_code: sysCode,
+        system_name_cn: source.system_name_cn || systemNameMap.value[sysCode],
         count: 0,
         children: []
       });
     }
-    const catNode = categoryMap.get(cat)!;
+    const sysNode = systemMap.get(sysCode)!;
 
-    const sysKey = `${cat}::${source.source_system || source.source_code}`;
-    let sysNode = catNode.children!.find(c => c.id === `system:${sysKey}`);
-    if (!sysNode) {
-      sysNode = {
-        id: `system:${sysKey}`,
+    const physical = source.physical_source_code || source.source_code;
+    const connKey = `${sysCode}::${physical}`;
+    let connNode = sysNode.children!.find(c => c.id === `connection:${connKey}`);
+    if (!connNode) {
+      connNode = {
+        id: `connection:${connKey}`,
         label:
           source.source_system_cn ||
+          source.connection_endpoint ||
           source.source_name_cn ||
           source.source_code,
-        kind: "system",
-        system_category: cat,
-        system_code: source.system_code,
+        kind: "connection",
+        system_code: sysCode,
+        system_name_cn: sysNode.system_name_cn,
         source_system: source.source_system || undefined,
         source_code: source.source_code,
         count: 0,
         children: []
       };
-      catNode.children!.push(sysNode);
+      sysNode.children!.push(connNode);
     }
 
     const addCount = source.table_count || 0;
-    catNode.count = (catNode.count || 0) + addCount;
     sysNode.count = (sysNode.count || 0) + addCount;
+    connNode.count = (connNode.count || 0) + addCount;
+
+    if (!source.schemas?.length && addCount === 0) {
+      if (!connNode.children!.some(c => c.id.startsWith("empty:"))) {
+        connNode.children!.push({
+          id: `empty:${connKey}`,
+          label: "当前未发现非空对象",
+          kind: "schema",
+          system_code: sysCode,
+          source_code: source.source_code
+        });
+      }
+    }
 
     for (const schema of source.schemas) {
-      const schemaId = `schema:${source.source_code}:${source.source_system || ""}:${schema.namespace}`;
-      let schemaNode = sysNode.children!.find(c => c.id === schemaId);
+      const schemaSourceCode = schema.source_code || source.source_code;
+      const schemaId = `schema:${schemaSourceCode}:${schema.namespace}`;
+      let schemaNode = connNode.children!.find(c => c.id === schemaId);
       if (!schemaNode) {
         schemaNode = {
           id: schemaId,
-          label: schema.namespace || "默认 Owner",
+          label: schema.namespace_name_cn
+            ? `${schema.namespace_name_cn}（${schema.namespace}）`
+            : schema.namespace || "默认 Owner",
           kind: "schema",
-          system_category: cat,
-          system_code: source.system_code,
+          system_code: sysCode,
+          system_name_cn: sysNode.system_name_cn,
           source_system: source.source_system || undefined,
-          source_code: source.source_code,
+          source_code: schemaSourceCode,
           schema_name: schema.namespace,
+          name_cn_source: schema.name_cn_source || undefined,
+          name_cn_status: schema.name_cn_status || undefined,
           count: schema.table_count,
           children: []
         };
-        sysNode.children!.push(schemaNode);
+        connNode.children!.push(schemaNode);
       } else {
         schemaNode.count = (schemaNode.count || 0) + schema.table_count;
       }
 
-      // 默认不内嵌表：懒加载后注入；include_tables 时仍可渲染
       const lazyTables = schemaTableChildren.value[schemaId];
       if (lazyTables?.length) {
         schemaNode.children = lazyTables.map(t => ({
@@ -361,8 +398,8 @@ const treeData = computed<TreeItem[]>(() => {
               ? `${table.table_name} · ${table.table_name_cn}`
               : table.table_name,
             kind: "table",
-            system_category: cat,
-            system_code: source.system_code,
+            system_code: sysCode,
+            system_name_cn: sysNode.system_name_cn,
             source_system: source.source_system || undefined,
             source_code: source.source_code,
             schema_name: schema.namespace,
@@ -374,7 +411,6 @@ const treeData = computed<TreeItem[]>(() => {
         }
         schemaNode.tablesLoaded = true;
       } else {
-        // 占位：显示「点击展开加载表」提示节点（可点）
         schemaNode.tablesLoaded = false;
         if ((schema.table_count || 0) > 0) {
           schemaNode.children = [
@@ -384,8 +420,7 @@ const treeData = computed<TreeItem[]>(() => {
                 ? "加载中…"
                 : `共 ${schema.table_count} 张表（展开/点击加载）`,
               kind: "table",
-              system_category: cat,
-              system_code: source.system_code,
+              system_code: sysCode,
               source_code: source.source_code,
               schema_name: schema.namespace
             }
@@ -395,7 +430,14 @@ const treeData = computed<TreeItem[]>(() => {
     }
   }
 
-  const base = CATEGORY_ORDER.map(code => categoryMap.get(code)).filter(Boolean) as TreeItem[];
+  const order = new Map(
+    (CANONICAL_SYSTEM_CODES as readonly string[]).map((c, i) => [c, i])
+  );
+  const base = Array.from(systemMap.values()).sort(
+    (a, b) =>
+      (order.get(a.system_code || "") ?? 999) - (order.get(b.system_code || "") ?? 999)
+  );
+
   if (searchHits.value.length && treeKeyword.value.trim()) {
     return [
       {
@@ -412,12 +454,14 @@ const treeData = computed<TreeItem[]>(() => {
 });
 
 const defaultExpandedKeys = computed(() =>
-  treeData.value.flatMap(cat => [cat.id, ...(cat.children || []).map(s => s.id)])
+  treeData.value.flatMap(sys => [sys.id, ...(sys.children || []).map(s => s.id)])
 );
 
 const selectedScopeText = computed(() => {
   const parts = [
-    scope.system_category ? CATEGORY_LABEL[scope.system_category] || scope.system_category : "",
+    scope.system_code
+      ? systemNameMap.value[scope.system_code] || scope.system_code
+      : "",
     scope.source_code,
     scope.schema_name
   ].filter(Boolean);
@@ -464,19 +508,33 @@ function filterTreeNode(value: string, data: TreeItem): boolean {
   return (data.children || []).some(child => filterTreeNode(value, child));
 }
 
-function setCategoryFilter(code: string) {
-  categoryFilter.value = code;
-  scope.system_category = code;
-  scope.system_code = "";
+function setSystemFilter(code: string) {
+  systemFilter.value = code;
+  scope.system_category = "";
+  scope.system_code = code;
   scope.source_code = "";
   scope.schema_name = "";
   params.page = 1;
   loadData();
 }
 
+async function loadSystemNames() {
+  try {
+    const res = await listSystems();
+    const map: Record<string, string> = {};
+    for (const s of res.data || []) {
+      if (s.system_code) map[s.system_code] = s.system_name_cn || s.system_code;
+    }
+    systemNameMap.value = map;
+  } catch {
+    systemNameMap.value = {};
+  }
+}
+
 async function loadTree() {
   treeLoading.value = true;
   try {
+    await loadSystemNames();
     // 默认不内嵌表，显著减小首包
     const res = await getAssetTree({ include_tables: false });
     rawTree.value = res.data || [];
@@ -502,6 +560,7 @@ async function loadSchemaTables(node: TreeItem) {
       source_code: node.source_code,
       source_name_cn: node.source_code,
       system_code: node.system_code || "",
+      system_name_cn: node.system_name_cn,
       system_category: node.system_category,
       source_system: node.source_system,
       table_count: res.data.total,
@@ -517,8 +576,8 @@ async function loadSchemaTables(node: TreeItem) {
             ? `${table.table_name} · ${table.table_name_cn}`
             : table.table_name,
           kind: "table" as const,
-          system_category: node.system_category,
           system_code: node.system_code,
+          system_name_cn: node.system_name_cn,
           source_system: node.source_system,
           source_code: node.source_code,
           schema_name: node.schema_name,
@@ -543,17 +602,19 @@ async function runTreeSearch(keyword: string) {
   try {
     const res = await searchAssetTree({
       keyword,
-      system_category: categoryFilter.value || undefined,
+      system_category: systemFilter.value || undefined,
       limit: 40
     });
     searchHits.value = (res.data.items || []).map(table => {
       const schema = (table as any).schema_name || "";
       const sourceCode = (table as any).source_code || "";
       const key = tableNodeKey(sourceCode, schema, table.table_name);
+      const path = (table as any).path as string | undefined;
       const stub: AssetTreeNode = {
         source_code: sourceCode,
         source_name_cn: (table as any).source_name_cn || sourceCode,
         system_code: (table as any).system_code || "",
+        system_name_cn: (table as any).system_name_cn,
         system_category: (table as any).system_category,
         source_system: (table as any).source_system,
         table_count: 1,
@@ -561,12 +622,14 @@ async function runTreeSearch(keyword: string) {
       };
       return {
         id: `search-table:${key}`,
-        label: table.table_name_cn
-          ? `${schema}.${table.table_name} · ${table.table_name_cn}`
-          : `${schema}.${table.table_name}`,
+        label:
+          path ||
+          (table.table_name_cn
+            ? `${schema}.${table.table_name} · ${table.table_name_cn}`
+            : `${schema}.${table.table_name}`),
         kind: "table" as const,
-        system_category: (table as any).system_category,
         system_code: (table as any).system_code,
+        system_name_cn: (table as any).system_name_cn,
         source_system: (table as any).source_system,
         source_code: sourceCode,
         schema_name: schema,
@@ -614,11 +677,11 @@ async function handleTreeClick(node: TreeItem) {
     await loadSchemaTables(schemaLike);
     return;
   }
-  scope.system_category = node.system_category || "";
-  // 列表过滤用真实 system_code / source_code，不用大类伪编码
+  scope.system_category = "";
+  // 列表过滤：业务系统 → 连接 → schema
   scope.system_code =
-    node.kind === "category" ? "" : node.system_code || "";
-  scope.source_code = ["system", "schema", "table", "column"].includes(node.kind)
+    node.kind === "category" || node.id === "search-hits" ? "" : node.system_code || "";
+  scope.source_code = ["connection", "schema", "table", "column"].includes(node.kind)
     ? node.source_code || ""
     : "";
   scope.schema_name = ["schema", "table", "column"].includes(node.kind)
@@ -657,10 +720,10 @@ async function loadData() {
       page: params.page,
       page_size: params.page_size
     });
-    // 附带大类展示字段（前端派生，兼容后端未回填）
     items.value = (res.data.items || []).map(row => ({
       ...row,
-      system_category_cn: categoryLabelOf(row),
+      system_name_cn: systemLabelOf(row),
+      system_category_cn: systemLabelOf(row),
       source_system_cn: row.source || row.source_code || undefined
     }));
     total.value = res.data.total;

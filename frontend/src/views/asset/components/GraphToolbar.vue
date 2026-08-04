@@ -89,11 +89,20 @@
       <el-tag v-if="selectedNodeId" type="success" effect="dark">已聚焦 {{ selectedNodeId }}</el-tag>
       <el-tag v-for="item in normalized.topGroups" :key="item.name" effect="plain">{{ item.name }} {{ item.count }}</el-tag>
     </div>
+    <div v-if="meta" class="meta-row" aria-label="图谱响应统计">
+      <el-tag type="info" effect="plain">总数 {{ meta.total_relations }}</el-tag>
+      <el-tag type="info" effect="plain">命中 {{ meta.matched_relations }}</el-tag>
+      <el-tag type="info" effect="plain">返回 {{ meta.returned_relations }}</el-tag>
+      <el-tag v-if="meta.truncated" type="danger" effect="plain" size="small">已截断（limit={{ filters.limit }}）</el-tag>
+      <el-tag v-else type="success" effect="plain" size="small">未截断</el-tag>
+      <el-tag v-if="meta.unresolved_endpoints" type="warning" effect="plain" size="small">端点未解析 {{ meta.unresolved_endpoints }}</el-tag>
+      <span v-if="meta.backend_build_id" class="meta-build">build:{{ meta.backend_build_id }}</span>
+    </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
-import type { GraphOptionsData, GraphViewMode } from "@/api/asset";
+import type { GraphMeta, GraphOptionsData, GraphViewMode } from "@/api/asset";
 import type { NormalizedGraph } from "@/views/asset/graph/graphNormalize";
 
 export type GraphEngine = "svg" | "g6";
@@ -136,6 +145,7 @@ defineProps<{
   graphEngine: GraphEngine;
   loading: boolean;
   selectedNodeId: string;
+  meta?: GraphMeta | null;
 }>();
 
 const emit = defineEmits<{
@@ -164,7 +174,9 @@ function statusLabel(status: string) {
     bounded: "有边界",
     needs_split: "需拆分",
     not_tested: "未验证",
-    rejected: "已拒绝"
+    rejected: "已拒绝",
+    sample_verified: "抽样验证",
+    needs_review: "待复核"
   };
   return map[status] || status || "-";
 }
@@ -206,6 +218,20 @@ function statusLabel(status: string) {
 .swatch.dashed-cand { border-top-style: dashed; border-top-color: #94a3b8; }
 .review-layer-alert { margin-top: 10px; }
 .stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-light, #e2e8f0);
+  font-size: 12px;
+}
+.meta-build {
+  color: var(--text-secondary, #64748b);
+  font-family: monospace;
+}
 @media (max-width: 1200px) { .filter-grid, .locate-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 680px) { .mode-row { align-items: stretch; } .mode-controls { display: grid; grid-template-columns: 1fr; } .group-select, .layout-select, .direction-segmented { width: 100%; } .filter-grid, .locate-row { grid-template-columns: 1fr; } }
 </style>

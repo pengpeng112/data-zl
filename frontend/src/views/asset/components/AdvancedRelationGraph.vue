@@ -52,6 +52,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   "node-click": [node: GraphNode];
   "edge-click": [edge: GraphEdge];
+  "render-error": [];
 }>();
 
 const containerRef = ref<HTMLDivElement>();
@@ -196,50 +197,64 @@ function displayEdge(raw: any) {
 
 function initGraph() {
   if (!containerRef.value || graph) return;
-  graph = new Graph({
-    container: containerRef.value,
-    autoFit: "view",
-    animation: false,
-    data: graphData() as any,
-    layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 },
-    node: { type: "rect" },
-    edge: { type: "line" },
-    behaviors: ["drag-canvas", "zoom-canvas", "drag-element", "hover-activate"]
-  } as any);
-  graph.on(NodeEvent.CLICK, (event: any) => {
-    const id = resolveElementId(event);
-    const raw = resolveRawElement(id, "node") || normalized.value.nodes.find(node => node.id === id);
-    if (raw) emit("node-click", raw as GraphNode);
-  });
-  graph.on(EdgeEvent.CLICK, (event: any) => {
-    const id = resolveElementId(event);
-    const raw = displayEdge(resolveRawElement(id, "edge")) || normalized.value.edges.find(edge => edge.id === id);
-    if (raw) emit("edge-click", raw as GraphEdge);
-  });
-  void graph.render();
+  try {
+    graph = new Graph({
+      container: containerRef.value,
+      autoFit: "view",
+      animation: false,
+      data: graphData() as any,
+      layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 },
+      node: { type: "rect" },
+      edge: { type: "line" },
+      behaviors: ["drag-canvas", "zoom-canvas", "drag-element", "hover-activate"]
+    } as any);
+    graph.on(NodeEvent.CLICK, (event: any) => {
+      const id = resolveElementId(event);
+      const raw = resolveRawElement(id, "node") || normalized.value.nodes.find(node => node.id === id);
+      if (raw) emit("node-click", raw as GraphNode);
+    });
+    graph.on(EdgeEvent.CLICK, (event: any) => {
+      const id = resolveElementId(event);
+      const raw = displayEdge(resolveRawElement(id, "edge")) || normalized.value.edges.find(edge => edge.id === id);
+      if (raw) emit("edge-click", raw as GraphEdge);
+    });
+    void graph.render().catch(() => emit("render-error"));
+  } catch (err) {
+    console.error("[AdvancedRelationGraph] init failed:", err);
+    emit("render-error");
+  }
 }
 
 async function renderGraph() {
   await nextTick();
-  if (!graph) {
-    initGraph();
-    return;
+  try {
+    if (!graph) {
+      initGraph();
+      return;
+    }
+    graph.setData(graphData() as any);
+    graph.setOptions({ layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 } } as any);
+    await graph.render();
+  } catch (err) {
+    console.error("[AdvancedRelationGraph] render failed:", err);
+    emit("render-error");
   }
-  graph.setData(graphData() as any);
-  graph.setOptions({ layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 } } as any);
-  await graph.render();
 }
 
 onMounted(() => {
-  void renderGraph();
+  void renderGraph().catch(() => emit("render-error"));
 });
 
 watch(() => [props.nodes, props.edges, props.groupBy, props.focusKeyword, props.centerTable, props.selectedNodeId, props.showReviewLayer, props.layoutMode, props.aggregateGroups, props.viewMode], () => {
-  void renderGraph();
+  void renderGraph().catch(() => emit("render-error"));
 }, { deep: true });
 
 onBeforeUnmount(() => {
-  graph?.destroy();
+  try {
+    graph?.destroy();
+  } catch {
+    // destroy 异常不阻断卸载
+  }
   graph = null;
 });
 </script>

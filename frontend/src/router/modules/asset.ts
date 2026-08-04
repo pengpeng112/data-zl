@@ -101,10 +101,10 @@ export default {
     {
       path: "/asset/candidates",
       name: "AssetCandidates",
-      component: () => import("@/views/asset/candidates/index.vue"),
+      redirect: "/asset/relation-review?class=candidate",
       meta: {
-        title: "候选关系",
-        showLink: true
+        title: "候选关系（兼容入口）",
+        showLink: false
       }
     },
     {
@@ -112,7 +112,7 @@ export default {
       name: "AssetRelationReview",
       component: () => import("@/views/asset/relation-review/index.vue"),
       meta: {
-        title: "关系复核",
+        title: "关系复核中心",
         showLink: true
       }
     },

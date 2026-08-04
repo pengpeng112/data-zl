@@ -90,7 +90,6 @@ const statusLabels: Record<string, string> = {
   not_tested: "未测试",
   sample_verified: "抽样验证",
   sample_pass: "抽样通过",
-  A_rechecked: "A 级复核",
   missing_in_8216: "8.216缺失"
 };
 

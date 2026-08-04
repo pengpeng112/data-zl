@@ -1,79 +1,90 @@
 <template>
-  <el-drawer :model-value="modelValue" title="关系证据详情" size="600px" @update:model-value="emit('update:modelValue', $event)">
-    <el-alert
-      v-if="edge && isDeferredEdge(edge)"
-      type="warning"
-      show-icon
-      :closable="false"
-      :title="deferredRelationVerificationText()"
-      class="drawer-alert"
-    />
-    <el-descriptions v-if="edge" :column="1" border size="small">
-      <el-descriptions-item label="来源系统">{{ edge.from_system_code || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源数据源">{{ edge.from_source_code || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源 Schema">{{ edge.from_schema_name || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源表">{{ edge.from_table_name || edge.source }}</el-descriptions-item>
-      <el-descriptions-item label="来源表中文名">{{ edge.from_table_name_cn || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源表角色">{{ edge.from_table_role || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源纳入状态">{{ edge.from_include_status || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="来源字段">{{ edge.from_columns || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标系统">{{ edge.to_system_code || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标数据源">{{ edge.to_source_code || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标 Schema">{{ edge.to_schema_name || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标表">{{ edge.to_table_name || edge.target }}</el-descriptions-item>
-      <el-descriptions-item label="目标表中文名">{{ edge.to_table_name_cn || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标表角色">{{ edge.to_table_role || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标纳入状态">{{ edge.to_include_status || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="目标字段">{{ edge.to_columns || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="字段映射">{{ fieldMappingSummary(edge) }}</el-descriptions-item>
-      <el-descriptions-item v-if="fieldMappingRows.length" label="关系字段">
-        <el-table :data="fieldMappingRows" size="small" border class="field-map-table">
-          <el-table-column prop="from_column" label="来源字段" min-width="120" />
-          <el-table-column prop="from_column_name_cn" label="来源字段中文名" min-width="140" />
-          <el-table-column prop="to_column" label="目标字段" min-width="120" />
-          <el-table-column prop="to_column_name_cn" label="目标字段中文名" min-width="140" />
-        </el-table>
-      </el-descriptions-item>
-      <el-descriptions-item label="关系类型">{{ relationTypeLabel(edge.relation_type) }}</el-descriptions-item>
-      <el-descriptions-item label="关系业务域">{{ edge.business_domain || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="关系等级">{{ edge.confidence || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="D 类/延后标记">
-        <el-tag v-if="isDeferredEdge(edge)" size="small" type="warning" effect="plain">待分析层</el-tag>
-        <span v-else>-</span>
-      </el-descriptions-item>
-      <el-descriptions-item label="验证状态">
-        <el-tag size="small" :type="statusTagType(edge.validation_status)">{{ statusLabel(edge.validation_status || '') }}</el-tag>
-      </el-descriptions-item>
-      <el-descriptions-item label="验证等级">{{ edge.validation_level || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="关联条件">{{ edge.join_condition || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="覆盖/孤儿指标">
-        <el-table v-if="metricRows.length" :data="metricRows" size="small" border class="metric-table">
-          <el-table-column prop="label" label="指标" min-width="130" />
-          <el-table-column prop="value" label="值" min-width="160" />
-        </el-table>
-        <span v-else>{{ rawEvidenceMetrics(edge) }}</span>
-      </el-descriptions-item>
-      <el-descriptions-item label="来源文档/依据">{{ evidenceSourceText(edge) }}</el-descriptions-item>
-      <el-descriptions-item v-if="isDeferredEdge(edge)" label="待验证范围">{{ deferredRelationVerificationText() }}</el-descriptions-item>
-      <el-descriptions-item label="延后原因">{{ edge.deferred_reason || edge.validation_note || edge.note || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="风险说明">{{ edge.validation_note || '-' }}</el-descriptions-item>
-    </el-descriptions>
+  <el-drawer :model-value="modelValue" title="关系证据详情" size="620px" @update:model-value="emit('update:modelValue', $event)">
+    <div v-loading="loadingDetail" class="evidence-loading">
+      <template v-if="detailEdge">
+        <el-alert
+          v-if="isDeferredEdge(detailEdge)"
+          type="warning"
+          show-icon
+          :closable="false"
+          :title="deferredRelationVerificationText()"
+          class="drawer-alert"
+        />
+        <el-descriptions :column="1" border size="small">
+          <el-descriptions-item label="来源系统">{{ detailEdge.from_system_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源数据源">{{ detailEdge.from_source_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源 Schema">{{ detailEdge.from_schema_name || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源表">{{ detailEdge.display_source || detailEdge.from_table_name || detailEdge.source }}</el-descriptions-item>
+          <el-descriptions-item label="来源表中文名">{{ detailEdge.from_table_name_cn || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源表角色">{{ detailEdge.from_table_role || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源纳入状态">{{ detailEdge.from_include_status || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源字段">{{ detailEdge.from_columns || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标系统">{{ detailEdge.to_system_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标数据源">{{ detailEdge.to_source_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标 Schema">{{ detailEdge.to_schema_name || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标表">{{ detailEdge.display_target || detailEdge.to_table_name || detailEdge.target }}</el-descriptions-item>
+          <el-descriptions-item label="目标表中文名">{{ detailEdge.to_table_name_cn || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标表角色">{{ detailEdge.to_table_role || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标纳入状态">{{ detailEdge.to_include_status || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标字段">{{ detailEdge.to_columns || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="字段映射">{{ fieldMappingSummary(detailEdge) }}</el-descriptions-item>
+          <el-descriptions-item v-if="fieldMappingRows.length" label="关系字段">
+            <el-table :data="fieldMappingRows" size="small" border class="field-map-table">
+              <el-table-column prop="from_column" label="来源字段" min-width="120" />
+              <el-table-column prop="from_column_name_cn" label="来源字段中文名" min-width="140" />
+              <el-table-column prop="to_column" label="目标字段" min-width="120" />
+              <el-table-column prop="to_column_name_cn" label="目标字段中文名" min-width="140" />
+            </el-table>
+          </el-descriptions-item>
+          <el-descriptions-item label="关系类型">{{ relationTypeLabel(detailEdge.relation_type) }}</el-descriptions-item>
+          <el-descriptions-item label="关系业务域">{{ detailEdge.business_domain || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="关系等级">{{ detailEdge.confidence || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="D 类/延后标记">
+            <el-tag v-if="isDeferredEdge(detailEdge)" size="small" type="warning" effect="plain">待分析层</el-tag>
+            <span v-else>-</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="验证状态">
+            <el-tag size="small" :type="statusTagType(detailEdge.validation_status)">{{ statusLabel(detailEdge.validation_status || '') }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="验证等级">{{ detailEdge.validation_level || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="关联条件">{{ detailEdge.join_condition || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="覆盖/孤儿指标">
+            <el-table v-if="metricRows.length" :data="metricRows" size="small" border class="metric-table">
+              <el-table-column prop="label" label="指标" min-width="130" />
+              <el-table-column prop="value" label="值" min-width="160" />
+            </el-table>
+            <span v-else>{{ rawEvidenceMetrics(detailEdge) }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="来源文档/依据">{{ evidenceSourceText(detailEdge) }}</el-descriptions-item>
+          <el-descriptions-item v-if="isDeferredEdge(detailEdge)" label="待验证范围">{{ deferredRelationVerificationText() }}</el-descriptions-item>
+          <el-descriptions-item label="延后原因">{{ detailEdge.deferred_reason || detailEdge.validation_note || detailEdge.note || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="风险说明">{{ detailEdge.validation_note || '-' }}</el-descriptions-item>
+        </el-descriptions>
+      </template>
+      <el-alert v-else-if="!loadingDetail" type="error" show-icon :closable="false" title="证据详情加载失败，请稍后重试" />
+    </div>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
+import { ElMessage } from "element-plus";
 import type { GraphEdge } from "@/api/asset";
+import { getGraphEdgeDetail } from "@/api/asset";
 import { buildEvidenceMetricRows, buildFieldMappingRows, deferredRelationVerificationText, evidenceSourceText, fieldMappingSummary, rawEvidenceMetrics } from "@/views/asset/graph/graphEvidence";
 
 const props = defineProps<{
   modelValue: boolean;
   edge: GraphEdge | null;
+  edgeKey?: string;
 }>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
+
+const loadingDetail = ref(false);
+const detailEdge = ref<GraphEdge | null>(null);
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
@@ -109,8 +120,38 @@ function statusTagType(status?: string | null) {
   return "info";
 }
 
-const fieldMappingRows = computed(() => props.edge ? buildFieldMappingRows(props.edge) : []);
-const metricRows = computed(() => props.edge ? buildEvidenceMetricRows(props.edge) : []);
+const fieldMappingRows = computed(() => detailEdge.value ? buildFieldMappingRows(detailEdge.value) : []);
+const metricRows = computed(() => detailEdge.value ? buildEvidenceMetricRows(detailEdge.value) : []);
+
+async function loadDetail(edgeKey: string) {
+  loadingDetail.value = true;
+  detailEdge.value = null;
+  try {
+    const res = await getGraphEdgeDetail(edgeKey);
+    if (!res.data) throw new Error("empty edge detail");
+    detailEdge.value = res.data as GraphEdge;
+  } catch (err) {
+    // 证据详情失败不影响主图；展示摘要边作为回退
+    if (props.edge) detailEdge.value = props.edge;
+    ElMessage.warning("边证据详情加载失败，已展示摘要信息");
+  } finally {
+    loadingDetail.value = false;
+  }
+}
+
+watch(
+  () => [props.modelValue, props.edgeKey, props.edge],
+  ([open, edgeKey, edge]: [boolean, string | undefined, GraphEdge | null]) => {
+    if (!open) return;
+    const key = String(edgeKey || "");
+    if (key && key !== "rel:") {
+      void loadDetail(key);
+    } else if (edge) {
+      detailEdge.value = edge;
+    }
+  },
+  { immediate: true, deep: false }
+);
 </script>
 
 <style scoped>

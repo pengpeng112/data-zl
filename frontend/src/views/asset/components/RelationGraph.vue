@@ -73,6 +73,7 @@ import { computed, ref, watch } from "vue";
 import type { GraphEdge, GraphNode } from "@/api/asset";
 import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graphNormalize";
 import { transformGraphByMode } from "@/views/asset/graph/graphTransform";
+import { nodeDisplayName, parsePhysicalKey } from "@/views/asset/graph/graphPhysical";
 
 type LayoutMode = "layered" | "grouped" | "radial";
 
@@ -157,17 +158,25 @@ const transformValue = computed(() => `translate(${pan.value.x} ${pan.value.y}) 
 const viewBox = computed(() => `0 0 ${layout.value.width} ${layout.value.height}`);
 
 function nodeGroup(node: any) {
-  return node.category || node.schema_name || node.id.split(".")[0] || "UNKNOWN";
+  if (node.isAggregate) return node.category || node.schema_name || "UNKNOWN";
+  const physical = parsePhysicalKey(node.id || node.physical_key);
+  if (physical?.schema) return physical.schema;
+  return node.category || node.schema_name || node.display_id?.split(".")[0] || node.id.split(".")[0] || "UNKNOWN";
 }
 
-function compactLabel(value: string) {
-  const raw = value.includes(".") ? value.split(".").pop() || value : value;
+function compactLabel(value: unknown) {
+  const str = typeof value === "string" ? value : String(value || "");
+  const raw = str.includes(".") ? str.split(".").pop() || str : str;
   return raw.length > 18 ? `${raw.slice(0, 16)}...` : raw;
 }
 
 function nodeMeta(node: any) {
   if (node.isAggregate) return `${node.count} 张表`;
-  return [node.system_code, node.source_code || node.source, node.schema_name, node.domain].filter(Boolean).slice(0, 2).join(" / ") || "-";
+  const parts = [node.system_code, node.source_code || node.source, node.schema_name, node.domain]
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(" / ");
+  return parts || "-";
 }
 
 function aggregateData(nodes: any[], edges: any[]) {
@@ -314,7 +323,7 @@ function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { 
     const p = positions.get(node.id) || { x: 80, y: 80 };
     return {
       id: node.id,
-      label: compactLabel(node.label || node.table_name || node.id),
+      label: compactLabel(node.name || node.nodeName || node.table_name || node.label || node.id),
       meta: nodeMeta(node),
       x: p.x,
       y: p.y,

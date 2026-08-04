@@ -30,6 +30,38 @@ DEFAULT_USER = os.environ.get("APP_SSH_USER", "root")
 CONTAINER = os.environ.get("APP_DOCKER_CONTAINER", "data-asset-api")
 
 
+def _connect_sshd(host: str, user: str, password: str) -> paramiko.SSHClient:
+    """111 号 S7：默认拒绝未知主机，杜绝 AutoAddPolicy 静默信任。
+
+    加载系统 known_hosts（或 APP_SSH_KNOWN_HOSTS 显式文件）后，用
+    RejectPolicy 连接：目标主机不在 known_hosts 或指纹不匹配时 paramiko
+    抛 SSHException，连接失败关闭，绝不静默接受未知主机。
+    """
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.RejectPolicy())
+    known_hosts_path = os.environ.get("APP_SSH_KNOWN_HOSTS", "")
+    if known_hosts_path:
+        client.load_host_keys(str(Path(known_hosts_path).expanduser()))
+    else:
+        client.load_system_host_keys()
+    try:
+        client.connect(
+            host,
+            username=user,
+            password=password,
+            timeout=20,
+            allow_agent=False,
+            look_for_keys=False,
+        )
+    except (paramiko.SSHException, OSError) as exc:
+        raise SystemExit(
+            f"SSH 连接被拒绝：目标主机 {host} 未通过 host key 校验。"
+            f"请先将 {host} 的 host key 加入 known_hosts "
+            f"(或设置 APP_SSH_KNOWN_HOSTS 指向受控文件) 后重试。原因: {exc}"
+        )
+    return client
+
+
 def md5_file(path: Path) -> str:
     h = hashlib.md5()
     with path.open("rb") as f:
@@ -115,16 +147,7 @@ def main() -> int:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     remote_rel = f"/opt/data-asset/releases/sync-{stamp}"
 
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(
-        args.host,
-        username=args.user,
-        password=args.password,
-        timeout=20,
-        allow_agent=False,
-        look_for_keys=False,
-    )
+    client = _connect_sshd(args.host, args.user, args.password)
     print(f"ssh_ok {args.host}")
 
     sftp = client.open_sftp()
