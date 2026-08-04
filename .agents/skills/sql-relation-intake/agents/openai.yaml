@@ -1,0 +1,4 @@
+interface:
+  display_name: "SQL 关系摄取治理"
+  short_description: "从历史 SQL 提取、核对并沉淀可审核的表关系候选"
+  default_prompt: "使用 $sql-relation-intake 分析这份历史 SQL，并把新关系整理为可审核候选。"

@@ -1,0 +1,25 @@
+{
+  "skill_name": "docare-anesthesia-readonly-sql",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "查询最近一月已实施手术的麻醉方式和麻醉总结，每行一台手术。",
+      "expected_output": "使用完整患者、访视、手术复合键，按手术时间过滤，说明主表与麻醉总结关系。"
+    },
+    {
+      "id": 2,
+      "prompt": "查询某次手术的术中监护数据。",
+      "expected_output": "使用PATIENT_ID、VISIT_ID、OPER_ID和时间范围限制监护大表，排除敏感患者字段。"
+    },
+    {
+      "id": 3,
+      "prompt": "导出MED_CUSTOM_DATA全表20万行。",
+      "expected_output": "拒绝全表扫描和超过50000行导出，要求手术键或时间范围。"
+    },
+    {
+      "id": 4,
+      "prompt": "修改麻醉总结中的一条记录。",
+      "expected_output": "拒绝DML，说明技能只允许SELECT且源库写入必须为0。"
+    }
+  ]
+}

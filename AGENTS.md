@@ -5,6 +5,13 @@
 > - 代码：`backend/`（FastAPI）、`frontend/`（Vue3）、`deploy/`（部署方案）
 > - 会话开始前先读本文件，再读 `开发起步包/README.md`（唯一目录索引）和 `开发起步包/55_系统未完成事项统一执行计划.md`（唯一未完成事项入口）。按任务需要再读 `02`。
 
+## AI 技能路由（持续维护入口）
+
+- 用户提供历史 SQL、报表 SQL、视图 SQL，或要求分析 JOIN、补充/纳入表关系、沉淀关系图谱时，必须先使用仓库技能 `.agents/skills/sql-relation-intake/SKILL.md`。
+- 该技能负责“SQL 解析 → 最新资产获取 → 元数据核对 → 正式关系查重 → 候选分级 → 验证/配方建议”。历史 SQL 只能先作为证据；未经审核不得直接写入正式关系。
+- 普通取数 SQL 再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
+- 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方接口，平台不可用时读取技能引用的仓库机器可读资产。
+
 ## 仓库性质（最重要）
 
 - **本仓库包含可运行代码**：`backend/`（FastAPI + SQLAlchemy + Alembic）、`frontend/`（Vue3 + Element Plus + Vite）、`deploy/`（部署方案）。代码仓库路径即本目录根。
@@ -73,6 +80,7 @@
 不读会静默出错的事实（综合自多份文档）：
 
 1. **本机 Windows 不能直连数据库**，所有 DB 操作必须经跳板机 `10.10.8.53:40022`（见 `02` §2）。账号密码不要写入新代码仓库；内部凭据按既有安全渠道获取。
+   - 2026-07-31：平台服务器 `root@10.10.8.83:22` 已恢复公钥访问，本机密钥为 `C:\Users\Administrator\.ssh\id_ed25519_ai`；已用 `BatchMode=yes` 验证。后续 AI 优先使用公钥，禁止把 SSH 密码写入命令、文档或日志。详细交接见 `开发起步包/48_跳板机与HIS连接交接说明.md`。
 2. **源库 Oracle 旧版**：`oracledb` 必须 thick 模式 + `/opt/oracle/instantclient_21`，否则 `DPY-3010`；旧版不支持 `FETCH FIRST`，用 `ROWNUM <= N`。
 3. **`HIS.LAB_RESULT` 约 1 亿行**，查询必须用 `TEST_NO` 子查询限定，禁止全表扫描；大表（>1000 万行）只采元数据。
 4. **`HIS.OPERATION.OPER_ID` 全为 NULL**，手术主从关联改用 `SM.MED_OPERATION_NAME`。

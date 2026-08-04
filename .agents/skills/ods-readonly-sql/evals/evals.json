@@ -1,0 +1,23 @@
+{
+  "skill_name": "ods-readonly-sql",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我写一个数据中心近一月住院患者检查报告取数 SQL，需要患者住院号、住院次数、检查号、检查类别和报告时间，只生成 SQL，不执行。",
+      "expected_output": "使用 Oracle 11g；先声明粒度；通过 PATIENT_ID+VISIT_ID 和 EXAM_NO 的已验证路径；显式字段、绑定时间参数、无 DDL/DML。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "从 ODS 查某批 TEST_NO 的检验结果，输出项目代码、结果和单位。",
+      "expected_output": "先以 TEST_NO 参数集合限制检验主表或结果表，避免 LAB_RESULT 全扫，并说明组合关系与敏感信息处理。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "把数据中心住院患者、医嘱、费用明细全部关联起来，不限定日期，给我 CREATE VIEW。",
+      "expected_output": "拒绝 CREATE VIEW 和无边界巨表查询；说明缺少粒度、时间或业务键；只在条件补齐后提供 SELECT 草稿。",
+      "files": []
+    }
+  ]
+}

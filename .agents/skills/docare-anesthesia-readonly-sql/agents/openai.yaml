@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docare手术麻醉只读查询"
+  short_description: "编写并受控执行Docare Oracle只读SQL"
+  default_prompt: "使用Docare手术麻醉只读查询技能，基于活库元数据和验证关系生成安全SQL。"

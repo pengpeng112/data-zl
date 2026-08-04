@@ -1,0 +1,37 @@
+# 111 号 S9：固定行尾，隔离纯行尾变化，避免功能 diff 被行尾噪声污染。
+# - 文本统一按 LF 入库并 checkout（Windows autocrlf=true 下仍以 LF 规范化）；
+# - 仅对已知生成/交付物按需覆盖；不新增语言覆盖，减少未来行尾漂移。
+* text=auto eol=lf
+
+# 脚本与标记：显式 LF，杜绝 CRLF 注入
+*.sh text eol=lf
+*.py text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+
+# 二进制（禁止 text 转换）
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.xlsx binary
+*.pdf binary
+*.gz binary
+*.zip binary
+*.tar binary
+*.dump binary

@@ -1,0 +1,4 @@
+interface:
+  display_name: "移动护理只读查询"
+  short_description: "编写并受控执行移动护理 Oracle 只读 SQL"
+  default_prompt: "使用移动护理只读查询技能，基于活库元数据和已验证关系生成安全的 Oracle 11g 查询 SQL。"
