@@ -10,6 +10,7 @@ export interface LocalAuthUser {
   id: number;
   username: string;
   user_identifier?: string | null;
+  person_name_cn?: string | null;
   enabled: boolean;
   must_change_password: boolean;
   failed_login_count?: number;
@@ -53,6 +54,7 @@ export function createLocalUser(data: {
       id: number;
       username: string;
       user_identifier?: string | null;
+      person_name_cn?: string | null;
       must_change_password: boolean;
       initial_password?: string | null;
       warning?: string | null;

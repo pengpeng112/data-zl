@@ -17,7 +17,8 @@ export default {
       component: () => import("@/views/ops/sql-workbench/index.vue"),
       meta: {
         title: "SQL 工作台",
-        showLink: true
+        showLink: true,
+        auths: ["ops.sql.view"]
       }
     },
     {
@@ -26,7 +27,8 @@ export default {
       component: () => import("@/views/ops/tools/index.vue"),
       meta: {
         title: "工具模板",
-        showLink: true
+        showLink: true,
+        auths: ["ops.tool.manage"]
       }
     },
     {
@@ -35,7 +37,8 @@ export default {
       component: () => import("@/views/ops/runs/index.vue"),
       meta: {
         title: "运维任务",
-        showLink: true
+        showLink: true,
+        auths: ["ops.run.view"]
       }
     },
     {
@@ -44,7 +47,8 @@ export default {
       component: () => import("@/views/ops/audit/index.vue"),
       meta: {
         title: "运维审计",
-        showLink: true
+        showLink: true,
+        auths: ["ops.audit.view"]
       }
     }
   ]

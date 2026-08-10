@@ -34,6 +34,11 @@ export function getMedicalMappings(params?: Record<string, unknown>) {
 export function getMedicalMappingRows(params?: Record<string, unknown>) {
   return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-medical/mapping-rows", { params });
 }
+export function getMedicalMappingOptions(categoryCode: string) {
+  return http.request<ApiResponse<Record<string, string[]>>>("get", "/api/v1/dict-medical/mapping-options", {
+    params: { category_code: categoryCode }
+  });
+}
 export function upsertMedicalMappingRow(data: Record<string, unknown>) {
   return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-medical/mapping-rows", { data });
 }

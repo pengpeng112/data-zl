@@ -17,7 +17,8 @@ export default {
       component: () => import("@/views/dict/medical/index.vue"),
       meta: {
         title: "诊断手术维护",
-        showLink: true
+        showLink: true,
+        auths: ["dict.medical.view"]
       }
     },
     {
@@ -26,7 +27,8 @@ export default {
       component: () => import("@/views/dict/mappings/index.vue"),
       meta: {
         title: "编码关系明细",
-        showLink: true
+        showLink: true,
+        auths: ["dict.mapping.view"]
       }
     },
     {
@@ -35,7 +37,8 @@ export default {
       component: () => import("@/views/dict/general/index.vue"),
       meta: {
         title: "通用字典",
-        showLink: true
+        showLink: true,
+        auths: ["dict.general.view"]
       }
     },
     {
@@ -44,7 +47,8 @@ export default {
       component: () => import("@/views/dict/sync-diffs/index.vue"),
       meta: {
         title: "同步差异",
-        showLink: true
+        showLink: true,
+        auths: ["dict.sync_diff.view"]
       }
     }
   ]

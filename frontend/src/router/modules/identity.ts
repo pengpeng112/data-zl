@@ -17,7 +17,8 @@ export default {
       component: () => import("@/views/identity/departments/index.vue"),
       meta: {
         title: "科室基线",
-        showLink: true
+        showLink: true,
+        auths: ["identity.dept.view"]
       }
     },
     {
@@ -26,7 +27,8 @@ export default {
       component: () => import("@/views/identity/persons/index.vue"),
       meta: {
         title: "人员管理",
-        showLink: true
+        showLink: true,
+        auths: ["identity.person.view"]
       }
     },
     {
@@ -35,7 +37,8 @@ export default {
       component: () => import("@/views/identity/accounts/index.vue"),
       meta: {
         title: "跨系统账号",
-        showLink: true
+        showLink: true,
+        auths: ["identity.account.view"]
       }
     },
     {
@@ -55,7 +58,8 @@ export default {
       component: () => import("@/views/identity/sync-diffs/index.vue"),
       meta: {
         title: "同步差异",
-        showLink: true
+        showLink: true,
+        auths: ["identity.sync_diff.view"]
       }
     },
     {
@@ -84,7 +88,7 @@ export default {
       path: "/identity/permission-requests",
       name: "IdentityPermissionRequests",
       component: () => import("@/views/identity/permission-requests/index.vue"),
-      meta: { title: "权限申请审批", showLink: true }
+      meta: { title: "权限申请审批", showLink: true, auths: ["identity.permission_request.view"] }
     }
   ]
 } satisfies RouteConfigsTable;

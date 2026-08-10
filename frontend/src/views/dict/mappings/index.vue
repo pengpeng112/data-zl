@@ -92,6 +92,9 @@
         <el-table-column prop="insurance_name" :label="insuranceNameLabel" min-width="230" show-overflow-tooltip />
 
         <template v-if="isDiagnosis">
+          <el-table-column prop="ybhm" label="JHEMR 灰码" width="110" align="center">
+            <template #default="{ row }"><el-tag v-if="row.ybhm === '灰码'" type="warning" size="small">灰码</el-tag></template>
+          </el-table-column>
           <el-table-column prop="special_disease_code" label="门诊慢特病编码" width="150" show-overflow-tooltip />
           <el-table-column prop="special_disease_name" label="门诊慢特病名称" min-width="170" show-overflow-tooltip />
           <el-table-column prop="low_risk_category_code" label="ICD低风险编码类目" width="160" show-overflow-tooltip />
@@ -129,36 +132,48 @@
       />
     </el-card>
 
-    <el-dialog v-model="dialog.visible" :title="dialog.isEdit ? '编辑映射行' : '新增映射行'" width="780px" destroy-on-close>
-      <el-form :model="dialog.form" label-width="170px">
+    <el-dialog v-model="dialog.visible" :title="dialog.isEdit ? `编辑${categoryText}映射` : `新增${categoryText}映射`" width="min(980px, 94vw)" top="5vh" destroy-on-close>
+      <el-form ref="mappingFormRef" :model="dialog.form" :rules="formRules" label-position="top" class="mapping-form">
+        <div class="form-section-title">院内字典</div>
+        <div class="form-grid">
         <el-form-item label="状态">
           <el-radio-group v-model="dialog.form.status">
             <el-radio-button value="active">启用</el-radio-button>
             <el-radio-button value="inactive">停用</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="字典属性"><el-input v-model="dialog.form.dict_attribute" /></el-form-item>
-        <el-form-item :label="localCodeLabel"><el-input v-model="dialog.form.local_code" :disabled="dialog.isEdit" /></el-form-item>
-        <el-form-item :label="localNameLabel"><el-input v-model="dialog.form.local_name" :disabled="dialog.isEdit" /></el-form-item>
-        <el-form-item v-if="isOperation" label="院内手术等级"><el-input v-model="dialog.form.operation_level" /></el-form-item>
+        <el-form-item label="字典属性" prop="dict_attribute"><el-select v-model="dialog.form.dict_attribute" filterable allow-create default-first-option class="full-width"><el-option v-for="value in optionData.dict_attributes" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+        <el-form-item :label="localCodeLabel" prop="local_code"><el-input v-model="dialog.form.local_code" :disabled="dialog.isEdit" /></el-form-item>
+        <el-form-item :label="localNameLabel" prop="local_name"><el-input v-model="dialog.form.local_name" :disabled="dialog.isEdit" /></el-form-item>
+        <el-form-item v-if="isOperation" label="院内手术等级"><el-select v-model="dialog.form.operation_level" clearable filterable class="full-width"><el-option v-for="value in optionData.operation_level" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+        <el-form-item v-if="isDiagnosis" label="JHEMR 医保灰码"><el-select v-model="dialog.form.ybhm" clearable placeholder="为空（非灰码）" class="full-width"><el-option label="灰码" value="灰码" /></el-select></el-form-item>
+        </div>
+
+        <div class="form-section-title">标准编码映射</div>
+        <div class="form-grid">
         <el-form-item :label="nationalCodeLabel"><el-input v-model="dialog.form.national_code" /></el-form-item>
         <el-form-item :label="nationalNameLabel"><el-input v-model="dialog.form.national_name" /></el-form-item>
         <el-form-item :label="insuranceCodeLabel"><el-input v-model="dialog.form.insurance_code" /></el-form-item>
         <el-form-item :label="insuranceNameLabel"><el-input v-model="dialog.form.insurance_name" /></el-form-item>
+        </div>
 
         <template v-if="isDiagnosis">
+          <div class="form-section-title">诊断扩展属性</div><div class="form-grid">
           <el-form-item label="门诊慢特病编码"><el-input v-model="dialog.form.special_disease_code" /></el-form-item>
           <el-form-item label="门诊慢特病名称"><el-input v-model="dialog.form.special_disease_name" /></el-form-item>
           <el-form-item label="ICD低风险编码类目"><el-input v-model="dialog.form.low_risk_category_code" /></el-form-item>
           <el-form-item label="ICD低风险病种名称"><el-input v-model="dialog.form.low_risk_disease_name" /></el-form-item>
           <el-form-item label="传染病诊断"><el-input v-model="dialog.form.infectious_disease_name" /></el-form-item>
+          </div>
         </template>
 
         <template v-if="isOperation">
-          <el-form-item label="手术类别"><el-input v-model="dialog.form.operation_category" /></el-form-item>
-          <el-form-item label="绩效四级"><el-input v-model="dialog.form.performance_level4_flag" /></el-form-item>
-          <el-form-item label="绩效微创"><el-input v-model="dialog.form.performance_minimally_invasive_flag" /></el-form-item>
-          <el-form-item label="限制技术"><el-input v-model="dialog.form.restricted_tech_flag" /></el-form-item>
+          <div class="form-section-title">手术下发属性</div><div class="form-grid">
+          <el-form-item label="手术类别"><el-select v-model="dialog.form.operation_category" clearable filterable class="full-width"><el-option v-for="value in optionData.operation_category" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+          <el-form-item label="绩效四级"><el-select v-model="dialog.form.performance_level4_flag" clearable placeholder="为空" class="full-width"><el-option v-for="value in optionData.performance_level4_flag" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+          <el-form-item label="绩效微创"><el-select v-model="dialog.form.performance_minimally_invasive_flag" clearable placeholder="为空" class="full-width"><el-option v-for="value in optionData.performance_minimally_invasive_flag" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+          <el-form-item label="限制技术"><el-select v-model="dialog.form.restricted_tech_flag" clearable placeholder="为空" class="full-width"><el-option v-for="value in optionData.restricted_tech_flag" :key="value" :label="value" :value="value" /></el-select></el-form-item>
+          </div>
         </template>
       </el-form>
       <template #footer>
@@ -172,8 +187,8 @@
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { computed, reactive, ref, onMounted } from "vue";
-import { ElMessage } from "element-plus";
-import { exportMedicalMappingRows, getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { exportMedicalMappingRows, getMedicalMappingOptions, getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
 
 const loading = ref(false);
 const exporting = ref(false);
@@ -190,6 +205,13 @@ const performanceLevel4Flag = ref("");
 const restrictedTechFlag = ref("");
 const operationLevel = ref("");
 const authHint = ref("");
+const mappingFormRef = ref<FormInstance>();
+const optionData = reactive<Record<string, string[]>>({ dict_attributes: ["院内扩展"], operation_category: [], operation_level: [], performance_level4_flag: [], performance_minimally_invasive_flag: [], restricted_tech_flag: [] });
+const formRules: FormRules = {
+  local_code: [{ required: true, whitespace: true, message: "请输入院内编码", trigger: "blur" }],
+  local_name: [{ required: true, whitespace: true, message: "请输入院内名称", trigger: "blur" }],
+  dict_attribute: [{ required: true, message: "请选择或填写字典属性", trigger: "change" }]
+};
 
 const categoryOptions = [
   { label: "诊断维护表", value: "diagnosis" },
@@ -210,7 +232,8 @@ const emptyForm = () => ({
   category_code: categoryCode.value,
   local_code: "",
   local_name: "",
-  dict_attribute: "",
+  dict_attribute: "院内扩展",
+  ybhm: "",
   national_code: "",
   national_name: "",
   insurance_code: "",
@@ -262,9 +285,20 @@ function openDialog(row?: any) {
     ? { ...emptyForm(), ...row, category_code: categoryCode.value, status: row.status || "active" }
     : emptyForm();
   dialog.visible = true;
+  loadOptions();
+}
+
+async function loadOptions() {
+  try {
+    const res = await getMedicalMappingOptions(categoryCode.value);
+    Object.assign(optionData, res.data || {});
+    if (!optionData.dict_attributes?.includes("院内扩展")) optionData.dict_attributes = ["院内扩展", ...(optionData.dict_attributes || [])];
+  } catch { ElMessage.warning("下拉值域加载失败，请刷新后重试"); }
 }
 
 async function saveRow() {
+  const valid = await mappingFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
   dialog.submitting = true;
   try {
     await upsertMedicalMappingRow(dialog.form);
@@ -365,4 +399,9 @@ onMounted(loadData);
 :deep(.row-inactive) { color: var(--el-text-color-secondary); background: var(--el-fill-color-lighter); }
 
 .full-width { width: 100%; }
+.mapping-form { max-height: 72vh; padding-right: 6px; overflow-y: auto; }
+.form-section-title { margin: 4px 0 12px; padding-left: 9px; border-left: 3px solid var(--el-color-primary); font-weight: 600; color: var(--el-text-color-primary); }
+.form-section-title:not(:first-child) { margin-top: 12px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
 </style>

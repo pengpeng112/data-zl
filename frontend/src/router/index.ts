@@ -150,7 +150,16 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   if (Cookies.get(multipleTabsKey) && userInfo) {
     // 无权限跳转403页面
     if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
-      next({ path: "/error/403" });
+      return next({ path: "/error/403" });
+    }
+    const requiredPermissions = to.meta?.auths as string[] | undefined;
+    const userPermissions = userInfo?.permissions ?? [];
+    if (
+      requiredPermissions?.length &&
+      !userPermissions.includes("*:*:*") &&
+      !requiredPermissions.some(code => userPermissions.includes(code))
+    ) {
+      return next({ path: "/error/403" });
     }
     // 开启隐藏首页后在浏览器地址栏手动输入首页welcome路由则跳转到404页面
     if (VITE_HIDE_HOME === "true" && to.fullPath === "/welcome") {

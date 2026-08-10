@@ -69,9 +69,8 @@
         <el-card>
           <template #header>
             <span>质量规则</span>
-            <el-button type="primary" size="small" class="ml12" @click="openRuleDialog()">
-              新增规则
-            </el-button>
+            <el-button type="primary" size="small" class="ml12" @click="openRuleDialog()">新增规则</el-button>
+            <el-button size="small" :loading="autoGenerating" @click="autoGenerateRules">按主键/关系生成建议</el-button>
           </template>
 
           <el-form :inline="true">
@@ -820,6 +819,7 @@ function filterBySystem(row: SystemSummaryItem) {
 // ============================================================
 const rules = ref<RuleItem[]>([]);
 const rulesLoading = ref(false);
+const autoGenerating = ref(false);
 const rulesPage = ref(1);
 const rulesPageSize = ref(30);
 const rulesTotal = ref(0);
@@ -919,6 +919,22 @@ function loadRules(page?: number) {
     .finally(() => {
       rulesLoading.value = false;
     });
+}
+
+async function autoGenerateRules() {
+  autoGenerating.value = true;
+  try {
+    const res = await http.post<any, any>("/api/v1/quality/rules/auto-generate", {
+      data: { limit: 100 }
+    });
+    const data = res.data || {};
+    ElMessage.success(`已生成 ${data.created || 0} 条建议，跳过 ${data.skipped || 0} 条重复规则`);
+    loadRules(1);
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.detail || "规则建议生成失败");
+  } finally {
+    autoGenerating.value = false;
+  }
 }
 
 function resetRuleFilters() {

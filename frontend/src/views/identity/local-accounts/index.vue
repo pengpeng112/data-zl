@@ -26,6 +26,9 @@
       <el-table v-loading="loading" :data="items" stripe>
         <el-table-column prop="username" label="用户名" min-width="140" />
         <el-table-column prop="user_identifier" label="人员标识" min-width="140" />
+        <el-table-column prop="person_name_cn" label="姓名" min-width="110">
+          <template #default="{ row }">{{ row.person_name_cn || "-" }}</template>
+        </el-table-column>
         <el-table-column prop="enabled" label="状态" width="90">
           <template #default="{ row }">
             <el-tag :type="row.enabled ? 'success' : 'info'" size="small">
@@ -76,13 +79,38 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createVisible" title="新建本地账号" width="480px" destroy-on-close>
+    <el-dialog v-model="createVisible" title="新建本地账号" width="560px" destroy-on-close>
       <el-form :model="createForm" label-width="110px">
-        <el-form-item label="用户名" required>
-          <el-input v-model="createForm.username" />
+        <el-form-item label="选择人员" required>
+          <el-select
+            v-model="createForm.user_identifier"
+            filterable
+            remote
+            clearable
+            :remote-method="searchPersons"
+            :loading="personsLoading"
+            placeholder="输入工号或姓名搜索"
+            class="full-width"
+            @change="selectPerson"
+          >
+            <el-option
+              v-for="person in personOptions"
+              :key="person.person_code"
+              :label="`${person.person_name_cn || '未维护姓名'}（${person.person_code}）`"
+              :value="person.person_code"
+            >
+              <div class="person-option">
+                <span>{{ person.person_name_cn || "未维护姓名" }}</span>
+                <small>{{ person.person_code }} · {{ person.dept_name_cn || "未维护科室" }}</small>
+              </div>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="人员标识">
-          <el-input v-model="createForm.user_identifier" placeholder="绑定 person_code，可空" />
+        <el-form-item label="工号">
+          <el-input v-model="createForm.username" readonly />
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="createForm.person_name_cn" readonly />
         </el-form-item>
         <el-form-item label="初始密码">
           <el-input
@@ -93,13 +121,13 @@
           />
         </el-form-item>
         <el-form-item label="角色">
-          <el-select v-model="createForm.role_codes" multiple class="full-width">
-            <el-option label="platform_admin" value="platform_admin" />
-            <el-option label="identity_admin" value="identity_admin" />
-            <el-option label="asset_viewer" value="asset_viewer" />
-            <el-option label="quality_admin" value="quality_admin" />
-            <el-option label="ops_admin" value="ops_admin" />
-            <el-option label="approver" value="approver" />
+          <el-select v-model="createForm.role_codes" multiple class="full-width" placeholder="请选择角色">
+            <el-option
+              v-for="role in roleOptions"
+              :key="role.role_code"
+              :label="role.role_name_cn || '未命名角色'"
+              :value="role.role_code"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -124,6 +152,8 @@
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import RePageHeader from "@/components/RePageHeader/index.vue";
+import { getPersons } from "@/api/identity";
+import { getPermissionRoles, type PermissionRole } from "@/api/permissions";
 import {
   createLocalUser,
   listLocalUsers,
@@ -144,9 +174,13 @@ const createLoading = ref(false);
 const createForm = reactive({
   username: "",
   user_identifier: "",
+  person_name_cn: "",
   password: "",
   role_codes: [] as string[]
 });
+const personsLoading = ref(false);
+const personOptions = ref<any[]>([]);
+const roleOptions = ref<PermissionRole[]>([]);
 
 const pwdVisible = ref(false);
 const oneTimePassword = ref("");
@@ -175,17 +209,46 @@ async function loadEvents() {
   }
 }
 
-function openCreate() {
+async function openCreate() {
   createForm.username = "";
   createForm.user_identifier = "";
+  createForm.person_name_cn = "";
   createForm.password = "";
   createForm.role_codes = [];
+  personOptions.value = [];
+  try {
+    const roleRes = await getPermissionRoles();
+    roleOptions.value = (roleRes.data || []).filter(role => Boolean(role.role_name_cn));
+  } catch {
+    roleOptions.value = [];
+    ElMessage.error("角色列表加载失败");
+  }
   createVisible.value = true;
 }
 
+async function searchPersons(keyword: string) {
+  if (!keyword.trim()) {
+    personOptions.value = [];
+    return;
+  }
+  personsLoading.value = true;
+  try {
+    const res = await getPersons({ keyword: keyword.trim(), page: 1, page_size: 30 });
+    personOptions.value = res.data?.items ?? [];
+  } finally {
+    personsLoading.value = false;
+  }
+}
+
+function selectPerson(personCode: string) {
+  const person = personOptions.value.find(item => item.person_code === personCode);
+  createForm.username = person?.person_code || "";
+  createForm.person_name_cn = person?.person_name_cn || "";
+}
+
 async function doCreate() {
-  if (!createForm.username.trim()) {
-    ElMessage.warning("请输入用户名");
+  if (!createForm.user_identifier || !createForm.username) {
+    ElMessage.warning("请从人员管理中选择人员");
     return;
   }
   createLoading.value = true;
@@ -289,5 +352,14 @@ onMounted(() => {
 .pwd-warning {
   color: var(--el-color-warning);
   margin-bottom: 12px;
+}
+.person-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.person-option small {
+  color: var(--el-text-color-secondary);
 }
 </style>

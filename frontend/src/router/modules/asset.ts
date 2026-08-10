@@ -17,7 +17,8 @@ export default {
       component: () => import("@/views/asset/overview/index.vue"),
       meta: {
         title: "资产总览",
-        showLink: true
+        showLink: true,
+        auths: ["asset.overview.view"]
       }
     },
     {
@@ -26,7 +27,8 @@ export default {
       component: () => import("@/views/asset/systems/index.vue"),
       meta: {
         title: "业务系统与数据资源",
-        showLink: true
+        showLink: true,
+        auths: ["asset.system.view"]
       }
     },
     {
@@ -44,7 +46,8 @@ export default {
       component: () => import("@/views/asset/tables/index.vue"),
       meta: {
         title: "表资产",
-        showLink: true
+        showLink: true,
+        auths: ["asset.table.view"]
       }
     },
     {
@@ -62,7 +65,8 @@ export default {
       component: () => import("@/views/asset/graph/index.vue"),
       meta: {
         title: "关系图谱",
-        showLink: true
+        showLink: true,
+        auths: ["asset.graph.view"]
       }
     },
     {
@@ -71,7 +75,8 @@ export default {
       component: () => import("@/views/asset/relations/index.vue"),
       meta: {
         title: "关系路径",
-        showLink: true
+        showLink: true,
+        auths: ["asset.relation.view"]
       }
     },
     {
@@ -80,14 +85,15 @@ export default {
       component: () => import("@/views/asset/ai-context/index.vue"),
       meta: {
         title: "AI上下文",
-        showLink: true
+        showLink: true,
+        auths: ["asset.ai_context.view"]
       }
     },
     {
       path: "/asset/relation-recipes",
       name: "AssetRelationRecipes",
       component: () => import("@/views/asset/relation-recipes/index.vue"),
-      meta: { title: "关系配方库", showLink: true }
+      meta: { title: "关系配方库", showLink: true, auths: ["asset.recipe.view"] }
     },
     {
       path: "/asset/lineage",
@@ -95,7 +101,8 @@ export default {
       component: () => import("@/views/asset/lineage/index.vue"),
       meta: {
         title: "血缘与影响",
-        showLink: true
+        showLink: true,
+        auths: ["asset.lineage.view"]
       }
     },
     {
@@ -113,7 +120,8 @@ export default {
       component: () => import("@/views/asset/relation-review/index.vue"),
       meta: {
         title: "关系复核中心",
-        showLink: true
+        showLink: true,
+        auths: ["asset.relation.review"]
       }
     },
     {
@@ -122,7 +130,8 @@ export default {
       component: () => import("@/views/asset/quality/index.vue"),
       meta: {
         title: "数据质量",
-        showLink: true
+        showLink: true,
+        auths: ["asset.quality.view"]
       }
     },
     {
@@ -131,7 +140,8 @@ export default {
       component: () => import("@/views/asset/ai-tools/index.vue"),
       meta: {
         title: "AI 协作",
-        showLink: true
+        showLink: true,
+        auths: ["asset.ai_draft.view"]
       }
     },
     {
@@ -140,7 +150,8 @@ export default {
       component: () => import("@/views/asset/admin/index.vue"),
       meta: {
         title: "治理管理",
-        showLink: true
+        showLink: true,
+        auths: ["asset.admin.view"]
       }
     }
   ]

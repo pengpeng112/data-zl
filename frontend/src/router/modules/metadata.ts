@@ -17,7 +17,8 @@ export default {
       component: () => import("@/views/metadata-changes/changes/index.vue"),
       meta: {
         title: "变更事件",
-        showLink: true
+        showLink: true,
+        auths: ["metadata.change.view"]
       }
     },
     {
@@ -26,7 +27,8 @@ export default {
       component: () => import("@/views/metadata-changes/snapshots/index.vue"),
       meta: {
         title: "快照管理",
-        showLink: true
+        showLink: true,
+        auths: ["metadata.snapshot.view"]
       }
     },
     {
@@ -35,7 +37,8 @@ export default {
       component: () => import("@/views/metadata-changes/diff/index.vue"),
       meta: {
         title: "快照对比",
-        showLink: true
+        showLink: true,
+        auths: ["metadata.diff.view"]
       }
     }
   ]
