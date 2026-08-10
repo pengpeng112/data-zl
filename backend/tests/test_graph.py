@@ -433,3 +433,64 @@ def test_edge_detail_endpoint(seeded_client: TestClient) -> None:
     edge = detail.json()["data"]
     assert "field_mappings" in edge
     assert edge["id"] == edges[0]["id"]
+
+
+def test_namespace_compatible_enrichment_preserves_cn_name_and_domain(seeded_client: TestClient) -> None:
+    db = SessionLocal()
+    try:
+        table = db.scalar(select(AssetTable).where(
+            AssetTable.system_code == "HIS",
+            AssetTable.source_code == "his_source_10_10_10_15",
+            AssetTable.schema_name == "HIS",
+            AssetTable.table_name == "PAT_VISIT",
+        ))
+        assert table is not None
+        table.namespace_name = "HIS"
+        table.table_name_cn = "病人住院主记录"
+        table.domain = "就诊"
+        # 关系端点 namespace 保持历史 NULL，模拟生产中的兼容富化场景。
+        rel = db.scalar(select(AssetRelation).where(AssetRelation.rel_id == 900001))
+        assert rel is not None
+        rel.from_namespace_name = None
+        rel.to_namespace_name = None
+        db.commit()
+    finally:
+        db.close()
+    data = seeded_client.get("/api/v1/graph?confidence=A&limit=20").json()["data"]
+    node = next(item for item in data["nodes"] if item["table_name"] == "PAT_VISIT")
+    assert node["table_name_cn"] == "病人住院主记录"
+    assert node["business_domain"] == "就诊"
+    assert node["metadata_match"] == "namespace_compatible"
+    assert data["meta"]["enrichment"]["namespace_compatible"] >= 1
+
+
+def test_server_side_overview_and_cascade_contract(seeded_client: TestClient) -> None:
+    overview = seeded_client.get("/api/v1/graph/overview?level=system&limit=80")
+    assert overview.status_code == 200
+    body = overview.json()["data"]
+    assert body["level"] == "system"
+    assert body["next_level"] == "source"
+    assert body["data"]["nodes"]
+    assert body["data"]["meta"]["returned_nodes"] == len(body["data"]["nodes"])
+
+    options = seeded_client.get("/api/v1/graph/filter-options?next_level=source&system_code=HIS")
+    assert options.status_code == 200
+    values = {item["value"] for item in options.json()["data"]["items"]}
+    assert "his_source_10_10_10_15" in values
+
+
+def test_table_search_returns_physical_key_and_disambiguation(seeded_client: TestClient) -> None:
+    resp = seeded_client.get("/api/v1/graph/tables/search?q=PAT_VISIT&limit=30")
+    assert resp.status_code == 200
+    items = resp.json()["data"]["items"]
+    assert items
+    assert all(item["physical_key"].count("|") == 4 for item in items)
+    assert all(item["technical_name"] for item in items)
+
+
+def test_neighbors_center_physical_key_alias(seeded_client: TestClient) -> None:
+    resp = seeded_client.get(
+        "/api/v1/graph/neighbors?center_physical_key=HIS|his_source_10_10_10_15||HIS|PAT_VISIT&depth=1"
+    )
+    assert resp.status_code == 200
+    assert resp.json()["data"]["meta"]["center_physical_key"].endswith("|PAT_VISIT")

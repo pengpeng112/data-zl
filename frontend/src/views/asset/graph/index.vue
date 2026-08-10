@@ -2,7 +2,7 @@
   <div class="asset-graph-page">
     <RePageHeader
       title="关系图谱"
-      subtitle="按系统大类 / 数据源 / Schema / 业务域浏览；A 类实线，D 类跨系统虚线灰紫并单独图例。"
+      subtitle="资产概览、关系探索、证据审核；中文名称为主，技术标识为辅。"
     />
 
     <!-- 加载/成功：工具栏 + 图表 -->
@@ -38,7 +38,7 @@
       />
       <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
       <div v-loading="loading" :element-loading-text="graphLoadingText" class="graph-wrap">
-        <template v-if="graphData.nodes.length && graphData.edges.length">
+        <template v-if="graphData.nodes.length && (graphData.edges.length || filters.view_mode === 'overview')">
           <component
             :is="graphEngine === 'g6' ? AdvancedRelationGraph : RelationGraph"
             :key="renderKey"
@@ -107,9 +107,9 @@
       <el-descriptions v-if="selectedNode" :column="1" border size="small">
         <el-descriptions-item label="节点（物理键）">{{ selectedNode.id }}</el-descriptions-item>
         <el-descriptions-item label="展示名">{{ selectedNodeDisplayKey }}</el-descriptions-item>
-        <el-descriptions-item label="系统大类">{{ selectedNode.system_code || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="系统库/数据源">{{ selectedNode.source_code || selectedNode.source || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="表空间">{{ selectedNode.schema_name || selectedNode.namespace_name || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="业务系统">{{ selectedNode.system_code || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="数据源/数据库">{{ selectedNode.source_code || selectedNode.source || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Schema / Owner">{{ selectedNode.schema_name || selectedNode.namespace_name || '-' }}</el-descriptions-item>
         <el-descriptions-item label="表名">{{ selectedNode.table_name || selectedNode.label }}</el-descriptions-item>
         <el-descriptions-item label="中文名">{{ selectedNode.table_name_cn || '-' }}</el-descriptions-item>
         <el-descriptions-item label="表角色">{{ selectedNode.table_role || '-' }}</el-descriptions-item>
@@ -151,7 +151,7 @@ import {
   type GraphErrorInfo,
   type GraphPageState
 } from "@/views/asset/graph/graphErrors";
-import { getGraph, getGraphDiagnostics, getGraphNeighbors, getGraphOptions, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode } from "@/api/asset";
+import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem } from "@/api/asset";
 
 type LayoutMode = "layered" | "grouped" | "radial";
 
@@ -164,7 +164,8 @@ const selectedEdge = ref<GraphEdge | null>(null);
 const selectedNode = ref<GraphNode | null>(null);
 const selectedNodeId = ref("");
 const centerTable = ref("");
-const graphEngine = ref<GraphEngine>("svg");
+const overviewLevel = ref<"system" | "source" | "schema" | "object">("system");
+const graphEngine = ref<GraphEngine>("g6");
 const graphLoadNotice = ref("");
 const diagnosticWarnings = ref<string[]>([]);
 const graphData = ref<GraphData>({ nodes: [], edges: [] });
@@ -197,13 +198,15 @@ const filters = reactive({
 
 const locate = reactive({
   table: "",
+  physical_key: "",
+  search_results: [] as GraphTableSearchItem[],
   depth: 1 as 1 | 2,
   direction: "both" as "in" | "out" | "both"
 });
 
-const viewModeOptions = computed(() => options.view_modes.map(item => ({ label: item.label, value: item.code })));
+const viewModeOptions = computed(() => options.view_modes.filter(item => !item.deprecated && ["overview", "explore", "review"].includes(item.code)).map(item => ({ label: item.label, value: item.code })));
 const currentViewMode = computed<GraphViewMode | undefined>(() => options.view_modes.find(item => item.code === filters.view_mode));
-const graphLoadingText = computed(() => filters.view_mode === "lineage" ? "Loading lineage graph" : "Loading relation graph");
+const graphLoadingText = computed(() => filters.view_mode === "overview" ? "正在加载资产概览" : filters.view_mode === "explore" ? "正在加载关系探索" : "正在加载证据视图");
 const isErrorState = computed(() => ["auth_error", "permission_error", "api_error", "contract_error"].includes(state.value));
 const errorIcon = computed(() => {
   if (state.value === "auth_error") return "error";
@@ -230,6 +233,11 @@ function applyModeDefaults(mode: GraphViewMode) {
   filters.include_dependencies = mode.include_dependencies;
   filters.show_review_layer = Boolean(mode.show_review_layer);
   filters.layout_mode = mode.layout_mode;
+  if (mode.code === "overview") {
+    filters.group_by = "system";
+    filters.confidence = "";
+    filters.validation_status = "";
+  }
 }
 
 function changeViewMode(value: string) {
@@ -247,8 +255,8 @@ function applyViewMode() {
   const mode = currentViewMode.value;
   if (!mode) return;
   applyModeDefaults(mode);
-  if (mode.requires_table) {
-    if (locate.table.trim()) {
+  if (mode.code === "explore" || mode.requires_table) {
+    if (locate.physical_key || locate.table.trim()) {
       loadChain();
     } else {
       refreshGraphOnly();
@@ -298,7 +306,8 @@ function applyRouteQueryFilters() {
 
 function routeViewMode() {
   const code = routeQueryText(route.query.view_mode).trim();
-  return options.view_modes.find(item => item.code === code);
+  const selected = options.view_modes.find(item => item.code === code);
+  return selected?.deprecated ? options.view_modes.find(item => item.code === "overview") : selected;
 }
 
 // 108号 P0-01：筛选默认值只来自后端 options.view_modes，前端不猜测状态
@@ -308,7 +317,7 @@ async function loadOptions() {
     const res = await getGraphOptions();
     Object.assign(options, res.data);
     optionsReady.value = true;
-    const mode = routeViewMode() || currentViewMode.value || options.view_modes.find(item => item.code === "table") || options.view_modes[0];
+    const mode = routeViewMode() || options.view_modes.find(item => item.code === "overview") || currentViewMode.value || options.view_modes.find(item => item.code === "table") || options.view_modes[0];
     if (mode) {
       filters.view_mode = mode.code;
       applyModeDefaults(mode);
@@ -337,6 +346,24 @@ async function loadDiagnostics() {
   }
 }
 
+async function loadCascadeOptions() {
+  if (filters.view_mode !== "overview") return;
+  try {
+    const res = await getGraphFilterOptions({
+      system_code: filters.system_code || undefined,
+      source_code: filters.source_code || undefined,
+      schema: filters.schema || undefined,
+      next_level: overviewLevel.value
+    });
+    if (overviewLevel.value === "system") options.systems = res.data.items.map(item => item.value);
+    if (overviewLevel.value === "source") options.sources = res.data.items.map(item => item.value);
+    if (overviewLevel.value === "schema") options.schemas = res.data.items.map(item => item.value);
+    if (overviewLevel.value === "object") options.domains = res.data.business_domains.map(item => item.value);
+  } catch {
+    // 主概览请求仍会返回可见错误，级联选项失败不覆盖主状态。
+  }
+}
+
 function emptyState() {
   const hasFilters = Boolean(
     filters.system_code || filters.source_code || filters.schema || filters.domain
@@ -351,6 +378,22 @@ async function loadData() {
   centerTable.value = "";
   selectedNodeId.value = "";
   try {
+    if (filters.view_mode === "overview") {
+      await loadCascadeOptions();
+      const overview = await getGraphOverview({
+        level: overviewLevel.value,
+        system_code: filters.system_code || undefined,
+        source_code: filters.source_code || undefined,
+        schema: filters.schema || undefined,
+        domain: filters.domain || undefined,
+        limit: 80
+      });
+      const data = overview.data.data;
+      graphData.value = data;
+      graphMeta.value = data.meta || null;
+      state.value = data.nodes.length ? "success" : "empty";
+      return;
+    }
     const res = await getGraph({
       system_code: filters.system_code || undefined,
       source_code: filters.source_code || undefined,
@@ -389,13 +432,36 @@ async function loadData() {
 }
 
 async function loadChain() {
-  const lineageMode = options.view_modes.find(item => item.code === "lineage");
-  if (lineageMode) {
-    filters.view_mode = lineageMode.code;
-    applyModeDefaults(lineageMode);
+  const exploreMode = options.view_modes.find(item => item.code === "explore");
+  if (exploreMode) {
+    filters.view_mode = exploreMode.code;
+    applyModeDefaults(exploreMode);
   }
-  const table = locate.table.trim();
-  if (!table) {
+  let physicalKey = locate.physical_key.trim();
+  if (!physicalKey && locate.table.trim()) {
+    try {
+      const search = await searchGraphTables({
+        q: locate.table.trim(),
+        system_code: filters.system_code || undefined,
+        source_code: filters.source_code || undefined,
+        schema: filters.schema || undefined,
+        limit: 30
+      });
+      locate.search_results = search.data.items;
+      if (search.data.items.length !== 1) {
+        ElMessage.warning(search.data.items.length ? "找到多个同名资产，请补充系统、数据源或 Owner 后再展开" : "未找到唯一中心资产");
+        return;
+      }
+      physicalKey = search.data.items[0].physical_key;
+      locate.physical_key = physicalKey;
+    } catch (err) {
+      const info = classifyGraphError(err);
+      state.value = info.state;
+      errorInfo.value = info;
+      return;
+    }
+  }
+  if (!physicalKey) {
     ElMessage.warning("请输入要定位的表名");
     return;
   }
@@ -403,7 +469,7 @@ async function loadChain() {
   state.value = "loading";
   try {
     const res = await getGraphNeighbors({
-      table,
+      center_physical_key: physicalKey,
       depth: locate.depth,
       direction: locate.direction,
       limit: filters.limit
@@ -416,9 +482,9 @@ async function loadChain() {
     graphData.value = res.data;
     graphMeta.value = res.data.meta || null;
     applyGraphLoadPolicy(res.data);
-    centerTable.value = table;
-    selectedNodeId.value = res.data.nodes[0]?.id || table;
-    filters.keyword = table;
+    centerTable.value = physicalKey;
+    selectedNodeId.value = res.data.nodes[0]?.id || physicalKey;
+    filters.keyword = physicalKey;
     filters.layout_mode = "radial";
     if (res.data.nodes.length && res.data.edges.length) {
       state.value = "success";
@@ -439,12 +505,15 @@ async function loadChain() {
 
 function backToGlobal() {
   locate.table = "";
+  locate.physical_key = "";
+  locate.search_results = [];
   centerTable.value = "";
   selectedNodeId.value = "";
-  const tableMode = options.view_modes.find(item => item.code === "table");
-  if (tableMode) {
-    filters.view_mode = tableMode.code;
-    applyModeDefaults(tableMode);
+  const overviewMode = options.view_modes.find(item => item.code === "overview");
+  if (overviewMode) {
+    filters.view_mode = overviewMode.code;
+    overviewLevel.value = "system";
+    applyModeDefaults(overviewMode);
   }
   loadData();
 }
@@ -459,19 +528,22 @@ function showSamplePass() {
 }
 
 function resetFilters() {
-  const tableMode = options.view_modes.find(item => item.code === "table");
-  filters.view_mode = tableMode?.code || "table";
-  if (tableMode) applyModeDefaults(tableMode);
+  const overviewMode = options.view_modes.find(item => item.code === "overview") || options.view_modes.find(item => item.code === "table");
+  filters.view_mode = overviewMode?.code || "overview";
+  overviewLevel.value = "system";
+  if (overviewMode) applyModeDefaults(overviewMode);
   filters.system_code = "";
   filters.source_code = "";
   filters.schema = "";
   filters.domain = "";
-  filters.validation_status = tableMode?.validation_status || "";
-  filters.confidence = tableMode?.confidence || "A";
+  filters.validation_status = overviewMode?.validation_status || "";
+  filters.confidence = overviewMode?.confidence || "";
   filters.keyword = "";
   filters.limit = 120;
   filters.aggregate_groups = false;
   locate.table = "";
+  locate.physical_key = "";
+  locate.search_results = [];
   locate.depth = 1;
   locate.direction = "both";
   errorInfo.value = null;
@@ -485,8 +557,10 @@ function retryPage() {
 
 // 108号 P1-05：表详情跳转保留 system/source 物理来源上下文
 function openTable(node: GraphNode) {
-  const schema = node.schema_name || (node.display_id || node.id).split(".")[0];
-  const table = node.table_name || (node.display_id || node.id).split(".").slice(1).join(".");
+  const rawId = String(node.display_id || node.id || "");
+  const parts = rawId ? rawId.split(".") : [];
+  const schema = node.schema_name || parts[0] || "";
+  const table = node.table_name || parts.slice(1).join(".");
   if (!schema || !table) {
     ElMessage.warning("该节点缺少 schema/table 信息，无法打开表详情");
     return;
@@ -498,6 +572,28 @@ function openTable(node: GraphNode) {
 }
 
 function selectNode(node: GraphNode) {
+  if (filters.view_mode === "overview" && node.is_aggregate) {
+    if (node.category === "system") {
+      filters.system_code = node.system_code || "";
+      filters.source_code = "";
+      filters.schema = "";
+      overviewLevel.value = "source";
+    } else if (node.category === "source") {
+      filters.source_code = node.source_code || "";
+      filters.schema = "";
+      overviewLevel.value = "schema";
+    } else if (node.category === "schema") {
+      filters.schema = node.schema_name || "";
+      overviewLevel.value = "object";
+    } else {
+      selectedNode.value = node;
+      selectedNodeId.value = node.id;
+      nodeDrawerVisible.value = true;
+      return;
+    }
+    void loadData();
+    return;
+  }
   selectedNode.value = node;
   selectedNodeId.value = node.id;
   nodeDrawerVisible.value = true;

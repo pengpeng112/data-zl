@@ -13,6 +13,8 @@ from __future__ import annotations
 import hashlib
 import re
 from itertools import zip_longest
+from collections import defaultdict
+from time import perf_counter
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -22,6 +24,7 @@ from sqlalchemy.orm import Session
 from ...core.config import settings
 from ...core.db import get_db
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
+from ...models.asset_system import AssetDataSource, AssetSourceSchema, AssetSystem
 from ...models.candidate import AssetCandidateRelation
 from ...models.lineage import AssetViewDependency
 from ...schemas.common import ApiResponse
@@ -32,6 +35,10 @@ from ...schemas.graph import (
     GraphMeta,
     GraphNode,
     GraphOptions,
+    GraphOverviewData,
+    GraphFilterOptionsData,
+    GraphFilterOption,
+    GraphTableSearchItem,
 )
 from ...services.relation_identity import resolve_endpoint, split_qualified_name
 
@@ -192,12 +199,12 @@ def _candidate_edge_id(cr: AssetCandidateRelation) -> str:
 
 GRAPH_VIEW_MODES = [
     {
-        "code": "system",
-        "label": "系统关系",
-        "description": "按 HIS、ODS 等系统大类观察资产关系。",
+        "code": "overview",
+        "label": "资产概览",
+        "description": "按系统、数据源、Schema/Owner 和对象层级浏览完整资产规模。",
         "group_by": "system",
         "layout_mode": "grouped",
-        "confidence": "A",
+        "confidence": None,
         "validation_status": None,
         "include_candidates": False,
         "include_dependencies": False,
@@ -205,48 +212,9 @@ GRAPH_VIEW_MODES = [
         "requires_table": False,
     },
     {
-        "code": "domain",
-        "label": "业务域",
-        "description": "按患者、就诊、医嘱、检验、检查、费用、药品等业务域聚合关系。",
-        "group_by": "domain",
-        "layout_mode": "grouped",
-        "confidence": "A",
-        "validation_status": None,
-        "include_candidates": False,
-        "include_dependencies": False,
-        "show_review_layer": False,
-        "requires_table": False,
-    },
-    {
-        "code": "schema",
-        "label": "Schema 聚合",
-        "description": "按 MEDREC、ORDADM、LAB、EXAM、COMM 等 schema/owner 聚合关系。",
-        "group_by": "schema",
-        "layout_mode": "grouped",
-        "confidence": "A",
-        "validation_status": None,
-        "include_candidates": False,
-        "include_dependencies": False,
-        "show_review_layer": False,
-        "requires_table": False,
-    },
-    {
-        "code": "table",
-        "label": "表级图谱",
-        "description": "表级关系图谱，展示库/owner 下表与表之间的正式关系。",
-        "group_by": "schema",
-        "layout_mode": "layered",
-        "confidence": "A",
-        "validation_status": None,
-        "include_candidates": False,
-        "include_dependencies": False,
-        "show_review_layer": False,
-        "requires_table": False,
-    },
-    {
-        "code": "lineage",
-        "label": "上下游链路",
-        "description": "单表上下游链路，围绕指定表展示直接上下游或两跳链路，并支持按边方向过滤。",
+        "code": "explore",
+        "label": "关系探索",
+        "description": "先选择唯一中心资产，再按方向和 1/2 跳展开关系。",
         "group_by": "schema",
         "layout_mode": "radial",
         "confidence": "A",
@@ -257,30 +225,31 @@ GRAPH_VIEW_MODES = [
         "requires_table": True,
     },
     {
-        "code": "deferred",
-        "label": "待分析层",
-        "description": "D 类跨系统关系和候选关系待分析视图，不进入正式图谱。",
-        "group_by": "schema",
-        "layout_mode": "layered",
-        "confidence": "D",
-        "validation_status": None,
-        "include_candidates": True,
-        "include_dependencies": False,
-        "show_review_layer": True,
-        "requires_table": False,
-    },
-    {
         "code": "review",
-        "label": "证据复核",
-        "description": "展示候选、依赖和 D 类待分析关系。",
+        "label": "证据审核",
+        "description": "按置信度、验证状态和证据来源查看正式、候选、冲突及延后关系。",
         "group_by": "schema",
-        "layout_mode": "layered",
+        "layout_mode": "grouped",
         "confidence": None,
         "validation_status": None,
         "include_candidates": True,
         "include_dependencies": True,
         "show_review_layer": True,
         "requires_table": False,
+    },
+    {
+        "code": "table",
+        "label": "表级图谱（兼容）",
+        "description": "旧版表级图谱接口兼容模式；前端不作为任务入口展示。",
+        "group_by": "schema",
+        "layout_mode": "layered",
+        "confidence": "A",
+        "validation_status": None,
+        "include_candidates": False,
+        "include_dependencies": False,
+        "show_review_layer": False,
+        "requires_table": False,
+        "deprecated": True,
     },
 ]
 
@@ -297,6 +266,14 @@ def _table_full(schema_name: str | None, table_name: str | None) -> str | None:
     if not schema_name or not table_name:
         return None
     return f"{schema_name}.{table_name}"
+
+
+def _object_type(table: AssetTable | None, table_name: str | None = None) -> str:
+    """统一对象类型，避免前端把表、视图都画成同一类。"""
+    role = (table.table_role if table else "") or ""
+    name = (table.table_name if table else table_name) or ""
+    lowered = f"{role} {name}".lower()
+    return "view" if "view" in lowered or "视图" in role or name.upper().startswith("V_") else "table"
 
 
 def _table_scope_names(
@@ -373,6 +350,15 @@ def _graph_node_for(
         include_status=table.include_status if table else None,
         review_status=table.review_status if table else None,
         note=table.note if table else None,
+        object_type=_object_type(table, table_name),
+        technical_name=_table_full(schema_name, table_name),
+        metadata_match=(
+            "exact"
+            if table and (table.namespace_name or "") == (namespace_name or "")
+            else "namespace_compatible"
+            if table
+            else "unresolved"
+        ),
     )
 
 
@@ -412,10 +398,23 @@ def _table_map_by_physical_key(
         return {}
     rows = db.scalars(select(AssetTable).where(or_(*conds))).all()
     result: dict[str, AssetTable] = {}
+    logical_candidates: dict[tuple[str, str, str, str], list[AssetTable]] = defaultdict(list)
     for t in rows:
         key = _physical_key(t.system_code, t.source_code, t.namespace_name, t.schema_name, t.table_name)
         if key:
             result[key] = t
+        if t.system_code and t.source_code and t.schema_name and t.table_name:
+            logical_candidates[(t.system_code, t.source_code, t.schema_name, t.table_name)].append(t)
+
+    # 关系 namespace 为空而资产 namespace=schema 是当前生产的主要历史差异。
+    # 只在四元组唯一时把兼容资产映射到关系端点键；多候选保持未富化，避免误配。
+    for sys_c, src_c, ns, schema, table in endpoints:
+        endpoint_key = _physical_key(sys_c, src_c, ns, schema, table)
+        if not endpoint_key or endpoint_key in result or not schema or not table:
+            continue
+        candidates = logical_candidates.get((sys_c, src_c, schema, table), [])
+        if ns in (None, "", schema) and len(candidates) == 1:
+            result[endpoint_key] = candidates[0]
     return result
 
 
@@ -625,6 +624,7 @@ def _nodes_and_edges_for_relations(
     node_meta: dict[str, tuple[str | None, str | None, str | None, str | None, str | None, str | None]] = {}
     edges: list[GraphEdge] = []
     unresolved: list[tuple[int, str]] = []
+    _seen_edge_ids: set[str] = set()
 
     for r in rows:
         from_ep = _resolve_relation_endpoint(db, r, "from")
@@ -639,11 +639,21 @@ def _nodes_and_edges_for_relations(
             unresolved.append((r.id, "to_endpoint_incomplete"))
         if not from_key or not to_key:
             continue
+        # 过滤自环边（from==to）：G6 布局/连线对自环边处理异常，会导致 .split 报错
+        if from_key == to_key:
+            unresolved.append((r.id, "self_loop_skipped"))
+            continue
         if from_key not in node_meta:
             node_meta[from_key] = from_ep
         if to_key not in node_meta:
             node_meta[to_key] = to_ep
-        edges.append(_build_edge(r, from_key, to_key, f_disp, t_disp, from_ep, to_ep))
+        edge = _build_edge(r, from_key, to_key, f_disp, t_disp, from_ep, to_ep)
+        # 边 ID 去重：同 ID 的边只保留第一条，避免 G6 addEdge 抛 "Edge already exists"
+        if edge.id not in _seen_edge_ids:
+            edges.append(edge)
+            _seen_edge_ids.add(edge.id)
+        else:
+            unresolved.append((r.id, "duplicate_edge_id_skipped"))
 
     endpoints = {(v[0], v[1], v[2], v[3], v[4]) for v in node_meta.values()}
     table_map = _table_map_by_physical_key(db, endpoints)
@@ -674,6 +684,12 @@ def _graph_meta(
     truncated: bool,
     unresolved_count: int,
     filters: dict[str, Any],
+    *,
+    query_ms: float | None = None,
+    enrichment: dict[str, int] | None = None,
+    warnings: list[str] | None = None,
+    center_physical_key: str | None = None,
+    direction_semantics: str | None = None,
 ) -> GraphMeta:
     return GraphMeta(
         total_relations=total_relations,
@@ -684,6 +700,13 @@ def _graph_meta(
         filters=filters,
         data_version=_data_version(),
         backend_build_id=settings.build_id,
+        query_ms=query_ms,
+        matched_total=matched_relations,
+        returned_nodes=None,
+        enrichment=enrichment or {},
+        warnings=warnings or [],
+        center_physical_key=center_physical_key,
+        direction_semantics=direction_semantics,
     )
 
 
@@ -694,6 +717,13 @@ def _data_version() -> str:
 
 def _filters_dict(**kwargs) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not None and v is not False}
+
+
+def _enrichment_stats(nodes: list[GraphNode]) -> dict[str, int]:
+    stats: dict[str, int] = defaultdict(int)
+    for node in nodes:
+        stats[node.metadata_match or "unresolved"] += 1
+    return dict(stats)
 
 
 def _build_relation_filter_stmt(
@@ -938,6 +968,7 @@ def graph(
                 truncated,
                 len(unresolved_set),
                 filters,
+                enrichment=_enrichment_stats(nodes),
             ),
         )
     )
@@ -1013,6 +1044,7 @@ def edge_detail(
 def neighbors(
     table: str | None = Query(None, description="旧参数：表名，如 HIS.PAT_VISIT（仅物理唯一时兼容）"),
     physical_key: str | None = Query(None, description="完整物理键 system|source|namespace|schema|table"),
+    center_physical_key: str | None = Query(None, description="关系探索中心物理键（physical_key 的明确别名）"),
     system_code: str | None = Query(None),
     source_code: str | None = Query(None),
     schema: str | None = Query(None),
@@ -1023,7 +1055,7 @@ def neighbors(
 ) -> ApiResponse[GraphData]:
     target = _resolve_neighbor_target(
         db,
-        physical_key=physical_key,
+        physical_key=center_physical_key or physical_key,
         system_code=system_code,
         source_code=source_code,
         schema=schema,
@@ -1107,9 +1139,235 @@ def neighbors(
                 truncated=len(collected) > limit,
                 unresolved_count=0,
                 filters={"physical_key": target, "depth": depth, "direction": direction, "limit": limit},
+                enrichment=_enrichment_stats(nodes),
+                center_physical_key=target,
+                direction_semantics="all/in/out",
             ),
         )
     )
+
+
+def _parse_parent_path(value: str | None) -> tuple[str | None, str | None, str | None, str | None, str | None]:
+    if not value:
+        return None, None, None, None, None
+    parts = value.split("|")
+    if len(parts) != 5:
+        raise HTTPException(status_code=422, detail="parent_physical_key 格式应为 system|source|namespace|schema|table")
+    return tuple(parts)  # type: ignore[return-value]
+
+
+def _object_type_name(table: AssetTable) -> str:
+    return _object_type(table)
+
+
+def _apply_asset_filters(stmt, *, system_code: str | None, source_code: str | None, schema_name: str | None, domain: str | None, object_type: str | None):
+    if system_code:
+        stmt = stmt.where(AssetTable.system_code == system_code)
+    if source_code:
+        stmt = stmt.where(AssetTable.source_code == source_code)
+    if schema_name:
+        stmt = stmt.where(AssetTable.schema_name == schema_name)
+    if domain:
+        stmt = stmt.where(AssetTable.domain == domain)
+    if object_type == "view":
+        stmt = stmt.where(or_(AssetTable.table_role.ilike("%view%"), AssetTable.table_role.ilike("%视图%"), AssetTable.table_name.ilike("V\\_%", escape="\\")))
+    elif object_type == "table":
+        stmt = stmt.where(~or_(AssetTable.table_role.ilike("%view%"), AssetTable.table_role.ilike("%视图%"), AssetTable.table_name.ilike("V\\_%", escape="\\")))
+    return stmt
+
+
+def _overview_id(level: str, values: tuple[str | None, ...]) -> str:
+    return "overview|" + level + "|" + "|".join(value or "" for value in values)
+
+
+def _overview_node(
+    level: str,
+    values: tuple[str | None, ...],
+    label: str,
+    count: int,
+    *,
+    path: str | None = None,
+) -> GraphNode:
+    system_code = values[0] if values else None
+    source_code = values[1] if len(values) > 1 else None
+    schema_name = values[2] if len(values) > 2 else None
+    return GraphNode(
+        id=_overview_id(level, values),
+        physical_key=_overview_id(level, values),
+        display_id=label,
+        label=label,
+        system_code=system_code,
+        source_code=source_code,
+        schema_name=schema_name,
+        table_name=values[3] if len(values) > 3 else None,
+        technical_name=label,
+        object_type="aggregate",
+        category=level,
+        asset_count=count,
+        child_count=count,
+        path=path,
+        is_aggregate=True,
+    )
+
+
+@router.get("/overview", response_model=ApiResponse[GraphOverviewData], summary="服务端完整资产概览")
+def overview(
+    level: str = Query("system", pattern="^(system|source|schema|object)$"),
+    parent_physical_key: str | None = Query(None),
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    schema: str | None = Query(None),
+    domain: str | None = Query(None),
+    object_type: str | None = Query(None, pattern="^(table|view)$"),
+    limit: int = Query(80, ge=1, le=80),
+    db: Session = Depends(get_db),
+) -> ApiResponse[GraphOverviewData]:
+    started = perf_counter()
+    p_sys, p_src, _p_ns, p_schema, _p_table = _parse_parent_path(parent_physical_key)
+    system_code, source_code, schema = system_code or p_sys, source_code or p_src, schema or p_schema
+    if level == "source" and not system_code:
+        raise HTTPException(status_code=422, detail="source 概览必须提供 system_code 或 parent_physical_key")
+    if level in ("schema", "object") and (not system_code or not source_code):
+        raise HTTPException(status_code=422, detail="schema/object 概览必须提供 system_code 和 source_code")
+    if level == "object" and not schema:
+        raise HTTPException(status_code=422, detail="object 概览必须提供 schema")
+    base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=domain, object_type=object_type)
+    matched_assets = db.scalar(select(func.count()).select_from(base.order_by(None).subquery())) or 0
+    nodes: list[GraphNode] = []
+    edges: list[GraphEdge] = []
+    if level == "object":
+        parent_id = _overview_id("schema", (system_code, source_code, schema))
+        parent_label = schema or "未命名 Owner"
+        parent_schema = db.scalar(
+            select(AssetSourceSchema.schema_name_cn).where(
+                AssetSourceSchema.source_code == source_code,
+                AssetSourceSchema.schema_name == schema,
+            )
+        ) if source_code and schema else None
+        nodes.append(
+            _overview_node(
+                "schema",
+                (system_code, source_code, schema),
+                parent_schema or parent_label,
+                matched_assets,
+                path=parent_id,
+            )
+        )
+        rows = db.scalars(base.order_by(AssetTable.schema_name, AssetTable.table_name).limit(limit)).all()
+        for table in rows:
+            key = _physical_key(table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name)
+            if not key:
+                continue
+            node = _graph_node_for(key, _display_id(table.schema_name, table.table_name), table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name, table)
+            node.asset_count, node.child_count, node.object_type, node.technical_name = 1, 1, _object_type_name(table), _table_full(table.schema_name, table.table_name)
+            nodes.append(node)
+            edges.append(GraphEdge(id=f"overview-edge:{parent_id}->{key}", source=parent_id, target=key, label="包含", relation_type="hierarchy", relation_layer="hierarchy"))
+    else:
+        fields = {
+            "system": (AssetTable.system_code,),
+            "source": (AssetTable.system_code, AssetTable.source_code),
+            "schema": (AssetTable.system_code, AssetTable.source_code, AssetTable.schema_name),
+        }[level]
+        stmt = base.with_only_columns(*fields, func.count(AssetTable.id).label("asset_count")).group_by(*fields).order_by(*fields).limit(limit)
+        system_names = {
+            row[0]: row[1]
+            for row in db.execute(select(AssetSystem.system_code, AssetSystem.system_name_cn)).all()
+            if row[0]
+        }
+        source_names = {
+            row[0]: row[1]
+            for row in db.execute(select(AssetDataSource.source_code, AssetDataSource.source_name_cn)).all()
+            if row[0]
+        }
+        schema_names = {
+            (row[0], row[1]): row[2]
+            for row in db.execute(
+                select(AssetSourceSchema.source_code, AssetSourceSchema.schema_name, AssetSourceSchema.schema_name_cn)
+            ).all()
+            if row[0] and row[1] and row[2]
+        }
+        for row in db.execute(stmt).all():
+            values = tuple(row[i] for i in range(len(fields)))
+            technical_name = str(values[-1] or "未命名")
+            if level == "system":
+                label = system_names.get(values[0], technical_name)
+            elif level == "source":
+                label = source_names.get(values[1], technical_name)
+            else:
+                label = schema_names.get((values[1], values[2]), technical_name)
+            nodes.append(
+                _overview_node(
+                    level,
+                    values,
+                    label,
+                    int(row[-1] or 0),
+                    path="|".join(value or "" for value in values),
+                )
+            )
+    meta = _graph_meta(matched_assets, matched_assets, len(nodes), matched_assets > len(nodes), 0, {"level": level, "system_code": system_code, "source_code": source_code, "schema": schema, "domain": domain, "object_type": object_type, "limit": limit}, query_ms=round((perf_counter() - started) * 1000, 2), warnings=["结果已按层级聚合，字段详情请打开对象抽屉"] if level != "object" else [])
+    meta.returned_nodes = len(nodes)
+    meta.estimated_total = matched_assets
+    next_level = {"system": "source", "source": "schema", "schema": "object", "object": None}[level]
+    return ApiResponse(data=GraphOverviewData(level=level, next_level=next_level, selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v}, data=GraphData(nodes=nodes, edges=edges, meta=meta)))
+
+
+@router.get("/filter-options", response_model=ApiResponse[GraphFilterOptionsData], summary="级联图谱筛选项")
+def filter_options(
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    schema: str | None = Query(None),
+    next_level: str = Query("system", pattern="^(system|source|schema|object)$"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[GraphFilterOptionsData]:
+    if next_level == "source" and not system_code:
+        raise HTTPException(status_code=422, detail="source 级联选项需要 system_code")
+    if next_level in ("schema", "object") and (not system_code or not source_code):
+        raise HTTPException(status_code=422, detail="schema/object 级联选项需要 system_code 和 source_code")
+    base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=None, object_type=None)
+    field = {"system": AssetTable.system_code, "source": AssetTable.source_code, "schema": AssetTable.schema_name, "object": AssetTable.table_name}[next_level]
+    rows = db.execute(base.with_only_columns(field, func.count(AssetTable.id)).group_by(field).order_by(field)).all()
+    domain_rows = db.execute(base.with_only_columns(AssetTable.domain, func.count(AssetTable.id)).where(AssetTable.domain.isnot(None)).group_by(AssetTable.domain).order_by(AssetTable.domain)).all()
+    type_rows = db.scalars(base).all()
+    type_counts: dict[str, int] = defaultdict(int)
+    for table in type_rows:
+        type_counts[_object_type_name(table)] += 1
+    return ApiResponse(data=GraphFilterOptionsData(
+        selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v},
+        next_level=next_level,
+        items=[GraphFilterOption(value=str(row[0]), label=str(row[0]), count=int(row[1] or 0)) for row in rows if row[0]],
+        business_domains=[GraphFilterOption(value=str(row[0]), label=str(row[0]), count=int(row[1] or 0)) for row in domain_rows if row[0]],
+        object_types=[GraphFilterOption(value=k, label=k, count=v) for k, v in sorted(type_counts.items())],
+    ))
+
+
+@router.get("/tables/search", response_model=ApiResponse[dict[str, Any]], summary="物理资产搜索")
+def table_search(
+    q: str = Query(..., min_length=1, max_length=100),
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    schema: str | None = Query(None),
+    limit: int = Query(30, ge=1, le=30),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict[str, Any]]:
+    keyword = q.strip()
+    if not keyword:
+        raise HTTPException(status_code=422, detail="q 不能为空")
+    stmt = _apply_asset_filters(select(AssetTable).where(or_(AssetTable.table_name.ilike(f"%{keyword}%"), AssetTable.table_name_cn.ilike(f"%{keyword}%"), AssetTable.schema_name.ilike(f"%{keyword}%"), AssetTable.namespace_name.ilike(f"%{keyword}%"))), system_code=system_code, source_code=source_code, schema_name=schema, domain=None, object_type=None)
+    rows = db.scalars(stmt.order_by(AssetTable.system_code, AssetTable.source_code, AssetTable.schema_name, AssetTable.table_name).limit(limit * 3)).all()
+    logical_counts: dict[tuple[str | None, str | None], int] = defaultdict(int)
+    for table in rows:
+        logical_counts[(table.schema_name, table.table_name)] += 1
+    items: list[GraphTableSearchItem] = []
+    seen: set[str] = set()
+    for table in rows:
+        key = _physical_key(table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        items.append(GraphTableSearchItem(physical_key=key, display_name=table.table_name_cn or table.table_name or key, technical_name=_table_full(table.schema_name, table.table_name) or key, system_code=table.system_code, source_code=table.source_code, namespace_name=table.namespace_name, schema_name=table.schema_name, table_name=table.table_name, object_type=_object_type_name(table), business_domain=table.domain, column_count=table.column_count, ambiguous=logical_counts[(table.schema_name, table.table_name)] > 1))
+        if len(items) >= limit:
+            break
+    return ApiResponse(data={"items": [item.model_dump() for item in items], "total": len(items), "query": keyword})
 
 
 @router.get("/options", response_model=ApiResponse[GraphOptions], summary="图谱筛选项")

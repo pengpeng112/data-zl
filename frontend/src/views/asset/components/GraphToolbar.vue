@@ -3,58 +3,51 @@
     <div class="mode-row">
       <el-segmented :model-value="filters.view_mode" :options="viewModeOptions" @update:model-value="emit('view-mode-change', String($event))" />
       <div class="mode-controls">
-        <el-segmented :model-value="graphEngine" :options="engineOptions" @update:model-value="emit('engine-change', $event as GraphEngine)" />
-        <el-select v-model="filters.group_by" class="group-select" @change="emit('refresh')">
-          <el-option label="按系统大类分组" value="system" />
-          <el-option label="按数据源分组" value="source" />
-          <el-option label="按表空间分组" value="schema" />
-          <el-option label="按业务域分组" value="domain" />
-        </el-select>
+        <span class="graph-mode-note">{{ currentViewMode?.description || "选择任务模式开始" }}</span>
         <el-select v-model="filters.layout_mode" class="layout-select" @change="emit('refresh')">
-          <el-option label="分层布局" value="layered" />
-          <el-option label="泳道分组" value="grouped" />
-          <el-option label="链路环形" value="radial" />
+          <el-option label="自动布局" value="layered" />
+          <el-option label="分组布局" value="grouped" />
+          <el-option label="中心辐射" value="radial" />
         </el-select>
       </div>
     </div>
 
-    <div class="locate-row">
-      <el-input v-model="locate.table" placeholder="输入表名定位，如 MEDREC.PAT_VISIT" clearable @keyup.enter="emit('load-chain')" />
-      <el-segmented v-model="locate.depth" :options="depthOptions" @change="emit('load-chain')" />
-      <el-segmented v-model="locate.direction" class="direction-segmented" :options="directionOptions" @change="emit('load-chain')" />
-      <el-button type="primary" :loading="loading" @click="emit('load-chain')">定位链路</el-button>
-      <el-button @click="emit('back-global')">返回全局</el-button>
+    <div v-if="filters.view_mode === 'explore'" class="locate-row">
+      <el-input v-model="locate.table" placeholder="搜索中文名或技术表名，选择唯一中心资产" clearable @keyup.enter="emit('load-chain')" />
+      <el-segmented v-model="locate.depth" :disabled="!locate.physical_key" :options="depthOptions" @change="emit('load-chain')" />
+      <el-segmented v-model="locate.direction" :disabled="!locate.physical_key" class="direction-segmented" :options="directionOptions" @change="emit('load-chain')" />
+      <el-button type="primary" :loading="loading" @click="emit('load-chain')">展开关系</el-button>
+      <el-button @click="emit('back-global')">返回概览</el-button>
     </div>
 
     <div class="filter-grid">
-      <el-select v-model="filters.system_code" placeholder="系统大类" clearable filterable @change="emit('load-data')">
+      <el-select v-model="filters.system_code" placeholder="业务系统" clearable filterable @change="emit('load-data')">
         <el-option v-for="item in options.systems" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="filters.source_code" placeholder="系统库/数据源" clearable filterable @change="emit('load-data')">
+      <el-select v-model="filters.source_code" placeholder="数据源/数据库" clearable filterable @change="emit('load-data')">
         <el-option v-for="item in options.sources" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="filters.schema" placeholder="表空间" clearable filterable @change="emit('load-data')">
+      <el-select v-model="filters.schema" placeholder="Schema / Owner" clearable filterable @change="emit('load-data')">
         <el-option v-for="item in options.schemas" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="filters.domain" placeholder="业务域" clearable filterable @change="emit('load-data')">
+      <el-select v-model="filters.domain" placeholder="业务域（正交筛选）" clearable filterable @change="emit('load-data')">
         <el-option v-for="item in options.domains" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="filters.validation_status" placeholder="验证状态" clearable @change="emit('load-data')">
+      <el-select v-if="filters.view_mode === 'review'" v-model="filters.validation_status" placeholder="验证状态" clearable @change="emit('load-data')">
         <el-option v-for="item in options.validation_statuses" :key="item" :label="statusLabel(item)" :value="item" />
       </el-select>
-      <el-select v-model="filters.confidence" placeholder="关系等级" clearable @change="emit('load-data')">
+      <el-select v-if="filters.view_mode === 'review'" v-model="filters.confidence" placeholder="置信度" clearable @change="emit('load-data')">
         <el-option v-for="item in options.confidences" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-input v-model="filters.keyword" placeholder="搜索表名、中文名或关系端点" clearable @keyup.enter="emit('load-data')" @clear="emit('load-data')" />
+      <el-input v-if="filters.view_mode !== 'explore'" v-model="filters.keyword" placeholder="搜索资产或关系" clearable @keyup.enter="emit('load-data')" @clear="emit('load-data')" />
       <el-input-number v-model="filters.limit" :min="20" :max="500" :step="20" controls-position="right" />
-      <el-button type="primary" :loading="loading" @click="emit('load-data')">查询</el-button>
+      <el-button type="primary" :loading="loading" @click="emit('load-data')">应用筛选</el-button>
       <el-button @click="emit('reset')">重置</el-button>
     </div>
 
-    <div class="switch-row">
+    <div v-if="filters.view_mode === 'review'" class="switch-row">
       <el-checkbox v-model="filters.include_candidates" @change="emit('load-data')">候选关系</el-checkbox>
       <el-checkbox v-model="filters.include_dependencies" @change="emit('load-data')">视图依赖</el-checkbox>
-      <el-checkbox v-model="filters.aggregate_groups" @change="emit('refresh')">节点聚合</el-checkbox>
       <el-checkbox
         v-model="filters.show_review_layer"
         :disabled="!currentViewMode?.show_review_layer"
@@ -63,12 +56,6 @@
       <el-button text type="success" @click="emit('sample-pass')">只看通过关系</el-button>
     </div>
 
-    <div class="legend-row" aria-label="关系图例">
-      <span class="legend-item"><i class="swatch solid-a" />A 类高置信（实线）</span>
-      <span class="legend-item"><i class="swatch dashed-bc" />B/C 类（虚线琥珀）</span>
-      <span class="legend-item"><i class="swatch dashed-d" />D 类跨系统待验证（虚线灰紫）</span>
-      <span class="legend-item"><i class="swatch dashed-cand" />候选关系</span>
-    </div>
 
     <el-alert
       v-if="filters.show_review_layer"
@@ -87,7 +74,6 @@
       <el-tag type="info">依赖 {{ normalized.dependencyCount }}</el-tag>
       <el-tag v-if="normalized.reviewHiddenCount" type="danger" effect="plain">已隐藏 D/待分析 {{ normalized.reviewHiddenCount }}</el-tag>
       <el-tag v-if="selectedNodeId" type="success" effect="dark">已聚焦 {{ selectedNodeId }}</el-tag>
-      <el-tag v-for="item in normalized.topGroups" :key="item.name" effect="plain">{{ item.name }} {{ item.count }}</el-tag>
     </div>
     <div v-if="meta" class="meta-row" aria-label="图谱响应统计">
       <el-tag type="info" effect="plain">总数 {{ meta.total_relations }}</el-tag>
@@ -131,6 +117,8 @@ interface GraphFilters {
 
 interface LocateState {
   table: string;
+  physical_key?: string;
+  search_results?: unknown[];
   depth: 1 | 2;
   direction: "in" | "out" | "both";
 }
@@ -159,12 +147,8 @@ const emit = defineEmits<{
   "reset": [];
 }>();
 
-const engineOptions = [
-  { label: "内置 SVG", value: "svg" },
-  { label: "AntV G6", value: "g6" }
-];
-const depthOptions = [{ label: "直接上下游", value: 1 }, { label: "两跳链路", value: 2 }];
-const directionOptions = [{ label: "双向", value: "both" }, { label: "上游", value: "in" }, { label: "下游", value: "out" }];
+const depthOptions = [{ label: "1 跳：直接关联", value: 1 }, { label: "2 跳：扩展关联", value: 2 }];
+const directionOptions = [{ label: "全部方向", value: "both" }, { label: "引用它", value: "in" }, { label: "它引用", value: "out" }];
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
@@ -188,6 +172,7 @@ function statusLabel(status: string) {
 .mode-controls { display: flex; gap: 8px; align-items: center; }
 .group-select { width: 160px; }
 .layout-select { width: 130px; }
+.graph-mode-note { color: var(--text-secondary, #64748b); font-size: 12px; }
 .locate-row { display: grid; grid-template-columns: minmax(240px, 1fr) 210px 190px 90px 90px; gap: 8px; align-items: center; margin-bottom: 10px; }
 .direction-segmented { width: 190px; }
 .filter-grid { display: grid; grid-template-columns: 130px 150px 130px 150px 140px 110px minmax(220px, 1fr) 110px 76px 76px; gap: 8px; align-items: center; }

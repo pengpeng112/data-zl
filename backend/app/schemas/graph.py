@@ -36,6 +36,13 @@ class GraphNode(BaseModel):
     include_status: str | None = None
     review_status: str | None = None
     note: str | None = None
+    object_type: str | None = None
+    technical_name: str | None = None
+    metadata_match: str | None = None
+    asset_count: int | None = None
+    child_count: int | None = None
+    path: str | None = None
+    is_aggregate: bool = False
 
 
 class GraphFieldMapping(BaseModel):
@@ -101,6 +108,14 @@ class GraphMeta(BaseModel):
     filters: dict[str, Any] = Field(default_factory=dict)
     data_version: str | None = None
     backend_build_id: str | None = None
+    query_ms: float | None = None
+    matched_total: int | None = None
+    returned_nodes: int | None = None
+    estimated_total: int | None = None
+    enrichment: dict[str, int] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
+    center_physical_key: str | None = None
+    direction_semantics: str | None = None
 
 
 class GraphData(BaseModel):
@@ -125,6 +140,7 @@ class GraphViewMode(BaseModel):
     include_dependencies: bool = False
     show_review_layer: bool = False
     requires_table: bool = False
+    deprecated: bool = False
 
 
 class GraphOptions(BaseModel):
@@ -140,3 +156,48 @@ class GraphOptions(BaseModel):
     view_modes: list[GraphViewMode]
     default_mode: str | None = None
     backend_build_id: str | None = None
+
+
+class GraphOverviewData(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    level: str
+    next_level: str | None = None
+    selected_path: dict[str, str] = Field(default_factory=dict)
+    data: GraphData
+
+
+class GraphFilterOption(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    value: str
+    label: str
+    count: int = 0
+    disabled: bool = False
+
+
+class GraphFilterOptionsData(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    selected_path: dict[str, str] = Field(default_factory=dict)
+    next_level: str
+    items: list[GraphFilterOption] = Field(default_factory=list)
+    business_domains: list[GraphFilterOption] = Field(default_factory=list)
+    object_types: list[GraphFilterOption] = Field(default_factory=list)
+
+
+class GraphTableSearchItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    physical_key: str
+    display_name: str
+    technical_name: str
+    system_code: str | None = None
+    source_code: str | None = None
+    namespace_name: str | None = None
+    schema_name: str | None = None
+    table_name: str | None = None
+    object_type: str = "table"
+    business_domain: str | None = None
+    column_count: int | None = None
+    ambiguous: bool = False

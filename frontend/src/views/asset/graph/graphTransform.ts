@@ -4,7 +4,7 @@ const GRAPH_COLOR_NEUTRAL = "#475569";
 const GRAPH_COLOR_NEUTRAL_LIGHT = "#94a3b8";
 const GRAPH_COLOR_NEUTRAL_DARK = "#334155";
 
-export type GraphNodeType = "system" | "schema" | "domain" | "table";
+export type GraphNodeType = "system" | "source" | "schema" | "domain" | "table" | "view" | "aggregate";
 
 export type GraphNode = {
   id: string;
@@ -18,6 +18,7 @@ export type GraphNode = {
   role?: string;
   status?: string;
   count?: number;
+  objectType?: string;
 };
 
 
@@ -33,9 +34,12 @@ export type GraphNodeStyle = {
 
 export const GRAPH_NODE_TYPE_STYLE: Record<GraphNodeType, GraphNodeStyle> = {
   system: { fill: "#0f3a66", stroke: "#00a6b8", textColor: "#ffffff", shape: "roundRect", size: [168, 58] },
+  source: { fill: "#155e75", stroke: "#22d3ee", textColor: "#ffffff", shape: "ellipse", size: [188, 62] },
   schema: { fill: "#00a6b8", stroke: "#0f3a66", textColor: "#ffffff", shape: "roundRect", size: [148, 52] },
   domain: { fill: "#d97706", stroke: "#92400e", textColor: "#ffffff", shape: "ellipse", size: [142, 50] },
-  table: { fill: GRAPH_COLOR_NEUTRAL, stroke: GRAPH_COLOR_NEUTRAL_DARK, textColor: "#ffffff", shape: "rect", size: [126, 42] }
+  table: { fill: GRAPH_COLOR_NEUTRAL, stroke: GRAPH_COLOR_NEUTRAL_DARK, textColor: "#ffffff", shape: "rect", size: [220, 74] },
+  view: { fill: "#4338ca", stroke: "#a5b4fc", textColor: "#ffffff", shape: "roundRect", size: [220, 74] },
+  aggregate: { fill: "#1e293b", stroke: "#38bdf8", textColor: "#ffffff", shape: "roundRect", size: [190, 68] }
 };
 
 export function graphNodeStyle(type: GraphNodeType): GraphNodeStyle {
@@ -71,20 +75,24 @@ export function isDeferredNode(node: Partial<GraphNode & ApiGraphNode>) {
 }
 
 export function graphNodeVisualStyle(node: Partial<GraphNode & ApiGraphNode>): GraphNodeStyle {
-  const base = graphNodeStyle(node.type || "table");
-  if ((node.type || "table") === "table" && isExcludedNode(node)) {
+  const aggregateType = node.is_aggregate && ["system", "source", "schema", "domain"].includes(String(node.category))
+    ? String(node.category) as GraphNodeType
+    : "aggregate";
+  const inferredType: GraphNodeType = node.type || (node.object_type === "view" ? "view" : node.is_aggregate ? aggregateType : "table");
+  const base = graphNodeStyle(inferredType);
+  if (inferredType === "table" && isExcludedNode(node)) {
     return { ...base, fill: GRAPH_COLOR_NEUTRAL_LIGHT, stroke: GRAPH_COLOR_NEUTRAL, textColor: "#ffffff", shape: "rect", size: [118, 38] };
   }
-  if ((node.type || "table") === "table" && isDeferredNode(node)) {
+  if (inferredType === "table" && isDeferredNode(node)) {
     return { ...base, fill: "#7c6aa6", stroke: "#5b4b7a", textColor: "#ffffff", shape: "roundRect", size: [132, 44], lineDash: [8, 5], opacity: 0.78 };
   }
-  if ((node.type || "table") === "table" && isCandidateNode(node)) {
+  if (inferredType === "table" && isCandidateNode(node)) {
     return { ...base, fill: "#d97706", stroke: "#92400e", textColor: "#ffffff", shape: "roundRect", size: [132, 44] };
   }
-  if ((node.type || "table") === "table" && isCoreFactNode(node)) {
+  if (inferredType === "table" && isCoreFactNode(node)) {
     return { ...base, fill: "#0f3a66", stroke: "#00d5ff", shape: "diamond", size: [154, 54] };
   }
-  if ((node.type || "table") === "table" && isDimensionNode(node)) {
+  if (inferredType === "table" && isDimensionNode(node)) {
     return { ...base, fill: "#00a6b8", stroke: "#0f3a66", shape: "roundRect", size: [138, 46] };
   }
   return base;

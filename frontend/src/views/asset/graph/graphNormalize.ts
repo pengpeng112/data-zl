@@ -46,6 +46,7 @@ function displayName(node: GraphNode) {
 }
 
 function groupName(node: GraphNode, groupBy: GraphGroupBy) {
+  if (node.is_aggregate && node.category) return node.category;
   if (groupBy === "system") return node.system_code || "未分系统";
   if (groupBy === "source") return node.source_code || node.source || "未分数据源";
   if (groupBy === "domain") return node.business_domain || node.domain || "未分业务域";

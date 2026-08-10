@@ -57,6 +57,8 @@ const emit = defineEmits<{
 
 const containerRef = ref<HTMLDivElement>();
 let graph: G6Graph | null = null;
+let renderVersion = 0;
+let renderQueue: Promise<void> = Promise.resolve();
 
 const transformed = computed(() => transformGraphByMode({ nodes: props.nodes, edges: props.edges }, props.viewMode, props.showReviewLayer));
 
@@ -69,17 +71,20 @@ const normalized = computed(() => normalizeGraphData(props.nodes, props.edges, {
 }));
 
 function nodeGroup(node: any) {
-  return node.category || node.schema_name || node.system_code || node.id.split(".")[0] || "UNKNOWN";
+  const id = String(node.id || "");
+  return node.category || node.schema_name || node.system_code || (id ? id.split(".")[0] : "") || "UNKNOWN";
 }
 
 function nodeLabel(node: any) {
-  const raw = node.table_name || node.label || node.id;
-  return raw.length > 18 ? `${raw.slice(0, 16)}...` : raw;
-}
-
-function nodeMeta(node: any) {
-  if (node.isAggregate) return `${node.count} 张表`;
-  return [node.system_code, node.source_code || node.source, node.schema_name, node.business_domain || node.domain].filter(Boolean).slice(0, 2).join(" / ") || "-";
+  // normalizeGraphData 会把节点 label 覆盖为 echarts 风格对象 {show, formatter, ...}，
+  // 必须把对象形态的 label 排除/取 formatter，否则 G6 文本布局对非字符串调 .split 抛 TypeError。
+  const labelField =
+    typeof node.label === "string" ? node.label : (node.label?.formatter ?? "");
+  const primary = String(node.table_name_cn || node.tableNameCn || labelField || node.table_name || node.display_id || node.id || "");
+  const shorten = (value: string, max: number) => value.length > max ? `${value.slice(0, max - 1)}…` : value;
+  // 技术名保存在 data.raw/节点详情中；labelText 保持单字符串，避免 G6 文本布局
+  // 在旧版本中把换行对象误判为数组而触发 split 运行时异常。
+  return shorten(primary, 23);
 }
 
 function aggregateData(nodes: any[], edges: any[]) {
@@ -122,10 +127,12 @@ function aggregateData(nodes: any[], edges: any[]) {
   return { nodes: nextNodes, edges: Array.from(edgeMap.values()) };
 }
 
-function layoutType() {
-  if (props.layoutMode === "radial") return "radial";
-  if (props.layoutMode === "grouped") return "force";
-  return "dagre";
+function layoutOptions() {
+  if (props.layoutMode === "radial") {
+    return { type: "radial", nodeSize: 132, preventOverlap: true, nodeSpacing: 60, linkDistance: 170 };
+  }
+  // force-atlas2 依赖节点尺寸做重叠排除，在大节点（132 宽 rect）下比 d3-force 收敛更稳定
+  return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
 }
 
 function edgeStyle(edge: any) {
@@ -137,22 +144,27 @@ function edgeStyle(edge: any) {
     lineDash: type === "dotted" ? [2, 5] : type === "dashed" ? [8, 5] : visual.lineDash,
     endArrow: true,
     opacity: edge.lineStyle?.opacity ?? visual.opacity,
-    labelText: edge.label?.formatter || edge.label || "",
-    labelFontSize: 10,
-    labelFill: "#334155",
-    labelBackground: true,
-    labelBackgroundFill: "rgba(255,255,255,0.82)",
-    labelBackgroundRadius: 4
+    labelText: ""
   };
 }
 
 function graphData() {
   const data = aggregateData(normalized.value.nodes, normalized.value.edges);
+  const uniqueNodes = Array.from(
+    new Map(data.nodes.filter(node => Boolean(node?.id)).map(node => [String(node.id), node])).values()
+  );
+  const nodeIds = new Set(uniqueNodes.map(node => String(node.id)));
+  const validEdges = data.edges.filter(edge => {
+    const source = String(edge?.source || "");
+    const target = String(edge?.target || "");
+    return source && target && source !== target && nodeIds.has(source) && nodeIds.has(target);
+  });
   return {
-    nodes: data.nodes.map(node => {
+    nodes: uniqueNodes.map(node => {
       const typeStyle = graphNodeVisualStyle(node);
       return {
         id: node.id,
+        type: typeStyle.shape === "diamond" ? "diamond" : typeStyle.shape === "ellipse" ? "circle" : "rect",
         data: { raw: node },
         style: {
           size: node.isAggregate ? [132, 50] : typeStyle.size,
@@ -164,16 +176,17 @@ function graphData() {
           lineDash: typeStyle.lineDash,
           labelText: nodeLabel(node),
           labelFill: typeStyle.textColor,
-          labelFontSize: 11,
-          labelFontWeight: node.id === props.selectedNodeId ? 700 : 500,
-          badges: [{ text: nodeMeta(node), placement: "bottom", fill: "#ffffff", fillOpacity: 0.92, fontSize: 9, color: "#334155" }]
+          labelFontSize: node.is_aggregate ? 13 : 13,
+          labelFontWeight: node.id === props.selectedNodeId ? 700 : 500
         }
       };
     }),
-    edges: data.edges.map(edge => ({
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
+    edges: validEdges.map((edge, index) => ({
+      // Renderer ids are isolated from backend evidence ids. The original
+      // relation remains in data.raw for the evidence drawer.
+      id: `render-edge-${index}`,
+      source: String(edge.source),
+      target: String(edge.target),
       data: { raw: edge },
       style: edgeStyle(edge)
     }))
@@ -195,50 +208,57 @@ function displayEdge(raw: any) {
   return raw?.sourceEdges?.[0] || raw;
 }
 
-function initGraph() {
-  if (!containerRef.value || graph) return;
-  try {
-    graph = new Graph({
+function createGraph() {
+  if (!containerRef.value || graph) return graph;
+  const instance = new Graph({
       container: containerRef.value,
-      autoFit: "view",
+      // 默认概览由服务端控制节点数量；禁用无限 autoFit，避免 127 个节点再次缩成不可读方块。
+      autoFit: false,
       animation: false,
-      data: graphData() as any,
-      layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 },
+      layout: layoutOptions(),
       node: { type: "rect" },
       edge: { type: "line" },
       behaviors: ["drag-canvas", "zoom-canvas", "drag-element", "hover-activate"]
     } as any);
-    graph.on(NodeEvent.CLICK, (event: any) => {
+  instance.on(NodeEvent.CLICK, (event: any) => {
       const id = resolveElementId(event);
       const raw = resolveRawElement(id, "node") || normalized.value.nodes.find(node => node.id === id);
       if (raw) emit("node-click", raw as GraphNode);
     });
-    graph.on(EdgeEvent.CLICK, (event: any) => {
+  instance.on(EdgeEvent.CLICK, (event: any) => {
       const id = resolveElementId(event);
       const raw = displayEdge(resolveRawElement(id, "edge")) || normalized.value.edges.find(edge => edge.id === id);
       if (raw) emit("edge-click", raw as GraphEdge);
     });
-    void graph.render().catch(() => emit("render-error"));
+  graph = instance;
+  return instance;
+}
+
+async function performRender(version: number) {
+  await nextTick();
+  if (version !== renderVersion || !containerRef.value) return;
+  try {
+    const instance = createGraph();
+    if (!instance || version !== renderVersion) return;
+    instance.setData(graphData() as any);
+    instance.setOptions({ layout: layoutOptions() } as any);
+    await instance.render();
   } catch (err) {
-    console.error("[AdvancedRelationGraph] init failed:", err);
+    console.error("[AdvancedRelationGraph] render failed:", err);
+    try {
+      graph?.destroy();
+    } catch {
+      // 失败实例不得继续接收后续 setData。
+    }
+    graph = null;
     emit("render-error");
   }
 }
 
-async function renderGraph() {
-  await nextTick();
-  try {
-    if (!graph) {
-      initGraph();
-      return;
-    }
-    graph.setData(graphData() as any);
-    graph.setOptions({ layout: { type: layoutType(), rankdir: "LR", nodeSize: [132, 58], preventOverlap: true, nodeSpacing: 36, ranksep: 90 } } as any);
-    await graph.render();
-  } catch (err) {
-    console.error("[AdvancedRelationGraph] render failed:", err);
-    emit("render-error");
-  }
+function renderGraph() {
+  const version = ++renderVersion;
+  renderQueue = renderQueue.then(() => performRender(version));
+  return renderQueue;
 }
 
 onMounted(() => {
@@ -250,6 +270,7 @@ watch(() => [props.nodes, props.edges, props.groupBy, props.focusKeyword, props.
 }, { deep: true });
 
 onBeforeUnmount(() => {
+  renderVersion += 1;
   try {
     graph?.destroy();
   } catch {
@@ -263,7 +284,7 @@ onBeforeUnmount(() => {
 .advanced-graph-shell { border: 1px solid #dbe3ef; border-radius: 8px; background: #f8fafc; overflow: hidden; }
 .advanced-legend { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 9px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 12px; background: #ffffff; }
 .advanced-legend span { display: inline-flex; align-items: center; gap: 5px; }
-.advanced-graph-canvas { width: 100%; min-height: 420px; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+.advanced-graph-canvas { width: 100%; min-height: 420px; background: #f8fafc; }
 .edge-line { display: inline-block; width: 24px; border-top-width: 2px; border-top-style: solid; }
 .edge-line.solid { border-top-style: solid; }
 .edge-line.dashed { border-top-style: dashed; }

@@ -485,6 +485,13 @@ export interface GraphNode {
   include_status?: string | null;
   review_status?: string | null;
   note?: string | null;
+  object_type?: string | null;
+  technical_name?: string | null;
+  metadata_match?: string | null;
+  asset_count?: number | null;
+  child_count?: number | null;
+  path?: string | null;
+  is_aggregate?: boolean;
 }
 
 export interface GraphFieldMapping {
@@ -544,6 +551,14 @@ export interface GraphMeta {
   filters?: Record<string, unknown>;
   data_version?: string | null;
   backend_build_id?: string | null;
+  query_ms?: number | null;
+  matched_total?: number | null;
+  returned_nodes?: number | null;
+  estimated_total?: number | null;
+  enrichment?: Record<string, number>;
+  warnings?: string[];
+  center_physical_key?: string | null;
+  direction_semantics?: string | null;
 }
 
 export interface GraphData {
@@ -564,6 +579,7 @@ export interface GraphViewMode {
   include_dependencies: boolean;
   show_review_layer: boolean;
   requires_table: boolean;
+  deprecated?: boolean;
 }
 
 export interface GraphOptionsData {
@@ -577,6 +593,43 @@ export interface GraphOptionsData {
   view_modes: GraphViewMode[];
   default_mode?: string | null;
   backend_build_id?: string | null;
+}
+
+export interface GraphOverviewResponse {
+  level: "system" | "source" | "schema" | "object";
+  next_level?: "system" | "source" | "schema" | "object" | null;
+  selected_path: Record<string, string>;
+  data: GraphData;
+}
+
+export interface GraphFilterOption {
+  value: string;
+  label: string;
+  count: number;
+  disabled?: boolean;
+}
+
+export interface GraphFilterOptionsData {
+  selected_path: Record<string, string>;
+  next_level: "system" | "source" | "schema" | "object";
+  items: GraphFilterOption[];
+  business_domains: GraphFilterOption[];
+  object_types: GraphFilterOption[];
+}
+
+export interface GraphTableSearchItem {
+  physical_key: string;
+  display_name: string;
+  technical_name: string;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
+  schema_name?: string | null;
+  table_name?: string | null;
+  object_type: string;
+  business_domain?: string | null;
+  column_count?: number | null;
+  ambiguous?: boolean;
 }
 
 export const getGraph = (params: {
@@ -599,6 +652,7 @@ export const getGraph = (params: {
 export const getGraphNeighbors = (params: {
   table?: string;
   physical_key?: string;
+  center_physical_key?: string;
   system_code?: string;
   source_code?: string;
   schema?: string;
@@ -609,6 +663,38 @@ export const getGraphNeighbors = (params: {
   return http.get<ApiResponse<GraphData>, object>("/api/v1/graph/neighbors", {
     params
   });
+};
+
+export const getGraphOverview = (params?: {
+  level?: "system" | "source" | "schema" | "object";
+  parent_physical_key?: string;
+  system_code?: string;
+  source_code?: string;
+  schema?: string;
+  domain?: string;
+  object_type?: "table" | "view";
+  limit?: number;
+}) => {
+  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", { params });
+};
+
+export const getGraphFilterOptions = (params?: {
+  system_code?: string;
+  source_code?: string;
+  schema?: string;
+  next_level?: "system" | "source" | "schema" | "object";
+}) => {
+  return http.get<ApiResponse<GraphFilterOptionsData>, object>("/api/v1/graph/filter-options", { params });
+};
+
+export const searchGraphTables = (params: {
+  q: string;
+  system_code?: string;
+  source_code?: string;
+  schema?: string;
+  limit?: number;
+}) => {
+  return http.get<ApiResponse<{ items: GraphTableSearchItem[]; total: number; query: string }>, object>("/api/v1/graph/tables/search", { params });
 };
 
 export const getGraphEdgeDetail = (edgeId: string) => {
