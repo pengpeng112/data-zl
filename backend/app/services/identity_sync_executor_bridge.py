@@ -93,6 +93,7 @@ def execute_cdms_apply(
     classification: str,
     primary_dept: str,
     additional_depts: list[str],
+    job_title: str | None = None,
 ) -> dict[str, Any]:
     """Execute CDMS account creation via the CDMS adapter.
 
@@ -130,6 +131,14 @@ def execute_cdms_apply(
 
         role_mapping = _load_role_mapping("CDMS", classification)
 
+        if adapter.snapshot_user(emp_no):
+            return adapter.align_existing_user(
+                emp_no=emp_no,
+                dept_code=primary_dept,
+                dept_codes=[primary_dept] + additional_depts,
+                role_mapping=role_mapping,
+            )
+
         result = adapter.apply_single_user(
             emp_no=emp_no,
             person_name=display_name,
@@ -154,6 +163,7 @@ def execute_jhemr_apply(
     primary_dept: str,
     additional_depts: list[str],
     date_str: str | None = None,
+    job_title: str | None = None,
 ) -> dict[str, Any]:
     """Execute JHEMR full user creation via the JHEMR adapter.
 
@@ -197,6 +207,7 @@ def execute_jhemr_apply(
                 classification=classification,
                 dept_codes=[primary_dept] + additional_depts,
                 role_group_code=role_group,
+                job_title=job_title,
             )
             return result
         # Create new user (6-table transaction)
@@ -207,6 +218,7 @@ def execute_jhemr_apply(
             primary_dept=primary_dept,
             additional_depts=additional_depts,
             date_str=date_str,
+            job_title=job_title,
         )
         return result
     except Exception as exc:
@@ -249,6 +261,40 @@ def execute_jhemr_readback(emp_no: str) -> dict[str, Any]:
         return snapshot
     except Exception as exc:
         return {"error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+    finally:
+        adapter.close()
+
+
+def execute_jhemr_password_reset(emp_no: str, date_str: str | None = None) -> dict[str, Any]:
+    """Reset one existing JHEMR account through the approved password path."""
+    if (gate := _require_identity_sync_enabled()) is not None:
+        return gate
+    if (gate := _require_phase_d_approval()) is not None:
+        return gate
+    if (gate := _require_password_write_enabled()) is not None:
+        return gate
+
+    from .jhemr_identity_adapter import JhemrIdentityAdapter
+
+    adapter = JhemrIdentityAdapter(
+        credential_ref=settings.identity_sync_jhemr_credential_ref,
+        hospital_no=settings.identity_sync_jhemr_hospital_no,
+        jump_host=settings.his_source_jump_host,
+        jump_port=settings.his_source_jump_port,
+        jump_user=settings.his_source_jump_user,
+        jump_key=settings.his_source_jump_key or None,
+        db_host=settings.identity_sync_jhemr_host,
+        db_port=settings.identity_sync_jhemr_port,
+        db_name=settings.identity_sync_jhemr_dbname,
+        password_secret_ref=settings.identity_jhemr_default_password_ref,
+        password_write_enabled=settings.identity_jhemr_password_write_enabled,
+    )
+    try:
+        adapter.connect()
+        return adapter.reset_existing_password(emp_no, date_str=date_str)
+    except Exception as exc:
+        logger.error("JHEMR password reset failed for masked emp: %s", type(exc).__name__)
+        return {"status": "failed", "error": f"{type(exc).__name__}: {str(exc)[:200]}"}
     finally:
         adapter.close()
 

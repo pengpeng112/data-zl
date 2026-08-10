@@ -108,6 +108,8 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
         job = person.raw_job or staff_raw.get("JOB")
         title = person.raw_title or staff_raw.get("TITLE")
         create_date = person.source_create_date or _parse_create_date(staff_raw.get("CREATE_DATE"))
+        employee_raw = employee_src.raw_data if employee_src and isinstance(employee_src.raw_data, dict) else {}
+        modified_time = _parse_create_date(employee_raw.get("MODIFIEDTIME"))
 
         result = classify_person(
             job=job,
@@ -115,6 +117,7 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
             status=_status_flag(staff_src.source_status if staff_src else None),
             validstate=_status_flag(employee_src.source_status if employee_src else None),
             create_date=create_date,
+            modified_time=modified_time,
         )
 
         person.raw_job = (str(job).strip() if job else None) or person.raw_job

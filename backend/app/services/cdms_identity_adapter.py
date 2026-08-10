@@ -65,7 +65,7 @@ _SQL_SELECT_EMP = (
 
 _SQL_SELECT_AUTH = (
     "SELECT FAUTHMAPPINGID, FID, FUSER, FUPDATEUSER, FTYPE, FAUTHORITYID, "
-    "FPRIVIEGETYPE FROM CDMS.T_MSS_AUTHMAPPING WHERE FID = :emp_no"
+    "FPRIVIEGETYPE, FST FROM CDMS.T_MSS_AUTHMAPPING WHERE FID = :emp_no"
 )
 
 _SQL_PWD_STATS = (
@@ -178,12 +178,16 @@ class CdmsIdentityAdapter:
             return
 
         self._init_oracle_client()
-        self._start_ssh_tunnel()
+        direct = os.environ.get("APP_IDENTITY_SYNC_DIRECT_CONNECTION", "").strip().lower() in {"1", "true", "yes"}
+        if not direct:
+            self._start_ssh_tunnel()
 
         username, password = _read_credential(self._credential_ref)
         # DSN must point at the LOCAL end of the SSH tunnel, never at the
         # remote host directly (the remote host is only reachable via jump).
-        dsn = f"127.0.0.1:{self._local_bind_port}/{self._cdms_service}"
+        dsn_host = self._cdms_host if direct else "127.0.0.1"
+        dsn_port = self._cdms_port if direct else self._local_bind_port
+        dsn = f"{dsn_host}:{dsn_port}/{self._cdms_service}"
         logger.info(
             "connecting to CDMS via tunnel %s:%s -> %s",
             self._jump_host,
@@ -522,6 +526,64 @@ class CdmsIdentityAdapter:
                 "rows_affected": rows_affected,
                 "actions": actions_log,
             }
+        finally:
+            cursor.close()
+
+    def align_existing_user(
+        self,
+        *,
+        emp_no: str,
+        dept_code: str,
+        dept_codes: list[str],
+        role_mapping: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Add missing CDMS role/department/base permissions without deletion."""
+        conn = self._require_conn()
+        cursor = conn.cursor()
+        actions: list[dict[str, Any]] = []
+        try:
+            cursor.execute(_SQL_COUNT_EMP, {"emp_no": emp_no})
+            if int(cursor.fetchone()[0]) != 1:
+                raise RuntimeError("existing CDMS account count is not one")
+            cursor.execute(
+                "UPDATE CDMS.T_MSS_EMP_DICT SET FDEPT = :dept "
+                "WHERE FLOGINNAME = :emp_no AND NVL(FDEPT, ' ') <> :dept",
+                {"dept": dept_code, "emp_no": emp_no},
+            )
+            if cursor.rowcount:
+                actions.append({"action": "update_primary_dept"})
+
+            cursor.execute(_SQL_SELECT_AUTH, {"emp_no": emp_no})
+            existing = {(str(r[4]), str(r[5])) for r in cursor.fetchall()}
+            required = []
+            role_code = str(role_mapping.get("role_code") or "").strip()
+            if role_code:
+                required.append(("0", role_code))
+            required.extend(("2", str(code)) for code in dept_codes if code)
+            required.extend((row["ftype"], row["fvalue"]) for row in CDMS_BASE_AUTH)
+            for ftype, value in required:
+                if (ftype, value) in existing:
+                    continue
+                cursor.execute(_SQL_INSERT_AUTH, {
+                    "fid_pk": uuid.uuid4().hex,
+                    "emp_no": emp_no,
+                    "fvalue": value,
+                    "ftype": ftype,
+                    "operator": CDMS_OPERATOR,
+                    "ftype2": ftype,
+                })
+                actions.append({"action": "insert_auth", "ftype": ftype})
+
+            cursor.execute(_SQL_SELECT_AUTH, {"emp_no": emp_no})
+            verified = {(str(r[4]), str(r[5])) for r in cursor.fetchall()}
+            missing = [pair for pair in required if pair not in verified]
+            if missing:
+                raise RuntimeError("CDMS permission read-back mismatch")
+            conn.commit()
+            return {"status": "success", "actions": actions, "aligned": True}
+        except Exception as exc:
+            conn.rollback()
+            return {"status": "failed", "reason": f"{type(exc).__name__}: {str(exc)[:200]}", "rolled_back": True}
         finally:
             cursor.close()
 

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from ...core.db import get_db
 from ...models.quality import QualityRule, QualityFinding, QualityCheckRun
+from ...models.asset import AssetTable, AssetRelation
 from ...models.asset import AssetRelation, AssetTable, AssetColumn
 from ...models.candidate import AssetCandidateRelation
 from ...schemas.common import ApiResponse
@@ -755,6 +756,12 @@ class TemplateGenerate(BaseModel):
     params: dict = Field(default_factory=dict)
 
 
+class AutoGenerateRequest(BaseModel):
+    system_code: str | None = None
+    source_code: str | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+
+
 class FindingAssign(BaseModel):
     assigned_to: str
     note: str | None = None
@@ -832,6 +839,103 @@ def rule_from_template(req: TemplateGenerate, db: Session = Depends(get_db)) -> 
 
     sql = template_fn(**req.params)
     return ApiResponse(data={"sql": sql, "template_type": req.template_type})
+
+
+@router.post("/rules/auto-generate", summary="按主键和已确认关系生成质控规则建议")
+def auto_generate_rules(req: AutoGenerateRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Generate disabled suggestions from trusted asset metadata only.
+
+    No source database is queried and no generated rule is enabled implicitly.
+    """
+    import re
+
+    identifier = re.compile(r"^[A-Za-z_][A-Za-z0-9_$#]*$")
+    created: list[str] = []
+    skipped = 0
+    tables_stmt = select(AssetTable).where(AssetTable.pk.is_not(None))
+    if req.system_code:
+        tables_stmt = tables_stmt.where(AssetTable.system_code == req.system_code)
+    if req.source_code:
+        tables_stmt = tables_stmt.where(AssetTable.source_code == req.source_code)
+    for table in db.scalars(tables_stmt.order_by(AssetTable.system_code, AssetTable.schema_name, AssetTable.table_name).limit(req.limit)).all():
+        fields = [x.strip() for x in re.split(r"[,;+]", str(table.pk or "")) if x.strip()]
+        if not fields or not all(identifier.fullmatch(x) for x in fields):
+            continue
+        table_ref = ".".join(x for x in (table.schema_name, table.table_name) if x)
+        if not table_ref or not identifier.fullmatch(table.table_name or ""):
+            continue
+        code = f"AUTO_PK_{(table.system_code or 'ASSET')}_{table.schema_name or 'PUBLIC'}_{table.table_name}".upper().replace("-", "_")
+        if db.scalar(select(QualityRule).where(QualityRule.rule_code == code)):
+            skipped += 1
+            continue
+        db.add(QualityRule(
+            rule_code=code[:240],
+            rule_name=f"{table.table_name_cn or table.table_name} 主键唯一性",
+            rule_type="metadata_generated",
+            rule_category="UNIQUE",
+            check_scope="TABLE_INNER",
+            constraint_level="WARN",
+            system_code=table.system_code,
+            source_code=table.source_code,
+            namespace_name=table.schema_name,
+            target_table=table.table_name,
+            target_field=",".join(fields),
+            execution_mode="sql_template",
+            check_sql=f"SELECT {', '.join(fields)}, COUNT(*) AS dup_cnt FROM {table_ref} GROUP BY {', '.join(fields)} HAVING COUNT(*) > 1",
+            error_condition="dup_cnt > 1",
+            error_level="major",
+            description="依据资产元数据已确认主键生成；启用前需复核数据源权限与 SQL 方言。",
+            enabled=False,
+            remark="auto_generated_from_asset_pk",
+        ))
+        created.append(code[:240])
+
+    relations_stmt = select(AssetRelation).where(
+        AssetRelation.validation_status.in_(("verified", "sample_pass", "sample_verified")),
+        AssetRelation.from_source_code == AssetRelation.to_source_code,
+    )
+    if req.source_code:
+        relations_stmt = relations_stmt.where(AssetRelation.from_source_code == req.source_code)
+    for relation in db.scalars(relations_stmt.limit(req.limit)).all():
+        from_fields = [x.strip() for x in re.split(r"[,;+]", str(relation.from_columns or "")) if x.strip()]
+        to_fields = [x.strip() for x in re.split(r"[,;+]", str(relation.to_columns or "")) if x.strip()]
+        if len(from_fields) != 1 or len(to_fields) != 1 or not all(identifier.fullmatch(x) for x in (*from_fields, *to_fields)):
+            continue
+        child = relation.from_table or relation.from_schema_name
+        parent = relation.to_table or relation.to_schema_name
+        if not child or not parent or not identifier.fullmatch(child.split(".")[-1]) or not identifier.fullmatch(parent.split(".")[-1]):
+            continue
+        code = f"AUTO_REL_{relation.id}"
+        if db.scalar(select(QualityRule).where(QualityRule.rule_code == code)):
+            skipped += 1
+            continue
+        child_ref = child if "." in child else ".".join(x for x in (relation.from_schema_name, child) if x)
+        parent_ref = parent if "." in parent else ".".join(x for x in (relation.to_schema_name, parent) if x)
+        db.add(QualityRule(
+            rule_code=code,
+            rule_name=f"{child.split('.')[-1]} 关联 {parent.split('.')[-1]} 孤儿记录",
+            rule_type="metadata_generated",
+            rule_category="RELATION",
+            check_scope="TABLE_RELATION",
+            constraint_level="WARN",
+            system_code=relation.from_system_code,
+            source_code=relation.from_source_code,
+            namespace_name=relation.from_schema_name,
+            target_table=child.split(".")[-1],
+            target_field=from_fields[0],
+            related_table=parent.split(".")[-1],
+            related_field=to_fields[0],
+            execution_mode="sql_template",
+            check_sql=f"SELECT COUNT(*) AS orphan_cnt FROM {child_ref} c WHERE c.{from_fields[0]} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM {parent_ref} p WHERE p.{to_fields[0]} = c.{from_fields[0]})",
+            error_condition="orphan_cnt > 0",
+            error_level="major",
+            description="依据已验证同源关系生成；跨系统关系不自动生成可执行 SQL。",
+            enabled=False,
+            remark="auto_generated_from_verified_relation",
+        ))
+        created.append(code)
+    db.commit()
+    return ApiResponse(data={"created": len(created), "skipped": skipped, "rule_codes": created})
 
 
 @router.post("/findings/{finding_id}/assign", summary="问题分派")

@@ -258,7 +258,10 @@ def retry_metadata_collect_job(source_code: str, job_id: int, db: Session = Depe
     except Exception as exc:
         job.status = "failed"
         job.finished_at = datetime.now(timezone.utc)
-        job.error_message = str(exc)[:500]
+        # Persist only a bounded, credential-safe diagnostic; raw DB/URL details
+        # must never enter platform data or API responses.
+        from ...services.data_masking import sanitize_text
+        job.error_message = sanitize_text(str(exc), limit=500)
         db.commit()
         raise HTTPException(status_code=500, detail="metadata collect retry failed")
 

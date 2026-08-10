@@ -98,7 +98,8 @@ WORK = textwrap.dedent(
 
 def main() -> None:
     c = paramiko.SSHClient()
-    c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    c.load_system_host_keys()
+    c.set_missing_host_key_policy(paramiko.RejectPolicy())
     c.connect(HOST, username="root", password=PASSWORD, timeout=15, allow_agent=False, look_for_keys=False)
 
     files = [

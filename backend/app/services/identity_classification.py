@@ -158,6 +158,7 @@ def classify_person(
     validstate: str | None,
     create_date: datetime | None,
     group_classes: list[str] | None = None,
+    modified_time: datetime | None = None,
 ) -> ClassificationResult:
     """Classify one HIS staff record.
 
@@ -179,19 +180,24 @@ def classify_person(
             conflict_detail={"status": status_text, "validstate": validstate_text},
         )
 
-    if create_date is None:
+    if create_date is None and modified_time is None:
         return ClassificationResult(
             classification=MASTER_DATA_MISSING,
             matched_rule="create_date_missing",
             conflict_detail={"job": job_text, "title": title_text},
         )
-    aware = create_date if create_date.tzinfo else create_date.replace(tzinfo=timezone.utc)
+    effective_date = max(
+        (value for value in (create_date, modified_time) if value is not None),
+        key=lambda value: value if value.tzinfo else value.replace(tzinfo=timezone.utc),
+    )
+    aware = effective_date if effective_date.tzinfo else effective_date.replace(tzinfo=timezone.utc)
     if aware < LEGACY_CUTOFF:
         return ClassificationResult(
             classification=LEGACY_UNMANAGED,
             matched_rule="create_date_before_cutoff",
             conflict_detail={
-                "create_date": create_date.isoformat(),
+                "create_date": create_date.isoformat() if create_date else None,
+                "modified_time": modified_time.isoformat() if modified_time else None,
                 "cutoff": LEGACY_CUTOFF.isoformat(),
             },
         )
