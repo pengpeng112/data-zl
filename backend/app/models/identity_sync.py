@@ -31,9 +31,16 @@ class IdentitySyncWatermark(Base):
     source_code = Column(Text, nullable=False)
     watermark_key = Column(Text, nullable=False)
     last_create_date = Column(TIMESTAMP(timezone=True))
-    last_emp_no = Column(Text)
+    last_emp_no = Column(Text)  # HMAC tie-breaker (legacy column name; never plaintext)
     last_run_at = Column(TIMESTAMP(timezone=True))
     rows_collected = Column(Integer, server_default="0")
+    # 122: candidate and committed watermarks are kept separately.  The
+    # committed pair is never advanced by a failed run.
+    candidate_create_date = Column(TIMESTAMP(timezone=True))
+    candidate_emp_no = Column(Text)  # HMAC tie-breaker (legacy column name; never plaintext)
+    candidate_run_id = Column(Text)
+    safe_lookback_hours = Column(Integer, server_default="24")
+    watermark_status = Column(Text, server_default="committed")  # candidate | committed | stalled
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -82,6 +89,10 @@ class IdentitySyncAction(Base):
     account_fingerprint = Column(Text)
     params_summary = Column(PortableJSON)
     status = Column(Text, server_default="planned")  # planned | executed | skipped | failed | rolled_back
+    subtask_code = Column(Text)  # main_account_sync | jhemr_signature_sync
+    reason_code = Column(Text)
+    error_class = Column(Text)
+    error_code_masked = Column(Text)
     rows_affected = Column(Integer)
     error_message = Column(Text)
     executed_at = Column(TIMESTAMP(timezone=True))
@@ -221,7 +232,7 @@ class IdentitySchedulerRun(Base):
     run_id = Column(Text, nullable=False, unique=True)
     triggered_by = Column(Text, nullable=False)  # nightly_cron | manual_rerun | validation
     status = Column(Text, server_default="running")
-    # running | success | failed | circuit_open | misfire_skipped | timeout
+    # success | partial_success | failed | skipped | running | overdue | misconfigured
     lock_holder = Column(Text)
     started_at = Column(TIMESTAMP(timezone=True))
     finished_at = Column(TIMESTAMP(timezone=True))
@@ -237,6 +248,14 @@ class IdentitySchedulerRun(Base):
     circuit_breaker_dimension = Column(Text)  # which threshold was hit
     error_message = Column(Text)
     report_summary = Column(PortableJSON)  # desensitized daily report
+    provider_code = Column(Text)
+    provider_config_fingerprint = Column(Text)
+    provider_heartbeat_at = Column(TIMESTAMP(timezone=True))
+    candidate_watermark = Column(PortableJSON)
+    committed_watermark = Column(PortableJSON)
+    watermark_advanced = Column(Boolean, server_default="false")
+    last_error_class = Column(Text)
+    duration_ms = Column(Integer)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -257,3 +276,48 @@ class IdentityCircuitBreaker(Base):
     opened_at = Column(TIMESTAMP(timezone=True))
     threshold = Column(Integer, server_default="3")
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentitySyncSubtask(Base):
+    """Durable per-run subtask facts used for status aggregation and audit."""
+    __tablename__ = "asset_identity_sync_subtasks"
+    __table_args__ = (
+        UniqueConstraint("run_id", "subtask_code", name="uq_identity_sync_subtask_run_code"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    run_id = Column(Text, nullable=False)
+    subtask_code = Column(Text, nullable=False)  # main_account_sync | jhemr_signature_sync
+    target_system = Column(Text)
+    status = Column(Text, nullable=False, server_default="running")
+    planned_count = Column(Integer, server_default="0")
+    succeeded_count = Column(Integer, server_default="0")
+    skipped_count = Column(Integer, server_default="0")
+    failed_count = Column(Integer, server_default="0")
+    error_classes = Column(PortableJSON)
+    report_summary = Column(PortableJSON)
+    started_at = Column(TIMESTAMP(timezone=True))
+    finished_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentitySyncAlert(Base):
+    """Queryable, redacted operational alert; no SQL parameters or identities."""
+    __tablename__ = "asset_identity_sync_alerts"
+    __table_args__ = (
+        Index("ix_identity_sync_alert_created", "created_at"),
+        Index("ix_identity_sync_alert_status", "status"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    run_id = Column(Text)
+    alert_type = Column(Text, nullable=False)
+    severity = Column(Text, nullable=False, server_default="warning")
+    status = Column(Text, nullable=False, server_default="open")
+    error_class = Column(Text)
+    occurrence_count = Column(Integer, server_default="1")
+    detail = Column(PortableJSON)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    resolved_at = Column(TIMESTAMP(timezone=True))

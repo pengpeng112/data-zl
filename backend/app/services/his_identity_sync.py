@@ -30,6 +30,7 @@ STAFF_TABLE = "COMM.STAFF_DICT"
 # 源库实测：SYS_EMPLOYEE 在 FXHIS，不在 COMM；USERCODE 多为空，人员主键用 EMPLCODE，
 # 与 COMM.STAFF_DICT.EMP_NO 桥接（约 98%）。用户口径：以 SYS_EMPLOYEE 为主数据。
 EMPLOYEE_TABLE = "FXHIS.SYS_EMPLOYEE"
+EMPLOYEE_TITLE_DICT_TABLE = "PORTAL_USER.PORTAL_SYS_DICT"
 DOCTOR_GROUP_TABLE = "COMM.DOCTOR_GROUP"
 STAFF_GROUP_TABLE = "COMM.STAFF_VS_GROUP"
 # 保留常量仅作文档：活库实测该表 DEPT_CODE 全空，采集不再依赖它（见 _collect 注释）。
@@ -103,7 +104,7 @@ def _safe_raw(row: dict[str, Any]) -> dict[str, Any]:
             safe[f"{key}_mask"] = _mask(value)
             safe[f"{key}_sha256"] = _hash(value)
         else:
-            safe[key] = value
+            safe[key] = value.isoformat() if hasattr(value, "isoformat") else value
     return safe
 
 
@@ -119,6 +120,7 @@ class PersonMaster:
     raw_job: str | None = None
     raw_title: str | None = None
     source_create_date: Any = None
+    source_modified_time: Any = None
 
 
 def _connector() -> OracleConnector:
@@ -180,6 +182,24 @@ def _select_optional(
         raise
 
 
+def _build_employee_title_map(rows: list[dict[str, Any]]) -> dict[str, str]:
+    """Return a unique LEVLCODE -> DICT_NAME map and fail closed on ambiguity."""
+    names_by_code: dict[str, set[str]] = {}
+    for row in rows:
+        code = _text(_value(row, "DICT_CODE"))
+        title = _text(_value(row, "DICT_NAME"))
+        if code and title:
+            names_by_code.setdefault(code, set()).add(title)
+    ambiguous = sorted(code for code, names in names_by_code.items() if len(names) > 1)
+    if ambiguous:
+        # Only dictionary codes are included; never employee identifiers or names.
+        raise RuntimeError(
+            "EmployeeTitle dictionary contains conflicting names for "
+            f"{len(ambiguous)} code(s); title synchronization is closed"
+        )
+    return {code: next(iter(names)) for code, names in names_by_code.items()}
+
+
 def _collect(max_rows: int) -> tuple[dict[str, list[dict[str, Any]]], list[str]]:
     connector = _connector()
     notes: list[str] = []
@@ -199,13 +219,22 @@ WHERE ROWNUM <= :max_rows
             "employees": _select_optional(
                 connector,
                 f"""
-SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERCODE, ISDELETED
+SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERCODE,
+       ISDELETED, EMPLTYPE, POSICODE, LEVLCODE, CREATEDTIME, MODIFIEDTIME
 FROM {EMPLOYEE_TABLE}
 WHERE ROWNUM <= :max_rows
 """,
                 max_rows,
                 label=EMPLOYEE_TABLE,
                 notes=notes,
+            ),
+            "employee_titles": _select(connector, f"""
+SELECT DICT_CODE, DICT_NAME
+FROM {EMPLOYEE_TITLE_DICT_TABLE}
+WHERE TYPE_CODE = 'EmployeeTitle'
+  AND ROWNUM <= :max_rows
+""",
+                max_rows,
             ),
             "doctor_groups": _select(connector, f"""
 SELECT DOCTOR_USER, DEPT_CODE, DOCTOR
@@ -344,6 +373,11 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
     bridge_hits = 0
     doctor_group_matched = 0
     doctor_group_unmatched = 0
+    title_by_level_code = _build_employee_title_map(rows.get("employee_titles", []))
+    if rows["employees"] and not title_by_level_code:
+        raise RuntimeError("EmployeeTitle dictionary is empty; title synchronization is closed")
+    title_mapped = 0
+    title_unmapped = 0
 
     for row in rows["staff"]:
         emp_no = _text(_value(row, "EMP_NO"))
@@ -365,17 +399,26 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
         if emplcode in staff_by_emp_no or (usercode and usercode in staff_by_emp_no):
             bridge_hits += 1
         staff = staff_by_emp_no.get(emplcode) or (staff_by_emp_no.get(usercode) if usercode else None)
+        level_code = _text(_value(row, "LEVLCODE"))
+        employee_title = title_by_level_code.get(level_code) if level_code else None
+        if employee_title:
+            title_mapped += 1
+        else:
+            title_unmapped += 1
         masters[emplcode] = PersonMaster(
             person_code=emplcode,
             person_name=_text(_value(row, "EMPLNAME")) or (_text(_value(staff, "NAME")) if staff else None),
             dept_code=_text(_value(row, "DEPTCODE"))
             or _text(_value(row, "DEPTID"))
             or (_text(_value(staff, "DEPT_CODE")) if staff else None),
-            job_title=(_text(_value(staff, "TITLE")) or _text(_value(staff, "JOB"))) if staff else None,
+            # JHEMR users.education_title must use SYS_EMPLOYEE.LEVLCODE's
+            # EmployeeTitle dictionary name, not COMM.STAFF_DICT free text.
+            job_title=employee_title,
             employment_status=_normalize_status(_value(row, "VALIDSTATE")),
             raw_job=_text(_value(staff, "JOB")) if staff else None,
             raw_title=_text(_value(staff, "TITLE")) if staff else None,
             source_create_date=_value(staff, "CREATE_DATE") if staff else None,
+            source_modified_time=_value(row, "MODIFIEDTIME"),
         )
 
     # 补充：仅出现在 STAFF_DICT、不在 SYS_EMPLOYEE 的人员
@@ -409,6 +452,9 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
         "doctor_group_matched": doctor_group_matched,
         "doctor_group_unmatched": doctor_group_unmatched,
         "staff_only_persons": max(0, len(masters) - len(rows["employees"])),
+        "title_mapped": title_mapped,
+        "title_unmapped": title_unmapped,
+        "title_dictionary_codes": len(title_by_level_code),
     }
 
 
@@ -457,6 +503,15 @@ def sync_his_identity(
             "matched_by_doctor_user": plan["doctor_group_matched"],
             "unmatched_doctor_user": plan["doctor_group_unmatched"],
             "note": "unmatched_doctor_user 可忽略（业务确认）",
+        },
+        "employee_title_diagnostics": {
+            "source": f"{EMPLOYEE_TABLE}.LEVLCODE -> {EMPLOYEE_TITLE_DICT_TABLE}.DICT_CODE",
+            "target_field": "jhemr.users.education_title",
+            "dictionary_codes": plan["title_dictionary_codes"],
+            "mapped_employees": plan["title_mapped"],
+            "unmapped_employees": plan["title_unmapped"],
+            "overwrite_existing": True,
+            "blank_source_clears_target": False,
         },
         "upserted": {"departments": 0, "persons": 0, "person_sources": 0, "person_departments": 0},
     }
@@ -555,6 +610,7 @@ def sync_his_identity(
                 "upserted": result["upserted"],
                 "bridge": result["bridge"],
                 "doctor_group_diagnostics": result["doctor_group_diagnostics"],
+                "employee_title_diagnostics": result["employee_title_diagnostics"],
             },
             operator=operator,
         ))

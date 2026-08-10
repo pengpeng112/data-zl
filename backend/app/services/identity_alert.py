@@ -46,35 +46,27 @@ def dispatch_circuit_breaker_alert(target: str, dimension: str, value: Any, limi
 
 
 def generate_dba_privilege_recommendation() -> dict[str, Any]:
-    """Generate DBA minimum-privilege recommendations for identity sync.
+    """Return a review-only minimum-privilege and revoke matrix.
 
-    Returns SQL suggestions ONLY. Does NOT execute GRANT/REVOKE.
-    Per plan 107 section 14: generate suggestions, DBA executes manually.
+    No executable GRANT/REVOKE statements are returned or run by the app.
     """
     return {
-        "note": "DBA must review and execute manually. AI/scheduler never executes GRANT/REVOKE.",
-        "jhemr_recommendations": [
-            "GRANT SELECT, INSERT ON jhemr.users TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON jhemr.user_dept TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON jhemr.jhauth_user_vs_role_group TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON jhemr.users_control_mode TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON jhemr.users_sublogin TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON jhemr.users_subsign TO identity_sync_role;",
-            "-- NO DELETE privilege for nightly scheduler",
-            "-- NO UPDATE on jhauth_user_vs_role or jhauth_user_vs_permission",
+        "note": "DBA reviews and applies separately; AI/scheduler never executes GRANT/REVOKE.",
+        "minimum_privilege_matrix": {
+            "CDMS": {"read": ["T_MSS_EMP_DICT", "T_MSS_DEPT_DICT"], "write": ["T_MSS_EMP_DICT", "T_MSS_EMP_DEPT"], "forbidden": ["DELETE", "DDL", "DBA", "RESOURCE"]},
+            "JHEMR": {"read": ["users", "users_pic", "jhauth_user_vs_role_group", "users_sublogin", "users_subsign"], "write": ["users_pic:INSERT", "users_pic:UPDATE"], "forbidden": ["DELETE", "dictionary writes", "DDL", "SUPERUSER"]},
+            "platform": {"read": ["identity sync audit tables"], "write": ["audit rows only"], "forbidden": ["arbitrary SQL", "credential tables"]},
+        },
+        "revoke_rollback_matrix": [
+            {"target": "JHEMR", "privilege": "DELETE", "objects": ["users", "users_pic", "users_sublogin", "users_subsign"], "rollback": "revoke before nightly enablement; verify effective privileges"},
+            {"target": "JHEMR", "privilege": "WRITE", "objects": ["diagnosis_dict", "operation_dict", "operation_dict_code"], "rollback": "revoke dictionary writes and keep identity role separate"},
+            {"target": "CDMS", "privilege": "DELETE/DDL", "objects": ["identity tables"], "rollback": "revoke and verify session privileges"},
         ],
-        "cdms_recommendations": [
-            "GRANT SELECT, INSERT ON CDMS.T_MSS_EMP_DICT TO identity_sync_role;",
-            "GRANT SELECT, INSERT ON CDMS.T_MSS_AUTHMAPPING TO identity_sync_role;",
-            "-- UPDATE only FUSERSTATE for soft-stop:",
-            "GRANT UPDATE (FUSERSTATE) ON CDMS.T_MSS_EMP_DICT TO identity_sync_role;",
-            "-- NO DELETE privilege for nightly scheduler",
+        "single_account_verification": [
+            "Use one synthetic/non-production account in an approved isolated transaction.",
+            "Verify only listed SELECT/INSERT/UPDATE capabilities; record boolean/count/error_class.",
+            "Perform one controlled write and target readback, then ROLLBACK or use the approved fixture.",
+            "Keep nightly disabled until platform release and production write gates are separately authorized.",
         ],
-        "platform_recommendations": [
-            "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA asset TO asset_app;",
-            "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA asset TO asset_app;",
-        ],
-        "delete_policy": "DELETE privilege must NOT be granted to daily scheduler. "
-                         "Temporary DELETE for one-time repair requires separate DBA approval and time-limited grant.",
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }

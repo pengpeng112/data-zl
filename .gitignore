@@ -83,3 +83,12 @@ deploy/offline/SHA256SUMS
 /2026高次次-病历首页数据表样*.xlsx
 /临床诊断字典与国标版本映射关系*.xlsx
 /**/*病历*.xlsx
+
+# 123 offline artifacts (never commit)
+_offline_build_123/
+offline/wheels/
+offline/pnpm-store/
+
+
+backend/identity_unit_test.db
+

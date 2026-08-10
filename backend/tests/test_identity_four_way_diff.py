@@ -119,14 +119,19 @@ class TestAlertDispatch:
         dispatch_circuit_breaker_alert("jhemr", "max_new", 60, 50)
 
     def test_dba_recommendation_structure(self):
+        # 当前实现只返回评审用最小权限矩阵，不返回可执行 GRANT/REVOKE SQL。
         rec = generate_dba_privilege_recommendation()
-        assert "jhemr_recommendations" in rec
-        assert "cdms_recommendations" in rec
-        assert "delete_policy" in rec
-        assert "NOT" in rec["delete_policy"] and "DELETE" in rec["delete_policy"]
-        assert any("INSERT" in r for r in rec["jhemr_recommendations"])
-        assert not any("GRANT DELETE" in r for r in rec["jhemr_recommendations"])
-        assert not any("GRANT DELETE" in r for r in rec["cdms_recommendations"])
+        assert "minimum_privilege_matrix" in rec
+        assert "revoke_rollback_matrix" in rec
+        assert "note" in rec
+        matrix = rec["minimum_privilege_matrix"]
+        assert "JHEMR" in matrix and "CDMS" in matrix
+        assert "DELETE" in matrix["JHEMR"]["forbidden"]
+        assert "DELETE" in matrix["CDMS"]["forbidden"]
+        assert any("INSERT" in w for w in matrix["JHEMR"]["write"])
+        blob = str(rec)
+        assert "GRANT DELETE" not in blob
+        assert "GRANT/REVOKE" in rec["note"] or "never executes" in rec["note"]
 
 
 class TestApiPermissionEnforcement:

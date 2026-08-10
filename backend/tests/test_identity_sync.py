@@ -388,6 +388,52 @@ class TestJhemrAdapterConstants:
                 assert "last_modify_user_id" not in cols
                 assert "last_modify_time" in cols
 
+    def test_existing_nonempty_education_title_is_overwritten_and_read_back(self):
+        from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
+
+        adapter = JhemrIdentityAdapter.__new__(JhemrIdentityAdapter)
+        adapter.hospital_no = "49557032X"
+        adapter.sync_operator_id = "TEST"
+        adapter._fetch_user = lambda emp_no: {
+            "user_id": emp_no,
+            "education_title": "old title",
+        }
+        conn = MagicMock()
+        adapter._ensure_conn = lambda: conn
+        writes = []
+
+        def execute_write(sql, params):
+            writes.append((sql, params))
+            return 1
+
+        def fetch_one(sql, params):
+            if "SELECT education_title" in sql:
+                return {"education_title": "dictionary title"}
+            if "users_control_mode" in sql:
+                return {"user_id": params[0]}
+            return {"role_group_id": "001"}
+
+        adapter._execute_write = execute_write
+        adapter._fetch_one = fetch_one
+        adapter._existing_dept_codes = lambda user_id: {"D001"}
+        adapter._fetch_all = lambda sql, params: (
+            [{"login_way": way} for way in ("0", "2", "4")]
+            if "users_sublogin" in sql
+            else [{"sign_way": way} for way in ("0", "2", "4")]
+        )
+
+        result = adapter.align_existing_user(
+            "E001", "doctor", ["D001"], "001", job_title="dictionary title"
+        )
+
+        assert result["status"] == "success"
+        title_writes = [(sql, params) for sql, params in writes if "education_title" in sql]
+        assert len(title_writes) == 1
+        assert title_writes[0][1][0] == "dictionary title"
+        assert any(action["action"] == "overwrite_education_title" for action in result["actions"])
+        conn.commit.assert_called_once()
+        conn.rollback.assert_not_called()
+
 
 class TestJhemrPasswordGate:
     def _adapter(self, **kwargs):
@@ -425,6 +471,34 @@ class TestJhemrPasswordGate:
         adapter = self._adapter(write_enabled=True, secret_ref="env:X")
         with pytest.raises(JhemrIdentityError):
             adapter.create_user_full("EMP90", "Test", "doctor", "", [])
+
+    def test_existing_password_reset_refused_when_gate_disabled(self):
+        from app.services.jhemr_identity_adapter import JhemrIdentityError
+        adapter = self._adapter(write_enabled=False, secret_ref="env:WHATEVER")
+        with pytest.raises(JhemrIdentityError):
+            adapter.reset_existing_password("EMP90")
+
+    def test_existing_password_reset_updates_one_row_and_verifies(self, monkeypatch):
+        monkeypatch.setenv("TEST_JHEMR_RESET_PWD", "test-only-password")
+        adapter = self._adapter(write_enabled=True, secret_ref="env:TEST_JHEMR_RESET_PWD")
+        adapter._fetch_user = lambda emp_no: {"user_id": emp_no}
+        expected = {}
+
+        def execute(sql, params):
+            expected["ciphertext"] = params[0]
+            return 1
+
+        adapter._execute_write = execute
+        adapter._fetch_one = lambda sql, params: {
+            "user_pwd_sm": expected["ciphertext"],
+            "is_sm": 2,
+        }
+        conn = MagicMock()
+        adapter._ensure_conn = lambda: conn
+        result = adapter.reset_existing_password("EMP90", date_str="20260804")
+        assert result["status"] == "success"
+        conn.commit.assert_called_once()
+        conn.rollback.assert_not_called()
 
 
 # ===========================================================================

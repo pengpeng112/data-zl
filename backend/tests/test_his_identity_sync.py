@@ -35,6 +35,11 @@ class FakeOracleConnector:
                 {"EMP_NO": "E001", "NAME": "Old Name", "DEPT_CODE": "D001", "JOB": "doctor", "TITLE": "old title", "STATUS": "0", "ID_NO": "370100199001011234"},
                 {"EMP_NO": "E002", "NAME": "Staff Only", "DEPT_CODE": "D002", "JOB": "nurse", "TITLE": "nurse", "STATUS": "0", "ID_NO": "370100199002021234"},
             ]
+        if "PORTAL_USER.PORTAL_SYS_DICT" in sql:
+            return [
+                {"DICT_CODE": "L01", "DICT_NAME": "mapped title"},
+                {"DICT_CODE": "L01", "DICT_NAME": "mapped title"},
+            ]
         if "SYS_EMPLOYEE" in sql:
             return [
                 {
@@ -46,6 +51,7 @@ class FakeOracleConnector:
                     "IDENNO": "370100199003031234",
                     "USERCODE": None,
                     "ISDELETED": 0,
+                    "LEVLCODE": "L01",
                 },
             ]
         if "COMM.DOCTOR_GROUP" in sql:
@@ -90,7 +96,7 @@ def test_his_identity_sync_dry_run_does_not_write(monkeypatch):
         assert result["doctor_group_diagnostics"]["unmatched_doctor_user"] == 1
         assert db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E001")) is None
         assert db.scalar(select(GovernAuditLog).where(GovernAuditLog.module == "sync", GovernAuditLog.entity_ref == "his_source_10_10_10_15")) is None
-        assert len(FakeOracleConnector.calls) == 5
+        assert len(FakeOracleConnector.calls) == 6
         assert FakeOracleConnector.last_kwargs["connection_mode"] == "ssh_jump"
         assert FakeOracleConnector.last_kwargs["jump_host"] == "10.10.8.83"
     finally:
@@ -116,6 +122,7 @@ def test_his_identity_sync_upserts_bridge_sources_departments_and_audit(monkeypa
         assert person.person_name_cn == "New Name"
         assert person.dept_code == "D002"
         assert person.primary_source_system == "HIS"
+        assert person.job_title == "mapped title"
         # 活库口径：VALIDSTATE=1 在用
         assert person.employment_status == "active"
 
@@ -148,9 +155,22 @@ def test_his_identity_sync_upserts_bridge_sources_departments_and_audit(monkeypa
         ))
         assert audit is not None
         assert audit.after_data["bridge"]["bridge_hits"] == 1
+        assert audit.after_data["employee_title_diagnostics"]["mapped_employees"] == 1
     finally:
         _cleanup(db)
         db.close()
+
+
+def test_employee_title_dictionary_ambiguity_fails_closed():
+    rows = [
+        {"DICT_CODE": "L01", "DICT_NAME": "Title A"},
+        {"DICT_CODE": "L01", "DICT_NAME": "Title B"},
+    ]
+    try:
+        his_identity_sync._build_employee_title_map(rows)
+        assert False, "conflicting dictionary names must fail closed"
+    except RuntimeError as exc:
+        assert "conflicting names" in str(exc)
 
 
 def test_his_identity_sync_api_dry_run(monkeypatch, client):

@@ -19,7 +19,7 @@ from sqlalchemy import select, and_, func
 from sqlalchemy.orm import Session
 
 from ..core.config import settings
-from ..models.identity import IdentityPerson, IdentityPersonDepartment
+from ..models.identity import IdentityPerson, IdentityPersonDepartment, IdentityPersonSource
 from ..models.identity_sync import (
     IdentitySyncBatch,
     IdentitySyncAction,
@@ -40,6 +40,12 @@ from ..services.identity_hmac import (
     compute_idempotency_key,
     compute_batch_fingerprint,
 )
+from ..services.identity_watermark import advance_watermark, get_watermark, max_watermark, window_start
+from ..services.identity_sync_status import error_code_masked, short_fingerprint
+from ..services.identity_time import (
+    as_aware as _as_aware,
+    is_after_modified_watermark as _is_after_modified_watermark,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,19 +59,6 @@ STAFF_GROUP_SOURCE_TABLE = "COMM.STAFF_VS_GROUP"
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
-
-
-def _as_aware(value: datetime | None) -> datetime | None:
-    """Normalize DB datetimes to tz-aware UTC for safe comparison.
-
-    PostgreSQL TIMESTAMPTZ comes back tz-aware, SQLite comes back naive;
-    comparing mixed values raises TypeError.
-    """
-    if value is None:
-        return None
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value
 
 
 def _now_shanghai() -> datetime:
@@ -193,9 +186,38 @@ def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
     - not in protected list
     - not outsource/management/conflict/status_conflict/master_data_missing
     """
+    from datetime import datetime as _dt
+    modified_since_raw = getattr(settings, "identity_sync_modified_since", None)
+    modified_since = _as_aware(_dt.fromisoformat(
+        modified_since_raw if isinstance(modified_since_raw, str) else "2026-08-04T00:00:00"
+    ))
+    main_watermark = get_watermark(db, source_code="HIS", watermark_key="main_account_sync")
+    if main_watermark.create_date is not None:
+        modified_since = window_start(main_watermark) or modified_since
+    source_rows = db.scalars(select(IdentityPersonSource).where(
+        IdentityPersonSource.source_table == "FXHIS.SYS_EMPLOYEE",
+    )).all()
+    modified_by_code: dict[str, datetime] = {}
+    for source in source_rows:
+        raw = source.raw_data or {}
+        value = raw.get("MODIFIEDTIME") or raw.get("modifiedtime")
+        if not value or not source.person_code:
+            continue
+        try:
+            parsed = _dt.fromisoformat(str(value))
+        except ValueError:
+            continue
+        source_tie_key = compute_account_fingerprint(source.person_code, "HIS", settings.identity_hmac_key_ref)
+        if _is_after_modified_watermark(
+            parsed,
+            modified_since,
+            source_tie_key,
+            main_watermark.employee_key,
+        ):
+            modified_by_code[source.person_code] = parsed
+
     persons = db.scalars(
         select(IdentityPerson).where(
-            IdentityPerson.source_create_date >= MANAGED_SINCE,
             IdentityPerson.employment_status == "active",
             IdentityPerson.classification.in_(list(ELIGIBLE_CLASSIFICATIONS)),
         ).order_by(
@@ -213,6 +235,14 @@ def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
         emp_no = person.person_code
         if not emp_no:
             continue
+        if modified_by_code:
+            if emp_no not in modified_by_code:
+                continue
+        elif (
+            not person.source_create_date
+            or _as_aware(person.source_create_date) < MANAGED_SINCE
+        ):
+            continue
         if person.conflict_flag:
             continue
         if emp_no in protected_ids:
@@ -227,6 +257,8 @@ def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
             "primary_dept": primary_dept,
             "dept_codes": [primary_dept] + additional_depts,
             "create_date": person.source_create_date.isoformat() if person.source_create_date else None,
+            "modified_time": modified_by_code[emp_no].isoformat() if emp_no in modified_by_code else None,
+            "job_title": person.job_title,
         })
 
     return candidates
@@ -248,11 +280,14 @@ def _get_person_depts(db: Session, person_code: str, classification: str | None 
         )
     ).all()
 
-    primaries = sorted(
-        (r for r in rows if r.is_primary and r.dept_code),
-        key=lambda r: (r.source_table or "", r.dept_code),
-    )
-    primary = primaries[0].dept_code if primaries else None
+    person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == person_code))
+    primary = person.dept_code if person and person.dept_code else None
+    if not primary:
+        primaries = sorted(
+            (r for r in rows if r.is_primary and r.dept_code),
+            key=lambda r: (0 if r.source_table == "FXHIS.SYS_EMPLOYEE" else 1, r.dept_code),
+        )
+        primary = primaries[0].dept_code if primaries else None
 
     allowed = allowed_additional_group_classes(classification or "")
     additionals: list[str] = []
@@ -389,7 +424,7 @@ def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str,
 # Full pipeline: plan -> apply -> readback -> reconcile -> report
 # ---------------------------------------------------------------------------
 
-def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> dict[str, Any]:
+def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", refresh_source: bool = False) -> dict[str, Any]:
     """Execute the full nightly pipeline. Auto-advances without human approval.
 
     Pipeline: collect -> preflight -> plan -> apply -> readback -> reconcile -> report.
@@ -398,6 +433,29 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
     run_id = f"RUN-{uuid.uuid4().hex[:12]}"
     lock_key = "identity_nightly_sync"
     holder = f"nightly_{run_id}"
+
+    declared_provider = str(getattr(settings, "identity_scheduler_provider", "disabled") or "disabled")
+    providers = ({declared_provider} if declared_provider != "disabled" else set())
+    if settings.identity_nightly_enabled:
+        providers.add("apscheduler")
+    if len(providers) > 1:
+        run_record = IdentitySchedulerRun(
+            run_id=run_id,
+            triggered_by=triggered_by,
+            status="misconfigured",
+            started_at=_now(),
+            finished_at=_now(),
+            provider_code="multiple",
+            report_summary={"reason": "multiple_scheduler_providers", "providers": sorted(providers)},
+        )
+        db.add(run_record)
+        db.commit()
+        try:
+            from .identity_sync_audit import record_alert
+            record_alert(db, run_id=run_id, alert_type="dual_scheduler", severity="error", error_class="multiple_providers", detail={"providers": sorted(providers)})
+        except Exception:
+            pass
+        return {"status": "misconfigured", "reason": "multiple_scheduler_providers", "run_id": run_id}
 
     # Acquire distributed lock
     if not acquire_lock(db, lock_key, holder, settings.identity_nightly_max_runtime_seconds):
@@ -409,6 +467,8 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
         status="running",
         lock_holder=holder,
         started_at=_now(),
+        provider_code=declared_provider if declared_provider != "disabled" else ("apscheduler" if settings.identity_nightly_enabled else "unknown"),
+        provider_heartbeat_at=_now(),
     )
     db.add(run_record)
     db.flush()
@@ -418,14 +478,26 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
         for target in ("cdms", "jhemr"):
             cb_state = check_circuit_breaker(db, f"nightly_{target}")
             if cb_state["open"]:
-                run_record.status = "circuit_open"
+                run_record.status = "failed"
                 run_record.circuit_breaker_triggered = True
                 run_record.circuit_breaker_dimension = f"nightly_{target}"
                 run_record.finished_at = _now()
                 db.commit()
-                return {"status": "circuit_open", "target": target, "run_id": run_id}
+                try:
+                    from .identity_sync_audit import record_alert
+                    record_alert(db, run_id=run_id, alert_type="circuit_breaker_open", severity="error", error_class=f"nightly_{target}", detail={"target": target})
+                except Exception:
+                    pass
+                return {"status": "failed", "reason": "circuit_breaker_open", "target": target, "run_id": run_id}
 
-        # COLLECT (platform-side): classification preflight, then candidates.
+        # COLLECT: refresh the platform identity master from read-only HIS,
+        # then classify and select the configured MODIFIEDTIME increment.
+        collection_stats: dict[str, Any] = {"status": "not_refreshed"}
+        if refresh_source:
+            from .his_identity_sync import sync_his_identity
+            collection_stats = sync_his_identity(
+                db, operator="identity-nightly", dry_run=False, write_audit=True,
+            )
         # The preflight fills IdentityPerson.classification / conflict_flag from
         # the collected HIS person sources — without it the candidate set would
         # always be empty (plan 107 §15.5 isolation rules are applied here).
@@ -437,21 +509,29 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
 
         if not candidates:
             run_record.status = "success"
+            run_record.success_count = 0
+            run_record.failed_count = 0
+            run_record.skipped_count = 0
             run_record.finished_at = _now()
-            run_record.report_summary = {"note": "no_candidates", "total": 0, "preflight": preflight_stats}
+            run_record.report_summary = {"note": "no_candidates", "total": 0, "preflight": preflight_stats, "collection": collection_stats}
             db.commit()
-            return {"status": "success", "run_id": run_id, "candidates": 0, "preflight": preflight_stats}
+            return {"status": "success", "run_id": run_id, "candidates": 0, "success_count": 0, "failed_count": 0, "skipped_count": 0, "preflight": preflight_stats}
 
         # PREFLIGHT: threshold checks with real change composition
         stats = _compute_change_stats(db, candidates)
         threshold_result = check_thresholds(candidates, stats)
         if threshold_result.get("triggered"):
-            run_record.status = "circuit_open"
+            run_record.status = "failed"
             run_record.circuit_breaker_triggered = True
             run_record.circuit_breaker_dimension = threshold_result["dimension"]
             run_record.finished_at = _now()
             db.commit()
-            return {"status": "threshold_exceeded", "dimension": threshold_result["dimension"], "run_id": run_id}
+            try:
+                from .identity_sync_audit import record_alert
+                record_alert(db, run_id=run_id, alert_type="circuit_breaker_open", severity="error", error_class=threshold_result["dimension"], detail={"dimension": threshold_result["dimension"]})
+            except Exception:
+                pass
+            return {"status": "failed", "reason": "threshold_exceeded", "dimension": threshold_result["dimension"], "run_id": run_id}
 
         # PLAN + APPLY: process each candidate with independent target transactions
         success_count = 0
@@ -459,7 +539,7 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
         skipped_count = 0
 
         for candidate in candidates:
-            result = _process_single_candidate(db, candidate, run_id)
+            result = _process_single_candidate(db, candidate, run_id, reconcile_existing=True)
             if result["status"] == "success":
                 success_count += 1
             elif result["status"] == "skipped":
@@ -488,6 +568,24 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
             "skipped": skipped_count,
         }
 
+        if failed_count == 0 and candidates:
+            candidate_wm = max_watermark(
+                [
+                    (datetime.fromisoformat(c["modified_time"]) if c.get("modified_time") else None,
+                     compute_account_fingerprint(c.get("emp_no"), "HIS", settings.identity_hmac_key_ref))
+                    for c in candidates
+                ]
+            )
+            advance_watermark(
+                db,
+                source_code="HIS",
+                watermark_key="main_account_sync",
+                candidate=candidate_wm,
+                run_id=run_id,
+                success=True,
+                commit=False,
+            )
+
         # Update circuit breakers
         if failed_count == 0:
             record_success(db, "nightly_cdms")
@@ -504,24 +602,38 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron") -> 
             "success": success_count,
             "failed": failed_count,
             "skipped": skipped_count,
+            "success_count": success_count,
+            "failed_count": failed_count,
+            "skipped_count": skipped_count,
         }
 
     except Exception as exc:
+        # Any exception after candidate calculation must also discard an
+        # uncommitted watermark candidate; failed runs never advance it.
+        from .data_masking import sanitize_text
+
+        db.rollback()
         run_record.status = "failed"
-        run_record.error_message = f"{type(exc).__name__}: {str(exc)[:300]}"
+        run_record.error_message = sanitize_text(
+            f"{type(exc).__name__}: {exc}", limit=300
+        )
         run_record.finished_at = _now()
         record_failure(db, "nightly_cdms")
         record_failure(db, "nightly_jhemr")
         db.commit()
         logger.exception("Nightly pipeline failed: %s", run_id)
-        return {"status": "failed", "run_id": run_id, "error": str(exc)[:200]}
+        return {
+            "status": "failed",
+            "run_id": run_id,
+            "error": sanitize_text(f"{type(exc).__name__}", limit=200),
+        }
 
     finally:
         release_lock(db, lock_key)
         db.commit()
 
 
-def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_retries: int | None = None) -> dict[str, Any]:
+def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_retries: int | None = None, reconcile_existing: bool = False) -> dict[str, Any]:
     """Process one candidate against both targets independently.
 
     Each target (CDMS, JHEMR) is an independent transaction.
@@ -556,7 +668,7 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
         )
     )
 
-    if existing_cdms and existing_jhemr:
+    if existing_cdms and existing_jhemr and not reconcile_existing:
         return {"status": "skipped", "reason": "already_managed_both"}
 
     batch_id = f"NTL-{run_id}-{uuid.uuid4().hex[:8]}"
@@ -564,12 +676,13 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
         batch_id=batch_id,
         batch_type="nightly",
         scheduler_run_id=run_id,
-        emp_no_masked=candidate["emp_no_masked"],
+        # 122: durable identity binding is the target-scoped HMAC only.
+        emp_no_masked=None,
         account_fingerprint=fp_cdms,
         person_classification=classification,
         status="applying",
         template_version=TEMPLATE_VERSION,
-        idempotency_key=f"{batch_id}:{emp_no}",
+        idempotency_key=f"{batch_id}:{fp_cdms}",
         started_at=_now(),
     )
     db.add(batch)
@@ -578,33 +691,65 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
     cdms_ok = bool(existing_cdms)
     jhemr_ok = bool(existing_jhemr)
 
+    def plan_target_action(target_system: str, fingerprint: str) -> IdentitySyncAction:
+        action = IdentitySyncAction(
+            batch_id=batch_id,
+            action_seq=1 if target_system == "CDMS" else 2,
+            target_system=target_system,
+            action_type="account_sync",
+            target_table="identity_target",
+            account_fingerprint=fingerprint,
+            params_summary={"run_id": run_id, "subtask": "main_account_sync"},
+            subtask_code="main_account_sync",
+            status="planned",
+        )
+        db.add(action)
+        db.flush()
+        return action
+
+    def close_target_action(action: IdentitySyncAction, *, status: str, result: dict[str, Any] | None = None, reason: str | None = None) -> None:
+        action.status = status
+        action.rows_affected = 1 if status == "executed" else 0
+        action.reason_code = reason
+        if result and status == "failed":
+            action.error_class = "target_write"
+            action.error_code_masked = error_code_masked(result.get("error"))
+        action.error_message = None
+        action.executed_at = _now()
+
     # CDMS target (independent, with limited retry)
+    cdms_action = plan_target_action("CDMS", fp_cdms)
     if not cdms_ok:
         for attempt in range(max_retries + 1):
-            cdms_result = _apply_cdms_target(db, batch_id, emp_no, classification, dept_codes, fp_cdms)
+            cdms_result = _apply_cdms_target(db, batch_id, emp_no, classification, dept_codes, fp_cdms, reconcile_existing=reconcile_existing, job_title=candidate.get("job_title"))
             cdms_ok = cdms_result.get("status") == "success"
             if cdms_ok or cdms_result.get("note") == "idempotent_skip":
                 cdms_ok = True
                 break
             if attempt < max_retries:
-                logger.warning("CDMS attempt %d failed for %s, retrying", attempt + 1, _mask_emp_no(emp_no))
+                logger.warning("CDMS attempt %d failed for fingerprint=%s, retrying", attempt + 1, short_fingerprint(fp_cdms))
         batch.cdms_status = "success" if cdms_ok else cdms_result.get("status", "failed")
+        close_target_action(cdms_action, status="executed" if cdms_ok else "failed", result=cdms_result)
     else:
         batch.cdms_status = "skipped"
+        close_target_action(cdms_action, status="skipped", reason="already_managed")
 
     # JHEMR target (independent, with limited retry)
+    jhemr_action = plan_target_action("JHEMR", fp_jhemr)
     if not jhemr_ok:
         for attempt in range(max_retries + 1):
-            jhemr_result = _apply_jhemr_target(db, batch_id, emp_no, classification, dept_codes, fp_jhemr)
+            jhemr_result = _apply_jhemr_target(db, batch_id, emp_no, classification, dept_codes, fp_jhemr, reconcile_existing=reconcile_existing, job_title=candidate.get("job_title"))
             jhemr_ok = jhemr_result.get("status") == "success"
             if jhemr_ok or jhemr_result.get("note") == "idempotent_skip":
                 jhemr_ok = True
                 break
             if attempt < max_retries:
-                logger.warning("JHEMR attempt %d failed for %s, retrying", attempt + 1, _mask_emp_no(emp_no))
+                logger.warning("JHEMR attempt %d failed for fingerprint=%s, retrying", attempt + 1, short_fingerprint(fp_jhemr))
         batch.jhemr_status = "success" if jhemr_ok else jhemr_result.get("status", "failed")
+        close_target_action(jhemr_action, status="executed" if jhemr_ok else "failed", result=jhemr_result)
     else:
         batch.jhemr_status = "skipped"
+        close_target_action(jhemr_action, status="skipped", reason="already_managed")
 
     # READBACK: verify applied state matches plan (plan 107 pipeline step 5)
     readback_ok = True
@@ -648,7 +793,7 @@ def _display_name(db: Session, emp_no: str) -> str:
     name = person.person_name_cn.strip() if person and person.person_name_cn else ""
     if not name:
         # No real name available: fail closed rather than write a masked value.
-        raise RuntimeError(f"display name unavailable for emp {_mask_emp_no(emp_no)}; refusing to write masked value")
+        raise RuntimeError("display_name_unavailable; refusing to write masked value")
     return name
 
 
@@ -693,13 +838,13 @@ def _register_managed(
         target_system=target_system,
         account_fingerprint=fingerprint,
         composite_business_key=(
-            f"CDMS:FLOGINNAME={_mask_emp_no(emp_no)}" if target_system == "CDMS"
-            else f"JHEMR:db_user+hospital_no={_mask_emp_no(emp_no)}"
+            f"CDMS:FLOGINNAME:fingerprint={fingerprint}" if target_system == "CDMS"
+            else f"JHEMR:db_user+hospital_no:fingerprint={fingerprint}"
         ),
-        emp_no_masked=_mask_emp_no(emp_no),
+        emp_no_masked=None,
         relation_type="account",
         target_table=target_table,
-        target_key=_mask_emp_no(emp_no),
+        target_key=fingerprint,
         relation_data=data,
         template_version=TEMPLATE_VERSION,
         action_hash=compute_action_hash(fingerprint, target_system, action, target_table, TEMPLATE_VERSION),
@@ -789,7 +934,7 @@ def _check_hmac_key_nonempty() -> bool:
         return False
 
 
-def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: str, dept_codes: list[str], fingerprint: str) -> dict[str, Any]:
+def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: str, dept_codes: list[str], fingerprint: str, *, reconcile_existing: bool = False, job_title: str | None = None) -> dict[str, Any]:
     """Apply CDMS target. Independent transaction. INSERT + column-whitelist UPDATE only."""
     role_mapping = _get_role_mapping(db, "CDMS", classification)
     if not role_mapping:
@@ -805,7 +950,7 @@ def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: 
             IdentityManagedRelation.status == "active",
         )
     )
-    if existing_by_fp:
+    if existing_by_fp and not reconcile_existing:
         return {"status": "success", "note": "idempotent_skip"}
     existing = db.scalar(
         select(IdentityManagedRelation).where(
@@ -813,7 +958,16 @@ def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: 
             IdentityManagedRelation.status == "active",
         )
     )
-    if existing:
+    if existing and not reconcile_existing:
+        return {"status": "success", "note": "idempotent_skip"}
+
+    pending = db.scalar(
+        select(IdentityManagedRelation).where(
+            IdentityManagedRelation.idempotency_key == idem_key,
+            IdentityManagedRelation.status == "pending_reconcile",
+        )
+    )
+    if pending and not reconcile_existing and not check_write_gates(db)["all_passed"]:
         return {"status": "success", "note": "idempotent_skip"}
 
     # 112 B1/B2：写入门禁（fail-closed）。任一 gate 不过则登记
@@ -827,7 +981,11 @@ def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: 
             idem_key=idem_key, status="pending_reconcile",
         )
         failed_gates = [g["gate"] for g in gates["gates"] if not g["passed"]]
-        return {"status": "blocked", "note": "write_gates_not_satisfied", "blocked_gates": failed_gates}
+        return {
+            "status": "success",
+            "note": "pending_reconcile",
+            "blocked_gates": failed_gates,
+        }
 
     # Gates passed: invoke the white-listed executor bridge (Phase D path).
     from ..services.identity_sync_executor_bridge import execute_cdms_apply
@@ -849,6 +1007,7 @@ def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: 
         classification=classification,
         primary_dept=primary_dept,
         additional_depts=additional,
+        job_title=job_title,
     )
     if result.get("status") != "success":
         _register_managed(
@@ -880,7 +1039,7 @@ def _apply_cdms_target(db: Session, batch_id: str, emp_no: str, classification: 
     return {"status": "success", "note": "applied_via_bridge"}
 
 
-def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification: str, dept_codes: list[str], fingerprint: str) -> dict[str, Any]:
+def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification: str, dept_codes: list[str], fingerprint: str, *, reconcile_existing: bool = False, job_title: str | None = None) -> dict[str, Any]:
     """Apply JHEMR target. Independent transaction. 6-table creation."""
     role_mapping = _get_role_mapping(db, "JHEMR", classification)
     if not role_mapping:
@@ -896,7 +1055,7 @@ def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification:
             IdentityManagedRelation.status == "active",
         )
     )
-    if existing_by_fp:
+    if existing_by_fp and not reconcile_existing:
         return {"status": "success", "note": "idempotent_skip"}
     existing = db.scalar(
         select(IdentityManagedRelation).where(
@@ -904,7 +1063,17 @@ def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification:
             IdentityManagedRelation.status == "active",
         )
     )
-    if existing:
+    if existing and not reconcile_existing:
+        return {"status": "success", "note": "idempotent_skip"}
+
+
+    pending = db.scalar(
+        select(IdentityManagedRelation).where(
+            IdentityManagedRelation.idempotency_key == idem_key,
+            IdentityManagedRelation.status == "pending_reconcile",
+        )
+    )
+    if pending and not reconcile_existing and not check_write_gates(db)["all_passed"]:
         return {"status": "success", "note": "idempotent_skip"}
 
     gates = check_write_gates(db)
@@ -916,7 +1085,11 @@ def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification:
             idem_key=idem_key, status="pending_reconcile",
         )
         failed_gates = [g["gate"] for g in gates["gates"] if not g["passed"]]
-        return {"status": "blocked", "note": "write_gates_not_satisfied", "blocked_gates": failed_gates}
+        return {
+            "status": "success",
+            "note": "pending_reconcile",
+            "blocked_gates": failed_gates,
+        }
 
     from ..services.identity_sync_executor_bridge import execute_jhemr_apply
     try:
@@ -937,6 +1110,7 @@ def _apply_jhemr_target(db: Session, batch_id: str, emp_no: str, classification:
         classification=classification,
         primary_dept=primary_dept,
         additional_depts=additional,
+        job_title=job_title,
     )
     if result.get("status") != "success":
         _register_managed(
@@ -1086,7 +1260,7 @@ def run_validation_batch(db: Session) -> dict[str, Any]:
         else:
             result = _apply_jhemr_target(db, batch_id, person["emp_no"], person["classification"], person["dept_codes"], fp)
 
-        results.append({"role": role, "target": target, "status": result.get("status"), "emp_no_masked": person["emp_no_masked"]})
+        results.append({"role": role, "target": target, "status": result.get("status"), "account_fingerprint": short_fingerprint(fp)})
 
         if result.get("status") == "failed":
             paused = True

@@ -62,6 +62,26 @@ def nightly_status(user=Depends(get_current_user), db: Session = Depends(get_db)
     return ApiResponse(data=result)
 
 
+@router.get("/alerts", summary="Queryable identity sync alerts")
+def identity_sync_alerts(user=Depends(get_current_user), db: Session = Depends(get_db)) -> ApiResponse[list[dict[str, Any]]]:
+    """Return redacted operational alerts; identities and SQL are never exposed."""
+    from sqlalchemy import select
+    from ...models.identity_sync import IdentitySyncAlert
+    try:
+        rows = db.scalars(select(IdentitySyncAlert).order_by(IdentitySyncAlert.created_at.desc()).limit(100)).all()
+    except Exception:
+        rows = []
+    return ApiResponse(data=[{
+        "run_id": row.run_id,
+        "alert_type": row.alert_type,
+        "severity": row.severity,
+        "status": row.status,
+        "error_class": row.error_class,
+        "occurrence_count": row.occurrence_count,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    } for row in rows])
+
+
 @router.post("/nightly/trigger", summary="Manual nightly rerun (reuses full pipeline)")
 def nightly_trigger(user=Depends(require_permission("identity.sync.trigger")), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Trigger a manual nightly rerun.
@@ -98,12 +118,14 @@ def select_candidates(user=Depends(get_current_user), db: Session = Depends(get_
     """
     _require_sync_enabled()
     from ...services.identity_sync_orchestrator import select_nightly_candidates
+    from ...services.identity_hmac import compute_account_fingerprint
+    from ...services.identity_sync_status import short_fingerprint
     candidates = select_nightly_candidates(db)
     return ApiResponse(data={
         "total_eligible": len(candidates),
         "candidates": [
             {
-                "emp_no_masked": c["emp_no_masked"],
+                "account_fingerprint": short_fingerprint(compute_account_fingerprint(c["emp_no"], "JHEMR", settings.identity_hmac_key_ref)),
                 "classification": c["classification"],
                 "dept_count": len(c["dept_codes"]),
                 "create_date": c["create_date"],
@@ -125,7 +147,7 @@ def list_batches(db: Session = Depends(get_db), user=Depends(get_current_user)) 
             "batch_id": b.batch_id,
             "batch_type": b.batch_type,
             "validation_mode": b.validation_mode,
-            "emp_no_masked": b.emp_no_masked,
+            "account_fingerprint": b.account_fingerprint[:12] if b.account_fingerprint else None,
             "person_classification": b.person_classification,
             "status": b.status,
             "cdms_status": b.cdms_status,

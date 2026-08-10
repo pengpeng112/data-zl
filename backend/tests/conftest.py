@@ -12,7 +12,15 @@ from sqlalchemy import inspect, text, delete, or_
 # 纯逻辑子进程测试子目录：不连数据库、不要求 APP_TEST_DB_URL，
 # 各自带 no-op conftest 覆盖根 conftest 的 autouse。运行这些子目录时不触发
 # 数据库门禁 exit，保证无测试库环境下仍可验证门禁/配置纯逻辑。
-_PURE_LOGIC_SUBDIRS = ("db_guard", "role_effective", "startup_check", "security_audit", "dict_sync_112")
+_PURE_LOGIC_SUBDIRS = (
+    "db_guard",
+    "role_effective",
+    "startup_check",
+    "security_audit",
+    "dict_sync_112",
+    "identity_title_sync",
+    "identity_signature_sync",
+)
 
 
 def _only_pure_logic_subdirs() -> bool:

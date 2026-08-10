@@ -1,20 +1,18 @@
 """JHEMR (Vastbase / PostgreSQL-compatible) identity account adapter.
 
-Implements the JHEMR side of plan 103 (HIS -> 电子病历 identity sync): for an
-existing JHEMR account, idempotently align role-group binding
-(``jhemr.jhauth_user_vs_role_group``) and multi-department bindings
-(``jhemr.user_dept``) for the production tenant ``49557032X``.
+Creates a missing account or idempotently aligns an existing account across
+``users``, ``user_dept``, ``jhauth_user_vs_role_group``,
+``users_control_mode``, ``users_sublogin`` and ``users_subsign`` for tenant
+``49557032X``.
 
-Hard rules (mirrors 开发起步包/103_...执行计划.md §12.2 / §14.3):
-- Only ``users`` / ``user_dept`` / ``jhauth_user_vs_role_group`` are read or
-  written. Never write ``jhauth_user_vs_role``, ``jhauth_user_vs_permission``,
-  ``user_pwd`` or ``user_pwd_sm``.
-- No account creation: if ``(db_user, hospital_no)`` is missing from
-  ``users``, the user is blocked, not created.
-- Insert-only / additive: never DELETE and never remove existing dept or role
-  bindings; only add what is missing.
-- One transaction per user for ``apply_single_user``; read-back verify before
-  COMMIT, full ROLLBACK on any failure.
+Hard rules:
+- Existing department and role bindings are additive: never DELETE and never
+  remove or replace historical bindings.
+- New-account creation and an explicitly requested existing-account password
+  reset use the controlled SM4 secret path and the password-write gate.
+- Never write ``jhauth_user_vs_role`` or ``jhauth_user_vs_permission``.
+- One transaction per operation; read-back before COMMIT and full ROLLBACK on
+  any failure.
 - All SQL is parameterized (``%s``); no string interpolation of values.
 - Audit-safe: passwords and personal identifiers are masked before any row
   leaves this module; credential file contents are never logged.
@@ -78,7 +76,6 @@ WRITE_POLICY = "identity_account_sync"
 
 TEMPLATE_VERSION = "jhemr-login-v1"
 
-# Tables this adapter is allowed to read/write. Anything else is out of scope.
 # Never written by this adapter (documented guardrail).
 FORBIDDEN_WRITE_TABLES = (
     "jhauth_user_vs_role",
@@ -244,10 +241,11 @@ class JhemrIdentityAdapter:
         with self._lock:
             if self._conn is not None:
                 return self._conn
-            if self._tunnel is None:
+            direct = os.environ.get("APP_IDENTITY_SYNC_DIRECT_CONNECTION", "").strip().lower() in {"1", "true", "yes"}
+            if not direct and self._tunnel is None:
                 self._start_tunnel()
             try:
-                self._open_db_connection()
+                self._open_db_connection(direct=direct)
             except Exception:
                 self._stop_tunnel()
                 raise
@@ -334,7 +332,7 @@ class JhemrIdentityAdapter:
         except Exception:
             pass
 
-    def _open_db_connection(self) -> None:
+    def _open_db_connection(self, *, direct: bool = False) -> None:
         user, password = _resolve_credentials(self.credential_ref)
         options = f"-c statement_timeout={self.statement_timeout_ms}"
         try:
@@ -342,8 +340,8 @@ class JhemrIdentityAdapter:
             from psycopg.rows import dict_row
 
             conn = psycopg.connect(
-                host="127.0.0.1",
-                port=self._local_port,
+                host=self.db_host if direct else "127.0.0.1",
+                port=self.db_port if direct else self._local_port,
                 dbname=self.db_name,
                 user=user,
                 password=password,
@@ -357,8 +355,8 @@ class JhemrIdentityAdapter:
             import psycopg2.extras
 
             conn = psycopg2.connect(
-                host="127.0.0.1",
-                port=self._local_port,
+                host=self.db_host if direct else "127.0.0.1",
+                port=self.db_port if direct else self._local_port,
                 dbname=self.db_name,
                 user=user,
                 password=password,
@@ -380,7 +378,13 @@ class JhemrIdentityAdapter:
         cur = conn.cursor(row_factory=self._dict_row)
         try:
             cur.execute(sql, params)
-            return [dict(row) for row in cur.fetchall()]
+            # Vastbase may expose unquoted column labels in upper case even
+            # through a PostgreSQL-compatible driver. Internal adapter logic
+            # uses canonical lower-case schema names.
+            return [
+                {str(key).lower(): value for key, value in dict(row).items()}
+                for row in cur.fetchall()
+            ]
         finally:
             cur.close()
 
@@ -478,6 +482,7 @@ class JhemrIdentityAdapter:
         primary_dept: str,
         additional_depts: list[str],
         date_str: str | None = None,
+        job_title: str | None = None,
     ) -> dict:
         """Create a complete JHEMR user in ONE transaction across 6 tables.
 
@@ -535,11 +540,11 @@ class JhemrIdentityAdapter:
             self._execute_write(
                 "INSERT INTO jhemr.users "
                 "(db_user, user_id, user_login_name, user_name, user_dept, account_status, "
-                "user_type, hospital_no, is_sm, user_pwd_sm, pwd_modify_time, create_date, start_date) "
-                "VALUES (%s, %s, %s, %s, %s, 0, 0, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                "user_type, hospital_no, is_sm, user_pwd_sm, education_title, pwd_modify_time, create_date, start_date) "
+                "VALUES (%s, %s, %s, %s, %s, 0, 0, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                 (emp_no, emp_no, emp_no, display_name, primary_dept, self.hospital_no,
                  int(password_fields.get("is_sm", "2")),
-                 password_fields.get("user_pwd_sm", "")),
+                 password_fields.get("user_pwd_sm", ""), job_title or None),
             )
             actions.append({"action": "insert", "table": "users", "target_key": emp_no})
 
@@ -704,8 +709,9 @@ class JhemrIdentityAdapter:
         classification: str,
         dept_codes: list[str],
         role_group_code: str,
+        job_title: str | None = None,
     ) -> dict:
-        """Idempotently align an existing user. Only fills missing, never overwrites."""
+        """Idempotently align an existing user and overwrite a changed HIS title."""
         classification_key, role_group_code, dept_codes = self._normalize_inputs(
             classification, dept_codes, role_group_code
         )
@@ -717,6 +723,26 @@ class JhemrIdentityAdapter:
         conn = self._ensure_conn()
         actions: list[dict] = []
         try:
+            normalized_title = str(job_title or "").strip()
+            current_title = str(user.get("education_title") or "").strip()
+            if normalized_title and normalized_title != current_title:
+                affected = self._execute_write(
+                    "UPDATE jhemr.users SET education_title = %s "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (normalized_title, user_id, self.hospital_no),
+                )
+                if affected != 1:
+                    raise JhemrIdentityError(
+                        f"education_title update affected {affected} rows; expected 1"
+                    )
+                verified_title = self._fetch_one(
+                    "SELECT education_title FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (user_id, self.hospital_no),
+                )
+                if not verified_title or str(verified_title.get("education_title") or "").strip() != normalized_title:
+                    raise JhemrIdentityError("education_title read-back mismatch")
+                actions.append({"action": "overwrite_education_title", "table": "users"})
             existing_rg = self._fetch_one(
                 "SELECT role_group_id FROM jhemr.jhauth_user_vs_role_group "
                 "WHERE user_id = %s AND role_group_id = %s AND hospital_no = %s",
@@ -817,6 +843,64 @@ class JhemrIdentityAdapter:
             return {"status": "failed", "actions": actions, "error": f"{type(exc).__name__}: {str(exc)[:300]}", "rolled_back": True}
 
         return {"status": "success", "actions": actions}
+
+    def reset_existing_password(self, emp_no: str, date_str: str | None = None) -> dict:
+        """Initialize an existing account password through the controlled SM4 path."""
+        emp_no = str(emp_no or "").strip()
+        if not emp_no:
+            raise JhemrIdentityError("emp_no must not be empty")
+        if not self.password_write_enabled:
+            raise JhemrIdentityError(
+                "password write is disabled (APP_IDENTITY_JHEMR_PASSWORD_WRITE_ENABLED=false)"
+            )
+        if not self.password_secret_ref:
+            raise JhemrIdentityError("password_secret_ref is required for password reset")
+
+        user = self._fetch_user(emp_no)
+        if user is None:
+            raise JhemrIdentityError("existing user not found; password reset refused")
+        user_id = str(user["user_id"])
+        if date_str is None:
+            date_str = get_shanghai_date_str()
+        password_fields = compute_password_fields(user_id, self.password_secret_ref, date_str)
+
+        conn = self._ensure_conn()
+        try:
+            affected = self._execute_write(
+                "UPDATE jhemr.users SET user_pwd_sm = %s, is_sm = %s, "
+                "pwd_modify_time = CURRENT_TIMESTAMP "
+                "WHERE user_id = %s AND db_user = %s AND hospital_no = %s",
+                (
+                    password_fields["user_pwd_sm"],
+                    int(password_fields["is_sm"]),
+                    user_id,
+                    emp_no,
+                    self.hospital_no,
+                ),
+            )
+            if affected != 1:
+                raise JhemrIdentityError(f"password reset affected {affected} rows; expected 1")
+            verified = self._fetch_one(
+                "SELECT user_pwd_sm, is_sm FROM jhemr.users "
+                "WHERE user_id = %s AND db_user = %s AND hospital_no = %s",
+                (user_id, emp_no, self.hospital_no),
+            )
+            if not verified or verified.get("user_pwd_sm") != password_fields["user_pwd_sm"]:
+                raise JhemrIdentityError("password reset read-back mismatch")
+            if str(verified.get("is_sm")) != str(password_fields["is_sm"]):
+                raise JhemrIdentityError("password algorithm read-back mismatch")
+            conn.commit()
+        except Exception as exc:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            return {
+                "status": "failed",
+                "error": f"{type(exc).__name__}: {str(exc)[:300]}",
+                "rolled_back": True,
+            }
+        return {"status": "success", "password_initialized": True, "pwd_set_date": date_str}
 
     # -- dry-run ------------------------------------------------------------
 
