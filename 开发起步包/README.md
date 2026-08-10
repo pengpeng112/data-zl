@@ -225,6 +225,7 @@
 
 | 日期 | 操作 | 内容 |
 |---|---|---|
+| 2026-08-10 | push+F10 apply+签名批量补跑 | push `6be5408`；F10 归并 his_source→HIS、ods_ydhl→DATA_CENTER（备份 pre_f10 dump）；签名 batch inserted=15 failed=0；JHEMR 写 15/HIS 写 0。 |
 | 2026-08-10 | 121 G8 图谱生产发布 | 前端 build `e1e24a6bf5cea97a` 原子切到 `releases/g8-…`；nginx root→current；后端 signature125 保持；e2e ACCEPTANCE PASS、**G7_ACCEPTANCE PASS**；方向文案新版上线；previous=pre-g8-flat-20260806；业务源写 0。 |
 | 2026-08-10 | H7 观察刷新 | post_fix_night_runs 仍 0；首夜窗口 08-11 02:00；Pillow/tz 绿；provider=host_cron。 |
 | 2026-08-10 | 后端全量 pytest 双次绿 | 隔离库 data_asset_test 串行两次：679 passed / 1 skipped / 0 failed；EXIT1=0 EXIT2=0。 |

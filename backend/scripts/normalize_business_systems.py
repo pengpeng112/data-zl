@@ -80,7 +80,8 @@ def build_plan(db) -> dict:
             if len(candidates) == 1:
                 target = next(iter(candidates))
                 reason = "heuristic"
-            else:
+            elif len(candidates) > 1:
+                # 多候选才是真冲突，必须人工裁定
                 conflicts.append({
                     "source_code": source.source_code,
                     "old_system": source.system_code,
@@ -88,6 +89,21 @@ def build_plan(db) -> dict:
                     "candidates": sorted(candidates),
                     "reason": "manual selection required",
                 })
+            else:
+                # 周边独立系统（JHEMR/DOCARE/LIS 等）保留现有 system_code，
+                # 不强制并入 HIS/HRP/DATA_CENTER，也不阻塞 apply。
+                current = (source.system_code or "").strip()
+                if current:
+                    target = current
+                    reason = "keep_existing_system"
+                else:
+                    conflicts.append({
+                        "source_code": source.source_code,
+                        "old_system": source.system_code,
+                        "target_host": host or None,
+                        "candidates": [],
+                        "reason": "missing system_code and no canonical map",
+                    })
         mapping.append({
             "source_code": source.source_code,
             "old_system": source.system_code,
@@ -178,6 +194,9 @@ def apply_plan(db, plan: dict, approval_ref: str) -> dict:
                 ),
                 {"new": new, "sc": src.source_code},
             )
+
+    # Ensure ORM updates are visible to subsequent COUNT queries.
+    db.flush()
 
     # mark old non-canonical systems as merged
     for old_code in old_systems_touched:
