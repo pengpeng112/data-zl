@@ -92,3 +92,7 @@ offline/pnpm-store/
 
 backend/identity_unit_test.db
 
+
+# GitHub 100MB limit: keep HRP bulk columns out of git
+开发起步包/数据资产_HRP源端资产包/hrp_source_columns.csv
+
