@@ -11,12 +11,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
 
 from fastapi import HTTPException
+from pypinyin import Style, lazy_pinyin
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -124,6 +126,14 @@ def _text(value: Any) -> str:
 def _flag_is_yes(value: Any) -> bool:
     t = _text(value)
     return t in {"是", "1", "Y", "y", "true", "TRUE", "yes", "YES"}
+
+
+def _pinyin_initials(value: Any, *, max_length: int) -> str:
+    text = _text(value)
+    if not text:
+        return ""
+    code = "".join(lazy_pinyin(text, style=Style.FIRST_LETTER, errors="default")).upper()
+    return code[:max_length]
 
 
 def _is_grey_insurance(insurance_code: str, insurance_name: str, mapping_status: str) -> bool:
@@ -268,7 +278,8 @@ def _load_platform_rows(
             or extra.get("insurance_raw_name")
         )
         mapping_status = _text(extra.get("insurance_mapping_status"))
-        grey = _is_grey_insurance(insurance_code, insurance_name, mapping_status)
+        requested_ybhm = _text(extra.get("jhemr_ybhm"))
+        grey = requested_ybhm == "灰码" or _is_grey_insurance(insurance_code, insurance_name, mapping_status)
         write_contrast = (not grey) and bool(insurance_code) and insurance_code != "灰码"
         rows.append({
             "category_code": category_code,
@@ -304,6 +315,15 @@ def _merit_num(flag: str) -> int:
     return 1 if _flag_is_yes(flag) else 0
 
 
+def _operation_scale(value: Any, *, jhemr: bool) -> str | None:
+    raw = _text(value).replace("级", "").strip()
+    if not raw:
+        return None
+    cn_to_num = {"一": "1", "二": "2", "三": "3", "四": "4"}
+    num_to_cn = {v: k for k, v in cn_to_num.items()}
+    return cn_to_num.get(raw, raw) if jhemr else num_to_cn.get(raw, raw)
+
+
 # ---------------------------------------------------------------------------
 # SQL builders (parameterized, single row)
 # ---------------------------------------------------------------------------
@@ -312,7 +332,8 @@ def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
     sql = (
         "INSERT INTO COMM.DIAGNOSIS_DICT ("
         "DIAGNOSIS_CODE, DIAGNOSIS_NAME, STD_INDICATOR, APPROVED_INDICATOR, "
-        "CREATE_DATE, DIAG_INDICATOR, STOP_FLAG, "
+        "CREATE_DATE, INPUT_CODE, DIAG_INDICATOR, NM1, "
+        "YB_CODE, YB_NAME, STOP_FLAG, "
         "DIAGNOSIS_CODE_GUO, DIAGNOSIS_NAME_GUO, DIAGNOSIS_TYPE, "
         "MTB_FLAG, MTB_CODE, MTB_NAME, "
         "DIAGNOSIS_CODE_MB, DIAGNOSIS_NAME_MB, "
@@ -320,7 +341,8 @@ def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
         "DIAGNOSIS_CODE_CRB, DIAGNOSIS_NAME_CRB"
         ") VALUES ("
         ":diagnosis_code, :diagnosis_name, 1, 1, "
-        "SYSDATE, 1, 0, "
+        "SYSDATE, :input_code, 1, '1', "
+        ":yb_code, :yb_name, 0, "
         ":guo_code, :guo_name, :diagnosis_type, "
         ":mtb_flag, :mtb_code, :mtb_name, "
         ":mtb_code, :mtb_name, "
@@ -329,11 +351,14 @@ def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
         ")"
     )
     mtb_code = row["mtb_code"] or None
-    mtb_flag = "1" if mtb_code else None
+    mtb_flag = "1" if mtb_code else "0"
     crb = row["infectious_name"] or None
     params = {
         "diagnosis_code": row["local_code"],
         "diagnosis_name": row["local_name"][:140],
+        "input_code": _pinyin_initials(row["local_name"], max_length=50),
+        "yb_code": row["insurance_code"] or None,
+        "yb_name": row["insurance_name"] or None,
         "guo_code": row["national_code"] or None,
         "guo_name": (row["national_name"] or None),
         "diagnosis_type": row["dict_attribute"] or None,
@@ -365,28 +390,34 @@ def build_his_operation_insert(row: dict[str, Any]) -> PushAction:
     sql = (
         "INSERT INTO COMM.OPERATION_DICT ("
         "OPERATION_CODE, OPERATION_NAME, OPERATION_SCALE, "
-        "STD_INDICATOR, APPROVED_INDICATOR, CREATE_DATE, "
+        "STD_INDICATOR, APPROVED_INDICATOR, CREATE_DATE, INPUT_CODE, "
         "OPERATION_INDICATOR, STOP_FLAG, "
         "OPERATION_CODE_GB, OPERATION_NAME_GB, YB_CODE, YB_NAME, "
         "FOUR_MERIT_STATUS, MIN_MERIT_STATUS, LIMIT_STATUS, OPERATION_TYPE"
         ") VALUES ("
         ":operation_code, :operation_name, :operation_scale, "
-        "1, 1, SYSDATE, "
+        ":std_indicator, :approved_indicator, SYSDATE, :input_code, "
         ":operation_indicator, 0, "
         ":gb_code, :gb_name, :yb_code, :yb_name, "
         ":four_merit, :min_merit, :limit_status, :operation_type"
         ")"
     )
     grey = row["is_grey_insurance"]
-    yb_code = None if grey else (row["insurance_code"] or None)
-    yb_name = None if grey else (row["insurance_name"] or None)
+    is_extension = row["dict_attribute"] == "院内扩展"
+    yb_code = None if grey else (row["insurance_code"] or row["national_code"] or None)
+    yb_name = None if grey else (row["insurance_name"] or row["national_name"] or None)
     params = {
         "operation_code": row["local_code"][:16],
         "operation_name": row["local_name"][:100],
-        "operation_scale": row["operation_level"] or None,
+        "operation_scale": _operation_scale(row["operation_level"], jhemr=False),
+        "input_code": _pinyin_initials(row["local_name"], max_length=50),
+        "std_indicator": 0 if is_extension else 1,
+        "approved_indicator": 0 if is_extension else 1,
         "operation_indicator": _oper_indicator(row["operation_category"]),
-        "gb_code": (row["national_code"] or None),
-        "gb_name": (row["national_name"] or None),
+        # Historical COMM.OPERATION_DICT stores the active mapping in YB_*;
+        # OPERATION_CODE_GB/NAME_GB are effectively unused in production.
+        "gb_code": None,
+        "gb_name": None,
         "yb_code": yb_code,
         "yb_name": yb_name,
         "four_merit": _merit_num(row["level4_flag"]),
@@ -413,21 +444,20 @@ def build_his_operation_insert(row: dict[str, Any]) -> PushAction:
 def build_jhemr_diagnosis_dict_insert(row: dict[str, Any], hospital_no: str) -> PushAction:
     sql = (
         "INSERT INTO jhemr.diagnosis_dict ("
-        "diagnosis_code, diagnosis_name, std_indicator, approved_indicator, "
-        "create_date, synchron, isstop, iszdy, hospital_no, "
-        "boh_diagnosis_code, diagnosis_type, ybhm"
+        "diagnosis_code, diagnosis_name, input_code, isstop, hospital_no, pym, ybhm"
         ") VALUES ("
-        "%(diagnosis_code)s, %(diagnosis_name)s, 1, 1, "
-        "CURRENT_TIMESTAMP, 1, 0, 1, %(hospital_no)s, "
-        "%(boh_code)s, %(diagnosis_type)s, %(ybhm)s"
+        "%(diagnosis_code)s, %(diagnosis_name)s, %(input_code)s, 0, "
+        "%(hospital_no)s, %(pym)s, %(ybhm)s"
         ")"
     )
     params = {
-        "diagnosis_code": row["local_code"],
+        # The main dictionary is keyed by the national standard code. The
+        # local extension is kept in the clinic mapping and contrast rows.
+        "diagnosis_code": row["national_code"] or row["local_code"],
         "diagnosis_name": row["local_name"][:300],
+        "input_code": _pinyin_initials(row["local_name"], max_length=50),
+        "pym": _pinyin_initials(row["local_name"], max_length=50),
         "hospital_no": hospital_no,
-        "boh_code": row["national_code"] or None,
-        "diagnosis_type": row["dict_attribute"] or None,
         "ybhm": row["ybhm_to_write"],
     }
     return PushAction(
@@ -484,19 +514,20 @@ def build_jhemr_diagnosis_contrast_insert(row: dict[str, Any]) -> PushAction | N
 def build_jhemr_jhdict_icd_insert(row: dict[str, Any], hospital_no: str, serial_no: int | None) -> PushAction:
     sql = (
         "INSERT INTO jhemr.jhdict_icd_vs_clinic ("
-        "clinic_diagnosis_name, diagnosis_code, status, hospital_no, "
-        "serial_no, diagnosis_desc"
+        "clinic_diagnosis_name, diagnosis_code, status, hospital_no, pym, "
+        "serial_no, clinic_type, diagnosis_desc"
         ") VALUES ("
-        "%(clinic_name)s, %(diagnosis_code)s, 0, %(hospital_no)s, "
-        "%(serial_no)s, %(diagnosis_desc)s"
+        "%(clinic_name)s, %(diagnosis_code)s, 1, %(hospital_no)s, %(pym)s, "
+        "%(serial_no)s, 1, %(diagnosis_desc)s"
         ")"
     )
     params = {
         "clinic_name": row["local_name"][:200],
         "diagnosis_code": row["local_code"][:40],
         "hospital_no": hospital_no,
+        "pym": _pinyin_initials(row["local_name"], max_length=50),
         "serial_no": serial_no,
-        "diagnosis_desc": row["national_name"] or None,
+        "diagnosis_desc": row["local_name"][:200],
     }
     status = "planned" if serial_no is not None else "blocked"
     reason = "" if serial_no is not None else "serial_no required before apply; only a DBA-whitelisted sequence can supply it (plan 112 A3)"
@@ -520,26 +551,28 @@ def build_jhemr_jhdict_icd_insert(row: dict[str, Any], hospital_no: str, serial_
 def build_jhemr_operation_dict_insert(row: dict[str, Any], hospital_no: str) -> PushAction:
     sql = (
         "INSERT INTO jhemr.operation_dict ("
-        "operation_code, operation_name, operation_scale, "
-        "std_indicator, approved_indicator, create_date, synchron, "
-        "isstop, iszdy, hospital_no, boh_operation_code, "
+        "operation_code, operation_name, operation_scale, input_code, "
+        "operation_type, isstop, hospital_no, pym, classify, "
         "sjjxssbs, wcssbs, xzlbs"
         ") VALUES ("
-        "%(operation_code)s, %(operation_name)s, %(operation_scale)s, "
-        "1, 1, CURRENT_TIMESTAMP, 1, "
-        "0, 1, %(hospital_no)s, %(boh_code)s, "
+        "%(operation_code)s, %(operation_name)s, %(operation_scale)s, %(input_code)s, "
+        "%(operation_type)s, 0, %(hospital_no)s, %(pym)s, %(classify)s, "
         "%(sjjxssbs)s, %(wcssbs)s, %(xzlbs)s"
         ")"
     )
+    input_code = _pinyin_initials(row["local_name"], max_length=75).lower()
     params = {
         "operation_code": row["local_code"][:18],
         "operation_name": row["local_name"][:150],
-        "operation_scale": row["operation_level"] or None,
+        "operation_scale": _operation_scale(row["operation_level"], jhemr=True),
+        "input_code": input_code,
+        "operation_type": _oper_indicator(row["operation_category"]),
         "hospital_no": hospital_no,
-        "boh_code": row["national_code"] or None,
-        "sjjxssbs": "1" if _flag_is_yes(row["level4_flag"]) else None,
-        "wcssbs": "1" if _flag_is_yes(row["mini_flag"]) else None,
-        "xzlbs": "1" if _flag_is_yes(row["limit_flag"]) else None,
+        "pym": input_code,
+        "classify": row["operation_category"] or "手术",
+        "sjjxssbs": "是" if _flag_is_yes(row["level4_flag"]) else None,
+        "wcssbs": "是" if _flag_is_yes(row["mini_flag"]) else None,
+        "xzlbs": "是" if _flag_is_yes(row["limit_flag"]) else None,
     }
     return PushAction(
         action_id=_action_id(ACTION_INSERT, TARGET_JHEMR, "jhemr.operation_dict", row["local_code"], hospital_no),
@@ -562,22 +595,29 @@ def build_jhemr_operation_dict_code_insert(row: dict[str, Any], hospital_no: str
         return None
     sql = (
         "INSERT INTO jhemr.operation_dict_code ("
-        "operation_code, operation_name, operation_scale, "
-        "std_indicator, approved_indicator, create_date, synchron, "
-        "isstop, iszdy, hospital_no, is_catalog, boh_operation_code, ybhm"
+        "operation_code, operation_name, operation_scale, input_code, "
+        "operation_type, isstop, hospital_no, pym, classify, "
+        "sjjxssbs, wcssbs, xzlbs"
         ") VALUES ("
-        "%(operation_code)s, %(operation_name)s, %(operation_scale)s, "
-        "1, 1, CURRENT_TIMESTAMP, 1, "
-        "0, 0, %(hospital_no)s, 1, %(boh_code)s, %(ybhm)s"
+        "%(operation_code)s, %(operation_name)s, %(operation_scale)s, %(input_code)s, "
+        "%(operation_type)s, 0, %(hospital_no)s, %(pym)s, %(classify)s, "
+        "%(sjjxssbs)s, %(wcssbs)s, %(xzlbs)s"
         ")"
     )
+    standard_name = row["national_name"] or row["local_name"]
+    input_code = _pinyin_initials(standard_name, max_length=75).upper()
     params = {
         "operation_code": row["national_code"][:18],
-        "operation_name": (row["national_name"] or row["local_name"])[:150],
-        "operation_scale": row["operation_level"] or None,
+        "operation_name": standard_name[:150],
+        "operation_scale": _operation_scale(row["operation_level"], jhemr=True),
+        "input_code": input_code,
+        "operation_type": _oper_indicator(row["operation_category"]),
         "hospital_no": hospital_no,
-        "boh_code": row["national_code"],
-        "ybhm": "灰码" if row["is_grey_insurance"] else None,
+        "pym": input_code,
+        "classify": row["operation_category"] or "手术",
+        "sjjxssbs": "是" if _flag_is_yes(row["level4_flag"]) else None,
+        "wcssbs": "是" if _flag_is_yes(row["mini_flag"]) else None,
+        "xzlbs": "是" if _flag_is_yes(row["limit_flag"]) else None,
     }
     return PushAction(
         action_id=_action_id(ACTION_INSERT, TARGET_JHEMR, "jhemr.operation_dict_code", row["national_code"], hospital_no),
@@ -596,7 +636,7 @@ def build_jhemr_operation_dict_code_insert(row: dict[str, Any], hospital_no: str
 
 
 def build_jhemr_operation_contrast_insert(row: dict[str, Any]) -> PushAction | None:
-    if not row["write_contrast"]:
+    if not row["national_code"]:
         return None
     sql = (
         "INSERT INTO jhemr.operation_contrast_dict ("
@@ -608,11 +648,11 @@ def build_jhemr_operation_contrast_insert(row: dict[str, Any]) -> PushAction | N
         ")"
     )
     params = {
-        "classify": "医保2.0",
+        "classify": "院内扩展" if row["dict_attribute"] == "院内扩展" else "国临版3.0",
         "operation_name": row["local_name"][:200],
         "operation_code": row["local_code"][:80],
-        "std_name": row["insurance_name"] or None,
-        "std_code": row["insurance_code"],
+        "std_name": row["national_name"] or None,
+        "std_code": row["national_code"],
     }
     return PushAction(
         action_id=_action_id(ACTION_INSERT, TARGET_JHEMR, "jhemr.operation_contrast_dict", row["local_code"]),
@@ -704,7 +744,7 @@ def plan_push_actions(
     targets: list[str],
     item_codes: list[str] | None = None,
     max_items: int = 50,
-    hospital_no: str = "1110002",
+    hospital_no: str = "49557032X",
     include_jhdict: bool = True,
     include_operation_vs_clinic: bool = False,
 ) -> dict[str, Any]:
@@ -841,6 +881,8 @@ def check_exists_remote(
     target = action["target_system"]
     table = action["target_table"]
     code = action["item_code"]
+    if table == "jhemr.diagnosis_dict":
+        code = (action.get("params") or {}).get("diagnosis_code") or code
     source_code = his_source_code if target == TARGET_HIS else jhemr_source_code
     if not source_code:
         return {**action, "remote_checked": False, "reason": action.get("reason") or "source_code not provided"}
@@ -880,8 +922,7 @@ def check_exists_remote(
             elif table == "jhemr.operation_dict_code":
                 sql = (
                     "SELECT operation_code AS code, isstop AS stopped "
-                    "FROM jhemr.operation_dict_code WHERE operation_code = %(code)s "
-                    "AND hospital_no = %(hospital_no)s LIMIT 5"
+                    "FROM jhemr.operation_dict_code WHERE operation_code = %(code)s LIMIT 5"
                 )
             elif table == "jhemr.diagnosis_contrast_dict":
                 sql = (
@@ -933,6 +974,32 @@ def check_exists_remote(
     return out
 
 
+# Sequence identifier must be server-side config only. Reject anything that is
+# not a plain schema.object token so it cannot become SQL injection.
+_SEQUENCE_IDENTIFIER_RE = re.compile(
+    r"^[A-Za-z_][A-Za-z0-9_$#]*(\.[A-Za-z_][A-Za-z0-9_$#]*)?$"
+)
+
+
+def validate_sequence_identifier(sequence_name: str) -> str:
+    """Return a validated sequence identifier or raise.
+
+    Only simple identifiers (optional schema.object) are allowed. No quotes,
+    spaces, semicolons, comments, or function calls.
+    """
+    name = (sequence_name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="sequence name is empty")
+    if len(name) > 128:
+        raise HTTPException(status_code=400, detail="sequence name is too long")
+    if not _SEQUENCE_IDENTIFIER_RE.fullmatch(name):
+        raise HTTPException(
+            status_code=400,
+            detail="sequence name must be a simple identifier (schema.object); rejected unsafe value",
+        )
+    return name
+
+
 def _resolve_serial_from_whitelisted_sequence(conn: Any, dialect: str, sequence_name: str) -> int:
     """Fetch the next value from a DBA-whitelisted sequence.
 
@@ -940,6 +1007,7 @@ def _resolve_serial_from_whitelisted_sequence(conn: Any, dialect: str, sequence_
     associated sequence, so any allowed source must be an explicit,
     operator-confirmed sequence name.
     """
+    sequence_name = validate_sequence_identifier(sequence_name)
     if dialect == "oracle":
         cur = conn.cursor()
         try:
@@ -950,7 +1018,8 @@ def _resolve_serial_from_whitelisted_sequence(conn: Any, dialect: str, sequence_
             cur.close()
     if dialect == "postgresql":
         with conn.cursor() as cur:
-            cur.execute(f"SELECT nextval('{sequence_name}')")
+            # Identifier already validated; quote as a single literal for nextval text arg.
+            cur.execute("SELECT nextval(%s)", (sequence_name,))
             row = cur.fetchone()
             return int(row[0])
     raise HTTPException(status_code=400, detail=f"unsupported dialect for sequence: {dialect}")
@@ -958,7 +1027,32 @@ def _resolve_serial_from_whitelisted_sequence(conn: Any, dialect: str, sequence_
 
 def _whitelisted_serial_sequence() -> str | None:
     """Return the DBA-whitelisted sequence for jhdict_icd_vs_clinic, if set."""
-    return settings.jhemr_serial_whitelisted_sequence or None
+    raw = (settings.jhemr_serial_whitelisted_sequence or "").strip()
+    if not raw:
+        return None
+    return validate_sequence_identifier(raw)
+
+
+def _resolve_serial_from_locked_max(conn: Any, dialect: str) -> int:
+    """Allocate max(serial_no)+1 while holding a target-table transaction lock.
+
+    This strategy is opt-in for the deployment where the operator confirmed
+    this platform is the sole writer. The lock still protects against two
+    platform workers allocating the same value. Commit/rollback is owned by
+    the caller, so allocation and insert remain one transaction.
+    """
+    if dialect != "postgresql":
+        raise HTTPException(status_code=400, detail="locked max+1 is supported only for JHEMR/Vastbase")
+    with conn.cursor() as cur:
+        cur.execute("LOCK TABLE jhemr.jhdict_icd_vs_clinic IN EXCLUSIVE MODE")
+        cur.execute(
+            "SELECT COALESCE(MAX(serial_no), 0) + 1 "
+            "FROM jhemr.jhdict_icd_vs_clinic"
+        )
+        row = cur.fetchone()
+    if not row or row[0] is None:
+        raise HTTPException(status_code=500, detail="failed to allocate JHEMR serial_no")
+    return int(row[0])
 
 
 def _open_write_connection(source: AssetDataSource):
@@ -985,8 +1079,25 @@ def _open_write_connection(source: AssetDataSource):
 
     if db_type == "oracle":
         import oracledb
-        dsn = oracledb.makedsn(host, port, service_name=database)
-        conn = oracledb.connect(user=user, password=password, dsn=dsn)
+        # HIS is Oracle 11g and requires python-oracledb thick mode, exactly as
+        # the established read-only connector does. Thin mode fails before
+        # credentials/permissions can be evaluated (DPY-3010 on old servers).
+        oracle_lib = os.environ.get("APP_ORACLE_CLIENT_LIB_DIR") or (
+            "/opt/oracle" if os.path.isdir("/opt/oracle") else "/opt/oracle/instantclient_21"
+        )
+        try:
+            oracledb.init_oracle_client(lib_dir=oracle_lib)
+        except Exception:
+            pass  # Already initialized in this process.
+        params = oracledb.ConnectParams(
+            host=host,
+            port=port,
+            service_name=database,
+            tcp_connect_timeout=15,
+            retry_count=0,
+        )
+        conn = oracledb.connect(user=user, password=password, params=params)
+        conn.call_timeout = 60_000
         return conn, "oracle"
 
     if db_type in {"postgresql", "vastbase"}:
@@ -1017,6 +1128,224 @@ def _run_write_on_conn(conn: Any, dialect: str, sql: str, params: dict[str, Any]
         return int(rowcount)
 
     raise HTTPException(status_code=400, detail=f"unsupported write dialect: {dialect}")
+
+
+def _run_select_on_conn(
+    conn: Any,
+    dialect: str,
+    sql: str,
+    params: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Run a parameterised SELECT on an open write connection (same transaction)."""
+    if dialect == "oracle":
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, params or {})
+            colnames = [d[0].lower() if d and d[0] else f"c{i}" for i, d in enumerate(cur.description or [])]
+            rows = cur.fetchall() or []
+            return [{colnames[i]: row[i] for i in range(len(colnames))} for row in rows]
+        finally:
+            cur.close()
+    if dialect == "postgresql":
+        with conn.cursor() as cur:
+            cur.execute(sql, params or {})
+            colnames = [d[0].lower() if d and d[0] else f"c{i}" for i, d in enumerate(cur.description or [])]
+            rows = cur.fetchall() or []
+            return [{colnames[i]: row[i] for i in range(len(colnames))} for row in rows]
+    raise HTTPException(status_code=400, detail=f"unsupported readback dialect: {dialect}")
+
+
+def build_readback_select(
+    target_table: str,
+    *,
+    dialect: str,
+    action_type: str,
+) -> tuple[str, dict[str, Any]] | None:
+    """Build same-connection readback SQL for a whitelist table.
+
+    Returns (sql, base_params_template_keys) or None if table is unknown.
+    Caller supplies code/hospital_no from the action params.
+    """
+    table = (target_table or "").strip()
+    if table not in WHITELIST_TABLES:
+        return None
+
+    # Dialect-specific bind style for the open write connection.
+    if dialect == "oracle":
+        code_ph = ":code"
+        hosp_ph = ":hospital_no"
+        limit_clause = " AND ROWNUM <= 5"
+    elif dialect == "postgresql":
+        code_ph = "%(code)s"
+        hosp_ph = "%(hospital_no)s"
+        classify_ph = "%(classify)s"
+        limit_clause = " LIMIT 5"
+    else:
+        return None
+
+    if table == "COMM.DIAGNOSIS_DICT":
+        sql = (
+            f"SELECT DIAGNOSIS_CODE AS code, STOP_FLAG AS stopped "
+            f"FROM COMM.DIAGNOSIS_DICT WHERE DIAGNOSIS_CODE = {code_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": False}
+    if table == "COMM.OPERATION_DICT":
+        sql = (
+            f"SELECT OPERATION_CODE AS code, STOP_FLAG AS stopped "
+            f"FROM COMM.OPERATION_DICT WHERE OPERATION_CODE = {code_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": False}
+    if table == "jhemr.diagnosis_dict":
+        sql = (
+            f"SELECT diagnosis_code AS code, isstop AS stopped "
+            f"FROM jhemr.diagnosis_dict WHERE diagnosis_code = {code_ph} "
+            f"AND hospital_no = {hosp_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": True}
+    if table == "jhemr.operation_dict":
+        sql = (
+            f"SELECT operation_code AS code, isstop AS stopped "
+            f"FROM jhemr.operation_dict WHERE operation_code = {code_ph} "
+            f"AND hospital_no = {hosp_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": True}
+    if table == "jhemr.operation_dict_code":
+        sql = (
+            f"SELECT operation_code AS code, isstop AS stopped "
+            f"FROM jhemr.operation_dict_code WHERE operation_code = {code_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": False}
+    if table == "jhemr.diagnosis_contrast_dict":
+        sql = (
+            f"SELECT diagnosis_code AS code, 0 AS stopped "
+            f"FROM jhemr.diagnosis_contrast_dict WHERE diagnosis_code = {code_ph} "
+            f"AND classify = {classify_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": False, "needs_classify": True}
+    if table == "jhemr.operation_contrast_dict":
+        sql = (
+            f"SELECT operation_code AS code, 0 AS stopped "
+            f"FROM jhemr.operation_contrast_dict WHERE operation_code = {code_ph} "
+            f"AND classify = {classify_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": False, "needs_classify": True}
+    if table == "jhemr.jhdict_icd_vs_clinic":
+        sql = (
+            f"SELECT diagnosis_code AS code, 0 AS stopped "
+            f"FROM jhemr.jhdict_icd_vs_clinic WHERE diagnosis_code = {code_ph} "
+            f"AND hospital_no = {hosp_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": True}
+    if table == "jhemr.jhdict_operation_vs_clinic":
+        sql = (
+            f"SELECT operation_code AS code, 0 AS stopped "
+            f"FROM jhemr.jhdict_operation_vs_clinic WHERE operation_code = {code_ph} "
+            f"AND hospital_no = {hosp_ph}{limit_clause}"
+        )
+        return sql, {"needs_hospital": True}
+    # action_type reserved for future stop-vs-insert SQL differences
+    _ = action_type
+    return None
+
+
+def readback_actions_on_conn(
+    conn: Any,
+    dialect: str,
+    actions: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Same-connection post-write readback before commit (112 A3).
+
+    For every action: row must exist; multi-row same key is conflict.
+    insert expects an active (stopped=0) row when stop column is present.
+    stop expects a stopped=1 row.
+    Failure raises HTTPException so the caller can rollback the whole target package.
+    """
+    details: list[dict[str, Any]] = []
+    for act in actions:
+        table = act.get("target_table") or ""
+        code = act.get("item_code") or (act.get("params") or {}).get("code")
+        if table == "jhemr.diagnosis_dict":
+            code = (act.get("params") or {}).get("diagnosis_code") or code
+        action_type = (act.get("action_type") or ACTION_INSERT).lower()
+        params = dict(act.get("params") or {})
+        built = build_readback_select(table, dialect=dialect, action_type=action_type)
+        if built is None:
+            raise HTTPException(
+                status_code=409,
+                detail=f"readback unavailable for table {table}; refusing to mark success",
+            )
+        sql, meta = built
+        if not code:
+            raise HTTPException(status_code=409, detail="readback missing item_code")
+        bind: dict[str, Any] = {"code": code}
+        if meta.get("needs_hospital"):
+            hospital_no = params.get("hospital_no") or (act.get("meta") or {}).get("hospital_no")
+            if not hospital_no:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"readback for {table} requires hospital_no",
+                )
+            bind["hospital_no"] = hospital_no
+        if meta.get("needs_classify"):
+            classify = params.get("classify")
+            if not classify:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"readback for {table} requires classify",
+                )
+            bind["classify"] = classify
+        try:
+            rows = _run_select_on_conn(conn, dialect, sql, bind)
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"readback query failed for {table}: {type(exc).__name__}",
+            ) from exc
+        if not rows:
+            raise HTTPException(
+                status_code=409,
+                detail=f"readback found 0 rows for {table}/{code}; refusing success",
+            )
+        if len(rows) > 1:
+            raise HTTPException(
+                status_code=409,
+                detail=f"readback found {len(rows)} rows for {table}/{code}; conflict",
+            )
+        stopped_raw = rows[0].get("stopped")
+        try:
+            stopped = int(stopped_raw) if stopped_raw is not None else 0
+        except (TypeError, ValueError):
+            stopped = 0
+        if action_type == ACTION_STOP:
+            if stopped != 1:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"readback stop not confirmed for {table}/{code} (stopped={stopped})",
+                )
+        elif action_type == ACTION_INSERT and table not in {
+            "jhemr.diagnosis_contrast_dict",
+            "jhemr.operation_contrast_dict",
+            "jhemr.jhdict_icd_vs_clinic",
+            "jhemr.jhdict_operation_vs_clinic",
+        }:
+            # Contrast / mapping tables may not carry stop flag; main dict rows must be active.
+            if stopped != 0:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"readback insert not active for {table}/{code} (stopped={stopped})",
+                )
+        details.append(
+            {
+                "target_table": table,
+                "item_code": code,
+                "action_type": action_type,
+                "rows": len(rows),
+                "stopped": stopped,
+            }
+        )
+    return {"ok": True, "checked": len(details), "details": details}
 
 
 def _execute_write_sql(source: AssetDataSource, dialect: str, sql: str, params: dict[str, Any]) -> int:
@@ -1054,7 +1383,11 @@ def apply_one_action(
     try:
         sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+        # 客户端只见脱敏类别消息，避免 SQL/参数原文外泄。
+        raise HTTPException(
+            status_code=400,
+            detail=sanitize_text(f"invalid_push_sql:{type(exc).__name__}"),
+        ) from exc
 
     if action.get("plan_status") == "skip_exists":
         return {

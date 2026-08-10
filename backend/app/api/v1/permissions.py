@@ -9,6 +9,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
+from ...core.security import get_current_user, require_permission
 from ...models.governance import ApiKey
 from ...models.governance_base import (
     AssetPermissionResource,
@@ -24,48 +25,71 @@ from ...services.data_masking import mask_sensitive
 router = APIRouter(prefix="/api/v1/permissions", tags=["permissions"])
 
 RESOURCE_CATALOG: list[dict] = [
-    {"code": "asset", "name_cn": "资产门户", "type": "menu", "parent_code": None},
-    {"code": "asset.table.view", "name_cn": "资产表浏览", "type": "page", "parent_code": "asset"},
-    {"code": "asset.graph.view", "name_cn": "关系图谱查看", "type": "page", "parent_code": "asset"},
-    {"code": "asset.relation.review", "name_cn": "关系复核", "type": "page", "parent_code": "asset"},
+    # ===== 数据资产 asset =====
+    {"code": "asset", "name_cn": "数据资产", "type": "menu", "parent_code": None},
+    {"code": "asset.overview.view", "name_cn": "资产总览", "type": "page", "parent_code": "asset"},
+    {"code": "asset.system.view", "name_cn": "业务系统与数据资源", "type": "page", "parent_code": "asset"},
+    {"code": "asset.table.view", "name_cn": "表资产浏览", "type": "page", "parent_code": "asset"},
+    {"code": "asset.graph.view", "name_cn": "关系图谱", "type": "page", "parent_code": "asset"},
+    {"code": "asset.relation.view", "name_cn": "关系路径", "type": "page", "parent_code": "asset"},
+    {"code": "asset.ai_context.view", "name_cn": "AI上下文", "type": "page", "parent_code": "asset"},
+    {"code": "asset.recipe.view", "name_cn": "关系配方库", "type": "page", "parent_code": "asset"},
+    {"code": "asset.lineage.view", "name_cn": "血缘与影响", "type": "page", "parent_code": "asset"},
+    {"code": "asset.relation.review", "name_cn": "关系复核中心", "type": "page", "parent_code": "asset"},
+    {"code": "asset.quality.view", "name_cn": "数据质量", "type": "page", "parent_code": "asset"},
+    {"code": "asset.quality.rule.create", "name_cn": "质量规则创建", "type": "button", "parent_code": "asset.quality.view"},
+    {"code": "asset.quality.rule.execute", "name_cn": "质量规则执行", "type": "button", "parent_code": "asset.quality.view"},
+    {"code": "asset.ai_draft.view", "name_cn": "AI 协作", "type": "page", "parent_code": "asset"},
+    {"code": "asset.admin.view", "name_cn": "治理管理", "type": "page", "parent_code": "asset"},
     {"code": "asset.annotation", "name_cn": "资产注释维护", "type": "button", "parent_code": "asset"},
-    {"code": "quality", "name_cn": "质量规则", "type": "menu", "parent_code": None},
-    {"code": "quality.rule.view", "name_cn": "规则查看", "type": "page", "parent_code": "quality"},
-    {"code": "quality.rule.create", "name_cn": "规则创建", "type": "button", "parent_code": "quality.rule.view"},
-    {"code": "quality.rule.execute", "name_cn": "规则执行", "type": "button", "parent_code": "quality.rule.view"},
-    {"code": "metadata", "name_cn": "元数据变更", "type": "menu", "parent_code": None},
-    {"code": "metadata.snapshot.collect", "name_cn": "采集快照", "type": "button", "parent_code": "metadata"},
-    {"code": "identity", "name_cn": "身份与权限", "type": "menu", "parent_code": None},
-    {"code": "identity.person.view", "name_cn": "人员查看", "type": "page", "parent_code": "identity"},
-    {"code": "identity.sync.run", "name_cn": "人员同步", "type": "button", "parent_code": "identity"},
-    {"code": "identity.role.manage", "name_cn": "角色管理", "type": "page", "parent_code": "identity"},
-    {"code": "identity.role.grant", "name_cn": "人员授权", "type": "button", "parent_code": "identity.role.manage"},
-    {"code": "identity.local_account.manage", "name_cn": "本地账号管理", "type": "page", "parent_code": "identity"},
+    {"code": "source.manage", "name_cn": "业务系统与连接维护", "type": "button", "parent_code": "asset.system.view"},
+    {"code": "source.credential_manage", "name_cn": "连接凭据维护", "type": "button", "parent_code": "asset.system.view"},
+    {"code": "source.collect", "name_cn": "元数据采集", "type": "button", "parent_code": "asset.system.view"},
+    {"code": "source.test", "name_cn": "连接连通性测试", "type": "button", "parent_code": "asset.system.view"},
+    # ===== 字典中心 dict =====
     {"code": "dict", "name_cn": "字典中心", "type": "menu", "parent_code": None},
-    {"code": "dict.medical.view", "name_cn": "诊断手术字典查看", "type": "page", "parent_code": "dict"},
-    {"code": "dict.medical.edit", "name_cn": "诊断手术字典维护", "type": "button", "parent_code": "dict.medical.view"},
+    {"code": "dict.medical.view", "name_cn": "诊断手术维护", "type": "page", "parent_code": "dict"},
+    {"code": "dict.medical.edit", "name_cn": "诊断手术字典编辑", "type": "button", "parent_code": "dict.medical.view"},
     {"code": "dict.medical.plan.create", "name_cn": "字典同步计划创建", "type": "button", "parent_code": "dict.medical.view"},
     {"code": "dict.medical.approve", "name_cn": "字典同步计划审批", "type": "button", "parent_code": "dict.medical.view"},
     {"code": "dict.medical.execute", "name_cn": "字典同步计划执行", "type": "button", "parent_code": "dict.medical.view"},
     {"code": "dict.medical.retry", "name_cn": "字典同步失败重试", "type": "button", "parent_code": "dict.medical.view"},
     {"code": "dict.medical.reconcile", "name_cn": "字典同步冲突处理", "type": "button", "parent_code": "dict.medical.view"},
+    {"code": "dict.mapping.view", "name_cn": "编码关系明细", "type": "page", "parent_code": "dict"},
+    {"code": "dict.general.view", "name_cn": "通用字典", "type": "page", "parent_code": "dict"},
+    {"code": "dict.general.edit", "name_cn": "通用字典编辑", "type": "button", "parent_code": "dict.general.view"},
+    {"code": "dict.sync_diff.view", "name_cn": "字典同步差异", "type": "page", "parent_code": "dict"},
+    # ===== 人员与科室 identity =====
+    {"code": "identity", "name_cn": "人员与科室", "type": "menu", "parent_code": None},
+    {"code": "identity.dept.view", "name_cn": "科室基线", "type": "page", "parent_code": "identity"},
+    {"code": "identity.person.view", "name_cn": "人员管理", "type": "page", "parent_code": "identity"},
+    {"code": "identity.account.view", "name_cn": "跨系统账号", "type": "page", "parent_code": "identity"},
+    {"code": "identity.local_account.manage", "name_cn": "本地账号管理", "type": "page", "parent_code": "identity"},
+    {"code": "identity.sync_diff.view", "name_cn": "人员同步差异", "type": "page", "parent_code": "identity"},
+    {"code": "identity.sync.run", "name_cn": "人员同步执行", "type": "button", "parent_code": "identity.person.view"},
+    {"code": "identity.role.manage", "name_cn": "角色权限", "type": "page", "parent_code": "identity"},
+    {"code": "identity.role.grant", "name_cn": "人员授权", "type": "page", "parent_code": "identity"},
+    {"code": "identity.permission_request.view", "name_cn": "权限申请审批", "type": "page", "parent_code": "identity"},
+    # ===== 运维工具 ops =====
     {"code": "ops", "name_cn": "运维工具", "type": "menu", "parent_code": None},
-    {"code": "ops.tool.manage", "name_cn": "工具模板管理", "type": "page", "parent_code": "ops"},
-    {"code": "ops.run.submit", "name_cn": "提交运维申请", "type": "button", "parent_code": "ops"},
-    {"code": "ops.run.approve", "name_cn": "审批运维申请", "type": "button", "parent_code": "ops"},
-    {"code": "ops.run.execute", "name_cn": "执行运维申请", "type": "button", "parent_code": "ops"},
-    {"code": "ops.sql.view", "name_cn": "SQL 工作台查看", "type": "page", "parent_code": "ops"},
-    {"code": "ops.sql.create", "name_cn": "SQL 模板创建", "type": "button", "parent_code": "ops.sql.view"},
-    {"code": "ops.sql.review", "name_cn": "SQL 模板审批", "type": "button", "parent_code": "ops.sql.view"},
-    {"code": "ops.sql.execute", "name_cn": "SQL 执行申请", "type": "button", "parent_code": "ops.sql.view"},
-    {"code": "ops.sql.audit", "name_cn": "SQL 执行审计", "type": "button", "parent_code": "ops.sql.view"},
-    {"code": "source.manage", "name_cn": "业务系统与连接维护", "type": "page", "parent_code": "asset"},
-    {"code": "source.credential_manage", "name_cn": "连接凭据维护", "type": "button", "parent_code": "source.manage"},
-    {"code": "source.collect", "name_cn": "元数据采集", "type": "button", "parent_code": "source.manage"},
-    {"code": "source.test", "name_cn": "连接连通性测试", "type": "button", "parent_code": "source.manage"},
-    {"code": "ai", "name_cn": "AI 协作", "type": "menu", "parent_code": None},
-    {"code": "ai.draft.view", "name_cn": "AI 草稿查看", "type": "page", "parent_code": "ai"},
-    {"code": "ai.draft.execute", "name_cn": "AI 草稿只读执行", "type": "button", "parent_code": "ai"},
+    {"code": "ops.sql.view", "name_cn": "SQL 工作台", "type": "page", "parent_code": "ops"},
+    {"code": "ops.sql.execute", "name_cn": "SQL 执行", "type": "button", "parent_code": "ops.sql.view"},
+    {"code": "ops.tool.manage", "name_cn": "工具模板", "type": "page", "parent_code": "ops"},
+    {"code": "ops.run.view", "name_cn": "运维任务", "type": "page", "parent_code": "ops"},
+    {"code": "ops.run.submit", "name_cn": "提交运维申请", "type": "button", "parent_code": "ops.run.view"},
+    {"code": "ops.run.approve", "name_cn": "审批运维申请", "type": "button", "parent_code": "ops.run.view"},
+    {"code": "ops.run.execute", "name_cn": "执行运维申请", "type": "button", "parent_code": "ops.run.view"},
+    {"code": "ops.audit.view", "name_cn": "运维审计", "type": "page", "parent_code": "ops"},
+    # ===== 变更检测 metadata =====
+    {"code": "metadata", "name_cn": "变更检测", "type": "menu", "parent_code": None},
+    {"code": "metadata.change.view", "name_cn": "变更事件", "type": "page", "parent_code": "metadata"},
+    {"code": "metadata.snapshot.view", "name_cn": "快照管理", "type": "page", "parent_code": "metadata"},
+    {"code": "metadata.snapshot.collect", "name_cn": "采集快照", "type": "button", "parent_code": "metadata.snapshot.view"},
+    {"code": "metadata.diff.view", "name_cn": "快照对比", "type": "page", "parent_code": "metadata"},
+    # ===== AI 协作(独立入口,与 asset.ai_draft 区分) =====
+    {"code": "ai", "name_cn": "AI 协作(旧)", "type": "menu", "parent_code": None},
+    {"code": "ai.draft.view", "name_cn": "AI 草稿查看(旧)", "type": "page", "parent_code": "ai"},
+    {"code": "ai.draft.execute", "name_cn": "AI 草稿只读执行(旧)", "type": "button", "parent_code": "ai"},
 ]
 
 
@@ -211,16 +235,32 @@ def _resource_map() -> dict[str, dict]:
 
 
 def _resource_payload(row: AssetPermissionResource) -> dict:
+    catalog_item = _resource_map().get(row.resource_code, {})
     return {
         "code": row.resource_code,
         "name_cn": row.resource_name_cn,
         "module_code": row.module_code,
         "action_code": row.action_code,
         "description": row.description,
+        "type": catalog_item.get("type") or row.description or "button",
+        "parent_code": catalog_item.get("parent_code"),
         "enabled": row.enabled,
         "sort_order": row.sort_order,
         "source": "database",
     }
+
+
+def _resource_catalog_payload(rows: list[AssetPermissionResource]) -> list[dict]:
+    """Merge persisted resources with the code catalog so old seeds cannot hide menus."""
+    persisted = {row.resource_code: _resource_payload(row) for row in rows}
+    merged = []
+    for item in RESOURCE_CATALOG:
+        payload = {**item, "source": "catalog"}
+        payload.update(persisted.pop(item["code"], {}))
+        merged.append(payload)
+    # Preserve explicitly added database resources until the next catalog refresh.
+    merged.extend(sorted(persisted.values(), key=lambda item: (item.get("sort_order", 0), item["code"])))
+    return merged
 
 
 def _role_payload(role: AssetRole) -> dict:
@@ -240,12 +280,13 @@ def _permission_codes_for_roles(db: Session, role_codes: Iterable[str]) -> list[
     if not codes:
         return []
     rows = db.scalars(select(AssetRolePermission).where(AssetRolePermission.role_code.in_(codes))).all()
-    permissions = {r.resource if r.action in (None, "access", "*") else f"{r.resource}:{r.action}" for r in rows}
+    permissions = {r.resource if r.action in (None, "access", "allow", "*") else f"{r.resource}:{r.action}" for r in rows}
     return sorted(permissions)
 
 
-@router.post("/seed", summary="Seed builtin roles and permission resources")
-def seed_permissions(operator: str | None = Query("system"), db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.post("/seed", summary="Seed builtin roles and permission resources", dependencies=[Depends(require_permission("identity.role.manage"))])
+def seed_permissions(request: Request, operator: str | None = Query(None), db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
     created_roles = 0
     created_permissions = 0
     for item in BUILTIN_ROLES:
@@ -289,22 +330,20 @@ def seed_permissions(operator: str | None = Query("system"), db: Session = Depen
     return ApiResponse(data={"created_roles": created_roles, "created_permissions": created_permissions, "created_resources": created_resources})
 
 
-@router.get("/resources", summary="Permission resource catalog")
+@router.get("/resources", summary="Permission resource catalog", dependencies=[Depends(require_permission("identity.role.manage"))])
 def list_resources(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(select(AssetPermissionResource).order_by(AssetPermissionResource.sort_order, AssetPermissionResource.resource_code)).all()
-    if rows:
-        return ApiResponse(data=[_resource_payload(row) for row in rows])
-    return ApiResponse(data=[{**item, "source": "fallback"} for item in RESOURCE_CATALOG])
+    return ApiResponse(data=_resource_catalog_payload(rows))
 
 
-@router.get("/roles", summary="Role list")
+@router.get("/roles", summary="Role list", dependencies=[Depends(require_permission("identity.role.manage"))])
 def list_roles(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(select(AssetRole).order_by(AssetRole.role_code)).all()
     return ApiResponse(data=[_role_payload(r) for r in rows])
 
 
-@router.put("/roles", summary="Create or update role")
-def upsert_role(req: RoleUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.put("/roles", summary="Create or update role", dependencies=[Depends(require_permission("identity.role.manage"))])
+def upsert_role(req: RoleUpsert, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == req.role_code))
     before = _role_payload(role) if role else None
     if role:
@@ -324,37 +363,40 @@ def upsert_role(req: RoleUpsert, db: Session = Depends(get_db)) -> ApiResponse[d
         action = "create_role"
     db.flush()
     after = _role_payload(role)
-    _audit(db, action, "role", req.role_code, req.operator, before=before, after=after)
+    _audit(db, action, "role", req.role_code, get_current_user(request), before=before, after=after)
     db.commit()
     return ApiResponse(data=after)
 
 
-@router.get("/roles/{role_code}/matrix", summary="Role permission matrix")
+@router.get("/roles/{role_code}/matrix", summary="Role permission matrix", dependencies=[Depends(require_permission("identity.role.manage"))])
 def get_role_matrix(role_code: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == role_code))
     if not role:
         raise HTTPException(status_code=404, detail="role not found")
     rows = db.scalars(select(AssetRolePermission).where(AssetRolePermission.role_code == role_code)).all()
-    granted = sorted({r.resource for r in rows if r.action in (None, "access", "*")})
-    return ApiResponse(data={"role": _role_payload(role), "resources": RESOURCE_CATALOG, "granted": granted})
+    granted = sorted({r.resource for r in rows if r.action in (None, "access", "allow", "*")})
+    resources = db.scalars(select(AssetPermissionResource).where(AssetPermissionResource.enabled.is_(True)).order_by(AssetPermissionResource.sort_order, AssetPermissionResource.resource_code)).all()
+    payload = _resource_catalog_payload(resources)
+    return ApiResponse(data={"role": _role_payload(role), "resources": payload, "granted": granted})
 
 
-@router.put("/roles/{role_code}/matrix", summary="Replace role permission matrix")
-def update_role_matrix(role_code: str, req: MatrixUpdate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.put("/roles/{role_code}/matrix", summary="Replace role permission matrix", dependencies=[Depends(require_permission("identity.role.grant"))])
+def update_role_matrix(role_code: str, req: MatrixUpdate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == role_code))
     if not role:
         raise HTTPException(status_code=404, detail="role not found")
-    valid = _resource_map()
+    persisted_codes = set(db.scalars(select(AssetPermissionResource.resource_code)).all())
+    valid = {**_resource_map(), **{code: {} for code in persisted_codes}}
     invalid = [p for p in req.permissions if p not in valid]
     if invalid:
         raise HTTPException(status_code=400, detail=f"invalid permissions: {', '.join(invalid)}")
     before_rows = db.scalars(select(AssetRolePermission).where(AssetRolePermission.role_code == role_code)).all()
-    before = sorted({r.resource for r in before_rows if r.action in (None, "access", "*")})
+    before = sorted({r.resource for r in before_rows if r.action in (None, "access", "allow", "*")})
     db.execute(delete(AssetRolePermission).where(AssetRolePermission.role_code == role_code))
     for resource in sorted(set(req.permissions)):
         db.add(AssetRolePermission(role_code=role_code, resource=resource, action="access"))
     after = sorted(set(req.permissions))
-    _audit(db, "update_role_matrix", "role", role_code, req.operator, before={"permissions": before}, after={"permissions": after}, reason=req.reason)
+    _audit(db, "update_role_matrix", "role", role_code, get_current_user(request), before={"permissions": before}, after={"permissions": after}, reason=req.reason)
     db.commit()
     return ApiResponse(data={"role_code": role_code, "granted": after})
 

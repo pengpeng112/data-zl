@@ -76,7 +76,8 @@ def main() -> None:
         raise SystemExit("Set APP_SSH_PASSWORD or APP_SSH_KEY")
 
     client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.RejectPolicy())
     connect_kwargs = {
         "hostname": HOST,
         "username": USER,

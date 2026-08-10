@@ -302,11 +302,19 @@ def list_users(
         like = f"%{q}%"
         stmt = stmt.where((AuthUser.username.ilike(like)) | (AuthUser.user_identifier.ilike(like)))
     rows = db.scalars(stmt.offset((page - 1) * page_size).limit(page_size)).all()
+    identifiers = {r.user_identifier for r in rows if r.user_identifier}
+    person_names = {
+        person.person_code: person.person_name_cn
+        for person in db.scalars(
+            select(IdentityPerson).where(IdentityPerson.person_code.in_(identifiers))
+        ).all()
+    } if identifiers else {}
     items = [
         {
             "id": r.id,
             "username": r.username,
             "user_identifier": r.user_identifier,
+            "person_name_cn": person_names.get(r.user_identifier),
             "enabled": r.enabled,
             "must_change_password": r.must_change_password,
             "failed_login_count": r.failed_login_count,
@@ -328,13 +336,28 @@ def create_user(
     operator = _require_admin_roles(request)
     import secrets as _secrets
 
+    person = None
+    if body.user_identifier:
+        person = db.scalar(
+            select(IdentityPerson).where(
+                IdentityPerson.person_code == body.user_identifier.strip()
+            )
+        )
+        if not person:
+            raise HTTPException(status_code=400, detail="所选人员不存在，请从人员管理中重新选择")
+        bound = db.scalar(
+            select(AuthUser).where(AuthUser.user_identifier == person.person_code)
+        )
+        if bound:
+            raise HTTPException(status_code=409, detail="该人员已绑定本地账号")
+
     password = body.password or _secrets.token_urlsafe(16)
     try:
         user = auth_service.create_local_user(
             db,
             username=body.username.strip(),
             password=password,
-            user_identifier=body.user_identifier,
+            user_identifier=person.person_code if person else None,
             must_change_password=body.must_change_password,
             enabled=body.enabled,
         )
@@ -361,6 +384,7 @@ def create_user(
             "id": user.id,
             "username": user.username,
             "user_identifier": user.user_identifier,
+            "person_name_cn": person.person_name_cn if person else None,
             "must_change_password": user.must_change_password,
             "initial_password": password if body.password is None else None,
             "warning": "初始密码仅返回一次，请通过安全渠道交付" if body.password is None else None,

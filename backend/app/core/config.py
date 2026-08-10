@@ -38,13 +38,19 @@ class Settings(BaseSettings):
 
     # Medical dict push to HIS / JHEMR (plan 96): default off; single-row insert/stop only.
     dict_medical_push_enabled: bool = False
+    dict_medical_production_approval_version: str = ""
+    dict_medical_auto_approve_enabled: bool = False
+    dict_medical_worker_interval_seconds: int = 5
+    dict_medical_worker_batch_size: int = 10
     dict_medical_push_confirmation_token: str = ""
-    dict_medical_push_default_hospital_no: str = "1110002"
+    dict_medical_push_default_hospital_no: str = "49557032X"
     dict_medical_his_source_code: str = "HIS_SOURCE"
     dict_medical_jhemr_source_code: str = "JHEMR_VASTBASE"
-    # 112 A3: 唯一允许生成 jhemr.jhdict_icd_vs_clinic.serial_no 的来源是
-    # DBA 明确的 sequence 名称；未配置则取号即失败（禁 MAX(serial_no)+1）。
+    # serial_no defaults to fail-closed. A whitelisted sequence remains the
+    # preferred source. The locked max+1 strategy is allowed only when the
+    # operator explicitly confirms this platform is the sole writer.
     jhemr_serial_whitelisted_sequence: str = ""
+    jhemr_serial_strategy: str = "disabled"
 
     # HIS identity sync to CDMS/JHEMR (plan 103/107): default OFF.
     identity_sync_enabled: bool = False
@@ -61,6 +67,7 @@ class Settings(BaseSettings):
     identity_sync_lock_timeout_seconds: int = 300
     identity_sync_lookback_hours: int = 24
     identity_sync_managed_since: str = "2026-07-20"
+    identity_sync_modified_since: str = "2026-08-04T00:00:00"
 
     # Nightly scheduler (plan 107): default OFF until Phase D validation passes.
     identity_nightly_enabled: bool = False
@@ -68,6 +75,12 @@ class Settings(BaseSettings):
     identity_nightly_max_runtime_seconds: int = 3600
     identity_nightly_max_retries: int = 2
     identity_nightly_misfire_grace_seconds: int = 600
+    # 122: one authoritative provider is declared by deployment.  The local
+    # default is disabled; host cron and in-process APScheduler must not both
+    # be treated as active.
+    identity_scheduler_provider: str = "disabled"  # host_cron | systemd | apscheduler | disabled
+    identity_scheduler_overdue_hours: int = 26
+    identity_scheduler_heartbeat_seconds: int = 300
 
     # Circuit breaker thresholds (plan 107 §3)
     identity_cb_max_candidates: int = 200

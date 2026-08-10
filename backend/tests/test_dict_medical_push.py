@@ -45,9 +45,14 @@ class TestPlanHash:
 
 class TestConstants:
     def test_valid_targets(self):
-        assert "HIS" in VALID_TARGET_SYSTEMS
+        # 正式目标系统编码为 HIS_SOURCE / JHEMR_VASTBASE；HIS/JHEMR 仅别名。
+        from app.services.dict_medical_push import TARGET_ALIASES
+
+        assert "HIS_SOURCE" in VALID_TARGET_SYSTEMS
         assert "JHEMR_VASTBASE" in VALID_TARGET_SYSTEMS
         assert len(VALID_TARGET_SYSTEMS) == 2
+        assert TARGET_ALIASES.get("HIS") == "HIS_SOURCE"
+        assert TARGET_ALIASES.get("JHEMR") == "JHEMR_VASTBASE"
 
     def test_plan_ttl(self):
         assert PLAN_TTL_HOURS == 24

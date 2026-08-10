@@ -863,7 +863,7 @@ def upsert_source(req: DataSourceUpsert, request: Request, db: Session = Depends
             ds.credential_updated_at = datetime.now(timezone.utc)
             ds.credential_updated_by = operator
         except credential_store.CredentialStoreError as exc:
-            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+            raise HTTPException(status_code=400, detail="credential_store_error") from exc
 
     _audit(db, action="upsert_source", operator=operator, entity_ref=req.source_code,
            after={"system_code": req.system_code, "source_code": req.source_code})
@@ -1044,7 +1044,7 @@ def update_source_credential(
                 writable=False,
             )
         except credential_store.CredentialStoreError as exc:
-            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+            raise HTTPException(status_code=400, detail="credential_store_error") from exc
         ds.credential_ref = ref
         ds.credential_status = "configured"
         ds.credential_username_masked = credential_store.mask_username(req.username)
@@ -1098,7 +1098,7 @@ def update_source_credential(
             writable=True,
         )
     except credential_store.CredentialStoreError as exc:
-        raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+        raise HTTPException(status_code=400, detail="credential_store_error") from exc
 
     ds.write_credential_ref = ref
     ds.write_policy = policy
@@ -1156,7 +1156,7 @@ def clear_source_credential(
         try:
             credential_store.delete(source_code, writable=False)
         except credential_store.CredentialStoreError as exc:
-            raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+            raise HTTPException(status_code=400, detail="credential_store_error") from exc
         ds.credential_ref = None
         ds.credential_status = "unconfigured"
         ds.credential_username_masked = None
@@ -1181,7 +1181,7 @@ def clear_source_credential(
     try:
         credential_store.delete(source_code, writable=True)
     except credential_store.CredentialStoreError as exc:
-        raise HTTPException(status_code=400, detail=sanitize_text(str(exc))) from exc
+        raise HTTPException(status_code=400, detail="credential_store_error") from exc
     ds.write_credential_ref = None
     # 清写凭据后回落只读策略，避免误用只读账号写
     if (ds.write_policy or "") == "medical_dict_push":

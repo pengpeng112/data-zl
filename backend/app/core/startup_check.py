@@ -84,10 +84,10 @@ def _validate_rbac_and_switches(settings) -> list[str]:
     errors: list[str] = []
     if not settings.rbac_require_bound_token:
         errors.append("production 必须开启 rbac_require_bound_token（绑定角色 RBAC）")
-    # 写开关族：production 一律关闭
+    # Most write switches remain forbidden in production. Medical dictionary
+    # dispatch is the narrow exception after an explicit versioned approval.
     write_switches = {
         "ops_write_enabled": settings.ops_write_enabled,
-        "dict_medical_push_enabled": settings.dict_medical_push_enabled,
         "identity_sync_enabled": settings.identity_sync_enabled,
         "identity_nightly_enabled": settings.identity_nightly_enabled,
         "identity_jhemr_password_write_enabled": settings.identity_jhemr_password_write_enabled,
@@ -95,6 +95,13 @@ def _validate_rbac_and_switches(settings) -> list[str]:
     for name, value in write_switches.items():
         if value:
             errors.append(f"production 写开关必须关闭: {name}=True")
+    if settings.dict_medical_push_enabled:
+        approval = str(getattr(settings, "dict_medical_production_approval_version", "") or "").strip()
+        confirmation = str(getattr(settings, "dict_medical_push_confirmation_token", "") or "").strip()
+        if not approval:
+            errors.append("production 字典自动下发必须配置批准版本")
+        if not confirmation:
+            errors.append("production 字典自动下发必须配置确认令牌")
     return errors
 
 

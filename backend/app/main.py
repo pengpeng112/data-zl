@@ -69,13 +69,55 @@ def _start_scheduler():
             from .services.identity_nightly_scheduler import register_nightly_job
             register_nightly_job(scheduler)
 
-            if jobs or settings.identity_nightly_enabled:
+            if settings.dict_medical_push_enabled:
+                scheduler.add_job(
+                    _run_dict_sync_worker_once,
+                    trigger="interval",
+                    seconds=max(2, settings.dict_medical_worker_interval_seconds),
+                    id="dict_medical_outbox_worker",
+                    replace_existing=True,
+                    max_instances=1,
+                    coalesce=True,
+                )
+                logger.info(
+                    "Dictionary outbox worker registered: interval=%ss batch=%s",
+                    settings.dict_medical_worker_interval_seconds,
+                    settings.dict_medical_worker_batch_size,
+                )
+
+            if jobs or settings.identity_nightly_enabled or settings.dict_medical_push_enabled:
                 scheduler.start()
                 logger.info("APScheduler started with %d scheduled jobs in %s", len(jobs), settings.scheduler_timezone)
         finally:
             db.close()
     except ImportError:
         logger.warning("apscheduler not installed, scheduling disabled")
+
+
+def _run_dict_sync_worker_once() -> None:
+    """Process only approved dictionary outbox events."""
+    from .services.dict_sync_worker import (
+        EVENT_CATEGORY_DICT_PUSH,
+        dispatch_dict_event,
+        run_worker_once,
+    )
+
+    db = SessionLocal()
+    try:
+        summary = run_worker_once(
+            db,
+            holder="dict-medical-scheduler",
+            handler=lambda event: dispatch_dict_event(db, event),
+            batch_size=max(1, settings.dict_medical_worker_batch_size),
+            categories=[EVENT_CATEGORY_DICT_PUSH],
+        )
+        if summary["claimed"] or summary["failed"] or summary["dead_letter"]:
+            logger.info("Dictionary outbox worker result: %s", summary)
+    except Exception as exc:
+        db.rollback()
+        logger.error("Dictionary outbox worker failed: %s", type(exc).__name__)
+    finally:
+        db.close()
 
 
 def _run_quality_nightly():
@@ -107,13 +149,16 @@ def _run_quality_nightly():
         db.commit()
         logger.info("Nightly quality check completed: %s", result)
     except Exception as e:
+        from .services.data_masking import sanitize_text
+
         db.rollback()
         job.status = "failed"
         job.finished_at = datetime.now(timezone.utc)
-        job.error_message = str(e)[:500]
+        # 111 S6 / 123 R3：审计字段只保留脱敏摘要，禁止原文 str(exc)。
+        job.error_message = sanitize_text(f"{type(e).__name__}: {e}", limit=500)
         db.add(job)
         db.commit()
-        logger.error("Nightly quality check failed: %s", e)
+        logger.error("Nightly quality check failed: %s", type(e).__name__)
     finally:
         db.close()
 
@@ -143,13 +188,15 @@ def _run_metadata_collect(source_code: str):
         db.commit()
         logger.info("Scheduled metadata scan completed for %s", source_code)
     except Exception as e:
+        from .services.data_masking import sanitize_text
+
         db.rollback()
         job.status = "failed"
         job.finished_at = datetime.now(timezone.utc)
-        job.error_message = str(e)[:500]
+        job.error_message = sanitize_text(f"{type(e).__name__}: {e}", limit=500)
         db.add(job)
         db.commit()
-        logger.error("Scheduled metadata scan failed for %s: %s", source_code, e)
+        logger.error("Scheduled metadata scan failed for %s: %s", source_code, type(e).__name__)
     finally:
         db.close()
 

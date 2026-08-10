@@ -9,12 +9,16 @@ SENSITIVE_FIELDS = {
     "password", "credential", "token",
 }
 
-# 111 S6：从异常消息中剥离连接串、密码、带参 URL、SQL 参数等敏感片段。
+# 111 S6 / 123 R3：从异常消息中剥离连接串、密码、带参 URL、SQL 参数等敏感片段。
 _SECRET_PATTERNS = (
     re.compile(r"(?i)(password|passwd|pwd|token|secret|api[_-]?key)\s*[:=]\s*\S+"),
     re.compile(r"(?i)://[^\s/@:]+:[^\s/@:]+@"),   # user:pass@host 连接串
     re.compile(r"(?i)(?:authorization|auth|bearer)\s*[:=]\s*\S+"),
     re.compile(r"(?i)(dsn|connect.?string|jdbc:oracle|postgresql://|mysql://|sqlserver://)[^\s;,)]+"),
+    re.compile(r"(?i)\b(ak|sk|access_key|private_key)\b\s*[:=]\s*\S+"),
+    re.compile(r"(?i)\b(params?|bind)\s*[:=]\s*\{[^}]{0,400}\}"),
+    # 长 hex / base64 片段（签名内容、密钥材料）折叠
+    re.compile(r"\b[A-Za-z0-9+/_-]{48,}={0,2}\b"),
 )
 
 
