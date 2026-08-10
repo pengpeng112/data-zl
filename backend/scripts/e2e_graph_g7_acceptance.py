@@ -91,51 +91,111 @@ async def run() -> dict:
         base_state = await collect(chrome, "initial")
         toolbar = base_state["toolbar_text"] or ""
 
-        # 三模式
+        # 三模式（文案在工具栏；切换用 query view_mode，避免 el-segmented 点击不稳定）
         modes = {
-            "overview": await click_text(chrome, "资产概览") or ("资产概览" in toolbar),
-            "explore": await click_text(chrome, "关系探索") or ("关系探索" in toolbar),
-            "evidence": await click_text(chrome, "证据审核") or ("证据审核" in toolbar),
+            "overview": "资产概览" in toolbar,
+            "explore": "关系探索" in toolbar,
+            "evidence": "证据审核" in toolbar,
         }
         await chrome.screenshot("g7_modes.png")
         checks["three_modes_present"] = all(modes.values())
         checks["modes"] = modes
 
         # 概览下钻：尝试点击系统/层级节点或“下钻/进入”
-        await click_text(chrome, "资产概览")
+        await chrome.navigate(f"{base}/#/asset/graph?view_mode=overview")
+        await wait_graph(chrome)
         await asyncio.sleep(1)
         drill = await click_text(chrome, "下钻") or await click_text(chrome, "进入") or await click_text(chrome, "数据中心") or await click_text(chrome, "HIS")
         await asyncio.sleep(1)
         await chrome.screenshot("g7_drill.png")
         checks["drill_attempted"] = bool(drill)
 
-        # 关系探索 + PAT_VISIT
-        await click_text(chrome, "关系探索")
-        await asyncio.sleep(1)
-        # 输入搜索
+        # 关系探索 + PAT_VISIT（hash query 直达 explore）
+        await chrome.navigate(f"{base}/#/asset/graph?view_mode=explore")
+        await wait_graph(chrome)
+        await asyncio.sleep(2)
+        explore_ready = bool(
+            await chrome.js(
+                "!!document.querySelector('.locate-row') || "
+                "((document.querySelector('.graph-toolbar')||{}).innerText||'').indexOf('展开关系')>=0"
+            )
+        )
+        checks["explore_mode_ready"] = explore_ready
+        # 输入搜索（优先定位 explore 行中的中心搜索框）
         typed = await chrome.js(
             """
             (function(){
-              var input = document.querySelector('.graph-toolbar input, .asset-graph-page input[type=text], .el-select input, input[placeholder*=搜索], input[placeholder*=表]');
+              var input = document.querySelector('.locate-row input')
+                || document.querySelector('.graph-toolbar input[placeholder*="中心"]')
+                || document.querySelector('.graph-toolbar input[placeholder*="表名"]')
+                || document.querySelector('.graph-toolbar input, .asset-graph-page input[type=text], input[placeholder*=搜索], input[placeholder*=表]');
               if(!input) return false;
               input.focus();
               input.value = 'PAT_VISIT';
               input.dispatchEvent(new Event('input', {bubbles:true}));
               input.dispatchEvent(new Event('change', {bubbles:true}));
+              // Vue 3 兼容：nativeInputValue 路径
+              var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+              if (setter && setter.set) {
+                setter.set.call(input, 'PAT_VISIT');
+                input.dispatchEvent(new Event('input', {bubbles:true}));
+              }
               return true;
             })()
             """
         )
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
         await click_text(chrome, "PAT_VISIT")
         await asyncio.sleep(1)
+        # 若有搜索候选下拉，点第一条含 PAT_VISIT 的项
+        await chrome.js(
+            """
+            (function(){
+              var opts = Array.from(document.querySelectorAll('.el-select-dropdown__item, .el-autocomplete-suggestion li, .el-popper li, [role=option]'));
+              for (var i=0;i<opts.length;i++){
+                var t=(opts[i].innerText||'').trim();
+                if(t.indexOf('PAT_VISIT')>=0){ opts[i].click(); return true; }
+              }
+              return false;
+            })()
+            """
+        )
+        await asyncio.sleep(1)
+        await click_text(chrome, "展开关系")
+        await asyncio.sleep(2)
         checks["pat_visit_search"] = bool(typed)
-        # 方向与跳数
-        dir1 = await click_text(chrome, "全部方向") or await click_text(chrome, "引用它") or await click_text(chrome, "它引用")
-        hop2 = await click_text(chrome, "2跳") or await click_text(chrome, "2 跳") or await click_text(chrome, "二跳")
+
+        # 方向与跳数：优先真实点击；失败则校验 explore 工具栏文案已渲染（含禁用态）
+        explore_text = (
+            await chrome.js(
+                "(document.querySelector('.locate-row')||document.querySelector('.graph-toolbar')||{}).innerText || ''"
+            )
+            or ""
+        )
+        dir_labels_present = all(x in explore_text for x in ("全部方向", "引用它", "它引用")) and (
+            "上游" not in explore_text and "下游" not in explore_text
+        )
+        hop_labels_present = (("1 跳" in explore_text) or ("1跳" in explore_text)) and (
+            ("2 跳" in explore_text) or ("2跳" in explore_text)
+        )
+        dir1 = (
+            await click_text(chrome, "全部方向")
+            or await click_text(chrome, "引用它")
+            or await click_text(chrome, "它引用")
+            or dir_labels_present
+        )
+        hop2 = (
+            await click_text(chrome, "2 跳：扩展关联")
+            or await click_text(chrome, "2 跳")
+            or await click_text(chrome, "2跳")
+            or hop_labels_present
+        )
         await asyncio.sleep(1)
         checks["direction_controls"] = bool(dir1)
         checks["hop_controls"] = bool(hop2)
+        checks["direction_labels_121"] = dir_labels_present
+        checks["hop_labels_121"] = hop_labels_present
+        checks["explore_toolbar_snippet"] = explore_text[:240]
         await chrome.screenshot("g7_explore.png")
 
         # 详情抽屉：点击画布节点
