@@ -7,11 +7,20 @@ from __future__ import annotations
 import pytest
 
 from app.services.dict_medical_import import (
+    CODE_SET_HOSPITAL,
+    CODE_SET_INSURANCE,
+    CODE_SET_NATIONAL_CLINICAL,
     _normalize_text,
     _row_hash,
     validate_row,
     parse_diagnosis_mapping_excel,
 )
+
+
+def test_import_uses_canonical_push_code_sets():
+    assert CODE_SET_HOSPITAL == "diagnosis_local_clinical"
+    assert CODE_SET_NATIONAL_CLINICAL == "diagnosis_national_clinical_v2"
+    assert CODE_SET_INSURANCE == "diagnosis_insurance_v2"
 
 
 class TestNormalizeText:
@@ -134,6 +143,30 @@ class TestParseExcel:
         assert "error" not in result
         assert result["row_count"] == 35
         assert result["sheet"] == "诊断字典映射"
+
+    def test_merged_group_headers_from_production_workbook(self):
+        header1 = [
+            "字典属性",
+            "临床诊断字典（海量电子病历数据库库 jhdict_icd_vs_clinic 和 his数据库 diagnosis_dict）",
+            None,
+            "对应国家临床版2.0映射关系 （海量电子病历数据库库 jdiagnosis_dict）",
+            None,
+            "对应国家医保版2.0映射关系（海量电子病历数据库库 jdiagnosis_contrast_dict）",
+            None,
+        ]
+        header2 = [None, "疾病编码", "疾病名称", "疾病编码", "疾病名称", "疾病编码", "疾病名称"]
+        data = [["院内扩展", "I63.0011", "测试诊断", "I63.001", "国临诊断", "I63.001", "医保诊断"]]
+        result = parse_diagnosis_mapping_excel(self._make_xlsx([header1, header2] + data), "real.xlsx")
+        assert "error" not in result
+        assert result["rows"][0]["values"] == {
+            "dict_attribute": "院内扩展",
+            "hospital_code": "I63.0011",
+            "hospital_name": "测试诊断",
+            "national_clinical_code": "I63.001",
+            "national_clinical_name": "国临诊断",
+            "insurance_code": "I63.001",
+            "insurance_name": "医保诊断",
+        }
 
     def test_empty_file_rejected(self):
         xlsx = self._make_xlsx([["字典属性", "院内疾病编码"]])

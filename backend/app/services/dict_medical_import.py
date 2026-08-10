@@ -37,9 +37,12 @@ COLUMN_ALIASES = {
     "国家医保版2.0名称": "insurance_name",
 }
 
-CODE_SET_HOSPITAL = "hospital_diagnosis"
-CODE_SET_NATIONAL_CLINICAL = "national_clinical_2"
-CODE_SET_INSURANCE = "national_insurance_2"
+# Keep imports on the same canonical code sets consumed by planning, source
+# collection and the maintenance workbench. Legacy names made a successful
+# import invisible to the push planner.
+CODE_SET_HOSPITAL = "diagnosis_local_clinical"
+CODE_SET_NATIONAL_CLINICAL = "diagnosis_national_clinical_v2"
+CODE_SET_INSURANCE = "diagnosis_insurance_v2"
 CATEGORY = "diagnosis"
 
 
@@ -96,6 +99,42 @@ def parse_diagnosis_mapping_excel(file_bytes: bytes, file_name: str) -> dict[str
                     if alias in cell_str and field not in col_map.values():
                         col_map[idx] = field
                         break
+
+    # The production workbook uses merged group headers such as
+    # "临床诊断字典（...）" followed by generic "疾病编码/疾病名称"
+    # cells. openpyxl exposes only the first cell of each merged group, so
+    # combine the two header rows by their physical column positions.
+    if "hospital_code" not in col_map.values() and header_row2 is not None:
+        groups: list[str | None] = []
+        current_group: str | None = None
+        width = max(len(header_row1), len(header_row2))
+        for idx in range(width):
+            top = _normalize_text(header_row1[idx]) if idx < len(header_row1) else None
+            if top:
+                if "国家临床" in top:
+                    current_group = "national_clinical"
+                elif "国家医保" in top:
+                    current_group = "insurance"
+                elif "临床诊断字典" in top or "院内" in top:
+                    current_group = "hospital"
+                elif "字典属性" in top:
+                    current_group = None
+            groups.append(current_group)
+
+        for idx in range(width):
+            sub = _normalize_text(header_row2[idx]) if idx < len(header_row2) else None
+            if idx == 0 and (
+                (_normalize_text(header_row1[0]) or "").find("字典属性") >= 0
+            ):
+                col_map.setdefault(idx, "dict_attribute")
+                continue
+            group = groups[idx]
+            if not group or not sub:
+                continue
+            if "编码" in sub:
+                col_map.setdefault(idx, f"{group}_code")
+            elif "名称" in sub:
+                col_map.setdefault(idx, f"{group}_name")
 
     if "hospital_code" not in col_map.values():
         return {"error": "未识别到院内疾病编码列，请检查表头"}

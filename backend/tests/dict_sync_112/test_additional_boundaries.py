@@ -46,6 +46,16 @@ except Exception:
 else:
     raise AssertionError("missing sequence must fail closed")
 assert calls == []
+
+# sequence 标识符白名单：危险值不得进入取号
+from app.services.medical_code_push import validate_sequence_identifier
+from fastapi import HTTPException
+try:
+    validate_sequence_identifier("x;select 1")
+    raise AssertionError("unsafe sequence must fail")
+except HTTPException:
+    pass
+assert validate_sequence_identifier("jhemr.seq_serial") == "jhemr.seq_serial"
 print("BOUNDARIES_OK")
 '''
     env = {k: v for k, v in os.environ.items() if not k.startswith("APP_")}

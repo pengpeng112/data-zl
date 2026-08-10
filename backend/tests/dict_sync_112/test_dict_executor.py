@@ -22,7 +22,20 @@ sys.path.insert(0, r"{BACKEND_DIR}")
 from fastapi import HTTPException
 
 from app.services.medical_code_push import validate_push_sql, ACTION_INSERT, ACTION_STOP
-from app.services.dict_sync_executor import _run_target_transaction, _whitelisted_serial_sequence
+from app.services.dict_sync_executor import (
+    _actions_requiring_readback,
+    _run_target_transaction,
+    _whitelisted_serial_sequence,
+)
+
+
+def test_readback_excludes_idempotently_skipped_existing_rows():
+    actions = [
+        {"action_id": "existing", "item_code": "A"},
+        {"action_id": "inserted", "item_code": "B"},
+    ]
+    assert _actions_requiring_readback(actions, {"existing": 0, "inserted": 1}) == [actions[1]]
+test_readback_excludes_idempotently_skipped_existing_rows()
 from app.core.config import settings
 
 # ---- 单行 INSERT 合法 ----

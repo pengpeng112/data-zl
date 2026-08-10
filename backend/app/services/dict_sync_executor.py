@@ -37,6 +37,7 @@ from .medical_code_push import (
     _load_platform_rows,
     _open_write_connection,
     _resolve_serial_from_whitelisted_sequence,
+    _resolve_serial_from_locked_max,
     _run_write_on_conn,
     _whitelisted_serial_sequence,
     build_his_diagnosis_insert,
@@ -48,10 +49,12 @@ from .medical_code_push import (
     build_jhemr_operation_dict_code_insert,
     build_jhemr_operation_dict_insert,
     build_stop_action,
+    readback_actions_on_conn,
     TARGET_HIS,
     TARGET_JHEMR,
     validate_push_sql,
 )
+from .data_masking import sanitize_text
 
 logger = logging.getLogger(__name__)
 
@@ -189,20 +192,116 @@ def _run_target_transaction(
         target_table = act.get("target_table") or ""
         sql = act.get("sql") or ""
         params = dict(act.get("params") or {})
+        if target_table in {"COMM.DIAGNOSIS_DICT", "COMM.OPERATION_DICT"}:
+            cur = conn.cursor()
+            try:
+                if target_table == "COMM.DIAGNOSIS_DICT":
+                    cur.execute(
+                        "SELECT 1 FROM COMM.DIAGNOSIS_DICT "
+                        "WHERE DIAGNOSIS_CODE = :code AND ROWNUM <= 1",
+                        {"code": params.get("diagnosis_code")},
+                    )
+                else:
+                    cur.execute(
+                        "SELECT 1 FROM COMM.OPERATION_DICT "
+                        "WHERE OPERATION_CODE = :code AND ROWNUM <= 1",
+                        {"code": params.get("operation_code")},
+                    )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
+            finally:
+                cur.close()
+        if target_table == "jhemr.diagnosis_dict":
+            # Standard-code rows are shared with the existing dictionary;
+            # an existing row is idempotent and must not be inserted again.
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT 1 FROM jhemr.diagnosis_dict "
+                    "WHERE diagnosis_code = %s AND hospital_no = %s LIMIT 1",
+                    (params.get("diagnosis_code"), params.get("hospital_no")),
+                )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
+        if target_table in {"jhemr.operation_dict", "jhemr.operation_dict_code"}:
+            with conn.cursor() as cur:
+                if target_table == "jhemr.operation_dict":
+                    cur.execute(
+                        "SELECT 1 FROM jhemr.operation_dict "
+                        "WHERE operation_code = %s AND hospital_no = %s LIMIT 1",
+                        (params.get("operation_code"), params.get("hospital_no")),
+                    )
+                else:
+                    # The standard-code catalog contains legacy source
+                    # hospital identifiers; the national code is the stable
+                    # idempotency key across those records.
+                    cur.execute(
+                        "SELECT 1 FROM jhemr.operation_dict_code "
+                        "WHERE operation_code = %s LIMIT 1",
+                        (params.get("operation_code"),),
+                    )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
+        if target_table == "jhemr.operation_contrast_dict":
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT 1 FROM jhemr.operation_contrast_dict "
+                    "WHERE operation_code = %s AND classify = %s LIMIT 1",
+                    (params.get("operation_code"), params.get("classify")),
+                )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
+        if target_table == "jhemr.diagnosis_contrast_dict":
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT 1 FROM jhemr.diagnosis_contrast_dict "
+                    "WHERE diagnosis_code = %s AND classify = %s LIMIT 1",
+                    (params.get("diagnosis_code"), params.get("classify")),
+                )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
+        if target_table == "jhemr.jhdict_icd_vs_clinic":
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT 1 FROM jhemr.jhdict_icd_vs_clinic "
+                    "WHERE diagnosis_code = %s AND hospital_no = %s LIMIT 1",
+                    (params.get("diagnosis_code"), params.get("hospital_no")),
+                )
+                if cur.fetchone() is not None:
+                    row_counts[act.get("action_id") or act.get("item_code")] = 0
+                    continue
         needs_serial = target_table == "jhemr.jhdict_icd_vs_clinic" and params.get("serial_no") is None
         if act.get("plan_status") == "blocked" and not needs_serial:
             raise HTTPException(status_code=409, detail="target package contains blocked action")
         sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
         if target_table == "jhemr.jhdict_icd_vs_clinic" and params.get("serial_no") is None:
             seq = _whitelisted_serial_sequence()
-            if not seq:
+            strategy = (settings.jhemr_serial_strategy or "disabled").strip().lower()
+            if seq:
+                params["serial_no"] = _resolve_serial_from_whitelisted_sequence(conn, dialect, seq)
+            elif strategy == "max_plus_one_locked":
+                params["serial_no"] = _resolve_serial_from_locked_max(conn, dialect)
+            else:
                 raise HTTPException(
                     status_code=400,
-                    detail="jhemr.jhdict_icd_vs_clinic needs serial_no; no DBA-whitelisted sequence configured",
+                    detail="jhemr.jhdict_icd_vs_clinic needs serial_no; no approved allocator configured",
                 )
-            params["serial_no"] = _resolve_serial_from_whitelisted_sequence(conn, dialect, seq)
             sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
         row_counts[act.get("action_id") or act.get("item_code")] = _run_write_on_conn(conn, dialect, sql, params)
+
+
+def _actions_requiring_readback(
+    actions: list[dict[str, Any]], row_counts: dict[str, int]
+) -> list[dict[str, Any]]:
+    """Return only actions that changed a row in the current transaction."""
+    return [
+        action for action in actions
+        if row_counts.get(action.get("action_id") or action.get("item_code"), 0) != 0
+    ]
 
 
 def dispatch_target(
@@ -213,7 +312,7 @@ def dispatch_target(
     his_source_code: str,
     jhemr_source_code: str,
     operator: str | None = None,
-    hospital_no: str = "1110002",
+    hospital_no: str = "49557032X",
 ) -> dict[str, Any]:
     """Dispatch ONE approved plan target under a shared connection/transaction.
 
@@ -252,6 +351,7 @@ def dispatch_target(
     source = _target_source(db, target_system, his_source_code=his_source_code, jhemr_source_code=jhemr_source_code)
     conn, dialect = _open_write_connection(source)
     row_counts: dict[str, int] = {}
+    readback_summary: dict[str, Any] | None = None
     run = DictMedicalPushRun(
         plan_id=plan.id,
         target_system=target_system,
@@ -264,19 +364,56 @@ def dispatch_target(
     db.flush()
     try:
         try:
-            _run_target_transaction(conn, dialect, runnable, row_counts)
+            # 1) same-target multi-action DML on one connection
+            _run_target_transaction(conn, dialect, runnable, row_counts=row_counts)
+            # 2) same-connection readback BEFORE commit (112 A3):
+            #    missing/multi-row/wrong stop state => fail-closed + full rollback.
+            #    Existing rows are deliberately skipped by the idempotency probes
+            #    above, so they must not be treated as newly inserted rows here
+            #    (including rows that are currently stopped).
+            applied_actions = _actions_requiring_readback(runnable, row_counts)
+            readback_summary = readback_actions_on_conn(conn, dialect, applied_actions)
+            # 3) only commit after readback confirms every key
             conn.commit()
-        except HTTPException:
+        except HTTPException as exc:
             conn.rollback()
+            run.status = "failed"
+            run.failed_count = len(runnable)
+            run.succeeded_count = 0
+            run.error_masked = sanitize_text(str(exc.detail if hasattr(exc, "detail") else exc))[:500]
+            run.reconcile_result = {
+                "status": "reconcile_required",
+                "reason": "write_or_readback_failed",
+                "row_counts": row_counts,
+            }
+            run.finished_at = datetime.now(timezone.utc)
+            db.commit()
             raise
         except Exception as exc:
             conn.rollback()
+            run.status = "failed"
+            run.failed_count = len(runnable)
+            run.succeeded_count = 0
+            run.error_masked = sanitize_text(f"{type(exc).__name__}")[:500]
+            run.reconcile_result = {
+                "status": "reconcile_required",
+                "reason": "write_or_readback_failed",
+                "row_counts": row_counts,
+            }
+            run.finished_at = datetime.now(timezone.utc)
+            db.commit()
             raise HTTPException(status_code=500, detail=f"dict target dispatch failed: {type(exc).__name__}") from exc
     finally:
         conn.close()
 
     run.status = "succeeded"
     run.succeeded_count = len(runnable)
+    run.failed_count = 0
+    run.reconcile_result = {
+        "status": "ok",
+        "readback": readback_summary,
+        "row_counts": row_counts,
+    }
     run.finished_at = datetime.now(timezone.utc)
     db.commit()
 
@@ -285,6 +422,7 @@ def dispatch_target(
         "total_actions": len(runnable),
         "succeeded": len(runnable),
         "row_counts": row_counts,
+        "readback": readback_summary,
         "status": "succeeded",
         "source_code": source.source_code,
     }

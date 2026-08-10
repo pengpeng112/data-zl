@@ -10,7 +10,9 @@ from app.models.dict_medical import DictMedicalCodeItem, DictMedicalCodeMapping,
 from app.services.medical_code_push import (
     _build_connector,
     _execute_write_sql,
+    build_his_diagnosis_insert,
     build_jhemr_diagnosis_dict_insert,
+    build_jhemr_jhdict_icd_insert,
     build_stop_action,
     plan_push_actions,
     validate_push_sql,
@@ -175,6 +177,8 @@ def test_apply_one_dry_run_and_apply_gate(client: TestClient, monkeypatch):
         "limit_flag": "",
     }
     action = build_jhemr_diagnosis_dict_insert(row, "H001").to_dict()
+    assert action["params"]["input_code"] == "JDDMXSXCDJXNGS"
+    assert action["params"]["pym"] == "JDDMXSXCDJXNGS"
 
     # API dry_run
     resp = client.post("/api/v1/dict-medical/push/apply-one", json={"action": action, "mode": "dry_run"})
@@ -210,6 +214,45 @@ def test_stop_one_sql_shape():
     assert "STOP_FLAG" in sql.upper()
     assert "I63.0011" not in sql  # parameterized
     assert "IN (" not in sql.upper()
+
+
+def test_diagnosis_insert_matches_live_dictionary_conventions():
+    row = {
+        "local_code": "I63.0011",
+        "local_name": "基底动脉血栓形成的急性脑梗死",
+        "dict_attribute": "",
+        "national_code": "I63.001",
+        "national_name": "基底动脉血栓形成脑梗死",
+        "insurance_code": "I63.001",
+        "insurance_name": "基底动脉血栓形成脑梗死",
+        "is_grey_insurance": False,
+        "ybhm_to_write": None,
+        "write_contrast": True,
+        "mtb_code": "",
+        "mtb_name": "",
+        "icd_lr_code": "",
+        "icd_lr_name": "",
+        "infectious_name": "",
+        "operation_level": "",
+        "operation_category": "",
+        "level4_flag": "",
+        "mini_flag": "",
+        "limit_flag": "",
+    }
+
+    his = build_his_diagnosis_insert(row).to_dict()
+    assert his["params"]["input_code"] == "JDDMXSXCDJXNGS"
+    assert his["params"]["yb_code"] == "I63.001"
+    assert his["params"]["yb_name"] == "基底动脉血栓形成脑梗死"
+    assert his["params"]["mtb_flag"] == "0"
+    assert "NM1" in his["sql"] and "'1'" in his["sql"]
+
+    clinic = build_jhemr_jhdict_icd_insert(row, "49557032X", 101237).to_dict()
+    assert clinic["params"]["hospital_no"] == "49557032X"
+    assert clinic["params"]["pym"] == "JDDMXSXCDJXNGS"
+    assert clinic["params"]["diagnosis_desc"] == row["local_name"]
+    assert "status" in clinic["sql"] and ", 1," in clinic["sql"]
+    assert "clinic_type" in clinic["sql"]
 
 
 def test_push_plan_api(client: TestClient):

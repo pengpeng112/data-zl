@@ -180,6 +180,7 @@ def claim_ready_events(
     *,
     batch_size: int = 10,
     now: datetime | None = None,
+    categories: list[str] | None = None,
 ) -> list[DictSyncOutboxEvent]:
     """Lease up to batch_size pending (or due-for-retry) events.
 
@@ -200,6 +201,8 @@ def claim_ready_events(
         .limit(batch_size)
         .with_for_update(skip_locked=True)
     )
+    if categories:
+        stmt = stmt.where(DictSyncOutboxEvent.category.in_(categories))
     events = list(db.scalars(stmt).all())
     for ev in events:
         ev.status = STATUS_LEASED
@@ -262,6 +265,7 @@ def run_worker_once(
     *,
     batch_size: int = 10,
     now: datetime | None = None,
+    categories: list[str] | None = None,
 ) -> dict[str, Any]:
     """One worker pass: recover stale leases, claim a batch, dispatch each.
 
@@ -269,7 +273,13 @@ def run_worker_once(
     """
     now = now or datetime.now(timezone.utc)
     recovered = reset_expired_leases(db, now=now)
-    claimed = claim_ready_events(db, holder, batch_size=batch_size, now=now)
+    claimed = claim_ready_events(
+        db,
+        holder,
+        batch_size=batch_size,
+        now=now,
+        categories=categories,
+    )
     db.commit()
 
     summary = {

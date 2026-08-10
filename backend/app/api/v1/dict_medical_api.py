@@ -206,6 +206,7 @@ def list_mapping_rows(
             "local_code": local.item_code,
             "local_name": local.item_name_cn,
             "dict_attribute": extra.get("dict_attribute"),
+            "ybhm": extra.get("jhemr_ybhm"),
             "national_code_set": national_code_set,
             "national_code": national_code,
             "national_name": target_name.get((national_code_set, national_code)) or extra.get("national_clinical_name"),
@@ -227,6 +228,28 @@ def list_mapping_rows(
             "status": local.status,
         })
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+@router.get("/mapping-options", summary="诊断手术维护下拉值域")
+def list_mapping_options(category_code: str = Query("diagnosis"), db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Return values already used by maintained rows; never invent target-system values."""
+    code_set = "operation_local_clinical" if category_code == "operation" else "diagnosis_local_clinical"
+    rows = db.scalars(select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == code_set)).all()
+    def values(key: str) -> list[str]:
+        return sorted({str((r.extra or {}).get(key)).strip() for r in rows if (r.extra or {}).get(key) not in (None, "")})
+    data = {
+        "dict_attributes": sorted(set(values("dict_attribute") + ["院内扩展"])),
+        "ybhm": ["灰码"],
+    }
+    if category_code == "operation":
+        data.update({
+            "operation_category": values("operation_category"),
+            "operation_level": values("operation_level"),
+            "performance_level4_flag": values("performance_level4_flag"),
+            "performance_minimally_invasive_flag": values("performance_minimally_invasive_flag"),
+            "restricted_tech_flag": values("restricted_tech_flag"),
+        })
+    return ApiResponse(data=data)
 
 
 def _excel_col_name(index: int) -> str:
@@ -350,6 +373,7 @@ def _mapping_rows_for_export(
             "local_code": local.item_code,
             "local_name": local.item_name_cn,
             "dict_attribute": extra.get("dict_attribute"),
+            "ybhm": extra.get("jhemr_ybhm"),
             "national_code": national_code,
             "national_name": target_name.get((national_code_set, national_code)) or extra.get("national_clinical_name") or "",
             "insurance_code": insurance_code,
@@ -392,8 +416,8 @@ def export_mapping_rows(
         data_rows = [[r.get("dict_attribute"), r.get("local_code"), r.get("local_name"), r.get("operation_level"), r.get("national_code"), r.get("national_name"), r.get("operation_category"), r.get("performance_level4_flag"), r.get("performance_minimally_invasive_flag"), r.get("restricted_tech_flag"), r.get("insurance_code"), r.get("insurance_name"), "停用" if r.get("status") == "inactive" else "启用", r.get("source_file"), r.get("source_sheet")] for r in rows]
         filename = "手术映射维护.xlsx"
     else:
-        headers = ["字典属性", "院内临床诊断编码", "院内临床诊断名称", "国家临床版2.0疾病编码", "国家临床版2.0疾病名称", "国家医保版2.0疾病编码", "国家医保版2.0疾病名称", "门诊慢特病编码", "门诊慢特病名称", "ICD低风险编码类目", "ICD低风险病种名称", "传染病诊断", "状态", "来源文件", "来源工作表"]
-        data_rows = [[r.get("dict_attribute"), r.get("local_code"), r.get("local_name"), r.get("national_code"), r.get("national_name"), r.get("insurance_code"), r.get("insurance_name"), r.get("special_disease_code"), r.get("special_disease_name"), r.get("low_risk_category_code"), r.get("low_risk_disease_name"), r.get("infectious_disease_name"), "停用" if r.get("status") == "inactive" else "启用", r.get("source_file"), r.get("source_sheet")] for r in rows]
+        headers = ["字典属性", "院内临床诊断编码", "院内临床诊断名称", "JHEMR灰码", "国家临床版2.0疾病编码", "国家临床版2.0疾病名称", "国家医保版2.0疾病编码", "国家医保版2.0疾病名称", "门诊慢特病编码", "门诊慢特病名称", "ICD低风险编码类目", "ICD低风险病种名称", "传染病诊断", "状态", "来源文件", "来源工作表"]
+        data_rows = [[r.get("dict_attribute"), r.get("local_code"), r.get("local_name"), r.get("ybhm"), r.get("national_code"), r.get("national_name"), r.get("insurance_code"), r.get("insurance_name"), r.get("special_disease_code"), r.get("special_disease_name"), r.get("low_risk_category_code"), r.get("low_risk_disease_name"), r.get("infectious_disease_name"), "停用" if r.get("status") == "inactive" else "启用", r.get("source_file"), r.get("source_sheet")] for r in rows]
         filename = "诊断映射维护.xlsx"
 
     content = _xlsx_bytes(headers, data_rows, "Sheet1")
@@ -410,6 +434,7 @@ class MappingRowUpsert(BaseModel):
     local_code: str
     local_name: str
     dict_attribute: str | None = None
+    ybhm: str | None = None
     national_code: str | None = None
     national_name: str | None = None
     insurance_code: str | None = None
@@ -486,15 +511,24 @@ def _replace_mapping(db: Session, category_code: str, from_code_set: str, from_c
 
 
 @router.put("/mapping-rows", summary="按院内编码新增/更新诊断手术映射宽表行")
-def upsert_mapping_row(req: MappingRowUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def upsert_mapping_row(
+    req: MappingRowUpsert,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
     local_code = (req.local_code or "").strip()
     local_name = (req.local_name or "").strip()
     if not local_code or not local_name:
         raise HTTPException(status_code=400, detail="院内编码和院内名称不能为空")
+    if req.category_code not in {"diagnosis", "operation"}:
+        raise HTTPException(status_code=400, detail="category_code must be diagnosis or operation")
+    if req.ybhm not in (None, "", "灰码"):
+        raise HTTPException(status_code=400, detail="ybhm 只能为灰码或为空")
 
     local_code_set, national_code_set, insurance_code_set = _code_sets_for_category(req.category_code)
     extra = {
-        "dict_attribute": req.dict_attribute,
+        "dict_attribute": (req.dict_attribute or "院内扩展").strip(),
+        "jhemr_ybhm": req.ybhm or None,
         "national_clinical_code": req.national_code,
         "national_clinical_name": req.national_name,
         "insurance_raw_code": req.insurance_code,
@@ -519,7 +553,32 @@ def upsert_mapping_row(req: MappingRowUpsert, db: Session = Depends(get_db)) -> 
     _replace_mapping(db, req.category_code, local_code_set, local_code, national_code_set, req.national_code)
     _replace_mapping(db, req.category_code, local_code_set, local_code, insurance_code_set, req.insurance_code)
     db.commit()
-    return ApiResponse(data={"local_code": local_code, "category_code": req.category_code})
+    result = {"local_code": local_code, "category_code": req.category_code}
+    from ...core.config import settings as app_settings
+    if (
+        app_settings.dict_medical_push_enabled
+        and app_settings.dict_medical_auto_approve_enabled
+        and (req.status or "active") == "active"
+    ):
+        from ...services.dict_medical_push import approve_plan, create_push_plan
+
+        current_user = get_current_user(request)
+        plan = create_push_plan(
+            db,
+            category_code=req.category_code,
+            target_systems=["HIS_SOURCE", "JHEMR_VASTBASE"],
+            item_codes=[local_code],
+            created_by=str(current_user),
+            action_type="insert",
+        )
+        approve_plan(
+            db,
+            plan.id,
+            approved_by="dict-auto-approver",
+            note="system auto-approved after mapping-row create",
+        )
+        result.update({"auto_sync": "queued", "plan_id": plan.id})
+    return ApiResponse(data=result)
 class MappingUpsert(BaseModel):
     category_code: str
     from_code_set: str
@@ -1089,7 +1148,7 @@ def medical_push_config(request: Request) -> ApiResponse[dict]:
 
     return ApiResponse(data={
         "push_enabled": push_enabled(),
-        "default_hospital_no": getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002"),
+        "default_hospital_no": getattr(app_settings, "dict_medical_push_default_hospital_no", "49557032X"),
         "allowed_actions": ["insert", "stop"],
         "hard_rules": {
             "single_row_only": True,
@@ -1133,7 +1192,7 @@ def medical_push_plan(
         plan_push_actions,
     )
 
-    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002")
+    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "49557032X")
     plan = plan_push_actions(
         db,
         category_code=req.category_code,
@@ -1208,7 +1267,7 @@ def medical_push_stop_one(
     from ...core.config import settings as app_settings
     from ...services.medical_code_push import apply_one_action, build_stop_action
 
-    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "1110002")
+    hospital_no = req.hospital_no or getattr(app_settings, "dict_medical_push_default_hospital_no", "49557032X")
     action = build_stop_action(
         category_code=req.category_code,
         target_system=req.target_system,
