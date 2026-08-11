@@ -1,7 +1,7 @@
 > 类别：执行记录
 >
-> 状态：当前（2026-08-10 一次性正式同步已完成；本地复用代码已完成；每日自动职称子任务尚未发布）
-> 最后复核：2026-08-10
+> 状态：当前（2026-08-10 一次性正式同步已完成；每日职称子任务本地代码与专项测试已完成，尚未发布/调度）
+> 最后复核：2026-08-11
 
 # HIS 职称同步 JHEMR 执行与复用说明
 
@@ -30,8 +30,8 @@
 | 本地复用代码 | PASS | 已实现 dry-run、备份绑定、批量覆盖、事务内回读、HMAC 审计和专项测试 |
 | 完整后端 pytest | BLOCKED | 本机没有隔离 `APP_TEST_DB_URL`；未使用生产库替代测试库 |
 | 当前服务器应用镜像包含本地职称代码 | NOT EXECUTED | 2026-08-10 只用临时受控脚本执行一次性同步，没有重建或发布应用镜像 |
-| 每日人员任务包含独立职称子任务 | NOT EXECUTED | 仍需按本文件第 12 节开发、隔离测试和单独发布 |
-| 目标提交与完成态审计原子性 | 待增强 | 当前一次性脚本先写 planned 审计、再提交 JHEMR、最后写完成态审计；若最后一步失败，必须先只读对账，禁止把审计失败等同于目标未提交后直接重跑 |
+| 每日人员任务包含独立职称子任务 | LOCAL PASS / NOT PUBLISHED | 已接入本地 nightly runner，并作为必需子任务参与 overall/退出码；尚未构建生产镜像、发布或修改调度 |
+| 目标提交与完成态审计恢复 | LOCAL PASS | 每批先落 planned action，再以单个 JHEMR 事务整批更新；完成态审计失败保留 `target_committed_pending_audit`，下一轮凭账号和值 HMAC 只读核对后补记，未确认动作失败关闭 |
 
 ## 3. 唯一业务契约
 
@@ -136,11 +136,14 @@ WHERE user_id = %s
 | `backend/scripts/sync_jhemr_education_titles.py` | 可复用的一次性 dry-run/备份/apply 工具 | `_build_source_map`、`_write_backup`、`_create_planned_audit`、`_apply_changes`、`main` |
 | `backend/app/services/his_identity_sync.py` | 日常 HIS 人员采集时读取 EmployeeTitle 字典，写入平台 `IdentityPerson.job_title` | `EMPLOYEE_TITLE_DICT_TABLE`、`_build_employee_title_map`、`_collect`、`_build_plan` |
 | `backend/app/services/jhemr_identity_adapter.py` | 已有账号被身份同步处理时，允许覆盖不同的 `education_title` 并在提交前回读 | `align_existing_user` |
+| `backend/app/services/identity_title_sync.py` | 每日全量限量比较、唯一性/长度/权限门禁、整批 planned 审计、JHEMR 单事务更新和完成态审计恢复 | `sync_jhemr_education_titles_daily`、`reconcile_pending_title_actions` |
+| `backend/scripts/run_identity_modified_nightly.py` | 将职称同步作为 `jhemr_education_title_sync` 必需子任务并入 overall、退出码和脱敏摘要 | `main` |
+| `backend/app/services/identity_sync_audit.py` / `identity_sync_status.py` | 通用子任务 action、计数守恒、告警和三子任务状态聚合 | `create_action`、`finalize_run`、`aggregate_overall_status` |
 | `backend/tests/identity_title_sync/` | 无测试库环境可执行的纯逻辑专项测试 | 歧义、覆盖、备份绑定、适配器回读 |
 | `backend/tests/test_his_identity_sync.py` | HIS 采集与平台主档集成测试 | 字典采集、映射计数、审计 |
 | `backend/tests/test_identity_sync.py` | JHEMR 适配器集成测试 | 非空职称覆盖与回读 |
 
-截至 2026-08-10，上述文件处于共享工作区改动中，尚未提交、推送或发布。后续 AI 必须先执行 `git status --short` 并保留其他协作者改动。
+截至 2026-08-11，上述每日化文件处于共享工作区改动中，尚未提交、推送或发布。后续 AI 必须先执行 `git status --short` 并保留其他协作者改动。
 
 ## 7. 2026-08-10 正式执行证据
 
@@ -393,7 +396,7 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" -o BatchMode=yes `
 |---|---|
 | Python 编译 | PASS |
 | HIS 三条 SQL 静态只读检查 | PASS |
-| `pytest tests/identity_title_sync/ -q` | PASS，6 passed |
+| `pytest tests/identity_title_sync/ -q` | PASS，17 passed（含每日子任务、整批回滚、审计恢复边界） |
 | `git diff --check` | PASS，仅既有 CRLF 提示 |
 | 生产 dry-run | PASS |
 | 备份摘要/权限 | PASS |
@@ -416,7 +419,7 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" -o BatchMode=yes `
 
 ## 12. 并入每日人员同步的后续方案
 
-一次性工具已经解决当前数据；要让未来 HIS 职称变化自动进入 JHEMR，还需要单独实施以下工作。未完成前不得宣称“每日职称同步已上线”。
+一次性工具已经解决当前数据；2026-08-11 已完成下述每日化本地实现和专项测试，但尚未发布、未修改 cron、未执行生产 runner。未完成隔离全量测试、发布授权和上线观察前，不得宣称“每日职称同步已上线”。
 
 ### 12.1 推荐运行方式
 
@@ -472,6 +475,15 @@ HIS 当前人员约 2521、职称字典约 60 行，均不是巨表。推荐每�
 4. 第一次纳入每日任务需用户明确授权应用发布和调度行为；不得从 2026-08-10 一次性写入授权推定。
 5. 不修改 HIS 权限；JHEMR 仅保留 `education_title` 列级 UPDATE。
 6. 连续观察至少 3 个夜间窗口，确认 overall/subtask/action/告警守恒。
+
+### 12.5 2026-08-11 本地实现结果
+
+- `jhemr_education_title_sync` 已作为必需子任务接入每日 runner；主任务成功而职称失败时 overall 为 `partial_success`、退出码 2。
+- HIS 仍仅执行 3 条显式字段、限量 `SELECT`；JHEMR 仅允许更新当前租户 `users.education_title`。
+- 所有差异先写 planned action，随后在一个 JHEMR 事务内逐行加锁、核对旧值、更新、回读；任一行失败整批回滚。
+- 完成态审计失败不重复写目标；保留待恢复计数，下一轮使用账号 HMAC 与目标值 HMAC 只读确认后补记 executed，无法确认则失败关闭。
+- 专项测试 `17 passed`、Python 编译通过；完整后端 pytest 因当前会话未配置合法隔离 `APP_TEST_DB_URL` 记为 BLOCKED。
+- 生产镜像发布、cron/systemd 修改、生产 runner、JHEMR/平台生产写入均 `NOT EXECUTED`。
 
 ## 13. 给后续 AI 的直接接手提示词
 

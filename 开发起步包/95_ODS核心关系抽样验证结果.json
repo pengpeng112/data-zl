@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-07-27T02:58:03.370921+00:00",
+  "relations": [
+    {
+      "rel_id": "G1",
+      "child": "HIS.INP_BILL_DETAIL",
+      "parent": "HIS.PAT_VISIT",
+      "sample_size": 1000,
+      "total": 1000,
+      "matched": 1000,
+      "orphan": 0,
+      "match_rate": 1.0,
+      "pass": true
+    },
+    {
+      "rel_id": "G2",
+      "child": "HIS.CLINIC_MASTER",
+      "parent": "HIS.PAT_MASTER_INDEX",
+      "sample_size": 10000,
+      "total": 10000,
+      "matched": 9999,
+      "orphan": 1,
+      "match_rate": 0.9999,
+      "pass": true
+    }
+  ],
+  "status": "ok",
+  "database": "orcl",
+  "current_user": "ODS"
+}

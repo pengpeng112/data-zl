@@ -31,6 +31,7 @@ dev.err
 .agents/skills/**/__pycache__/
 .agents/skills/**/*.pyc
 .ssh/
+.zcode/
 
 # 本地临时探查/运维脚本（常含环境注入默认值，禁止进发布基线）
 backend/scripts/_ro_*.py
@@ -67,6 +68,8 @@ backend/scripts/_continue_*.py
 backend/scripts/_metrics_snapshot.py
 backend/scripts/_run_push_tests.py
 backend/scripts/_server_test_medical_push.py
+# 其余单下划线脚本均为本地一次性探查/复现辅助；双下划线包文件不匹配。
+backend/scripts/_[!_]*.py
 
 # 大体积本地缓存/导出 / 离线构建产物（不进 Git，仅随发布包传输）
 *.dump
@@ -91,8 +94,12 @@ offline/pnpm-store/
 
 
 backend/identity_unit_test.db
+backend/identity_test.db
 
+# 本地备份副本和用户另行保存的上报材料不属于代码发布基线
+*.bak.*
+/材料上报/
+/开发起步包/_archive/临时命令输出_*
 
 # GitHub 100MB limit: keep HRP bulk columns out of git
 开发起步包/数据资产_HRP源端资产包/hrp_source_columns.csv
-

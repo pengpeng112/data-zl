@@ -1,0 +1,8 @@
+source_code,schema_name,table_name,column_name,value_desc_cn,name_cn_source
+his_source_10_10_10_15,MEDREC,PAT_VISIT,DISCHARGE_DISPOSITION2,'3'=死亡（三甲复审统计口径）,handover_doc_20260727
+his_source_10_10_10_15,MEDREC,PAT_VISIT,DISCHARGE_DATE_TIME,统计归年口径：2022-01-01~2026-01-01,handover_doc_20260727
+his_source_10_10_10_15,MEDREC,DIAGNOSIS,DIAGNOSIS_TYPE,'3'=出院诊断,handover_doc_20260727
+his_source_10_10_10_15,MEDREC,DIAGNOSIS,DIAGNOSIS_NO,1=主诊断,handover_doc_20260727
+his_source_10_10_10_15,INPBILL,INP_BILL_DETAIL,ITEM_CLASS,'A'=西药、'B'=中成药（药费口径 IN ('A','B')）,handover_doc_20260727
+his_source_10_10_10_15,ORDADM,ORDERS,ORDER_CLASS,医嘱类别（三甲复审指标按类别过滤）,handover_doc_20260727
+his_source_10_10_10_15,COMM,DEPT_DICT,DEPT_NAME,科室名称，多科室指标按出院科室归属,handover_doc_20260727

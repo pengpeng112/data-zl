@@ -1590,6 +1590,399 @@
       "validation_metrics": "total=41832099; matched=41832099; orphan=0",
       "note": "护理评估明细挂评估主表",
       "validation_note": "移动护理评估明细按 FORM_ID 挂评估主表成立"
+    },
+    {
+      "id": 48,
+      "domain": "人员",
+      "from": "INSURANCE.DRG_PERSON_INFO",
+      "from_columns": [
+        "USER_NAME"
+      ],
+      "to": "COMM.STAFF_DICT",
+      "to_columns": [
+        "EMP_NO"
+      ],
+      "join": "DRG_PERSON_INFO.USER_NAME=STAFF_DICT.EMP_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "DRG医师信息关联人员字典(医保飞检查询实测)",
+      "validation_note": "医保飞检SQL验证:1812行"
+    },
+    {
+      "id": 49,
+      "domain": "诊断",
+      "from": "MEDREC.DIAGNOSIS",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "INPBILL.INP_SETTLE_MASTER",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "DIAGNOSIS.PATIENT_ID=INP_SETTLE_MASTER.PATIENT_ID AND DIAGNOSIS.VISIT_ID=INP_SETTLE_MASTER.VISIT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "诊断关联住院结算取结算单据号",
+      "validation_note": "医保飞检SQL验证:134147行(2026.05~06)"
+    },
+    {
+      "id": 50,
+      "domain": "就诊",
+      "from": "MEDREC.PAT_ICU_RECORD",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "MEDREC.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PAT_ICU_RECORD.PATIENT_ID=PAT_VISIT.PATIENT_ID AND PAT_ICU_RECORD.VISIT_ID=PAT_VISIT.VISIT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "ICU记录关联就诊",
+      "validation_note": "医保飞检SQL验证:199行(2026.05~06)"
+    },
+    {
+      "id": 51,
+      "domain": "手术",
+      "from": "SURGERY.OPERATION_MASTER",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "MEDREC.OPERATION",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "OPERATION_MASTER.PATIENT_ID=OPERATION.PATIENT_ID AND OPERATION_MASTER.VISIT_ID=OPERATION.VISIT_ID",
+      "cardinality": "one-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "手术主表(SURGERY)关联手术记录(MEDREC),注意两表麻醉字段拼写不同(ANESTHESIA_METHOD vs ANAESTHESIA_METHOD)",
+      "validation_note": "医保飞检SQL验证:11784行(2026.05~06)"
+    },
+    {
+      "id": 52,
+      "domain": "手术",
+      "from": "SURGERY.OPERATION_MASTER",
+      "from_columns": [
+        "SURGEON"
+      ],
+      "to": "COMM.STAFF_DICT",
+      "to_columns": [
+        "EMP_NO"
+      ],
+      "join": "OPERATION_MASTER.SURGEON=STAFF_DICT.EMP_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "手术主表术者关联人员字典",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 53,
+      "domain": "住院费用",
+      "from": "INPBILL.INP_BILL_DETAIL",
+      "from_columns": [
+        "RCPT_NO"
+      ],
+      "to": "INPBILL.INP_SETTLE_MASTER",
+      "to_columns": [
+        "RCPT_NO"
+      ],
+      "join": "INP_BILL_DETAIL.RCPT_NO=INP_SETTLE_MASTER.RCPT_NO",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "住院费用明细关联结算主表",
+      "validation_note": "医保飞检SQL验证:3637185行(2026.05~06)"
+    },
+    {
+      "id": 54,
+      "domain": "住院费用",
+      "from": "INPBILL.INP_BILL_DETAIL",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "INPBILL.INP_SETTLE_MASTER_YB",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "INP_BILL_DETAIL.PATIENT_ID=INP_SETTLE_MASTER_YB.PATIENT_ID AND INP_BILL_DETAIL.VISIT_ID=INP_SETTLE_MASTER_YB.VISIT_ID AND settle_type=结算",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "住院明细关联医保结算取brjsh(注意:217就诊多条结算记录,子查询需去重或取一条)",
+      "validation_note": "医保飞检SQL验证,发现ORA-01427风险已记录"
+    },
+    {
+      "id": 55,
+      "domain": "门诊费用",
+      "from": "OUTPBILL.OUTP_BILL_ITEMS",
+      "from_columns": [
+        "RCPT_NO"
+      ],
+      "to": "OUTPBILL.OUTP_ORDER_DESC",
+      "to_columns": [
+        "RCPT_NO"
+      ],
+      "join": "OUTP_BILL_ITEMS.RCPT_NO=OUTP_ORDER_DESC.RCPT_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "门诊计费关联门诊医嘱取clinic_no",
+      "validation_note": "医保飞检SQL验证:695464行(2026.05~06)"
+    },
+    {
+      "id": 56,
+      "domain": "门诊费用",
+      "from": "OUTPBILL.OUTP_BILL_ITEMS",
+      "from_columns": [
+        "APPOINT_NO"
+      ],
+      "to": "EXAM.EXAM_MASTER",
+      "to_columns": [
+        "EXAM_NO"
+      ],
+      "join": "OUTP_BILL_ITEMS.APPOINT_NO=EXAM_MASTER.EXAM_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "门诊计费关联检查申请单(门诊检查VISIT_ID=0)",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 57,
+      "domain": "门诊费用",
+      "from": "OUTPBILL.OUTP_BILL_ITEMS",
+      "from_columns": [
+        "APPOINT_NO",
+        "ITEM_NO"
+      ],
+      "to": "LAB.LAB_TEST_MASTER",
+      "to_columns": [
+        "TEST_NO"
+      ],
+      "join": "OUTP_BILL_ITEMS.APPOINT_NO=LAB_RESULT.TEST_NO AND OUTP_BILL_ITEMS.ITEM_NO=LAB_RESULT.ITEM_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "门诊计费关联检验(门诊检验VISIT_ID=0)",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 58,
+      "domain": "门诊",
+      "from": "OUTPBILL.OUTP_ORDER_DESC",
+      "from_columns": [
+        "RCPT_NO"
+      ],
+      "to": "OUTPADM.CLINIC_MASTER",
+      "to_columns": [
+        "CLINIC_NO"
+      ],
+      "join": "OUTP_ORDER_DESC.RCPT_NO关联取CLINIC_NO(需经OUTP_BILL_ITEMS或RCPT_NO中间关联)",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "门诊医嘱关联门诊主记录取就诊科室",
+      "validation_note": "医保飞检SQL验证:门诊结算179421行(2026.05~06)"
+    },
+    {
+      "id": 59,
+      "domain": "检查",
+      "from": "EXAM.EXAM_MASTER",
+      "from_columns": [
+        "EXAM_NO"
+      ],
+      "to": "EXAM.EXAM_ITEMS",
+      "to_columns": [
+        "EXAM_NO"
+      ],
+      "join": "EXAM_MASTER.EXAM_NO=EXAM_ITEMS.EXAM_NO",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "检查主表关联检查项目明细",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 60,
+      "domain": "药品",
+      "from": "DRUG_USER.MED_IN_DETAIL",
+      "from_columns": [
+        "DRUG_PRI"
+      ],
+      "to": "DRUG_USER.MED_DICT_PRICE",
+      "to_columns": [
+        "DRUG_PRI"
+      ],
+      "join": "MED_IN_DETAIL.DRUG_PRI=MED_DICT_PRICE.DRUG_PRI",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "入库明细关联价格字典(注意:MED_IN_DETAIL无DRUG_CODE字段,必须用DRUG_PRI)",
+      "validation_note": "医保飞检SQL验证:入库明细关联跑通"
+    },
+    {
+      "id": 61,
+      "domain": "药品",
+      "from": "DRUG_USER.MED_DICT_PRICE",
+      "from_columns": [
+        "DRUG_CODE"
+      ],
+      "to": "DRUG_USER.MED_DICT_BASEINFO",
+      "to_columns": [
+        "DRUG_CODE"
+      ],
+      "join": "MED_DICT_PRICE.DRUG_CODE=MED_DICT_BASEINFO.DRUG_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "价格字典关联药品基本信息",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 62,
+      "domain": "药品",
+      "from": "DRUG_USER.MED_DICT_PRICE",
+      "from_columns": [
+        "FACTORY_CODE"
+      ],
+      "to": "DRUG_USER.MED_DICT_FACTORY",
+      "to_columns": [
+        "FACTORY_CODE"
+      ],
+      "join": "MED_DICT_PRICE.FACTORY_CODE=MED_DICT_FACTORY.FACTORY_CODE",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "价格字典关联厂家字典",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 63,
+      "domain": "药品",
+      "from": "DRUG_USER.MED_IN_DETAIL",
+      "from_columns": [
+        "SORT_NO"
+      ],
+      "to": "DRUG_USER.MED_DETAIL_STORAGE",
+      "to_columns": [
+        "DETAIL_ID"
+      ],
+      "join": "MED_IN_DETAIL.SORT_NO=MED_DETAIL_STORAGE.DETAIL_ID",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "入库明细关联库存记录取库存量(关联字段待确认覆盖率)",
+      "validation_note": "医保飞检SQL验证,关联字段待确认"
+    },
+    {
+      "id": 64,
+      "domain": "输血",
+      "from": "MEDREC.PAT_VISIT_BIS",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "MEDREC.PAT_VISIT",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "PAT_VISIT_BIS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND PAT_VISIT_BIS.VISIT_ID=PAT_VISIT.VISIT_ID",
+      "cardinality": "one-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "输血记录关联就诊",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 65,
+      "domain": "住院费用",
+      "from": "INPBILL.INP_SETTLE_MASTER",
+      "from_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "to": "INSURANCE.SETTLE_ZY_REC",
+      "to_columns": [
+        "PATIENT_ID",
+        "VISIT_ID"
+      ],
+      "join": "INP_SETTLE_MASTER.PATIENT_ID=SETTLE_ZY_REC.PATIENT_ID AND INP_SETTLE_MASTER.VISIT_ID=SETTLE_ZY_REC.VISIT_ID",
+      "cardinality": "one-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "住院结算关联医保结算流水取zylsh住院流水号",
+      "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 66,
+      "domain": "诊断",
+      "from": "MEDREC.DIAGNOSIS",
+      "from_columns": [
+        "PATIENT_ID"
+      ],
+      "to": "MEDREC.PAT_MASTER_INDEX",
+      "to_columns": [
+        "PATIENT_ID"
+      ],
+      "join": "DIAGNOSIS.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A+",
+      "validation_status": "verified",
+      "validation_metrics": {},
+      "note": "诊断关联患者主索引",
+      "validation_note": "医保飞检SQL验证"
     }
   ]
 }
