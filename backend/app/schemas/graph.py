@@ -143,13 +143,30 @@ class GraphViewMode(BaseModel):
     deprecated: bool = False
 
 
+class GraphOptionItem(BaseModel):
+    """A filter value with the canonical human label and physical code."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    value: str
+    label: str
+    count: int = 0
+    disabled: bool = False
+
+
 class GraphOptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    # Legacy code arrays remain stable for API consumers; *_options carry the
+    # canonical human label without changing filter values.
     systems: list[str]
     sources: list[str]
     schemas: list[str]
     domains: list[str]
+    system_options: list[GraphOptionItem] = Field(default_factory=list)
+    source_options: list[GraphOptionItem] = Field(default_factory=list)
+    schema_options: list[GraphOptionItem] = Field(default_factory=list)
+    domain_options: list[GraphOptionItem] = Field(default_factory=list)
     validation_statuses: list[str]
     confidences: list[str]
     relation_types: list[str]

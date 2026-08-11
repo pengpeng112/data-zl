@@ -152,6 +152,33 @@ describe("graphTransform", () => {
     expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.type).toBe("dashed");
     expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.color).toBe("#7c6aa6");
   });
+
+  it("uses canonical system and connection labels for graph groups while keeping physical keys", () => {
+    const nodes = [
+      {
+        id: "DATA_CENTER|docare_oracle|MEDSURGERY|MED_OPERATION_MASTER",
+        label: "MED_OPERATION_MASTER",
+        system_code: "DATA_CENTER",
+        source_code: "docare_oracle",
+        schema_name: "MEDSURGERY",
+        table_name: "MED_OPERATION_MASTER"
+      }
+    ];
+    const bySystem = normalizeGraphData(nodes, [], {
+      groupBy: "system",
+      systemNames: { DATA_CENTER: "数据中心" },
+      sourceNames: { docare_oracle: "Docare手术麻醉连接" }
+    });
+    expect(bySystem.topGroups[0]?.name).toBe("数据中心");
+    expect(bySystem.nodes[0]?.id).toBe(nodes[0].id);
+
+    const bySource = normalizeGraphData(nodes, [], {
+      groupBy: "source",
+      systemNames: { DATA_CENTER: "数据中心" },
+      sourceNames: { docare_oracle: "Docare手术麻醉连接" }
+    });
+    expect(bySource.topGroups[0]?.name).toBe("Docare手术麻醉连接");
+  });
   it("normalizes and labels upstream downstream direction switches", () => {
     expect(normalizeGraphNeighborDirection("in")).toBe("in");
     expect(normalizeGraphNeighborDirection("out")).toBe("out");

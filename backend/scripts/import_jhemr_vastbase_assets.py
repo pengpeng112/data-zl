@@ -135,7 +135,8 @@ def apply_package(package: dict) -> dict:
     with SessionLocal() as db:
         system = db.scalar(select(AssetSystem).where(AssetSystem.system_code == SYSTEM_CODE))
         if not system:
-            system = AssetSystem(system_code=SYSTEM_CODE, system_name_cn="嘉和电子病历（Vastbase）", system_type="EMR", target_host="10.10.8.177", system_identity_key="vastbase://10.10.8.177:5432/jhemr", status="active")
+            from app.services.asset_catalog import CANONICAL_SYSTEMS
+            system = AssetSystem(system_code=SYSTEM_CODE, system_name_cn=CANONICAL_SYSTEMS["JHEMR_VASTBASE"], system_type="EMR", target_host="10.10.8.177", system_identity_key="vastbase://10.10.8.177:5432/jhemr", status="active")
             db.add(system)
         source = db.scalar(select(AssetDataSource).where(AssetDataSource.source_code == SOURCE_CODE))
         if not source:
@@ -170,7 +171,10 @@ def apply_package(package: dict) -> dict:
         # idempotent without colliding with existing HIS/ODS relationships.
         next_rel_id = (db.scalar(select(func.max(AssetRelation.rel_id))) or 0) + 1
         for offset, row in enumerate(package["relationships"]):
-            db.add(AssetRelation(rel_id=next_rel_id + offset, domain=SYSTEM_CODE, from_table=row["from_table"], to_table=row["to_table"], confidence=row["confidence"], validation_level=row["validation_level"], validation_status=row["validation_status"], note=row["note"]))
+            _rel = AssetRelation(rel_id=next_rel_id + offset, domain=SYSTEM_CODE, from_table=row["from_table"], to_table=row["to_table"], confidence=row["confidence"], validation_level=row["validation_level"], validation_status=row["validation_status"], note=row["note"])
+            from app.services.relation_identity import populate_endpoint_fields
+            populate_endpoint_fields(db, _rel)
+            db.add(_rel)
         db.commit()
         return {"status": "succeeded", **package["summary"]}
 

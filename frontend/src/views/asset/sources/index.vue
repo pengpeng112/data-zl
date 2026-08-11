@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 兼容薄页：旧“数据源连接”入口重定向到统一系统页连接 Tab。
+ * 兼容薄页：旧“数据连接”入口重定向到统一系统页连接 Tab。
  * 业务逻辑已合并到 views/asset/systems/index.vue。
  */
 import { onMounted } from "vue";

@@ -36,6 +36,8 @@ const props = withDefaults(
     aggregateGroups?: boolean;
     aggregationThreshold?: number;
     viewMode?: string;
+    systemNames?: Record<string, string>;
+    sourceNames?: Record<string, string>;
   }>(),
   {
     height: "620px",
@@ -67,11 +69,34 @@ const normalized = computed(() => normalizeGraphData(props.nodes, props.edges, {
   focusKeyword: props.focusKeyword,
   centerTable: props.centerTable,
   selectedNodeId: props.selectedNodeId,
-  showReviewLayer: props.showReviewLayer
+  showReviewLayer: props.showReviewLayer,
+  systemNames: props.systemNames,
+  sourceNames: props.sourceNames
 }));
+
+function mappedSystem(node: any) {
+  const code = node.system_code || node.systemCode;
+  return props.systemNames?.[code] || code || "";
+}
+
+function mappedSource(node: any) {
+  const code = node.source_code || node.sourceCode || node.source;
+  return props.sourceNames?.[code] || code || "";
+}
+
+function mappedMeta(node: any) {
+  const systemCode = node.system_code || node.systemCode;
+  const sourceCode = node.source_code || node.sourceCode || node.source;
+  return [
+    props.systemNames?.[systemCode] && props.systemNames[systemCode] !== systemCode ? props.systemNames[systemCode] : "",
+    props.sourceNames?.[sourceCode] && props.sourceNames[sourceCode] !== sourceCode ? props.sourceNames[sourceCode] : ""
+  ].filter(Boolean).slice(0, 2).join(" / ");
+}
 
 function nodeGroup(node: any) {
   const id = String(node.id || "");
+  if (props.groupBy === "system") return node.category || mappedSystem(node) || "未分业务系统";
+  if (props.groupBy === "source") return node.category || mappedSource(node) || "未分数据连接";
   return node.category || node.schema_name || node.system_code || (id ? id.split(".")[0] : "") || "UNKNOWN";
 }
 
@@ -80,11 +105,13 @@ function nodeLabel(node: any) {
   // 必须把对象形态的 label 排除/取 formatter，否则 G6 文本布局对非字符串调 .split 抛 TypeError。
   const labelField =
     typeof node.label === "string" ? node.label : (node.label?.formatter ?? "");
-  const primary = String(node.table_name_cn || node.tableNameCn || labelField || node.table_name || node.display_id || node.id || "");
+  const primary = node.type === "system"
+    ? mappedSystem(node)
+    : String(node.table_name_cn || node.tableNameCn || labelField || node.table_name || node.display_id || node.id || "");
   const shorten = (value: string, max: number) => value.length > max ? `${value.slice(0, max - 1)}…` : value;
-  // 技术名保存在 data.raw/节点详情中；labelText 保持单字符串，避免 G6 文本布局
-  // 在旧版本中把换行对象误判为数组而触发 split 运行时异常。
-  return shorten(primary, 23);
+  const meta = node.type === "system" ? "" : mappedMeta(node);
+  // 保留物理 key 在 data.raw 中，同时把业务系统/数据连接中文名放入节点元信息。
+  return meta ? `${shorten(primary, 23)}\n${shorten(meta, 32)}` : shorten(primary, 23);
 }
 
 function aggregateData(nodes: any[], edges: any[]) {

@@ -47,7 +47,12 @@
             @row-click="filterBySystem"
             class="clickable-row"
           >
-            <el-table-column prop="system_code" label="系统编码" width="160" />
+            <el-table-column label="业务系统" width="180">
+              <template #default="{ row }">
+                {{ row.system_name_cn || systemNameMap[row.system_code] || row.system_code }}
+                <small class="system-code-inline">{{ row.system_code }}</small>
+              </template>
+            </el-table-column>
             <el-table-column prop="total_findings" label="问题总数" width="100" align="center" />
             <el-table-column prop="open_count" label="待处理" width="100" align="center" />
             <el-table-column prop="resolved_count" label="已解决" width="100" align="center" />
@@ -69,8 +74,8 @@
         <el-card>
           <template #header>
             <span>质量规则</span>
-            <el-button type="primary" size="small" class="ml12" @click="openRuleDialog()">新增规则</el-button>
-            <el-button size="small" :loading="autoGenerating" @click="autoGenerateRules">按主键/关系生成建议</el-button>
+            <el-button v-perms="'asset.quality.rule.create'" type="primary" size="small" class="ml12" @click="openRuleDialog()">新增规则</el-button>
+            <el-button v-perms="'asset.quality.rule.create'" size="small" :loading="autoGenerating" @click="autoGenerateRules">按主键/关系生成建议</el-button>
           </template>
 
           <el-form :inline="true">
@@ -166,15 +171,16 @@
             </el-table-column>
             <el-table-column label="操作" width="240" fixed="right">
               <template #default="{ row }">
-                <el-button size="small" @click="openRuleDialog(row)">编辑</el-button>
+                <el-button v-perms="'asset.quality.rule.create'" size="small" @click="openRuleDialog(row)">编辑</el-button>
                 <el-button
+                  v-perms="'asset.quality.rule.create'"
                   size="small"
                   :type="row.enabled ? 'warning' : 'success'"
                   @click="toggleRuleEnabled(row)"
                 >
                   {{ row.enabled ? '停用' : '启用' }}
                 </el-button>
-                <el-button
+                <el-button v-perms="'asset.quality.rule.create'"
                   v-if="row.check_sql"
                   size="small"
                   type="info"
@@ -182,7 +188,7 @@
                 >
                   校验SQL
                 </el-button>
-                <el-button size="small" type="danger" @click="deleteRule(row)">删除</el-button>
+                <el-button v-perms="'asset.quality.rule.create'" size="small" type="danger" @click="deleteRule(row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -263,7 +269,7 @@
           </el-form>
           <template #footer>
             <el-button @click="ruleDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="saveRule">保存</el-button>
+            <el-button v-perms="'asset.quality.rule.create'" type="primary" @click="saveRule">保存</el-button>
           </template>
         </el-dialog>
 
@@ -294,7 +300,7 @@
           <template #header>
             <span>执行质控检查</span>
           </template>
-          <el-button
+          <el-button v-perms="'asset.quality.rule.execute'"
             type="primary"
             :loading="checking"
             @click="runCheck"
@@ -486,9 +492,9 @@
             <el-table-column prop="assigned_to" label="分派人" width="100" />
             <el-table-column label="操作" width="220" fixed="right">
               <template #default="{ row }">
-                <el-button size="small" @click="openAssignDialog(row)">分派</el-button>
+                <el-button v-perms="'asset.quality.rule.execute'" size="small" @click="openAssignDialog(row)">分派</el-button>
                 <el-dropdown class="ml4" @command="(cmd: string) => recheckFinding(row, cmd)">
-                  <el-button size="small">
+                  <el-button v-perms="'asset.quality.rule.execute'" size="small">
                     复核<el-icon class="el-icon--right"><ArrowDown /></el-icon>
                   </el-button>
                   <template #dropdown>
@@ -500,7 +506,7 @@
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
-                <el-button size="small" type="info" class="ml4" @click="openFindingStatusDialog(row)">
+                <el-button v-perms="'asset.quality.rule.execute'" size="small" type="info" class="ml4" @click="openFindingStatusDialog(row)">
                   编辑状态
                 </el-button>
               </template>
@@ -529,7 +535,7 @@
           </el-form>
           <template #footer>
             <el-button @click="assignDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="submitAssign">确定</el-button>
+            <el-button v-perms="'asset.quality.rule.execute'" type="primary" @click="submitAssign">确定</el-button>
           </template>
         </el-dialog>
 
@@ -551,7 +557,7 @@
           </el-form>
           <template #footer>
             <el-button @click="findingStatusDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="submitFindingStatus">保存</el-button>
+            <el-button v-perms="'asset.quality.rule.execute'" type="primary" @click="submitFindingStatus">保存</el-button>
           </template>
         </el-dialog>
       </el-tab-pane>
@@ -567,7 +573,12 @@
           <el-table v-loading="recordsLoading" :data="records" stripe size="small">
             <el-table-column prop="id" label="ID" width="60" />
             <el-table-column prop="task_id" label="任务ID" width="80" />
-            <el-table-column prop="system_code" label="系统编码" width="140" />
+            <el-table-column label="业务系统" width="180">
+              <template #default="{ row }">
+                {{ row.system_name_cn || systemNameMap[row.system_code] || row.system_code || '-' }}
+                <small class="system-code-inline">{{ row.system_code }}</small>
+              </template>
+            </el-table-column>
             <el-table-column prop="started_at" label="开始时间" width="170" />
             <el-table-column prop="total_rules" label="规则数" width="80" align="center" />
             <el-table-column prop="total_findings" label="发现问题" width="100" align="center" />
@@ -663,6 +674,7 @@ import {
   getQualityFindings,
   getQualityCheckRuns,
   runQualityCheck,
+  listSystems,
   type QualitySummary
 } from "@/api/asset";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -674,11 +686,23 @@ import IssueIcon from "~icons/ri/file-warning-line";
 import QualityIcon from "~icons/ri/shield-check-line";
 import WarningIcon from "~icons/ri/alert-line";
 
+const systemNameMap = reactive<Record<string, string>>({});
+
+async function loadSystemNames() {
+  try {
+    const res = await listSystems();
+    for (const item of res.data || []) systemNameMap[item.system_code] = item.system_name_cn;
+  } catch {
+    // Technical codes remain a safe fallback if the catalog endpoint is unavailable.
+  }
+}
+
 // ============================================================
 // Types
 // ============================================================
 interface SystemSummaryItem {
   system_code: string;
+  system_name_cn?: string;
   total_findings: number;
   open_count: number;
   resolved_count: number;
@@ -720,6 +744,7 @@ interface CheckRunItem {
   id: number;
   task_id: string;
   system_code: string;
+  system_name_cn?: string;
   started_at: string;
   triggered_by: string;
   total_rules: number;
@@ -1397,6 +1422,7 @@ function onTabChange(tabName: any) {
 // Initialization
 // ============================================================
 onMounted(() => {
+  void loadSystemNames();
   loadSummary();
   loadSystemSummary();
   loadMetrics();
@@ -1408,6 +1434,7 @@ onMounted(() => {
 .quality-page {
   padding: 4px;
 }
+.system-code-inline { display: block; color: var(--text-secondary); font-size: 11px; }
 .quality-stat-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

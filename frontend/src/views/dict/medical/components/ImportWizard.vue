@@ -124,6 +124,7 @@ function statusTag(status: string): TagType {
     <!-- Step 1: Upload -->
     <div v-if="step === 1" class="step-content">
       <el-upload
+        v-perms="'dict.medical.edit'"
         drag
         :auto-upload="false"
         :show-file-list="false"
@@ -161,13 +162,13 @@ function statusTag(status: string): TagType {
     <div v-if="step === 3 && runInfo" class="step-content">
       <div class="toolbar mb-2">
         <el-checkbox v-model="onlyAnomalies" @change="loadRows()">只看异常</el-checkbox>
-        <el-button type="success" size="small" :disabled="selectedIds.length === 0" @click="batchReview('approve')">
+        <el-button v-perms="'dict.medical.approve'" type="success" size="small" :disabled="selectedIds.length === 0" @click="batchReview('approve')">
           批量批准 ({{ selectedIds.length }})
         </el-button>
-        <el-button type="danger" size="small" :disabled="selectedIds.length === 0" @click="batchReview('reject')">
+        <el-button v-perms="'dict.medical.approve'" type="danger" size="small" :disabled="selectedIds.length === 0" @click="batchReview('reject')">
           批量驳回
         </el-button>
-        <el-button type="primary" size="small" @click="doMerge()" :loading="merging">
+        <el-button v-perms="'dict.medical.edit'" type="primary" size="small" @click="doMerge()" :loading="merging">
           合并已批准行
         </el-button>
       </div>

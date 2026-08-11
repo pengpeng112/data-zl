@@ -22,7 +22,7 @@
       <el-table-column prop="tool_code" label="工具编码" min-width="170" />
       <el-table-column prop="tool_name_cn" label="工具名称" min-width="160" />
       <el-table-column prop="system_code" label="系统" width="130" />
-      <el-table-column prop="source_code" label="数据源" width="110" />
+      <el-table-column prop="source_code" label="数据连接" width="110" />
       <el-table-column prop="execution_mode" label="执行模式" width="140">
         <template #default="{ row }">
           <el-tag :type="row.execution_mode === 'whitelist_dml' ? 'danger' : 'info'">
@@ -82,7 +82,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="数据源" prop="source_code">
+            <el-form-item label="数据连接" prop="source_code">
               <el-input v-model="form.source_code" placeholder="asset" />
             </el-form-item>
           </el-col>
@@ -245,7 +245,7 @@ const formRules = {
   tool_code: [{ required: true, message: "请输入工具编码", trigger: "blur" }],
   tool_name_cn: [{ required: true, message: "请输入工具名称", trigger: "blur" }],
   system_code: [{ required: true, message: "请输入系统编码", trigger: "blur" }],
-  source_code: [{ required: true, message: "请输入数据源", trigger: "blur" }],
+  source_code: [{ required: true, message: "请输入数据连接", trigger: "blur" }],
   tool_type: [{ required: true, message: "请选择工具类型", trigger: "change" }],
   risk_level: [{ required: true, message: "请选择风险等级", trigger: "change" }],
   execution_mode: [{ required: true, message: "请选择执行模式", trigger: "change" }]

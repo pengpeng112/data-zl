@@ -34,6 +34,7 @@ from ...schemas.graph import (
     GraphFieldMapping,
     GraphMeta,
     GraphNode,
+    GraphOptionItem,
     GraphOptions,
     GraphOverviewData,
     GraphFilterOptionsData,
@@ -41,6 +42,7 @@ from ...schemas.graph import (
     GraphTableSearchItem,
 )
 from ...services.relation_identity import resolve_endpoint, split_qualified_name
+from ...services.asset_catalog import load_system_name_map
 
 router = APIRouter(prefix="/api/v1/graph", tags=["graph"])
 
@@ -201,7 +203,7 @@ GRAPH_VIEW_MODES = [
     {
         "code": "overview",
         "label": "资产概览",
-        "description": "按系统、数据源、Schema/Owner 和对象层级浏览完整资产规模。",
+        "description": "按业务系统、数据连接、Schema/Owner 和对象层级浏览完整资产规模。",
         "group_by": "system",
         "layout_mode": "grouped",
         "confidence": None,
@@ -737,7 +739,7 @@ def _build_relation_filter_stmt(
     confidence: str | None,
     keyword: str | None,
 ):
-    """应用关系过滤条件（供全局/邻居共用）。系统/数据源范围优先按关系物理端点字段过滤。"""
+    """应用关系过滤条件（供全局/邻居共用）。业务系统/数据连接范围优先按关系物理端点字段过滤。"""
     if scoped_physical:
         scope_conds = []
         for sys_c, src_c in scoped_physical:
@@ -1269,11 +1271,7 @@ def overview(
             "schema": (AssetTable.system_code, AssetTable.source_code, AssetTable.schema_name),
         }[level]
         stmt = base.with_only_columns(*fields, func.count(AssetTable.id).label("asset_count")).group_by(*fields).order_by(*fields).limit(limit)
-        system_names = {
-            row[0]: row[1]
-            for row in db.execute(select(AssetSystem.system_code, AssetSystem.system_name_cn)).all()
-            if row[0]
-        }
+        system_names = load_system_name_map(db)
         source_names = {
             row[0]: row[1]
             for row in db.execute(select(AssetDataSource.source_code, AssetDataSource.source_name_cn)).all()
@@ -1326,15 +1324,22 @@ def filter_options(
     base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=None, object_type=None)
     field = {"system": AssetTable.system_code, "source": AssetTable.source_code, "schema": AssetTable.schema_name, "object": AssetTable.table_name}[next_level]
     rows = db.execute(base.with_only_columns(field, func.count(AssetTable.id)).group_by(field).order_by(field)).all()
+    system_names = load_system_name_map(db)
+    source_names = {
+        row[0]: row[1]
+        for row in db.execute(select(AssetDataSource.source_code, AssetDataSource.source_name_cn).where(AssetDataSource.source_code.isnot(None))).all()
+        if row[0]
+    }
     domain_rows = db.execute(base.with_only_columns(AssetTable.domain, func.count(AssetTable.id)).where(AssetTable.domain.isnot(None)).group_by(AssetTable.domain).order_by(AssetTable.domain)).all()
     type_rows = db.scalars(base).all()
     type_counts: dict[str, int] = defaultdict(int)
     for table in type_rows:
         type_counts[_object_type_name(table)] += 1
+    names = system_names if next_level == "system" else source_names if next_level == "source" else {}
     return ApiResponse(data=GraphFilterOptionsData(
         selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v},
         next_level=next_level,
-        items=[GraphFilterOption(value=str(row[0]), label=str(row[0]), count=int(row[1] or 0)) for row in rows if row[0]],
+        items=[GraphFilterOption(value=str(row[0]), label=names.get(str(row[0]), str(row[0])), count=int(row[1] or 0)) for row in rows if row[0]],
         business_domains=[GraphFilterOption(value=str(row[0]), label=str(row[0]), count=int(row[1] or 0)) for row in domain_rows if row[0]],
         object_types=[GraphFilterOption(value=k, label=k, count=v) for k, v in sorted(type_counts.items())],
     ))
@@ -1395,12 +1400,31 @@ def options(db: Session = Depends(get_db)) -> ApiResponse[GraphOptions]:
         )
     ).all()
 
+    system_names = load_system_name_map(db)
+    source_names = {
+        row[0]: row[1]
+        for row in db.execute(
+            select(AssetDataSource.source_code, AssetDataSource.source_name_cn)
+            .where(AssetDataSource.source_code.isnot(None))
+        ).all()
+        if row[0]
+    }
+    def option_items(values: list[Any], names: dict[str, str] | None = None) -> list[GraphOptionItem]:
+        return [
+            GraphOptionItem(value=value, label=(names or {}).get(value) or value)
+            for value in sorted({str(value) for value in values if value})
+        ]
+
     return ApiResponse(
         data=GraphOptions(
-            systems=sorted([s for s in systems_rows if s]),
-            sources=sorted([s for s in sources_rows if s]),
-            schemas=sorted([s for s in schemas_rows if s]),
-            domains=sorted([d for d in domains_rows if d]),
+            systems=sorted([str(s) for s in systems_rows if s]),
+            sources=sorted([str(s) for s in sources_rows if s]),
+            schemas=sorted([str(s) for s in schemas_rows if s]),
+            domains=sorted([str(d) for d in domains_rows if d]),
+            system_options=option_items(systems_rows, system_names),
+            source_options=option_items(sources_rows, source_names),
+            schema_options=option_items(schemas_rows),
+            domain_options=option_items(domains_rows),
             validation_statuses=sorted({s for s in statuses_rows if s}),
             confidences=sorted([c for c in confidences_rows if c]),
             relation_types=["formal", "candidate", "dependency"],

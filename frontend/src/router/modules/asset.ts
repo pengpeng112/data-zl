@@ -36,7 +36,7 @@ export default {
       name: "AssetSources",
       redirect: "/asset/systems?tab=connections",
       meta: {
-        title: "数据源连接（兼容入口）",
+        title: "数据连接（兼容入口）",
         showLink: false
       }
     },

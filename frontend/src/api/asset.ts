@@ -582,11 +582,22 @@ export interface GraphViewMode {
   deprecated?: boolean;
 }
 
+export interface GraphOptionItem {
+  value: string;
+  label: string;
+  count?: number;
+  disabled?: boolean;
+}
+
 export interface GraphOptionsData {
   systems: string[];
   sources: string[];
   schemas: string[];
   domains: string[];
+  system_options?: GraphOptionItem[];
+  source_options?: GraphOptionItem[];
+  schema_options?: GraphOptionItem[];
+  domain_options?: GraphOptionItem[];
   validation_statuses: string[];
   confidences: string[];
   relation_types: string[];

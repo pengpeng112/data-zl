@@ -11,16 +11,16 @@
           class="drawer-alert"
         />
         <el-descriptions :column="1" border size="small">
-          <el-descriptions-item label="来源系统">{{ detailEdge.from_system_code || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="来源数据源">{{ detailEdge.from_source_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="来源业务系统">{{ systemLabel(detailEdge.from_system_code) }}</el-descriptions-item>
+          <el-descriptions-item label="来源数据连接">{{ sourceLabel(detailEdge.from_source_code) }}</el-descriptions-item>
           <el-descriptions-item label="来源 Schema">{{ detailEdge.from_schema_name || '-' }}</el-descriptions-item>
           <el-descriptions-item label="来源表">{{ detailEdge.display_source || detailEdge.from_table_name || detailEdge.source }}</el-descriptions-item>
           <el-descriptions-item label="来源表中文名">{{ detailEdge.from_table_name_cn || '-' }}</el-descriptions-item>
           <el-descriptions-item label="来源表角色">{{ detailEdge.from_table_role || '-' }}</el-descriptions-item>
           <el-descriptions-item label="来源纳入状态">{{ detailEdge.from_include_status || '-' }}</el-descriptions-item>
           <el-descriptions-item label="来源字段">{{ detailEdge.from_columns || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="目标系统">{{ detailEdge.to_system_code || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="目标数据源">{{ detailEdge.to_source_code || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="目标业务系统">{{ systemLabel(detailEdge.to_system_code) }}</el-descriptions-item>
+          <el-descriptions-item label="目标数据连接">{{ sourceLabel(detailEdge.to_source_code) }}</el-descriptions-item>
           <el-descriptions-item label="目标 Schema">{{ detailEdge.to_schema_name || '-' }}</el-descriptions-item>
           <el-descriptions-item label="目标表">{{ detailEdge.display_target || detailEdge.to_table_name || detailEdge.target }}</el-descriptions-item>
           <el-descriptions-item label="目标表中文名">{{ detailEdge.to_table_name_cn || '-' }}</el-descriptions-item>
@@ -77,6 +77,8 @@ const props = defineProps<{
   modelValue: boolean;
   edge: GraphEdge | null;
   edgeKey?: string;
+  systemNames?: Record<string, string>;
+  sourceNames?: Record<string, string>;
 }>();
 
 const emit = defineEmits<{
@@ -85,6 +87,18 @@ const emit = defineEmits<{
 
 const loadingDetail = ref(false);
 const detailEdge = ref<GraphEdge | null>(null);
+
+function systemLabel(code?: string | null) {
+  if (!code) return "-";
+  const label = props.systemNames?.[code] || code;
+  return label === code ? label : `${label}（${code}）`;
+}
+
+function sourceLabel(code?: string | null) {
+  if (!code) return "-";
+  const label = props.sourceNames?.[code] || code;
+  return label === code ? label : `${label}（${code}）`;
+}
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {

@@ -34,6 +34,7 @@ from app.services.connection_identity import (
     host_masked_from_target,
 )
 from app.services.ops_event_log import log_event
+from app.services.asset_catalog import CANONICAL_SYSTEMS
 
 CONFIRMATION = "IMPORT-HRP-ASSETS"
 SOURCE_CODE = "hrp_10_10_10_23"
@@ -163,7 +164,7 @@ def ensure_hrp_registry(db) -> None:
         db.add(
             AssetSystem(
                 system_code=SYSTEM_CODE,
-                system_name_cn="HRP 业务系统",
+                system_name_cn=CANONICAL_SYSTEMS["HRP"],
                 system_type="HRP",
                 status="active",
                 target_host=HRP_HOST,

@@ -27,7 +27,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
 export function kindLabel(kind: TreeKind | string) {
   const labels: Record<string, string> = {
     system: "业务系统",
-    connection: "数据库连接",
+    connection: "数据连接",
     schema: "Owner/Schema",
     table: "表",
     column: "字段",

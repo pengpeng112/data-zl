@@ -423,6 +423,13 @@ def test_options_has_backend_build_id(seeded_client: TestClient) -> None:
     assert data["default_mode"] == "table"
 
 
+def test_options_keep_codes_and_expose_canonical_labels(seeded_client: TestClient) -> None:
+    data = seeded_client.get("/api/v1/graph/options").json()["data"]
+    assert all(isinstance(value, str) for value in data["systems"])
+    assert all({"value", "label"}.issubset(item) for item in data["system_options"])
+    assert all({"value", "label"}.issubset(item) for item in data["source_options"])
+
+
 def test_edge_detail_endpoint(seeded_client: TestClient) -> None:
     resp = seeded_client.get("/api/v1/graph?limit=5")
     assert resp.status_code == 200

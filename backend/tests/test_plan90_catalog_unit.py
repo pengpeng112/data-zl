@@ -64,6 +64,12 @@ def test_data_center_aliases_stay_nested():
         assert info["catalog_ok"] is True
 
 
+def test_all_ods_peripheral_aliases_stay_nested_even_for_canonical_codes():
+    # ODS aliases are physical owner mirrors, not first-level business systems.
+    for code, source in (("LIS", "ods_lis"), ("PACS", "ods_pacs"), ("EMR", "ods_emr"), ("SM", "ods_sm"), ("MOBILE_NURSING", "ods_ydhl")):
+        assert normalize_system_code(code, source_code=source, source_kind="legacy_alias") == "DATA_CENTER"
+
+
 def test_independent_sources_are_peers():
     for code in ("LIS_SOURCE", "PACS_SOURCE", "DOCARE", "JHEMR_VASTBASE", "MOBILE_NURSING"):
         assert normalize_system_code(code) == code

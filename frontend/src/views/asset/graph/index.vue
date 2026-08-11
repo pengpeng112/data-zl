@@ -53,6 +53,8 @@
             :aggregate-groups="filters.aggregate_groups"
             :aggregation-threshold="8"
             :view-mode="filters.view_mode"
+            :system-names="systemNameMap"
+            :source-names="sourceNameMap"
             height="calc(100vh - 400px)"
             @node-click="selectNode"
             @edge-click="showEdge"
@@ -107,8 +109,8 @@
       <el-descriptions v-if="selectedNode" :column="1" border size="small">
         <el-descriptions-item label="节点（物理键）">{{ selectedNode.id }}</el-descriptions-item>
         <el-descriptions-item label="展示名">{{ selectedNodeDisplayKey }}</el-descriptions-item>
-        <el-descriptions-item label="业务系统">{{ selectedNode.system_code || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="数据源/数据库">{{ selectedNode.source_code || selectedNode.source || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="业务系统">{{ systemNameMap[selectedNode.system_code || ''] || selectedNode.system_code || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="数据连接">{{ sourceNameMap[selectedNode.source_code || ''] || selectedNode.source || selectedNode.source_code || '-' }}<span v-if="selectedNode.source_code && sourceNameMap[selectedNode.source_code] && sourceNameMap[selectedNode.source_code] !== selectedNode.source_code">（{{ selectedNode.source_code }}）</span></el-descriptions-item>
         <el-descriptions-item label="Schema / Owner">{{ selectedNode.schema_name || selectedNode.namespace_name || '-' }}</el-descriptions-item>
         <el-descriptions-item label="表名">{{ selectedNode.table_name || selectedNode.label }}</el-descriptions-item>
         <el-descriptions-item label="中文名">{{ selectedNode.table_name_cn || '-' }}</el-descriptions-item>
@@ -128,7 +130,13 @@
       </template>
     </ReDetailDrawer>
 
-    <GraphEvidenceDrawer v-model="drawerVisible" :edge="selectedEdge" :edge-key="selectedEdge?.id || ''" />
+    <GraphEvidenceDrawer
+      v-model="drawerVisible"
+      :edge="selectedEdge"
+      :edge-key="selectedEdge?.id || ''"
+      :system-names="systemNameMap"
+      :source-names="sourceNameMap"
+    />
   </div>
 </template>
 
@@ -151,7 +159,7 @@ import {
   type GraphErrorInfo,
   type GraphPageState
 } from "@/views/asset/graph/graphErrors";
-import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem } from "@/api/asset";
+import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, listSources, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem } from "@/api/asset";
 
 type LayoutMode = "layered" | "grouped" | "radial";
 
@@ -172,6 +180,11 @@ const graphData = ref<GraphData>({ nodes: [], edges: [] });
 const graphMeta = ref<GraphMeta | null>(null);
 const renderKey = ref(0);
 const options = reactive<GraphOptionsData>({ systems: [], sources: [], schemas: [], domains: [], validation_statuses: [], confidences: [], relation_types: [], view_modes: [] });
+const allSourceOptions = ref<NonNullable<GraphOptionsData["source_options"]>>([]);
+const systemNameMap = computed(() => Object.fromEntries((options.system_options || []).map(item => [item.value, item.label])));
+const sourceNameMap = computed(() => Object.fromEntries(
+  [...allSourceOptions.value, ...(options.source_options || [])].map(item => [item.value, item.label])
+));
 
 // 108号 §五：明确状态机
 const state = ref<GraphPageState>("initial");
@@ -222,8 +235,10 @@ const normalized = computed(() => normalizeGraphData(graphData.value.nodes, grap
   focusKeyword: filters.keyword,
   centerTable: centerTable.value,
   selectedNodeId: selectedNodeId.value,
-  showReviewLayer: filters.show_review_layer && Boolean(currentViewMode.value?.show_review_layer)
-}));
+  showReviewLayer: filters.show_review_layer && Boolean(currentViewMode.value?.show_review_layer),
+  systemNames: systemNameMap.value,
+  sourceNames: sourceNameMap.value
+  }));
 
 function applyModeDefaults(mode: GraphViewMode) {
   filters.group_by = mode.group_by;
@@ -316,6 +331,7 @@ async function loadOptions() {
   try {
     const res = await getGraphOptions();
     Object.assign(options, res.data);
+    allSourceOptions.value = [...(options.source_options || options.sources.map(value => ({ value, label: value })) )];
     optionsReady.value = true;
     const mode = routeViewMode() || options.view_modes.find(item => item.code === "overview") || currentViewMode.value || options.view_modes.find(item => item.code === "table") || options.view_modes[0];
     if (mode) {
@@ -334,6 +350,22 @@ async function loadOptions() {
     };
     return false;
   }
+}
+
+async function handleSystemChange() {
+  // system_code and source_code are distinct dimensions.  A system change
+  // resets the child connection and narrows it to the selected system.
+  filters.source_code = "";
+  try {
+    const res = await listSources(filters.system_code ? { system_code: filters.system_code } : undefined);
+    options.source_options = (res.data || []).map(source => ({
+      value: source.source_code,
+      label: source.source_name_cn || source.source_code
+    }));
+  } catch {
+    options.source_options = [...allSourceOptions.value];
+  }
+  await loadData();
 }
 
 async function loadDiagnostics() {
@@ -355,10 +387,10 @@ async function loadCascadeOptions() {
       schema: filters.schema || undefined,
       next_level: overviewLevel.value
     });
-    if (overviewLevel.value === "system") options.systems = res.data.items.map(item => item.value);
-    if (overviewLevel.value === "source") options.sources = res.data.items.map(item => item.value);
-    if (overviewLevel.value === "schema") options.schemas = res.data.items.map(item => item.value);
-    if (overviewLevel.value === "object") options.domains = res.data.business_domains.map(item => item.value);
+    if (overviewLevel.value === "system") options.system_options = res.data.items;
+    if (overviewLevel.value === "source") options.source_options = res.data.items;
+    if (overviewLevel.value === "schema") options.schema_options = res.data.items;
+    if (overviewLevel.value === "object") options.domain_options = res.data.business_domains;
   } catch {
     // 主概览请求仍会返回可见错误，级联选项失败不覆盖主状态。
   }
@@ -449,7 +481,7 @@ async function loadChain() {
       });
       locate.search_results = search.data.items;
       if (search.data.items.length !== 1) {
-        ElMessage.warning(search.data.items.length ? "找到多个同名资产，请补充系统、数据源或 Owner 后再展开" : "未找到唯一中心资产");
+        ElMessage.warning(search.data.items.length ? "找到多个同名资产，请补充业务系统、数据连接或 Owner 后再展开" : "未找到唯一中心资产");
         return;
       }
       physicalKey = search.data.items[0].physical_key;

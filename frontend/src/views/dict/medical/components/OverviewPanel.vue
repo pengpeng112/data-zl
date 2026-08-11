@@ -50,7 +50,7 @@ onMounted(async () => {
       </el-col>
       <el-col :span="6">
         <el-card shadow="never">
-          <div class="stat-label">数据源</div>
+          <div class="stat-label">数据连接</div>
           <div class="stat-value">PostgreSQL</div>
           <div class="stat-hint">唯一事实源</div>
         </el-card>

@@ -21,17 +21,17 @@
     </div>
 
     <div class="filter-grid">
-      <el-select v-model="filters.system_code" placeholder="业务系统" clearable filterable @change="emit('load-data')">
-        <el-option v-for="item in options.systems" :key="item" :label="item" :value="item" />
+      <el-select v-model="filters.system_code" placeholder="业务系统" clearable filterable @change="emit('system-change')">
+        <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="filters.source_code" placeholder="数据源/数据库" clearable filterable @change="emit('load-data')">
-        <el-option v-for="item in options.sources" :key="item" :label="item" :value="item" />
+      <el-select v-model="filters.source_code" placeholder="数据连接（可选）" clearable filterable @change="emit('load-data')">
+        <el-option v-for="item in sourceOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-select v-model="filters.schema" placeholder="Schema / Owner" clearable filterable @change="emit('load-data')">
-        <el-option v-for="item in options.schemas" :key="item" :label="item" :value="item" />
+        <el-option v-for="item in schemaOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-select v-model="filters.domain" placeholder="业务域（正交筛选）" clearable filterable @change="emit('load-data')">
-        <el-option v-for="item in options.domains" :key="item" :label="item" :value="item" />
+        <el-option v-for="item in domainOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-select v-if="filters.view_mode === 'review'" v-model="filters.validation_status" placeholder="验证状态" clearable @change="emit('load-data')">
         <el-option v-for="item in options.validation_statuses" :key="item" :label="statusLabel(item)" :value="item" />
@@ -88,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import type { GraphMeta, GraphOptionsData, GraphViewMode } from "@/api/asset";
 import type { NormalizedGraph } from "@/views/asset/graph/graphNormalize";
 
@@ -123,7 +124,7 @@ interface LocateState {
   direction: "in" | "out" | "both";
 }
 
-defineProps<{
+const props = defineProps<{
   filters: GraphFilters;
   locate: LocateState;
   options: GraphOptionsData;
@@ -136,11 +137,17 @@ defineProps<{
   meta?: GraphMeta | null;
 }>();
 
+const systemOptions = computed(() => props.options.system_options?.length ? props.options.system_options : props.options.systems.map(value => ({ value, label: value })));
+const sourceOptions = computed(() => props.options.source_options?.length ? props.options.source_options : props.options.sources.map(value => ({ value, label: value })));
+const schemaOptions = computed(() => props.options.schema_options?.length ? props.options.schema_options : props.options.schemas.map(value => ({ value, label: value })));
+const domainOptions = computed(() => props.options.domain_options?.length ? props.options.domain_options : props.options.domains.map(value => ({ value, label: value })));
+
 const emit = defineEmits<{
   "view-mode-change": [value: string];
   "engine-change": [value: GraphEngine];
   "load-chain": [];
   "back-global": [];
+  "system-change": [];
   "load-data": [];
   "refresh": [];
   "sample-pass": [];

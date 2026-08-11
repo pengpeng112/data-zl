@@ -19,7 +19,7 @@
     </RePageHeader>
 
     <section class="snapshot-stats">
-      <ReStatCard label="快照数" :value="snapshots.length" tone="primary" helper="当前数据源">
+      <ReStatCard label="快照数" :value="snapshots.length" tone="primary" helper="当前数据连接">
         <template #icon><SnapshotIcon /></template>
       </ReStatCard>
       <ReStatCard label="表数量" :value="latestSnapshot?.table_count ?? '-'" tone="accent" helper="最近快照">
@@ -38,7 +38,7 @@
         <div class="collect-panel">
           <el-select
             v-model="sourceCode"
-            placeholder="选择数据源"
+            placeholder="选择数据连接"
             filterable
             clearable
             class="source-select"
@@ -102,7 +102,7 @@
       <ReEmptyState
         v-if="!loading && snapshots.length === 0"
         title="暂无快照"
-        description="请选择数据源或先采集快照。"
+        description="请选择数据连接或先采集快照。"
       />
     </el-card>
   </div>

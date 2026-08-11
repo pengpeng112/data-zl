@@ -20,7 +20,9 @@ from sqlalchemy import func, select
 
 from app.core.db import SessionLocal
 from app.models.asset import AssetColumn, AssetRelation, AssetTable
+from app.services.relation_identity import populate_endpoint_fields
 from app.models.asset_system import AssetDataSource, AssetSystem
+from app.services.asset_catalog import CANONICAL_SYSTEMS
 
 
 def _ensure_system_source(db, system_code: str, system_name: str, system_type: str, source_code: str, source_name: str, host: str, service: str):
@@ -29,7 +31,7 @@ def _ensure_system_source(db, system_code: str, system_name: str, system_type: s
         db.add(
             AssetSystem(
                 system_code=system_code,
-                system_name_cn=system_name,
+                system_name_cn=CANONICAL_SYSTEMS.get(system_code, system_name),
                 system_type=system_type,
                 status="active",
             )
@@ -50,6 +52,9 @@ def _ensure_system_source(db, system_code: str, system_name: str, system_type: s
                 enabled=True,
             )
         )
+    elif source_code.startswith("ods_") and src.system_code != "DATA_CENTER":
+        # ODS 镜像连接始终属于数据中心；重跑导入时也要纠偏历史一级系统归属。
+        src.system_code = "DATA_CENTER"
     db.flush()
 
 
@@ -213,8 +218,7 @@ def import_relations(db, rel_csv: Path) -> dict:
             _fs, fn = split(ft)
             _ts, tn = split(tt)
             conf = (row.get("confidence") or row.get("validation_level") or "").strip() or None
-            db.add(
-                AssetRelation(
+            _rel = AssetRelation(
                     from_table=fn if not _fs else f"{_fs}.{fn}",
                     to_table=tn if not _ts else f"{_ts}.{tn}",
                     from_columns=(row.get("from_columns") or row.get("left_columns") or "").strip() or None,
@@ -225,7 +229,8 @@ def import_relations(db, rel_csv: Path) -> dict:
                     validation_status=(row.get("validation_status") or "").strip() or None,
                     note=(row.get("note") or "").strip() or None,
                 )
-            )
+            populate_endpoint_fields(db, _rel)
+            db.add(_rel)
             n += 1
     db.commit()
     return {"relations_upserted": n}
@@ -255,22 +260,18 @@ def main():
     db = SessionLocal()
     try:
         _ensure_system_source(
-            db, "DATA_CENTER", "数据中心/ODS", "ODS", "ods_8_216", "数据中心 ODS", "10.10.8.216", "orcl"
+            db, "DATA_CENTER", CANONICAL_SYSTEMS["DATA_CENTER"], "ODS", "ods_8_216", "数据中心 ODS", "10.10.8.216", "orcl"
         )
         _ensure_system_source(
-            db, "HIS_SOURCE", "HIS 源端", "HIS", "his_source_10_10_10_15", "HIS业务库", "10.10.10.15", "his"
+            db, "HIS_SOURCE", CANONICAL_SYSTEMS["HIS_SOURCE"], "HIS", "his_source_10_10_10_15", "HIS业务库", "10.10.10.15", "his"
         )
-        for code, name, st in [
-            ("LIS", "检验系统", "LIS"),
-            ("PACS", "影像系统", "PACS"),
-            ("EMR", "电子病历", "EMR"),
-            ("MOBILE_NURSING", "移动护理", "NURSING"),
-            ("SM", "手麻系统", "OTHER"),
-        ]:
-            src = f"ods_{code.lower()}" if code != "MOBILE_NURSING" else "ods_ydhl"
-            if code == "EMR":
-                src = "ods_emr"
-            _ensure_system_source(db, code, name, st, src, f"ODS.{code}", "10.10.8.216", "orcl")
+        # ODS owner mirrors are physical connections under DATA_CENTER, never
+        # first-level business systems. Keep each connection code/name intact.
+        for source_code, owner in (("ods_lis", "LIS"), ("ods_pacs", "PACS"), ("ods_emr", "EMR"), ("ods_ydhl", "YDHL"), ("ods_sm", "SM")):
+            _ensure_system_source(
+                db, "DATA_CENTER", CANONICAL_SYSTEMS["DATA_CENTER"], "ODS",
+                source_code, f"ODS.{owner}", "10.10.8.216", "orcl"
+            )
         db.commit()
 
         out = {

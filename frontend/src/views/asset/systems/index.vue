@@ -443,7 +443,7 @@ onMounted(async () => {
       subtitle="系统、连接、Schema/表。只读凭据与写凭据分离；密码只写不回显。字典下发请配置 write 策略与写账号。"
     >
       <template #actions>
-        <el-button type="primary" @click="openCreate">新增系统与连接</el-button>
+        <el-button v-perms="'source.manage'" type="primary" @click="openCreate">新增系统与连接</el-button>
       </template>
     </RePageHeader>
 
@@ -467,9 +467,9 @@ onMounted(async () => {
                     </p>
                   </div>
                   <div class="tile-actions">
-                    <el-button size="small" text @click="openAddConnection(s.system_code)">加连接</el-button>
-                    <el-button size="small" text @click="openEdit(s)">编辑</el-button>
-                    <el-button size="small" text type="danger" @click="onSoftDisableSystem(s.system_code)">停用</el-button>
+                    <el-button v-perms="'source.manage'" size="small" text @click="openAddConnection(s.system_code)">加连接</el-button>
+                    <el-button v-perms="'source.manage'" size="small" text @click="openEdit(s)">编辑</el-button>
+                    <el-button v-perms="'source.manage'" size="small" text type="danger" @click="onSoftDisableSystem(s.system_code)">停用</el-button>
                   </div>
                 </div>
               </el-card>
@@ -479,7 +479,7 @@ onMounted(async () => {
         </el-card>
       </el-tab-pane>
 
-      <el-tab-pane label="数据库连接" name="connections">
+      <el-tab-pane label="数据连接" name="connections">
         <el-card v-loading="sourcesLoading" class="systems-card">
           <el-alert
             class="mb-12"
@@ -489,9 +489,14 @@ onMounted(async () => {
             title="只读凭据用于探库/对账；写凭据用于诊断手术字典下发（medical_dict_push）。密码不回显、不进 Git。HIS/海量请分别配置写账号后，再到字典中心做 dry-run/apply。"
           />
           <el-table :data="sources" border stripe>
-            <el-table-column prop="system_code" label="系统标签" width="110" />
+            <el-table-column label="业务系统" width="150">
+              <template #default="{ row }">
+                <span>{{ systems.find(s => s.system_code === row.system_code)?.system_name_cn || row.system_code || '-' }}</span>
+                <small v-if="row.system_code" class="system-code-inline">{{ row.system_code }}</small>
+              </template>
+            </el-table-column>
             <el-table-column prop="source_code" label="连接编码" min-width="140" />
-            <el-table-column prop="source_name_cn" label="名称" min-width="120" />
+            <el-table-column prop="source_name_cn" label="连接名称" min-width="120" />
             <el-table-column label="类型" width="120">
               <template #default="{ row }">{{ dbLabel(row.db_type) }}</template>
             </el-table-column>
@@ -541,11 +546,11 @@ onMounted(async () => {
             </el-table-column>
             <el-table-column label="操作" width="420" fixed="right">
               <template #default="{ row }">
-                <el-button link type="primary" size="small" @click="onCheck(row.source_code)">测试</el-button>
-                <el-button link type="primary" size="small" @click="onCollectMetadata(row.source_code)">采集</el-button>
-                <el-button link type="primary" size="small" @click="openCredRotate(row, 'readonly')">只读凭据</el-button>
-                <el-button link type="warning" size="small" @click="openCredRotate(row, 'write')">写凭据</el-button>
-                <el-dropdown trigger="click" @command="(cmd: string) => onSetWritePolicy(row, cmd)">
+                <el-button v-perms="'source.test'" link type="primary" size="small" @click="onCheck(row.source_code)">测试</el-button>
+                <el-button v-perms="'source.collect'" link type="primary" size="small" @click="onCollectMetadata(row.source_code)">采集</el-button>
+                <el-button v-perms="'source.credential_manage'" link type="primary" size="small" @click="openCredRotate(row, 'readonly')">只读凭据</el-button>
+                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="openCredRotate(row, 'write')">写凭据</el-button>
+                <el-dropdown v-perms="'source.manage'" trigger="click" @command="(cmd: string) => onSetWritePolicy(row, cmd)">
                   <el-button link type="primary" size="small">写策略</el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -554,9 +559,9 @@ onMounted(async () => {
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
-                <el-button link type="warning" size="small" @click="onClearCred(row, 'readonly')">清只读</el-button>
-                <el-button link type="warning" size="small" @click="onClearCred(row, 'write')">清写</el-button>
-                <el-button link type="danger" size="small" @click="onDisableSource(row)">禁用</el-button>
+                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="onClearCred(row, 'readonly')">清只读</el-button>
+                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="onClearCred(row, 'write')">清写</el-button>
+                <el-button v-perms="'source.manage'" link type="danger" size="small" @click="onDisableSource(row)">禁用</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -567,7 +572,7 @@ onMounted(async () => {
       <el-tab-pane label="数据资源树" name="tree">
         <el-card class="systems-card resource-tree-card">
           <template #header>
-            <span>系统 → 连接/库 → Schema/Owner → 表 → 字段</span>
+            <span>业务系统 → 数据连接 → Schema/Owner → 表 → 字段</span>
           </template>
           <el-collapse>
             <el-collapse-item v-for="node in resourceTree" :key="`${node.source_code}-${node.source_system}`" :name="`${node.source_code}-${node.source_system}`">
@@ -659,8 +664,8 @@ onMounted(async () => {
             <el-input v-model="connectionForm.default_schema" />
           </el-form-item>
           <el-space>
-            <el-button type="primary" plain @click="addConnectionToList">加入连接列表</el-button>
-            <el-button @click="onTestDraftForm">仅测试（不保存）</el-button>
+            <el-button v-perms="'source.manage'" type="primary" plain @click="addConnectionToList">加入连接列表</el-button>
+            <el-button v-perms="'source.test'" @click="onTestDraftForm">仅测试（不保存）</el-button>
           </el-space>
           <p v-if="checkResult" class="hint">{{ checkResult }}</p>
           <el-tag v-for="c in connections" :key="c.source_code" class="conn-tag" closable @close="connections = connections.filter(x => x.source_code !== c.source_code)">
@@ -679,7 +684,7 @@ onMounted(async () => {
             <el-input v-model="credForm.password" type="password" show-password autocomplete="new-password" />
           </el-form-item>
           <p class="hint">凭据将写入当前正在编辑的连接表单；先填凭据再「加入连接列表」，或保存后在连接 Tab 轮换。</p>
-          <el-button @click="addConnectionToList">将凭据写入当前连接并加入列表</el-button>
+          <el-button v-perms="'source.manage'" @click="addConnectionToList">将凭据写入当前连接并加入列表</el-button>
         </el-form>
       </div>
 
@@ -700,7 +705,7 @@ onMounted(async () => {
       <template #footer>
         <el-button v-if="wizardStep > 0" @click="wizardStep--">上一步</el-button>
         <el-button v-if="wizardStep < 3" type="primary" @click="wizardStep++">下一步</el-button>
-        <el-button v-if="wizardStep === 3" type="primary" @click="saveWizard">保存</el-button>
+        <el-button v-if="wizardStep === 3" v-perms="'source.manage'" type="primary" @click="saveWizard">保存</el-button>
         <el-button @click="drawerVisible = false">取消</el-button>
       </template>
     </el-drawer>
@@ -740,7 +745,7 @@ onMounted(async () => {
       </el-form>
       <template #footer>
         <el-button @click="credDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveCredRotate">写入</el-button>
+        <el-button v-perms="'source.credential_manage'" type="primary" @click="saveCredRotate">写入</el-button>
       </template>
     </el-dialog>
 
@@ -765,7 +770,7 @@ onMounted(async () => {
       </el-form>
       <template #footer>
         <el-button @click="addConnDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveAddConnection">保存</el-button>
+        <el-button v-perms="'source.manage'" type="primary" @click="saveAddConnection">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -800,4 +805,5 @@ onMounted(async () => {
 .mb-12 { margin-bottom: 12px; }
 .mt-12 { margin-top: 12px; }
 .hint { font-size: 12px; color: var(--text-secondary); }
+.system-code-inline { display: block; color: var(--text-secondary); font-size: 11px; }
 </style>

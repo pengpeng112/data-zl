@@ -3,10 +3,10 @@
     <RePageHeader title="人员同步差异" subtitle="采集 HIS/HRP 等来源人员与科室数据，生成差异并进行人工处理；默认 HIS dry-run 不写入。">
       <template #icon><DiffIcon /></template>
       <template #actions>
-        <el-button :loading="reviewLoading" type="warning" :icon="DiffIcon" @click="doReview">生成复核差异</el-button>
-        <el-button :loading="hisSyncLoading" type="success" :icon="HisIcon" @click="doHisSync">HIS 预同步</el-button>
-        <el-button :loading="collectLoading" :icon="CollectIcon" @click="doCollect">采集来源</el-button>
-        <el-button type="primary" :loading="syncLoading" :icon="DiffIcon" @click="doSync">生成差异</el-button>
+        <el-button v-perms="'identity.sync.run'" :loading="reviewLoading" type="warning" :icon="DiffIcon" @click="doReview">生成复核差异</el-button>
+        <el-button v-perms="'identity.sync.run'" :loading="hisSyncLoading" type="success" :icon="HisIcon" @click="doHisSync">HIS 预同步</el-button>
+        <el-button v-perms="'identity.sync.run'" :loading="collectLoading" :icon="CollectIcon" @click="doCollect">采集来源</el-button>
+        <el-button v-perms="'identity.sync.run'" type="primary" :loading="syncLoading" :icon="DiffIcon" @click="doSync">生成差异</el-button>
       </template>
     </RePageHeader>
 
@@ -66,6 +66,7 @@
           type="danger"
           :disabled="!selectedDiffs.length"
           :loading="batchLoading"
+          v-perms="'identity.sync.run'"
           @click="batchPropose"
         >
           批量提出主档变更
@@ -75,6 +76,7 @@
           type="success"
           :disabled="!selectedDiffs.length"
           :loading="batchLoading"
+          v-perms="'identity.sync.run'"
           @click="batchSetStatus('resolved')"
         >
           批量解决
@@ -84,6 +86,7 @@
           type="info"
           :disabled="!selectedDiffs.length"
           :loading="batchLoading"
+          v-perms="'identity.sync.run'"
           @click="batchSetStatus('ignored')"
         >
           批量忽略
@@ -133,13 +136,14 @@
               link
               type="danger"
               :loading="proposingId === row.id"
+              v-perms="'identity.sync.run'"
               @click="doProposeMaster(row)"
             >
               提出主档变更
             </el-button>
-            <el-button v-if="row.status !== 'resolved'" link type="success" :loading="updatingId === row.id" @click="updateStatus(row, 'resolved')">解决</el-button>
-            <el-button v-if="row.status !== 'ignored'" link type="info" :loading="updatingId === row.id" @click="updateStatus(row, 'ignored')">忽略</el-button>
-            <el-button v-if="row.status !== 'open'" link type="warning" :loading="updatingId === row.id" @click="updateStatus(row, 'open')">重开</el-button>
+            <el-button v-perms="'identity.sync.run'" v-if="row.status !== 'resolved'" link type="success" :loading="updatingId === row.id" @click="updateStatus(row, 'resolved')">解决</el-button>
+            <el-button v-perms="'identity.sync.run'" v-if="row.status !== 'ignored'" link type="info" :loading="updatingId === row.id" @click="updateStatus(row, 'ignored')">忽略</el-button>
+            <el-button v-perms="'identity.sync.run'" v-if="row.status !== 'open'" link type="warning" :loading="updatingId === row.id" @click="updateStatus(row, 'open')">重开</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -159,7 +163,7 @@
             v-if="detailRow.status === 'open' && (detailRow.entity_type === 'identity_person' || detailRow.entity_type === 'identity_department')"
             class="drawer-actions"
           >
-            <el-button type="primary" :loading="proposingId === detailRow.id" @click="doProposeMaster(detailRow)">
+            <el-button v-perms="'identity.sync.run'" type="primary" :loading="proposingId === detailRow.id" @click="doProposeMaster(detailRow)">
               按源优先提出主档变更（L16）
             </el-button>
             <p class="muted">仅创建变更请求，需另一人审批后执行才会写主档（人员/科室）。</p>
@@ -183,6 +187,7 @@
       <ReToolbar title="L16 主档变更请求（审批后执行）" class="diff-toolbar">
         <el-button size="small" :loading="crLoading" @click="loadChangeRequests">刷新</el-button>
         <el-button
+          v-perms="'identity.sync.run'"
           size="small"
           type="success"
           :disabled="!selectedCrs.length"
@@ -196,6 +201,7 @@
           type="danger"
           :disabled="!selectedCrs.length"
           :loading="batchLoading"
+          v-perms="'identity.sync.run'"
           @click="batchExecuteCrs"
         >
           批量执行写主档
@@ -225,6 +231,7 @@
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
+              v-perms="'identity.sync.run'"
               v-if="row.approval_status === 'pending' || row.approval_status === 'draft'"
               link
               type="success"
@@ -234,6 +241,7 @@
               审批
             </el-button>
             <el-button
+              v-perms="'identity.sync.run'"
               v-if="row.approval_status === 'approved'"
               link
               type="danger"
@@ -741,4 +749,3 @@ onMounted(() => {
   }
 }
 </style>
-

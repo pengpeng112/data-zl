@@ -124,6 +124,8 @@ const props = withDefaults(
     aggregateGroups?: boolean;
     aggregationThreshold?: number;
     viewMode?: string;
+    systemNames?: Record<string, string>;
+    sourceNames?: Record<string, string>;
   }>(),
   {
     height: "620px",
@@ -151,7 +153,9 @@ const normalized = computed(() => normalizeGraphData(props.nodes, props.edges, {
   focusKeyword: props.focusKeyword,
   centerTable: props.centerTable,
   selectedNodeId: props.selectedNodeId,
-  showReviewLayer: props.showReviewLayer
+  showReviewLayer: props.showReviewLayer,
+  systemNames: props.systemNames,
+  sourceNames: props.sourceNames
 }));
 
 const transformValue = computed(() => `translate(${pan.value.x} ${pan.value.y}) scale(${zoom.value})`);
@@ -159,6 +163,10 @@ const viewBox = computed(() => `0 0 ${layout.value.width} ${layout.value.height}
 
 function nodeGroup(node: any) {
   if (node.isAggregate) return node.category || node.schema_name || "UNKNOWN";
+  const systemCode = node.system_code || node.systemCode;
+  const sourceCode = node.source_code || node.sourceCode || node.source;
+  if (props.groupBy === "system") return node.category || props.systemNames?.[systemCode] || systemCode || "未分业务系统";
+  if (props.groupBy === "source") return node.category || props.sourceNames?.[sourceCode] || sourceCode || "未分数据连接";
   const physical = parsePhysicalKey(node.id || node.physical_key);
   if (physical?.schema) return physical.schema;
   return node.category || node.schema_name || node.display_id?.split(".")[0] || node.id.split(".")[0] || "UNKNOWN";
@@ -172,7 +180,11 @@ function compactLabel(value: unknown) {
 
 function nodeMeta(node: any) {
   if (node.isAggregate) return `${node.count} 张表`;
-  const parts = [node.system_code, node.source_code || node.source, node.schema_name, node.domain]
+  const systemCode = node.system_code || node.systemCode;
+  const sourceCode = node.source_code || node.sourceCode || node.source;
+  const system = props.systemNames?.[systemCode] || systemCode;
+  const source = props.sourceNames?.[sourceCode] || sourceCode;
+  const parts = [system, source, node.schema_name, node.domain]
     .filter(Boolean)
     .slice(0, 2)
     .join(" / ");

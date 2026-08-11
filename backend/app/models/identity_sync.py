@@ -89,7 +89,7 @@ class IdentitySyncAction(Base):
     account_fingerprint = Column(Text)
     params_summary = Column(PortableJSON)
     status = Column(Text, server_default="planned")  # planned | executed | skipped | failed | rolled_back
-    subtask_code = Column(Text)  # main_account_sync | jhemr_signature_sync
+    subtask_code = Column(Text)  # main_account_sync | jhemr_signature_sync | jhemr_education_title_sync
     reason_code = Column(Text)
     error_class = Column(Text)
     error_code_masked = Column(Text)
@@ -288,7 +288,7 @@ class IdentitySyncSubtask(Base):
 
     id = Column(PortableBigInt, primary_key=True)
     run_id = Column(Text, nullable=False)
-    subtask_code = Column(Text, nullable=False)  # main_account_sync | jhemr_signature_sync
+    subtask_code = Column(Text, nullable=False)  # main_account_sync | jhemr_signature_sync | jhemr_education_title_sync
     target_system = Column(Text)
     status = Column(Text, nullable=False, server_default="running")
     planned_count = Column(Integer, server_default="0")

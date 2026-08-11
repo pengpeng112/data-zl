@@ -70,11 +70,14 @@ def normalize_system_code(
     schema = (schema_name or "").strip().upper()
     kind = (source_kind or "").strip().lower()
 
-    if sc in CANONICAL_SYSTEMS:
-        return sc
     # ODS / data-center connections always DATA_CENTER
+    # This check intentionally precedes the canonical-code shortcut: legacy
+    # ODS aliases may carry an otherwise canonical owner code (for example
+    # MOBILE_NURSING + ods_ydhl) but remain nested under DATA_CENTER.
     if sc == "DATA_CENTER" or src.startswith("ods") or "8_216" in src or "8.216" in src:
         return "DATA_CENTER"
+    if sc in CANONICAL_SYSTEMS:
+        return sc
     # Mirror owner under data center connection must stay DATA_CENTER
     if schema in ODS_MIRROR_OWNERS and (
         src.startswith("ods") or sc in {"", "LIS", "PACS", "SM", "EMR", "YDHL", "MOBILE_NURSING"}

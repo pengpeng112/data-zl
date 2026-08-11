@@ -256,7 +256,7 @@ ROLE_REQUIRED: dict[str, list[str]] = {
     "admin": ["platform_admin"],
     "quality": ["quality_admin", "platform_admin"],
     "relations": ["platform_admin", "approver"],
-    "recipes": ["platform_admin"],
+    "recipes": ["asset_editor", "platform_admin"],
     "ai": ["platform_admin", "quality_admin"],
     "auth": ["platform_admin", "identity_admin"],
 }

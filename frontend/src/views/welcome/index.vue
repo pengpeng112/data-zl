@@ -72,7 +72,7 @@ const kpis = computed<KpiItem[]>(() => {
   if (!d) {
     return [
       {
-        label: "系统与数据源",
+        label: "业务系统与数据资源",
         value: "—",
         helper: "加载中…",
         trend: "…",
@@ -135,9 +135,9 @@ const kpis = computed<KpiItem[]>(() => {
 
   return [
     {
-      label: "系统与数据源",
+      label: "业务系统与数据资源",
       value: String(d.systems),
-      helper: `启用数据源 ${d.sources_enabled}/${d.sources_total}`,
+      helper: `启用数据连接 ${d.sources_enabled}/${d.sources_total}`,
       trend: "登记",
       trendDirection: "flat" as const,
       tone: "primary" as const,

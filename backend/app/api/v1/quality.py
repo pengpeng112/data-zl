@@ -7,8 +7,8 @@ from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.quality import QualityRule, QualityFinding, QualityCheckRun
-from ...models.asset import AssetTable, AssetRelation
 from ...models.asset import AssetRelation, AssetTable, AssetColumn
 from ...models.candidate import AssetCandidateRelation
 from ...schemas.common import ApiResponse
@@ -534,7 +534,11 @@ def run_quality_check_core(
     }
 
 
-@router.post("/checks/run", summary="手动触发质量检查")
+@router.post(
+    "/checks/run",
+    summary="手动触发质量检查",
+    dependencies=[Depends(require_permission("asset.quality.rule.execute"))],
+)
 def run_quality_check(
     rule_codes: list[str] | None = Query(None),
     db: Session = Depends(get_db),
@@ -596,7 +600,11 @@ def list_findings(
     return ApiResponse(data={"total": count, "page": page, "page_size": page_size, "items": items})
 
 
-@router.patch("/findings/{finding_id}", summary="更新问题状态")
+@router.patch(
+    "/findings/{finding_id}",
+    summary="更新问题状态",
+    dependencies=[Depends(require_permission("asset.quality.rule.execute"))],
+)
 def update_finding(
     finding_id: int,
     req: FindingUpdateRequest,
@@ -657,17 +665,17 @@ def quality_summary(db: Session = Depends(get_db)) -> ApiResponse[QualitySummary
 def quality_summary_by_system(
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
-    from ...models.asset_system import AssetSystem
+    from ...services.asset_catalog import load_system_name_map
     tables = db.scalars(select(AssetTable)).all()
     findings = db.scalars(select(QualityFinding)).all()
 
-    systems = {s.system_code: s for s in db.scalars(select(AssetSystem)).all()}
+    systems = load_system_name_map(db)
     grouped: dict[str, dict] = {}
 
     for sc in set(t.system_code for t in tables if t.system_code):
         grouped[sc] = {
             "system_code": sc,
-            "system_name_cn": systems[sc].system_name_cn if sc in systems else sc,
+            "system_name_cn": systems.get(sc, sc),
             "table_count": 0,
             "column_count": 0,
             "findings_total": 0,
@@ -767,7 +775,11 @@ class FindingAssign(BaseModel):
     note: str | None = None
 
 
-@router.post("/rules", summary="新建质控规则")
+@router.post(
+    "/rules",
+    summary="新建质控规则",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def create_rule(req: RuleCreate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(QualityRule).where(QualityRule.rule_code == req.rule_code))
     if existing:
@@ -779,7 +791,11 @@ def create_rule(req: RuleCreate, db: Session = Depends(get_db)) -> ApiResponse[d
     return ApiResponse(data={"id": rule.id, "rule_code": rule.rule_code})
 
 
-@router.patch("/rules/{rule_id}", summary="编辑质控规则")
+@router.patch(
+    "/rules/{rule_id}",
+    summary="编辑质控规则",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def patch_rule(rule_id: int, req: RulePatch, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     rule = db.get(QualityRule, rule_id)
     if not rule:
@@ -790,7 +806,11 @@ def patch_rule(rule_id: int, req: RulePatch, db: Session = Depends(get_db)) -> A
     return ApiResponse(data={"id": rule.id, "rule_code": rule.rule_code})
 
 
-@router.post("/rules/{rule_id}/enable", summary="启用/停用规则")
+@router.post(
+    "/rules/{rule_id}/enable",
+    summary="启用/停用规则",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def toggle_rule(rule_id: int, enabled: bool = Query(True), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     rule = db.get(QualityRule, rule_id)
     if not rule:
@@ -800,7 +820,11 @@ def toggle_rule(rule_id: int, enabled: bool = Query(True), db: Session = Depends
     return ApiResponse(data={"id": rule.id, "enabled": rule.enabled})
 
 
-@router.delete("/rules/{rule_id}", summary="删除质控规则")
+@router.delete(
+    "/rules/{rule_id}",
+    summary="删除质控规则",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def delete_rule(rule_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     rule = db.get(QualityRule, rule_id)
     if not rule:
@@ -818,7 +842,11 @@ def delete_rule(rule_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict
     return ApiResponse(data={"id": rule_id, "rule_code": rule_code, "deleted": True})
 
 
-@router.post("/rules/{rule_id}/validate-sql", summary="校验只读 SQL 安全性")
+@router.post(
+    "/rules/{rule_id}/validate-sql",
+    summary="校验只读 SQL 安全性",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def validate_rule_sql(rule_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     rule = db.get(QualityRule, rule_id)
     if not rule:
@@ -829,7 +857,11 @@ def validate_rule_sql(rule_id: int, db: Session = Depends(get_db)) -> ApiRespons
     return ApiResponse(data=result)
 
 
-@router.post("/rules/from-template", summary="从模板生成质控规则")
+@router.post(
+    "/rules/from-template",
+    summary="从模板生成质控规则",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def rule_from_template(req: TemplateGenerate, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     from ...services import quality_templates as tpl
 
@@ -841,7 +873,11 @@ def rule_from_template(req: TemplateGenerate, db: Session = Depends(get_db)) -> 
     return ApiResponse(data={"sql": sql, "template_type": req.template_type})
 
 
-@router.post("/rules/auto-generate", summary="按主键和已确认关系生成质控规则建议")
+@router.post(
+    "/rules/auto-generate",
+    summary="按主键和已确认关系生成质控规则建议",
+    dependencies=[Depends(require_permission("asset.quality.rule.create"))],
+)
 def auto_generate_rules(req: AutoGenerateRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Generate disabled suggestions from trusted asset metadata only.
 
@@ -938,7 +974,11 @@ def auto_generate_rules(req: AutoGenerateRequest, db: Session = Depends(get_db))
     return ApiResponse(data={"created": len(created), "skipped": skipped, "rule_codes": created})
 
 
-@router.post("/findings/{finding_id}/assign", summary="问题分派")
+@router.post(
+    "/findings/{finding_id}/assign",
+    summary="问题分派",
+    dependencies=[Depends(require_permission("asset.quality.rule.execute"))],
+)
 def assign_finding(finding_id: int, req: FindingAssign, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     f = db.get(QualityFinding, finding_id)
     if not f:
@@ -951,7 +991,11 @@ def assign_finding(finding_id: int, req: FindingAssign, db: Session = Depends(ge
     return ApiResponse(data={"id": f.id, "assigned_to": f.assigned_to, "status": f.status})
 
 
-@router.post("/findings/{finding_id}/recheck", summary="单问题复核")
+@router.post(
+    "/findings/{finding_id}/recheck",
+    summary="单问题复核",
+    dependencies=[Depends(require_permission("asset.quality.rule.execute"))],
+)
 def recheck_finding(finding_id: int, status: str = Query(..., description="confirmed/fixed/ignored"), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     if status not in ("confirmed", "fixed", "ignored", "rechecked"):
         raise HTTPException(status_code=400, detail="status 必须为 confirmed/fixed/ignored/rechecked")

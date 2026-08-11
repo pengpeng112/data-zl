@@ -14,6 +14,8 @@ export interface NormalizedGraphOptions {
   centerTable?: string;
   selectedNodeId?: string;
   showReviewLayer?: boolean;
+  systemNames?: Record<string, string>;
+  sourceNames?: Record<string, string>;
 }
 
 export interface NormalizedGraph {
@@ -45,10 +47,17 @@ function displayName(node: GraphNode) {
   return nodeDisplayName(node);
 }
 
-function groupName(node: GraphNode, groupBy: GraphGroupBy) {
-  if (node.is_aggregate && node.category) return node.category;
-  if (groupBy === "system") return node.system_code || "未分系统";
-  if (groupBy === "source") return node.source_code || node.source || "未分数据源";
+function groupName(node: GraphNode, groupBy: GraphGroupBy, options: NormalizedGraphOptions) {
+  const system = node.system_code ? options.systemNames?.[node.system_code] || node.system_code : "";
+  const sourceCode = node.source_code || node.source || "";
+  const source = sourceCode ? options.sourceNames?.[sourceCode] || sourceCode : "";
+  if (node.is_aggregate && node.category) {
+    if (groupBy === "system") return options.systemNames?.[node.category] || node.category;
+    if (groupBy === "source") return options.sourceNames?.[node.category] || node.category;
+    return node.category;
+  }
+  if (groupBy === "system") return system || "未分业务系统";
+  if (groupBy === "source") return source || "未分数据连接";
   if (groupBy === "domain") return node.business_domain || node.domain || "未分业务域";
   return node.schema_name || node.namespace_name || node.category || (parsePhysicalKey(node.id)?.schema) || node.id.split(".")[0] || "UNKNOWN";
 }
@@ -130,7 +139,7 @@ export function normalizeGraphData(
       issues.push({ key: node.id, displayKey: node.display_id || node.id, reason: "missing_physical_key" });
     }
   }
-  const groups = Array.from(new Set(visibleNodes.map(node => groupName(node, options.groupBy)))).sort();
+  const groups = Array.from(new Set(visibleNodes.map(node => groupName(node, options.groupBy, options)))).sort();
   const categories = groups.map((name, index) => ({
     name,
     itemStyle: { color: GROUP_COLORS[index % GROUP_COLORS.length] }
@@ -154,7 +163,7 @@ export function normalizeGraphData(
   const pathEdges = new Set(highlightedPath.edgeIds);
 
   const normalizedNodes = visibleNodes.map(node => {
-    const group = groupName(node, options.groupBy);
+    const group = groupName(node, options.groupBy, options);
     const focused = matchesKeyword(node, options.focusKeyword);
     const isCenter = Boolean(options.centerTable && node.id === options.centerTable);
     const selected = Boolean(options.selectedNodeId && node.id === options.selectedNodeId);
@@ -211,7 +220,7 @@ export function normalizeGraphData(
 
   const groupCount = new Map<string, number>();
   for (const node of visibleNodes) {
-    const group = groupName(node, options.groupBy);
+    const group = groupName(node, options.groupBy, options);
     groupCount.set(group, (groupCount.get(group) || 0) + 1);
   }
 

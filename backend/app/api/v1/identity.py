@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
 from ...models.governance_base import GovernAuditLog, GovernChangeRequest
 from ...models.governance_ops import SchedulerJob
 from ...models.identity import (
@@ -134,7 +134,11 @@ def get_sync_diff(diff_id: int, db: Session = Depends(get_db)) -> ApiResponse[di
     return ApiResponse(data=_diff_item(r))
 
 
-@router.post("/review/generate", summary="L13 生成主数据复核差异（仅 diff，不自动写主档）")
+@router.post(
+    "/review/generate",
+    summary="L13 生成主数据复核差异（仅 diff，不自动写主档）",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def generate_identity_review(
     request: Request,
     source_system: str = Query("HIS"),
@@ -212,7 +216,11 @@ class ProfileChangeRequest(BaseModel):
     reason: str = Field(..., min_length=2, max_length=500)
 
 
-@router.post("/persons/{person_code}/profile-change-requests", summary="提交人员画像变更审批")
+@router.post(
+    "/persons/{person_code}/profile-change-requests",
+    summary="提交人员画像变更审批",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def create_profile_change_request(
     person_code: str,
     req: ProfileChangeRequest,
@@ -321,7 +329,11 @@ def department_profile(dept_code: str, db: Session = Depends(get_db)) -> ApiResp
     })
 
 
-@router.post("/collect-sources", summary="Collect identity source data")
+@router.post(
+    "/collect-sources",
+    summary="Collect identity source data",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def trigger_collection(
     request: Request,
     req: IdentityCollectSourcesRequest | None = None,
@@ -397,7 +409,11 @@ def _store_sync_job(
     return job
 
 
-@router.post("/sync/his", summary="Sync HIS identity departments/persons")
+@router.post(
+    "/sync/his",
+    summary="Sync HIS identity departments/persons",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def sync_his_identity_endpoint(
     request: Request,
     dry_run: bool = Query(True),
@@ -408,7 +424,11 @@ def sync_his_identity_endpoint(
 
     result = sync_his_identity(db, operator=get_current_user(request), dry_run=dry_run, max_rows=max_rows)
     return ApiResponse(data=result)
-@router.post("/sync/run", summary="Run identity sync diff generation")
+@router.post(
+    "/sync/run",
+    summary="Run identity sync diff generation",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def run_identity_sync(req: IdentitySyncRunRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     if not req.entity_type.startswith("identity_"):
@@ -425,7 +445,11 @@ def run_identity_sync(req: IdentitySyncRunRequest, request: Request, db: Session
     return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
 
 
-@router.post("/sync/jobs/{job_id}/retry", summary="Retry identity sync job")
+@router.post(
+    "/sync/jobs/{job_id}/retry",
+    summary="Retry identity sync job",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def retry_identity_sync_job(
     job_id: int,
     request: Request,
@@ -482,7 +506,11 @@ def retry_identity_sync_job(
     db.commit()
     return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
 
-@router.put("/accounts/bind", summary="绑定人员到系统账号")
+@router.put(
+    "/accounts/bind",
+    summary="绑定人员到系统账号",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def bind_account(req: AccountBind, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     acct = db.scalar(
         select(IdentityAccount).where(
@@ -497,7 +525,11 @@ def bind_account(req: AccountBind, db: Session = Depends(get_db)) -> ApiResponse
     return ApiResponse(data={"system_code": req.system_code, "account_id": req.account_id, "person_code": req.person_code})
 
 
-@router.post("/change-requests", summary="创建身份变更请求")
+@router.post(
+    "/change-requests",
+    summary="创建身份变更请求",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def create_identity_cr(req: IdentityCRCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = GovernChangeRequest(
@@ -547,7 +579,11 @@ def list_identity_crs(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.patch("/change-requests/{cr_id}/approve", summary="审批身份变更请求")
+@router.patch(
+    "/change-requests/{cr_id}/approve",
+    summary="审批身份变更请求",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def approve_identity_cr(cr_id: int, req: ApproveBody, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
@@ -568,7 +604,11 @@ def approve_identity_cr(cr_id: int, req: ApproveBody, request: Request, db: Sess
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})
 
 
-@router.post("/change-requests/{cr_id}/execute", summary="执行身份变更请求")
+@router.post(
+    "/change-requests/{cr_id}/execute",
+    summary="执行身份变更请求",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def execute_identity_cr(cr_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     cr = db.get(GovernChangeRequest, cr_id)
@@ -848,7 +888,11 @@ def _create_cr_from_diff(
     return out
 
 
-@router.post("/sync-diffs/{diff_id}/propose-master", summary="L16 从差异提出主档变更（默认不直接写）")
+@router.post(
+    "/sync-diffs/{diff_id}/propose-master",
+    summary="L16 从差异提出主档变更（默认不直接写）",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def propose_master_from_diff(
     diff_id: int,
     req: ApplyDiffMasterRequest,
@@ -867,7 +911,11 @@ def propose_master_from_diff(
     return ApiResponse(data=out)
 
 
-@router.post("/sync-diffs/batch-propose-master", summary="L16 批量提出主档变更（默认上限 50）")
+@router.post(
+    "/sync-diffs/batch-propose-master",
+    summary="L16 批量提出主档变更（默认上限 50）",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def batch_propose_master_from_diffs(
     req: BatchDiffIdsRequest,
     request: Request,
@@ -905,7 +953,11 @@ def batch_propose_master_from_diffs(
     )
 
 
-@router.post("/sync-diffs/batch-status", summary="批量更新差异状态 open/resolved/ignored")
+@router.post(
+    "/sync-diffs/batch-status",
+    summary="批量更新差异状态 open/resolved/ignored",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def batch_update_sync_diff_status(
     req: BatchDiffIdsRequest,
     request: Request,
@@ -946,7 +998,11 @@ def batch_update_sync_diff_status(
     return ApiResponse(data={"requested": len(ids), "updated": updated, "missing": missing, "status": req.status})
 
 
-@router.post("/change-requests/batch-approve", summary="批量审批身份变更请求")
+@router.post(
+    "/change-requests/batch-approve",
+    summary="批量审批身份变更请求",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def batch_approve_identity_cr(
     req: BatchChangeRequestIds,
     request: Request,
@@ -987,7 +1043,11 @@ def batch_approve_identity_cr(
     return ApiResponse(data={"requested": len(ids), "approved": len(ok), "failed": len(failed), "items": ok, "errors": failed})
 
 
-@router.post("/change-requests/batch-execute", summary="批量执行已审批身份变更（写平台主档）")
+@router.post(
+    "/change-requests/batch-execute",
+    summary="批量执行已审批身份变更（写平台主档）",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def batch_execute_identity_cr(
     req: BatchChangeRequestIds,
     request: Request,
@@ -1041,7 +1101,11 @@ def batch_execute_identity_cr(
     )
 
 
-@router.patch("/sync-diffs/{diff_id}", summary="Update identity sync diff status")
+@router.patch(
+    "/sync-diffs/{diff_id}",
+    summary="Update identity sync diff status",
+    dependencies=[Depends(require_permission("identity.sync.run"))],
+)
 def update_sync_diff(
     diff_id: int,
     req: IdentitySyncDiffUpdate,
@@ -1097,6 +1161,5 @@ def list_inconsistencies(
         for r in rows
     ]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
-
 
 

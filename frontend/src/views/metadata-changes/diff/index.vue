@@ -1,6 +1,6 @@
 <template>
   <div class="metadata-diff">
-    <RePageHeader title="快照对比" subtitle="选择同一数据源的两个元数据快照，识别表、字段和关联质量影响。" />
+    <RePageHeader title="快照对比" subtitle="选择同一数据连接的两个元数据快照，识别表、字段和关联质量影响。" />
 
     <el-card shadow="never" class="diff-card">
       <template #header>
@@ -52,7 +52,7 @@
         <span class="hint-label">提示：</span>
         <el-select
           v-model="sourceCode"
-          placeholder="先选择数据源，加载快照列表"
+          placeholder="先选择数据连接，加载快照列表"
           clearable
           class="source-select"
           @change="loadSnapshots"

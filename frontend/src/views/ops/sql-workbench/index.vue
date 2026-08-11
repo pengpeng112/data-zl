@@ -273,8 +273,8 @@ onMounted(async () => {
               <el-input v-model="paramsJson" type="textarea" :rows="3" />
             </el-form-item>
             <el-space>
-              <el-button @click="onValidate">安全扫描</el-button>
-              <el-button type="primary" @click="onSaveTemplate">
+              <el-button v-perms="'ops.sql.view'" @click="onValidate">安全扫描</el-button>
+              <el-button v-perms="'ops.sql.create'" type="primary" @click="onSaveTemplate">
                 {{ approvalUiEnabled ? '保存草稿' : '保存并发布' }}
               </el-button>
             </el-space>
@@ -291,7 +291,7 @@ onMounted(async () => {
             <el-table-column prop="status" label="状态" width="90" />
             <el-table-column label="操作" width="100">
               <template #default="{ row }">
-                <el-button
+                <el-button v-perms="'ops.sql.execute'"
                   link
                   size="small"
                   type="primary"
@@ -308,8 +308,8 @@ onMounted(async () => {
         <el-card class="mt-12">
           <template #header>任务闭环 · #{{ runId || '-' }}</template>
           <el-space wrap>
-            <el-button :disabled="!runId" @click="onPreview">影响行预览</el-button>
-            <el-button :disabled="!runId" type="danger" @click="onExecute">二次确认执行</el-button>
+            <el-button v-perms="'ops.sql.execute'" :disabled="!runId" @click="onPreview">影响行预览</el-button>
+            <el-button v-perms="'ops.sql.execute'" :disabled="!runId" type="danger" @click="onExecute">二次确认执行</el-button>
             <el-button :disabled="!runId" type="primary" @click="goTask">查看任务</el-button>
           </el-space>
           <pre v-if="preview" class="result-box">{{ JSON.stringify(preview, null, 2) }}</pre>

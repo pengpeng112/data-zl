@@ -9,16 +9,15 @@ import { router } from "./index";
 import { isProxy, toRaw } from "vue";
 import { useTimeoutFn } from "@vueuse/core";
 import {
-  isString,
   cloneDeep,
   isAllEmpty,
   intersection,
-  storageLocal,
-  isIncludeAllChildren
+  storageLocal
 } from "@pureadmin/utils";
 import { getConfig } from "@/config";
 import { buildHierarchyTree } from "@/utils/tree";
 import { userKey, type DataInfo } from "@/utils/auth";
+import { hasUserPermissions } from "@/utils/permission";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
@@ -374,19 +373,14 @@ function getHistoryMode(routerHistory): RouterHistory {
 
 /** 获取当前页面按钮级别的权限 */
 function getAuths(): Array<string> {
-  return router.currentRoute.value.meta.auths as Array<string>;
+  return (router.currentRoute.value.meta.auths as Array<string> | undefined) ?? [];
 }
 
-/** 是否有按钮级别的权限（根据路由`meta`中的`auths`字段进行判断）*/
+/** 是否有按钮级别的权限（根据当前登录用户的实际 permissions 判断）*/
 function hasAuth(value: string | Array<string>): boolean {
   if (!value) return false;
-  /** 从当前路由的`meta`字段里获取按钮级别的所有自定义`code`值 */
-  const metaAuths = getAuths();
-  if (!metaAuths) return false;
-  const isAuths = isString(value)
-    ? metaAuths.includes(value)
-    : isIncludeAllChildren(value, metaAuths);
-  return isAuths ? true : false;
+  const profile = storageLocal().getItem<DataInfo<number>>(userKey);
+  return hasUserPermissions(value, profile);
 }
 
 function handleTopMenu(route) {

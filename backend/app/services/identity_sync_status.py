@@ -15,7 +15,7 @@ SYNC_STATUSES = frozenset({
     "success", "partial_success", "failed", "skipped", "running",
     "overdue", "misconfigured",
 })
-SUBTASK_CODES = ("main_account_sync", "jhemr_signature_sync")
+SUBTASK_CODES = ("main_account_sync", "jhemr_signature_sync", "jhemr_education_title_sync")
 EXIT_CODES = {
     "success": 0,
     "skipped": 0,
@@ -46,19 +46,24 @@ def aggregate_overall_status(
     *,
     signature_required: bool = True,
     lock_reason: str | None = None,
+    title_status: Any = "success",
+    title_required: bool = True,
 ) -> str:
-    """Aggregate two durable subtasks without hiding required failures."""
+    """Aggregate all required durable subtasks without hiding failures."""
     main = normalize_status(main_status)
     signature = normalize_status(signature_status)
+    title = normalize_status(title_status)
     if lock_reason == "lock_held" or main == "skipped":
         return "skipped"
     if main in {"failed", "misconfigured", "overdue"}:
         return main
-    if main == "running" or signature == "running":
+    if main == "running" or signature == "running" or title == "running":
         return "running"
     if signature_required and signature in {"failed", "misconfigured", "overdue"}:
         return "partial_success" if main == "success" else signature
-    if main == "success" and (not signature_required or signature in {"success", "skipped"}):
+    if title_required and title in {"failed", "misconfigured", "overdue"}:
+        return "partial_success" if main == "success" else title
+    if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}):
         return "success"
     if main == "skipped" and signature in {"skipped", "success"}:
         return "skipped"
@@ -143,8 +148,18 @@ def summarize_counts(statuses: list[str]) -> dict[str, int]:
     return {key: int(counts.get(key, 0)) for key in ("success", "partial_success", "failed", "skipped", "running", "overdue", "misconfigured")}
 
 
-def stdout_summary(*, overall_status: str, run_id: str | None, main: Mapping[str, Any], signature: Mapping[str, Any]) -> dict[str, Any]:
+def stdout_summary(*, overall_status: str, run_id: str | None, main: Mapping[str, Any], signature: Mapping[str, Any], title: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Strict one-shot stdout contract: no free-form report or identifiers."""
+    title = title or {}
+    error_classes: dict[str, Any] = {}
+    for source_errors in (main.get("error_classes") or {}, signature.get("error_classes") or {}, title.get("error_classes") or {}):
+        for category, values in source_errors.items():
+            if isinstance(values, Mapping):
+                bucket = error_classes.setdefault(category, {})
+                for code, count in values.items():
+                    bucket[code] = int(bucket.get(code, 0)) + int(count or 0)
+            else:
+                error_classes[category] = values
     return {
         "status": normalize_status(overall_status),
         "run_id": run_id,
@@ -157,7 +172,12 @@ def stdout_summary(*, overall_status: str, run_id: str | None, main: Mapping[str
             "signature_inserted": int(signature.get("inserted") or 0),
             "signature_failed": int(signature.get("failed") or 0),
             "signature_skipped": int(signature.get("skipped_existing") or 0) + int(signature.get("skipped_no_user") or 0),
+            "title_planned": int(title.get("planned_count") or 0),
+            "title_updated": int(title.get("updated") or 0),
+            "title_failed": int(title.get("failed") or 0),
+            "title_skipped": int(title.get("skipped_equal") or 0) + int(title.get("skipped_no_user") or 0),
+            "title_target_committed_pending_audit": int(title.get("target_committed_pending_audit") or 0),
         },
-        "error_classes": signature.get("error_classes") or main.get("error_classes") or {},
-        "failed_fingerprints": list(signature.get("failed_fingerprints") or [])[:3],
+        "error_classes": error_classes,
+        "failed_fingerprints": list((title.get("failed_fingerprints") or signature.get("failed_fingerprints") or []))[:3],
     }

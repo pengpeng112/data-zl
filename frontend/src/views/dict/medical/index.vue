@@ -18,7 +18,7 @@
       </template>
 
       <div class="toolbar">
-        <el-button type="primary" @click="openCodeSetDialog()">新增编码体系</el-button>
+        <el-button v-perms="'dict.medical.edit'" type="primary" @click="openCodeSetDialog()">新增编码体系</el-button>
         <el-alert
           v-if="authHint"
           :title="authHint"
@@ -41,7 +41,7 @@
           <template #default="{ row }">
             <div class="sub-table-wrap">
               <div class="toolbar sub-toolbar">
-                <el-button type="primary" size="small" @click="openItemDialog(row.code_set_code)">新增编码项</el-button>
+                <el-button v-perms="'dict.medical.edit'" type="primary" size="small" @click="openItemDialog(row.code_set_code)">新增编码项</el-button>
                 <el-button size="small" @click="loadItems(row)">刷新编码项</el-button>
                 <span class="sub-count">共 {{ row._itemsTotal || 0 }} 项</span>
               </div>
@@ -64,7 +64,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="100" align="center" fixed="right">
                   <template #default="{ row: it }">
-                    <el-button link type="primary" size="small" @click="openItemDialog(it.code_set_code, it)">编辑</el-button>
+                    <el-button v-perms="'dict.medical.edit'" link type="primary" size="small" @click="openItemDialog(it.code_set_code, it)">编辑</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -102,7 +102,7 @@
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="loadItems(row)">查看编码</el-button>
-            <el-button link type="primary" size="small" @click="openCodeSetDialog(row)">编辑</el-button>
+            <el-button v-perms="'dict.medical.edit'" link type="primary" size="small" @click="openCodeSetDialog(row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -138,7 +138,7 @@
       </el-form>
       <template #footer>
         <el-button @click="codeSetDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="codeSetDialog.submitting" @click="saveCodeSet">保存</el-button>
+        <el-button v-perms="'dict.medical.edit'" type="primary" :loading="codeSetDialog.submitting" @click="saveCodeSet">保存</el-button>
       </template>
     </el-dialog>
 
@@ -162,7 +162,7 @@
       </el-form>
       <template #footer>
         <el-button @click="itemDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="itemDialog.submitting" @click="saveItem">保存</el-button>
+        <el-button v-perms="'dict.medical.edit'" type="primary" :loading="itemDialog.submitting" @click="saveItem">保存</el-button>
       </template>
     </el-dialog>
 
@@ -185,7 +185,7 @@
         :closable="false"
         show-icon
         class="push-alert"
-        title="写账号在「业务系统与数据资源 → 数据库连接」配置：对 HIS/海量连接点「写凭据」，策略选 medical_dict_push。只读凭据与写凭据分离。"
+        title="写账号在「业务系统与数据资源 → 数据连接」配置：对 HIS/海量连接点「写凭据」，策略选 medical_dict_push。只读凭据与写凭据分离。"
       />
       <el-form :inline="true" class="push-form" label-width="100px">
         <el-form-item label="目标">
@@ -204,8 +204,8 @@
           <el-input v-model="pushForm.hospital_no" style="width: 140px" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="pushLoading" @click="runPushPlan">生成计划</el-button>
-          <el-button :loading="pushLoading" @click="runPushExport">导出预览</el-button>
+          <el-button v-perms="'dict.medical.plan.create'" type="primary" :loading="pushLoading" @click="runPushPlan">生成计划</el-button>
+          <el-button v-perms="'dict.medical.plan.create'" :loading="pushLoading" @click="runPushExport">导出预览</el-button>
         </el-form-item>
       </el-form>
       <div v-if="pushSummary" class="push-summary">
@@ -226,8 +226,8 @@
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="dryRunOne(row)">dry-run</el-button>
-            <el-button link type="danger" size="small" :disabled="!pushConfig.push_enabled" @click="applyOne(row)">apply</el-button>
+            <el-button v-perms="'dict.medical.execute'" link type="primary" size="small" @click="dryRunOne(row)">dry-run</el-button>
+            <el-button v-perms="'dict.medical.execute'" link type="danger" size="small" :disabled="!pushConfig.push_enabled" @click="applyOne(row)">apply</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -238,8 +238,8 @@
           <el-option label="JHEMR_VASTBASE" value="JHEMR_VASTBASE" />
         </el-select>
         <el-input v-model="stopForm.item_code" placeholder="业务编码" style="width: 180px" />
-        <el-button :loading="pushLoading" @click="stopOne('dry_run')">停用 dry-run</el-button>
-        <el-button type="danger" :loading="pushLoading" :disabled="!pushConfig.push_enabled" @click="stopOne('apply')">停用 apply</el-button>
+        <el-button v-perms="'dict.medical.execute'" :loading="pushLoading" @click="stopOne('dry_run')">停用 dry-run</el-button>
+        <el-button v-perms="'dict.medical.execute'" type="danger" :loading="pushLoading" :disabled="!pushConfig.push_enabled" @click="stopOne('apply')">停用 apply</el-button>
       </div>
       <el-input v-model="lastResultJson" type="textarea" :rows="6" readonly class="result-box" placeholder="最近一次执行结果 JSON" />
     </el-card>

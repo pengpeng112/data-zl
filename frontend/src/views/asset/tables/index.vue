@@ -2,7 +2,7 @@
   <div class="asset-tables-page">
     <RePageHeader
       title="资产表目录"
-      subtitle="统一层级：业务系统 → 数据库连接 → Schema/Owner → 表 → 字段。一级名称来自系统总览，十个业务系统平行展示。"
+      subtitle="统一层级：业务系统 → 数据连接 → Schema/Owner → 表 → 字段。一级名称来自系统总览，十个业务系统平行展示。"
     >
       <template #icon><TableIcon /></template>
       <template #actions>
@@ -103,7 +103,7 @@
             <el-table-column label="业务系统" width="140" show-overflow-tooltip>
               <template #default="{ row }">{{ row.system_name_cn || systemLabelOf(row) }}</template>
             </el-table-column>
-            <el-table-column label="数据库连接" width="180" show-overflow-tooltip>
+            <el-table-column label="数据连接" width="180" show-overflow-tooltip>
               <template #default="{ row }">{{ row.source_system_cn || row.source_code || "-" }}</template>
             </el-table-column>
             <el-table-column prop="schema_name" label="Schema/Owner" width="120" />

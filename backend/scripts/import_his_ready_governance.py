@@ -13,6 +13,8 @@ from sqlalchemy import delete, func, select
 
 from app.core.db import SessionLocal
 from app.models.asset import AssetColumn, AssetRelation, AssetTable
+from app.services.relation_identity import populate_endpoint_fields
+from app.services.asset_catalog import CANONICAL_SYSTEMS
 from app.models.asset_system import AssetDataSource, AssetSystem
 
 
@@ -46,7 +48,7 @@ def ensure_his_source(db) -> None:
         system = AssetSystem(
             id=next_id(db, AssetSystem),
             system_code=SYSTEM_CODE,
-            system_name_cn="HIS业务库",
+            system_name_cn=CANONICAL_SYSTEMS["HIS_SOURCE"],
             system_name_en="HIS Source",
             system_type="HIS",
             description_cn="10.10.10.15/his 多 owner HIS 业务库",
@@ -75,7 +77,7 @@ def ensure_his_source(db) -> None:
         db.add(source)
     else:
         source.system_code = SYSTEM_CODE
-        source.source_name_cn = source.source_name_cn or "HIS业务库 10.10.10.15/his"
+        source.source_name_cn = source.source_name_cn or "HIS 业务连接 10.10.10.15/his"
         source.db_type = "oracle"
         source.host_masked = "10.10.10.15"
         source.port = 1521
@@ -113,6 +115,7 @@ def import_tables(db, rows: list[dict[str, str]]) -> int:
                 source=row.get("source_db"),
             )
         )
+        populate_endpoint_fields(db, rel_obj)
         row_id += 1
     return len(rows)
 
@@ -141,6 +144,7 @@ def import_columns(db, rows: list[dict[str, str]]) -> int:
                 review_status="approved",
             )
         )
+        populate_endpoint_fields(db, rel_obj)
         row_id += 1
     return len(rows)
 
@@ -148,8 +152,7 @@ def import_columns(db, rows: list[dict[str, str]]) -> int:
 def import_relations(db, rows: list[dict[str, str]]) -> int:
     row_id = next_id(db, AssetRelation)
     for idx, row in enumerate(rows, start=1):
-        db.add(
-            AssetRelation(
+        rel_obj = AssetRelation(
                 id=row_id,
                 rel_id=idx,
                 domain=row.get("domain"),
@@ -166,7 +169,8 @@ def import_relations(db, rows: list[dict[str, str]]) -> int:
                 note=row.get("source_evidence"),
                 validation_note=row.get("risk_note") or row.get("suggestion"),
             )
-        )
+        db.add(rel_obj)
+        populate_endpoint_fields(db, rel_obj)
         row_id += 1
     return len(rows)
 

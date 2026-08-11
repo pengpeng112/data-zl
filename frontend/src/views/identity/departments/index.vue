@@ -1,6 +1,6 @@
 <template>
   <div class="identity-departments">
-    <RePageHeader title="科室基线" subtitle="查看平台科室主数据、来源系统编码和启停状态，支撑人员科室关系与权限授权。" />
+    <RePageHeader title="科室基线" subtitle="查看平台科室主数据、来源系统与科室编码和启停状态，支撑人员科室关系与权限授权。" />
 
     <section class="dept-stat-grid">
       <ReStatCard label="科室总数" :value="items.length" tone="primary" />
@@ -48,7 +48,7 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="来源系统">{{ detail.source_system }}</el-descriptions-item>
-        <el-descriptions-item label="来源系统编码">{{ detail.source_dept_code }}</el-descriptions-item>
+        <el-descriptions-item label="来源科室编码">{{ detail.source_dept_code }}</el-descriptions-item>
         <el-descriptions-item label="创建时间" :span="2">{{ detail.created_at }}</el-descriptions-item>
         <el-descriptions-item label="更新时间" :span="2">{{ detail.updated_at }}</el-descriptions-item>
       </el-descriptions>

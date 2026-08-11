@@ -16,10 +16,11 @@ from app.core.db import SessionLocal
 from app.models.asset import AssetColumn, AssetRelationReview, AssetTable
 from app.models.asset_system import AssetDataSource, AssetSystem
 from app.models.governance_base import GovernAuditLog
+from app.services.asset_catalog import CANONICAL_SYSTEMS as CANONICAL_SYSTEM_NAMES
 
 # Explicit canonical mapping (plan 75 §4.3)
 EXPLICIT_SOURCE_MAP = {
-    "his_source_10_10_10_15": "HIS",
+    "his_source_10_10_10_15": "HIS_SOURCE",
     "ods_8_216": "DATA_CENTER",
     "ods_lis": "DATA_CENTER",
     "ods_pacs": "DATA_CENTER",
@@ -30,9 +31,9 @@ EXPLICIT_SOURCE_MAP = {
 }
 
 CANONICAL_SYSTEMS = {
-    "HIS": {"system_name_cn": "HIS 业务系统", "system_type": "HIS"},
-    "HRP": {"system_name_cn": "HRP 业务系统", "system_type": "HRP"},
-    "DATA_CENTER": {"system_name_cn": "数据中心", "system_type": "ODS"},
+    "HIS_SOURCE": {"system_name_cn": CANONICAL_SYSTEM_NAMES["HIS_SOURCE"], "system_type": "HIS"},
+    "HRP": {"system_name_cn": CANONICAL_SYSTEM_NAMES["HRP"], "system_type": "HRP"},
+    "DATA_CENTER": {"system_name_cn": CANONICAL_SYSTEM_NAMES["DATA_CENTER"], "system_type": "ODS"},
 }
 
 CONFIRMATION = "NORMALIZE-BUSINESS-SYSTEMS"
@@ -76,7 +77,7 @@ def build_plan(db) -> dict:
             if source.system_code == "HRP" or "hrp" in text_blob:
                 candidates.add("HRP")
             if source.system_code in {"HIS", "HIS_SOURCE"} or "his" in text_blob:
-                candidates.add("HIS")
+                candidates.add("HIS_SOURCE")
             if len(candidates) == 1:
                 target = next(iter(candidates))
                 reason = "heuristic"

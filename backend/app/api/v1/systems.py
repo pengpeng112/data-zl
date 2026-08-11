@@ -403,7 +403,7 @@ def system_detail(system_code: str, db: Session = Depends(get_db)) -> ApiRespons
 
 @router.post(
     "/systems-with-connections",
-    summary="组合创建系统与一个或多个数据库连接",
+    summary="组合创建系统与一个或多个数据连接",
     dependencies=[Depends(require_permission("source:manage"))],
 )
 def create_system_with_connections(

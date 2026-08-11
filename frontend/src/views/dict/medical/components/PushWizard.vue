@@ -101,7 +101,7 @@ async function executePlan() {
       <el-checkbox-group v-model="targetSystems" class="mb-4">
         <el-checkbox v-for="opt in systemOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
       </el-checkbox-group>
-      <el-button type="primary" :loading="loading" @click="createPlan">生成推送计划</el-button>
+      <el-button v-perms="'dict.medical.plan.create'" type="primary" :loading="loading" @click="createPlan">生成推送计划</el-button>
     </div>
 
     <div v-if="step === 2 && plan" class="step-content">
@@ -113,13 +113,13 @@ async function executePlan() {
           <el-tag :type="plan.status === 'approved' ? 'success' : 'info'" size="small">{{ plan.status }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
-      <el-button v-if="plan.status === 'draft'" type="primary" :loading="loading" @click="approvePlan">审批计划</el-button>
+      <el-button v-if="plan.status === 'draft'" v-perms="'dict.medical.approve'" type="primary" :loading="loading" @click="approvePlan">审批计划</el-button>
       <el-button v-else type="success" @click="step = 3">进入执行</el-button>
     </div>
 
     <div v-if="step === 3 && plan" class="step-content">
       <el-alert title="本轮仅 dry-run，不会实际写入 HIS/JHEMR 业务库。" type="warning" show-icon :closable="false" class="mb-4" />
-      <el-button type="primary" :loading="loading" @click="executePlan">执行已审批计划（dry-run）</el-button>
+      <el-button v-perms="'dict.medical.execute'" type="primary" :loading="loading" @click="executePlan">执行已审批计划（dry-run）</el-button>
     </div>
 
     <div v-if="step === 4" class="step-content">

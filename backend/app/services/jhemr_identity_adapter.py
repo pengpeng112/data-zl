@@ -844,6 +844,118 @@ class JhemrIdentityAdapter:
 
         return {"status": "success", "actions": actions}
 
+    def update_education_title_only(
+        self,
+        user_id: str,
+        education_title: str,
+        *,
+        expected_current: str | None = None,
+    ) -> dict[str, Any]:
+        """Update only ``users.education_title`` and verify it before commit.
+
+        This deliberately does not call :meth:`align_existing_user`, whose
+        normal identity reconciliation also touches role and department
+        tables.  The daily title subtask has a narrower write contract.
+        """
+        normalized = str(education_title or "").strip()
+        if not normalized:
+            raise JhemrIdentityError("education_title must not be empty")
+        current_row = self._fetch_one(
+            "SELECT user_id, education_title FROM jhemr.users "
+            "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+            (str(user_id).strip(), self.hospital_no),
+        )
+        if current_row is None:
+            return {"status": "missing_target"}
+        current = str(current_row.get("education_title") or "").strip() or None
+        if current != expected_current:
+            raise JhemrIdentityError("target_changed_after_plan")
+        if current == normalized:
+            return {"status": "skipped", "reason": "already_equal"}
+        conn = self._ensure_conn()
+        try:
+            affected = self._execute_write(
+                "UPDATE jhemr.users SET education_title = %s "
+                "WHERE user_id = %s AND hospital_no = %s",
+                (normalized, str(user_id).strip(), self.hospital_no),
+            )
+            if affected != 1:
+                raise JhemrIdentityError(
+                    f"education_title update affected {affected} rows; expected 1"
+                )
+            verified = self._fetch_one(
+                "SELECT education_title FROM jhemr.users "
+                "WHERE user_id = %s AND hospital_no = %s",
+                (str(user_id).strip(), self.hospital_no),
+            )
+            if not verified or str(verified.get("education_title") or "").strip() != normalized:
+                raise JhemrIdentityError("education_title read-back mismatch")
+            conn.commit()
+            return {"status": "success", "rows_affected": 1}
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
+    def update_education_titles_only(
+        self,
+        changes: list[tuple[str, str | None, str]],
+    ) -> dict[str, Any]:
+        """Apply the daily title plan in one JHEMR transaction.
+
+        Every row is locked and compared with the snapshot value. Any
+        missing/concurrently changed row, row-count mismatch or read-back
+        mismatch rolls back the whole batch.
+        """
+        conn = self._ensure_conn()
+        updated = 0
+        skipped = 0
+        try:
+            for user_id, expected_current, education_title in changes:
+                normalized = str(education_title or "").strip()
+                if not normalized:
+                    raise JhemrIdentityError("education_title must not be empty")
+                current_row = self._fetch_one(
+                    "SELECT user_id, education_title FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+                    (str(user_id).strip(), self.hospital_no),
+                )
+                if current_row is None:
+                    raise JhemrIdentityError("target_user_missing_during_update")
+                current = str(current_row.get("education_title") or "").strip() or None
+                if current != expected_current:
+                    raise JhemrIdentityError("target_changed_after_plan")
+                if current == normalized:
+                    skipped += 1
+                    continue
+                affected = self._execute_write(
+                    "UPDATE jhemr.users SET education_title = %s "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (normalized, str(user_id).strip(), self.hospital_no),
+                )
+                if affected != 1:
+                    raise JhemrIdentityError(
+                        f"education_title update affected {affected} rows; expected 1"
+                    )
+                verified = self._fetch_one(
+                    "SELECT education_title FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (str(user_id).strip(), self.hospital_no),
+                )
+                if not verified or str(verified.get("education_title") or "").strip() != normalized:
+                    raise JhemrIdentityError("education_title read-back mismatch")
+                updated += 1
+            conn.commit()
+            return {"status": "success", "updated": updated, "skipped": skipped}
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
     def reset_existing_password(self, emp_no: str, date_str: str | None = None) -> dict:
         """Initialize an existing account password through the controlled SM4 path."""
         emp_no = str(emp_no or "").strip()

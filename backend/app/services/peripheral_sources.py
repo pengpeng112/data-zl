@@ -10,12 +10,13 @@ from sqlalchemy.orm import Session
 
 from ..models.asset_system import AssetDataSource, AssetSystem
 from ..models.governance import MetadataSnapshot
+from .asset_catalog import CANONICAL_SYSTEMS, normalize_system_code
 
 # 周边系统挂在数据中心 ODS 同一连接上，按 owner 过滤采集（不另连库、不写源库）
 PERIPHERAL = [
     {
         "system_code": "LIS",
-        "system_name_cn": "检验系统",
+        "system_name_cn": CANONICAL_SYSTEMS["DATA_CENTER"],
         "system_type": "LIS",
         "source_code": "ods_lis",
         "source_name_cn": "ODS.LIS（数据中心镜像）",
@@ -24,7 +25,7 @@ PERIPHERAL = [
     },
     {
         "system_code": "PACS",
-        "system_name_cn": "影像系统",
+        "system_name_cn": CANONICAL_SYSTEMS["DATA_CENTER"],
         "system_type": "PACS",
         "source_code": "ods_pacs",
         "source_name_cn": "ODS.PACS（数据中心镜像）",
@@ -33,7 +34,7 @@ PERIPHERAL = [
     },
     {
         "system_code": "EMR",
-        "system_name_cn": "电子病历",
+        "system_name_cn": CANONICAL_SYSTEMS["DATA_CENTER"],
         "system_type": "EMR",
         "source_code": "ods_emr",
         "source_name_cn": "ODS.JHEMR+MTL（数据中心镜像）",
@@ -42,7 +43,7 @@ PERIPHERAL = [
     },
     {
         "system_code": "MOBILE_NURSING",
-        "system_name_cn": "移动护理",
+        "system_name_cn": CANONICAL_SYSTEMS["DATA_CENTER"],
         "system_type": "NURSING",
         "source_code": "ods_ydhl",
         "source_name_cn": "ODS.YDHL（数据中心镜像）",
@@ -51,7 +52,7 @@ PERIPHERAL = [
     },
     {
         "system_code": "SM",
-        "system_name_cn": "手麻系统",
+        "system_name_cn": CANONICAL_SYSTEMS["DATA_CENTER"],
         "system_type": "OTHER",
         "source_code": "ods_sm",
         "source_name_cn": "ODS.SM（数据中心镜像）",
@@ -71,12 +72,14 @@ def ensure_peripheral_registry(db: Session) -> dict[str, Any]:
     created_sys = 0
     created_src = 0
     for item in PERIPHERAL:
-        sys = db.scalar(select(AssetSystem).where(AssetSystem.system_code == item["system_code"]))
+        canonical_code = normalize_system_code(item["system_code"], source_code=item["source_code"], source_kind="legacy_alias")
+        canonical_name = CANONICAL_SYSTEMS.get(canonical_code, item["system_name_cn"])
+        sys = db.scalar(select(AssetSystem).where(AssetSystem.system_code == canonical_code))
         if not sys:
             db.add(
                 AssetSystem(
-                    system_code=item["system_code"],
-                    system_name_cn=item["system_name_cn"],
+                    system_code=canonical_code,
+                    system_name_cn=canonical_name,
                     system_type=item["system_type"],
                     description_cn=item["description_cn"],
                     status="active",
@@ -84,7 +87,10 @@ def ensure_peripheral_registry(db: Session) -> dict[str, Any]:
             )
             created_sys += 1
         else:
-            sys.system_name_cn = item["system_name_cn"]
+            # Existing catalog names are authoritative; never let an alias
+            # registration overwrite the system overview label.
+            if not (sys.system_name_cn or "").strip():
+                sys.system_name_cn = canonical_name
             sys.system_type = item["system_type"]
             sys.description_cn = item["description_cn"]
             sys.status = "active"
@@ -94,7 +100,7 @@ def ensure_peripheral_registry(db: Session) -> dict[str, Any]:
         if not src:
             db.add(
                 AssetDataSource(
-                    system_code=item["system_code"],
+                    system_code=canonical_code,
                     source_code=item["source_code"],
                     source_name_cn=item["source_name_cn"],
                     db_type="oracle",

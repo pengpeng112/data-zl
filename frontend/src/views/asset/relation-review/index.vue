@@ -262,7 +262,7 @@ onMounted(() => {
     </el-card>
 
     <el-card>
-      <template #header><div class="review-header"><span>关系清单（{{ total }}）</span><div><el-button size="small" type="success" :disabled="!selectedRelations.length" @click="batchReview('approve')">批量批准</el-button><el-button size="small" type="danger" :disabled="!selectedRelations.length" @click="batchReview('reject')">批量驳回</el-button></div></div></template>
+      <template #header><div class="review-header"><span>关系清单（{{ total }}）</span><div><el-button v-perms="'asset.relation.review'" size="small" type="success" :disabled="!selectedRelations.length" @click="batchReview('approve')">批量批准</el-button><el-button v-perms="'asset.relation.review'" size="small" type="danger" :disabled="!selectedRelations.length" @click="batchReview('reject')">批量驳回</el-button></div></div></template>
       <el-table :data="relations" v-loading="loading" size="small" @selection-change="selectedRelations = $event">
         <el-table-column type="selection" width="44" />
         <el-table-column label="来源表" width="220" show-overflow-tooltip><template #default="{ row }"><div>{{ row.from_table_name_cn || row.from_table }}</div><small v-if="row.from_table_name_cn">{{ row.from_table }}</small></template></el-table-column>
@@ -284,10 +284,10 @@ onMounted(() => {
         <el-table-column prop="relation_class" label="关系类别" width="120" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" text type="success" @click="handleApprove(row.id)">批准</el-button>
-            <el-button size="small" text type="danger" @click="handleReject(row.id)">驳回</el-button>
+            <el-button v-perms="'asset.relation.review'" size="small" text type="success" @click="handleApprove(row.id)">批准</el-button>
+            <el-button v-perms="'asset.relation.review'" size="small" text type="danger" @click="handleReject(row.id)">驳回</el-button>
             <el-button size="small" text @click="showMappings(row.id)">字段映射</el-button>
-            <el-button size="small" text @click="openEdit(row)">编辑</el-button>
+            <el-button v-perms="'asset.relation.review'" size="small" text @click="openEdit(row)">编辑</el-button>
             <el-button size="small" text @click="openAudit(row)">审计</el-button>
           </template>
         </el-table-column>
@@ -314,7 +314,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveRelation">保存</el-button>
+        <el-button v-perms="'asset.relation.review'" type="primary" @click="saveRelation">保存</el-button>
       </template>
     </el-dialog>
 

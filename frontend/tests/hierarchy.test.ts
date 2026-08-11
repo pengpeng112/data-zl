@@ -31,7 +31,7 @@ describe("plan90 hierarchy", () => {
 
   it("uses system/connection/schema labels", () => {
     expect(kindLabel("system")).toBe("业务系统");
-    expect(kindLabel("connection")).toBe("数据库连接");
+    expect(kindLabel("connection")).toBe("数据连接");
     expect(kindLabel("schema")).toContain("Owner");
   });
 });

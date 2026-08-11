@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from ...core.db import get_db
 from ...models.governance import ApiKey, TableOwner, BusinessTerm, MetadataSnapshot
 from ...schemas.common import ApiResponse
+from ...services.asset_catalog import CANONICAL_SYSTEMS
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
@@ -361,7 +362,7 @@ def backfill_p6(
     if not sys:
         sys = AssetSystem(
             system_code="DATA_CENTER",
-            system_name_cn="数据中心",
+            system_name_cn=CANONICAL_SYSTEMS["DATA_CENTER"],
             system_type="ODS",
             description_cn="10.10.8.216 数据中心 ODS 汇聚库",
         )
@@ -433,7 +434,7 @@ def backfill_p6(
     })
 
 
-@router.post("/init/import-his-source", summary="导入 HIS 源端 1234 表资产（从 CSV 读取，仅首次运行）")
+@router.post("/init/import-his-source", summary="导入 HIS 1234 表资产（从 CSV 读取，仅首次运行）")
 def import_his_source(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
@@ -453,7 +454,7 @@ def import_his_source(
     if not sys:
         sys = AssetSystem(
             system_code="HIS_SOURCE",
-            system_name_cn="HIS 源端",
+            system_name_cn=CANONICAL_SYSTEMS["HIS_SOURCE"],
             system_type="HIS",
             description_cn="10.10.10.15/his 多 owner 业务库",
         )
@@ -480,7 +481,7 @@ def import_his_source(
         select(func.count()).select_from(AssetTable).where(AssetTable.source_code == "his_source_10_10_10_15")
     ) or 0
     if existing > 100:
-        return ApiResponse(data={"message": f"HIS 源端已有 {existing} 张表，跳过重复导入"})
+        return ApiResponse(data={"message": f"HIS 已有 {existing} 张表，跳过重复导入"})
 
     table_count = 0
     col_count = 0
@@ -530,7 +531,7 @@ def import_his_source(
     db.commit()
 
     return ApiResponse(data={
-        "message": f"HIS 源端导入完成：{table_count} 张表, {col_count} 列",
+        "message": f"HIS 导入完成：{table_count} 张表, {col_count} 列",
         "system": "HIS_SOURCE",
         "source": "his_source_10_10_10_15",
         "table_count": table_count,
