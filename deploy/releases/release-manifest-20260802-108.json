@@ -1,0 +1,12 @@
+{
+  "git_sha": "3d65800a9499bcc5b4775818d1c4b436aa11067e",
+  "backend_image": "data-asset:20260802-108",
+  "frontend_build_id": "fbee1a5bbf38d215",
+  "alembic_head": "f1a2b3c4d5e6",
+  "built_at": "2026-08-02T01:37:05.860151+00:00",
+  "backend_sha256": {
+    "app/api/v1/graph.py": "560039abd57433e7ff69b7e626cfb4a8a18501e13a6a015aeb8793a1af712b69",
+    "app/schemas/graph.py": "11c5c6cc51f7eaa6d6991827d2632410b260287e8c04344eab3b30666ef6dacf"
+  },
+  "frontend_index_sha256": "2dc139fe5e534b90b47e1f7c35b5d8fa43e1c2924341b556bd2ee8f5d90c53dd"
+}

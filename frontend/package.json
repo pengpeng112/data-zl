@@ -1,14 +1,18 @@
 {
   "name": "pure-admin-thin",
   "version": "6.2.0",
+  "packageManager": "pnpm@11.9.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "serve": "pnpm dev",
+    "prebuild": "rimraf dist",
     "build": "vite build --configLoader runner",
     "postbuild": "node build/check-bundle-budget.mjs",
+    "prebuild:staging": "rimraf dist",
     "build:staging": "vite build --mode staging --configLoader runner",
+    "prereport": "rimraf dist",
     "report": "vite build --configLoader runner",
     "size:check": "node build/check-bundle-budget.mjs",
     "preview": "vite preview",

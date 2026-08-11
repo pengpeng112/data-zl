@@ -1,29 +1,37 @@
-# Offline Deployment
+# 离线部署与 R8 验收
 
-This procedure assumes the target host has no internet access and runs the API as
-the dedicated `dataasset` user.
+目标运行时为 Linux x86_64、CPython 3.11、glibc；API 使用专用 `dataasset`
+账号运行。2026-08-11 已在与生产容器一致的 Python 3.11/glibc 运行时和
+Docker `--network none` 环境完成从零安装、迁移往返与健康检查。
 
 ## 1. Build the offline package
 
-On a connected build host (must match the target OS/arch/Python for wheels):
+联网准备机负责解析和下载，最终 wheel 仍必须经过目标运行时标签校验。当前
+前端固定使用 `pnpm@11.9.0`；CLI 与 store 主版本必须一致：
 
 ```bash
-# Lock and download backend wheels (use a constraints/pinned file if available)
-python3 -m pip download -r backend/requirements.txt -d offline/wheels
-python3 -m pip check  # verify no dependency conflicts
+# 已有锁文件时按锁文件准备 Linux wheelhouse
+python3 -m pip download --require-hashes -r backend/requirements.lock -d package/wheels
+
+# 首次解析后，从扁平 wheelhouse 生成逐包 SHA-256 锁；脚本会拒绝
+# Windows/macOS、musllinux、错误 CPython ABI/架构和嵌套 wheel。
+python3 deploy/offline/build_hashed_lock.py package/wheels \
+  package/backend/requirements.lock \
+  --python-version 3.11 --os linux --arch x86_64
 
 cd frontend
-# Fetch ALL deps (incl. devDependencies like Vite) — do NOT use --prod,
-# the build step needs Vite which lives in devDependencies.
-pnpm fetch --frozen-lockfile
-pnpm install --offline --frozen-lockfile
+# 必须包含 devDependencies（Vite/typecheck）；不要使用 --prod。
+pnpm fetch --force --frozen-lockfile --store-dir ../package/pnpm-store
+pnpm install --offline --frozen-lockfile --trust-lockfile \
+  --store-dir ../package/pnpm-store
 pnpm run typecheck
 pnpm run build
 ```
 
-Copy `backend/`, `frontend/dist/`, `offline/wheels/`, and `deploy/` to the target
-host. Do not copy `.env` files, `node_modules/`, or credentials. The target host
-does NOT need Node/pnpm installed — it only serves the prebuilt `frontend/dist/`.
+包内保留 `backend/`、`frontend/dist/`、`wheels/`、`deploy/`、
+`pnpm-store/v11/` 和 `pnpm-11.9.0.tgz`。不得包含 `.env`、`node_modules` 或
+凭据。正式目标机只服务预构建 `frontend/dist/`，无需安装 Node/pnpm；store
+用于复现和断网验收构建。
 
 ## 2. Prepare the database
 
@@ -59,7 +67,9 @@ Then run:
 ```bash
 cd /opt/data-asset/backend
 python3 -m venv venv
-venv/bin/pip install --no-index --find-links=/opt/data-asset/offline/wheels -r requirements.txt
+venv/bin/pip install --require-hashes --no-index \
+  --find-links=/opt/data-asset/offline/wheels -r requirements.lock
+venv/bin/pip check
 venv/bin/alembic upgrade head
 venv/bin/python -m scripts.create_admin_token --key-name platform-admin --user-identifier <platform-user-id>
 ```
@@ -89,6 +99,52 @@ curl --fail http://127.0.0.1:8000/api/v1/health
 curl --fail http://127.0.0.1/api/v1/health        # through Nginx
 ```
 
-The repository has not been able to run this procedure on a clean target host;
-the first real deployment must record package hashes, migration output, and
-health-check output in the release ticket.
+2026-08-11 已在临时内部网络中的全新 PostgreSQL 14 完成：从零
+`upgrade head`、第二次幂等 `upgrade head`、`downgrade -1`、再次
+`upgrade head`，最终 `/health` 返回 200。可在注入隔离测试库 URL 后运行：
+
+```bash
+sh deploy/offline/run_backend_drill.sh /opt/data-asset-offline
+```
+
+该脚本只应连接全新或明确授权的隔离测试库，不得用于生产库回退演练。
+
+## 4. Verify an offline package before installation
+
+The package root must contain `manifest.json` and `SHA256SUMS`. The manifest
+must contain a `files` list (or path-to-hash object), for example:
+
+```json
+{
+  "target": {"python_version": "3.11", "os": "linux", "arch": "x86_64"},
+  "files": [{"path": "wheels/example.whl", "sha256": "<64 hex characters>"}]
+}
+```
+
+Run the fail-closed verifier on the target package directory before copying or
+installing files:
+
+```bash
+python3 deploy/offline/verify_offline_package.py \
+  /opt/data-asset-offline --profile r8
+```
+
+R8 profile 除完整性和运行时检查外，还强制核对 `requirements.lock` 与全部
+wheel 哈希完全一致、每个 wheel 与当前 Python/OS/架构/glibc 兼容，以及前端
+dist、pnpm 离线 store/CLI 和演练脚本均存在。验证器只使用 Python 标准库，
+可在安装 wheel 前运行。任一缺失、未登记文件、符号链接、路径逃逸、哈希或
+平台不匹配都会非零退出。
+
+在最终打包前生成确定性清单（时间戳必须显式固定；也可用
+`SOURCE_DATE_EPOCH`）：
+
+```bash
+python3 deploy/offline/build_offline_manifest.py package \
+  --python-version 3.11 --os linux --arch x86_64 \
+  --source-revision "$(git rev-parse HEAD)" \
+  --source-tree-state clean \
+  --created-at 2026-08-11T00:00:00Z
+```
+
+正式发布包必须使用 `--source-tree-state clean`；共享工作区候选包必须如实写
+`dirty`，不得把未提交内容伪装成由 `source_revision` 可完整复现的 release。
