@@ -1,0 +1,31 @@
+-- 127 计划生产基线只读复核（data_asset @ 10.10.8.83）
+SET TRANSACTION READ ONLY;
+\pset tuples_only on
+SELECT '3.1 表资产|' || count(*) FROM asset.asset_tables;
+SELECT '3.1 字段资产|' || count(*) FROM asset.asset_columns;
+SELECT '3.1 非空业务域|' || count(distinct domain) FROM asset.asset_tables WHERE domain IS NOT NULL AND domain<>'';
+SELECT '3.1 数据库分区记录|' || count(*) FROM asset.asset_source_schemas;
+SELECT '3.1 分区缺中文名|' || count(*) FROM asset.asset_source_schemas WHERE schema_name_cn IS NULL OR schema_name_cn='';
+SELECT '3.1 未分业务域表|' || count(*) FROM asset.asset_tables WHERE domain IS NULL OR domain='';
+SELECT '3.1 column_count=0或NULL|' || count(*) FROM asset.asset_tables WHERE column_count IS NULL OR column_count=0;
+SELECT '3.1 关系合计|' || count(*) FROM asset.asset_relations;
+SELECT '3.1 关系按层级状态|' || coalesce(layer,'-') || '/' || coalesce(validation_status,'-') || '=' || count(*) FROM asset.asset_relations GROUP BY 1,2 ORDER BY 1,2;
+SELECT '3.2 质量规则|' || count(*) FROM asset.asset_quality_rules;
+SELECT '3.2 启用规则|' || count(*) FROM asset.asset_quality_rules WHERE enabled=true;
+SELECT '3.2 停用规则|' || count(*) FROM asset.asset_quality_rules WHERE enabled=false;
+SELECT '3.2 质量问题|' || count(*) FROM asset.asset_quality_findings;
+SELECT '3.2 问题按状态|' || coalesce(status,'-') || '=' || count(*) FROM asset.asset_quality_findings GROUP BY 1 ORDER BY 2 DESC;
+SELECT '3.2 检查批次|' || count(*) FROM asset.asset_quality_check_runs;
+SELECT '3.2 质量任务表|' || count(*) FROM asset.asset_quality_tasks;
+SELECT '3.2 质量指标表|' || count(*) FROM asset.asset_quality_metrics;
+SELECT '3.3 复核草稿|' || count(*) FROM asset.asset_relation_reviews;
+SELECT '3.3 配方|' || count(*) FROM asset.asset_relation_recipes;
+SELECT '3.3 AI会话|' || count(*) FROM asset.asset_ai_sessions;
+SELECT '3.3 AI工具调用|' || count(*) FROM asset.asset_ai_tool_calls;
+SELECT '3.3 SQL草稿|' || count(*) FROM asset.asset_view_drafts;
+SELECT '3.3 表负责人|' || count(*) FROM asset.asset_table_owners;
+SELECT '3.3 业务术语|' || count(*) FROM asset.asset_business_terms;
+SELECT '3.3 元数据快照|' || count(*) FROM asset.asset_metadata_snapshots;
+SELECT '3.4 系统清单|' || system_code || '=' || coalesce(system_name_cn,'') FROM asset.asset_systems ORDER BY 1;
+SELECT 'alembic|' || version_num FROM public.alembic_version;
+SELECT '数据新鲜度 asset_tables|' || max(updated_at) FROM asset.asset_tables;

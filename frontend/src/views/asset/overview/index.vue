@@ -2,7 +2,7 @@
   <div class="asset-overview">
     <RePageHeader
       title="资产总览"
-      subtitle="按业务域、关系状态、Schema 与核心表热度汇总当前治理资产。"
+      subtitle="按业务域、关系状态、数据库分区与核心表热度汇总当前治理资产。"
     >
       <template #icon><DashboardIcon /></template>
       <template #actions>
@@ -28,21 +28,34 @@
     </section>
 
     <section class="chart-grid">
-      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
-        <template #header>业务域分布</template>
-        <ReChart :option="domainChartOption" :empty="!domainRows.length" height="340px" :dark="false" />
+      <el-card v-loading="domainLoading" shadow="never" class="overview-card">
+        <template #header>
+          业务域分布
+          <small v-if="domainHint" class="chart-hint">{{ domainHint }}</small>
+        </template>
+        <ReChart :option="domainChartOption" :empty="!domainRows.length && !domainError" height="340px" :dark="false" />
+        <el-alert v-if="domainError" type="error" :closable="false" :title="domainError" class="mt8" />
       </el-card>
-      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
+      <el-card v-loading="statusLoading" shadow="never" class="overview-card">
         <template #header>关系验证状态分布</template>
-        <ReChart :option="statusChartOption" :empty="!statusRows.length" height="340px" :dark="false" />
+        <ReChart :option="statusChartOption" :empty="!statusRows.length && !statusError" height="340px" :dark="false" />
+        <el-alert v-if="statusError" type="error" :closable="false" :title="statusError" class="mt8" />
       </el-card>
-      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
-        <template #header>Schema 关系数 Top 10</template>
-        <ReChart :option="schemaRelChartOption" :empty="!schemaRows.length" height="340px" :dark="false" />
+      <el-card v-loading="partitionLoading" shadow="never" class="overview-card">
+        <template #header>
+          数据库分区关系数 Top 10
+          <small class="chart-hint">Oracle 对应 Owner，其他库对应数据库/架构或命名空间</small>
+        </template>
+        <ReChart :option="schemaRelChartOption" :empty="!schemaRows.length && !partitionError" height="340px" :dark="false" />
+        <el-alert v-if="partitionError" type="error" :closable="false" :title="partitionError" class="mt8" />
       </el-card>
-      <el-card v-loading="chartsLoading" shadow="never" class="overview-card">
-        <template #header>核心表 Top 10（按关联关系数）</template>
-        <ReChart :option="coreTableChartOption" :empty="!coreTableRows.length" height="340px" :dark="false" />
+      <el-card v-loading="coreLoading" shadow="never" class="overview-card">
+        <template #header>
+          核心表 Top 10
+          <small class="chart-hint">按已治理关系数量排序，不等同于业务重要性认定</small>
+        </template>
+        <ReChart :option="coreTableChartOption" :empty="!coreTableRows.length && !coreError" height="340px" :dark="false" />
+        <el-alert v-if="coreError" type="error" :closable="false" :title="coreError" class="mt8" />
       </el-card>
     </section>
   </div>
@@ -53,14 +66,8 @@ import ReChart from "@/components/ReChart/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import { computed, onMounted, ref } from "vue";
-import {
-  getGraph,
-  getSummary,
-  getTables,
-  type GraphEdge,
-  type SummaryData,
-  type TableBrief
-} from "@/api/asset";
+import { getSummary, type SummaryData } from "@/api/asset";
+import { http } from "@/utils/http";
 import type { EChartsCoreOption } from "echarts/core";
 import DashboardIcon from "~icons/ri/dashboard-3-line";
 import ListIcon from "~icons/ri/list-check-2";
@@ -78,10 +85,19 @@ const summary = ref<SummaryData>({
   domains: 0
 });
 const chartsLoading = ref(true);
+const domainLoading = ref(false);
+const statusLoading = ref(false);
+const partitionLoading = ref(false);
+const coreLoading = ref(false);
 const domainRows = ref<[string, number][]>([]);
 const statusRows = ref<[string, number][]>([]);
 const schemaRows = ref<[string, number][]>([]);
 const coreTableRows = ref<[string, number][]>([]);
+const domainHint = ref("");
+const domainError = ref("");
+const statusError = ref("");
+const partitionError = ref("");
+const coreError = ref("");
 
 const statusLabels: Record<string, string> = {
   verified: "已验证",
@@ -90,7 +106,10 @@ const statusLabels: Record<string, string> = {
   not_tested: "未测试",
   sample_verified: "抽样验证",
   sample_pass: "抽样通过",
-  missing_in_8216: "8.216缺失"
+  missing_in_8216: "8.216缺失",
+  candidate: "候选",
+  approved: "已批准",
+  rejected: "已拒绝"
 };
 
 const barItemStyle = { borderRadius: [0, 8, 8, 0] };
@@ -150,47 +169,48 @@ async function loadSummary() {
   }
 }
 
-function topEntries(map: Record<string, number>, limit: number) {
-  return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, limit);
-}
-
 async function loadCharts() {
   chartsLoading.value = true;
+  domainLoading.value = true;
+  statusLoading.value = true;
+  partitionLoading.value = true;
+  coreLoading.value = true;
+  domainError.value = "";
+  statusError.value = "";
+  partitionError.value = "";
+  coreError.value = "";
   try {
-    const [graphRes, tablesRes] = await Promise.all([
-      getGraph({ limit: 500 }),
-      getTables({ page: 1, page_size: 1000 })
+    const res = await http.request<any>("get", "/api/v1/overview/charts");
+    const data = res.data || {};
+    const domains = data.domains || {};
+    domainRows.value = (domains.items || []).map((x: any) => [x.name, x.count]);
+    if (domains.unclassified != null) {
+      domainHint.value = `未分业务域 ${domains.unclassified} / 表总数 ${domains.total_tables ?? "-"}`;
+    }
+    statusRows.value = (data.validation_status?.items || []).map((x: any) => [
+      statusLabels[x.name] || x.name,
+      x.count
     ]);
-    const edges: GraphEdge[] = graphRes.data.edges;
-    const tables: TableBrief[] = tablesRes.data.items;
-
-    const domainMap: Record<string, number> = {};
-    for (const table of tables) {
-      const domain = table.domain || "未分类";
-      domainMap[domain] = (domainMap[domain] || 0) + 1;
-    }
-    domainRows.value = topEntries(domainMap, 15);
-
-    const statusMap: Record<string, number> = {};
-    const schemaMap: Record<string, number> = {};
-    const tableRelMap: Record<string, number> = {};
-    for (const edge of edges) {
-      const status = edge.validation_status || "unknown";
-      statusMap[statusLabels[status] || status] = (statusMap[statusLabels[status] || status] || 0) + 1;
-      const schema = edge.source?.split(".")[0] || "?";
-      schemaMap[schema] = (schemaMap[schema] || 0) + 1;
-      if (edge.source) tableRelMap[edge.source] = (tableRelMap[edge.source] || 0) + 1;
-      if (edge.target) tableRelMap[edge.target] = (tableRelMap[edge.target] || 0) + 1;
-    }
-    statusRows.value = topEntries(statusMap, 12);
-    schemaRows.value = topEntries(schemaMap, 10);
-    coreTableRows.value = topEntries(tableRelMap, 10);
-  } catch {
+    schemaRows.value = (data.partitions?.items || []).map((x: any) => [x.name, x.count]);
+    coreTableRows.value = (data.core_tables?.items || []).map((x: any) => [
+      x.label || x.table,
+      x.count
+    ]);
+  } catch (e: any) {
+    const msg = e?.response?.data?.detail || e?.message || "聚合接口加载失败";
+    domainError.value = msg;
+    statusError.value = msg;
+    partitionError.value = msg;
+    coreError.value = msg;
     domainRows.value = [];
     statusRows.value = [];
     schemaRows.value = [];
     coreTableRows.value = [];
   } finally {
+    domainLoading.value = false;
+    statusLoading.value = false;
+    partitionLoading.value = false;
+    coreLoading.value = false;
     chartsLoading.value = false;
   }
 }
@@ -215,6 +235,16 @@ onMounted(reloadAll);
   margin-bottom: 16px;
 }
 
+.chart-hint {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+}
+.mt8 {
+  margin-top: 8px;
+}
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

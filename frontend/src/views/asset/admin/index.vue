@@ -1,18 +1,33 @@
 <template>
   <div class="admin-page">
-    <RePageHeader title="治理管理" subtitle="维护 API Token、表 Owner、业务术语和元数据快照等平台治理基础配置。" />
+    <RePageHeader
+      title="治理基础配置"
+      subtitle="责任归属、业务术语、安全接入（API Token）与元数据快照入口。Token 仅在创建时显示一次明文。"
+    />
+
+    <el-alert
+      class="mb20"
+      type="info"
+      :closable="false"
+      title="本页用于平台治理底座，不承担业务统计指标或日常查询版本管理（见 126 查询与指标中心）。"
+    />
 
     <el-card class="mb20">
       <template #header>
-        <span>API Token</span>
+        <span>安全接入 · API Token</span>
         <el-button size="small" class="ml8" @click="createKey"
           >创建新 Token</el-button
         >
       </template>
       <el-table :data="keys" stripe size="small">
         <el-table-column prop="key_name" label="名称" width="180" />
-        <el-table-column label="Token" width="150" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.token }}</template>
+        <el-table-column prop="user_identifier" label="绑定用户" width="140" />
+        <el-table-column label="凭证" width="120">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.has_legacy_token || row.token ? 'success' : 'info'">
+              {{ row.token ? "刚创建（请立即保存）" : row.has_legacy_token ? "已签发" : "无明文" }}
+            </el-tag>
+          </template>
         </el-table-column>
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
@@ -21,6 +36,7 @@
             }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="last_used_at" label="最后使用" width="170" />
         <el-table-column prop="created_at" label="创建时间" width="170" />
         <el-table-column label="操作" width="120">
           <template #default="{ row }">
@@ -215,10 +231,10 @@
       </div>
       <div class="mt15 action-row">
         <el-button type="info" size="small" @click="goToChanges">
-          查看变更事件
+          打开元数据变更事件
         </el-button>
         <el-button type="info" size="small" @click="goToMetadataChanges">
-          元数据变更检测
+          打开快照管理页
         </el-button>
       </div>
       <div v-if="compareResult" class="mt15 compare-result">
@@ -536,7 +552,8 @@ function goToChanges() {
 }
 
 function goToMetadataChanges() {
-  router.push("/metadata/changes");
+  // 专用快照工作台，避免与变更事件重复入口
+  router.push("/metadata/snapshots");
 }
 
 onMounted(() => {

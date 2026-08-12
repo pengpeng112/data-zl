@@ -7,10 +7,11 @@
 
 ## AI 技能路由（持续维护入口）
 
+- 用户要求日常取数、保存 SQL、复用查询、修订口径、导入历史查询，或提到 `取数/`、`queryctl`、`query_code`、查询资产时，必须先使用 `.agents/skills/query-governance-intake/SKILL.md`（126 查询资产闭环），并阅读 `取数/START_HERE.md`。
 - 用户提供历史 SQL、报表 SQL、视图 SQL，或要求分析 JOIN、补充/纳入表关系、沉淀关系图谱时，必须先使用仓库技能 `.agents/skills/sql-relation-intake/SKILL.md`。
 - 该技能负责“SQL 解析 → 最新资产获取 → 元数据核对 → 正式关系查重 → 候选分级 → 验证/配方建议”。历史 SQL 只能先作为证据；未经审核不得直接写入正式关系。
-- 普通取数 SQL 再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
-- 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方接口，平台不可用时读取技能引用的仓库机器可读资产。
+- 普通取数 SQL 在完成查询资产检索后，再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
+- 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方/查询资产接口，平台不可用时读取技能引用的仓库机器可读资产。
 
 ## 仓库性质（最重要）
 

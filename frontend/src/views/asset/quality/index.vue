@@ -773,6 +773,8 @@ interface MetricsData {
   total_rules: number;
   sql_rules: number;
   pass_rate: number | null;
+  rules_pass_rate?: number | null;
+  resolution_rate?: number | null;
   rule_categories: { category: string; count: number }[];
   top_tables: { table: string; count: number }[];
 }
@@ -819,18 +821,44 @@ function loadSystemSummary() {
   http
     .get<any, any>("/api/v1/quality/summary/by-system")
     .then((d: any) => {
-      systemSummary.value = d.data || [];
+      const rows = d.data || [];
+      systemSummary.value = rows.map((row: any) => ({
+        system_code: row.system_code,
+        system_name_cn: row.system_name_cn,
+        total_findings: row.total_findings ?? row.findings_total ?? 0,
+        open_count: row.open_count ?? row.findings_open ?? 0,
+        resolved_count: row.resolved_count ?? 0,
+        critical_count: row.critical_count ?? 0
+      }));
     })
-    .catch(() => {});
+    .catch((err: any) => {
+      systemSummary.value = [];
+      ElMessage.error(err?.response?.data?.detail || "系统质量汇总加载失败");
+    });
 }
 
 function loadMetrics() {
   return http
-    .get<any, any>("/api/v1/quality/metrics", { params: { system_code: "DATA_CENTER" } })
+    .get<any, any>("/api/v1/quality/metrics")
     .then((d: any) => {
-      metrics.value = d.data || { total_rules: 0, sql_rules: 0, pass_rate: null, rule_categories: [], top_tables: [] };
+      const raw = d.data || {};
+      // Normalize rule_categories: accept array or legacy dict
+      let cats = raw.rule_categories;
+      if (cats && !Array.isArray(cats) && typeof cats === "object") {
+        cats = Object.entries(cats).map(([category, count]) => ({ category, count: Number(count) || 0 }));
+      }
+      metrics.value = {
+        total_rules: raw.total_rules || 0,
+        sql_rules: raw.sql_rules || 0,
+        pass_rate: raw.resolution_rate ?? raw.pass_rate ?? null,
+        rules_pass_rate: raw.rules_pass_rate ?? null,
+        rule_categories: Array.isArray(cats) ? cats : [],
+        top_tables: raw.top_tables || []
+      };
     })
-    .catch(() => {});
+    .catch((err: any) => {
+      ElMessage.error(err?.response?.data?.detail || "质量指标加载失败");
+    });
 }
 
 function filterBySystem(row: SystemSummaryItem) {
@@ -938,8 +966,20 @@ function loadRules(page?: number) {
   http
     .get<any, any>("/api/v1/quality/rules", { params })
     .then((d: any) => {
-      rules.value = d.data.items || [];
-      rulesTotal.value = d.data.total || 0;
+      const payload = d.data;
+      // Transition: accept page envelope or legacy bare array
+      if (Array.isArray(payload)) {
+        rules.value = payload;
+        rulesTotal.value = payload.length;
+      } else {
+        rules.value = payload?.items || [];
+        rulesTotal.value = payload?.total || 0;
+      }
+    })
+    .catch((err: any) => {
+      rules.value = [];
+      rulesTotal.value = 0;
+      ElMessage.error(err?.response?.data?.detail || "规则列表加载失败");
     })
     .finally(() => {
       rulesLoading.value = false;
@@ -1330,7 +1370,17 @@ function passRateClass(rate: number | null | undefined): string {
 }
 
 const ruleCategoryChartOption = computed(() => {
-  const categories = metrics.value.rule_categories || [];
+  let categories: any[] = metrics.value.rule_categories || [];
+  if (!Array.isArray(categories) && categories && typeof categories === "object") {
+    categories = Object.entries(categories as Record<string, number>).map(([category, count]) => ({
+      category,
+      count
+    }));
+  }
+  const data = (Array.isArray(categories) ? categories : []).map((c: any) => ({
+    name: ruleCategoryLabel(c.category ?? c.name ?? "other"),
+    value: Number(c.count ?? c.value ?? 0)
+  }));
   return {
     tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
     legend: { orient: "vertical", left: 10, top: 20 },
@@ -1341,10 +1391,7 @@ const ruleCategoryChartOption = computed(() => {
         center: ["58%", "55%"],
         avoidLabelOverlap: true,
         itemStyle: { borderRadius: 8, borderColor: "#fff", borderWidth: 2 },
-        data: categories.map(c => ({
-          name: ruleCategoryLabel(c.category),
-          value: c.count
-        })),
+        data,
         label: { formatter: "{b}: {c}" }
       }
     ]

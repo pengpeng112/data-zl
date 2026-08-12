@@ -1,0 +1,27 @@
+# Rebuild a production-tagged image from the currently known-good runtime image
+# (Oracle thick client, wheels, env already present). Only application code is layered.
+#
+# Build on 10.10.8.83:
+#   docker build -f deploy/docker/Dockerfile.hotpatch \
+#     --build-arg BASE_IMAGE=data-asset:126complete-20260811220449 \
+#     -t data-asset:126p5-YYYYMMDDHHMMSS \
+#     -t data-asset:latest-hot \
+#     backend/
+#
+ARG BASE_IMAGE=data-asset:latest-hot
+FROM ${BASE_IMAGE}
+
+WORKDIR /app
+
+# Layer only app code + alembic; keep system packages and wheels from base.
+COPY app /app/app
+COPY alembic /app/alembic
+COPY alembic.ini /app/alembic.ini
+
+ENV APP_BUILD_ID=hotpatch-local
+ENV PYTHONPATH=/app
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8000/api/v1/health || curl -fsS http://127.0.0.1:8000/health || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "1"]

@@ -28,6 +28,8 @@ dev.err
 !.agents/skills/docare-anesthesia-readonly-sql/**
 !.agents/skills/sql-relation-intake/
 !.agents/skills/sql-relation-intake/**
+!.agents/skills/query-governance-intake/
+!.agents/skills/query-governance-intake/**
 .agents/skills/**/__pycache__/
 .agents/skills/**/*.pyc
 .ssh/
@@ -81,8 +83,22 @@ deploy/offline/*.tar.gz
 deploy/offline/*.zip
 deploy/offline/SHA256SUMS
 
-# 111 号 S9：病历/临床字典等含患者信息的本地样本与取数目录，禁止进入 Git
-/取数/
+# 126：取数工作区 — 运行缓存不进 Git；模板与入口可进 Git
+/取数/*
+!/取数/START_HERE.md
+!/取数/_query_templates/
+!/取数/_query_templates/**
+# 保留历史项目目录由用户自管；默认忽略其下可能含结果的内容
+/取数/48项目核心制度/
+/取数/exports/
+/取数/_query_inbox/
+/取数/_query_working/
+/取数/_query_outbox/
+/取数/_query_synced/
+/取数/_query_quarantine/
+/取数/_query_results/
+/取数/_query_context/
+/取数/.query_state/
 /2026高次次-病历首页数据表样*.xlsx
 /临床诊断字典与国标版本映射关系*.xlsx
 /**/*病历*.xlsx
@@ -103,3 +119,6 @@ backend/identity_test.db
 
 # GitHub 100MB limit: keep HRP bulk columns out of git
 开发起步包/数据资产_HRP源端资产包/hrp_source_columns.csv
+backend/var/*.py
+backend/var/*.txt
+backend/var/*.sh

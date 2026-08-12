@@ -1,0 +1,19 @@
+query_code: QRY_EXAMPLE
+title: 示例查询
+purpose: 业务用途
+system_code: DATA_CENTER
+source_code: ods_8_216
+dialect: oracle
+status: captured
+period_field: HIS.PAT_VISIT.DISCHARGE_DATE_TIME
+grain: month
+parameters: {}
+metric_refs: []
+recipe_refs: []
+sensitivity: aggregate
+limitations: []
+result_storage: none
+ai_source:
+  provider: unknown
+  model: unknown
+  session_ref: local-only

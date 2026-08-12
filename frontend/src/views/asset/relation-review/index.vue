@@ -92,6 +92,42 @@ function resetFilters() {
 async function loadRelations() {
   loading.value = true;
   try {
+    // 127: draft/pending/confirmed/rejected use relation-reviews main table
+    const reviewTab = ["pending", "confirmed", "rejected", ""].includes(relationClass.value);
+    if (reviewTab && (relationClass.value === "pending" || relationClass.value === "confirmed" || relationClass.value === "rejected" || relationClass.value === "")) {
+      const statusMap: Record<string, string> = {
+        pending: "draft",
+        confirmed: "approved",
+        rejected: "rejected",
+        "": ""
+      };
+      const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
+      const st = statusMap[relationClass.value];
+      if (st) params.review_status = st;
+      if (filters.keyword) params.keyword = filters.keyword;
+      const res = await http.request<any>("get", "/api/v1/relation-reviews", { params });
+      const items = res.data?.items || [];
+      relations.value = items.map((r: any) => ({
+        id: r.id,
+        rel_id: r.source_relation_id || r.id,
+        from_table: r.from_table,
+        from_columns: r.from_columns,
+        to_table: r.to_table,
+        to_columns: r.to_columns,
+        join_condition: r.join_condition,
+        confidence: r.confidence,
+        validation_status: r.validation_status,
+        validation_note: r.review_note,
+        note: r.relation_desc_cn || r.source_evidence,
+        system_code: r.from_system_code,
+        from_system_code: r.from_system_code,
+        to_system_code: r.to_system_code,
+        review_status: r.review_status,
+        source_relation_id: r.source_relation_id
+      }));
+      total.value = res.data?.total || 0;
+      return;
+    }
     const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
     if (filters.system_code) params.system_code = filters.system_code;
     if (filters.confidence) params.confidence = filters.confidence;
@@ -159,8 +195,15 @@ function getConfidenceType(c: string) {
 
 async function handleApprove(relId: number) {
   try {
-    await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "approve" } });
-    ElMessage.success("已批准");
+    // Prefer relation-reviews approve (links formal, no candidate promote)
+    try {
+      const res = await http.request<any>("post", `/api/v1/relation-reviews/${relId}/approve`, { data: {} });
+      const action = res.data?.action || "approved";
+      ElMessage.success(`已批准（${action}）`);
+    } catch {
+      await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "approve" } });
+      ElMessage.success("已批准");
+    }
     loadRelations();
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.detail || "操作失败");
@@ -169,8 +212,13 @@ async function handleApprove(relId: number) {
 
 async function handleReject(relId: number) {
   try {
-    await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "reject" } });
-    ElMessage.success("已驳回");
+    try {
+      await http.request("post", `/api/v1/relation-reviews/${relId}/reject`, { data: {} });
+      ElMessage.success("已驳回（草稿保留证据）");
+    } catch {
+      await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "reject" } });
+      ElMessage.success("已驳回");
+    }
     loadRelations();
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.detail || "操作失败");
@@ -200,8 +248,18 @@ async function showMappings(relId: number) {
   mappingsLoading.value = true;
   mappings.value = [];
   try {
-    const res = await http.request<any>("get", "/api/v1/relations/field-mappings", { params: { rel_id: relId } });
-    mappings.value = res.data || [];
+    try {
+      const res = await http.request<any>("get", `/api/v1/relation-reviews/${relId}/field-mappings`);
+      mappings.value = Array.isArray(res.data) ? res.data : res.data?.items || [];
+      return;
+    } catch {
+      /* fall through to relations API */
+    }
+    const res = await http.request<any>("get", "/api/v1/relations/field-mappings", {
+      params: { rel_id: relId }
+    });
+    const payload = res.data;
+    mappings.value = Array.isArray(payload) ? payload : payload?.items || [];
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.detail || "获取字段映射失败");
   } finally {
