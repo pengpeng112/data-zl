@@ -29,83 +29,123 @@ router = APIRouter(prefix="/api/v1/quality", tags=["quality"])
 QUALITY_RULES_SEED = [
     {
         "rule_code": "REL_ORPHAN_RATE",
+        "rule_name": "关系孤儿率超标",
         "rule_type": "orphan",
+        "rule_category": "RELATION",
+        "check_scope": "TABLE_RELATION",
         "target_type": "relation",
         "execution_mode": "metadata_only",
         "description": "正式关系孤儿率超标（基于 validation_metrics 中已存储的 orphan_rate）",
         "threshold_config": {"max_orphan_rate": 0.05},
+        "enabled": True,
     },
     {
         "rule_code": "TABLE_NO_DOMAIN",
+        "rule_name": "表业务域缺失",
         "rule_type": "completeness",
+        "rule_category": "COMPLETE",
+        "check_scope": "TABLE_INNER",
         "target_type": "table",
         "execution_mode": "metadata_only",
         "description": "表未归入任何业务域",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "COL_NULL_COMMENT",
+        "rule_name": "字段注释覆盖不足",
         "rule_type": "completeness",
+        "rule_category": "COMPLETE",
+        "check_scope": "TABLE_INNER",
         "target_type": "column",
         "execution_mode": "metadata_only",
         "description": "字段缺少注释",
         "threshold_config": {"min_comment_rate": 0.5},
+        "enabled": True,
     },
     {
         "rule_code": "REL_NOT_VERIFIED",
+        "rule_name": "关系未实测验证",
         "rule_type": "completeness",
+        "rule_category": "RELATION",
+        "check_scope": "TABLE_RELATION",
         "target_type": "relation",
         "execution_mode": "metadata_only",
         "description": "正式关系未经过数据库实测验证",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "CANDIDATE_NOT_REVIEWED",
+        "rule_name": "候选关系待审核积压",
         "rule_type": "completeness",
+        "rule_category": "RELATION",
+        "check_scope": "TABLE_RELATION",
         "target_type": "candidate",
         "execution_mode": "metadata_only",
         "description": "候选关系仍未审核（status=candidate 超过阈值天数）",
         "threshold_config": {"max_days": 30},
+        "enabled": True,
     },
     {
         "rule_code": "TABLE_ZERO_COLUMNS",
+        "rule_name": "表字段数异常（零字段/未采集）",
         "rule_type": "completeness",
+        "rule_category": "COMPLETE",
+        "check_scope": "TABLE_INNER",
         "target_type": "table",
         "execution_mode": "metadata_only",
-        "description": "表字段数为 0 或 NULL",
+        "description": "表字段数为 0 或 NULL；需与字段明细对账，未采集不得标为确实零字段",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "TABLE_NO_CN_NAME",
+        "rule_name": "表中文名缺失",
         "rule_type": "completeness",
+        "rule_category": "COMPLETE",
+        "check_scope": "TABLE_INNER",
         "target_type": "table",
         "execution_mode": "metadata_only",
         "description": "表缺少中文名（table_name_cn 为空）",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "COLUMN_NO_CN_NAME",
+        "rule_name": "字段中文名缺失",
         "rule_type": "completeness",
+        "rule_category": "COMPLETE",
+        "check_scope": "TABLE_INNER",
         "target_type": "column",
         "execution_mode": "metadata_only",
         "description": "字段缺少中文名（column_name_cn 为空）",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "SOURCE_CONNECTIVITY",
+        "rule_name": "数据连接可用性",
         "rule_type": "connectivity",
+        "rule_category": "CONNECTIVITY",
+        "check_scope": "SYSTEM_CROSS",
         "target_type": "source",
         "execution_mode": "metadata_only",
-        "description": "数据源最近连通性检测状态（待 P5.5 实现实际连接测试）",
+        "description": "数据源最近连通性检测状态（使用最近一次真实连接测试）",
         "threshold_config": {},
+        "enabled": True,
     },
     {
         "rule_code": "SOURCE_METADATA_STALE",
+        "rule_name": "元数据采集新鲜度",
         "rule_type": "completeness",
+        "rule_category": "CONNECTIVITY",
+        "check_scope": "SYSTEM_CROSS",
         "target_type": "source",
         "execution_mode": "metadata_only",
         "description": "数据源元数据快照过旧（超过 7 天未更新）",
         "threshold_config": {"max_days": 7},
+        "enabled": True,
     },
 ]
 
@@ -352,20 +392,72 @@ RULE_RUNNERS = {
 
 
 def seed_rules(db: Session) -> None:
+    """Insert missing seed rules and backfill governance fields on enabled seeds."""
     for rule_data in QUALITY_RULES_SEED:
         existing = db.scalar(
             select(QualityRule).where(QualityRule.rule_code == rule_data["rule_code"])
         )
         if not existing:
             db.add(QualityRule(**rule_data))
+            continue
+        # Backfill empty governance fields without forcing re-enable of SQL suggestions
+        for field in (
+            "rule_name",
+            "rule_category",
+            "check_scope",
+            "description",
+            "rule_type",
+            "target_type",
+            "execution_mode",
+        ):
+            if field in rule_data and not getattr(existing, field, None):
+                setattr(existing, field, rule_data[field])
     db.commit()
 
 
-@router.get("/rules", summary="获取质量规则列表")
-def list_rules(db: Session = Depends(get_db)) -> ApiResponse[list[QualityRuleItem]]:
+@router.get("/rules", summary="获取质量规则列表（分页）")
+def list_rules(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(30, ge=1, le=200),
+    rule_category: str | None = Query(None),
+    check_scope: str | None = Query(None),
+    constraint_level: str | None = Query(None),
+    enabled: bool | None = Query(None),
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    keyword: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    """Paginated rules contract: data={items,total,page,page_size} (127 A1)."""
     seed_rules(db)
-    rows = db.scalars(select(QualityRule).order_by(QualityRule.rule_code)).all()
-    return ApiResponse(data=[QualityRuleItem.model_validate(r) for r in rows])
+    stmt = select(QualityRule)
+    if rule_category:
+        stmt = stmt.where(QualityRule.rule_category == rule_category)
+    if check_scope:
+        stmt = stmt.where(QualityRule.check_scope == check_scope)
+    if constraint_level:
+        stmt = stmt.where(QualityRule.constraint_level == constraint_level)
+    if enabled is not None:
+        stmt = stmt.where(QualityRule.enabled.is_(enabled))
+    if system_code:
+        stmt = stmt.where(QualityRule.system_code == system_code)
+    if source_code:
+        stmt = stmt.where(QualityRule.source_code == source_code)
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(
+            QualityRule.rule_code.ilike(like)
+            | QualityRule.rule_name.ilike(like)
+            | QualityRule.description.ilike(like)
+        )
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(QualityRule.rule_code).offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    items = [QualityRuleItem.model_validate(r).model_dump() for r in rows]
+    return ApiResponse(
+        data={"total": total, "page": page, "page_size": page_size, "items": items}
+    )
 
 
 def run_quality_check_core(
@@ -665,44 +757,65 @@ def quality_summary(db: Session = Depends(get_db)) -> ApiResponse[QualitySummary
 def quality_summary_by_system(
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
-    from ...services.asset_catalog import load_system_name_map
+    """Per-system finding counts by real attribution (127 A3/A4). Never copy global totals."""
+    from ...services.asset_catalog import load_system_name_map, normalize_system_code
+
     tables = db.scalars(select(AssetTable)).all()
     findings = db.scalars(select(QualityFinding)).all()
-
-    systems = load_system_name_map(db)
+    name_map = load_system_name_map(db)
     grouped: dict[str, dict] = {}
 
-    for sc in set(t.system_code for t in tables if t.system_code):
-        grouped[sc] = {
-            "system_code": sc,
-            "system_name_cn": systems.get(sc, sc),
-            "table_count": 0,
-            "column_count": 0,
-            "findings_total": 0,
-            "findings_open": 0,
-        }
+    def _bucket(code: str | None) -> str:
+        raw = (code or "").strip()
+        if not raw:
+            return "UNASSIGNED"
+        return normalize_system_code(raw) or raw
+
+    def _ensure(sc: str) -> dict:
+        if sc not in grouped:
+            display = sc
+            if sc == "UNASSIGNED":
+                display_cn = "待归属"
+            else:
+                display_cn = name_map.get(sc) or sc
+            grouped[sc] = {
+                "system_code": sc,
+                "system_name_cn": display_cn,
+                "table_count": 0,
+                "column_count": 0,
+                "total_findings": 0,
+                "open_count": 0,
+                "resolved_count": 0,
+                "critical_count": 0,
+                # backward-compatible aliases
+                "findings_total": 0,
+                "findings_open": 0,
+            }
+        return grouped[sc]
 
     for t in tables:
-        sc = t.system_code or "UNKNOWN"
-        if sc not in grouped:
-            grouped[sc] = {"system_code": sc, "system_name_cn": sc, "table_count": 0, "column_count": 0, "findings_total": 0, "findings_open": 0}
-        grouped[sc]["table_count"] += 1
-        grouped[sc]["column_count"] += t.column_count or 0
+        sc = _bucket(t.system_code)
+        b = _ensure(sc)
+        b["table_count"] += 1
+        b["column_count"] += t.column_count or 0
 
     for f in findings:
-        if f.status == "open":
-            for sc in grouped:
-                grouped[sc]["findings_open"] += 1
-                grouped[sc]["findings_total"] += 1
-            break
-        grouped.get("UNKNOWN", {}).setdefault("findings_total", 0)
-        grouped.get("UNKNOWN", {}).setdefault("findings_open", 0)
+        sc = _bucket(f.system_code)
+        b = _ensure(sc)
+        status = (f.status or "open").lower()
+        b["total_findings"] += 1
+        b["findings_total"] += 1
+        if status == "open":
+            b["open_count"] += 1
+            b["findings_open"] += 1
+        elif status in {"resolved", "fixed", "ignored"}:
+            b["resolved_count"] += 1
+        if (f.severity or "").lower() == "critical":
+            b["critical_count"] += 1
 
-    for sc in grouped:
-        grouped[sc]["findings_total"] = len([f for f in findings if f.status != "resolved"])
-        grouped[sc]["findings_open"] = len([f for f in findings if f.status == "open"])
-
-    return ApiResponse(data=sorted(grouped.values(), key=lambda x: x["table_count"], reverse=True))
+    return ApiResponse(
+        data=sorted(grouped.values(), key=lambda x: x["total_findings"], reverse=True)
+    )
 
 
 # ──────────────────────────────────────────────
@@ -1014,13 +1127,16 @@ def quality_metrics(
     system_code: str | None = Query(None),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
+    """Metrics with array rule_categories and split pass rates (127 A5)."""
     rules = db.scalars(select(QualityRule).where(QualityRule.enabled.is_(True))).all()
     total_rules = len(rules)
     sql_rules = len([r for r in rules if r.execution_mode == "sql_template"])
 
     count_stmt = select(func.count(QualityFinding.id))
     open_stmt = select(func.count(QualityFinding.id)).where(QualityFinding.status == "open")
-    resolved_stmt = select(func.count(QualityFinding.id)).where(QualityFinding.status == "resolved")
+    resolved_stmt = select(func.count(QualityFinding.id)).where(
+        QualityFinding.status.in_(["resolved", "fixed"])
+    )
     if system_code:
         count_stmt = count_stmt.where(QualityFinding.system_code == system_code)
         open_stmt = open_stmt.where(QualityFinding.system_code == system_code)
@@ -1029,7 +1145,15 @@ def quality_metrics(
     total = db.scalar(count_stmt) or 0
     open_count = db.scalar(open_stmt) or 0
     resolved_count = db.scalar(resolved_stmt) or 0
-    pass_rate = round((resolved_count / total * 100) if total > 0 else 100, 1)
+    # resolution_rate: closed findings / all findings (not "rule pass rate")
+    resolution_rate = round((resolved_count / total * 100) if total > 0 else 100.0, 1)
+    # rules_pass_rate: prefer last run pass_rate when available
+    last_run = db.scalar(select(QualityCheckRun).order_by(QualityCheckRun.id.desc()).limit(1))
+    rules_pass_rate = None
+    if last_run and last_run.pass_rate is not None:
+        rules_pass_rate = float(last_run.pass_rate)
+    # Keep pass_rate as resolution_rate for backward UI, but label correctly via new fields
+    pass_rate = resolution_rate
 
     top_stmt = select(QualityFinding.table_name, func.count(QualityFinding.id).label("cnt"))
     if system_code:
@@ -1039,21 +1163,26 @@ def quality_metrics(
         .order_by(func.count(QualityFinding.id).desc())
         .limit(5)
     ).all()
-    top_tables = [{"table": r[0] or r[1], "count": r[1]} for r in top_rows]
+    top_tables = [{"table": r[0] or "unknown", "count": r[1]} for r in top_rows]
 
-    cat_counts: dict = {}
+    cat_counts: dict[str, int] = {}
     for r in rules:
-        cat = r.rule_category or "other"
+        cat = r.rule_category or r.rule_type or "other"
         cat_counts[cat] = cat_counts.get(cat, 0) + 1
+    rule_categories = [{"category": k, "count": v} for k, v in sorted(cat_counts.items())]
 
-    return ApiResponse(data={
-        "total_rules": total_rules,
-        "enabled_rules": total_rules,
-        "sql_rules": sql_rules,
-        "total_findings": total,
-        "open_findings": open_count,
-        "resolved_findings": resolved_count,
-        "pass_rate": pass_rate,
-        "rule_categories": cat_counts,
-        "top_tables": top_tables,
-    })
+    return ApiResponse(
+        data={
+            "total_rules": total_rules,
+            "enabled_rules": total_rules,
+            "sql_rules": sql_rules,
+            "total_findings": total,
+            "open_findings": open_count,
+            "resolved_findings": resolved_count,
+            "pass_rate": pass_rate,
+            "resolution_rate": resolution_rate,
+            "rules_pass_rate": rules_pass_rate,
+            "rule_categories": rule_categories,
+            "top_tables": top_tables,
+        }
+    )

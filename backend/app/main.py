@@ -11,7 +11,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, auth, candidates, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, ops_tools, permissions, permission_requests, quality, recipes, relations, systems, tables
+from .api.v1 import admin, ai, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -69,6 +69,35 @@ def _start_scheduler():
             from .services.identity_nightly_scheduler import register_nightly_job
             register_nightly_job(scheduler)
 
+            # 126 P3: query schedules — only when APP_QUERY_SCHEDULE_ENABLED=true
+            if settings.query_schedule_enabled:
+                from .models.query_schedule import AssetQuerySchedule
+
+                qjobs = db.scalars(
+                    select(AssetQuerySchedule).where(AssetQuerySchedule.enabled.is_(True))
+                ).all()
+                for qs in qjobs:
+                    try:
+                        qtrigger = CronTrigger.from_crontab(
+                            qs.schedule_cron or "0 3 * * *",
+                            timezone=settings.scheduler_timezone,
+                        )
+                    except ValueError:
+                        logger.error("Skipping query schedule %s: invalid cron", qs.query_code)
+                        continue
+                    scheduler.add_job(
+                        _run_scheduled_query,
+                        trigger=qtrigger,
+                        args=[qs.query_code],
+                        id=f"query_schedule_{qs.id}",
+                        replace_existing=True,
+                        max_instances=1,
+                        coalesce=True,
+                    )
+                logger.info("Query schedules registered: %s (enabled flag on)", len(qjobs))
+            else:
+                logger.info("Query schedules disabled (APP_QUERY_SCHEDULE_ENABLED=false)")
+
             if settings.dict_medical_push_enabled:
                 scheduler.add_job(
                     _run_dict_sync_worker_once,
@@ -85,7 +114,8 @@ def _start_scheduler():
                     settings.dict_medical_worker_batch_size,
                 )
 
-            if jobs or settings.identity_nightly_enabled or settings.dict_medical_push_enabled:
+            query_sched_on = bool(settings.query_schedule_enabled)
+            if jobs or settings.identity_nightly_enabled or settings.dict_medical_push_enabled or query_sched_on:
                 scheduler.start()
                 logger.info("APScheduler started with %d scheduled jobs in %s", len(jobs), settings.scheduler_timezone)
         finally:
@@ -116,6 +146,57 @@ def _run_dict_sync_worker_once() -> None:
     except Exception as exc:
         db.rollback()
         logger.error("Dictionary outbox worker failed: %s", type(exc).__name__)
+    finally:
+        db.close()
+
+
+def _run_scheduled_query(query_code: str) -> None:
+    """126 P3: run one enabled query schedule (only if global flag on)."""
+    from datetime import datetime, timezone
+
+    from .models.query_schedule import AssetQuerySchedule
+    from .services.query_runner import run_query_version
+
+    if not settings.query_schedule_enabled:
+        logger.warning("query schedule skipped (global flag off): %s", query_code)
+        return
+    db = SessionLocal()
+    try:
+        qs = db.scalar(
+            select(AssetQuerySchedule).where(
+                AssetQuerySchedule.query_code == query_code,
+                AssetQuerySchedule.enabled.is_(True),
+            )
+        )
+        if not qs:
+            return
+        result = run_query_version(
+            db,
+            query_code=query_code,
+            source_code=qs.source_code,
+            result_storage=qs.result_storage or "none",
+            max_rows=qs.max_rows or 1000,
+            triggered_by="query_scheduler",
+        )
+        qs.last_run_id = result.get("run_id")
+        qs.last_status = result.get("status")
+        qs.last_error = result.get("error_message")
+        qs.last_run_at = datetime.now(timezone.utc)
+        qs.updated_at = datetime.now(timezone.utc)
+        db.commit()
+        logger.info("Scheduled query %s finished: %s", query_code, result.get("status"))
+    except Exception as exc:
+        db.rollback()
+        logger.error("Scheduled query %s failed: %s", query_code, type(exc).__name__)
+        try:
+            qs = db.scalar(select(AssetQuerySchedule).where(AssetQuerySchedule.query_code == query_code))
+            if qs:
+                qs.last_status = "failed"
+                qs.last_error = type(exc).__name__
+                qs.last_run_at = datetime.now(timezone.utc)
+                db.commit()
+        except Exception:
+            db.rollback()
     finally:
         db.close()
 
@@ -451,9 +532,13 @@ app.include_router(graph_analysis.router)
 app.include_router(health.router)
 app.include_router(tables.router)
 app.include_router(relations.router)
+app.include_router(relation_reviews.router)
 app.include_router(lineage.router)
 app.include_router(candidates.router)
 app.include_router(quality.router)
+app.include_router(queries.router)
+app.include_router(metrics.router)
+app.include_router(data_products.router)
 app.include_router(ai.router)
 app.include_router(admin.router)
 app.include_router(governance.router)

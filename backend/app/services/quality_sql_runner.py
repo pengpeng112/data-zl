@@ -32,14 +32,22 @@ def _as_int(value: Any, default: int = 0) -> int:
 
 
 def _extract_stats(rows: list[dict[str, Any]]) -> tuple[int, int] | None:
+    """Extract TOTAL_CNT/ERROR_CNT from a single-row stats result.
+
+    Multi-row result sets without TOTAL_CNT are rejected (return None) so callers
+    can mark the run as rule_error instead of treating row count as error count.
+    """
     if not rows:
         return 0, 0
     first = _upper_row(rows[0])
     total_key = next((k for k in STAT_TOTAL_KEYS if k in first), None)
     error_key = next((k for k in STAT_ERROR_KEYS if k in first), None)
+    # Contract: stats SQL must return exactly one row with TOTAL_CNT + ERROR_CNT
+    if len(rows) > 1 and not (total_key and error_key):
+        return None
     if total_key and error_key:
         return _as_int(first[total_key]), _as_int(first[error_key])
-    if error_key:
+    if error_key and len(rows) == 1:
         error_cnt = _as_int(first[error_key])
         total_cnt = _as_int(first.get(total_key or "TOTAL_CNT"), error_cnt)
         return total_cnt, error_cnt
@@ -108,10 +116,18 @@ def execute_quality_sql(
         rows = [dict(r) for r in rows]
         stats = _extract_stats(rows)
         if stats is None:
-            total_cnt = len(rows)
-            error_cnt = len(rows)
-        else:
-            total_cnt, error_cnt = stats
+            # Never treat multi-row dup listings as "all rows are errors" (false pass/fail).
+            return {
+                "rule_code": rule_code,
+                "total_cnt": 0,
+                "error_cnt": 0,
+                "error_rate": 0,
+                "sample_data": [mask_sensitive(row) for row in rows[: max(0, sample_limit)]],
+                "status": "rule_error",
+                "note": "SQL must return a single row with TOTAL_CNT and ERROR_CNT",
+                "warnings": validation.get("warnings", []),
+            }
+        total_cnt, error_cnt = stats
         error_rate = int(round(error_cnt / total_cnt * 100)) if total_cnt else 0
         samples = [mask_sensitive(row) for row in rows[: max(0, sample_limit)]]
         return {

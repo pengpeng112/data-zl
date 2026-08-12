@@ -55,6 +55,114 @@ def summary(db: Session = Depends(get_db)) -> ApiResponse[SummaryOut]:
     )
 
 
+@router.get("/overview/charts", summary="资产总览四图全量聚合（127 S4）")
+def overview_charts(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Server-side aggregates for domain / validation / partition / core-table charts.
+
+    Avoids client page_size=1000 422 and Promise.all cascade failures.
+    """
+    # 业务域分布（全量）
+    domain_rows = db.execute(
+        select(
+            func.coalesce(func.nullif(AssetTable.domain, ""), "未分类").label("domain"),
+            func.count(AssetTable.id),
+        ).group_by(func.coalesce(func.nullif(AssetTable.domain, ""), "未分类"))
+        .order_by(func.count(AssetTable.id).desc())
+        .limit(20)
+    ).all()
+    unclassified = db.scalar(
+        select(func.count()).select_from(AssetTable).where(
+            (AssetTable.domain.is_(None)) | (AssetTable.domain == "")
+        )
+    ) or 0
+    domain_total = db.scalar(select(func.count()).select_from(AssetTable)) or 0
+
+    # 关系验证状态
+    status_rows = db.execute(
+        select(
+            func.coalesce(func.nullif(AssetRelation.validation_status, ""), "unknown"),
+            func.count(AssetRelation.id),
+        ).group_by(func.coalesce(func.nullif(AssetRelation.validation_status, ""), "unknown"))
+        .order_by(func.count(AssetRelation.id).desc())
+    ).all()
+    relation_total = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
+
+    # 数据库分区（优先 schema_name，其次 from_schema_name）
+    partition_expr = func.coalesce(
+        func.nullif(AssetRelation.from_schema_name, ""),
+        func.nullif(AssetRelation.from_namespace_name, ""),
+        func.split_part(AssetRelation.from_table, ".", 1),
+        "?",
+    )
+    partition_rows = db.execute(
+        select(partition_expr.label("partition"), func.count(AssetRelation.id))
+        .group_by(partition_expr)
+        .order_by(func.count(AssetRelation.id).desc())
+        .limit(10)
+    ).all()
+
+    # 核心表 Top（按出现在关系端点次数）
+    # Count both from_table and to_table via union-all subquery
+    from_counts = select(
+        AssetRelation.from_table.label("tbl"), func.count().label("cnt")
+    ).where(AssetRelation.from_table.isnot(None)).group_by(AssetRelation.from_table)
+    to_counts = select(
+        AssetRelation.to_table.label("tbl"), func.count().label("cnt")
+    ).where(AssetRelation.to_table.isnot(None)).group_by(AssetRelation.to_table)
+    union_sub = from_counts.union_all(to_counts).subquery()
+    core_rows = db.execute(
+        select(union_sub.c.tbl, func.sum(union_sub.c.cnt).label("total"))
+        .group_by(union_sub.c.tbl)
+        .order_by(func.sum(union_sub.c.cnt).desc())
+        .limit(10)
+    ).all()
+
+    # Enrich core table labels with Chinese names when available
+    core_items = []
+    for tbl, cnt in core_rows:
+        cn = None
+        if tbl and "." in str(tbl):
+            schema, name = str(tbl).split(".", 1)
+            row = db.scalar(
+                select(AssetTable).where(
+                    AssetTable.schema_name == schema, AssetTable.table_name == name
+                ).limit(1)
+            )
+            if row:
+                cn = row.table_name_cn
+        core_items.append({
+            "table": tbl,
+            "table_name_cn": cn,
+            "label": f"{cn}（{tbl}）" if cn else str(tbl),
+            "count": int(cnt or 0),
+        })
+
+    return ApiResponse(data={
+        "domains": {
+            "items": [{"name": r[0], "count": r[1]} for r in domain_rows],
+            "total_tables": domain_total,
+            "unclassified": unclassified,
+            "truncated": False,
+        },
+        "validation_status": {
+            "items": [{"name": r[0], "count": r[1]} for r in status_rows],
+            "total_relations": relation_total,
+            "truncated": False,
+        },
+        "partitions": {
+            "items": [{"name": r[0], "count": r[1]} for r in partition_rows],
+            "label_cn": "数据库分区关系数 Top 10",
+            "hint": "Oracle 对应 Owner，其他数据库对应数据库/架构或命名空间",
+            "truncated": len(partition_rows) >= 10,
+        },
+        "core_tables": {
+            "items": core_items,
+            "hint": "按已治理关系数量排序，不等同于业务重要性认定",
+            "truncated": False,
+        },
+    })
+
+
 @router.get("/dashboard/summary", summary="首页指挥中心真实指标（聚合只读）")
 def dashboard_summary(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Aggregate live counts for /welcome KPI cards and lightweight charts."""

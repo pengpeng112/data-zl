@@ -4,11 +4,72 @@ import re
 
 from fastapi import HTTPException
 
+# Historical seed statuses → current state machine
+_SEED_STATUS_MAP = {
+    "user_confirmed": "approved",
+    "confirmed": "approved",
+    "formal": "active",
+    "verified": "approved",
+    "candidate": "draft",
+    "draft": "draft",
+    "submitted": "submitted",
+    "approved": "approved",
+    "active": "active",
+    "deprecated": "deprecated",
+}
+
+
+def map_seed_status(raw: str | None) -> str:
+    """Map historical seed status strings into draft→submitted→approved→active."""
+    key = (raw or "draft").strip().lower()
+    return _SEED_STATUS_MAP.get(key, "draft")
+
+
+def normalize_recipe_joins(joins: list | None) -> list[dict]:
+    """Normalize seed join shape {type,from,to,condition} → {join_type,on,from,to}."""
+    out: list[dict] = []
+    for join in joins or []:
+        if not isinstance(join, dict):
+            continue
+        item = dict(join)
+        join_type = (
+            item.get("join_type")
+            or item.get("type")
+            or "LEFT"
+        )
+        on = (
+            item.get("on")
+            or item.get("join_condition")
+            or item.get("condition")
+            or ""
+        )
+        item["join_type"] = str(join_type).upper()
+        item["on"] = str(on).strip()
+        if "join_condition" not in item:
+            item["join_condition"] = item["on"]
+        out.append(item)
+    return out
+
 
 def canonical_recipe_payload(data: dict) -> dict:
-    payload = dict(data)
+    payload = dict(data or {})
     payload["primary_tables"] = payload.get("primary_tables") or []
-    payload["joins"] = payload.get("joins") or []
+    raw_joins = payload.get("joins") or []
+    payload["joins"] = normalize_recipe_joins(raw_joins)
+    # Preserve full knowledge fields when present
+    for key in (
+        "field_logic",
+        "hard_rules",
+        "validation_evidence",
+        "do_not_use_as_primary_join",
+        "sql_fragments",
+        "filters",
+        "dedup",
+        "scope",
+        "forbidden",
+    ):
+        if key in data:
+            payload[key] = data[key]
     return payload
 
 
@@ -18,7 +79,13 @@ def recipe_hash(data: dict) -> str:
 
 
 def assert_transition(current: str, target: str) -> None:
-    allowed = {"draft": {"submitted"}, "submitted": {"approved", "draft"}, "approved": {"active"}, "active": {"deprecated"}, "deprecated": set()}
+    allowed = {
+        "draft": {"submitted"},
+        "submitted": {"approved", "draft"},
+        "approved": {"active"},
+        "active": {"deprecated"},
+        "deprecated": set(),
+    }
     if target not in allowed.get(current, set()):
         raise HTTPException(status_code=400, detail=f"配方状态不能从 {current} 转为 {target}")
 
@@ -28,11 +95,13 @@ _CONDITION = re.compile(r"^[A-Za-z0-9_$#.\s=<>!()+\-*/]+$")
 
 
 def generate_select_sql(primary_tables: list, joins: list) -> str:
-    names = [str(item.get("table") or item.get("name") or "") if isinstance(item, dict) else str(item) for item in primary_tables]
+    names = [
+        str(item.get("table") or item.get("name") or "") if isinstance(item, dict) else str(item)
+        for item in primary_tables
+    ]
     if not names or any(not _IDENTIFIER.fullmatch(name) for name in names):
         raise HTTPException(status_code=400, detail="配方包含非法或缺失的表标识")
-    # Reject dangerous content even when a malformed caller supplies unused
-    # joins for a single-table recipe.
+    joins = normalize_recipe_joins(joins)
     for join in joins:
         if not isinstance(join, dict):
             raise HTTPException(status_code=400, detail="配方包含非法关联定义")

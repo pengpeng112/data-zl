@@ -159,6 +159,73 @@ AVAILABLE_TOOLS = [
             "sql_text": {"type": "string", "description": "需扫描的 SQL"},
         },
     },
+    # 126 P5: query / metric / data-product MCP tools (no arbitrary SQL)
+    {
+        "name": "list_queries",
+        "description": "列出已登记查询资产（版本化 SQL 口径）",
+        "method": "GET",
+        "path": "/api/v1/queries",
+        "auth_required": True,
+        "parameters": {
+            "keyword": {"type": "string", "description": "编码/标题关键词"},
+            "page": {"type": "integer"},
+        },
+    },
+    {
+        "name": "get_query",
+        "description": "获取查询资产详情与现行 SQL 版本",
+        "method": "GET",
+        "path": "/api/v1/queries/{query_code}",
+        "auth_required": True,
+        "parameters": {"query_code": {"type": "string", "description": "如 QRY_CORE_03"}},
+    },
+    {
+        "name": "list_metrics",
+        "description": "列出统计指标资产",
+        "method": "GET",
+        "path": "/api/v1/metrics",
+        "auth_required": True,
+        "parameters": {"keyword": {"type": "string"}},
+    },
+    {
+        "name": "metric_board",
+        "description": "获取核心制度指标月度结果看板（禁止改口径）",
+        "method": "GET",
+        "path": "/api/v1/metrics/board/overview",
+        "auth_required": True,
+        "parameters": {
+            "period_from": {"type": "string", "description": "YYYY-MM"},
+            "period_to": {"type": "string", "description": "YYYY-MM"},
+        },
+    },
+    {
+        "name": "list_data_products",
+        "description": "列出已发布数据产品目录（禁止任意 SQL）",
+        "method": "GET",
+        "path": "/api/v1/data-products",
+        "auth_required": True,
+        "parameters": {"keyword": {"type": "string"}},
+    },
+    {
+        "name": "execute_data_product",
+        "description": "执行已发布数据产品（参数化，禁止传 SQL）",
+        "method": "POST",
+        "path": "/api/v1/data-products/{product_code}/execute",
+        "auth_required": True,
+        "parameters": {
+            "product_code": {"type": "string"},
+            "parameters": {"type": "object", "description": "产品参数，不得含 SQL"},
+            "execute_sql": {"type": "boolean", "description": "metric 产品是否联动执行查询"},
+        },
+    },
+    {
+        "name": "list_source_capabilities",
+        "description": "多源连接适配能力探测（只读）",
+        "method": "GET",
+        "path": "/api/v1/queries/sources/capabilities",
+        "auth_required": True,
+        "parameters": {},
+    },
 ]
 
 
@@ -224,7 +291,39 @@ def list_tools() -> ApiResponse[dict]:
         data={
             "platform": "医院数据资产平台",
             "tools": AVAILABLE_TOOLS,
-            "policy": "所有工具只读元数据；propose_sql 仅保存草稿不执行",
+            "mcp_compatible": True,
+            "policy": (
+                "默认只读元数据与风险扫描；propose_sql 仅保存草稿不执行；"
+                "execute_approved_sql 仅在草稿已人工批准后经只读 runner 限量执行；"
+                "数据产品/查询/指标工具禁止任意 SQL，仅可调用已发布资产"
+            ),
+        }
+    )
+
+
+@router.get("/mcp/catalog", summary="126 P5：MCP 风格工具目录（查询/指标/数据产品）")
+def mcp_catalog() -> ApiResponse[dict]:
+    """Subset catalog optimized for MCP/Dify registration of governance exports."""
+    names = {
+        "list_queries",
+        "get_query",
+        "list_metrics",
+        "metric_board",
+        "list_data_products",
+        "execute_data_product",
+        "list_source_capabilities",
+        "search_tables",
+        "get_table_schema",
+        "get_relations",
+        "sql_risk_scan",
+    }
+    tools = [t for t in AVAILABLE_TOOLS if t["name"] in names]
+    return ApiResponse(
+        data={
+            "name": "data-asset-governance",
+            "version": "126-p5",
+            "tools": tools,
+            "forbidden": ["arbitrary_sql", "dml", "ddl", "credential_export"],
         }
     )
 
@@ -592,10 +691,22 @@ def system_context(
             for r in rels
         ]
 
+    total_columns = db.scalar(
+        select(func.count()).select_from(AssetColumn).where(AssetColumn.system_code == system_code)
+    )
+    if total_columns is None:
+        # fallback when column.system_code sparse: sum column_count on tables
+        total_columns = sum(int(t.column_count or 0) for t in tables)
+    total_relations = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
+    if table_names:
+        total_relations = len(relations)
+
     return ApiResponse(data={
         "system_code": system_code,
         "system_name_cn": sys.system_name_cn if sys else system_code,
         "total_tables": total_tables,
+        "total_columns": int(total_columns or 0),
+        "total_relations": int(total_relations or 0),
         "exported_tables": len(tables),
         "tables": [
             {
@@ -622,20 +733,71 @@ class SqlScanRequest(BaseModel):
     sql_text: str
 
 
-@router.post("/tool-execute", summary="AI 工具执行代理（只读）")
+# Tools that can be safely dispatched inline (metadata-only, no source DB write)
+_INLINE_TOOL_DISPATCH = {
+    "sql_risk_scan",
+    "list_tools",
+}
+
+
+@router.post("/tool-execute", summary="AI 工具执行代理（只读，真实分发或明确不支持）")
 def tool_execute(req: ToolExecuteRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """Never return fake executed=True. Dispatch known read-only helpers or mark unsupported."""
     tool_names = [t["name"] for t in AVAILABLE_TOOLS]
     if req.tool_name not in tool_names:
         raise HTTPException(status_code=400, detail=f"未注册的工具: {req.tool_name}，可用: {tool_names}")
+
+    params = req.params or {}
+    result: dict
+    executed = False
+    status = "unsupported"
+
+    if req.tool_name == "sql_risk_scan":
+        sql_text = str(params.get("sql_text") or "")
+        flags = _scan_sql_risk(sql_text)
+        result = {
+            "sql_length": len(sql_text),
+            "risk_flags": flags,
+            "safe_for_review": not flags.get("blocked", False),
+        }
+        executed = True
+        status = "success"
+    elif req.tool_name == "get_system_context" and req.system_code:
+        # Reuse system_context logic via internal call pattern
+        ctx = system_context(system_code=req.system_code, max_tables=int(params.get("max_tables") or 30), db=db)
+        result = ctx.data if hasattr(ctx, "data") else ctx
+        executed = True
+        status = "success"
+    elif req.tool_name in _INLINE_TOOL_DISPATCH:
+        result = {"note": f"tool {req.tool_name} registered; use dedicated endpoint"}
+        executed = False
+        status = "unsupported"
+    else:
+        # Explicit unsupported — client must call the dedicated path from AVAILABLE_TOOLS
+        tool_meta = next((t for t in AVAILABLE_TOOLS if t["name"] == req.tool_name), {})
+        result = {
+            "note": "tool-execute does not proxy arbitrary HTTP; call the dedicated path",
+            "method": tool_meta.get("method"),
+            "path": tool_meta.get("path"),
+            "auth_required": tool_meta.get("auth_required", True),
+        }
+        executed = False
+        status = "unsupported"
+
     db.add(GovernAuditLog(
-        module="ai", entity_type="tool_execute", entity_ref=req.tool_name, action="execute",
-        after_data=req.params, operator=req.system_code,
+        module="ai",
+        entity_type="tool_execute",
+        entity_ref=req.tool_name,
+        action="execute" if executed else "unsupported",
+        after_data={"params": params, "status": status, "executed": executed},
+        operator=req.system_code,
     ))
     db.commit()
     return ApiResponse(data={
         "tool_name": req.tool_name,
-        "executed": True,
-        "note": "readonly proxy executed, refer to tool-call audit",
+        "executed": executed,
+        "status": status,
+        "result": result,
     })
 
 

@@ -6,20 +6,22 @@ def _get_or_create_rule(client: TestClient, rule_code: str, **extra) -> dict:
     resp = client.post("/api/v1/quality/rules", json={"rule_code": rule_code, **extra})
     if resp.status_code == 200:
         return resp.json()["data"]
-    # 已存在 → 从列表中查找
-    rules = client.get("/api/v1/quality/rules").json()["data"]
-    for r in rules:
+    # 已存在 → 从分页列表中查找
+    data = client.get("/api/v1/quality/rules", params={"page_size": 200}).json()["data"]
+    items = data["items"] if isinstance(data, dict) else data
+    for r in items:
         if r["rule_code"] == rule_code:
             return {"id": r["id"], "rule_code": r["rule_code"]}
     raise AssertionError(f"无法获取或创建规则 {rule_code}: {resp.status_code} {resp.text}")
 
 
 def test_quality_rules(client: TestClient):
-    resp = client.get("/api/v1/quality/rules")
+    resp = client.get("/api/v1/quality/rules", params={"page": 1, "page_size": 50})
     assert resp.status_code == 200
     data = resp.json()["data"]
-    assert isinstance(data, list)
-    assert any(r["rule_code"] == "REL_ORPHAN_RATE" for r in data)
+    assert isinstance(data, dict)
+    assert "items" in data and "total" in data
+    assert any(r["rule_code"] == "REL_ORPHAN_RATE" for r in data["items"])
 
 
 def test_run_quality_check(client: TestClient):

@@ -69,6 +69,9 @@ class Settings(BaseSettings):
     identity_sync_managed_since: str = "2026-07-20"
     identity_sync_modified_since: str = "2026-08-04T00:00:00"
 
+    # 126 P3: scheduled query runs — default OFF; enable only after explicit authorization.
+    query_schedule_enabled: bool = False
+
     # Nightly scheduler (plan 107): default OFF until Phase D validation passes.
     identity_nightly_enabled: bool = False
     identity_nightly_cron: str = "0 2 * * *"  # 02:00 Asia/Shanghai
