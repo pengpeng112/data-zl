@@ -101,7 +101,11 @@ describe("AdvancedRelationGraph G6 输入契约（119 回归）", () => {
       expect(node.style.labelText).not.toBe("[object Object]");
       expect(node.style.labelText.length).toBeGreaterThan(0);
     }
-    expect(graph.data.nodes[0].style.labelText).toBe("PAT_VISIT中文名");
+    // 127: table nodes show 中文名 + technical name (two lines) when both exist
+    const label0 = graph.data.nodes[0].style.labelText as string;
+    expect(label0).toContain("PAT_VISIT中文名");
+    expect(label0.split("\n")[0]).toBe("PAT_VISIT中文名");
+    expect(graph.data.nodes[0].style.labelPlacement).toBe("center");
     expect(wrapper.emitted("render-error")).toBeUndefined();
     wrapper.unmount();
   });

@@ -105,13 +105,25 @@ function nodeLabel(node: any) {
   // 必须把对象形态的 label 排除/取 formatter，否则 G6 文本布局对非字符串调 .split 抛 TypeError。
   const labelField =
     typeof node.label === "string" ? node.label : (node.label?.formatter ?? "");
-  const primary = node.type === "system"
+  const isSystem = node.type === "system" || node.category === "system" || node.is_aggregate;
+  const count = node.count ?? node.table_count ?? node.child_count;
+  let primary = isSystem && !node.table_name
     ? mappedSystem(node)
     : String(node.table_name_cn || node.tableNameCn || labelField || node.table_name || node.display_id || node.id || "");
+  // 系统/聚合节点：中文名 + 数量；表节点：中文名 + 技术表名
+  if (isSystem && count != null && !String(primary).includes(String(count))) {
+    primary = `${primary}（${count}）`;
+  }
+  const techName = node.table_name || node.tableName || "";
+  const cnName = node.table_name_cn || node.tableNameCn || "";
+  if (!isSystem && cnName && techName && cnName !== techName) {
+    primary = `${cnName}`;
+  }
   const shorten = (value: string, max: number) => value.length > max ? `${value.slice(0, max - 1)}…` : value;
-  const meta = node.type === "system" ? "" : mappedMeta(node);
-  // 保留物理 key 在 data.raw 中，同时把业务系统/数据连接中文名放入节点元信息。
-  return meta ? `${shorten(primary, 23)}\n${shorten(meta, 32)}` : shorten(primary, 23);
+  const meta = isSystem && !node.table_name
+    ? ""
+    : (techName && cnName && cnName !== techName ? techName : mappedMeta(node));
+  return meta ? `${shorten(String(primary), 23)}\n${shorten(String(meta), 32)}` : shorten(String(primary), 23);
 }
 
 function aggregateData(nodes: any[], edges: any[]) {
@@ -158,8 +170,24 @@ function layoutOptions() {
   if (props.layoutMode === "radial") {
     return { type: "radial", nodeSize: 132, preventOverlap: true, nodeSpacing: 60, linkDistance: 170 };
   }
-  // force-atlas2 依赖节点尺寸做重叠排除，在大节点（132 宽 rect）下比 d3-force 收敛更稳定
-  return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
+  if (props.layoutMode === "grouped") {
+    return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
+  }
+  // 默认 layered → 改为 Neo4j 风格的 d3-force 力导向布局
+  // 节点自然散布、弹簧连接、可拖拽交互，类似 Neo4j Browser 的图谱展示
+  return {
+    type: "force",
+    linkDistance: (d: any) => 140 + (d?.data?.weight ? d.data.weight * 10 : 0),
+    nodeStrength: -120,
+    edgeStrength: 0.7,
+    collideStrength: 0.8,
+    preventOverlap: true,
+    nodeSize: 40,
+    alpha: 0.3,
+    alphaDecay: 0.028,
+    alphaMin: 0.01,
+    forceSimulation: undefined
+  };
 }
 
 function edgeStyle(edge: any) {
@@ -201,10 +229,16 @@ function graphData() {
           stroke: typeStyle.stroke,
           lineWidth: node.itemStyle?.borderWidth || (typeStyle.shape === "diamond" ? 2.6 : 1.5),
           lineDash: typeStyle.lineDash,
+          // 127: G6 default labelPlacement is bottom → white text on light canvas is invisible
+          labelPlacement: "center",
           labelText: nodeLabel(node),
-          labelFill: typeStyle.textColor,
-          labelFontSize: node.is_aggregate ? 13 : 13,
-          labelFontWeight: node.id === props.selectedNodeId ? 700 : 500
+          labelFill: typeStyle.textColor || "#ffffff",
+          labelFontSize: node.is_aggregate || node.isAggregate ? 13 : 12,
+          labelFontWeight: node.id === props.selectedNodeId ? 700 : 600,
+          labelWordWrap: true,
+          labelMaxWidth: node.isAggregate ? 120 : 200,
+          labelTextAlign: "center",
+          labelTextBaseline: "middle"
         }
       };
     }),

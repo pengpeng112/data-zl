@@ -330,6 +330,91 @@ function buildRadial(nodes: any[], edges: any[]) {
   return materializeLayout(nodes, edges, positions, [], width, height);
 }
 
+/**
+ * Neo4j 风格力导向布局：模拟物理排斥力 + 弹簧吸引力，节点自然散布。
+ * 简化版 d3-force：多次迭代直到收敛。
+ */
+function buildForce(nodes: any[], edges: any[]) {
+  const width = 1200;
+  const height = 800;
+  const cx = width / 2;
+  const cy = height / 2;
+  const n = nodes.length;
+  if (n === 0) return materializeLayout(nodes, edges, new Map(), [], width, height);
+
+  // 初始位置：圆环散布（避免重叠起点）
+  const pos = new Map<string, { x: number; y: number; vx: number; vy: number }>();
+  nodes.forEach((node, i) => {
+    const angle = (Math.PI * 2 * i) / Math.max(n, 1);
+    const r = 80 + Math.random() * 60;
+    pos.set(node.id, { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, vx: 0, vy: 0 });
+  });
+
+  // 边的目标距离（弹簧自然长度）
+  const linkDist = 180;
+  const iterations = 220;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const alpha = 1 - iter / iterations; // 降温
+
+    // 排斥力（所有节点对）
+    for (let i = 0; i < n; i++) {
+      const a = pos.get(nodes[i].id)!;
+      for (let j = i + 1; j < n; j++) {
+        const b = pos.get(nodes[j].id)!;
+        let dx = a.x - b.x;
+        let dy = a.y - b.y;
+        let dist2 = dx * dx + dy * dy;
+        if (dist2 < 1) { dist2 = 1; dx = Math.random(); dy = Math.random(); }
+        const dist = Math.sqrt(dist2);
+        const force = 6500 / dist2; // 库仑式排斥
+        const fx = (dx / dist) * force * alpha;
+        const fy = (dy / dist) * force * alpha;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      }
+    }
+
+    // 弹簧吸引力（有边的节点对）
+    edges.forEach(edge => {
+      const s = pos.get(edge.source);
+      const t = pos.get(edge.target);
+      if (!s || !t) return;
+      let dx = t.x - s.x;
+      let dy = t.y - s.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const diff = dist - linkDist;
+      const force = diff * 0.04 * alpha;
+      const fx = (dx / dist) * force;
+      const fy = (dy / dist) * force;
+      s.vx += fx; s.vy += fy;
+      t.vx -= fx; t.vy -= fy;
+    });
+
+    // 中心引力（防止节点飞太远）
+    nodes.forEach(node => {
+      const p = pos.get(node.id)!;
+      p.vx += (cx - p.x) * 0.008 * alpha;
+      p.vy += (cy - p.y) * 0.008 * alpha;
+    });
+
+    // 应用速度 + 阻尼 + 边界
+    nodes.forEach(node => {
+      const p = pos.get(node.id)!;
+      p.x += Math.max(-30, Math.min(30, p.vx)) * 0.6;
+      p.y += Math.max(-30, Math.min(30, p.vy)) * 0.6;
+      p.vx *= 0.35;
+      p.vy *= 0.35;
+      p.x = Math.max(80, Math.min(width - 80, p.x));
+      p.y = Math.max(70, Math.min(height - 70, p.y));
+    });
+  }
+
+  const positions = new Map<string, { x: number; y: number }>();
+  pos.forEach((p, id) => positions.set(id, { x: p.x, y: p.y }));
+  return materializeLayout(nodes, edges, positions, [], width, height);
+}
+
 function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { x: number; y: number }>, bands: LayoutBand[], width: number, height: number) {
   const layoutNodes: LayoutNode[] = nodes.map(node => {
     const p = positions.get(node.id) || { x: 80, y: 80 };
@@ -374,7 +459,8 @@ const layout = computed(() => {
   const data = aggregateData(normalized.value.nodes, normalized.value.edges);
   if (props.layoutMode === "grouped") return buildGrouped(data.nodes, data.edges);
   if (props.layoutMode === "radial") return buildRadial(data.nodes, data.edges);
-  return buildLayered(data.nodes, data.edges);
+  // 默认使用 Neo4j 风格力导向布局（节点自然散布，非网格）
+  return buildForce(data.nodes, data.edges);
 });
 
 function onWheel(event: WheelEvent) {

@@ -135,11 +135,21 @@ export default {
       }
     },
     {
+      path: "/asset/queries",
+      name: "AssetQueries",
+      component: () => import("@/views/query-center/queries/index.vue"),
+      meta: {
+        title: "查询与指标中心",
+        showLink: true,
+        auths: ["asset.ai_draft.view"]
+      }
+    },
+    {
       path: "/asset/ai-tools",
       name: "AssetAiTools",
       component: () => import("@/views/asset/ai-tools/index.vue"),
       meta: {
-        title: "AI 协作",
+        title: "AI 接入与协作",
         showLink: true,
         auths: ["asset.ai_draft.view"]
       }
