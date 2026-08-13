@@ -492,6 +492,13 @@ export interface GraphNode {
   child_count?: number | null;
   path?: string | null;
   is_aggregate?: boolean;
+  /** 字段层只读契约：字段节点挂在 parent 表下。 */
+  column_name?: string | null;
+  column_name_cn?: string | null;
+  data_type?: string | null;
+  nullable?: boolean | string | null;
+  is_primary_key?: boolean | null;
+  is_relation_key?: boolean | null;
 }
 
 export interface GraphFieldMapping {
@@ -572,7 +579,7 @@ export interface GraphViewMode {
   label: string;
   description?: string | null;
   group_by: "system" | "source" | "schema" | "domain";
-  layout_mode: "layered" | "grouped" | "radial";
+  layout_mode: "layered" | "grouped" | "radial" | "hierarchy";
   confidence?: string | null;
   validation_status?: string | null;
   include_candidates: boolean;
@@ -607,8 +614,8 @@ export interface GraphOptionsData {
 }
 
 export interface GraphOverviewResponse {
-  level: "system" | "source" | "schema" | "object";
-  next_level?: "system" | "source" | "schema" | "object" | null;
+  level: "system" | "source" | "schema" | "object" | "field";
+  next_level?: "system" | "source" | "schema" | "object" | "field" | null;
   selected_path: Record<string, string>;
   data: GraphData;
 }
@@ -677,7 +684,7 @@ export const getGraphNeighbors = (params: {
 };
 
 export const getGraphOverview = (params?: {
-  level?: "system" | "source" | "schema" | "object";
+  level?: "system" | "source" | "schema" | "object" | "field";
   parent_physical_key?: string;
   system_code?: string;
   source_code?: string;
@@ -839,6 +846,12 @@ export interface QualityFindingItem {
   rule_code: string | null;
   target_type: string | null;
   target_ref: string | null;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
+  schema_name?: string | null;
+  table_name?: string | null;
+  column_name?: string | null;
   severity: string | null;
   status: string | null;
   metric_value: string | null;
@@ -856,6 +869,9 @@ export interface QualityCheckRunItem {
   triggered_by: string | null;
   total_rules: number | null;
   total_findings: number | null;
+  total_records?: number | null;
+  error_records?: number | null;
+  pass_rate?: number | null;
   status: string | null;
 }
 
@@ -925,6 +941,100 @@ export const getQualitySummary = () => {
     "/api/v1/quality/summary"
   );
 };
+
+// --- S5 Dify AI 质控工作台（服务端只读组包；浏览器永不接触 Key） ---
+export interface AiQualityStatus {
+  enabled: boolean;
+  configured: boolean;
+  reachable?: boolean | null;
+  workflow_name?: string | null;
+  workflow?: string | null;
+  prompt_version?: string | null;
+  schema_version?: string | null;
+  last_success_at?: string | null;
+  timeout_seconds?: number | null;
+  quota_state?: string | null;
+  message?: string | null;
+}
+
+export interface AiQualityPreview {
+  request_id: string;
+  task_type: "finding" | "finding_batch" | "run_summary";
+  finding_ids?: number[];
+  run_id?: number | null;
+  fields?: string[];
+  item_count?: number;
+  payload_bytes?: number;
+  input_digest: string;
+  redacted_count?: number;
+  dropped_count?: number;
+  dropped_fields?: string[];
+  warnings?: string[];
+  payload_json?: string;
+}
+
+export type AiQualityJobStatus = "queued" | "running" | "succeeded" | "failed" | "unknown" | "blocked";
+
+export interface AiQualityJob {
+  id: number | string;
+  request_id?: string | null;
+  task_type: "finding" | "finding_batch" | "run_summary";
+  status: AiQualityJobStatus;
+  finding_ids?: number[];
+  run_id?: number | null;
+  input_digest?: string | null;
+  prompt_version?: string | null;
+  dify_run_id?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  duration_ms?: number | null;
+  token_usage?: Record<string, unknown> | null;
+  error_class?: string | null;
+  error_message?: string | null;
+  result?: AiQualityResultItem | null;
+}
+
+export interface AiQualityResult {
+  schema_version?: string;
+  request_id?: string;
+  input_digest?: string;
+  summary: string;
+  risk_level?: "critical" | "high" | "medium" | "low" | "unknown";
+  root_causes?: { title: string; reason?: string; confidence?: number; evidence_finding_ids?: number[] }[];
+  recommendations?: { title: string; action_type?: string; priority?: string; reason?: string; confidence?: number; target_refs?: string[] }[];
+  false_positive?: { possible?: boolean; reason?: string };
+  follow_up_checks?: { description: string; sql_draft?: string | null }[];
+  limitations?: string[];
+}
+
+export interface AiQualityResultItem {
+  id: number;
+  job_id: number;
+  risk_level: string;
+  summary: string;
+  structured_result: AiQualityResult;
+  output_digest?: string | null;
+  review_status: "pending" | "accepted" | "rejected" | "partial";
+  attached_by?: string | null;
+  attached_at?: string | null;
+  accepted_recommendations?: number[] | null;
+}
+
+const AI_QUALITY_BASE = "/api/v1/quality/ai";
+export const getAiQualityStatus = () => http.get<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/status`);
+export const testAiQualityConnection = () => http.post<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/connection-test`);
+export const previewAiQuality = (data: { task_type: AiQualityPreview["task_type"]; finding_ids?: number[]; run_id?: number }) =>
+  http.post<ApiResponse<AiQualityPreview>, object>(`${AI_QUALITY_BASE}/preview`, { data });
+export const createAiQualityJob = (data: { task_type: AiQualityPreview["task_type"]; finding_ids?: number[]; run_id?: number; input_digest: string; request_id: string }) =>
+  http.post<ApiResponse<AiQualityJob>, object>(`${AI_QUALITY_BASE}/jobs`, { data });
+export const getAiQualityJobs = (params?: { page?: number; page_size?: number; status?: AiQualityJobStatus }) =>
+  http.get<ApiResponse<PageData<AiQualityJob>>, object>(`${AI_QUALITY_BASE}/jobs`, { params });
+export const getAiQualityJob = (jobId: number | string) => http.get<ApiResponse<AiQualityJob>, object>(`${AI_QUALITY_BASE}/jobs/${encodeURIComponent(String(jobId))}`);
+export const retryAiQualityJob = (jobId: number | string) => http.post<ApiResponse<AiQualityJob>, object>(`${AI_QUALITY_BASE}/jobs/${encodeURIComponent(String(jobId))}/retry`);
+export const reviewAiQualityResult = (resultId: number | string, data: { status: "accepted" | "rejected" | "partial"; note?: string; accepted_recommendations?: number[] }) =>
+  http.patch<ApiResponse<AiQualityResultItem>, object>(`${AI_QUALITY_BASE}/results/${encodeURIComponent(String(resultId))}/review`, { data });
+export const attachAiQualityResult = (resultId: number | string, data: { recommendation_indexes: number[]; note?: string }) =>
+  http.post<ApiResponse<AiQualityResultItem>, object>(`${AI_QUALITY_BASE}/results/${encodeURIComponent(String(resultId))}/attach`, { data });
 
 // --- P4A AI 工具与草稿 ---
 

@@ -2,10 +2,8 @@ import type { GraphData, GraphEdge as ApiGraphEdge, GraphNode as ApiGraphNode } 
 
 const GRAPH_COLOR_NEUTRAL = "#475569";
 const GRAPH_COLOR_NEUTRAL_LIGHT = "#94a3b8";
-const GRAPH_COLOR_NEUTRAL_DARK = "#334155";
 
-export type GraphNodeType = "system" | "source" | "schema" | "domain" | "table" | "view" | "aggregate";
-
+export type GraphNodeType = "system" | "source" | "schema" | "domain" | "table" | "view" | "field" | "aggregate";
 export type GraphNode = {
   id: string;
   label: string;
@@ -32,14 +30,16 @@ export type GraphNodeStyle = {
   opacity?: number;
 };
 
+// 129号：知识图谱 pastel 配色（参考医学知识图谱样式：白底、柔和色块、深色文字）
 export const GRAPH_NODE_TYPE_STYLE: Record<GraphNodeType, GraphNodeStyle> = {
-  system: { fill: "#0f3a66", stroke: "#00a6b8", textColor: "#ffffff", shape: "roundRect", size: [168, 58] },
-  source: { fill: "#155e75", stroke: "#22d3ee", textColor: "#ffffff", shape: "ellipse", size: [188, 62] },
-  schema: { fill: "#00a6b8", stroke: "#0f3a66", textColor: "#ffffff", shape: "roundRect", size: [148, 52] },
-  domain: { fill: "#d97706", stroke: "#92400e", textColor: "#ffffff", shape: "ellipse", size: [142, 50] },
-  table: { fill: GRAPH_COLOR_NEUTRAL, stroke: GRAPH_COLOR_NEUTRAL_DARK, textColor: "#ffffff", shape: "rect", size: [220, 74] },
-  view: { fill: "#4338ca", stroke: "#a5b4fc", textColor: "#ffffff", shape: "roundRect", size: [220, 74] },
-  aggregate: { fill: "#1e293b", stroke: "#38bdf8", textColor: "#ffffff", shape: "roundRect", size: [190, 68] }
+  system: { fill: "#f8d7c4", stroke: "#e0a075", textColor: "#8a4b1f", shape: "roundRect", size: [168, 58] },
+  source: { fill: "#fdf0b8", stroke: "#e3c85f", textColor: "#755d0a", shape: "ellipse", size: [188, 62] },
+  schema: { fill: "#dcebc8", stroke: "#a3c47e", textColor: "#49601f", shape: "roundRect", size: [148, 52] },
+  domain: { fill: "#ffe1b3", stroke: "#e8a04c", textColor: "#8a5310", shape: "ellipse", size: [142, 50] },
+  table: { fill: "#d6e9f8", stroke: "#8fbfe6", textColor: "#23527c", shape: "roundRect", size: [200, 68] },
+  view: { fill: "#e6ddf5", stroke: "#b6a3dd", textColor: "#54407f", shape: "roundRect", size: [220, 74] },
+  field: { fill: "#eef5e8", stroke: "#a8c58d", textColor: "#38552c", shape: "roundRect", size: [168, 44] },
+  aggregate: { fill: "#d3eef2", stroke: "#86ccd6", textColor: "#1f5f6b", shape: "roundRect", size: [190, 68] }
 };
 
 export function graphNodeStyle(type: GraphNodeType): GraphNodeStyle {
@@ -78,22 +78,22 @@ export function graphNodeVisualStyle(node: Partial<GraphNode & ApiGraphNode>): G
   const aggregateType = node.is_aggregate && ["system", "source", "schema", "domain"].includes(String(node.category))
     ? String(node.category) as GraphNodeType
     : "aggregate";
-  const inferredType: GraphNodeType = node.type || (node.object_type === "view" ? "view" : node.is_aggregate ? aggregateType : "table");
+  const inferredType: GraphNodeType = node.type || (node.category === "field" || node.object_type === "column" ? "field" : node.object_type === "view" ? "view" : node.is_aggregate ? aggregateType : "table");
   const base = graphNodeStyle(inferredType);
   if (inferredType === "table" && isExcludedNode(node)) {
-    return { ...base, fill: GRAPH_COLOR_NEUTRAL_LIGHT, stroke: GRAPH_COLOR_NEUTRAL, textColor: "#ffffff", shape: "rect", size: [118, 38] };
+    return { ...base, fill: "#f1f5f9", stroke: GRAPH_COLOR_NEUTRAL, textColor: "#64748b", shape: "rect", size: [118, 38] };
   }
   if (inferredType === "table" && isDeferredNode(node)) {
-    return { ...base, fill: "#7c6aa6", stroke: "#5b4b7a", textColor: "#ffffff", shape: "roundRect", size: [132, 44], lineDash: [8, 5], opacity: 0.78 };
+    return { ...base, fill: "#ece5f5", stroke: "#b9a3d4", textColor: "#634d8a", shape: "roundRect", size: [132, 44], lineDash: [8, 5], opacity: 0.78 };
   }
   if (inferredType === "table" && isCandidateNode(node)) {
-    return { ...base, fill: "#d97706", stroke: "#92400e", textColor: "#ffffff", shape: "roundRect", size: [132, 44] };
+    return { ...base, fill: "#fde8cd", stroke: "#e8a04c", textColor: "#92580e", shape: "roundRect", size: [132, 44] };
   }
   if (inferredType === "table" && isCoreFactNode(node)) {
-    return { ...base, fill: "#0f3a66", stroke: "#00d5ff", shape: "diamond", size: [154, 54] };
+    return { ...base, fill: "#ffe08a", stroke: "#d4a017", textColor: "#6b4e00", shape: "diamond", size: [154, 54] };
   }
   if (inferredType === "table" && isDimensionNode(node)) {
-    return { ...base, fill: "#00a6b8", stroke: "#0f3a66", shape: "roundRect", size: [138, 46] };
+    return { ...base, fill: "#c9e7f2", stroke: "#7cc4d8", textColor: "#175d6e", shape: "roundRect", size: [138, 46] };
   }
   return base;
 }
@@ -166,11 +166,12 @@ export function graphEdgeStyle(edge: Partial<GraphEdge & ApiGraphEdge>): GraphEd
   const confidence = edgeConfidence(edge);
   const relationType = edgeRelationTypeValue(edge);
   const status = edgeValidationStatus(edge);
-  if (isDeferredEdge(edge)) return { stroke: "#7c6aa6", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.74 };
-  if (relationType === "dependency") return { stroke: GRAPH_COLOR_NEUTRAL_LIGHT, lineWidth: 1.2, lineDash: [2, 5], opacity: 0.48 };
-  if (["sample_pass", "verified"].includes(status)) return { stroke: "#00a6b8", lineWidth: 3, opacity: 0.9 };
-  if (confidence === "B" || confidence === "C") return { stroke: "#d97706", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.78 };
-  if (confidence === "A") return { stroke: "#0f3a66", lineWidth: 2.4, opacity: 0.86 };
+  // 129号：pastel 底图上的彩色细边（参考知识图谱：绿/蓝/橙/紫区分关系状态）
+  if (isDeferredEdge(edge)) return { stroke: "#9b7ec8", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.8 };
+  if (relationType === "dependency") return { stroke: GRAPH_COLOR_NEUTRAL_LIGHT, lineWidth: 1.2, lineDash: [2, 5], opacity: 0.55 };
+  if (["sample_pass", "verified"].includes(status)) return { stroke: "#58a05c", lineWidth: 2.6, opacity: 0.9 };
+  if (confidence === "B" || confidence === "C") return { stroke: "#dd8b2e", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.85 };
+  if (confidence === "A") return { stroke: "#3f7cac", lineWidth: 2.2, opacity: 0.88 };
   return { stroke: GRAPH_COLOR_NEUTRAL, lineWidth: 1.2, opacity: 0.72 };
 }
 

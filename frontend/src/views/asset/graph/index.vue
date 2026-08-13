@@ -7,6 +7,19 @@
 
     <!-- 加载/成功：工具栏 + 图表 -->
     <template v-if="!isErrorState && state !== 'loading'">
+      <div v-if="filters.view_mode === 'overview'" class="graph-breadcrumb" aria-label="图谱下钻路径">
+        <el-button text :disabled="overviewLevel === 'system'" @click="goOverviewLevel('system')">业务系统</el-button>
+        <template v-if="overviewLevel !== 'system'">
+          <span>›</span><el-button text :disabled="overviewLevel === 'source'" @click="goOverviewLevel('source')">库·数据连接</el-button>
+        </template>
+        <template v-if="['schema', 'object', 'field'].includes(overviewLevel)">
+          <span>›</span><el-button text :disabled="overviewLevel === 'schema'" @click="goOverviewLevel('schema')">库·Owner/Schema</el-button>
+        </template>
+        <template v-if="['object', 'field'].includes(overviewLevel)">
+          <span>›</span><el-button text :disabled="overviewLevel === 'object'" @click="goOverviewLevel('object')">表</el-button>
+        </template>
+        <span v-if="overviewLevel === 'field'">› 字段</span>
+      </div>
       <GraphToolbar
         :filters="filters"
         :locate="locate"
@@ -118,6 +131,8 @@
         <el-descriptions-item label="业务域">{{ selectedNode.business_domain || selectedNode.domain || '-' }}</el-descriptions-item>
         <el-descriptions-item label="来源说明">{{ selectedNode.source || '-' }}</el-descriptions-item>
         <el-descriptions-item label="字段数">{{ selectedNode.column_count ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item v-if="selectedNode.category === 'field' || selectedNode.object_type === 'column'" label="字段名">{{ selectedNode.column_name || '-' }}</el-descriptions-item>
+        <el-descriptions-item v-if="selectedNode.category === 'field' || selectedNode.object_type === 'column'" label="数据类型">{{ selectedNode.data_type || '-' }}</el-descriptions-item>
         <el-descriptions-item label="行数统计">{{ selectedNode.row_count_stats || '-' }}</el-descriptions-item>
         <el-descriptions-item label="粒度">{{ selectedNode.grain || '-' }}</el-descriptions-item>
         <el-descriptions-item label="主键">{{ selectedNode.pk || '-' }}</el-descriptions-item>
@@ -125,7 +140,8 @@
         <el-descriptions-item label="复核状态">{{ selectedNode.review_status || '-' }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
-        <el-button v-if="selectedNode" type="primary" @click="openTable(selectedNode)">打开表详情</el-button>
+        <el-button v-if="selectedNode && overviewLevel === 'object' && selectedNode.object_type !== 'column'" type="primary" @click="loadFieldGraph(selectedNode)">查看字段图谱</el-button>
+        <el-button v-if="selectedNode && selectedNode.object_type !== 'column'" @click="openTable(selectedNode)">打开表详情</el-button>
         <el-button @click="selectedNodeId = ''">取消高亮</el-button>
       </template>
     </ReDetailDrawer>
@@ -133,7 +149,7 @@
     <GraphEvidenceDrawer
       v-model="drawerVisible"
       :edge="selectedEdge"
-      :edge-key="selectedEdge?.id || ''"
+      :edge-key="selectedEdgeDetailKey"
       :system-names="systemNameMap"
       :source-names="sourceNameMap"
     />
@@ -161,7 +177,7 @@ import {
 } from "@/views/asset/graph/graphErrors";
 import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, listSources, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem } from "@/api/asset";
 
-type LayoutMode = "layered" | "grouped" | "radial";
+type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
 const route = useRoute();
 const router = useRouter();
@@ -172,7 +188,8 @@ const selectedEdge = ref<GraphEdge | null>(null);
 const selectedNode = ref<GraphNode | null>(null);
 const selectedNodeId = ref("");
 const centerTable = ref("");
-const overviewLevel = ref<"system" | "source" | "schema" | "object">("system");
+const overviewLevel = ref<"system" | "source" | "schema" | "object" | "field">("system");
+const fieldParentKey = ref("");
 const graphEngine = ref<GraphEngine>("g6");
 const graphLoadNotice = ref("");
 const diagnosticWarnings = ref<string[]>([]);
@@ -229,6 +246,10 @@ const errorIcon = computed(() => {
 const errorDescription = computed(() => errorInfo.value?.description || "");
 const hasAnyData = computed(() => graphData.value.nodes.length > 0 || graphData.value.edges.length > 0);
 const selectedNodeDisplayKey = computed(() => selectedNode.value?.display_id || selectedNode.value?.id || "");
+const selectedEdgeDetailKey = computed(() => {
+  const layer = selectedEdge.value?.relation_layer;
+  return ["hierarchy", "aggregated"].includes(layer || "") ? "" : selectedEdge.value?.id || "";
+});
 
 const normalized = computed(() => normalizeGraphData(graphData.value.nodes, graphData.value.edges, {
   groupBy: filters.group_by,
@@ -252,6 +273,8 @@ function applyModeDefaults(mode: GraphViewMode) {
     filters.group_by = "system";
     filters.confidence = "";
     filters.validation_status = "";
+    // 129号：概览默认分层树状布局（系统→连接→Schema→表 逐级展开）
+    filters.layout_mode = "hierarchy";
   }
 }
 
@@ -379,7 +402,7 @@ async function loadDiagnostics() {
 }
 
 async function loadCascadeOptions() {
-  if (filters.view_mode !== "overview") return;
+  if (filters.view_mode !== "overview" || overviewLevel.value === "field") return;
   try {
     const res = await getGraphFilterOptions({
       system_code: filters.system_code || undefined,
@@ -414,6 +437,7 @@ async function loadData() {
       await loadCascadeOptions();
       const overview = await getGraphOverview({
         level: overviewLevel.value,
+        parent_physical_key: overviewLevel.value === "field" ? fieldParentKey.value : undefined,
         system_code: filters.system_code || undefined,
         source_code: filters.source_code || undefined,
         schema: filters.schema || undefined,
@@ -423,6 +447,11 @@ async function loadData() {
       const data = overview.data.data;
       graphData.value = data;
       graphMeta.value = data.meta || null;
+      if (overviewLevel.value === "field") {
+        centerTable.value = fieldParentKey.value;
+        selectedNodeId.value = fieldParentKey.value;
+        filters.layout_mode = "radial";
+      }
       state.value = data.nodes.length ? "success" : "empty";
       return;
     }
@@ -540,6 +569,7 @@ function backToGlobal() {
   locate.physical_key = "";
   locate.search_results = [];
   centerTable.value = "";
+  fieldParentKey.value = "";
   selectedNodeId.value = "";
   const overviewMode = options.view_modes.find(item => item.code === "overview");
   if (overviewMode) {
@@ -576,6 +606,7 @@ function resetFilters() {
   locate.table = "";
   locate.physical_key = "";
   locate.search_results = [];
+  fieldParentKey.value = "";
   locate.depth = 1;
   locate.direction = "both";
   errorInfo.value = null;
@@ -603,8 +634,53 @@ function openTable(node: GraphNode) {
   router.push({ path: `/asset/tables/${schema}/${table}`, query });
 }
 
+async function loadFieldGraph(node: GraphNode) {
+  const parent = String(node.physical_key || node.id || "").trim();
+  if (!parent) { ElMessage.warning("表节点缺少 physical_key，无法加载字段图谱"); return; }
+  loading.value = true;
+  state.value = "loading";
+  try {
+    const res = await getGraphOverview({ level: "field", parent_physical_key: parent, limit: 80 });
+    graphData.value = res.data.data;
+    graphMeta.value = graphData.value.meta || null;
+    fieldParentKey.value = parent;
+    overviewLevel.value = "field";
+    filters.layout_mode = "radial";
+    selectedNodeId.value = parent;
+    centerTable.value = parent;
+    nodeDrawerVisible.value = false;
+    state.value = graphData.value.nodes.length ? "success" : "empty";
+  } catch (err) {
+    const info = classifyGraphError(err); state.value = info.state; errorInfo.value = info;
+  } finally { loading.value = false; }
+}
+
+async function goOverviewLevel(level: "system" | "source" | "schema" | "object") {
+  overviewLevel.value = level;
+  fieldParentKey.value = "";
+  centerTable.value = "";
+  selectedNodeId.value = "";
+  nodeDrawerVisible.value = false;
+  if (level === "system") {
+    filters.system_code = "";
+    filters.source_code = "";
+    filters.schema = "";
+  } else if (level === "source") {
+    filters.source_code = "";
+    filters.schema = "";
+  } else if (level === "schema") {
+    filters.schema = "";
+  }
+  filters.layout_mode = level === "object" ? "layered" : "hierarchy";
+  await loadData();
+}
+
 function selectNode(node: GraphNode) {
+  if (node.category === "field" || node.object_type === "column") {
+    selectedNode.value = node; selectedNodeId.value = node.id; nodeDrawerVisible.value = true; return;
+  }
   if (filters.view_mode === "overview" && node.is_aggregate) {
+    // 129号（按用户确认）：点击聚合节点 = 整层替换下钻（上一层隐藏），配合分层树状布局
     if (node.category === "system") {
       filters.system_code = node.system_code || "";
       filters.source_code = "";
@@ -617,6 +693,7 @@ function selectNode(node: GraphNode) {
     } else if (node.category === "schema") {
       filters.schema = node.schema_name || "";
       overviewLevel.value = "object";
+      filters.layout_mode = "layered";
     } else {
       selectedNode.value = node;
       selectedNodeId.value = node.id;
@@ -678,29 +755,43 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-base);
 }
 
+.graph-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 8px;
+  padding: 5px 10px;
+  color: #475569;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+}
+
 .graph-wrap {
   min-height: calc(100vh - 400px);
   padding: 14px;
   overflow: hidden;
+  /* 129号：知识图谱白底样式（参考图：浅色画布 + pastel 节点） */
   background:
-    radial-gradient(circle at 82% 10%, rgb(14 165 233 / 12%), transparent 28%),
-    linear-gradient(135deg, #0b1120 0%, #0f172a 52%, #111827 100%);
-  border: 1px solid rgb(148 163 184 / 16%);
+    radial-gradient(circle at 82% 10%, rgb(14 165 233 / 6%), transparent 28%),
+    linear-gradient(135deg, #ffffff 0%, #f8fafc 52%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-inset), 0 18px 45px rgb(2 6 23 / 22%);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 8%);
 }
 
 .graph-wrap :deep(.el-loading-mask) {
-  background: rgb(15 23 42 / 72%);
+  background: rgb(255 255 255 / 72%);
   backdrop-filter: blur(8px);
 }
 
 .graph-wrap :deep(.re-empty-state h3) {
-  color: var(--dark-text-primary);
+  color: var(--el-text-color-primary);
 }
 
 .graph-wrap :deep(.re-empty-state p) {
-  color: var(--dark-text-secondary);
+  color: var(--el-text-color-secondary);
 }
 
 .graph-error-panel {

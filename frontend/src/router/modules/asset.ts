@@ -135,6 +135,16 @@ export default {
       }
     },
     {
+      path: "/asset/ai-quality",
+      name: "AssetAiQuality",
+      component: () => import("@/views/asset/ai-quality/index.vue"),
+      meta: {
+        title: "AI质控分析",
+        showLink: true,
+        auths: ["asset.quality.ai.view"]
+      }
+    },
+    {
       path: "/asset/queries",
       name: "AssetQueries",
       component: () => import("@/views/query-center/queries/index.vue"),

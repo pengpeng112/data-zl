@@ -2,6 +2,9 @@
   <div class="quality-page">
     <RePageHeader title="数据质量" subtitle="集中查看质量问题、规则库、执行任务、整改状态和质量看板。">
       <template #icon><QualityIcon /></template>
+      <template #actions>
+        <el-button v-perms="'asset.quality.ai.view'" type="primary" plain @click="router.push('/asset/ai-quality')">AI 质控分析</el-button>
+      </template>
     </RePageHeader>
 
     <el-tabs v-model="activeTab" @tab-change="onTabChange">
@@ -667,6 +670,7 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReChart from "@/components/ReChart/index.vue";
 import { computed, ref, reactive, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 import { http } from "@/utils/http";
 import {
@@ -687,6 +691,7 @@ import QualityIcon from "~icons/ri/shield-check-line";
 import WarningIcon from "~icons/ri/alert-line";
 
 const systemNameMap = reactive<Record<string, string>>({});
+const router = useRouter();
 
 async function loadSystemNames() {
   try {

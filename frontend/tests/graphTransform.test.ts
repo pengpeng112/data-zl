@@ -40,48 +40,50 @@ describe("graphTransform", () => {
   });
 
   it("returns node style by graph node type", () => {
-    expect(graphNodeStyle("system").fill).toBe("#0f3a66");
-    expect(graphNodeStyle("schema").fill).toBe("#00a6b8");
+    expect(graphNodeStyle("system").fill).toBe("#f8d7c4");
+    expect(graphNodeStyle("schema").fill).toBe("#dcebc8");
     expect(graphNodeStyle("domain").shape).toBe("ellipse");
-    expect(graphNodeStyle("table").shape).toBe("rect");
+    expect(graphNodeStyle("table").shape).toBe("roundRect");
+    expect(graphNodeStyle("field").shape).toBe("roundRect");
+    expect(graphNodeVisualStyle({ category: "field", object_type: "column" }).fill).toBe("#eef5e8");
   });
   it("highlights core fact table nodes by table role", () => {
     expect(isCoreFactNode({ type: "table", role: "核心事实表" })).toBe(true);
     expect(isCoreFactNode({ table_role: "core_fact" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).fill).toBe("#0f3a66");
-    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).stroke).toBe("#00d5ff");
-    expect(graphNodeVisualStyle({ type: "table", role: "普通表" }).fill).toBe("#475569");
+    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).fill).toBe("#ffe08a");
+    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).stroke).toBe("#d4a017");
+    expect(graphNodeVisualStyle({ type: "table", role: "普通表" }).fill).toBe("#d6e9f8");
   });
   it("highlights dictionary and dimension table nodes by table role", () => {
     expect(isDimensionNode({ type: "table", role: "字典表" })).toBe(true);
     expect(isDimensionNode({ type: "table", role: "维表" })).toBe(true);
     expect(isDimensionNode({ table_role: "dimension" })).toBe(true);
     expect(isDimensionNode({ table_role: "dict" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).fill).toBe("#00a6b8");
-    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).stroke).toBe("#0f3a66");
+    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).fill).toBe("#c9e7f2");
+    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).stroke).toBe("#7cc4d8");
   });
   it("dims excluded table nodes by status or table role", () => {
     expect(isExcludedNode({ type: "table", role: "排除表" })).toBe(true);
     expect(isExcludedNode({ include_status: "excluded" })).toBe(true);
     expect(isExcludedNode({ status: "exclude" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "排除表" }).fill).toBe("#94a3b8");
-    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表", status: "excluded" }).fill).toBe("#94a3b8");
+    expect(graphNodeVisualStyle({ type: "table", role: "排除表" }).fill).toBe("#f1f5f9");
+    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表", status: "excluded" }).fill).toBe("#f1f5f9");
   });
   it("highlights candidate table nodes by status or table role", () => {
     expect(isCandidateNode({ type: "table", role: "候选表" })).toBe(true);
     expect(isCandidateNode({ include_status: "pending" })).toBe(true);
     expect(isCandidateNode({ status: "candidate" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).fill).toBe("#d97706");
-    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).stroke).toBe("#92400e");
-    expect(graphNodeVisualStyle({ type: "table", role: "候选表", status: "excluded" }).fill).toBe("#94a3b8");
+    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).fill).toBe("#fde8cd");
+    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).stroke).toBe("#e8a04c");
+    expect(graphNodeVisualStyle({ type: "table", role: "候选表", status: "excluded" }).fill).toBe("#f1f5f9");
   });
   it("marks D-class deferred relation nodes with dashed purple style", () => {
     expect(isDeferredNode({ type: "table", role: "D类延后关系节点" })).toBe(true);
     expect(isDeferredNode({ status: "待分析" })).toBe(true);
     expect(isDeferredNode({ include_status: "deferred" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).fill).toBe("#7c6aa6");
+    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).fill).toBe("#ece5f5");
     expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).lineDash).toEqual([8, 5]);
-    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点", status: "excluded" }).fill).toBe("#94a3b8");
+    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点", status: "excluded" }).fill).toBe("#f1f5f9");
   });
   it("detects high-confidence relationship edges", () => {
     expect(isHighConfidenceEdge({ confidence: "A" })).toBe(true);
@@ -95,8 +97,8 @@ describe("graphTransform", () => {
     expect(isSamplePassEdge({ validationStatus: "sample_pass" })).toBe(true);
     expect(isSamplePassEdge({ validation_status: "sample_pass" })).toBe(true);
     expect(isSamplePassEdge({ validationStatus: "verified" })).toBe(false);
-    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).stroke).toBe("#00a6b8");
-    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).lineWidth).toBe(3);
+    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).stroke).toBe("#58a05c");
+    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).lineWidth).toBe(2.6);
   });
   it("detects deferred relationship edges", () => {
     expect(isDeferredEdge({ deferred: true })).toBe(true);
@@ -104,7 +106,7 @@ describe("graphTransform", () => {
     expect(isDeferredEdge({ confidence: "D" })).toBe(true);
     expect(isDeferredEdge({ relationType: "candidate" })).toBe(true);
     expect(isDeferredEdge({ confidence: "A" })).toBe(false);
-    expect(graphEdgeStyle({ deferred: true }).stroke).toBe("#7c6aa6");
+    expect(graphEdgeStyle({ deferred: true }).stroke).toBe("#9b7ec8");
     expect(graphEdgeStyle({ deferred: true }).lineDash).toEqual([8, 5]);
   });
   it("matches table search by full name table name Chinese name and context", () => {
@@ -125,10 +127,10 @@ describe("graphTransform", () => {
     expect(matchesTableSearch(node, "费用")).toBe(false);
   });
   it("returns edge style by relation confidence and deferred layer", () => {
-    expect(graphEdgeStyle({ confidence: "A" }).stroke).toBe("#0f3a66");
-    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).stroke).toBe("#00a6b8");
-    expect(graphEdgeStyle({ confidence: "B" }).stroke).toBe("#d97706");
-    expect(graphEdgeStyle({ confidence: "D" }).stroke).toBe("#7c6aa6");
+    expect(graphEdgeStyle({ confidence: "A" }).stroke).toBe("#3f7cac");
+    expect(graphEdgeStyle({ validationStatus: "sample_pass" }).stroke).toBe("#58a05c");
+    expect(graphEdgeStyle({ confidence: "B" }).stroke).toBe("#dd8b2e");
+    expect(graphEdgeStyle({ confidence: "D" }).stroke).toBe("#9b7ec8");
     expect(graphEdgeStyle({ confidence: "D" }).stroke).not.toBe(graphEdgeStyle({ confidence: "A" }).stroke);
     expect(graphEdgeStyle({ confidence: "D" }).lineDash).toEqual([8, 5]);
     expect(graphEdgeStyle({ relationType: "dependency" }).lineDash).toEqual([2, 5]);
@@ -150,7 +152,7 @@ describe("graphTransform", () => {
     const visible = normalizeGraphData(nodes, edges, { groupBy: "schema", showReviewLayer: true });
     expect(visible.edges.map(edge => edge.id).sort()).toEqual(["deferred", "formal"]);
     expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.type).toBe("dashed");
-    expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.color).toBe("#7c6aa6");
+    expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.color).toBe("#9b7ec8");
   });
 
   it("uses canonical system and connection labels for graph groups while keeping physical keys", () => {

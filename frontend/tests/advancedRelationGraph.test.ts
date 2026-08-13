@@ -28,6 +28,13 @@ vi.mock("@antv/g6", () => {
     }
     setOptions() {}
     async render() {}
+    // 渲染后视口适配（与真实 G6 v5 API 对齐）：fitView + 最小缩放兜底
+    async fitView() {}
+    async fitCenter() {}
+    async zoomTo() {}
+    getZoom() {
+      return 1;
+    }
     destroy() {
       this.destroyed = true;
     }

@@ -57,7 +57,7 @@
               :transform="`translate(${node.x}, ${node.y})`"
               @click.stop="emitNode(node.raw)"
             >
-              <rect :width="node.width" :height="node.height" :x="-node.width / 2" :y="-node.height / 2" rx="7" />
+              <rect :width="node.width" :height="node.height" :x="-node.width / 2" :y="-node.height / 2" :rx="Math.min(node.height / 2, 28)" />
               <text class="node-title" text-anchor="middle" y="-4">{{ node.label }}</text>
               <text class="node-meta" text-anchor="middle" y="14">{{ node.meta }}</text>
             </g>
@@ -74,8 +74,9 @@ import type { GraphEdge, GraphNode } from "@/api/asset";
 import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graphNormalize";
 import { transformGraphByMode } from "@/views/asset/graph/graphTransform";
 import { nodeDisplayName, parsePhysicalKey } from "@/views/asset/graph/graphPhysical";
+import { computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
 
-type LayoutMode = "layered" | "grouped" | "radial";
+type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
 interface LayoutNode {
   id: string;
@@ -180,6 +181,10 @@ function compactLabel(value: unknown) {
 
 function nodeMeta(node: any) {
   if (node.isAggregate) return `${node.count} 张表`;
+  if (node.category === "field" || node.object_type === "column") {
+    const keyKind = node.is_primary_key ? "PK" : node.is_relation_key ? "关系键" : "";
+    return [node.data_type, keyKind].filter(Boolean).join(" · ") || "字段";
+  }
   const systemCode = node.system_code || node.systemCode;
   const sourceCode = node.source_code || node.sourceCode || node.source;
   const system = props.systemNames?.[systemCode] || systemCode;
@@ -267,8 +272,16 @@ function edgeClass(edge: any) {
 
 function nodeClass(node: any) {
   const active = isActiveNode(node.id);
+  const kind = node.category === "field" || node.object_type === "column"
+    ? "field"
+    : node.object_type === "view"
+      ? "view"
+      : node.is_aggregate && ["system", "source", "schema"].includes(String(node.category))
+        ? String(node.category)
+        : "table";
   return [
     "graph-node",
+    `node-${kind}`,
     active ? "is-active" : "is-muted",
     node.id === props.centerTable || node.id === props.selectedNodeId ? "is-center" : "",
     node.isAggregate ? "is-aggregate" : ""
@@ -314,7 +327,7 @@ function buildGrouped(nodes: any[], edges: any[]) {
 
 function buildRadial(nodes: any[], edges: any[]) {
   const width = 1100;
-  const height = 720;
+  const height = 760;
   const cx = width / 2;
   const cy = height / 2;
   const positions = new Map<string, { x: number; y: number }>();
@@ -324,7 +337,7 @@ function buildRadial(nodes: any[], edges: any[]) {
   if (centerNode) positions.set(centerNode.id, { x: cx, y: cy });
   outer.forEach((node, index) => {
     const angle = (Math.PI * 2 * index) / Math.max(outer.length, 1) - Math.PI / 2;
-    const radius = centerNode ? 260 : 285;
+    const radius = centerNode ? 300 : 320;
     positions.set(node.id, { x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius });
   });
   return materializeLayout(nodes, edges, positions, [], width, height);
@@ -418,14 +431,16 @@ function buildForce(nodes: any[], edges: any[]) {
 function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { x: number; y: number }>, bands: LayoutBand[], width: number, height: number) {
   const layoutNodes: LayoutNode[] = nodes.map(node => {
     const p = positions.get(node.id) || { x: 80, y: 80 };
+    // 129号：中心节点（辐射图焦点）放大强调
+    const isCenter = Boolean(props.centerTable) && String(node.id) === String(props.centerTable);
     return {
       id: node.id,
       label: compactLabel(node.name || node.nodeName || node.table_name || node.label || node.id),
       meta: nodeMeta(node),
       x: p.x,
       y: p.y,
-      width: node.isAggregate ? 156 : 138,
-      height: node.isAggregate ? 58 : 52,
+      width: isCenter ? 176 : node.isAggregate ? 156 : 138,
+      height: isCenter ? 64 : node.isAggregate ? 58 : 52,
       className: nodeClass(node),
       raw: node
     };
@@ -442,10 +457,11 @@ function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { 
       return {
         id: edge.id,
         path: `M ${s.x} ${s.y} C ${midX + curve} ${s.y}, ${midX - curve} ${t.y}, ${t.x} ${t.y}`,
-        label: edge.label || edge.from_columns || "",
+        label: String(edge.label || edge.from_columns || "").slice(0, 16),
         labelX: midX,
         labelY: midY - 8,
-        showLabel: Boolean(props.selectedNodeId && (edge.source === props.selectedNodeId || edge.target === props.selectedNodeId)),
+        // 129号：辐射模式下显示全部边标签（知识图谱样式）；其他模式仅选中节点相关边
+        showLabel: props.layoutMode === "radial" || Boolean(props.selectedNodeId && (edge.source === props.selectedNodeId || edge.target === props.selectedNodeId)),
         className: edgeClass(edge),
         markerEnd: "url(#arrow-primary)",
         raw: edge
@@ -455,10 +471,19 @@ function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { 
   return { width, height, bands, nodes: layoutNodes, edges: layoutEdges };
 }
 
+/**
+ * 分层树状布局：业务系统 → 数据连接 → Schema → 表 逐级分层（与 G6 版共用算法）。
+ */
+function buildHierarchy(nodes: any[], edges: any[]) {
+  const { positions, width, height } = computeHierarchyPositions(nodes, edges, { xGap: 200, yGap: 150 });
+  return materializeLayout(nodes, edges, positions, [], width, height);
+}
+
 const layout = computed(() => {
   const data = aggregateData(normalized.value.nodes, normalized.value.edges);
   if (props.layoutMode === "grouped") return buildGrouped(data.nodes, data.edges);
   if (props.layoutMode === "radial") return buildRadial(data.nodes, data.edges);
+  if (props.layoutMode === "hierarchy") return buildHierarchy(data.nodes, data.edges);
   // 默认使用 Neo4j 风格力导向布局（节点自然散布，非网格）
   return buildForce(data.nodes, data.edges);
 });
@@ -488,7 +513,7 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   overflow: hidden;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
-  background: #f8fafc;
+  background: #ffffff;
 }
 
 .graph-viewport {
@@ -538,10 +563,10 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   border-top: 2px solid var(--re-text-secondary);
 }
 
-.edge-line.primary { border-color: #0f3a66; }
-.edge-line.pass { border-color: #00a6b8; }
-.edge-line.orange { border-color: #d97706; }
-.edge-line.review { border-color: #7c6aa6; }
+.edge-line.primary { border-color: #3f7cac; }
+.edge-line.pass { border-color: #58a05c; }
+.edge-line.orange { border-color: #dd8b2e; }
+.edge-line.review { border-color: #9b7ec8; }
 .edge-line.muted { border-color: #94a3b8; }
 .edge-line.dashed { border-top-style: dashed; }
 .edge-line.dotted { border-top-style: dotted; }
@@ -549,9 +574,9 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 .node-dot {
   width: 11px;
   height: 11px;
-  border: 2px solid #00d5ff;
+  border: 2px solid #d4a017;
   border-radius: 3px;
-  background: #0f3a66;
+  background: #ffe08a;
   transform: rotate(45deg);
 }
 
@@ -568,7 +593,7 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 
 .graph-edge {
   fill: none;
-  stroke: #0f3a66;
+  stroke: #3f7cac;
   stroke-width: 2.2;
   opacity: 0.82;
   cursor: pointer;
@@ -581,9 +606,9 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   cursor: pointer;
 }
 
-.graph-edge.is-pass { stroke: #00a6b8; stroke-width: 3; }
-.graph-edge.is-bounded { stroke: #d97706; stroke-dasharray: 8 5; }
-.graph-edge.is-review { stroke: #7c6aa6; stroke-dasharray: 7 6; }
+.graph-edge.is-pass { stroke: #58a05c; stroke-width: 2.6; }
+.graph-edge.is-bounded { stroke: #dd8b2e; stroke-dasharray: 8 5; }
+.graph-edge.is-review { stroke: #9b7ec8; stroke-dasharray: 7 6; }
 .graph-edge.is-dependency { stroke: #94a3b8; stroke-dasharray: 2 5; }
 .graph-edge.is-muted { opacity: 0.12; }
 .graph-edge:hover { opacity: 1; stroke-width: 4; }
@@ -602,22 +627,30 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 }
 
 .graph-node rect {
-  fill: #ffffff;
-  stroke: #0f3a66;
+  fill: #d6e9f8;
+  stroke: #8fbfe6;
   stroke-width: 1.6;
   filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.12));
 }
 
+.graph-node.node-system rect { fill: #f8d7c4; stroke: #e0a075; }
+.graph-node.node-source rect { fill: #fdf0b8; stroke: #e3c85f; }
+.graph-node.node-schema rect { fill: #dcebc8; stroke: #a3c47e; }
+.graph-node.node-view rect { fill: #e6ddf5; stroke: #b6a3dd; }
+.graph-node.node-field rect { fill: #eef5e8; stroke: #a8c58d; }
+
 .graph-node.is-center rect {
-  stroke: #00d5ff;
+  stroke: #f0b429;
   stroke-width: 3;
-  fill: #ecfeff;
+  fill: #111827;
 }
 
+.graph-node.is-center .node-title { fill: #ffffff; }
+.graph-node.is-center .node-meta { fill: #e5e7eb; }
+
 .graph-node.is-aggregate rect {
-  fill: #eff6ff;
-  stroke: var(--re-text-secondary);
-  stroke-dasharray: 5 4;
+  fill: #d3eef2;
+  stroke: #86ccd6;
 }
 
 .graph-node.is-muted {
@@ -625,7 +658,7 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 }
 
 .graph-node:hover rect {
-  stroke: #00a6b8;
+  stroke: #3f7cac;
   stroke-width: 3;
 }
 

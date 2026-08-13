@@ -31,20 +31,22 @@ export interface NormalizedGraph {
 }
 
 const GRAPH_COLOR_NEUTRAL = "#475569";
-const GROUP_COLORS = ["#0f3a66", "#00a6b8", GRAPH_COLOR_NEUTRAL, "#d97706", "#7c6aa6", "#1f766e", "#334155", "#b45309"];
+const GROUP_COLORS = ["#e0a075", "#7cc4d8", GRAPH_COLOR_NEUTRAL, "#e8a04c", "#b9a3d4", "#5fa8a0", "#8fbfe6", "#d99a3d"];
 
 const STATUS_COLORS: Record<string, string> = {
-  verified: "#00a6b8",
-  sample_pass: "#00a6b8",
-  manual_reviewed: "#0f3a66",
-  bounded: "#d97706",
+  verified: "#58a05c",
+  sample_pass: "#58a05c",
+  manual_reviewed: "#3f7cac",
+  bounded: "#dd8b2e",
   needs_split: "#ef4444",
   rejected: "#991b1b",
   not_tested: "#94a3b8"
 };
 
 function displayName(node: GraphNode) {
-  return nodeDisplayName(node);
+  return node.category === "field" || node.object_type === "column"
+    ? String(node.column_name_cn || node.column_name || node.label || node.id)
+    : nodeDisplayName(node);
 }
 
 function groupName(node: GraphNode, groupBy: GraphGroupBy, options: NormalizedGraphOptions) {
@@ -86,12 +88,12 @@ function edgeLineType(edge: GraphEdge) {
 
 function edgeColor(edge: GraphEdge) {
   const confidence = (edge.confidence || "").toUpperCase();
-  if (edge.is_deferred || confidence === "D") return "#7c6aa6";
-  if (edge.relation_type === "candidate") return "#7c6aa6";
+  if (edge.is_deferred || confidence === "D") return "#9b7ec8";
+  if (edge.relation_type === "candidate") return "#9b7ec8";
   if (edge.relation_type === "dependency") return "#94a3b8";
   if (edge.validation_status) return STATUS_COLORS[edge.validation_status] || GRAPH_COLOR_NEUTRAL;
-  if (confidence === "A") return "#0f3a66";
-  if (confidence === "B" || confidence === "C") return "#d97706";
+  if (confidence === "A") return "#3f7cac";
+  if (confidence === "B" || confidence === "C") return "#dd8b2e";
   return GRAPH_COLOR_NEUTRAL;
 }
 
@@ -213,7 +215,7 @@ export function normalizeGraphData(
         opacity: dimmed ? 0.1 : pathSelected ? 1 : edge.relation_type === "dependency" ? 0.46 : 0.86,
         curveness: 0.18
       },
-      label: { show: selected, formatter: edge.label || edge.from_columns || "", color: pathSelected ? "#0f3a66" : "#0f172a", fontSize: 11, fontWeight: pathSelected ? 700 : 500 },
+      label: { show: selected, formatter: edge.label || edge.from_columns || "", color: pathSelected ? "#3f7cac" : "#0f172a", fontSize: 11, fontWeight: pathSelected ? 700 : 500 },
       emphasis: { lineStyle: { width: edgeWidth(edge) + 2, opacity: 1 } }
     };
   });

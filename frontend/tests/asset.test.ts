@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { GraphOverviewResponse, GraphNode } from "@/api/asset";
 
 describe("Asset API types", () => {
   it("SummaryData should match expected shape", () => {
@@ -18,6 +19,32 @@ describe("Asset API types", () => {
     };
     expect(edge.relation_type).toBeDefined();
     expect(["formal", "candidate", "dependency"]).toContain(edge.relation_type);
+  });
+
+  it("field overview contract carries table parent and column metadata", () => {
+    const field: GraphNode = {
+      id: "DATA_CENTER|ods_8_216||HIS|PAT_VISIT|PATIENT_ID",
+      label: "患者ID",
+      category: "field",
+      object_type: "column",
+      column_name: "PATIENT_ID",
+      column_name_cn: "患者ID",
+      data_type: "VARCHAR2",
+      is_primary_key: false,
+      is_relation_key: true
+    };
+    const response: GraphOverviewResponse = {
+      level: "field",
+      next_level: null,
+      selected_path: { parent_physical_key: "DATA_CENTER|ods_8_216||HIS|PAT_VISIT" },
+      data: {
+        nodes: [field],
+        edges: [{ id: "hierarchy:1", source: "table", target: field.id, label: "字段" }]
+      }
+    };
+    expect(response.level).toBe("field");
+    expect(response.next_level).toBeNull();
+    expect(response.data.nodes[0].object_type).toBe("column");
   });
 
   it("QualityFinding severity values should be valid", () => {
