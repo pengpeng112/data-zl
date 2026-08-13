@@ -118,6 +118,7 @@ def seed_minimal_assets(db=None) -> dict:
         db = SessionLocal()
     try:
         from sqlalchemy import select
+        from app.services.relation_identity import populate_endpoint_fields
 
         if not db.scalar(select(AssetSystem).where(AssetSystem.system_code == "HIS")):
             db.add(AssetSystem(system_code="HIS", system_name_cn="HIS", system_type="HIS", status="active"))
@@ -169,7 +170,9 @@ def seed_minimal_assets(db=None) -> dict:
                 row = AssetTable(
                     schema_name=schema,
                     table_name=table,
-                    namespace_name=schema,
+                    # Oracle uses schema/owner here; namespace is reserved for
+                    # sources that have a separate database/catalog layer.
+                    namespace_name=None,
                     source_code=source,
                     system_code=system,
                     column_count=2,
@@ -202,7 +205,7 @@ def seed_minimal_assets(db=None) -> dict:
                     AssetColumn(
                         system_code="HIS",
                         source_code="his_source_10_10_10_15",
-                        namespace_name="HIS",
+                        namespace_name=None,
                         schema_name="HIS",
                         table_name=table,
                         column_id=ordinal,
@@ -225,7 +228,7 @@ def seed_minimal_assets(db=None) -> dict:
                 AssetColumn(
                     system_code="DATA_CENTER",
                     source_code="ods_8_216",
-                    namespace_name="ODS",
+                    namespace_name=None,
                     schema_name="ODS",
                     table_name="TEST_ASSET",
                     column_id=1,
@@ -236,10 +239,15 @@ def seed_minimal_assets(db=None) -> dict:
                 )
             )
 
+        # Relation endpoint resolution depends on the physical table rows being
+        # visible in this transaction. Flush first, then populate both new and
+        # pre-existing deterministic seed relations so tests never depend on a
+        # previous migration/backfill run.
+        db.flush()
         rel = db.scalar(select(AssetRelation).where(AssetRelation.rel_id == 900001))
         if not rel:
             db.add(
-                AssetRelation(
+                rel := AssetRelation(
                     rel_id=900001,
                     domain="test",
                     from_table="HIS.PAT_VISIT",
@@ -253,10 +261,11 @@ def seed_minimal_assets(db=None) -> dict:
                     validation_status="verified",
                 )
             )
+        populate_endpoint_fields(db, rel)
         rel2 = db.scalar(select(AssetRelation).where(AssetRelation.rel_id == 900002))
         if not rel2:
             db.add(
-                AssetRelation(
+                rel2 := AssetRelation(
                     rel_id=900002,
                     domain="test",
                     from_table="HIS.LAB_TEST_MASTER",
@@ -270,6 +279,7 @@ def seed_minimal_assets(db=None) -> dict:
                     validation_status="verified",
                 )
             )
+        populate_endpoint_fields(db, rel2)
         db.commit()
         return {"ok": True}
     finally:

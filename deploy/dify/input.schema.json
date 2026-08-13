@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quality-analysis-input/v1",
+  "type": "object",
+  "required": ["schema_version", "request_id", "task_type", "prompt_version", "payload_json", "input_digest"],
+  "properties": {
+    "schema_version": {"const": "quality-analysis-input/v1"},
+    "request_id": {"type": "string", "maxLength": 100},
+    "task_type": {"enum": ["finding", "finding_batch", "run_summary"]},
+    "prompt_version": {"type": "string", "maxLength": 100},
+    "payload_json": {"type": "string", "maxLength": 65536},
+    "input_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

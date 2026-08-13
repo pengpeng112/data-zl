@@ -122,3 +122,7 @@ backend/identity_test.db
 backend/var/*.py
 backend/var/*.txt
 backend/var/*.sh
+
+# 截图/网络抓包/临时二进制
+开发起步包/截图/
+*.har

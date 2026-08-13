@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from app.services.quality_rule_engine import validate_sql_safety
 
 
 def _get_or_create_rule(client: TestClient, rule_code: str, **extra) -> dict:
@@ -226,3 +227,65 @@ def test_finding_recheck_invalid_status(client: TestClient):
         f"/api/v1/quality/findings/{finding_id}/recheck?status=invalid_xyz"
     )
     assert resp.status_code == 400
+
+
+def test_zero_column_rule_only_reports_deterministic_count_mismatch(db_session):
+    from app.api.v1.quality import _run_rule_table_zero_columns
+    from app.models.asset import AssetColumn, AssetTable
+
+    pending = AssetTable(
+        system_code="TEST_QC",
+        source_code="test_qc_source",
+        namespace_name="TEST_QC",
+        schema_name="TEST_QC",
+        table_name="PENDING_METADATA",
+        column_count=None,
+    )
+    unknown_zero = AssetTable(
+        system_code="TEST_QC",
+        source_code="test_qc_source",
+        namespace_name="TEST_QC",
+        schema_name="TEST_QC",
+        table_name="UNKNOWN_ZERO",
+        column_count=0,
+    )
+    mismatch = AssetTable(
+        system_code="TEST_QC",
+        source_code="test_qc_source",
+        namespace_name="TEST_QC",
+        schema_name="TEST_QC",
+        table_name="COUNT_MISMATCH",
+        column_count=2,
+    )
+    db_session.add_all([pending, unknown_zero, mismatch])
+    db_session.add(
+        AssetColumn(
+            system_code="TEST_QC",
+            source_code="test_qc_source",
+            namespace_name="TEST_QC",
+            schema_name="TEST_QC",
+            table_name="COUNT_MISMATCH",
+            column_id=1,
+            column_name="ID",
+        )
+    )
+    db_session.flush()
+
+    findings = _run_rule_table_zero_columns(db_session)
+    test_findings = [item for item in findings if item.system_code == "TEST_QC"]
+
+    assert [item.table_name for item in test_findings] == ["COUNT_MISMATCH"]
+    assert test_findings[0].detail == {
+        "classification": "column_count_mismatch",
+        "declared_column_count": 2,
+        "actual_column_count": 1,
+    }
+
+
+def test_readonly_sql_safety_ignores_literals_but_rejects_real_extra_statement():
+    safe = validate_sql_safety("SELECT '说明; DELETE仅为文本' AS note FROM dual;", db_type="oracle")
+    assert safe["valid"] is True
+    unsafe = validate_sql_safety("SELECT 1 FROM dual; DELETE FROM asset.x", db_type="oracle")
+    assert unsafe["valid"] is False
+    assert "禁止多语句" in unsafe["errors"]
+    assert "禁止关键字: DELETE" in unsafe["errors"]

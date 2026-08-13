@@ -485,6 +485,65 @@ def test_server_side_overview_and_cascade_contract(seeded_client: TestClient) ->
     values = {item["value"] for item in options.json()["data"]["items"]}
     assert "his_source_10_10_10_15" in values
 
+    objects = seeded_client.get(
+        "/api/v1/graph/overview"
+        "?level=object&system_code=HIS"
+        "&source_code=his_source_10_10_10_15&schema=HIS&limit=80"
+    )
+    assert objects.status_code == 200
+    object_data = objects.json()["data"]
+    assert object_data["next_level"] == "field"
+    assert all(not node["is_aggregate"] for node in object_data["data"]["nodes"])
+    assert all(edge["relation_type"] != "hierarchy" for edge in object_data["data"]["edges"])
+    assert any(edge["from_columns"] == "PATIENT_ID" for edge in object_data["data"]["edges"])
+
+
+def test_field_overview_uses_physical_source_and_marks_keys(seeded_client: TestClient) -> None:
+    db = SessionLocal()
+    try:
+        table = db.scalar(select(AssetTable).where(
+            AssetTable.system_code == "HIS",
+            AssetTable.source_code == "his_source_10_10_10_15",
+            AssetTable.schema_name == "HIS",
+            AssetTable.table_name == "PAT_VISIT",
+        ))
+        assert table is not None
+        table.pk = "PATIENT_ID+VISIT_ID"
+        db.commit()
+    finally:
+        db.close()
+
+    resp = seeded_client.get(
+        "/api/v1/graph/overview"
+        "?level=field"
+        "&parent_physical_key=HIS|his_source_10_10_10_15||HIS|PAT_VISIT"
+        "&limit=80"
+    )
+    assert resp.status_code == 200
+    body = resp.json()["data"]
+    assert body["level"] == "field"
+    assert body["next_level"] is None
+    assert body["selected_path"]["object"] == "PAT_VISIT"
+
+    nodes = body["data"]["nodes"]
+    center = next(node for node in nodes if node["category"] == "table")
+    fields = [node for node in nodes if node["category"] == "field"]
+    assert center["physical_key"].endswith("|HIS|PAT_VISIT")
+    assert {node["column_name"] for node in fields} >= {"PATIENT_ID", "VISIT_ID"}
+    assert all(node["system_code"] == "HIS" for node in fields)
+    assert all(node["source_code"] == "his_source_10_10_10_15" for node in fields)
+    assert all(node["object_type"] == "column" for node in fields)
+    assert all(node["is_primary_key"] for node in fields if node["column_name"] in {"PATIENT_ID", "VISIT_ID"})
+    patient_id = next(node for node in fields if node["column_name"] == "PATIENT_ID")
+    assert patient_id["is_relation_key"] is True
+    assert body["data"]["meta"]["center_physical_key"] == center["physical_key"]
+    assert len(body["data"]["edges"]) == len(fields)
+
+
+def test_field_overview_requires_complete_table_physical_key(seeded_client: TestClient) -> None:
+    resp = seeded_client.get("/api/v1/graph/overview?level=field")
+    assert resp.status_code == 422
+
 
 def test_table_search_returns_physical_key_and_disambiguation(seeded_client: TestClient) -> None:
     resp = seeded_client.get("/api/v1/graph/tables/search?q=PAT_VISIT&limit=30")

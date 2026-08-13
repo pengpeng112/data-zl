@@ -1,0 +1,8 @@
+{
+  "schema_version": "quality-analysis-input/v1",
+  "request_id": "AQJ-synthetic-001",
+  "task_type": "finding",
+  "prompt_version": "quality-control-v1",
+  "payload_json": "{\"error_cnt\":12,\"error_rate\":0.12,\"rule_code\":\"TABLE_NO_CN_NAME\",\"table_name\":\"HIS.EXAM_MASTER\"}",
+  "input_digest": "e4865d490de35a877842ca1437cee4cf8c28e0d9e3ae0a55a0a275640b745d7c"
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quality-analysis-output/v1",
+  "type": "object",
+  "required": ["schema_version", "request_id", "input_digest", "summary", "risk_level", "root_causes", "recommendations", "false_positive", "follow_up_checks", "limitations"],
+  "properties": {
+    "schema_version": {"const": "quality-analysis-output/v1"},
+    "request_id": {"type": "string", "maxLength": 100},
+    "input_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "risk_level": {"enum": ["critical", "high", "medium", "low", "unknown"]},
+    "root_causes": {
+      "type": "array", "maxItems": 20,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["title", "reason", "confidence", "evidence_finding_ids"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 300},
+          "reason": {"type": "string", "minLength": 1, "maxLength": 2000},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "evidence_finding_ids": {"type": "array", "maxItems": 50, "items": {"type": "integer"}}
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array", "maxItems": 50,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["title", "action_type", "priority", "reason", "confidence", "target_refs"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 300},
+          "action_type": {"enum": ["rule_adjustment", "data_remediation", "metadata_fix", "manual_review", "monitor"]},
+          "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+          "reason": {"type": "string", "minLength": 1, "maxLength": 2000},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "target_refs": {"type": "array", "maxItems": 50, "items": {"type": "string"}}
+        }
+      }
+    },
+    "false_positive": {
+      "type": "object", "additionalProperties": false,
+      "required": ["possible", "reason"],
+      "properties": {"possible": {"type": "boolean"}, "reason": {"type": "string", "maxLength": 2000}}
+    },
+    "follow_up_checks": {
+      "type": "array", "maxItems": 50,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["description", "sql_draft"],
+        "properties": {"description": {"type": "string", "minLength": 1, "maxLength": 2000}, "sql_draft": {"type": "null"}}
+      }
+    },
+    "limitations": {"type": "array", "maxItems": 50, "items": {"type": "string", "maxLength": 2000}}
+  },
+  "additionalProperties": false
+}

@@ -130,9 +130,9 @@ def encode_jhemr_password(user_id: str, plain_pwd: str, date_str: str = None) ->
 
 | 内容 | 路径 |
 |---|---|
-| 前序交接（已脱敏） | `开发起步包/105_JHEMR密码加密逆向分析与身份同步灰度交接说明.md` |
-| 执行计划 | `开发起步包/103_HIS人员向无纸化与电子病历夜间同步执行计划.md` |
-| 独立复核 | `开发起步包/104_HIS人员夜间同步CDMS与JHEMR方案独立复核报告.md` |
+| 前序交接（已脱敏，历史归档） | `开发起步包/_archive/105_JHEMR密码加密逆向分析与身份同步灰度交接说明.md` |
+| 历史执行计划 | `开发起步包/_archive/103_HIS人员向无纸化与电子病历夜间同步执行计划.md` |
+| 历史独立复核 | `开发起步包/_archive/104_HIS人员夜间同步CDMS与JHEMR方案独立复核报告.md` |
 | JHEMR 适配器 | `backend/app/services/jhemr_identity_adapter.py` |
 | 身份同步编排 | `backend/app/services/identity_sync_orchestrator.py` |
 | 待办总入口 | `开发起步包/55_系统未完成事项统一执行计划.md` |

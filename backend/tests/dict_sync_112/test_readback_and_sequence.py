@@ -14,46 +14,20 @@ sys.path.insert(0, r"{BACKEND_DIR}")
 
 from fastapi import HTTPException
 from app.services.medical_code_push import (
-    _resolve_serial_from_locked_max,
     validate_sequence_identifier,
     build_readback_select,
     readback_actions_on_conn,
     _whitelisted_serial_sequence,
     _resolve_serial_from_whitelisted_sequence,
 )
-
-
-class _LockedMaxCursor:
-    def __init__(self):
-        self.sql = []
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_args):
-        return False
-
-    def execute(self, sql, params=None):
-        self.sql.append((sql, params))
-
-    def fetchone(self):
-        return (42,)
-
-
-class _LockedMaxConn:
-    def __init__(self):
-        self.cur = _LockedMaxCursor()
-
-    def cursor(self):
-        return self.cur
-
-
-def test_locked_max_serial_uses_table_lock_before_max():
-    conn = _LockedMaxConn()
-    assert _resolve_serial_from_locked_max(conn, "postgresql") == 42
-    assert conn.cur.sql[0][0] == "LOCK TABLE jhemr.jhdict_icd_vs_clinic IN EXCLUSIVE MODE"
-    assert "MAX(serial_no)" in conn.cur.sql[1][0]
 from app.core.config import settings
+
+# There is intentionally no MAX+1 fallback or runtime strategy switch. Missing
+# sequence configuration must remain fail-closed.
+import app.services.medical_code_push as medical_code_push
+
+assert not hasattr(medical_code_push, "_resolve_serial_from_locked_max")
+assert not hasattr(settings, "jhemr_serial_strategy")
 
 # ---- sequence identifier whitelist ----
 assert validate_sequence_identifier("jhemr.serial_seq") == "jhemr.serial_seq"
