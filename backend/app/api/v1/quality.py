@@ -206,6 +206,11 @@ def _run_rule_table_no_domain(db: Session) -> list[QualityFinding]:
             rule_code="TABLE_NO_DOMAIN",
             target_type="table",
             target_ref=f"{r.schema_name}.{r.table_name}" if r.schema_name else (r.table_name or "?"),
+            system_code=r.system_code,
+            source_code=r.source_code,
+            namespace_name=r.namespace_name,
+            schema_name=r.schema_name,
+            table_name=r.table_name,
             severity="minor",
             metric_value="domain=empty",
         )
@@ -224,16 +229,30 @@ def _run_rule_col_null_comment(db: Session) -> list[QualityFinding]:
         )
     ).all()
 
-    group: dict[str, dict] = {}
+    group: dict[tuple[str, str, str, str, str], dict] = {}
     for c in all_cols:
-        key = f"{c.schema_name}.{c.table_name}"
+        key = (
+            c.system_code or "",
+            c.source_code or "",
+            c.namespace_name or "",
+            c.schema_name or "",
+            c.table_name or "",
+        )
         if key not in group:
-            group[key] = {"schema": c.schema_name, "table": c.table_name, "total": 0, "nulls": 0}
+            group[key] = {
+                "system": c.system_code,
+                "source": c.source_code,
+                "namespace": c.namespace_name,
+                "schema": c.schema_name,
+                "table": c.table_name,
+                "total": 0,
+                "nulls": 0,
+            }
         group[key]["total"] += 1
         if not c.comment:
             group[key]["nulls"] += 1
 
-    for key, info in group.items():
+    for _key, info in group.items():
         if info["total"] > 0:
             null_rate = info["nulls"] / info["total"]
             if null_rate > (1 - threshold):
@@ -241,7 +260,12 @@ def _run_rule_col_null_comment(db: Session) -> list[QualityFinding]:
                     QualityFinding(
                         rule_code="COL_NULL_COMMENT",
                         target_type="column",
-                        target_ref=key,
+                        target_ref=f"{info['schema']}.{info['table']}",
+                        system_code=info["system"],
+                        source_code=info["source"],
+                        namespace_name=info["namespace"],
+                        schema_name=info["schema"],
+                        table_name=info["table"],
                         severity="minor",
                         metric_value=f"null_comment_rate={null_rate:.2%} ({info['nulls']}/{info['total']})",
                         detail={"total_columns": info["total"], "null_comments": info["nulls"], "ratio": round(null_rate, 4)},
@@ -290,21 +314,79 @@ def _run_rule_candidate_not_reviewed(db: Session) -> list[QualityFinding]:
 
 
 def _run_rule_table_zero_columns(db: Session) -> list[QualityFinding]:
-    rows = db.scalars(
-        select(AssetTable).where(
-            (AssetTable.column_count.is_(None)) | (AssetTable.column_count == 0)
+    """Report deterministic declared/actual column-count mismatches only.
+
+    A NULL count, or zero with no collected column rows, cannot prove that a
+    physical table truly has zero columns. Those states remain metadata
+    collection gaps and must not be emitted as false "zero-column" findings.
+    """
+    rows = db.scalars(select(AssetTable).where(AssetTable.column_count.isnot(None))).all()
+    count_rows = db.execute(
+        select(
+            AssetColumn.system_code,
+            AssetColumn.source_code,
+            AssetColumn.namespace_name,
+            AssetColumn.schema_name,
+            AssetColumn.table_name,
+            func.count(AssetColumn.id),
+        ).group_by(
+            AssetColumn.system_code,
+            AssetColumn.source_code,
+            AssetColumn.namespace_name,
+            AssetColumn.schema_name,
+            AssetColumn.table_name,
         )
     ).all()
-    return [
-        QualityFinding(
-            rule_code="TABLE_ZERO_COLUMNS",
-            target_type="table",
-            target_ref=f"{r.schema_name}.{r.table_name}" if r.schema_name else (r.table_name or "?"),
-            severity="major",
-            metric_value=f"column_count={r.column_count}",
+    actual_by_physical = {
+        (
+            system_code or "",
+            source_code or "",
+            namespace_name or "",
+            schema_name or "",
+            table_name or "",
+        ): int(actual_count or 0)
+        for system_code, source_code, namespace_name, schema_name, table_name, actual_count in count_rows
+    }
+
+    findings: list[QualityFinding] = []
+    for row in rows:
+        key = (
+            row.system_code or "",
+            row.source_code or "",
+            row.namespace_name or "",
+            row.schema_name or "",
+            row.table_name or "",
         )
-        for r in rows
-    ]
+        declared = int(row.column_count or 0)
+        actual = actual_by_physical.get(key, 0)
+        if declared == actual:
+            continue
+        findings.append(
+            QualityFinding(
+                rule_code="TABLE_ZERO_COLUMNS",
+                target_type="table",
+                target_ref=(
+                    f"{row.schema_name}.{row.table_name}"
+                    if row.schema_name
+                    else (row.table_name or "?")
+                ),
+                system_code=row.system_code,
+                source_code=row.source_code,
+                namespace_name=row.namespace_name,
+                schema_name=row.schema_name,
+                table_name=row.table_name,
+                severity="major" if declared == 0 or actual == 0 else "minor",
+                metric_value=f"declared={declared}, actual={actual}",
+                total_cnt=actual,
+                error_cnt=abs(declared - actual),
+                detail={
+                    "classification": "column_count_mismatch",
+                    "declared_column_count": declared,
+                    "actual_column_count": actual,
+                },
+            )
+        )
+    return findings
 
 
 def _run_rule_table_no_cn_name(db: Session) -> list[QualityFinding]:
@@ -355,6 +437,8 @@ def _run_rule_source_connectivity(db: Session) -> list[QualityFinding]:
                 rule_code="SOURCE_CONNECTIVITY",
                 target_type="source",
                 target_ref=s.source_code,
+                system_code=s.system_code,
+                source_code=s.source_code,
                 severity="major",
                 metric_value=f"status={s.last_check_status}",
             ))
@@ -371,6 +455,8 @@ def _run_rule_source_metadata_stale(db: Session) -> list[QualityFinding]:
                 rule_code="SOURCE_METADATA_STALE",
                 target_type="source",
                 target_ref=s.source_code,
+                system_code=s.system_code,
+                source_code=s.source_code,
                 severity="minor",
                 metric_value="never_checked",
             ))

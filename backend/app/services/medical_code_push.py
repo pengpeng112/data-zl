@@ -1033,28 +1033,6 @@ def _whitelisted_serial_sequence() -> str | None:
     return validate_sequence_identifier(raw)
 
 
-def _resolve_serial_from_locked_max(conn: Any, dialect: str) -> int:
-    """Allocate max(serial_no)+1 while holding a target-table transaction lock.
-
-    This strategy is opt-in for the deployment where the operator confirmed
-    this platform is the sole writer. The lock still protects against two
-    platform workers allocating the same value. Commit/rollback is owned by
-    the caller, so allocation and insert remain one transaction.
-    """
-    if dialect != "postgresql":
-        raise HTTPException(status_code=400, detail="locked max+1 is supported only for JHEMR/Vastbase")
-    with conn.cursor() as cur:
-        cur.execute("LOCK TABLE jhemr.jhdict_icd_vs_clinic IN EXCLUSIVE MODE")
-        cur.execute(
-            "SELECT COALESCE(MAX(serial_no), 0) + 1 "
-            "FROM jhemr.jhdict_icd_vs_clinic"
-        )
-        row = cur.fetchone()
-    if not row or row[0] is None:
-        raise HTTPException(status_code=500, detail="failed to allocate JHEMR serial_no")
-    return int(row[0])
-
-
 def _open_write_connection(source: AssetDataSource):
     """Open ONE write connection to the target; caller owns commit/rollback/close.
 

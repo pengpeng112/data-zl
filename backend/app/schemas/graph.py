@@ -43,6 +43,12 @@ class GraphNode(BaseModel):
     child_count: int | None = None
     path: str | None = None
     is_aggregate: bool = False
+    column_name: str | None = None
+    column_name_cn: str | None = None
+    data_type: str | None = None
+    nullable: str | None = None
+    is_primary_key: bool = False
+    is_relation_key: bool = False
 
 
 class GraphFieldMapping(BaseModel):

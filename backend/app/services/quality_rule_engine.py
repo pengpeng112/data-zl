@@ -1,8 +1,10 @@
 """质控规则执行引擎——分发 metadata_only/sql_template 规则"""
 
 import re
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from ..models.asset import AssetTable
 from ..models.quality import QualityFinding, QualityRule
 
 FORBIDDEN_SQL = {
@@ -12,14 +14,22 @@ FORBIDDEN_SQL = {
 BIG_TABLES = {"HIS.LAB_RESULT", "INP_BILL_DETAIL", "ORDERS", "HIS.MEDREC"}
 
 
+def _sql_code_only(sql: str) -> str:
+    """Remove comments and string contents before token/semicolon checks."""
+    without_comments = re.sub(r"/\*.*?\*/", " ", sql or "", flags=re.S)
+    without_comments = re.sub(r"--[^\r\n]*", " ", without_comments)
+    return re.sub(r"'(?:''|[^'])*'", "''", without_comments)
+
+
 def validate_sql_safety(sql: str, db_type: str = "oracle") -> dict:
     """校验 SQL 是否只读安全，返回 {valid: bool, errors: [str], warnings: [str]}"""
     errors = []
     warnings = []
-    upper = sql.upper().strip()
+    code = _sql_code_only(sql)
+    upper = code.upper().strip()
 
     # 检查多语句
-    if ";" in sql.rstrip(";"):
+    if ";" in code.rstrip().rstrip(";"):
         errors.append("禁止多语句")
 
     # 检查禁止关键字
@@ -76,6 +86,19 @@ def run_sql_rule(rule: QualityRule, db: Session) -> list[QualityFinding]:
     if result.get("error_cnt", 0) <= 0:
         return []
 
+    table_stmt = select(AssetTable).where(AssetTable.table_name == rule.target_table)
+    if rule.system_code:
+        table_stmt = table_stmt.where(AssetTable.system_code == rule.system_code)
+    if rule.source_code:
+        table_stmt = table_stmt.where(AssetTable.source_code == rule.source_code)
+    if rule.namespace_name:
+        table_stmt = table_stmt.where(or_(
+            AssetTable.namespace_name == rule.namespace_name,
+            AssetTable.schema_name == rule.namespace_name,
+        ))
+    table_matches = list(db.scalars(table_stmt).all()) if rule.target_table else []
+    physical = table_matches[0] if len(table_matches) == 1 else None
+
     return [
         QualityFinding(
             rule_code=rule.rule_code,
@@ -83,8 +106,9 @@ def run_sql_rule(rule: QualityRule, db: Session) -> list[QualityFinding]:
             target_ref=f"{rule.namespace_name or ''}.{rule.target_table or ''}.{rule.target_field or ''}",
             system_code=rule.system_code,
             source_code=rule.source_code,
-            namespace_name=rule.namespace_name,
-            table_name=rule.target_table,
+            namespace_name=physical.namespace_name if physical else None,
+            schema_name=physical.schema_name if physical else rule.namespace_name,
+            table_name=physical.table_name if physical else rule.target_table,
             column_name=rule.target_field,
             severity=rule.error_level or "minor",
             status="open",

@@ -37,7 +37,6 @@ from .medical_code_push import (
     _load_platform_rows,
     _open_write_connection,
     _resolve_serial_from_whitelisted_sequence,
-    _resolve_serial_from_locked_max,
     _run_write_on_conn,
     _whitelisted_serial_sequence,
     build_his_diagnosis_insert,
@@ -280,16 +279,15 @@ def _run_target_transaction(
         sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
         if target_table == "jhemr.jhdict_icd_vs_clinic" and params.get("serial_no") is None:
             seq = _whitelisted_serial_sequence()
-            strategy = (settings.jhemr_serial_strategy or "disabled").strip().lower()
-            if seq:
-                params["serial_no"] = _resolve_serial_from_whitelisted_sequence(conn, dialect, seq)
-            elif strategy == "max_plus_one_locked":
-                params["serial_no"] = _resolve_serial_from_locked_max(conn, dialect)
-            else:
+            if not seq:
                 raise HTTPException(
                     status_code=400,
-                    detail="jhemr.jhdict_icd_vs_clinic needs serial_no; no approved allocator configured",
+                    detail=(
+                        "jhemr.jhdict_icd_vs_clinic needs serial_no; "
+                        "no DBA-whitelisted sequence is configured"
+                    ),
                 )
+            params["serial_no"] = _resolve_serial_from_whitelisted_sequence(conn, dialect, seq)
             sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
         row_counts[act.get("action_id") or act.get("item_code")] = _run_write_on_conn(conn, dialect, sql, params)
 

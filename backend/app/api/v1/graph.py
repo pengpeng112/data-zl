@@ -1212,9 +1212,179 @@ def _overview_node(
     )
 
 
+def _field_node_id(table_physical_key: str, column_name: str) -> str:
+    return f"field|{table_physical_key}|{column_name}"
+
+
+def _field_overview(
+    db: Session,
+    *,
+    table_physical_key: str,
+    system_code: str,
+    source_code: str,
+    namespace_name: str | None,
+    schema_name: str,
+    table_name: str,
+    limit: int,
+    started: float,
+) -> ApiResponse[GraphOverviewData]:
+    """按完整物理键返回一张表及其字段节点，不跨来源拼接同名字段。"""
+    endpoint = (system_code, source_code, namespace_name, schema_name, table_name)
+    table = _table_map_by_physical_key(db, {endpoint}).get(table_physical_key)
+    if table is None:
+        raise HTTPException(status_code=404, detail="字段概览的中心表不存在或物理键不唯一")
+
+    column_base = select(AssetColumn).where(
+        AssetColumn.system_code == system_code,
+        AssetColumn.source_code == source_code,
+        AssetColumn.schema_name == schema_name,
+        AssetColumn.table_name == table_name,
+    )
+    if namespace_name:
+        exact_stmt = column_base.where(AssetColumn.namespace_name == namespace_name)
+        exact_count = db.scalar(select(func.count()).select_from(exact_stmt.order_by(None).subquery())) or 0
+        if exact_count:
+            column_base = exact_stmt
+        else:
+            column_base = column_base.where(or_(
+                AssetColumn.namespace_name.is_(None),
+                AssetColumn.namespace_name == "",
+                AssetColumn.namespace_name == schema_name,
+            ))
+    else:
+        column_base = column_base.where(or_(
+            AssetColumn.namespace_name.is_(None),
+            AssetColumn.namespace_name == "",
+            AssetColumn.namespace_name == schema_name,
+        ))
+
+    matched_columns = db.scalar(
+        select(func.count()).select_from(column_base.order_by(None).subquery())
+    ) or 0
+    columns = db.scalars(
+        column_base.order_by(AssetColumn.column_id, AssetColumn.column_name).limit(limit)
+    ).all()
+
+    relation_columns: set[str] = set()
+    from_match = (
+        (AssetRelation.from_system_code == system_code)
+        & (AssetRelation.from_source_code == source_code)
+        & (AssetRelation.from_schema_name == schema_name)
+        & (AssetRelation.from_table_name == table_name)
+    )
+    to_match = (
+        (AssetRelation.to_system_code == system_code)
+        & (AssetRelation.to_source_code == source_code)
+        & (AssetRelation.to_schema_name == schema_name)
+        & (AssetRelation.to_table_name == table_name)
+    )
+    for relation in db.scalars(select(AssetRelation).where(or_(from_match, to_match))).all():
+        if (
+            relation.from_system_code == system_code
+            and relation.from_source_code == source_code
+            and relation.from_schema_name == schema_name
+            and relation.from_table_name == table_name
+        ):
+            relation_columns.update(item.upper() for item in _split_relation_columns(relation.from_columns))
+        if (
+            relation.to_system_code == system_code
+            and relation.to_source_code == source_code
+            and relation.to_schema_name == schema_name
+            and relation.to_table_name == table_name
+        ):
+            relation_columns.update(item.upper() for item in _split_relation_columns(relation.to_columns))
+
+    primary_columns = {item.upper() for item in _split_relation_columns(table.pk)}
+    center = _graph_node_for(
+        table_physical_key,
+        _display_id(schema_name, table_name),
+        system_code,
+        source_code,
+        namespace_name,
+        schema_name,
+        table_name,
+        table,
+    )
+    center.category = "table"
+    center.path = table_physical_key
+    center.asset_count = matched_columns
+    center.child_count = matched_columns
+
+    nodes: list[GraphNode] = [center]
+    edges: list[GraphEdge] = []
+    for column in columns:
+        column_name = column.column_name or f"COLUMN_{column.column_id or len(nodes)}"
+        field_id = _field_node_id(table_physical_key, column_name)
+        upper_name = column_name.upper()
+        is_primary = upper_name in primary_columns
+        is_relation = upper_name in relation_columns
+        nodes.append(GraphNode(
+            id=field_id,
+            physical_key=field_id,
+            display_id=column_name,
+            label=column.column_name_cn or column_name,
+            system_code=system_code,
+            source_code=source_code,
+            namespace_name=column.namespace_name or namespace_name,
+            schema_name=schema_name,
+            table_name=table_name,
+            category="field",
+            object_type="column",
+            technical_name=f"{schema_name}.{table_name}.{column_name}",
+            metadata_match="exact" if (column.namespace_name or "") == (namespace_name or "") else "namespace_compatible",
+            path=table_physical_key,
+            column_name=column_name,
+            column_name_cn=column.column_name_cn,
+            data_type=column.data_type,
+            nullable=column.nullable,
+            is_primary_key=is_primary,
+            is_relation_key=is_relation,
+        ))
+        edge_label = "主键字段" if is_primary else "关联字段" if is_relation else "包含字段"
+        edges.append(GraphEdge(
+            id=f"overview-field:{table_physical_key}->{field_id}",
+            source=table_physical_key,
+            target=field_id,
+            label=edge_label,
+            relation_type="hierarchy",
+            relation_layer="hierarchy",
+        ))
+
+    truncated = matched_columns > len(columns)
+    warnings = []
+    if truncated:
+        warnings.append(f"字段共 {matched_columns} 个，当前展示前 {len(columns)} 个；请在表详情查看完整字段清单")
+    meta = _graph_meta(
+        total_relations=len(edges),
+        matched_relations=matched_columns,
+        returned_relations=len(edges),
+        truncated=truncated,
+        unresolved_count=0,
+        filters={"level": "field", "parent_physical_key": table_physical_key, "limit": limit},
+        query_ms=round((perf_counter() - started) * 1000, 2),
+        enrichment=_enrichment_stats(nodes),
+        warnings=warnings,
+        center_physical_key=table_physical_key,
+        direction_semantics="contains",
+    )
+    meta.returned_nodes = len(nodes)
+    meta.estimated_total = matched_columns
+    return ApiResponse(data=GraphOverviewData(
+        level="field",
+        next_level=None,
+        selected_path={
+            "system": system_code,
+            "source": source_code,
+            "schema": schema_name,
+            "object": table_name,
+        },
+        data=GraphData(nodes=nodes, edges=edges, meta=meta),
+    ))
+
+
 @router.get("/overview", response_model=ApiResponse[GraphOverviewData], summary="服务端完整资产概览")
 def overview(
-    level: str = Query("system", pattern="^(system|source|schema|object)$"),
+    level: str = Query("system", pattern="^(system|source|schema|object|field)$"),
     parent_physical_key: str | None = Query(None),
     system_code: str | None = Query(None),
     source_code: str | None = Query(None),
@@ -1225,7 +1395,7 @@ def overview(
     db: Session = Depends(get_db),
 ) -> ApiResponse[GraphOverviewData]:
     started = perf_counter()
-    p_sys, p_src, _p_ns, p_schema, _p_table = _parse_parent_path(parent_physical_key)
+    p_sys, p_src, p_ns, p_schema, p_table = _parse_parent_path(parent_physical_key)
     system_code, source_code, schema = system_code or p_sys, source_code or p_src, schema or p_schema
     if level == "source" and not system_code:
         raise HTTPException(status_code=422, detail="source 概览必须提供 system_code 或 parent_physical_key")
@@ -1233,37 +1403,64 @@ def overview(
         raise HTTPException(status_code=422, detail="schema/object 概览必须提供 system_code 和 source_code")
     if level == "object" and not schema:
         raise HTTPException(status_code=422, detail="object 概览必须提供 schema")
+    if level == "field":
+        if not parent_physical_key or not p_sys or not p_src or not p_schema or not p_table:
+            raise HTTPException(status_code=422, detail="field 概览必须提供完整表物理键 parent_physical_key")
+        return _field_overview(
+            db,
+            table_physical_key=parent_physical_key,
+            system_code=p_sys,
+            source_code=p_src,
+            namespace_name=p_ns,
+            schema_name=p_schema,
+            table_name=p_table,
+            limit=limit,
+            started=started,
+        )
     base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=domain, object_type=object_type)
     matched_assets = db.scalar(select(func.count()).select_from(base.order_by(None).subquery())) or 0
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
     if level == "object":
-        parent_id = _overview_id("schema", (system_code, source_code, schema))
-        parent_label = schema or "未命名 Owner"
-        parent_schema = db.scalar(
-            select(AssetSourceSchema.schema_name_cn).where(
-                AssetSourceSchema.source_code == source_code,
-                AssetSourceSchema.schema_name == schema,
-            )
-        ) if source_code and schema else None
-        nodes.append(
-            _overview_node(
-                "schema",
-                (system_code, source_code, schema),
-                parent_schema or parent_label,
-                matched_assets,
-                path=parent_id,
-            )
-        )
         rows = db.scalars(base.order_by(AssetTable.schema_name, AssetTable.table_name).limit(limit)).all()
+        object_candidates: dict[tuple[str, str, str, str], list[str]] = defaultdict(list)
         for table in rows:
             key = _physical_key(table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name)
             if not key:
                 continue
             node = _graph_node_for(key, _display_id(table.schema_name, table.table_name), table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name, table)
             node.asset_count, node.child_count, node.object_type, node.technical_name = 1, 1, _object_type_name(table), _table_full(table.schema_name, table.table_name)
+            node.category = node.object_type
             nodes.append(node)
-            edges.append(GraphEdge(id=f"overview-edge:{parent_id}->{key}", source=parent_id, target=key, label="包含", relation_type="hierarchy", relation_layer="hierarchy"))
+            if table.system_code and table.source_code and table.schema_name and table.table_name:
+                object_candidates[(table.system_code, table.source_code, table.schema_name, table.table_name)].append(key)
+
+        object_ids = {
+            logical_key: candidates[0]
+            for logical_key, candidates in object_candidates.items()
+            if len(candidates) == 1
+        }
+
+        # 对象层展示真实表间关系，上一层 Schema 节点不继续占据画布。
+        # 历史关系 namespace 可能为空，因此先按唯一逻辑四元组定位到当前展示节点，
+        # 再把边端点替换为资产表的完整物理键，避免同名跨来源串边。
+        seen_edge_ids: set[str] = set()
+        for relation in db.scalars(select(AssetRelation)).all():
+            from_ep = _resolve_relation_endpoint(db, relation, "from")
+            to_ep = _resolve_relation_endpoint(db, relation, "to")
+            f_sys, f_src, _f_ns, f_schema, f_table, f_display = from_ep
+            t_sys, t_src, _t_ns, t_schema, t_table, t_display = to_ep
+            if not all((f_sys, f_src, f_schema, f_table, t_sys, t_src, t_schema, t_table)):
+                continue
+            from_key = object_ids.get((f_sys, f_src, f_schema, f_table))
+            to_key = object_ids.get((t_sys, t_src, t_schema, t_table))
+            if not from_key or not to_key or from_key == to_key:
+                continue
+            edge = _build_edge(relation, from_key, to_key, f_display, t_display, from_ep, to_ep)
+            if edge.id in seen_edge_ids:
+                continue
+            seen_edge_ids.add(edge.id)
+            edges.append(edge)
     else:
         fields = {
             "system": (AssetTable.system_code,),
@@ -1302,10 +1499,72 @@ def overview(
                     path="|".join(value or "" for value in values),
                 )
             )
-    meta = _graph_meta(matched_assets, matched_assets, len(nodes), matched_assets > len(nodes), 0, {"level": level, "system_code": system_code, "source_code": source_code, "schema": schema, "domain": domain, "object_type": object_type, "limit": limit}, query_ms=round((perf_counter() - started) * 1000, 2), warnings=["结果已按层级聚合，字段详情请打开对象抽屉"] if level != "object" else [])
+        # 129号 S2：概览聚合关系边。此前概览（system/source/schema 层）只返回节点不返回边，
+        # 导致落地页永远是孤立方块（用户反馈"图谱不像图谱"的根因）。
+        # 这里把 asset_relations 按当前层级的分组键聚合为 "A -> B（N 条关系）" 边；
+        # 组内关系（自环）跳过；端点缺失的沿用 _resolve_relation_endpoint 宽松反查，多命中不猜。
+        if nodes:
+            node_ids = {node.id for node in nodes}
+
+            def _level_key(sys_c: str | None, src_c: str | None, sch: str | None) -> str | None:
+                values = {
+                    "system": (sys_c,),
+                    "source": (sys_c, src_c),
+                    "schema": (sys_c, src_c, sch),
+                }[level]
+                if not all(values):
+                    return None
+                return _overview_id(level, values)
+
+            rel_stmt = select(AssetRelation)
+            if domain:
+                rel_stmt = rel_stmt.where(AssetRelation.domain == domain)
+            pair_counts: dict[tuple[str, str], int] = {}
+            for rel in db.scalars(rel_stmt).all():
+                f_sys, f_src, _f_ns, f_sch, _f_tbl, _f_disp = _resolve_relation_endpoint(db, rel, "from")
+                t_sys, t_src, _t_ns, t_sch, _t_tbl, _t_disp = _resolve_relation_endpoint(db, rel, "to")
+                f_id = _level_key(f_sys, f_src, f_sch)
+                t_id = _level_key(t_sys, t_src, t_sch)
+                if not f_id or not t_id or f_id == t_id:
+                    continue
+                if f_id not in node_ids or t_id not in node_ids:
+                    continue
+                pair_counts[(f_id, t_id)] = pair_counts.get((f_id, t_id), 0) + 1
+            for (f_id, t_id), edge_count in sorted(pair_counts.items()):
+                edges.append(GraphEdge(
+                    id=f"overview-rel:{f_id}->{t_id}",
+                    source=f_id,
+                    target=t_id,
+                    label=f"{edge_count} 条关系",
+                    relation_type="formal",
+                    relation_layer="aggregated",
+                ))
+    filters = {"level": level, "system_code": system_code, "source_code": source_code, "schema": schema, "domain": domain, "object_type": object_type, "limit": limit}
+    if level == "object":
+        meta = _graph_meta(
+            db.scalar(select(func.count()).select_from(AssetRelation)) or 0,
+            len(edges),
+            len(edges),
+            matched_assets > len(nodes),
+            0,
+            filters,
+            query_ms=round((perf_counter() - started) * 1000, 2),
+            warnings=[] if edges else ["当前表层暂无已治理的表间关系；仍可选择表查看字段图谱"],
+        )
+    else:
+        meta = _graph_meta(
+            matched_assets,
+            matched_assets,
+            len(edges),
+            matched_assets > len(nodes),
+            0,
+            filters,
+            query_ms=round((perf_counter() - started) * 1000, 2),
+            warnings=["结果已按层级聚合；继续下钻可查看真实表间关系和字段"],
+        )
     meta.returned_nodes = len(nodes)
     meta.estimated_total = matched_assets
-    next_level = {"system": "source", "source": "schema", "schema": "object", "object": None}[level]
+    next_level = {"system": "source", "source": "schema", "schema": "object", "object": "field"}[level]
     return ApiResponse(data=GraphOverviewData(level=level, next_level=next_level, selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v}, data=GraphData(nodes=nodes, edges=edges, meta=meta)))
 
 

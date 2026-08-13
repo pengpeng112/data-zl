@@ -46,11 +46,10 @@ class Settings(BaseSettings):
     dict_medical_push_default_hospital_no: str = "49557032X"
     dict_medical_his_source_code: str = "HIS_SOURCE"
     dict_medical_jhemr_source_code: str = "JHEMR_VASTBASE"
-    # serial_no defaults to fail-closed. A whitelisted sequence remains the
-    # preferred source. The locked max+1 strategy is allowed only when the
-    # operator explicitly confirms this platform is the sole writer.
+    # serial_no defaults to fail-closed and may only come from a DBA-whitelisted
+    # sequence. MAX+1 allocation is prohibited even when a caller claims to be
+    # the sole writer.
     jhemr_serial_whitelisted_sequence: str = ""
-    jhemr_serial_strategy: str = "disabled"
 
     # HIS identity sync to CDMS/JHEMR (plan 103/107): default OFF.
     identity_sync_enabled: bool = False
@@ -129,6 +128,22 @@ class Settings(BaseSettings):
     auth_login_rate_limit: str = "5/minute"
     auth_refresh_rate_limit: str = "30/minute"
     rate_limit_enabled: bool = True
+
+    # S5: internal Dify quality analysis is fail-closed by default.
+    dify_quality_enabled: bool = False
+    dify_base_url: str = "http://10.10.8.53/v1"
+    dify_allowed_hosts: list[str] = ["10.10.8.53"]
+    dify_quality_api_key_ref: str = "file:///etc/data-asset/credentials/dify_quality_workflow.api_key"
+    dify_quality_workflow_name: str = "data-quality-control"
+    dify_quality_prompt_version: str = "quality-control-v1"
+    dify_connect_timeout_seconds: float = 3
+    dify_read_timeout_seconds: float = 90
+    dify_max_findings_per_job: int = 50
+    dify_max_payload_bytes: int = 65536
+    dify_max_response_bytes: int = 262144
+    dify_stale_running_seconds: int = 600
+    dify_tls_verify: bool = True
+    dify_ca_bundle: str = ""
 
 
 settings = Settings()

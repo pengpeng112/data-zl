@@ -33,6 +33,8 @@ class QualityFindingItem(BaseModel):
     target_ref: str | None
     system_code: str | None = None
     source_code: str | None = None
+    namespace_name: str | None = None
+    schema_name: str | None = None
     table_name: str | None = None
     column_name: str | None = None
     severity: str | None

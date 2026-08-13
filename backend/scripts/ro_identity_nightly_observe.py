@@ -8,25 +8,64 @@ Never prints emp nos, names, tokens, or signature bytes.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
 
 
-def main() -> int:
+APP_ROOT = Path(__file__).resolve().parents[1]
+if str(APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(APP_ROOT))
+
+DEFAULT_OBSERVE_SINCE = "2026-08-11T00:00:00+08:00"
+
+
+def parse_observation_since(value: str) -> datetime:
+    normalized = value.strip().replace("Z", "+00:00")
+    parsed = datetime.fromisoformat(normalized)
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("--since must include an explicit timezone offset")
+    return parsed
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Read-only identity nightly H7 observation")
+    parser.add_argument(
+        "--since",
+        default=os.environ.get("APP_H7_OBSERVE_SINCE", DEFAULT_OBSERVE_SINCE),
+        help="ISO-8601 start of the post-fix observation window, including timezone",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    try:
+        observe_since = parse_observation_since(args.since)
+    except ValueError as exc:
+        print(json.dumps({"status": "refused", "error": str(exc)}))
+        return 2
+
     url = os.environ["APP_DB_URL"]
-    if "data_asset_test" in url:
-        print(json.dumps({"status": "refused", "error": "refuse_test_db"}))
+    database_name = (make_url(url).database or "").lower()
+    if database_name != "data_asset":
+        print(json.dumps({"status": "refused", "error": "refuse_non_production_db"}))
         return 2
     engine = create_engine(url)
     out: dict = {
         "observed_at": datetime.now(timezone.utc).isoformat(),
+        "observation_since": observe_since.isoformat(),
         "provider_env": os.environ.get("APP_IDENTITY_SCHEDULER_PROVIDER"),
         "nightly_env": os.environ.get("APP_IDENTITY_NIGHTLY_ENABLED"),
     }
     with engine.connect() as c:
+        c.execute(text("SET TRANSACTION READ ONLY"))
         runs = c.execute(
             text(
                 """
@@ -43,7 +82,7 @@ def main() -> int:
                 "run_id": (r["run_id"] or "")[:32],
                 "status": r["status"],
                 "last_error_class": r["last_error_class"],
-                "error_prefix": (r["em"] or "").replace("\n", " ")[:160],
+                "has_error": bool(r["em"]),
                 "started_at": str(r["started_at"])[:19] if r["started_at"] else None,
                 "has_typeerror": "TypeError" in (r["em"] or "")
                 or "offset-naive" in (r["em"] or ""),
@@ -92,17 +131,25 @@ def main() -> int:
             }
             for w in wms
         ]
-        # Post-fix windows: count 02:00-ish runs after signature125 publish day
-        out["post_fix_night_runs"] = c.execute(
+        # Count runs and successful calendar nights in the explicit observation
+        # window. The date is evaluated in the hospital timezone so multiple
+        # retries in one night cannot be misreported as multiple observed nights.
+        night_counts = c.execute(
             text(
                 """
-                select count(*) from asset.asset_identity_scheduler_runs
-                where started_at >= timestamptz '2026-08-11 00:00:00+08'
+                select count(*) as run_count,
+                       count(distinct (started_at at time zone 'Asia/Shanghai')::date)
+                           filter (where status = 'success') as success_nights
+                from asset.asset_identity_scheduler_runs
+                where started_at >= :observe_since
                   and triggered_by is distinct from 'unused'
                   and (run_id like 'RUN-%' or triggered_by like '%cron%' or run_id like 'NTL%')
                 """
-            )
-        ).scalar()
+            ),
+            {"observe_since": observe_since},
+        ).mappings().one()
+        out["post_fix_night_runs"] = int(night_counts["run_count"] or 0)
+        out["post_fix_success_nights"] = int(night_counts["success_nights"] or 0)
     # import gate
     try:
         from PIL import Image  # noqa: F401
@@ -129,7 +176,8 @@ def main() -> int:
         "pillow_present": bool((out.get("runtime") or {}).get("pillow")),
         "tz_helper_ok": bool((out.get("runtime") or {}).get("tz_compare_ok")),
         "post_fix_night_runs": out.get("post_fix_night_runs"),
-        "need_three_nights": int(out.get("post_fix_night_runs") or 0) >= 3,
+        "post_fix_success_nights": out.get("post_fix_success_nights"),
+        "need_three_nights": int(out.get("post_fix_success_nights") or 0) >= 3,
     }
     print(json.dumps(out, ensure_ascii=True, default=str))
     return 0

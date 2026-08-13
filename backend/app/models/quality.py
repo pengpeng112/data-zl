@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, Integer, Text, TIMESTAMP, Boolean
+from sqlalchemy import BigInteger, Column, Integer, Text, TIMESTAMP, Boolean, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
@@ -50,6 +50,7 @@ class QualityFinding(Base):
     system_code = Column(Text)
     source_code = Column(Text)
     namespace_name = Column(Text)
+    schema_name = Column(Text)
     table_name = Column(Text)
     column_name = Column(Text)
     severity = Column(Text)
@@ -119,3 +120,53 @@ class QualityMetric(Base):
     metric_value = Column(Integer)
     metric_text = Column(Text)
     measured_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class AiQualityJob(Base):
+    __tablename__ = "asset_ai_quality_jobs"
+    __table_args__ = ({"schema": "asset"},)
+    id = Column(BigInteger, primary_key=True)
+    job_key = Column(Text, unique=True, nullable=False)
+    task_type = Column(Text, nullable=False)
+    prompt_version = Column(Text, nullable=False)
+    schema_version = Column(Text, nullable=False)
+    input_digest = Column(Text, nullable=False)
+    request_id = Column(Text, nullable=False)
+    input_summary = Column(JSONB)
+    status = Column(Text, nullable=False, server_default="queued")
+    requested_by = Column(Text)
+    dify_run_id = Column(Text)
+    attempt = Column(Integer, nullable=False, server_default="0")
+    duration_ms = Column(Integer)
+    token_usage = Column(JSONB)
+    error_class = Column(Text)
+    error_summary = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    started_at = Column(TIMESTAMP(timezone=True))
+    finished_at = Column(TIMESTAMP(timezone=True))
+
+
+class AiQualityJobFinding(Base):
+    __tablename__ = "asset_ai_quality_job_findings"
+    __table_args__ = (UniqueConstraint("job_id", "finding_id", name="uq_ai_quality_job_finding"), {"schema": "asset"})
+    id = Column(BigInteger, primary_key=True)
+    job_id = Column(BigInteger, ForeignKey("asset.asset_ai_quality_jobs.id", ondelete="CASCADE"), nullable=False)
+    finding_id = Column(BigInteger, ForeignKey("asset.asset_quality_findings.id"), nullable=False)
+
+
+class AiQualityResult(Base):
+    __tablename__ = "asset_ai_quality_results"
+    __table_args__ = ({"schema": "asset"},)
+    id = Column(BigInteger, primary_key=True)
+    job_id = Column(BigInteger, ForeignKey("asset.asset_ai_quality_jobs.id", ondelete="CASCADE"), unique=True, nullable=False)
+    risk_level = Column(Text, nullable=False, server_default="unknown")
+    summary = Column(Text, nullable=False)
+    structured_result = Column(JSONB, nullable=False)
+    output_digest = Column(Text, nullable=False)
+    review_status = Column(Text, nullable=False, server_default="pending")
+    review_by = Column(Text)
+    review_at = Column(TIMESTAMP(timezone=True))
+    review_note = Column(Text)
+    accepted_recommendations = Column(JSONB)
+    attached_by = Column(Text)
+    attached_at = Column(TIMESTAMP(timezone=True))

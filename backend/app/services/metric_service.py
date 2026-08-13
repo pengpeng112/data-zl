@@ -296,7 +296,14 @@ def ingest_metric(
         version.status = "active"
         version.activated_at = _now()
         definition.current_version_id = version.id
+        definition.status = "active"
         activated = True
+    elif parent is None:
+        # Definition-level status is a catalog summary, not permission to run.
+        # Keep it aligned with the latest non-active version so a blocked
+        # placeholder cannot be presented as an active metric.
+        definition.current_version_id = None
+        definition.status = status
 
     db.add(
         GovernAuditLog(

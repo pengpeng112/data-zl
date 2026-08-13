@@ -64,8 +64,9 @@ def parse_metric_sql_file(path: Path) -> dict[str, Any]:
     if scope:
         limitations.append(f"纳排: {scope}")
 
-    # Strip block comment header for SQL body but keep WITH/SELECT
-    body = re.sub(r"/\*.*?\*/", "", text, count=1, flags=re.S).strip()
+    # Strip every consecutive leading documentation block while preserving
+    # any comments/hints that may legitimately occur inside the SELECT body.
+    body = re.sub(r"\A(?:\s*/\*.*?\*/\s*)+", "", text, flags=re.S).strip()
     if not body:
         body = text
     # Remove leading pure comment lines

@@ -11,7 +11,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables
+from .api.v1 import admin, ai, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -536,6 +536,7 @@ app.include_router(relation_reviews.router)
 app.include_router(lineage.router)
 app.include_router(candidates.router)
 app.include_router(quality.router)
+app.include_router(ai_quality.router)
 app.include_router(queries.router)
 app.include_router(metrics.router)
 app.include_router(data_products.router)
