@@ -67,3 +67,43 @@ export function isForbiddenCategoryLabel(label: string | null | undefined): bool
   if (!label) return false;
   return (FORBIDDEN_CATEGORY_LABELS as readonly string[]).includes(label.trim());
 }
+
+export interface TreeScopeInput {
+  id?: string;
+  kind?: string;
+  system_code?: string;
+  source_code?: string;
+  schema_name?: string;
+  table_name?: string;
+}
+
+export interface TableListScope {
+  system_code: string;
+  source_code: string;
+  schema_name: string;
+  table_name: string;
+}
+
+const SOURCE_SCOPED_KINDS = new Set(["connection", "schema", "table", "column"]);
+const SCHEMA_SCOPED_KINDS = new Set(["schema", "table", "column"]);
+const TABLE_SCOPED_KINDS = new Set(["table", "column"]);
+
+/** 左树点击 → 右侧表清单过滤范围。占位节点按 schema 处理。 */
+export function scopeFromTreeNode(node: TreeScopeInput): TableListScope {
+  if (!node || node.kind === "category" || node.id === "search-hits") {
+    return { system_code: "", source_code: "", schema_name: "", table_name: "" };
+  }
+  const kind = node.id?.startsWith("placeholder:") ? "schema" : node.kind || "";
+  return {
+    system_code: node.system_code || "",
+    source_code: SOURCE_SCOPED_KINDS.has(kind) ? node.source_code || "" : "",
+    schema_name: SCHEMA_SCOPED_KINDS.has(kind) ? node.schema_name || "" : "",
+    table_name: TABLE_SCOPED_KINDS.has(kind) ? node.table_name || "" : ""
+  };
+}
+
+/** 表/字段点击必须重载右侧清单；不能只改字段预览。 */
+export function treeClickShouldReloadTables(node: TreeScopeInput): boolean {
+  if (!node || node.id === "search-hits") return false;
+  return true;
+}

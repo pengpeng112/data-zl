@@ -29,6 +29,79 @@ export interface HierarchyLayoutResult {
   height: number;
 }
 
+/** Neo4j 式散布：小规模单环，较多节点用同心圆，保证相邻间距。 */
+export function computeCircularSpreadPositions(
+  nodes: HierarchyNodeLike[],
+  options: { nodeSize?: number; gap?: number } = {}
+): HierarchyLayoutResult {
+  const ids = nodes.map(n => String(n.id));
+  const n = ids.length;
+  const nodeSize = Math.max(48, options.nodeSize ?? 160);
+  const gap = Math.max(16, options.gap ?? 56);
+  const pitch = nodeSize + gap;
+  const positions = new Map<string, HierarchyPosition>();
+  if (n === 0) return { positions, width: 960, height: 640 };
+  if (n === 1) {
+    positions.set(ids[0], { x: 480, y: 320 });
+    return { positions, width: 960, height: 640 };
+  }
+
+  const rings: string[][] = [];
+  const remaining = [...ids];
+  let ringIndex = 0;
+  while (remaining.length) {
+    const radius = Math.max(pitch, (ringIndex + 1) * pitch);
+    const capacity = Math.max(6, Math.floor((2 * Math.PI * radius) / pitch));
+    rings.push(remaining.splice(0, capacity));
+    ringIndex += 1;
+  }
+
+  rings.forEach((ring, ri) => {
+    const radius = Math.max(pitch, (ri + 1) * pitch);
+    const count = ring.length;
+    const start = -Math.PI / 2;
+    ring.forEach((id, i) => {
+      const angle = start + (2 * Math.PI * i) / count;
+      positions.set(id, {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius
+      });
+    });
+  });
+
+  const xs = [...positions.values()].map(p => p.x);
+  const ys = [...positions.values()].map(p => p.y);
+  const pad = nodeSize;
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const dx = pad - minX;
+  const dy = pad - minY;
+  positions.forEach(p => {
+    p.x += dx;
+    p.y += dy;
+  });
+  return {
+    positions,
+    width: Math.max(...xs) - minX + pad * 2,
+    height: Math.max(...ys) - minY + pad * 2
+  };
+}
+
+function distance(a: HierarchyPosition, b: HierarchyPosition) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+export function minSpreadDistance(positions: Map<string, HierarchyPosition>): number {
+  const pts = [...positions.values()];
+  let min = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < pts.length; i += 1) {
+    for (let j = i + 1; j < pts.length; j += 1) {
+      min = Math.min(min, distance(pts[i], pts[j]));
+    }
+  }
+  return Number.isFinite(min) ? min : 0;
+}
+
 export function computeHierarchyPositions(
   nodes: HierarchyNodeLike[],
   edges: HierarchyEdgeLike[],

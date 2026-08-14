@@ -63,6 +63,16 @@ export default {
       }
     },
     {
+      path: "/identity/sync-logs",
+      name: "IdentitySyncLogs",
+      component: () => import("@/views/identity/sync-logs/index.vue"),
+      meta: {
+        title: "同步日志",
+        showLink: true,
+        auths: ["identity.sync_diff.view"]
+      }
+    },
+    {
       path: "/identity/roles",
       name: "IdentityRoles",
       component: () => import("@/views/identity/roles/index.vue"),

@@ -5,10 +5,10 @@
       <div class="mode-controls">
         <span class="graph-mode-note">{{ currentViewMode?.description || "选择任务模式开始" }}</span>
         <el-select v-model="filters.layout_mode" class="layout-select" @change="emit('refresh')">
-          <el-option label="分层树状" value="hierarchy" />
-          <el-option label="自动布局" value="layered" />
-          <el-option label="分组布局" value="grouped" />
+          <el-option label="知识图谱" value="layered" />
           <el-option label="中心辐射" value="radial" />
+          <el-option label="分层树状" value="hierarchy" />
+          <el-option label="分组布局" value="grouped" />
         </el-select>
       </div>
     </div>

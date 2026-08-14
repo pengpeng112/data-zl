@@ -3,7 +3,11 @@
  * 包含边（relation_type=hierarchy）决定层深；关系边不参与分层；成环数据不崩溃。
  */
 import { describe, expect, it } from "vitest";
-import { computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
+import {
+  computeCircularSpreadPositions,
+  computeHierarchyPositions,
+  minSpreadDistance
+} from "@/views/asset/graph/hierarchyLayout";
 
 const N = (id: string) => ({ id });
 const H = (source: string, target: string) => ({ source, target, relation_type: "hierarchy" });
@@ -52,6 +56,20 @@ describe("computeHierarchyPositions（129 分层树状）", () => {
     const { positions } = computeHierarchyPositions(nodes, edges);
     expect(positions.get("x")).toBeTruthy();
     expect(positions.get("y")).toBeTruthy();
+  });
+
+  it("圆形散布：13 个 Schema 节点相邻间距不小于节点直径", () => {
+    const nodes = Array.from({ length: 13 }, (_, i) => N(`s${i}`));
+    const { positions } = computeCircularSpreadPositions(nodes, { nodeSize: 160, gap: 56 });
+    expect(positions.size).toBe(13);
+    expect(minSpreadDistance(positions)).toBeGreaterThanOrEqual(160);
+  });
+
+  it("圆形散布：25 个节点用同心圆且互不重叠", () => {
+    const nodes = Array.from({ length: 25 }, (_, i) => N(`t${i}`));
+    const { positions } = computeCircularSpreadPositions(nodes, { nodeSize: 140, gap: 48 });
+    expect(positions.size).toBe(25);
+    expect(minSpreadDistance(positions)).toBeGreaterThanOrEqual(140);
   });
 
   it("单层超宽折行：25 个同层节点按 12 个一行折成 3 行", () => {

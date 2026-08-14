@@ -119,16 +119,12 @@ export function normalizeGraphData(
   const showReviewLayer = Boolean(options.showReviewLayer);
   const visibleEdges = edges.filter(edge => showReviewLayer || !isReviewOnly(edge));
   const reviewHiddenCount = edges.length - visibleEdges.length;
-  const nodeIds = new Set<string>();
-  visibleEdges.forEach(edge => {
-    nodeIds.add(edge.source);
-    nodeIds.add(edge.target);
-  });
   // 物理去重：同 display_id 的不同物理节点各自保留（108号 §四）
   const seenKeys = new Set<string>();
   const visibleNodes: GraphNode[] = [];
   for (const node of nodes) {
-    if (!(nodeIds.has(node.id) || visibleEdges.length === 0)) continue;
+    // 知识图谱：API 返回的节点一律保留。孤立系统/Schema 没有跨组边，
+    // 不能因为画面上存在 1 条边就把其余节点丢掉。
     const key = nodeUniqueKey(node);
     if (!key || seenKeys.has(key)) continue;
     seenKeys.add(key);
@@ -192,8 +188,8 @@ export function normalizeGraphData(
         color: "#0f172a",
         fontSize: isCenter || focused || selected ? 12 : 11,
         fontWeight: isCenter || focused || selected ? 700 : 500,
-        overflow: "truncate",
-        width: 124,
+        overflow: "break",
+        width: 160,
         opacity: active ? 1 : 0.35
       }
     };

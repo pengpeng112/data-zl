@@ -11,6 +11,12 @@ export interface PageData<T> {
   page: number;
   page_size: number;
   items: T[];
+  stats?: {
+    total?: number;
+    active?: number;
+    inactive?: number;
+    source_count?: number;
+  };
 }
 
 // 科室基线
@@ -42,6 +48,12 @@ export function bindAccount(data: Record<string, any>) {
   return http.request<ApiResponse<any>>("put", "/api/v1/identity/accounts/bind", { data });
 }
 // 同步差异
+export function getIdentitySyncRuns(params?: Record<string, any>) {
+  return http.request<ApiResponse<any>>("get", "/api/v1/identity-sync/runs", { params });
+}
+export function getIdentitySyncRun(runId: string) {
+  return http.request<ApiResponse<any>>("get", `/api/v1/identity-sync/runs/${runId}`);
+}
 export function getSyncDiffs(params?: Record<string, any>) {
   return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/identity/sync-diffs", { params });
 }

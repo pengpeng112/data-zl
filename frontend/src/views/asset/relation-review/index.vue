@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { http } from "@/utils/http";
 import { ElMessage } from "element-plus";
+import {
+  RELATION_CLASS_TABS,
+  normalizeRelationClass,
+  relationClassQuery,
+  relationEvidenceKind,
+  relationEvidenceLabel,
+  displayRelationColumns
+} from "@/views/asset/relation-review/relationReviewTabs";
 
 interface Relation {
   id: number;
@@ -25,6 +33,9 @@ interface Relation {
   from_table_name_cn?: string;
   to_table_name_cn?: string;
   validation_metrics?: string;
+  evidence_kind?: string;
+  inferred_columns?: string;
+  review_status?: string;
 }
 
 interface FieldMapping {
@@ -55,17 +66,24 @@ const form = ref({ from_table: "", from_columns: "", to_table: "", to_columns: "
 
 const systemOptions = ref<SystemOption[]>([]);
 const filters = reactive({ system_code: "", confidence: "", review_status: "", keyword: "" });
-const relationClass = ref(String(route.query.class || ""));
+const relationClass = ref(normalizeRelationClass(route.query.class as string));
 const selectedRelations = ref<Relation[]>([]);
-const classTabs = [
-  { value: "", label: "全部关系" },
-  { value: "pending", label: "待复核" },
-  { value: "confirmed", label: "已确认" },
-  { value: "rejected", label: "已拒绝" },
-  { value: "candidate", label: "候选关系" },
-  { value: "lineage", label: "同步/镜像血缘" },
-  { value: "dependency", label: "视图依赖" }
-];
+const classTabs = RELATION_CLASS_TABS;
+const tabCounts = ref<Record<string, number>>({});
+interface RecentReview {
+  id: number;
+  from_table?: string;
+  from_columns?: string;
+  to_table?: string;
+  to_columns?: string;
+  reviewer?: string;
+  review_status?: string;
+  review_note?: string;
+  relation_desc_cn?: string;
+  reviewed_at?: string;
+}
+
+const recentReviews = ref<RecentReview[]>([]);
 
 const mappingsDrawerVisible = ref(false);
 const mappings = ref<FieldMapping[]>([]);
@@ -84,8 +102,9 @@ function resetFilters() {
   filters.confidence = "";
   filters.review_status = "";
   filters.keyword = "";
-  relationClass.value = "";
+  relationClass.value = "pending";
   page.value = 1;
+  if (route.query.class) router.replace({ path: "/asset/relation-review", query: {} });
   loadRelations();
 }
 
@@ -93,58 +112,46 @@ async function loadRelations() {
   loading.value = true;
   try {
     // 127: draft/pending/confirmed/rejected use relation-reviews main table
-    const reviewTab = ["pending", "confirmed", "rejected", ""].includes(relationClass.value);
-    if (reviewTab && (relationClass.value === "pending" || relationClass.value === "confirmed" || relationClass.value === "rejected" || relationClass.value === "")) {
-      const statusMap: Record<string, string> = {
-        pending: "draft",
-        confirmed: "approved",
-        rejected: "rejected",
-        "": ""
-      };
-      const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
-      const st = statusMap[relationClass.value];
-      if (st) params.review_status = st;
-      if (filters.keyword) params.keyword = filters.keyword;
-      const res = await http.request<any>("get", "/api/v1/relation-reviews", { params });
-      const items = res.data?.items || [];
-      relations.value = items.map((r: any) => ({
-        id: r.id,
-        rel_id: r.source_relation_id || r.id,
-        from_table: r.from_table,
-        from_columns: r.from_columns,
-        to_table: r.to_table,
-        to_columns: r.to_columns,
-        join_condition: r.join_condition,
-        confidence: r.confidence,
-        validation_status: r.validation_status,
-        validation_note: r.review_note,
-        note: r.relation_desc_cn || r.source_evidence,
-        system_code: r.from_system_code,
-        from_system_code: r.from_system_code,
-        to_system_code: r.to_system_code,
-        review_status: r.review_status,
-        source_relation_id: r.source_relation_id
-      }));
-      total.value = res.data?.total || 0;
-      return;
-    }
     const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
     if (filters.system_code) params.system_code = filters.system_code;
     if (filters.confidence) params.confidence = filters.confidence;
     if (filters.review_status) params.review_status = filters.review_status;
     if (filters.keyword) params.keyword = filters.keyword;
-    if (relationClass.value) params.relation_class = relationClass.value;
+    if (relationClass.value && relationClass.value !== "all") params.relation_class = relationClass.value;
     const res = await http.request<any>("get", "/api/v1/relations/list", { params });
     relations.value = res.data?.items || [];
     total.value = res.data?.total || 0;
+    void loadTabCounts();
+    void loadRecentReviews();
   } finally {
     loading.value = false;
   }
 }
 
-function changeClass() {
+async function loadRecentReviews() {
+  if (relationClass.value !== "confirmed" && relationClass.value !== "rejected") {
+    recentReviews.value = [];
+    return;
+  }
+  try {
+    const status = relationClass.value === "rejected" ? "rejected" : "approved";
+    const res = await http.request<any>("get", "/api/v1/relation-reviews", {
+      params: { review_status: status, page: 1, page_size: 50 }
+    });
+    recentReviews.value = res.data?.items || [];
+  } catch {
+    recentReviews.value = [];
+  }
+}
+
+function changeClass(name?: string | number) {
+  const next = normalizeRelationClass(name ?? relationClass.value);
+  if (relationClass.value !== next) relationClass.value = next;
   page.value = 1;
-  router.replace({ path: "/asset/relation-review", query: relationClass.value ? { class: relationClass.value } : {} });
+  const query = relationClassQuery(next);
+  if (String(route.query.class || "pending") !== String(query.class || "pending")) {
+    router.replace({ path: "/asset/relation-review", query });
+  }
   loadRelations();
 }
 
@@ -184,6 +191,47 @@ async function updateField(relId: number, field: string, value: string) {
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.detail || "更新失败");
   }
+}
+
+async function loadTabCounts() {
+  try {
+    const res = await http.request<any>("get", "/api/v1/relations/list-counts");
+    tabCounts.value = res.data || {};
+  } catch {
+    tabCounts.value = {};
+  }
+}
+
+function tabLabel(tab: { value: string; label: string }) {
+  const count = tabCounts.value[tab.value];
+  return count == null ? tab.label : `${tab.label} ${count}`;
+}
+
+function columnText(row: Relation, side: "from" | "to") {
+  const raw = side === "from" ? row.from_columns : row.to_columns;
+  return displayRelationColumns(raw, row.inferred_columns);
+}
+
+function evidenceOf(row: Relation) {
+  return relationEvidenceKind(row.note, row.from_columns, row.to_columns);
+}
+
+function statusText(value?: string) {
+  const map: Record<string, string> = {
+    verified: "已验证",
+    approved: "已确认",
+    manual_reviewed: "人工确认",
+    candidate: "候选",
+    not_tested: "未验证",
+    bounded: "有边界",
+    needs_split: "需拆分",
+    sample_pass: "抽样通过",
+    sample_verified: "抽样验证",
+    rejected: "已拒绝",
+    user_confirmed_sync: "已确认镜像",
+    verified_dependency: "已确认依赖"
+  };
+  return map[value || ""] || value || "-";
 }
 
 function getConfidenceType(c: string) {
@@ -271,6 +319,14 @@ function openAudit(row: Relation) {
   router.push({ path: "/ops/audit", query: { entity_ref: `relation:${row.id}` } });
 }
 
+watch(() => String(route.query.class || "pending"), value => {
+  const next = normalizeRelationClass(value);
+  if (next === relationClass.value) return;
+  relationClass.value = next;
+  page.value = 1;
+  loadRelations();
+});
+
 onMounted(() => {
   loadSystemOptions();
   loadRelations();
@@ -281,11 +337,19 @@ onMounted(() => {
   <div class="relation-review-page">
     <RePageHeader
       title="关系复核中心"
-      subtitle="统一查询正式、候选、同步血缘和视图依赖关系；所有人工操作保留审计。"
+      subtitle="审的是“表和表怎么关联”。批准后进入正式关系图谱；视图解析出来、没有 JOIN 字段的只能当线索，不能直接当外键。"
     />
 
-    <el-tabs v-model="relationClass" class="relation-tabs" @change="changeClass">
-      <el-tab-pane v-for="tab in classTabs" :key="tab.value" :label="tab.label" :name="tab.value" />
+    <el-alert
+      class="review-hint"
+      type="info"
+      show-icon
+      :closable="false"
+      title="待复核是还没点头的关系。已经批准的在「已确认」，不会留在待复核里。最近人工复核的记录会单独列在已确认顶部。"
+    />
+
+    <el-tabs v-model="relationClass" class="relation-tabs" @tab-change="changeClass">
+      <el-tab-pane v-for="tab in classTabs" :key="tab.value" :label="tabLabel(tab)" :name="tab.value" />
     </el-tabs>
 
     <el-card class="filter-card" shadow="never">
@@ -319,27 +383,88 @@ onMounted(() => {
       </el-form>
     </el-card>
 
+    <el-card v-if="recentReviews.length" class="recent-review-card" shadow="never">
+      <template #header>
+        <span>{{ relationClass === "rejected" ? "最近驳回的复核记录" : "最近人工复核记录" }}（{{ recentReviews.length }}）</span>
+      </template>
+      <el-table :data="recentReviews" size="small">
+        <el-table-column label="来源表" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.from_table }}</template>
+        </el-table-column>
+        <el-table-column label="来源字段" width="150" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.from_columns || "未解析" }}</template>
+        </el-table-column>
+        <el-table-column label="目标表" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.to_table }}</template>
+        </el-table-column>
+        <el-table-column label="目标字段" width="150" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.to_columns || "未解析" }}</template>
+        </el-table-column>
+        <el-table-column label="复核人" width="130">
+          <template #default="{ row }">{{ row.reviewer || "-" }}</template>
+        </el-table-column>
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.review_status === 'approved' ? 'success' : 'info'">
+              {{ row.review_status === "approved" ? "已确认" : "已拒绝" }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="复核时间" width="170">
+          <template #default="{ row }">{{ row.reviewed_at || "-" }}</template>
+        </el-table-column>
+        <el-table-column label="说明" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.review_note || row.relation_desc_cn || "-" }}</template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
     <el-card>
       <template #header><div class="review-header"><span>关系清单（{{ total }}）</span><div><el-button v-perms="'asset.relation.review'" size="small" type="success" :disabled="!selectedRelations.length" @click="batchReview('approve')">批量批准</el-button><el-button v-perms="'asset.relation.review'" size="small" type="danger" :disabled="!selectedRelations.length" @click="batchReview('reject')">批量驳回</el-button></div></div></template>
       <el-table :data="relations" v-loading="loading" size="small" @selection-change="selectedRelations = $event">
         <el-table-column type="selection" width="44" />
-        <el-table-column label="来源表" width="220" show-overflow-tooltip><template #default="{ row }"><div>{{ row.from_table_name_cn || row.from_table }}</div><small v-if="row.from_table_name_cn">{{ row.from_table }}</small></template></el-table-column>
-        <el-table-column prop="from_columns" label="来源字段" width="150" show-overflow-tooltip />
-        <el-table-column label="目标表" width="220" show-overflow-tooltip><template #default="{ row }"><div>{{ row.to_table_name_cn || row.to_table }}</div><small v-if="row.to_table_name_cn">{{ row.to_table }}</small></template></el-table-column>
-        <el-table-column prop="to_columns" label="目标字段" width="150" show-overflow-tooltip />
-        <el-table-column prop="join_condition" label="关联条件" width="200" show-overflow-tooltip />
+        <el-table-column label="来源表" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div>{{ row.from_table_name_cn || row.from_table }}</div>
+            <small class="tech-name">{{ row.from_table }}</small>
+          </template>
+        </el-table-column>
+        <el-table-column label="来源字段" width="160" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span :class="{ 'muted-col': !row.from_columns }">{{ columnText(row, "from").text }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="目标表" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div>{{ row.to_table_name_cn || row.to_table }}</div>
+            <small class="tech-name">{{ row.to_table }}</small>
+          </template>
+        </el-table-column>
+        <el-table-column label="目标字段" width="160" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span :class="{ 'muted-col': !row.to_columns }">{{ columnText(row, "to").text }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="证据来源" width="150">
+          <template #default="{ row }">
+            <el-tag size="small" :type="evidenceOf(row) === 'view_ddl' ? 'info' : 'success'" effect="plain">
+              {{ relationEvidenceLabel(row.evidence_kind || evidenceOf(row)) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="join_condition" label="关联条件" min-width="160" show-overflow-tooltip />
         <el-table-column prop="confidence" label="置信度" width="80">
           <template #default="{ row }">
-            <el-tag :type="getConfidenceType(row.confidence)" size="small">{{ row.confidence }}</el-tag>
+            <el-tag :type="getConfidenceType(row.confidence)" size="small">{{ row.confidence || "-" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="validation_status" label="验证状态" width="110">
+        <el-table-column label="状态" width="110">
           <template #default="{ row }">
-            <el-tag :type="row.validation_status === 'verified' ? 'success' : 'warning'" size="small">{{ row.validation_status || '-' }}</el-tag>
+            <el-tag :type="row.validation_status === 'verified' ? 'success' : 'warning'" size="small">
+              {{ statusText(row.validation_status) }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="note" label="备注" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="relation_class" label="关系类别" width="120" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button v-perms="'asset.relation.review'" size="small" text type="success" @click="handleApprove(row.id)">批准</el-button>
@@ -350,6 +475,10 @@ onMounted(() => {
           </template>
         </el-table-column>
       </el-table>
+      <el-empty
+        v-if="!loading && !relations.length"
+        :description="relationClass === 'pending' ? '当前没有带关联字段的待审关系。无字段的视图推断在「视图推断」页签。' : '当前页签没有数据'"
+      />
       <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 50, 100, 200]" layout="total, sizes, prev, pager, next" class="pager" @current-change="loadRelations" @size-change="loadRelations" />
     </el-card>
 
@@ -414,10 +543,18 @@ onMounted(() => {
   box-shadow: var(--re-shadow-sm);
 }
 
-.filter-card {
+.filter-card,
+.recent-review-card {
   margin-bottom: 16px;
 }
+
+.recent-review-card {
+  border: 1px solid var(--el-color-success-light-5, #b3e19d);
+}
+.review-hint { margin-bottom: 12px; }
 .relation-tabs { margin-bottom: 12px; }
+.tech-name { color: var(--text-secondary, #64748b); font-size: 12px; }
+.muted-col { color: var(--text-secondary, #94a3b8); }
 .review-header { display: flex; align-items: center; justify-content: space-between; }
 .pager { justify-content: flex-end; margin-top: 16px; }
 

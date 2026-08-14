@@ -1,117 +1,382 @@
 <template>
   <div class="ai-quality-page">
-    <RePageHeader title="AI 质控分析" subtitle="手动组包、人工复核的质量分析工作台">
-      <template #actions><el-tag type="warning">AI建议，仅供质控复核</el-tag></template>
+    <RePageHeader title="AI 质控分析" subtitle="用院内模型解读平台里的质控规则和问题。只读平台库汇总，不连 HIS/ODS/嘉和业务库。">
+      <template #actions>
+        <el-tag :type="hospitalReady ? 'success' : 'warning'">{{ hospitalReady ? `院内 ${modelName}` : "未接通" }}</el-tag>
+      </template>
     </RePageHeader>
 
-    <el-alert class="notice" type="info" :closable="false" show-icon>
-      Dify 只接收脱敏后的质量摘要，不接收患者级样本、凭据或自由文本；接受建议不会修改质量问题或执行 SQL。
-    </el-alert>
-
-    <el-card class="section" shadow="never">
-      <template #header><div class="card-title"><span>连接状态</span><el-button v-perms="'asset.quality.ai.connection_test'" size="small" @click="testConnection" :loading="connectionTesting">测试连接</el-button></div></template>
-      <el-descriptions :column="4" border size="small">
-        <el-descriptions-item label="状态"><el-tag :type="statusTone(statusText)">{{ statusText }}</el-tag></el-descriptions-item>
-        <el-descriptions-item label="Workflow">{{ aiStatus?.workflow_name || aiStatus?.workflow || '未配置' }}</el-descriptions-item>
-        <el-descriptions-item label="Prompt / Schema">{{ aiStatus?.prompt_version || '-' }} / {{ aiStatus?.schema_version || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="最近成功">{{ aiStatus?.last_success_at || '-' }}</el-descriptions-item>
-      </el-descriptions>
-      <el-alert v-if="aiStatus?.message" class="inner-alert" :type="aiStatus.enabled ? 'warning' : 'info'" :closable="false" :title="aiStatus.message" />
-    </el-card>
-
-    <el-card class="section" shadow="never">
-      <template #header><div class="card-title"><span>待分析问题</span><el-tag size="small">最多 50 条同域问题</el-tag></div></template>
-      <div class="filters">
-        <el-select v-model="findingStatus" clearable placeholder="状态" @change="loadFindings"><el-option label="待处理" value="open" /><el-option label="已分派" value="assigned" /><el-option label="已确认" value="acknowledged" /></el-select>
-        <el-select v-model="findingSeverity" clearable placeholder="严重程度" @change="loadFindings"><el-option label="严重" value="critical" /><el-option label="重要" value="major" /><el-option label="一般" value="minor" /></el-select>
-        <el-button @click="loadFindings">刷新问题</el-button>
-        <span class="selection-note">已选 {{ selectedFindingIds.length }} / 50</span>
+    <section class="toolbar">
+      <div class="toolbar-meta">
+        <el-tag :type="statusTone(statusText)" size="small">{{ statusText }}</el-tag>
+        <span>模型 {{ modelName }}</span>
+        <span class="quiet">只传平台规则/问题/关系，不传患者明细</span>
       </div>
-      <el-table v-loading="findingsLoading" :data="findings" row-key="id" size="small" @selection-change="onSelectionChange">
-        <el-table-column type="selection" width="48" :selectable="rowSelectable" />
-        <el-table-column prop="id" label="ID" width="72" />
-        <el-table-column prop="rule_code" label="规则" width="160" show-overflow-tooltip />
-        <el-table-column prop="table_name" label="表" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="column_name" label="字段" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="system_code" label="系统" width="120" />
-        <el-table-column prop="severity" label="严重程度" width="100" />
-        <el-table-column prop="status" label="状态" width="100" />
+      <div class="toolbar-actions">
+        <el-button v-perms="'asset.quality.ai.connection_test'" size="small" @click="testConnection" :loading="connectionTesting">测试连接</el-button>
+        <el-button v-perms="'asset.quality.ai.analyze'" size="small" @click="makeGovernanceReport" :loading="reportLoading">生成总览报告</el-button>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <el-card class="panel" shadow="never">
+        <template #header>
+          <div class="card-title">
+            <span>待分析问题</span>
+            <el-tag size="small">已选 {{ selectedFindingIds.length }}</el-tag>
+          </div>
+        </template>
+        <div class="filters">
+          <el-select v-model="findingStatus" clearable placeholder="状态" @change="loadFindings">
+            <el-option label="待处理" value="open" />
+            <el-option label="已分派" value="assigned" />
+            <el-option label="已确认" value="acknowledged" />
+          </el-select>
+          <el-select v-model="findingSeverity" clearable placeholder="程度" @change="loadFindings">
+            <el-option label="严重" value="critical" />
+            <el-option label="重要" value="major" />
+            <el-option label="一般" value="minor" />
+          </el-select>
+          <el-button @click="loadFindings">刷新</el-button>
+        </div>
+        <el-table v-loading="findingsLoading" :data="findings" row-key="id" size="small" height="420" @selection-change="onSelectionChange">
+          <el-table-column type="selection" width="44" :selectable="rowSelectable" />
+          <el-table-column label="问题是什么" min-width="240">
+            <template #default="{ row }">
+              <div class="problem">{{ row.problem || row.rule_name || "质量问题" }}</div>
+              <small class="quiet">{{ row.rule_description || "目录/关系级检查，不一定有单表字段" }}</small>
+            </template>
+          </el-table-column>
+          <el-table-column label="规则" width="170">
+            <template #default="{ row }">
+              <div>{{ row.rule_name || row.rule_code || "-" }}</div>
+              <small class="quiet">{{ row.rule_code }}</small>
+            </template>
+          </el-table-column>
+          <el-table-column label="库 / 表 / 字段" min-width="200">
+            <template #default="{ row }">
+              <div>{{ objectText(row) }}</div>
+              <small class="quiet">{{ row.system_name_cn || row.system_code || "未归属系统" }}</small>
+            </template>
+          </el-table-column>
+          <el-table-column label="程度" width="72">
+            <template #default="{ row }">{{ severityLabel(row.severity) }}</template>
+          </el-table-column>
+        </el-table>
+        <div class="analyze-bar">
+          <el-button v-perms="'asset.quality.ai.analyze'" type="primary" :disabled="!selectedFindingIds.length" :loading="submitting || previewLoading" @click="analyzeSelected">
+            分析所选问题
+          </el-button>
+          <span class="quiet">{{ selectedFindingIds.length ? `将把 ${selectedFindingIds.length} 条问题的规则说明和对象传给院内模型` : "先勾选问题" }}</span>
+        </div>
+      </el-card>
+
+      <el-card class="panel report-panel" shadow="never">
+        <template #header>
+          <div class="card-title">
+            <span>分析结果</span>
+            <div v-if="selectedResult" class="result-heading">
+              <el-tag :type="riskTone(selectedResult.risk_level)" size="small">{{ riskLabel(selectedResult.risk_level) }}</el-tag>
+              <el-tag size="small">{{ reviewLabel(selectedResult.review_status) }}</el-tag>
+            </div>
+          </div>
+        </template>
+        <div v-if="analyzing || (interruptedText && !selectedResult)" class="report-body">
+          <div class="live-head">
+            <el-tag :type="interruptedText && !analyzing ? 'danger' : 'warning'" size="small">
+              {{ interruptedText && !analyzing ? "分析未完成，以下是已生成内容" : (livePhase === "thinking" ? "模型思考中" : "正在生成") }}
+            </el-tag>
+            <span class="quiet">{{ interruptedText && !analyzing ? "可直接阅读，或重新点分析" : "右侧会边出字边更新，不用重复点" }}</span>
+          </div>
+          <div class="selected-box">
+            <div v-for="row in selectedRows" :key="row.id">{{ row.problem || row.rule_name }} · {{ objectText(row) }}</div>
+          </div>
+          <div class="live-text markdown" v-html="renderReportHtml(liveDisplayText(interruptedText || liveText))" />
+        </div>
+        <div v-else-if="selectedResult" class="report-body">
+          <section class="fact">
+            <h4>结论</h4>
+            <p>{{ selectedResult.summary }}</p>
+          </section>
+          <section v-for="item in selectedResult.structured_result.root_causes || []" :key="item.title" class="fact">
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.reason }}</p>
+          </section>
+          <section class="fact">
+            <h4>是不是噪音</h4>
+            <p>{{ noiseText }}</p>
+          </section>
+          <section class="fact">
+            <h4>建议动作</h4>
+            <el-checkbox-group v-model="acceptedRecommendationIndexes">
+              <el-checkbox v-for="(item, index) in selectedResult.structured_result.recommendations || []" :key="item.title" :label="index">
+                {{ item.title }}<span v-if="item.reason">：{{ item.reason }}</span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </section>
+          <div class="review-actions">
+            <el-input v-model="reviewNote" placeholder="复核备注" clearable />
+            <el-button v-perms="'asset.quality.ai.review'" type="success" @click="reviewJob('accepted')">接受</el-button>
+            <el-button v-perms="'asset.quality.ai.review'" type="warning" @click="reviewJob('partial')">部分接受</el-button>
+            <el-button v-perms="'asset.quality.ai.review'" type="danger" @click="reviewJob('rejected')">拒绝</el-button>
+          </div>
+        </div>
+        <el-empty v-else description="勾选问题后点“分析所选问题”" />
+      </el-card>
+    </div>
+
+    <el-card class="panel" shadow="never">
+      <template #header><span>最近分析</span></template>
+      <el-table v-loading="jobsLoading" :data="jobs" size="small" @row-click="selectJob">
+        <el-table-column prop="id" label="任务" width="70" />
+        <el-table-column label="类型" width="120">
+          <template #default="{ row }">{{ row.task_type === "run_summary" ? "总览报告" : "问题分析" }}</template>
+        </el-table-column>
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">{{ row.status === "succeeded" ? "已完成" : row.status }}</template>
+        </el-table-column>
+        <el-table-column label="对象" min-width="180" show-overflow-tooltip>
+          <template #default="{ row }">{{ (row.finding_ids || []).length ? `问题 ${row.finding_ids.join("、")}` : "平台规则/关系总览" }}</template>
+        </el-table-column>
+        <el-table-column width="90">
+          <template #default="{ row }">
+            <el-button v-if="row.result || row.status === 'succeeded'" size="small" @click.stop="selectJob(row)">查看</el-button>
+          </template>
+        </el-table-column>
       </el-table>
-    </el-card>
-
-    <el-card class="section" shadow="never">
-      <template #header><span>安全预览（提交前必做）</span></template>
-      <div class="preview-actions">
-        <el-select v-model="taskType" style="width: 180px" @change="preview = null"><el-option label="问题批量分析" value="finding_batch" /><el-option label="单问题分析" value="finding" /><el-option label="质控批次摘要" value="run_summary" /></el-select>
-        <el-select v-if="taskType === 'run_summary'" v-model="selectedRunId" style="width: 220px" placeholder="选择质量检查 run" @change="preview = null"><el-option v-for="run in runs" :key="run.id" :label="`#${run.id} · ${run.status || '-'} · ${run.total_findings ?? 0} 个问题`" :value="run.id" /></el-select>
-        <el-button v-perms="'asset.quality.ai.analyze'" type="primary" :disabled="(taskType === 'run_summary' ? !selectedRunId : !selectedFindingIds.length) || previewLoading" :loading="previewLoading" @click="makePreview">生成安全预览</el-button>
-        <el-button v-if="preview" v-perms="'asset.quality.ai.analyze'" type="success" :disabled="!canSubmit" :loading="submitting" @click="submitJob">提交分析</el-button>
-      </div>
-      <el-alert v-if="!aiStatus?.enabled || !aiStatus?.configured" class="inner-alert" type="info" :closable="false" title="AI 质控当前未配置或处于关闭态，可查看问题但不能提交分析。" />
-      <el-descriptions v-if="preview" class="preview-grid" :column="3" border size="small">
-        <el-descriptions-item label="实际字段"><span v-for="field in preview.fields || []" :key="field" class="field-chip">{{ field }}</span><span v-if="!preview.fields?.length">由服务端白名单组包</span></el-descriptions-item>
-        <el-descriptions-item label="条数 / 字节">{{ preview.item_count ?? preview.finding_ids?.length ?? (preview.run_id ? 1 : 0) }} / {{ preview.payload_bytes ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item label="input_digest"><code>{{ preview.input_digest }}</code></el-descriptions-item>
-        <el-descriptions-item label="脱敏剔除数">{{ preview.redacted_count ?? 0 }} / {{ preview.dropped_count ?? 0 }}</el-descriptions-item>
-        <el-descriptions-item label="请求号">{{ preview.request_id }}</el-descriptions-item>
-        <el-descriptions-item label="安全告警">{{ preview.warnings?.join('；') || '无' }}</el-descriptions-item>
-      </el-descriptions>
-    </el-card>
-
-    <el-card class="section" shadow="never">
-      <template #header><span>分析任务与结构化结果</span></template>
-      <el-table v-loading="jobsLoading" :data="jobs" row-key="id" size="small" @row-click="selectJob">
-        <el-table-column prop="id" label="任务" width="90" /><el-table-column prop="task_type" label="类型" width="130" /><el-table-column prop="status" label="状态" width="110" /><el-table-column prop="finding_ids" label="问题/Run" width="120" show-overflow-tooltip /><el-table-column prop="input_digest" label="digest" min-width="190" show-overflow-tooltip /><el-table-column prop="error_class" label="错误分类" width="120" />
-        <el-table-column label="操作" width="180" fixed="right"><template #default="{ row }"><el-button v-if="['failed','unknown'].includes(row.status)" v-perms="'asset.quality.ai.analyze'" size="small" @click.stop="retryJob(row)">重试</el-button><el-button v-if="row.result" size="small" @click.stop="selectJob(row)">查看结果</el-button></template></el-table-column>
-      </el-table>
-      <div v-if="selectedResult" class="result-panel">
-        <div class="result-heading"><span>结果摘要</span><el-tag :type="riskTone(selectedResult.risk_level)">{{ selectedResult.risk_level || 'unknown' }}</el-tag><el-tag>{{ selectedResult.review_status }}</el-tag></div>
-        <p>{{ selectedResult.summary }}</p>
-        <h4>可能根因</h4><ul><li v-for="item in selectedResult.structured_result.root_causes || []" :key="item.title">{{ item.title }}<span v-if="item.reason">：{{ item.reason }}</span></li></ul>
-        <h4>建议动作</h4><el-checkbox-group v-model="acceptedRecommendationIndexes"><el-checkbox v-for="(item, index) in selectedResult.structured_result.recommendations || []" :key="item.title" :label="index">{{ item.title }}<span v-if="item.reason">：{{ item.reason }}</span></el-checkbox></el-checkbox-group>
-        <div class="review-actions"><el-input v-model="reviewNote" placeholder="复核备注（可选）" clearable /><el-button v-perms="'asset.quality.ai.review'" type="success" @click="reviewJob('accepted')">接受</el-button><el-button v-perms="'asset.quality.ai.review'" type="warning" @click="reviewJob('partial')">部分接受</el-button><el-button v-perms="'asset.quality.ai.review'" type="danger" @click="reviewJob('rejected')">拒绝</el-button><el-button v-perms="'asset.quality.ai.review'" :disabled="!acceptedRecommendationIndexes.length" @click="attachJob">挂接已接受建议</el-button></div>
-      </div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import RePageHeader from "@/components/RePageHeader/index.vue";
-import { getQualityFindings, getQualityCheckRuns, getAiQualityStatus, testAiQualityConnection, previewAiQuality, createAiQualityJob, getAiQualityJobs, getAiQualityJob, retryAiQualityJob, reviewAiQualityResult, attachAiQualityResult, type AiQualityJob, type AiQualityPreview, type AiQualityStatus, type AiQualityResultItem, type QualityFindingItem, type QualityCheckRunItem } from "@/api/asset";
-import { aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds, sameFindingDomain } from "./contracts";
+import {
+  getQualityFindings, getAiQualityStatus, testAiQualityConnection,
+  previewAiQuality, createAiQualityJob, createGovernanceReport, getAiQualityJobs, getAiQualityJob,
+  reviewAiQualityResult,
+  type AiQualityJob, type AiQualityStatus, type AiQualityResultItem, type QualityFindingItem
+} from "@/api/asset";
+import { aiQualityErrorLabel, aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds, usesHospitalLlm } from "./contracts";
+import { liveDisplayText, objectText, renderReportHtml, severityLabel } from "./reportMarkdown";
 
-type Finding = QualityFindingItem & { table_name?: string; column_name?: string; system_code?: string; source_code?: string; schema_name?: string; error_cnt?: number; domain?: string };
-const route = useRoute();
-const aiStatus = ref<AiQualityStatus | null>(null); const connectionTesting = ref(false);
-const findings = ref<Finding[]>([]); const findingsLoading = ref(false); const findingStatus = ref("open"); const findingSeverity = ref("");
-const selectedFindingIds = ref<number[]>([]); const taskType = ref<"finding" | "finding_batch" | "run_summary">("finding_batch");
-const runs = ref<QualityCheckRunItem[]>([]); const selectedRunId = ref<number | undefined>();
-const preview = ref<AiQualityPreview | null>(null); const previewLoading = ref(false); const submitting = ref(false);
-const jobs = ref<AiQualityJob[]>([]); const jobsLoading = ref(false); const selectedJob = ref<AiQualityJob | null>(null); const selectedResult = ref<AiQualityResultItem | null>(null); const acceptedRecommendationIndexes = ref<number[]>([]); const reviewNote = ref("");
+const aiStatus = ref<AiQualityStatus | null>(null);
+const connectionTesting = ref(false);
+const findings = ref<QualityFindingItem[]>([]);
+const findingsLoading = ref(false);
+const findingStatus = ref("open");
+const findingSeverity = ref("");
+const selectedFindingIds = ref<number[]>([]);
+const previewLoading = ref(false);
+const submitting = ref(false);
+const reportLoading = ref(false);
+const jobs = ref<AiQualityJob[]>([]);
+const jobsLoading = ref(false);
+const selectedResult = ref<AiQualityResultItem | null>(null);
+const acceptedRecommendationIndexes = ref<number[]>([]);
+const reviewNote = ref("");
+const analyzing = ref(false);
+const liveText = ref("");
+const livePhase = ref("");
+const interruptedText = ref("");
+let pollTimer: number | undefined;
+
 const statusText = computed(() => aiQualityStatusLabel(aiStatus.value));
-const canSubmit = computed(() => canSubmitAiQuality(aiStatus.value, preview.value));
+const hospitalReady = computed(() => usesHospitalLlm(aiStatus.value) && Boolean(aiStatus.value?.configured));
+const modelName = computed(() => aiStatus.value?.hospital_llm?.model || "未配置");
+const selectedRows = computed(() => findings.value.filter(row => selectedFindingIds.value.includes(row.id)));
+const noiseText = computed(() => {
+  const flag = selectedResult.value?.structured_result?.false_positive;
+  if (!flag) return "需人工判断";
+  return flag.possible ? `更像噪音。${flag.reason || ""}` : `需要处理。${flag.reason || ""}`;
+});
 
-async function loadStatus() { try { aiStatus.value = (await getAiQualityStatus()).data; } catch { aiStatus.value = { enabled: false, configured: false, message: "状态接口不可用" }; } }
-async function testConnection() { connectionTesting.value = true; try { aiStatus.value = (await testAiQualityConnection()).data; ElMessage.success("连接测试完成"); } catch { ElMessage.error("连接测试失败"); } finally { connectionTesting.value = false; } }
-async function loadFindings() { findingsLoading.value = true; try { const data = (await getQualityFindings({ page: 1, page_size: 50, status: findingStatus.value || undefined, severity: findingSeverity.value || undefined })).data; findings.value = (data.items || []) as Finding[]; } finally { findingsLoading.value = false; } }
-async function loadRuns() { try { runs.value = ((await getQualityCheckRuns({ page: 1, page_size: 50 })).data.items || []); } catch { runs.value = []; } }
-async function loadJobs() { jobsLoading.value = true; try { jobs.value = ((await getAiQualityJobs({ page: 1, page_size: 30 })).data.items || []); } finally { jobsLoading.value = false; } }
-function rowSelectable(row: Finding) { return selectedFindingIds.value.length < 50 || selectedFindingIds.value.includes(row.id); }
-function onSelectionChange(rows: Finding[]) { if (rows.length > 50) ElMessage.warning("最多选择 50 条同域问题"); const limited = rows.slice(0, 50); if (!sameFindingDomain(limited)) { ElMessage.warning("所选问题必须属于同一业务系统+数据连接，且不能缺少物理归属"); selectedFindingIds.value = []; preview.value = null; return; } selectedFindingIds.value = limitFindingIds(limited.map(row => row.id)); preview.value = null; }
-async function makePreview() { if (taskType.value === "run_summary" && !selectedRunId.value) { ElMessage.warning("请选择质量检查 run"); return; } if (taskType.value !== "run_summary" && !selectedFindingIds.value.length) { ElMessage.warning("请选择问题"); return; } if (taskType.value === "finding" && selectedFindingIds.value.length !== 1) { ElMessage.warning("单问题分析只能选择 1 条问题"); return; } if (taskType.value === "finding_batch" && selectedFindingIds.value.length < 2) { ElMessage.warning("批量分析至少选择 2 条同域问题"); return; } previewLoading.value = true; try { preview.value = (await previewAiQuality({ task_type: taskType.value, finding_ids: taskType.value === "run_summary" ? [] : selectedFindingIds.value, run_id: taskType.value === "run_summary" ? selectedRunId.value : undefined })).data; } catch { preview.value = null; ElMessage.error("安全预览失败"); } finally { previewLoading.value = false; } }
-async function submitJob() { if (!preview.value || !canSubmit.value || submitting.value) return; submitting.value = true; try { const result = (await createAiQualityJob({ task_type: preview.value.task_type, finding_ids: preview.value.finding_ids, run_id: preview.value.run_id ?? undefined, input_digest: preview.value.input_digest, request_id: preview.value.request_id })).data; jobs.value = [result, ...jobs.value.filter(item => item.id !== result.id)]; selectedJob.value = result; selectedResult.value = result.result || null; ElMessage.success("分析任务已提交"); } catch { ElMessage.error("提交失败或已有相同任务在处理中"); } finally { submitting.value = false; } }
-async function selectJob(job: AiQualityJob) { selectedJob.value = job; acceptedRecommendationIndexes.value = []; selectedResult.value = job.result || null; if (!selectedResult.value) { try { const detail = (await getAiQualityJob(job.id)).data; selectedJob.value = detail; selectedResult.value = detail.result || null; } catch { ElMessage.error("任务详情加载失败"); } } }
-async function retryJob(job: AiQualityJob) { try { const result = (await retryAiQualityJob(job.id)).data; jobs.value = jobs.value.map(item => item.id === job.id ? result : item); ElMessage.success("已提交重试"); } catch { ElMessage.error("当前任务不可重试"); } }
-async function reviewJob(status: "accepted" | "rejected" | "partial") { if (!selectedResult.value) return; try { selectedResult.value = (await reviewAiQualityResult(selectedResult.value.id, { status, note: reviewNote.value, accepted_recommendations: acceptedRecommendationIndexes.value })).data; ElMessage.success("复核状态已保存"); } catch { ElMessage.error("复核失败"); } }
-async function attachJob() { if (!selectedResult.value || !acceptedRecommendationIndexes.value.length) return; try { selectedResult.value = (await attachAiQualityResult(selectedResult.value.id, { recommendation_indexes: acceptedRecommendationIndexes.value, note: reviewNote.value })).data; ElMessage.success("已挂接已接受建议"); } catch { ElMessage.error("挂接失败"); } }
+async function loadStatus() {
+  try { aiStatus.value = (await getAiQualityStatus()).data; }
+  catch { aiStatus.value = { enabled: false, configured: false, message: "状态接口不可用" }; }
+}
+async function loadFindings() {
+  findingsLoading.value = true;
+  try {
+    const data = (await getQualityFindings({
+      page: 1, page_size: 50,
+      status: findingStatus.value || undefined,
+      severity: findingSeverity.value || undefined
+    })).data;
+    findings.value = data.items || [];
+  } finally { findingsLoading.value = false; }
+}
+async function loadJobs() {
+  jobsLoading.value = true;
+  try { jobs.value = ((await getAiQualityJobs({ page: 1, page_size: 20 })).data.items || []); }
+  finally { jobsLoading.value = false; }
+}
+function rowSelectable(row: QualityFindingItem) {
+  return selectedFindingIds.value.length < 50 || selectedFindingIds.value.includes(row.id);
+}
+function onSelectionChange(rows: QualityFindingItem[]) {
+  selectedFindingIds.value = limitFindingIds(rows.map(row => row.id));
+}
+async function testConnection() {
+  connectionTesting.value = true;
+  try {
+    aiStatus.value = (await testAiQualityConnection()).data;
+    ElMessage.success("院内模型已接通");
+  } catch { ElMessage.error("连接失败"); }
+  finally { connectionTesting.value = false; }
+}
+function stopWatch() {
+  if (pollTimer) {
+    window.clearTimeout(pollTimer);
+    pollTimer = undefined;
+  }
+}
+async function watchJob(jobId: number | string) {
+  analyzing.value = true;
+  selectedResult.value = null;
+  liveText.value = "";
+  livePhase.value = "thinking";
+  interruptedText.value = "";
+  stopWatch();
+  const tick = async () => {
+    try {
+      const detail = (await getAiQualityJob(jobId)).data;
+      liveText.value = detail.partial_text || liveText.value;
+      livePhase.value = detail.phase || livePhase.value;
+      jobs.value = [detail, ...jobs.value.filter(item => item.id !== detail.id)];
+      if (detail.status === "succeeded" && detail.result) {
+        selectedResult.value = detail.result;
+        analyzing.value = false;
+        ElMessage.success("分析完成");
+        return;
+      }
+      if (["failed", "blocked", "unknown"].includes(detail.status)) {
+        interruptedText.value = detail.partial_text || liveText.value;
+        analyzing.value = false;
+        ElMessage.error(aiQualityErrorLabel(detail.error_class));
+        return;
+      }
+    } catch {
+      // keep polling through a single transient error
+    }
+    pollTimer = window.setTimeout(tick, 800);
+  };
+  await tick();
+}
+async function makeGovernanceReport() {
+  reportLoading.value = true;
+  try {
+    const result = (await createGovernanceReport()).data;
+    jobs.value = [result, ...jobs.value.filter(item => item.id !== result.id)];
+    if (result.status === "succeeded" && result.result) selectedResult.value = result.result;
+    else await watchJob(result.id);
+  } catch { ElMessage.error("生成报告失败"); }
+  finally { reportLoading.value = false; }
+}
+async function analyzeSelected() {
+  if (!selectedFindingIds.value.length) {
+    ElMessage.warning("请先勾选问题");
+    return;
+  }
+  submitting.value = true;
+  previewLoading.value = true;
+  analyzing.value = true;
+  selectedResult.value = null;
+  liveText.value = "正在提交所选问题…";
+  try {
+    const taskType = selectedFindingIds.value.length === 1 ? "finding" : "finding_batch";
+    const preview = (await previewAiQuality({
+      task_type: taskType,
+      finding_ids: selectedFindingIds.value
+    })).data;
+    if (!canSubmitAiQuality(aiStatus.value, preview)) {
+      ElMessage.error("当前不能提交分析");
+      analyzing.value = false;
+      return;
+    }
+    const result = (await createAiQualityJob({
+      task_type: preview.task_type,
+      finding_ids: preview.finding_ids,
+      input_digest: preview.input_digest,
+      request_id: preview.request_id
+    })).data;
+    jobs.value = [result, ...jobs.value.filter(item => item.id !== result.id)];
+    if (result.status === "succeeded" && result.result) {
+      selectedResult.value = result.result;
+      analyzing.value = false;
+      ElMessage.success("分析完成");
+    } else {
+      await watchJob(result.id);
+    }
+  } catch { ElMessage.error("提交失败"); analyzing.value = false; }
+  finally {
+    submitting.value = false;
+    previewLoading.value = false;
+  }
+}
+async function selectJob(job: AiQualityJob) {
+  acceptedRecommendationIndexes.value = [];
+  selectedResult.value = job.result || null;
+  if (!selectedResult.value) {
+    try { selectedResult.value = (await getAiQualityJob(job.id)).data.result || null; }
+    catch { ElMessage.error("加载失败"); }
+  }
+}
+async function reviewJob(status: "accepted" | "rejected" | "partial") {
+  if (!selectedResult.value) return;
+  try {
+    selectedResult.value = (await reviewAiQualityResult(selectedResult.value.id, {
+      status, note: reviewNote.value, accepted_recommendations: acceptedRecommendationIndexes.value
+    })).data;
+    ElMessage.success("复核已保存");
+  } catch { ElMessage.error("复核失败"); }
+}
 function statusTone(status: string) { return status === "可用" ? "success" : status === "连接失败" ? "danger" : "warning"; }
 function riskTone(level?: string) { return level === "critical" || level === "high" ? "danger" : level === "medium" ? "warning" : "success"; }
-onMounted(async () => { await loadStatus(); await Promise.all([loadFindings(), loadRuns(), loadJobs()]); const id = Number(route.query.finding_id); if (id && findings.value.some(item => item.id === id)) selectedFindingIds.value = [id]; });
+function riskLabel(level?: string) {
+  return ({ critical: "严重", high: "偏高", medium: "中等", low: "较低", unknown: "待判断" } as Record<string, string>)[level || ""] || "待判断";
+}
+function reviewLabel(status?: string) {
+  return ({ pending: "待复核", accepted: "已接受", rejected: "已拒绝", partial: "部分接受" } as Record<string, string>)[status || ""] || "待复核";
+}
+onMounted(async () => {
+  await loadStatus();
+  await Promise.all([loadFindings(), loadJobs()]);
+});
+onUnmounted(() => stopWatch());
 </script>
 
 <style scoped>
-.ai-quality-page { padding: 4px; }.notice { margin-bottom: 14px; }.section { margin-bottom: 14px; border-color: var(--border-light); }.card-title,.preview-actions,.result-heading,.review-actions { display:flex; align-items:center; gap:10px; justify-content:space-between; }.filters { display:flex; gap:10px; align-items:center; margin-bottom:10px; }.selection-note { color:var(--text-secondary); }.inner-alert { margin-top:12px; }.preview-grid { margin-top:12px; }.field-chip { display:inline-block; margin:2px 4px 2px 0; padding:2px 6px; border-radius:4px; background:#f0f7ec; color:#38552c; }.result-panel { margin-top:16px; padding:16px; background:var(--bg-elevated); border-radius:8px; }.result-heading { justify-content:flex-start; }.result-panel li { margin:5px 0; }.review-actions { justify-content:flex-start; margin-top:15px; }.review-actions .el-input { max-width:320px; }code { font-size:11px; word-break:break-all; }@media(max-width:760px){.filters,.preview-actions,.review-actions{flex-wrap:wrap}.review-actions .el-input{max-width:none;width:100%}}
+.ai-quality-page { padding: 4px 4px 24px; }
+.toolbar, .card-title, .analyze-bar, .review-actions, .toolbar-actions, .toolbar-meta, .result-heading {
+  display: flex; align-items: center; gap: 10px;
+}
+.toolbar { justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; }
+.toolbar-meta { color: var(--el-text-color-regular); }
+.quiet { color: var(--el-text-color-secondary); font-size: 12px; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 12px; margin-bottom: 12px; }
+.panel { border-color: var(--border-light); }
+.card-title { justify-content: space-between; }
+.filters { display: flex; gap: 8px; margin-bottom: 10px; }
+.problem { font-weight: 600; }
+.analyze-bar { margin-top: 12px; }
+.report-body { min-height: 360px; }
+.fact { margin-bottom: 14px; }
+.fact h4 { margin: 0 0 6px; font-size: 13px; color: var(--el-text-color-secondary); }
+.fact p { margin: 0; line-height: 1.7; }
+.live-head, .selected-box { margin-bottom: 10px; }
+.live-text {
+  white-space: pre-wrap;
+  min-height: 180px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--el-fill-color-light);
+  line-height: 1.65;
+}
+.review-actions { margin-top: 14px; }
+.review-actions .el-input { max-width: 240px; }
+@media (max-width: 1200px) {
+  .workspace, .split { grid-template-columns: 1fr; }
+}
 </style>

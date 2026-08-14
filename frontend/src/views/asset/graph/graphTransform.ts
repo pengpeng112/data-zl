@@ -32,11 +32,11 @@ export type GraphNodeStyle = {
 
 // 129号：知识图谱 pastel 配色（参考医学知识图谱样式：白底、柔和色块、深色文字）
 export const GRAPH_NODE_TYPE_STYLE: Record<GraphNodeType, GraphNodeStyle> = {
-  system: { fill: "#f8d7c4", stroke: "#e0a075", textColor: "#8a4b1f", shape: "roundRect", size: [168, 58] },
-  source: { fill: "#fdf0b8", stroke: "#e3c85f", textColor: "#755d0a", shape: "ellipse", size: [188, 62] },
-  schema: { fill: "#dcebc8", stroke: "#a3c47e", textColor: "#49601f", shape: "roundRect", size: [148, 52] },
+  system: { fill: "#f8d7c4", stroke: "#e0a075", textColor: "#8a4b1f", shape: "ellipse", size: [158, 158] },
+  source: { fill: "#fdf0b8", stroke: "#e3c85f", textColor: "#755d0a", shape: "ellipse", size: [188, 72] },
+  schema: { fill: "#dcebc8", stroke: "#a3c47e", textColor: "#49601f", shape: "ellipse", size: [150, 150] },
   domain: { fill: "#ffe1b3", stroke: "#e8a04c", textColor: "#8a5310", shape: "ellipse", size: [142, 50] },
-  table: { fill: "#d6e9f8", stroke: "#8fbfe6", textColor: "#23527c", shape: "roundRect", size: [200, 68] },
+  table: { fill: "#d6e9f8", stroke: "#8fbfe6", textColor: "#23527c", shape: "roundRect", size: [236, 118] },
   view: { fill: "#e6ddf5", stroke: "#b6a3dd", textColor: "#54407f", shape: "roundRect", size: [220, 74] },
   field: { fill: "#eef5e8", stroke: "#a8c58d", textColor: "#38552c", shape: "roundRect", size: [168, 44] },
   aggregate: { fill: "#d3eef2", stroke: "#86ccd6", textColor: "#1f5f6b", shape: "roundRect", size: [190, 68] }
@@ -44,6 +44,179 @@ export const GRAPH_NODE_TYPE_STYLE: Record<GraphNodeType, GraphNodeStyle> = {
 
 export function graphNodeStyle(type: GraphNodeType): GraphNodeStyle {
   return GRAPH_NODE_TYPE_STYLE[type];
+}
+
+const GRAPH_LABEL_TAILS = [
+  "数据表", "字典表", "明细表", "事实表", "对照表", "映射表", "目录表", "编码表",
+  "主表", "从表", "维表",
+  "记录", "信息", "首页", "申请", "报告", "结果", "清单", "配置",
+  "对照", "映射", "目录", "分类", "编码", "明细"
+].sort((a, b) => b.length - a.length);
+
+function mergeOrphanChar(lines: string[]): string[] {
+  if (lines.length >= 2 && lines[lines.length - 1].length === 1) {
+    const orphan = lines.pop() as string;
+    lines[lines.length - 1] += orphan;
+  }
+  return lines;
+}
+
+function splitSemanticTail(text: string): [string, string] | null {
+  for (const tail of GRAPH_LABEL_TAILS) {
+    if (!text.endsWith(tail) || text.length <= tail.length + 1) continue;
+    const head = text.slice(0, -tail.length);
+    if (head.length >= 4) return [head, tail];
+  }
+  return null;
+}
+
+function hardWrapCjk(text: string, width: number): string[] {
+  if (text.length <= width + 1) return [text];
+  const parts: string[] = [];
+  let rest = text;
+  while (rest.length > width) {
+    const cut = rest.length - width === 1 ? width - 1 : width;
+    parts.push(rest.slice(0, cut));
+    rest = rest.slice(cut);
+  }
+  if (rest) parts.push(rest);
+  return mergeOrphanChar(parts);
+}
+
+function wrapLatinToken(text: string, width: number): string[] {
+  if (text.length <= width) return [text];
+  if (/[_./]/.test(text)) {
+    return text.split(/[_./]+/).map(part => part.trim()).filter(Boolean);
+  }
+  return [text];
+}
+
+function wrapToken(token: string, width: number): string[] {
+  if (/^[A-Za-z0-9._]+$/.test(token)) {
+    return wrapLatinToken(token, Math.max(width + 8, 16));
+  }
+  if (token.length <= width + 1) return [token];
+  const latinCjk = token.match(/^([A-Za-z][A-Za-z0-9._]{0,10})([\u4e00-\u9fff].+)$/);
+  if (latinCjk) {
+    return [latinCjk[1], ...wrapToken(latinCjk[2], width)];
+  }
+  const semantic = splitSemanticTail(token);
+  if (semantic) {
+    return semantic.flatMap(part => wrapToken(part, width));
+  }
+  return hardWrapCjk(token, width);
+}
+
+export function wrapGraphText(text: string, width = 8, maxLines = 6): string {
+  const value = String(text || "").trim();
+  if (!value) return "";
+
+  const hyphenated = /[-—–·／/]/.test(value);
+  const tokens = value
+    .split(/[-—–·／/]+/)
+    .map(token => token.trim())
+    .filter(Boolean);
+  const chunks = (tokens.length ? tokens : [value]).flatMap(token => wrapToken(token, width));
+
+  const lines: string[] = [];
+  for (const chunk of chunks) {
+    const prev = lines[lines.length - 1];
+    const canMergeShort = !hyphenated && prev && prev.length + chunk.length <= width;
+    if (canMergeShort) {
+      lines[lines.length - 1] = prev + chunk;
+    } else {
+      lines.push(chunk);
+    }
+  }
+  const merged = hyphenated ? lines : mergeOrphanChar(lines);
+  if (merged.length <= maxLines) return merged.join("\n");
+  return [...merged.slice(0, maxLines - 1), merged.slice(maxLines - 1).join("")].join("\n");
+}
+
+export function estimateGraphLabelSize(text: string, fontSize = 12, fallback: [number, number] = [160, 64]): [number, number] {
+  const lines = String(text || "").split("\n").filter(Boolean);
+  const lineCount = Math.max(1, lines.length);
+  const maxEm = Math.max(
+    1,
+    ...lines.map(line => Array.from(line).reduce((sum, ch) => sum + (/[\u4e00-\u9fff]/.test(ch) ? 1 : 0.58), 0))
+  );
+  const width = Math.max(fallback[0], Math.ceil(maxEm * fontSize + 36));
+  const height = Math.max(fallback[1], Math.ceil(lineCount * (fontSize + 5) + 26));
+  return [Math.min(width, 280), Math.min(height, 176)];
+}
+
+export function formatGraphNodeLabel(node: Partial<GraphNode & ApiGraphNode> & {
+  display_id?: string;
+  is_aggregate?: boolean;
+  count?: number;
+  child_count?: number;
+  asset_count?: number;
+}): string {
+  const rawLabel = typeof node.label === "string" ? node.label : "";
+  const isField = node.category === "field" || node.object_type === "column";
+  const isAggregate = Boolean(node.is_aggregate) || ["system", "source", "schema"].includes(String(node.category || ""));
+  const count = node.count ?? node.child_count ?? node.asset_count;
+  if (isField) {
+    return wrapGraphText(String(node.column_name_cn || node.column_name || rawLabel || ""), 8, 3);
+  }
+
+  let name = "";
+  let tech = "";
+  const tableCn = String(node.table_name_cn || "").trim();
+  const tableEn = String(node.table_name || "").trim();
+  if (!isAggregate && tableCn) {
+    name = tableCn;
+    if (tableEn && tableEn !== tableCn) tech = tableEn;
+  } else {
+    name = String(node.display_id || rawLabel || tableEn || "").trim();
+  }
+  name = name.replace(/[（(]\s*\d+\s*[)）]\s*$/g, "").trim();
+  const paired = name.match(/^(.*?)[（(]([^）)]+)[)）]\s*$/);
+  if (paired?.[1] && paired[2] && !/^\d+$/.test(paired[2].trim())) {
+    name = paired[1].trim();
+    tech = tech || paired[2].trim();
+  }
+
+  const showCount = count != null && Number.isFinite(Number(count)) && (isAggregate || Number(count) > 1);
+  const techLine = tech && tech !== name ? wrapGraphText(tech, 16, 2) : "";
+  const lines = [
+    ...wrapGraphText(name, isAggregate ? 6 : 7, 5).split("\n"),
+    techLine,
+    showCount ? `(${count})` : ""
+  ].filter(Boolean);
+  return lines.join("\n");
+}
+
+export function linkAdjacentOverviewNodes<T extends { id?: string; source?: string; target?: string }>(
+  nodes: { id?: string }[],
+  edges: T[]
+): T[] {
+  const ids = nodes.map(node => String(node.id || "")).filter(Boolean);
+  if (ids.length < 2) return edges;
+  const seen = new Set<string>();
+  for (const edge of edges) {
+    const from = String(edge.source || "");
+    const to = String(edge.target || "");
+    if (!from || !to) continue;
+    seen.add(`${from}|${to}`);
+    seen.add(`${to}|${from}`);
+  }
+  const extra: T[] = [];
+  for (let index = 0; index < ids.length; index += 1) {
+    const from = ids[index];
+    const to = ids[(index + 1) % ids.length];
+    if (from === to || seen.has(`${from}|${to}`)) continue;
+    seen.add(`${from}|${to}`);
+    extra.push({
+      id: `cycle:${from}:${to}`,
+      source: from,
+      target: to,
+      label: "",
+      relation_type: "structure",
+      relation_layer: "structure"
+    } as unknown as T);
+  }
+  return [...edges, ...extra];
 }
 
 export function isCoreFactNode(node: Partial<GraphNode & ApiGraphNode>) {
@@ -167,6 +340,9 @@ export function graphEdgeStyle(edge: Partial<GraphEdge & ApiGraphEdge>): GraphEd
   const relationType = edgeRelationTypeValue(edge);
   const status = edgeValidationStatus(edge);
   // 129号：pastel 底图上的彩色细边（参考知识图谱：绿/蓝/橙/紫区分关系状态）
+  if (edgeRelationTypeValue(edge) === "structure") {
+    return { stroke: "#94a3b8", lineWidth: 1.3, opacity: 0.45 };
+  }
   if (isDeferredEdge(edge)) return { stroke: "#9b7ec8", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.8 };
   if (relationType === "dependency") return { stroke: GRAPH_COLOR_NEUTRAL_LIGHT, lineWidth: 1.2, lineDash: [2, 5], opacity: 0.55 };
   if (["sample_pass", "verified"].includes(status)) return { stroke: "#58a05c", lineWidth: 2.6, opacity: 0.9 };

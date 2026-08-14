@@ -91,8 +91,8 @@ import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
 import ReEmptyState from "@/components/ReEmptyState/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import {
   getRelationPath,
@@ -104,6 +104,7 @@ import {
 import RelationIcon from "~icons/ri/git-branch-line";
 
 const router = useRouter();
+const route = useRoute();
 const fromTable = ref("");
 const toTable = ref("");
 const loading = ref(false);
@@ -180,6 +181,16 @@ function showEdge(edge: GraphEdge) {
   selectedEdge.value = edge;
   drawerVisible.value = true;
 }
+
+onMounted(() => {
+  const from = String(route.query.from || "").trim();
+  const to = String(route.query.to || "").trim();
+  if (from && to) {
+    fromTable.value = from;
+    toTable.value = to;
+    void doQuery();
+  }
+});
 </script>
 
 <style scoped lang="scss">

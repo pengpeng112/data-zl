@@ -7,10 +7,54 @@
     <el-card shadow="never" class="lineage-card">
       <ReToolbar title="表影响分析">
         <div class="impact-query">
-          <el-input v-model="impactTable" placeholder="例如 HIS.PAT_VISIT" @keyup.enter="runImpact" />
+          <el-select
+            v-model="systemCode"
+            class="system-select"
+            placeholder="业务系统"
+            clearable
+            filterable
+            :loading="optionsLoading"
+            @change="onSystemChange"
+          >
+            <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+          <el-select
+            v-model="schemaName"
+            class="schema-select"
+            placeholder="Schema / 库"
+            clearable
+            filterable
+            :loading="schemaLoading"
+            @change="onSchemaChange"
+          >
+            <el-option v-for="item in schemaOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+          <el-select
+            v-model="impactTable"
+            class="table-select"
+            placeholder="输入中文名或表名，从资产库选择"
+            clearable
+            filterable
+            remote
+            reserve-keyword
+            allow-create
+            default-first-option
+            :remote-method="searchImpactTables"
+            :loading="tableSearching"
+            @visible-change="onTableSelectVisible"
+            @keyup.enter="runImpact"
+          >
+            <el-option
+              v-for="item in tableOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
           <el-button type="primary" :loading="impactLoading" @click="runImpact">分析</el-button>
         </div>
       </ReToolbar>
+      <p class="impact-hint">先选业务系统和库，表清单会从资产库带出；也可直接输入中文名或表名搜索，不必手敲完整 SCHEMA.TABLE。</p>
 
       <div v-if="impactResult" class="impact-result">
         <section class="impact-stats">
@@ -37,7 +81,27 @@
       <ReToolbar :title="`ODS 视图依赖（${depsTotal}）`">
         <div class="deps-filter">
           <el-input v-model="depView" placeholder="视图名" clearable @clear="loadDeps" @keyup.enter="loadDeps" />
-          <el-input v-model="depTable" placeholder="被引用表名" clearable @clear="loadDeps" @keyup.enter="loadDeps" />
+          <el-select
+            v-model="depTable"
+            class="dep-table-select"
+            placeholder="被引用表，可搜索资产库"
+            clearable
+            filterable
+            remote
+            allow-create
+            default-first-option
+            :remote-method="searchDepTables"
+            :loading="depTableSearching"
+            @clear="loadDeps"
+            @change="loadDeps"
+          >
+            <el-option
+              v-for="item in depTableOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.table || item.value"
+            />
+          </el-select>
         </div>
         <template #actions><el-button type="primary" :icon="SearchIcon" @click="loadDeps">查询</el-button></template>
       </ReToolbar>
@@ -58,15 +122,42 @@ import ReEmptyState from "@/components/ReEmptyState/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
-import { ref } from "vue";
-import { getImpactAnalysis, getViewDependencies, type ImpactResult, type ViewDependencyItem } from "@/api/asset";
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import {
+  getGraphFilterOptions,
+  getGraphOptions,
+  getImpactAnalysis,
+  getTables,
+  getViewDependencies,
+  searchGraphTables,
+  type GraphOptionItem,
+  type ImpactResult,
+  type ViewDependencyItem
+} from "@/api/asset";
+import {
+  mergeTableOptions,
+  optionFromCatalog,
+  parseImpactTableQuery,
+  type ImpactTableOption
+} from "@/views/asset/lineage/lineagePicker";
 import { ElMessage } from "element-plus";
 import LineageIcon from "~icons/ri/node-tree";
 import SearchIcon from "~icons/ri/search-line";
 
+const route = useRoute();
+const systemCode = ref("");
+const schemaName = ref("");
 const impactTable = ref("");
 const impactLoading = ref(false);
 const impactResult = ref<ImpactResult | null>(null);
+const optionsLoading = ref(false);
+const schemaLoading = ref(false);
+const tableSearching = ref(false);
+const systemOptions = ref<GraphOptionItem[]>([]);
+const schemaOptions = ref<GraphOptionItem[]>([]);
+const allSchemaOptions = ref<GraphOptionItem[]>([]);
+const tableOptions = ref<ImpactTableOption[]>([]);
 const depsLoading = ref(false);
 const depsItems = ref<ViewDependencyItem[]>([]);
 const depsTotal = ref(0);
@@ -74,18 +165,138 @@ const depPage = ref(1);
 const depPageSize = ref(50);
 const depView = ref("");
 const depTable = ref("");
+const depTableSearching = ref(false);
+const depTableOptions = ref<ImpactTableOption[]>([]);
 
 function runImpact() {
-  if (!impactTable.value.trim()) { ElMessage.warning("请输入表名"); return; }
+  if (!impactTable.value.trim()) { ElMessage.warning("请选择或搜索要分析的表"); return; }
   impactLoading.value = true;
   getImpactAnalysis(impactTable.value.trim()).then(({ data }) => { impactResult.value = data; }).catch(() => { impactResult.value = null; }).finally(() => { impactLoading.value = false; });
 }
+
 function loadDeps() {
   depsLoading.value = true;
   getViewDependencies({ page: depPage.value, page_size: depPageSize.value, view: depView.value || undefined, referenced_table: depTable.value || undefined })
     .then(({ data }) => { depsItems.value = data.items; depsTotal.value = data.total; })
     .finally(() => { depsLoading.value = false; });
 }
+
+async function loadCatalogOptions() {
+  optionsLoading.value = true;
+  try {
+    const { data } = await getGraphOptions();
+    systemOptions.value = data.system_options?.length
+      ? data.system_options
+      : (data.systems || []).map(value => ({ value, label: value }));
+    allSchemaOptions.value = data.schema_options?.length
+      ? data.schema_options
+      : (data.schemas || []).map(value => ({ value, label: value }));
+    if (!systemCode.value) schemaOptions.value = allSchemaOptions.value;
+  } finally {
+    optionsLoading.value = false;
+  }
+}
+
+async function loadSchemas(system?: string) {
+  if (!system) {
+    schemaOptions.value = allSchemaOptions.value;
+    return;
+  }
+  schemaLoading.value = true;
+  try {
+    const { data } = await getGraphFilterOptions({ system_code: system, next_level: "schema" });
+    schemaOptions.value = data.items?.length ? data.items : allSchemaOptions.value;
+  } catch {
+    schemaOptions.value = allSchemaOptions.value;
+  } finally {
+    schemaLoading.value = false;
+  }
+}
+
+async function loadTablesFromLibrary(keyword = "") {
+  tableSearching.value = true;
+  try {
+    const query = keyword.trim();
+    if (query) {
+      const { data } = await searchGraphTables({
+        q: query,
+        system_code: systemCode.value || undefined,
+        schema: schemaName.value || undefined,
+        limit: 30
+      });
+      tableOptions.value = mergeTableOptions([], (data.items || []).map(optionFromCatalog).filter((item): item is ImpactTableOption => Boolean(item)));
+      return;
+    }
+    if (!schemaName.value && !systemCode.value) {
+      tableOptions.value = [];
+      return;
+    }
+    const { data } = await getTables({
+      system_code: systemCode.value || undefined,
+      schema_name: schemaName.value || undefined,
+      page: 1,
+      page_size: 80
+    });
+    tableOptions.value = mergeTableOptions([], (data.items || []).map(item => optionFromCatalog({
+      table_name_cn: item.table_name_cn,
+      schema_name: item.schema_name,
+      table_name: item.table_name,
+      technical_name: item.schema_name && item.table_name ? `${item.schema_name}.${item.table_name}` : item.table_name
+    })).filter((item): item is ImpactTableOption => Boolean(item)));
+  } catch {
+    tableOptions.value = [];
+  } finally {
+    tableSearching.value = false;
+  }
+}
+
+function searchImpactTables(query: string) {
+  void loadTablesFromLibrary(query);
+}
+
+function onTableSelectVisible(visible: boolean) {
+  if (visible && !tableOptions.value.length) void loadTablesFromLibrary();
+}
+
+async function onSystemChange() {
+  schemaName.value = "";
+  impactTable.value = "";
+  tableOptions.value = [];
+  await loadSchemas(systemCode.value);
+}
+
+async function onSchemaChange() {
+  impactTable.value = "";
+  await loadTablesFromLibrary();
+}
+
+async function searchDepTables(query: string) {
+  const keyword = query.trim();
+  if (!keyword) {
+    depTableOptions.value = [];
+    return;
+  }
+  depTableSearching.value = true;
+  try {
+    const { data } = await searchGraphTables({ q: keyword, limit: 30 });
+    depTableOptions.value = (data.items || []).map(optionFromCatalog).filter((item): item is ImpactTableOption => Boolean(item));
+  } catch {
+    depTableOptions.value = [];
+  } finally {
+    depTableSearching.value = false;
+  }
+}
+
+onMounted(async () => {
+  const parsed = parseImpactTableQuery(route.query as Record<string, unknown>);
+  systemCode.value = parsed.systemCode;
+  schemaName.value = parsed.schemaName;
+  impactTable.value = parsed.table;
+  await loadCatalogOptions();
+  if (systemCode.value) await loadSchemas(systemCode.value);
+  if (schemaName.value || parsed.table) await loadTablesFromLibrary(parsed.table.split(".").pop() || "");
+  if (impactTable.value) runImpact();
+});
 loadDeps();
 </script>
 
@@ -93,8 +304,12 @@ loadDeps();
 .asset-lineage-page { padding: 4px; }
 .lineage-card { border: 1px solid var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
 .deps-card { margin-top: 16px; }
-.impact-query, .deps-filter { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
-.impact-query :deep(.el-input) { width: 300px; }
+.impact-query, .deps-filter { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; align-items: center; }
+.system-select { width: 180px; }
+.schema-select { width: 180px; }
+.table-select { width: min(420px, 100%); }
+.dep-table-select { width: 280px; }
+.impact-hint { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .deps-filter :deep(.el-input) { width: 240px; }
 .impact-result { display: grid; gap: 14px; margin-top: 14px; }
 .impact-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }

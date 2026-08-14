@@ -5,7 +5,9 @@ import {
   CATEGORY_ORDER,
   FORBIDDEN_CATEGORY_LABELS,
   isForbiddenCategoryLabel,
-  kindLabel
+  kindLabel,
+  scopeFromTreeNode,
+  treeClickShouldReloadTables
 } from "./hierarchy";
 
 describe("plan90 hierarchy", () => {
@@ -33,5 +35,23 @@ describe("plan90 hierarchy", () => {
     expect(kindLabel("system")).toBe("业务系统");
     expect(kindLabel("connection")).toBe("数据连接");
     expect(kindLabel("schema")).toContain("Owner");
+  });
+
+  it("maps table clicks to schema-scoped list filters", () => {
+    expect(
+      scopeFromTreeNode({
+        kind: "table",
+        system_code: "HIS_SOURCE",
+        source_code: "his_source_10_10_10_15",
+        schema_name: "EXAM",
+        table_name: "EXAM_APPOINTS"
+      })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "his_source_10_10_10_15",
+      schema_name: "EXAM",
+      table_name: "EXAM_APPOINTS"
+    });
+    expect(treeClickShouldReloadTables({ kind: "table" })).toBe(true);
   });
 });

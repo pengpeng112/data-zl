@@ -2,23 +2,27 @@
   <div class="asset-graph-page">
     <RePageHeader
       title="关系图谱"
-      subtitle="资产概览、关系探索、证据审核；中文名称为主，技术标识为辅。"
+      subtitle="知识图谱：业务系统 → Schema/库 → 表 → 字段。单击节点下钻，拖拽查看关系。"
     />
 
     <!-- 加载/成功：工具栏 + 图表 -->
     <template v-if="!isErrorState && state !== 'loading'">
       <div v-if="filters.view_mode === 'overview'" class="graph-breadcrumb" aria-label="图谱下钻路径">
         <el-button text :disabled="overviewLevel === 'system'" @click="goOverviewLevel('system')">业务系统</el-button>
-        <template v-if="overviewLevel !== 'system'">
-          <span>›</span><el-button text :disabled="overviewLevel === 'source'" @click="goOverviewLevel('source')">库·数据连接</el-button>
-        </template>
         <template v-if="['schema', 'object', 'field'].includes(overviewLevel)">
-          <span>›</span><el-button text :disabled="overviewLevel === 'schema'" @click="goOverviewLevel('schema')">库·Owner/Schema</el-button>
+          <span>›</span>
+          <el-button text :disabled="overviewLevel === 'schema'" @click="goOverviewLevel('schema')">
+            {{ filters.system_code ? (systemNameMap[filters.system_code] || filters.system_code) : "Schema / 库" }}
+          </el-button>
         </template>
         <template v-if="['object', 'field'].includes(overviewLevel)">
-          <span>›</span><el-button text :disabled="overviewLevel === 'object'" @click="goOverviewLevel('object')">表</el-button>
+          <span>›</span>
+          <el-button text :disabled="overviewLevel === 'object'" @click="goOverviewLevel('object')">
+            {{ filters.schema || "表" }}
+          </el-button>
         </template>
         <span v-if="overviewLevel === 'field'">› 字段</span>
+        <span class="graph-breadcrumb-hint">单击节点进入下一层 · 拖拽/滚轮缩放</span>
       </div>
       <GraphToolbar
         :filters="filters"
@@ -273,8 +277,8 @@ function applyModeDefaults(mode: GraphViewMode) {
     filters.group_by = "system";
     filters.confidence = "";
     filters.validation_status = "";
-    // 129号：概览默认分层树状布局（系统→连接→Schema→表 逐级展开）
-    filters.layout_mode = "hierarchy";
+    // 概览默认 Neo4j 式力导向：系统分散，有关系则连线
+    filters.layout_mode = "layered";
   }
 }
 
@@ -442,7 +446,7 @@ async function loadData() {
         source_code: filters.source_code || undefined,
         schema: filters.schema || undefined,
         domain: filters.domain || undefined,
-        limit: 80
+        limit: overviewLevel.value === "system" ? 40 : 120
       });
       const data = overview.data.data;
       graphData.value = data;
@@ -656,7 +660,7 @@ async function loadFieldGraph(node: GraphNode) {
 }
 
 async function goOverviewLevel(level: "system" | "source" | "schema" | "object") {
-  overviewLevel.value = level;
+  overviewLevel.value = level === "source" ? "schema" : level;
   fieldParentKey.value = "";
   centerTable.value = "";
   selectedNodeId.value = "";
@@ -665,13 +669,12 @@ async function goOverviewLevel(level: "system" | "source" | "schema" | "object")
     filters.system_code = "";
     filters.source_code = "";
     filters.schema = "";
-  } else if (level === "source") {
+  } else if (level === "source" || level === "schema") {
     filters.source_code = "";
     filters.schema = "";
-  } else if (level === "schema") {
-    filters.schema = "";
+    overviewLevel.value = "schema";
   }
-  filters.layout_mode = level === "object" ? "layered" : "hierarchy";
+  filters.layout_mode = level === "object" ? "radial" : "layered";
   await loadData();
 }
 
@@ -679,29 +682,37 @@ function selectNode(node: GraphNode) {
   if (node.category === "field" || node.object_type === "column") {
     selectedNode.value = node; selectedNodeId.value = node.id; nodeDrawerVisible.value = true; return;
   }
-  if (filters.view_mode === "overview" && node.is_aggregate) {
-    // 129号（按用户确认）：点击聚合节点 = 整层替换下钻（上一层隐藏），配合分层树状布局
-    if (node.category === "system") {
+  if (filters.view_mode === "overview") {
+    if (node.category === "system" || (node.is_aggregate && !node.schema_name && !node.table_name)) {
       filters.system_code = node.system_code || "";
       filters.source_code = "";
       filters.schema = "";
-      overviewLevel.value = "source";
-    } else if (node.category === "source") {
+      overviewLevel.value = "schema";
+      filters.layout_mode = "layered";
+      void loadData();
+      return;
+    }
+    if (node.category === "source") {
+      filters.system_code = node.system_code || filters.system_code;
       filters.source_code = node.source_code || "";
       filters.schema = "";
       overviewLevel.value = "schema";
-    } else if (node.category === "schema") {
+      filters.layout_mode = "layered";
+      void loadData();
+      return;
+    }
+    if (node.category === "schema" || (node.is_aggregate && node.schema_name && !node.table_name)) {
+      filters.system_code = node.system_code || filters.system_code;
       filters.schema = node.schema_name || "";
       overviewLevel.value = "object";
       filters.layout_mode = "layered";
-    } else {
-      selectedNode.value = node;
-      selectedNodeId.value = node.id;
-      nodeDrawerVisible.value = true;
+      void loadData();
       return;
     }
-    void loadData();
-    return;
+    if (node.table_name || node.category === "table" || node.object_type === "table" || node.object_type === "view") {
+      void loadFieldGraph(node);
+      return;
+    }
   }
   selectedNode.value = node;
   selectedNodeId.value = node.id;
@@ -766,6 +777,12 @@ onBeforeUnmount(() => {
   background: #fff;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
+}
+
+.graph-breadcrumb-hint {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 .graph-wrap {

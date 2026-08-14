@@ -178,6 +178,17 @@ export const getSummary = () => {
   return http.get<ApiResponse<SummaryData>, object>("/api/v1/summary");
 };
 
+/** 登录页公开统计（免认证）：真实资产对象/治理关系数 */
+export interface PublicStatsData {
+  tables: number;
+  columns: number;
+  relations: number;
+  confirmed_relations: number;
+}
+export const getPublicStats = () => {
+  return http.get<ApiResponse<PublicStatsData>, object>("/api/v1/public/stats");
+};
+
 /** 首页指挥中心聚合指标 */
 export const getDashboardSummary = () => {
   return http.get<ApiResponse<DashboardSummary>, object>(
@@ -192,6 +203,7 @@ export const getTables = (params: {
   system_code?: string;
   source_code?: string;
   schema_name?: string;
+  table_name?: string;
   page?: number;
   page_size?: number;
 }) => {
@@ -238,6 +250,73 @@ export const getRelationPath = (fromTable: string, toTable: string) => {
   return http.get<ApiResponse<PathResult>, object>("/api/v1/relations/path", {
     params: { from: fromTable, to: toTable }
   });
+};
+
+export interface RelationHitRateItem {
+  id: number;
+  rel_id: number | null;
+  from_table: string | null;
+  to_table: string | null;
+  from_columns: string | null;
+  to_columns: string | null;
+  join_condition: string | null;
+  cardinality: string | null;
+  confidence: string | null;
+  domain: string | null;
+  validation_status: string | null;
+  validation_level: string | null;
+  relation_layer: string | null;
+  from_system_code: string | null;
+  to_system_code: string | null;
+  note: string | null;
+  validation_note: string | null;
+  validation_metrics: string | null;
+  scene: string | null;
+  scene_label: string | null;
+  hit_rate: number | null;
+  orphan_rate: number | null;
+  sample_size: number | null;
+  matched: number | null;
+  missed: number | null;
+  tone: string;
+}
+
+export interface RelationHitRateData {
+  total: number;
+  page: number;
+  page_size: number;
+  with_rate: number;
+  avg_hit_rate: number | null;
+  highlights: RelationHitRateItem[];
+  items: RelationHitRateItem[];
+}
+
+export interface RelationAuthorityRule {
+  rule_code: string;
+  rule_name_cn: string;
+  authority_system_code: string;
+  mirror_system_code: string;
+  authority_source_code?: string;
+  mirror_source_code?: string;
+  enabled: boolean;
+  persisted: boolean;
+  description: string;
+  table_map: { ods_table: string; hisuser_table: string }[];
+  updated_at?: string | null;
+}
+
+export const getRelationHitRates = (params?: {
+  system_code?: string;
+  scene?: string;
+  keyword?: string;
+  page?: number;
+  page_size?: number;
+}) => {
+  return http.get<ApiResponse<RelationHitRateData>, object>("/api/v1/relations/hit-rates", { params });
+};
+
+export const getRelationAuthorityRule = () => {
+  return http.get<ApiResponse<RelationAuthorityRule>, object>("/api/v1/relations/authority-rule");
 };
 
 /** AI 上下文导出 */
@@ -844,6 +923,13 @@ export interface QualityRuleItem {
 export interface QualityFindingItem {
   id: number;
   rule_code: string | null;
+  rule_name?: string | null;
+  rule_category?: string | null;
+  rule_description?: string | null;
+  problem?: string | null;
+  target_display?: string | null;
+  system_name_cn?: string | null;
+  source_name_cn?: string | null;
   target_type: string | null;
   target_ref: string | null;
   system_code?: string | null;
@@ -851,7 +937,12 @@ export interface QualityFindingItem {
   namespace_name?: string | null;
   schema_name?: string | null;
   table_name?: string | null;
+  table_name_cn?: string | null;
   column_name?: string | null;
+  related_schema?: string | null;
+  related_table?: string | null;
+  related_table_cn?: string | null;
+  related_field?: string | null;
   severity: string | null;
   status: string | null;
   metric_value: string | null;
@@ -919,6 +1010,7 @@ export const getQualityFindings = (params: {
   rule_code?: string;
   run_id?: number;
   keyword?: string;
+  system_code?: string;
 }) => {
   return http.get<ApiResponse<PageData<QualityFindingItem>>, object>(
     "/api/v1/quality/findings",
@@ -947,6 +1039,7 @@ export interface AiQualityStatus {
   enabled: boolean;
   configured: boolean;
   reachable?: boolean | null;
+  provider?: string | null;
   workflow_name?: string | null;
   workflow?: string | null;
   prompt_version?: string | null;
@@ -955,6 +1048,13 @@ export interface AiQualityStatus {
   timeout_seconds?: number | null;
   quota_state?: string | null;
   message?: string | null;
+  sample?: string | null;
+  hospital_llm?: {
+    enabled?: boolean;
+    configured?: boolean;
+    model?: string | null;
+    host?: string | null;
+  };
 }
 
 export interface AiQualityPreview {
@@ -991,6 +1091,8 @@ export interface AiQualityJob {
   token_usage?: Record<string, unknown> | null;
   error_class?: string | null;
   error_message?: string | null;
+  partial_text?: string | null;
+  phase?: string | null;
   result?: AiQualityResultItem | null;
 }
 
@@ -1023,6 +1125,7 @@ export interface AiQualityResultItem {
 const AI_QUALITY_BASE = "/api/v1/quality/ai";
 export const getAiQualityStatus = () => http.get<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/status`);
 export const testAiQualityConnection = () => http.post<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/connection-test`);
+export const createGovernanceReport = () => http.post<ApiResponse<AiQualityJob>, object>(`${AI_QUALITY_BASE}/governance-report`);
 export const previewAiQuality = (data: { task_type: AiQualityPreview["task_type"]; finding_ids?: number[]; run_id?: number }) =>
   http.post<ApiResponse<AiQualityPreview>, object>(`${AI_QUALITY_BASE}/preview`, { data });
 export const createAiQualityJob = (data: { task_type: AiQualityPreview["task_type"]; finding_ids?: number[]; run_id?: number; input_digest: string; request_id: string }) =>

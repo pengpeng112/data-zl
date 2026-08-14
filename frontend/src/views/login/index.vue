@@ -13,17 +13,39 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+import { getPublicStats } from "@/api/asset";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "~icons/ri/lock-fill";
 import User from "~icons/ri/user-3-fill";
 
-const commandMetrics = [
-  { label: "资产对象", value: "8.6万+" },
-  { label: "治理关系", value: "47" },
+// 登录页展示指标：资产对象/治理关系从后端公开接口实时同步，质量规则保持文案
+const commandMetrics = ref([
+  { label: "资产对象", value: "-" },
+  { label: "治理关系", value: "-" },
   { label: "质量规则", value: "运行中" }
-];
+]);
+
+// 千分位格式化
+function fmtNum(n: number | null | undefined): string {
+  if (n === null || n === undefined || Number.isNaN(n)) return "-";
+  return n.toLocaleString("zh-CN");
+}
+
+async function loadPublicStats() {
+  try {
+    const res = await getPublicStats();
+    const d = res.data;
+    commandMetrics.value = [
+      { label: "资产对象", value: fmtNum(d.tables) },
+      { label: "治理关系", value: fmtNum(d.confirmed_relations) },
+      { label: "质量规则", value: "运行中" }
+    ];
+  } catch {
+    // 接口不可用时保持占位“-”，不阻断登录
+  }
+}
 
 const capabilityItems = ["源库只读探查", "关系图谱分析", "质量规则执行"];
 
@@ -162,6 +184,9 @@ useEventListener(document, "keydown", ({ code }) => {
   )
     immediateDebounce(ruleFormRef.value);
 });
+
+// 进入登录页即拉取真实资产/关系数（失败不阻断登录）
+loadPublicStats();
 </script>
 
 <template>

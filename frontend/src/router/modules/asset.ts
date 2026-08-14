@@ -80,6 +80,16 @@ export default {
       }
     },
     {
+      path: "/asset/relation-rates",
+      name: "AssetRelationRates",
+      component: () => import("@/views/asset/relation-rates/index.vue"),
+      meta: {
+        title: "关系命中率",
+        showLink: true,
+        auths: ["asset.relation.view"]
+      }
+    },
+    {
       path: "/asset/ai-context",
       name: "AssetAiContext",
       component: () => import("@/views/asset/ai-context/index.vue"),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildGraphNodeKey, filterOneHopNeighbors, filterTwoHopNeighbors, filterNeighborsByDepth, findGraphPath, graphEdgeStyle, graphNeighborDirectionLabel, graphNodeStyle, graphNodeVisualStyle, isCandidateNode, isCoreFactNode, isDeferredEdge, isDeferredNode, isDimensionNode, isExcludedNode, isHighConfidenceEdge, isOneHopDepth, isTwoHopDepth, isSamplePassEdge, normalizeGraphNeighborDirection, matchesTableSearch, transformGraphData } from "@/views/asset/graph/graphTransform";
+import { buildGraphNodeKey, filterOneHopNeighbors, filterTwoHopNeighbors, filterNeighborsByDepth, findGraphPath, formatGraphNodeLabel, graphEdgeStyle, graphNeighborDirectionLabel, graphNodeStyle, graphNodeVisualStyle, isCandidateNode, isCoreFactNode, isDeferredEdge, isDeferredNode, isDimensionNode, isExcludedNode, isHighConfidenceEdge, isOneHopDepth, isTwoHopDepth, isSamplePassEdge, linkAdjacentOverviewNodes, normalizeGraphNeighborDirection, matchesTableSearch, transformGraphData } from "@/views/asset/graph/graphTransform";
 import type { GraphData } from "@/api/asset";
 import { normalizeGraphData } from "@/views/asset/graph/graphNormalize";
 import { decideGraphLoadPolicy } from "@/views/asset/graph/graphLoadPolicy";
@@ -37,6 +37,57 @@ describe("graphTransform", () => {
 
   it("falls back to table id suffix for table aggregation key", () => {
     expect(buildGraphNodeKey({ id: "EXAM.EXAM_MASTER", label: "EXAM_MASTER", system_code: "HIS", schema_name: "EXAM" }, "table")).toBe("table:HIS:EXAM:EXAM_MASTER");
+  });
+
+  it("wraps system and schema names instead of truncating", () => {
+    expect(formatGraphNodeLabel({
+      display_id: "Docare手术麻醉",
+      is_aggregate: true,
+      category: "system",
+      count: 646
+    })).toBe("Docare\n手术麻醉\n(646)");
+    expect(formatGraphNodeLabel({
+      display_id: "新电子病历区（jhemr）",
+      is_aggregate: true,
+      category: "schema",
+      count: 993
+    })).toBe("新电子病历区\njhemr\n(993)");
+    const tableLabel = formatGraphNodeLabel({
+      table_name_cn: "诊断手术-字典类-CCHI字典表",
+      table_name: "cchi_dict",
+      category: "table",
+      count: 1
+    });
+    expect(tableLabel).toBe("诊断手术\n字典类\nCCHI字典表\ncchi_dict");
+    expect(formatGraphNodeLabel({
+      table_name_cn: "新电子病历区数据表",
+      table_name: "dc_cda_doctype",
+      category: "table",
+      count: 1
+    })).toBe("新电子病历区\n数据表\ndc_cda_doctype");
+    expect(formatGraphNodeLabel({
+      table_name_cn: "病案首页-业务类-输血信息",
+      table_name: "blood_transfusion",
+      category: "table"
+    })).toBe("病案首页\n业务类\n输血信息\nblood_transfusion");
+    expect(formatGraphNodeLabel({
+      table_name_cn: "病案首页-业务类-新生儿记录",
+      table_name: "newborn_record",
+      category: "table"
+    })).toBe("病案首页\n业务类\n新生儿记录\nnewborn_record");
+    expect(formatGraphNodeLabel({
+      table_name_cn: "病案首页-业务类-入院记录",
+      table_name: "admission_record",
+      category: "table"
+    })).toBe("病案首页\n业务类\n入院记录\nadmission_record");
+  });
+
+  it("links isolated top-level systems into a ring", () => {
+    const nodes = [{ id: "A" }, { id: "B" }, { id: "C" }];
+    const linked = linkAdjacentOverviewNodes(nodes, [{ id: "e1", source: "A", target: "B", label: "1 条关系" }]);
+    expect(linked.some(edge => edge.source === "B" && edge.target === "C")).toBe(true);
+    expect(linked.some(edge => edge.source === "C" && edge.target === "A")).toBe(true);
+    expect(linked.filter(edge => edge.source === "A" && edge.target === "B")).toHaveLength(1);
   });
 
   it("returns node style by graph node type", () => {
@@ -153,6 +204,26 @@ describe("graphTransform", () => {
     expect(visible.edges.map(edge => edge.id).sort()).toEqual(["deferred", "formal"]);
     expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.type).toBe("dashed");
     expect(visible.edges.find(edge => edge.id === "deferred")?.lineStyle.color).toBe("#9b7ec8");
+  });
+
+  it("keeps isolated overview systems when a single cross-system edge exists", () => {
+    const nodes = [
+      { id: "overview|system|DATA_CENTER", label: "数据中心", is_aggregate: true, category: "system", system_code: "DATA_CENTER" },
+      { id: "overview|system|DOCARE", label: "Docare手术麻醉", is_aggregate: true, category: "system", system_code: "DOCARE" },
+      { id: "overview|system|HIS_SOURCE", label: "HIS", is_aggregate: true, category: "system", system_code: "HIS_SOURCE" },
+      { id: "overview|system|LIS_SOURCE", label: "LIS", is_aggregate: true, category: "system", system_code: "LIS_SOURCE" }
+    ];
+    const edges = [
+      { id: "e1", source: "overview|system|DATA_CENTER", target: "overview|system|DOCARE", relation_type: "formal" }
+    ];
+    const normalized = normalizeGraphData(nodes as any, edges as any, { groupBy: "system" });
+    expect(normalized.nodes.map((n: any) => n.id).sort()).toEqual([
+      "overview|system|DATA_CENTER",
+      "overview|system|DOCARE",
+      "overview|system|HIS_SOURCE",
+      "overview|system|LIS_SOURCE"
+    ]);
+    expect(normalized.edges).toHaveLength(1);
   });
 
   it("uses canonical system and connection labels for graph groups while keeping physical keys", () => {

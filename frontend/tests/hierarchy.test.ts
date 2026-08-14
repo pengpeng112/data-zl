@@ -5,7 +5,9 @@ import {
   CATEGORY_ORDER,
   FORBIDDEN_CATEGORY_LABELS,
   isForbiddenCategoryLabel,
-  kindLabel
+  kindLabel,
+  scopeFromTreeNode,
+  treeClickShouldReloadTables
 } from "../src/views/asset/tables/hierarchy";
 
 describe("plan90 hierarchy", () => {
@@ -33,5 +35,78 @@ describe("plan90 hierarchy", () => {
     expect(kindLabel("system")).toBe("业务系统");
     expect(kindLabel("connection")).toBe("数据连接");
     expect(kindLabel("schema")).toContain("Owner");
+  });
+
+  it("maps left-tree clicks to the right-side table filter", () => {
+    expect(
+      scopeFromTreeNode({ kind: "system", system_code: "HIS_SOURCE" })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "",
+      schema_name: "",
+      table_name: ""
+    });
+    expect(
+      scopeFromTreeNode({
+        kind: "connection",
+        system_code: "HIS_SOURCE",
+        source_code: "his_source_10_10_10_15"
+      })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "his_source_10_10_10_15",
+      schema_name: "",
+      table_name: ""
+    });
+    expect(
+      scopeFromTreeNode({
+        kind: "schema",
+        system_code: "HIS_SOURCE",
+        source_code: "his_source_10_10_10_15",
+        schema_name: "EXAM"
+      })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "his_source_10_10_10_15",
+      schema_name: "EXAM",
+      table_name: ""
+    });
+    expect(
+      scopeFromTreeNode({
+        kind: "table",
+        system_code: "HIS_SOURCE",
+        source_code: "his_source_10_10_10_15",
+        schema_name: "EXAM",
+        table_name: "EXAM_APPOINTS"
+      })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "his_source_10_10_10_15",
+      schema_name: "EXAM",
+      table_name: "EXAM_APPOINTS"
+    });
+    expect(
+      scopeFromTreeNode({
+        id: "placeholder:schema:his_source_10_10_10_15:EXAM",
+        kind: "table",
+        system_code: "HIS_SOURCE",
+        source_code: "his_source_10_10_10_15",
+        schema_name: "EXAM",
+        table_name: "EXAM_APPOINTS"
+      })
+    ).toEqual({
+      system_code: "HIS_SOURCE",
+      source_code: "his_source_10_10_10_15",
+      schema_name: "EXAM",
+      table_name: ""
+    });
+  });
+
+  it("reloads the table list for table and placeholder clicks", () => {
+    expect(treeClickShouldReloadTables({ kind: "table", schema_name: "EXAM" })).toBe(true);
+    expect(
+      treeClickShouldReloadTables({ id: "placeholder:schema:x:EXAM", kind: "table" })
+    ).toBe(true);
+    expect(treeClickShouldReloadTables({ id: "search-hits" })).toBe(false);
   });
 });

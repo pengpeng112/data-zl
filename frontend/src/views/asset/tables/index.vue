@@ -93,9 +93,11 @@
           <el-table
             v-loading="loading"
             :data="items"
+            :row-key="tableRowKey"
             stripe
             height="430"
             highlight-current-row
+            :current-row-key="selectedTableKey"
             class="medical-data-table"
             @row-click="selectTable"
             @row-dblclick="goDetail"
@@ -186,6 +188,7 @@ import {
   CANONICAL_SYSTEM_CODES,
   kindLabel,
   kindTagType,
+  scopeFromTreeNode,
   type TreeKind
 } from "./hierarchy";
 import RefreshIcon from "~icons/ri/refresh-line";
@@ -245,7 +248,8 @@ const scope = reactive({
   system_category: "",
   system_code: "",
   source_code: "",
-  schema_name: ""
+  schema_name: "",
+  table_name: ""
 });
 const params = reactive({ keyword: "", domain: "", page: 1, page_size: 20 });
 
@@ -260,6 +264,17 @@ const systemFilterOptions = computed(() =>
 function tableNodeKey(sourceCode: string, schemaName: string, tableName: string) {
   return `${sourceCode}::${schemaName}::${tableName}`;
 }
+
+function tableRowKey(
+  row: { id?: number | null; source_code?: string | null; schema_name?: string | null; table_name?: string | null }
+) {
+  if (row.id != null) return String(row.id);
+  return tableNodeKey(row.source_code || "", row.schema_name || "", row.table_name || "");
+}
+
+const selectedTableKey = computed(() =>
+  selectedTable.value ? tableRowKey(selectedTable.value) : undefined
+);
 
 function toTableBrief(
   source: AssetTreeNode,
@@ -463,7 +478,8 @@ const selectedScopeText = computed(() => {
       ? systemNameMap.value[scope.system_code] || scope.system_code
       : "",
     scope.source_code,
-    scope.schema_name
+    scope.schema_name,
+    scope.table_name
   ].filter(Boolean);
   return parts.length ? ` / ${parts.join(" / ")}` : " / 全部资产";
 });
@@ -514,6 +530,7 @@ function setSystemFilter(code: string) {
   scope.system_code = code;
   scope.source_code = "";
   scope.schema_name = "";
+  scope.table_name = "";
   params.page = 1;
   loadData();
 }
@@ -665,47 +682,53 @@ async function hydrateColumnChildren(table: TableBrief) {
   };
 }
 
+function applyTreeScope(node: TreeItem) {
+  const next = scopeFromTreeNode(node);
+  scope.system_category = "";
+  scope.system_code = next.system_code;
+  scope.source_code = next.source_code;
+  scope.schema_name = next.schema_name;
+  scope.table_name = next.table_name;
+}
+
 async function handleTreeClick(node: TreeItem) {
   if (node.id === "search-hits") return;
-  // 占位节点：触发 schema 加载
-  if (node.id.startsWith("placeholder:")) {
-    const schemaLike: TreeItem = {
-      ...node,
-      id: node.id.replace(/^placeholder:/, ""),
-      kind: "schema"
-    };
-    await loadSchemaTables(schemaLike);
-    return;
-  }
-  scope.system_category = "";
-  // 列表过滤：业务系统 → 连接 → schema
-  scope.system_code =
-    node.kind === "category" || node.id === "search-hits" ? "" : node.system_code || "";
-  scope.source_code = ["connection", "schema", "table", "column"].includes(node.kind)
-    ? node.source_code || ""
-    : "";
-  scope.schema_name = ["schema", "table", "column"].includes(node.kind)
-    ? node.schema_name || ""
-    : "";
-  if (node.kind === "schema") {
-    await loadSchemaTables(node);
-  }
-  if (node.kind === "table" && node.table) {
-    await selectTable(node.table);
-    await hydrateColumnChildren(node.table);
-    return;
-  }
-  if (node.kind === "column" && node.schema_name && node.table_name) {
-    const table =
-      selectedTable.value?.schema_name === node.schema_name &&
-      selectedTable.value?.table_name === node.table_name
-        ? selectedTable.value
-        : node.table;
-    if (table) await selectTable(table);
-    return;
-  }
+
+  const schemaNode: TreeItem = node.id.startsWith("placeholder:")
+    ? { ...node, id: node.id.replace(/^placeholder:/, ""), kind: "schema" }
+    : node;
+
+  applyTreeScope(schemaNode);
   params.page = 1;
-  loadData();
+
+  if (schemaNode.kind === "schema" || node.id.startsWith("placeholder:")) {
+    await loadSchemaTables(schemaNode);
+  }
+
+  const pickedTable =
+    node.kind === "table" && node.table
+      ? node.table
+      : node.kind === "column"
+        ? node.table ||
+          (selectedTable.value?.schema_name === node.schema_name &&
+          selectedTable.value?.table_name === node.table_name
+            ? selectedTable.value
+            : null)
+        : null;
+
+  if (!pickedTable) {
+    selectedTable.value = null;
+    columns.value = [];
+  } else {
+    selectedTable.value = pickedTable;
+  }
+
+  await loadData();
+
+  if (pickedTable) {
+    await selectTable(pickedTable);
+    await hydrateColumnChildren(pickedTable);
+  }
 }
 
 async function loadData() {
@@ -714,9 +737,12 @@ async function loadData() {
     const res = await getTables({
       keyword: params.keyword || undefined,
       domain: params.domain || undefined,
-      system_code: scope.system_code || undefined,
+      // 已选连接/Owner 时 source_code 更精确；避免旧表 system_code=HIS
+      // 与目录规范码 HIS_SOURCE 不一致把右侧筛成 0 条。
+      system_code: scope.source_code ? undefined : scope.system_code || undefined,
       source_code: scope.source_code || undefined,
       schema_name: scope.schema_name || undefined,
+      table_name: scope.table_name || undefined,
       page: params.page,
       page_size: params.page_size
     });
@@ -727,7 +753,13 @@ async function loadData() {
       source_system_cn: row.source || row.source_code || undefined
     }));
     total.value = res.data.total;
-    if (!selectedTable.value && items.value.length) {
+    if (selectedTable.value) {
+      const selectedKey = tableRowKey(selectedTable.value);
+      const exists = items.value.some(row => tableRowKey(row) === selectedKey);
+      if (!exists) {
+        items.value = [selectedTable.value, ...items.value];
+      }
+    } else if (items.value.length) {
       await selectTable(items.value[0]);
     }
   } finally {
