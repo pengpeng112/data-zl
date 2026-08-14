@@ -57,9 +57,14 @@
               :transform="`translate(${node.x}, ${node.y})`"
               @click.stop="emitNode(node.raw)"
             >
-              <rect :width="node.width" :height="node.height" :x="-node.width / 2" :y="-node.height / 2" :rx="Math.min(node.height / 2, 28)" />
-              <text class="node-title" text-anchor="middle" y="-4">{{ node.label }}</text>
-              <text class="node-meta" text-anchor="middle" y="14">{{ node.meta }}</text>
+              <circle :r="node.width / 2" />
+              <text
+                v-for="(line, lineIndex) in node.label.split('\n')"
+                :key="`${node.id}:${lineIndex}`"
+                class="node-title"
+                text-anchor="middle"
+                :y="node.width / 2 + 14 + lineIndex * 15"
+              >{{ line }}</text>
             </g>
           </g>
         </g>
@@ -72,9 +77,9 @@
 import { computed, ref, watch } from "vue";
 import type { GraphEdge, GraphNode } from "@/api/asset";
 import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graphNormalize";
-import { transformGraphByMode } from "@/views/asset/graph/graphTransform";
+import { formatGraphNodeLabel, linkAdjacentOverviewNodes, transformGraphByMode } from "@/views/asset/graph/graphTransform";
 import { nodeDisplayName, parsePhysicalKey } from "@/views/asset/graph/graphPhysical";
-import { computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
+import { computeCircularSpreadPositions, computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
 
 type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
@@ -173,10 +178,12 @@ function nodeGroup(node: any) {
   return node.category || node.schema_name || node.display_id?.split(".")[0] || node.id.split(".")[0] || "UNKNOWN";
 }
 
-function compactLabel(value: unknown) {
-  const str = typeof value === "string" ? value : String(value || "");
-  const raw = str.includes(".") ? str.split(".").pop() || str : str;
-  return raw.length > 18 ? `${raw.slice(0, 16)}...` : raw;
+function compactLabel(node: any) {
+  return formatGraphNodeLabel({
+    ...node,
+    display_id: node.display_id || node.name || node.nodeName || node.label,
+    count: node.count ?? node.child_count ?? node.asset_count
+  }) || String(node.table_name || node.label || node.id || "");
 }
 
 function nodeMeta(node: any) {
@@ -429,18 +436,28 @@ function buildForce(nodes: any[], edges: any[]) {
 }
 
 function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { x: number; y: number }>, bands: LayoutBand[], width: number, height: number) {
+  // 度数（关联边数）用于圆点大小：枢纽表更醒目（与 G6 版一致）
+  const degreeMap = new Map<string, number>();
+  for (const edge of edges) {
+    degreeMap.set(String(edge.source), (degreeMap.get(String(edge.source)) || 0) + 1);
+    degreeMap.set(String(edge.target), (degreeMap.get(String(edge.target)) || 0) + 1);
+  }
   const layoutNodes: LayoutNode[] = nodes.map(node => {
     const p = positions.get(node.id) || { x: 80, y: 80 };
-    // 129号：中心节点（辐射图焦点）放大强调
     const isCenter = Boolean(props.centerTable) && String(node.id) === String(props.centerTable);
+    // 130p2：Neo4j 圆点节点——width 即直径（模板渲染 circle r=width/2）
+    const isGroup = Boolean(node.is_aggregate || node.isAggregate);
+    const objectType = String(node.object_type || "");
+    const base = isCenter ? 66 : isGroup ? 52 : objectType === "view" ? 40 : 42;
+    const diameter = isCenter ? base : base + Math.min(degreeMap.get(String(node.id)) || 0, 6) * 2;
     return {
       id: node.id,
-      label: compactLabel(node.name || node.nodeName || node.table_name || node.label || node.id),
-      meta: nodeMeta(node),
+      label: compactLabel(node),
+      meta: node.category === "field" || node.object_type === "column" ? nodeMeta(node) : "",
       x: p.x,
       y: p.y,
-      width: isCenter ? 176 : node.isAggregate ? 156 : 138,
-      height: isCenter ? 64 : node.isAggregate ? 58 : 52,
+      width: diameter,
+      height: diameter,
       className: nodeClass(node),
       raw: node
     };
@@ -475,8 +492,17 @@ function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { 
  * 分层树状布局：业务系统 → 数据连接 → Schema → 表 逐级分层（与 G6 版共用算法）。
  */
 function buildHierarchy(nodes: any[], edges: any[]) {
-  const { positions, width, height } = computeHierarchyPositions(nodes, edges, { xGap: 200, yGap: 150 });
+  const { positions, width, height } = computeHierarchyPositions(nodes, edges, { xGap: 220, yGap: 170, maxPerRow: 8 });
   return materializeLayout(nodes, edges, positions, [], width, height);
+}
+
+function buildCircular(nodes: any[], edges: any[]) {
+  const isSystemLayer = nodes.length > 1 && nodes.every(
+    (node: any) => String(node.id || "").startsWith("overview|system|") || (node.is_aggregate && !node.schema_name && !node.table_name)
+  );
+  const linked = isSystemLayer ? linkAdjacentOverviewNodes(nodes, edges) : edges;
+  const { positions, width, height } = computeCircularSpreadPositions(nodes, { nodeSize: 186, gap: 72 });
+  return materializeLayout(nodes, linked, positions, [], width, height);
 }
 
 const layout = computed(() => {
@@ -484,8 +510,7 @@ const layout = computed(() => {
   if (props.layoutMode === "grouped") return buildGrouped(data.nodes, data.edges);
   if (props.layoutMode === "radial") return buildRadial(data.nodes, data.edges);
   if (props.layoutMode === "hierarchy") return buildHierarchy(data.nodes, data.edges);
-  // 默认使用 Neo4j 风格力导向布局（节点自然散布，非网格）
-  return buildForce(data.nodes, data.edges);
+  return buildCircular(data.nodes, data.edges);
 });
 
 function onWheel(event: WheelEvent) {
@@ -521,6 +546,10 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   min-height: 360px;
   overflow: auto;
   cursor: default;
+  /* 130p2：Neo4j 式点阵画布 */
+  background-color: #fbfcfe;
+  background-image: radial-gradient(circle, #ccd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 .graph-svg {
@@ -574,10 +603,9 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 .node-dot {
   width: 11px;
   height: 11px;
-  border: 2px solid #d4a017;
-  border-radius: 3px;
-  background: #ffe08a;
-  transform: rotate(45deg);
+  border: 2px solid #f0b429;
+  border-radius: 50%;
+  background: #111827;
 }
 
 .group-band rect {
@@ -626,29 +654,26 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   cursor: pointer;
 }
 
-.graph-node rect {
+/* 130p2：Neo4j 圆点节点——彩色圆心 + 同色系描边环 */
+.graph-node circle {
   fill: #d6e9f8;
   stroke: #8fbfe6;
-  stroke-width: 1.6;
-  filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.12));
+  stroke-width: 2;
 }
 
-.graph-node.node-system rect { fill: #f8d7c4; stroke: #e0a075; }
-.graph-node.node-source rect { fill: #fdf0b8; stroke: #e3c85f; }
-.graph-node.node-schema rect { fill: #dcebc8; stroke: #a3c47e; }
-.graph-node.node-view rect { fill: #e6ddf5; stroke: #b6a3dd; }
-.graph-node.node-field rect { fill: #eef5e8; stroke: #a8c58d; }
+.graph-node.node-system circle { fill: #f8d7c4; stroke: #e0a075; }
+.graph-node.node-source circle { fill: #fdf0b8; stroke: #e3c85f; }
+.graph-node.node-schema circle { fill: #dcebc8; stroke: #a3c47e; }
+.graph-node.node-view circle { fill: #e6ddf5; stroke: #b6a3dd; }
+.graph-node.node-field circle { fill: #eef5e8; stroke: #a8c58d; }
 
-.graph-node.is-center rect {
+.graph-node.is-center circle {
   stroke: #f0b429;
   stroke-width: 3;
   fill: #111827;
 }
 
-.graph-node.is-center .node-title { fill: #ffffff; }
-.graph-node.is-center .node-meta { fill: #e5e7eb; }
-
-.graph-node.is-aggregate rect {
+.graph-node.is-aggregate circle {
   fill: #d3eef2;
   stroke: #86ccd6;
 }
@@ -657,19 +682,18 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   opacity: 0.24;
 }
 
-.graph-node:hover rect {
+.graph-node:hover circle {
   stroke: #3f7cac;
   stroke-width: 3;
 }
 
 .node-title {
-  fill: #0f172a;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.node-meta {
-  fill: var(--re-text-secondary);
-  font-size: 10px;
+  fill: #3b4453;
+  font-size: 11.5px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 </style>

@@ -108,12 +108,55 @@ describe("AdvancedRelationGraph G6 输入契约（119 回归）", () => {
       expect(node.style.labelText).not.toBe("[object Object]");
       expect(node.style.labelText.length).toBeGreaterThan(0);
     }
-    // 127: table nodes show 中文名 + technical name (two lines) when both exist
     const label0 = graph.data.nodes[0].style.labelText as string;
-    expect(label0).toContain("PAT_VISIT中文名");
-    expect(label0.split("\n")[0]).toBe("PAT_VISIT中文名");
-    expect(graph.data.nodes[0].style.labelPlacement).toBe("center");
+    expect(label0.replace(/\n/g, "")).toContain("PAT_VISIT中文名");
+    expect(label0.includes("...")).toBe(false);
+    expect(label0.includes("…")).toBe(false);
+    // 130p2：Neo4j 式圆点节点——标题（caption）置于节点下方
+    expect(graph.data.nodes[0].style.labelPlacement).toBe("bottom");
+    expect(graph.data.nodes[0].type).toBe("circle");
+    expect(graph.data.nodes[0].style.labelMaxLines).toBeGreaterThanOrEqual(4);
+    expect(graph.data.nodes[0].style.labelWordWrap).toBe(false);
+    expect(graph.data.nodes[0].style.labelTextOverflow).not.toBe("...");
     expect(wrapper.emitted("render-error")).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it("表节点按连字符和语义后缀换行，不把数据表拆开", async () => {
+    const wrapper = mount(AdvancedRelationGraph, {
+      props: {
+        nodes: [
+          {
+            id: "JHEMR|jhemr||jhemr|blood_transfusion",
+            display_id: "jhemr.blood_transfusion",
+            label: { show: true, formatter: "病案首页-业务类-输血信息" },
+            table_name: "blood_transfusion",
+            table_name_cn: "病案首页-业务类-输血信息",
+            system_code: "JHEMR",
+            schema_name: "jhemr"
+          },
+          {
+            id: "JHEMR|jhemr||jhemr|dc_cda_doctype",
+            display_id: "jhemr.dc_cda_doctype",
+            label: { show: true, formatter: "新电子病历区数据表" },
+            table_name: "dc_cda_doctype",
+            table_name_cn: "新电子病历区数据表",
+            system_code: "JHEMR",
+            schema_name: "jhemr"
+          }
+        ],
+        edges: []
+      },
+      attachTo: document.body
+    });
+    await flushRenderQueue();
+
+    const graph = mockG6.instances.at(-1);
+    const labels = graph.data.nodes.map((node: any) => node.style.labelText);
+    expect(labels).toContain("病案首页\n业务类\n输血信息\nblood_transfusion");
+    expect(labels).toContain("新电子病历区\n数据表\ndc_cda_doctype");
+    expect(labels.some((label: string) => label.includes("病案首页-业"))).toBe(false);
+    expect(labels.some((label: string) => /区数|数\n据表/.test(label))).toBe(false);
     wrapper.unmount();
   });
 

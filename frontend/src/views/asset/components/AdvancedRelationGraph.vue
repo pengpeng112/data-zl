@@ -1,6 +1,9 @@
 <template>
   <div class="advanced-graph-shell">
     <div class="advanced-legend">
+      <span><i class="node-chip chip-group" />系统/Schema 聚合</span>
+      <span><i class="node-chip chip-table" />数据表</span>
+      <span><i class="node-chip chip-view" />视图</span>
       <span><i class="edge-line solid primary" />A/正式关系</span>
       <span><i class="edge-line solid pass" />已验证</span>
       <span><i class="edge-line dashed orange" />B/C</span>
@@ -16,8 +19,14 @@ import { Graph, EdgeEvent, NodeEvent } from "@antv/g6";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import type { GraphEdge, GraphNode } from "@/api/asset";
 import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graphNormalize";
-import { graphEdgeStyle, graphNodeVisualStyle, transformGraphByMode } from "@/views/asset/graph/graphTransform";
-import { computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
+import {
+  formatGraphNodeLabel,
+  graphEdgeStyle,
+  graphNodeVisualStyle,
+  linkAdjacentOverviewNodes,
+  transformGraphByMode
+} from "@/views/asset/graph/graphTransform";
+import { computeCircularSpreadPositions, computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
 
 type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
@@ -102,34 +111,14 @@ function nodeGroup(node: any) {
 }
 
 function nodeLabel(node: any) {
-  // normalizeGraphData 会把节点 label 覆盖为 echarts 风格对象 {show, formatter, ...}，
-  // 必须把对象形态的 label 排除/取 formatter，否则 G6 文本布局对非字符串调 .split 抛 TypeError。
-  const labelField =
-    typeof node.label === "string" ? node.label : (node.label?.formatter ?? "");
-  const isField = node.category === "field" || node.object_type === "column";
-  const isSystem = !isField && (node.type === "system" || node.category === "system" || node.is_aggregate);
-  const count = node.count ?? node.table_count ?? node.child_count;
-  // 129号修复：聚合节点（系统/连接/Schema 各层）必须用后端下发的本层名称
-  // （display_id/label），不能一律映射成系统中文名——否则下钻后所有子节点都叫"数据中心"。
-  let primary = isField
-    ? String(node.column_name_cn || node.column_name || labelField || node.display_id || node.id || "")
-    : isSystem && !node.table_name
-    ? String(node.display_id || labelField || "") || mappedSystem(node)
-    : String(node.table_name_cn || node.tableNameCn || labelField || node.table_name || node.display_id || node.id || "");
-  // 系统/聚合节点：中文名 + 数量；表节点：中文名 + 技术表名
-  if (isSystem && count != null && !String(primary).includes(String(count))) {
-    primary = `${primary}（${count}）`;
-  }
-  const techName = isField ? node.data_type || "" : node.table_name || node.tableName || "";
-  const cnName = node.table_name_cn || node.tableNameCn || "";
-  if (!isSystem && cnName && techName && cnName !== techName) {
-    primary = `${cnName}`;
-  }
-  const shorten = (value: string, max: number) => value.length > max ? `${value.slice(0, max - 1)}…` : value;
-  const meta = isField ? techName : isSystem && !node.table_name
-    ? ""
-    : (techName && cnName && cnName !== techName ? techName : mappedMeta(node));
-  return meta ? `${shorten(String(primary), 23)}\n${shorten(String(meta), 32)}` : shorten(String(primary), 23);
+  const formatted = formatGraphNodeLabel({
+    ...node,
+    display_id: node.display_id || (typeof node.label === "string" ? node.label : node.label?.formatter),
+    count: node.count ?? node.table_count ?? node.child_count ?? node.asset_count
+  });
+  if (formatted) return formatted;
+  const fallback = mappedSystem(node) || mappedMeta(node) || String(node.id || "");
+  return fallback;
 }
 
 function aggregateData(nodes: any[], edges: any[]) {
@@ -172,10 +161,25 @@ function aggregateData(nodes: any[], edges: any[]) {
   return { nodes: nextNodes, edges: Array.from(edgeMap.values()) };
 }
 
+function usesPresetPositions() {
+  return props.layoutMode === "hierarchy" || props.layoutMode === "layered";
+}
+
+// 130p2：Neo4j 知识图谱视觉——节点统一为圆点，度数（关联边数）越高圆越大，
+// 枢纽表自然更醒目；聚合层（系统/Schema 等）用更大的圆区分层级语义。
+function nodeCircleSize(node: any, degree: number, isCenter: boolean): number {
+  if (isCenter) return 66;
+  const category = String(node.category || "");
+  const objectType = String(node.object_type || "");
+  const isGroup = Boolean(node.is_aggregate || node.isAggregate) || ["system", "source", "schema", "domain"].includes(category);
+  const isField = category === "field" || objectType === "column";
+  const base = isGroup ? 52 : isField ? 32 : objectType === "view" ? 40 : 42;
+  return base + Math.min(degree, 6) * 2;
+}
+
 function layoutOptions() {
-  // 分层树状：坐标由 computeHierarchyPositions 预计算（写入节点 style.x/y），
-  // 返回 null 表示不启用 G6 布局引擎（G6 v5 数据自带位置时可省略 layout）。
-  if (props.layoutMode === "hierarchy") {
+  // 知识图谱/分层树状：坐标预计算后写入节点，不用 G6 force（会挤到中心重叠）。
+  if (usesPresetPositions()) {
     return null;
   }
   if (props.layoutMode === "radial") {
@@ -198,15 +202,16 @@ function layoutOptions() {
   // 节点自然散布、弹簧连接、可拖拽交互，类似 Neo4j Browser 的图谱展示
   return {
     type: "force",
-    linkDistance: (d: any) => 140 + (d?.data?.weight ? d.data.weight * 10 : 0),
-    nodeStrength: -120,
-    edgeStrength: 0.7,
-    collideStrength: 0.8,
+    linkDistance: 180,
+    nodeStrength: -280,
+    edgeStrength: 0.45,
+    collideStrength: 1,
     preventOverlap: true,
-    nodeSize: 40,
-    alpha: 0.3,
-    alphaDecay: 0.028,
-    alphaMin: 0.01,
+    nodeSize: 88,
+    nodeSpacing: 36,
+    alpha: 0.35,
+    alphaDecay: 0.022,
+    alphaMin: 0.008,
     forceSimulation: undefined
   };
 }
@@ -215,22 +220,27 @@ function edgeStyle(edge: any, showLabel = false) {
   const visual = graphEdgeStyle(edge);
   const type = edge.lineStyle?.type;
   const stroke = edge.lineStyle?.color || visual.stroke;
-  // 129号：知识图谱样式——边上显示关系标签（参考图：科室/产品/检查等关系名），标签随边着色
-  const labelText = showLabel
-    ? String(edge.label || edge.from_columns || "").slice(0, 14)
-    : "";
+  // Neo4j 式关系标签：白底圆角胶囊、随边着色，仅信息边展示
+  const rawLabel = String(edge.label || "").trim();
+  const labelText =
+    showLabel && rawLabel && !/^object(\s+object)?$/i.test(rawLabel) && edge.relation_type !== "structure"
+      ? rawLabel.slice(0, 16)
+      : "";
   return {
     stroke,
     lineWidth: edge.lineStyle?.width || visual.lineWidth,
     lineDash: type === "dotted" ? [2, 5] : type === "dashed" ? [8, 5] : visual.lineDash,
-    endArrow: true,
+    endArrow: edge.relation_type !== "structure",
+    endArrowSize: 5.5,
     opacity: edge.lineStyle?.opacity ?? visual.opacity,
     labelText,
     labelFontSize: 10,
     labelFill: stroke,
     labelBackground: Boolean(labelText),
-    labelBackgroundFill: "rgba(255,255,255,0.88)",
-    labelBackgroundRadius: 3
+    labelBackgroundFill: "rgba(255,255,255,0.92)",
+    labelBackgroundStroke: "rgba(148,163,184,0.38)",
+    labelBackgroundLineWidth: 1,
+    labelBackgroundRadius: 8
   };
 }
 
@@ -245,46 +255,60 @@ function graphData() {
     const target = String(edge?.target || "");
     return source && target && source !== target && nodeIds.has(source) && nodeIds.has(target);
   });
-  // 分层树状：预计算节点坐标（包含边定层深，关系边不影响分层）
   const hierarchyPos =
     props.layoutMode === "hierarchy"
-      ? computeHierarchyPositions(uniqueNodes, validEdges).positions
-      : null;
-  // 129号：边标签在边数较少时显示（知识图谱样式），边多时不显示防糊
-  const showEdgeLabels = validEdges.length <= 40;
+      ? computeHierarchyPositions(uniqueNodes, validEdges, { xGap: 220, yGap: 170, maxPerRow: 8 }).positions
+      : props.layoutMode === "layered"
+        ? computeCircularSpreadPositions(uniqueNodes, { nodeSize: 186, gap: 72 }).positions
+        : null;
+  const isSystemLayer = uniqueNodes.length > 1 && uniqueNodes.every(
+    node => String(node.id || "").startsWith("overview|system|") || (node.is_aggregate && !node.schema_name && !node.table_name)
+  );
+  const renderEdges = isSystemLayer ? linkAdjacentOverviewNodes(uniqueNodes, validEdges) : validEdges;
+  const showEdgeLabels = renderEdges.length <= 40;
+  // 度数（关联边数）用于圆点大小：枢纽表更醒目（Neo4j 知识图谱习惯）
+  const degreeMap = new Map<string, number>();
+  for (const edge of validEdges) {
+    degreeMap.set(String(edge.source), (degreeMap.get(String(edge.source)) || 0) + 1);
+    degreeMap.set(String(edge.target), (degreeMap.get(String(edge.target)) || 0) + 1);
+  }
   return {
     nodes: uniqueNodes.map(node => {
       const typeStyle = graphNodeVisualStyle(node);
       const preset = hierarchyPos?.get(String(node.id));
-      // 129号：中心节点强调（辐射图参考样式：中心实体更大更醒目）
       const isCenter = Boolean(props.centerTable) && String(node.id) === String(props.centerTable);
+      const labelText = nodeLabel(node);
+      const degree = degreeMap.get(String(node.id)) || 0;
       return {
         id: node.id,
-        type: typeStyle.shape === "diamond" ? "diamond" : typeStyle.shape === "ellipse" ? "circle" : "rect",
+        type: "circle",
         data: { raw: node },
         style: {
           ...(preset ? { x: preset.x, y: preset.y } : {}),
-          size: isCenter ? [176, 64] : node.isAggregate ? [132, 50] : typeStyle.size,
-          radius: typeStyle.shape === "roundRect" ? 24 : typeStyle.shape === "rect" ? 8 : 12,
+          size: nodeCircleSize(node, degree, isCenter),
           fill: isCenter ? "#111827" : typeStyle.fill,
           fillOpacity: node.itemStyle?.opacity ?? typeStyle.opacity ?? 1,
           stroke: isCenter ? "#f0b429" : typeStyle.stroke,
-          lineWidth: isCenter ? 3.5 : node.itemStyle?.borderWidth || (typeStyle.shape === "diamond" ? 2.6 : 1.5),
+          lineWidth: isCenter || node.id === props.selectedNodeId ? 3 : 2,
           lineDash: typeStyle.lineDash,
-          // 127: G6 default labelPlacement is bottom → white text on light canvas is invisible
-          labelPlacement: "center",
-          labelText: nodeLabel(node),
-          labelFill: isCenter ? "#ffffff" : typeStyle.textColor || "#ffffff",
-          labelFontSize: isCenter ? 14 : node.is_aggregate || node.isAggregate ? 13 : 12,
-          labelFontWeight: isCenter ? 800 : node.id === props.selectedNodeId ? 700 : 600,
-          labelWordWrap: true,
-          labelMaxWidth: node.isAggregate ? 120 : 200,
+          // Neo4j 式标题（caption）：文字置于圆点下方，深灰文字不遮挡节点色环
+          labelPlacement: "bottom",
+          labelOffsetY: 6,
+          labelText,
+          labelFill: "#3b4453",
+          labelFontSize: isCenter ? 12 : 11,
+          labelFontWeight: node.id === props.selectedNodeId ? 700 : 600,
+          labelWordWrap: false,
+          labelMaxWidth: 150,
+          labelMaxLines: 5,
+          labelTextOverflow: "clip",
+          labelLineHeight: 15,
           labelTextAlign: "center",
-          labelTextBaseline: "middle"
+          labelTextBaseline: "top"
         }
       };
     }),
-    edges: validEdges.map((edge, index) => ({
+    edges: renderEdges.map((edge, index) => ({
       // Renderer ids are isolated from backend evidence ids. The original
       // relation remains in data.raw for the evidence drawer.
       id: `render-edge-${index}`,
@@ -315,17 +339,36 @@ function createGraph() {
   if (!containerRef.value || graph) return graph;
   const layout = layoutOptions();
   const instance = new Graph({
-      container: containerRef.value,
-      // 不做自动 autoFit：渲染后手动 fitView + 最小缩放兜底（见 performRender），
-      // 兼顾"少节点不散出视口"与"127+ 节点不缩成不可读方块"两种场景。
-      autoFit: false,
-      animation: false,
-      // 分层模式 layout 为 null：不配置布局引擎，使用节点自带坐标
-      ...(layout ? { layout } : {}),
-      node: { type: "rect" },
-      edge: { type: "line" },
-      behaviors: ["drag-canvas", "zoom-canvas", "drag-element", "hover-activate"]
-    } as any);
+    container: containerRef.value,
+    // 不做自动 autoFit：渲染后手动 fitView + 最小缩放兜底（见 performRender），
+    // 兼顾"少节点不散出视口"与"127+ 节点不缩成不可读方块"两种场景。
+    autoFit: false,
+    animation: false,
+    // 分层模式 layout 为 null：不配置布局引擎，使用节点自带坐标
+    ...(layout ? { layout } : {}),
+    // 130p2：Neo4j 知识图谱视觉——圆点节点 + 二次曲线边；
+    // hover 高亮一度邻居（active），其余元素淡出（inactive）
+    node: {
+      type: "circle",
+      state: {
+        active: { lineWidth: 3.4, labelFill: "#0f172a" },
+        inactive: { opacity: 0.14 }
+      }
+    },
+    edge: {
+      type: "quadratic",
+      state: {
+        active: { opacity: 1 },
+        inactive: { opacity: 0.07 }
+      }
+    },
+    behaviors: [
+      "drag-canvas",
+      "zoom-canvas",
+      "drag-element",
+      { type: "hover-activate", degree: 1, state: "active", inactiveState: "inactive", animation: false }
+    ]
+  } as any);
   instance.on(NodeEvent.CLICK, (event: any) => {
       const id = resolveElementId(event);
       const raw = resolveRawElement(id, "node") || normalized.value.nodes.find(node => node.id === id);
@@ -344,8 +387,7 @@ async function performRender(version: number) {
   await nextTick();
   if (version !== renderVersion || !containerRef.value) return;
   try {
-    // 分层模式不启用布局引擎；若现有实例带着旧布局配置，销毁重建以彻底清除
-    if (props.layoutMode === "hierarchy" && graph) {
+    if (usesPresetPositions() && graph) {
       try {
         graph.destroy();
       } catch {
@@ -361,8 +403,8 @@ async function performRender(version: number) {
     await instance.render();
     // 视口适配：先 fitView 让所有节点进入可视区（修复少节点时节点散出视口被裁切）；
     // 若整体缩放过小（节点很多时），锁定最小缩放并居中，保证节点文字可读，用户可再缩放/拖拽。
-    await instance.fitView({ padding: 40 } as any, false);
-    const MIN_ZOOM = 0.5;
+    await instance.fitView({ padding: 56 } as any, false);
+    const MIN_ZOOM = 0.28;
     if (instance.getZoom() < MIN_ZOOM) {
       await instance.zoomTo(MIN_ZOOM, false);
       await instance.fitCenter(false);
@@ -405,18 +447,28 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.advanced-graph-shell { border: 1px solid #dbe3ef; border-radius: 8px; background: #ffffff; overflow: hidden; }
+.advanced-graph-shell { border: 1px solid #d8e0ec; border-radius: 10px; background: #ffffff; overflow: hidden; }
 .advanced-legend { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 9px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 12px; background: #ffffff; }
 .advanced-legend span { display: inline-flex; align-items: center; gap: 5px; }
-.advanced-graph-canvas { width: 100%; min-height: 420px; background: #ffffff; }
+/* 130p2：Neo4j 式点阵画布（浅灰底 + 规则圆点网格） */
+.advanced-graph-canvas {
+  width: 100%;
+  min-height: 420px;
+  background-color: #fbfcfe;
+  background-image: radial-gradient(circle, #ccd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 .edge-line { display: inline-block; width: 24px; border-top-width: 2px; border-top-style: solid; }
 .edge-line.solid { border-top-style: solid; }
 .edge-line.dashed { border-top-style: dashed; }
 .edge-line.dotted { border-top-style: dotted; }
-/* 129号：与 pastel 边色一致的图例 */
 .edge-line.primary { border-color: #3f7cac; }
 .edge-line.pass { border-color: #58a05c; }
 .edge-line.orange { border-color: #dd8b2e; }
 .edge-line.review { border-color: #9b7ec8; }
 .edge-line.muted { border-color: #94a3b8; }
+.node-chip { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 2px solid; }
+.chip-group { background: #dcebc8; border-color: #a3c47e; }
+.chip-table { background: #d6e9f8; border-color: #8fbfe6; }
+.chip-view { background: #e6ddf5; border-color: #b6a3dd; }
 </style>
