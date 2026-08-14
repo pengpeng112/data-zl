@@ -772,10 +772,10 @@
       "cardinality": "one-to-many",
       "confidence": "A",
       "validation_level": "B",
-      "validation_status": "bounded",
+      "validation_status": "verified",
       "validation_metrics": "detail_rows=768942; matched_visit_keys=1996/2000",
-      "note": "",
-      "validation_note": "INP_BILL_DETAIL 巨表；用 2000 个住院键限定验证，键关系可用，禁止全表扫描"
+      "note": "20260814升正式",
+      "validation_note": "住院结算按就诊键挂费用明细（更细可用 RCPT_NO）；巨表禁全扫"
     },
     {
       "id": 9,
@@ -794,10 +794,10 @@
       "cardinality": "one-to-many",
       "confidence": "B",
       "validation_level": "B",
-      "validation_status": "bounded",
+      "validation_status": "verified",
       "validation_metrics": "order_rows=130734; matched_visit_keys=1999/2000",
-      "note": "",
-      "validation_note": "ORDERS 巨表；用 2000 个住院键限定验证，键关系可用"
+      "note": "20260814升正式",
+      "validation_note": "ORDERS 巨表；2000 住院键限定验证通过，对应 HIS 源端 formal 453"
     },
     {
       "id": 10,
@@ -813,11 +813,11 @@
       "join": "CLINIC_MASTER->OUTP_RCPT_MASTER",
       "cardinality": "one-to-many",
       "confidence": "B",
-      "validation_level": "not_tested",
-      "validation_status": "not_tested",
-      "validation_metrics": "",
-      "note": "门诊主线",
-      "validation_note": "门诊主线未在本轮验证，需单独按门诊键复核"
+      "validation_level": "rejected",
+      "validation_status": "rejected",
+      "validation_metrics": "clinic_master.RCPT_NO columns=0",
+      "note": "字段不存在",
+      "validation_note": "HIS.CLINIC_MASTER 无 RCPT_NO；门诊收据应改走 CLINIC_NO / OUTP_ORDER_DESC"
     },
     {
       "id": 11,
@@ -832,12 +832,12 @@
       ],
       "join": "OUTP_RCPT_MASTER.RCPT_NO=OUTP_BILL_ITEMS.RCPT_NO",
       "cardinality": "one-to-many",
-      "confidence": "B",
-      "validation_level": "not_tested",
-      "validation_status": "not_tested",
-      "validation_metrics": "",
-      "note": "",
-      "validation_note": "门诊费用明细未在本轮验证，需单独按 RCPT_NO 复核"
+      "confidence": "A",
+      "validation_level": "B",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=0",
+      "note": "20260814升正式",
+      "validation_note": "ODS 5万样本0孤儿；视图 V_EMR_OUT_FEE_INFO_* 同键；源端 formal 473 已验证"
     },
     {
       "id": 12,
@@ -904,8 +904,8 @@
       "validation_level": "C",
       "validation_status": "needs_split",
       "validation_metrics": "total=3415127; orphan=1402517; orphan_rate=41.1%",
-      "note": "",
-      "validation_note": "EXAM_MASTER 混合住院/门诊/体检/历史来源；仅住院子集可按 PATIENT_ID+VISIT_ID 挂 PAT_VISIT"
+      "note": "20260814已拆553/554",
+      "validation_note": "全量混合不再当住院检查；住院见553，门诊收据见554"
     },
     {
       "id": 15,
@@ -945,8 +945,8 @@
       "validation_level": "C",
       "validation_status": "needs_split",
       "validation_metrics": "total=9142446; visit_null_or_zero=3339952; exact_visit_match=5800092; nonzero_visit_unmatched=2402",
-      "note": "住院+同患者门诊检验",
-      "validation_note": "LAB_TEST_MASTER 需拆住院检验与 VISIT_ID=0/NULL 的门诊/其他检验"
+      "note": "20260814已拆555/556",
+      "validation_note": "全量混合不再使用；住院见555，门诊收据见556"
     },
     {
       "id": 17,
@@ -985,10 +985,10 @@
       "cardinality": "one-to-many",
       "confidence": "A",
       "validation_level": "B",
-      "validation_status": "bounded",
+      "validation_status": "verified",
       "validation_metrics": "result_rows=22721; matched_test_no=1367/2000",
-      "note": "",
-      "validation_note": "LAB_RESULT 巨表；用 2000 个 TEST_NO 限定验证，TEST_NO 关系可用，禁止全表扫描"
+      "note": "20260814升正式",
+      "validation_note": "项目级复合键 TEST_NO+ITEM_NO；LAB_RESULT 禁全扫"
     },
     {
       "id": 19,
@@ -1005,10 +1005,10 @@
       "cardinality": "one-to-many",
       "confidence": "A",
       "validation_level": "B",
-      "validation_status": "bounded",
+      "validation_status": "verified",
       "validation_metrics": "result_rows=22721; matched_test_no=1367/2000",
-      "note": "",
-      "validation_note": "LAB_RESULT 巨表；用 2000 个 TEST_NO 限定验证，TEST_NO 关系可用，禁止全表扫描"
+      "note": "20260814升正式",
+      "validation_note": "LAB_RESULT 巨表；2000 个 TEST_NO 限定验证通过，禁止全表扫描；对应源端 formal 460"
     },
     {
       "id": 20,
@@ -1023,12 +1023,12 @@
       ],
       "join": "CDA_DICTIONARY.字典名称='ICD-10诊断编码' AND 系统标识='HIS' AND 院标编码=DIAGNOSIS.DIAGNOSIS_CODE",
       "cardinality": "many-to-one",
-      "confidence": "A",
-      "validation_level": "A",
+      "confidence": "B",
+      "validation_level": "B",
       "validation_status": "sample_verified",
       "validation_metrics": "sample_rows=50000; mapped_rows=47091; map_rate=94.18%",
-      "note": "ICD-10 标准化;关联前按院标编码聚合防爆行",
-      "validation_note": "ICD-10 映射可用，但需保留未命中回退 HIS 原始编码/名称"
+      "note": "20260814升正式;ICD-10;未映射回退",
+      "validation_note": "ICD-10 映射可用，未命中须回退 HIS 原始编码/名称"
     },
     {
       "id": 21,
@@ -1044,11 +1044,11 @@
       "join": "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
       "cardinality": "many-to-one",
       "confidence": "A",
-      "validation_level": "not_tested",
-      "validation_status": "not_tested",
-      "validation_metrics": "",
-      "note": "",
-      "validation_note": "DIAGNOSIS_TYPE_DICT 未在本轮单独验证，可按字典小表后续补验"
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=0",
+      "note": "20260814升正式",
+      "validation_note": "ODS 5万样本0孤儿，诊断类别字典关系成立"
     },
     {
       "id": 22,
@@ -1086,9 +1086,9 @@
       "cardinality": "one-to-many",
       "confidence": "A",
       "validation_level": "A+",
-      "validation_status": "sample_verified",
+      "validation_status": "verified",
       "validation_metrics": "sample_rows=50000; orphan=0",
-      "note": "",
+      "note": "20260814升正式",
       "validation_note": "旧 EMR 文书主表按 UHID 可挂 DOCINDEX"
     },
     {
@@ -1108,9 +1108,9 @@
       "cardinality": "one-to-many",
       "confidence": "A",
       "validation_level": "A",
-      "validation_status": "sample_verified",
+      "validation_status": "verified",
       "validation_metrics": "sample_rows=50000; orphan=29; orphan_rate=0.058%",
-      "note": "",
+      "note": "20260814升正式",
       "validation_note": "旧 EMR 段落内容按 UHID+段落编号可挂文书主表"
     },
     {
@@ -1146,12 +1146,12 @@
       ],
       "join": "DEPT_CODE",
       "cardinality": "many-to-one",
-      "confidence": "B",
-      "validation_level": "not_tested",
-      "validation_status": "not_tested",
-      "validation_metrics": "",
-      "note": "",
-      "validation_note": "JHEMR 文书按 DEPT_CODE 关联科室未在本轮验证；JHEMR 到住院键仍未确认"
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=0",
+      "note": "20260814升正式",
+      "validation_note": "嘉和文书科室编码可挂 HIS 科室字典"
     },
     {
       "id": 27,
@@ -1230,9 +1230,9 @@
       "cardinality": "many-to-one",
       "confidence": "A",
       "validation_level": "A+",
-      "validation_status": "sample_verified",
+      "validation_status": "verified",
       "validation_metrics": "sample_rows=100000; orphan=1",
-      "note": "段落内容可直接追溯文书索引",
+      "note": "20260814升正式",
       "validation_note": "旧 EMR 段落内容可按 UHID 直接追溯文书索引"
     },
     {
@@ -1983,6 +1983,118 @@
       "validation_metrics": {},
       "note": "诊断关联患者主索引",
       "validation_note": "医保飞检SQL验证"
+    },
+    {
+      "id": 553,
+      "domain": "检查-住院",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": ["PATIENT_ID", "VISIT_ID"],
+      "to": "HIS.EXAM_MASTER",
+      "to_columns": ["PATIENT_ID", "VISIT_ID"],
+      "join": "PATIENT_ID+VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=4",
+      "note": "20260814拆分",
+      "validation_note": "仅非零 VISIT_ID 检查挂住院"
+    },
+    {
+      "id": 554,
+      "domain": "检查-门诊",
+      "from": "HIS.EXAM_MASTER",
+      "from_columns": ["RCPT_NO"],
+      "to": "HIS.OUTP_RCPT_MASTER",
+      "to_columns": ["RCPT_NO"],
+      "join": "EXAM_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(VISIT_ID,0)=0",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=0",
+      "note": "20260814拆分",
+      "validation_note": "VISIT_ID=0/NULL 检查按收据号挂门诊收据"
+    },
+    {
+      "id": 555,
+      "domain": "检验-住院",
+      "from": "HIS.PAT_VISIT",
+      "from_columns": ["PATIENT_ID", "VISIT_ID"],
+      "to": "HIS.LAB_TEST_MASTER",
+      "to_columns": ["PATIENT_ID", "VISIT_ID"],
+      "join": "PATIENT_ID+VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=22",
+      "note": "20260814拆分",
+      "validation_note": "仅非零 VISIT_ID 检验挂住院"
+    },
+    {
+      "id": 556,
+      "domain": "检验-门诊",
+      "from": "HIS.LAB_TEST_MASTER",
+      "from_columns": ["RCPT_NO"],
+      "to": "HIS.OUTP_RCPT_MASTER",
+      "to_columns": ["RCPT_NO"],
+      "join": "LAB_TEST_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(VISIT_ID,0)=0",
+      "cardinality": "many-to-one",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods_sample=50000; orphan=0",
+      "note": "20260814拆分",
+      "validation_note": "VISIT_ID=0/NULL 检验按收据号挂门诊收据"
+    },
+    {
+      "id": 557,
+      "domain": "住院费用-检验检查",
+      "from": "HIS.INP_BILL_DETAIL",
+      "from_columns": ["OPER_CODE"],
+      "to": "HIS.ORDERS",
+      "to_columns": ["APP_NO"],
+      "join": "INP_BILL_DETAIL.OPER_CODE=ORDERS.APP_NO AND LENGTH(OPER_CODE)>=8",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods n=5000 miss=98; his n=5990 miss=511",
+      "note": "20260814用户口径",
+      "validation_note": "费用OPER_CODE挂医嘱检验检查申请号；短码多为操作员"
+    },
+    {
+      "id": 558,
+      "domain": "门诊费用",
+      "from": "HIS.OUTP_ORDER_DESC",
+      "from_columns": ["VISIT_DATE", "VISIT_NO", "RCPT_NO"],
+      "to": "HIS.OUTP_BILL_ITEMS",
+      "to_columns": ["VISIT_DATE", "VISIT_NO", "RCPT_NO"],
+      "join": "VISIT_DATE+VISIT_NO+RCPT_NO",
+      "cardinality": "one-to-many",
+      "confidence": "A",
+      "validation_level": "A",
+      "validation_status": "sample_verified",
+      "validation_metrics": "ods miss=0; his miss=0",
+      "note": "20260814用户口径",
+      "validation_note": "开单表有重复必须用三联键"
+    },
+    {
+      "id": 559,
+      "domain": "门诊费用-检验",
+      "from": "HIS.OUTP_BILL_ITEMS",
+      "from_columns": ["APPOINT_NO", "ITEM_NO"],
+      "to": "HIS.LAB_RESULT",
+      "to_columns": ["TEST_NO", "ITEM_NO"],
+      "join": "APPOINT_NO=TEST_NO AND ITEM_NO=ITEM_NO",
+      "cardinality": "many-to-one",
+      "confidence": "B",
+      "validation_level": "B",
+      "validation_status": "sample_verified",
+      "validation_metrics": "his n=20451 miss=6971 hit=65.9%",
+      "note": "20260814用户口径",
+      "validation_note": "仅检验收费行；禁 LAB_RESULT 全扫"
     }
   ]
 }
