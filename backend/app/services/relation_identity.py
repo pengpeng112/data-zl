@@ -161,7 +161,7 @@ def derive_layer(confidence: Optional[str], validation_status: Optional[str]) ->
     if validation_status == "candidate":
         return "candidate"
     if validation_status in (
-        "verified", "partial", "user_confirmed", "user_confirmed_mapping",
+        "verified", "partial", "sample_verified", "user_confirmed", "user_confirmed_mapping",
         "user_confirmed_parallel_sources", "manual_reviewed", "A_rechecked",
     ):
         return "formal"

@@ -14,8 +14,13 @@ class QualityRuleItem(BaseModel):
     check_scope: str | None = None
     constraint_level: str | None = None
     business_domain: str | None = None
+    system_code: str | None = None
+    source_code: str | None = None
+    namespace_name: str | None = None
     target_table: str | None = None
     target_field: str | None = None
+    related_table: str | None = None
+    related_field: str | None = None
     check_sql: str | None = None
     error_level: str | None = None
     description: str | None
@@ -29,6 +34,13 @@ class QualityRuleItem(BaseModel):
 class QualityFindingItem(BaseModel):
     id: int
     rule_code: str | None
+    rule_name: str | None = None
+    rule_category: str | None = None
+    rule_description: str | None = None
+    problem: str | None = None
+    target_display: str | None = None
+    system_name_cn: str | None = None
+    source_name_cn: str | None = None
     target_type: str | None
     target_ref: str | None
     system_code: str | None = None
@@ -36,7 +48,12 @@ class QualityFindingItem(BaseModel):
     namespace_name: str | None = None
     schema_name: str | None = None
     table_name: str | None = None
+    table_name_cn: str | None = None
     column_name: str | None = None
+    related_schema: str | None = None
+    related_table: str | None = None
+    related_table_cn: str | None = None
+    related_field: str | None = None
     severity: str | None
     status: str | None
     metric_value: str | None

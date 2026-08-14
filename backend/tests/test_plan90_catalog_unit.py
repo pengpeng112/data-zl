@@ -7,6 +7,7 @@ from app.services.asset_catalog import (
     CANONICAL_SYSTEMS,
     classify_for_tree,
     normalize_system_code,
+    system_code_filter_values,
 )
 from app.services.asset_import_upsert import pick_chinese_name
 from app.services.row_presence import (
@@ -85,6 +86,15 @@ def test_legacy_codes_physical_remap():
     assert normalize_system_code("PACS", source_code="pacs_mysql_10_10_10_191") == "PACS_SOURCE"
     assert normalize_system_code("SM", source_code="docare_oracle") == "DOCARE"
     assert normalize_system_code("YDHL", source_code="mobile_nursing_oracle") == "MOBILE_NURSING"
+
+
+def test_system_code_filter_includes_his_legacy_alias():
+    his_vals = system_code_filter_values("HIS_SOURCE")
+    assert "HIS_SOURCE" in his_vals
+    assert "HIS" in his_vals
+    assert system_code_filter_values("HIS") == his_vals
+    assert "DATA_CENTER" not in his_vals
+    assert system_code_filter_values("") == []
 
 
 def test_zero_row_table_is_not_imported_visible():

@@ -75,6 +75,7 @@ def test_preview_create_idempotent_review_attach_without_mutating_finding(client
     assert safe["finding_ids"] == [finding.id]
     assert "findings" in safe["payload_json"]
     assert "must-never-leave" not in safe["payload_json"]
+    assert "PATIENT_ID" in safe["payload_json"]
 
     create_body = {"task_type": "finding", "finding_ids": [finding.id], "request_id": safe["request_id"], "input_digest": safe["input_digest"]}
     created = client.post("/api/v1/quality/ai/jobs", json=create_body)
@@ -120,6 +121,83 @@ def test_task_scope_preview_token_and_run_summary_contract(client, db_session, m
     assert run_preview.json()["data"]["run_id"] == run.id
     forged = client.post("/api/v1/quality/ai/jobs", json={"task_type": "finding", "finding_ids": [first.id], "request_id": "AQJ-000000000000000000000000-00000000000000000000000000000000", "input_digest": "0" * 64})
     assert forged.status_code == 422
+
+
+def test_hospital_llm_analyzes_selected_findings_without_dify(client, db_session, monkeypatch):
+    first = _finding(db_session)
+    second = _finding(db_session, table="LAB_TEST_MASTER")
+    monkeypatch.setattr(settings, "hospital_llm_enabled", True)
+    monkeypatch.setattr(ai_quality, "_hospital_ready", lambda: True)
+
+    class ImmediateThread:
+        def __init__(self, target=None, args=(), kwargs=None, daemon=None):
+            self._target = target
+            self._args = args
+            self._kwargs = kwargs or {}
+        def start(self):
+            if self._target:
+                self._target(*self._args, **self._kwargs)
+
+    reply = (
+        '{"schema_version":"quality-analysis-output/v1","request_id":"PLACEHOLDER",'
+        '"input_digest":"DIGEST","summary":"检查和检验应拆门诊住院后分别看命中率",'
+        '"risk_level":"medium","root_causes":[{"title":"就诊键混用","reason":"VISIT_ID=0 不是住院",'
+        '"confidence":0.8,"evidence_finding_ids":[]}],"recommendations":[{"title":"按门诊住院复核",'
+        '"action_type":"manual_review","priority":"P1","reason":"避免混用",'
+        '"confidence":0.8,"target_refs":[]}],"false_positive":{"possible":false,"reason":"需人工确认"},'
+        '"follow_up_checks":[],"limitations":["不能访源库"]}'
+    )
+
+    def complete_stream(self, user_text, max_tokens=None):
+        assert "INSERT" not in user_text
+        yield reply
+
+    monkeypatch.setattr(ai_quality.threading, "Thread", ImmediateThread)
+    monkeypatch.setattr(ai_quality.HospitalLlmClient, "complete_stream", complete_stream)
+    preview = client.post("/api/v1/quality/ai/preview", json={"task_type": "finding_batch", "finding_ids": [first.id, second.id]})
+    assert preview.status_code == 200, preview.text
+    safe = preview.json()["data"]
+    created = client.post("/api/v1/quality/ai/jobs", json={
+        "task_type": "finding_batch",
+        "finding_ids": [first.id, second.id],
+        "request_id": safe["request_id"],
+        "input_digest": safe["input_digest"],
+    })
+    assert created.status_code == 200, created.text
+    job = created.json()["data"]
+    assert job["status"] == "succeeded"
+    assert "门诊住院" in job["result"]["summary"]
+    assert job["result"]["structured_result"]["recommendations"][0]["action_type"] == "manual_review"
+
+
+def test_preview_keeps_mixed_exam_split_hint(client, db_session, monkeypatch):
+    if not db_session.scalar(select(QualityRule).where(QualityRule.rule_code == "REL_ORPHAN_RATE")):
+        db_session.add(QualityRule(rule_code="REL_ORPHAN_RATE", rule_name="关系孤儿率", rule_type="orphan_record", rule_category="RELATION"))
+    row = QualityFinding(
+        run_id=1,
+        rule_code="REL_ORPHAN_RATE",
+        target_type="relation",
+        target_ref="HIS.PAT_VISIT -> HIS.EXAM_MASTER (rel_id=14)",
+        system_code="HIS",
+        source_code="his_source_10_10_10_15",
+        schema_name="HIS",
+        table_name="PAT_VISIT",
+        severity="critical",
+        status="open",
+        metric_value="orphan_rate=41.1%",
+    )
+    db_session.add(row)
+    db_session.commit()
+    db_session.refresh(row)
+    monkeypatch.setattr(settings, "hospital_llm_enabled", True)
+    monkeypatch.setattr(ai_quality, "_hospital_ready", lambda: True)
+    preview = client.post("/api/v1/quality/ai/preview", json={"task_type": "finding", "finding_ids": [row.id]})
+    assert preview.status_code == 200, preview.text
+    payload = preview.json()["data"]["payload_json"]
+    assert "PATIENT_ID" in payload or "PAT_VISIT" in payload
+    assert "553" in payload
+    assert "554" in payload
+    assert "handling_hint" in payload
 
 
 def test_rbac_and_stale_running_recovery(client, db_session):

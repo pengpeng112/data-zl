@@ -221,7 +221,7 @@ def _run_quality_nightly():
         db.commit()
         from .api.v1.quality import run_quality_check_core
 
-        result = run_quality_check_core(db, triggered_by="nightly_scheduler")
+        result = run_quality_check_core(db, triggered_by="nightly_scheduler", include_sql=False)
         job.status = "success"
         job.finished_at = datetime.now(timezone.utc)
         job.total_processed = result.get("total_rules", 0)
@@ -315,7 +315,7 @@ app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 
-PUBLIC_PREFIXES = ("/health", "/docs", "/openapi", "/redoc", "/api/v1/health")
+PUBLIC_PREFIXES = ("/health", "/docs", "/openapi", "/redoc", "/api/v1/health", "/api/v1/public")
 PUBLIC_EXACT = {
     "/",
     "/api/v1/ai/tools",

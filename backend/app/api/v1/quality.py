@@ -10,6 +10,7 @@ from ...core.db import get_db
 from ...core.security import require_permission
 from ...models.quality import QualityRule, QualityFinding, QualityCheckRun
 from ...models.asset import AssetRelation, AssetTable, AssetColumn
+from ...models.asset_system import AssetDataSource, AssetSystem
 from ...models.candidate import AssetCandidateRelation
 from ...schemas.common import ApiResponse
 from ...schemas.quality import (
@@ -22,6 +23,13 @@ from ...schemas.quality import (
 from ...services.quality_rule_engine import validate_sql_safety
 from ...services.quality_sql_runner import execute_quality_sql
 from ...services.data_masking import mask_sensitive
+from ...services.quality_attribution import resolve_finding_location
+from ...services.quality_rule_catalog import (
+    all_seed_rules,
+    finding_problem,
+    finding_target_display,
+    generate_rule_suggestions,
+)
 
 router = APIRouter(prefix="/api/v1/quality", tags=["quality"])
 
@@ -143,9 +151,9 @@ QUALITY_RULES_SEED = [
         "check_scope": "SYSTEM_CROSS",
         "target_type": "source",
         "execution_mode": "metadata_only",
-        "description": "数据源元数据快照过旧（超过 7 天未更新）",
+        "description": "已停用：采集超过 7 天未更新不作为质量问题。",
         "threshold_config": {"max_days": 7},
-        "enabled": True,
+        "enabled": False,
     },
 ]
 
@@ -187,9 +195,22 @@ def _run_rule_rel_orphan(db: Session) -> list[QualityFinding]:
                         rule_code="REL_ORPHAN_RATE",
                         target_type="relation",
                         target_ref=f"{r.from_table} -> {r.to_table} (rel_id={r.rel_id})",
+                        system_code=r.from_system_code,
+                        source_code=r.from_source_code,
+                        namespace_name=r.from_namespace_name or r.from_schema_name,
+                        schema_name=r.from_schema_name,
+                        table_name=r.from_table_name or r.from_table,
+                        column_name=r.from_columns,
                         severity=sev,
                         metric_value=f"orphan_rate={orphan_rate}%",
-                        detail={"orphan_rate": orphan_rate, "metrics_raw": metrics, "threshold": threshold["max_orphan_rate"]},
+                        detail={
+                            "orphan_rate": orphan_rate,
+                            "metrics_raw": metrics,
+                            "threshold": threshold["max_orphan_rate"],
+                            "related_schema": r.to_schema_name,
+                            "related_table": r.to_table_name or r.to_table,
+                            "related_columns": r.to_columns,
+                        },
                     )
                 )
     return findings
@@ -287,8 +308,19 @@ def _run_rule_rel_not_verified(db: Session) -> list[QualityFinding]:
             rule_code="REL_NOT_VERIFIED",
             target_type="relation",
             target_ref=f"{r.from_table} -> {r.to_table} (rel_id={r.rel_id})",
+            system_code=r.from_system_code,
+            source_code=r.from_source_code,
+            namespace_name=r.from_namespace_name or r.from_schema_name,
+            schema_name=r.from_schema_name,
+            table_name=r.from_table_name or r.from_table,
+            column_name=r.from_columns,
             severity="minor",
             metric_value=f"status={r.validation_status or 'empty'}",
+            detail={
+                "related_schema": r.to_schema_name,
+                "related_table": r.to_table_name or r.to_table,
+                "related_columns": r.to_columns,
+            },
         )
         for r in rows
     ]
@@ -463,6 +495,81 @@ def _run_rule_source_metadata_stale(db: Session) -> list[QualityFinding]:
     return findings
 
 
+def _summary_finding(rule_code: str, target_type: str, count: int, label: str, extra: dict | None = None) -> list[QualityFinding]:
+    if count <= 0:
+        return []
+    return [
+        QualityFinding(
+            rule_code=rule_code,
+            target_type=target_type,
+            target_ref=f"共 {count} {label}",
+            severity="minor",
+            metric_value=f"total={count}",
+            error_cnt=count,
+            detail=extra or {},
+        )
+    ]
+
+
+def _run_rule_table_no_pk(db: Session) -> list[QualityFinding]:
+    count = db.scalar(
+        select(func.count(AssetTable.id)).where(
+            (AssetTable.pk.is_(None)) | (AssetTable.pk == "")
+        )
+    ) or 0
+    return _summary_finding("TABLE_NO_PK", "table", int(count), "张表未登记主键")
+
+
+def _run_rule_rel_no_join_columns(db: Session) -> list[QualityFinding]:
+    count = db.scalar(
+        select(func.count(AssetRelation.id)).where(
+            (func.coalesce(AssetRelation.from_columns, "") == "")
+            & (func.coalesce(AssetRelation.to_columns, "") == "")
+        )
+    ) or 0
+    return _summary_finding("REL_NO_JOIN_COLUMNS", "relation", int(count), "条关系缺少关联字段")
+
+
+def _run_rule_meta_table_identity(db: Session) -> list[QualityFinding]:
+    count = db.scalar(
+        select(func.count(AssetTable.id)).where(
+            (AssetTable.system_code.is_(None))
+            | (AssetTable.system_code == "")
+            | (AssetTable.source_code.is_(None))
+            | (AssetTable.source_code == "")
+            | (AssetTable.table_name.is_(None))
+            | (AssetTable.table_name == "")
+        )
+    ) or 0
+    return _summary_finding("META_TABLE_IDENTITY_COMPLETE", "table", int(count), "张表物理身份不完整")
+
+
+def _run_rule_meta_rel_layer_status(db: Session) -> list[QualityFinding]:
+    rows = db.scalars(select(AssetRelation)).all()
+    bad = 0
+    for row in rows:
+        status = (row.validation_status or "").lower()
+        layer = (row.relation_layer or "").lower()
+        confirmed = status in {"verified", "approved", "manual_reviewed", "sample_pass", "sample_verified"}
+        if confirmed and layer == "candidate":
+            bad += 1
+        elif status in {"candidate", "not_tested"} and layer == "formal":
+            bad += 1
+    return _summary_finding("META_REL_LAYER_STATUS_MATCH", "relation", bad, "条关系层级与状态不一致")
+
+
+def _run_rule_meta_rel_endpoint(db: Session) -> list[QualityFinding]:
+    count = db.scalar(
+        select(func.count(AssetRelation.id)).where(
+            (AssetRelation.from_table.is_(None))
+            | (AssetRelation.from_table == "")
+            | (AssetRelation.to_table.is_(None))
+            | (AssetRelation.to_table == "")
+        )
+    ) or 0
+    return _summary_finding("META_REL_ENDPOINT_RESOLVABLE", "relation", int(count), "条关系端点无法解析")
+
+
 RULE_RUNNERS = {
     "REL_ORPHAN_RATE": _run_rule_rel_orphan,
     "TABLE_NO_DOMAIN": _run_rule_table_no_domain,
@@ -474,12 +581,35 @@ RULE_RUNNERS = {
     "COLUMN_NO_CN_NAME": _run_rule_column_no_cn_name,
     "SOURCE_CONNECTIVITY": _run_rule_source_connectivity,
     "SOURCE_METADATA_STALE": _run_rule_source_metadata_stale,
+    "TABLE_NO_PK": _run_rule_table_no_pk,
+    "REL_NO_JOIN_COLUMNS": _run_rule_rel_no_join_columns,
+    "META_TABLE_IDENTITY_COMPLETE": _run_rule_meta_table_identity,
+    "META_REL_LAYER_STATUS_MATCH": _run_rule_meta_rel_layer_status,
+    "META_REL_ENDPOINT_RESOLVABLE": _run_rule_meta_rel_endpoint,
 }
+
+
+def _retire_unused_rules(db: Session) -> None:
+    """Keep catalog rows but stop treating retired rules as open problems."""
+    retired = {"SOURCE_METADATA_STALE"}
+    for code in retired:
+        rule = db.scalar(select(QualityRule).where(QualityRule.rule_code == code))
+        if rule and rule.enabled is not False:
+            rule.enabled = False
+        for finding in db.scalars(
+            select(QualityFinding).where(
+                QualityFinding.rule_code == code,
+                QualityFinding.status.in_(["open", "acknowledged", "assigned"]),
+            )
+        ).all():
+            finding.status = "ignored"
+            finding.note = "用户确认：采集超过7天未更新不作为质量问题"
+            finding.resolved_at = datetime.now(timezone.utc)
 
 
 def seed_rules(db: Session) -> None:
     """Insert missing seed rules and backfill governance fields on enabled seeds."""
-    for rule_data in QUALITY_RULES_SEED:
+    for rule_data in all_seed_rules(QUALITY_RULES_SEED):
         existing = db.scalar(
             select(QualityRule).where(QualityRule.rule_code == rule_data["rule_code"])
         )
@@ -498,6 +628,7 @@ def seed_rules(db: Session) -> None:
         ):
             if field in rule_data and not getattr(existing, field, None):
                 setattr(existing, field, rule_data[field])
+    _retire_unused_rules(db)
     db.commit()
 
 
@@ -535,10 +666,17 @@ def list_rules(
             QualityRule.rule_code.ilike(like)
             | QualityRule.rule_name.ilike(like)
             | QualityRule.description.ilike(like)
+            | QualityRule.target_table.ilike(like)
         )
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(
-        stmt.order_by(QualityRule.rule_code).offset((page - 1) * page_size).limit(page_size)
+        stmt.order_by(
+            QualityRule.enabled.desc().nullslast(),
+            QualityRule.rule_category,
+            QualityRule.rule_code,
+        )
+        .offset((page - 1) * page_size)
+        .limit(page_size)
     ).all()
     items = [QualityRuleItem.model_validate(r).model_dump() for r in rows]
     return ApiResponse(
@@ -546,11 +684,111 @@ def list_rules(
     )
 
 
+def _split_table_ref(ref: str | None) -> tuple[str, str]:
+    text = str(ref or "").strip()
+    if "." not in text or " " in text or text.startswith("共"):
+        return "", ""
+    schema_name, table_name = text.split(".", 1)
+    return schema_name, table_name.split()[0]
+
+
+def _source_name_map(db: Session, codes: set[str]) -> dict[str, str]:
+    if not codes:
+        return {}
+    return {
+        row.source_code: row.source_name_cn
+        for row in db.scalars(select(AssetDataSource).where(AssetDataSource.source_code.in_(codes))).all()
+        if row.source_code and row.source_name_cn
+    }
+
+
+def _system_name_map(db: Session, codes: set[str]) -> dict[str, str]:
+    if not codes:
+        return {}
+    return {
+        row.system_code: row.system_name_cn
+        for row in db.scalars(select(AssetSystem).where(AssetSystem.system_code.in_(codes))).all()
+        if row.system_code and row.system_name_cn
+    }
+
+
+def _table_name_map(db: Session, keys: set[tuple[str, str]]) -> dict[tuple[str, str], str]:
+    tables = {key[1] for key in keys if key[1]}
+    if not tables:
+        return {}
+    result: dict[tuple[str, str], str] = {}
+    for row in db.scalars(select(AssetTable).where(AssetTable.table_name.in_(tables))).all():
+        if not row.table_name_cn:
+            continue
+        result[(str(row.schema_name or "").upper(), str(row.table_name or "").upper())] = row.table_name_cn
+    return result
+
+
+def _relation_id(target_ref: str | None) -> int | None:
+    text = str(target_ref or "")
+    if "rel_id=" not in text:
+        return None
+    raw = text.split("rel_id=", 1)[1]
+    raw = raw.split(")", 1)[0].split(",", 1)[0].strip()
+    try:
+        return int(raw)
+    except ValueError:
+        return None
+
+
+def _finding_payload(
+    row: QualityFinding,
+    rule: QualityRule | None = None,
+    *,
+    source_names: dict[str, str] | None = None,
+    table_names: dict[tuple[str, str], str] | None = None,
+    system_names: dict[str, str] | None = None,
+    relation: AssetRelation | None = None,
+) -> dict:
+    data = QualityFindingItem.model_validate(row).model_dump()
+    data["rule_name"] = rule.rule_name if rule else None
+    data["rule_category"] = rule.rule_category if rule else None
+    data["rule_description"] = rule.description if rule else None
+    data["problem"] = finding_problem(row, rule, source_names=source_names, table_names=table_names)
+    data["target_display"] = finding_target_display(row, source_names=source_names, table_names=table_names)
+    system_names = system_names or {}
+    source_names = source_names or {}
+    table_names = table_names or {}
+    loc = resolve_finding_location(row, rule)
+    data["schema_name"] = data.get("schema_name") or loc.schema_name
+    data["table_name"] = data.get("table_name") or loc.table_name
+    data["column_name"] = data.get("column_name") or loc.column_name
+    data["related_schema"] = loc.related_schema
+    data["related_table"] = loc.related_table
+    data["related_field"] = loc.related_column
+    if relation is not None:
+        data["schema_name"] = data.get("schema_name") or relation.from_schema_name
+        data["table_name"] = data.get("table_name") or relation.from_table_name or relation.from_table
+        data["column_name"] = data.get("column_name") or relation.from_columns
+        data["related_schema"] = data.get("related_schema") or relation.to_schema_name
+        data["related_table"] = data.get("related_table") or relation.to_table_name or relation.to_table
+        data["related_field"] = data.get("related_field") or relation.to_columns
+    schema_key = str(data.get("schema_name") or data.get("namespace_name") or "")
+    table_key = str(data.get("table_name") or "")
+    data["table_name_cn"] = table_names.get((schema_key.upper(), table_key.upper())) if table_key else None
+    related_table = data.get("related_table")
+    if related_table:
+        data["related_table_cn"] = table_names.get(
+            (str(data.get("related_schema") or "").upper(), str(related_table).upper())
+        )
+    else:
+        data["related_table_cn"] = None
+    data["system_name_cn"] = system_names.get(row.system_code or "")
+    data["source_name_cn"] = source_names.get(row.source_code or "") or source_names.get(row.target_ref or "")
+    return data
+
+
 def run_quality_check_core(
     db: Session,
     *,
     rule_codes: list[str] | None = None,
     triggered_by: str = "manual",
+    include_sql: bool = False,
 ) -> dict:
     """Shared entry for manual API and nightly scheduler (L15)."""
     seed_rules(db)
@@ -558,7 +796,9 @@ def run_quality_check_core(
     rules_q = select(QualityRule).where(QualityRule.enabled.is_(True))  # noqa: E712
     if rule_codes:
         rules_q = rules_q.where(QualityRule.rule_code.in_(rule_codes))
-    rules = db.scalars(rules_q).all()
+    rules = list(db.scalars(rules_q).all())
+    if not include_sql:
+        rules = [rule for rule in rules if (rule.execution_mode or "metadata_only") != "sql_template"]
 
     system_codes = list({r.system_code for r in rules if r.system_code})
     source_codes = list({r.source_code for r in rules if r.source_code})
@@ -719,9 +959,17 @@ def run_quality_check_core(
 )
 def run_quality_check(
     rule_codes: list[str] | None = Query(None),
+    include_sql: bool = Query(False, description="是否同时执行源库 SQL 规则；默认只跑元数据规则"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    return ApiResponse(data=run_quality_check_core(db, rule_codes=rule_codes, triggered_by="manual"))
+    return ApiResponse(
+        data=run_quality_check_core(
+            db,
+            rule_codes=rule_codes,
+            triggered_by="manual",
+            include_sql=include_sql,
+        )
+    )
 
 
 @router.get("/checks/runs", summary="质量检查历史")
@@ -750,6 +998,7 @@ def list_findings(
     rule_code: str | None = Query(None),
     run_id: int | None = Query(None),
     keyword: str | None = Query(None),
+    system_code: str | None = Query(None),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     stmt = select(QualityFinding)
@@ -761,9 +1010,23 @@ def list_findings(
         stmt = stmt.where(QualityFinding.rule_code == rule_code)
     if run_id is not None:
         stmt = stmt.where(QualityFinding.run_id == run_id)
+    if system_code and system_code != "UNASSIGNED":
+        stmt = stmt.where(QualityFinding.system_code == system_code)
+    elif system_code == "UNASSIGNED":
+        stmt = stmt.where((QualityFinding.system_code.is_(None)) | (QualityFinding.system_code == "") | (QualityFinding.system_code == "UNASSIGNED"))
     if keyword:
         like = f"%{keyword}%"
-        stmt = stmt.where(QualityFinding.target_ref.ilike(like))
+        name_match = select(QualityRule.rule_code).where(QualityRule.rule_name.ilike(like))
+        stmt = stmt.where(
+            QualityFinding.target_ref.ilike(like)
+            | QualityFinding.schema_name.ilike(like)
+            | QualityFinding.namespace_name.ilike(like)
+            | QualityFinding.table_name.ilike(like)
+            | QualityFinding.column_name.ilike(like)
+            | QualityFinding.rule_code.ilike(like)
+            | QualityFinding.metric_value.ilike(like)
+            | QualityFinding.rule_code.in_(name_match)
+        )
 
     count = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(
@@ -774,7 +1037,45 @@ def list_findings(
         .offset((page - 1) * page_size)
         .limit(page_size)
     ).all()
-    items = [QualityFindingItem.model_validate(r) for r in rows]
+    codes = {row.rule_code for row in rows if row.rule_code}
+    rule_map = {
+        rule.rule_code: rule
+        for rule in db.scalars(select(QualityRule).where(QualityRule.rule_code.in_(codes))).all()
+    } if codes else {}
+    source_codes = {row.source_code for row in rows if row.source_code}
+    source_codes.update(row.target_ref for row in rows if row.target_type == "source" and row.target_ref)
+    system_codes = {row.system_code for row in rows if row.system_code}
+    table_keys: set[tuple[str, str]] = set()
+    for row in rows:
+        loc = resolve_finding_location(row, rule_map.get(row.rule_code))
+        if loc.table_name:
+            table_keys.add((loc.schema_name or "", loc.table_name))
+        if loc.related_table:
+            table_keys.add((loc.related_schema or "", loc.related_table))
+    source_names = _source_name_map(db, source_codes)
+    system_names = _system_name_map(db, system_codes)
+    rel_ids = {rid for rid in (_relation_id(row.target_ref) for row in rows) if rid is not None}
+    rel_map = {
+        rel.rel_id: rel
+        for rel in db.scalars(select(AssetRelation).where(AssetRelation.rel_id.in_(rel_ids))).all()
+    } if rel_ids else {}
+    for rel in rel_map.values():
+        if rel.from_table_name or rel.from_table:
+            table_keys.add((rel.from_schema_name or "", rel.from_table_name or rel.from_table))
+        if rel.to_table_name or rel.to_table:
+            table_keys.add((rel.to_schema_name or "", rel.to_table_name or rel.to_table))
+    table_names = _table_name_map(db, table_keys)
+    items = [
+        _finding_payload(
+            row,
+            rule_map.get(row.rule_code),
+            source_names=source_names,
+            table_names=table_names,
+            system_names=system_names,
+            relation=rel_map.get(_relation_id(row.target_ref)),
+        )
+        for row in rows
+    ]
     return ApiResponse(data={"total": count, "page": page, "page_size": page_size, "items": items})
 
 
@@ -801,7 +1102,8 @@ def update_finding(
         finding.resolved_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(finding)
-    return ApiResponse(data=QualityFindingItem.model_validate(finding))
+    rule = db.scalar(select(QualityRule).where(QualityRule.rule_code == finding.rule_code)) if finding.rule_code else None
+    return ApiResponse(data=_finding_payload(finding, rule))
 
 
 @router.get("/summary", summary="质量总览")
@@ -844,18 +1146,25 @@ def quality_summary_by_system(
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
     """Per-system finding counts by real attribution (127 A3/A4). Never copy global totals."""
-    from ...services.asset_catalog import load_system_name_map, normalize_system_code
+    from ...services.asset_catalog import load_system_name_map
+    from ...services.quality_attribution import build_table_system_index, infer_system_code
 
     tables = db.scalars(select(AssetTable)).all()
     findings = db.scalars(select(QualityFinding)).all()
     name_map = load_system_name_map(db)
+    table_map, schema_map = build_table_system_index(db)
     grouped: dict[str, dict] = {}
 
-    def _bucket(code: str | None) -> str:
-        raw = (code or "").strip()
-        if not raw:
-            return "UNASSIGNED"
-        return normalize_system_code(raw) or raw
+    def _bucket(code: str | None, *, source_code: str | None = None, schema_name: str | None = None, table_name: str | None = None, target_ref: str | None = None) -> str:
+        return infer_system_code(
+            system_code=code,
+            source_code=source_code,
+            schema_name=schema_name,
+            table_name=table_name,
+            target_ref=target_ref,
+            table_map=table_map,
+            schema_map=schema_map,
+        )
 
     def _ensure(sc: str) -> dict:
         if sc not in grouped:
@@ -880,13 +1189,19 @@ def quality_summary_by_system(
         return grouped[sc]
 
     for t in tables:
-        sc = _bucket(t.system_code)
+        sc = _bucket(t.system_code, source_code=t.source_code, schema_name=t.schema_name, table_name=t.table_name)
         b = _ensure(sc)
         b["table_count"] += 1
         b["column_count"] += t.column_count or 0
 
     for f in findings:
-        sc = _bucket(f.system_code)
+        sc = _bucket(
+            f.system_code,
+            source_code=f.source_code,
+            schema_name=f.schema_name,
+            table_name=f.table_name,
+            target_ref=f.target_ref,
+        )
         b = _ensure(sc)
         status = (f.status or "open").lower()
         b["total_findings"] += 1
@@ -966,7 +1281,7 @@ class TemplateGenerate(BaseModel):
 class AutoGenerateRequest(BaseModel):
     system_code: str | None = None
     source_code: str | None = None
-    limit: int = Field(default=100, ge=1, le=500)
+    limit: int = Field(default=200, ge=1, le=500)
 
 
 class FindingAssign(BaseModel):
@@ -1082,95 +1397,12 @@ def auto_generate_rules(req: AutoGenerateRequest, db: Session = Depends(get_db))
 
     No source database is queried and no generated rule is enabled implicitly.
     """
-    import re
-
-    identifier = re.compile(r"^[A-Za-z_][A-Za-z0-9_$#]*$")
-    created: list[str] = []
-    skipped = 0
-    tables_stmt = select(AssetTable).where(AssetTable.pk.is_not(None))
-    if req.system_code:
-        tables_stmt = tables_stmt.where(AssetTable.system_code == req.system_code)
-    if req.source_code:
-        tables_stmt = tables_stmt.where(AssetTable.source_code == req.source_code)
-    for table in db.scalars(tables_stmt.order_by(AssetTable.system_code, AssetTable.schema_name, AssetTable.table_name).limit(req.limit)).all():
-        fields = [x.strip() for x in re.split(r"[,;+]", str(table.pk or "")) if x.strip()]
-        if not fields or not all(identifier.fullmatch(x) for x in fields):
-            continue
-        table_ref = ".".join(x for x in (table.schema_name, table.table_name) if x)
-        if not table_ref or not identifier.fullmatch(table.table_name or ""):
-            continue
-        code = f"AUTO_PK_{(table.system_code or 'ASSET')}_{table.schema_name or 'PUBLIC'}_{table.table_name}".upper().replace("-", "_")
-        if db.scalar(select(QualityRule).where(QualityRule.rule_code == code)):
-            skipped += 1
-            continue
-        db.add(QualityRule(
-            rule_code=code[:240],
-            rule_name=f"{table.table_name_cn or table.table_name} 主键唯一性",
-            rule_type="metadata_generated",
-            rule_category="UNIQUE",
-            check_scope="TABLE_INNER",
-            constraint_level="WARN",
-            system_code=table.system_code,
-            source_code=table.source_code,
-            namespace_name=table.schema_name,
-            target_table=table.table_name,
-            target_field=",".join(fields),
-            execution_mode="sql_template",
-            check_sql=f"SELECT {', '.join(fields)}, COUNT(*) AS dup_cnt FROM {table_ref} GROUP BY {', '.join(fields)} HAVING COUNT(*) > 1",
-            error_condition="dup_cnt > 1",
-            error_level="major",
-            description="依据资产元数据已确认主键生成；启用前需复核数据源权限与 SQL 方言。",
-            enabled=False,
-            remark="auto_generated_from_asset_pk",
-        ))
-        created.append(code[:240])
-
-    relations_stmt = select(AssetRelation).where(
-        AssetRelation.validation_status.in_(("verified", "sample_pass", "sample_verified")),
-        AssetRelation.from_source_code == AssetRelation.to_source_code,
-    )
-    if req.source_code:
-        relations_stmt = relations_stmt.where(AssetRelation.from_source_code == req.source_code)
-    for relation in db.scalars(relations_stmt.limit(req.limit)).all():
-        from_fields = [x.strip() for x in re.split(r"[,;+]", str(relation.from_columns or "")) if x.strip()]
-        to_fields = [x.strip() for x in re.split(r"[,;+]", str(relation.to_columns or "")) if x.strip()]
-        if len(from_fields) != 1 or len(to_fields) != 1 or not all(identifier.fullmatch(x) for x in (*from_fields, *to_fields)):
-            continue
-        child = relation.from_table or relation.from_schema_name
-        parent = relation.to_table or relation.to_schema_name
-        if not child or not parent or not identifier.fullmatch(child.split(".")[-1]) or not identifier.fullmatch(parent.split(".")[-1]):
-            continue
-        code = f"AUTO_REL_{relation.id}"
-        if db.scalar(select(QualityRule).where(QualityRule.rule_code == code)):
-            skipped += 1
-            continue
-        child_ref = child if "." in child else ".".join(x for x in (relation.from_schema_name, child) if x)
-        parent_ref = parent if "." in parent else ".".join(x for x in (relation.to_schema_name, parent) if x)
-        db.add(QualityRule(
-            rule_code=code,
-            rule_name=f"{child.split('.')[-1]} 关联 {parent.split('.')[-1]} 孤儿记录",
-            rule_type="metadata_generated",
-            rule_category="RELATION",
-            check_scope="TABLE_RELATION",
-            constraint_level="WARN",
-            system_code=relation.from_system_code,
-            source_code=relation.from_source_code,
-            namespace_name=relation.from_schema_name,
-            target_table=child.split(".")[-1],
-            target_field=from_fields[0],
-            related_table=parent.split(".")[-1],
-            related_field=to_fields[0],
-            execution_mode="sql_template",
-            check_sql=f"SELECT COUNT(*) AS orphan_cnt FROM {child_ref} c WHERE c.{from_fields[0]} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM {parent_ref} p WHERE p.{to_fields[0]} = c.{from_fields[0]})",
-            error_condition="orphan_cnt > 0",
-            error_level="major",
-            description="依据已验证同源关系生成；跨系统关系不自动生成可执行 SQL。",
-            enabled=False,
-            remark="auto_generated_from_verified_relation",
-        ))
-        created.append(code)
-    db.commit()
-    return ApiResponse(data={"created": len(created), "skipped": skipped, "rule_codes": created})
+    return ApiResponse(data=generate_rule_suggestions(
+        db,
+        system_code=req.system_code,
+        source_code=req.source_code,
+        limit=req.limit,
+    ))
 
 
 @router.post(
@@ -1214,9 +1446,12 @@ def quality_metrics(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     """Metrics with array rule_categories and split pass rates (127 A5)."""
-    rules = db.scalars(select(QualityRule).where(QualityRule.enabled.is_(True))).all()
+    rules = db.scalars(select(QualityRule)).all()
+    enabled_rules = [r for r in rules if r.enabled is not False]
     total_rules = len(rules)
-    sql_rules = len([r for r in rules if r.execution_mode == "sql_template"])
+    enabled_rule_count = len(enabled_rules)
+    sql_rules = len([r for r in rules if (r.execution_mode or "") == "sql_template" or (r.check_sql or "").strip()])
+    suggested_rules = len([r for r in rules if r.enabled is False])
 
     count_stmt = select(func.count(QualityFinding.id))
     open_stmt = select(func.count(QualityFinding.id)).where(QualityFinding.status == "open")
@@ -1260,7 +1495,8 @@ def quality_metrics(
     return ApiResponse(
         data={
             "total_rules": total_rules,
-            "enabled_rules": total_rules,
+            "enabled_rules": enabled_rule_count,
+            "suggested_rules": suggested_rules,
             "sql_rules": sql_rules,
             "total_findings": total,
             "open_findings": open_count,

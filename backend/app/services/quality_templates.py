@@ -81,6 +81,23 @@ def template_complete_required(table_name: str, column_name: str, namespace: str
     )
 
 
+def template_complete_required_any(
+    table_name: str, column_names: list[str], namespace: str | None = None
+) -> str:
+    full_table = _full_table(table_name, namespace)
+    cols = [c.strip() for c in column_names if c and c.strip()]
+    if not cols:
+        return template_complete_required(table_name, "ID", namespace)
+    if len(cols) == 1:
+        return template_complete_required(table_name, cols[0], namespace)
+    missing = " OR ".join(f"{col} IS NULL" for col in cols)
+    return (
+        f"SELECT COUNT(*) AS TOTAL_CNT, "
+        f"SUM(CASE WHEN {missing} THEN 1 ELSE 0 END) AS ERROR_CNT "
+        f"FROM {full_table}"
+    )
+
+
 def template_standard_length(
     table_name: str, column_name: str, max_length: int, namespace: str | None = None
 ) -> str:
@@ -120,6 +137,35 @@ def template_relation_orphan(
         f"SELECT COUNT(*) AS TOTAL_CNT, "
         f"SUM(CASE WHEN c.{child_fk} IS NOT NULL AND NOT EXISTS ("
         f"SELECT 1 FROM {parent_full} p WHERE p.{parent_pk} = c.{child_fk}"
+        f") THEN 1 ELSE 0 END) AS ERROR_CNT "
+        f"FROM {child_full} c"
+    )
+
+
+def template_relation_orphan_composite(
+    child_table: str,
+    child_fks: list[str],
+    parent_table: str,
+    parent_pks: list[str],
+    child_namespace: str | None = None,
+    parent_namespace: str | None = None,
+) -> str:
+    child_cols = [c.strip() for c in child_fks if c and c.strip()]
+    parent_cols = [c.strip() for c in parent_pks if c and c.strip()]
+    if len(child_cols) == 1 and len(parent_cols) == 1:
+        return template_relation_orphan(
+            child_table, child_cols[0], parent_table, parent_cols[0], child_namespace
+        )
+    child_full = _full_table(child_table, child_namespace)
+    parent_full = _full_table(parent_table, parent_namespace)
+    present = " AND ".join(f"c.{col} IS NOT NULL" for col in child_cols)
+    join_pred = " AND ".join(
+        f"p.{pcol} = c.{ccol}" for ccol, pcol in zip(child_cols, parent_cols)
+    )
+    return (
+        f"SELECT COUNT(*) AS TOTAL_CNT, "
+        f"SUM(CASE WHEN {present} AND NOT EXISTS ("
+        f"SELECT 1 FROM {parent_full} p WHERE {join_pred}"
         f") THEN 1 ELSE 0 END) AS ERROR_CNT "
         f"FROM {child_full} c"
     )

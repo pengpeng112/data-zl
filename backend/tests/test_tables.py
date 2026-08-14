@@ -14,6 +14,24 @@ def test_summary(client: TestClient) -> None:
     assert data["data"]["domains"] > 0
 
 
+def test_overview_charts(client: TestClient) -> None:
+    """127 S4 四图聚合：必须一次返回全量，且 PG 下 coalesce GROUP BY 不能 500。"""
+    resp = client.get("/api/v1/overview/charts")
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["code"] == 0
+    data = body["data"]
+    for key in ("domains", "validation_status", "partitions", "core_tables"):
+        assert key in data
+        assert isinstance(data[key].get("items"), list)
+    assert data["domains"]["total_tables"] > 0
+    assert data["validation_status"]["total_relations"] > 0
+    assert all("name" in item and "count" in item for item in data["domains"]["items"])
+    assert all("name" in item and "count" in item for item in data["validation_status"]["items"])
+    assert all("name" in item and "count" in item for item in data["partitions"]["items"])
+    assert all("table" in item and "count" in item for item in data["core_tables"]["items"])
+
+
 def test_list_tables_pagination(client: TestClient) -> None:
     resp = client.get("/api/v1/tables?page=1&page_size=5")
     assert resp.status_code == 200

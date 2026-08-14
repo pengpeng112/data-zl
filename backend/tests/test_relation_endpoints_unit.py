@@ -115,6 +115,7 @@ class TestDeriveLayer:
 
     def test_formal_verified_a(self):
         assert derive_layer("A", "verified") == "formal"
+        assert derive_layer("A", "sample_verified") == "formal"
 
     def test_formal_partial(self):
         assert derive_layer("B", "partial") == "formal"

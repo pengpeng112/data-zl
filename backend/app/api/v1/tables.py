@@ -9,6 +9,7 @@ from ...core.security import require_permission
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
 from ...schemas.asset import ColumnOut, RelationOut, SummaryOut, TableBrief, TableDetail
 from ...schemas.common import ApiResponse, PageData
+from ...services.asset_catalog import system_code_filter_values
 
 router = APIRouter(prefix="/api/v1", tags=["tables"])
 
@@ -42,6 +43,40 @@ def _parse_sort(sort_str: str | None, whitelist: dict[str, ColumnElement]) -> Co
     return col.desc() if desc else col.asc()
 
 
+# 正式关系状态（已确认/已验证/复核通过），用于登录页“治理关系”口径
+_CONFIRMED_STATUSES = (
+    "verified",
+    "approved",
+    "manual_reviewed",
+    "sample_pass",
+    "sample_verified",
+    "user_confirmed_sync",
+    "user_confirmed_mapping",
+)
+
+
+@router.get("/public/stats", summary="登录页公开统计（免认证）")
+def public_stats(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """登录页展示用：资产对象数（表）、字段数、治理关系数（全部 + 正式确认）。
+    无需登录态，仅返回聚合计数，不含任何敏感明细。"""
+    tables = db.scalar(select(func.count()).select_from(AssetTable))
+    columns = db.scalar(select(func.count()).select_from(AssetColumn))
+    relations = db.scalar(select(func.count()).select_from(AssetRelation))
+    confirmed = db.scalar(
+        select(func.count())
+        .select_from(AssetRelation)
+        .where(func.lower(AssetRelation.validation_status).in_(_CONFIRMED_STATUSES))
+    )
+    return ApiResponse(
+        data={
+            "tables": tables or 0,
+            "columns": columns or 0,
+            "relations": relations or 0,
+            "confirmed_relations": confirmed or 0,
+        }
+    )
+
+
 @router.get("/summary", response_model=ApiResponse[SummaryOut], summary="数据资产总览")
 def summary(db: Session = Depends(get_db)) -> ApiResponse[SummaryOut]:
     t = db.scalar(select(func.count()).select_from(AssetTable))
@@ -62,11 +97,12 @@ def overview_charts(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     Avoids client page_size=1000 422 and Promise.all cascade failures.
     """
     # 业务域分布（全量）
+    # PostgreSQL 要求 GROUP BY 与 SELECT 是同一表达式；SQLAlchemy 对
+    # coalesce/nullif 各编译一次会产生不同绑定参数，触发 GroupingError。
+    domain_key = func.coalesce(func.nullif(AssetTable.domain, ""), "未分类")
     domain_rows = db.execute(
-        select(
-            func.coalesce(func.nullif(AssetTable.domain, ""), "未分类").label("domain"),
-            func.count(AssetTable.id),
-        ).group_by(func.coalesce(func.nullif(AssetTable.domain, ""), "未分类"))
+        select(domain_key.label("domain"), func.count(AssetTable.id))
+        .group_by(domain_key)
         .order_by(func.count(AssetTable.id).desc())
         .limit(20)
     ).all()
@@ -78,11 +114,10 @@ def overview_charts(db: Session = Depends(get_db)) -> ApiResponse[dict]:
     domain_total = db.scalar(select(func.count()).select_from(AssetTable)) or 0
 
     # 关系验证状态
+    status_key = func.coalesce(func.nullif(AssetRelation.validation_status, ""), "unknown")
     status_rows = db.execute(
-        select(
-            func.coalesce(func.nullif(AssetRelation.validation_status, ""), "unknown"),
-            func.count(AssetRelation.id),
-        ).group_by(func.coalesce(func.nullif(AssetRelation.validation_status, ""), "unknown"))
+        select(status_key, func.count(AssetRelation.id))
+        .group_by(status_key)
         .order_by(func.count(AssetRelation.id).desc())
     ).all()
     relation_total = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
@@ -335,6 +370,7 @@ def _build_table_query(
     system_code: str | None = None,
     source_code: str | None = None,
     schema_name: str | None = None,
+    table_name: str | None = None,
 ):
     stmt = select(AssetTable)
     if keyword:
@@ -347,11 +383,15 @@ def _build_table_query(
     if domain:
         stmt = stmt.where(AssetTable.domain == domain)
     if system_code:
-        stmt = stmt.where(AssetTable.system_code == system_code)
+        codes = system_code_filter_values(system_code)
+        stmt = stmt.where(AssetTable.system_code.in_(codes or [system_code]))
     if source_code:
         stmt = stmt.where(AssetTable.source_code == source_code)
     if schema_name:
-        stmt = stmt.where(AssetTable.schema_name == schema_name)
+        ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+        stmt = stmt.where(ns_key == schema_name)
+    if table_name:
+        stmt = stmt.where(AssetTable.table_name == table_name)
     return stmt
 
 
@@ -362,12 +402,13 @@ def list_tables(
     system_code: str | None = None,
     source_code: str | None = None,
     schema_name: str | None = None,
+    table_name: str | None = None,
     sort: str | None = Query(None, description="排序字段: schema_name/table_name/column_count/domain，前缀 - 表示降序"),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=1, le=200, description="每页条数"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[PageData[TableBrief]]:
-    base = _build_table_query(keyword, domain, system_code, source_code, schema_name)
+    base = _build_table_query(keyword, domain, system_code, source_code, schema_name, table_name)
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     order = _parse_sort(sort, TABLE_SORT_COLUMNS)
     stmt = base.order_by(order) if order is not None else base.order_by(AssetTable.schema_name, AssetTable.table_name)

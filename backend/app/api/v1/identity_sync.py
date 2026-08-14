@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ...core.config import settings
@@ -134,6 +134,29 @@ def select_candidates(user=Depends(get_current_user), db: Session = Depends(get_
         ],
         "note": "Full list truncated; only first 20 shown. No emp_no plaintext returned.",
     })
+
+
+@router.get("/runs", summary="夜间同步运行日志")
+def list_runs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    status: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+) -> ApiResponse[dict]:
+    from ...services.identity_sync_log import list_sync_runs
+
+    return ApiResponse(data=list_sync_runs(db, page=page, page_size=page_size, status=status))
+
+
+@router.get("/runs/{run_id}", summary="单次同步运行详情")
+def get_run(run_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)) -> ApiResponse[dict]:
+    from ...services.identity_sync_log import get_sync_run
+
+    data = get_sync_run(db, run_id)
+    if not data:
+        raise HTTPException(status_code=404, detail="同步运行记录不存在")
+    return ApiResponse(data=data)
 
 
 @router.get("/batches", summary="List sync batches")

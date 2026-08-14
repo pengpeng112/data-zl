@@ -67,6 +67,8 @@ def test_by_system_does_not_copy_global_counts_to_every_system():
     assert "grouped[sc][\"findings_total\"] = len(" not in body.replace(" ", "")
     # Must group findings by system_code
     assert "system_code" in body
+    assert "infer_system_code" in body
+    assert "target_ref" in body
     # Must expose frontend-compatible keys
     assert "total_findings" in body or '"total_findings"' in body
     assert "open_count" in body or '"open_count"' in body
@@ -177,6 +179,28 @@ def test_relation_review_approve_dedups_via_alias_and_formal_link():
 def test_overview_charts_aggregate_endpoint_exists():
     src = _read("app/api/v1/tables.py")
     assert "overview/charts" in src or "overview_charts" in src or "/charts/aggregate" in src
+    # PG GroupingError：coalesce/nullif 必须绑定一次再 group_by，禁止 SELECT/GROUP BY 各写一遍。
+    assert "domain_key" in src
+    assert "status_key" in src
+    assert ".group_by(domain_key)" in src
+    assert ".group_by(status_key)" in src
+    assert 'group_by(func.coalesce(func.nullif(AssetTable.domain' not in src
+    assert 'group_by(func.coalesce(func.nullif(AssetRelation.validation_status' not in src
+
+
+def test_table_list_system_filter_accepts_his_alias():
+    catalog = _read("app/services/asset_catalog.py")
+    assert "def system_code_filter_values" in catalog
+    assert "LEGACY_SYSTEM_MAP" in catalog
+    src = _read("app/api/v1/tables.py")
+    assert "system_code_filter_values" in src
+    assert "if table_name:" in src
+    tree_api = _read("../frontend/src/api/asset.ts")
+    assert "table_name?: string" in tree_api
+    tree_src = _read("../frontend/src/views/asset/tables/index.vue")
+    click_fn = tree_src.split("async function handleTreeClick")[1].split("async function loadData")[0]
+    assert "await loadData()" in click_fn
+    assert "await hydrateColumnChildren(node.table);\n    return;" not in click_fn
 
 
 # ── 4.5 graph label placement ───────────────────────────────────────

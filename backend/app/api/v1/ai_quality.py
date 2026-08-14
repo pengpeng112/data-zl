@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import secrets
+import threading
 import time
 from datetime import datetime, timedelta, timezone
 
@@ -11,7 +12,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.orm import Session
 
 from ...core.config import settings
-from ...core.db import get_db
+from ...core.db import SessionLocal, get_db
 from ...core.security import get_current_user, require_permission
 from ...models.asset import AssetColumn, AssetTable
 from ...models.governance_base import GovernAuditLog
@@ -24,6 +25,12 @@ from ...schemas.common import ApiResponse, PageData
 from ...services.ai_quality_payload import build_payload
 from ...services.ai_quality_result import output_digest, validate_output
 from ...services.dify_quality_client import DifyClientError, DifyQualityClient
+from ...services.hospital_llm_analysis import analysis_from_llm_text, attach_platform_examples, build_analysis_prompt
+from ...services.hospital_llm_client import HospitalLlmClient, HospitalLlmError
+from ...services.hospital_llm_report import build_governance_brief
+from ...services.quality_attribution import parse_relation_id, resolve_finding_location
+from ...services.quality_rule_catalog import finding_problem, finding_target_display
+from ...services.relation_metrics import mixed_relation_hint
 
 router = APIRouter(prefix="/api/v1/quality/ai", tags=["quality-ai"])
 INPUT_SCHEMA = "quality-analysis-input/v1"
@@ -46,21 +53,44 @@ def _finding_payload(db: Session, ids: list[int]) -> dict:
         row.rule_code: row
         for row in db.scalars(select(QualityRule).where(QualityRule.rule_code.in_(rule_codes))).all()
     } if rule_codes else {}
-    # Only columns explicitly approved by the contract are copied. detail/sample_data are unreachable.
+    # Platform catalog fields only. detail/sample_data never leave this function.
     findings = []
     for r in rows:
         rule = rules.get(r.rule_code)
-        findings.append({"finding_id": r.id, "run_id": r.run_id, "rule_code": r.rule_code,
-        "rule_name": getattr(rule, "rule_name", None), "rule_type": getattr(rule, "rule_type", None),
-        "rule_category": getattr(rule, "rule_category", None),
-        "business_domain": getattr(rule, "business_domain", None),
-        "target_type": r.target_type, "target_ref": r.target_ref, "system_code": r.system_code,
-        "source_code": r.source_code, "namespace_name": r.namespace_name, "schema_name": r.schema_name,
-        "table_name": r.table_name,
-        "column_name": r.column_name, "severity": r.severity, "status": r.status,
-        "metric_value": r.metric_value, "total_cnt": r.total_cnt, "error_cnt": r.error_cnt,
-        "error_rate": r.error_rate})
-    return {"findings": findings}
+        loc = resolve_finding_location(r, rule)
+        rel_id = parse_relation_id(r.target_ref)
+        item = {
+            "finding_id": r.id,
+            "run_id": r.run_id,
+            "rule_code": r.rule_code,
+            "rule_name": getattr(rule, "rule_name", None),
+            "rule_type": getattr(rule, "rule_type", None),
+            "rule_category": getattr(rule, "rule_category", None),
+            "rule_description": getattr(rule, "description", None),
+            "problem": finding_problem(r, rule),
+            "target_display": finding_target_display(r),
+            "target_type": r.target_type,
+            "target_ref": r.target_ref,
+            "system_code": r.system_code,
+            "source_code": r.source_code,
+            "schema_name": loc.schema_name or r.schema_name,
+            "table_name": loc.table_name or r.table_name,
+            "column_name": loc.column_name or r.column_name,
+            "related_table": loc.related_table,
+            "related_field": loc.related_column,
+            "rel_id": rel_id,
+            "severity": r.severity,
+            "status": r.status,
+            "metric_value": r.metric_value,
+            "total_cnt": r.total_cnt,
+            "error_cnt": r.error_cnt,
+            "error_rate": r.error_rate,
+        }
+        hint = mixed_relation_hint(rel_id)
+        if hint:
+            item.update(hint)
+        findings.append(item)
+    return {"findings": attach_platform_examples(db, findings)}
 
 
 def _build_source_payload(req, db: Session) -> dict:
@@ -72,12 +102,13 @@ def _build_source_payload(req, db: Session) -> dict:
         if not 2 <= len(req.finding_ids) <= settings.dify_max_findings_per_job or req.run_id is not None:
             raise HTTPException(422, "finding_batch requires 2-50 finding_ids")
         data = _finding_payload(db, req.finding_ids)["findings"]
-        # A batch is intentionally stricter than a visual grouping: every
-        # finding must have a complete, identical physical/rule scope.
-        keys = {(x.get("system_code"), x.get("source_code"), x.get("namespace_name") or "",
-                 x.get("schema_name") or "", x.get("table_name"), x.get("rule_code")) for x in data}
-        if len(keys) != 1 or any(not k[0] or not k[1] or not k[3] or not k[4] or not k[5] for k in keys):
-            raise HTTPException(422, "finding_batch must share system/source/schema/table/rule")
+        # Dify keeps the original same-scope contract. Hospital LLM can analyze
+        # mixed tables so the workbench stays usable for real review.
+        if not _hospital_ready():
+            keys = {(x.get("system_code"), x.get("source_code"), x.get("namespace_name") or "",
+                     x.get("schema_name") or "", x.get("table_name"), x.get("rule_code")) for x in data}
+            if len(keys) != 1 or any(not k[0] or not k[1] or not k[3] or not k[4] or not k[5] for k in keys):
+                raise HTTPException(422, "finding_batch must share system/source/schema/table/rule")
         return {"findings": data}
     if req.finding_ids or req.run_id is None:
         raise HTTPException(422, "run_summary requires run_id and no finding_ids")
@@ -125,6 +156,10 @@ def _new_request_id() -> str:
     return f"AQJ-{nonce}-{_preview_signature(nonce)}"
 
 
+def _hospital_ready() -> bool:
+    return bool(settings.hospital_llm_enabled and HospitalLlmClient().configured())
+
+
 def _require_preview_request_id(request_id: str) -> None:
     parts = request_id.split("-")
     if len(parts) != 3 or parts[0] != "AQJ" or not hmac.compare_digest(parts[2], _preview_signature(parts[1])):
@@ -132,10 +167,12 @@ def _require_preview_request_id(request_id: str) -> None:
 
 
 def _status_payload(db: Session | None = None):
-    configured = False
+    hospital = HospitalLlmClient()
+    hospital_configured = hospital.configured()
+    dify_configured = False
     try:
         DifyQualityClient()._api_key()
-        configured = True
+        dify_configured = True
     except DifyClientError:
         pass
     last_success = db.scalar(
@@ -144,13 +181,39 @@ def _status_payload(db: Session | None = None):
         .order_by(AiQualityJob.finished_at.desc())
         .limit(1)
     ) if db is not None else None
-    return {"enabled": settings.dify_quality_enabled, "configured": configured, "reachable": None,
-            "workflow_name": settings.dify_quality_workflow_name, "prompt_version": settings.dify_quality_prompt_version,
-            "schema_version": INPUT_SCHEMA,
-            "max_findings": settings.dify_max_findings_per_job, "max_payload_bytes": settings.dify_max_payload_bytes,
-            "timeout_seconds": settings.dify_read_timeout_seconds,
-            "quota_state": "unknown",
-            "last_success_at": last_success}
+    enabled = bool(settings.hospital_llm_enabled or settings.dify_quality_enabled)
+    configured = (settings.hospital_llm_enabled and hospital_configured) or (settings.dify_quality_enabled and dify_configured)
+    provider = "hospital_llm" if settings.hospital_llm_enabled and hospital_configured else (
+        "dify" if settings.dify_quality_enabled and dify_configured else "none"
+    )
+    message = None
+    if provider == "hospital_llm":
+        message = "已接通院内模型。选中问题后可直接分析，只出建议、不改库、不执行 SQL。"
+    elif not enabled:
+        message = "AI 分析未启用。"
+    elif not configured:
+        message = "AI 质控当前未配置或处于关闭态，可查看问题但不能提交分析。"
+    return {
+        "enabled": enabled,
+        "configured": configured,
+        "reachable": None,
+        "provider": provider,
+        "workflow_name": settings.hospital_llm_model if provider == "hospital_llm" else settings.dify_quality_workflow_name,
+        "prompt_version": settings.dify_quality_prompt_version,
+        "schema_version": INPUT_SCHEMA,
+        "max_findings": settings.dify_max_findings_per_job,
+        "max_payload_bytes": settings.dify_max_payload_bytes,
+        "timeout_seconds": settings.hospital_llm_read_timeout_seconds if provider == "hospital_llm" else settings.dify_read_timeout_seconds,
+        "quota_state": "unknown",
+        "last_success_at": last_success,
+        "message": message,
+        "hospital_llm": {
+            "enabled": settings.hospital_llm_enabled,
+            "configured": hospital_configured,
+            "model": settings.hospital_llm_model,
+            "host": "10.255.255.10:9000",
+        },
+    }
 
 
 @router.get("/status", dependencies=[Depends(require_permission("asset.quality.ai.view"))])
@@ -160,17 +223,33 @@ def status(db: Session = Depends(get_db)) -> ApiResponse[dict]:
 
 @router.post("/connection-test", dependencies=[Depends(require_permission("asset.quality.ai.connection_test"))])
 def connection_test(request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    if settings.hospital_llm_enabled:
+        try:
+            result = HospitalLlmClient().connection_test()
+            _audit(db, "connection_test", "hospital_llm", settings.hospital_llm_model,
+                   operator, {"reachable": True, "model": result.get("model")})
+            db.commit()
+            payload = _status_payload(db)
+            payload["reachable"] = True
+            payload["sample"] = result.get("sample")
+            return ApiResponse(data=payload)
+        except HospitalLlmError as exc:
+            _audit(db, "connection_test_failed", "hospital_llm", settings.hospital_llm_model,
+                   operator, {"error_class": exc.error_class})
+            db.commit()
+            raise HTTPException(503, detail={"error_class": exc.error_class}) from exc
     if not settings.dify_quality_enabled:
-        raise HTTPException(409, "Dify quality analysis is disabled")
+        raise HTTPException(409, "AI analysis is disabled")
     try:
         result = DifyQualityClient().connection_test()
         _audit(db, "connection_test", "dify_workflow", settings.dify_quality_workflow_name,
-               get_current_user(request), {"reachable": True})
+               operator, {"reachable": True})
         db.commit()
         return ApiResponse(data={**_status_payload(db), **result})
     except DifyClientError as exc:
         _audit(db, "connection_test_failed", "dify_workflow", settings.dify_quality_workflow_name,
-               get_current_user(request), {"error_class": exc.error_class})
+               operator, {"error_class": exc.error_class})
         db.commit()
         raise HTTPException(503, detail={"error_class": exc.error_class}) from exc
 
@@ -212,8 +291,11 @@ def _job_payload(db: Session, job: AiQualityJob) -> dict:
         .where(AiQualityJobFinding.job_id == job.id)
         .order_by(AiQualityJobFinding.finding_id)
     ).all())
+    usage = job.token_usage if isinstance(job.token_usage, dict) else {}
     return {**_job_item(job), "finding_ids": finding_ids,
             "run_id": (job.input_summary or {}).get("run_id"),
+            "partial_text": usage.get("partial_text") or "",
+            "phase": usage.get("phase") or "",
             "result": AiQualityResultItem.model_validate(result).model_dump() if result else None}
 
 
@@ -249,8 +331,159 @@ def job_detail(job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     return ApiResponse(data=_job_payload(db, job))
 
 
+def _new_job(req: AiQualityCreateRequest, db: Session, operator: str, payload: dict, *, retry_job=None, prompt_version: str):
+    key_material = f"quality|{req.task_type}|{sorted(req.finding_ids)}|{req.run_id}|{payload['input_digest']}|{prompt_version}"
+    job_key = hashlib.sha256(key_material.encode()).hexdigest()
+    job = retry_job or db.scalar(select(AiQualityJob).where(AiQualityJob.job_key == job_key))
+    if job and retry_job is None:
+        _audit(db, "reuse", "ai_quality_job", job.id, operator, {"status": job.status})
+        db.commit()
+        return job, None
+    job = job or AiQualityJob(
+        job_key=job_key, task_type=req.task_type, prompt_version=prompt_version,
+        schema_version=INPUT_SCHEMA, input_digest=payload["input_digest"], request_id=req.request_id,
+        input_summary={"finding_count": len(req.finding_ids), "finding_ids": sorted(req.finding_ids),
+                       "run_id": req.run_id, "payload_bytes": payload["payload_bytes"],
+                       "dropped_count": len(payload["dropped_fields"]), "provider": "hospital_llm" if _hospital_ready() else "dify"},
+        requested_by=operator)
+    job.status, job.attempt, job.started_at = "running", (job.attempt or 0) + 1, datetime.now(timezone.utc)
+    db.add(job)
+    db.flush()
+    for fid in sorted(set(req.finding_ids)):
+        if not db.scalar(select(AiQualityJobFinding).where(AiQualityJobFinding.job_id == job.id, AiQualityJobFinding.finding_id == fid)):
+            db.add(AiQualityJobFinding(job_id=job.id, finding_id=fid))
+    _audit(db, "submit", "ai_quality_job", job.id, operator, {"input_digest": job.input_digest})
+    db.commit()
+    return job, payload
+
+
+def _save_partial(db: Session, job_id: int, text: str, phase: str) -> None:
+    job = db.get(AiQualityJob, job_id)
+    if not job:
+        return
+    usage = dict(job.token_usage or {})
+    usage["partial_text"] = text[-4000:]
+    usage["phase"] = phase
+    job.token_usage = usage
+    db.add(job)
+    db.commit()
+
+
+def _finish_hospital_job(job_id: int, payload: dict, operator: str, request_id: str) -> None:
+    db = SessionLocal()
+    started = time.monotonic()
+    try:
+        job = db.get(AiQualityJob, job_id)
+        if not job:
+            return
+        prompt = build_analysis_prompt(
+            task_type=job.task_type,
+            request_id=request_id,
+            input_digest=payload["input_digest"],
+            payload_json=payload["payload_json"],
+        )
+        pieces: list[str] = []
+        last_flush = time.monotonic()
+        _save_partial(db, job_id, "院内模型思考中…", "thinking")
+        for chunk in HospitalLlmClient().complete_stream(prompt, max_tokens=1800):
+            pieces.append(chunk)
+            if time.monotonic() - last_flush >= 0.4:
+                _save_partial(db, job_id, "".join(pieces), "writing")
+                last_flush = time.monotonic()
+        text = "".join(pieces)
+        _save_partial(db, job_id, text, "writing")
+        result = analysis_from_llm_text(text, request_id=request_id, input_digest=payload["input_digest"])
+        job = db.get(AiQualityJob, job_id)
+        if db.scalar(select(AiQualityResult).where(AiQualityResult.job_id == job_id)) is None:
+            db.add(AiQualityResult(
+                job_id=job_id, risk_level=result.risk_level, summary=result.summary,
+                structured_result=result.model_dump(), output_digest=output_digest(result),
+            ))
+        job.status = "succeeded"
+        job.dify_run_id = settings.hospital_llm_model[:64]
+        job.duration_ms = int((time.monotonic() - started) * 1000)
+        job.finished_at = datetime.now(timezone.utc)
+        _audit(db, "succeeded", "ai_quality_job", job_id, operator,
+               {"input_digest": job.input_digest, "provider": "hospital_llm"})
+        db.commit()
+    except HospitalLlmError as exc:
+        job = db.get(AiQualityJob, job_id)
+        if job:
+            job.status = "unknown" if exc.error_class in {"timeout", "network", "server"} else "failed"
+            job.error_class = exc.error_class
+            job.error_summary = "Hospital LLM analysis failed"
+            job.finished_at = datetime.now(timezone.utc)
+            _audit(db, "failed", "ai_quality_job", job_id, operator, {"error_class": exc.error_class})
+            db.commit()
+    except Exception as exc:
+        job = db.get(AiQualityJob, job_id)
+        if job:
+            leftover = "".join(pieces).strip() if pieces else ""
+            recovered = False
+            if leftover:
+                try:
+                    result = analysis_from_llm_text(
+                        leftover, request_id=request_id, input_digest=payload["input_digest"]
+                    )
+                    if db.scalar(select(AiQualityResult).where(AiQualityResult.job_id == job_id)) is None:
+                        db.add(AiQualityResult(
+                            job_id=job_id, risk_level=result.risk_level, summary=result.summary,
+                            structured_result=result.model_dump(), output_digest=output_digest(result),
+                        ))
+                    job.status = "succeeded"
+                    job.error_class = None
+                    job.error_summary = None
+                    job.dify_run_id = settings.hospital_llm_model[:64]
+                    job.duration_ms = int((time.monotonic() - started) * 1000)
+                    job.finished_at = datetime.now(timezone.utc)
+                    _audit(db, "succeeded", "ai_quality_job", job_id, operator,
+                           {"input_digest": job.input_digest, "provider": "hospital_llm", "recovered": True})
+                    recovered = True
+                except Exception:
+                    recovered = False
+            if not recovered:
+                job.status = "blocked"
+                job.error_class = "contract"
+                job.error_summary = "Hospital LLM output contract rejected"
+                job.finished_at = datetime.now(timezone.utc)
+                usage = dict(job.token_usage or {})
+                usage["contract_reason"] = type(exc).__name__
+                job.token_usage = usage
+                _audit(db, "blocked", "ai_quality_job", job_id, operator, {"error_class": "contract"})
+            db.commit()
+    finally:
+        db.close()
+
+
+def _submit_hospital(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None):
+    if retry_job is None:
+        _require_preview_request_id(req.request_id)
+    try:
+        payload = _make(req, db, req.request_id)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    if retry_job is None and not hmac.compare_digest(payload["input_digest"], req.input_digest):
+        raise HTTPException(422, "input_digest does not match server preview")
+    job, built = _new_job(req, db, operator, payload, retry_job=retry_job, prompt_version="hospital-llm-analysis-v1")
+    if built is None:
+        return job
+    if job.status == "running":
+        threading.Thread(
+            target=_finish_hospital_job,
+            args=(job.id, built, operator, req.request_id),
+            daemon=True,
+        ).start()
+        # Worker commits via its own SessionLocal; expire the request-session
+        # copy so the response reflects the latest committed status.
+        db.expire(job)
+    return job
+
+
 def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None):
-    if not settings.dify_quality_enabled: raise HTTPException(409, "Dify quality analysis is disabled")
+    if _hospital_ready():
+        return _submit_hospital(req, db, operator, retry_job=retry_job)
+    if not settings.dify_quality_enabled:
+        raise HTTPException(409, "AI quality analysis is disabled")
     if retry_job is None:
         _require_preview_request_id(req.request_id)
     client = DifyQualityClient()
@@ -363,3 +596,40 @@ def attach_result(result_id: int, req: AiQualityAttachRequest, request: Request,
     _audit(db, "attach", "ai_quality_result", result.id, operator,
            {"recommendation_count": len(req.recommendation_indexes), "has_note": bool(req.note)}); db.commit()
     return ApiResponse(data=AiQualityResultItem.model_validate(result).model_dump())
+
+
+@router.post("/governance-report", dependencies=[Depends(require_permission("asset.quality.ai.analyze"))])
+def create_governance_report(request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    if not settings.hospital_llm_enabled:
+        raise HTTPException(409, "Hospital LLM is disabled")
+    operator = get_current_user(request)
+    brief = build_governance_brief(db)
+    digest = hashlib.sha256(brief.encode("utf-8")).hexdigest()
+    job_key = hashlib.sha256(f"hospital-report|{digest}".encode()).hexdigest()
+    existing = db.scalar(select(AiQualityJob).where(AiQualityJob.job_key == job_key, AiQualityJob.status == "succeeded"))
+    if existing:
+        return ApiResponse(data=_job_payload(db, existing))
+    job = AiQualityJob(
+        job_key=job_key,
+        task_type="run_summary",
+        prompt_version="hospital-llm-report-v1",
+        schema_version="governance-report/v1",
+        input_digest=digest,
+        request_id=_new_request_id(),
+        input_summary={"kind": "governance_report", "bytes": len(brief.encode("utf-8"))},
+        requested_by=operator,
+        status="running",
+        attempt=1,
+        started_at=datetime.now(timezone.utc),
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    threading.Thread(
+        target=_finish_hospital_job,
+        args=(job.id, {"payload_json": brief, "input_digest": digest}, operator, job.request_id),
+        daemon=True,
+    ).start()
+    # Same stale-ORM concern as _submit_hospital: worker owns its session.
+    db.expire(job)
+    return ApiResponse(data=_job_payload(db, job))

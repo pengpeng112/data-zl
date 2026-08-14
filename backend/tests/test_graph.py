@@ -476,7 +476,7 @@ def test_server_side_overview_and_cascade_contract(seeded_client: TestClient) ->
     assert overview.status_code == 200
     body = overview.json()["data"]
     assert body["level"] == "system"
-    assert body["next_level"] == "source"
+    assert body["next_level"] == "schema"
     assert body["data"]["nodes"]
     assert body["data"]["meta"]["returned_nodes"] == len(body["data"]["nodes"])
 

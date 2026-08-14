@@ -53,7 +53,25 @@ class QualityOutput(BaseModel):
     limitations: list[Annotated[str, Field(max_length=2000)]] = Field(max_length=50)
 
 
-SENSITIVE = re.compile(r"(password|token|cookie|api[_-]?key|credential|身份证|电话|病历|住院号|门诊号|姓名|患者)", re.I)
+# Domain words such as 患者/病历/住院号 are field names in this hospital
+# catalog. Only block secrets and concrete PII values.
+SENSITIVE = re.compile(
+    r"("
+    r"password\s*[:=]|token\s*[:=]|cookie\s*[:=]|api[_-]?key|credential\s*[:=]|"
+    r"\b\d{17}[\dXx]\b|"
+    r"(?<!\d)1[3-9]\d{9}(?!\d)|"
+    r"(身份证号?|手机号)\s*[:：=]\s*\S+"
+    r")",
+    re.I,
+)
+
+
+def redact_concrete_pii(value: str) -> str:
+    text = value or ""
+    text = re.sub(r"\b\d{17}[\dXx]\b", "[REDACTED]", text)
+    text = re.sub(r"(?<!\d)1[3-9]\d{9}(?!\d)", "[REDACTED]", text)
+    text = re.sub(r"((?:身份证号?|手机号)\s*[:：=]\s*)\S+", r"\1[REDACTED]", text, flags=re.I)
+    return text
 
 
 def validate_output(raw: Any, *, request_id: str, input_digest: str) -> QualityOutput:

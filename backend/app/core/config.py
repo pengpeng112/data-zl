@@ -145,5 +145,17 @@ class Settings(BaseSettings):
     dify_tls_verify: bool = True
     dify_ca_bundle: str = ""
 
+    # Hospital OpenAI-compatible chat: analysis/report only, never writes databases.
+    hospital_llm_enabled: bool = True
+    hospital_llm_base_url: str = "http://10.255.255.10:9000"
+    hospital_llm_allowed_hosts: list[str] = ["10.255.255.10"]
+    hospital_llm_api_key_ref: str = "file:///etc/data-asset/credentials/hospital_llm.api_key"
+    hospital_llm_model: str = "deepseek-r1"
+    hospital_llm_connect_timeout_seconds: float = 5
+    hospital_llm_read_timeout_seconds: float = 90
+    hospital_llm_max_tokens: int = 1800
+    hospital_llm_max_payload_bytes: int = 24000
+    hospital_llm_max_response_bytes: int = 131072
+
 
 settings = Settings()

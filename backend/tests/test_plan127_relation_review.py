@@ -160,6 +160,23 @@ def test_approve_review1_links_formal_not_candidate(client: TestClient):
         db.close()
 
 
+def test_approve_review_normalizes_plus_and_comma_columns(client: TestClient):
+    db = SessionLocal()
+    try:
+        seed = _seed_review_scenario(db)
+        seed["r1"].from_columns = "PATIENT_ID+VISIT_ID"
+        seed["r1"].to_columns = "PATIENT_ID+VISIT_ID"
+        db.flush()
+        result = approve_review(db, seed["r1"], reviewer="plan127-test", note="plus-vs-comma")
+        db.commit()
+        assert result["ok"] is True
+        assert result["action"] == "linked_formal"
+        assert result["source_relation_id"] == seed["formal_bill"].id
+        assert result["source_relation_id"] != seed["cand_bill"].id
+    finally:
+        db.close()
+
+
 def test_approve_review2_links_formal_keeps_orphan_note(client: TestClient):
     db = SessionLocal()
     try:

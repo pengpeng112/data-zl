@@ -23,13 +23,66 @@ router = APIRouter(prefix="/api/v1/identity", tags=["identity"])
 
 
 @router.get("/departments", summary="科室基线列表（HIS dept_dict 为核心）")
-def list_departments(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
-    rows = db.scalars(select(IdentityDepartment).order_by(IdentityDepartment.dept_code)).all()
+def list_departments(
+    keyword: str | None = Query(None),
+    dept_type: str | None = Query(None),
+    status: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[list[dict]]:
+    from ...services.identity_dept_labels import (
+        dept_review_label,
+        dept_status_label,
+        dept_type_label,
+        infer_parent_dept_code,
+    )
+
+    stmt = select(IdentityDepartment)
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(
+            IdentityDepartment.dept_code.ilike(like)
+            | IdentityDepartment.dept_name_cn.ilike(like)
+            | IdentityDepartment.parent_dept_code.ilike(like)
+        )
+    if dept_type:
+        stmt = stmt.where(IdentityDepartment.dept_type == dept_type)
+    if status:
+        stmt = stmt.where(IdentityDepartment.status == status)
+    rows = db.scalars(stmt.order_by(IdentityDepartment.dept_code)).all()
+    names = {row.dept_code: row.dept_name_cn for row in rows}
+    extra_parents = {
+        (row.parent_dept_code or infer_parent_dept_code(row.dept_code))
+        for row in rows
+        if (row.parent_dept_code or infer_parent_dept_code(row.dept_code))
+        and (row.parent_dept_code or infer_parent_dept_code(row.dept_code)) not in names
+    }
+    if extra_parents:
+        for parent in db.scalars(select(IdentityDepartment).where(IdentityDepartment.dept_code.in_(extra_parents))).all():
+            names[parent.dept_code] = parent.dept_name_cn
+    person_counts = {
+        dept_code: int(count or 0)
+        for dept_code, count in db.execute(
+            select(IdentityPerson.dept_code, func.count(IdentityPerson.id)).group_by(IdentityPerson.dept_code)
+        ).all()
+        if dept_code
+    }
     return ApiResponse(data=[
         {
-            "id": r.id, "dept_code": r.dept_code, "dept_name_cn": r.dept_name_cn,
-            "dept_type": r.dept_type, "source_system": r.source_system,
+            "id": r.id,
+            "dept_code": r.dept_code,
+            "dept_name_cn": r.dept_name_cn,
+            "dept_type": r.dept_type,
+            "dept_type_name": dept_type_label(r.dept_type),
+            "parent_dept_code": r.parent_dept_code or infer_parent_dept_code(r.dept_code),
+            "parent_dept_name": names.get(r.parent_dept_code or infer_parent_dept_code(r.dept_code) or ""),
+            "source_system": r.source_system,
+            "source_table": r.source_table,
             "status": r.status,
+            "status_name": dept_status_label(r.status),
+            "review_status": r.review_status,
+            "review_status_name": dept_review_label(r.review_status),
+            "person_count": person_counts.get(r.dept_code, 0),
+            "last_source_sync_at": r.last_source_sync_at.isoformat() if r.last_source_sync_at else None,
         }
         for r in rows
     ])
@@ -45,27 +98,78 @@ def list_persons(
 ) -> ApiResponse[dict]:
     stmt = select(IdentityPerson)
     if person_type:
-        stmt = stmt.where(IdentityPerson.person_type == person_type)
+        stmt = stmt.where(
+            (IdentityPerson.person_type == person_type) | (IdentityPerson.classification == person_type)
+        )
     if keyword:
         like = f"%{keyword}%"
+        dept_name_match = select(IdentityDepartment.dept_code).where(IdentityDepartment.dept_name_cn.ilike(like))
         stmt = stmt.where(
             IdentityPerson.person_name_cn.ilike(like)
             | IdentityPerson.person_code.ilike(like)
             | IdentityPerson.dept_name_cn.ilike(like)
+            | IdentityPerson.dept_code.ilike(like)
+            | IdentityPerson.job_title.ilike(like)
+            | IdentityPerson.dept_code.in_(dept_name_match)
         )
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(
         stmt.order_by(IdentityPerson.person_code)
         .offset((page - 1) * page_size).limit(page_size)
     ).all()
-    items = [
-        {"id": r.id, "person_code": r.person_code, "person_name_cn": r.person_name_cn,
-         "dept_code": r.dept_code, "dept_name_cn": r.dept_name_cn,
-         "person_type": r.person_type, "employment_status": r.employment_status,
-         "primary_source_system": r.primary_source_system}
-        for r in rows
-    ]
-    return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+    dept_codes = {row.dept_code for row in rows if row.dept_code}
+    dept_names = {
+        row.dept_code: row.dept_name_cn
+        for row in db.scalars(select(IdentityDepartment).where(IdentityDepartment.dept_code.in_(dept_codes))).all()
+    } if dept_codes else {}
+    from ...services.identity_person_labels import classification_label, employment_label, person_type_label
+
+    items = []
+    for row in rows:
+        dept_name = row.dept_name_cn or dept_names.get(row.dept_code or "")
+        items.append({
+            "id": row.id,
+            "person_code": row.person_code,
+            "person_name_cn": row.person_name_cn,
+            "dept_code": row.dept_code,
+            "dept_name_cn": dept_name,
+            "job_title": row.job_title,
+            "person_type": row.person_type,
+            "person_type_name": person_type_label(row.person_type),
+            "classification": row.classification,
+            "classification_name": classification_label(row.classification),
+            "employment_status": row.employment_status,
+            "employment_status_name": employment_label(row.employment_status),
+            "primary_source_system": row.primary_source_system,
+        })
+    active_total = db.scalar(
+        select(func.count()).select_from(
+            stmt.where(func.lower(func.coalesce(IdentityPerson.employment_status, "")) == "active").subquery()
+        )
+    ) or 0
+    inactive_total = db.scalar(
+        select(func.count()).select_from(
+            stmt.where(func.lower(func.coalesce(IdentityPerson.employment_status, "")) == "inactive").subquery()
+        )
+    ) or 0
+    source_total = db.scalar(
+        select(func.count(func.distinct(IdentityPerson.primary_source_system))).where(
+            IdentityPerson.primary_source_system.isnot(None),
+            IdentityPerson.primary_source_system != "",
+        )
+    ) or 0
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": items,
+        "stats": {
+            "total": total,
+            "active": int(active_total),
+            "inactive": int(inactive_total),
+            "source_count": int(source_total),
+        },
+    })
 
 
 @router.get("/accounts", summary="多系统账号列表")
@@ -180,9 +284,25 @@ def person_profile(person_code: str, db: Session = Depends(get_db)) -> ApiRespon
     departments = db.scalars(
         select(IdentityPersonDepartment).where(IdentityPersonDepartment.person_code == person_code)
     ).all()
+    from ...services.identity_person_labels import classification_label, employment_label, person_type_label
+
+    dept_codes = {p.dept_code, *[item.dept_code for item in departments if item.dept_code]}
+    dept_codes.discard(None)
+    dept_names = {
+        row.dept_code: row.dept_name_cn
+        for row in db.scalars(select(IdentityDepartment).where(IdentityDepartment.dept_code.in_(dept_codes))).all()
+    } if dept_codes else {}
     return ApiResponse(data={
         "person_code": p.person_code, "person_name_cn": p.person_name_cn,
-        "dept_code": p.dept_code, "person_type": p.person_type,
+        "dept_code": p.dept_code,
+        "dept_name_cn": p.dept_name_cn or dept_names.get(p.dept_code or ""),
+        "job_title": p.job_title,
+        "person_type": p.person_type,
+        "person_type_name": person_type_label(p.person_type),
+        "classification": p.classification,
+        "classification_name": classification_label(p.classification),
+        "employment_status": p.employment_status,
+        "employment_status_name": employment_label(p.employment_status),
         "primary_source_system": p.primary_source_system,
         "profile": {
             "summary": p.profile_summary,
@@ -201,6 +321,7 @@ def person_profile(person_code: str, db: Session = Depends(get_db)) -> ApiRespon
         "departments": [
             {
                 "dept_code": d.dept_code,
+                "dept_name_cn": dept_names.get(d.dept_code or ""),
                 "is_primary": bool(d.is_primary),
                 "source_table": d.source_table,
                 "source_dept_code": d.source_dept_code,
@@ -314,10 +435,26 @@ def department_profile(dept_code: str, db: Session = Depends(get_db)) -> ApiResp
     accounts = db.scalars(
         select(IdentityAccount).where(IdentityAccount.dept_code == dept_code)
     ).all()
+    from ...services.identity_dept_labels import (
+        dept_review_label,
+        dept_status_label,
+        dept_type_label,
+        infer_parent_dept_code,
+    )
+
+    parent_code = d.parent_dept_code or infer_parent_dept_code(d.dept_code)
+    parent = None
+    if parent_code:
+        parent = db.scalar(select(IdentityDepartment).where(IdentityDepartment.dept_code == parent_code))
     return ApiResponse(data={
         "dept_code": d.dept_code, "dept_name_cn": d.dept_name_cn,
-        "dept_type": d.dept_type, "parent_dept_code": d.parent_dept_code,
-        "source_system": d.source_system, "status": d.status,
+        "dept_type": d.dept_type, "dept_type_name": dept_type_label(d.dept_type),
+        "parent_dept_code": parent_code,
+        "parent_dept_name": parent.dept_name_cn if parent else None,
+        "source_system": d.source_system, "source_table": d.source_table,
+        "status": d.status, "status_name": dept_status_label(d.status),
+        "review_status": d.review_status, "review_status_name": dept_review_label(d.review_status),
+        "last_source_sync_at": d.last_source_sync_at.isoformat() if d.last_source_sync_at else None,
         "persons": [
             {"person_code": p.person_code, "person_name_cn": p.person_name_cn, "person_type": p.person_type}
             for p in persons

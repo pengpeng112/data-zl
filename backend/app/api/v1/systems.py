@@ -1354,14 +1354,12 @@ def get_connection(connection_id: int, db: Session = Depends(get_db)) -> ApiResp
         select(AssetDataSource).where(AssetDataSource.canonical_source_code == ds.source_code)
     ).all()
     data["aliases"] = [_source_public(a) for a in aliases]
+    schema_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
     schemas = db.execute(
-        select(
-            func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "").label("schema_name"),
-            func.count().label("table_count"),
-        )
+        select(schema_key.label("schema_name"), func.count().label("table_count"))
         .where(AssetTable.source_code == ds.source_code)
-        .group_by(func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, ""))
-        .order_by(func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, ""))
+        .group_by(schema_key)
+        .order_by(schema_key)
     ).all()
     data["schemas"] = [{"schema_name": s or "(default)", "table_count": int(c)} for s, c in schemas]
     return ApiResponse(data=data)

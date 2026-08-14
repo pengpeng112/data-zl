@@ -42,7 +42,11 @@ from ...schemas.graph import (
     GraphTableSearchItem,
 )
 from ...services.relation_identity import resolve_endpoint, split_qualified_name
-from ...services.asset_catalog import load_system_name_map
+from ...services.asset_catalog import (
+    load_system_name_map,
+    normalize_system_code,
+    system_code_filter_values,
+)
 
 router = APIRouter(prefix="/api/v1/graph", tags=["graph"])
 
@@ -1164,11 +1168,13 @@ def _object_type_name(table: AssetTable) -> str:
 
 def _apply_asset_filters(stmt, *, system_code: str | None, source_code: str | None, schema_name: str | None, domain: str | None, object_type: str | None):
     if system_code:
-        stmt = stmt.where(AssetTable.system_code == system_code)
+        codes = system_code_filter_values(system_code)
+        stmt = stmt.where(AssetTable.system_code.in_(codes or [system_code]))
     if source_code:
         stmt = stmt.where(AssetTable.source_code == source_code)
     if schema_name:
-        stmt = stmt.where(AssetTable.schema_name == schema_name)
+        ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+        stmt = stmt.where(ns_key == schema_name)
     if domain:
         stmt = stmt.where(AssetTable.domain == domain)
     if object_type == "view":
@@ -1391,7 +1397,7 @@ def overview(
     schema: str | None = Query(None),
     domain: str | None = Query(None),
     object_type: str | None = Query(None, pattern="^(table|view)$"),
-    limit: int = Query(80, ge=1, le=80),
+    limit: int = Query(80, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> ApiResponse[GraphOverviewData]:
     started = perf_counter()
@@ -1399,10 +1405,10 @@ def overview(
     system_code, source_code, schema = system_code or p_sys, source_code or p_src, schema or p_schema
     if level == "source" and not system_code:
         raise HTTPException(status_code=422, detail="source 概览必须提供 system_code 或 parent_physical_key")
-    if level in ("schema", "object") and (not system_code or not source_code):
-        raise HTTPException(status_code=422, detail="schema/object 概览必须提供 system_code 和 source_code")
-    if level == "object" and not schema:
-        raise HTTPException(status_code=422, detail="object 概览必须提供 schema")
+    if level == "schema" and not system_code:
+        raise HTTPException(status_code=422, detail="schema 概览必须提供 system_code 或 parent_physical_key")
+    if level == "object" and (not system_code or not schema):
+        raise HTTPException(status_code=422, detail="object 概览必须提供 system_code 和 schema")
     if level == "field":
         if not parent_physical_key or not p_sys or not p_src or not p_schema or not p_table:
             raise HTTPException(status_code=422, detail="field 概览必须提供完整表物理键 parent_physical_key")
@@ -1462,12 +1468,6 @@ def overview(
             seen_edge_ids.add(edge.id)
             edges.append(edge)
     else:
-        fields = {
-            "system": (AssetTable.system_code,),
-            "source": (AssetTable.system_code, AssetTable.source_code),
-            "schema": (AssetTable.system_code, AssetTable.source_code, AssetTable.schema_name),
-        }[level]
-        stmt = base.with_only_columns(*fields, func.count(AssetTable.id).label("asset_count")).group_by(*fields).order_by(*fields).limit(limit)
         system_names = load_system_name_map(db)
         source_names = {
             row[0]: row[1]
@@ -1481,40 +1481,66 @@ def overview(
             ).all()
             if row[0] and row[1] and row[2]
         }
-        for row in db.execute(stmt).all():
-            values = tuple(row[i] for i in range(len(fields)))
-            technical_name = str(values[-1] or "未命名")
-            if level == "system":
-                label = system_names.get(values[0], technical_name)
-            elif level == "source":
-                label = source_names.get(values[1], technical_name)
-            else:
-                label = schema_names.get((values[1], values[2]), technical_name)
-            nodes.append(
-                _overview_node(
-                    level,
-                    values,
-                    label,
-                    int(row[-1] or 0),
-                    path="|".join(value or "" for value in values),
-                )
+        ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+        if level == "system":
+            raw_rows = db.execute(
+                base.with_only_columns(AssetTable.system_code, func.count(AssetTable.id)).group_by(AssetTable.system_code)
+            ).all()
+            merged: dict[str, int] = {}
+            for raw_code, cnt in raw_rows:
+                canon = normalize_system_code(raw_code) or (raw_code or "UNKNOWN")
+                merged[canon] = merged.get(canon, 0) + int(cnt or 0)
+            for canon, cnt in sorted(merged.items(), key=lambda item: (-item[1], item[0])):
+                label = system_names.get(canon, canon)
+                nodes.append(_overview_node("system", (canon,), label, cnt, path=canon))
+        elif level == "source":
+            stmt = (
+                base.with_only_columns(AssetTable.system_code, AssetTable.source_code, func.count(AssetTable.id).label("asset_count"))
+                .group_by(AssetTable.system_code, AssetTable.source_code)
+                .order_by(func.count(AssetTable.id).desc())
+                .limit(limit)
             )
-        # 129号 S2：概览聚合关系边。此前概览（system/source/schema 层）只返回节点不返回边，
-        # 导致落地页永远是孤立方块（用户反馈"图谱不像图谱"的根因）。
-        # 这里把 asset_relations 按当前层级的分组键聚合为 "A -> B（N 条关系）" 边；
-        # 组内关系（自环）跳过；端点缺失的沿用 _resolve_relation_endpoint 宽松反查，多命中不猜。
+            for row in db.execute(stmt).all():
+                values = (row[0], row[1])
+                label = source_names.get(row[1], str(row[1] or "未命名连接"))
+                nodes.append(_overview_node("source", values, label, int(row[2] or 0), path="|".join(v or "" for v in values)))
+        else:
+            schema_stmt = (
+                base.with_only_columns(ns_key.label("schema_key"), func.count(AssetTable.id))
+                .group_by(ns_key)
+                .order_by(func.count(AssetTable.id).desc())
+                .limit(limit)
+            )
+            for row in db.execute(schema_stmt).all():
+                schema_name = row[0] or "未命名"
+                canon = normalize_system_code(system_code) or system_code
+                label = schema_name
+                for (_src, sch), cn in schema_names.items():
+                    if sch == schema_name and cn:
+                        label = cn
+                        break
+                display = f"{label}（{schema_name}）" if label != schema_name else schema_name
+                nodes.append(
+                    _overview_node(
+                        "schema",
+                        (canon, "", schema_name),
+                        display,
+                        int(row[1] or 0),
+                        path=f"{canon}|{schema_name}",
+                    )
+                )
         if nodes:
             node_ids = {node.id for node in nodes}
 
             def _level_key(sys_c: str | None, src_c: str | None, sch: str | None) -> str | None:
-                values = {
-                    "system": (sys_c,),
-                    "source": (sys_c, src_c),
-                    "schema": (sys_c, src_c, sch),
-                }[level]
-                if not all(values):
+                canon = normalize_system_code(sys_c) or sys_c
+                if level == "system":
+                    return _overview_id("system", (canon,)) if canon else None
+                if level == "source":
+                    return _overview_id("source", (canon, src_c)) if canon and src_c else None
+                if not canon or not sch:
                     return None
-                return _overview_id(level, values)
+                return _overview_id("schema", (canon, "", sch))
 
             rel_stmt = select(AssetRelation)
             if domain:
@@ -1564,7 +1590,7 @@ def overview(
         )
     meta.returned_nodes = len(nodes)
     meta.estimated_total = matched_assets
-    next_level = {"system": "source", "source": "schema", "schema": "object", "object": "field"}[level]
+    next_level = {"system": "schema", "source": "schema", "schema": "object", "object": "field"}[level]
     return ApiResponse(data=GraphOverviewData(level=level, next_level=next_level, selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v}, data=GraphData(nodes=nodes, edges=edges, meta=meta)))
 
 
@@ -1578,8 +1604,10 @@ def filter_options(
 ) -> ApiResponse[GraphFilterOptionsData]:
     if next_level == "source" and not system_code:
         raise HTTPException(status_code=422, detail="source 级联选项需要 system_code")
-    if next_level in ("schema", "object") and (not system_code or not source_code):
-        raise HTTPException(status_code=422, detail="schema/object 级联选项需要 system_code 和 source_code")
+    if next_level == "schema" and not system_code:
+        raise HTTPException(status_code=422, detail="schema 级联选项需要 system_code")
+    if next_level == "object" and (not system_code or not schema):
+        raise HTTPException(status_code=422, detail="object 级联选项需要 system_code 和 schema")
     base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=None, object_type=None)
     field = {"system": AssetTable.system_code, "source": AssetTable.source_code, "schema": AssetTable.schema_name, "object": AssetTable.table_name}[next_level]
     rows = db.execute(base.with_only_columns(field, func.count(AssetTable.id)).group_by(field).order_by(field)).all()

@@ -143,6 +143,25 @@ def is_first_level_business_system(system_code: str | None) -> bool:
     return normalize_system_code(system_code) in CANONICAL_SYSTEMS
 
 
+def system_code_filter_values(system_code: str | None) -> list[str]:
+    """Canonical + legacy codes that should match a tree/system filter.
+
+    asset_tables.system_code still stores HIS for HIS_SOURCE sources; the
+    catalog tree classifies that connection as HIS_SOURCE. List APIs must
+    accept either value or the right-hand table list goes empty.
+    """
+    raw = (system_code or "").strip()
+    if not raw:
+        return []
+    canonical = normalize_system_code(raw)
+    values = {raw, raw.upper(), canonical}
+    for legacy, canon in LEGACY_SYSTEM_MAP.items():
+        if canon == canonical or legacy == raw.upper():
+            values.add(legacy)
+            values.add(canon)
+    return sorted(v for v in values if v)
+
+
 def owner_display_cn(schema_name: str | None, *, parent_system: str | None = None) -> str | None:
     schema = (schema_name or "").strip().upper()
     if not schema:

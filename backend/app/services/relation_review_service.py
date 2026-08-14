@@ -79,12 +79,22 @@ def find_matching_relations(
     rows = list(db.scalars(stmt).all())
     # Prefer exact column match when provided
     if from_columns or to_columns:
-        fc = (from_columns or "").replace(" ", "").upper()
-        tc = (to_columns or "").replace(" ", "").upper()
+        def _norm_cols(value: str | None) -> str:
+            return (
+                (value or "")
+                .upper()
+                .replace(" ", "")
+                .replace("+", ",")
+                .replace("|", ",")
+                .replace(";", ",")
+            )
+
+        fc = _norm_cols(from_columns)
+        tc = _norm_cols(to_columns)
 
         def cols_ok(r: AssetRelation) -> bool:
-            rfc = (r.from_columns or "").replace(" ", "").upper()
-            rtc = (r.to_columns or "").replace(" ", "").upper()
+            rfc = _norm_cols(r.from_columns)
+            rtc = _norm_cols(r.to_columns)
             if fc and fc not in rfc and rfc not in fc:
                 return False
             if tc and tc not in rtc and rtc not in tc:
