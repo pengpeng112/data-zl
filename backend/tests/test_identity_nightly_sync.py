@@ -696,13 +696,20 @@ class TestPartialTargetSuccess:
             mock_jhemr.return_value = {"status": "failed", "error": "timeout"}
             result = _process_single_candidate(db_session, candidate, "PARTIAL-RUN")
             db_session.commit()
-        from app.models.identity_sync import IdentitySyncBatch
+        from app.models.identity_sync import IdentitySyncBatch, IdentitySyncAction
         from sqlalchemy import select
         batch = db_session.scalar(select(IdentitySyncBatch).where(IdentitySyncBatch.scheduler_run_id == "PARTIAL-RUN"))
         assert batch is not None
         assert batch.status == "partial_target_success"
-        assert batch.cdms_status == "success" or batch.cdms_status == "pending_reconcile"
+        # 2026-08-20：测试环境无写入门禁凭据 → CDMS 软阻断。旧代码把这种
+        # 门禁拦截误记 success/executed；现在必须如实记 skipped/blocked_gates。
+        assert batch.cdms_status == "skipped"
         assert batch.jhemr_status == "failed"
+        cdms_action = db_session.scalar(select(IdentitySyncAction).where(
+            IdentitySyncAction.batch_id == batch.batch_id,
+            IdentitySyncAction.target_system == "CDMS"))
+        assert cdms_action.status == "skipped"
+        assert cdms_action.reason_code == "blocked_gates"
 
     def test_recovery_rerun_skips_completed_target(self, db_session, seed_role_mappings, seed_candidates):
         """After partial success, rerun skips the already-managed target."""
@@ -1037,15 +1044,34 @@ class TestClassificationPreflight:
         person = db_session.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E003"))
         assert person.classification != "doctor"
 
-    def test_preflight_status_conflict(self, db_session):
+    def test_preflight_status_conflict_resolved_by_employee_authority(self, db_session):
+        """2026-08-20 用户裁定：状态矛盾时 FXHIS.SYS_EMPLOYEE 为权威源，不再隔离。"""
         from app.services.identity_classification_preflight import run_classification_preflight
+        from app.models.identity_sync import IdentityClassificationRecord
         self._seed_person_with_source(db_session, "E004", "护理", "护师", "active",
                                       datetime(2026, 7, 25), validstate="inactive")
         run_classification_preflight(db_session)
         db_session.commit()
         person = db_session.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E004"))
-        assert person.classification == "status_conflict"
-        assert person.conflict_flag == "status_conflict"
+        # SYS_EMPLOYEE(inactive) 为权威 → 按停用口径继续分类为护士，不再 status_conflict 隔离
+        assert person.classification == "nurse"
+        assert person.conflict_flag is None
+        record = db_session.scalar(select(IdentityClassificationRecord).where(
+            IdentityClassificationRecord.emp_no == "E004"))
+        assert record.conflict_detail["resolved"] == "status_mismatch_employee_authority"
+        assert record.conflict_detail["employee_flag"] == "0"
+        assert record.conflict_detail["staff_dict_flag"] == "1"
+
+    def test_preflight_status_conflict_employee_active_wins(self, db_session):
+        """STAFF_DICT 停用 + SYS_EMPLOYEE 在职（004063 情形）→ 按在职继续分类。"""
+        from app.services.identity_classification_preflight import run_classification_preflight
+        self._seed_person_with_source(db_session, "E007", "医生", "主治医师", "inactive",
+                                      datetime(2026, 7, 25), validstate="active")
+        run_classification_preflight(db_session)
+        db_session.commit()
+        person = db_session.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E007"))
+        assert person.classification == "doctor"
+        assert person.conflict_flag is None
 
     def test_preflight_skips_person_without_sources(self, db_session):
         from app.services.identity_classification_preflight import run_classification_preflight

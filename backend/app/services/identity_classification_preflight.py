@@ -111,11 +111,26 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
         employee_raw = employee_src.raw_data if employee_src and isinstance(employee_src.raw_data, dict) else {}
         modified_time = _parse_create_date(employee_raw.get("MODIFIEDTIME"))
 
+        staff_flag = _status_flag(staff_src.source_status if staff_src else None)
+        employee_flag = _status_flag(employee_src.source_status if employee_src else None)
+        resolved_note = None
+        if staff_flag and employee_flag and staff_flag != employee_flag:
+            # 2026-08-20 用户裁定：在职状态以 FXHIS.SYS_EMPLOYEE 为权威源。
+            # STAFF_DICT 与之矛盾时不再隔离为 status_conflict，改用 SYS_EMPLOYEE
+            # 状态继续分类；原始矛盾保留在分类记录里供审计追溯。
+            resolved_note = {
+                "resolved": "status_mismatch_employee_authority",
+                "authoritative_source": EMPLOYEE_TABLE,
+                "staff_dict_flag": staff_flag,
+                "employee_flag": employee_flag,
+            }
+            staff_flag = employee_flag
+
         result = classify_person(
             job=job,
             title=title,
-            status=_status_flag(staff_src.source_status if staff_src else None),
-            validstate=_status_flag(employee_src.source_status if employee_src else None),
+            status=staff_flag,
+            validstate=employee_flag,
             create_date=create_date,
             modified_time=modified_time,
         )
@@ -142,7 +157,7 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
         record.raw_title = person.raw_title
         record.classification = result.classification
         record.matched_rule = result.matched_rule
-        record.conflict_detail = result.conflict_detail
+        record.conflict_detail = {**(result.conflict_detail or {}), **resolved_note} if resolved_note else result.conflict_detail
         record.source_create_date = person.source_create_date
 
         stats["classified"] += 1

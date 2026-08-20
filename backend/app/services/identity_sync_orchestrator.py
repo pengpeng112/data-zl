@@ -41,6 +41,7 @@ from ..services.identity_hmac import (
     compute_batch_fingerprint,
 )
 from ..services.identity_watermark import advance_watermark, get_watermark, max_watermark, window_start
+from ..services.identity_sync_audit import _person_trace
 from ..services.identity_sync_status import error_code_masked, short_fingerprint
 from ..services.identity_time import (
     as_aware as _as_aware,
@@ -174,18 +175,8 @@ def record_failure(db: Session, breaker_key: str) -> bool:
 # Candidate selection (plan 107 section 4)
 # ---------------------------------------------------------------------------
 
-def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
-    """Select all eligible candidates for nightly sync.
-
-    Rules (plan 107 section 4):
-    - doctor/nurse/pharmacist only
-    - status active
-    - classification unique (no conflict)
-    - primary dept valid
-    - create_date >= managed_since
-    - not in protected list
-    - not outsource/management/conflict/status_conflict/master_data_missing
-    """
+def _modified_employee_times(db: Session) -> dict[str, datetime]:
+    """HIS SYS_EMPLOYEE rows whose MODIFIEDTIME is after the main watermark."""
     from datetime import datetime as _dt
     modified_since_raw = getattr(settings, "identity_sync_modified_since", None)
     modified_since = _as_aware(_dt.fromisoformat(
@@ -215,6 +206,22 @@ def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
             main_watermark.employee_key,
         ):
             modified_by_code[source.person_code] = parsed
+    return modified_by_code
+
+
+def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
+    """Select all eligible candidates for nightly sync.
+
+    Rules (plan 107 section 4):
+    - doctor/nurse/pharmacist only
+    - status active
+    - classification unique (no conflict)
+    - primary dept valid
+    - create_date >= managed_since
+    - not in protected list
+    - not outsource/management/conflict/status_conflict/master_data_missing
+    """
+    modified_by_code = _modified_employee_times(db)
 
     persons = db.scalars(
         select(IdentityPerson).where(
@@ -261,6 +268,41 @@ def select_nightly_candidates(db: Session) -> list[dict[str, Any]]:
             "job_title": person.job_title,
         })
 
+    return candidates
+
+
+def select_deactivate_candidates(db: Session) -> list[dict[str, Any]]:
+    """HIS-disabled employees in the current MODIFIEDTIME increment.
+
+    Only the increment is processed so historical inactive accounts are not
+    bulk-locked. Protected and status-conflict rows stay out. JHEMR existence
+    is checked at apply time.
+    """
+    modified_by_code = _modified_employee_times(db)
+    if not modified_by_code:
+        return []
+    protected_ids = {r for r in db.scalars(select(IdentityProtectedAccount.account_id)).all() if r}
+    persons = db.scalars(
+        select(IdentityPerson).where(
+            IdentityPerson.employment_status == "inactive",
+            IdentityPerson.person_code.in_(list(modified_by_code.keys())),
+        )
+    ).all()
+    candidates = []
+    for person in persons:
+        emp_no = person.person_code
+        if not emp_no or emp_no in protected_ids:
+            continue
+        if person.employment_status != "inactive":
+            continue
+        if person.conflict_flag:
+            continue
+        candidates.append({
+            "emp_no": emp_no,
+            "emp_no_masked": _mask_emp_no(emp_no),
+            "classification": person.classification,
+            "modified_time": modified_by_code[emp_no].isoformat() if emp_no in modified_by_code else None,
+        })
     return candidates
 
 
@@ -505,21 +547,24 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
         preflight_stats = run_classification_preflight(db)
 
         candidates = select_nightly_candidates(db)
+        deactivate_candidates = select_deactivate_candidates(db)
         run_record.candidates_total = len(candidates)
+        run_record.candidates_deactivate = len(deactivate_candidates)
 
-        if not candidates:
+        if not candidates and not deactivate_candidates:
             run_record.status = "success"
             run_record.success_count = 0
             run_record.failed_count = 0
             run_record.skipped_count = 0
             run_record.finished_at = _now()
-            run_record.report_summary = {"note": "no_candidates", "total": 0, "preflight": preflight_stats, "collection": collection_stats}
+            run_record.report_summary = {"note": "no_candidates", "total": 0, "deactivate": 0, "preflight": preflight_stats, "collection": collection_stats}
             db.commit()
-            return {"status": "success", "run_id": run_id, "candidates": 0, "success_count": 0, "failed_count": 0, "skipped_count": 0, "preflight": preflight_stats}
+            return {"status": "success", "run_id": run_id, "candidates": 0, "deactivate": 0, "success_count": 0, "failed_count": 0, "skipped_count": 0, "preflight": preflight_stats}
 
         # PREFLIGHT: threshold checks with real change composition
         stats = _compute_change_stats(db, candidates)
-        threshold_result = check_thresholds(candidates, stats)
+        stats["deactivate"] = len(deactivate_candidates)
+        threshold_result = check_thresholds(candidates + deactivate_candidates, stats)
         if threshold_result.get("triggered"):
             run_record.status = "failed"
             run_record.circuit_breaker_triggered = True
@@ -533,10 +578,25 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
                 pass
             return {"status": "failed", "reason": "threshold_exceeded", "dimension": threshold_result["dimension"], "run_id": run_id}
 
-        # PLAN + APPLY: process each candidate with independent target transactions
+        # PLAN + APPLY: lock HIS-disabled JHEMR accounts first, then create/update.
         success_count = 0
         failed_count = 0
         skipped_count = 0
+        deactivate_success = 0
+        deactivate_failed = 0
+        deactivate_skipped = 0
+
+        for candidate in deactivate_candidates:
+            result = _process_deactivate_candidate(db, candidate, run_id)
+            if result["status"] == "success":
+                deactivate_success += 1
+                success_count += 1
+            elif result["status"] == "skipped":
+                deactivate_skipped += 1
+                skipped_count += 1
+            else:
+                deactivate_failed += 1
+                failed_count += 1
 
         for candidate in candidates:
             result = _process_single_candidate(db, candidate, run_id, reconcile_existing=True)
@@ -566,14 +626,19 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
             "success": success_count,
             "failed": failed_count,
             "skipped": skipped_count,
+            "deactivate": len(deactivate_candidates),
+            "deactivate_success": deactivate_success,
+            "deactivate_failed": deactivate_failed,
+            "deactivate_skipped": deactivate_skipped,
         }
 
-        if failed_count == 0 and candidates:
+        watermark_rows = candidates + deactivate_candidates
+        if failed_count == 0 and watermark_rows:
             candidate_wm = max_watermark(
                 [
                     (datetime.fromisoformat(c["modified_time"]) if c.get("modified_time") else None,
                      compute_account_fingerprint(c.get("emp_no"), "HIS", settings.identity_hmac_key_ref))
-                    for c in candidates
+                    for c in watermark_rows
                 ]
             )
             advance_watermark(
@@ -599,6 +664,7 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
             "status": run_record.status,
             "run_id": run_id,
             "candidates": len(candidates),
+            "deactivate": len(deactivate_candidates),
             "success": success_count,
             "failed": failed_count,
             "skipped": skipped_count,
@@ -631,6 +697,87 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
     finally:
         release_lock(db, lock_key)
         db.commit()
+
+
+def _process_deactivate_candidate(db: Session, candidate: dict, run_id: str) -> dict[str, Any]:
+    """Lock the matching JHEMR login when HIS has disabled the employee."""
+    emp_no = candidate["emp_no"]
+    fp_jhemr = compute_account_fingerprint(emp_no, "JHEMR", settings.identity_hmac_key_ref)
+    batch_id = f"NTL-{run_id}-L{uuid.uuid4().hex[:8]}"
+    batch = IdentitySyncBatch(
+        batch_id=batch_id,
+        batch_type="nightly",
+        scheduler_run_id=run_id,
+        emp_no_masked=None,
+        account_fingerprint=fp_jhemr,
+        person_classification=candidate.get("classification"),
+        status="applying",
+        template_version=TEMPLATE_VERSION,
+        idempotency_key=f"{batch_id}:{fp_jhemr}:lock",
+        started_at=_now(),
+    )
+    db.add(batch)
+    db.flush()
+    action = IdentitySyncAction(
+        batch_id=batch_id,
+        action_seq=1,
+        target_system="JHEMR",
+        action_type="account_lock",
+        target_table="jhemr.users",
+        emp_no_masked=emp_no,
+        account_fingerprint=fp_jhemr,
+        params_summary={
+            "run_id": run_id,
+            "subtask": "main_account_sync",
+            "action": "jhemr_account_lock",
+            **{key: value for key, value in _person_trace(db, emp_no).items() if value},
+        },
+        subtask_code="main_account_sync",
+        status="planned",
+    )
+    db.add(action)
+    db.flush()
+
+    from ..services.identity_sync_executor_bridge import execute_jhemr_lock
+    result = execute_jhemr_lock(emp_no)
+    status = result.get("status")
+    if status == "success":
+        action.status = "executed"
+        action.rows_affected = int(result.get("rows_affected") or 1)
+        batch.status = "success"
+        batch.jhemr_status = "success"
+        managed = db.scalar(
+            select(IdentityManagedRelation).where(
+                IdentityManagedRelation.target_system == "JHEMR",
+                IdentityManagedRelation.account_fingerprint == fp_jhemr,
+            )
+        )
+        if managed is not None:
+            managed.status = "deactivated"
+    elif status == "skipped":
+        action.status = "skipped"
+        action.reason_code = result.get("reason") or "already_locked"
+        batch.status = "skipped"
+        batch.jhemr_status = "skipped"
+    elif status == "missing_target":
+        action.status = "skipped"
+        action.reason_code = "no_target_user"
+        batch.status = "skipped"
+        batch.jhemr_status = "skipped"
+    else:
+        action.status = "failed"
+        action.error_class = "target_write"
+        action.error_code_masked = error_code_masked(result.get("error"))
+        batch.status = "failed"
+        batch.jhemr_status = "failed"
+    action.executed_at = _now()
+    batch.finished_at = _now()
+    db.flush()
+    if status == "success":
+        return {"status": "success"}
+    if status in {"skipped", "missing_target"}:
+        return {"status": "skipped", "reason": result.get("reason") or status}
+    return {"status": "failed", "error": result.get("error")}
 
 
 def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_retries: int | None = None, reconcile_existing: bool = False) -> dict[str, Any]:
@@ -698,8 +845,20 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
             target_system=target_system,
             action_type="account_sync",
             target_table="identity_target",
+            emp_no_masked=emp_no,
             account_fingerprint=fingerprint,
-            params_summary={"run_id": run_id, "subtask": "main_account_sync"},
+            params_summary={
+                "run_id": run_id,
+                "subtask": "main_account_sync",
+                **{
+                    key: value
+                    for key, value in {
+                        **_person_trace(db, emp_no),
+                        "job_title": candidate.get("job_title") or "",
+                    }.items()
+                    if value
+                },
+            },
             subtask_code="main_account_sync",
             status="planned",
         )
@@ -728,8 +887,14 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
                 break
             if attempt < max_retries:
                 logger.warning("CDMS attempt %d failed for fingerprint=%s, retrying", attempt + 1, short_fingerprint(fp_cdms))
-        batch.cdms_status = "success" if cdms_ok else cdms_result.get("status", "failed")
-        close_target_action(cdms_action, status="executed" if cdms_ok else "failed", result=cdms_result)
+        # 2026-08-20：门禁阻断时 _apply_*_target 返回 success+pending_reconcile
+        # （软阻断设计，供下次夜间重试），但动作记录必须如实——记
+        # skipped/blocked_gates，不得记成 executed/success。
+        cdms_blocked = cdms_ok and cdms_result.get("note") == "pending_reconcile"
+        batch.cdms_status = "skipped" if cdms_blocked else ("success" if cdms_ok else cdms_result.get("status", "failed"))
+        close_target_action(cdms_action, status="skipped" if cdms_blocked else ("executed" if cdms_ok else "failed"),
+                            result=None if cdms_blocked else cdms_result,
+                            reason="blocked_gates" if cdms_blocked else None)
     else:
         batch.cdms_status = "skipped"
         close_target_action(cdms_action, status="skipped", reason="already_managed")
@@ -745,8 +910,11 @@ def _process_single_candidate(db: Session, candidate: dict, run_id: str, max_ret
                 break
             if attempt < max_retries:
                 logger.warning("JHEMR attempt %d failed for fingerprint=%s, retrying", attempt + 1, short_fingerprint(fp_jhemr))
-        batch.jhemr_status = "success" if jhemr_ok else jhemr_result.get("status", "failed")
-        close_target_action(jhemr_action, status="executed" if jhemr_ok else "failed", result=jhemr_result)
+        jhemr_blocked = jhemr_ok and jhemr_result.get("note") == "pending_reconcile"
+        batch.jhemr_status = "skipped" if jhemr_blocked else ("success" if jhemr_ok else jhemr_result.get("status", "failed"))
+        close_target_action(jhemr_action, status="skipped" if jhemr_blocked else ("executed" if jhemr_ok else "failed"),
+                            result=None if jhemr_blocked else jhemr_result,
+                            reason="blocked_gates" if jhemr_blocked else None)
     else:
         batch.jhemr_status = "skipped"
         close_target_action(jhemr_action, status="skipped", reason="already_managed")
