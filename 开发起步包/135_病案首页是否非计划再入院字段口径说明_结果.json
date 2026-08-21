@@ -1,0 +1,39 @@
+{
+  "doc": "135",
+  "checked_at": "2026-08-18/2026-08-19",
+  "readonly": true,
+  "business_source_writes": 0,
+  "his_pat_visit_extend_plan_admission": {
+    "2": 37670,
+    "1": 0
+  },
+  "jhemr_pat_visit1_sffjhzry": {
+    "hospital_no": "49557032X",
+    "1": 410,
+    "2": 37611,
+    "null": 76930
+  },
+  "jhemr_v_hisshouye_plan_admission": {
+    "1": 328,
+    "2": 37713,
+    "null": 42139
+  },
+  "jhemr_internal": {
+    "v_hisshouye_equals_r_pat_visit1": true,
+    "v_hisshouye_reads": "report.r_pat_visit1.sffjhzry",
+    "pat_visit1_vs_view_both": 80165,
+    "same": 79343,
+    "diff": 822,
+    "agree_yes": 238,
+    "view2_page1": 168,
+    "view1_page_null": 75,
+    "view1_page2": 15
+  },
+  "jhemr_pat_visit1_vs_his_extend": {
+    "both": 37670,
+    "same_2_2": 36943,
+    "jhemr1_his2": 406,
+    "jhemr_null_his2": 321,
+    "only_his": 0
+  }
+}

@@ -2,7 +2,7 @@
   <div class="sync-logs-page">
     <div class="page-head">
       <strong>同步日志</strong>
-      <span>夜间定时把人员同步到合理用药、嘉和电子病历；这里只看运行情况和各系统结果，不展示工号姓名。</span>
+      <span>夜间定时把人员同步到合理用药、嘉和电子病历；动作记录显示工号、脱敏姓名、科室和结果，便于按人排查。</span>
     </div>
 
     <section class="stat-grid">
@@ -28,12 +28,22 @@
       <template #header>
         <div class="list-head">
           <strong>历史运行（{{ total }}）</strong>
-          <el-select v-model="statusFilter" clearable placeholder="全部状态" class="status-filter" @change="loadRuns(1)">
-            <el-option label="成功" value="success" />
-            <el-option label="部分成功" value="partial_success" />
-            <el-option label="失败" value="failed" />
-            <el-option label="已跳过" value="skipped" />
-          </el-select>
+          <div class="list-filters">
+            <el-input
+              v-model="empNoFilter"
+              clearable
+              placeholder="按工号查询"
+              class="emp-filter"
+              @keyup.enter="loadRuns(1)"
+              @clear="loadRuns(1)"
+            />
+            <el-select v-model="statusFilter" clearable placeholder="全部状态" class="status-filter" @change="loadRuns(1)">
+              <el-option label="成功" value="success" />
+              <el-option label="部分成功" value="partial_success" />
+              <el-option label="失败" value="failed" />
+              <el-option label="已跳过" value="skipped" />
+            </el-select>
+          </div>
         </div>
       </template>
       <el-table v-loading="loading" :data="runs" size="small" stripe @row-click="openRun">
@@ -111,11 +121,15 @@
 
         <h4>动作记录</h4>
         <el-table :data="detail.actions || []" size="small">
+          <el-table-column prop="emp_no" label="工号" width="110" />
+          <el-table-column prop="person_name_masked" label="姓名" width="90" />
+          <el-table-column prop="dept_name" label="科室" min-width="120" />
           <el-table-column prop="target_system_name" label="系统" width="110" />
           <el-table-column prop="subtask_name" label="子任务" min-width="120" />
-          <el-table-column prop="action_type" label="动作" min-width="120" />
           <el-table-column prop="status_name" label="结果" width="90" />
-          <el-table-column prop="error_class" label="错误类型" min-width="140" />
+          <el-table-column label="原因" min-width="140">
+            <template #default="{ row }">{{ row.reason_name || row.error_class || "-" }}</template>
+          </el-table-column>
           <el-table-column prop="account_fingerprint" label="账号指纹" width="120" />
         </el-table>
 
@@ -169,6 +183,7 @@ const total = ref(0);
 const page = ref(1);
 const pageSize = 20;
 const statusFilter = ref("");
+const empNoFilter = ref("");
 const overview = ref<any>({ open_alerts: 0, circuit_breakers: {} });
 const drawerVisible = ref(false);
 const detail = ref<any>(null);
@@ -192,7 +207,12 @@ async function loadRuns(nextPage?: number) {
   loading.value = true;
   try {
     const res = await http.request<any>("get", "/api/v1/identity-sync/runs", {
-      params: { page: page.value, page_size: pageSize, status: statusFilter.value || undefined }
+      params: {
+        page: page.value,
+        page_size: pageSize,
+        status: statusFilter.value || undefined,
+        emp_no: empNoFilter.value.trim() || undefined
+      }
     });
     const payload = res.data || {};
     runs.value = payload.items || [];
@@ -260,6 +280,8 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
 }
+.list-filters { display: flex; gap: 8px; }
+.emp-filter { width: 160px; }
 .status-filter { width: 140px; }
 .pager { justify-content: flex-end; margin-top: 12px; }
 .subtask-pill {

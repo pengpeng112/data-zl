@@ -1,0 +1,262 @@
+{
+  "doc": "134",
+  "created_at": "2026-08-18",
+  "source": "取数/_query_outbox/SQL_RELATION_INTAKE_20260818",
+  "policy": "historical SQL is evidence only; insert asset_relation_reviews draft; do not approve or write formal relationships",
+  "reviews": [
+    {
+      "key": "Q01",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "MEDREC.TRANSFER",
+      "from_columns": "PATIENT_ID+VISIT_ID",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "MEDREC.PAT_VISIT",
+      "to_columns": "PATIENT_ID+VISIT_ID",
+      "join_condition": "MEDREC.TRANSFER.PATIENT_ID = MEDREC.PAT_VISIT.PATIENT_ID AND MEDREC.TRANSFER.VISIT_ID = MEDREC.PAT_VISIT.VISIT_ID",
+      "desc": "住院在科/转科记录按就诊挂住院主表",
+      "logic": "工作量日报床日数字段从 TRANSFER 汇总后挂 PAT_VISIT。ODS 资产包未收录 TRANSFER 同名表，本边按 HIS 源端登记。",
+      "confidence": "B",
+      "evidence_count": 3,
+      "source_files": [
+        "取数/工作量日报/出院者占用总床日数_口径核对.sql",
+        "取数/工作量日报/创伤骨科整形组_040464_出院者占用床日核对.sql",
+        "取数/工作量日报/耳外科_020111_工作量表二核对.sql"
+      ]
+    },
+    {
+      "key": "Q02",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "MEDREC.TRANSFER",
+      "from_columns": "DEPT_STAYED",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.DEPT_DICT",
+      "to_columns": "DEPT_CODE",
+      "join_condition": "MEDREC.TRANSFER.DEPT_STAYED = COMM.DEPT_DICT.DEPT_CODE",
+      "desc": "在科记录所在科室挂科室字典",
+      "logic": "TRANSFER.DEPT_STAYED 字段备注为所在科室。工作量日报按此字段对齐科室。",
+      "confidence": "C",
+      "evidence_count": 1,
+      "source_files": [
+        "取数/工作量日报/出院者占用总床日数_口径核对.sql"
+      ]
+    },
+    {
+      "key": "Q03",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "MEDADM.STAT_DEPT_MODIFYFIX",
+      "from_columns": "STAT_DEPTCODE",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.DEPT_DICT",
+      "to_columns": "DEPT_CODE",
+      "join_condition": "MEDADM.STAT_DEPT_MODIFYFIX.STAT_DEPTCODE = COMM.DEPT_DICT.DEPT_CODE",
+      "desc": "工作量统计科室映射表挂科室字典",
+      "logic": "病房工作报表/全院表二用 STAT_DEPT_MODIFYFIX 作为统计科室入口。ODS 资产包未收录该表。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/工作量日报/新建文本文档 (2).txt",
+        "取数/工作量日报/病房工作报表(2).txt"
+      ]
+    },
+    {
+      "key": "Q04",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "OUTPBILL.OUTP_ORDER_DESC",
+      "from_columns": "RCPT_NO",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "OUTPBILL.OUTP_RCPT_MASTER",
+      "to_columns": "RCPT_NO",
+      "join_condition": "OUTPBILL.OUTP_ORDER_DESC.RCPT_NO = OUTPBILL.OUTP_RCPT_MASTER.RCPT_NO",
+      "desc": "门诊开单记录按收据号挂门诊收据主表",
+      "logic": "正式资产已有 OUTP_BILL_ITEMS↔OUTP_ORDER_DESC（55/558/565）和 OUTP_BILL_ITEMS↔OUTP_RCPT_MASTER（R028）。本边补收据主表到开单的直接边。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/exports/1、医保/医保飞检数据提取———病理.txt",
+        "取数/exports/20260730市场监督管理费用明细/01_门诊诊疗项目费用明细_只读.sql"
+      ]
+    },
+    {
+      "key": "Q05",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "INPBILL.INP_SETTLE_MASTER_YB",
+      "from_columns": "PATIENT_ID+VISIT_ID",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "INPBILL.INP_SETTLE_MASTER",
+      "to_columns": "PATIENT_ID+VISIT_ID",
+      "join_condition": "INPBILL.INP_SETTLE_MASTER_YB.PATIENT_ID = INPBILL.INP_SETTLE_MASTER.PATIENT_ID AND INPBILL.INP_SETTLE_MASTER_YB.VISIT_ID = INPBILL.INP_SETTLE_MASTER.VISIT_ID",
+      "desc": "住院医保结算按就诊挂住院结算主表",
+      "logic": "正式资产 54 是 INP_BILL_DETAIL→INP_SETTLE_MASTER_YB。本边是结算主表到医保结算。同一就诊可有多条结算，子查询必须去重。",
+      "confidence": "B",
+      "evidence_count": 1,
+      "source_files": [
+        "取数/exports/1、医保/医保飞检数据提取———病理.txt"
+      ]
+    },
+    {
+      "key": "Q06",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+      "from_columns": "ORDERED_BY_DOCTOR",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.STAFF_DICT",
+      "to_columns": "EMP_NO",
+      "join_condition": "OUTPBILL.OUTP_BILL_ITEMS.ORDERED_BY_DOCTOR = COMM.STAFF_DICT.EMP_NO",
+      "desc": "门诊费用开单医生按工号挂人员字典",
+      "logic": "ORDERED_BY_DOCTOR 字段备注为开单医生。与已验证的 CLINIC_MASTER.DOCTOR/LAB.ORDERING_PROVIDER 工号口径同类。",
+      "confidence": "C",
+      "evidence_count": 1,
+      "source_files": [
+        "取数/exports/20260730质量控制部药占比/03_科室专业组药占比门诊+住院_只读.sql"
+      ]
+    },
+    {
+      "key": "Q07",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "INPBILL.INP_BILL_DETAIL",
+      "from_columns": "ORDERED_BY",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "FXHIS.SYS_DEPARTMENT",
+      "to_columns": "DEPTCODE",
+      "join_condition": "INPBILL.INP_BILL_DETAIL.ORDERED_BY = FXHIS.SYS_DEPARTMENT.DEPTCODE",
+      "desc": "住院费用开单科室挂门户科室主表",
+      "logic": "2026-08-18 用户确认开单科室主口径为 FXHIS.SYS_DEPARTMENT，不再用 COMM.DEPT_DICT。ORDERED_BY 字段备注为开单科室。源端资产包未收录 FXHIS 表，表字段来自取数 SQL 与人员同步活库口径。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "replace_review_id": 10,
+      "source_files": [
+        "取数/exports/20260730质量控制部药占比/04_科室专业组住院药占比_只读.sql",
+        "取数/exports/9 药学部/药品金额.txt"
+      ]
+    },
+    {
+      "key": "Q08",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "MEDREC.PAT_VISIT",
+      "from_columns": "DISCHARGE_DISPOSITION2",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.DISCHARGE_DISPOSITION_DICT",
+      "to_columns": "DISCHARGE_DISPOSITION_CODE",
+      "join_condition": "MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION2 = COMM.DISCHARGE_DISPOSITION_DICT.DISCHARGE_DISPOSITION_CODE",
+      "desc": "住院出院方式代码挂出院方式字典",
+      "logic": "抗菌药物统计 SQL 使用 DISCHARGE_DISPOSITION2，字典主键为 DISCHARGE_DISPOSITION_CODE。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/exports/6、抗菌办/抗菌药物sql_修正版_202603.sql"
+      ]
+    },
+    {
+      "key": "Q09",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "MEDREC.OPERATION",
+      "from_columns": "OPERATION_CODE",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.OPERATION_DICT",
+      "to_columns": "OPERATION_CODE",
+      "join_condition": "MEDREC.OPERATION.OPERATION_CODE = COMM.OPERATION_DICT.OPERATION_CODE",
+      "desc": "住院手术记录按手术编码挂手术字典",
+      "logic": "48 项核心制度四级手术多学科讨论率使用该边。OPER_ID 全空，不能用手术序号关联字典。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/48项目核心制度/48项核心制度_电子病历指标_总SQL.sql",
+        "取数/48项目核心制度/指标SQL/指标25_四级手术多学科讨论率.sql"
+      ]
+    },
+    {
+      "key": "Q10",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "from_columns": "DRUG_PRI",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "DRUG_USER.MED_DICT_PRICE",
+      "to_columns": "DRUG_PRI",
+      "join_condition": "DRUG_USER.PHA_INP_REQUEST_DRUG.DRUG_PRI = DRUG_USER.MED_DICT_PRICE.DRUG_PRI",
+      "desc": "住院摆药申请按药品价格主键挂药品产地价格表",
+      "logic": "MED_DICT_PRICE.DRUG_PRI 为唯一主键。PHA_INP_REQUEST_DRUG 仅 HIS 源端收录，ODS 资产包无同名表。已有正式边是 MED_DICT_BASEINFO↔MED_DICT_PRICE（药品编码）。",
+      "confidence": "C",
+      "evidence_count": 4,
+      "source_files": [
+        "取数/exports/9 药学部/2026版基本药物相关sql(1).txt"
+      ]
+    },
+    {
+      "key": "Q11",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "DRUG_USER.PHA_CLI_REQUEST_DRUG",
+      "from_columns": "PAT_ID+PRESC_NO",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "ORDADM.ORDERS",
+      "to_columns": "PATIENT_ID+CURRENT_PRESC_NO",
+      "join_condition": "DRUG_USER.PHA_CLI_REQUEST_DRUG.PAT_ID = ORDADM.ORDERS.PATIENT_ID AND DRUG_USER.PHA_CLI_REQUEST_DRUG.PRESC_NO = TO_CHAR(ORDADM.ORDERS.CURRENT_PRESC_NO)",
+      "desc": "门诊摆药申请按患者+处方号挂医嘱",
+      "logic": "2026-08-18 用户确认类型不一致可接受。PRESC_NO 为 VARCHAR2，CURRENT_PRESC_NO 为 NUMBER(5)，登记时用 TO_CHAR 避免隐式转换失败。原 SQL 另有 CURRENT_PRESC_NO IS NOT NULL。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/exports/6、抗菌办/抗菌药物sql_修正版_202603.sql"
+      ]
+    },
+    {
+      "key": "Q12",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "LAB.LAB_TEST_ITEMS",
+      "from_columns": "ITEM_CODE",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.CLINIC_ITEM_DICT",
+      "to_columns": "ITEM_CLASS+ITEM_CODE",
+      "join_condition": "LAB.LAB_TEST_ITEMS.ITEM_CODE = COMM.CLINIC_ITEM_DICT.ITEM_CODE AND COMM.CLINIC_ITEM_DICT.ITEM_CLASS = 'C'",
+      "desc": "检验项目按项目代码挂临床诊疗字典（限定检验类）",
+      "logic": "2026-08-18 用户确认按 ITEM_CLASS+ITEM_CODE 入库。LAB_TEST_ITEMS 无 ITEM_CLASS 字段，字典侧固定 ITEM_CLASS='C'（检验）。原 SQL 还排除 EXPAND2<>'微生物类'，正式化时作为配方限定保留。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/exports/6、抗菌办/抗菌药物sql_修正版_202603.sql"
+      ]
+    },
+    {
+      "key": "Q13",
+      "from_system_code": "HIS_SOURCE",
+      "from_source_code": "his_source_10_10_10_15",
+      "from_table": "EXAM.EXAM_MASTER",
+      "from_columns": "REQ_DEPT",
+      "to_system_code": "HIS_SOURCE",
+      "to_source_code": "his_source_10_10_10_15",
+      "to_table": "COMM.DEPT_DICT",
+      "to_columns": "DEPT_CODE",
+      "join_condition": "EXAM.EXAM_MASTER.REQ_DEPT = COMM.DEPT_DICT.DEPT_CODE",
+      "desc": "检查申请科室挂科室字典",
+      "logic": "原解析把别名 dd 误配成费用 DEPT_CODE。人工纠正：dd 是 dept_dict。2026-08-18 用户确认按此纠正边入库。开单科室主口径是 SYS_DEPARTMENT，本边保留原 SQL 的 DEPT_DICT。",
+      "confidence": "C",
+      "evidence_count": 2,
+      "source_files": [
+        "取数/exports/6、抗菌办/抗菌药物sql_修正版_202603.sql"
+      ]
+    }
+  ]
+}

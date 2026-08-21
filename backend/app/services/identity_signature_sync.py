@@ -177,7 +177,12 @@ def sync_missing_jhemr_signatures(
             try:
                 # The audit row is durable before the target transaction.  A
                 # failed audit write therefore prevents an untraceable write.
-                action = create_action(db, run_id=run_id or "unbound", fingerprint=fingerprint)
+                action = create_action(
+                    db,
+                    run_id=run_id or "unbound",
+                    fingerprint=fingerprint,
+                    emp_no=emp_no,
+                )
                 try:
                     user = adapter._fetch_all(
                         "SELECT user_name FROM jhemr.users WHERE user_id = %s AND hospital_no = %s",

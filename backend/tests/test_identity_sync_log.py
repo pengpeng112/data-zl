@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 
 from app.services.identity_sync_log import (
+    reason_label,
+    run_id_from_action,
     serialize_action,
     serialize_run,
     status_label,
@@ -40,22 +42,42 @@ def test_serialize_run_hides_sensitive_fields():
     assert "emp_no" not in data
 
 
-def test_serialize_action_uses_fingerprint_only():
+def test_serialize_action_includes_emp_trace():
     action = SimpleNamespace(
         action_seq=1,
         target_system="JHEMR",
         subtask_code="jhemr_education_title_sync",
         action_type="update_title",
         status="executed",
-        reason_code="idempotent_skip",
+        reason_code="already_has_signature",
         error_class=None,
         error_code_masked=None,
         rows_affected=1,
         account_fingerprint="abcdef1234567890",
+        emp_no_masked="004061",
+        params_summary={"emp_no": "004061", "person_name_masked": "张**", "dept_code": "021738"},
         executed_at=None,
     )
     data = serialize_action(action)
     assert data["target_system_name"] == "嘉和电子病历"
     assert data["account_fingerprint"] == "abcdef123456"
+    assert data["emp_no"] == "004061"
+    assert data["person_name_masked"] == "张**"
+    assert data["dept_code"] == "021738"
+    assert data["reason_name"] == "目标已有签名，未覆盖"
     assert "error_message" not in data
-    assert "emp_no" not in data
+
+
+def test_run_id_from_action_supports_nightly_batch_and_signature_batch():
+    assert run_id_from_action(SimpleNamespace(params_summary={"run_id": "RUN-aa"}, batch_id="x")) == "RUN-aa"
+    assert (
+        run_id_from_action(SimpleNamespace(params_summary={}, batch_id="NTL-RUN-4fab0af6fc29-195738e1"))
+        == "RUN-4fab0af6fc29"
+    )
+    assert (
+        run_id_from_action(
+            SimpleNamespace(params_summary={}, batch_id="RUN-ea7c75b2b885:jhemr_signature_sync:d2ebdfae9c91abcd")
+        )
+        == "RUN-ea7c75b2b885"
+    )
+    assert reason_label("no_target_user") == "嘉和无此账号"

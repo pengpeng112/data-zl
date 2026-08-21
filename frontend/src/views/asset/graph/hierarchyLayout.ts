@@ -87,6 +87,43 @@ export function computeCircularSpreadPositions(
   };
 }
 
+/** Scale preset coordinates into the live canvas so G6 can stay near zoom=1 (canvas text stays sharp). */
+export function fitPositionsToBox(
+  positions: Map<string, HierarchyPosition>,
+  width: number,
+  height: number,
+  options: { paddingX?: number; paddingY?: number; maxScale?: number } = {}
+): Map<string, HierarchyPosition> {
+  const paddingX = options.paddingX ?? 80;
+  const paddingY = options.paddingY ?? 64;
+  const maxScale = options.maxScale ?? 1.2;
+  const pts = [...positions.values()];
+  if (!pts.length || width <= 0 || height <= 0) return positions;
+  const innerW = Math.max(80, width - paddingX * 2);
+  const innerH = Math.max(80, height - paddingY * 2);
+  if (pts.length === 1) {
+    pts[0].x = width / 2;
+    pts[0].y = height / 2;
+    return positions;
+  }
+  const xs = pts.map(p => p.x);
+  const ys = pts.map(p => p.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const boxW = Math.max(1, maxX - minX);
+  const boxH = Math.max(1, maxY - minY);
+  const scale = Math.min(innerW / boxW, innerH / boxH, maxScale);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  positions.forEach(p => {
+    p.x = (p.x - cx) * scale + width / 2;
+    p.y = (p.y - cy) * scale + height / 2;
+  });
+  return positions;
+}
+
 function distance(a: HierarchyPosition, b: HierarchyPosition) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }

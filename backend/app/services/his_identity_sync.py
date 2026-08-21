@@ -60,6 +60,19 @@ def _text(value: Any) -> str | None:
     return text or None
 
 
+def _is_deleted_flag(value: Any) -> bool:
+    if value is None:
+        return False
+    return str(value).strip() not in {"", "0", "N", "False", "false"}
+
+
+def _employee_employment_status(row: dict[str, Any]) -> str:
+    """HIS 禁用：ISDELETED 非 0，或 VALIDSTATE=0。"""
+    if _is_deleted_flag(_value(row, "ISDELETED")):
+        return "inactive"
+    return _normalize_status(_value(row, "VALIDSTATE"))
+
+
 def _normalize_status(value: Any) -> str:
     """归一 STAFF_DICT.STATUS / SYS_EMPLOYEE.VALIDSTATE（活库实测 1=在用，0=停用）。"""
     text = (_text(value) or "").upper()
@@ -390,10 +403,6 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
         emplcode = _text(_value(row, "EMPLCODE"))
         if not emplcode:
             continue
-        # 已删除行不进主档
-        deleted = _value(row, "ISDELETED")
-        if deleted is not None and str(deleted).strip() not in {"", "0", "N", "False", "false"}:
-            continue
         usercode = _text(_value(row, "USERCODE"))
         # 桥接：EMPLCODE 或 USERCODE 命中 STAFF.EMP_NO
         if emplcode in staff_by_emp_no or (usercode and usercode in staff_by_emp_no):
@@ -414,7 +423,7 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
             # JHEMR users.education_title must use SYS_EMPLOYEE.LEVLCODE's
             # EmployeeTitle dictionary name, not COMM.STAFF_DICT free text.
             job_title=employee_title,
-            employment_status=_normalize_status(_value(row, "VALIDSTATE")),
+            employment_status=_employee_employment_status(row),
             raw_job=_text(_value(staff, "JOB")) if staff else None,
             raw_title=_text(_value(staff, "TITLE")) if staff else None,
             source_create_date=_value(staff, "CREATE_DATE") if staff else None,
@@ -550,9 +559,6 @@ def sync_his_identity(
         emplcode = _text(_value(row, "EMPLCODE"))
         if not emplcode:
             continue
-        deleted = _value(row, "ISDELETED")
-        if deleted is not None and str(deleted).strip() not in {"", "0", "N", "False", "false"}:
-            continue
         person_code = emplcode
         dept_code = _text(_value(row, "DEPTCODE")) or _text(_value(row, "DEPTID"))
         result["upserted"]["person_sources"] += int(_upsert_person_source(
@@ -564,7 +570,7 @@ def sync_his_identity(
             person_code=person_code,
             person_name=_text(_value(row, "EMPLNAME")),
             dept_code=dept_code,
-            status=_normalize_status(_value(row, "VALIDSTATE")),
+            status=_employee_employment_status(row),
             raw=row,
         ))
         result["upserted"]["person_departments"] += int(_upsert_person_department(

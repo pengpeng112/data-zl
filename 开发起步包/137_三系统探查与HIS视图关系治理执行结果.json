@@ -1,0 +1,184 @@
+{
+  "doc": 137,
+  "date": "2026-08-19",
+  "plan": 136,
+  "status": "completed_with_source_credential_skips",
+  "new_sources": [
+    {
+      "source": "core2db",
+      "endpoint": "10.10.8.135:3306",
+      "tcp": "reachable",
+      "credential": "missing_controlled_readonly_credential",
+      "status": "BLOCKED_CREDENTIAL",
+      "source_writes": 0
+    },
+    {
+      "source": "physical_exam",
+      "endpoint": "10.10.10.96:1433",
+      "tcp": "reachable",
+      "credential": "missing_controlled_readonly_credential",
+      "status": "BLOCKED_CREDENTIAL",
+      "source_writes": 0
+    },
+    {
+      "source": "occupational_disease",
+      "endpoint": "10.10.8.96:1433",
+      "tcp": "reachable",
+      "credential": "missing_controlled_readonly_credential",
+      "status": "BLOCKED_CREDENTIAL",
+      "source_writes": 0
+    }
+  ],
+  "his_views": {
+    "owners": 13,
+    "views": 426,
+    "valid": 335,
+    "invalid": 91,
+    "columns": 6313,
+    "dictionary_dependencies": 1598,
+    "definitions": 426,
+    "sanitized_definitions": 327,
+    "truncated_definitions": 0,
+    "compile_errors": 1,
+    "runtime_probe_status": "runtime_skipped",
+    "source_writes": 0
+  },
+  "relation_intake": {
+    "dependencies": 1191,
+    "relations": 463,
+    "existing": 20,
+    "candidate": 39,
+    "partial": 31,
+    "recipe_candidate": 373,
+    "rejected": 0,
+    "unresolved": 220,
+    "conflicts": 16,
+    "formal_assets_modified": false
+  },
+  "conflict_groups": [
+    {
+      "existing_relation": "R005",
+      "endpoints": "MEDREC.PAT_VISIT<->INPADM.ADT_LOG",
+      "count": 4,
+      "types": ["existing_relation_missing_composite_key", "qualifier_mismatch"]
+    },
+    {
+      "existing_relation": "R031",
+      "endpoints": "ORDADM.ORDERS<->DRUG_USER.PHA_INP_REQUEST_DRUG",
+      "count": 8,
+      "types": ["existing_relation_missing_composite_key"]
+    },
+    {
+      "existing_relation": "R006",
+      "endpoints": "MEDREC.PAT_VISIT<->ORDADM.ORDERS",
+      "count": 2,
+      "types": ["qualifier_mismatch"]
+    },
+    {
+      "existing_relation": "R011",
+      "endpoints": "MEDREC.PAT_VISIT<->LAB.LAB_TEST_MASTER",
+      "count": 1,
+      "types": ["qualifier_mismatch"]
+    },
+    {
+      "existing_relation": "R016",
+      "endpoints": "MEDREC.PAT_VISIT<->EXAM.EXAM_MASTER",
+      "count": 1,
+      "types": ["qualifier_mismatch"]
+    }
+  ],
+  "manual_conflict_review": {
+    "status": "resolved_and_applied_to_platform",
+    "raw_conflict_records": 16,
+    "formal_relations_involved": 5,
+    "formal_relations_to_overwrite_or_delete": 0,
+    "records_reclassified_as_existing_or_subset_evidence": 11,
+    "records_reclassified_as_recipe_evidence": 5,
+    "formal_relation_semantics_modified": false,
+    "formal_evidence_notes_updated": 5,
+    "notes": {
+      "R005": "1 subset evidence; 3 ADT department/time/action recipe records",
+      "R031": "8 records collectively express the existing four-key mapping; parser split the AND group",
+      "R006": "2 UNION-branch duplicates of the same inpatient-order subset",
+      "R011": "three-table PAT_VISIT to ORDERS to LAB recipe evidence",
+      "R016": "three-table PAT_VISIT to ORDERS to EXAM recipe evidence"
+    }
+  },
+  "platform_conflict_resolution": {
+    "date": "2026-08-20",
+    "batch": "plan137_conflict_resolution_v1",
+    "user_additional_review_required": false,
+    "backup": "/opt/data-asset/backups/data_asset_pre_plan137_conflict_resolution_20260820.dump",
+    "backup_bytes": 8464790,
+    "backup_sha256": "f339b29283fa83ca12d5068264eb7fd7a5c2e2fdf383839f4d6096f90d4ec96a",
+    "target_formal_relations_found": 5,
+    "formal_evidence_notes_updated": 5,
+    "formal_relation_semantics_modified": 0,
+    "candidate_reviews_rejected": 5,
+    "candidate_review_ids": [24, 25, 26, 27, 28],
+    "batch_review_statuses_after": {"draft": 9, "rejected": 5},
+    "recipes_annotated": 2,
+    "recipes_activated": 0,
+    "full_recipes_remain_inactive_reason": "only conflict edges were reviewed; full complex recipes remain runtime_skipped",
+    "platform_row_updates": 12,
+    "second_dry_run_writes": 0,
+    "source_writes": 0,
+    "health_http_status": 200
+  },
+  "test_platform": {
+    "backup": "/opt/data-asset/backups/data_asset_test_pre_plan136_20260819.dump",
+    "backup_bytes": 304225,
+    "backup_sha256": "5c93533f84b86deee5409dfa3316a7645e7538dc230ef923ec3ef610dd14077d",
+    "seeded_tables": 1234,
+    "seeded_columns": 14435,
+    "review_drafts": 13,
+    "recipe_drafts": 26,
+    "active_recipes": 0,
+    "second_dry_run_writes": 0
+  },
+  "production_platform": {
+    "backup": "/opt/data-asset/backups/data_asset_pre_plan136_20260819.dump",
+    "backup_bytes": 8307739,
+    "backup_sha256": "8ea25d0a4bef65e70bd8d98318af97eb80010f7b350905308433f59f6345b4b9",
+    "metadata_tables": 1236,
+    "metadata_columns": 13913,
+    "relations_before": 568,
+    "relations_after": 568,
+    "reviews_before": 16,
+    "reviews_after": 30,
+    "recipes_before": 0,
+    "recipes_after": 24,
+    "batch_review_statuses": {"draft": 14},
+    "batch_recipe_statuses": {"draft": 24},
+    "batch_active_recipes": 0,
+    "skipped_existing_formal": 2,
+    "skipped_existing_review": 1,
+    "skipped_metadata": 158,
+    "second_dry_run_eligible": 0,
+    "second_dry_run_inserted": 0,
+    "formal_relations_modified": 0
+  },
+  "tests": {
+    "backend": {"passed": 858, "skipped": 1, "failed": 0, "seconds": 1589.01},
+    "frontend": {"files_passed": 20, "tests_passed": 119, "failed": 0},
+    "typecheck": "PASS",
+    "frontend_build": "PASS",
+    "bundle_budget": "PASS"
+  },
+  "deployment": {
+    "application_image_changed": false,
+    "frontend_release_changed": false,
+    "image_at_plan136_close": "data-asset:130p1-20260814062017",
+    "image_observed_2026_08_20": "data-asset:130p1-20260820040456",
+    "observed_image_change_attributed_to_plan136": false,
+    "frontend_release_observed_2026_08_20": "202608141503-graph-restore",
+    "evidence_directory": "/opt/data-asset/evidence/plan136-20260820",
+    "evidence_sha256_manifest": "SHA256SUMS",
+    "temporary_server_files_removed": 16,
+    "container_status": "running_healthy",
+    "health_http_status": 200,
+    "protected_api_without_auth": 401,
+    "alembic_head": "aa11bb22cc33",
+    "source_dml_ddl": 0
+  }
+}

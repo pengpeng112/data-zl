@@ -49,6 +49,8 @@ except Exception:  # pragma: no cover - standalone use without the app package
 from .identity_password import compute_password_fields, get_shanghai_date_str
 
 JHEMR_HOSPITAL_NO = "49557032X"
+ACCOUNT_STATUS_ACTIVE = 0
+ACCOUNT_STATUS_LOCKED = 8
 
 # Classification -> role group. 药师 (pharmacist) reuses the doctor group per
 # user-confirmed policy (no pharmacist-specific role exists in JHEMR).
@@ -892,6 +894,61 @@ class JhemrIdentityAdapter:
                 raise JhemrIdentityError("education_title read-back mismatch")
             conn.commit()
             return {"status": "success", "rows_affected": 1}
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
+    def lock_account(self, user_id: str) -> dict[str, Any]:
+        """Lock one JHEMR login: account_status=8 and locked_time, never DELETE.
+
+        Live contract (103): active=0, lock=8 plus non-null locked_time.
+        Already-locked accounts are idempotent skips. Missing users are
+        reported, not created. ``state`` is left unchanged.
+        """
+        emp = str(user_id or "").strip()
+        if not emp:
+            raise JhemrIdentityError("user_id must not be empty")
+        current = self._fetch_one(
+            "SELECT user_id, account_status, locked_time FROM jhemr.users "
+            "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+            (emp, self.hospital_no),
+        )
+        if current is None:
+            return {"status": "missing_target"}
+        status = current.get("account_status")
+        if str(status).strip() == str(ACCOUNT_STATUS_LOCKED):
+            return {"status": "skipped", "reason": "already_locked", "account_status": ACCOUNT_STATUS_LOCKED}
+        conn = self._ensure_conn()
+        try:
+            affected = self._execute_write(
+                "UPDATE jhemr.users SET account_status = %s, locked_time = CURRENT_TIMESTAMP "
+                "WHERE user_id = %s AND hospital_no = %s AND CAST(account_status AS TEXT) = %s",
+                (ACCOUNT_STATUS_LOCKED, emp, self.hospital_no, str(ACCOUNT_STATUS_ACTIVE)),
+            )
+            if affected != 1:
+                raise JhemrIdentityError(
+                    f"account lock update affected {affected} rows; expected 1"
+                )
+            verified = self._fetch_one(
+                "SELECT account_status, locked_time FROM jhemr.users "
+                "WHERE user_id = %s AND hospital_no = %s",
+                (emp, self.hospital_no),
+            )
+            if (
+                not verified
+                or str(verified.get("account_status")).strip() != str(ACCOUNT_STATUS_LOCKED)
+                or verified.get("locked_time") is None
+            ):
+                raise JhemrIdentityError("account lock read-back mismatch")
+            conn.commit()
+            return {
+                "status": "success",
+                "rows_affected": 1,
+                "account_status": ACCOUNT_STATUS_LOCKED,
+            }
         except Exception:
             try:
                 conn.rollback()

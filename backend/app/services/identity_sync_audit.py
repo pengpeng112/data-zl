@@ -49,6 +49,34 @@ def upsert_subtask(db: Session, *, run_id: str, subtask_code: str, target_system
         raise AuditWriteError(f"subtask_audit_write:{type(exc).__name__}") from exc
 
 
+def _mask_person_name(value: str | None) -> str:
+    raw = (value or "").strip()
+    if not raw:
+        return ""
+    if len(raw) == 1:
+        return "*"
+    return raw[0] + ("*" * (len(raw) - 1))
+
+
+def _person_trace(db: Session | None, emp_no: str | None) -> dict[str, str]:
+    emp = (emp_no or "").strip()
+    if db is None or not emp:
+        return {}
+    from sqlalchemy import select
+
+    from ..models.identity import IdentityPerson
+
+    person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == emp))
+    if person is None:
+        return {"emp_no": emp}
+    return {
+        "emp_no": emp,
+        "person_name_masked": _mask_person_name(person.person_name_cn),
+        "dept_code": str(person.dept_code or ""),
+        "dept_name": str(person.dept_name_cn or ""),
+    }
+
+
 def create_action(
     db: Session | None,
     *,
@@ -59,6 +87,7 @@ def create_action(
     action_type: str = "signature_sync",
     target_table: str = "jhemr.users_pic",
     value_fingerprint: str | None = None,
+    emp_no: str | None = None,
 ) -> Any | None:
     """Create a planned target action before any target write."""
     if db is None:
@@ -69,12 +98,14 @@ def create_action(
         params_summary = {"run_id": run_id, "subtask": subtask_code}
         if value_fingerprint:
             params_summary["value_fingerprint"] = value_fingerprint
+        params_summary.update({key: value for key, value in _person_trace(db, emp_no).items() if value})
         row = IdentitySyncAction(
             batch_id=f"{run_id}:{subtask_code}:{fingerprint[:16]}",
             action_seq=1,
             target_system=target_system,
             action_type=action_type,
             target_table=target_table,
+            emp_no_masked=(emp_no or "").strip() or None,
             account_fingerprint=fingerprint,
             params_summary=params_summary,
             subtask_code=subtask_code,

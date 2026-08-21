@@ -1,6 +1,7 @@
 """Read-only identity nightly sync log serialization.
 
-No emp_no, names, passwords, signatures or SQL are returned.
+Passwords, signatures and SQL are never returned. Operator-facing rows may
+include employee number and a masked name for troubleshooting.
 """
 from __future__ import annotations
 
@@ -41,6 +42,13 @@ TRIGGER_LABELS = {
     "manual_rerun": "手工重跑",
     "validation": "校验批次",
 }
+REASON_LABELS = {
+    "no_target_user": "嘉和无此账号",
+    "already_has_signature": "目标已有签名，未覆盖",
+    "idempotent_noop": "目标无变化",
+    "already_managed_both": "两端账号已存在",
+    "already_exists": "目标已存在",
+}
 
 
 def subtask_label(code: str | None) -> str:
@@ -58,6 +66,35 @@ def status_label(code: str | None) -> str:
 def trigger_label(code: str | None) -> str:
     raw = str(code or "")
     return TRIGGER_LABELS.get(raw, raw or "-")
+
+
+def reason_label(code: str | None) -> str:
+    raw = str(code or "")
+    return REASON_LABELS.get(raw, raw or "")
+
+
+def _summary_dict(row: Any) -> dict[str, Any]:
+    raw = getattr(row, "params_summary", None)
+    return raw if isinstance(raw, dict) else {}
+
+
+def run_id_from_action(row: Any) -> str | None:
+    summary = _summary_dict(row)
+    if summary.get("run_id"):
+        return str(summary["run_id"])
+    batch_id = str(getattr(row, "batch_id", "") or "")
+    if batch_id.startswith("NTL-RUN-"):
+        parts = batch_id.split("-")
+        if len(parts) >= 3:
+            return f"{parts[1]}-{parts[2]}"
+    if ":" in batch_id:
+        return batch_id.split(":", 1)[0]
+    return None
+
+
+def _action_emp_no(row: Any) -> str:
+    summary = _summary_dict(row)
+    return str(summary.get("emp_no") or getattr(row, "emp_no_masked", None) or "").strip()
 
 
 def _iso(value: Any) -> str | None:
@@ -106,6 +143,7 @@ def serialize_run(row: Any, subtasks: list[Any] | None = None) -> dict[str, Any]
 
 
 def serialize_action(row: Any) -> dict[str, Any]:
+    summary = _summary_dict(row)
     return {
         "action_seq": row.action_seq,
         "target_system": row.target_system,
@@ -115,11 +153,70 @@ def serialize_action(row: Any) -> dict[str, Any]:
         "status": row.status,
         "status_name": status_label(row.status),
         "reason_code": row.reason_code,
+        "reason_name": reason_label(row.reason_code),
         "error_class": row.error_class or row.error_code_masked,
         "rows_affected": row.rows_affected,
+        "emp_no": _action_emp_no(row) or None,
+        "person_name_masked": summary.get("person_name_masked") or "",
+        "dept_code": summary.get("dept_code") or "",
+        "dept_name": summary.get("dept_name") or "",
+        "job_title": summary.get("job_title") or "",
         "account_fingerprint": short_fingerprint(row.account_fingerprint),
         "executed_at": _iso(row.executed_at),
     }
+
+
+def _run_ids_for_emp(db: "Session", emp_no: str) -> list[str]:
+    from sqlalchemy import or_, select
+
+    from ..core.config import settings
+    from ..models.identity_sync import IdentitySyncAction
+    from .identity_hmac import compute_account_fingerprint
+
+    emp = (emp_no or "").strip()
+    if not emp:
+        return []
+    fingerprints = []
+    for system in ("JHEMR", "CDMS", "HIS"):
+        try:
+            fingerprints.append(compute_account_fingerprint(emp, system, settings.identity_hmac_key_ref))
+        except Exception:
+            continue
+    filters = [IdentitySyncAction.emp_no_masked == emp]
+    if fingerprints:
+        filters.append(IdentitySyncAction.account_fingerprint.in_(fingerprints))
+    rows = db.scalars(select(IdentitySyncAction).where(or_(*filters)).limit(300)).all()
+    run_ids: list[str] = []
+    seen: set[str] = set()
+    for row in rows:
+        run_id = run_id_from_action(row)
+        if run_id and run_id not in seen:
+            seen.add(run_id)
+            run_ids.append(run_id)
+    return run_ids
+
+
+def _enrich_action_people(db: "Session", actions: list[dict[str, Any]]) -> None:
+    from sqlalchemy import select
+
+    from ..models.identity import IdentityPerson
+    from .identity_sync_audit import _mask_person_name
+
+    codes = sorted({str(item.get("emp_no") or "") for item in actions if item.get("emp_no")})
+    if not codes:
+        return
+    people = {
+        row.person_code: row
+        for row in db.scalars(select(IdentityPerson).where(IdentityPerson.person_code.in_(codes))).all()
+    }
+    for item in actions:
+        person = people.get(str(item.get("emp_no") or ""))
+        if person is None:
+            continue
+        item["person_name_masked"] = item.get("person_name_masked") or _mask_person_name(person.person_name_cn)
+        item["dept_code"] = item.get("dept_code") or (person.dept_code or "")
+        item["dept_name"] = item.get("dept_name") or (person.dept_name_cn or "")
+        item["job_title"] = item.get("job_title") or (person.job_title or "")
 
 
 def list_sync_runs(
@@ -128,6 +225,7 @@ def list_sync_runs(
     page: int = 1,
     page_size: int = 20,
     status: str | None = None,
+    emp_no: str | None = None,
 ) -> dict[str, Any]:
     from sqlalchemy import func, select
 
@@ -141,6 +239,10 @@ def list_sync_runs(
     stmt = select(IdentitySchedulerRun)
     if status:
         stmt = stmt.where(func.lower(func.coalesce(IdentitySchedulerRun.status, "")) == status.lower())
+    emp = (emp_no or "").strip()
+    if emp:
+        run_ids = _run_ids_for_emp(db, emp)
+        stmt = stmt.where(IdentitySchedulerRun.run_id.in_(run_ids or ["__none__"]))
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = list(
         db.scalars(
@@ -196,7 +298,7 @@ def list_sync_runs(
 
 
 def get_sync_run(db: "Session", run_id: str) -> dict[str, Any] | None:
-    from sqlalchemy import select
+    from sqlalchemy import or_, select
 
     from ..models.identity_sync import (
         IdentitySchedulerRun,
@@ -225,16 +327,17 @@ def get_sync_run(db: "Session", run_id: str) -> dict[str, Any] | None:
         ).all()
     )
     batch_ids = [item.batch_id for item in batches if item.batch_id]
-    actions: list[Any] = []
+    action_filters = [IdentitySyncAction.batch_id.like(f"%{run_id}%")]
     if batch_ids:
-        actions = list(
-            db.scalars(
-                select(IdentitySyncAction)
-                .where(IdentitySyncAction.batch_id.in_(batch_ids))
-                .order_by(IdentitySyncAction.executed_at.desc().nullslast(), IdentitySyncAction.id.desc())
-                .limit(100)
-            ).all()
-        )
+        action_filters.append(IdentitySyncAction.batch_id.in_(batch_ids))
+    actions = list(
+        db.scalars(
+            select(IdentitySyncAction)
+            .where(or_(*action_filters))
+            .order_by(IdentitySyncAction.executed_at.desc().nullslast(), IdentitySyncAction.id.desc())
+            .limit(200)
+        ).all()
+    )
     alerts = list(
         db.scalars(
             select(IdentitySyncAlert)
@@ -261,6 +364,7 @@ def get_sync_run(db: "Session", run_id: str) -> dict[str, Any] | None:
         for item in batches
     ]
     data["actions"] = [serialize_action(item) for item in actions]
+    _enrich_action_people(db, data["actions"])
     data["alerts"] = [
         {
             "alert_type": item.alert_type,

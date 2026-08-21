@@ -228,6 +228,35 @@ def execute_jhemr_apply(
         adapter.close()
 
 
+def execute_jhemr_lock(emp_no: str) -> dict[str, Any]:
+    """Lock one existing JHEMR login. Does not create users or write passwords."""
+    if (gate := _require_identity_sync_enabled()) is not None:
+        return gate
+    if (gate := _require_phase_d_approval()) is not None:
+        return gate
+    from .jhemr_identity_adapter import JhemrIdentityAdapter
+
+    adapter = JhemrIdentityAdapter(
+        credential_ref=settings.identity_sync_jhemr_credential_ref,
+        hospital_no=settings.identity_sync_jhemr_hospital_no,
+        jump_host=settings.his_source_jump_host,
+        jump_port=settings.his_source_jump_port,
+        jump_user=settings.his_source_jump_user,
+        jump_key=settings.his_source_jump_key or None,
+        db_host=settings.identity_sync_jhemr_host,
+        db_port=settings.identity_sync_jhemr_port,
+        db_name=settings.identity_sync_jhemr_dbname,
+    )
+    try:
+        adapter.connect()
+        return adapter.lock_account(emp_no)
+    except Exception as exc:
+        logger.error("JHEMR lock failed for masked emp: %s", type(exc).__name__)
+        return {"status": "failed", "error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+    finally:
+        adapter.close()
+
+
 def execute_jhemr_readback(emp_no: str) -> dict[str, Any]:
     """Read back JHEMR user state after apply for verification.
 

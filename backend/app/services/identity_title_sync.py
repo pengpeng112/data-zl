@@ -314,6 +314,7 @@ def sync_jhemr_education_titles_daily(
                     action_type="education_title_overwrite",
                     target_table="jhemr.users",
                     value_fingerprint=_title_value_fingerprint(user_id, new_title),
+                    emp_no=user_id,
                 )
                 if action is None:
                     raise AuditWriteError("action_audit_missing")

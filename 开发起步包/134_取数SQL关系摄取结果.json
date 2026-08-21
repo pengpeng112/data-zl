@@ -1,0 +1,53 @@
+{
+  "doc": "134",
+  "created_at": "2026-08-18",
+  "updated_at": "2026-08-18",
+  "scan": {
+    "files": 67,
+    "unique_relations": 164,
+    "existing": 25,
+    "candidate": 23,
+    "partial": 44,
+    "rejected": 72
+  },
+  "imported_reviews": {
+    "status": "written_to_8_83",
+    "host": "10.10.8.83",
+    "table": "asset.asset_relation_reviews",
+    "count": 13,
+    "keys": ["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10", "Q11", "Q12", "Q13"],
+    "ids": {
+      "Q01": 4,
+      "Q02": 5,
+      "Q03": 6,
+      "Q04": 7,
+      "Q05": 8,
+      "Q06": 9,
+      "Q07": 10,
+      "Q08": 11,
+      "Q09": 12,
+      "Q10": 13,
+      "Q11": 14,
+      "Q12": 15,
+      "Q13": 16
+    },
+    "review_status": "draft",
+    "approved": false,
+    "formal_relationships_written": false,
+    "user_confirm_20260818": {
+      "Q07": "INP_BILL_DETAIL.ORDERED_BY -> FXHIS.SYS_DEPARTMENT.DEPTCODE (primary dept)",
+      "Q11": "PHA_CLI_REQUEST_DRUG.PRESC_NO = TO_CHAR(ORDERS.CURRENT_PRESC_NO)",
+      "Q12": "LAB_TEST_ITEMS.ITEM_CODE + CLINIC_ITEM_DICT.ITEM_CLASS='C'",
+      "Q13": "EXAM_MASTER.REQ_DEPT -> COMM.DEPT_DICT.DEPT_CODE (corrected alias)"
+    },
+    "previous_reviews": [
+      {"id": 1, "status": "approved"},
+      {"id": 2, "status": "approved"},
+      {"id": 3, "status": "approved"}
+    ]
+  },
+  "held_for_user": [
+    "approve Q01-Q13 vs live-sample first",
+    "optional: INP_BILL_DETAIL.PERFORMED_BY and OUTP_BILL_ITEMS.ORDERED_BY_DEPT/PERFORMED_BY to SYS_DEPARTMENT"
+  ]
+}

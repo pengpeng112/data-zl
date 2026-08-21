@@ -91,27 +91,27 @@ describe("graphTransform", () => {
   });
 
   it("returns node style by graph node type", () => {
-    expect(graphNodeStyle("system").fill).toBe("#f8d7c4");
-    expect(graphNodeStyle("schema").fill).toBe("#dcebc8");
+    expect(graphNodeStyle("system").fill).toBe("#d96a1a");
+    expect(graphNodeStyle("schema").fill).toBe("#5a9628");
     expect(graphNodeStyle("domain").shape).toBe("ellipse");
     expect(graphNodeStyle("table").shape).toBe("roundRect");
     expect(graphNodeStyle("field").shape).toBe("roundRect");
-    expect(graphNodeVisualStyle({ category: "field", object_type: "column" }).fill).toBe("#eef5e8");
+    expect(graphNodeVisualStyle({ category: "field", object_type: "column" }).fill).toBe("#5a8f32");
   });
   it("highlights core fact table nodes by table role", () => {
     expect(isCoreFactNode({ type: "table", role: "核心事实表" })).toBe(true);
     expect(isCoreFactNode({ table_role: "core_fact" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).fill).toBe("#ffe08a");
-    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).stroke).toBe("#d4a017");
-    expect(graphNodeVisualStyle({ type: "table", role: "普通表" }).fill).toBe("#d6e9f8");
+    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).fill).toBe("#d4a017");
+    expect(graphNodeVisualStyle({ type: "table", role: "核心事实表" }).stroke).toBe("#8a6a0a");
+    expect(graphNodeVisualStyle({ type: "table", role: "普通表" }).fill).toBe("#2f7eb8");
   });
   it("highlights dictionary and dimension table nodes by table role", () => {
     expect(isDimensionNode({ type: "table", role: "字典表" })).toBe(true);
     expect(isDimensionNode({ type: "table", role: "维表" })).toBe(true);
     expect(isDimensionNode({ table_role: "dimension" })).toBe(true);
     expect(isDimensionNode({ table_role: "dict" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).fill).toBe("#c9e7f2");
-    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).stroke).toBe("#7cc4d8");
+    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).fill).toBe("#2a8f99");
+    expect(graphNodeVisualStyle({ type: "table", role: "字典/维表" }).stroke).toBe("#16565c");
   });
   it("dims excluded table nodes by status or table role", () => {
     expect(isExcludedNode({ type: "table", role: "排除表" })).toBe(true);
@@ -124,15 +124,15 @@ describe("graphTransform", () => {
     expect(isCandidateNode({ type: "table", role: "候选表" })).toBe(true);
     expect(isCandidateNode({ include_status: "pending" })).toBe(true);
     expect(isCandidateNode({ status: "candidate" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).fill).toBe("#fde8cd");
-    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).stroke).toBe("#e8a04c");
+    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).fill).toBe("#d4891d");
+    expect(graphNodeVisualStyle({ type: "table", role: "候选表" }).stroke).toBe("#8a5310");
     expect(graphNodeVisualStyle({ type: "table", role: "候选表", status: "excluded" }).fill).toBe("#f1f5f9");
   });
   it("marks D-class deferred relation nodes with dashed purple style", () => {
     expect(isDeferredNode({ type: "table", role: "D类延后关系节点" })).toBe(true);
     expect(isDeferredNode({ status: "待分析" })).toBe(true);
     expect(isDeferredNode({ include_status: "deferred" })).toBe(true);
-    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).fill).toBe("#ece5f5");
+    expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).fill).toBe("#8b6cc7");
     expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点" }).lineDash).toEqual([8, 5]);
     expect(graphNodeVisualStyle({ type: "table", role: "D类延后关系节点", status: "excluded" }).fill).toBe("#f1f5f9");
   });

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeCircularSpreadPositions,
   computeHierarchyPositions,
+  fitPositionsToBox,
   minSpreadDistance
 } from "@/views/asset/graph/hierarchyLayout";
 
@@ -79,5 +80,19 @@ describe("computeHierarchyPositions（129 分层树状）", () => {
     expect(ys.size).toBe(3);
     expect(Math.min(...ys)).toBe(80);
     expect(Math.max(...ys)).toBe(380);
+  });
+});
+
+describe("fitPositionsToBox", () => {
+  it("把环形坐标缩进当前画布，避免后续再靠缩小视口", () => {
+    const nodes = Array.from({ length: 8 }, (_, i) => N(`s${i}`));
+    const { positions } = computeCircularSpreadPositions(nodes, { nodeSize: 88, gap: 92 });
+    fitPositionsToBox(positions, 1000, 520, { paddingX: 80, paddingY: 60, maxScale: 1.1 });
+    const xs = [...positions.values()].map(p => p.x);
+    const ys = [...positions.values()].map(p => p.y);
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(70);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(930);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(50);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(470);
   });
 });

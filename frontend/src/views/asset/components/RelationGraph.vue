@@ -656,16 +656,16 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 
 /* 130p2：Neo4j 圆点节点——彩色圆心 + 同色系描边环 */
 .graph-node circle {
-  fill: #d6e9f8;
-  stroke: #8fbfe6;
-  stroke-width: 2;
+  fill: #2f7eb8;
+  stroke: #184468;
+  stroke-width: 2.4;
 }
 
-.graph-node.node-system circle { fill: #f8d7c4; stroke: #e0a075; }
-.graph-node.node-source circle { fill: #fdf0b8; stroke: #e3c85f; }
-.graph-node.node-schema circle { fill: #dcebc8; stroke: #a3c47e; }
-.graph-node.node-view circle { fill: #e6ddf5; stroke: #b6a3dd; }
-.graph-node.node-field circle { fill: #eef5e8; stroke: #a8c58d; }
+.graph-node.node-system circle { fill: #d96a1a; stroke: #8a3d0c; }
+.graph-node.node-source circle { fill: #c9a116; stroke: #7a6308; }
+.graph-node.node-schema circle { fill: #5a9628; stroke: #365f14; }
+.graph-node.node-view circle { fill: #7a55c4; stroke: #4c2d86; }
+.graph-node.node-field circle { fill: #5a8f32; stroke: #365c1c; }
 
 .graph-node.is-center circle {
   stroke: #f0b429;
@@ -674,8 +674,8 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 }
 
 .graph-node.is-aggregate circle {
-  fill: #d3eef2;
-  stroke: #86ccd6;
+  fill: #2a8f99;
+  stroke: #16565c;
 }
 
 .graph-node.is-muted {
@@ -688,12 +688,12 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
 }
 
 .node-title {
-  fill: #3b4453;
-  font-size: 11.5px;
-  font-weight: 600;
+  fill: #111827;
+  font-size: 13px;
+  font-weight: 650;
   paint-order: stroke;
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 3px;
+  stroke: rgba(255, 255, 255, 0.94);
+  stroke-width: 4px;
   stroke-linejoin: round;
 }
 </style>

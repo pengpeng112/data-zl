@@ -27,6 +27,11 @@ class TestHisIdentitySyncStatus:
         assert his._normalize_status("") == "unknown"
         assert his._normalize_status("Y") == "unknown"
 
+    def test_deleted_employee_is_inactive(self):
+        assert his._employee_employment_status({"ISDELETED": 1, "VALIDSTATE": 1}) == "inactive"
+        assert his._employee_employment_status({"ISDELETED": "0", "VALIDSTATE": 0}) == "inactive"
+        assert his._employee_employment_status({"ISDELETED": 0, "VALIDSTATE": 1}) == "active"
+
     def test_stop_flag(self):
         assert his._normalize_stop_flag(None) == "active"
         assert his._normalize_stop_flag("0") == "active"

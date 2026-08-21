@@ -35,6 +35,7 @@ vi.mock("@antv/g6", () => {
     getZoom() {
       return 1;
     }
+    resize() {}
     destroy() {
       this.destroyed = true;
     }
@@ -118,6 +119,8 @@ describe("AdvancedRelationGraph G6 输入契约（119 回归）", () => {
     expect(graph.data.nodes[0].style.labelMaxLines).toBeGreaterThanOrEqual(4);
     expect(graph.data.nodes[0].style.labelWordWrap).toBe(false);
     expect(graph.data.nodes[0].style.labelTextOverflow).not.toBe("...");
+    expect(graph.data.nodes[0].style.labelFontSize).toBeGreaterThanOrEqual(12);
+    expect(graph.options.devicePixelRatio).toBeGreaterThanOrEqual(2);
     expect(wrapper.emitted("render-error")).toBeUndefined();
     wrapper.unmount();
   });

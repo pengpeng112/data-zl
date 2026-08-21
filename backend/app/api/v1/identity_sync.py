@@ -141,12 +141,13 @@ def list_runs(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     status: str | None = Query(None),
+    emp_no: str | None = Query(None, max_length=32),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ) -> ApiResponse[dict]:
     from ...services.identity_sync_log import list_sync_runs
 
-    return ApiResponse(data=list_sync_runs(db, page=page, page_size=page_size, status=status))
+    return ApiResponse(data=list_sync_runs(db, page=page, page_size=page_size, status=status, emp_no=emp_no))
 
 
 @router.get("/runs/{run_id}", summary="单次同步运行详情")

@@ -28,6 +28,11 @@ import {
 } from "@/views/asset/graph/graphTransform";
 import { computeCircularSpreadPositions, computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
 
+function graphCanvasPixelRatio(): number {
+  const dpr = typeof window !== "undefined" ? Number(window.devicePixelRatio) || 1 : 1;
+  return Math.min(Math.max(dpr, 2), 3);
+}
+
 type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
 type G6Graph = InstanceType<typeof Graph>;
@@ -71,6 +76,16 @@ const containerRef = ref<HTMLDivElement>();
 let graph: G6Graph | null = null;
 let renderVersion = 0;
 let renderQueue: Promise<void> = Promise.resolve();
+let resizeObserver: ResizeObserver | null = null;
+let lastCanvasSize = { width: 0, height: 0 };
+
+function containerSize() {
+  const el = containerRef.value;
+  return {
+    width: Math.max(320, el?.clientWidth || 960),
+    height: Math.max(280, el?.clientHeight || 520)
+  };
+}
 
 const transformed = computed(() => transformGraphByMode({ nodes: props.nodes, edges: props.edges }, props.viewMode, props.showReviewLayer));
 
@@ -173,7 +188,7 @@ function nodeCircleSize(node: any, degree: number, isCenter: boolean): number {
   const objectType = String(node.object_type || "");
   const isGroup = Boolean(node.is_aggregate || node.isAggregate) || ["system", "source", "schema", "domain"].includes(category);
   const isField = category === "field" || objectType === "column";
-  const base = isGroup ? 52 : isField ? 32 : objectType === "view" ? 40 : 42;
+  const base = isGroup ? 56 : isField ? 32 : objectType === "view" ? 40 : 42;
   return base + Math.min(degree, 6) * 2;
 }
 
@@ -234,7 +249,7 @@ function edgeStyle(edge: any, showLabel = false) {
     endArrowSize: 5.5,
     opacity: edge.lineStyle?.opacity ?? visual.opacity,
     labelText,
-    labelFontSize: 10,
+    labelFontSize: 12,
     labelFill: stroke,
     labelBackground: Boolean(labelText),
     labelBackgroundFill: "rgba(255,255,255,0.92)",
@@ -259,7 +274,10 @@ function graphData() {
     props.layoutMode === "hierarchy"
       ? computeHierarchyPositions(uniqueNodes, validEdges, { xGap: 220, yGap: 170, maxPerRow: 8 }).positions
       : props.layoutMode === "layered"
-        ? computeCircularSpreadPositions(uniqueNodes, { nodeSize: 186, gap: 72 }).positions
+        ? computeCircularSpreadPositions(uniqueNodes, {
+          nodeSize: uniqueNodes.length > 24 ? 140 : 186,
+          gap: uniqueNodes.length > 24 ? 88 : 72
+        }).positions
         : null;
   const isSystemLayer = uniqueNodes.length > 1 && uniqueNodes.every(
     node => String(node.id || "").startsWith("overview|system|") || (node.is_aggregate && !node.schema_name && !node.table_name)
@@ -287,24 +305,27 @@ function graphData() {
           ...(preset ? { x: preset.x, y: preset.y } : {}),
           size: nodeCircleSize(node, degree, isCenter),
           fill: isCenter ? "#111827" : typeStyle.fill,
-          fillOpacity: node.itemStyle?.opacity ?? typeStyle.opacity ?? 1,
+          fillOpacity: 1,
           stroke: isCenter ? "#f0b429" : typeStyle.stroke,
-          lineWidth: isCenter || node.id === props.selectedNodeId ? 3 : 2,
+          lineWidth: isCenter || node.id === props.selectedNodeId ? 3.4 : 2.4,
           lineDash: typeStyle.lineDash,
-          // Neo4j 式标题（caption）：文字置于圆点下方，深灰文字不遮挡节点色环
           labelPlacement: "bottom",
-          labelOffsetY: 6,
+          labelOffsetY: 8,
           labelText,
-          labelFill: "#3b4453",
-          labelFontSize: isCenter ? 12 : 11,
-          labelFontWeight: node.id === props.selectedNodeId ? 700 : 600,
+          labelFill: "#111827",
+          labelFontSize: isCenter || Boolean(node.is_aggregate || node.isAggregate) ? 13 : 12,
+          labelFontWeight: node.id === props.selectedNodeId ? 700 : 650,
           labelWordWrap: false,
-          labelMaxWidth: 150,
+          labelMaxWidth: 168,
           labelMaxLines: 5,
           labelTextOverflow: "clip",
-          labelLineHeight: 15,
+          labelLineHeight: 18,
           labelTextAlign: "center",
-          labelTextBaseline: "top"
+          labelTextBaseline: "top",
+          labelBackground: true,
+          labelBackgroundFill: "rgba(255,255,255,0.92)",
+          labelBackgroundRadius: 4,
+          labelBackgroundPadding: [1, 4, 1, 4]
         }
       };
     }),
@@ -338,12 +359,15 @@ function displayEdge(raw: any) {
 function createGraph() {
   if (!containerRef.value || graph) return graph;
   const layout = layoutOptions();
+  const view = containerSize();
   const instance = new Graph({
     container: containerRef.value,
-    // 不做自动 autoFit：渲染后手动 fitView + 最小缩放兜底（见 performRender），
-    // 兼顾"少节点不散出视口"与"127+ 节点不缩成不可读方块"两种场景。
+    width: view.width,
+    height: view.height,
+    devicePixelRatio: graphCanvasPixelRatio(),
     autoFit: false,
     animation: false,
+    zoomRange: [0.18, 2.8],
     // 分层模式 layout 为 null：不配置布局引擎，使用节点自带坐标
     ...(layout ? { layout } : {}),
     // 130p2：Neo4j 知识图谱视觉——圆点节点 + 二次曲线边；
@@ -401,8 +425,7 @@ async function performRender(version: number) {
     const layout = layoutOptions();
     if (layout) instance.setOptions({ layout } as any);
     await instance.render();
-    // 视口适配：先 fitView 让所有节点进入可视区（修复少节点时节点散出视口被裁切）；
-    // 若整体缩放过小（节点很多时），锁定最小缩放并居中，保证节点文字可读，用户可再缩放/拖拽。
+    lastCanvasSize = { width: containerRef.value.clientWidth, height: containerRef.value.clientHeight };
     await instance.fitView({ padding: 56 } as any, false);
     const MIN_ZOOM = 0.28;
     if (instance.getZoom() < MIN_ZOOM) {
@@ -427,7 +450,29 @@ function renderGraph() {
   return renderQueue;
 }
 
+function bindResizeObserver() {
+  if (typeof ResizeObserver === "undefined" || !containerRef.value) return;
+  resizeObserver?.disconnect();
+  resizeObserver = new ResizeObserver(() => {
+    const el = containerRef.value;
+    if (!el || !graph) return;
+    const width = el.clientWidth;
+    const height = el.clientHeight;
+    if (width < 40 || height < 40) return;
+    if (Math.abs(width - lastCanvasSize.width) < 8 && Math.abs(height - lastCanvasSize.height) < 8) return;
+    lastCanvasSize = { width, height };
+    graph.resize();
+    if (usesPresetPositions()) {
+      void renderGraph().catch(() => emit("render-error"));
+    }
+  });
+  resizeObserver.observe(containerRef.value);
+}
+
 onMounted(() => {
+  const el = containerRef.value;
+  if (el) lastCanvasSize = { width: el.clientWidth, height: el.clientHeight };
+  bindResizeObserver();
   void renderGraph().catch(() => emit("render-error"));
 });
 
@@ -437,6 +482,8 @@ watch(() => [props.nodes, props.edges, props.groupBy, props.focusKeyword, props.
 
 onBeforeUnmount(() => {
   renderVersion += 1;
+  resizeObserver?.disconnect();
+  resizeObserver = null;
   try {
     graph?.destroy();
   } catch {
@@ -458,6 +505,9 @@ onBeforeUnmount(() => {
   background-image: radial-gradient(circle, #ccd5e1 1px, transparent 1px);
   background-size: 24px 24px;
 }
+.advanced-graph-canvas :deep(canvas) {
+  display: block;
+}
 .edge-line { display: inline-block; width: 24px; border-top-width: 2px; border-top-style: solid; }
 .edge-line.solid { border-top-style: solid; }
 .edge-line.dashed { border-top-style: dashed; }
@@ -468,7 +518,7 @@ onBeforeUnmount(() => {
 .edge-line.review { border-color: #9b7ec8; }
 .edge-line.muted { border-color: #94a3b8; }
 .node-chip { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 2px solid; }
-.chip-group { background: #dcebc8; border-color: #a3c47e; }
-.chip-table { background: #d6e9f8; border-color: #8fbfe6; }
+.chip-group { background: #5a9628; border-color: #365f14; }
+.chip-table { background: #2f7eb8; border-color: #184468; }
 .chip-view { background: #e6ddf5; border-color: #b6a3dd; }
 </style>
