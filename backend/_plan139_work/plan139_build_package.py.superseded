@@ -1,0 +1,1070 @@
+"""Build the plan-139 four-source asset package from harvested snapshots.
+
+Pure file-to-file transformation: no database, no network, deterministic.
+Reads the four read-only harvester snapshots and emits the package described
+in plan 139 §3 (catalog/objects/columns/constraints/indexes/routines, view
+inventory/dependencies, relation candidates, governance, import plan).
+
+Layering rules are enforced structurally (plan 139 §4.2):
+- declared PK/FK   -> structural relations (``db_constraint`` evidence);
+- view references  -> dependency/lineage rows only;
+- view JOINs       -> review-draft candidates (never formal relations);
+- complex logic    -> inactive recipe candidates;
+- unresolved ends  -> rejected records with machine-readable reasons.
+
+Full view definitions are never written to the package: only SHA-256,
+parse status and sanitized join expressions (literals masked by the shared
+intake parser).
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import re
+import sys
+from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable, Mapping, Sequence
+
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BACKEND_DIR))
+
+from scripts.intake_his_view_relations import ingest_views, source_sql_sha256  # noqa: E402
+
+GENERATOR = "plan139_build_package.v1"
+PARSER_VERSION = "intake_his_view_relations.plan139.v1"
+
+SYSTEM_SCHEMA_DBO = "dbo"
+SQLSERVER_SYSTEM_SCHEMAS = {"cdc", "sys", "information_schema", "guest"}
+SQLSERVER_SYSTEM_OBJECT_RE = re.compile(r"(?i)^(fn_cdc_|systranschemas|MSreplication)")
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+SOURCES: list[dict[str, Any]] = [
+    {
+        "system_code": "CORE2DB",
+        "system_name_cn": "门诊病历",
+        "source_code": "core2db_mysql_10_10_8_135",
+        "source_name_cn": "门诊病历 MySQL 业务库",
+        "db_type": "mysql",
+        "host": "10.10.8.135",
+        "port": 3306,
+        "databases": ["core2db"],
+        "default_schema": "core2db",
+        "credential_ref": "file:///etc/data-asset/credentials/core2db_mysql_10_10_8_135.readonly",
+        "snapshot": "core2db_snapshot.json",
+    },
+    {
+        "system_code": "PHYSICAL_EXAM",
+        "system_name_cn": "体检系统",
+        "source_code": "physical_exam_sqlserver_10_10_10_96",
+        "source_name_cn": "体检 SQL Server 业务实例",
+        "db_type": "sqlserver",
+        "host": "10.10.10.96",
+        "port": 1433,
+        "databases": ["EIS", "JZCIS", "ZONEKINGNET"],
+        "default_schema": "EIS.dbo",
+        "credential_ref": "file:///etc/data-asset/credentials/physical_exam_sqlserver_10_10_10_96.readonly",
+        "snapshot": "physical_exam_snapshot.json",
+    },
+    {
+        "system_code": "PATHOLOGY",
+        "system_name_cn": "病理系统",
+        "source_code": "pathology_sqlserver_10_10_9_41",
+        "source_name_cn": "病理 SQL Server 业务库",
+        "db_type": "sqlserver",
+        "host": "10.10.9.41",
+        "port": 1433,
+        "databases": ["pitaya", "QPIS"],
+        "default_schema": "pitaya.dbo",
+        "credential_ref": "file:///etc/data-asset/credentials/pathology_sqlserver_10_10_9_41.readonly",
+        "snapshot": "pathology_snapshot.json",
+    },
+    {
+        "system_code": "OCCUPATIONAL_DISEASE",
+        "system_name_cn": "职业病系统",
+        "source_code": "occupational_disease_sqlserver_10_10_8_96",
+        "source_name_cn": "职业病 SQL Server 业务库",
+        "db_type": "sqlserver",
+        "host": "10.10.8.96",
+        "port": 1433,
+        "databases": ["tjdatabase4"],
+        "default_schema": "dbo",
+        "credential_ref": "file:///etc/data-asset/credentials/occupational_disease_sqlserver_10_10_8_96.readonly",
+        "snapshot": "occupational_disease_snapshot.json",
+    },
+]
+
+
+def namespace_for(source: Mapping[str, Any], database: str, schema: str | None) -> str:
+    """Namespace mirrors the platform's multi-database convention.
+
+    MySQL uses the database as schema; a SQL Server instance with exactly one
+    harvested database keeps the plain schema name (LIS precedent), while
+    multi-database instances prefix the database (ultrasound precedent).
+    """
+    if source["db_type"] == "mysql":
+        return database
+    if len(source["databases"]) == 1:
+        return schema or SYSTEM_SCHEMA_DBO
+    return f"{database}.{schema or SYSTEM_SCHEMA_DBO}"
+
+
+def split_namespace(source: Mapping[str, Any], namespace: str) -> tuple[str, str]:
+    if source["db_type"] == "mysql":
+        return namespace, namespace
+    if len(source["databases"]) == 1:
+        return source["databases"][0], namespace
+    database, _, schema = namespace.partition(".")
+    return database, schema
+
+
+def object_key(namespace: str, name: str) -> str:
+    return f"{namespace}.{name}".upper()
+
+
+# --------------------------------------------------------------------------- #
+# S4: normalization + governance
+# --------------------------------------------------------------------------- #
+
+_BACKUP_RE = re.compile(r"(?i)(?:备份|_bak(?:up)?$|^bak_|_(?:19|20)\d{2}(?:[-_/][0-9]{1,2}){0,2}$)")
+_TEMP_RE = re.compile(r"(?i)(?:临时|^(?:tmp|temp)[_a-z0-9]*$|_(?:tmp|temp)$)")
+_TEST_RE = re.compile(r"(?i)(?:测试|^(?:test|api_test)[_a-z0-9]*$|_test$|_test\d*$)")
+_LOG_SEGMENTS = {"log", "logs", "journal"}
+_INTERFACE_SEGMENTS = {"esb", "interface", "interfaces"}
+
+
+def classify_table(
+    *,
+    schema: str,
+    table: str,
+    database: str,
+    estimated_rows: int | None,
+    comment: str | None,
+) -> tuple[str, str, str]:
+    """Return (recommendation, reason, name_status) per plan-139 S4 / doc-40."""
+    lower_schema = (schema or "").lower()
+    base = (table or "").split(".")[-1]
+    segments = [seg for seg in re.split(r"[^0-9a-z\u4e00-\u9fff]+", base.lower()) if seg]
+    if lower_schema in SQLSERVER_SYSTEM_SCHEMAS or SQLSERVER_SYSTEM_OBJECT_RE.match(base):
+        return "exclude", "system_schema_object", "physical_name"
+    if _BACKUP_RE.search(base):
+        return "exclude", "backup_or_snapshot_table", "physical_name"
+    if _TEST_RE.search(base):
+        return "exclude", "test_table", "physical_name"
+    if _TEMP_RE.search(base):
+        return "exclude", "temp_table", "physical_name"
+    if any(seg in _LOG_SEGMENTS for seg in segments):
+        return "exclude", "log_table", "physical_name"
+    if any(seg in _INTERFACE_SEGMENTS for seg in segments) or base.lower().startswith("api"):
+        return "pending", "interface_flow_uncertain", "pending_business_name"
+    if estimated_rows == 0:
+        return "pending", "stats_zero_rows_unconfirmed", "pending_business_name"
+    name_status = "from_db_comment" if (comment or "").strip() else "pending_business_name"
+    return "keep", "business_table_default", name_status
+
+
+def normalized_objects(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if source["db_type"] == "mysql":
+        for row in snapshot.get("tables", []):
+            database = str(row["database_name"])
+            rows.append({
+                "database": database, "schema": None, "name": str(row["table_name"]),
+                "object_type": "table", "estimated_rows": _int_or_none(row.get("estimated_rows")),
+                "comment": row.get("comment"),
+            })
+        for row in snapshot.get("views", []):
+            rows.append({
+                "database": str(row["database_name"]), "schema": None, "name": str(row["view_name"]),
+                "object_type": "view", "estimated_rows": None, "comment": None,
+            })
+    else:
+        for row in snapshot.get("tables", []):
+            rows.append({
+                "database": str(row["database_name"]), "schema": str(row["schema_name"]),
+                "name": str(row["table_name"]), "object_type": "table",
+                "estimated_rows": _int_or_none(row.get("estimated_rows")), "comment": row.get("comment"),
+            })
+        for row in snapshot.get("views", []):
+            rows.append({
+                "database": str(row["database_name"]), "schema": str(row["schema_name"]),
+                "name": str(row["view_name"]), "object_type": "view",
+                "estimated_rows": None, "comment": row.get("comment"),
+            })
+    return rows
+
+
+def _int_or_none(value: Any) -> int | None:
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def build_metadata_index(
+    source: Mapping[str, Any], snapshot: Mapping[str, Any]
+) -> tuple[dict[str, dict[str, Any]], dict[str, set[str]]]:
+    """Index objects and columns by ``NAMESPACE.NAME`` (upper)."""
+    tables: dict[str, dict[str, Any]] = {}
+    for row in normalized_objects(source, snapshot):
+        namespace = namespace_for(source, row["database"], row["schema"])
+        tables[object_key(namespace, row["name"])] = row | {"namespace": namespace}
+    columns: dict[str, set[str]] = defaultdict(set)
+    for row in snapshot.get("columns", []):
+        if source["db_type"] == "mysql":
+            namespace = str(row["database_name"])
+            table = str(row["table_name"])
+        else:
+            namespace = namespace_for(source, str(row["database_name"]), str(row["schema_name"]))
+            table = str(row["object_name"])
+        columns[object_key(namespace, table)].add(str(row.get("column_name") or "").upper())
+    return tables, columns
+
+
+def build_routines_index(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> set[str]:
+    """Index routine objects (procedures/functions/triggers) by object key."""
+    index: set[str] = set()
+    for row in snapshot.get("routines", []) + snapshot.get("triggers", []):
+        database = str(row.get("database_name") or "")
+        schema = row.get("schema_name")
+        name = row.get("routine_name") or row.get("trigger_name")
+        if not name:
+            continue
+        index.add(object_key(namespace_for(source, database, schema), str(name)))
+    return index
+
+
+# --------------------------------------------------------------------------- #
+# S5/S6: view analysis
+# --------------------------------------------------------------------------- #
+
+def resolve_reference(
+    ref: str,
+    *,
+    source: Mapping[str, Any],
+    view_database: str,
+    tables_index: Mapping[str, Any],
+    routines_index: Mapping[str, Any] | None = None,
+) -> tuple[str | None, str]:
+    """Resolve a parser table reference to a harvested object key.
+
+    Returns ``(object_key_or_None, resolution)`` where resolution is one of
+    ``same_database``, ``cross_database``, ``not_found``, ``ambiguous``,
+    ``cross_instance``, ``routine_reference``.  Namespace construction always
+    mirrors :func:`namespace_for` so single-database and multi-database
+    instances stay consistent with the harvested object keys.
+    """
+    parts = [part.strip().strip('"[]`').upper() for part in str(ref).split(".") if part.strip()]
+    if not parts:
+        return None, "not_found"
+    if source["db_type"] == "mysql":
+        if len(parts) >= 2:
+            candidate = object_key(parts[-2], parts[-1])
+        else:
+            candidate = object_key(view_database, parts[-1])
+        if candidate in tables_index:
+            return candidate, "same_database"
+        if routines_index and candidate in routines_index:
+            return candidate, "routine_reference"
+        return candidate, "not_found"
+
+    def _lookup(database: str, schema: str, name: str) -> tuple[str | None, str]:
+        candidate = object_key(namespace_for(source, database, schema), name)
+        if candidate in tables_index:
+            return candidate, "same_database"
+        if routines_index and candidate in routines_index:
+            return candidate, "routine_reference"
+        return candidate, "not_found"
+
+    if len(parts) >= 3:
+        database = parts[-3]
+        if database.lower() not in {d.lower() for d in source["databases"]}:
+            return object_key(namespace_for(source, database, parts[-2]), parts[-1]), "cross_instance"
+        return _lookup(database, parts[-2], parts[-1])
+    schema, name = (SYSTEM_SCHEMA_DBO, parts[-1]) if len(parts) == 1 else (parts[-2], parts[-1])
+    candidate, resolution = _lookup(view_database, schema, name)
+    if resolution != "not_found":
+        return candidate, resolution
+    if len(source["databases"]) > 1:
+        matches: set[tuple[str, str]] = set()
+        for database in source["databases"]:
+            key, found = _lookup(database, schema, name)
+            if found != "not_found":
+                matches.add((key, "cross_database" if database.upper() != view_database.upper() else "same_database"))
+        if len(matches) == 1:
+            return matches.pop()
+        if len(matches) > 1:
+            return candidate, "ambiguous"
+    return candidate, "not_found"
+
+
+def _view_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    for row in snapshot.get("views", []):
+        if source["db_type"] == "mysql":
+            database, schema, name = str(row["database_name"]), None, str(row["view_name"])
+        else:
+            database, schema, name = str(row["database_name"]), str(row["schema_name"]), str(row["view_name"])
+        rows.append({
+            "database": database,
+            "schema": schema,
+            "namespace": namespace_for(source, database, schema),
+            "name": name,
+            "definition": row.get("view_definition"),
+            "comment": row.get("comment"),
+        })
+    return rows
+
+
+def _catalog_dependencies(
+    source: Mapping[str, Any], snapshot: Mapping[str, Any]
+) -> dict[str, list[dict[str, str]]]:
+    """sys.sql_expression_dependencies rows keyed by referencing view name."""
+    by_view: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
+    view_keys = {
+        (str(row["database_name"]).upper(), str(row.get("schema_name") or "").upper(), str(row["view_name"]).upper())
+        for row in snapshot.get("views", [])
+    }
+    for row in snapshot.get("dependencies", []):
+        database = str(row.get("database_name") or "").upper()
+        referencing_schema = str(row.get("referencing_schema") or "").upper()
+        referencing = str(row.get("referencing_object") or "").upper()
+        if source["db_type"] == "mysql":
+            continue
+        if (database, referencing_schema, referencing) not in view_keys:
+            continue
+        referenced_schema = str(row.get("referenced_schema_name") or "").upper() or SYSTEM_SCHEMA_DBO.upper()
+        referenced = str(row.get("referenced_entity_name") or "").upper()
+        if referenced_schema.lower() in SQLSERVER_SYSTEM_SCHEMAS or SQLSERVER_SYSTEM_OBJECT_RE.match(referenced):
+            continue
+        ref_database = str(row.get("referenced_database_name") or "").upper() or database
+        by_view[(database, referencing_schema, referencing)].append({
+            "database": ref_database,
+            "schema": referenced_schema,
+            "name": referenced,
+        })
+    return by_view
+
+
+def analyze_views(
+    source: Mapping[str, Any],
+    snapshot: Mapping[str, Any],
+    tables_index: Mapping[str, Any],
+    columns_index: Mapping[str, set[str]],
+    routines_index: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run S5/S6 view analysis for one source; returns package-ready rows."""
+    view_rows = _view_rows(source, snapshot)
+    catalog_deps = _catalog_dependencies(source, snapshot)
+    view_payload = [
+        {
+            "owner": row["namespace"],
+            "view_name": row["name"],
+            "definition": row["definition"] or "",
+            "status": "VALID",
+            "dialect": source["db_type"],
+            "runtime_status": "runtime_skipped",
+        }
+        for row in view_rows
+    ]
+    intake = ingest_views(view_payload)
+    inventory: list[dict[str, Any]] = []
+    dependencies: list[dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
+    resolutions: dict[str, dict[str, Any]] = {}
+    view_by_key = {
+        (str(row["namespace"]).upper(), str(row["name"]).upper()): row for row in view_rows
+    }
+    dep_records: dict[tuple[str, str], list[dict[str, Any]]] = {
+        (str(d.get("owner", "")).upper(), str(d.get("view", "")).upper()): []
+        for d in intake["dependencies"]
+    }
+    for dep in intake["dependencies"]:
+        dep_records[(str(dep.get("owner", "")).upper(), str(dep.get("view", "")).upper())].append(dep)
+    parsed_tables: dict[tuple[str, str], list[str]] = {}
+    for (owner, view), deps in dep_records.items():
+        parsed_tables[(owner, view)] = [str(d.get("table") or "") for d in deps]
+    # Per-view inventory + dependencies with resolution.
+    for row in view_rows:
+        view_upper = str(row["name"]).upper()
+        catalog_key = (row["database"].upper(), str(row["schema"] or "").upper(), view_upper)
+        definition = row["definition"] or ""
+        sha = source_sql_sha256(definition)
+        parse_warnings: list[str] = []
+        relation_records = [c for c in intake["candidates"] if str(c.get("view", "")).upper() == view_upper]
+        unresolved = [
+            u for u in intake["unresolved"] if str(u.get("view", "")).upper() == view_upper
+        ]
+        if unresolved:
+            parse_warnings = sorted({w for u in unresolved for w in (u.get("warnings") or [])})
+        dep_sources: dict[str, str] = {}
+        resolved_keys: dict[str, str] = {}
+        cross_database = False
+        view_dep_rows: list[dict[str, Any]] = []
+        for ref in parsed_tables.get((str(row["namespace"]).upper(), view_upper), []):
+            key, resolution = resolve_reference(
+                ref, source=source, view_database=row["database"], tables_index=tables_index,
+                routines_index=routines_index,
+            )
+            dep_sources[ref] = resolution
+            resolved_keys[ref] = key or ref
+            if resolution == "cross_database":
+                cross_database = True
+            view_dep_rows.append({
+                "system_code": source["system_code"],
+                "database": row["database"],
+                "namespace": row["namespace"],
+                "view_name": row["name"],
+                "view_object_key": object_key(row["namespace"], row["name"]),
+                "referenced_reference": ref,
+                "referenced_object_key": key,
+                "resolution": resolution,
+                "evidence_source": "definition_parse",
+                "source_sql_sha256": sha,
+            })
+        for dep in catalog_deps.get(catalog_key, []):
+            namespace = namespace_for(source, dep["database"], dep["schema"])
+            key = object_key(namespace, dep["name"])
+            if key in tables_index:
+                resolution = "same_database"
+            elif routines_index and key in routines_index:
+                resolution = "routine_reference"
+            else:
+                resolution = "not_found"
+            view_dep_rows.append({
+                "system_code": source["system_code"],
+                "database": row["database"],
+                "namespace": row["namespace"],
+                "view_name": row["name"],
+                "view_object_key": object_key(row["namespace"], row["name"]),
+                "referenced_reference": f"{dep['database']}.{dep['schema']}.{dep['name']}",
+                "referenced_object_key": key,
+                "resolution": resolution,
+                "evidence_source": "catalog_sql_expression_dependencies",
+                "source_sql_sha256": None,
+            })
+        # Merge evidence when both layers agree on the same endpoint.
+        endpoints: dict[str, set[str]] = defaultdict(set)
+        for dep in view_dep_rows:
+            endpoints[str(dep["referenced_object_key"])].add(dep["evidence_source"])
+        for dep in view_dep_rows:
+            if len(endpoints[str(dep["referenced_object_key"])]) > 1:
+                dep["evidence_source"] = "both"
+        dependencies.extend(view_dep_rows)
+        inventory.append({
+            "system_code": source["system_code"],
+            "db_type": source["db_type"],
+            "database": row["database"],
+            "schema": row["schema"] or "",
+            "view_name": row["name"],
+            "object_key": object_key(row["namespace"], row["name"]),
+            "definition_visible": bool(definition.strip()),
+            "definition_sha256": sha,
+            "definition_length": len(definition),
+            "is_union": "union_branch_semantics" in parse_warnings or _union_branches(definition),
+            "aggregation_or_grain_change": "aggregation_or_grain_change" in parse_warnings,
+            "parse_warnings": ";".join(parse_warnings),
+            "parse_status": "parsed" if definition.strip() else "definition_missing",
+            "dependency_count": len(endpoints),
+            "cross_database": cross_database,
+            "candidate_count": len(relation_records),
+            "parser_version": PARSER_VERSION,
+            "runtime_status": "runtime_skipped",
+        })
+        resolutions[row["name"].upper()] = {"cross_database": cross_database}
+    # Candidates: qualify endpoints and run metadata checks (S6).
+    seen_keys: dict[tuple[Any, ...], int] = {}
+    for raw in intake["candidates"]:
+        view_upper = str(raw.get("view", "")).upper()
+        owner_upper = str(raw.get("owner") or "").upper()
+        view_row = view_by_key.get((owner_upper, view_upper))
+        owner = str(raw.get("owner") or (view_row["namespace"] if view_row else ""))
+        from_key, from_res = resolve_reference(
+            raw.get("from_table"), source=source,
+            view_database=view_row["database"] if view_row else "", tables_index=tables_index,
+            routines_index=routines_index,
+        )
+        to_key, to_res = resolve_reference(
+            raw.get("to_table"), source=source,
+            view_database=view_row["database"] if view_row else "", tables_index=tables_index,
+            routines_index=routines_index,
+        )
+        metadata_status = "ok"
+        metadata_errors: list[str] = []
+        for side, key, columns in (
+            ("from", from_key, raw.get("from_columns") or []),
+            ("to", to_key, raw.get("to_columns") or []),
+        ):
+            if not key or key not in tables_index:
+                metadata_status = "rejected"
+                metadata_errors.append(f"missing_table:{side}:{key or raw.get(f'{side}_table')}")
+                continue
+            missing = sorted({str(c).upper() for c in columns} - columns_index.get(key, set()))
+            if missing:
+                metadata_status = "rejected"
+                metadata_errors.append(f"missing_columns:{side}:{key}:{','.join(missing)}")
+        status = raw.get("intake_status")
+        if metadata_status == "rejected":
+            status = "rejected"
+        cross_database = from_res == "cross_database" or to_res == "cross_database"
+        cross_instance = from_res == "cross_instance" or to_res == "cross_instance"
+        record = {
+            "system_code": source["system_code"],
+            "dialect": source["db_type"],
+            "database": view_row["database"] if view_row else "",
+            "namespace": owner,
+            "source_view": raw.get("view"),
+            "source_view_key": object_key(owner, str(raw.get("view") or "")),
+            "branch": raw.get("branch"),
+            "from_table": from_key or str(raw.get("from_table") or ""),
+            "from_columns": ",".join(str(c).upper() for c in (raw.get("from_columns") or [])),
+            "to_table": to_key or str(raw.get("to_table") or ""),
+            "to_columns": ",".join(str(c).upper() for c in (raw.get("to_columns") or [])),
+            "join_condition": raw.get("join_condition") or "",
+            "qualifiers": "|".join(raw.get("qualifiers") or []),
+            "outer_join": raw.get("outer_join") or "",
+            "function_wrapped": bool(raw.get("function_wrapped")),
+            "intake_status": status,
+            "confidence": "C",
+            "metadata_status": ";".join(metadata_errors) if metadata_errors else "ok",
+            "cross_database": cross_database,
+            "cross_instance": cross_instance,
+            "warnings": ";".join(raw.get("warnings") or []),
+            "source_sql_sha256": raw.get("source_sql_sha256"),
+            "existing_relation_id": raw.get("existing_relation_id"),
+            "runtime_status": "runtime_skipped",
+            "parser_version": PARSER_VERSION,
+        }
+        key = (
+            record["from_table"], record["from_columns"], record["to_table"], record["to_columns"],
+            record["qualifiers"], record["intake_status"],
+        )
+        seen_keys[key] = seen_keys.get(key, 0) + 1
+        record["duplicate_in_batch"] = seen_keys[key] - 1
+        candidates.append(record)
+    # Batch-level dedup keeps the first occurrence; duplicates stay flagged.
+    deduped: list[dict[str, Any]] = []
+    emitted: set[tuple[Any, ...]] = set()
+    for record in candidates:
+        key = (
+            record["from_table"], record["from_columns"], record["to_table"], record["to_columns"],
+            record["qualifiers"], record["intake_status"],
+        )
+        if key in emitted:
+            continue
+        emitted.add(key)
+        deduped.append(record)
+    return {
+        "inventory": inventory,
+        "dependencies": dependencies,
+        "candidates": deduped,
+        "batch_duplicates_removed": len(candidates) - len(deduped),
+        "intake_summary": intake["summary"],
+        "unresolved": intake["unresolved"],
+    }
+
+
+def _union_branches(definition: str) -> bool:
+    return bool(re.search(r"(?i)\bUNION\b", definition or ""))
+
+
+# --------------------------------------------------------------------------- #
+# Package writers
+# --------------------------------------------------------------------------- #
+
+def _write_csv(path: Path, fieldnames: Sequence[str], rows: Iterable[Mapping[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(fieldnames), extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({name: row.get(name, "") for name in fieldnames})
+
+
+def _write_json(path: Path, payload: Any) -> None:
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=False, default=str) + "\n",
+        encoding="utf-8",
+    )
+
+
+def constraint_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in snapshot.get("keys", []):
+        if source["db_type"] == "mysql":
+            database, schema = str(row["database_name"]), None
+            table = str(row["table_name"])
+            constraint_type = str(row.get("constraint_type") or "").upper()
+        else:
+            database, schema = str(row["database_name"]), str(row["schema_name"])
+            table = str(row["table_name"])
+            constraint_type = "PRIMARY KEY" if "PRIMARY" in str(row.get("type_desc") or "").upper() else "UNIQUE"
+        name = str(row.get("constraint_name") or "")
+        ordinal = _int_or_none(row.get("ordinal_position") or row.get("key_ordinal")) or 1
+        key = (database, table, name)
+        entry = grouped.setdefault(key, {
+            "database": database, "schema": schema, "table": table, "constraint_name": name,
+            "constraint_type": constraint_type, "columns": {},
+        })
+        entry["columns"][ordinal] = str(row.get("column_name") or "").upper()
+    for entry in grouped.values():
+        rows.append({
+            "system_code": source["system_code"],
+            "database": entry["database"],
+            "namespace": namespace_for(source, entry["database"], entry["schema"]),
+            "table": entry["table"],
+            "constraint_name": entry["constraint_name"],
+            "constraint_type": entry["constraint_type"],
+            "columns": ",".join(entry["columns"][o] for o in sorted(entry["columns"])),
+        })
+    return rows
+
+
+def foreign_key_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in snapshot.get("foreign_keys", []):
+        if source["db_type"] == "mysql":
+            database, schema = str(row["database_name"]), None
+            table = str(row["table_name"])
+            ref_namespace = str(row.get("referenced_database") or database)
+            ref_table = str(row["referenced_table"])
+        else:
+            database, schema = str(row["database_name"]), str(row["schema_name"])
+            table = str(row["table_name"])
+            ref_namespace = namespace_for(
+                source, database, str(row.get("parent_schema") or schema)
+            )
+            ref_table = str(row["parent_table"])
+        name = str(row.get("constraint_name") or "")
+        ordinal = _int_or_none(row.get("ordinal_position") or row.get("constraint_column_id")) or 1
+        key = (database, table, name)
+        entry = grouped.setdefault(key, {
+            "database": database, "schema": schema, "table": table, "constraint_name": name,
+            "ref_namespace": ref_namespace, "ref_table": ref_table,
+            "columns": {}, "ref_columns": {},
+        })
+        if source["db_type"] == "mysql":
+            entry["columns"][ordinal] = str(row.get("column_name") or "").upper()
+            entry["ref_columns"][ordinal] = str(row.get("referenced_column") or "").upper()
+        else:
+            entry["columns"][ordinal] = str(row.get("child_column") or "").upper()
+            entry["ref_columns"][ordinal] = str(row.get("parent_column") or "").upper()
+    rows: list[dict[str, Any]] = []
+    for entry in grouped.values():
+        rows.append({
+            "system_code": source["system_code"],
+            "database": entry["database"],
+            "namespace": namespace_for(source, entry["database"], entry["schema"]),
+            "table": entry["table"],
+            "constraint_name": entry["constraint_name"],
+            "from_columns": ",".join(entry["columns"][o] for o in sorted(entry["columns"])),
+            "to_namespace": entry["ref_namespace"],
+            "to_table": entry["ref_table"],
+            "to_columns": ",".join(entry["ref_columns"][o] for o in sorted(entry["ref_columns"])),
+            "evidence_level": "db_constraint",
+        })
+    return rows
+
+
+def index_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in snapshot.get("indexes", []):
+        if source["db_type"] == "mysql":
+            database, schema = str(row["database_name"]), None
+            table = str(row["table_name"])
+            index_name = str(row.get("index_name") or "")
+            unique = str(row.get("non_unique")) not in ("1", "True", "true")
+            index_type = str(row.get("index_type") or "")
+        else:
+            database, schema = str(row["database_name"]), str(row["schema_name"])
+            table = str(row["table_name"])
+            index_name = str(row.get("index_name") or "")
+            unique = bool(row.get("is_unique"))
+            index_type = str(row.get("type_desc") or "")
+        ordinal = _int_or_none(row.get("ordinal_position") or row.get("key_ordinal")) or 1
+        key = (database, table, index_name)
+        entry = grouped.setdefault(key, {
+            "database": database, "schema": schema, "table": table, "index_name": index_name,
+            "is_unique": unique, "index_type": index_type, "columns": {},
+        })
+        entry["columns"][ordinal] = str(row.get("column_name") or "").upper()
+    return [
+        {
+            "system_code": source["system_code"],
+            "database": entry["database"],
+            "namespace": namespace_for(source, entry["database"], entry["schema"]),
+            "table": entry["table"],
+            "index_name": entry["index_name"],
+            "is_unique": entry["is_unique"],
+            "index_type": entry["index_type"],
+            "columns": ",".join(entry["columns"][o] for o in sorted(entry["columns"])),
+        }
+        for entry in grouped.values()
+    ]
+
+
+def routine_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in snapshot.get("routines", []):
+        definition = row.get("routine_definition")
+        rows.append({
+            "system_code": source["system_code"],
+            "database": str(row.get("database_name") or ""),
+            "namespace": namespace_for(
+                source, str(row.get("database_name") or ""), str(row.get("schema_name") or None)
+            ),
+            "routine_name": str(row.get("routine_name") or ""),
+            "routine_type": str(row.get("routine_type") or ""),
+            "definition_status": row.get("definition_status") or "metadata_only",
+            "definition_sha256_stored": (
+                source_sql_sha256(definition) if definition not in (None, "") else None
+            ),
+        })
+    for row in snapshot.get("triggers", []):
+        definition = row.get("trigger_definition")
+        rows.append({
+            "system_code": source["system_code"],
+            "database": str(row.get("database_name") or ""),
+            "namespace": namespace_for(
+                source, str(row.get("database_name") or ""), str(row.get("schema_name") or None)
+            ),
+            "routine_name": str(row.get("trigger_name") or ""),
+            "routine_type": "TRIGGER",
+            "definition_status": "ok" if definition not in (None, "") else "BLOCKED_ROUTINE_METADATA",
+            "definition_sha256_stored": (
+                source_sql_sha256(definition) if definition not in (None, "") else None
+            ),
+        })
+    return rows
+
+
+def column_rows(source: Mapping[str, Any], snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in snapshot.get("columns", []):
+        if source["db_type"] == "mysql":
+            namespace = str(row["database_name"])
+            table = str(row["table_name"])
+            data_type = str(row.get("data_type") or "")
+            length = None
+            key_info = str(row.get("column_key") or "")
+            default_value = row.get("column_default")
+            extra = str(row.get("extra") or "")
+        else:
+            namespace = namespace_for(source, str(row["database_name"]), str(row["schema_name"]))
+            table = str(row["object_name"])
+            data_type = str(row.get("data_type") or "")
+            length = row.get("max_length")
+            key_info = "PK" if row.get("is_identity") else ""
+            default_value = row.get("default_definition")
+            extra = "computed" if row.get("is_computed") else ""
+        rows.append({
+            "system_code": source["system_code"],
+            "database": str(row.get("database_name") or ""),
+            "namespace": namespace,
+            "table": table,
+            "ordinal": row.get("ordinal_position") or row.get("column_id"),
+            "column": str(row.get("column_name") or ""),
+            "data_type": data_type,
+            "length": length,
+            "nullable": row.get("is_nullable"),
+            "key_info": key_info,
+            "default_value": default_value,
+            "extra": extra,
+            "comment": row.get("comment"),
+        })
+    return rows
+
+
+def build_package(snapshots_dir: Path, output_dir: Path, run_id: str) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    sources_dir = output_dir / "sources"
+    systems: list[dict[str, Any]] = []
+    all_objects: list[dict[str, Any]] = []
+    all_columns: list[dict[str, Any]] = []
+    all_constraints: list[dict[str, Any]] = []
+    all_indexes: list[dict[str, Any]] = []
+    all_routines: list[dict[str, Any]] = []
+    all_inventory: list[dict[str, Any]] = []
+    all_dependencies: list[dict[str, Any]] = []
+    all_candidates: list[dict[str, Any]] = []
+    all_governance: list[dict[str, Any]] = []
+    all_fk_relations: list[dict[str, Any]] = []
+    per_source: dict[str, dict[str, Any]] = {}
+    for source in SOURCES:
+        snapshot_path = snapshots_dir / source["snapshot"]
+        snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+        snapshot_sha = _sha256_file(snapshot_path)
+        tables_index, columns_index = build_metadata_index(source, snapshot)
+        routines_index = build_routines_index(source, snapshot)
+        objects = normalized_objects(source, snapshot)
+        analysis = analyze_views(source, snapshot, tables_index, columns_index, routines_index)
+        governance: list[dict[str, Any]] = []
+        for row in objects:
+            namespace = namespace_for(source, row["database"], row["schema"])
+            database, schema = split_namespace(source, namespace)
+            recommendation, reason, name_status = classify_table(
+                schema=schema if source["db_type"] != "mysql" else namespace,
+                table=row["name"], database=database,
+                estimated_rows=row["estimated_rows"], comment=row["comment"],
+            )
+            all_objects.append({
+                "system_code": source["system_code"],
+                "db_type": source["db_type"],
+                "endpoint": f"{source['host']}:{source['port']}",
+                "database": row["database"],
+                "namespace": namespace,
+                "object_name": row["name"],
+                "object_type": row["object_type"],
+                "object_key": object_key(namespace, row["name"]),
+                "estimated_rows": row["estimated_rows"],
+                "comment": row["comment"],
+            })
+            governance.append({
+                "system_code": source["system_code"],
+                "object_key": object_key(namespace, row["name"]),
+                "recommendation": recommendation,
+                "reason": reason,
+                "name_status": name_status,
+                "estimated_rows": row["estimated_rows"],
+            })
+        all_governance.extend(governance)
+        src_columns = column_rows(source, snapshot)
+        src_constraints = constraint_rows(source, snapshot)
+        src_indexes = index_rows(source, snapshot)
+        src_routines = routine_rows(source, snapshot)
+        src_fks = foreign_key_rows(source, snapshot)
+        all_columns.extend(src_columns)
+        all_constraints.extend(src_constraints)
+        all_indexes.extend(src_indexes)
+        all_routines.extend(src_routines)
+        all_inventory.extend(analysis["inventory"])
+        all_dependencies.extend(analysis["dependencies"])
+        all_candidates.extend(analysis["candidates"])
+        for fk in src_fks:
+            all_fk_relations.append({
+                "system_code": source["system_code"],
+                "from_table": f"{fk['namespace']}.{fk['table']}".upper(),
+                "from_columns": fk["from_columns"],
+                "to_table": f"{fk['to_namespace']}.{fk['to_table']}".upper(),
+                "to_columns": fk["to_columns"],
+                "level": "declared_foreign_key",
+                "status": "verified",
+                "confidence": "A",
+                "note": f"db_constraint:{fk['constraint_name']}",
+            })
+        systems.append({
+            "system_code": source["system_code"],
+            "system_name_cn": source["system_name_cn"],
+            "source_code": source["source_code"],
+            "source_name_cn": source["source_name_cn"],
+            "db_type": source["db_type"],
+            "endpoint": f"{source['host']}:{source['port']}",
+            "databases": ",".join(source["databases"]),
+            "credential_ref": source["credential_ref"],
+            "snapshot_file": source["snapshot"],
+            "snapshot_sha256": snapshot_sha,
+            "collected_at": snapshot.get("collected_at"),
+            "database_version": snapshot.get("database_version"),
+        })
+        source_dir = sources_dir / source["system_code"]
+        source_dir.mkdir(parents=True, exist_ok=True)
+        _write_json(source_dir / "view_analysis.json", {
+            "system_code": source["system_code"],
+            "parser_version": PARSER_VERSION,
+            "summary": analysis["intake_summary"],
+            "batch_duplicates_removed": analysis["batch_duplicates_removed"],
+            "inventory": analysis["inventory"],
+            "dependencies": analysis["dependencies"],
+            "candidates": analysis["candidates"],
+            "unresolved": analysis["unresolved"],
+        })
+        counts = {
+            "objects": len(objects),
+            "tables": sum(1 for row in objects if row["object_type"] == "table"),
+            "views": sum(1 for row in objects if row["object_type"] == "view"),
+            "columns": len(src_columns),
+            "constraints": len(src_constraints),
+            "foreign_keys": len(src_fks),
+            "indexes": len(src_indexes),
+            "routines": len(src_routines),
+            "view_dependencies": len(analysis["dependencies"]),
+            "relation_candidates": len(analysis["candidates"]),
+            "intake_summary": analysis["intake_summary"],
+            "harvest_errors": snapshot.get("errors", []),
+            "harvest_summary": snapshot.get("summary", {}),
+        }
+        per_source[source["system_code"]] = counts
+        _write_json(source_dir / "source_summary.json", {
+            **counts, "snapshot_sha256": snapshot_sha, "collected_at": snapshot.get("collected_at"),
+            "database_version": snapshot.get("database_version"),
+            "transport": snapshot.get("transport"), "tds_version": snapshot.get("tds_version"),
+        })
+    _write_csv(output_dir / "systems.csv", list(systems[0].keys()), systems)
+    _write_csv(
+        output_dir / "objects.csv",
+        ["system_code", "db_type", "endpoint", "database", "namespace", "object_name", "object_type",
+         "object_key", "estimated_rows", "comment"],
+        all_objects,
+    )
+    _write_csv(
+        output_dir / "columns.csv",
+        ["system_code", "database", "namespace", "table", "ordinal", "column", "data_type", "length",
+         "nullable", "key_info", "default_value", "extra", "comment"],
+        all_columns,
+    )
+    _write_csv(
+        output_dir / "constraints.csv",
+        ["system_code", "database", "namespace", "table", "constraint_name", "constraint_type", "columns"],
+        all_constraints,
+    )
+    _write_csv(
+        output_dir / "indexes.csv",
+        ["system_code", "database", "namespace", "table", "index_name", "is_unique", "index_type", "columns"],
+        all_indexes,
+    )
+    _write_csv(
+        output_dir / "routines.csv",
+        ["system_code", "database", "namespace", "routine_name", "routine_type", "definition_status",
+         "definition_sha256_stored"],
+        all_routines,
+    )
+    _write_csv(
+        output_dir / "view_inventory.csv",
+        ["system_code", "db_type", "database", "schema", "view_name", "object_key", "definition_visible",
+         "definition_sha256", "definition_length", "is_union", "aggregation_or_grain_change",
+         "parse_warnings", "parse_status", "dependency_count", "cross_database", "candidate_count",
+         "parser_version", "runtime_status"],
+        all_inventory,
+    )
+    _write_csv(
+        output_dir / "view_dependencies.csv",
+        ["system_code", "database", "namespace", "view_name", "view_object_key", "referenced_reference",
+         "referenced_object_key", "resolution", "evidence_source", "source_sql_sha256"],
+        all_dependencies,
+    )
+    _write_csv(
+        output_dir / "relation_candidates.csv",
+        ["system_code", "dialect", "database", "namespace", "source_view", "source_view_key", "branch",
+         "from_table", "from_columns", "to_table", "to_columns", "join_condition", "qualifiers",
+         "outer_join", "function_wrapped", "intake_status", "confidence", "metadata_status",
+         "cross_database", "cross_instance", "warnings", "source_sql_sha256", "existing_relation_id",
+         "runtime_status", "parser_version", "duplicate_in_batch"],
+        all_candidates,
+    )
+    _write_csv(
+        output_dir / "table_governance.csv",
+        ["system_code", "object_key", "recommendation", "reason", "name_status", "estimated_rows"],
+        all_governance,
+    )
+    relation_validations = {
+        "schema_version": "plan139.relation_validations.v1",
+        "run_id": run_id,
+        "policy": "metadata-only by default (plan 139 §4.4); declared FKs carry db_constraint evidence; view JOINs stay runtime_skipped",
+        "live_validations": [],
+        "skipped": [
+            {
+                "system_code": source["system_code"],
+                "status": "VALIDATION_SKIPPED_RISK",
+                "reason": "runtime_skipped; view JOIN candidates are review drafts only and bounded aggregates were not required for import",
+            }
+            for source in SOURCES
+        ],
+    }
+    _write_json(output_dir / "relation_validations.json", relation_validations)
+    _write_json(output_dir / "import_plan.json", {
+        "run_id": run_id,
+        "generator": GENERATOR,
+        "targets": [
+            "asset.asset_systems", "asset.asset_data_sources", "asset.asset_tables", "asset.asset_columns",
+            "asset.asset_relations(declared_fk_only)", "asset.asset_view_dependencies",
+            "asset.asset_relation_reviews(draft_only)", "asset.asset_relation_recipes(inactive_draft_only)",
+        ],
+        "per_source": per_source,
+        "candidate_status_counts": dict(sorted(
+            (status, sum(1 for c in all_candidates if c["intake_status"] == status))
+            for status in {c["intake_status"] for c in all_candidates}
+        )),
+    })
+    catalog = {
+        "schema_version": "plan139.catalog.v1",
+        "run_id": run_id,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "systems": [
+            {
+                "system_code": row["system_code"], "system_name_cn": row["system_name_cn"],
+                "db_type": row["db_type"], "endpoint": row["endpoint"],
+                "databases": source["databases"], "source_code": row["source_code"],
+            }
+            for row, source in zip(systems, SOURCES)
+        ],
+        "totals": {
+            "systems": len(systems),
+            "objects": len(all_objects),
+            "tables": sum(1 for o in all_objects if o["object_type"] == "table"),
+            "views": sum(1 for o in all_objects if o["object_type"] == "view"),
+            "columns": len(all_columns),
+            "constraints": len(all_constraints),
+            "foreign_keys": len(all_fk_relations),
+            "indexes": len(all_indexes),
+            "routines": len(all_routines),
+            "view_dependencies": len(all_dependencies),
+            "relation_candidates": len(all_candidates),
+        },
+        "per_system": per_source,
+    }
+    _write_json(output_dir / "catalog.json", catalog)
+    manifest = {
+        "schema_version": "plan139.manifest.v1",
+        "run_id": run_id,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generator": GENERATOR,
+        "parser_version": PARSER_VERSION,
+        "snapshots": [
+            {"file": source["snapshot"], "sha256": row["snapshot_sha256"],
+             "collected_at": row["collected_at"], "database_version": row["database_version"]}
+            for source, row in zip(SOURCES, systems)
+        ],
+        "layering": {
+            "declared_fk": "asset_relations(db_constraint, confidence A)",
+            "view_dependency": "asset_view_dependencies only",
+            "view_join": "asset_relation_reviews draft only; never formal in this run",
+            "complex_logic": "asset_relation_recipes inactive draft only",
+            "cross_instance": "flagged cross_instance; never imported as relation",
+        },
+        "totals": catalog["totals"],
+        "files": {},
+    }
+    for path in sorted(output_dir.rglob("*")):
+        if path.is_file() and path.name != "manifest.json":
+            manifest["files"][str(path.relative_to(output_dir)).replace("\\", "/")] = {
+                "sha256": _sha256_file(path), "bytes": path.stat().st_size,
+            }
+    _write_json(output_dir / "manifest.json", manifest)
+    return manifest
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--snapshots-dir", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--run-id", default="plan139-local")
+    args = parser.parse_args(argv)
+    manifest = build_package(args.snapshots_dir, args.output, args.run_id)
+    print(json.dumps({"status": "ok", "output": str(args.output), "totals": manifest["totals"]},
+                     ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
