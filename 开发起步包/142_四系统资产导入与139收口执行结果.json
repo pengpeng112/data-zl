@@ -1,0 +1,116 @@
+{
+  "run_id": "plan139-20260822T000829Z",
+  "resumed_at": "2026-08-22T01:05Z (user re-authorization; single executor)",
+  "final_status": "COMPLETED",
+  "sources": {
+    "CORE2DB": {
+      "status": "COMPLETED",
+      "blocked": [
+        "BLOCKED_ROUTINE_METADATA (MySQL 5.7 no SHOW_ROUTINE; privileges not extended)",
+        "view_dependencies engine layer unavailable: information_schema.VIEW_TABLE_USAGE not visible -> skipped_optional"
+      ],
+      "imported": true
+    },
+    "PHYSICAL_EXAM": {
+      "status": "COMPLETED",
+      "blocked": [
+        "BLOCKED_ROUTINE_METADATA: 277 JZCIS routine definitions not visible; privileges not extended"
+      ],
+      "imported": true
+    },
+    "PATHOLOGY": {
+      "status": "COMPLETED",
+      "blocked": [
+        "BLOCKED_ROUTINE_METADATA: 13 pitaya routine definitions not visible; privileges not extended"
+      ],
+      "imported": true,
+      "v_blzlst_registered": true
+    },
+    "OCCUPATIONAL_DISEASE": {
+      "status": "COMPLETED",
+      "blocked": [],
+      "imported": true
+    }
+  },
+  "gates": {
+    "plan139_unit_tests": "54/54 passed",
+    "full_pytest_v2": "914 passed / 7 failed (all 7 pre-existing on HEAD c3a5d18: plan127 x2, security_audit x2, core_import x3) / 3 skipped",
+    "alembic_roundtrip": "PASS aa11bb22cc33 -> h5c6d7e8f9a0 -> aa11bb22cc33 (isolated data_asset_test_139)",
+    "backup": "/opt/data-asset/backups/data_asset_pre_plan139_apply_20260822013602.dump (8607947 bytes, sha256=64f3e14eab584a5a588fc39f76fac9e6e58063002c402336f7bf250cd009328c)",
+    "dry_run_review": "deletes=0; formal view-JOIN adds=0 (592 additions are database-declared FK structural relations, allowed layer); active recipe=0; source identity conflicts=0",
+    "apply": "committed",
+    "second_dry_run": "all zeros (tables 0/0, fk 0/0, eligible_reviews 0, eligible_recipes 0, relations_delta 0)",
+    "sampling": "4 sources x (3 tables + 3 views + 3 deps) all present; PATHOLOGY V_BLZLST confirmed (view role, 11 columns, dependency edges)",
+    "health": "GET /health -> 200; data-asset-api Up (healthy), no restart (asset-only import)",
+    "source_db_writes": 0,
+    "credential_leaks": 0,
+    "patient_values_returned": 0
+  },
+  "platform_counts": {
+    "before": {
+      "systems": 15,
+      "sources": 15,
+      "tables": 7766,
+      "columns": 89730,
+      "relations": 568,
+      "reviews": 30,
+      "recipes": 24
+    },
+    "after": {
+      "systems": 19,
+      "sources": 19,
+      "tables": 9497,
+      "columns": 113751,
+      "relations": 1160,
+      "reviews": 86,
+      "recipes": 64
+    },
+    "delta": {
+      "systems": 4,
+      "sources": 4,
+      "tables": 1731,
+      "columns": 24021,
+      "relations": 592,
+      "reviews": 56,
+      "recipes": 40,
+      "view_dependencies": 729
+    }
+  },
+  "layering": {
+    "fk_structural_formal": 592,
+    "view_join_review_drafts": 56,
+    "complex_recipe_drafts_inactive": 40,
+    "batch_active_recipes": 0,
+    "formal_view_join_promotions": 0,
+    "cross_system_pending": "no cross-system candidates drawn as formal edges"
+  },
+  "validations": {
+    "validated": 15,
+    "failed": 0,
+    "skipped_risk": 27,
+    "eligible_not_selected_capped": 54,
+    "match_rates": "0.61-1.0"
+  },
+  "fixes_completed": [
+    "builder fork merged: plan139_build_package.py superseded (kept in backend/_plan139_work/ for audit)",
+    "140 report erratum appended (4 factual corrections)",
+    "test_sqlserver_tds_fallback monkeypatch fix",
+    "importer db.flush() before schema inventory rebuild",
+    "COORDINATION.md re-authorization record"
+  ],
+  "git": {
+    "commit": null,
+    "push": false,
+    "note": "working tree intentionally left uncommitted pending user decision (141 §3)"
+  },
+  "artifacts_local": {
+    "package": "开发起步包/数据资产_四系统源端资产包/ (now incl. import_result.json)",
+    "report": "开发起步包/142_四系统资产导入与139收口执行报告.md",
+    "result_json": "开发起步包/142_四系统资产导入与139收口执行结果.json"
+  },
+  "artifacts_server": {
+    "evidence": "/opt/data-asset/evidence/plan139-20260822T000829Z/ (750/640 + SHA256SUMS, refreshed)",
+    "backup_early": "/opt/data-asset/backups/data_asset_pre_plan139_20260822001107.dump",
+    "backup_apply": "/opt/data-asset/backups/data_asset_pre_plan139_apply_20260822013602.dump"
+  }
+}
