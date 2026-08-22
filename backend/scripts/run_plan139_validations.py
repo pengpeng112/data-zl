@@ -192,9 +192,11 @@ def _meta(item: Mapping[str, Any]) -> dict[str, Any]:
         "system_code": item.get("system_code"),
         "source_code": item.get("source_code"),
         "view_name": item.get("view_name"),
-        "from_table": item.get("from_table"),
+        # Batch rows may carry only fully-qualified ``_from``/``_to`` names;
+        # fall back to them so evidence records stay self-describing.
+        "from_table": item.get("from_table") or item.get("_from"),
         "from_columns": item.get("from_columns"),
-        "to_table": item.get("to_table"),
+        "to_table": item.get("to_table") or item.get("_to"),
         "to_columns": item.get("to_columns"),
         "intake_status": item.get("intake_status"),
         "source_sql_sha256": item.get("source_sql_sha256"),

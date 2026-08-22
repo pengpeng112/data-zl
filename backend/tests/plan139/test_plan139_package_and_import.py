@@ -201,3 +201,35 @@ def test_validator_columns_parser(validator):
     assert validator._columns("['A']") == ["A"]
     assert validator._columns("A,B") == ["A", "B"]
     assert validator._columns("['A', 'B']") == ["A", "B"]
+
+
+# ---------------- 143: OA source extension ----------------
+
+def test_oa_system_registered_with_db_schema_namespace(builder):
+    assert "OA" in builder.SYSTEMS
+    oa = builder.SYSTEMS["OA"]
+    assert oa["db_type"] == "sqlserver" and oa["databases"] == ["oa"]
+    assert oa["source_code"] == "oa_sqlserver_10_10_10_69"
+    # multi-schema source: namespace keeps db.schema (ezoffice/dbo), not bare db
+    assert "OA" not in builder.SINGLE_DB_SYSTEMS
+    assert builder.namespace_for(oa, "oa", "ezoffice") == "OA.EZOFFICE"
+    assert builder.namespace_for(oa, "oa", None) == "OA.DBO"
+
+
+def test_oa_import_profile_and_confirmation(importer):
+    assert "OA" in importer.SOURCE_REGISTRY
+    profile = importer.SOURCE_REGISTRY["OA"]
+    assert profile["system_type"] == "OA"
+    assert profile["default_schema"] == "oa.ezoffice"
+    assert "APPLY-PLAN139-FOUR-SOURCES" in importer.CONFIRM_TEXTS
+    assert "APPLY-PLAN139-OA-SOURCE" in importer.CONFIRM_TEXTS
+
+
+def test_confirmation_rejects_unknown_string(importer, tmp_path):
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    for name in ("objects.csv", "columns.csv", "constraints.csv",
+                 "view_dependencies.csv", "relation_candidates.csv"):
+        (pkg / name).write_text("x\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="confirm"):
+        importer.execute(pkg, run_id="t", apply=True, confirm="NOT-A-CONFIRM")

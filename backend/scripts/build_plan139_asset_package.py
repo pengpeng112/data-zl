@@ -97,6 +97,21 @@ SYSTEMS: dict[str, dict[str, Any]] = {
         "engine_label": "sqlserver",
         "baseline": {"tables": 269, "views": 22, "procs": 13},
     },
+    # 143 号：医院 OA（万户 ezOFFICE）纳入；多 schema（ezoffice/dbo）故不进
+    # SINGLE_DB_SYSTEMS，命名空间为 OA.EZOFFICE / OA.DBO。
+    "OA": {
+        "system_code": "OA",
+        "system_name_cn": "OA办公系统",
+        "source_code": "oa_sqlserver_10_10_10_69",
+        "source_name_cn": "医院OA（万户 ezOFFICE）SQL Server 业务库",
+        "db_type": "sqlserver",
+        "host": "10.10.10.69",
+        "port": 1433,
+        "databases": ["oa"],
+        "credential_ref": "file:///etc/data-asset/credentials/oa_sqlserver_10_10_10_69.readonly",
+        "engine_label": "sqlserver",
+        "baseline": {"tables": 1681, "views": 4, "procs": 26},
+    },
 }
 
 SINGLE_DB_SYSTEMS = {"CORE2DB", "OCCUPATIONAL_DISEASE"}
@@ -437,7 +452,7 @@ def build_package(
     all_candidates: list[dict[str, Any]] = []
     source_reports: dict[str, Any] = {}
 
-    for system_code, system in SYSTEMS.items():
+    for system_code, system in ((code, SYSTEMS[code]) for code in sorted(snapshots)):
         snapshot_path = snapshots[system_code]
         snapshot = load_snapshot(snapshot_path)
         intake = ingest_views({"views": [
@@ -583,7 +598,7 @@ def build_package(
         ["system_code", "system_name_cn", "source_code", "db_type", "endpoint", "databases", "credential_ref"],
         [{"system_code": s["system_code"], "system_name_cn": s["system_name_cn"], "source_code": s["source_code"],
           "db_type": s["db_type"], "endpoint": f"{s['host']}:{s['port']}", "databases": ",".join(s["databases"]),
-          "credential_ref": s["credential_ref"]} for s in SYSTEMS.values()])
+          "credential_ref": s["credential_ref"]} for s in (SYSTEMS[c] for c in sorted(snapshots))])
     counts["objects"] = _write_csv(output_dir / "objects.csv",
         ["object_key", "system_code", "source_code", "namespace", "object_name", "object_type", "estimated_rows", "comment"],
         all_objects)
@@ -687,20 +702,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot", action="append", required=True,
                         help="SYSTEM_CODE=path/to/snapshot.json (repeatable)")
+    parser.add_argument("--systems", default="",
+                        help="comma-separated subset of SYSTEMS to build (default: all)")
     parser.add_argument("--platform-assets", type=Path, required=True,
                         help="platform relations/reviews export JSON for dedup")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args(argv)
+    selected = {item.strip() for item in args.systems.split(",") if item.strip()} or set(SYSTEMS)
+    unknown = selected - set(SYSTEMS)
+    if unknown:
+        raise SystemExit(f"unknown system codes: {', '.join(sorted(unknown))}")
     snapshots: dict[str, Path] = {}
     for item in args.snapshot:
         code, _, path = item.partition("=")
         if code not in SYSTEMS:
             raise SystemExit(f"unknown system code: {code}")
         snapshots[code] = Path(path)
-    missing = [code for code in SYSTEMS if code not in snapshots]
+    missing = [code for code in selected if code not in snapshots]
     if missing:
         raise SystemExit(f"missing snapshots: {', '.join(missing)}")
+    extra = [code for code in snapshots if code not in selected]
+    if extra:
+        raise SystemExit(f"snapshots outside --systems selection: {', '.join(extra)}")
     platform = json.loads(args.platform_assets.read_text(encoding="utf-8"))
     result = build_package(snapshots, platform, args.output_dir, args.run_id)
     manifest = {
@@ -719,7 +743,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     }
     (args.output_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    for code in SYSTEMS:
+    for code in snapshots:
         src_dir = args.output_dir / "sources" / code
         src_dir.mkdir(parents=True, exist_ok=True)
         report = result["sources"][code]

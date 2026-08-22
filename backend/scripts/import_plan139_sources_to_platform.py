@@ -35,6 +35,8 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 CONFIRM_TEXT = "APPLY-PLAN139-FOUR-SOURCES"
+# 143 号：OA 纳入使用独立确认串，四源串保持历史不变。
+CONFIRM_TEXTS = {CONFIRM_TEXT, "APPLY-PLAN139-OA-SOURCE"}
 BATCH_TAG_PREFIX = "plan139_four_sources"
 
 SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
@@ -69,6 +71,15 @@ SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
         "service_name": None, "database_name": "tjdatabase4", "service_mode": "database",
         "default_schema": "tjdatabase4.dbo", "labels": ["职业病", "tjdatabase4"],
         "credential_ref": "file:///etc/data-asset/credentials/occupational_disease_sqlserver_10_10_8_96.readonly",
+    },
+    # 143 号：医院 OA（万户 ezOFFICE）；多 schema，default_schema 指向 oa.ezoffice。
+    "OA": {
+        "system_code": "OA", "system_name_cn": "OA办公系统", "system_type": "OA",
+        "source_code": "oa_sqlserver_10_10_10_69", "source_name_cn": "医院OA（万户 ezOFFICE）业务库",
+        "db_type": "sqlserver", "host": "10.10.10.69", "port": 1433,
+        "service_name": None, "database_name": "oa", "service_mode": "database",
+        "default_schema": "oa.ezoffice", "labels": ["OA", "万户ezOFFICE", "ezoffice", "工作流"],
+        "credential_ref": "file:///etc/data-asset/credentials/oa_sqlserver_10_10_10_69.readonly",
     },
 }
 
@@ -169,9 +180,10 @@ def _source_identity_audit(db: Any) -> dict[str, Any]:
 
 
 def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
-            validation_results: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    if apply and confirm != CONFIRM_TEXT:
-        raise RuntimeError(f"apply requires --confirm {CONFIRM_TEXT}")
+            validation_results: Mapping[str, Any] | None = None,
+            selected_systems: Sequence[str] | None = None) -> dict[str, Any]:
+    if apply and confirm not in CONFIRM_TEXTS:
+        raise RuntimeError(f"apply requires --confirm in {'/'.join(sorted(CONFIRM_TEXTS))}")
     if apply and not run_id:
         raise RuntimeError("apply requires --run-id")
     batch_tag = f"{BATCH_TAG_PREFIX}_{run_id}"
@@ -196,8 +208,14 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         host_masked_from_target,
     )
 
-    objects = _read_csv(package_dir / "objects.csv")
-    columns = _read_csv(package_dir / "columns.csv")
+    registry = dict(SOURCE_REGISTRY)
+    if selected_systems is not None:
+        unknown = set(selected_systems) - set(registry)
+        if unknown:
+            raise RuntimeError(f"unknown systems: {', '.join(sorted(unknown))}")
+        registry = {code: registry[code] for code in selected_systems}
+    objects = [row for row in _read_csv(package_dir / "objects.csv") if row["system_code"] in registry]
+    columns = [row for row in _read_csv(package_dir / "columns.csv") if row["system_code"] in registry]
     constraints = _read_csv(package_dir / "constraints.csv")
     view_deps = _read_csv(package_dir / "view_dependencies.csv")
     candidates = _read_csv(package_dir / "relation_candidates.csv")
@@ -266,7 +284,7 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
             by_system_columns[row["system_code"]].append(row)
 
         # 1. systems + data sources + assets upsert
-        for code, profile in SOURCE_REGISTRY.items():
+        for code, profile in registry.items():
             system = db.scalar(select(AssetSystem).where(AssetSystem.system_code == profile["system_code"]))
             if not system:
                 system = AssetSystem(system_code=profile["system_code"], system_name_cn=profile["system_name_cn"])
@@ -358,7 +376,7 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         for r in constraints:
             if r["constraint_type"] != "FOREIGN KEY":
                 continue
-            profile = SOURCE_REGISTRY.get(r["system_code"])
+            profile = registry.get(r["system_code"])
             if not profile:
                 continue
             fcols, tcols = _normalize_columns(r["columns"]), (r.get("references") or "")
@@ -448,11 +466,11 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         table_names = {
             f"{row.namespace_name}.{row.table_name}".upper()
             for row in db.scalars(select(AssetTable).where(AssetTable.source_code.in_(
-                [p["source_code"] for p in SOURCE_REGISTRY.values()]))).all()
+                [p["source_code"] for p in registry.values()]))).all()
         }
         column_names: dict[str, set[str]] = defaultdict(set)
         for row in db.scalars(select(AssetColumn).where(AssetColumn.source_code.in_(
-                [p["source_code"] for p in SOURCE_REGISTRY.values()]))).all():
+                [p["source_code"] for p in registry.values()]))).all():
             column_names[f"{row.namespace_name}.{row.table_name}".upper()].add(str(row.column_name).upper())
 
         from plan139_common import metadata_check
@@ -462,7 +480,7 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         review_ids = {_identity(vars(row)) for row in db.scalars(select(AssetRelationReview)).all()
                       if row.from_table and row.to_table}
 
-        source_by_system = {code: p["source_code"] for code, p in SOURCE_REGISTRY.items()}
+        source_by_system = {code: p["source_code"] for code, p in registry.items()}
         for group in review_groups:
             identity = _identity(group)
             if identity in formal_ids:
@@ -614,14 +632,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--package-dir", required=True, type=Path)
     parser.add_argument("--validation-results", type=Path)
     parser.add_argument("--run-id", default="")
+    parser.add_argument("--systems", default="",
+                        help="comma-separated subset of registry systems to import (default: all)")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--confirm", default="")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     try:
         validations = json.loads(args.validation_results.read_text(encoding="utf-8")) if args.validation_results else None
+        selected = [item.strip() for item in args.systems.split(",") if item.strip()] or None
         result = execute(args.package_dir, run_id=args.run_id, apply=args.apply,
-                         confirm=args.confirm, validation_results=validations)
+                         confirm=args.confirm, validation_results=validations,
+                         selected_systems=selected)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
