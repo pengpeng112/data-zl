@@ -233,3 +233,20 @@ def test_confirmation_rejects_unknown_string(importer, tmp_path):
         (pkg / name).write_text("x\n", encoding="utf-8")
     with pytest.raises(RuntimeError, match="confirm"):
         importer.execute(pkg, run_id="t", apply=True, confirm="NOT-A-CONFIRM")
+
+
+def test_review_evidence_carries_system_attribution():
+    import importlib.util as iu
+    spec = iu.spec_from_file_location("plan139_common_mod", SCRIPTS / "plan139_common.py")
+    mod = iu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    payload = {"candidates": [{
+        "system_code": "OA", "source_code": "oa_sqlserver_10_10_10_69", "owner": "OA.EZOFFICE",
+        "view": "V1", "source_sql_sha256": "ab" * 32, "intake_status": "candidate",
+        "from_table": "OA.EZOFFICE.T1", "from_columns": ["A"], "to_table": "OA.EZOFFICE.T2",
+        "to_columns": ["B"], "join_condition": "T1.A=T2.B",
+    }]}
+    groups, _ = mod.prepare_review_groups(payload)
+    assert len(groups) == 1
+    assert groups[0]["evidence"][0]["system_code"] == "OA"
+    assert groups[0]["evidence"][0]["source_code"] == "oa_sqlserver_10_10_10_69"

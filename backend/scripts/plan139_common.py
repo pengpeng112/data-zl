@@ -96,6 +96,10 @@ def prepare_review_groups(
             "runtime_status": raw.get("runtime_status") or "runtime_skipped",
             "warnings": raw.get("warnings") or [],
             "cross_database": bool(raw.get("cross_database")),
+            # 143 修正：evidence 必须携带系统/数据源归属，导入器据此填
+            # asset_relation_reviews.from/to_system_code，否则按系统筛选会漏掉草稿。
+            "system_code": raw.get("system_code"),
+            "source_code": raw.get("source_code"),
         }
         if key not in grouped:
             grouped[key] = {**row, "evidence": [evidence]}
