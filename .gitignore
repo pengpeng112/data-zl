@@ -131,3 +131,8 @@ backend/var/.*
 # 会话临时脚本/发布包（可能含凭据，永不入库）
 /_tmp_*
 /*.tar
+
+# plan139: 四业务源库表结构/元数据大块仅保留本地与服务器证据目录，不进 Git（2026-08-22 用户指令）
+backend/_plan139_work/*_snapshot.json
+backend/_plan139_work/platform_assets_export.json
+开发起步包/数据资产_四系统源端资产包/
