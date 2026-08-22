@@ -1,0 +1,83 @@
+{
+  "run_id": "oa-20260822",
+  "final_status": "COMPLETED",
+  "source": {
+    "system_code": "OA",
+    "system_name_cn": "OA办公系统",
+    "source_code": "oa_sqlserver_10_10_10_69",
+    "db_type": "sqlserver",
+    "version": "10.50.1600.1 (2008 R2)",
+    "database": "oa",
+    "product": "万户 ezOFFICE",
+    "tds": "7.0"
+  },
+  "gates": {
+    "unit_tests": "57/57 (tests/plan139, +3 OA extension)",
+    "backup": "/opt/data-asset/backups/data_asset_pre_oa143_20260822075047.dump (9014716B, sha256=6b1798a221ba8684bdd96565bf204c2df64a59074b76ed7f56272323b6f17109)",
+    "dry_run_review": "deletes=0; formal view-JOIN adds=0 (141 are declared-FK structural); active recipe=0; conflicts=0; skipped_existing_formal=2 (declared-FK duplicates correctly deduped)",
+    "apply_confirmation": "APPLY-PLAN139-OA-SOURCE + run_id oa-20260822",
+    "second_dry_run": "all zeros",
+    "sampling": "3 tables + 2 views direct + tManager via dep edges; fk=141; 5 drafts all with bounded_validations evidence",
+    "health": "200; container Up (no restart; asset-only)",
+    "source_db_writes": 0,
+    "patient_values_returned": 0
+  },
+  "platform_counts": {
+    "before": {
+      "systems": 19,
+      "sources": 19,
+      "tables": 9497,
+      "columns": 113751,
+      "relations": 1160,
+      "reviews": 86,
+      "recipes": 64
+    },
+    "after": {
+      "systems": 20,
+      "sources": 20,
+      "tables": 11182,
+      "columns": 143707,
+      "relations": 1301,
+      "reviews": 91,
+      "recipes": 64
+    },
+    "delta": {
+      "systems": 1,
+      "sources": 1,
+      "tables": 1685,
+      "columns": 29956,
+      "relations": 141,
+      "reviews": 5,
+      "recipes": 0,
+      "view_dependencies": 21
+    }
+  },
+  "engine_validation": {
+    "batch": 12,
+    "validated": 12,
+    "failed": 0,
+    "engine_chains": {
+      "HI_TASKINST->HI_PROCINST": 0.9996,
+      "HI_ACTINST->HI_PROCINST": 1.0,
+      "RU_TASK->HI_PROCINST": 1.0,
+      "RU_EXECUTION->HI_PROCINST": 1.0
+    },
+    "business_links": {
+      "WF_WORK->ORG_EMPLOYEE": 0.999061,
+      "ORG_ORGANIZATION_USER->ORG_EMPLOYEE": 1.0
+    }
+  },
+  "layering": {
+    "fk_structural_formal": 141,
+    "review_drafts": 5,
+    "recipe_drafts": 0,
+    "active_recipes": 0
+  },
+  "git": "not committed this round (assets/snapshots excluded per policy)",
+  "artifacts_local": [
+    "开发起步包/数据资产_OA源端资产包/",
+    "backend/_oa_work/ (gitignored)",
+    "开发起步包/143_OA资产导入与工作流引擎验证执行报告.md",
+    "本 JSON"
+  ]
+}
