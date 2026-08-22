@@ -27,7 +27,8 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 
-IDENT = r'(?:(?:"[^"]+")|(?:[A-Za-z_][\w$#]*))(?:\.(?:(?:"[^"]+")|(?:[A-Za-z_][\w$#]*))){0,3}'
+_IDENT_PART = r'(?:"[^"]+"|\[[^\]\r\n]+\]|`[^`\r\n]+`|[A-Za-z_][\w$#]*)'
+IDENT = rf"{_IDENT_PART}(?:\.{_IDENT_PART}){{0,3}}"
 RESERVED = {
     "AS", "ON", "WHERE", "JOIN", "LEFT", "RIGHT", "FULL", "INNER", "OUTER",
     "CROSS", "NATURAL", "USING", "GROUP", "ORDER", "HAVING", "UNION", "ALL",
@@ -49,8 +50,7 @@ EQ_RE = re.compile(
     re.I | re.S,
 )
 COL_REF_RE = re.compile(
-    r"(?:(?P<alias>[A-Za-z_][\w$#]*|\"[^\"]+\")\s*\.\s*)"
-    r"(?P<column>[A-Za-z_][\w$#]*|\"[^\"]+\")",
+    rf"(?P<ref>{_IDENT_PART}\s*\.\s*{_IDENT_PART}(?:\s*\.\s*{_IDENT_PART})*)",
     re.I,
 )
 
@@ -176,16 +176,34 @@ def _select_body(sql: str) -> str:
     return text[view.end() + as_match.end() :].strip() if as_match else text
 
 
+_RESERVED_LOOKAHEAD = "(?!" + "|".join(sorted(RESERVED)) + r"\b)"
+# An alias must not swallow the next JOIN/ON/WHERE keyword: without the guard
+# ``FROM a JOIN b`` consumes ``JOIN`` as a's alias and drops table ``b``.
+_ALIAS_PART = _RESERVED_LOOKAHEAD + r"(?:`[^`\r\n]+`|\[[^\]\r\n]+\]|\"[^\"]+\"|[A-Za-z_][\w$#]*)"
+
+# Bare keywords that the FROM/JOIN scan can mistake for a table when the
+# text around derived tables or window functions is fragmented.
+NON_TABLE_KEYWORDS = RESERVED | {
+    "FROM", "WITH", "OVER", "ALL", "PARTITION", "SELECT", "WHERE", "BY", "CASE", "WHEN",
+    "THEN", "ELSE", "END", "EXISTS", "NOT", "NULL", "IS", "IN", "LIKE", "BETWEEN",
+    "ASC", "DESC", "SET", "VALUES", "INTO", "DISTINCT", "TOP",
+}
+
+
+def _strip_ident_quotes(value: str) -> str:
+    return value.strip().strip('"[]`').strip()
+
+
 def _read_table_and_alias(segment: str, pos: int) -> tuple[str | None, str | None, int]:
     match = re.match(rf"\s*({IDENT})", segment[pos:], re.I)
     if not match:
         return None, None, pos
     table = normalize_identifier(match.group(1))
     cursor = pos + match.end()
-    alias_match = re.match(r"\s+(?:AS\s+)?([A-Za-z_][\w$#]*)", segment[cursor:], re.I)
+    alias_match = re.match(rf"\s+(?:AS\s+)?({_ALIAS_PART})", segment[cursor:], re.I)
     alias = table.split(".")[-1]
-    if alias_match and alias_match.group(1).upper() not in RESERVED:
-        alias = alias_match.group(1).upper()
+    if alias_match and _strip_ident_quotes(alias_match.group(1)).upper() not in RESERVED:
+        alias = _strip_ident_quotes(alias_match.group(1)).upper()
         cursor += alias_match.end()
     return table, alias, cursor
 
@@ -196,11 +214,36 @@ def _table_aliases(from_part: str) -> tuple[dict[str, str], list[str]]:
     aliases: dict[str, str] = {}
     tables: list[str] = []
     # Remove parenthesized subqueries before collecting their outer references.
-    source = re.sub(r"\(\s*SELECT\b.*?\)\s*(?:AS\s+)?[A-Za-z_]\w*", " ", from_part, flags=re.I | re.S)
-    scan_source = source if re.search(r"\b(?:FROM|JOIN)\b", source, re.I) else "FROM " + source
-    for match in re.finditer(rf"\b(?:FROM|JOIN)\s+({IDENT})(?:\s+(?:AS\s+)?([A-Za-z_][\w$#]*))?", scan_source, re.I):
+    source = re.sub(
+        r"\(\s*SELECT\b.*?\)\s*(?:AS\s+)?(?:[A-Za-z_]\w*|`[^`\r\n]+`|\[[^\]\r\n]+\]|\"[^\"]+\")",
+        " ",
+        from_part,
+        flags=re.I | re.S,
+    )
+    # ``from_part`` starts right after the FROM keyword, so the first table has
+    # no FROM/JOIN in front of it.  Anchor it explicitly (unless the text is a
+    # full SELECT statement, which already carries its own FROM); otherwise the
+    # first ANSI table (and its alias) is never registered and every ON
+    # predicate that references it drops out as unresolved.
+    scan_source = source
+    if not re.search(r"\b(?:FROM|JOIN)\b", source, re.I):
+        scan_source = "FROM " + source.lstrip()
+    elif not re.match(r"(?i)\s*(?:FROM|JOIN|SELECT)\b", source):
+        scan_source = "FROM " + source.lstrip()
+    # The optional alias must never swallow the next clause keyword: with a
+    # prepended "FROM", "FROM t_a JOIN t_b ..." would otherwise consume JOIN
+    # as t_a's alias and lose t_b entirely.  A bare-keyword lookahead keeps
+    # genuine (possibly quoted) aliases while leaving clause keywords for the
+    # next finditer match.
+    keyword_guard = r"(?!(?:" + "|".join(sorted(NON_TABLE_KEYWORDS)) + r")\b)"
+    for match in re.finditer(
+        rf"\b(?:FROM|JOIN)\s+[(\s]*({IDENT})(?:\s+(?:AS\s+)?{keyword_guard}({_ALIAS_PART}))?", scan_source, re.I
+    ):
         table = normalize_identifier(match.group(1))
-        alias = (match.group(2) or table.split(".")[-1]).upper()
+        if table.split(".")[-1] in NON_TABLE_KEYWORDS:
+            continue
+        raw_alias = match.group(2)
+        alias = _strip_ident_quotes(raw_alias).upper() if raw_alias else table.split(".")[-1]
         if alias in RESERVED:
             alias = table.split(".")[-1]
         aliases[alias] = table
@@ -213,21 +256,43 @@ def _table_aliases(from_part: str) -> tuple[dict[str, str], list[str]]:
         # form where the JOIN regex would otherwise mistake B for an alias.
         for item in _balanced_slices(from_part, ","):
             table, alias, _ = _read_table_and_alias(item, 0)
-            if table:
+            if table and table.split(".")[-1] not in NON_TABLE_KEYWORDS:
                 aliases[alias or table.split(".")[-1]] = table
                 if table not in tables:
                     tables.append(table)
     return aliases, tables
 
 
+def _split_ident_parts(ref: str) -> list[str]:
+    """Split a possibly quoted multi-part identifier into normalized parts."""
+
+    parts: list[str] = []
+    for raw in re.split(r"\.", ref.strip()):
+        part = raw.strip().strip('"[]`').strip()
+        if part:
+            parts.append(part.upper())
+    return parts
+
+
 def _resolve_ref(expression: str, aliases: Mapping[str, str]) -> tuple[str, str, str] | None:
     refs = list(COL_REF_RE.finditer(expression))
     if not refs:
         return None
-    ref = refs[0]
-    alias = ref.group("alias").strip('"').upper()
-    column = ref.group("column").strip('"').upper()
+    parts = _split_ident_parts(refs[0].group("ref"))
+    if len(parts) < 2:
+        return None
+    alias = parts[-2]
+    column = parts[-1]
     table = aliases.get(alias)
+    if not table:
+        # Schema/table-qualified references (dbo.T.COL, db.dbo.T.COL) resolve
+        # against known table names instead of aliases.
+        target = alias.upper()
+        for candidate in aliases.values():
+            normalized = str(candidate).upper()
+            if normalized == target or normalized.endswith("." + target):
+                table = candidate
+                break
     if not table:
         return None
     wrapper = _compact(expression)
@@ -287,15 +352,12 @@ def _parse_condition(condition: str, aliases: Mapping[str, str], branch: int) ->
             outer = "left_optional"
         if any(re.search(r"\(\s*\+\s*\)", p[3]) for p in pairs):
             outer = "right_optional"
+        def _plain(expr: str) -> str:
+            return re.sub(r"[\[\]\"`\s]", "", re.sub(r"\(\s*\+\s*\)", "", expr.strip()))
+
+        bare_column = re.compile(r"[A-Za-z_][\w$#]*(?:\.[A-Za-z_][\w$#]*)*")
         wrapped = any(
-            not re.fullmatch(
-                r"[A-Za-z_][\w$#]*\.[A-Za-z_][\w$#]*",
-                re.sub(r"\(\s*\+\s*\)", "", p[2].strip('"')).strip(),
-            )
-            or not re.fullmatch(
-                r"[A-Za-z_][\w$#]*\.[A-Za-z_][\w$#]*",
-                re.sub(r"\(\s*\+\s*\)", "", p[3].strip('"')).strip(),
-            )
+            not bare_column.fullmatch(_plain(p[2])) or not bare_column.fullmatch(_plain(p[3]))
             for p in pairs
         )
         output.append(
@@ -320,12 +382,15 @@ def parse_sql(sql: str) -> dict[str, Any]:
 
     clean = _select_body(sql or "")
     upper = clean.upper()
+    # Keyword risk checks must ignore words inside string literals (e.g. a
+    # view projecting 'INSERT...' text would otherwise look like DML).
+    literal_masked = re.sub(r"'(?:''|[^'])*'", "''", clean)
     warnings: list[str] = []
-    if re.search(r"\bEXEC(?:UTE)?\s+IMMEDIATE\b|\bDBMS_SQL\b", upper):
+    if re.search(r"\bEXEC(?:UTE)?\s+IMMEDIATE\b|\bDBMS_SQL\b", literal_masked, re.I):
         warnings.append("dynamic_sql")
     if "||" in clean:
         warnings.append("expression_concatenation")
-    if re.search(r"\b(INSERT|UPDATE|DELETE|MERGE|CREATE|ALTER|DROP)\b", upper):
+    if re.search(r"\b(INSERT|UPDATE|DELETE|MERGE|CREATE|ALTER|DROP)\b", literal_masked, re.I):
         warnings.append("non_select_statement")
     branches = split_union(clean)
     if len(branches) > 1:

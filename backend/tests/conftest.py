@@ -20,8 +20,9 @@ _PURE_LOGIC_SUBDIRS = (
     "dict_sync_112",
     "identity_title_sync",
     "identity_signature_sync",
-    "plan127",
     "plan126",
+    "plan127",
+    "plan139",
 )
 
 

@@ -31,6 +31,13 @@ def sanitize_view_definition(value: Any) -> str | None:
     return None if value is None else _sanitize(value, limit=1_000_000)
 
 
+def redact_string_literals(value: Any) -> str | None:
+    """Mask quoted string contents so stored definitions stay evidence-only."""
+    if value is None:
+        return None
+    return re.sub(r"'(?:''|[^'])*'", "'***REDACTED***'", str(value))
+
+
 def load_config(path: str | Path) -> dict[str, Any]:
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(data, dict):
@@ -45,6 +52,26 @@ def load_config(path: str | Path) -> dict[str, Any]:
     return source
 
 
+def read_credential_file(file_name: Any) -> dict[str, str]:
+    """Read a credential file as JSON or as the single-line ``user:password``."""
+    text = Path(str(file_name)).read_text(encoding="utf-8").strip()
+    if not text:
+        raise ValueError("credential file is empty")
+    if text.startswith("{"):
+        data = json.loads(text)
+        if not isinstance(data, Mapping):
+            raise ValueError("credential file must contain an object")
+        result: dict[str, str] = {}
+        for key in ("user", "username", "password"):
+            if data.get(key) is not None:
+                result["user" if key in {"user", "username"} else key] = str(data[key])
+        return result
+    if "\n" not in text and ":" in text:
+        user, password = text.split(":", 1)
+        return {"user": user.strip(), "password": password.strip()}
+    raise ValueError("unsupported credential file format")
+
+
 def load_credentials(config: Mapping[str, Any]) -> dict[str, str]:
     ref = config.get("credentials") or config.get("credential") or {}
     if not isinstance(ref, Mapping):
@@ -52,12 +79,7 @@ def load_credentials(config: Mapping[str, Any]) -> dict[str, str]:
     result: dict[str, str] = {}
     file_name = ref.get("file") or config.get("credential_file") or config.get("credentials_file")
     if file_name:
-        data = json.loads(Path(str(file_name)).read_text(encoding="utf-8"))
-        if not isinstance(data, Mapping):
-            raise ValueError("credential file must contain an object")
-        for key in ("user", "username", "password"):
-            if data.get(key) is not None:
-                result["user" if key in {"user", "username"} else key] = str(data[key])
+        result.update({key: value for key, value in read_credential_file(file_name).items() if key in {"user", "password"}})
     env_names = ref.get("env") or config.get("credential_env") or {}
     if isinstance(env_names, Mapping):
         for key, env_name in env_names.items():
@@ -75,7 +97,8 @@ def load_credentials(config: Mapping[str, Any]) -> dict[str, str]:
     return result
 
 
-def _connect(config: Mapping[str, Any], credentials: Mapping[str, str], database: str | None = None) -> Any:
+def _connect(config: Mapping[str, Any], credentials: Mapping[str, str], database: str | None = None,
+             tds_version: str | None = None) -> Any:
     # pymssql is preferred because it does not require an ODBC driver.  The
     # import remains lazy so py_compile and offline tests need no connector.
     import pymssql
@@ -85,15 +108,50 @@ def _connect(config: Mapping[str, Any], credentials: Mapping[str, str], database
         "login_timeout": int(config.get("connect_timeout", 10)), "timeout": int(config.get("read_timeout", 90)),
         "autocommit": False, "appname": "DataAssetReadOnlyMetadataHarvest",
     }
+    resolved = tds_version if tds_version is not None else config.get("tds_version")
+    if resolved:
+        kwargs["tds_version"] = str(resolved)
     return pymssql.connect(**kwargs)
+
+
+def resolve_tds_version(config: Mapping[str, Any], credentials: Mapping[str, str]) -> tuple[str | None, list[dict[str, str]]]:
+    """Probe the configured TDS version once; fall back only when configured.
+
+    Returns ``(resolved_tds_or_None, sanitized_attempts)``.  The fallback is a
+    controlled, config-driven downgrade (plan 139 S1) and is recorded.
+    """
+    attempts: list[dict[str, str]] = []
+    configured = config.get("tds_version")
+    try:
+        probe = _connect(config, credentials, "master")
+        probe.rollback()
+        probe.close()
+        label = str(configured) if configured else "driver_default"
+        attempts.append({"tds_version": label, "result": "ok"})
+        return (str(configured) if configured else None), attempts
+    except Exception as exc:
+        attempts.append({"tds_version": str(configured) if configured else "driver_default",
+                         "result": "failed", "error": sanitize_text(exc)[:300]})
+    fallback = config.get("tds_fallback")
+    if fallback and str(fallback) != str(configured):
+        try:
+            probe = _connect(config, credentials, "master", tds_version=str(fallback))
+            probe.rollback()
+            probe.close()
+            attempts.append({"tds_version": str(fallback), "result": "ok_fallback"})
+            return str(fallback), attempts
+        except Exception as exc:
+            attempts.append({"tds_version": str(fallback), "result": "failed", "error": sanitize_text(exc)[:300]})
+            raise RuntimeError(f"connection failed after tds fallback: {sanitize_text(exc)[:200]}") from None
+    raise RuntimeError(f"connection failed: {attempts[-1].get('error', 'unknown')[:200]}")
 
 
 def _rows(cursor: Any, sql: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
     cursor.execute(sql, params)
     rows = cursor.fetchall()
-    names = [str(item[0]).lower() for item in (cursor.description or [])]
     if rows and isinstance(rows[0], Mapping):
         return [dict(row) for row in rows]
+    names = [str(item[0]).lower() for item in (getattr(cursor, "description", None) or [])]
     return [dict(zip(names, row)) for row in rows]
 
 
@@ -115,8 +173,11 @@ def _empty_snapshot(config: Mapping[str, Any]) -> dict[str, Any]:
         "source": {"db_type": "sqlserver", "endpoint": f"{config['host']}:{config['port']}", "read_only": True},
         "collected_at": datetime.now(timezone.utc).isoformat(), "database_version": None, "read_only": True,
         "databases": [], "schemas": [], "tables": [], "views": [], "columns": [], "keys": [], "unique_keys": [],
-        "indexes": [], "foreign_keys": [], "dependencies": [], "errors": [], "summary": {},
-        "sanitization": {"view_definitions": "credential/url patterns masked", "errors": "bounded and masked"}, "source_writes": 0,
+        "indexes": [], "foreign_keys": [], "dependencies": [], "routines": [], "triggers": [], "synonyms": [],
+        "tds_version": None, "connection_attempts": [], "errors": [], "summary": {},
+        "sanitization": {"view_definitions": "credential/url patterns masked", "errors": "bounded and masked",
+                         "routine_definitions": "credential/url patterns masked; execution denied"},
+        "source_writes": 0,
     }
 
 
@@ -179,8 +240,43 @@ def _collect_database(connection: Any, database: str, payload: dict[str, Any], c
             JOIN sys.tables pt ON pt.object_id=fk.referenced_object_id JOIN sys.schemas ps ON ps.schema_id=pt.schema_id
             JOIN sys.columns pc ON pc.object_id=pt.object_id AND pc.column_id=fkc.referenced_column_id ORDER BY fk.name,fkc.constraint_column_id"""))
         payload["dependencies"].extend(_rows(cursor, """SELECT DB_NAME() database_name,OBJECT_SCHEMA_NAME(sed.referencing_id) referencing_schema,
-            OBJECT_NAME(sed.referencing_id) referencing_object,sed.referenced_database,sed.referenced_schema,sed.referenced_entity_name
+            OBJECT_NAME(sed.referencing_id) referencing_object,sed.referenced_database_name referenced_database,
+            sed.referenced_schema_name referenced_schema,sed.referenced_entity_name
             FROM sys.sql_expression_dependencies sed WHERE sed.referencing_id IS NOT NULL ORDER BY referencing_schema,referencing_object"""))
+        # Routines/triggers/synonyms: metadata + definitions only.  The login
+        # is explicitly DENY EXECUTE, so nothing here can run a module.
+        routine_rows = _rows(cursor, """SELECT DB_NAME() database_name,s.name schema_name,o.name routine_name,
+            o.type_desc routine_type,m.definition routine_definition FROM sys.objects o
+            JOIN sys.schemas s ON s.schema_id=o.schema_id LEFT JOIN sys.sql_modules m ON m.object_id=o.object_id
+            WHERE o.type IN ('P','FN','IF','TF') AND o.is_ms_shipped=0 ORDER BY s.name,o.name""")
+        blocked_definitions = 0
+        for row in routine_rows:
+            definition = row.get("routine_definition")
+            if definition in (None, ""):
+                blocked_definitions += 1
+                row["definition_status"] = "BLOCKED_ROUTINE_METADATA"
+                row["routine_definition"] = None
+            else:
+                row["definition_status"] = "ok"
+                row["routine_definition"] = sanitize_view_definition(redact_string_literals(definition))
+        payload["routines"].extend(routine_rows)
+        trigger_rows = _rows(cursor, """SELECT DB_NAME() database_name,s.name schema_name,t.name trigger_name,
+            t.type_desc trigger_type,OBJECT_NAME(t.parent_id) parent_object,CASE WHEN t.is_disabled=1 THEN 'yes' ELSE 'no' END is_disabled,
+            m.definition trigger_definition FROM sys.triggers t JOIN sys.objects o ON o.object_id=t.object_id
+            JOIN sys.schemas s ON s.schema_id=o.schema_id LEFT JOIN sys.sql_modules m ON m.object_id=t.object_id
+            WHERE t.is_ms_shipped=0 ORDER BY s.name,t.name""")
+        for row in trigger_rows:
+            row["trigger_definition"] = sanitize_view_definition(redact_string_literals(row.get("trigger_definition")))
+        payload["triggers"].extend(trigger_rows)
+        payload["synonyms"].extend(_rows(cursor, """SELECT DB_NAME() database_name,s.name schema_name,sy.name synonym_name,
+            OBJECT_DEFINITION(sy.object_id) base_object FROM sys.synonyms sy JOIN sys.schemas s ON s.schema_id=sy.schema_id
+            WHERE s.name NOT IN ('guest','INFORMATION_SCHEMA','sys') ORDER BY s.name,sy.name"""))
+        if blocked_definitions:
+            payload["errors"].append({
+                "database": database, "scope": "routine_definitions",
+                "status": "BLOCKED_ROUTINE_METADATA", "count": blocked_definitions,
+                "error": f"{blocked_definitions} routine definitions not visible to this login; privileges not extended",
+            })
     finally:
         cursor.close()
 
@@ -189,7 +285,10 @@ def harvest(config: Mapping[str, Any], *, check_connection: bool = False,
             discover_databases: bool = False) -> dict[str, Any]:
     credentials = load_credentials(config)
     payload = _empty_snapshot(config)
-    control = _connect(config, credentials, "master")
+    tds_version, attempts = resolve_tds_version(config, credentials)
+    payload["tds_version"] = tds_version or "driver_default"
+    payload["connection_attempts"] = attempts
+    control = _connect(config, credentials, "master", tds_version=tds_version)
     try:
         cursor = control.cursor()
         try:
@@ -202,7 +301,8 @@ def harvest(config: Mapping[str, Any], *, check_connection: bool = False,
             names = _names(cursor, None if discover_databases else configured)
             if check_connection:
                 payload["databases"] = names
-                payload["summary"] = {"connected": True, "databases": len(names), "source_writes": 0}
+                payload["summary"] = {"connected": True, "databases": len(names),
+                                      "tds_version": payload.get("tds_version"), "source_writes": 0}
                 if not discover_databases:
                     return payload
         finally:
@@ -212,11 +312,11 @@ def harvest(config: Mapping[str, Any], *, check_connection: bool = False,
         control.close()
     if discover_databases:
         payload["databases"] = names
-        payload["summary"] = {"databases": len(names), "source_writes": 0}
+        payload["summary"] = {"databases": len(names), "tds_version": payload.get("tds_version"), "source_writes": 0}
         return payload
     for database in names:
         try:
-            connection = _connect(config, credentials, database)
+            connection = _connect(config, credentials, database, tds_version=tds_version)
             try:
                 _collect_database(connection, database, payload, config)
             finally:
@@ -230,7 +330,10 @@ def harvest(config: Mapping[str, Any], *, check_connection: bool = False,
         "views": len(payload["views"]), "columns": len(payload["columns"]), "keys": len(payload["keys"]),
         "unique_keys": len(payload["unique_keys"]),
         "indexes": len(payload["indexes"]), "foreign_keys": len(payload["foreign_keys"]),
-        "dependencies": len(payload["dependencies"]), "errors": len(payload["errors"]), "source_writes": 0}
+        "dependencies": len(payload["dependencies"]), "routines": len(payload["routines"]),
+        "triggers": len(payload["triggers"]), "synonyms": len(payload["synonyms"]),
+        "tds_version": payload.get("tds_version"),
+        "errors": len(payload["errors"]), "source_writes": 0}
     return payload
 
 
