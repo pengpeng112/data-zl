@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted, computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import {
   getAssetTree,
   listSystems,
+  getSystemDetail,
   listSources,
   listConnections,
   listDbTypes,
@@ -26,8 +28,15 @@ import {
   type DbTypeMeta
 } from "@/api/asset";
 import { collectMetadata } from "@/api/metadata";
+import {
+  buildSystemTypeOptions,
+  filterAndPaginateConnections,
+  systemDetailToForm,
+  validateWizardStep
+} from "./contracts";
 
 const route = useRoute();
+const router = useRouter();
 const activeTab = ref("overview");
 const systems = ref<AssetSystemItem[]>([]);
 const sources = ref<AssetSourceItem[]>([]);
@@ -35,10 +44,16 @@ const resourceTree = ref<AssetTreeNode[]>([]);
 const dbTypes = ref<DbTypeMeta[]>([]);
 const loading = ref(false);
 const sourcesLoading = ref(false);
+const systemsError = ref("");
+const sourcesError = ref("");
+const resourceTreeError = ref("");
 
 // wizard
 const drawerVisible = ref(false);
 const wizardStep = ref(0);
+const editorMode = ref<"create" | "edit">("create");
+const editorLoading = ref(false);
+const editorSaving = ref(false);
 const form = ref({
   system_code: "",
   system_name_cn: "",
@@ -67,6 +82,10 @@ const addConnDialog = ref(false);
 const addConnSystem = ref("");
 const addConnForm = ref(emptyConnection());
 const addConnCred = ref({ username: "", password: "" });
+const connectionEditMode = ref(false);
+const connectionFilters = ref({ system_code: "", db_type: "" });
+const connectionPage = ref(1);
+const connectionPageSize = ref(20);
 
 function emptyConnection() {
   return {
@@ -92,6 +111,29 @@ const selectedDbMeta = computed(() =>
   dbTypes.value.find(d => d.db_type === connectionForm.value.db_type)
 );
 
+const systemTypeOptions = computed(() =>
+  buildSystemTypeOptions(systems.value, form.value.system_type)
+);
+const pagedConnections = computed(() =>
+  filterAndPaginateConnections(
+    sources.value,
+    connectionFilters.value,
+    connectionPage.value,
+    connectionPageSize.value
+  )
+);
+
+watch(connectionFilters, () => {
+  connectionPage.value = 1;
+}, { deep: true });
+
+watch(activeTab, tab => {
+  const query = { ...route.query };
+  if (tab === "overview") delete query.tab;
+  else query.tab = tab;
+  void router.replace({ query });
+});
+
 watch(
   () => connectionForm.value.db_type,
   code => {
@@ -105,10 +147,13 @@ watch(
 
 async function loadSystems() {
   loading.value = true;
+  systemsError.value = "";
   try {
     const res = await listSystems();
     // 不再硬编码过滤 HIS/HRP/DATA_CENTER；展示后端返回的非 merged 系统
     systems.value = res.data || [];
+  } catch (error: any) {
+    systemsError.value = error?.response?.data?.detail || "系统列表加载失败";
   } finally {
     loading.value = false;
   }
@@ -116,24 +161,32 @@ async function loadSystems() {
 
 async function loadSources() {
   sourcesLoading.value = true;
+  sourcesError.value = "";
   try {
     // physical connections with aliases folded (plan 76)
     const res = await listConnections({ include_aliases: false });
     sources.value = (res.data || []) as AssetSourceItem[];
   } catch {
-    const res = await listSources();
-    sources.value = res.data || [];
+    try {
+      const res = await listSources();
+      sources.value = res.data || [];
+    } catch (error: any) {
+      sources.value = [];
+      sourcesError.value = error?.response?.data?.detail || "数据连接加载失败";
+    }
   } finally {
     sourcesLoading.value = false;
   }
 }
 
 async function loadResourceTree() {
+  resourceTreeError.value = "";
   try {
     const res = await getAssetTree({ include_tables: false });
     resourceTree.value = res.data || [];
-  } catch {
+  } catch (error: any) {
     resourceTree.value = [];
+    resourceTreeError.value = error?.response?.data?.detail || "数据资源树加载失败";
   }
 }
 
@@ -153,6 +206,7 @@ async function loadDbTypes() {
 }
 
 function openCreate() {
+  editorMode.value = "create";
   wizardStep.value = 0;
   form.value = { system_code: "", system_name_cn: "", system_type: "business", target_host: "", description_cn: "", status: "active" };
   connections.value = [];
@@ -162,22 +216,48 @@ function openCreate() {
   drawerVisible.value = true;
 }
 
-function openEdit(row: AssetSystemItem) {
-  form.value = {
-    system_code: row.system_code,
-    system_name_cn: row.system_name_cn,
-    system_type: row.system_type || "business",
-    target_host: row.target_host || "",
-    description_cn: "",
-    status: row.status || "active"
-  };
-  ElMessageBox.confirm("仅更新系统基本信息（不含连接）？", "编辑系统", { type: "info" })
-    .then(async () => {
-      await upsertSystem(form.value);
-      ElMessage.success("已更新");
-      loadSystems();
-    })
-    .catch(() => undefined);
+async function openEdit(row: AssetSystemItem) {
+  editorMode.value = "edit";
+  wizardStep.value = 0;
+  drawerVisible.value = true;
+  editorLoading.value = true;
+  try {
+    const res = await getSystemDetail(row.system_code);
+    form.value = systemDetailToForm(res.data);
+  } catch (error: any) {
+    drawerVisible.value = false;
+    ElMessage.error(extractErrorDetail(error, "系统详情加载失败，未进入编辑"));
+  } finally {
+    editorLoading.value = false;
+  }
+}
+
+async function saveSystemEdit() {
+  const error = validateWizardStep(0, form.value, []);
+  if (error) {
+    ElMessage.warning(error);
+    return;
+  }
+  editorSaving.value = true;
+  try {
+    await upsertSystem({ ...form.value });
+    ElMessage.success("系统信息已更新");
+    drawerVisible.value = false;
+    await Promise.all([loadSystems(), loadResourceTree()]);
+  } catch (error: any) {
+    ElMessage.error(extractErrorDetail(error, "系统更新失败"));
+  } finally {
+    editorSaving.value = false;
+  }
+}
+
+function nextWizardStep() {
+  const error = validateWizardStep(wizardStep.value, form.value, connections.value);
+  if (error) {
+    ElMessage.warning(error);
+    return;
+  }
+  wizardStep.value += 1;
 }
 
 function addConnectionToList() {
@@ -227,8 +307,19 @@ async function saveWizard() {
     drawerVisible.value = false;
     await Promise.all([loadSystems(), loadSources(), loadResourceTree()]);
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "保存失败");
+    ElMessage.error(extractErrorDetail(e, "保存失败"));
   }
+}
+
+function connectionStatusLabel(status?: string | null) {
+  const labels: Record<string, string> = {
+    connected: "已连通",
+    success: "成功",
+    failed: "失败",
+    timeout: "超时",
+    pending: "待检测"
+  };
+  return status ? labels[status.toLowerCase()] || status : "未检测";
 }
 
 async function onCheck(sourceCode: string) {
@@ -249,7 +340,7 @@ async function onCheck(sourceCode: string) {
     }
     loadSources();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "检测失败");
+    ElMessage.error(extractErrorDetail(e, "检测失败"));
   }
 }
 
@@ -269,7 +360,7 @@ async function onTestDraftForm() {
     checkResult.value = d.success ? `连通成功 ${d.latency_ms}ms` : `失败: ${d.error_masked}`;
     ElMessage[d.success ? "success" : "warning"](checkResult.value);
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "draft 测试失败");
+    ElMessage.error(extractErrorDetail(e, "draft 测试失败"));
   }
 }
 
@@ -284,7 +375,7 @@ async function onCollectMetadata(sourceCode: string) {
     ElMessage.success(`采集已触发：${JSON.stringify(res.data || {}).slice(0, 120)}`);
   } catch (e: any) {
     if (e === "cancel" || e === "close") return;
-    ElMessage.error(e?.response?.data?.detail || "采集失败");
+    ElMessage.error(extractErrorDetail(e, "采集失败"));
   }
 }
 
@@ -328,7 +419,7 @@ async function saveCredRotate() {
     credDialog.value = false;
     loadSources();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "凭据写入失败");
+    ElMessage.error(extractErrorDetail(e, "凭据写入失败"));
   }
 }
 
@@ -341,11 +432,15 @@ async function onClearCred(row: AssetSourceItem, purpose: "readonly" | "write" =
       "确认",
       { type: "warning" }
     );
+  } catch {
+    return; // 用户取消
+  }
+  try {
     await clearSourceCredential(row.source_code, { purpose });
     ElMessage.success("已清除");
     loadSources();
-  } catch {
-    /* cancel */
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "清除凭据失败"));
   }
 }
 
@@ -355,7 +450,7 @@ async function onSetWritePolicy(row: AssetSourceItem, policy: string) {
     ElMessage.success(`写策略已设为 ${policy}`);
     loadSources();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "更新写策略失败");
+    ElMessage.error(extractErrorDetail(e, "更新写策略失败"));
   }
 }
 
@@ -368,28 +463,45 @@ function writePolicyLabel(policy?: string | null) {
 async function onDisableSource(row: AssetSourceItem) {
   try {
     await ElMessageBox.confirm(`禁用连接 ${row.source_code}？`, "确认", { type: "warning" });
+  } catch {
+    return; // 用户取消
+  }
+  try {
     await disableSource(row.source_code);
     ElMessage.success("已禁用");
     loadSources();
-  } catch {
-    /* cancel */
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "禁用连接失败"));
   }
 }
 
 async function onSoftDisableSystem(code: string) {
   try {
     await ElMessageBox.confirm(`软停用系统 ${code}？存在连接/资产时不会物理删除。`, "确认", { type: "warning" });
+  } catch {
+    return; // 用户取消
+  }
+  try {
     await softDisableSystem(code);
     ElMessage.success("已软停用");
     loadSystems();
-  } catch {
-    /* cancel */
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "软停用系统失败"));
   }
 }
 
 function openAddConnection(systemCode: string) {
+  connectionEditMode.value = false;
   addConnSystem.value = systemCode;
   addConnForm.value = emptyConnection();
+  addConnCred.value = { username: "", password: "" };
+  addConnDialog.value = true;
+}
+
+function openEditConnection(row: AssetSourceItem) {
+  connectionEditMode.value = true;
+  addConnSystem.value = row.system_code;
+  addConnForm.value = { ...emptyConnection(), ...row };
   addConnCred.value = { username: "", password: "" };
   addConnDialog.value = true;
 }
@@ -401,19 +513,50 @@ async function saveAddConnection() {
     return;
   }
   try {
-    await addSystemConnection(addConnSystem.value, {
-      ...c,
-      write_policy: "readonly",
-      username: addConnCred.value.username || undefined,
-      password: addConnCred.value.password || undefined
-    });
-    ElMessage.success("连接已添加");
+    if (connectionEditMode.value) {
+      await patchSource(c.source_code, {
+        source_name_cn: c.source_name_cn,
+        db_type: c.db_type,
+        target_host: c.target_host,
+        port: c.port,
+        service_mode: c.service_mode,
+        service_name: c.service_name || null,
+        database_name: c.database_name || null,
+        default_schema: c.default_schema || null,
+        environment: c.environment,
+        connection_mode: c.connection_mode,
+        collect_mode: c.collect_mode
+      });
+      ElMessage.success("连接信息已更新");
+    } else {
+      await addSystemConnection(addConnSystem.value, {
+        ...c,
+        write_policy: "readonly",
+        username: addConnCred.value.username || undefined,
+        password: addConnCred.value.password || undefined
+      });
+      ElMessage.success("连接已添加");
+    }
     addConnDialog.value = false;
     loadSources();
     loadSystems();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "添加失败");
+    ElMessage.error(extractErrorDetail(e, "添加失败"));
   }
+}
+
+function handleSourceMore(row: AssetSourceItem, command: string) {
+  if (command === "readonly_credential") return openCredRotate(row, "readonly");
+  if (command === "write_credential") return openCredRotate(row, "write");
+  if (command === "policy_readonly") return onSetWritePolicy(row, "readonly");
+  if (command === "policy_medical") return onSetWritePolicy(row, "medical_dict_push");
+  if (command === "clear_readonly") return onClearCred(row, "readonly");
+  if (command === "clear_write") return onClearCred(row, "write");
+  if (command === "disable") return onDisableSource(row);
+}
+
+function openSchemaTables(sourceCode: string, namespace: string) {
+  void router.push({ path: "/asset/tables", query: { source_code: sourceCode, schema: namespace } });
 }
 
 function dbLabel(code?: string | null) {
@@ -430,7 +573,9 @@ function credStatusText(row: AssetSourceItem) {
 }
 
 onMounted(async () => {
-  if (route.query.tab === "connections") activeTab.value = "connections";
+  if (["connections", "tree"].includes(String(route.query.tab || ""))) {
+    activeTab.value = String(route.query.tab);
+  }
   await loadDbTypes();
   await Promise.all([loadSystems(), loadSources(), loadResourceTree()]);
 });
@@ -450,6 +595,9 @@ onMounted(async () => {
     <el-tabs v-model="activeTab">
       <el-tab-pane label="系统总览" name="overview">
         <el-card v-loading="loading" class="systems-card">
+          <el-alert v-if="systemsError" type="error" :closable="false" show-icon class="mb-12" :title="systemsError">
+            <template #default><el-button size="small" @click="loadSystems">重试</el-button></template>
+          </el-alert>
           <el-row :gutter="16">
             <el-col v-for="s in systems" :key="s.id" :xs="24" :sm="12" :lg="8">
               <el-card shadow="hover" class="system-tile">
@@ -481,6 +629,9 @@ onMounted(async () => {
 
       <el-tab-pane label="数据连接" name="connections">
         <el-card v-loading="sourcesLoading" class="systems-card">
+          <el-alert v-if="sourcesError" type="error" :closable="false" show-icon class="mb-12" :title="sourcesError">
+            <template #default><el-button size="small" @click="loadSources">重试</el-button></template>
+          </el-alert>
           <el-alert
             class="mb-12"
             type="info"
@@ -488,7 +639,15 @@ onMounted(async () => {
             show-icon
             title="只读凭据用于探库/对账；写凭据用于诊断手术字典下发（medical_dict_push）。密码不回显、不进 Git。HIS/海量请分别配置写账号后，再到字典中心做 dry-run/apply。"
           />
-          <el-table :data="sources" border stripe>
+          <div class="connection-filters">
+            <el-select v-model="connectionFilters.system_code" clearable placeholder="筛选业务系统" style="width: 190px">
+              <el-option v-for="system in systems" :key="system.system_code" :label="system.system_name_cn" :value="system.system_code" />
+            </el-select>
+            <el-select v-model="connectionFilters.db_type" clearable placeholder="筛选数据库类型" style="width: 180px">
+              <el-option v-for="db in dbTypes" :key="db.db_type" :label="db.label" :value="db.db_type" />
+            </el-select>
+          </div>
+          <el-table :data="pagedConnections.items" border stripe>
             <el-table-column label="业务系统" width="150">
               <template #default="{ row }">
                 <span>{{ systems.find(s => s.system_code === row.system_code)?.system_name_cn || row.system_code || '-' }}</span>
@@ -537,35 +696,45 @@ onMounted(async () => {
               </template>
             </el-table-column>
             <el-table-column label="检测" width="100">
-              <template #default="{ row }">{{ (row as any).last_test_status || row.last_check_status || '-' }}</template>
+              <template #default="{ row }">{{ connectionStatusLabel(row.last_test_status || row.last_check_status) }}</template>
             </el-table-column>
             <el-table-column prop="enabled" label="启用" width="70">
               <template #default="{ row }">
                 <el-tag :type="row.enabled ? 'success' : 'info'" size="small">{{ row.enabled ? '是' : '否' }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="420" fixed="right">
+            <el-table-column label="操作" width="250" fixed="right">
               <template #default="{ row }">
                 <el-button v-perms="'source.test'" link type="primary" size="small" @click="onCheck(row.source_code)">测试</el-button>
                 <el-button v-perms="'source.collect'" link type="primary" size="small" @click="onCollectMetadata(row.source_code)">采集</el-button>
-                <el-button v-perms="'source.credential_manage'" link type="primary" size="small" @click="openCredRotate(row, 'readonly')">只读凭据</el-button>
-                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="openCredRotate(row, 'write')">写凭据</el-button>
-                <el-dropdown v-perms="'source.manage'" trigger="click" @command="(cmd: string) => onSetWritePolicy(row, cmd)">
-                  <el-button link type="primary" size="small">写策略</el-button>
+                <el-button v-perms="'source.manage'" link type="primary" size="small" @click="openEditConnection(row)">编辑</el-button>
+                <el-dropdown trigger="click" @command="(cmd: string) => handleSourceMore(row, cmd)">
+                  <el-button link type="primary" size="small">更多</el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="readonly">只读</el-dropdown-item>
-                      <el-dropdown-item command="medical_dict_push">字典下发写</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.credential_manage'" command="readonly_credential">只读凭据</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.credential_manage'" command="write_credential">写凭据</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.manage'" command="policy_readonly">写策略：只读</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.manage'" command="policy_medical">写策略：字典下发</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.credential_manage'" command="clear_readonly">清除只读凭据</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.credential_manage'" command="clear_write">清除写凭据</el-dropdown-item>
+                      <el-dropdown-item v-perms="'source.manage'" command="disable" divided>禁用连接</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
-                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="onClearCred(row, 'readonly')">清只读</el-button>
-                <el-button v-perms="'source.credential_manage'" link type="warning" size="small" @click="onClearCred(row, 'write')">清写</el-button>
-                <el-button v-perms="'source.manage'" link type="danger" size="small" @click="onDisableSource(row)">禁用</el-button>
               </template>
             </el-table-column>
           </el-table>
-          <el-empty v-if="!sourcesLoading && !sources.length" description="暂无连接" />
+          <el-pagination
+            v-if="pagedConnections.total"
+            v-model:current-page="connectionPage"
+            v-model:page-size="connectionPageSize"
+            :total="pagedConnections.total"
+            :page-sizes="[10, 20, 50]"
+            layout="total, sizes, prev, pager, next"
+            class="connection-pagination"
+          />
+          <el-empty v-if="!sourcesLoading && !sourcesError && !pagedConnections.total" description="当前筛选下暂无连接" />
         </el-card>
       </el-tab-pane>
 
@@ -574,6 +743,9 @@ onMounted(async () => {
           <template #header>
             <span>业务系统 → 数据连接 → Schema/Owner → 表 → 字段</span>
           </template>
+          <el-alert v-if="resourceTreeError" type="error" :closable="false" show-icon class="mb-12" :title="resourceTreeError">
+            <template #default><el-button size="small" @click="loadResourceTree">重试</el-button></template>
+          </el-alert>
           <el-collapse>
             <el-collapse-item v-for="node in resourceTree" :key="`${node.source_code}-${node.source_system}`" :name="`${node.source_code}-${node.source_system}`">
               <template #title>
@@ -591,6 +763,7 @@ onMounted(async () => {
                     <el-tag size="small">{{ schema.table_count }} 表</el-tag>
                   </template>
                   <div class="tree-note">表和字段按需加载，进入「表资产」完整检索。</div>
+                  <el-button size="small" link type="primary" @click="openSchemaTables(node.source_code, schema.namespace)">查看该 Schema 的表</el-button>
                 </el-collapse-item>
               </el-collapse>
             </el-collapse-item>
@@ -601,15 +774,15 @@ onMounted(async () => {
     </el-tabs>
 
     <!-- 新增系统向导 -->
-    <el-drawer v-model="drawerVisible" title="新增系统与连接" size="560px" destroy-on-close>
-      <el-steps :active="wizardStep" finish-status="success" align-center class="wizard-steps">
+    <el-drawer v-model="drawerVisible" :title="editorMode === 'create' ? '新增系统与连接' : '编辑系统'" size="560px" destroy-on-close>
+      <el-steps v-if="editorMode === 'create'" :active="wizardStep" finish-status="success" align-center class="wizard-steps">
         <el-step title="基本信息" />
         <el-step title="添加连接" />
         <el-step title="凭据" />
         <el-step title="确认保存" />
       </el-steps>
 
-      <div v-show="wizardStep === 0" class="wizard-body">
+      <div v-loading="editorLoading" v-show="editorMode === 'edit' || wizardStep === 0" class="wizard-body">
         <el-form label-width="100px">
           <el-form-item label="系统编码" required>
             <el-input v-model="form.system_code" placeholder="如 HIS / NEW_SYSTEM" />
@@ -618,7 +791,9 @@ onMounted(async () => {
             <el-input v-model="form.system_name_cn" />
           </el-form-item>
           <el-form-item label="类型">
-            <el-input v-model="form.system_type" placeholder="business" />
+            <el-select v-model="form.system_type" filterable allow-create class="full-width" placeholder="选择或保留原系统类型">
+              <el-option v-for="option in systemTypeOptions" :key="option" :label="option" :value="option" />
+            </el-select>
           </el-form-item>
           <el-form-item label="目标地址">
             <el-input v-model="form.target_host" placeholder="系统主 IP，可选" />
@@ -629,7 +804,7 @@ onMounted(async () => {
         </el-form>
       </div>
 
-      <div v-show="wizardStep === 1" class="wizard-body">
+      <div v-if="editorMode === 'create'" v-show="wizardStep === 1" class="wizard-body">
         <el-form label-width="110px">
           <el-form-item label="连接编码" required>
             <el-input v-model="connectionForm.source_code" />
@@ -674,7 +849,7 @@ onMounted(async () => {
         </el-form>
       </div>
 
-      <div v-show="wizardStep === 2" class="wizard-body">
+      <div v-if="editorMode === 'create'" v-show="wizardStep === 2" class="wizard-body">
         <el-alert type="info" :closable="false" show-icon title="密码只写不回显；编辑时留空表示不轮换。业务源强制只读凭据。" class="mb-12" />
         <el-form label-width="100px">
           <el-form-item label="用户名">
@@ -688,7 +863,7 @@ onMounted(async () => {
         </el-form>
       </div>
 
-      <div v-show="wizardStep === 3" class="wizard-body">
+      <div v-if="editorMode === 'create'" v-show="wizardStep === 3" class="wizard-body">
         <el-descriptions :column="1" border>
           <el-descriptions-item label="系统">{{ form.system_code }} / {{ form.system_name_cn }}</el-descriptions-item>
           <el-descriptions-item label="连接数">{{ connections.length }}</el-descriptions-item>
@@ -703,9 +878,10 @@ onMounted(async () => {
       </div>
 
       <template #footer>
-        <el-button v-if="wizardStep > 0" @click="wizardStep--">上一步</el-button>
-        <el-button v-if="wizardStep < 3" type="primary" @click="wizardStep++">下一步</el-button>
-        <el-button v-if="wizardStep === 3" v-perms="'source.manage'" type="primary" @click="saveWizard">保存</el-button>
+        <el-button v-if="editorMode === 'create' && wizardStep > 0" @click="wizardStep--">上一步</el-button>
+        <el-button v-if="editorMode === 'create' && wizardStep < 3" type="primary" @click="nextWizardStep">下一步</el-button>
+        <el-button v-if="editorMode === 'create' && wizardStep === 3" v-perms="'source.manage'" type="primary" @click="saveWizard">保存</el-button>
+        <el-button v-if="editorMode === 'edit'" v-perms="'source.manage'" type="primary" :loading="editorSaving" @click="saveSystemEdit">保存修改</el-button>
         <el-button @click="drawerVisible = false">取消</el-button>
       </template>
     </el-drawer>
@@ -750,9 +926,9 @@ onMounted(async () => {
     </el-dialog>
 
     <!-- 追加连接 -->
-    <el-dialog v-model="addConnDialog" :title="`为 ${addConnSystem} 添加连接`" width="520px">
+    <el-dialog v-model="addConnDialog" :title="connectionEditMode ? `编辑连接 ${addConnForm.source_code}` : `为 ${addConnSystem} 添加连接`" width="520px">
       <el-form label-width="110px">
-        <el-form-item label="连接编码" required><el-input v-model="addConnForm.source_code" /></el-form-item>
+        <el-form-item label="连接编码" required><el-input v-model="addConnForm.source_code" :disabled="connectionEditMode" /></el-form-item>
         <el-form-item label="名称" required><el-input v-model="addConnForm.source_name_cn" /></el-form-item>
         <el-form-item label="类型">
           <el-select v-model="addConnForm.db_type" class="full-width">
@@ -765,8 +941,10 @@ onMounted(async () => {
           <el-input v-model="addConnForm.service_name" />
         </el-form-item>
         <el-form-item v-else label="Database"><el-input v-model="addConnForm.database_name" /></el-form-item>
-        <el-form-item label="用户名"><el-input v-model="addConnCred.username" autocomplete="off" /></el-form-item>
-        <el-form-item label="密码"><el-input v-model="addConnCred.password" type="password" show-password autocomplete="new-password" /></el-form-item>
+        <template v-if="!connectionEditMode">
+          <el-form-item label="用户名"><el-input v-model="addConnCred.username" autocomplete="off" /></el-form-item>
+          <el-form-item label="密码"><el-input v-model="addConnCred.password" type="password" show-password autocomplete="new-password" /></el-form-item>
+        </template>
       </el-form>
       <template #footer>
         <el-button @click="addConnDialog = false">取消</el-button>
@@ -783,6 +961,15 @@ onMounted(async () => {
   border-radius: var(--radius-base);
   box-shadow: var(--shadow-sm);
   margin-bottom: 12px;
+}
+.connection-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.connection-pagination {
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 .system-tile :deep(.el-card__body) { padding: 16px; }
 .system-tile-main {

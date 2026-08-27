@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from ..models.governance_base import GovernAuditLog
 from ..models.metric_asset import AssetMetricDefinition, AssetMetricResult, AssetMetricVersion
 from ..models.query_asset import AssetQueryVersion
+from .intake_version_retry import flush_new_version_with_retry
 
 
 def _now():
@@ -232,14 +233,15 @@ def ingest_metric(
             "version": _ser_ver(existing),
         }
 
-    max_ver = db.scalar(
-        select(AssetMetricVersion.version)
-        .where(AssetMetricVersion.metric_id == definition.id)
-        .order_by(AssetMetricVersion.version.desc())
-        .limit(1)
-    ) or 0
+    def _max_version() -> int:
+        return db.scalar(
+            select(AssetMetricVersion.version)
+            .where(AssetMetricVersion.metric_id == definition.id)
+            .order_by(AssetMetricVersion.version.desc())
+            .limit(1)
+        ) or 0
+
     parent = get_active_metric_version(db, metric_code)
-    next_ver = max_ver + 1
 
     if errors:
         status = "blocked"
@@ -251,39 +253,84 @@ def ingest_metric(
         status = "active" if auto_activate else "validated"
         activate = auto_activate
 
-    version = AssetMetricVersion(
-        metric_id=definition.id,
-        metric_code=metric_code,
-        version=next_ver,
-        parent_version_id=parent.id if parent else None,
-        status=status,
-        is_active=False,
-        definition_text=payload["definition_text"],
-        numerator_desc=numerator_desc,
-        denominator_desc=denominator_desc,
-        formula=formula,
-        query_code=q_code,
-        query_version=q_ver,
-        numerator_query_code=n_code,
-        numerator_query_version=n_ver,
-        denominator_query_code=d_code,
-        denominator_query_version=d_ver,
-        period_field=period_field,
-        include_rules=include_rules,
-        exclude_rules=exclude_rules,
-        dedup_rules=dedup_rules,
-        limitations=limitations or [],
-        system_code=system_code,
-        source_code=source_code,
-        revision_reason=revision_reason,
-        content_hash=chash,
-        created_by=created_by,
+    def _build_version(next_ver: int) -> AssetMetricVersion:
+        return AssetMetricVersion(
+            metric_id=definition.id,
+            metric_code=metric_code,
+            version=next_ver,
+            parent_version_id=parent.id if parent else None,
+            status=status,
+            is_active=False,
+            definition_text=payload["definition_text"],
+            numerator_desc=numerator_desc,
+            denominator_desc=denominator_desc,
+            formula=formula,
+            query_code=q_code,
+            query_version=q_ver,
+            numerator_query_code=n_code,
+            numerator_query_version=n_ver,
+            denominator_query_code=d_code,
+            denominator_query_version=d_ver,
+            period_field=period_field,
+            include_rules=include_rules,
+            exclude_rules=exclude_rules,
+            dedup_rules=dedup_rules,
+            limitations=limitations or [],
+            system_code=system_code,
+            source_code=source_code,
+            revision_reason=revision_reason,
+            content_hash=chash,
+            created_by=created_by,
+        )
+
+    # A9：并发摄取撞 (metric_id, version) 唯一键时重读 max 重试一次。
+    version, next_ver = flush_new_version_with_retry(
+        db, build_version=_build_version, current_max_version=_max_version
     )
-    db.add(version)
-    db.flush()
 
     activated = False
     if activate and status == "active":
+        # 144 S4/A04: metric activation requires runnable query refs —
+        # candidate/blocked references must never back an active metric.
+        from .query_version_ref_guard import validate_version_reference
+
+        def _resolver(code: str, ver: int):
+            return db.scalar(
+                select(AssetQueryVersion).where(
+                    AssetQueryVersion.query_code == code,
+                    AssetQueryVersion.version == ver,
+                )
+            )
+
+        try:
+            if q_code and q_ver is not None:
+                validate_version_reference(_resolver, q_code, q_ver, context="metric")
+            if n_code and n_ver is not None:
+                validate_version_reference(_resolver, n_code, n_ver, context="metric numerator")
+            if d_code and d_ver is not None:
+                validate_version_reference(_resolver, d_code, d_ver, context="metric denominator")
+        except (ValueError, LookupError) as exc:
+            version.status = "candidate"
+            version.unresolved_reason = str(exc)[:500]
+            db.add(
+                GovernAuditLog(
+                    module="metric_asset",
+                    entity_type="metric_version",
+                    entity_ref=f"{metric_code}@{next_ver}",
+                    action="activation_gate_rejected",
+                    after_data={"metric_code": metric_code, "reason": str(exc)[:300]},
+                    operator=created_by,
+                )
+            )
+            db.flush()
+            return {
+                "idempotent": False,
+                "created_definition": created_def,
+                "activated": False,
+                "gate_errors": [str(exc)],
+                "definition": _ser_def(definition),
+                "version": _ser_ver(version),
+            }
         db.execute(
             update(AssetMetricVersion)
             .where(

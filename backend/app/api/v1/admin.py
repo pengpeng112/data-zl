@@ -2,13 +2,15 @@ import hashlib
 import secrets
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
+from ...core.security import get_current_user, get_request_operator
 from ...models.governance import ApiKey, TableOwner, BusinessTerm, MetadataSnapshot
+from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
 from ...services.asset_catalog import CANONICAL_SYSTEMS
 
@@ -47,9 +49,14 @@ def list_keys(
     return ApiResponse(data=items)
 
 
+def _admin_operator(request: Request) -> str:
+    return get_request_operator(request, default="system")
+
+
 @router.post("/keys", summary="创建新 API Key")
 def create_key(
     req: KeyCreateRequest,
+    request: Request,
     db: Session = Depends(get_db),
 
 ) -> ApiResponse[dict]:
@@ -60,6 +67,16 @@ def create_key(
         user_identifier=req.user_identifier,
     )
     db.add(key)
+    db.flush()
+    # B4：API Key 创建此前零审计；审计只记 key 元数据，绝不落 token/token_hash。
+    db.add(GovernAuditLog(
+        module="admin",
+        entity_type="api_key",
+        entity_ref=str(key.id),
+        action="create",
+        after_data={"key_name": key.key_name, "user_identifier": key.user_identifier, "enabled": True},
+        operator=_admin_operator(request),
+    ))
     db.commit()
     return ApiResponse(data={"id": key.id, "key_name": key.key_name, "token": token, "warning": "Token 只显示一次，请立即保存"})
 
@@ -67,6 +84,7 @@ def create_key(
 @router.patch("/keys/{key_id}", summary="禁用/启用 API Key")
 def toggle_key(
     key_id: int,
+    request: Request,
     enabled: bool = Query(True),
     db: Session = Depends(get_db),
 
@@ -74,7 +92,18 @@ def toggle_key(
     key = db.get(ApiKey, key_id)
     if not key:
         raise HTTPException(status_code=404)
+    before = {"enabled": key.enabled}
     key.enabled = enabled
+    # B4：API Key 启停补审计。
+    db.add(GovernAuditLog(
+        module="admin",
+        entity_type="api_key",
+        entity_ref=str(key_id),
+        action="toggle",
+        before_data=before,
+        after_data={"enabled": enabled, "key_name": key.key_name},
+        operator=_admin_operator(request),
+    ))
     db.commit()
     return ApiResponse(data={"id": key.id, "key_name": key.key_name, "enabled": key.enabled})
 

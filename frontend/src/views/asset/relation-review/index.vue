@@ -1,8 +1,22 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { http } from "@/utils/http";
+import {
+  approveRelationReview,
+  batchReviewRelations,
+  getRelationFieldMappings,
+  getRelationFieldMappingsFor,
+  getRelationListCounts,
+  getRelationReviews,
+  getRelationsList,
+  legacyReviewRelation,
+  listSystems,
+  rejectRelationReview,
+  updateRelation
+} from "@/api/asset";
+import { usePagedList } from "@/composables/usePagedList";
 import { ElMessage } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import {
   RELATION_CLASS_TABS,
   normalizeRelationClass,
@@ -54,11 +68,38 @@ interface SystemOption {
 
 const router = useRouter();
 const route = useRoute();
-const relations = ref<Relation[]>([]);
-const total = ref(0);
-const page = ref(1);
-const pageSize = ref(30);
-const loading = ref(false);
+// F6：分页五件套收敛到 usePagedList（含请求序号守卫与 catch 提示）；
+// items 别名为 relations 保持模板引用不变。
+const {
+  items: relations,
+  total,
+  page,
+  pageSize,
+  loading,
+  loadData: loadRelations,
+  doSearch
+} = usePagedList<Relation, any>({
+  pageSize: 30,
+  errorText: "关系列表加载失败",
+  extraParams: () => {
+    const extra: Record<string, string> = {};
+    if (filters.system_code) extra.system_code = filters.system_code;
+    if (filters.confidence) extra.confidence = filters.confidence;
+    if (filters.review_status) extra.review_status = filters.review_status;
+    if (filters.keyword) extra.keyword = filters.keyword;
+    if (relationClass.value && relationClass.value !== "all") extra.relation_class = relationClass.value;
+    return extra as any;
+  },
+  fetcher: async query => {
+    const res = await getRelationsList(query as Record<string, string | number>);
+    void loadTabCounts();
+    void loadRecentReviews();
+    return {
+      items: (res.data?.items || []) as unknown as Relation[],
+      total: res.data?.total || 0
+    };
+  }
+});
 const dialogVisible = ref(false);
 const isEdit = ref(false);
 const editId = ref(0);
@@ -92,7 +133,7 @@ const currentMappingRel = ref<Relation | null>(null);
 
 async function loadSystemOptions() {
   try {
-    const res = await http.request<any>("get", "/api/v1/systems");
+    const res = await listSystems();
     systemOptions.value = res.data || [];
   } catch { /* ignore */ }
 }
@@ -108,25 +149,6 @@ function resetFilters() {
   loadRelations();
 }
 
-async function loadRelations() {
-  loading.value = true;
-  try {
-    // 127: draft/pending/confirmed/rejected use relation-reviews main table
-    const params: Record<string, string | number> = { page: page.value, page_size: pageSize.value };
-    if (filters.system_code) params.system_code = filters.system_code;
-    if (filters.confidence) params.confidence = filters.confidence;
-    if (filters.review_status) params.review_status = filters.review_status;
-    if (filters.keyword) params.keyword = filters.keyword;
-    if (relationClass.value && relationClass.value !== "all") params.relation_class = relationClass.value;
-    const res = await http.request<any>("get", "/api/v1/relations/list", { params });
-    relations.value = res.data?.items || [];
-    total.value = res.data?.total || 0;
-    void loadTabCounts();
-    void loadRecentReviews();
-  } finally {
-    loading.value = false;
-  }
-}
 
 async function loadRecentReviews() {
   if (relationClass.value !== "confirmed" && relationClass.value !== "rejected") {
@@ -135,10 +157,8 @@ async function loadRecentReviews() {
   }
   try {
     const status = relationClass.value === "rejected" ? "rejected" : "approved";
-    const res = await http.request<any>("get", "/api/v1/relation-reviews", {
-      params: { review_status: status, page: 1, page_size: 50 }
-    });
-    recentReviews.value = res.data?.items || [];
+    const res = await getRelationReviews({ review_status: status, page: 1, page_size: 50 });
+    recentReviews.value = (res.data?.items || []) as unknown as RecentReview[];
   } catch {
     recentReviews.value = [];
   }
@@ -174,28 +194,28 @@ function openEdit(row: Relation) {
 async function saveRelation() {
   try {
     if (isEdit.value) {
-      await http.request("patch", `/api/v1/relations/${editId.value}`, { data: form.value });
+      await updateRelation(editId.value, form.value);
       ElMessage.success("修改成功");
     }
     dialogVisible.value = false;
     loadRelations();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "保存失败");
+    ElMessage.error(extractErrorDetail(e, "保存失败"));
   }
 }
 
 async function updateField(relId: number, field: string, value: string) {
   try {
-    await http.request("patch", `/api/v1/relations/${relId}`, { data: { [field]: value } });
+    await updateRelation(relId, { [field]: value });
     ElMessage.success("已更新");
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "更新失败");
+    ElMessage.error(extractErrorDetail(e, "更新失败"));
   }
 }
 
 async function loadTabCounts() {
   try {
-    const res = await http.request<any>("get", "/api/v1/relations/list-counts");
+    const res = await getRelationListCounts();
     tabCounts.value = res.data || {};
   } catch {
     tabCounts.value = {};
@@ -245,31 +265,39 @@ async function handleApprove(relId: number) {
   try {
     // Prefer relation-reviews approve (links formal, no candidate promote)
     try {
-      const res = await http.request<any>("post", `/api/v1/relation-reviews/${relId}/approve`, { data: {} });
+      const res = await approveRelationReview(relId);
       const action = res.data?.action || "approved";
       ElMessage.success(`已批准（${action}）`);
-    } catch {
-      await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "approve" } });
+    } catch (primaryError: any) {
+      // E9：仅主端点 404（草稿不在 relation-reviews）时回退 legacy；其余错误原样上抛。
+      if (primaryError?.response?.status !== 404) {
+        throw primaryError;
+      }
+      await legacyReviewRelation(relId, "approve");
       ElMessage.success("已批准");
     }
     loadRelations();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "操作失败");
+    ElMessage.error(extractErrorDetail(e, "操作失败"));
   }
 }
 
 async function handleReject(relId: number) {
   try {
     try {
-      await http.request("post", `/api/v1/relation-reviews/${relId}/reject`, { data: {} });
+      await rejectRelationReview(relId);
       ElMessage.success("已驳回（草稿保留证据）");
-    } catch {
-      await http.request("patch", `/api/v1/relations/${relId}/review`, { params: { action: "reject" } });
+    } catch (primaryError: any) {
+      // E9：仅主端点 404 时回退 legacy。
+      if (primaryError?.response?.status !== 404) {
+        throw primaryError;
+      }
+      await legacyReviewRelation(relId, "reject");
       ElMessage.success("已驳回");
     }
     loadRelations();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "操作失败");
+    ElMessage.error(extractErrorDetail(e, "操作失败"));
   }
 }
 
@@ -279,14 +307,15 @@ async function batchReview(action: "approve" | "reject") {
     return;
   }
   try {
-    await http.request("post", "/api/v1/relations/batch-review", {
-      data: { relation_ids: selectedRelations.value.map(row => row.id), action }
+    await batchReviewRelations({
+      relation_ids: selectedRelations.value.map(row => row.id),
+      action
     });
     ElMessage.success(`已批量${action === "approve" ? "批准" : "驳回"} ${selectedRelations.value.length} 条关系`);
     selectedRelations.value = [];
     loadRelations();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "批量处理失败");
+    ElMessage.error(extractErrorDetail(e, "批量处理失败"));
   }
 }
 
@@ -297,19 +326,17 @@ async function showMappings(relId: number) {
   mappings.value = [];
   try {
     try {
-      const res = await http.request<any>("get", `/api/v1/relation-reviews/${relId}/field-mappings`);
+      const res = await getRelationFieldMappingsFor(relId);
       mappings.value = Array.isArray(res.data) ? res.data : res.data?.items || [];
       return;
     } catch {
       /* fall through to relations API */
     }
-    const res = await http.request<any>("get", "/api/v1/relations/field-mappings", {
-      params: { rel_id: relId }
-    });
+    const res = await getRelationFieldMappings(relId);
     const payload = res.data;
     mappings.value = Array.isArray(payload) ? payload : payload?.items || [];
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "获取字段映射失败");
+    ElMessage.error(extractErrorDetail(e, "获取字段映射失败"));
   } finally {
     mappingsLoading.value = false;
   }

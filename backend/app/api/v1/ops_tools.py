@@ -185,16 +185,26 @@ def _tool_payload(r: OpsToolTemplate) -> dict:
 @router.get("/tools", summary="Ops tool template list")
 def list_tools(
     tool_type: str | None = Query(None),
+    keyword: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
-) -> ApiResponse[list[dict]]:
+) -> ApiResponse[dict]:
     stmt = select(OpsToolTemplate)
     if tool_type:
         stmt = stmt.where(OpsToolTemplate.tool_type == tool_type)
-    rows = db.scalars(stmt.order_by(OpsToolTemplate.tool_code)).all()
-    return ApiResponse(data=[_tool_payload(r) for r in rows])
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(OpsToolTemplate.tool_code.ilike(like) | OpsToolTemplate.tool_name_cn.ilike(like))
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(OpsToolTemplate.tool_code)
+        .offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": [_tool_payload(r) for r in rows]})
 
 
-@router.put("/tools", summary="Create or update ops tool template")
+@router.put("/tools", summary="Create or update ops tool template", dependencies=[Depends(require_permission("ops.tool.manage"))])
 def upsert_tool(req: ToolUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(OpsToolTemplate).where(OpsToolTemplate.tool_code == req.tool_code))
     input_schema = _merge_write_config(req.input_schema, req)
@@ -313,6 +323,7 @@ def approve_run(run_id: int, req: ApproveBody, request: Request, db: Session = D
 def list_runs(
     status: str | None = Query(None),
     approval_status: str | None = Query(None),
+    run_id: int | None = Query(None, description="定位指定 run 所在页（146 E7）"),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -322,6 +333,13 @@ def list_runs(
     if status_filter:
         stmt = stmt.where(OpsToolRun.approval_status == status_filter)
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    if run_id:
+        target = db.get(OpsToolRun, run_id)
+        if target:
+            newer = db.scalar(
+                select(func.count()).select_from(stmt.where(OpsToolRun.created_at > target.created_at, OpsToolRun.id != run_id).subquery())
+            ) or 0
+            page = newer // page_size + 1
     rows = db.scalars(
         stmt.order_by(OpsToolRun.created_at.desc())
         .offset((page - 1) * page_size).limit(page_size)

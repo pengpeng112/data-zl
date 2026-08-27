@@ -15,6 +15,7 @@ from ..models.query_asset import (
 )
 from ..services.query_fingerprint import semantic_fingerprint, sql_sha256, normalize_sql
 from ..services.query_gate import evaluate_query_gate, extract_table_refs
+from .intake_version_retry import flush_new_version_with_retry
 
 
 def _now():
@@ -191,15 +192,6 @@ def ingest_query(
             "gate": gate,
         }
 
-    max_ver = db.scalar(
-        select(AssetQueryVersion.version)
-        .where(AssetQueryVersion.query_id == definition.id)
-        .order_by(AssetQueryVersion.version.desc())
-        .limit(1)
-    ) or 0
-    parent = get_active_version(db, query_code)
-    next_ver = max_ver + 1
-
     status = gate["status"]
     if status == "validated" and gate["auto_activate"]:
         final_status = "active"
@@ -214,37 +206,52 @@ def ingest_query(
         "safety": gate.get("safety"),
     }
 
-    version = AssetQueryVersion(
-        query_id=definition.id,
-        query_code=query_code,
-        version=next_ver,
-        parent_version_id=parent.id if parent else None,
-        status=final_status,
-        is_active=False,
-        dialect=dialect,
-        sql_text=sql_text,
-        sql_normalized=normalize_sql(sql_text),
-        sql_sha256=sha,
-        semantic_fingerprint=semantic_fingerprint(
-            sql_text, system_code=system_code, source_code=source_code
-        ),
-        parameter_schema=parameter_schema,
-        grain=grain,
-        period_field=period_field,
-        limitations=limitations or [],
-        risk_flags=risk,
-        recipe_refs=recipe_refs or [],
-        metric_refs=metric_refs or [],
-        source_path=source_path,
-        ai_source=ai_source,
-        session_key=session_key,
-        revision_reason=revision_reason,
-        created_by=created_by,
+    def _max_version() -> int:
+        return db.scalar(
+            select(AssetQueryVersion.version)
+            .where(AssetQueryVersion.query_id == definition.id)
+            .order_by(AssetQueryVersion.version.desc())
+            .limit(1)
+        ) or 0
+
+    parent = get_active_version(db, query_code)
+
+    def _build_version(next_ver: int) -> AssetQueryVersion:
+        version = AssetQueryVersion(
+            query_id=definition.id,
+            query_code=query_code,
+            version=next_ver,
+            parent_version_id=parent.id if parent else None,
+            status=final_status,
+            is_active=False,
+            dialect=dialect,
+            sql_text=sql_text,
+            sql_normalized=normalize_sql(sql_text),
+            sql_sha256=sha,
+            semantic_fingerprint=semantic_fingerprint(
+                sql_text, system_code=system_code, source_code=source_code
+            ),
+            parameter_schema=parameter_schema,
+            grain=grain,
+            period_field=period_field,
+            limitations=limitations or [],
+            risk_flags=risk,
+            recipe_refs=recipe_refs or [],
+            metric_refs=metric_refs or [],
+            source_path=source_path,
+            ai_source=ai_source,
+            session_key=session_key,
+            revision_reason=revision_reason,
+            created_by=created_by,
+        )
+        if final_status in {"validated", "active"}:
+            version.validated_at = _now()
+        return version
+
+    # A9：并发摄取撞 (query_id, version) 唯一键时重读 max 重试一次。
+    version, next_ver = flush_new_version_with_retry(
+        db, build_version=_build_version, current_max_version=_max_version
     )
-    if final_status in {"validated", "active"}:
-        version.validated_at = _now()
-    db.add(version)
-    db.flush()
 
     # Dependencies from table refs (candidate evidence only)
     for tbl in extract_table_refs(sql_text):
@@ -266,20 +273,37 @@ def ingest_query(
 
     activated = False
     if final_status == "active":
-        # supersede previous active
-        db.execute(
-            update(AssetQueryVersion)
-            .where(
-                AssetQueryVersion.query_code == query_code,
-                AssetQueryVersion.is_active.is_(True),
+        # 144 S7 G5 gate (FF_G5_EVAL_GATE, default off): before a new version
+        # becomes the active one, replay affected golden cases; failures keep
+        # the version candidate. Gate never runs during intake without cases.
+        from ..core.config import settings as _settings
+
+        eval_summary = None
+        if getattr(_settings, "ff_g5_eval_gate", False):
+            from .query_evaluation_service import evaluation_gate_pass, run_evaluation
+
+            eval_summary = run_evaluation(db, query_code=query_code, triggered_by="g5_gate")
+            if not evaluation_gate_pass(eval_summary):
+                final_status = "candidate"
+                version.status = "candidate"
+                version.unresolved_reason = (
+                    f"G5 黄金用例回放未通过: failed={eval_summary.get('failed')} errors={eval_summary.get('errors')}"
+                )
+        if final_status == "active":
+            # supersede previous active
+            db.execute(
+                update(AssetQueryVersion)
+                .where(
+                    AssetQueryVersion.query_code == query_code,
+                    AssetQueryVersion.is_active.is_(True),
+                )
+                .values(is_active=False, status="superseded", updated_at=_now())
             )
-            .values(is_active=False, status="superseded", updated_at=_now())
-        )
-        version.is_active = True
-        version.status = "active"
-        version.activated_at = _now()
-        definition.current_version_id = version.id
-        activated = True
+            version.is_active = True
+            version.status = "active"
+            version.activated_at = _now()
+            definition.current_version_id = version.id
+            activated = True
 
     db.add(
         GovernAuditLog(

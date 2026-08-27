@@ -6,6 +6,12 @@
 
 # AI 视图 SQL 生成与平台对接说明
 
+> **144 实施注记（2026-08-23）**：144 S2–S9 已落地以下实现，本文件中与之不一致的描述以运行时 `/docs` 与 144 §16.1 执行记录为准——
+> 参数真实 bind 连接器、状态/来源/大表（AST 含 WHERE 1=1 拒绝）门禁、result/schema digest 与 data_as_of、指标真实计算引擎（批次/维度唯一键）、
+> 精确 object_key 与静态血缘（asset_lineage_edges）、统一 AI context（/api/v1/ai/context/resolve）、反馈—评测闭环（/api/v1/ai/feedback|evaluations）。
+> 旧 AI context 返回完整 SQL 的行为已改为默认仅哈希（需 ai:sql:full_read 权限）。
+
+
 ## 1. 目的与最终边界
 
 本规范用于指导 AI 根据平台已经登记的系统、数据库、Schema、表、字段、关系和关系配方生成**视图查询 SQL**。

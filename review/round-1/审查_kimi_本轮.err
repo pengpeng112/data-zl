@@ -1,0 +1,22 @@
+• Read only 方案.md.I'm a read-only reviewer. Need to review the 方案.md which is a summary of the plan (149 doc). I must not read other files in review/. But can I read the referenced 149 document? The instruction says "不要读取 review/ 下其他任何文件" — only review/ is forbidden. Reading 开发起步包/149 might help accuracy, but the task says "通读 方案.md，独立审查" — review based on the document. The 方案.md is the 复核对象 containing the summary of the plan. I could read 149 for fact-checking, but the user scoped to 方案.md. Also AGENTS.md startup checks... but this is a review task in review/ directory, read-only. I'll just review based on the document, but I can leverage my knowledge of AGENTS.md content (already in context: 148 doc exists, field dictionary). Keep it focused.
+
+  Let me produce item-by-item review with 同意/反对/疑问+理由+风险, citing sections/原文.
+
+  Structure my review around:
+  1. §一 P1 数据模型: evidence 单字段 → 关注点2/3 多来源冲突
+  2. status 三态 vs conflict
+  3. current_version_id
+  4. P1 API 注入 design — 关注点1
+  5. SQL 解析宁缺勿错 — 同意
+  6. P2 幂等导入 — 同意, small notes
+  7. P3 技能路由硬规则 — 同意; value_domains.json 兜底滞后风险
+  8. P4 二期延后 — 反对/疑问: 冲突检测是owner核心关注点3，P4里的字面量冲突warning才是冲突检测的核心机制，延后削弱
+  9. 双写一致性 Q4 — 库为权威，同意；但导出单向→文档为导出视图与"文档兜底"矛盾
+  10. Q1 确认人机制待定 — 风险
+  11. 遗漏风险: 值域粒度（依赖上下文如住院/门诊子集、STATE IN (2,3) 条件型值域无法表达）; code+meaning 无值域上下文条件字段; 审计; 权限; system_context 注入量膨胀; versions API; AI 提交 pending 的防垃圾; 唯一约束 (system_code, table, column, code).
+
+  Note: 方案.md is only a summary; I don't have the full 149 doc. I should note that审查基于摘要. That's honest.
+
+  Write concise itemized review in Chinese.
+
+To resume this session: kimi -r session_00bbc7cf-a395-4d7d-93b1-c3387944310b

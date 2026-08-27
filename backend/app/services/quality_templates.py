@@ -116,7 +116,8 @@ def template_standard_domain(
     namespace: str | None = None,
 ) -> str:
     full_table = _full_table(table_name, namespace)
-    values = ", ".join(f"'{v}'" for v in valid_values)
+    # B6：值内单引号双写转义，防止值域值带引号时截断/改写 SQL 字面量。
+    values = ", ".join("'" + str(v).replace("'", "''") + "'" for v in valid_values)
     return (
         f"SELECT COUNT(*) AS TOTAL_CNT, "
         f"SUM(CASE WHEN {column_name} NOT IN ({values}) THEN 1 ELSE 0 END) AS ERROR_CNT "
@@ -187,9 +188,11 @@ def template_accuracy_single(
     table_name: str, column_name: str, condition: str, namespace: str | None = None
 ) -> str:
     full_table = _full_table(table_name, namespace)
+    # B6：条件值内单引号双写转义，与其他值域模板口径一致。
+    escaped_condition = str(condition).replace("'", "''")
     return (
         f"SELECT COUNT(*) AS TOTAL_CNT, "
-        f"SUM(CASE WHEN {column_name} = {condition} THEN 1 ELSE 0 END) AS ERROR_CNT "
+        f"SUM(CASE WHEN {column_name} = {escaped_condition} THEN 1 ELSE 0 END) AS ERROR_CNT "
         f"FROM {full_table}"
     )
 

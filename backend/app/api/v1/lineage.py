@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.lineage import AssetViewDependency
-from ...models.candidate import AssetCandidateRelation
-from ...models.asset import AssetRelation
 from ...schemas.common import ApiResponse
 from ...schemas.lineage import ImpactResult, ViewDependencyItem
 
@@ -48,11 +47,64 @@ def view_dependencies(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.get("/impact", summary="表影响分析：某表被哪些视图引用，关联哪些关系")
+@router.post("/sync", summary="144 S5：静态血缘确定性导入（默认 dry-run）", dependencies=[Depends(require_permission("query.create"))])
+def sync_static_lineage(
+    request: Request,
+    dry_run: bool = Query(True, description="默认 dry-run；true 时零写入"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    from ...services.lineage_ingest import sync_lineage_edges
+
+    result = sync_lineage_edges(db, dry_run=dry_run)
+    if not dry_run:
+        db.commit()
+    return ApiResponse(data=result)
+
+
+@router.get("/impact", summary="精确 object_key 血缘影响分析（typed nodes/edges）")
 def impact_analysis(
+    object_key: str | None = Query(None, description="138 对象键；表键可由 table 参数代算"),
+    table: str | None = Query(None, description="SCHEMA.TABLE；服务端在元数据目录内精确解析，歧义即 422"),
+    direction: str = Query("downstream", pattern="^(downstream|upstream|both)$"),
+    max_hops: int = Query(3, ge=1, le=5),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    from ...services.lineage_ingest import lineage_impact, table_object_key
+    from ...services.object_identity import AmbiguousObjectError
+    from ...services.query_validation_service import build_metadata_index
+
+    if not object_key and not table:
+        raise HTTPException(status_code=422, detail="需要 object_key 或 table 参数")
+    if table and not object_key:
+        index = build_metadata_index(db)
+        parts = table.split(".")
+        if len(parts) == 2:
+            key = (parts[0].upper(), parts[1].upper())
+            meta = index.get(key)
+            if meta is None:
+                raise HTTPException(status_code=422, detail=f"表不在元数据目录: {table}")
+        else:
+            hits = [k for k in index if k[1] == parts[0].upper()]
+            if len(hits) != 1:
+                raise HTTPException(status_code=422, detail="裸表名歧义或不存在，请提供 SCHEMA.TABLE")
+            key = hits[0]
+            meta = index[key]
+        object_key = table_object_key(meta.get("system_code"), meta.get("source_code"), key[0], key[1])
+    try:
+        result = lineage_impact(db, object_key=object_key, direction=direction, max_hops=max_hops)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return ApiResponse(data=result)
+
+
+@router.get("/impact/legacy", summary="旧表影响分析（兼容保留：视图引用 + 业务关系提示）", include_in_schema=False)
+def impact_analysis_legacy(
     table: str = Query(..., description="格式: SCHEMA.TABLE, 如 HIS.PAT_VISIT"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[ImpactResult]:
+    from ...models.asset import AssetRelation
+    from ...models.candidate import AssetCandidateRelation
+
     parts = table.split(".", 1)
     if len(parts) == 2:
         schema, tbl = parts[0].upper(), parts[1].upper()

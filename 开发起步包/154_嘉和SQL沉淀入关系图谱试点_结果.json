@@ -1,0 +1,138 @@
+{
+ "meta": {
+  "plan": "三仓库检查处理提示词-数据资产 T4 试点",
+  "report": "154_嘉和SQL沉淀入关系图谱试点报告.md",
+  "date": "2026-08-27",
+  "verify_chain": "verify/round-1/（核查报告 P1/P2/P5/P8 修正已吸收）",
+  "safety": {
+   "源库DML_DDL": 0,
+   "正式资产写入": 0,
+   "relationships_csv_catalog_json": "未动",
+   "平台库": "只读元数据+限量live SELECT",
+   "嘉和仓库": "只读"
+  }
+ },
+ "input": {
+  "pilot_sql_sha256": "c111b4b66fee46ca9349ba95018abe5cf911414bce00821cd5a14dc8c86ec469",
+  "complete_statements": 13,
+  "ph_skipped": [
+   "02#7 写链片段",
+   "02#8 窗口扫描片段"
+  ],
+  "new_view_ddls_extracted": [
+   "view_zdhc",
+   "v_jinchuangbl",
+   "v_cdauploadbc",
+   "v_hlht"
+  ]
+ },
+ "metadata_check": {
+  "checked_objects": 18,
+  "exists": 17,
+  "missing": {
+   "jhemr.interface_log": "177 只读副本全库无此表；疑在 179 主库或未建（pending-verify）",
+   "jhemr.v_hisicu1": "活库无该对象（152 E1 一致）"
+  }
+ },
+ "parser_output": {
+  "tables": [
+   "JHEMR.INTERFACE_LOG",
+   "JHEMR.DC_CDA_UPLOADTASK",
+   "JHEMR.VIEW_ZDHC",
+   "JHEMR.V_HISSHOUYE1",
+   "JHEMR.V_HISSHOUSHU1",
+   "JHEMR.V_HISZHENDUAN1",
+   "JHEMR.V_HISICU1",
+   "JHEMR.V_HISSHOUYE",
+   "JHEMR.V_HISSHOUSHU",
+   "JHEMR.V_HISZHENDUAN",
+   "JHEMR.V_HISICU",
+   "JHEMR.V_JINCHUANGBL",
+   "JHEMR.DC_CDA_FILEUPLOADRECORD",
+   "JHEMR.DC_CDA_UPLOADRECORD",
+   "JHEMR.PAT_DIAGNOSIS",
+   "JHEMR.V_CDAUPLOAD",
+   "JHEMR.PAT_VISIT",
+   "JHEMR.JHMR_FILE_INDEX",
+   "JHEMR.JHMR_TEMPLET_CLASS"
+  ],
+  "auto_candidates": 8,
+  "note": "8 条候选均为 PAT_VISIT→JHMR_FILE_INDEX，ON 键被 ::text 包裹需人工补全（技能预期行为）"
+ },
+ "dedup": {
+  "jhemr_package_csv": "283 条全部 view_dependency 型",
+  "existing_8": [
+   "pat_diagnosis→view_zdhc",
+   "pat_visit→v_jinchuangbl",
+   "jhmr_file_index→v_jinchuangbl",
+   "jhmr_templet_class→v_jinchuangbl",
+   "pat_visit→v_hlht",
+   "pat_master_index→v_hlht",
+   "v_cdaupload→v_cdauploadbc",
+   "dc_cda_uploadrecord→v_cdauploadbc"
+  ],
+  "base_table_join_edges_in_package": 0,
+  "overlap_with_152e6": "零重叠（E6=跨系统 jhemr→MEDREC 写血缘；本试点=JHEMR 内部）",
+  "e6_note": "E6 八条=7 D 级 + 1 existing（核查 P8 修正）"
+ },
+ "candidates": [
+  {
+   "id": "C9",
+   "edge": "pat_visit⋈jhmr_file_index",
+   "keys": "patient_id+visit_id",
+   "grade": "recipe_candidate(B)",
+   "evidence": "v_jinchuangbl DDL 多分支 JOIN"
+  },
+  {
+   "id": "C10",
+   "edge": "jhmr_file_index⋈jhmr_templet_class",
+   "keys": "mr_class=mr_class_code",
+   "grade": "recipe_candidate(B)",
+   "evidence": "v_jinchuangbl LEFT JOIN"
+  },
+  {
+   "id": "C11",
+   "edge": "pat_visit⋈pat_master_index",
+   "keys": "patient_id+inp_no 双键",
+   "grade": "recipe_candidate(B)",
+   "evidence": "v_hlht 逗号连接 DDL"
+  },
+  {
+   "id": "C12",
+   "edge": "工具→dc_cda_uploadtask 写链",
+   "keys": "patient_id+visit_id+UPLOADSTATE",
+   "grade": "candidate(D 写血缘)",
+   "evidence": "02#3 INSERT + 04#2/3 UPDATE 状态机"
+  },
+  {
+   "id": "C13",
+   "edge": "App_Code→pat_visit 字段回写",
+   "keys": "patient_id+visit_id",
+   "grade": "candidate(D 写血缘)",
+   "evidence": "02#7 片段 UPDATE"
+  },
+  {
+   "id": "C14",
+   "edge": "interface_log 摄入",
+   "grade": "rejected(元数据未过,pending-verify 179)",
+   "evidence": "02#1"
+  },
+  {
+   "id": "C15",
+   "edge": "v_hisicu1 取数",
+   "grade": "rejected(对象不存在)",
+   "evidence": "02#5 族"
+  }
+ ],
+ "batch_plan": {
+  "base": "在库编号 35 条（13+8+7+7）；README 自述 151=中间筛选口径不可复算",
+  "B2": "03 分册→HIS_SOURCE，查重 HIS 源端资产包+152 E6；DML 仅解析禁执行",
+  "B3": "01 分册→PAPERLESS_CDMS，查重平台元数据+79 号证据；跨系统延后"
+ },
+ "view_ddls_full": {
+  "view_zdhc": "SELECT CASE t.diagnosis_no WHEN 1 THEN 'true'::text ELSE 'false'::text END AS ismaindiagnosis, t.diagnosis_type AS diagnosistype, t.patient_id AS patientid, (t.visit_id)::integer AS visitid, NULL::text AS addmissioncondition, t.diagnosis_code AS diagnosiscode, NULL::text AS diagnosiscode2, t.diagnosis_date AS diagnosisdate, t.diagnosis_desc AS diagnosisdesc, NULL::text AS diagnosisdescdoc FROM jhemr.pat_diagnosis t;",
+  "v_jinchuangbl": "((((((SELECT DISTINCT (((('49557032X-'::text || (t.patient_id)::text) || '-'::text) || (t.visit_id)::text) || '病程记录'::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, '病程记录'::text AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, ((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || '_'::text) || (b.ds_name)::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((b.ds_name)::text = '病程记录'::text)) UNION ALL SELECT DISTINCT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, '讨论记录'::text AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || '讨论记录'::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((a.mr_class)::text = 'EMR07.00.08'::text))) UNION ALL SELECT DISTINCT (((('49557032X-'::text || (t.patient_id)::text) || '-'::text) || (t.visit_id)::text) || '病案首页'::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, '病案首页'::text AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, ((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || '_'::text) || '病案首页'::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE ((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric))) UNION ALL SELECT DISTINCT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, b.mr_class_name AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || '入院记录'::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((a.mr_class)::text = 'EMR09.00.02'::text))) UNION ALL SELECT DISTINCT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, b.mr_class_name AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || '入院记录'::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((a.mr_class)::text = 'EMR09.00.03'::text))) UNION ALL SELECT DISTINCT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, b.mr_class_name AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || '死亡记录'::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((a.mr_class)::text = 'EMR10.00.15'::text))) UNION ALL SELECT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, b.mr_class_name AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || (b.mr_class_name)::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((a.mr_class)::text <> ALL (ARRAY[('EMR10.00.01'::varchar)::text, ('EMR10.00.02'::varchar)::text, ('EMR10.00.03'::varchar)::text, ('EMR10.00.04'::varchar)::text, ('EMR10.00.05'::varchar)::text, ('EMR10.00.06'::varchar)::text, ('EMR10.00.07'::varchar)::text, ('EMR10.00.08'::varchar)::text, ('EMR10.00.09'::varchar)::text, ('EMR10.00.10'::varchar)::text, ('EMR10.00.11'::varchar)::text, ('EMR10.00.12'::varchar)::text, ('EMR10.00.16'::varchar)::text, ('EMR10.00.17'::varchar)::text, ('EMR07.00.01'::varchar)::text, ('EMR07.00.02'::varchar)::text, ('EMR07.00.03'::varchar)::text, ('EMR07.00.04'::varchar)::text, ('EMR07.00.05'::varchar)::text, ('EMR07.00.06'::varchar)::text, ('EMR09.00.02'::varchar)::text, ('EMR09.00.03'::varchar)::text, ('EMR07.00.07'::varchar)::text])))) UNION ALL SELECT DISTINCT ((a.file_unique_id)::text || (a.topic)::text) AS id, t.inp_no AS inhospitalid, t.visit_id AS inhospitaltimes, CASE WHEN (t.visit_id > (9)::numeric) THEN ('0'::text || (t.visit_id)::text) ELSE ('00'::text || (t.visit_id)::text) END AS medicalid, t.patient_id AS patentid, t.discharge_date_time AS outhospitaldate, t.admission_date_time AS inhospitaldate, '谈话记录'::text AS doctype, 'D:\\病历导出\\【PATIENT_ID】_【VISIT_ID】\\【EMRCatalogName】'::text AS filepath, '【FILE_UNIQUE_ID】.PDF'::text AS filename, t.patient_id, t.visit_id, (((((((t.patient_id)::text || '_'::text) || (t.visit_id)::text) || '_'::text) || (a.file_unique_id)::text) || '_'::text) || (b.ds_name)::text) AS pdffilename, t.mr_back_date_time FROM ((jhemr.pat_visit t LEFT JOIN jhemr.jhmr_file_index a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (t.visit_id = a.visit_id)))) LEFT JOIN jhemr.jhmr_templet_class b ON (((b.mr_class_code)::text = (a.mr_class)::text))) WHERE (((((t.discharge_date_time IS NOT NULL) AND (a.file_unique_id IS NOT NULL)) AND ((a.file_flag)::text <> 'T'::text)) AND (a.delete_flag = (0)::numeric)) AND ((b.ds_name)::text = '谈话记录'::text));",
+  "v_cdauploadbc": "SELECT a.* FROM jhemr.v_cdaupload a WHERE ((NOT (EXISTS (SELECT 1 AS \"?column?\" FROM jhemr.dc_cda_uploadrecord b WHERE ((((b.patient_id)::text = (a.patient_id)::text) AND ((b.visit_id)::numeric = a.visit_id)) AND (a.mr_back_date_time < b.uploadtime))))) AND (a.mr_back_date_time IS NOT NULL));",
+  "v_hlht": "SELECT DISTINCT t.patient_id, t.visit_id, b.name, t.mr_back_date_time, t.discharge_date_time FROM jhemr.pat_visit t, jhemr.pat_master_index b WHERE ((((((t.patient_id)::text = (b.patient_id)::text) AND ((t.inp_no)::text = (b.inp_no)::text)) AND ((t.mr_nurse_part_status >= 3::numeric) OR (t.mr_doctor_part_status >= 3::numeric))) AND (t.mr_back_date_time IS NOT NULL)) AND (NOT (EXISTS (SELECT 1 AS \"?column?\" FROM jhemr.dc_cda_uploadrecord m WHERE (((((t.patient_id)::text = (m.patient_id)::text) AND (t.visit_id = (m.visit_id)::numeric)) AND (m.isuploadsuccess = 1::numeric)) AND (m.uploadtime > t.mr_back_date_time))))));"
+ }
+}

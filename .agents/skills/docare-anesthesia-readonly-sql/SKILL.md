@@ -17,6 +17,13 @@ description: 为山东省第二人民医院 Docare 手术麻醉独立源端（�
 4. 字段以 `开发起步包/80_手麻Docare系统Oracle元数据快照.json` 为准。
 5. 关系以 `80_手麻Docare系统活库探查与关系分析报告.md` 和 `80_手麻Docare系统关系验证结果.json` 为准。
 
+## 字段值域硬规则（149 值域知识库，强制）
+
+- 涉及编码/状态/类型/阈值/字典类字段（如 手术/麻醉状态码、急诊标志、离院方式等（含跨系统镜像 `SM.MED_OPERATION_MASTER.OPER_STATUS` 口径））写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
+- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=DOCARE` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+
 ## 标准流程
 
 1. 明确业务目的、每行粒度、手术范围、时间范围、字段、汇总口径和是否导出。

@@ -7,9 +7,14 @@
     >
       <template #actions>
         <el-button @click="goBack">返回表清单</el-button>
-        <el-button type="primary" @click="openAnnotDialog">编辑注释</el-button>
+        <el-button v-perms="'asset.annotation'" type="primary" @click="openAnnotDialog">编辑注释</el-button>
       </template>
     </RePageHeader>
+
+    <el-alert v-if="loadError" type="error" :closable="false" :title="loadError" show-icon>
+      <template #default><el-button size="small" @click="loadAll">重试</el-button></template>
+    </el-alert>
+    <ReEmptyState v-else-if="notFound" title="表不存在" description="未找到该表（或来源不匹配），可能已下线或来源参数有误。" />
 
     <el-card v-if="detail" class="detail-card" shadow="never">
       <el-descriptions :column="3" border size="small">
@@ -242,7 +247,7 @@
         </el-form-item>
       </el-form>
       <div class="dialog-action-row">
-        <el-button type="primary" @click="saveTableAnnot">保存表注释</el-button>
+        <el-button v-perms="'asset.annotation'" type="primary" @click="saveTableAnnot">保存表注释</el-button>
       </div>
       <el-divider />
       <div
@@ -295,12 +300,13 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
-import { http } from "@/utils/http";
 import {
   getTableDetail,
   getTableColumns,
   getTableRelations,
   getGraphNeighbors,
+  updateTableAnnotation,
+  updateColumnAnnotation,
   type TableDetail,
   type ColumnInfo,
   type RelationInfo,
@@ -308,6 +314,7 @@ import {
   type GraphNode,
   type GraphEdge
 } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
 
 const route = useRoute();
 const router = useRouter();
@@ -315,6 +322,8 @@ const schema = route.params.schema as string;
 const table = route.params.table as string;
 const loading = ref(true);
 
+const loadError = ref("");
+const notFound = ref(false);
 const detail = ref<TableDetail | null>(null);
 const columns = ref<ColumnInfo[]>([]);
 const relations = ref<RelationInfo[]>([]);
@@ -349,20 +358,31 @@ const filteredColumns = computed(() => {
   return list;
 });
 
+const sourceCode = ref(String(route.query.source_code || ""));
+
 async function loadAll() {
   loading.value = true;
   neighborLoading.value = true;
+  loadError.value = "";
+  notFound.value = false;
   try {
     const [dRes, cRes, rRes] = await Promise.all([
-      getTableDetail(schema, table),
-      getTableColumns(schema, table),
-      getTableRelations(schema, table)
+      getTableDetail(schema, table, sourceCode.value || undefined),
+      getTableColumns(schema, table, sourceCode.value || undefined),
+      getTableRelations(schema, table, sourceCode.value || undefined)
     ]);
     detail.value = dRes.data;
     columns.value = cRes.data;
     relations.value = rRes.data;
-  } catch {
-    /* */
+  } catch (error: any) {
+    detail.value = null;
+    columns.value = [];
+    relations.value = [];
+    if (error?.response?.status === 404) {
+      notFound.value = true;
+    } else {
+      loadError.value = String(error?.response?.data?.detail || "表详情加载失败");
+    }
   }
 
   try {
@@ -394,7 +414,9 @@ function showEdge(edge: GraphEdge) {
 }
 
 function goBack() {
-  router.push("/asset/tables");
+  // 返回保留表清单页筛选/分页（tables 页把自身 query 存在 back_query 中）
+  const backQuery = route.query.back_query ? String(route.query.back_query) : "";
+  router.push(backQuery ? `/asset/tables?${backQuery}` : "/asset/tables");
 }
 
 function openAnnotDialog() {
@@ -415,29 +437,27 @@ function openAnnotDialog() {
 }
 
 function saveTableAnnot() {
-  http
-    .request("patch", `/api/v1/tables/${(detail.value as any)?.id}/annotation`, {
-      data: annotForm
-    })
+  updateTableAnnotation((detail.value as any)?.id, { ...annotForm })
     .then(() => {
       ElMessage.success("表注释已保存");
       annotDialogVisible.value = false;
       loadAll();
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "表注释保存失败"));
+    });
 }
 
 function saveColumnAnnot(colId: number) {
   const form = columnAnnotForm.value[colId];
   if (!form) return;
-  http
-    .request("patch", `/api/v1/columns/${colId}/annotation`, {
-      data: form
-    })
+  updateColumnAnnotation(colId, { ...form })
     .then(() => {
       ElMessage.success("字段注释已保存");
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "字段注释保存失败"));
+    });
 }
 
 onMounted(loadAll);

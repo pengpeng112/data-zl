@@ -7,7 +7,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user, require_permission
+from ...core.security import get_current_user, get_request_operator, require_permission, require_query_view_on_get
 from ...models.metric_asset import AssetMetricDefinition, AssetMetricResult, AssetMetricVersion
 from ...schemas.common import ApiResponse
 from ...services.metric_service import (
@@ -19,7 +19,13 @@ from ...services.metric_service import (
     register_metric_result,
 )
 
-router = APIRouter(prefix="/api/v1/metrics", tags=["metrics"])
+
+
+router = APIRouter(
+    prefix="/api/v1/metrics",
+    tags=["metrics"],
+    dependencies=[Depends(require_query_view_on_get)],
+)
 
 
 class MetricIngestRequest(BaseModel):
@@ -101,7 +107,11 @@ def list_metrics(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.get("/ai/context", summary="AI 可读现行指标上下文")
+@router.get(
+    "/ai/context",
+    summary="AI 可读现行指标上下文",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def ai_metric_context(
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -145,24 +155,49 @@ def board_overview(
     """Return latest result per metric_code + period_key for board UI/export."""
     defs = db.scalars(select(AssetMetricDefinition).order_by(AssetMetricDefinition.metric_code)).all()
     if category:
-        defs = [d for d in defs if (d.category or "") == category or category in (d.category or "")]
+        # A10：子串包含已覆盖相等（x == y ⟹ x in y），删除冗余 == 分支；
+        # 命中集不变，仅去逻辑重复。
+        defs = [d for d in defs if category in (d.category or "")]
     codes = [d.metric_code for d in defs]
     if not codes:
         return ApiResponse(data={"periods": [], "metrics": [], "cells": {}, "total_results": 0})
 
-    stmt = select(AssetMetricResult).where(AssetMetricResult.metric_code.in_(codes))
+    where_clauses = [AssetMetricResult.metric_code.in_(codes)]
     if period_from:
-        stmt = stmt.where(AssetMetricResult.period_key >= period_from)
+        where_clauses.append(AssetMetricResult.period_key >= period_from)
     if period_to:
-        stmt = stmt.where(AssetMetricResult.period_key <= period_to)
-    rows = db.scalars(stmt.order_by(AssetMetricResult.id.desc())).all()
+        where_clauses.append(AssetMetricResult.period_key <= period_to)
+    # C4：最新批次取数下推 SQL（row_number 按 id 倒序取每组第 1 行），
+    # 替代全量结果拉内存逐行去重；输出结构与旧口径逐字段一致。
+    latest_subq = (
+        select(
+            AssetMetricResult.metric_code,
+            AssetMetricResult.period_key,
+            AssetMetricResult.metric_value,
+            AssetMetricResult.numerator_value,
+            AssetMetricResult.denominator_value,
+            AssetMetricResult.status,
+            AssetMetricResult.limitations_note,
+            AssetMetricResult.is_recalc,
+            AssetMetricResult.run_batch,
+            func.row_number()
+            .over(
+                partition_by=(AssetMetricResult.metric_code, AssetMetricResult.period_key),
+                order_by=AssetMetricResult.id.desc(),
+            )
+            .label("rn"),
+        )
+        .where(*where_clauses)
+        .subquery()
+    )
+    latest_rows = db.execute(
+        select(latest_subq).where(latest_subq.c.rn == 1)
+    ).all()
 
     cells: dict[str, dict[str, dict]] = {}
     periods: set[str] = set()
-    for r in rows:
+    for r in latest_rows:
         m = cells.setdefault(r.metric_code, {})
-        if r.period_key in m:
-            continue
         periods.add(r.period_key)
         m[r.period_key] = {
             "metric_value": r.metric_value,
@@ -175,9 +210,19 @@ def board_overview(
         }
 
     period_list = sorted(periods)
+    # C4：active 版本一次 IN 查询批量取，替代逐 def 的 get_active_metric_version。
+    active_by_code: dict[str, AssetMetricVersion] = {
+        v.metric_code: v
+        for v in db.scalars(
+            select(AssetMetricVersion).where(
+                AssetMetricVersion.metric_code.in_(codes),
+                AssetMetricVersion.is_active.is_(True),
+            )
+        ).all()
+    }
     metrics = []
     for d in defs:
-        active = get_active_metric_version(db, d.metric_code)
+        active = active_by_code.get(d.metric_code)
         metrics.append(
             {
                 "metric_code": d.metric_code,
@@ -226,11 +271,7 @@ def get_metric_detail(metric_code: str, db: Session = Depends(get_db)) -> ApiRes
     dependencies=[Depends(require_permission("query:create"))],
 )
 def ingest(req: MetricIngestRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = ingest_metric(db, created_by=user, **req.model_dump())
         db.commit()
@@ -246,11 +287,7 @@ def ingest(req: MetricIngestRequest, request: Request, db: Session = Depends(get
     dependencies=[Depends(require_permission("query:create"))],
 )
 def post_result(req: MetricResultRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = register_metric_result(db, created_by=user, **req.model_dump())
         db.commit()
@@ -258,6 +295,79 @@ def post_result(req: MetricResultRequest, request: Request, db: Session = Depend
     except LookupError as exc:
         db.rollback()
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+class MetricCalculateRequest(BaseModel):
+    version: int | None = Field(None, description="缺省用现行 active 版本")
+    period_key: str = Field(..., min_length=1, description="期间键 YYYY-MM 或业务声明的账期口径")
+    parameters: dict | None = None
+    dimensions: dict | None = None
+
+
+def _calculate_metric_shared(
+    metric_code: str,
+    req: MetricCalculateRequest,
+    request: Request,
+    db: Session,
+    *,
+    forced_version: int | None = None,
+) -> ApiResponse[dict]:
+    """D4：双 calculate 端点共用内部函数。
+
+    forced_version 来自路径（强制版本）；None 落到 req.version / active 缺省。
+    """
+    from ...services.metric_calculation_orchestrator import calculate_metric_version
+
+    try:
+        result = calculate_metric_version(
+            db,
+            metric_code=metric_code,
+            version=forced_version if forced_version is not None else req.version,
+            period_key=req.period_key,
+            parameters=req.parameters,
+            dimensions=req.dimensions,
+            triggered_by=get_request_operator(request, default="api"),
+        )
+        db.commit()
+    except LookupError as exc:
+        db.rollback()
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PermissionError as exc:
+        db.rollback()
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return ApiResponse(data=result)
+
+
+@router.post(
+    "/{metric_code}/versions/{version}/calculate",
+    summary="144 S4：受控计算指标并登记 metric run/result",
+    dependencies=[Depends(require_permission("metric:calculate"))],
+)
+def calculate_metric_endpoint(
+    metric_code: str,
+    version: int,
+    req: MetricCalculateRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    return _calculate_metric_shared(metric_code, req, request, db, forced_version=version)
+
+
+@router.post(
+    "/{metric_code}/calculate",
+    summary="144 S4：按现行 active 版本受控计算指标",
+    dependencies=[Depends(require_permission("metric:calculate"))],
+)
+def calculate_metric_active_endpoint(
+    metric_code: str,
+    req: MetricCalculateRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    return _calculate_metric_shared(metric_code, req, request, db)
 
 
 @router.get("/{metric_code}/results", summary="指标周期结果列表")

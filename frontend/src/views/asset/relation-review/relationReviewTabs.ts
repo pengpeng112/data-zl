@@ -22,10 +22,6 @@ export function normalizeRelationClass(value?: string | number | null): Relation
   return RELATION_CLASS_TABS.some(tab => tab.value === raw) ? raw as RelationClassTab : "pending";
 }
 
-export function isReviewInboxTab(_value?: string | null): boolean {
-  return false;
-}
-
 export function relationEvidenceKind(note?: string | null, fromColumns?: string | null, toColumns?: string | null): "view_ddl" | "sampled" | "sync" | "imported" {
   const text = String(note || "").toLowerCase();
   if (text.includes("pg_views") || text.includes("vastbase") || text.includes("all_dependencies")) return "view_ddl";

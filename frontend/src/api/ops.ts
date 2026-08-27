@@ -1,17 +1,8 @@
 import { http } from "@/utils/http";
 
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
-export interface PageData<T> {
-  total: number;
-  page: number;
-  page_size: number;
-  items: T[];
-}
+export type { ApiResponse, PageData } from "./types";
+import type { ApiResponse, PageData } from "./types";
 
 export interface OpsTool {
   id?: number;
@@ -50,7 +41,7 @@ export interface OpsRun {
 }
 
 export function getOpsTools(params?: Record<string, any>) {
-  return http.request<ApiResponse<OpsTool[]>>("get", "/api/v1/ops/tools", { params });
+  return http.request<ApiResponse<PageData<OpsTool>>>("get", "/api/v1/ops/tools", { params });
 }
 
 export function upsertOpsTool(data: Partial<OpsTool>) {
@@ -143,6 +134,19 @@ export function listOpsEvents(params?: Record<string, any>) {
   return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/ops/events", { params });
 }
 
-export function getOpsEvent(eventId: string) {
-  return http.request<ApiResponse<any>>("get", `/api/v1/ops/events/${eventId}`);
+// 146 D3：治理审计与平台健康（视图层不再裸 http.request）
+export function getGovernAuditLogs(params?: Record<string, any>) {
+  return http.request<ApiResponse<PageData<any>>>("get", "/api/v1/govern/audit-logs", { params });
+}
+
+export function getAuditLogsSummary(params?: Record<string, any>) {
+  return http.request<ApiResponse<{ total: number; by_module: Record<string, number>; by_action: Record<string, number>; by_operator: Record<string, number> }>>("get", "/api/v1/govern/audit-logs/summary", { params });
+}
+
+export function exportAuditLogs(params?: Record<string, any>) {
+  return http.request<Blob>("get", "/api/v1/govern/audit-logs/export", { params, responseType: "blob" });
+}
+
+export function getPlatformHealth() {
+  return http.request<ApiResponse<Record<string, unknown>>>("get", "/api/v1/health");
 }

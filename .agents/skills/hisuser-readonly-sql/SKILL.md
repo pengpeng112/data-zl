@@ -27,6 +27,13 @@ description: 为山东省第二人民医院 HIS 源端业务库（平台系统�
 
 不要使用 `_archive/` 作为当前依据。表字段以 `16_hisuser业务库元数据快照.json` 或平台当前元数据为准；统计行数只用于估算规模，不代表实时精确数量。
 
+## 字段值域硬规则（149 值域知识库，强制）
+
+- 涉及编码/状态/类型/阈值/字典类字段（如 `MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION`、`MEDREC.OPERATION.OPERATION_EMER_INDICATOR`、`MEDREC.DIAGNOSIS.DIAGNOSIS_TYPE`、`OUTPADM.CLINIC_MASTER.VISIT_TYPE/REGISTTYPE`、`INPBILL.INP_BILL_DETAIL.ITEM_NAME` 字面量）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
+- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=HIS_SOURCE` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+
 ## 标准流程
 
 ### 1. 明确需求和数据粒度
@@ -164,6 +171,19 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" data-asset-83
 - 数据库：Oracle 11g，多 Owner
 - 使用对象：
 - 时间与业务过滤：
+
+## 感控视图族与专用表（158 号实证，活库已核验）
+
+- `FXHIS` owner 下感控/传染病域视图（字段含 PATIENT_ID + SERIAL_NUMBER/ADMISSION_DATE 等键，活库 2026-08-27 核验存在）：
+  - `V_EMR_PATIENT_INFO`（33 列，患者主档）
+  - `V_EMR_ADMISSION_INFO`（19 列，入院）
+  - `V_EMR_DISCHARGE_INFO`（18 列，出院）
+  - `V_EMR_ACTIVITY_INFO`（32 列，诊疗活动，含 ACTIVITY_TYPE_CODE/NAME）
+  - `V_EMR_VITAL_SIGNS_RECORD`（20 列，生命体征）
+  - `V_CRBREPORT`（传染病上报报告）
+  - 注意：以上视图各存在 `_copy1` 备份副本，取数一律用正名，勿用 `_copy1`。
+- `HISUSER.PLATE_EMR_PDF`（无纸化病案 PDF 路径表，活库核验存在）：病案 PDF 类取数优先此表。
+- 双轨表警示（158）：`SYS_EMPLOYEE` 在 ODS 为 `COMM.SYS_EMPLOYEE`，在凡科新HIS 侧为 masterdb 裸名 `SYS_EMPLOYEE`（hisuser 源库无此表，ORA-00942 实测）。写跨库对账 SQL 时必须显式 owner，禁止裸名。
 
 ## 表结构与系统对接
 

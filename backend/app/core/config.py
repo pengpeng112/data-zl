@@ -5,6 +5,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_prefix="APP_", extra="ignore")
 
     db_url: str
+    # 144 §15.2 feature flags (fixed names, default off)
+    ff_ai_context_v2: bool = False
+    ff_metric_calc_write: bool = False
+    ff_g5_eval_gate: bool = False
+    ff_ai_feedback: bool = False
+    ff_eval_scheduler: bool = False
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8848"]
     # 108号 P0-02/P0-03：发布原子化版本身份。由构建脚本注入，不得写死生产值。
     build_id: str = "dev-local"

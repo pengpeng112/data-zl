@@ -1,10 +1,5 @@
 import { http } from "@/utils/http";
 
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
 export interface SummaryData {
   tables: number;
@@ -59,12 +54,8 @@ export interface DashboardSummary {
   activities: DashboardActivity[];
 }
 
-export interface PageData<T> {
-  total: number;
-  page: number;
-  page_size: number;
-  items: T[];
-}
+export type { ApiResponse, PageData } from "./types";
+import type { ApiResponse, PageData } from "./types";
 
 export interface TableBrief {
   id?: number;
@@ -159,12 +150,8 @@ export interface HopInfo {
   to_columns: string | null;
 }
 
-export interface PathResult {
-  from: string;
-  to: string;
-  path: string[] | null;
-  hops: HopInfo[];
-}
+/** 旧 PathResult 已由 RelationPathResult 取代（146 E1）。 */
+export type PathResult = RelationPathResult;
 
 export interface ExportContext {
   safety: string;
@@ -213,44 +200,149 @@ export const getTables = (params: {
 };
 
 /** 表详情 */
-export const getTableDetail = (schema: string, table: string) => {
+export const getTableDetail = (schema: string, table: string, sourceCode?: string) => {
   return http.get<ApiResponse<TableDetail>, object>(
-    `/api/v1/tables/${schema}/${table}`
+    `/api/v1/tables/${schema}/${table}`,
+    { params: sourceCode ? { source_code: sourceCode } : undefined }
   );
 };
 
 /** 表字段 */
-export const getTableColumns = (schema: string, table: string) => {
+export const getTableColumns = (schema: string, table: string, sourceCode?: string) => {
   return http.get<ApiResponse<ColumnInfo[]>, object>(
-    `/api/v1/tables/${schema}/${table}/columns`
+    `/api/v1/tables/${schema}/${table}/columns`,
+    { params: sourceCode ? { source_code: sourceCode } : undefined }
   );
 };
 
 /** 表关系 */
-export const getTableRelations = (schema: string, table: string) => {
+export const getTableRelations = (schema: string, table: string, sourceCode?: string) => {
   return http.get<ApiResponse<RelationInfo[]>, object>(
-    `/api/v1/tables/${schema}/${table}/relations`
+    `/api/v1/tables/${schema}/${table}/relations`,
+    { params: sourceCode ? { source_code: sourceCode } : undefined }
   );
 };
 
-/** 字段搜索 */
-export const searchColumns = (params: {
-  keyword: string;
-  page?: number;
-  page_size?: number;
-}) => {
-  return http.get<ApiResponse<PageData<ColumnInfo>>, object>(
-    "/api/v1/columns/search",
-    { params }
+/** 表注释维护（153 F4：table-detail 页裸 http 收编） */
+export const updateTableAnnotation = (
+  tableId: number,
+  data: { table_name_cn?: string; business_desc_cn?: string; table_role?: string }
+) => {
+  return http.request<ApiResponse<unknown>>(
+    "patch",
+    `/api/v1/tables/${tableId}/annotation`,
+    { data }
+  );
+};
+
+/** 字段注释维护 */
+export const updateColumnAnnotation = (
+  columnId: number,
+  data: { column_name_cn?: string; business_desc_cn?: string; value_desc_cn?: string }
+) => {
+  return http.request<ApiResponse<unknown>>(
+    "patch",
+    `/api/v1/columns/${columnId}/annotation`,
+    { data }
   );
 };
 
 /** 关系路径 */
-export const getRelationPath = (fromTable: string, toTable: string) => {
-  return http.get<ApiResponse<PathResult>, object>("/api/v1/relations/path", {
-    params: { from: fromTable, to: toTable }
+export interface RelationPathHop {
+  from: string;
+  to: string;
+  rel_id?: number | null;
+  join_condition?: string | null;
+  cardinality?: string | null;
+  confidence?: string | null;
+  validation_level?: string | null;
+  validation_status?: string | null;
+  validation_metrics?: string | null;
+  from_columns?: string | null;
+  to_columns?: string | null;
+  note?: string | null;
+}
+
+export interface RelationPathResult {
+  from: string;
+  to: string;
+  path: string[] | null;
+  hops: RelationPathHop[];
+  hops_used?: number;
+}
+
+export const getRelationPath = (
+  fromTable: string,
+  toTable: string,
+  options?: { direction?: "both" | "out" | "in"; max_hops?: number }
+) => {
+  return http.get<ApiResponse<RelationPathResult>, object>("/api/v1/relations/path", {
+    params: { from: fromTable, to: toTable, ...(options || {}) }
   });
 };
+
+// ── 关系复核中心（146 D3：视图层不再裸 http.request）──
+
+export interface RelationReviewFilters {
+  page?: number;
+  page_size?: number;
+  system_code?: string;
+  confidence?: string;
+  review_status?: string;
+  keyword?: string;
+  relation_class?: string;
+}
+
+export const getRelationsList = (params: RelationReviewFilters) =>
+  http.request<ApiResponse<PageData<Record<string, unknown>>>>("get", "/api/v1/relations/list", { params });
+
+export const getRelationListCounts = () =>
+  http.request<ApiResponse<Record<string, number>>>("get", "/api/v1/relations/list-counts");
+
+export const updateRelation = (id: number, data: Record<string, unknown>) =>
+  http.request<ApiResponse<Record<string, unknown>>>("patch", `/api/v1/relations/${id}`, { data });
+
+export const legacyReviewRelation = (id: number, action: "approve" | "reject") =>
+  http.request<ApiResponse<Record<string, unknown>>>("patch", `/api/v1/relations/${id}/review`, {
+    params: { action }
+  });
+
+export const batchReviewRelations = (data: { relation_ids: number[]; action: "approve" | "reject" }) =>
+  http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/relations/batch-review", { data });
+
+export const getRelationReviews = (params: { review_status?: string; page?: number; page_size?: number }) =>
+  http.request<ApiResponse<PageData<Record<string, unknown>>>>("get", "/api/v1/relation-reviews", { params });
+
+export const approveRelationReview = (relId: number) =>
+  http.request<ApiResponse<{ action?: string }>>("post", `/api/v1/relation-reviews/${relId}/approve`, { data: {} });
+
+export const rejectRelationReview = (relId: number) =>
+  http.request<ApiResponse<Record<string, unknown>>>("post", `/api/v1/relation-reviews/${relId}/reject`, { data: {} });
+
+export const getRelationFieldMappingsFor = (relId: number) =>
+  http.request<ApiResponse<unknown[] | PageData<unknown>>>("get", `/api/v1/relation-reviews/${relId}/field-mappings`);
+
+export const getRelationFieldMappings = (relId: number) =>
+  http.request<ApiResponse<unknown[] | PageData<unknown>>>("get", "/api/v1/relations/field-mappings", {
+    params: { rel_id: relId }
+  });
+
+// ── 资产总览图表 ──
+export interface OverviewChartGroup {
+  items: Array<{ name: string; count: number; label?: string; table?: string }>;
+  unclassified?: number;
+  total_tables?: number;
+}
+
+export interface OverviewChartsData {
+  domains: OverviewChartGroup;
+  validation_status: OverviewChartGroup;
+  partitions: OverviewChartGroup;
+  core_tables: OverviewChartGroup;
+}
+
+export const getOverviewCharts = () =>
+  http.request<ApiResponse<Partial<OverviewChartsData>>>("get", "/api/v1/overview/charts");
 
 export interface RelationHitRateItem {
   id: number;
@@ -309,6 +401,8 @@ export const getRelationHitRates = (params?: {
   system_code?: string;
   scene?: string;
   keyword?: string;
+  hit_rate_min?: number;
+  hit_rate_max?: number;
   page?: number;
   page_size?: number;
 }) => {
@@ -330,6 +424,27 @@ export const exportContext = (data: {
     { data }
   );
 };
+
+export interface AiSystemContext {
+  system_code?: string;
+  system_name_cn?: string | null;
+  table_count?: number;
+  relation_count?: number;
+  tables?: string[];
+  relations?: Array<{
+    from: string;
+    to: string;
+    join_condition: string | null;
+    confidence: string | null;
+    validation_status: string | null;
+  }>;
+}
+
+/** 146 E1：按系统导出 AI 上下文摘要（吸收原系统上下文入口） */
+export const getAiSystemContext = (systemCode: string, maxTables = 30) =>
+  http.get<ApiResponse<AiSystemContext>, object>("/api/v1/ai/system-context", {
+    params: { system_code: systemCode, max_tables: maxTables }
+  });
 
 export interface AssetTreeTable {
   id: number;
@@ -425,6 +540,7 @@ export interface AssetSystemItem {
   system_type?: string | null;
   status?: string | null;
   target_host?: string | null;
+  description_cn?: string | null;
   connection_count?: number;
   table_count?: number;
   created_at?: string | null;
@@ -449,6 +565,7 @@ export interface AssetSourceItem {
   write_policy?: string | null;
   enabled?: boolean;
   last_check_status?: string | null;
+  last_test_status?: string | null;
   credential_configured?: boolean;
   credential_status?: string | null;
   credential_username_masked?: string | null;
@@ -473,7 +590,11 @@ export const listSystems = (params?: { include_merged?: boolean }) =>
   http.request<ApiResponse<AssetSystemItem[]>>("get", "/api/v1/systems", { params });
 
 export const getSystemDetail = (systemCode: string) =>
-  http.request<ApiResponse<any>>("get", `/api/v1/systems/${systemCode}/detail`);
+  http.request<ApiResponse<AssetSystemItem & {
+    schema_count?: number;
+    column_count?: number;
+    connections?: AssetSourceItem[];
+  }>>("get", `/api/v1/systems/${encodeURIComponent(systemCode)}/detail`);
 
 export const upsertSystem = (data: Record<string, any>) =>
   http.request<ApiResponse<any>>("put", "/api/v1/systems", { data });
@@ -526,8 +647,6 @@ export const listDbTypes = () =>
 export const listConnections = (params?: { include_aliases?: boolean }) =>
   http.request<ApiResponse<AssetSourceItem[]>>("get", "/api/v1/connections", { params });
 
-export const getConnection = (id: number) =>
-  http.request<ApiResponse<any>>("get", `/api/v1/connections/${id}`);
 
 export const testConnectionDraft = (data: Record<string, any>) =>
   http.request<ApiResponse<any>>("post", "/api/v1/connections/test-draft", { data });
@@ -535,10 +654,6 @@ export const testConnectionDraft = (data: Record<string, any>) =>
 export const testSavedConnection = (id: number) =>
   http.request<ApiResponse<any>>("post", `/api/v1/connections/${id}/test`);
 
-export const listConnectionTargets = () =>
-  http.request<ApiResponse<any[]>>("get", "/api/v1/connections-targets");
-
-// --- P1.5 关系图谱 ---
 
 export interface GraphNode {
   id: string;
@@ -829,24 +944,6 @@ export interface ImpactResult {
   total_relations: number;
 }
 
-export interface CandidateRelationItem {
-  id: number;
-  from_table: string | null;
-  from_columns: string | null;
-  to_table: string | null;
-  to_columns: string | null;
-  join_condition: string | null;
-  source_view: string | null;
-  source_file: string | null;
-  confidence: string | null;
-  status: string | null;
-  domain: string | null;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  note: string | null;
-  created_at: string | null;
-}
-
 export const getViewDependencies = (params: {
   view?: string;
   referenced_table?: string;
@@ -866,48 +963,8 @@ export const getImpactAnalysis = (table: string) => {
   });
 };
 
-export const getCandidates = (params: {
-  page?: number;
-  page_size?: number;
-  status?: string;
-  keyword?: string;
-  source_view?: string;
-}) => {
-  return http.get<ApiResponse<PageData<CandidateRelationItem>>, object>(
-    "/api/v1/candidates",
-    { params }
-  );
-};
 
-export const promoteCandidate = (
-  candidateId: number,
-  data?: {
-    reviewer?: string;
-    note?: string;
-    domain?: string;
-    cardinality?: string;
-  }
-) => {
-  return http.post<ApiResponse<any>, object>(
-    `/api/v1/candidates/${candidateId}/promote`,
-    { data }
-  );
-};
 
-export const rejectCandidate = (
-  candidateId: number,
-  data?: {
-    reviewer?: string;
-    note?: string;
-  }
-) => {
-  return http.post<ApiResponse<any>, object>(
-    `/api/v1/candidates/${candidateId}/reject`,
-    { data }
-  );
-};
-
-// --- P3 数据质量 ---
 
 export interface QualityRuleItem {
   id: number;
@@ -978,18 +1035,271 @@ export interface QualitySummary {
   top_tables: { table: string; count: number }[];
 }
 
-export const getQualityRules = () => {
-  return http.get<ApiResponse<QualityRuleItem[]>, object>(
-    "/api/v1/quality/rules"
-  );
+export interface GraphFieldMapping {
+  from_column?: string | null;
+  from_column_name_cn?: string | null;
+  to_column?: string | null;
+  to_column_name_cn?: string | null;
+}
+
+export interface GraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  display_source?: string | null;
+  display_target?: string | null;
+  from_system_code?: string | null;
+  from_source_code?: string | null;
+  from_schema_name?: string | null;
+  from_table_name?: string | null;
+  from_table_name_cn?: string | null;
+  from_table_role?: string | null;
+  from_include_status?: string | null;
+  to_system_code?: string | null;
+  to_source_code?: string | null;
+  to_schema_name?: string | null;
+  to_table_name?: string | null;
+  to_table_name_cn?: string | null;
+  to_table_role?: string | null;
+  to_include_status?: string | null;
+  label?: string | null;
+  relation_type?: string | null;
+  relation_layer?: string | null;
+  db_id?: number | null;
+  rel_id?: number | null;
+  join_condition?: string | null;
+  from_columns?: string | null;
+  to_columns?: string | null;
+  field_mappings?: GraphFieldMapping[];
+  cardinality?: string | null;
+  business_domain?: string | null;
+  confidence?: string | null;
+  validation_level?: string | null;
+  validation_status?: string | null;
+  validation_metrics?: string | null;
+  is_deferred?: boolean | null;
+  deferred_reason?: string | null;
+  note?: string | null;
+  validation_note?: string | null;
+}
+
+export interface GraphMeta {
+  total_relations: number;
+  matched_relations: number;
+  returned_relations: number;
+  truncated: boolean;
+  unresolved_endpoints?: number;
+  filters?: Record<string, unknown>;
+  data_version?: string | null;
+  backend_build_id?: string | null;
+  query_ms?: number | null;
+  matched_total?: number | null;
+  returned_nodes?: number | null;
+  estimated_total?: number | null;
+  enrichment?: Record<string, number>;
+  warnings?: string[];
+  center_physical_key?: string | null;
+  direction_semantics?: string | null;
+}
+
+export interface GraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  meta?: GraphMeta | null;
+}
+
+export interface GraphViewMode {
+  code: string;
+  label: string;
+  description?: string | null;
+  group_by: "system" | "source" | "schema" | "domain";
+  layout_mode: "layered" | "grouped" | "radial" | "hierarchy";
+  confidence?: string | null;
+  validation_status?: string | null;
+  include_candidates: boolean;
+  include_dependencies: boolean;
+  show_review_layer: boolean;
+  requires_table: boolean;
+  deprecated?: boolean;
+}
+
+export interface GraphOptionItem {
+  value: string;
+  label: string;
+  count?: number;
+  disabled?: boolean;
+}
+
+export interface GraphOptionsData {
+  systems: string[];
+  sources: string[];
+  schemas: string[];
+  domains: string[];
+  system_options?: GraphOptionItem[];
+  source_options?: GraphOptionItem[];
+  schema_options?: GraphOptionItem[];
+  domain_options?: GraphOptionItem[];
+  validation_statuses: string[];
+  confidences: string[];
+  relation_types: string[];
+  view_modes: GraphViewMode[];
+  default_mode?: string | null;
+  backend_build_id?: string | null;
+}
+
+export interface GraphOverviewResponse {
+  level: "system" | "source" | "schema" | "object" | "field";
+  next_level?: "system" | "source" | "schema" | "object" | "field" | null;
+  selected_path: Record<string, string>;
+  data: GraphData;
+}
+
+export interface GraphFilterOption {
+  value: string;
+  label: string;
+  count: number;
+  disabled?: boolean;
+}
+
+export interface GraphFilterOptionsData {
+  selected_path: Record<string, string>;
+  next_level: "system" | "source" | "schema" | "object";
+  items: GraphFilterOption[];
+  business_domains: GraphFilterOption[];
+  object_types: GraphFilterOption[];
+}
+
+export interface GraphTableSearchItem {
+  physical_key: string;
+  display_name: string;
+  technical_name: string;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
+  schema_name?: string | null;
+  table_name?: string | null;
+  object_type: string;
+  business_domain?: string | null;
+  column_count?: number | null;
+  ambiguous?: boolean;
+}
+
+
+
+
+
+export interface ViewDependencyItem {
+  id: number;
+  view_name: string;
+  referenced_schema: string | null;
+  referenced_table: string;
+  alias: string | null;
+  source_file: string | null;
+}
+
+export interface ImpactResult {
+  table: string;
+  referencing_views: string[];
+  dependent_relations: string[];
+  total_views: number;
+  total_relations: number;
+}
+
+
+export interface QualityRuleItem {
+  id: number;
+  rule_code: string;
+  rule_type: string | null;
+  target_type: string | null;
+  execution_mode: string | null;
+  description: string | null;
+  threshold_config: any;
+  enabled: boolean | null;
+}
+
+export interface QualityFindingItem {
+  id: number;
+  rule_code: string | null;
+  rule_name?: string | null;
+  rule_category?: string | null;
+  rule_description?: string | null;
+  problem?: string | null;
+  target_display?: string | null;
+  system_name_cn?: string | null;
+  source_name_cn?: string | null;
+  target_type: string | null;
+  target_ref: string | null;
+  system_code?: string | null;
+  source_code?: string | null;
+  namespace_name?: string | null;
+  schema_name?: string | null;
+  table_name?: string | null;
+  table_name_cn?: string | null;
+  column_name?: string | null;
+  related_schema?: string | null;
+  related_table?: string | null;
+  related_table_cn?: string | null;
+  related_field?: string | null;
+  severity: string | null;
+  status: string | null;
+  metric_value: string | null;
+  detail: any;
+  found_at: string | null;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  note: string | null;
+}
+
+export interface QualityCheckRunItem {
+  id: number;
+  started_at: string | null;
+  finished_at: string | null;
+  triggered_by: string | null;
+  total_rules: number | null;
+  total_findings: number | null;
+  total_records?: number | null;
+  error_records?: number | null;
+  pass_rate?: number | null;
+  status: string | null;
+}
+
+export interface QualitySummary {
+  total_findings: number;
+  open_count: number;
+  acknowledged_count: number;
+  resolved_count: number;
+  critical_count: number;
+  major_count: number;
+  minor_count: number;
+  info_count: number;
+  top_tables: { table: string; count: number }[];
+}
+
+// 153 F4：quality 页 loadRules 裸 http 收编（分页口径：127 A1 items 信封）。
+export const listQualityRules = (params?: {
+  page?: number;
+  page_size?: number;
+  rule_category?: string;
+  check_scope?: string;
+  constraint_level?: string;
+  enabled?: boolean;
+  system_code?: string;
+  source_code?: string;
+  keyword?: string;
+}) => {
+  return http.get<
+    ApiResponse<PageData<QualityRuleItem> | QualityRuleItem[]>,
+    object
+  >("/api/v1/quality/rules", { params });
 };
 
 export const runQualityCheck = (ruleCodes?: string[]) => {
-  let url = "/api/v1/quality/checks/run";
-  if (ruleCodes && ruleCodes.length > 0) {
-    url += "?" + ruleCodes.map(c => `rule_codes=${c}`).join("&");
-  }
-  return http.post<ApiResponse<any>, object>(url);
+  // E10：数组查询参数走 params + qs repeat 序列化，删除手工拼 URL。
+  return http.post<ApiResponse<any>, object>(
+    "/api/v1/quality/checks/run",
+    null,
+    ruleCodes?.length ? { params: { rule_codes: ruleCodes } } : undefined
+  );
 };
 
 export const getQualityCheckRuns = (params?: {
@@ -1031,6 +1341,77 @@ export const updateQualityFinding = (
 export const getQualitySummary = () => {
   return http.get<ApiResponse<QualitySummary>, object>(
     "/api/v1/quality/summary"
+  );
+};
+
+// --- 153 F4：quality 页裸 http 收编（此前散落在视图内） ---
+export const getQualitySummaryBySystem = () => {
+  return http.get<ApiResponse<any[]>, object>("/api/v1/quality/summary/by-system");
+};
+
+export const getQualityMetrics = (params?: { system_code?: string }) => {
+  return http.get<ApiResponse<any>, object>("/api/v1/quality/metrics", { params });
+};
+
+export const autoGenerateQualityRules = (data: {
+  system_code?: string | null;
+  source_code?: string | null;
+  limit?: number;
+}) => {
+  return http.post<ApiResponse<any>, object>("/api/v1/quality/rules/auto-generate", {
+    data
+  });
+};
+
+export const createQualityRule = (data: Record<string, unknown>) => {
+  return http.post<ApiResponse<{ id: number; rule_code: string }>, object>(
+    "/api/v1/quality/rules",
+    { data }
+  );
+};
+
+export const updateQualityRule = (ruleId: number, data: Record<string, unknown>) => {
+  return http.patch<ApiResponse<{ id: number; rule_code: string }>, object>(
+    `/api/v1/quality/rules/${ruleId}`,
+    { data }
+  );
+};
+
+export const toggleQualityRule = (ruleId: number, enabled: boolean) => {
+  return http.post<ApiResponse<{ id: number; enabled: boolean }>, object>(
+    `/api/v1/quality/rules/${ruleId}/enable`,
+    null,
+    { params: { enabled } }
+  );
+};
+
+export const validateQualityRuleSql = (ruleId: number) => {
+  return http.post<ApiResponse<Record<string, unknown>>, object>(
+    `/api/v1/quality/rules/${ruleId}/validate-sql`
+  );
+};
+
+export const deleteQualityRule = (ruleId: number) => {
+  return http.delete<ApiResponse<{ id: number; deleted: boolean }>, object>(
+    `/api/v1/quality/rules/${ruleId}`
+  );
+};
+
+export const assignQualityFinding = (
+  findingId: number,
+  data: { assigned_to: string; note?: string }
+) => {
+  return http.post<ApiResponse<Record<string, unknown>>, object>(
+    `/api/v1/quality/findings/${findingId}/assign`,
+    { data }
+  );
+};
+
+export const recheckQualityFinding = (findingId: number, status: string) => {
+  return http.post<ApiResponse<Record<string, unknown>>, object>(
+    `/api/v1/quality/findings/${findingId}/recheck`,
+    null,
+    { params: { status } }
   );
 };
 
@@ -1185,21 +1566,6 @@ export interface ViewDraftItem {
 
 export const getAiTools = () => {
   return http.get<ApiResponse<AiToolsResponse>, object>("/api/v1/ai/tools");
-};
-
-export const startAiSession = (purpose?: string) => {
-  return http.post<ApiResponse<any>, object>("/api/v1/ai/sessions", {
-    data: { purpose }
-  });
-};
-
-export const logToolCall = (data: {
-  session_key: string;
-  tool_name: string;
-  request?: any;
-  response_summary?: string;
-}) => {
-  return http.post<ApiResponse<any>, object>("/api/v1/ai/tool-call", { data });
 };
 
 export const getToolCalls = (params?: {

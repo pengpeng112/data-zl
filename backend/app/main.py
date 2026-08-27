@@ -11,7 +11,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables
+from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables, value_domains
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -332,7 +332,7 @@ ROLE_REQUIRED: dict[str, list[str]] = {
     "identity": ["identity_admin", "platform_admin"],
     "permissions": ["identity_admin", "platform_admin"],
     "dict-medical": ["platform_admin"],
-    "dictionaries": ["platform_admin"],
+    "dictionaries": ["platform_admin", "dict_admin"],
     "govern": ["platform_admin", "approver"],
     "admin": ["platform_admin"],
     "quality": ["quality_admin", "platform_admin"],
@@ -541,6 +541,7 @@ app.include_router(queries.router)
 app.include_router(metrics.router)
 app.include_router(data_products.router)
 app.include_router(ai.router)
+app.include_router(ai_accuracy.router)
 app.include_router(admin.router)
 app.include_router(governance.router)
 app.include_router(governance_ops.router)
@@ -556,6 +557,8 @@ app.include_router(dict_medical_import_api.router)
 app.include_router(dict_medical_push_api.router)
 app.include_router(systems.router)
 app.include_router(recipes.router)
+# 149 P1b: 字段值域知识库（独立路由模块，不塞 tables.py）
+app.include_router(value_domains.router)
 
 @app.get("/", summary="根")
 def root() -> dict[str, str]:

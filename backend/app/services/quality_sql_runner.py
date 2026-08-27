@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from ..core.db import SessionLocal
 from ..models.asset_system import AssetDataSource
 from ..services.credentials import resolve
-from ..services.data_masking import mask_sensitive
+from ..services.data_masking import mask_sensitive, sanitize_text
 from ..services.db_connectors import DB_CONNECTOR_MAP
 
 
@@ -61,8 +61,11 @@ def _build_connector(source: AssetDataSource):
         raise ValueError(f"unsupported db_type: {source.db_type}")
     user, password = resolve(source.credential_ref)
     database = source.service_name or source.database_name or ""
+    # 2026-08-24 修复：连接主机必须用 target_host（真实地址）；
+    # host_masked 是脱敏展示值（空/掩码），此前误用导致所有真实源
+    # 直连 ORA-12545（126/144 查询执行路径被 FakeConnector 测试掩盖）。
     return connector_cls(
-        host=source.host_masked or "",
+        host=source.target_host or "",
         port=source.port or 0,
         database=database,
         user=user or "",
@@ -113,7 +116,9 @@ def execute_quality_sql(
 
         connector = _build_connector(source)
         rows = connector.execute_readonly(sql, max_rows=max_rows)
-        rows = [dict(r) for r in rows]
+        # A4：连接器现在多取 1 行探针（max_rows+1）；本入口不做截断判定，
+        # 按 max_rows 夹紧以保持既有样本/统计口径不变。
+        rows = [dict(r) for r in rows][:max(1, max_rows)]
         stats = _extract_stats(rows)
         if stats is None:
             # Never treat multi-row dup listings as "all rows are errors" (false pass/fail).
@@ -147,7 +152,9 @@ def execute_quality_sql(
             "error_rate": 0,
             "sample_data": [],
             "status": "failed",
-            "note": str(exc)[:500],
+            # B3：note 会落入 finding.detail 并回显调用方，统一 sanitize_text
+            # （保留 error_class 可辨识性），禁止直出 str(exc)。
+            "note": sanitize_text(f"{type(exc).__name__}: {exc}", limit=500),
         }
     finally:
         if connector is not None:

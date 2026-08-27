@@ -82,7 +82,7 @@
               clearable
               @keyup.enter="doSearch"
             />
-            <el-select v-model="params.page_size" class="page-size-select" @change="loadData">
+            <el-select v-model="pageSize" class="page-size-select" @change="onPageSizeChange">
               <el-option :value="20" label="20 条" />
               <el-option :value="50" label="50 条" />
               <el-option :value="100" label="100 条" />
@@ -125,8 +125,8 @@
           </el-table>
 
           <el-pagination
-            v-model:current-page="params.page"
-            v-model:page-size="params.page_size"
+            v-model:current-page="page"
+            v-model:page-size="pageSize"
             :total="total"
             layout="total, prev, pager, next, sizes"
             :page-sizes="[20, 50, 100]"
@@ -184,6 +184,8 @@ import {
   type ColumnInfo,
   type TableBrief
 } from "@/api/asset";
+import { usePagedList } from "@/composables/usePagedList";
+import { fetchSystemNameMap } from "@/utils/systemNames";
 import {
   CANONICAL_SYSTEM_CODES,
   kindLabel,
@@ -224,7 +226,6 @@ const router = useRouter();
 const treeRef = ref<InstanceType<typeof ElTree>>();
 const treeKeyword = ref("");
 const treeLoading = ref(false);
-const loading = ref(false);
 const columnsLoading = ref(false);
 const rawTree = ref<AssetTreeNode[]>([]);
 /** schemaId -> 已加载的表节点 */
@@ -232,11 +233,7 @@ const schemaTableChildren = ref<Record<string, TreeItem[]>>({});
 const schemaTablesLoading = ref<Record<string, boolean>>({});
 const columnChildren = ref<Record<string, TreeItem[]>>({});
 const searchHits = ref<TreeItem[]>([]);
-const items = ref<
-  (TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string })[]
->([]);
 const columns = ref<ColumnInfo[]>([]);
-const total = ref(0);
 const selectedTable = ref<
   (TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string }) | null
 >(null);
@@ -251,7 +248,60 @@ const scope = reactive({
   schema_name: "",
   table_name: ""
 });
-const params = reactive({ keyword: "", domain: "", page: 1, page_size: 20 });
+const params = reactive({ keyword: "", domain: "" });
+// F6：分页五件套收敛到 usePagedList（含请求序号守卫与 catch 提示）。
+const {
+  items,
+  total,
+  page,
+  pageSize,
+  loading,
+  loadData
+} = usePagedList<
+  TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string },
+  {
+    page: number;
+    page_size: number;
+    keyword?: string;
+    domain?: string;
+    system_code?: string;
+    source_code?: string;
+    schema_name?: string;
+    table_name?: string;
+  }
+>({
+  pageSize: 20,
+  errorText: "表清单加载失败",
+  extraParams: () => ({
+    keyword: params.keyword || undefined,
+    domain: params.domain || undefined,
+    // 已选连接/Owner 时 source_code 更精确；避免旧表 system_code=HIS
+    // 与目录规范码 HIS_SOURCE 不一致把右侧筛成 0 条。
+    system_code: scope.source_code ? undefined : scope.system_code || undefined,
+    source_code: scope.source_code || undefined,
+    schema_name: scope.schema_name || undefined,
+    table_name: scope.table_name || undefined
+  }),
+  fetcher: async query => {
+    const res = await getTables(query);
+    const rows = (res.data.items || []).map(row => ({
+      ...row,
+      system_name_cn: systemLabelOf(row),
+      system_category_cn: systemLabelOf(row),
+      source_system_cn: row.source || row.source_code || undefined
+    }));
+    if (selectedTable.value) {
+      const selectedKey = tableRowKey(selectedTable.value);
+      const exists = rows.some(row => tableRowKey(row) === selectedKey);
+      if (!exists) {
+        rows.unshift(selectedTable.value as (typeof rows)[number]);
+      }
+    } else if (rows.length) {
+      await selectTable(rows[0] as TableBrief);
+    }
+    return { items: rows, total: res.data.total };
+  }
+});
 
 const treeProps = { label: "label", children: "children" };
 const systemFilterOptions = computed(() =>
@@ -531,21 +581,12 @@ function setSystemFilter(code: string) {
   scope.source_code = "";
   scope.schema_name = "";
   scope.table_name = "";
-  params.page = 1;
-  loadData();
+  loadData(1);
 }
 
+// F5：loadSystemNames 两份合一 → utils/systemNames。
 async function loadSystemNames() {
-  try {
-    const res = await listSystems();
-    const map: Record<string, string> = {};
-    for (const s of res.data || []) {
-      if (s.system_code) map[s.system_code] = s.system_name_cn || s.system_code;
-    }
-    systemNameMap.value = map;
-  } catch {
-    systemNameMap.value = {};
-  }
+  systemNameMap.value = await fetchSystemNameMap();
 }
 
 async function loadTree() {
@@ -699,7 +740,6 @@ async function handleTreeClick(node: TreeItem) {
     : node;
 
   applyTreeScope(schemaNode);
-  params.page = 1;
 
   if (schemaNode.kind === "schema" || node.id.startsWith("placeholder:")) {
     await loadSchemaTables(schemaNode);
@@ -723,7 +763,7 @@ async function handleTreeClick(node: TreeItem) {
     selectedTable.value = pickedTable;
   }
 
-  await loadData();
+  await loadData(1);
 
   if (pickedTable) {
     await selectTable(pickedTable);
@@ -731,63 +771,32 @@ async function handleTreeClick(node: TreeItem) {
   }
 }
 
-async function loadData() {
-  loading.value = true;
-  try {
-    const res = await getTables({
-      keyword: params.keyword || undefined,
-      domain: params.domain || undefined,
-      // 已选连接/Owner 时 source_code 更精确；避免旧表 system_code=HIS
-      // 与目录规范码 HIS_SOURCE 不一致把右侧筛成 0 条。
-      system_code: scope.source_code ? undefined : scope.system_code || undefined,
-      source_code: scope.source_code || undefined,
-      schema_name: scope.schema_name || undefined,
-      table_name: scope.table_name || undefined,
-      page: params.page,
-      page_size: params.page_size
-    });
-    items.value = (res.data.items || []).map(row => ({
-      ...row,
-      system_name_cn: systemLabelOf(row),
-      system_category_cn: systemLabelOf(row),
-      source_system_cn: row.source || row.source_code || undefined
-    }));
-    total.value = res.data.total;
-    if (selectedTable.value) {
-      const selectedKey = tableRowKey(selectedTable.value);
-      const exists = items.value.some(row => tableRowKey(row) === selectedKey);
-      if (!exists) {
-        items.value = [selectedTable.value, ...items.value];
-      }
-    } else if (items.value.length) {
-      await selectTable(items.value[0]);
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
+// E7：请求序号守卫——快速切换表时仅最后一次请求的列生效。
+let selectTableSeq = 0;
 async function selectTable(row: TableBrief) {
+  const seq = ++selectTableSeq;
   selectedTable.value = row;
   columnsLoading.value = true;
   try {
     const res = await getTableColumns(row.schema_name, row.table_name);
+    if (seq !== selectTableSeq) return;
     columns.value = res.data || [];
   } finally {
-    columnsLoading.value = false;
+    if (seq === selectTableSeq) {
+      columnsLoading.value = false;
+    }
   }
 }
 
 function onPageSizeChange() {
-  params.page = 1;
-  loadData();
+  loadData(1);
 }
 
+// E6 语义：搜索入口统一重置 page=1，并清空已选表。
 function doSearch() {
-  params.page = 1;
   selectedTable.value = null;
   columns.value = [];
-  loadData();
+  loadData(1);
 }
 
 function reloadAll() {
@@ -796,7 +805,12 @@ function reloadAll() {
 }
 
 function goDetail(row: TableBrief) {
-  router.push(`/asset/tables/${row.schema_name}/${row.table_name}`);
+  // 146 E5：带物理来源隔离同名表；back_query 保留列表筛选/分页状态
+  const query: Record<string, string> = {};
+  if (row.source_code) query.source_code = row.source_code;
+  const back = window.location.search.startsWith("?") ? window.location.search.slice(1) : "";
+  if (back) query.back_query = back;
+  router.push({ path: `/asset/tables/${row.schema_name}/${row.table_name}`, query });
 }
 
 onMounted(async () => {
@@ -832,7 +846,7 @@ onMounted(async () => {
   }
 
   .tree-panel {
-    min-height: 320px;
+    min-height: auto;
     max-height: 420px;
     overflow: auto;
   }
@@ -921,16 +935,6 @@ onMounted(async () => {
 
 .field-panel {
   min-height: 320px;
-}
-
-@media (max-width: 1100px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tree-panel {
-    min-height: auto;
-  }
 }
 
 @media (max-width: 760px) {

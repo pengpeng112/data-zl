@@ -27,6 +27,9 @@
           </div>
         </div>
       </template>
+      <el-alert v-if="loadError" type="error" :closable="false" :title="loadError" show-icon class="dept-load-error">
+        <template #default><el-button size="small" @click="loadData">重试</el-button></template>
+      </el-alert>
       <el-table v-loading="loading" :data="pagedItems" stripe size="small" class="dept-table" @row-click="showDetail">
         <el-table-column prop="dept_code" label="科室编码" width="110" />
         <el-table-column prop="dept_name_cn" label="科室名称" width="180" show-overflow-tooltip />
@@ -166,13 +169,17 @@ function onPageChange() {
   /* pagination handled by computed slice */
 }
 
+const loadError = ref("");
+
 async function loadData() {
   loading.value = true;
+  loadError.value = "";
   try {
     const res = await getDepartments();
-    items.value = res.data ?? [];
-  } catch {
-    ElMessage.error("加载科室列表失败");
+    items.value = (res.data ?? []) as unknown as DeptItem[];
+  } catch (error: any) {
+    items.value = [];
+    loadError.value = String(error?.response?.data?.detail || "科室列表加载失败");
   } finally {
     loading.value = false;
   }
@@ -227,4 +234,5 @@ onMounted(loadData);
   .dept-stat-grid { grid-template-columns: 1fr; }
   .list-head { flex-direction: column; align-items: stretch; }
 }
+.dept-load-error { margin-bottom: 12px; }
 </style>

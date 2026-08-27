@@ -104,10 +104,10 @@
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <template v-if="row.status === 'draft'">
-              <el-button type="success" size="small" @click="approveDraft(row)"
+              <el-button v-perms="'asset.ai_draft.review'" type="success" size="small" @click="approveDraft(row)"
                 >通过</el-button
               >
-              <el-button type="danger" size="small" @click="rejectDraft(row)"
+              <el-button v-perms="'asset.ai_draft.review'" type="danger" size="small" @click="rejectDraft(row)"
                 >拒绝</el-button
               >
             </template>
@@ -148,8 +148,8 @@
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import { ref, onMounted } from "vue";
-import { http } from "@/utils/http";
-import { getAiTools, getDrafts, getToolCalls, reviewDraft } from "@/api/asset";
+import { getAiTools, getDrafts, getToolCalls, reviewDraft, listSystems, getAiSystemContext } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import type { AiToolDef, ViewDraftItem, AiToolCallItem } from "@/api/asset";
 import { ElMessage } from "element-plus";
 
@@ -196,12 +196,15 @@ function draftStatusTag(s: string | null): any {
 }
 
 function loadSystems() {
-  http
-    .request("get", "/api/v1/systems")
-    .then((d: any) => {
-      systemOptions.value = d.data || [];
+  // F4：裸 http 收编到 listSystems。
+  listSystems()
+    .then(({ data }) => {
+      systemOptions.value = data as any;
     })
-    .catch(() => {});
+    .catch(() => {
+      // 下拉选项加载失败保持空列表（非关键路径）。
+      systemOptions.value = [];
+    });
 }
 
 function loadSystemContext() {
@@ -209,15 +212,14 @@ function loadSystemContext() {
     systemContext.value = null;
     return;
   }
-  http
-    .request("get", "/api/v1/ai/system-context", {
-      params: { system_code: systemCode.value }
+  // F4：裸 http 收编到 getAiSystemContext。
+  getAiSystemContext(systemCode.value)
+    .then(({ data }) => {
+      systemContext.value = data as any;
     })
-    .then((d: any) => {
-      systemContext.value = d.data;
-    })
-    .catch(() => {
+    .catch(error => {
       systemContext.value = null;
+      ElMessage.error(extractErrorDetail(error, "系统上下文加载失败"));
     });
 }
 

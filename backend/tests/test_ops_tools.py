@@ -121,8 +121,10 @@ def test_list_tools(client: TestClient):
     resp = client.get("/api/v1/ops/tools")
     assert resp.status_code == 200
     data = resp.json()["data"]
-    assert isinstance(data, list)
-    assert len(data) >= 1
+    # 146 E7：服务端分页契约
+    assert {"items", "total", "page", "page_size"} <= set(data)
+    assert data["total"] >= 1
+    assert len(data["items"]) >= 1
 
 
 def test_list_tools_type_filter(client: TestClient):
@@ -130,7 +132,7 @@ def test_list_tools_type_filter(client: TestClient):
     resp = client.get("/api/v1/ops/tools?tool_type=query")
     assert resp.status_code == 200
     data = resp.json()["data"]
-    for t in data:
+    for t in data["items"]:
         assert t["tool_type"] == "query"
 
 

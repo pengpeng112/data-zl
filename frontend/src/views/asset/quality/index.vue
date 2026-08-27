@@ -758,16 +758,40 @@ import ReChart from "@/components/ReChart/index.vue";
 import { computed, ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-import { http } from "@/utils/http";
 import {
   getQualitySummary,
+  getQualitySummaryBySystem,
+  getQualityMetrics,
   getQualityFindings,
   getQualityCheckRuns,
   runQualityCheck,
   listSystems,
+  listQualityRules,
+  createQualityRule,
+  updateQualityRule,
+  toggleQualityRule,
+  validateQualityRuleSql,
+  deleteQualityRule,
+  autoGenerateQualityRules,
+  updateQualityFinding,
+  assignQualityFinding,
+  recheckQualityFinding,
   type QualitySummary
 } from "@/api/asset";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
+import { fetchSystemNameMap } from "@/utils/systemNames";
+
+// E3：同一加载序列的失败提示合并为一条（3 秒窗口内相同消息去重，防九连弹）。
+let lastLoadErrorAt = 0;
+let lastLoadErrorMsg = "";
+function notifyLoadError(message: string) {
+  const now = Date.now();
+  if (message === lastLoadErrorMsg && now - lastLoadErrorAt < 3000) return;
+  lastLoadErrorMsg = message;
+  lastLoadErrorAt = now;
+  ElMessage.error(message);
+}
 import {
   RULE_CATEGORY_OPTIONS,
   checkScopeLabel,
@@ -793,13 +817,10 @@ import WarningIcon from "~icons/ri/alert-line";
 const systemNameMap = reactive<Record<string, string>>({});
 const router = useRouter();
 
+// F5：loadSystemNames 两份合一 → utils/systemNames。
 async function loadSystemNames() {
-  try {
-    const res = await listSystems();
-    for (const item of res.data || []) systemNameMap[item.system_code] = item.system_name_cn;
-  } catch {
-    // Technical codes remain a safe fallback if the catalog endpoint is unavailable.
-  }
+  const map = await fetchSystemNameMap();
+  Object.assign(systemNameMap, map);
 }
 
 // ============================================================
@@ -943,14 +964,15 @@ function loadSummary() {
     .then(({ data }) => {
       summary.value = data;
     })
-    .catch(() => {});
+    .catch(error => {
+      notifyLoadError(extractErrorDetail(error, "质量汇总加载失败"));
+    });
 }
 
 function loadSystemSummary() {
-  http
-    .get<any, any>("/api/v1/quality/summary/by-system")
-    .then((d: any) => {
-      const rows = d.data || [];
+  getQualitySummaryBySystem()
+    .then(({ data }) => {
+      const rows = (data as any) || [];
       systemSummary.value = rows.map((row: any) => ({
         system_code: row.system_code,
         system_name_cn: row.system_name_cn,
@@ -960,17 +982,16 @@ function loadSystemSummary() {
         critical_count: row.critical_count ?? 0
       }));
     })
-    .catch((err: any) => {
+    .catch(error => {
       systemSummary.value = [];
-      ElMessage.error(err?.response?.data?.detail || "系统质量汇总加载失败");
+      notifyLoadError(extractErrorDetail(error, "系统质量汇总加载失败"));
     });
 }
 
 function loadMetrics() {
-  return http
-    .get<any, any>("/api/v1/quality/metrics")
-    .then((d: any) => {
-      const raw = d.data || {};
+  return getQualityMetrics()
+    .then(({ data }) => {
+      const raw = (data as any) || {};
       // Normalize rule_categories: accept array or legacy dict
       let cats = raw.rule_categories;
       if (cats && !Array.isArray(cats) && typeof cats === "object") {
@@ -987,8 +1008,8 @@ function loadMetrics() {
         top_tables: raw.top_tables || []
       };
     })
-    .catch((err: any) => {
-      ElMessage.error(err?.response?.data?.detail || "质量指标加载失败");
+    .catch(error => {
+      notifyLoadError(extractErrorDetail(error, "质量指标加载失败"));
     });
 }
 
@@ -1097,23 +1118,22 @@ function loadRules(page?: number) {
   if (ruleFilters.enabled !== undefined) params.enabled = ruleFilters.enabled;
   if (ruleFilters.keyword) params.keyword = ruleFilters.keyword;
 
-  http
-    .get<any, any>("/api/v1/quality/rules", { params })
-    .then((d: any) => {
-      const payload = d.data;
+  listQualityRules(params as any)
+    .then(({ data }) => {
+      const payload = data;
       // Transition: accept page envelope or legacy bare array
       if (Array.isArray(payload)) {
-        rules.value = payload;
+        rules.value = payload as any;
         rulesTotal.value = payload.length;
       } else {
-        rules.value = payload?.items || [];
+        rules.value = (payload?.items || []) as any;
         rulesTotal.value = payload?.total || 0;
       }
     })
     .catch((err: any) => {
       rules.value = [];
       rulesTotal.value = 0;
-      ElMessage.error(err?.response?.data?.detail || "规则列表加载失败");
+      ElMessage.error(extractErrorDetail(err, "规则列表加载失败"));
     })
     .finally(() => {
       rulesLoading.value = false;
@@ -1123,15 +1143,13 @@ function loadRules(page?: number) {
 async function autoGenerateRules() {
   autoGenerating.value = true;
   try {
-    const res = await http.post<any, any>("/api/v1/quality/rules/auto-generate", {
-      data: { limit: 200 }
-    });
+    const res = await autoGenerateQualityRules({ limit: 200 });
     const data = res.data || {};
     ElMessage.success(`已生成 ${data.created || 0} 条建议，跳过 ${data.skipped || 0} 条重复规则`);
     loadMetrics();
     loadRules(1);
   } catch (error: any) {
-    ElMessage.error(error?.response?.data?.detail || "规则建议生成失败");
+    ElMessage.error(extractErrorDetail(error, "规则建议生成失败"));
   } finally {
     autoGenerating.value = false;
   }
@@ -1180,47 +1198,40 @@ function openRuleDialog(row?: RuleItem) {
 
 function saveRule() {
   const payload: any = { ...ruleForm };
-  if (editingRuleId.value) {
-    http
-      .patch<any, any>(`/api/v1/quality/rules/${editingRuleId.value}`, { data: payload })
-      .then(() => {
-        ElMessage.success("规则已更新");
-        ruleDialogVisible.value = false;
-        loadRules();
-      })
-      .catch(() => {});
-  } else {
-    http
-      .post<any, any>("/api/v1/quality/rules", { data: payload })
-      .then(() => {
-        ElMessage.success("规则已创建");
-        ruleDialogVisible.value = false;
-        loadRules();
-      })
-      .catch(() => {});
-  }
+  const request = editingRuleId.value
+    ? updateQualityRule(editingRuleId.value, payload)
+    : createQualityRule(payload);
+  request
+    .then(() => {
+      ElMessage.success(editingRuleId.value ? "规则已更新" : "规则已创建");
+      ruleDialogVisible.value = false;
+      loadRules();
+    })
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "规则保存失败"));
+    });
 }
 
 function toggleRuleEnabled(row: RuleItem) {
   const newEnabled = !row.enabled;
-  http
-    .post<any, any>(`/api/v1/quality/rules/${row.id}/enable?enabled=${newEnabled}`)
+  toggleQualityRule(row.id, newEnabled)
     .then(() => {
       ElMessage.success(`已${newEnabled ? '启用' : '停用'}`);
       loadRules();
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "规则启停失败"));
+    });
 }
 
 function validateRuleSql(row: RuleItem) {
-  http
-    .post<any, any>(`/api/v1/quality/rules/${row.id}/validate-sql`)
-    .then((d: any) => {
-      sqlValidateResult.value = d.data;
+  validateQualityRuleSql(row.id)
+    .then(({ data }) => {
+      sqlValidateResult.value = data;
       sqlValidateVisible.value = true;
     })
-    .catch(() => {
-      ElMessage.error("SQL 校验失败");
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "SQL 校验失败"));
     });
 }
 
@@ -1231,15 +1242,16 @@ function deleteRule(row: RuleItem) {
     type: "warning"
   })
     .then(() => {
-      http
-        .delete<any, any>(`/api/v1/quality/rules/${row.id}`)
+      deleteQualityRule(row.id)
         .then(() => {
           ElMessage.success("已删除");
           loadRules();
         })
-        .catch(() => {});
+        .catch(error => {
+          ElMessage.error(extractErrorDetail(error, "规则删除失败"));
+        });
     })
-    .catch(() => {});
+    .catch(() => {}); // 用户取消删除
 }
 
 // ============================================================
@@ -1261,6 +1273,9 @@ function runCheck() {
       ElMessage.success(`检查完成：${data.total_findings} 个问题`);
       loadCheckRuns(1);
     })
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "质量检查执行失败"));
+    })
     .finally(() => {
       checking.value = false;
     });
@@ -1279,6 +1294,9 @@ function loadCheckRuns(page?: number) {
     .then(({ data }) => {
       checkRuns.value = (data.items || []) as any;
       tasksTotal.value = data.total || 0;
+    })
+    .catch(error => {
+      notifyLoadError(extractErrorDetail(error, "检查历史加载失败"));
     })
     .finally(() => {
       tasksLoading.value = false;
@@ -1389,6 +1407,7 @@ function ensureRunOptions() {
       findingRunOptions.value = (data.items || []) as any;
     })
     .catch(() => {
+      // 下拉选项预取失败不弹窗（非关键路径），保持空列表回退。
       findingRunOptions.value = [];
     });
 }
@@ -1411,6 +1430,9 @@ function loadFindings(page?: number) {
       findings.value = data.items as any;
       findingsTotal.value = data.total;
     })
+    .catch(error => {
+      notifyLoadError(extractErrorDetail(error, "质量问题列表加载失败"));
+    })
     .finally(() => {
       fLoading.value = false;
     });
@@ -1425,26 +1447,29 @@ function openAssignDialog(row: FindingItem) {
 
 function submitAssign() {
   if (!assignFindingId.value) return;
-  http
-    .post<any, any>(`/api/v1/quality/findings/${assignFindingId.value}/assign`, {
-      data: { assigned_to: assignForm.assigned_to, note: assignForm.note }
-    })
+  assignQualityFinding(assignFindingId.value, {
+    assigned_to: assignForm.assigned_to,
+    note: assignForm.note
+  })
     .then(() => {
       ElMessage.success("已分派");
       assignDialogVisible.value = false;
       loadFindings();
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "问题分派失败"));
+    });
 }
 
 function recheckFinding(row: FindingItem, status: string) {
-  http
-    .post<any, any>(`/api/v1/quality/findings/${row.id}/recheck?status=${status}`)
+  recheckQualityFinding(row.id, status)
     .then(() => {
       ElMessage.success("复核完成");
       loadFindings();
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "问题复核失败"));
+    });
 }
 
 function openFindingStatusDialog(row: FindingItem) {
@@ -1460,14 +1485,15 @@ function submitFindingStatus() {
     status: findingStatusForm.status,
     note: findingStatusForm.note
   };
-  http
-    .patch<any, any>(`/api/v1/quality/findings/${findingStatusFindingId.value}`, { data: body })
+  updateQualityFinding(findingStatusFindingId.value, body)
     .then(() => {
       ElMessage.success("状态已更新");
       findingStatusDialogVisible.value = false;
       loadFindings();
     })
-    .catch(() => {});
+    .catch(error => {
+      ElMessage.error(extractErrorDetail(error, "问题状态更新失败"));
+    });
 }
 
 // ============================================================
@@ -1487,6 +1513,9 @@ function loadRecords(page?: number) {
     .then(({ data }) => {
       records.value = (data.items || []) as any;
       recordsTotal.value = data.total || 0;
+    })
+    .catch(error => {
+      notifyLoadError(extractErrorDetail(error, "执行记录加载失败"));
     })
     .finally(() => {
       recordsLoading.value = false;

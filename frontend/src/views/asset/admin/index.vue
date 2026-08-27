@@ -9,7 +9,7 @@
       class="mb20"
       type="info"
       :closable="false"
-      title="本页用于平台治理底座，不承担业务统计指标或日常查询版本管理（见 126 查询与指标中心）。"
+      title="本页用于平台治理底座，不承担业务统计指标或日常查询版本管理；相关能力请前往查询与指标中心。"
     />
 
     <el-card class="mb20">
@@ -300,15 +300,52 @@
         <el-button type="primary" @click="saveOwner">保存</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="keyDialog.visible" title="创建 API Token" width="460px" destroy-on-close>
+      <el-form ref="keyFormRef" :model="keyDialog.form" :rules="keyDialog.rules" label-width="110px">
+        <el-form-item label="Token 名称" prop="key_name">
+          <el-input v-model="keyDialog.form.key_name" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="绑定用户标识" prop="user_identifier">
+          <el-input v-model="keyDialog.form.user_identifier" maxlength="100" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="keyDialog.visible = false">取消</el-button>
+        <el-button type="primary" :loading="keyDialog.submitting" @click="submitCreateKey">创建</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="tokenOnce.visible" title="Token 创建成功（仅显示一次）" width="560px" :close-on-click-modal="false">
+      <el-alert type="warning" :closable="false" title="请立即复制保存；关闭后平台不再显示明文，也不会写入日志。" show-icon class="mb8" />
+      <pre class="token-once">{{ tokenOnce.value }}</pre>
+      <template #footer>
+        <el-button @click="copyTokenOnce">复制</el-button>
+        <el-button type="primary" @click="tokenOnce.visible = false">我已保存，关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { http } from "@/utils/http";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  listAdminKeys,
+  createAdminKey,
+  toggleAdminKey,
+  listAdminOwners,
+  upsertAdminOwner,
+  deleteAdminOwner,
+  listAdminTerms,
+  upsertAdminTerm,
+  deleteAdminTerm,
+  listAdminSnapshots,
+  createAdminSnapshot,
+  compareAdminSnapshots
+} from "@/api/admin";
+import { extractErrorDetail } from "@/utils/errorMessage";
 
 const router = useRouter();
 
@@ -349,45 +386,85 @@ const ownerForm = ref({
 const editId = ref<number | null>(null);
 
 function loadKeys() {
-  http.get<any, any>("/api/v1/admin/keys").then(d => {
-    keys.value = d.data;
-  });
-}
-
-function createKey() {
-  const name = prompt("Token 名称：");
-  if (!name) return;
-  const userIdentifier = prompt("绑定的平台用户标识：");
-  if (!userIdentifier) return;
-  http
-    .post<any, any>("/api/v1/admin/keys", {
-      data: { key_name: name, user_identifier: userIdentifier }
+  listAdminKeys()
+    .then(({ data }) => {
+      keys.value = data as any;
     })
-    .then(d => {
-      ElMessage.success(`新 Token: ${d.data.token}`);
-      loadKeys();
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "API Key 列表加载失败"));
     });
 }
 
+const keyDialog = reactive({
+  visible: false,
+  submitting: false,
+  form: { key_name: "", user_identifier: "" },
+  rules: {
+    key_name: [{ required: true, message: "请填写 Token 名称", trigger: "blur" }],
+    user_identifier: [{ required: true, message: "请填写绑定用户标识", trigger: "blur" }]
+  }
+});
+const keyFormRef = ref();
+const tokenOnce = reactive({ visible: false, value: "" });
+
+function createKey() {
+  keyDialog.form = { key_name: "", user_identifier: "" };
+  keyDialog.visible = true;
+}
+
+async function submitCreateKey() {
+  const valid = await keyFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
+  keyDialog.submitting = true;
+  try {
+    const d = await createAdminKey({
+      key_name: keyDialog.form.key_name.trim(),
+      user_identifier: keyDialog.form.user_identifier.trim()
+    });
+    keyDialog.visible = false;
+    tokenOnce.value = String(d.data?.token || "");
+    tokenOnce.visible = true;
+    loadKeys();
+  } catch (error: any) {
+    ElMessage.error(extractErrorDetail(error, "创建失败"));
+  } finally {
+    keyDialog.submitting = false;
+  }
+}
+
+async function copyTokenOnce() {
+  try {
+    await navigator.clipboard.writeText(tokenOnce.value);
+    ElMessage.success("已复制");
+  } catch {
+    ElMessage.warning("剪贴板不可用，请手动选择复制");
+  }
+}
+
 function toggleKey(row: KeyItem) {
-  http
-    .patch<any, any>(`/api/v1/admin/keys/${row.id}?enabled=${!row.enabled}`)
-    .then(() => loadKeys());
+  toggleAdminKey(row.id, !row.enabled)
+    .then(() => loadKeys())
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "API Key 启停失败"));
+    });
 }
 
 function loadOwners() {
   ownersLoading.value = true;
-  http
-    .get<any, any>("/api/v1/admin/owners", {
-      params: {
-        page: ownerPage.value,
-        page_size: ownerPageSize.value,
-        keyword: ownerKeyword.value || undefined
-      }
+  listAdminOwners({
+    page: ownerPage.value,
+    page_size: ownerPageSize.value,
+    keyword: ownerKeyword.value || undefined
+  })
+    .then(({ data }) => {
+      owners.value = data.items as any;
+      ownerTotal.value = data.total;
     })
-    .then(d => {
-      owners.value = d.data.items;
-      ownerTotal.value = d.data.total;
+    .catch(error => {
+      owners.value = [];
+      ElMessage.error(extractErrorDetail(error, "表 Owner 列表加载失败"));
     })
     .finally(() => {
       ownersLoading.value = false;
@@ -415,21 +492,32 @@ function openOwnerDialog(row?: OwnerItem) {
 }
 
 function saveOwner() {
-  http
-    .put<any, any>("/api/v1/admin/owners", { data: ownerForm.value })
+  upsertAdminOwner(ownerForm.value)
     .then(() => {
       ElMessage.success("已保存");
       ownerDialogVisible.value = false;
       loadOwners();
+    })
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "表 Owner 保存失败"));
     });
 }
 
 function delOwner(row: OwnerItem) {
-  if (!confirm("确定删除？")) return;
-  http.delete<any, any>(`/api/v1/admin/owners/${row.id}`).then(() => {
-    ElMessage.success("已删除");
-    loadOwners();
-  });
+  // E12：原生 confirm 改 ElMessageBox（统一交互）。
+  ElMessageBox.confirm(`确定删除表 ${row.full_table_name} 的 Owner 登记？`, "删除确认", {
+    type: "warning"
+  })
+    .then(() => deleteAdminOwner(row.id))
+    .then(() => {
+      ElMessage.success("已删除");
+      loadOwners();
+    })
+    .catch(error => {
+      if (error === "cancel" || (error as Error)?.message === "cancel") return;
+      ElMessage.error(extractErrorDetail(error, "删除失败"));
+    });
 }
 
 interface TermItem {
@@ -451,17 +539,18 @@ const termForm = ref({ term: "", mapping_target: "", description: "" });
 
 function loadTerms() {
   termsLoading.value = true;
-  http
-    .get<any, any>("/api/v1/admin/terms", {
-      params: {
-        page: termPage.value,
-        page_size: termPageSize.value,
-        keyword: termKeyword.value || undefined
-      }
+  listAdminTerms({
+    page: termPage.value,
+    page_size: termPageSize.value,
+    keyword: termKeyword.value || undefined
+  })
+    .then(({ data }) => {
+      terms.value = data.items as any;
+      termTotal.value = data.total;
     })
-    .then(d => {
-      terms.value = d.data.items;
-      termTotal.value = d.data.total;
+    .catch(error => {
+      terms.value = [];
+      ElMessage.error(extractErrorDetail(error, "业务术语列表加载失败"));
     })
     .finally(() => {
       termsLoading.value = false;
@@ -480,21 +569,32 @@ function openTermDialog(row?: TermItem) {
 }
 
 function saveTerm() {
-  http
-    .put<any, any>("/api/v1/admin/terms", { data: termForm.value })
+  upsertAdminTerm(termForm.value)
     .then(() => {
       ElMessage.success("已保存");
       termDialogVisible.value = false;
       loadTerms();
+    })
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "业务术语保存失败"));
     });
 }
 
 function delTerm(row: TermItem) {
-  if (!confirm("确定删除？")) return;
-  http.delete<any, any>(`/api/v1/admin/terms/${row.id}`).then(() => {
-    ElMessage.success("已删除");
-    loadTerms();
-  });
+  // E12：原生 confirm 改 ElMessageBox。
+  ElMessageBox.confirm(`确定删除术语「${row.term}」？`, "删除确认", {
+    type: "warning"
+  })
+    .then(() => deleteAdminTerm(row.id))
+    .then(() => {
+      ElMessage.success("已删除");
+      loadTerms();
+    })
+    .catch(error => {
+      if (error === "cancel" || (error as Error)?.message === "cancel") return;
+      ElMessage.error(extractErrorDetail(error, "删除失败"));
+    });
 }
 
 interface SnapItem {
@@ -513,10 +613,13 @@ const compareResult = ref<any>(null);
 
 function loadSnapshots() {
   snapLoading.value = true;
-  http
-    .get<any, any>("/api/v1/admin/snapshots")
-    .then(d => {
-      snapshots.value = d.data.items;
+  listAdminSnapshots()
+    .then(({ data }) => {
+      snapshots.value = data.items as any;
+    })
+    .catch(error => {
+      snapshots.value = [];
+      ElMessage.error(extractErrorDetail(error, "快照列表加载失败"));
     })
     .finally(() => {
       snapLoading.value = false;
@@ -524,10 +627,15 @@ function loadSnapshots() {
 }
 
 function createSnapshot() {
-  http.post<any, any>("/api/v1/admin/snapshots", { data: {} }).then(() => {
-    ElMessage.success("快照已创建");
-    loadSnapshots();
-  });
+  createAdminSnapshot()
+    .then(() => {
+      ElMessage.success("快照已创建");
+      loadSnapshots();
+    })
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "快照创建失败"));
+    });
 }
 
 function selectCompare(row: SnapItem) {
@@ -538,12 +646,13 @@ function selectCompare(row: SnapItem) {
 
 function runCompare() {
   if (compareIds.value.length !== 2) return;
-  http
-    .get<any, any>("/api/v1/admin/snapshots/compare", {
-      params: { id1: compareIds.value[0], id2: compareIds.value[1] }
+  compareAdminSnapshots(compareIds.value[0], compareIds.value[1])
+    .then(({ data }) => {
+      compareResult.value = data;
     })
-    .then(d => {
-      compareResult.value = d.data;
+    .catch(error => {
+      // E12：无 catch 链补齐。
+      ElMessage.error(extractErrorDetail(error, "快照对比失败"));
     });
 }
 
@@ -617,4 +726,6 @@ onMounted(() => {
   display: flex;
   gap: 8px;
 }
+.token-once { margin: 0; padding: 12px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; word-break: break-all; background: var(--el-fill-color-light); border-radius: 6px; }
+.mb8 { margin-bottom: 8px; }
 </style>

@@ -66,8 +66,7 @@ import ReChart from "@/components/ReChart/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import { computed, onMounted, ref } from "vue";
-import { getSummary, type SummaryData } from "@/api/asset";
-import { http } from "@/utils/http";
+import { getOverviewCharts, getSummary, type SummaryData } from "@/api/asset";
 import type { EChartsCoreOption } from "echarts/core";
 import DashboardIcon from "~icons/ri/dashboard-3-line";
 import ListIcon from "~icons/ri/list-check-2";
@@ -180,9 +179,9 @@ async function loadCharts() {
   partitionError.value = "";
   coreError.value = "";
   try {
-    const res = await http.request<any>("get", "/api/v1/overview/charts");
+    const res = await getOverviewCharts();
     const data = res.data || {};
-    const domains = data.domains || {};
+    const domains = data.domains || { items: [] };
     domainRows.value = (domains.items || []).map((x: any) => [x.name, x.count]);
     if (domains.unclassified != null) {
       domainHint.value = `未分业务域 ${domains.unclassified} / 表总数 ${domains.total_tables ?? "-"}`;

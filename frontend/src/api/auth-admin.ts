@@ -1,10 +1,7 @@
 import { http } from "@/utils/http";
 
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+export type { ApiResponse } from "./types";
+import type { ApiResponse } from "./types";
 
 export interface LocalAuthUser {
   id: number;

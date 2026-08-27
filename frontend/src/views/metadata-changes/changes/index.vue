@@ -42,8 +42,10 @@
           <el-option label="删除表" value="table_removed" />
           <el-option label="新增字段" value="column_added" />
           <el-option label="删除字段" value="column_removed" />
-          <el-option label="字段类型变更" value="column_type_changed" />
-          <el-option label="字段重命名" value="column_renamed" />
+          <el-option label="字段类型变更" value="column_data_type_changed" />
+          <el-option label="字段长度变更" value="column_length_changed" />
+          <el-option label="非空约束变更" value="column_nullable_changed" />
+          <el-option label="字段注释变更" value="column_comment_changed" />
         </el-select>
 
         <el-select
@@ -82,22 +84,44 @@
         />
       </div>
 
+      <el-alert v-if="loadError" type="error" :closable="false" :title="loadError" show-icon class="load-error">
+        <template #default><el-button size="small" @click="loadData">重试</el-button></template>
+      </el-alert>
+
+      <div v-if="selectedIds.length" class="batch-bar">
+        <span>已选 {{ selectedIds.length }} 条</span>
+        <el-button v-perms="'metadata.change.edit'" size="small" type="primary" @click="batchAction('acknowledge')">批量确认</el-button>
+        <el-button v-perms="'metadata.change.edit'" size="small" type="warning" @click="batchAction('ignore')">批量忽略</el-button>
+        <el-button v-perms="'metadata.change.edit'" size="small" type="success" @click="batchAction('resolve')">批量解决</el-button>
+        <el-button v-perms="'metadata.change.edit'" size="small" @click="batchAction('reopen')">批量重开</el-button>
+      </div>
       <el-table
         v-loading="loading"
         :data="items"
         stripe
         class="event-table"
         @row-click="showDetail"
+        @selection-change="onSelectionChange"
       >
+        <el-table-column type="selection" width="45" />
         <el-table-column prop="id" label="ID" width="70" align="center" />
         <el-table-column prop="system_code" label="系统" width="90" />
+        <el-table-column prop="namespace" label="Schema" width="100" show-overflow-tooltip />
         <el-table-column prop="change_type" label="变更类型" width="120">
           <template #default="{ row }">
             {{ changeTypeLabel(row.change_type) }}
           </template>
         </el-table-column>
-        <el-table-column prop="table_name" label="表名" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="column_name" label="字段名" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="table_name" label="表名" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="column_name" label="字段名" min-width="120" show-overflow-tooltip />
+        <el-table-column label="变更内容" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span v-if="row.before_value || row.after_value">
+              {{ row.before_value || "（无）" }} → {{ row.after_value || "（无）" }}
+            </span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="severity" label="严重程度" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="severityColor(row.severity)" size="small" disable-transitions>
@@ -117,11 +141,14 @@
           </template>
         </el-table-column>
         <el-table-column prop="assigned_to" label="分配人" width="100" show-overflow-tooltip />
-        <el-table-column prop="created_at" label="创建时间" width="160" />
+        <el-table-column label="创建时间" width="140">
+          <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+        </el-table-column>
         <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
             <el-button
               v-if="row.status === 'open'"
+              v-perms="'metadata.change.edit'"
               type="primary"
               size="small"
               link
@@ -131,6 +158,7 @@
             </el-button>
             <el-button
               v-if="row.status === 'open'"
+              v-perms="'metadata.change.edit'"
               type="warning"
               size="small"
               link
@@ -140,6 +168,7 @@
             </el-button>
             <el-button
               v-if="row.status === 'acknowledged'"
+              v-perms="'metadata.change.edit'"
               type="success"
               size="small"
               link
@@ -148,6 +177,7 @@
               解决
             </el-button>
             <el-button
+              v-perms="'metadata.change.edit'"
               type="info"
               size="small"
               link
@@ -184,13 +214,15 @@
         </el-descriptions-item>
         <el-descriptions-item label="表名">{{ currentRow?.table_name }}</el-descriptions-item>
         <el-descriptions-item label="字段名">{{ currentRow?.column_name || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Schema">{{ currentRow?.namespace || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="来源">{{ currentRow?.source_code || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusTagType(currentRow?.status)" size="small" disable-transitions>
             {{ statusLabel(currentRow?.status) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="分配人">{{ currentRow?.assigned_to || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ currentRow?.created_at }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间" :span="2">{{ formatTime(currentRow?.created_at) }}</el-descriptions-item>
         <el-descriptions-item label="变更前值" :span="2">
           <pre v-if="currentRow?.before_value" class="json-block">{{ formatJson(currentRow.before_value) }}</pre>
           <span v-else>-</span>
@@ -226,8 +258,19 @@ import {
   updateMetadataChange,
   getChangesSummary
 } from "@/api/metadata";
+import {
+  changeTypeLabel,
+  severityColor,
+  severityLabel,
+  statusLabel,
+  statusTagType
+} from "../labels";
+import { extractErrorDetail } from "@/utils/errorMessage";
+import { batchUpdateMetadataChanges } from "@/api/metadata";
+import { formatTime } from "@/utils/format";
 
 const loading = ref(false);
+const loadError = ref("");
 const items = ref<any[]>([]);
 const summary = reactive({
   total: 0,
@@ -250,6 +293,25 @@ const pagination = reactive({
   total: 0
 });
 
+const selectedIds = ref<number[]>([]);
+
+function onSelectionChange(rows: any[]) {
+  selectedIds.value = rows.map(row => row.id);
+}
+
+async function batchAction(action: "acknowledge" | "ignore" | "resolve" | "reopen") {
+  if (!selectedIds.value.length) return;
+  try {
+    const res = await batchUpdateMetadataChanges({ ids: selectedIds.value, action });
+    ElMessage.success(`已处理 ${res.data.updated} 条${res.data.missing.length ? `，缺失 ${res.data.missing.length} 条` : ""}`);
+    selectedIds.value = [];
+    loadData();
+    loadSummary();
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "批量处理失败"));
+  }
+}
+
 const detailVisible = ref(false);
 const currentRow = ref<any>(null);
 
@@ -265,12 +327,13 @@ async function loadSummary() {
     const res = await getChangesSummary();
     Object.assign(summary, res.data);
   } catch {
-    // ignore
+    // 汇总卡片是可降级资源：主列表错误态由 loadData 负责，这里保持上次值。
   }
 }
 
 async function loadData() {
   loading.value = true;
+  loadError.value = "";
   try {
     const res = await getMetadataChanges({
       system_code: filters.system_code || undefined,
@@ -283,9 +346,10 @@ async function loadData() {
     });
     items.value = res.data.items ?? [];
     pagination.total = res.data.total ?? 0;
-  } catch {
+  } catch (error) {
     items.value = [];
     pagination.total = 0;
+    loadError.value = extractErrorDetail(error, "变更事件加载失败");
   } finally {
     loading.value = false;
   }
@@ -307,8 +371,8 @@ async function acknowledge(row: any) {
     ElMessage.success("已确认");
     loadData();
     loadSummary();
-  } catch {
-    // handled
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "确认失败"));
   }
 }
 
@@ -318,8 +382,8 @@ async function ignore(row: any) {
     ElMessage.success("已忽略");
     loadData();
     loadSummary();
-  } catch {
-    // handled
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "忽略失败"));
   }
 }
 
@@ -329,8 +393,8 @@ async function resolve(row: any) {
     ElMessage.success("已解决");
     loadData();
     loadSummary();
-  } catch {
-    // handled
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "解决失败"));
   }
 }
 
@@ -350,65 +414,11 @@ async function doAssign() {
     ElMessage.success("已分配");
     assignVisible.value = false;
     loadData();
-  } catch {
-    // handled
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "分配失败"));
   } finally {
     assignLoading.value = false;
   }
-}
-
-function changeTypeLabel(type: string): string {
-  const map: Record<string, string> = {
-    table_added: "新增表",
-    table_removed: "删除表",
-    column_added: "新增字段",
-    column_removed: "删除字段",
-    column_type_changed: "字段类型变更",
-    column_renamed: "字段重命名"
-  };
-  return map[type] ?? type;
-}
-
-function severityLabel(sev: string): string {
-  const map: Record<string, string> = {
-    info: "提示",
-    low: "低",
-    medium: "中",
-    high: "高",
-    critical: "严重"
-  };
-  return map[sev] ?? sev;
-}
-
-function severityColor(sev: string): any {
-  const map: Record<string, string> = {
-    info: "info",
-    low: "success",
-    medium: "warning",
-    high: "danger",
-    critical: "danger"
-  };
-  return map[sev] ?? "info";
-}
-
-function statusLabel(s: string): string {
-  const map: Record<string, string> = {
-    open: "待处理",
-    acknowledged: "已确认",
-    ignored: "已忽略",
-    resolved: "已解决"
-  };
-  return map[s] ?? s;
-}
-
-function statusTagType(s: string): any {
-  const map: Record<string, string> = {
-    open: "danger",
-    acknowledged: "warning",
-    ignored: "info",
-    resolved: "success"
-  };
-  return map[s] ?? "info";
 }
 
 function formatJson(val: any): string {
@@ -459,6 +469,8 @@ onMounted(() => {
 .type-select { width: 160px; margin-left: 12px; }
 .compact-select { width: 140px; margin-left: 12px; }
 .keyword-input { width: 220px; margin-left: 12px; }
+.load-error { margin-bottom: 12px; }
+.batch-bar { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .event-table { margin-top: 12px; }
 .pager { justify-content: flex-end; margin-top: 16px; }
 </style>

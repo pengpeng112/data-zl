@@ -1,0 +1,471 @@
+{
+  "typedef_total": 11718,
+  "namespace_roots_top": {
+    "": 5967,
+    "Fancy.His": 5742,
+    "System": 3,
+    "FanCyPayService": 3,
+    "Microsoft": 1,
+    "Refit": 1,
+    "FreeSql": 1
+  },
+  "jh_types_total": 73,
+  "jh_interfaces_found": [
+    "IIPCOrderManager",
+    "IInPatientEsbManager",
+    "IInPatientManager",
+    "IJHPubManager",
+    "ITermManager"
+  ],
+  "jh_type_details": [
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientEsbManager",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "CommonService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "JHAuthService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "JHInPatientService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "JHOutPatientService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "JHPatientService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.Services",
+      "type": "JHTermService",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.PubDto",
+      "type": "ExamApply",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.PubDto",
+      "type": "ExamApplyItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.PubDto",
+      "type": "ResponseDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO",
+      "type": "ResponseResult`1",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO",
+      "type": "PayPlatResult",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "BedDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "ClinicItemDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "DictionaryDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "DrugDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "PerformFreqDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermRow",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "Column",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermStructureDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermColumn",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermStructureStateDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term",
+      "type": "TermStructureItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term.Attributes",
+      "type": "JHColumnAttribute",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Term.Attributes",
+      "type": "JHTableAttribute",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "JHServiceData",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "LabApply",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "LabApplyItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "OperationApply",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "OperationItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "PathologyApply",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "PathologyApplyItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "PathologyPositon",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Pub",
+      "type": "UserDetailInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Patient",
+      "type": "PatientInfoQueryDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "AddRecipeInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "RecipelInfoDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "Recipel",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "BaseRecipel",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "WMedRecipel",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "CMedRecipel",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "CMedItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "ChargedRecipel",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ops",
+      "type": "PatientCard",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "BabyInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "CancelDischargeInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "ChangeBedInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "ChangeDeptInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "DischargeInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "EsbMessageDto",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "EsbmsgmethodOutput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "InDeptInfo",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc",
+      "type": "PayRegister",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "CancelOrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "OrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "OrderItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "DrugOrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "DrugOrderBase",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "WesternOrder",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "HerbOrder",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "HerbOrderItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "ClinicOrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "ClinicOrderItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "ChargedClinicOrderItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "NurseOrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "NurseOrderItem",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "OtherOrderInput",
+      "attributes": []
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi.DTO.Ipc.Order",
+      "type": "OtherOrderItem",
+      "attributes": []
+    }
+  ],
+  "http_strings": [
+    "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ser=\"http://service.communication.service.dareway.com/\">",
+    "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org\">",
+    "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">",
+    "Apifox/1.0.0 (https://apifox.com)",
+    "http://10.10.10.225:10000/YzyEntry",
+    "http://10.10.40.29:6302",
+    "http://10.10.8.228:8426/invoice/zyapi/hosinvoicing",
+    "http://10.10.8.228:8426/invoice/zyapi/invoicingRed",
+    "http://10.10.9.145:8132/api/OutMAQS/CancelAppoint",
+    "http://10.10.9.162:6200",
+    "http://10.10.9.162:8200/fancy/service-ssoauth/outApi/judgeDoctorMedicalAuth",
+    "http://10.10.9.198:6200",
+    "http://10.10.9.201:33",
+    "http://10.10.9.227:8080/webroot/decision/view/report?",
+    "http://10.10.9.227:8080/webroot/decision/view/report?viewlet=/his/ipc/",
+    "http://127.0.0.1:8888",
+    "http://192.168.101.83/unipay/api/api?wsdl",
+    "http://47.92.223.150:1777/smsJson.aspx",
+    "http://ice.natapp4.cc",
+    "http://localhost:30000/",
+    "http://tempuri.org/fxapi/FXFX.NEWHIS.BS.NEWHISBS.",
+    "http://www.w3.org/2001/XMLSchema#integer32",
+    "http://www.w3.org/2001/XMLSchema#integer64",
+    "https://ice.natapp4.cc",
+    "https://localhost:5000",
+    "https://sd-tyzfpt-test.chinaums.com/trade"
+  ],
+  "route_like_strings_sample": [
+    "/Med/Com/InputDetailsRepository/InputSaveInputDetails",
+    "/api/MessageHub",
+    "/api/insurance/query_basic_info",
+    "/api/insurance/read_card",
+    "/api/ipc/consultation/CloseConsultationNotice",
+    "/api/ipc/payRefund/confirmRefundByDrug",
+    "/api/med/priceModify/taskPriceModifyProfit",
+    "/api/pay/v1/aggr/dataAggr",
+    "/api/pay/v1/aggr/dataList",
+    "/api/pay/v1/op/cancel",
+    "/api/pay/v1/op/query",
+    "/api/pay/v1/op/queryRefund",
+    "/api/pay/v1/op/refund",
+    "/api/pay/v1/trade/barcodePay",
+    "/connect/authorize",
+    "/empImg/",
+    "/empImg2/",
+    "/medical-phain/phaInpSettlementCallback/settlementCallback",
+    "/pub/fanCyUnPay/rechargeResults",
+    "/service/scanLogin/signMsg",
+    "/sharingcenter/api/lis/report/upload",
+    "/sharingcenter/api/report/doctorBehavior",
+    "/sharingcenter/api/report/getSecureUrl",
+    "/sharingcenter/api/report/getSecureUrlAll",
+    "InitData/Admin",
+    "SM4/ECB/PKCS7",
+    "api/Task/Create",
+    "api/dw/query_basic_info_by_his",
+    "api/ops/apply/delApply",
+    "api/ops/apply/outpApply",
+    "api/ops/apply/updateApply",
+    "api/ops/outpMrDiagDesc/add",
+    "api/ops/outpMrDiagDesc/delete",
+    "api/ops/outpPresc/createOutpPresc",
+    "api/ops/outpPresc/deleteOutpPresc",
+    "api/ops/patient/saveOutpMr",
+    "api/ops/patient/saveOutpMrDiagDesc",
+    "api/ops/prepaymentRcp/addOrderCostList",
+    "api/ops/prepaymentRcp/delOutpTreatRec",
+    "application/json",
+    "application/x-www-form-urlencoded",
+    "application/xml",
+    "grf/gridreport",
+    "hxzdJkdy/hxzdCancel",
+    "hxzdJkdy/hxzdUpload",
+    "ipc/expenseManagement/refundApply/list",
+    "payRefund/confirmRefundByDrug",
+    "swagger/",
+    "text/javascript",
+    "text/json"
+  ],
+  "repo_domain_type_total": 1518,
+  "entity_table_matches": [],
+  "tables_matched": 0,
+  "tables_total": 52
+}

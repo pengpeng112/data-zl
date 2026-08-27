@@ -1,3 +1,5 @@
+import { formatTime } from "@/utils/format";
+
 export function syncStatusLabel(value?: string | null): string {
   const map: Record<string, string> = {
     success: "成功",
@@ -40,7 +42,5 @@ export function formatDuration(ms?: number | null): string {
   return seconds ? `${minutes} 分 ${seconds} 秒` : `${minutes} 分`;
 }
 
-export function formatDateTime(value?: string | null): string {
-  if (!value) return "-";
-  return String(value).replace("T", " ").slice(0, 19);
-}
+// F7：私有 replace("T"," ") 副本收编 → utils/format formatTime 单份实现。
+export const formatDateTime = formatTime;

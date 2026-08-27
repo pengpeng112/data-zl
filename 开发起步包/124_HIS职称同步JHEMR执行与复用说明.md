@@ -5,6 +5,14 @@
 
 # HIS 职称同步 JHEMR 执行与复用说明
 
+## 0. 执行日志（追加制）
+
+| 日期 | 触发 | dry-run 待变更 | 实际更新 | run_id | 回读/审计 | 备份（宿主机 600） | 备注 |
+|---|---|---:|---:|---|---|---|---|
+| 2026-08-10 | 一次性正式同步 | 317 | 317 | `title-7bfc3814f2e0434dbe490462ef0123c1` | 二次对账 0 待变更；317 actions executed | `jhemr_education_title_backup_20260810.json`（SHA d17df0f8…） | 见 §7 |
+| 2026-08-27 | 用户改 HIS 职称后授权立即同步 | 125 | 125 | `title-4590bb783fec44f5a1350c2eaef81b41` | 二次 dry-run changed=0/already_equal=2065=matched；run success 125/125/0、subtask success、actions executed=125（守恒） | `jhemr_education_title_backup_20260827200117.json`（SHA 8743e4f4…，8493B） | 严格按 S0-S7；S1 专项 17 passed、容器脚本与本地 md5 一致（5cd8e456…）；源侧 HIS 只读 DML=0；/tmp 已精确清理；今晚夜窗子任务将按幂等规则 planned=0 跳过 |
+
+
 ## 1. 文档目的
 
 本说明是 HIS 人员职称同步到 JHEMR 的跨会话接手入口。后续更换 AI、再次全量对账、职称字典发生变化或准备并入每日人员同步时，应先读取：

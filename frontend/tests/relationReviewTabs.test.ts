@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   displayRelationColumns,
-  isReviewInboxTab,
   normalizeRelationClass,
   relationClassQuery,
   relationEvidenceKind,
@@ -16,8 +15,7 @@ describe("relationReviewTabs", () => {
     expect(normalizeRelationClass("pending")).toBe("pending");
   });
 
-  it("does not hide the real relation list behind empty draft inbox", () => {
-    expect(isReviewInboxTab("pending")).toBe(false);
+  it("maps pending and confirmed tabs to backend review statuses", () => {
     expect(reviewStatusForTab("pending")).toBe("draft");
     expect(reviewStatusForTab("confirmed")).toBe("approved");
   });

@@ -1,8 +1,7 @@
 ﻿<script setup lang="ts">
 import { ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { http } from "@/utils/http";
-import type { ApiResponse } from "@/api/dict";
+import { approveMedicalPushPlan, createMedicalPushPlan, executeMedicalPushPlan } from "@/api/dict";
 
 interface PlanSummary {
   id: number;
@@ -34,11 +33,11 @@ async function createPlan() {
   }
   loading.value = true;
   try {
-    const res = await http.request<ApiResponse<PlanSummary>>(
-      "post", "/api/v1/dict-medical/push/plans",
-      { data: { category_code: "diagnosis", target_systems: targetSystems.value } }
-    );
-    plan.value = res.data;
+    const res = await createMedicalPushPlan({
+      category_code: "diagnosis",
+      target_systems: targetSystems.value
+    });
+    plan.value = res.data as unknown as PlanSummary;
     step.value = 2;
     ElMessage.success(`计划已生成：${res.data.item_count} 项`);
   } catch (e: unknown) {
@@ -53,11 +52,8 @@ async function approvePlan() {
   await ElMessageBox.confirm("确认审批此推送计划？审批后不可撤回。", "审批确认");
   loading.value = true;
   try {
-    const res = await http.request<ApiResponse<PlanSummary>>(
-      "post", `/api/v1/dict-medical/push/plans/${plan.value.id}/approve`,
-      { data: { note: "工作台审批" } }
-    );
-    plan.value = res.data;
+    const res = await approveMedicalPushPlan(plan.value.id, "工作台审批");
+    plan.value = res.data as unknown as PlanSummary;
     step.value = 3;
     ElMessage.success("计划已审批");
   } catch (e: unknown) {
@@ -75,10 +71,8 @@ async function executePlan() {
   );
   loading.value = true;
   try {
-    const res = await http.request<ApiResponse<Record<string, unknown>>>(
-      "post", `/api/v1/dict-medical/push/plans/${plan.value.id}/execute`
-    );
-    executeResult.value = res.data;
+    const res = await executeMedicalPushPlan(plan.value.id);
+    executeResult.value = res.data as Record<string, unknown>;
     step.value = 4;
   } catch (e: unknown) {
     ElMessage.error(e instanceof Error ? e.message : "执行失败");

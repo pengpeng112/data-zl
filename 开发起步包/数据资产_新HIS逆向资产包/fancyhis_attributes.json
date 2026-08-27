@@ -1,0 +1,2858 @@
+{
+  "table_attribute_count": 519,
+  "table_attributes": [
+    {
+      "namespace": "Fancy.His.Micro.Services.ThirdParty.PayPlat.DTO",
+      "entity": "OPS_SHEET1",
+      "table": "OPS_SHEET1"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Services.IPC.Pay.Dto.Balance",
+      "entity": "HospitalConfigNew",
+      "table": "PAT_MASTER_INDEX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Services.IPC.Patient.Dto.Output",
+      "entity": "RegisterInfoByInpatientNoDiagnoseCompare",
+      "table": "PUB_DIAGNOSTIC_COMPARE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.SecureCore",
+      "entity": "SecureCoreEntity",
+      "table": "SECURE_CORE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.Paperless",
+      "entity": "PlateEmrPdfEntity",
+      "table": "HISUSER.PLATE_EMR_PDF"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.ListeningReport",
+      "entity": "ItfReportEntity",
+      "table": "report.t_itf_report"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "EmrInfReportEntity",
+      "table": "V_CrbReport"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "VEmrActivityInfoEntity",
+      "table": "FXHIS.V_EMR_ACTIVITY_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "VEmrAdmissionInfoEntity",
+      "table": "FXHIS.V_EMR_ADMISSION_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "VEmrDischargeEntity",
+      "table": "FXHIS.V_EMR_DISCHARGE_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "VEmrPatientInfoEntity",
+      "table": "FXHIS.V_EMR_PATIENT_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.InfectiousDiseases",
+      "entity": "VEmrVitalSignsRecordEntity",
+      "table": "FXHIS.V_EMR_VITAL_SIGNS_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.HrpConsumables",
+      "entity": "HrpHisHaocaiEntity",
+      "table": "hrpsey656.hrp_his_haocai"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.HrpConsumables",
+      "entity": "HrpHisHcckxxEntity",
+      "table": "hrpsey656.hrp_his_hcckxx"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.Emergency",
+      "entity": "OpsEmergencyTriageInfoEntity",
+      "table": "OPS_EMERGENCY_TRIAGE_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.ThirdParty.CriticalValue",
+      "entity": "PubCriticalValueRecordEntity",
+      "table": "FXHIS.PUB_CRITICAL_VALUE_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Yard",
+      "entity": "YardEntity",
+      "table": "SYS_YARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.YardDept",
+      "entity": "YardDeptEntity",
+      "table": "SYS_YARD_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.WardAreaWard",
+      "entity": "WardAreaWardEntity",
+      "table": "SYS_WARDAREA_WARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.WardAreaPharmacy",
+      "entity": "WardAreaPharmacyEntity",
+      "table": "SYS_WARDAREA_PHARMACY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.User",
+      "entity": "UserCAEntity",
+      "table": "PORTAL_USER.PORTAL_STAFF_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.User",
+      "entity": "UserEntity",
+      "table": "SYS_USER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.UserPermission",
+      "entity": "UserPermissionEntity",
+      "table": "SYS_USER_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.UserDept",
+      "entity": "UserDeptEntity",
+      "table": "SYS_USER_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Tenant",
+      "entity": "TenantEntity",
+      "table": "SYS_TENANT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.TenantPermission",
+      "entity": "TenantPermissionEntity",
+      "table": "SYS_TENANT_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.SubSystem",
+      "entity": "SubSystemEntity",
+      "table": "SYS_SUBSYSTEM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.SubSystemDept",
+      "entity": "SubSystemDeptEntity",
+      "table": "SYS_SUBSYSTEM_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Sequence",
+      "entity": "SequenceEntity",
+      "table": "SYS_SEQUENCE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Role",
+      "entity": "RoleEntity",
+      "table": "FXHIS.SYS_ROLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Role",
+      "entity": "RolePermissionEntity",
+      "table": "FXHIS.SYS_ROLE_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Role",
+      "entity": "UserRoleEntity",
+      "table": "FXHIS.SYS_USER_ROLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Permission",
+      "entity": "PermissionEntity",
+      "table": "SYS_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.PermissionApi",
+      "entity": "PermissionApiEntity",
+      "table": "SYS_PERMISSION_API"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.OprationLog",
+      "entity": "DoctorOperationLogEntity",
+      "table": "SYS_DOCTOR_OPERATION_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.OprationLog",
+      "entity": "OprationLogEntity",
+      "table": "SYS_OPRATION_LOG3"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Notice",
+      "entity": "SysNoticeEntity",
+      "table": "SYS_NOTICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Notice",
+      "entity": "SysNoticeMessageEntity",
+      "table": "SYS_NOTICE_MESSAGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.MessagePush",
+      "entity": "MessagePushEntity",
+      "table": "SYS_MESSAGE_PUSH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.MessagePush",
+      "entity": "MessagePushReadEntity",
+      "table": "SYS_MESSAGE_PUSH_READ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Menu",
+      "entity": "MenuEntity",
+      "table": "SYS_MENU"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.LoginLog",
+      "entity": "CALoginInfoEntity",
+      "table": "FXHIS.CA_LOGIN_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.LoginLog",
+      "entity": "DisposalLogEntity",
+      "table": "FXHIS.DISPOSAL_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.LoginLog",
+      "entity": "LoginLogEntity",
+      "table": "sys_login_log"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.LoginLog",
+      "entity": "SysLoginDeptEntity",
+      "table": "SYS_LOGIN_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.LoginLog",
+      "entity": "SysLogSqlEntity",
+      "table": "SYS_LOG_SQL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.JHIP",
+      "entity": "JHIPLogEntity",
+      "table": "SYS_JHIP_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Employee",
+      "entity": "EmployeeEntity",
+      "table": "SYS_EMPLOYEE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Employee",
+      "entity": "EmployeeQMEntity",
+      "table": "SYS_EMPLOYEE_QM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Employee",
+      "entity": "EmployVsGroupEntity",
+      "table": "STAFF_VS_GROUP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Employee",
+      "entity": "StaffDictEntity",
+      "table": "STAFF_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Employee",
+      "entity": "StaffGroupDictEntity",
+      "table": "STAFF_GROUP_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Document",
+      "entity": "DocumentEntity",
+      "table": "sys_document"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.DocumentImage",
+      "entity": "DocumentImageEntity",
+      "table": "sys_document_image"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Dept",
+      "entity": "DeptEntity",
+      "table": "SYS_DEPARTMENT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.DeptVsWard",
+      "entity": "DeptVsWardEntity",
+      "table": "DEPT_VS_WARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.DeptVsWardNew",
+      "entity": "DeptVsWardNewEntity",
+      "table": "DEPT_VS_WARD_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.DeptPermission",
+      "entity": "DeptPermissionEntity",
+      "table": "SYS_DEPT_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.AppLog",
+      "entity": "AppLogEntity",
+      "table": "SYS_APP_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.SYS.Api",
+      "entity": "ApiEntity",
+      "table": "SYS_API"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugDispenseRecEntity",
+      "table": "DRUG_DISPENSE_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugDispenseReqEntity",
+      "table": "DRUG_DISPENSE_REQ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugDispensPropertyEntity",
+      "table": "DRUG_DISPENS_PROPERTY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescDetailEntity",
+      "table": "DRUG_PRESC_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescDetailTempEntity",
+      "table": "DRUG_PRESC_DETAIL_TEMP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescDetailTempRefundEntity",
+      "table": "DRUG_PRESC_DETAIL_TEMP_REFUND"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescMasterEntity",
+      "table": "DRUG_PRESC_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescMasterTempEntity",
+      "table": "DRUG_PRESC_MASTER_TEMP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugPrescMasterTempRefundEntity",
+      "table": "DRUG_PRESC_MASTER_TEMP_REFUND"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "DrugStockEntity",
+      "table": "DRUG_STOCK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "ExpExportDetailEntity",
+      "table": "EXP_EXPORT_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Pharmacy",
+      "entity": "ExpExportMasterEntity",
+      "table": "EXP_EXPORT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS",
+      "entity": "OpsCliPathologyApplyEntity",
+      "table": "OPS_CLI_PATHOLOGY_APPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Treat",
+      "entity": "OpsTreatNarcotismEntity",
+      "table": "OPS_TREAT_NARCOTISM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Treat",
+      "entity": "TreatProjectItemsEntity",
+      "table": "FX_TREAT_PROJECT_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Treat",
+      "entity": "TreatProjectItemsPriceEntity",
+      "table": "FX_TREAT_PROJECT_ITEMS_PRICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Treat",
+      "entity": "TreatProjectMasterEntity",
+      "table": "FX_TREAT_PROJECT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.TencentPreDiagnosis",
+      "entity": "TencentPreReportChiefEntity",
+      "table": "TENCENT_PRE_REPORT_CHIEF"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.TencentPreDiagnosis",
+      "entity": "TencentPreReportEntity",
+      "table": "TENCENT_PRE_REPORT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliDiagnoseEntity",
+      "table": "OPS_CLI_DIAGNOSE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliRecipeapplyEntity",
+      "table": "OPS_CLI_RECIPEAPPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliRecipedetailEntity",
+      "table": "OPS_CLI_RECIPEDETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliRecipeInjectEntity",
+      "table": "OPS_CLI_RECIPE_INJECT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliRecipeSpecdrugEntity",
+      "table": "OPS_CLI_RECIPE_SPECDRUG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsCliRecipewanderDrugEntity",
+      "table": "OPS_CLI_RECIPEWANDER_DRUG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsExamApplyEntity",
+      "table": "OPS_EXAM_APPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsHerbDrugSpecEntity",
+      "table": "OPS_HERB_DRUG_SPEC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OpsHerbPrescDiagEntity",
+      "table": "OPS_HERB_PRESC_DIAG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OutpPrescEntity",
+      "table": "OUTP_PRESC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Prescription",
+      "entity": "OutpPrescTempEntity",
+      "table": "OUTP_PRESC_T"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "InpAcctDetailEntity",
+      "table": "INP_ACCT_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "InpAcctMasterEntity",
+      "table": "INP_ACCT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "InpAcctMoneyEntity",
+      "table": "INP_ACCT_MONEY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "OutpCardRcptMasterEntity",
+      "table": "OUTP_CARD_RCPT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "PrepayAcctEntity",
+      "table": "PREPAY_ACCT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "PrepayAcctMoneyEntity",
+      "table": "PREPAY_ACCT_MONEY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "PrepaymentRcptAddEntity",
+      "table": "PREPAYMENT_RCPT_ADD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.PrePay",
+      "entity": "PrepaymentRcptEntity",
+      "table": "PREPAYMENT_RCPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pharmacy",
+      "entity": "OpsPharmacyEducateEntity",
+      "table": "OPS_PHARMACY_EDUCATE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pharmacy",
+      "entity": "OpsPharmacyInterrogationEntity",
+      "table": "OPS_PHARMACY_INTERROGATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pharmacy",
+      "entity": "OpsPharmacyPatientEntity",
+      "table": "OPS_PHARMACY_PATIENT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pharmacy",
+      "entity": "OpsPharmacyReorganizaBeforeEntity",
+      "table": "OPS_PHARMACY_REORGANIZA_BEFORE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pharmacy",
+      "entity": "OpsPharmacyReorganizaEntity",
+      "table": "OPS_PHARMACY_REORGANIZA"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "CurrentPriceListEntity",
+      "table": "CURRENT_PRICE_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsChronicInsureListEntity",
+      "table": "OPS_CHRONIC_INSURELIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayAccountCardEntity",
+      "table": "OPS_PAY_ACCOUNTCARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayAccountinfoEntity",
+      "table": "OPS_PAY_ACCOUNTINFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayAccountprepayEntity",
+      "table": "OPS_PAY_ACCOUNTPREPAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayAccountrecordEntity",
+      "table": "OPS_PAY_ACCOUNTRECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayFeedetailEntity",
+      "table": "OPS_PAY_FEEDETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayInsureSettleEntity",
+      "table": "OPS_PAY_INSURE_SETTLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayRefundapplyEntity",
+      "table": "OPS_PAY_REFUNDAPPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPayRegisterEntity",
+      "table": "OPS_PAY_REGISTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPaySettleEntity",
+      "table": "OPS_PAY_SETTLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OpsPaySettleYdgrzhEntity",
+      "table": "OPS_PAY_SETTLE_YDGRZH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpBillItemsEntity",
+      "table": "OUTP_BILL_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpBillItemsHrpEntity",
+      "table": "OUTP_BILL_ITEMS_HRP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpOrderDescEntity",
+      "table": "OUTP_ORDER_DESC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpPaymentsMoneyEntity",
+      "table": "OUTP_PAYMENTS_MONEY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpRcptMasterEntity",
+      "table": "OUTP_RCPT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "OutpRcptMasterYbEntity",
+      "table": "OUTP_RCPT_MASTER_YB"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Pay",
+      "entity": "VStaffOnJobDictEntity",
+      "table": "V_STAFF_ON_JOB_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "IpcCliTendLogEntity",
+      "table": "IPC_CLI_TEND_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "OpsDocWorkplanDetailsEntity",
+      "table": "OPS_DOC_WORKPLAN_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "OpsDocWorkplanEntity",
+      "table": "OPS_DOC_WORKPLAN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "OpsInpatientCardEntity",
+      "table": "OPS_INPATIENT_CARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "OpsTimeIntervalEntity",
+      "table": "OPS_TIME_INTERVAL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Patient",
+      "entity": "WaitBedPatsNewEntity",
+      "table": "WAIT_BED_PATS_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.MedicalCard",
+      "entity": "MedicalCardLogEntity",
+      "table": "MEDICAL_CARD_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.MedicalCard",
+      "entity": "MedicalCardMemoEntity",
+      "table": "MEDICAL_CARD_MEMO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.MedicalCard",
+      "entity": "MedicalCardVsIdnoEntity",
+      "table": "MEDICAL_CARD_VS_IDNO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicBillItemsEntity",
+      "table": "CLINIC_BILL_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicForRegistEntity",
+      "table": "CLINIC_FOR_REGIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicIndexEntity",
+      "table": "CLINIC_INDEX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicMasterEntity",
+      "table": "CLINIC_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicMasterReferralEntity",
+      "table": "CLINIC_MASTER_REFERRAL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicPaymentsMoneyEntity",
+      "table": "CLINIC_PAYMENTS_MONEY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicReturnedAcctEntity",
+      "table": "CLINIC_RETURNED_ACCT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicScheduleEntity",
+      "table": "CLINIC_SCHEDULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicTypeChargeDictEntity",
+      "table": "CLINIC_TYPE_CHARGE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicTypeDictEntity",
+      "table": "CLINIC_TYPE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "ClinicTypeSettingEntity",
+      "table": "CLINIC_TYPE_SETTING"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "LabTestDeliveryItemsEntity",
+      "table": "LAB_TEST_DELIVERY_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "LabTestDeliveryMasterEntity",
+      "table": "LAB_TEST_DELIVERY_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "NursingDeptRelEntity",
+      "table": "NURSING_DEPT_REL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OpsVisitAnalysisEntity",
+      "table": "OPS_VISIT_ANALYSIS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OpsVisitQueueEntity",
+      "table": "OPS_VISIT_QUEUE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpDoctorRegistEntity",
+      "table": "OUTP_DOCTOR_REGIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpDoctorScheduleEntity",
+      "table": "OUTP_DOCTOR_SCHEDULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpMrDiagDescEntity",
+      "table": "OUTP_MR_DIAG_DESC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpMrEntity",
+      "table": "OUTP_MR"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpOrdersCostsEntity",
+      "table": "OUTP_ORDERS_COSTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpOrdersEntity",
+      "table": "OUTP_ORDERS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpOrdersTempEntity",
+      "table": "OUTP_ORDERS_T"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpTreatEntity",
+      "table": "OUTP_TREAT_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpTreatRecTempEntity",
+      "table": "OUTP_TREAT_REC_T"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "OutpWaitQueueEntity",
+      "table": "OUTP_WAIT_QUEUE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.Clinic",
+      "entity": "PatSomaCharacterEntity",
+      "table": "PAT_SOMA_CHARACTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.ClinicInfoPage",
+      "entity": "OpsClinicInfoDiagEntity",
+      "table": "OPS_CLINIC_INFO_DIAG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.ClinicInfoPage",
+      "entity": "OpsClinicInfoEntity",
+      "table": "OPS_CLINIC_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.ClinicInfoPage",
+      "entity": "OpsClinicInfoLogEntity",
+      "table": "OPS_CLINIC_INFO_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPS.ClinicInfoPage",
+      "entity": "OpsClinicInfoOperationEntity",
+      "table": "OPS_CLINIC_INFO_OPERATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenApiInfoEntity",
+      "table": "OPEN_API_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenApiPkEntity",
+      "table": "OPEN_API_PK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenApiUrlEntity",
+      "table": "OPEN_API_URL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenDictionaryEntity",
+      "table": "OPEN_DICTIONARY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenHmdispDrugEnity",
+      "table": "OPEN_HMDISP_DRUG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenHmdispRecipeDetailEntity",
+      "table": "OPEN_HMDISP_RECIPE_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenHmdispRecipeEntity",
+      "table": "OPEN_HMDISP_RECIPE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "OpenPrescriptionEntity",
+      "table": "OPEN_PRESCRIPTION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.OPEN",
+      "entity": "SybccxEntity",
+      "table": "HIS_SYBCCX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.StockBalance",
+      "entity": "MedStockBalanceEntity",
+      "table": "MED_STOCK_BALANCE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.PriceModify",
+      "entity": "MedPriceModifyEntity",
+      "table": "MED_PRICE_MODIFY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.PriceModifyProfit",
+      "entity": "MedPriceModifyProfitEntity",
+      "table": "MED_PRICE_MODIFY_PROFIT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.DispProperty",
+      "entity": "MedDispPreEntity",
+      "table": "MED_DISP_PRE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.DispProperty",
+      "entity": "MedDispPreStockinfoEntity",
+      "table": "MED_DISP_PRE_STOCKINFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.DispProperty",
+      "entity": "MedDispPropertyEntity",
+      "table": "MED_DISP_PROPERTY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.DispProperty",
+      "entity": "DrugDispensePreEntity",
+      "table": "DRUG_DISPENSE_PRE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StorageDict",
+      "entity": "DrugSubStorageDictEntity",
+      "table": "DRUG_SUB_STORAGE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StorageDept",
+      "entity": "DrugStorageDeptEntity",
+      "table": "DRUG_STORAGE_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Stock",
+      "entity": "MedComStockEntity",
+      "table": "MED_COM_STOCK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockPackage",
+      "entity": "MedComStockPackageEntity",
+      "table": "MED_COM_STOCK_PACKAGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockOpelog",
+      "entity": "MedComStockOpelogEntity",
+      "table": "MED_COM_STOCK_OPELOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockLock",
+      "entity": "MedComStockLockEntity",
+      "table": "MED_COM_STOCK_LOCK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockPreout",
+      "entity": "MedComStockPreoutEntity",
+      "table": "MED_COM_STOCK_PREOUT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockLimit",
+      "entity": "MedComStockLimitEntity",
+      "table": "MED_COM_STOCK_LIMIT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.StockDayset",
+      "entity": "MedStockDaysetEntity",
+      "table": "MED_STOCK_DAYSET"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Ratio",
+      "entity": "MedComRatioEntity",
+      "table": "MED_COM_RATIO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ProvideNotice",
+      "entity": "MedComProvideNoticeEntity",
+      "table": "MED_COM_PROVIDE_NOTICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ProvideApply",
+      "entity": "MedComProvideApplyEntity",
+      "table": "MED_COM_PROVIDE_APPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ProcurePlan",
+      "entity": "MedComProcurePlanEntity",
+      "table": "MED_COM_PROCUREPLAN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ProcurePlanDetails",
+      "entity": "MedComProcurePlanDetailsEntity",
+      "table": "MED_COM_PROCUREPLAN_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Price",
+      "entity": "MedComPriceEntity",
+      "table": "MED_COM_PRICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.OutputDetails",
+      "entity": "MedComOutputDetailsEntity",
+      "table": "MED_COM_OUTPUT_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Output",
+      "entity": "MedComOutputEntity",
+      "table": "MED_COM_OUTPUT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.LocationRec",
+      "entity": "MedComLocationRecEntity",
+      "table": "MED_COM_LOCATION_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.LocationDic",
+      "entity": "MedComLocationDicEntity",
+      "table": "MED_COM_LOCATION_DIC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Input",
+      "entity": "MedComInputDetailsEntity",
+      "table": "MED_COM_INPUT_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Input",
+      "entity": "MedComInputEntity",
+      "table": "MED_COM_INPUT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Inplan",
+      "entity": "MedComInplanEntity",
+      "table": "MED_COM_INPLAN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.InplanDetails",
+      "entity": "MedComInplanDetailsEntity",
+      "table": "MED_COM_INPLAN_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ImportMaster",
+      "entity": "DrugImportMasterEntity",
+      "table": "DRUG_IMPORT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ImportDetalt",
+      "entity": "DrugImportDetaltEntity",
+      "table": "DRUG_IMPORT_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.ImportDetalt",
+      "entity": "DrugImportExportTraceCodeEntity",
+      "table": "DRUG_IMPORT_EXPORT_TRACE_CODE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.DrugSupplierCataLog",
+      "entity": "DrugSupplierCataLogEntity",
+      "table": "DRUG_SUPPLIER_CATALOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Company",
+      "entity": "MedComCompanyEntity",
+      "table": "MED_COM_COMPANY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.Com.Baseinfo",
+      "entity": "MedComBaseinfoEntity",
+      "table": "MED_COM_BASEINFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.CheckRecord",
+      "entity": "MedCheckRecordEntity",
+      "table": "MED_CHECK_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Med.CheckDetails",
+      "entity": "MedCheckDetailsEntity",
+      "table": "MED_CHECK_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "OperatingRoomEntity",
+      "table": "OPERATING_ROOM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "OperationEntity",
+      "table": "OPERATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "OperationMasterEntity",
+      "table": "OPERATION_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "OperationNameEntity",
+      "table": "OPERATION_NAME"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "OperationScheduleEntity",
+      "table": "OPERATION_SCHEDULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Surgery",
+      "entity": "ScheduledOperationNameEntity",
+      "table": "SCHEDULED_OPERATION_NAME"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Equipment",
+      "entity": "ExpExportDetailEntity",
+      "table": "EXP_EXPORT_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Equipment",
+      "entity": "ExpExportMasterEntity",
+      "table": "EXP_EXPORT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Equipment",
+      "entity": "ExpProvideApplicationEntity",
+      "table": "EXP_PROVIDE_APPLICATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Equipment",
+      "entity": "ExpStockEntity",
+      "table": "EXP_STOCK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Equipment",
+      "entity": "ExpStorageDeptEntity",
+      "table": "EXP_STORAGE_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.DIC.Dictionary",
+      "entity": "DictionaryEntity",
+      "table": "PUB_DICTIONARY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.DIC.DictionaryType",
+      "entity": "DictionaryTypeEntity",
+      "table": "PUB_DICTIONARY_TYPE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "ClinicItemClassDictEntity",
+      "table": "CLINIC_ITEM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "ClinicItemNameDictEntity",
+      "table": "CLINIC_ITEM_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "DoctorLevelVsPriceEntity",
+      "table": "DOCTOR_LEVEL_VS_PRICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "MrBillClassDictEntity",
+      "table": "MR_BILL_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "TJ_ClinicItemEntity",
+      "table": "CLINIC_ITEM_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "ClinicPriceEntity",
+      "table": "CLINIC_VS_CHARGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubClinicVsNursingLevelEntity",
+      "table": "PUB_CLINIC_VS_NURSINGLEVEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubDiagnosticDicEntity",
+      "table": "PUB_DIAGNOSTIC_DIC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubLetterDicEntity",
+      "table": "PUB_LETTER_DIC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubItemCompareEntity",
+      "table": "PUB_ITEM_COMPARE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubItemCompareInjuryEntity",
+      "table": "PUB_ITEM_COMPARE_INJURY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubItemCompareNewEntity",
+      "table": "PUB_ITEM_COMPARE_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubPatientinfoEntity",
+      "table": "PUB_PATIENTINFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubPatientinfoInsureEntity",
+      "table": "PUB_PATIENTINFO_INSURE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PubPayRecordEntity",
+      "table": "PUB_PAY_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "BillItemClassDictEntity",
+      "table": "BILL_ITEM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "BillUnitsDictEntity",
+      "table": "BILL_UNITS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "ClinicVsChargeEntity",
+      "table": "CLINIC_VS_CHARGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "PriceItemNameDictEntity",
+      "table": "PRICE_ITEM_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB",
+      "entity": "TJ_PriceListEntity",
+      "table": "PRICE_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.XlNisInfection",
+      "entity": "XlNisInfectionEntity",
+      "table": "XL_NIS_INFECTION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.WardLabel",
+      "entity": "WardLabelEntity",
+      "table": "PUB_WARDLABEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.WorkGroup",
+      "entity": "VDeptVsWardEntity",
+      "table": "V_DEPT_VS_WARD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.WorkGroup",
+      "entity": "WorkGroupEntity",
+      "table": "PUB_WORKGROUP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.WorkGroup",
+      "entity": "WorkGroupUserEntity",
+      "table": "PUB_WORKGROUP_USER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "PayTemplateDetailEntity",
+      "table": "PUB_PAY_TEMPLATE_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "PayTemplateEntity",
+      "table": "PUB_PAY_TEMPLATE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "PayTemplatePurviewEntity",
+      "table": "PUB_PAY_TEMPLATE_PURVIEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "TempletDetailEntity",
+      "table": "PUB_TEMPLET_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "TempletEntity",
+      "table": "PUB_TEMPLET"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Template",
+      "entity": "TempletPermissionEntity",
+      "table": "PUB_TEMPLET_PERMISSIONS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.SysParam",
+      "entity": "DictionarySetEntity",
+      "table": "DICTIONARYSET"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.SysParam",
+      "entity": "SysParamEntity",
+      "table": "PUB_SYSPARAM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.SysParameter",
+      "entity": "SysParameterEntity",
+      "table": "ZYGL_XXBM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Specimen",
+      "entity": "SpecimenEntity",
+      "table": "SPECIMAN_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.SkinTest",
+      "entity": "PubSkinTestEntity",
+      "table": "PUB_SKIN_TEST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Report",
+      "entity": "StatisticalReportEntity",
+      "table": "PUB_STATISTICAL_REPORT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PrintData",
+      "entity": "PrintDataEntity",
+      "table": "FXHIS.PUB_PRINT_DATA"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PrintConfig",
+      "entity": "PubPrintConfigEntity",
+      "table": "FXHIS.PUB_PRINT_CONFIG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PreAudit",
+      "entity": "PreAuditFeedbackDetailEntity",
+      "table": "PRE_AUDIT_FEEDBACK_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PreAudit",
+      "entity": "PreAuditFeedbackMasterEntity",
+      "table": "PRE_AUDIT_FEEDBACK_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Poverty",
+      "entity": "PovertyEntity",
+      "table": "PUB_POVERTY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PerformFreq",
+      "entity": "PerformDefaultScheduleEntity",
+      "table": "PERFORM_DEFAULT_SCHEDULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PerformFreq",
+      "entity": "PerformFreqDetailEntity",
+      "table": "PUB_PERFORM_FREQ_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PerformFreq",
+      "entity": "PerformFreqDictEntity",
+      "table": "PERFORM_FREQ_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PerformFreq",
+      "entity": "PerformFreqEntity",
+      "table": "PUB_PERFORM_FREQ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PatientType",
+      "entity": "PubPatientTypeEntity",
+      "table": "PUB_PATIENT_TYPE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PatientInfo",
+      "entity": "PatMasterIndexEntity",
+      "table": "PAT_MASTER_INDEX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PathologySubmission",
+      "entity": "PathologySubmissionEntity",
+      "table": "PATHOLOGY_SUBMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.PathologySubmission",
+      "entity": "PathologySubmissionItemsEntity",
+      "table": "PATHOLOGY_SUBMISSION_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.OrderTemplate",
+      "entity": "OrderTemplateEntity",
+      "table": "PUB_ORDERTEMPLATE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Medical",
+      "entity": "MedicalActEntity",
+      "table": "PUB_MEDICAL_ACT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Medical",
+      "entity": "MedicalPermissionEntity",
+      "table": "PUB_MEDICAL_PERMISSION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Medical",
+      "entity": "MedicalRoleEntity",
+      "table": "PUB_MEDICAL_ROLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.LabSpecimen",
+      "entity": "LabSpecimenEntity",
+      "table": "PUB_LAB_SPECIMEN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.LabClass",
+      "entity": "LabItemClassDictEntity",
+      "table": "LAB_ITEM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ItemCompare",
+      "entity": "PubItemCompareOilEntity",
+      "table": "PUB_ITEM_COMPARE_OIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ItemCompare",
+      "entity": "PubItemCompareOilInjuryEntity",
+      "table": "PUB_ITEM_COMPARE_OIL_INJURY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ItemCompare",
+      "entity": "PubItemCompareOilNewEntity",
+      "table": "PUB_ITEM_COMPARE_OIL_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.MedDrg",
+      "entity": "MedDrgEntity",
+      "table": "PUB_MED_DRG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.IpmBill",
+      "entity": "IpmBillDetailEntity",
+      "table": "PUB_IPM_BILLDETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.IpmBill",
+      "entity": "IpmBillEntity",
+      "table": "PUB_IPM_BILL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Insure",
+      "entity": "AuditingCommDictEntity",
+      "table": "AUDITING_COMM_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Insure",
+      "entity": "InsurPrepaymentRcptEntity",
+      "table": "INSUR_PREPAYMENT_RCPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Insure",
+      "entity": "InsurSettleDwEntity",
+      "table": "INSUR_SETTLE_DW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Insure",
+      "entity": "InsurVshCenterItemNewEntity",
+      "table": "INSUR_VSH_CENTER_ITEM_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Hos",
+      "entity": "HosYktdaEntity",
+      "table": "HOS_YKTDA"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Hos",
+      "entity": "HosYldybEntity",
+      "table": "HOS_YLDYB"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.HisTask",
+      "entity": "HisTaskEntity",
+      "table": "IPC_PAY_REGISTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.FPRY",
+      "entity": "FPRYEntity",
+      "table": "PUB_FPRY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.FeeCodeStat",
+      "entity": "FeeCodeStatEntity",
+      "table": "PUB_FEECODESTAT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ExamSubclass",
+      "entity": "ExamSubclassEntity",
+      "table": "EXAM_SUBCLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ExamClass",
+      "entity": "ExamClassEntity",
+      "table": "EXAM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.EmpltypeDic",
+      "entity": "EmpltypeDicEntity",
+      "table": "PUB_EMPLTYPE_DIC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DrugDict",
+      "entity": "DrugDictEntity",
+      "table": "DRUG_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DrugDict",
+      "entity": "DrugDictView",
+      "table": "INPUT_DRUG_LISTS_DM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DocOpeLevel",
+      "entity": "DocOpeLevelEntity",
+      "table": "PUB_DOC_OPE_LEVEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DocDrugLevel",
+      "entity": "DocDrugLevelEntity",
+      "table": "PUB_DOC_DRUG_LEVEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DocAuthority",
+      "entity": "DocAuthorityEntity",
+      "table": "PUB_DOC_AUTHORITY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.DocAuthority",
+      "entity": "DocAuthorityOperationEntity",
+      "table": "PUB_DOC_AUTHORITY_OPERATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Dic",
+      "entity": "DoctorGroupEntity",
+      "table": "DOCTOR_GROUP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Diagnostic",
+      "entity": "DiagnosisDictEntity",
+      "table": "DIAGNOSIS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Container",
+      "entity": "ContainerEntity",
+      "table": "PUB_CONTAINER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ClinicItem",
+      "entity": "SpecimanDictEntity",
+      "table": "SPECIMAN_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.CallTypeClinic",
+      "entity": "PubCalltypeClinicEntity",
+      "table": "PUB_CALLTYPE_CLINIC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BubblingMsg",
+      "entity": "BubblingMsgEntity",
+      "table": "ZYGL_XXTX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "AdtLogEntity",
+      "table": "ADT_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "BedMaintainEntity",
+      "table": "PUB_KSCWXX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "BedRecEntity",
+      "table": "BED_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "BedRecLogEntity",
+      "table": "FXHIS.BED_REC_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "BedTransLogEntity",
+      "table": "BED_TRANS_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.BedMaintain",
+      "entity": "PubBedEntity",
+      "table": "PUB_BED"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.AutoSetting",
+      "entity": "AutoSettingIdEntity",
+      "table": "AUTO_SETTING_ID"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Approve",
+      "entity": "SptSharingcenterStatisticsEntity",
+      "table": "Name#MEDADM.SPT_SHARINGCENTER_STATISTICS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamAppointsEntity",
+      "table": "EXAM_APPOINTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamBillItemsEntity",
+      "table": "EXAM_BILL_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamClassDictEntity",
+      "table": "EXAM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamExpListClassNoEntity",
+      "table": "EXAM_EXP_LIST_CLASS_NO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamExpListEntity",
+      "table": "EXAM_EXP_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamItemsEntity",
+      "table": "EXAM_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamMasterEntity",
+      "table": "EXAM_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamPatMiEntity",
+      "table": "EXAM_PAT_MI"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamRptPatternEntity",
+      "table": "EXAM_RPT_PATTERN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "ExamSubClassDictEntity",
+      "table": "EXAM_SUBCLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "LabItemClassDictEntity",
+      "table": "LAB_ITEM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "LabTestItemsDetailEntity",
+      "table": "LAB_TEST_ITEMS_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "LabTestItemsEntity",
+      "table": "LAB_TEST_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Apply",
+      "entity": "LabTestMasterEntity",
+      "table": "LAB_TEST_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.AppConfiger",
+      "entity": "AppConfigerParameterEntity",
+      "table": "APP_CONFIGER_PARAMETER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Agreed",
+      "entity": "AgreedDetailEntity",
+      "table": "PUB_AGREED_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.Agreed",
+      "entity": "AgreedEntity",
+      "table": "PUB_AGREED"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.TallySubjectDictEntity",
+      "entity": "TallySubjectDictEntity",
+      "table": "TALLY_SUBJECT_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.ReckItemClassDictEntity",
+      "entity": "ReckItemClassDictEntity",
+      "table": "RECK_ITEM_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.OutpRcptFeeDictEntity",
+      "entity": "OutpRcptFeeDictEntity",
+      "table": "OUTP_RCPT_FEE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.MrFeeClassDictEntity",
+      "entity": "MrFeeClassDictEntity",
+      "table": "MR_FEE_CLASS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.PUB.AreaDict",
+      "entity": "AreaDictEntity",
+      "table": "AREA_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.View",
+      "entity": "EmrShouyeEntity",
+      "table": "FXJCPT.EMR_SHOUYE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Version",
+      "entity": "CpPathwayAdviceVerEntity",
+      "table": "CP.CP_PATHWAY_ADVICE_VER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Version",
+      "entity": "CpPathwayStageVerEntity",
+      "table": "CP.CP_PATHWAY_STAGE_VER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Version",
+      "entity": "CpPathwayTreatActivityVerEntity",
+      "table": "CP.CP_PATHWAY_TREATACTIVITY_VER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Version",
+      "entity": "CpPathwayVerEntity",
+      "table": "CP.CP_PATHWAY_VER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDictDiseaseEntity",
+      "table": "CP.CP_DICT_DISEASE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDictEvalueRuleEntity",
+      "table": "CP.CP_DICT_EVALUE_RULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDictVariationReasonEntity",
+      "table": "CP.CP_DICT_VARIATION_REASON"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDiseaseRelateEntity",
+      "table": "CP.CP_DISEASE_RELATE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDrugReplaceEntity",
+      "table": "CP.CP_DRUG_REPLACE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpDrugReplaceRecordEntity",
+      "table": "CP.CP_DRUG_REPLACE_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpPathwayAdviceEntity",
+      "table": "CP.CP_PATHWAY_ADVICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpPathwayEntity",
+      "table": "CP.CP_PATHWAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpPathwayStageEntity",
+      "table": "CP.CP_PATHWAY_STAGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpPathwayTreatActivityEntity",
+      "table": "CP.CP_PATHWAY_TREATACTIVITY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Managed",
+      "entity": "CpSubwayEntity",
+      "table": "CP.CP_SUBWAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpPatientAdviceEntity",
+      "table": "CP.CP_PATIENT_ADVICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpPatientExeRecordEntity",
+      "table": "CP.CP_PATIENT_EXERECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpPatientPathwayEntity",
+      "table": "CP.CP_PATIENT_PATHWAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpPatientPathwayRefuseEntity",
+      "table": "CP.CP_PATIENT_PATHWAY_REFUSE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpVariationDetailEntity",
+      "table": "CP.CP_VARIATION_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Doctor",
+      "entity": "CpVariationRecordEntity",
+      "table": "CP.CP_VARIATION_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Common",
+      "entity": "CpSpecialDeptEntity",
+      "table": "CP.CP_SPECIAL_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Common",
+      "entity": "CpDictMedAdviceEntity",
+      "table": "CP.CP_DICT_MED_ADVICE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Common",
+      "entity": "PubItemEquateDetailEntity",
+      "table": "CP.PUB_ITEM_EQUATE_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.CP.Common",
+      "entity": "PubItemEquateMasterEntity",
+      "table": "PUB_ITEM_EQUATE_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.View",
+      "entity": "CliRequestDrugViewEntity",
+      "table": "DRUG_USER.CLI_REQUEST_DRUG_VIEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "IpcManagerbeddocLogEntity",
+      "table": "IPC_MANAGERBEDDOC_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "IpcPatientStatusLogEntity",
+      "table": "IPC_PATIENT_STATUS_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "DrgPersonInfoEntity",
+      "table": "INSURANCE.DRG_PERSON_INFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InpSettleDetailEntity",
+      "table": "INP_SETTLE_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InpSettleMasterEntity",
+      "table": "INP_SETTLE_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InpSettleMasterYBEntity",
+      "table": "INP_SETTLE_MASTER_YB"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InsurDiagnosisEntity",
+      "table": "INSURANCE.INSUR_DIAGNOSIS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InsurNameDictEntity",
+      "table": "INSUR_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "IpcPayBabyInfoEntity",
+      "table": "IPC_PAY_BABYINFO"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "IpcPayInprepayEntity",
+      "table": "IPC_PAY_INPREPAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "IpcPayRegisterEntity",
+      "table": "IPC_PAY_REGISTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "OrdersChangeLogEntity",
+      "table": "ORDERS_CHANGE_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "OrdersCostsCancelEntity",
+      "table": "ORDERS_COSTS_CANCEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "OrdersCostsEntity",
+      "table": "ORDERS_COSTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "PayFeedetailEntity",
+      "table": "IPC_PAY_FEEDETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "ReproductionSettleEntity",
+      "table": "REPRODUCTION_SETTLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "ReproductionSettleSybfzEntity",
+      "table": "REPRODUCTION_SETTLE_SYBFZ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "ReproductionSettleSyhbzEntity",
+      "table": "REPRODUCTION_SETTLE_SYHBZ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "SettleZyRecEntity",
+      "table": "SETTLE_ZY_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InputDrugListsEntity",
+      "table": "INPUT_DRUG_LISTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "InputDrugListsForPREEntity",
+      "table": "INPUT_DRUG_LISTS_FOR_PRE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay",
+      "entity": "VClinicNameDictEntity",
+      "table": "V_CLINIC_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "BloodReduceFeeEntity",
+      "table": "BLOOD_REDUCE_FEE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "PayBalanceDetailEntity",
+      "table": "IPC_PAY_BALANCE_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "PayBalanceHeadEntity",
+      "table": "IPC_PAY_BALANCE_HEAD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "PayBalancePayEntity",
+      "table": "IPC_PAY_BALANCE_PAY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "PayBalanceSettleEntity",
+      "table": "IPC_PAY_BALANCE_SETTLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Pay.Balance",
+      "entity": "PayBalanceSettleYdgrzhEntity",
+      "table": "IPC_PAY_BALANCE_SETTLE_YDGRZH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "BackBillPatchConfigEntity",
+      "table": "FXJCPT.BACKBILLPATCHCONFIG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "BillMiscItemPatchEntity",
+      "table": "BILL_MISC_ITEM_PATCH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "CaStampsignLogEntity",
+      "table": "CA_STAMPSIGN_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ConsultationDoctorDetailEntity",
+      "table": "CONSULTATION_DOCTOR_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ConsultationDoctorMasterEntity",
+      "table": "CONSULTATION_DOCTOR_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ConsultationDoctorRecordEntity",
+      "table": "CONSULTATION_DOCTOR_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ConsultationMDTDetailEntity",
+      "table": "CONSULTATION_MDT_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ConsultationMDTMasterEntity",
+      "table": "CONSULTATION_MDT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "DiagnosisEntity",
+      "table": "DIAGNOSIS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "DiagnosisJHEntity",
+      "table": "COMM.DIAGNOSIS_JH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "DiagnosisTypeDictEntity",
+      "table": "DIAGNOSIS_TYPE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "DischargeDispositionDictEntity",
+      "table": "DISCHARGE_DISPOSITION_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "IpcPatientInsureEntity",
+      "table": "IPC_PATIENT_INSURE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "IpcNurseWorkLogEntity",
+      "table": "IPC_NURSE_WORK_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "IpcOldPatientEntity",
+      "table": "IPC_OLD_PATIENT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "IpcPathologyDetailEntity",
+      "table": "IPC_PATHOLOGY_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "IpcPatientMedicalEntity",
+      "table": "IPC_PATIENT_MEDICAL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "MedicalRecordHandoverEntity",
+      "table": "MEDICAL_RECORD_HANDOVER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "MedicalRecordReviewTableEntity",
+      "table": "MEDICAL_RECORD_REVIEW_TABLE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "MrIndexEntity",
+      "table": "MR_INDEX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "MrOnLineEntity",
+      "table": "MR_ON_LINE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "MrWorkPathEntity",
+      "table": "MR_WORK_PATH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "NewbornRecEntity",
+      "table": "NEWBORN_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "OrdersAntiDrugEntity",
+      "table": "ORDERS_ANTI_DRUG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "OrdersGroupRecEntity",
+      "table": "ORDERS_GROUP_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatsInHospitalEntity",
+      "table": "PATS_IN_HOSPITAL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatsInTransferringEntity",
+      "table": "PATS_IN_TRANSFERRING"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatVisitCancelEntity",
+      "table": "PAT_VISIT_CANCEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatVisitEntity",
+      "table": "PAT_VISIT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatVisitNewEntity",
+      "table": "PAT_VISIT_NEW"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PatVisitTempEntity",
+      "table": "PAT_VISIT_TEMP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PreDischgedPatsEntity",
+      "table": "PRE_DISCHGED_PATS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "PreTransferringPatsEntity",
+      "table": "INPADM.PRE_TRANSFERRING_PATS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "ReviewRefundEntity",
+      "table": "REVIEW_REFUND"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "TransferEntity",
+      "table": "TRANSFER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Patient",
+      "entity": "WardTransferEntity",
+      "table": "WARD_TRANSFER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.MedRec",
+      "entity": "WardbedTransEntity",
+      "table": "WARDBED_TRANS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI",
+      "entity": "IpcCliDiagnoseEntity",
+      "table": "IPC_CLI_DIAGNOSE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI",
+      "entity": "IpcCliShiftapplyEntity",
+      "table": "IPC_CLI_SHIFTAPPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI",
+      "entity": "GroupOrderItemEntity",
+      "table": "GROUP_ORDER_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI",
+      "entity": "GroupOrderMasterEntity",
+      "table": "GROUP_ORDER_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialAetiologyEntity",
+      "table": "SPECIAL_AETIOLOGY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialAntiDispEntity",
+      "table": "SPECIAL_ANTI_DISP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialAntimicrobialsDetailsEntity",
+      "table": "SPECIAL_ANTIMICROBIALS_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialConsulHandleRecordEntity",
+      "table": "SPECIAL_CONSUL_HANDLE_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialConsulMasterEntity",
+      "table": "SPECIAL_CONSUL_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialConsulNofeeSettingEntity",
+      "table": "SPECIAL_CONSUL_NOFEE_SETTING"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialConsulOrdersEntity",
+      "table": "SPECIAL_CONSUL_ORDERS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialInvestigationsDictEntity",
+      "table": "SPECIAL_INVESTIGATIONS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Special",
+      "entity": "SpecialInvestigationsEntity",
+      "table": "SPECIAL_INVESTIGATIONS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.PIVAS",
+      "entity": "PIVASOrderApplyEntity",
+      "table": "DYSRMYY_MIDTAB_HISFAYAOS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.PIVAS",
+      "entity": "PIVASOrderEntity",
+      "table": "DYSRMYY_MidTab_HisOrderS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.PIVAS",
+      "entity": "PIVASOrderRefundApplyEntity",
+      "table": "DYSRMYY_MIDTAB_TUIYAOSQ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Push.PIVAS",
+      "entity": "DrugTemporaryAvailableEntity",
+      "table": "tbGlobal_YaoPinXX"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Push.Middle",
+      "entity": "MiddleOrderApplyEntity",
+      "table": "IPC_CLI_ORDERAPPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.ICU",
+      "entity": "ICUOrderEntity",
+      "table": "Bus_MedicalOrderCDA"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Prescription",
+      "entity": "DoctDrugPrescDetailEntity",
+      "table": "DOCT_DRUG_PRESC_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Prescription",
+      "entity": "DoctDrugPrescMasterEntity",
+      "table": "DOCT_DRUG_PRESC_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "IpcCliOrderAttachEntity",
+      "table": "IPC_CLI_ORDER_ATTACH"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "IpcCliOrderEntity",
+      "table": "IPC_CLI_ORDER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "OrdersCancelEntity",
+      "table": "ORDERS_CANCEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "OrdersEntity",
+      "table": "ORDERS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "OrdersExecuteDetailsEntity",
+      "table": "ORDERS_EXECUTE_DETAILS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "OrdersSheetImageEntity",
+      "table": "ORDERS_SHEET_IMAGE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Order",
+      "entity": "PrintRecordEntity",
+      "table": "PRINT_RECORD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.OrderApply",
+      "entity": "IpcCliOrderApplyEntity",
+      "table": "IPC_CLI_ORDERAPPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Exam",
+      "entity": "JmpzDispenseRecHvEntity",
+      "table": "JMPZ_DISPENSE_REC_H_V"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Exam",
+      "entity": "JmpzDispenseRecHIsVEntity",
+      "table": "JMPZ_DISPENSE_REC_HIS_V"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Apply",
+      "entity": "IpcCliBloodApplyEntity",
+      "table": "BLDBANK.BLOOD_APPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Apply",
+      "entity": "IpcCliBloodCapacityEntity",
+      "table": "BLDBANK.BLOOD_CAPACITY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Apply",
+      "entity": "IpcCliPathologyApplyEntity",
+      "table": "IPC_CLI_PATHOLOGY_APPLY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.CLI.Apply",
+      "entity": "IpcPathologyBarcodeEntity",
+      "table": "IPC_PATHOLOGY_BARCODE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "BillPatternDetailEntity",
+      "table": "BILL_PATTERN_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "BillPatternMasterEntity",
+      "table": "BILL_PATTERN_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "BindingPresDetailEntity",
+      "table": "BINDING_PRESC_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "BindingPresMasterEntity",
+      "table": "BINDING_PRESC_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "BullPatternMasterEntity",
+      "table": "BILL_PATTERN_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "CasherWorkingLogEntity",
+      "table": "CASHER_WORKING_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "DospenseMedicineApplicationEntity",
+      "table": "DISPENSE_MEDICINE_APPLICATION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpBillDetailCancelEntity",
+      "table": "INP_BILL_DETAIL_CANCEL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpBillDetailEntity",
+      "table": "INP_BILL_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpBillDetailJzEntity",
+      "table": "INP_BILL_DETAIL_JZ"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpBillDetailSettleBkEntity",
+      "table": "INP_BILL_DETAIL_SETTLE_BK"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpOverdraftRegDetailEntity",
+      "table": "INP_OVERDRAFT_REG_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpOverdraftRegMasterEntity",
+      "table": "INP_OVERDRAFT_REG_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpPaymentsMoneyEntity",
+      "table": "INP_PAYMENTS_MONEY"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpRcptFeeDictEntity",
+      "table": "INP_RCPT_FEE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "InpSettleMasterYdEntity",
+      "table": "INP_SETTLE_MASTER_YD"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "MedicalCostsEntity",
+      "table": "MEDICAL_COSTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "MrBillCostsEntity",
+      "table": "MR_BILL_COSTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.IPC.Bill",
+      "entity": "UnsettleRecEntity",
+      "table": "UNSETTLE_REC"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "AnaesthesiaDictEntity",
+      "table": "ANAESTHESIA_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "AppGrantsEntity",
+      "table": "APP_GRANTS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExamSharingcenterDetailEntity",
+      "table": "EXAM_SHARINGCENTER_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExamSharingcenterMasterEntity",
+      "table": "EXAM_SHARINGCENTER_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabSharingcenterDetailEntity",
+      "table": "LAB_SHARINGCENTER_DETAIL"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabSharingcenterMasterEntity",
+      "table": "LAB_SHARINGCENTER_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "BuyDrugPlanEntity",
+      "table": "BUY_DRUG_PLAN"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ChargePriceScheduleEntity",
+      "table": "CHARGE_PRICE_SCHEDULE"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ChargeSpecialExceptDictEntity",
+      "table": "CHARGE_SPECIAL_EXCEPT_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ChargeSpecialItemDictEntity",
+      "table": "CHARGE_SPECIAL_ITEM_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ChargeTypeDictEntity",
+      "table": "CHARGE_TYPE_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ClinicItemMappingEntity",
+      "table": "CLINIC_ITEM_MAPPING"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "DoctorGroupEntity",
+      "table": "DOCTOR_GROUP"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "DosageUnitsDictEntity",
+      "table": "DOSAGE_UNITS_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "DrugNameDictEntity",
+      "table": "DRUG_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "DrugPriceListEntity",
+      "table": "DRUG_PRICE_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "EinvRcptMasterEntity",
+      "table": "EINV_RCPT_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExamReportEntity",
+      "table": "EXAM_REPORT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExpDictEntity",
+      "table": "EXP_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExpNameDictEntity",
+      "table": "EXP_NAME_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "ExpPriceListEntity",
+      "table": "EXP_PRICE_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "InfectDeptDictEntity",
+      "table": "INFECT_DEPT_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "InpCancelLogEntity",
+      "table": "INP_CANCEL_LOG"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "InputNodrugListEntity",
+      "table": "INPUT_NODRUG_LIST"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "InsurVsCenterEntity",
+      "table": "INSUR_VS_CENTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabRejectItemEntity",
+      "table": "LAB_REJECT_ITEM"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabResultEntity",
+      "table": "LAB_RESULT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabResultMappingEntity",
+      "table": "LAB.LAB_RESULT_MAPPING"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabSheetItemEntity",
+      "table": "LAB_SHEET_ITEMS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "LabSheetMasterEntity",
+      "table": "LAB_SHEET_MASTER"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "OperatingPositionEntity",
+      "table": "OPERATING_POSITION"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "OperationDictEntity",
+      "table": "OPERATION_DICT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "PerformDeptEntity",
+      "table": "PERFORM_DEPT"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "PrepaymentVsDiagnosisEntity",
+      "table": "PREPAYMENT_VS_DIAGNOSIS"
+    },
+    {
+      "namespace": "Fancy.His.Micro.Domain.Comm",
+      "entity": "RejectItemEntity",
+      "table": "FXHIS.LAB_REJECT_ITEM"
+    }
+  ],
+  "jh_route_count": 36,
+  "jh_routes": [
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientEsbManager",
+      "method": "SendMessage",
+      "verb": "Post",
+      "route": "'/fancy/esb-interaction/esb/esbmsgmethod"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "AddRegisterInfo",
+      "verb": "Post",
+      "route": "/api/InPatient/AddRegisterInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "UpdateRegisterInfo",
+      "verb": "Post",
+      "route": "!/api/InPatient/UpdateRegisterInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "AddInDept",
+      "verb": "Post",
+      "route": "/api/InPatient/AddInDept"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "UpdateInDept",
+      "verb": "Post",
+      "route": "/api/InPatient/UpdateInDept"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "AddChangeDeptInfo",
+      "verb": "Post",
+      "route": " /api/InPatient/AddChangeDeptInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "AddDischargeInfo",
+      "verb": "Post",
+      "route": "/api/InPatient/AddDischargeInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "UpdateDischargeInfo",
+      "verb": "Post",
+      "route": "\"/api/InPatient/UpdateDischargeInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "ChangeAreaBed",
+      "verb": "Post",
+      "route": "/api/InPatient/ChangeAreaBed"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "CancelRegisterInfo",
+      "verb": "Post",
+      "route": "!/api/InPatient/CancelRegisterInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "CancelInDept",
+      "verb": "Post",
+      "route": "/api/InPatient/CancelInDept"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IInPatientManager",
+      "method": "CancelDischargeInfo",
+      "verb": "Post",
+      "route": "\"/api/InPatient/CancelDischargeInfo"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "method": "AddDrugOrder",
+      "verb": "Post",
+      "route": "/api/inPatient/addMedicalOrder"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "method": "AddClinicOrder",
+      "verb": "Post",
+      "route": "/api/inPatient/diagnosisOrder"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "method": "AddNurseOrder",
+      "verb": "Post",
+      "route": "/api/inPatient/nurseOrder"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "method": "AddOtherOrder",
+      "verb": "Post",
+      "route": "/api/inPatient/otherOrder"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IIPCOrderManager",
+      "method": "AddOrder",
+      "verb": "Post",
+      "route": "/api/inPatient/addOrder"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "AddExamApply",
+      "verb": "Post",
+      "route": "/api/pub/AddExamApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "UpdateExamApply",
+      "verb": "Post",
+      "route": "/api/pub/UpdateExamApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "CancelExamApply",
+      "verb": "Post",
+      "route": "/api/pub/CancelExamApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "AddLabApply",
+      "verb": "Post",
+      "route": "/api/pub/AddLabApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "UpdateLabApply",
+      "verb": "Post",
+      "route": "/api/pub/UpdateLabApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "CancelLabApply",
+      "verb": "Post",
+      "route": "/api/pub/CancelLabApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "AddOperationApply",
+      "verb": "Post",
+      "route": "/api/pub/AddOperationApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "CancelOperationApply",
+      "verb": "Post",
+      "route": "/api/pub/CancelOperationApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "SSO",
+      "verb": "Get",
+      "route": "\"/api/pub/SSO?sessionId={sessionId}"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "AddPathologyApplyAsync",
+      "verb": "Post",
+      "route": "/api/pub/AddPathologyApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "UpdatePathologyApplyAsync",
+      "verb": "Post",
+      "route": "/api/pub/UpdatePathologyApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "CancelPathologyApplyAsync",
+      "verb": "Post",
+      "route": "/api/pub/CancelPathologyApply"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "IJHPubManager",
+      "method": "CallJHServiceAsync",
+      "verb": "Post",
+      "route": "/api/pub/CallJHService"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "AddTermStructure",
+      "verb": "Post",
+      "route": "/api/Term/AddTermStructure"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "UpdateTermStructure",
+      "verb": "Post",
+      "route": "/api/Term/UpdateTermStructure"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "UpdateTermStructureState",
+      "verb": "Post",
+      "route": "\"/api/Term/UpdateTermStructureState"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "AddTerm",
+      "verb": "Post",
+      "route": "/api/Term/AddTerm"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "UpdateTerm",
+      "verb": "Post",
+      "route": "/api/Term/UpdateTerm"
+    },
+    {
+      "namespace": "Fancy.His.Micro.References.ThirdOpenApi.JHApi",
+      "type": "ITermManager",
+      "method": "UpdateTermState",
+      "verb": "Post",
+      "route": "/api/Term/UpdateTermState"
+    }
+  ],
+  "other_http_attr_by_root": {
+    "Fancy": 108
+  }
+}

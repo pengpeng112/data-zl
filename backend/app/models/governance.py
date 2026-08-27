@@ -58,3 +58,6 @@ class MetadataSnapshot(Base):
     column_count = Column(Integer)
     relation_count = Column(Integer)
     data = Column(Text)
+    # 146 E9：受保护软归档；引用存在时禁止归档，禁止物理删除。
+    archived_at = Column(TIMESTAMP(timezone=True))
+    archived_by = Column(Text)

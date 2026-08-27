@@ -79,17 +79,12 @@ export const router: Router = createRouter({
   routes: constantRoutes.concat(...(remainingRouter as any)),
   strict: true,
   scrollBehavior(to, from, savedPosition) {
-    return new Promise(resolve => {
-      if (savedPosition) {
-        return savedPosition;
-      } else {
-        if (from.meta.saveSrollTop) {
-          const top: number =
-            document.documentElement.scrollTop || document.body.scrollTop;
-          resolve({ left: 0, top });
-        }
-      }
-    });
+    // E11：修复不 resolve 分支（原 Promise 在无 saveSrollTop 时永不 resolve，
+    // 导致路由滚动行为挂起）；saveSrollTop 全仓无 meta 使用，属死分支一并删除。
+    if (savedPosition) {
+      return savedPosition;
+    }
+    return { left: 0, top: 0 };
   }
 });
 

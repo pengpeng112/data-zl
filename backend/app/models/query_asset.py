@@ -85,6 +85,15 @@ class AssetQueryVersion(Base):
     effective_to = Column(TIMESTAMP(timezone=True))
     validated_at = Column(TIMESTAMP(timezone=True))
     activated_at = Column(TIMESTAMP(timezone=True))
+    # 144 S3: certification is decoupled from lifecycle status — existing
+    # active assets default to legacy_unverified until evaluated (144 §12)
+    certification_status = Column(Text, server_default="legacy_unverified")
+    metadata_snapshot_id = Column(BigInteger)
+    lineage_snapshot_id = Column(BigInteger)
+    validation_digest = Column(Text)
+    parser_version = Column(Text)
+    unresolved_reason = Column(Text)
+    semantic_contract = Column(JSONB)
     created_by = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
@@ -110,6 +119,12 @@ class AssetQueryDependency(Base):
     recipe_version = Column(Integer)
     is_formal = Column(Boolean, server_default="false")
     evidence = Column(Text)
+    # 144 S3: physical identity + typed evidence for dependency rows
+    object_key = Column(Text)
+    column_key = Column(Text)
+    evidence_type = Column(Text)
+    evidence_ref = Column(Text)
+    resolution_status = Column(Text, server_default="unresolved")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -137,6 +152,12 @@ class AssetQueryRun(Base):
     truncated = Column(Boolean, server_default="false")
     result_storage = Column(Text, server_default="none")  # none|summary|file_ref
     result_hash = Column(Text)
+    result_digest = Column(Text)
+    schema_digest = Column(Text)
+    result_digest_version = Column(Text)
+    data_as_of_source = Column(Text)
+    safe_parameters_summary = Column(JSONB)
+    recalc_reason = Column(Text)
     sql_sha256 = Column(Text)
     warnings = Column(JSONB)
     error_class = Column(Text)

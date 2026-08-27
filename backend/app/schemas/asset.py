@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
@@ -79,8 +80,8 @@ class RelationOut(BaseModel):
     to_table_name: str | None = None
     relation_layer: str | None = None
     relation_business_key: str | None = None
-    created_at: str | None = None
-    updated_at: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class SummaryOut(BaseModel):

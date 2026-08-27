@@ -1,0 +1,50 @@
+{
+  "source": "Fancy.His.Micro.dll SQL string heap (158 T1)",
+  "edge_total": 4,
+  "edges": [
+    {
+      "from_table": "STAFF_DICT",
+      "from_column": "ID",
+      "to_table": "CASHER_NO_REC",
+      "to_column": "USER_ID",
+      "evidence_sql_head": [
+        "select (select a.name from staff_dict a where a.id = t.user_id) name,t.user_id UserId,t.local_no LocalNo from CASHER_NO_"
+      ],
+      "evidence_count": 1,
+      "formal_table_pair_exists": false
+    },
+    {
+      "from_table": "SYS_USER_DEPT",
+      "from_column": "USERID",
+      "to_table": "SYS_USER",
+      "to_column": "ID",
+      "evidence_sql_head": [
+        "select b.EMPL_CODE from SYS_USER_DEPT a left join SYS_USER b on a.USERID =b.ID where a.DEPTID in("
+      ],
+      "evidence_count": 1,
+      "formal_table_pair_exists": false
+    },
+    {
+      "from_table": "INPUT_NODRUG_LIST",
+      "from_column": "PERFORMED_BY",
+      "to_table": "SYS_DEPARTMENT",
+      "to_column": "DEPTCODE",
+      "evidence_sql_head": [
+        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
+      ],
+      "evidence_count": 1,
+      "formal_table_pair_exists": false
+    },
+    {
+      "from_table": "INPUT_NODRUG_LIST",
+      "from_column": "ITEM_CLASS",
+      "to_table": "BILL_ITEM_CLASS_DICT",
+      "to_column": "CLASS_CODE",
+      "evidence_sql_head": [
+        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
+      ],
+      "evidence_count": 1,
+      "formal_table_pair_exists": false
+    }
+  ]
+}

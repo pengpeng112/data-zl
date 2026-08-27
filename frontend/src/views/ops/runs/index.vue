@@ -35,12 +35,14 @@
       <el-table-column prop="approval_status" label="状态" width="110">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.approval_status)" effect="dark">
-            {{ row.approval_status }}
+            {{ opsRunStatusLabel(row.approval_status) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="affected_count" label="影响行数" width="100" />
-      <el-table-column prop="created_at" label="创建时间" min-width="170" />
+      <el-table-column label="创建时间" min-width="150">
+        <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="310" fixed="right">
         <template #default="{ row }">
           <el-button
@@ -153,6 +155,8 @@ import {
 } from "@/api/ops";
 import AddIcon from "~icons/ri/add-line";
 import RunIcon from "~icons/ri/play-list-add-line";
+import { opsRunStatusLabel } from "@/constants/labels";
+import { formatTime } from "@/utils/format";
 
 const tableData = ref<OpsRun[]>([]);
 const loading = ref(false);
@@ -347,7 +351,19 @@ async function handleAudit(row: OpsRun) {
   }
 }
 
-onMounted(fetchData);
+onMounted(() => {
+  // 146 E7：消费 ?run_id= 定位到该 run 所在页并打开抽屉
+  const target = Number(new URLSearchParams(window.location.search).get("run_id") || 0);
+  if (target) {
+    getOpsRuns({ run_id: target, page: 1, page_size: 20 }).then((res: any) => {
+      tableData.value = res.data?.items || [];
+      const row = tableData.value.find((item: any) => item.id === target);
+      if (row) handleAudit(row);
+    }).catch(() => undefined);
+  } else {
+    fetchData();
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -404,18 +420,6 @@ onMounted(fetchData);
 .audit-reason {
   margin-top: 4px;
   color: var(--text-secondary);
-}
-
-@media (max-width: 1180px) {
-  .run-pipeline {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .run-pipeline {
-    grid-template-columns: 1fr;
-  }
 }
 
 .status-filter { width: 180px; }

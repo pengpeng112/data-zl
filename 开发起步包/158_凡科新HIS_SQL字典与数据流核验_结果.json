@@ -1,0 +1,99 @@
+{
+  "report": "158_凡科新HIS_SQL字典与数据流核验报告.md",
+  "t1_sql_dictionary": {
+    "strings": 5359,
+    "sql_total": 124,
+    "table_total": 52,
+    "library_class_summary": {
+      "masterdb(新HIS主库,SYS_/PUB_)": 9,
+      "HisRead/HisV2Open(老HIS风格)": 12,
+      "未归类(待核)": 27,
+      "owner:HIS": 1,
+      "MEDREC(老HIS病案owner)": 1,
+      "老HIS(COMM owner)": 1,
+      "owner:JHEMR": 1
+    }
+  },
+  "t2_jhapi": {
+    "base_url": "http://192.168.102.3:8002/",
+    "interfaces": 5,
+    "routes": 36,
+    "esb_route": "POST /fancy/esb-interaction/esb/esbmsgmethod"
+  },
+  "t3_entity_tables": {
+    "table_attribute_count": 519
+  },
+  "t4_live_checks": [
+    {
+      "target": "PAT_VISIT",
+      "channel": "DATA_CENTER columns",
+      "ok": true
+    },
+    {
+      "target": "INP_BILL_DETAIL",
+      "channel": "DATA_CENTER columns",
+      "ok": true
+    },
+    {
+      "target": "COMM.SYS_EMPLOYEE",
+      "channel": "DATA_CENTER columns",
+      "ok": true
+    },
+    {
+      "target": "COMM.SYS_EMPLOYEE@his_source",
+      "channel": "live",
+      "ok": false,
+      "note": "ORA-00942; 新HIS masterdb 双轨"
+    },
+    {
+      "target": "HISUSER.PLATE_EMR_PDF",
+      "channel": "his_source live",
+      "ok": true
+    },
+    {
+      "target": "FXHIS.V_EMR_PATIENT_INFO",
+      "channel": "his_source live",
+      "ok": true
+    },
+    {
+      "target": "ods_8_216 live",
+      "channel": "live",
+      "ok": false,
+      "note": "ORA-12541 当次不可达,元数据替代"
+    }
+  ],
+  "t5_value_domains": {
+    "in_literals": "IN('2','3') 待确认",
+    "status_literals": [
+      "DIAGNOSIS_TYPE=3",
+      "BED_STATUS=0",
+      "ORDER_STATUS=3(待确认)"
+    ],
+    "dict_refs": [
+      "ORDER_CLASS_DICT",
+      "DEPT_DICT",
+      "STAFF_DICT",
+      "AREA_DICT",
+      "NATION_DICT",
+      "COUNTRY_DICT",
+      "INP_ITEM_BATCH_DICT",
+      "INP_RCPT_FEE_DICT",
+      "MEDREC.ID_TYPE_DICT",
+      "COMM.OUTP_MR_DICT"
+    ]
+  },
+  "artifacts": {
+    "fancyhis_sql_dictionary.json": {
+      "size": 32464,
+      "sha256": "0c6304fff64e065b"
+    },
+    "fancyhis_dnfile_scan.json": {
+      "size": 14749,
+      "sha256": "26a38cfadcd063de"
+    },
+    "fancyhis_attributes.json": {
+      "size": 87119,
+      "sha256": "2c14245c2feac3c0"
+    }
+  }
+}

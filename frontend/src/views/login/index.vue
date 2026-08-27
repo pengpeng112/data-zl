@@ -149,6 +149,13 @@ const submitChangePassword = async () => {
     message("两次输入的新密码不一致", { type: "error" });
     return;
   }
+  if (
+    changePwdForm.new_password ===
+    (changePwdForm.old_password || ruleForm.password)
+  ) {
+    message("新密码不能与旧密码相同", { type: "error" });
+    return;
+  }
   changePwdLoading.value = true;
   try {
     const { changePasswordApi } = await import("@/api/user");

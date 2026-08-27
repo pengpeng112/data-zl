@@ -6,7 +6,7 @@
     >
       <template #actions>
         <el-button @click="$router.push('/ops/sql-workbench')">SQL 工作台</el-button>
-        <el-button type="primary" @click="handleCreate">新建工具</el-button>
+        <el-button v-perms="'ops.tool.manage'" type="primary" @click="handleCreate">新建工具</el-button>
       </template>
     </RePageHeader>
 
@@ -54,6 +54,24 @@
         </template>
       </el-table-column>
     </el-table>
+      <el-pagination
+        v-model:current-page="page"
+        :page-size="pageSize"
+        :total="total"
+        layout="total, prev, pager, next"
+        size="small"
+        class="tools-pager"
+        @current-change="fetchData"
+      />
+      <el-input
+        v-model="keyword"
+        placeholder="搜索工具编码/名称"
+        clearable
+        size="small"
+        class="tools-keyword"
+        @keyup.enter="fetchData"
+        @clear="fetchData"
+      />
 
     <el-dialog
       v-model="dialogVisible"
@@ -199,7 +217,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">保存</el-button>
+        <el-button v-perms="'ops.tool.manage'" type="primary" :loading="submitting" @click="handleSubmit">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -210,6 +228,10 @@ import { onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { getOpsTools, upsertOpsTool, type OpsTool } from "@/api/ops";
 
+const page = ref(1);
+const pageSize = 20;
+const total = ref(0);
+const keyword = ref("");
 const tableData = ref<OpsTool[]>([]);
 const loading = ref(false);
 const dialogVisible = ref(false);
@@ -292,8 +314,9 @@ function resetForm() {
 async function fetchData() {
   loading.value = true;
   try {
-    const res = await getOpsTools();
-    tableData.value = res.data || [];
+    const res = await getOpsTools({ page: page.value, page_size: pageSize, keyword: keyword.value || undefined });
+    tableData.value = res.data?.items || [];
+    total.value = res.data?.total || 0;
   } catch {
     ElMessage.error("获取工具列表失败");
   } finally {

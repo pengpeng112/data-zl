@@ -48,22 +48,27 @@ def aggregate_overall_status(
     lock_reason: str | None = None,
     title_status: Any = "success",
     title_required: bool = True,
+    dept_status: Any = "success",
+    dept_required: bool = True,
 ) -> str:
     """Aggregate all required durable subtasks without hiding failures."""
     main = normalize_status(main_status)
     signature = normalize_status(signature_status)
     title = normalize_status(title_status)
+    dept = normalize_status(dept_status)
     if lock_reason == "lock_held" or main == "skipped":
         return "skipped"
     if main in {"failed", "misconfigured", "overdue"}:
         return main
-    if main == "running" or signature == "running" or title == "running":
+    if main == "running" or signature == "running" or title == "running" or dept == "running":
         return "running"
     if signature_required and signature in {"failed", "misconfigured", "overdue"}:
         return "partial_success" if main == "success" else signature
     if title_required and title in {"failed", "misconfigured", "overdue"}:
         return "partial_success" if main == "success" else title
-    if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}):
+    if dept_required and dept in {"failed", "misconfigured", "overdue"}:
+        return "partial_success" if main == "success" else dept
+    if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}) and (not dept_required or dept in {"success", "skipped"}):
         return "success"
     if main == "skipped" and signature in {"skipped", "success"}:
         return "skipped"

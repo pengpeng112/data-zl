@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user, require_permission
+from ...core.security import get_current_user, get_request_operator, require_permission
 from ...models.asset import AssetRelation, AssetRelationReview
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
@@ -146,12 +146,7 @@ def approve(
     r = db.get(AssetRelationReview, review_id)
     if not r:
         raise HTTPException(status_code=404, detail="复核草稿不存在")
-    user = "reviewer"
-    try:
-        if request is not None:
-            user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="reviewer")
     result = approve_review(db, r, reviewer=user, note=(req.note if req else None))
     if not result.get("ok"):
         raise HTTPException(status_code=400, detail=result.get("error") or "approve failed")
@@ -183,12 +178,7 @@ def reject(
     r = db.get(AssetRelationReview, review_id)
     if not r:
         raise HTTPException(status_code=404, detail="复核草稿不存在")
-    user = "reviewer"
-    try:
-        if request is not None:
-            user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="reviewer")
     result = reject_review(db, r, reviewer=user, note=(req.note if req else None))
     db.add(
         GovernAuditLog(
@@ -214,12 +204,7 @@ def batch_review(
     request: Request = None,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    user = "reviewer"
-    try:
-        if request is not None:
-            user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="reviewer")
     results = []
     for rid in req.review_ids:
         r = db.get(AssetRelationReview, rid)
@@ -230,6 +215,23 @@ def batch_review(
             results.append(approve_review(db, r, reviewer=user, note=req.note))
         else:
             results.append(reject_review(db, r, reviewer=user, note=req.note))
+    # B4：批量复核补一条汇总审计（含 review_ids 与计数），避免逐条写放大。
+    ok_count = sum(1 for item in results if item.get("ok"))
+    db.add(
+        GovernAuditLog(
+            module="relation_review",
+            entity_type="relation_review_batch",
+            entity_ref=f"{req.action}:{len(req.review_ids)}",
+            action=req.action,
+            after_data={
+                "review_ids": list(req.review_ids),
+                "total": len(results),
+                "ok": ok_count,
+                "failed": len(results) - ok_count,
+            },
+            operator=user,
+        )
+    )
     db.commit()
     return ApiResponse(data={"results": results, "count": len(results)})
 
@@ -241,9 +243,18 @@ def field_mappings(review_id: int, db: Session = Depends(get_db)) -> ApiResponse
         raise HTTPException(status_code=404, detail="复核草稿不存在")
     from_cols = [c.strip() for c in (r.from_columns or "").split(",") if c.strip()]
     to_cols = [c.strip() for c in (r.to_columns or "").split(",") if c.strip()]
+    # A5：两侧映射数量不等时显式 400，不再用 to_cols[-1] 补位（补位会伪造映射）。
+    if len(from_cols) != len(to_cols):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"字段映射数量不一致（from={len(from_cols)}, to={len(to_cols)}），"
+                "请先修正复核草稿的关联字段"
+            ),
+        )
     items = []
     for i, fc in enumerate(from_cols):
-        tc = to_cols[i] if i < len(to_cols) else (to_cols[-1] if to_cols else "")
+        tc = to_cols[i] if i < len(to_cols) else ""
         items.append(
             {
                 "from_table": r.from_table,

@@ -20,20 +20,51 @@ export function renderReportHtml(raw?: string | null): string {
   if (!text) return "<p>暂无报告正文</p>";
   const lines = text.split("\n");
   const html: string[] = [];
-  let inList = false;
+  let listKind: "ul" | "ol" | null = null;
 
   const closeList = () => {
-    if (inList) {
-      html.push("</ul>");
-      inList = false;
+    if (listKind) {
+      html.push(`</${listKind}>`);
+      listKind = null;
     }
   };
 
   const inline = (line: string) =>
     escapeHtml(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
 
+  // 146 E3：管道表格与有序列表支持
+  const isTableRow = (line: string) => /^\|.*\|$/.test(line.trim());
+  const isTableDivider = (line: string) => line.includes("-") && /^[\s|:-]+$/.test(line.trim());
+
+  let tableBuffer: string[] = [];
+  const flushTable = () => {
+    if (!tableBuffer.length) return;
+    const rows = tableBuffer
+      .filter(line => !isTableDivider(line))
+      .map(line => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(cell => cell.trim()));
+    if (rows.length) {
+      const [header, ...body] = rows;
+      html.push('<table class="md-table"><thead><tr>');
+      header.forEach(cell => html.push(`<th>${inline(cell)}</th>`));
+      html.push("</tr></thead><tbody>");
+      body.forEach(row => {
+        html.push("<tr>");
+        row.forEach(cell => html.push(`<td>${inline(cell)}</td>`));
+        html.push("</tr>");
+      });
+      html.push("</tbody></table>");
+    }
+    tableBuffer = [];
+  };
+
   for (const line of lines) {
     const trimmed = line.trim();
+    if (isTableRow(trimmed)) {
+      closeList();
+      tableBuffer.push(trimmed);
+      continue;
+    }
+    flushTable();
     if (!trimmed) {
       closeList();
       continue;
@@ -45,10 +76,21 @@ export function renderReportHtml(raw?: string | null): string {
       html.push(`<h${level}>${inline(heading[2])}</h${level}>`);
       continue;
     }
+    const ordered = trimmed.match(/^\d+[.、]\s+(.*)$/);
+    if (ordered) {
+      if (listKind !== "ol") {
+        closeList();
+        html.push("<ol>");
+        listKind = "ol";
+      }
+      html.push(`<li>${inline(ordered[1])}</li>`);
+      continue;
+    }
     if (/^[-*]\s+/.test(trimmed)) {
-      if (!inList) {
+      if (listKind !== "ul") {
+        closeList();
         html.push("<ul>");
-        inList = true;
+        listKind = "ul";
       }
       html.push(`<li>${inline(trimmed.replace(/^[-*]\s+/, ""))}</li>`);
       continue;
@@ -56,6 +98,7 @@ export function renderReportHtml(raw?: string | null): string {
     closeList();
     html.push(`<p>${inline(trimmed)}</p>`);
   }
+  flushTable();
   closeList();
   return html.join("");
 }

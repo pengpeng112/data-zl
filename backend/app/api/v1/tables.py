@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -336,9 +338,7 @@ def dashboard_summary(db: Session = Depends(get_db)) -> ApiResponse[dict]:
 
     return ApiResponse(
         data={
-            "generated_at": __import__("datetime").datetime.now(
-                __import__("datetime").timezone.utc
-            ).isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "assets": {
                 "tables": tables,
                 "columns": columns,
@@ -424,12 +424,16 @@ def _full(schema_name: str, table_name: str) -> str:
 
 
 @router.get("/tables/{schema}/{table}", response_model=ApiResponse[dict], summary="表详情")
-def get_table(schema: str, table: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    row = db.scalar(
-        select(AssetTable).where(
-            AssetTable.schema_name == schema, AssetTable.table_name == table
-        )
-    )
+def get_table(
+    schema: str,
+    table: str,
+    source_code: str | None = Query(None, description="物理来源；提供后按来源隔离同名表（146 E5）"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    conditions = [AssetTable.schema_name == schema, AssetTable.table_name == table]
+    if source_code:
+        conditions.append(AssetTable.source_code == source_code)
+    row = db.scalar(select(AssetTable).where(*conditions))
     if not row:
         raise HTTPException(status_code=404, detail="表不存在")
     detail = TableDetail.model_validate(row)
@@ -458,12 +462,16 @@ def get_table(schema: str, table: str, db: Session = Depends(get_db)) -> ApiResp
     response_model=ApiResponse[list[ColumnOut]],
     summary="表字段清单",
 )
-def get_columns(schema: str, table: str, db: Session = Depends(get_db)) -> ApiResponse[list[ColumnOut]]:
-    stmt = (
-        select(AssetColumn)
-        .where(AssetColumn.schema_name == schema, AssetColumn.table_name == table)
-        .order_by(AssetColumn.column_id)
-    )
+def get_columns(
+    schema: str,
+    table: str,
+    source_code: str | None = Query(None, description="物理来源；提供后按来源隔离同名表（146 E5）"),
+    db: Session = Depends(get_db),
+) -> ApiResponse[list[ColumnOut]]:
+    conditions = [AssetColumn.schema_name == schema, AssetColumn.table_name == table]
+    if source_code:
+        conditions.append(AssetColumn.source_code == source_code)
+    stmt = select(AssetColumn).where(*conditions).order_by(AssetColumn.column_id)
     return ApiResponse(data=[ColumnOut.model_validate(r) for r in db.scalars(stmt)])
 
 
@@ -495,8 +503,19 @@ def search_columns(
     summary="该表的关联关系（上下游）",
 )
 def get_table_relations(
-    schema: str, table: str, db: Session = Depends(get_db)
+    schema: str,
+    table: str,
+    source_code: str | None = Query(None, description="物理来源；提供后校验表归属，避免串库（146 E5）"),
+    db: Session = Depends(get_db),
 ) -> ApiResponse[list[RelationOut]]:
+    if source_code:
+        table_conditions = [
+            AssetTable.schema_name == schema,
+            AssetTable.table_name == table,
+            AssetTable.source_code == source_code,
+        ]
+        if not db.scalar(select(AssetTable).where(*table_conditions)):
+            raise HTTPException(status_code=404, detail="表不存在或来源不匹配")
     full = _full(schema, table)
     stmt = select(AssetRelation).where(
         (AssetRelation.from_table == full) | (AssetRelation.to_table == full)

@@ -3,6 +3,7 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import {
   validateOpsSql,
   createSqlTemplate,
@@ -14,6 +15,7 @@ import {
   executeOpsRun,
   type OpsTool
 } from "@/api/ops";
+import { parseParameterObject } from "./contracts";
 
 const router = useRouter();
 const sql = ref(
@@ -35,6 +37,10 @@ const writeEnabled = ref(false);
 const approvalUiEnabled = ref(false);
 const targets = ref<any[]>([]);
 const selectedTarget = ref("asset");
+const targetsLoading = ref(false);
+const targetsError = ref("");
+const templatesError = ref("");
+const paramsError = ref("");
 
 const selectedTargetMeta = computed(() =>
   targets.value.find(t => t.source_code === selectedTarget.value)
@@ -45,49 +51,56 @@ async function loadConfig() {
     const res = await getOpsConfig();
     writeEnabled.value = !!res.data?.ops_write_enabled;
     approvalUiEnabled.value = !!res.data?.ops_approval_ui_enabled;
-  } catch {
+  } catch (error: any) {
     writeEnabled.value = false;
     approvalUiEnabled.value = false;
+    ElMessage.error(extractErrorDetail(error, "加载运维配置失败"));
   }
 }
 
 async function loadTargets() {
+  targetsLoading.value = true;
+  targetsError.value = "";
   try {
     const res = await listConnectionTargets();
     targets.value = res.data || [];
     if (!targets.value.find(t => t.source_code === selectedTarget.value)) {
       selectedTarget.value = targets.value[0]?.source_code || "asset";
     }
-  } catch {
-    targets.value = [
-      {
-        source_code: "asset",
-        label: "平台库 / data_asset / asset",
-        write_allowed: true,
-        readonly_reason: null
-      }
-    ];
+  } catch (error: any) {
+    targets.value = [];
+    selectedTarget.value = "";
+    targetsError.value = error?.response?.data?.detail || "目标数据库加载失败";
+  } finally {
+    targetsLoading.value = false;
   }
 }
 
 async function loadTemplates() {
   loading.value = true;
+  templatesError.value = "";
   try {
     const res = await getOpsTools({ tool_type: "sql_workbench" });
-    templates.value = (res.data || []).filter(
+    templates.value = (res.data?.items || []).filter(
       (t: OpsTool) => t.tool_type === "sql_workbench" || t.execution_mode === "whitelist_dml"
     );
+  } catch (error: any) {
+    templates.value = [];
+    templatesError.value = error?.response?.data?.detail || "模板加载失败";
   } finally {
     loading.value = false;
   }
 }
 
-function parseParams(): Record<string, any> {
+function parseParams(): Record<string, unknown> | null {
   try {
-    return JSON.parse(paramsJson.value || "{}");
-  } catch {
-    ElMessage.error("参数 JSON 无效");
-    return {};
+    const value = parseParameterObject(paramsJson.value);
+    paramsError.value = "";
+    return value;
+  } catch (error: any) {
+    paramsError.value = error?.message || "参数 JSON 无效";
+    ElMessage.error(paramsError.value);
+    return null;
   }
 }
 
@@ -106,6 +119,8 @@ function ensureTargetWritable() {
 
 async function onValidate() {
   if (!ensureTargetWritable()) return;
+  const params = parseParams();
+  if (!params) return;
   try {
     const res = await validateOpsSql({
       sql: sql.value,
@@ -115,12 +130,12 @@ async function onValidate() {
         .map(s => s.trim())
         .filter(Boolean),
       allowed_operations: ["INSERT", "UPDATE"],
-      params: parseParams()
+      params
     });
     validateResult.value = res.data;
     ElMessage[res.data?.valid ? "success" : "warning"](res.data?.valid ? "校验通过" : "校验未通过");
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "校验失败");
+    ElMessage.error(extractErrorDetail(e, "校验失败"));
   }
 }
 
@@ -149,23 +164,21 @@ async function onSaveTemplate() {
     ElMessage.success(
       res.data?.status === "approved" ? "模板已发布（管理员模式）" : "模板草稿已保存"
     );
-    writeEnabled.value = !!res.data?.ops_write_enabled;
-    loadTemplates();
+    await loadTemplates();
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "保存失败");
+    ElMessage.error(extractErrorDetail(e, "保存失败"));
   }
 }
 
 async function onCreateRun(code: string) {
+  const params = parseParams();
+  if (!params) return;
   try {
-    const res = await createSqlRun({ tool_code: code, input_params: parseParams() });
+    const res = await createSqlRun({ tool_code: code, input_params: params });
     runId.value = res.data?.id;
     ElMessage.success(`已创建任务 #${runId.value}`);
-    if (res.data?.task_path) {
-      // keep user on workbench but offer navigation
-    }
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "创建 run 失败");
+    ElMessage.error(extractErrorDetail(e, "创建 run 失败"));
   }
 }
 
@@ -179,7 +192,7 @@ async function onPreview() {
     preview.value = res.data;
     ElMessage.success(`预估影响行: ${res.data?.estimated_count}`);
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "预览失败");
+    ElMessage.error(extractErrorDetail(e, "预览失败"));
   }
 }
 
@@ -237,7 +250,7 @@ onMounted(async () => {
           <template #header>目标数据库与 SQL</template>
           <el-form label-width="120px">
             <el-form-item label="目标数据库" required>
-              <el-select v-model="selectedTarget" class="full-width" filterable>
+              <el-select v-model="selectedTarget" class="full-width" filterable :loading="targetsLoading">
                 <el-option
                   v-for="t in targets"
                   :key="t.source_code"
@@ -253,6 +266,18 @@ onMounted(async () => {
                   {{ selectedTargetMeta.write_allowed ? '允许受控写' : '只读源库' }}
                 </el-tag>
               </div>
+              <el-alert
+                v-if="targetsError"
+                :title="targetsError"
+                type="error"
+                :closable="false"
+                show-icon
+                class="inline-error"
+              >
+                <template #default>
+                  <el-button link type="primary" @click="loadTargets">重试</el-button>
+                </template>
+              </el-alert>
             </el-form-item>
             <el-form-item label="模板编码">
               <el-input v-model="toolCode" />
@@ -269,12 +294,12 @@ onMounted(async () => {
             <el-form-item label="dry-run SQL">
               <el-input v-model="dryRunSql" type="textarea" :rows="3" />
             </el-form-item>
-            <el-form-item label="参数 JSON">
-              <el-input v-model="paramsJson" type="textarea" :rows="3" />
+            <el-form-item label="参数 JSON" :error="paramsError">
+              <el-input v-model="paramsJson" type="textarea" :rows="3" @blur="parseParams" />
             </el-form-item>
             <el-space>
-              <el-button v-perms="'ops.sql.view'" @click="onValidate">安全扫描</el-button>
-              <el-button v-perms="'ops.sql.create'" type="primary" @click="onSaveTemplate">
+              <el-button v-perms="'ops.sql.view'" :disabled="!selectedTarget || !!targetsError" @click="onValidate">安全扫描</el-button>
+              <el-button v-perms="'ops.sql.create'" type="primary" :disabled="!selectedTarget || !!targetsError" @click="onSaveTemplate">
                 {{ approvalUiEnabled ? '保存草稿' : '保存并发布' }}
               </el-button>
             </el-space>
@@ -286,6 +311,9 @@ onMounted(async () => {
       <el-col :span="10">
         <el-card v-loading="loading">
           <template #header>已发布/草稿模板</template>
+          <el-alert v-if="templatesError" :title="templatesError" type="error" :closable="false" show-icon class="mb-12">
+            <template #default><el-button link type="primary" @click="loadTemplates">重试</el-button></template>
+          </el-alert>
           <el-table :data="templates" size="small" max-height="320">
             <el-table-column prop="tool_code" label="编码" min-width="110" />
             <el-table-column prop="status" label="状态" width="90" />
@@ -313,7 +341,7 @@ onMounted(async () => {
             <el-button :disabled="!runId" type="primary" @click="goTask">查看任务</el-button>
           </el-space>
           <pre v-if="preview" class="result-box">{{ JSON.stringify(preview, null, 2) }}</pre>
-          <p class="hint">创建            必须先预览；写开关关闭时正式执行拒绝。业务源库目标不可创建写模板。
+          <p class="hint">创建任务后必须先预览；写开关关闭时正式执行拒绝。业务源库目标不可创建写模板。
           </p>
         </el-card>
       </el-col>
@@ -326,6 +354,7 @@ onMounted(async () => {
 .mb-12 { margin-bottom: 12px; }
 .mt-12 { margin-top: 12px; }
 .full-width { width: 100%; }
+.inline-error { width: 100%; margin-top: 8px; }
 .target-meta {
   margin-top: 6px;
   display: flex;

@@ -1,22 +1,34 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 withDefaults(
   defineProps<{
     title?: string;
     description?: string;
+    variant?: "empty" | "error";
+    retryable?: boolean;
   }>(),
   {
-    title: "暂无数据",
-    description: "当前条件下没有可展示内容"
+    title: undefined,
+    description: undefined,
+    variant: "empty",
+    retryable: false
   }
 );
+
+const emit = defineEmits<{ retry: [] }>();
 </script>
 
 <template>
-  <div class="re-empty-state">
-    <div class="empty-icon"><slot name="icon">∅</slot></div>
-    <h3>{{ title }}</h3>
-    <p>{{ description }}</p>
-    <div v-if="$slots.action" class="empty-action"><slot name="action" /></div>
+  <div class="re-empty-state" :class="{ 'is-error': variant === 'error' }">
+    <div class="empty-icon">
+      <slot name="icon">{{ variant === "error" ? "⚠" : "∅" }}</slot>
+    </div>
+    <h3>{{ title ?? (variant === "error" ? "加载失败" : "暂无数据") }}</h3>
+    <p>{{ description ?? (variant === "error" ? "请求未完成，可重试或调整条件后再试。" : "当前条件下没有可展示内容") }}</p>
+    <div v-if="$slots.action || (variant === 'error' && retryable)" class="empty-action">
+      <slot name="action">
+        <el-button type="primary" size="small" @click="emit('retry')">重试</el-button>
+      </slot>
+    </div>
   </div>
 </template>
 
@@ -40,6 +52,17 @@ withDefaults(
   color: var(--primary-500);
   background: var(--primary-50);
   border-radius: var(--radius-full);
+}
+
+.is-error {
+  .empty-icon {
+    color: var(--el-color-danger);
+    background: var(--el-color-danger-light-9);
+  }
+
+  h3 {
+    color: var(--el-color-danger);
+  }
 }
 
 h3 {

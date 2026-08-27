@@ -91,16 +91,21 @@ def list_departments(
 @router.get("/persons", summary="人员主数据列表")
 def list_persons(
     person_type: str | None = Query(None),
+    classification: str | None = Query(None),
     keyword: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(30, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     stmt = select(IdentityPerson)
-    if person_type:
-        stmt = stmt.where(
-            (IdentityPerson.person_type == person_type) | (IdentityPerson.classification == person_type)
-        )
+    legacy_classifications = {"doctor", "nurse", "pharmacist"}
+    legacy_classification = person_type if person_type in legacy_classifications else None
+    effective_classification = classification or legacy_classification
+    effective_person_type = None if legacy_classification else person_type
+    if effective_classification:
+        stmt = stmt.where(IdentityPerson.classification == effective_classification)
+    if effective_person_type:
+        stmt = stmt.where(IdentityPerson.person_type == effective_person_type)
     if keyword:
         like = f"%{keyword}%"
         dept_name_match = select(IdentityDepartment.dept_code).where(IdentityDepartment.dept_name_cn.ilike(like))
@@ -175,18 +180,63 @@ def list_persons(
 @router.get("/accounts", summary="多系统账号列表")
 def list_accounts(
     system_code: str | None = Query(None),
+    keyword: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
-) -> ApiResponse[list[dict]]:
+) -> ApiResponse[dict]:
     stmt = select(IdentityAccount)
     if system_code:
         stmt = stmt.where(IdentityAccount.system_code == system_code)
-    rows = db.scalars(stmt.order_by(IdentityAccount.system_code, IdentityAccount.account_id)).all()
-    return ApiResponse(data=[
-        {"id": r.id, "person_code": r.person_code, "system_code": r.system_code,
-         "account_id": r.account_id, "account_name": r.account_name,
-         "account_status": r.account_status}
-        for r in rows
-    ])
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(
+            IdentityAccount.account_id.ilike(like)
+            | IdentityAccount.account_name.ilike(like)
+            | IdentityAccount.person_code.ilike(like)
+        )
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(IdentityAccount.system_code, IdentityAccount.account_id)
+        .offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": [
+            {"id": r.id, "person_code": r.person_code, "system_code": r.system_code,
+             "account_id": r.account_id, "account_name": r.account_name,
+             "account_status": r.account_status}
+            for r in rows
+        ],
+    })
+
+
+class AccountUnbind(BaseModel):
+    reason: str | None = None
+
+
+@router.delete("/accounts/{account_id}/binding", summary="解绑账号与人员（仅清空 person_code，不删账号；146 E6）", dependencies=[Depends(require_permission("identity.local_account.manage"))])
+def unbind_account(account_id: int, request: Request, req: AccountUnbind | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    account = db.get(IdentityAccount, account_id)
+    if not account:
+        raise HTTPException(status_code=404, detail="账号不存在")
+    previous = account.person_code
+    account.person_code = None
+    db.add(GovernAuditLog(
+        module="identity",
+        entity_type="account",
+        entity_ref=str(account.id),
+        action="unbind",
+        operator=operator,
+        before_data={"person_code": previous},
+        after_data={"person_code": None},
+        reason=(req.reason if req else None),
+    ))
+    db.commit()
+    return ApiResponse(data={"id": account.id, "person_code": None})
 
 
 def _diff_item(r: IdentitySyncDiff) -> dict:
@@ -1298,5 +1348,4 @@ def list_inconsistencies(
         for r in rows
     ]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
-
 

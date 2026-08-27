@@ -16,6 +16,12 @@ class MetadataCollectorAdapter(ABC):
     def __init__(self, connector: Any):
         self.connector = connector
 
+    @staticmethod
+    def _clamp_rows(rows: list, max_rows: int) -> list:
+        """A4：连接器可能多返回 1 行探针；采集入口按声明上限夹紧。"""
+        limit = max(1, int(max_rows))
+        return list(rows)[:limit]
+
     @abstractmethod
     def list_schemas(self) -> list[dict]:
         """返回 [{"name": "HIS", "type": "schema"|"owner"}, ...]"""
@@ -74,6 +80,7 @@ class OracleMetadataCollector(MetadataCollectorAdapter):
             "ORDER BY username",
             max_rows=500,
         )
+        rows = self._clamp_rows(rows, 500)
         return [{"name": r.get("OWNER") or r.get("owner"), "type": "owner"} for r in rows if r.get("OWNER") or r.get("owner")]
 
     def list_tables(self, schema_name: str) -> list[dict]:
@@ -82,6 +89,7 @@ class OracleMetadataCollector(MetadataCollectorAdapter):
             {"owner": schema_name},
             max_rows=5000,
         )
+        rows = self._clamp_rows(rows, 5000)
         return [
             {
                 "table_name": r.get("TABLE_NAME") or r.get("table_name"),
@@ -99,6 +107,7 @@ class OracleMetadataCollector(MetadataCollectorAdapter):
             {"owner": schema_name, "table": table_name},
             max_rows=10000,
         )
+        rows = self._clamp_rows(rows, 10000)
         return [self._column_row(r) for r in rows]
 
     @staticmethod
@@ -142,7 +151,9 @@ class OracleMetadataCollector(MetadataCollectorAdapter):
                     "ORDER BY table_name, column_id"
                 )
                 binds["owner"] = schema_name
-                rows = self.connector.execute_readonly(sql, binds, max_rows=10000)
+                rows = self._clamp_rows(
+                    self.connector.execute_readonly(sql, binds, max_rows=10000), 10000
+                )
                 for r in rows:
                     col = self._column_row(r)
                     col["schema_name"] = schema_name
@@ -163,6 +174,7 @@ class PostgresMetadataCollector(MetadataCollectorAdapter):
             "AND table_type='BASE TABLE'",
             max_rows=500,
         )
+        rows = self._clamp_rows(rows, 500)
         return [{"name": r["table_schema"], "type": "schema"} for r in rows]
 
     def list_tables(self, schema_name: str) -> list[dict]:
@@ -171,6 +183,7 @@ class PostgresMetadataCollector(MetadataCollectorAdapter):
             "WHERE table_schema = :schema AND table_type='BASE TABLE'",
             {"schema": schema_name}, max_rows=5000,
         )
+        rows = self._clamp_rows(rows, 5000)
         return [{"table_name": r["table_name"], "row_count": None, "comment": ""} for r in rows]
 
     def list_columns(self, schema_name: str, table_name: str) -> list[dict]:
@@ -179,7 +192,9 @@ class PostgresMetadataCollector(MetadataCollectorAdapter):
             "FROM information_schema.columns "
             "WHERE table_schema = :schema AND table_name = :table",
             {"schema": schema_name, "table": table_name},
+            max_rows=10000,
         )
+        rows = self._clamp_rows(rows, 10000)
         return [{
             "column_name": r["column_name"], "data_type": r["data_type"],
             "length": r.get("character_maximum_length"),
@@ -198,6 +213,7 @@ class MysqlMetadataCollector(MetadataCollectorAdapter):
             "SELECT DISTINCT TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'",
             max_rows=500,
         )
+        rows = self._clamp_rows(rows, 500)
         return [{"name": r["TABLE_SCHEMA"], "type": "schema"} for r in rows]
 
     def list_tables(self, schema_name: str) -> list[dict]:
@@ -205,6 +221,7 @@ class MysqlMetadataCollector(MetadataCollectorAdapter):
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schema AND TABLE_TYPE='BASE TABLE'",
             {"schema": schema_name}, max_rows=5000,
         )
+        rows = self._clamp_rows(rows, 5000)
         return [{"table_name": r["TABLE_NAME"], "row_count": None, "comment": ""} for r in rows]
 
     def list_columns(self, schema_name: str, table_name: str) -> list[dict]:
@@ -213,7 +230,9 @@ class MysqlMetadataCollector(MetadataCollectorAdapter):
             "FROM INFORMATION_SCHEMA.COLUMNS "
             "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table",
             {"schema": schema_name, "table": table_name},
+            max_rows=10000,
         )
+        rows = self._clamp_rows(rows, 10000)
         return [{
             "column_name": r["COLUMN_NAME"], "data_type": r["DATA_TYPE"],
             "length": r.get("CHARACTER_MAXIMUM_LENGTH"),
@@ -232,6 +251,7 @@ class SqlServerMetadataCollector(MetadataCollectorAdapter):
             "SELECT DISTINCT TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'",
             max_rows=500,
         )
+        rows = self._clamp_rows(rows, 500)
         return [{"name": r["TABLE_SCHEMA"], "type": "schema"} for r in rows]
 
     def list_tables(self, schema_name: str) -> list[dict]:
@@ -239,6 +259,7 @@ class SqlServerMetadataCollector(MetadataCollectorAdapter):
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE='BASE TABLE'",
             {"schema": schema_name}, max_rows=5000,
         )
+        rows = self._clamp_rows(rows, 5000)
         return [{"table_name": r["TABLE_NAME"], "row_count": None, "comment": ""} for r in rows]
 
     def list_columns(self, schema_name: str, table_name: str) -> list[dict]:
@@ -247,7 +268,9 @@ class SqlServerMetadataCollector(MetadataCollectorAdapter):
             "FROM INFORMATION_SCHEMA.COLUMNS "
             "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?",
             {"schema": schema_name, "table": table_name},
+            max_rows=10000,
         )
+        rows = self._clamp_rows(rows, 10000)
         return [{
             "column_name": r["COLUMN_NAME"], "data_type": r["DATA_TYPE"],
             "length": r.get("CHARACTER_MAXIMUM_LENGTH"),

@@ -49,6 +49,7 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "asset.quality.ai.review", "name_cn": "AI质控复核", "type": "button", "parent_code": "asset.quality.ai.view"},
     {"code": "asset.quality.ai.connection_test", "name_cn": "AI质控连接测试", "type": "button", "parent_code": "asset.quality.ai.view"},
     {"code": "asset.ai_draft.view", "name_cn": "AI 协作", "type": "page", "parent_code": "asset"},
+    {"code": "asset.ai_draft.review", "name_cn": "AI 草稿审核", "type": "button", "parent_code": "asset.ai_draft.view"},
     {"code": "asset.admin.view", "name_cn": "治理管理", "type": "page", "parent_code": "asset"},
     {"code": "asset.annotation", "name_cn": "资产注释维护", "type": "button", "parent_code": "asset"},
     {"code": "source.manage", "name_cn": "业务系统与连接维护", "type": "button", "parent_code": "asset.system.view"},
@@ -67,6 +68,7 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "dict.mapping.view", "name_cn": "编码关系明细", "type": "page", "parent_code": "dict"},
     {"code": "dict.general.view", "name_cn": "通用字典", "type": "page", "parent_code": "dict"},
     {"code": "dict.general.edit", "name_cn": "通用字典编辑", "type": "button", "parent_code": "dict.general.view"},
+    {"code": "dict.general.import", "name_cn": "通用字典导入", "type": "button", "parent_code": "dict.general.view"},
     {"code": "dict.sync_diff.view", "name_cn": "字典同步差异", "type": "page", "parent_code": "dict"},
     # ===== 人员与科室 identity =====
     {"code": "identity", "name_cn": "人员与科室", "type": "menu", "parent_code": None},
@@ -79,6 +81,9 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "identity.role.manage", "name_cn": "角色权限", "type": "page", "parent_code": "identity"},
     {"code": "identity.role.grant", "name_cn": "人员授权", "type": "page", "parent_code": "identity"},
     {"code": "identity.permission_request.view", "name_cn": "权限申请审批", "type": "page", "parent_code": "identity"},
+    {"code": "identity.permission_request.create", "name_cn": "发起权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
+    {"code": "identity.permission_request.approve", "name_cn": "审批权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
+    {"code": "identity.permission_request.execute", "name_cn": "执行权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
     # ===== 运维工具 ops =====
     {"code": "ops", "name_cn": "运维工具", "type": "menu", "parent_code": None},
     {"code": "ops.sql.view", "name_cn": "SQL 工作台", "type": "page", "parent_code": "ops"},
@@ -95,6 +100,7 @@ RESOURCE_CATALOG: list[dict] = [
     # ===== 变更检测 metadata =====
     {"code": "metadata", "name_cn": "变更检测", "type": "menu", "parent_code": None},
     {"code": "metadata.change.view", "name_cn": "变更事件", "type": "page", "parent_code": "metadata"},
+    {"code": "metadata.change.edit", "name_cn": "变更事件处理", "type": "button", "parent_code": "metadata.change.view"},
     {"code": "metadata.snapshot.view", "name_cn": "快照管理", "type": "page", "parent_code": "metadata"},
     {"code": "metadata.snapshot.collect", "name_cn": "采集快照", "type": "button", "parent_code": "metadata.snapshot.view"},
     {"code": "metadata.diff.view", "name_cn": "快照对比", "type": "page", "parent_code": "metadata"},
@@ -102,6 +108,32 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "ai", "name_cn": "AI 协作(旧)", "type": "menu", "parent_code": None},
     {"code": "ai.draft.view", "name_cn": "AI 草稿查看(旧)", "type": "page", "parent_code": "ai"},
     {"code": "ai.draft.execute", "name_cn": "AI 草稿只读执行(旧)", "type": "button", "parent_code": "ai"},
+    # ===== 144 S4/S6/S7: 查询执行、指标计算、AI 上下文与反馈评测 =====
+    # colon-form equivalents (query:view 等) match via the security normalizer;
+    # new codes default to platform_admin only (144 §8.4).
+    {"code": "query144", "name_cn": "精准取数与准确性", "type": "menu", "parent_code": None},
+    {"code": "query.view", "name_cn": "查询资产查看", "type": "page", "parent_code": "query144"},
+    {"code": "query.create", "name_cn": "查询创建与修订", "type": "button", "parent_code": "query.view"},
+    {"code": "query.run", "name_cn": "查询执行", "type": "button", "parent_code": "query.view"},
+    {"code": "query.publish", "name_cn": "查询版本发布", "type": "button", "parent_code": "query.view"},
+    {"code": "query.schedule", "name_cn": "查询调度管理", "type": "button", "parent_code": "query.view"},
+    {"code": "query.recalc", "name_cn": "历史重算", "type": "button", "parent_code": "query.view"},
+    {"code": "metric.calculate", "name_cn": "指标受控计算", "type": "button", "parent_code": "query.view"},
+    {"code": "product.publish", "name_cn": "数据产品发布", "type": "button", "parent_code": "query.view"},
+    {"code": "ai.context.read", "name_cn": "统一 AI 上下文读取", "type": "button", "parent_code": "query.view"},
+    {"code": "ai.sql.full_read", "name_cn": "完整 SQL 读取(高权限)", "type": "button", "parent_code": "query.view"},
+    # 153 B5：AI 真实执行类端点（drafts/execute、tool-execute）专用码；
+    # 只读上下文端点只挂 ai.context.read，禁止用执行码套读接口。
+    {"code": "ai.sql.execute", "name_cn": "AI SQL 只读执行(高权限)", "type": "button", "parent_code": "query.view"},
+    {"code": "feedback.create", "name_cn": "准确性反馈提交", "type": "button", "parent_code": "query.view"},
+    {"code": "feedback.review", "name_cn": "准确性反馈复核", "type": "button", "parent_code": "query.view"},
+    {"code": "evaluation.run", "name_cn": "回归评测执行", "type": "button", "parent_code": "query.view"},
+    {"code": "evaluation.view", "name_cn": "回归评测查看", "type": "button", "parent_code": "query.view"},
+    # ===== 149: 字段值域知识库（AI 仅 submit，confirm 仅人工角色） =====
+    {"code": "value_domain", "name_cn": "值域知识库", "type": "menu", "parent_code": None},
+    {"code": "value_domain.read", "name_cn": "值域查看", "type": "page", "parent_code": "value_domain"},
+    {"code": "value_domain.submit", "name_cn": "值域候选提交", "type": "button", "parent_code": "value_domain.read"},
+    {"code": "value_domain.confirm", "name_cn": "值域人工确认", "type": "button", "parent_code": "value_domain.read"},
 ]
 
 
@@ -136,7 +168,7 @@ BUILTIN_ROLES: list[dict] = [
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     "platform_admin": [r["code"] for r in RESOURCE_CATALOG],
-    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view"],
+    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read"],
     "asset_editor": [
         "asset",
         "asset.table.view",
@@ -148,12 +180,22 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "asset.relation.review",
         "asset.annotation",
         "metadata",
+        "metadata.change.view",
+        "metadata.change.edit",
+        "metadata.diff.view",
+        "metadata.snapshot.view",
         "metadata.snapshot.collect",
+        "asset.ai_draft.view",
+        "asset.ai_draft.review",
         "source.manage",
         "source.collect",
         "source.test",
+        "value_domain",
+        "value_domain.read",
+        "value_domain.submit",
+        "value_domain.confirm",
     ],
-    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review"],
+    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute"],
     "identity_admin": [
         "identity",
         "identity.person.view",
@@ -161,8 +203,12 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "identity.role.manage",
         "identity.role.grant",
         "identity.local_account.manage",
+        "identity.permission_request.view",
+        "identity.permission_request.create",
+        "identity.permission_request.approve",
+        "identity.permission_request.execute",
     ],
-    "dict_admin": ["dict", "dict.medical.view", "dict.medical.edit", "dict.medical.plan.create", "dict.medical.approve"],
+    "dict_admin": ["dict", "dict.medical.view", "dict.medical.edit", "dict.medical.plan.create", "dict.medical.approve", "dict.medical.execute", "dict.medical.retry", "dict.medical.reconcile", "dict.general.view", "dict.general.edit"],
     "ops_admin": [
         "ops",
         "ops.tool.manage",
@@ -187,7 +233,12 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "identity",
         "identity.person.view",
     ],
-    "ai_user": ["ai", "ai.draft.view", "ai.draft.execute", "asset", "asset.table.view", "asset.graph.view"],
+    "ai_user": [
+        "ai", "ai.draft.view", "ai.draft.execute", "asset", "asset.table.view", "asset.graph.view",
+        "query144", "query.view", "ai.context.read",
+        # 149: AI 协作角色可读可提交 pending，但绝不授予 value_domain.confirm
+        "value_domain", "value_domain.read", "value_domain.submit",
+    ],
 }
 
 

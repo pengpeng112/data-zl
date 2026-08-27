@@ -47,6 +47,11 @@ from app.models.dict_medical import (  # noqa: F401
     DictMedicalCodeSet,
     DictMedicalSyncDiff,
 )
+from app.models.value_domain import (  # noqa: F401
+    AssetColumnValueDomain,
+    AssetColumnValueDomainEvidence,
+    AssetColumnValueDomainVersion,
+)
 
 config = context.config
 

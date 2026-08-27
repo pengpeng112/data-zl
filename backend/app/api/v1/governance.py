@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, get_request_operator
 from ...models.governance_base import (
     AssetActionExecutor,
     AssetRole,
@@ -17,7 +18,7 @@ from ...models.governance_base import (
     GovernEnumValue,
 )
 from ...schemas.common import ApiResponse
-from ...services.data_masking import mask_sensitive
+from ...services.data_masking import mask_sensitive, sanitize_text
 
 router = APIRouter(prefix="/api/v1/govern", tags=["govern"])
 
@@ -274,22 +275,61 @@ def reject_change_request(
 # 统一审计日志
 # ──────────────────────────────────────────────
 
-@router.get("/audit-logs", summary="审计日志列表")
+def _audit_filters(
+    module: str | None,
+    operator: str | None,
+    action: str | None,
+    entity_type: str | None,
+    entity_ref: str | None,
+    created_from: str | None,
+    created_to: str | None,
+):
+    from datetime import datetime as _dt
+    filters = []
+    if module:
+        filters.append(GovernAuditLog.module == module)
+    if operator:
+        filters.append(GovernAuditLog.operator == operator)
+    if action:
+        filters.append(GovernAuditLog.action == action)
+    if entity_type:
+        filters.append(GovernAuditLog.entity_type == entity_type)
+    if entity_ref:
+        filters.append(GovernAuditLog.entity_ref.ilike(f"%{entity_ref}%"))
+    if created_from:
+        try:
+            filters.append(GovernAuditLog.created_at >= _dt.fromisoformat(created_from.replace("Z", "+00:00")))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="created_from 需为 ISO 时间")
+    if created_to:
+        try:
+            filters.append(GovernAuditLog.created_at <= _dt.fromisoformat(created_to.replace("Z", "+00:00")))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="created_to 需为 ISO 时间")
+    return filters
+
+
+def _audit_limited(value) -> str | None:
+    if value is None:
+        return None
+    rendered = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+    return sanitize_text(rendered, limit=300)
+
+
+@router.get("/audit-logs", summary="审计日志列表（146 E7：时间/操作人/动作/实体筛选 + 详情字段）")
 def list_audit_logs(
     module: str | None = Query(None),
     operator: str | None = Query(None),
     action: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    entity_ref: str | None = Query(None),
+    created_from: str | None = Query(None),
+    created_to: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(30, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    stmt = select(GovernAuditLog)
-    if module:
-        stmt = stmt.where(GovernAuditLog.module == module)
-    if operator:
-        stmt = stmt.where(GovernAuditLog.operator == operator)
-    if action:
-        stmt = stmt.where(GovernAuditLog.action == action)
+    stmt = select(GovernAuditLog).where(*_audit_filters(module, operator, action, entity_type, entity_ref, created_from, created_to))
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(
         stmt.order_by(GovernAuditLog.created_at.desc())
@@ -300,12 +340,84 @@ def list_audit_logs(
         {
             "id": r.id, "module": r.module, "entity_type": r.entity_type,
             "entity_ref": r.entity_ref, "action": r.action,
-            "operator": r.operator,
+            "operator": r.operator, "reason": r.reason,
+            "before_data": _audit_limited(r.before_data),
+            "after_data": _audit_limited(r.after_data),
             "created_at": r.created_at.isoformat() if r.created_at else None,
         }
         for r in rows
     ]
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
+
+
+@router.get("/audit-logs/summary", summary="审计日志全量统计（与列表同口径筛选；146 E7）")
+def audit_logs_summary(
+    module: str | None = Query(None),
+    operator: str | None = Query(None),
+    action: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    entity_ref: str | None = Query(None),
+    created_from: str | None = Query(None),
+    created_to: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    filters = _audit_filters(module, operator, action, entity_type, entity_ref, created_from, created_to)
+    rows = db.scalars(select(GovernAuditLog).where(*filters)).all()
+    by_module: dict[str, int] = {}
+    by_action: dict[str, int] = {}
+    by_operator: dict[str, int] = {}
+    for r in rows:
+        by_module[r.module] = by_module.get(r.module, 0) + 1
+        by_action[r.action] = by_action.get(r.action, 0) + 1
+        if r.operator:
+            by_operator[r.operator] = by_operator.get(r.operator, 0) + 1
+    return ApiResponse(data={
+        "total": len(rows),
+        "by_module": by_module,
+        "by_action": by_action,
+        "by_operator": by_operator,
+    })
+
+
+AUDIT_EXPORT_LIMIT = 5000
+
+
+@router.get("/audit-logs/export", summary="审计日志 CSV 导出（与列表同口径筛选；146 E7）")
+def audit_logs_export(
+    module: str | None = Query(None),
+    operator: str | None = Query(None),
+    action: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    entity_ref: str | None = Query(None),
+    created_from: str | None = Query(None),
+    created_to: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    import csv
+    import io as _io
+    from fastapi.responses import StreamingResponse
+    filters = _audit_filters(module, operator, action, entity_type, entity_ref, created_from, created_to)
+    rows = db.scalars(
+        select(GovernAuditLog).where(*filters)
+        .order_by(GovernAuditLog.created_at.desc())
+        .limit(AUDIT_EXPORT_LIMIT)
+    ).all()
+    buffer = _io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["id", "created_at", "module", "entity_type", "entity_ref", "action", "operator", "reason"])
+    for r in rows:
+        writer.writerow([
+            r.id,
+            r.created_at.isoformat() if r.created_at else "",
+            r.module, r.entity_type, r.entity_ref, r.action,
+            r.operator or "", (r.reason or "").replace(chr(10), " "),
+        ])
+    buffer.seek(0)
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=audit-logs.csv"},
+    )
 
 
 # ──────────────────────────────────────────────
@@ -438,24 +550,46 @@ def list_user_roles(
 
 @router.post("/user-roles", summary="分配用户角色")
 def assign_user_role(
-    req: UserRoleAssign, db: Session = Depends(get_db)
+    req: UserRoleAssign, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == req.role_code))
     if not role:
         raise HTTPException(status_code=404, detail="角色不存在")
     ur = AssetUserRole(user_identifier=req.user_identifier, role_code=req.role_code)
     db.add(ur)
+    db.flush()
+    # B4：角色分配此前零审计，补 GovernAuditLog（不含任何凭据类字段）。
+    operator = get_request_operator(request, default="system")
+    db.add(GovernAuditLog(
+        module="governance",
+        entity_type="user_role",
+        entity_ref=f"{req.user_identifier}:{req.role_code}",
+        action="assign",
+        after_data={"user_identifier": req.user_identifier, "role_code": req.role_code},
+        operator=operator,
+    ))
     db.commit()
     db.refresh(ur)
     return ApiResponse(data={"id": ur.id, "user_identifier": ur.user_identifier, "role_code": ur.role_code})
 
 
 @router.delete("/user-roles/{ur_id}", summary="移除用户角色")
-def remove_user_role(ur_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def remove_user_role(ur_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     ur = db.get(AssetUserRole, ur_id)
     if not ur:
         raise HTTPException(status_code=404)
+    before = {"user_identifier": ur.user_identifier, "role_code": ur.role_code}
     db.delete(ur)
+    # B4：移除角色同补审计。
+    operator = get_request_operator(request, default="system")
+    db.add(GovernAuditLog(
+        module="governance",
+        entity_type="user_role",
+        entity_ref=f"{before['user_identifier']}:{before['role_code']}",
+        action="remove",
+        before_data=before,
+        operator=operator,
+    ))
     db.commit()
     return ApiResponse(data={"deleted": ur_id})
 

@@ -138,3 +138,6 @@ backend/_plan139_work/platform_assets_export.json
 开发起步包/数据资产_四系统源端资产包/
 backend/_oa_work/
 开发起步包/数据资产_OA源端资产包/
+
+# 150: 七系统源库表结构/元数据大块仅保留本地与服务器证据目录，不进 Git
+开发起步包/数据资产_七系统源端资产包/

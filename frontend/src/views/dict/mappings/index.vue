@@ -5,7 +5,7 @@
         <RePageHeader title="诊断手术映射维护" subtitle="按 Excel 维护表展示，一行一个院内编码；院内编码和名称作为主键口径，编辑时不可修改。">
           <template #actions>
             <el-button :loading="exporting" @click="exportExcel">导出 Excel</el-button>
-            <el-button type="primary" @click="openDialog()">新增映射</el-button>
+            <el-button v-perms="'dict.medical.edit'" type="primary" @click="openDialog()">新增映射</el-button>
           </template>
         </RePageHeader>
       </template>
@@ -178,7 +178,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="dialog.submitting" @click="saveRow">保存</el-button>
+        <el-button v-perms="'dict.medical.edit'" type="primary" :loading="dialog.submitting" @click="saveRow">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -188,6 +188,8 @@
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { computed, reactive, ref, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
+import { authHintForStatus } from "@/utils/statusLabels";
 import { exportMedicalMappingRows, getMedicalMappingOptions, getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
 
 const loading = ref(false);
@@ -305,6 +307,9 @@ async function saveRow() {
     ElMessage.success(dialog.isEdit ? "编辑成功" : "新增成功");
     dialog.visible = false;
     loadData();
+  } catch (error) {
+    // E8：保存失败提示（此前裸抛未处理拒绝）。
+    ElMessage.error(extractErrorDetail(error, "映射保存失败"));
   } finally {
     dialog.submitting = false;
   }
@@ -312,9 +317,14 @@ async function saveRow() {
 
 async function toggleStatus(row: any) {
   const nextStatus = row.status === "inactive" ? "active" : "inactive";
-  await upsertMedicalMappingRow({ ...row, status: nextStatus });
-  ElMessage.success(nextStatus === "inactive" ? "已停用" : "已启用");
-  loadData();
+  try {
+    await upsertMedicalMappingRow({ ...row, status: nextStatus });
+    ElMessage.success(nextStatus === "inactive" ? "已停用" : "已启用");
+    loadData();
+  } catch (error) {
+    // E8：启停失败提示。
+    ElMessage.error(extractErrorDetail(error, "状态切换失败"));
+  }
 }
 
 function tableRowClassName({ row }: { row: any }) {
@@ -356,8 +366,8 @@ async function exportExcel() {
     window.URL.revokeObjectURL(url);
     ElMessage.success("导出完成");
   } catch (error: any) {
-    if (error?.response?.status === 401) authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
-    else if (error?.response?.status === 403) authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
+    const hint = authHintForStatus(error?.response?.status);
+    if (hint) authHint.value = hint;
     else ElMessage.error("导出失败");
   } finally {
     exporting.value = false;
@@ -369,11 +379,12 @@ async function loadData() {
   authHint.value = "";
   try {
     const res = await getMedicalMappingRows(buildQueryParams(true));
-    items.value = (res as any).data.items || [];
-    total.value = (res as any).data.total || 0;
+    items.value = res.data.items || [];
+    total.value = res.data.total || 0;
   } catch (error: any) {
-    if (error?.response?.status === 401) authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
-    else if (error?.response?.status === 403) authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
+    const hint = authHintForStatus(error?.response?.status); // E8：非鉴权失败不再静默
+    if (hint) authHint.value = hint;
+    else ElMessage.error(extractErrorDetail(error, "映射列表加载失败"));
   } finally {
     loading.value = false;
   }

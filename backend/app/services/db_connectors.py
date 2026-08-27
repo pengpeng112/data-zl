@@ -3,10 +3,13 @@
 from abc import ABC, abstractmethod
 import base64
 import json
+import logging
 import os
 import re
 import subprocess
 from typing import Any
+
+from .data_masking import sanitize_text
 
 
 MAX_READONLY_ROWS = 10_000
@@ -15,12 +18,28 @@ DEFAULT_TIMEOUT_MS = 60_000
 # hundred-million-row HIS table protected by default; callers can add sources
 # through the connector's large_tables option.
 DEFAULT_LARGE_TABLES = {"HIS.LAB_RESULT"}
+# 危险写/DDL 关键字（整词匹配）。B7：提取为公共函数 forbidden_keyword_hits，
+# 供连接器只读校验与 ai._scan_sql_risk 共用，避免子串匹配误杀 UPDATED_AT。
+_FORBIDDEN_KEYWORDS = (
+    "INSERT", "UPDATE", "DELETE", "MERGE", "UPSERT", "CREATE", "ALTER", "DROP",
+    "TRUNCATE", "GRANT", "REVOKE", "EXEC", "EXECUTE", "CALL", "COPY", "VACUUM",
+    "ANALYZE",
+)
 _FORBIDDEN_SQL = re.compile(
-    r"\b(?:INSERT|UPDATE|DELETE|MERGE|UPSERT|CREATE|ALTER|DROP|TRUNCATE|"
-    r"GRANT|REVOKE|EXEC(?:UTE)?|CALL|COPY|VACUUM|ANALYZE)\b",
+    r"\b(?:" + "|".join(_FORBIDDEN_KEYWORDS) + r")\b",
     re.IGNORECASE,
 )
 _LOCK_SQL = re.compile(r"\b(?:LOCK\s+TABLE|FOR\s+(?:UPDATE|SHARE)|LOCK\s+IN\s+SHARE\s+MODE)\b", re.IGNORECASE)
+
+
+def forbidden_keyword_hits(sql: str, keywords: list[str] | tuple[str, ...] = _FORBIDDEN_KEYWORDS) -> list[str]:
+    """按整词（\\b 词边界）返回 SQL 中出现的危险关键字列表（B7 公共实现）。
+
+    子串匹配会把列名 UPDATED_AT/CREATED_BY 误判为 UPDATE/CREATE；词边界匹配
+    只命中独立关键字。默认关键字集与连接器只读校验一致，可传子集复用。
+    """
+    pattern = re.compile(r"\b(?:" + "|".join(keywords) + r")\b", re.IGNORECASE)
+    return [match.group(0).upper() for match in pattern.finditer(sql)]
 
 
 def validate_readonly_sql(sql: str, large_tables: set[str] | None = None) -> str:
@@ -93,7 +112,12 @@ class DatabaseConnector(ABC):
 
     @abstractmethod
     def execute_readonly(self, sql: str, params: dict | None = None, max_rows: int = 1000) -> list[dict]:
-        """执行只读查询，返回 [{col: val, ...}] 列表。"""
+        """执行只读查询，返回 [{col: val, ...}] 列表。
+
+        A4 契约：最多返回 max_rows+1 行（探针行）。当结果超过 max_rows 时，
+        额外的第 max_rows+1 行让调用方能区分“恰好 max_rows 行”与“被截断”
+        （truncated = len(rows) > max_rows）；不需要区分的调用方按需切片。
+        """
         ...
 
     @abstractmethod
@@ -164,7 +188,8 @@ try:
     cur = conn.cursor()
     cur.execute("SET TRANSACTION READ ONLY")
     cur.execute(payload["sql"], payload.get("params") or {})
-    rows = cur.fetchmany(int(payload.get("max_rows") or 1000))
+    # A4：多取 1 行探针，调用方据此区分“恰好 max_rows 行”与“被截断”。
+    rows = cur.fetchmany(int(payload.get("max_rows") or 1000) + 1)
     cols = [d[0] for d in cur.description]
     print(json.dumps([
         {col: normalize(value) for col, value in zip(cols, row)}
@@ -227,8 +252,14 @@ finally:
         )
         try:
             oracledb.init_oracle_client(lib_dir=lib_dir)
-        except Exception:
-            pass  # 已初始化或路径无效，继续尝试连接
+        except Exception as exc:
+            # A8：已初始化（DPI-1047 类重复 init）或路径无效都继续尝试连接，
+            # 但路径无效此前完全静默，排查 thick 模式问题困难——记 warning 留痕。
+            logging.getLogger(__name__).warning(
+                "oracledb init_oracle_client(lib_dir=%s) failed: %s（继续尝试连接）",
+                lib_dir,
+                type(exc).__name__,
+            )
         # Bound the TCP handshake as well as statement execution. Without this,
         # an unreachable business source can hang a read-only inventory run.
         dsn = oracledb.ConnectParams(
@@ -261,7 +292,8 @@ finally:
             self._conn.call_timeout = self._timeout_ms()
             cursor.execute("SET TRANSACTION READ ONLY")
             cursor.execute(sql, params or {})
-            rows = cursor.fetchmany(safe_limit)
+            # A4：多取 1 行探针（见 DatabaseConnector.execute_readonly 契约）。
+            rows = cursor.fetchmany(safe_limit + 1)
             cols = [d[0] for d in cursor.description]
             return [dict(zip(cols, row)) for row in rows]
         finally:
@@ -312,7 +344,8 @@ finally:
             return True, "connected", elapsed
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            return False, str(e)[:200], elapsed
+            # B8：连接异常可能携带 DSN/账号/密码片段，统一走 sanitize_text 脱敏。
+            return False, sanitize_text(str(e)), elapsed
         finally:
             self.close()
 
@@ -350,7 +383,8 @@ class PostgresConnector(DatabaseConnector):
         cursor = self._conn.cursor(row_factory=psycopg.rows.dict_row)
         try:
             cursor.execute(sql, params or {})
-            return cursor.fetchmany(safe_limit)
+            # A4：多取 1 行探针（见 DatabaseConnector.execute_readonly 契约）。
+            return cursor.fetchmany(safe_limit + 1)
         finally:
             cursor.close()
 
@@ -390,7 +424,7 @@ class PostgresConnector(DatabaseConnector):
             return True, "connected", elapsed
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            return False, str(e)[:200], elapsed
+            return False, sanitize_text(str(e)), elapsed
         finally:
             self.close()
 
@@ -436,7 +470,8 @@ class MysqlConnector(DatabaseConnector):
         cursor = self._conn.cursor()
         try:
             cursor.execute(sql, params or {})
-            return cursor.fetchmany(safe_limit)
+            # A4：多取 1 行探针（见 DatabaseConnector.execute_readonly 契约）。
+            return cursor.fetchmany(safe_limit + 1)
         finally:
             cursor.close()
 
@@ -469,7 +504,7 @@ class MysqlConnector(DatabaseConnector):
             return True, "connected", elapsed
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            return False, str(e)[:200], elapsed
+            return False, sanitize_text(str(e)), elapsed
         finally:
             self.close()
 
@@ -567,12 +602,12 @@ class SqlServerConnector(DatabaseConnector):
                     pass
                 cursor.execute(sql, params or {})
             else:
-                # pymssql: only simple param tuples; prefer no named params for SELECT 1
-                if params:
-                    cursor.execute(sql, tuple(params.values()))
-                else:
-                    cursor.execute(sql)
-            rows = cursor.fetchmany(safe_limit) if hasattr(cursor, "fetchmany") else cursor.fetchall()[:safe_limit]
+                # pymssql 原生支持 dict 命名参数绑定（A1）；此前按 tuple(params.values())
+                # 插入序绑参，占位符顺序与 dict 顺序不一致时会绑错值。pyodbc 分支保持
+                # 上面的 dict 透传不变。
+                cursor.execute(sql, params or {})
+            # A4：多取 1 行探针（见 DatabaseConnector.execute_readonly 契约）。
+            rows = cursor.fetchmany(safe_limit + 1) if hasattr(cursor, "fetchmany") else cursor.fetchall()[: safe_limit + 1]
             cols = [d[0] for d in cursor.description] if cursor.description else []
             return [dict(zip(cols, row)) for row in rows]
         finally:
@@ -583,12 +618,13 @@ class SqlServerConnector(DatabaseConnector):
             self.connect()
         cursor = self._conn.cursor()
         try:
+            # A11：SQL Server 无 LIMIT，用 TOP；上限与其它连接器 5000/100000 对齐。
             cursor.execute(
-                "SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
+                "SELECT TOP 5000 TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
             )
             tables = [{"owner": r[0], "table_name": r[1]} for r in cursor.fetchall()]
             cursor.execute(
-                "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE "
+                "SELECT TOP 100000 TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE "
                 "FROM INFORMATION_SCHEMA.COLUMNS"
             )
             columns = [{
@@ -612,12 +648,8 @@ class SqlServerConnector(DatabaseConnector):
             return True, f"connected via {self._driver}", elapsed
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            msg = str(e)[:200]
-            for secret in filter(None, [self.password, self.user]):
-                if secret and secret in msg:
-                    msg = "sqlserver connectivity failed"
-                    break
-            return False, msg, elapsed
+            # B8：与其它连接器统一走 sanitize_text 脱敏路径（连接串/账号/密码模式折叠）。
+            return False, sanitize_text(str(e)), elapsed
         finally:
             self.close()
 

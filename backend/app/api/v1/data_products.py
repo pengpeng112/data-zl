@@ -7,7 +7,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user, require_permission
+from ...core.security import get_current_user, get_request_operator, require_permission, require_query_view_on_get
 from ...models.data_product import AssetDataProduct
 from ...schemas.common import ApiResponse
 from ...services.data_product_service import (
@@ -18,7 +18,13 @@ from ...services.data_product_service import (
 )
 from ...services.metric_result_import import import_all_result_csvs
 
-router = APIRouter(prefix="/api/v1/data-products", tags=["data-products"])
+
+
+router = APIRouter(
+    prefix="/api/v1/data-products",
+    tags=["data-products"],
+    dependencies=[Depends(require_query_view_on_get)],
+)
 
 
 class ProductUpsert(BaseModel):
@@ -72,7 +78,11 @@ def list_products(
     )
 
 
-@router.get("/ai/context", summary="AI 可读数据产品目录")
+@router.get(
+    "/ai/context",
+    summary="AI 可读数据产品目录",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def ai_context(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(
         select(AssetDataProduct).where(
@@ -110,11 +120,7 @@ def get_product(product_code: str, db: Session = Depends(get_db)) -> ApiResponse
     dependencies=[Depends(require_permission("query:create"))],
 )
 def create_product(req: ProductUpsert, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         data = upsert_product(db, created_by=user, **req.model_dump())
         db.commit()
@@ -130,11 +136,7 @@ def create_product(req: ProductUpsert, request: Request, db: Session = Depends(g
     dependencies=[Depends(require_permission("query:create"))],
 )
 def publish_core(request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     data = publish_core_products(db, created_by=user)
     db.commit()
     return ApiResponse(data=data)
@@ -151,11 +153,7 @@ def exec_product(
     request: Request,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         data = execute_product(
             db,
@@ -189,10 +187,5 @@ def import_results(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     user = "system"
-    try:
-        if request is not None:
-            user = get_current_user(request) or user
-    except Exception:
-        pass
     data = import_all_result_csvs(db, dry_run=dry_run, created_by=user)
     return ApiResponse(data=data)

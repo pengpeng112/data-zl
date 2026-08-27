@@ -1,0 +1,4062 @@
+{
+ "meta": {
+  "plan": "152_JHEMR病案首页回写HIS链路关系与结构梳理执行计划.md",
+  "result_file": "152_JHEMR病案首页回写HIS链路梳理_结果.json",
+  "executed_at": "2026-08-26",
+  "executor": "ZCode (GLM)",
+  "channel": "sjzc live 只读（jhemr_vastbase_10_10_8_177 / his_source_10_10_10_15）+ server_test 本机文件只读",
+  "safety": {
+   "业务源库_DML_DDL": 0,
+   "生产平台库写入": 0,
+   "server_test_文件改动": "0（执行前后 find 时间戳基线比对一致，见 e6.zero_modification_check）",
+   "dbconfig_加密串": "未解密、未复制（仅确认 3 个连接块结构）",
+   "git操作": "无 push/tag/commit",
+   "患者标识": "所有输出前2后2脱敏；无姓名/身份证/电话"
+  }
+ },
+ "chain_overview": {
+  "text": "医生在 JHEMR 填病案首页 → jhemr.pat_visit/pat_visit1/pat_diagnosis/diagnosis/operation/grave_ward_detail（现用表） ↘ 定时/触发快照（机制未知，R4） → report.r_pat_visit/r_pat_visit1/r_operation_doct/r_diagnosis_doct/r_grave_ward_detail → jhemr.v_hisshouye(67列)/v_hisshoushu(21)/v_hiszhenduan(14)/v_hisicu(6)（内嵌 CASE+字典转码） → 调用方(10.10.8.1)按 patient_id+visit_id 取 4 视图打包 JSON（键=列名大写；SHOUYE 平铺+OPERATION/DIAGNOSIS/ICU 数组） → POST http://<server_test>:9008/pbtest/api/his/basy（SATRDA ljserver2.exe，HTTP 无 TLS） → plugins/test/plugin.pbd（basy 路由）→ testdemo.pbd（写库 SQL，未带 schema 前缀，目标 owner 由 mycon2 连接用户决定= MEDREC 实测吻合） → HIS MEDREC 库：WEBSERVICE_LOG 审计入参 → pat_visit UPDATE ×2 变体 → pat_visit_extend/OPERATION/DIAGNOSIS/pat_icu_record 先 DELETE 后 INSERT(SOURCE='2') → MEDICAL_RECORD_REVIEW_TABLE 计数+登记评阅(mr_falg=1)+MR_NUMBER 回写 → 病理联动：diagnosis_type=8 查 pitaya.dbo.v_blzlst 回填病理医师/技师工号",
+  "write_sql_sha256": "82e9f32fc7790881170819cf8964769f00eea7e43d5a5251220526a1a9b57c1e（testdemo.pbd 全部写库 SQL 提取文本）",
+  "caller_ip": "10.10.8.1",
+  "cadence": "约 40–105 秒/次轮询（log20260817–0823 中间件 12729 次 POST）"
+ },
+ "e1_jhemr_live": {
+  "ddl_source": "live pg_views（Vastbase），definition 完整取回（长度逐一核对）",
+  "views": {
+   "v_hisshouye": {
+    "ddl_len": 4523,
+    "columns": 67,
+    "from": "report.r_pat_visit t LEFT JOIN jhemr.pat_diagnosis a LEFT JOIN report.r_pat_visit1 b（a 未被 SELECT 引用，疑似历史残留）"
+   },
+   "v_hisshouye1": {
+    "ddl_len": 4517,
+    "columns": 67,
+    "from": "jhemr.pat_visit t LEFT JOIN jhemr.pat_diagnosis a LEFT JOIN jhemr.pat_visit1 b（与主视图仅 FROM 不同，135 建议的改读现用表即此变体）"
+   },
+   "v_HISshouye1": {
+    "ddl_len": 4398,
+    "columns": 67,
+    "from": "同 v_hisshouye1，唯一差异 trt_type CASE 替换为常量 '1' AS tyt_type（旧版变体）",
+    "finding": "77 资产包 v_hisshouye1 记 134 列 = 本体 67 + 该混合大小写对象 67 被大小写折叠合并；其中 tyt_type 拼写差异即来自该对象。非漂移，为采集口径问题"
+   },
+   "v_hisshoushu": {
+    "ddl_len": 1523,
+    "columns": 21,
+    "from": "report.r_operation_doct c"
+   },
+   "v_hisshoushu1": {
+    "ddl_len": 776,
+    "columns": 18,
+    "from": "jhemr.operation c（少 primary_day/oper_day/oper_plan——rjss/rjcz/fjhzss 仅存快照表）"
+   },
+   "v_hiszhenduan": {
+    "ddl_len": 683,
+    "columns": 14,
+    "from": "report.r_diagnosis_doct d LEFT JOIN jhemr.pat_visit1 t"
+   },
+   "v_hiszhenduan1": {
+    "ddl_len": 556,
+    "columns": 15,
+    "from": "jhemr.diagnosis d LEFT JOIN jhemr.pat_visit1 t（多 diagnosis_code1/oper_treat_indicator1；treat_result 不转码直传 discharge_conditions）"
+   },
+   "v_hisicu": {
+    "ddl_len": 335,
+    "columns": 6,
+    "from": "report.r_grave_ward_detail e"
+   },
+   "v_hisicu1": {
+    "exists": false,
+    "finding": "活库与 77 资产包均无此对象；152 §1.2 '及 *1 变体' 对 ICU 不存在"
+   }
+  },
+  "column_diff_vs_77": {
+   "v_hisshouye/v_hisshoushu/v_hiszhenduan/v_hisicu": "列名+列数与 77 资产包完全一致（DDL 别名逐列比对 0 差异）——无漂移",
+   "v_hisshouye1": "134→67 解释见上；v_hisshoushu1(18)/v_hiszhenduan1(15) 一致",
+   "conclusion": "R3 关闭：视图较 77 采集（2026-07）无 DDL 漂移"
+  },
+  "transcode_points": {
+   "case_transcodes": [
+    "v_hisshouye.trt_type：西医→1/中医→2/中西医→3/ELSE→1（默认 1）",
+    "v_hisshouye.blood_type：A→1/B→2/O→3/AB→4/不详→5/未查→6/ELSE 原样",
+    "v_hisshouye.blood_type_rh：阴→1/阳→2/不详→3/未查→4/ELSE NULL",
+    "v_hisshouye.autopsy_indicator：否→2/是→1/ELSE NULL",
+    "v_hisshouye.plan_31_admission：有→2/ELSE→1",
+    "v_hisshouye.clinical_pathway：是→1/否→2/ELSE NULL",
+    "v_hisshouye.clinical_pathway_finish：完成→1/退出→2/ELSE NULL",
+    "v_hisshouye.clinical_pathway_variation：无→1/有→2/ELSE NULL",
+    "v_hisshouye.day_ward：sfrjbf 是→1/否→2/ELSE 原样",
+    "v_hisshouye.plan_admission：sffjhzry 是→1/否→2/ELSE 原样",
+    "v_hisshouye.tumor_stage：0期→0/Ⅰ→1/Ⅱ→2/Ⅲ→3/Ⅳ/IV→4/ELSE 原样",
+    "v_hisshoushu.anaesthesia_method：method=id 时字典 boh_name→boh_code 否则直传 id",
+    "v_hisshoushu.op_primary：operation_no=1→1 ELSE 2",
+    "v_hisshoushu.operation_emer_indicator：operation_type 1/2/3 直通 ELSE NULL",
+    "v_hisshoushu.primary_day：operation_rjss 是→1/否→0 ELSE NULL",
+    "v_hisshoushu.oper_day：operation_rjcz 是→1/否→0 ELSE NULL",
+    "v_hisshoushu.oper_plan：operation_fjhzss 是→1/否→0 ELSE NULL"
+   ],
+   "dict_references": [
+    {
+     "view": "v_hisshouye.discharge_disposition",
+     "field_name": "DISCHARGE_DISPOSITION",
+     "match": "item_value=t.discharge_disposition → item_text",
+     "dict_rows": 6,
+     "pairs_live": {
+      "医嘱离院": "1",
+      "医嘱转院": "2",
+      "医嘱转社区": "3",
+      "非医嘱离院": "4",
+      "死亡": "5",
+      "其他": "9"
+     }
+    },
+    {
+     "view": "v_hisshoushu.anaesthesia_method",
+     "field_name": "ANAESTHESIA_METHOD",
+     "match": "boh_name=c.anaesthesia_method → boh_code",
+     "dict_rows": 27
+    },
+    {
+     "view": "v_hiszhenduan.treat_result",
+     "field_name": "DISCHARGE_CONDITIONS",
+     "match": "item_value=d.discharge_conditions → item_text",
+     "dict_rows": 5,
+     "pairs_live": {
+      "治愈": "1",
+      "好转": "2",
+      "未愈": "3",
+      "死亡": "4",
+      "其他": "9"
+     }
+    },
+    {
+     "view": "v_hisicu.icu_type",
+     "field_name": "WARD_NAME_TYPE",
+     "match": "item_value=e.ward_name → item_text",
+     "dict_rows": 8,
+     "pairs_live": {
+      "内科重症监护": "MICU",
+      "外科重症监护": "SICU",
+      "冠心病重症监护": "CCU",
+      "呼吸重症监护": "RICU",
+      "急诊重症监护": "EICU",
+      "新生儿重症监护": "NICU",
+      "儿科重症监护": "PICU",
+      "其他": "QT"
+     }
+    }
+   ]
+  },
+  "snapshot_vs_current": {
+   "note": "对应关系：r_pat_visit↔jhemr.pat_visit；r_pat_visit1↔jhemr.pat_visit1；r_operation_doct↔jhemr.operation；r_diagnosis_doct↔jhemr.diagnosis（v_hiszhenduan1 直读 diagnosis 佐证）；r_grave_ward_detail↔jhemr.grave_ward_detail",
+   "rows": [
+    {
+     "snapshot": "report.r_pat_visit",
+     "snap_cnt": 81485,
+     "snap_max_time": "2026-08-24 11:28:00（discharge_date_time）",
+     "current": "jhemr.pat_visit",
+     "cur_cnt": 116829,
+     "cur_max_time": "22025-02-01（未来脏数据）",
+     "gap": "-35344"
+    },
+    {
+     "snapshot": "report.r_pat_visit1",
+     "snap_cnt": 81484,
+     "snap_max_time": "无统一时间列",
+     "current": "jhemr.pat_visit1",
+     "cur_cnt": 116163,
+     "cur_max_time": "无统一时间列",
+     "gap": "-34679"
+    },
+    {
+     "snapshot": "report.r_operation_doct",
+     "snap_cnt": 115740,
+     "snap_max_time": "2026-08-23 15:00:00（operating_date）",
+     "current": "jhemr.operation",
+     "cur_cnt": 107243,
+     "cur_max_time": "2026-08-30 10:00:00（未来脏数据）",
+     "gap": "+8497（快照多，含历史手术）"
+    },
+    {
+     "snapshot": "report.r_diagnosis_doct",
+     "snap_cnt": 540752,
+     "snap_max_time": "2026-08-26 08:33:39（diagnosis_date，今晨仍在刷新）",
+     "current": "jhemr.diagnosis",
+     "cur_cnt": 564768,
+     "cur_max_time": "2026-08-26 08:42:54",
+     "gap": "-24016"
+    },
+    {
+     "snapshot": "report.r_grave_ward_detail",
+     "snap_cnt": 1388,
+     "snap_max_time": "2026-08-19 04:20:00（enter_time）",
+     "current": "jhemr.grave_ward_detail",
+     "cur_cnt": 1190,
+     "cur_max_time": "2026-08-19 16:52:00",
+     "gap": "+198（快照含历史或未清理）"
+    }
+   ],
+   "conclusion": "快照表均在活跃刷新但滞后现用表（135 的 3.5 万分叉仍在）；R4 快照机制仍不可知，留用户问嘉和实施"
+  },
+  "full_ddls": {
+   "v_hisshouye": "SELECT DISTINCT t.patient_id, t.visit_id, CASE b.trt_type WHEN '西医'::text THEN '1'::text WHEN '中医'::text THEN '2'::text WHEN '中西医'::text THEN '3'::text ELSE '1'::text END AS trt_type, t.discharge_date_time, t.spec_level_nurs_days, t.first_level_nurs_days, t.second_level_nurs_days, t.third_level_nurs_days, CASE WHEN ((t.blood_type)::text = 'A'::text) THEN '1'::varchar WHEN ((t.blood_type)::text = 'B'::text) THEN '2'::varchar WHEN ((t.blood_type)::text = 'O'::text) THEN '3'::varchar WHEN ((t.blood_type)::text = 'AB'::text) THEN '4'::varchar WHEN ((t.blood_type)::text = '不详'::text) THEN '5'::varchar WHEN ((t.blood_type)::text = '未查'::text) THEN '6'::varchar ELSE t.blood_type END AS blood_type, CASE WHEN ((t.blood_type_rh)::text = '阴'::text) THEN '1'::text WHEN ((t.blood_type_rh)::text = '阳'::text) THEN '2'::text WHEN ((t.blood_type_rh)::text = '不详'::text) THEN '3'::text WHEN ((t.blood_type_rh)::text = '未查'::text) THEN '4'::text ELSE NULL::text END AS blood_type_rh, t.alergy_drugs, t.mr_quality, t.director_id AS director, t.attending_doctor_id AS attending_doctor, t.doctor_in_charge_id AS doctor_in_charge, (SELECT aa.item_text FROM jhemr.emr_first_page_item_dict aa WHERE (((aa.field_name)::text = 'DISCHARGE_DISPOSITION'::text) AND ((aa.item_value)::text = (t.discharge_disposition)::text))) AS discharge_disposition, t.zymc_sq AS trans_hospital, t.zyjg AS trans_community, t.chief_doctor_id AS chief_doctor, t.advanced_studies_doctor_id AS advanced_studies_doctor, t.chief_doctor_id AS practice_doctor_of_graduate, t.practice_doctor_id AS practice_doctor, t.doctor_of_control_quality_id AS doctor_of_control_quality, t.nurse_of_control_quality_id AS nurse_of_control_quality, t.date_of_control_quality, NULL::text AS treated_in_others_indicator, NULL::text AS pathology_no, t.liability_nurse_id AS duty_nurse1, b.liability_nurse_id2 AS duty_nurse2, b.liability_nurse_id3 AS duty_nurse3, b.liability_nurse_id4 AS duty_nurse4, b.liability_nurse_id5 AS duty_nurse5, b.baby_admin_weight AS baby_weight, NULL::text AS baby_height, t.work_zip AS business_zip_code, t.zymc_sq AS entrance_hospital, CASE WHEN ((t.autopsy_indicator_name)::text = '否'::text) THEN '2'::text WHEN ((t.autopsy_indicator_name)::text = '是'::text) THEN '1'::text ELSE NULL::text END AS autopsy_indicator, NULL::text AS adt_room_no, NULL::text AS ddt_room_no, b.breath_time_day AS breath_mach_times, b.first_coma_day AS coma_times_b0, b.first_coma_hour AS coma_times_b1, b.first_coma_minute AS cona_times_b2, b.back_coma_day AS coma_times_a0, b.back_coma_hour AS coma_times_a1, b.back_coma_minute AS coma_times_a2, CASE WHEN ((t.zryjh)::text = '有'::text) THEN '2'::text ELSE '1'::text END AS plan_31_admission, t.zymd AS reason_31_admission, b.baby_birth_weight AS weight_birth, NULL::text AS weight_birth2, NULL::text AS weight_birth3, NULL::text AS weight_birth4, NULL::text AS clinical_pathway_type, CASE WHEN ((b.isinclinicalpathway)::text = '是'::text) THEN '1'::text WHEN ((b.isinclinicalpathway)::text = '否'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway, CASE WHEN ((b.isfiniclinicalpathway)::text = '完成'::text) THEN '1'::text WHEN ((b.isfiniclinicalpathway)::text = '退出'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_finish, CASE WHEN ((b.is_cp_variation)::text = '无'::text) THEN '1'::text WHEN ((b.is_cp_variation)::text = '有'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_variation, b.medical_team_leader_id AS cdoctor_leader, '山东省第二人民医院'::text AS hospital_name, NULL::text AS daysurgery_indicator, b.breath_time_h AS breath_mach_time2, b.breath_time_m AS breath_mach_time3, t.cataloger_id AS cataloger, t.catalog_date, CASE WHEN ((b.sfrjbf)::text = '是'::text) THEN '1'::text WHEN ((b.sfrjbf)::text = '否'::text) THEN '2'::text ELSE (b.sfrjbf)::text END AS day_ward, CASE WHEN ((b.sffjhzry)::text = '是'::text) THEN '1'::text WHEN ((b.sffjhzry)::text = '否'::text) THEN '2'::text ELSE (b.sffjhzry)::text END AS plan_admission, t.doctor_in_charge_id AS doctor_code, CASE t.tumor_stage WHEN '0期'::text THEN (0)::varchar WHEN 'Ⅰ期'::text THEN (1)::varchar WHEN 'Ⅱ期'::text THEN (2)::varchar WHEN 'Ⅲ期'::text THEN (3)::varchar WHEN 'Ⅳ期'::text THEN (4)::varchar WHEN 'IV期'::text THEN (4)::varchar ELSE t.tumor_stage END AS tumor_stage FROM ((report.r_pat_visit t LEFT JOIN jhemr.pat_diagnosis a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (a.visit_id = t.visit_id)))) LEFT JOIN report.r_pat_visit1 b ON ((((b.patient_id)::text = (t.patient_id)::text) AND (b.visit_id = t.visit_id))));",
+   "v_hisshouye1": "SELECT DISTINCT t.patient_id, t.visit_id, CASE b.trt_type WHEN '西医'::text THEN '1'::text WHEN '中医'::text THEN '2'::text WHEN '中西医'::text THEN '3'::text ELSE '1'::text END AS trt_type, t.discharge_date_time, t.spec_level_nurs_days, t.first_level_nurs_days, t.second_level_nurs_days, t.third_level_nurs_days, CASE WHEN ((t.blood_type)::text = 'A'::text) THEN '1'::varchar WHEN ((t.blood_type)::text = 'B'::text) THEN '2'::varchar WHEN ((t.blood_type)::text = 'O'::text) THEN '3'::varchar WHEN ((t.blood_type)::text = 'AB'::text) THEN '4'::varchar WHEN ((t.blood_type)::text = '不详'::text) THEN '5'::varchar WHEN ((t.blood_type)::text = '未查'::text) THEN '6'::varchar ELSE t.blood_type END AS blood_type, CASE WHEN ((t.blood_type_rh)::text = '阴'::text) THEN '1'::text WHEN ((t.blood_type_rh)::text = '阳'::text) THEN '2'::text WHEN ((t.blood_type_rh)::text = '不详'::text) THEN '3'::text WHEN ((t.blood_type_rh)::text = '未查'::text) THEN '4'::text ELSE NULL::text END AS blood_type_rh, t.alergy_drugs, t.mr_quality, t.director_id AS director, t.attending_doctor_id AS attending_doctor, t.doctor_in_charge_id AS doctor_in_charge, (SELECT aa.item_text FROM jhemr.emr_first_page_item_dict aa WHERE (((aa.field_name)::text = 'DISCHARGE_DISPOSITION'::text) AND ((aa.item_value)::text = (t.discharge_disposition)::text))) AS discharge_disposition, t.zymc_sq AS trans_hospital, t.zyjg AS trans_community, t.chief_doctor_id AS chief_doctor, t.advanced_studies_doctor_id AS advanced_studies_doctor, t.chief_doctor_id AS practice_doctor_of_graduate, t.practice_doctor_id AS practice_doctor, t.doctor_of_control_quality_id AS doctor_of_control_quality, t.nurse_of_control_quality_id AS nurse_of_control_quality, t.date_of_control_quality, NULL::text AS treated_in_others_indicator, NULL::text AS pathology_no, t.liability_nurse_id AS duty_nurse1, b.liability_nurse_id2 AS duty_nurse2, b.liability_nurse_id3 AS duty_nurse3, b.liability_nurse_id4 AS duty_nurse4, b.liability_nurse_id5 AS duty_nurse5, b.baby_admin_weight AS baby_weight, NULL::text AS baby_height, t.work_zip AS business_zip_code, t.zymc_sq AS entrance_hospital, CASE WHEN ((t.autopsy_indicator_name)::text = '否'::text) THEN '2'::text WHEN ((t.autopsy_indicator_name)::text = '是'::text) THEN '1'::text ELSE NULL::text END AS autopsy_indicator, NULL::text AS adt_room_no, NULL::text AS ddt_room_no, b.breath_time_day AS breath_mach_times, b.first_coma_day AS coma_times_b0, b.first_coma_hour AS coma_times_b1, b.first_coma_minute AS cona_times_b2, b.back_coma_day AS coma_times_a0, b.back_coma_hour AS coma_times_a1, b.back_coma_minute AS coma_times_a2, CASE WHEN ((t.zryjh)::text = '有'::text) THEN '2'::text ELSE '1'::text END AS plan_31_admission, t.zymd AS reason_31_admission, b.baby_birth_weight AS weight_birth, NULL::text AS weight_birth2, NULL::text AS weight_birth3, NULL::text AS weight_birth4, NULL::text AS clinical_pathway_type, CASE WHEN ((b.isinclinicalpathway)::text = '是'::text) THEN '1'::text WHEN ((b.isinclinicalpathway)::text = '否'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway, CASE WHEN ((b.isfiniclinicalpathway)::text = '完成'::text) THEN '1'::text WHEN ((b.isfiniclinicalpathway)::text = '退出'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_finish, CASE WHEN ((b.is_cp_variation)::text = '无'::text) THEN '1'::text WHEN ((b.is_cp_variation)::text = '有'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_variation, b.medical_team_leader_id AS cdoctor_leader, '山东省第二人民医院'::text AS hospital_name, NULL::text AS daysurgery_indicator, b.breath_time_h AS breath_mach_time2, b.breath_time_m AS breath_mach_time3, t.cataloger_id AS cataloger, t.catalog_date, CASE WHEN ((b.sfrjbf)::text = '是'::text) THEN '1'::text WHEN ((b.sfrjbf)::text = '否'::text) THEN '2'::text ELSE (b.sfrjbf)::text END AS day_ward, CASE WHEN ((b.sffjhzry)::text = '是'::text) THEN '1'::text WHEN ((b.sffjhzry)::text = '否'::text) THEN '2'::text ELSE (b.sffjhzry)::text END AS plan_admission, t.doctor_in_charge_id AS doctor_code, CASE t.tumor_stage WHEN '0期'::text THEN (0)::varchar WHEN 'Ⅰ期'::text THEN (1)::varchar WHEN 'Ⅱ期'::text THEN (2)::varchar WHEN 'Ⅲ期'::text THEN (3)::varchar WHEN 'Ⅳ期'::text THEN (4)::varchar WHEN 'IV期'::text THEN (4)::varchar ELSE t.tumor_stage END AS tumor_stage FROM ((jhemr.pat_visit t LEFT JOIN jhemr.pat_diagnosis a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (a.visit_id = t.visit_id)))) LEFT JOIN jhemr.pat_visit1 b ON ((((b.patient_id)::text = (t.patient_id)::text) AND (b.visit_id = t.visit_id))));",
+   "v_hisshoushu": "SELECT DISTINCT c.patient_id, c.visit_id, c.display_no AS operation_no, c.operation_desc, c.operation_code, c.heal, c.wound_grade, c.operating_date, CASE WHEN ((c.anaesthesia_method)::text = (c.anaesthesia_method_id)::text) THEN (SELECT a.boh_code FROM jhemr.emr_first_page_item_dict a WHERE (((a.field_name)::text = 'ANAESTHESIA_METHOD'::text) AND ((a.boh_name)::text = (c.anaesthesia_method)::text))) ELSE c.anaesthesia_method_id END AS anaesthesia_method, c.operator_id AS operator, c.first_assistant_id AS first_assistant, c.second_assistant_id AS second_assistant, c.anesthesia_doctor_id AS anesthesia_doctor, NULL::text AS operation_nurse, NULL::text AS opeype_primary, CASE WHEN (c.operation_no = (1)::numeric) THEN '1'::text ELSE '2'::text END AS op_primary, CASE WHEN ((c.operation_type)::text = '1'::text) THEN '1'::text WHEN ((c.operation_type)::text = '2'::text) THEN '2'::text WHEN ((c.operation_type)::text = '3'::text) THEN '3'::text ELSE NULL::text END AS operation_emer_indicator, c.operation_scale, CASE WHEN ((c.operation_rjss)::text = '是'::text) THEN '1'::text WHEN ((c.operation_rjss)::text = '否'::text) THEN '0'::text ELSE NULL::text END AS primary_day, CASE WHEN ((c.operation_rjcz)::text = '是'::text) THEN '1'::text WHEN ((c.operation_rjcz)::text = '否'::text) THEN '0'::text ELSE NULL::text END AS oper_day, CASE WHEN ((c.operation_fjhzss)::text = '是'::text) THEN '1'::text WHEN ((c.operation_fjhzss)::text = '否'::text) THEN '0'::text ELSE NULL::text END AS oper_plan FROM report.r_operation_doct c;",
+   "v_hisshoushu1": "SELECT DISTINCT c.patient_id, c.visit_id, c.display_no AS operation_no, c.operation_desc, c.operation_code, c.heal, c.wound_grade, c.operating_date, c.anaesthesia_method_id AS anaesthesia_method, c.operator_id AS operator, c.first_assistant_id AS first_assistant, c.second_assistant_id AS second_assistant, c.anesthesia_doctor_id AS anesthesia_doctor, NULL::text AS operation_nurse, NULL::text AS opeype_primary, CASE WHEN (c.operation_no = (1)::numeric) THEN '1'::text ELSE '2'::text END AS op_primary, CASE WHEN ((c.operation_type)::text = '1'::text) THEN '1'::text WHEN ((c.operation_type)::text = '2'::text) THEN '2'::text WHEN ((c.operation_type)::text = '3'::text) THEN '3'::text ELSE NULL::text END AS operation_emer_indicator, c.operation_scale FROM jhemr.operation c;",
+   "v_hiszhenduan": "SELECT DISTINCT d.patient_id, d.visit_id, d.diagnosis_type, d.diagnosis_no, d.diagnosis_desc, d.diagnosis_date, d.bl_check_no AS pathology_no, NULL::text AS treat_days, (SELECT aa.item_text FROM jhemr.emr_first_page_item_dict aa WHERE (((aa.field_name)::text = 'DISCHARGE_CONDITIONS'::text) AND ((aa.item_value)::text = (d.discharge_conditions)::text))) AS treat_result, NULL::text AS oper_treat_indicator, d.diagnosis_code, NULL::text AS insert_indicator, d.oper_treat_indicator1_id AS admission_condition, NULL::text AS diagnosis_code2 FROM (report.r_diagnosis_doct d LEFT JOIN jhemr.pat_visit1 t ON ((((t.patient_id)::text = (d.patient_id)::text) AND (t.visit_id = d.visit_id))));",
+   "v_hiszhenduan1": "SELECT DISTINCT d.patient_id, d.visit_id, d.diagnosis_type, d.diagnosis_no, d.diagnosis_name AS diagnosis_desc, d.diagnosis_date, d.bl_check_no AS pathology_no, NULL::text AS treat_days, t.discharge_conditions AS treat_result, NULL::text AS oper_treat_indicator, d.diagnosis_code, NULL::text AS insert_indicator, d.oper_treat_indicator1, NULL::text AS diagnosis_code1, d.oper_treat_indicator1_id AS admission_condition FROM (jhemr.diagnosis d LEFT JOIN jhemr.pat_visit1 t ON ((((t.patient_id)::text = (d.patient_id)::text) AND (t.visit_id = d.visit_id))));",
+   "v_hisicu": "SELECT e.patient_id, e.visit_id, (SELECT aa.item_text FROM jhemr.emr_first_page_item_dict aa WHERE (((aa.field_name)::text = 'WARD_NAME_TYPE'::text) AND ((aa.item_value)::text = (e.ward_name)::text))) AS icu_type, e.enter_time AS into_icu_date, e.exit_time AS out_icu_date, e.cumulative_time AS hours FROM report.r_grave_ward_detail e;",
+   "v_HISshouye1": "SELECT DISTINCT t.patient_id, t.visit_id, '1'::text AS tyt_type, t.discharge_date_time, t.spec_level_nurs_days, t.first_level_nurs_days, t.second_level_nurs_days, t.third_level_nurs_days, CASE WHEN ((t.blood_type)::text = 'A'::text) THEN '1'::varchar WHEN ((t.blood_type)::text = 'B'::text) THEN '2'::varchar WHEN ((t.blood_type)::text = 'O'::text) THEN '3'::varchar WHEN ((t.blood_type)::text = 'AB'::text) THEN '4'::varchar WHEN ((t.blood_type)::text = '不详'::text) THEN '5'::varchar WHEN ((t.blood_type)::text = '未查'::text) THEN '6'::varchar ELSE t.blood_type END AS blood_type, CASE WHEN ((t.blood_type_rh)::text = '阴'::text) THEN '1'::text WHEN ((t.blood_type_rh)::text = '阳'::text) THEN '2'::text WHEN ((t.blood_type_rh)::text = '不详'::text) THEN '3'::text WHEN ((t.blood_type_rh)::text = '未查'::text) THEN '4'::text ELSE NULL::text END AS blood_type_rh, t.alergy_drugs, t.mr_quality, t.director_id AS director, t.attending_doctor_id AS attending_doctor, t.doctor_in_charge_id AS doctor_in_charge, (SELECT aa.item_text FROM jhemr.emr_first_page_item_dict aa WHERE (((aa.field_name)::text = 'DISCHARGE_DISPOSITION'::text) AND ((aa.item_value)::text = (t.discharge_disposition)::text))) AS discharge_disposition, t.zymc_sq AS trans_hospital, t.zyjg AS trans_community, t.chief_doctor_id AS chief_doctor, t.advanced_studies_doctor_id AS advanced_studies_doctor, t.chief_doctor_id AS practice_doctor_of_graduate, t.practice_doctor_id AS practice_doctor, t.doctor_of_control_quality_id AS doctor_of_control_quality, t.nurse_of_control_quality_id AS nurse_of_control_quality, t.date_of_control_quality, NULL::text AS treated_in_others_indicator, NULL::text AS pathology_no, t.liability_nurse_id AS duty_nurse1, b.liability_nurse_id2 AS duty_nurse2, b.liability_nurse_id3 AS duty_nurse3, b.liability_nurse_id4 AS duty_nurse4, b.liability_nurse_id5 AS duty_nurse5, b.baby_admin_weight AS baby_weight, NULL::text AS baby_height, t.work_zip AS business_zip_code, t.zymc_sq AS entrance_hospital, CASE WHEN ((t.autopsy_indicator_name)::text = '否'::text) THEN '2'::text WHEN ((t.autopsy_indicator_name)::text = '是'::text) THEN '1'::text ELSE NULL::text END AS autopsy_indicator, NULL::text AS adt_room_no, NULL::text AS ddt_room_no, b.breath_time_day AS breath_mach_times, b.first_coma_day AS coma_times_b0, b.first_coma_hour AS coma_times_b1, b.first_coma_minute AS cona_times_b2, b.back_coma_day AS coma_times_a0, b.back_coma_hour AS coma_times_a1, b.back_coma_minute AS coma_times_a2, CASE WHEN ((t.zryjh)::text = '有'::text) THEN '2'::text ELSE '1'::text END AS plan_31_admission, t.zymd AS reason_31_admission, b.baby_birth_weight AS weight_birth, NULL::text AS weight_birth2, NULL::text AS weight_birth3, NULL::text AS weight_birth4, NULL::text AS clinical_pathway_type, CASE WHEN ((b.isinclinicalpathway)::text = '是'::text) THEN '1'::text WHEN ((b.isinclinicalpathway)::text = '否'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway, CASE WHEN ((b.isfiniclinicalpathway)::text = '完成'::text) THEN '1'::text WHEN ((b.isfiniclinicalpathway)::text = '退出'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_finish, CASE WHEN ((b.is_cp_variation)::text = '无'::text) THEN '1'::text WHEN ((b.is_cp_variation)::text = '有'::text) THEN '2'::text ELSE NULL::text END AS clinical_pathway_variation, b.medical_team_leader_id AS cdoctor_leader, '山东省第二人民医院'::text AS hospital_name, NULL::text AS daysurgery_indicator, b.breath_time_h AS breath_mach_time2, b.breath_time_m AS breath_mach_time3, t.cataloger_id AS cataloger, t.catalog_date, CASE WHEN ((b.sfrjbf)::text = '是'::text) THEN '1'::text WHEN ((b.sfrjbf)::text = '否'::text) THEN '2'::text ELSE (b.sfrjbf)::text END AS day_ward, CASE WHEN ((b.sffjhzry)::text = '是'::text) THEN '1'::text WHEN ((b.sffjhzry)::text = '否'::text) THEN '2'::text ELSE (b.sffjhzry)::text END AS plan_admission, t.doctor_in_charge_id AS doctor_code, CASE t.tumor_stage WHEN '0期'::text THEN (0)::varchar WHEN 'Ⅰ期'::text THEN (1)::varchar WHEN 'Ⅱ期'::text THEN (2)::varchar WHEN 'Ⅲ期'::text THEN (3)::varchar WHEN 'Ⅳ期'::text THEN (4)::varchar WHEN 'IV期'::text THEN (4)::varchar ELSE t.tumor_stage END AS tumor_stage FROM ((jhemr.pat_visit t LEFT JOIN jhemr.pat_diagnosis a ON ((((a.patient_id)::text = (t.patient_id)::text) AND (a.visit_id = t.visit_id)))) LEFT JOIN jhemr.pat_visit1 b ON ((((b.patient_id)::text = (t.patient_id)::text) AND (b.visit_id = t.visit_id))));"
+  }
+ },
+ "e2_server_test_static": {
+  "path": "d:/Users/Administrator/Desktop/嘉和/老his/server_test（只读勘察）",
+  "endpoint_census": {
+   "middleware_logs_log20260817_0823": {
+    "POST /pbtest/api/his/basy": 12729,
+    "GET /pbtest/api/his/basy": 1,
+    "non-200": 0,
+    "per_day": {
+     "0817": 1877,
+     "0818": 1917,
+     "0819": 1889,
+     "0820": 1902,
+     "0821": 1852,
+     "0822": 1634,
+     "0823": 1658
+    }
+   },
+   "app_logs_20260805_0824": {
+    "api/his/basy 提及": 70280,
+    "去重调用数": 35139,
+    "响应200成功": 3776,
+    "响应500失败": 31363,
+    "失败原因唯一": "不是标准的json串：\"{}\"（空载荷轮询）",
+    "唯一端点": "全部日志 100% 为 api/his/basy，无其他 his 端点"
+   },
+   "correction_to_152": "152 §1.3 '7046 次 POST' 为初勘估算，实测 12729（7 天）——更新依据：逐文件 grep Started POST 计数",
+   "caller": "10.10.8.1（回写调用方；成功≈188 次/天）"
+  },
+  "payload_structure": "顶层 SHOUYE 字段平铺（≈67 键=视图列名大写，另含 ALLERGY_HISTORY 等少量额外键）+ OPERATION[]（21 键）+ DIAGNOSIS[] + ICU[]；样例取自 log/24.log 成功调用（值全部脱敏未留存）",
+  "config_review": {
+   "config/config": "Port 9008 / HTTP / Log=1 / service satrda",
+   "config/dbconfig": "3 个连接块（mycon1/mycon2/mycon3），mycon2 为实际业务连接（加密串未解密未复制）——R2：目标 owner 由该连接用户决定，E3 实测全部落在 MEDREC",
+   "restful.cfg/session.cfg": "mycon1 出厂示例（IsStoped=true）；session cookie 3600s——无其他 his 端点",
+   "plugins/config.cfg": "10 条插件路由（webui/dnet/dtest/erp/java/js/pb125/pbtest/wx），日志零流量，业务仅 /pbtest/**"
+  },
+  "write_sql_full": [
+   "INSERT INTO WEBSERVICE_LOG ( OPER_ID , OPER_DATE , OPER_SOURCE , MACHINE_ID , OPER_XML , MEMO , START_TIME ) VALUES ( '2' , sysdate , '病案首页回传' , '' , ' ' , '入参' , sysdate )",
+   "DELETE FROM operation WHERE PATIENT_ID =' ' and visit_id =0",
+   "DELETE FROM diagnosis WHERE PATIENT_ID =' ' and visit_id =0 and diagnosis_type not in ( '2' )",
+   "delete from pat_visit_extend WHERE PATIENT_ID =' ' and visit_id =0",
+   "select count ( *) from pat_visit a where a.patient_id =' ' and a.visit_id =0",
+   "update pat_visit a SET a.spec_level_nurs_days =0 , a.first_level_nurs_days =0 , a.second_level_nurs_days =0 , a.third_level_nurs_days =0 , a.blood_type =' ' , a.blood_type_rh =' ' , a.alergy_drugs =' ' , a.mr_quality =' ' , a.director =' ' , a.attending_doctor =' ' , a.doctor_in_charge =' ' , a.discharge_disposition =' ' , a.advanced_studies_doctor =' ' , a.practice_doctor_of_graduate =' ' , a.practice_doctor =' ' , a.doctor_of_control_quality =' ' , a.nurse_of_control_quality =' ' , a.pathology_no =' ' , a.duty_nurse =' ' , a.business_zip_code =' ' , a.entrance_hospital =' ' , a.autopsy_indicator =' ' , a.adt_room_no =' ' , a.ddt_room_no =' ' , a.daysurgery_indicator =0 , a.BREATH_MACH_TIMES =0 , a.breath_mach_time2 =0 , a.breath_mach_time3 =0 , a.date_of_control_quality ='2026-05-11' , a.body_weight =0 , a.body_height =0 , a.coma_times_b1 =0 , a.coma_times_b2 =0 , a.coma_times_a1 =0 , a.coma_times_a2 =0 , a.plan_31_admission =' ' , a.reason_31_admission =' ' , a.weight_birth =0 , a.clinical_pathway_type =' ' , a.clinical_pathway =' ' , a.clinical_pathway_finish =0 , a.clinical_pathway_variation =' ' , a.cdoctor_leader =' ' , a.hospital_name =' ' , a.TRANS_HOSPITAL =' ' , a.TRANS_COMMUNITY =' ' , WEIGHT_BIRTH2 =0 , WEIGHT_BIRTH3 =0 , WEIGHT_BIRTH4 =0 , COMA_TIMES_B0 =0 , COMA_TIMES_A0 =0 , cataloger =' ' , catalog_date ='2026-05-11 16:49:34.075' , CHIEF_DOCTOR =' ' , TUMOR_STAGE =' ' WHERE a.patient_id =' ' AND a.visit_id =0",
+   "insert into pat_visit_extend ( PATIENT_ID , VISIT_ID , PLAN_ADMISSION , DAY_WARD , DUTY_NURSE1 , DUTY_NURSE2 , DUTY_NURSE3 , DUTY_NURSE4 , DUTY_NURSE5 ) VALUES ( ' ' , 0 , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' )",
+   "select anaesthesia_name from anaesthesia_dict where anaesthesia_code =' '",
+   "INSERT INTO OPERATION ( PATIENT_ID , VISIT_ID , OPERATION_NO , OPERATION_DESC , OPERATION_CODE , HEAL , WOUND_GRADE , OPERATING_DATE , ANAESTHESIA_METHOD , OPERATOR , first_assistant , second_assistant , anesthesia_doctor , OPERATION_NURSE , OPTYPE_PRIMARY , OP_PRIMARY , operation_scale , OPERATING_END_DATE , OPERATION_EMER_INDICATOR , SOURCE , primary_day , oper_day , oper_plan ) VALUES ( ' ' , 0 , 0 , ' ' , ' ' , ' ' , ' ' , '2026-05-11 16:49:34.075' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , '2026-05-11 16:49:34.075' , ' ' , '2' , ' ' , ' ' , ' ' )",
+   "INSERT INTO DIAGNOSIS ( PATIENT_ID , VISIT_ID , DIAGNOSIS_TYPE , DIAGNOSIS_NO , DIAGNOSIS_DESC , DIAGNOSIS_DATE , TREAT_DAYS , TREAT_RESULT , OPER_TREAT_INDICATOR , DIAGNOSIS_CODE , DIAGNOSIS_CODE2 , ADMISSION_CONDITION , SOURCE , doctor_code , pathology_no ) VALUES ( ' ' , 0 , ' ' , 0 , ' ' , '2026-05-11 16:49:34.075' , 0 , ' ' , ' ' , ' ' , ' ' , ' ' , '2' , ' ' , ' ' )",
+   "DELETE FROM pat_icu_record WHERE PATIENT_ID =' ' and visit_id =0",
+   "INSERT INTO pat_icu_record ( patient_id , visit_id , icu_no , icu_type , into_icu_date , out_icu_date , hours ) VALUES ( ' ' , 0 , 0 , ' ' , '2026-05-11 16:49:34.075' , '2026-05-11 16:49:34.075' , 0 )",
+   "select nvl ( count ( *) , 0 ) , MR_NUMBER from MEDICAL_RECORD_REVIEW_TABLE where patient_id =' ' and visit_id =0 group by MR_NUMBER",
+   "insert into MEDICAL_RECORD_REVIEW_TABLE ( patient_id , visit_id , mr_falg , MR_NUMBER , mr_alter_user , MR_ALTER_DATE ) values ( ' ' , 0 , 1 , 1 , '病历回写' , sysdate )",
+   "update MEDICAL_RECORD_REVIEW_TABLE set MR_NUMBER =0 , MR_UPDATE_DATE =sysdate where patient_id =' ' and visit_id =0",
+   "select 病理医师工号 , 病理技师工号 from pitaya.dbo.v_blzlst where 患者ID =' ' and 住院次数 =0 and 病理号 =' '",
+   "update diagnosis set doctor_code =' ' , technician_code =' ' where patient_id =' ' and visit_id =0 and pathology_no =' ' and diagnosis_type ='8'",
+   "update pat_visit a SET a.patient_class =' ' , a.pat_adm_condition =' ' , a.spec_level_nurs_days =0 , a.first_level_nurs_days =0 , a.second_level_nurs_days =0 , a.third_level_nurs_days =0 , a.blood_type =' ' , a.blood_type_rh =' ' , a.alergy_drugs =' ' , a.mr_quality =' ' , a.director =' ' , a.attending_doctor =' ' , a.doctor_in_charge =' ' , a.discharge_disposition =' ' , a.chief_doctor =' ' , a.advanced_studies_doctor =' ' , a.practice_doctor_of_graduate =' ' , a.practice_doctor =' ' , a.doctor_of_control_quality =' ' , a.nurse_of_control_quality =' ' , a.treated_in_others_indicator =' ' , a.pathology_no =' ' , a.duty_nurse =' ' , a.business_zip_code =' ' , a.entrance_hospital =' ' , a.autopsy_indicator =' ' , a.adt_room_no =' ' , a.ddt_room_no =' ' , a.pat_street_address =' ' , a.daysurgery_indicator =0 , a.breath_mach_time2 =0 , a.breath_mach_time3 =0 , a.date_of_control_quality =' ' , a.body_weight =0 , a.body_height =0 , a.coma_times_b1 =0 , a.coma_times_b2 =0 , a.coma_times_a1 =0 , a.coma_times_a2 =0 , a.plan_31_admission =' ' , a.reason_31_admission =' ' , a.patient_area_address =' ' , a.weight_birth =0 , a.clinical_pathway_type =' ' , a.clinical_pathway =' ' , a.clinical_pathway_finish =0 , a.clinical_pathway_variation =' ' , a.cdoctor_leader =' ' , a.hospital_name =' ' WHERE a.patient_id =' ' AND a.visit_id =0",
+   "INSERT INTO OPERATION ( PATIENT_ID , VISIT_ID , OPERATION_NO , OPERATION_DESC , OPERATION_CODE , HEAL , WOUND_GRADE , OPERATING_DATE , ANAESTHESIA_METHOD , OPERATOR , first_assistant , second_assistant , anesthesia_doctor , OPERATION_NURSE , OPTYPE_PRIMARY , OP_PRIMARY , operation_scale , OPERATING_END_DATE , OPERATION_EMER_INDICATOR ) VALUES ( ' ' , 0 , 0 , ' ' , ' ' , ' ' , ' ' , '2026-05-11 16:49:34.122' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , '2026-05-11 16:49:34.122' , ' ' )",
+   "INSERT INTO DIAGNOSIS ( PATIENT_ID , VISIT_ID , DIAGNOSIS_TYPE , DIAGNOSIS_NO , DIAGNOSIS_DESC , DIAGNOSIS_DATE , TREAT_DAYS , TREAT_RESULT , OPER_TREAT_INDICATOR , DIAGNOSIS_CODE , DIAGNOSIS_CODE2 , ADMISSION_CONDITION ) VALUES ( ' ' , 0 , ' ' , 0 , ' ' , '2026-05-11 16:49:34.122' , 0 , ' ' , ' ' , ' ' , ' ' , ' ' )",
+   "INSERT INTO pat_icu_record ( patient_id , visit_id , icu_no , icu_type , into_icu_date , out_icu_date , hours ) VALUES ( ' ' , 0 , 0 , ' ' , '2026-05-11 16:49:34.122' , '2026-05-11 16:49:34.122' , 0 )",
+   "select *\n\n   from diagnosis a\n\n  where a.pathology_no is not null\n\n    and a.doctor_code is null\n\nand diagnosis_type='8'\n\nand (patient_id,visit_id) in(select patient_id,visit_id from pat_visit where discharge_date_time>=trunc(sysdate-60))"
+  ],
+  "write_sql_findings": {
+   "update_pat_visit_complete": "两条全字段 UPDATE 完整 SET 清单已抽全（1450/1341 字符，无截断）：#5（新代，含 tumor_stage/cataloger/catalog_date/TRANS_*/WEIGHT_BIRTH2-4/COMA_TIMES_B0A0/CHIEF_DOCTOR）与 #17（旧代，含 patient_class/pat_adm_condition/pat_street_address/patient_area_address/treated_in_others_indicator）",
+   "discharge_disposition_confirmed": "两条 UPDATE SET 均含 a.discharge_disposition —— 152 §1.4 遗留问号闭合：离院方式确实被回写",
+   "correction_to_152_1_4": "初勘记 'UPDATE ×2（一条仅护理天数）' 不成立：实为两代全字段 UPDATE（同一 PBD 内共存，构建时间戳 .075/.122 相邻 47ms，疑新旧代码路径并存）；护理天数仅是 SET 清单前 4 列",
+   "extra_discoveries": [
+    "WEBSERVICE_LOG 审计：每次回写前 INSERT 入参（OPER_SOURCE='病案首页回传'，MEMO='入参'）——HIS 侧存在回写审计留痕",
+    "病理联动：SELECT 病理医师工号,病理技师工号 FROM pitaya.dbo.v_blzlst（病理系统 SQLServer）→ UPDATE diagnosis SET doctor_code/technician_code WHERE diagnosis_type='8'",
+    "触发查询：近 60 天出院且 pathology_no 非空且 doctor_code 为空的 type 8 诊断为病理回填候选集",
+    "diagnosis DELETE 保留 diagnosis_type NOT IN ('2') 之外——即类型 2 不删除（疑 HIS 侧门诊诊断保护）",
+    "MEDICAL_RECORD_REVIEW_TABLE：计数 SELECT → INSERT mr_falg=1（mr_alter_user='病历回写'）→ UPDATE MR_NUMBER——回写后登记病案评阅任务"
+   ]
+  },
+  "relation_parse": "sql-relation-intake 确定性解析器（extract_sql_relations.py）对 22 条写库 SQL 输出：8 表、0 JOIN 候选（写路径无 JOIN，符合预期）；关系按写路径血缘手工分级（见 e6.relation_candidates）"
+ },
+ "e3_his_live": {
+  "owner_confirmation": "6 张目标表在 all_tables 中均仅存在于 MEDREC owner（无同名歧义）——R2 关闭：mycon2 连接用户= MEDREC 体系",
+  "table_stats": [
+   {
+    "table": "MEDREC.PAT_VISIT",
+    "num_rows_stats": 584993,
+    "columns": 268,
+    "last_analyzed": "2026-08-25"
+   },
+   {
+    "table": "MEDREC.PAT_VISIT_EXTEND",
+    "num_rows_stats": 37906,
+    "columns": 9,
+    "last_analyzed": "2026-08-19"
+   },
+   {
+    "table": "MEDREC.OPERATION",
+    "num_rows_stats": 527828,
+    "columns": 31,
+    "last_analyzed": "2026-06-29"
+   },
+   {
+    "table": "MEDREC.DIAGNOSIS",
+    "num_rows_stats": 3411768,
+    "columns": 23,
+    "last_analyzed": "2026-08-14"
+   },
+   {
+    "table": "MEDREC.PAT_ICU_RECORD",
+    "num_rows_stats": 4852,
+    "columns": 7,
+    "last_analyzed": "2026-07-29"
+   },
+   {
+    "table": "MEDREC.MEDICAL_RECORD_REVIEW_TABLE",
+    "num_rows_stats": 285494,
+    "columns": 10,
+    "last_analyzed": "2026-03-24"
+   }
+  ],
+  "column_existence_check": "写库 SQL 引用的全部 124 个目标列（PAT_VISIT 62 + EXTEND 9 + OPERATION 23 + DIAGNOSIS 16 + ICU 7 + REVIEW 7）逐列核对 all_tab_columns 全部存在，0 缺失",
+  "aggregates": {
+   "operation_source": {
+    "NULL（HIS 原生）": 428083,
+    "'2'（本回写）": 115394,
+    "note": "SOURCE='2' 行数 115394 ≈ report.r_operation_doct 115740（差 346），且 max(operating_date)=2026-08-23 与快照最大时间一致——SOURCE=2 即本回写写入，链路活跃"
+   },
+   "pat_icu_record": {
+    "total_live_count": 4948,
+    "last30d_into_icu": 50,
+    "max_into": "2026-08-19 04:20:00",
+    "max_out": "2026-08-22 14:16:00",
+    "note": "stats 4852 → live 4948，近 30 天 50 条新增，回写持续"
+   },
+   "pat_visit_extend_plan_admission": {
+    "total": 38932,
+    "distribution": {
+     "2": 38932
+    },
+    "note": "135 结论复核成立：全表仍无一个 '1'（较 2026-08-19 的 37670 新增 1262 行仍全 2）"
+   },
+   "diagnosis_source_sample": "抽样 5 患者诊断行见 SOURCE 三态：'1'（另一写入方）/ '2'（本回写）/ NULL（HIS 原生）；SOURCE=2 行 TREAT_RESULT 实存 '2'/'9'（JHEMR DISCHARGE_CONDITIONS 产码）"
+  },
+  "sample_reconciliation": {
+   "method": "v_hisshouye 取 discharge_date_time>=2026-08-20 最近 5 键 → HIS 同键 MEDREC.PAT_VISIT/PAT_VISIT_EXTEND 字段级比对（患者标识前2后2脱敏）",
+   "rows": [
+    {
+     "pid_masked": "c0****99",
+     "visit_id": "1",
+     "jhemr_view": {
+      "trt_type": "1",
+      "discharge_date_time": "2026-08-24 11:28:00",
+      "nurs_days": [
+       "None",
+       "None",
+       "6",
+       "None"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "plan_admission": "2",
+      "day_ward": "2",
+      "tumor_stage": "None",
+      "clinical_pathway": "2",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit": {
+      "discharge_date_time": "2026-08-24 11:28:22",
+      "nurs_days": [
+       "None",
+       "None",
+       "None",
+       "None"
+      ],
+      "blood_type": "None",
+      "blood_type_rh": "None",
+      "discharge_disposition": "None",
+      "tumor_stage": "None",
+      "clinical_pathway": "None",
+      "plan_31_admission": "None",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit_extend": "NO_ROW（尚未回写）",
+     "verdict": "NOT_WRITTEN_BACK（HIS 首页字段全 NULL、无 EXTEND 行）"
+    },
+    {
+     "pid_masked": "c1****69",
+     "visit_id": "1",
+     "jhemr_view": {
+      "trt_type": "1",
+      "discharge_date_time": "2026-08-24 11:15:00",
+      "nurs_days": [
+       "None",
+       "None",
+       "8",
+       "None"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "plan_admission": "2",
+      "day_ward": "2",
+      "tumor_stage": "None",
+      "clinical_pathway": "1",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit": {
+      "discharge_date_time": "2026-08-24 11:15:02",
+      "nurs_days": [
+       "0",
+       "0",
+       "8",
+       "0"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "tumor_stage": "None",
+      "clinical_pathway": "1",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit_extend": {
+      "PID": "c1****69",
+      "VISIT_ID": "1",
+      "PA": "2",
+      "DW": "2",
+      "DN1": "000578",
+      "DN2": "None"
+     },
+     "verdict": "WRITTEN_BACK 全部比对字段一致（空值→0/2 默认写入痕迹见 nurs_days）"
+    },
+    {
+     "pid_masked": "c1****54",
+     "visit_id": "3",
+     "jhemr_view": {
+      "trt_type": "1",
+      "discharge_date_time": "2026-08-24 10:57:00",
+      "nurs_days": [
+       "None",
+       "None",
+       "16",
+       "None"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "plan_admission": "2",
+      "day_ward": "2",
+      "tumor_stage": "None",
+      "clinical_pathway": "2",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit": {
+      "discharge_date_time": "2026-08-24 10:57:52",
+      "nurs_days": [
+       "None",
+       "None",
+       "None",
+       "None"
+      ],
+      "blood_type": "None",
+      "blood_type_rh": "None",
+      "discharge_disposition": "None",
+      "tumor_stage": "None",
+      "clinical_pathway": "None",
+      "plan_31_admission": "None",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit_extend": "NO_ROW（尚未回写）",
+     "verdict": "NOT_WRITTEN_BACK（HIS 首页字段全 NULL、无 EXTEND 行）"
+    },
+    {
+     "pid_masked": "c1****76",
+     "visit_id": "1",
+     "jhemr_view": {
+      "trt_type": "1",
+      "discharge_date_time": "2026-08-24 10:57:00",
+      "nurs_days": [
+       "None",
+       "7",
+       "None",
+       "None"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "plan_admission": "2",
+      "day_ward": "2",
+      "tumor_stage": "None",
+      "clinical_pathway": "1",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit": {
+      "discharge_date_time": "2026-08-24 10:57:45",
+      "nurs_days": [
+       "0",
+       "7",
+       "0",
+       "0"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "tumor_stage": "None",
+      "clinical_pathway": "1",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit_extend": {
+      "PID": "c1****76",
+      "VISIT_ID": "1",
+      "PA": "2",
+      "DW": "2",
+      "DN1": "000332",
+      "DN2": "None"
+     },
+     "verdict": "WRITTEN_BACK 全部比对字段一致（空值→0/2 默认写入痕迹见 nurs_days）"
+    },
+    {
+     "pid_masked": "c0****81",
+     "visit_id": "2",
+     "jhemr_view": {
+      "trt_type": "1",
+      "discharge_date_time": "2026-08-24 10:45:00",
+      "nurs_days": [
+       "None",
+       "None",
+       "7",
+       "None"
+      ],
+      "blood_type": "6",
+      "blood_type_rh": "4",
+      "discharge_disposition": "1",
+      "plan_admission": "2",
+      "day_ward": "2",
+      "tumor_stage": "None",
+      "clinical_pathway": "2",
+      "plan_31_admission": "1",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit": {
+      "discharge_date_time": "2026-08-24 10:45:39",
+      "nurs_days": [
+       "None",
+       "None",
+       "None",
+       "None"
+      ],
+      "blood_type": "None",
+      "blood_type_rh": "None",
+      "discharge_disposition": "None",
+      "tumor_stage": "None",
+      "clinical_pathway": "None",
+      "plan_31_admission": "None",
+      "autopsy_indicator": "None"
+     },
+     "his_pat_visit_extend": "NO_ROW（尚未回写）",
+     "verdict": "NOT_WRITTEN_BACK（HIS 首页字段全 NULL、无 EXTEND 行）"
+    }
+   ],
+   "conclusion": "5 键中 2 键已完成回写且比对字段全一致（nurs_days 空→0 痕迹可见=空值默认写入问题实证）；3 键 HIS 首页字段全 NULL 且无 EXTEND 行=当日出院尚未回写（回写滞后/触发条件未满足，与 500 空轮询并存说明调用持续但按条件触发实际写）",
+   "minor_note": "视图 discharge_date_time 分钟截断（快照侧 11:28:00 vs HIS 原生 11:28:22）——快照同步精度差异，非回写问题"
+  },
+  "target_columns_full": {
+   "PAT_VISIT": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "DEPT_ADMISSION_TO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "ADMISSION_DATE_TIME",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "DEPT_DISCHARGE_FROM",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "DISCHARGE_DATE_TIME",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "OCCUPATION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "30",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "8",
+     "COLUMN_NAME": "MARITAL_STATUS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "9",
+     "COLUMN_NAME": "IDENTITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "10",
+     "COLUMN_NAME": "ARMED_SERVICES",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "11",
+     "COLUMN_NAME": "DUTY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "19",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "12",
+     "COLUMN_NAME": "TOP_UNIT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "13",
+     "COLUMN_NAME": "SERVICE_SYSTEM_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "14",
+     "COLUMN_NAME": "UNIT_IN_CONTRACT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "11",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "15",
+     "COLUMN_NAME": "CHARGE_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "16",
+     "COLUMN_NAME": "WORKING_STATUS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "17",
+     "COLUMN_NAME": "INSURANCE_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "18",
+     "COLUMN_NAME": "INSURANCE_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "18",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "19",
+     "COLUMN_NAME": "SERVICE_AGENCY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "20",
+     "COLUMN_NAME": "MAILING_ADDRESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "21",
+     "COLUMN_NAME": "ZIP_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "6",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "22",
+     "COLUMN_NAME": "NEXT_OF_KIN",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "23",
+     "COLUMN_NAME": "RELATIONSHIP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "24",
+     "COLUMN_NAME": "NEXT_OF_KIN_ADDR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "85",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "25",
+     "COLUMN_NAME": "NEXT_OF_KIN_ZIPCODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "6",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "26",
+     "COLUMN_NAME": "NEXT_OF_KIN_PHONE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "27",
+     "COLUMN_NAME": "PATIENT_CLASS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "28",
+     "COLUMN_NAME": "ADMISSION_CAUSE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "29",
+     "COLUMN_NAME": "CONSULTING_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "30",
+     "COLUMN_NAME": "PAT_ADM_CONDITION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "31",
+     "COLUMN_NAME": "CONSULTING_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "32",
+     "COLUMN_NAME": "ADMITTED_BY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "33",
+     "COLUMN_NAME": "EMER_TREAT_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "34",
+     "COLUMN_NAME": "ESC_EMER_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "35",
+     "COLUMN_NAME": "SERIOUS_COND_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "36",
+     "COLUMN_NAME": "CRITICAL_COND_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "37",
+     "COLUMN_NAME": "ICU_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "38",
+     "COLUMN_NAME": "CCU_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "39",
+     "COLUMN_NAME": "SPEC_LEVEL_NURS_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "40",
+     "COLUMN_NAME": "FIRST_LEVEL_NURS_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "41",
+     "COLUMN_NAME": "SECOND_LEVEL_NURS_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "42",
+     "COLUMN_NAME": "AUTOPSY_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "43",
+     "COLUMN_NAME": "BLOOD_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "44",
+     "COLUMN_NAME": "BLOOD_TYPE_RH",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "45",
+     "COLUMN_NAME": "INFUSION_REACT_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "46",
+     "COLUMN_NAME": "BLOOD_TRAN_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "47",
+     "COLUMN_NAME": "BLOOD_TRAN_VOL",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "48",
+     "COLUMN_NAME": "BLOOD_TRAN_REACT_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "49",
+     "COLUMN_NAME": "DECUBITAL_ULCER_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "50",
+     "COLUMN_NAME": "ALERGY_DRUGS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "80",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "51",
+     "COLUMN_NAME": "ADVERSE_REACTION_DRUGS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "80",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "52",
+     "COLUMN_NAME": "MR_VALUE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "53",
+     "COLUMN_NAME": "MR_QUALITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "54",
+     "COLUMN_NAME": "FOLLOW_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "55",
+     "COLUMN_NAME": "FOLLOW_INTERVAL",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "56",
+     "COLUMN_NAME": "FOLLOW_INTERVAL_UNITS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "57",
+     "COLUMN_NAME": "DIRECTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "58",
+     "COLUMN_NAME": "ATTENDING_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "59",
+     "COLUMN_NAME": "DOCTOR_IN_CHARGE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "60",
+     "COLUMN_NAME": "DISCHARGE_DISPOSITION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "61",
+     "COLUMN_NAME": "TOTAL_COSTS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "62",
+     "COLUMN_NAME": "TOTAL_PAYMENTS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "63",
+     "COLUMN_NAME": "CATALOG_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "64",
+     "COLUMN_NAME": "CATALOGER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "65",
+     "COLUMN_NAME": "HBSAG_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "66",
+     "COLUMN_NAME": "HCV_AB_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "67",
+     "COLUMN_NAME": "HIV_AB_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "68",
+     "COLUMN_NAME": "CHIEF_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "69",
+     "COLUMN_NAME": "ADVANCED_STUDIES_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "70",
+     "COLUMN_NAME": "PRACTICE_DOCTOR_OF_GRADUATE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "71",
+     "COLUMN_NAME": "PRACTICE_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "72",
+     "COLUMN_NAME": "DOCTOR_OF_CONTROL_QUALITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "73",
+     "COLUMN_NAME": "NURSE_OF_CONTROL_QUALITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "74",
+     "COLUMN_NAME": "DATE_OF_CONTROL_QUALITY",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "75",
+     "COLUMN_NAME": "FIRST_CASE_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "76",
+     "COLUMN_NAME": "THIRD_LEVEL_NURS_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "77",
+     "COLUMN_NAME": "X_EXAM_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "78",
+     "COLUMN_NAME": "TREATED_IN_OTHERS_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "79",
+     "COLUMN_NAME": "TREAT_METHOD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "80",
+     "COLUMN_NAME": "HOSP_MADE_MEDICINE_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "81",
+     "COLUMN_NAME": "PATHOLOGY_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "30",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "82",
+     "COLUMN_NAME": "UPPER_DOCTOR_GUIDE_EFFECT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "83",
+     "COLUMN_NAME": "EMER_TREAT_METHOD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "84",
+     "COLUMN_NAME": "ICTUS_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "85",
+     "COLUMN_NAME": "DIFFICULTY_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "86",
+     "COLUMN_NAME": "FROM_OTHER_PLACE_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "87",
+     "COLUMN_NAME": "SUSPICION_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "88",
+     "COLUMN_NAME": "CHINESE_MEDICINE_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "89",
+     "COLUMN_NAME": "OPERATION_SCALE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "90",
+     "COLUMN_NAME": "DIAGNOSIS_CORRECTNESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "91",
+     "COLUMN_NAME": "TREAT_METHOD_CORRECTNESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "92",
+     "COLUMN_NAME": "PRESCRIPTION_CORRECTNESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "93",
+     "COLUMN_NAME": "MR_COMPLETE_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "94",
+     "COLUMN_NAME": "MEDICAL_TERM_CORRECTNESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "95",
+     "COLUMN_NAME": "TREAT_METHOD_JUDGEMENT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "96",
+     "COLUMN_NAME": "DUTY_NURSE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "97",
+     "COLUMN_NAME": "DEATH_REASON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "40",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "98",
+     "COLUMN_NAME": "DEATH_DATE_TIME",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "99",
+     "COLUMN_NAME": "SCIENCE_RESEARCH_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "100",
+     "COLUMN_NAME": "FIRST_OPERATION_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "101",
+     "COLUMN_NAME": "FIRST_TREATMENT_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "102",
+     "COLUMN_NAME": "FIRST_EXAMINATION_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "103",
+     "COLUMN_NAME": "FIRST_DIAGNOSIS_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "104",
+     "COLUMN_NAME": "SERIOUS_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "105",
+     "COLUMN_NAME": "ADT_ROOM_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "106",
+     "COLUMN_NAME": "DDT_ROOM_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "107",
+     "COLUMN_NAME": "INFECT_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "108",
+     "COLUMN_NAME": "HEALTH_LEVEL",
+     "DATA_TYPE": "CHAR",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "109",
+     "COLUMN_NAME": "MR_INFECT_REPORT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "110",
+     "COLUMN_NAME": "NEWBORN",
+     "DATA_TYPE": "CHAR",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "111",
+     "COLUMN_NAME": "INSURANCE_AERA",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "60",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "112",
+     "COLUMN_NAME": "BODY_WEIGHT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "113",
+     "COLUMN_NAME": "BODY_HEIGHT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "114",
+     "COLUMN_NAME": "BUSINESS_ZIP_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "6",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "115",
+     "COLUMN_NAME": "INFUSION_TRAN_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "116",
+     "COLUMN_NAME": "CHANGE_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "117",
+     "COLUMN_NAME": "DOCUM_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "118",
+     "COLUMN_NAME": "DOCUM_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "119",
+     "COLUMN_NAME": "DOCUM_PERSON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "120",
+     "COLUMN_NAME": "ZYMOSIS_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "121",
+     "COLUMN_NAME": "ZYMOSIS_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "122",
+     "COLUMN_NAME": "BREATH_MACH_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "123",
+     "COLUMN_NAME": "COMA_TIMES_B1",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "124",
+     "COLUMN_NAME": "COMA_TIMES_B2",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "125",
+     "COLUMN_NAME": "COMA_TIMES_A1",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "126",
+     "COLUMN_NAME": "COMA_TIMES_A2",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "127",
+     "COLUMN_NAME": "TRANS_HOSPITAL",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "128",
+     "COLUMN_NAME": "TRANS_COMMUNITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "129",
+     "COLUMN_NAME": "PHONE_NUMBER_BUSINESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "130",
+     "COLUMN_NAME": "MR_BINDER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "131",
+     "COLUMN_NAME": "CARRY_PERSON_NUMBER",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "132",
+     "COLUMN_NAME": "DISCHARGE_WARD_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "32",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "133",
+     "COLUMN_NAME": "DISCHARGE_BED_NO",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "134",
+     "COLUMN_NAME": "INP_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "135",
+     "COLUMN_NAME": "INP_SERIAL_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "136",
+     "COLUMN_NAME": "PAT_STREET_ADDRESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "200",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "137",
+     "COLUMN_NAME": "PAT_ZIP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "6",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "138",
+     "COLUMN_NAME": "PAT_PHONE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "139",
+     "COLUMN_NAME": "PATIENT_AREA",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "140",
+     "COLUMN_NAME": "PATIENT_AREA_ADDRESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "200",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "141",
+     "COLUMN_NAME": "DIFF_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "142",
+     "COLUMN_NAME": "BASIS_ON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "143",
+     "COLUMN_NAME": "LOCKED_USER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "144",
+     "COLUMN_NAME": "LOCKED_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "145",
+     "COLUMN_NAME": "CATALOG_STATUS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "146",
+     "COLUMN_NAME": "WEIGHT_BIRTH",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "147",
+     "COLUMN_NAME": "COMA_TIMES_B0",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "148",
+     "COLUMN_NAME": "COMA_TIMES_A0",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "149",
+     "COLUMN_NAME": "PLAN_31_ADMISSION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "150",
+     "COLUMN_NAME": "REASON_31_ADMISSION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "151",
+     "COLUMN_NAME": "TUMOR_T",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "152",
+     "COLUMN_NAME": "TUMOR_N",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "153",
+     "COLUMN_NAME": "TUMOR_M",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "154",
+     "COLUMN_NAME": "TUMOR_STAGE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "155",
+     "COLUMN_NAME": "ADL_ADM",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "156",
+     "COLUMN_NAME": "ADL_DIS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "157",
+     "COLUMN_NAME": "PHONE_NUMBER_HOME",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "158",
+     "COLUMN_NAME": "CLINICAL_PATHWAY_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "159",
+     "COLUMN_NAME": "CHINESE_MEDICINE_DEVICE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "160",
+     "COLUMN_NAME": "CHINESE_MEDICINE_TECHNOLOGY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "161",
+     "COLUMN_NAME": "DIALECTICAL_CARE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "162",
+     "COLUMN_NAME": "EMAIL_ADDRESS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "163",
+     "COLUMN_NAME": "QQ_NUMBER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "164",
+     "COLUMN_NAME": "ANTIBIOTIC_PREVENT_WOUND1",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "165",
+     "COLUMN_NAME": "ANTIBIOTIC_PREVENT_WOUND1_TIME",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "166",
+     "COLUMN_NAME": "COMBINED_PREVENT_WOUND1",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "167",
+     "COLUMN_NAME": "ANTIBIOTIC_PREVENT_INP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "168",
+     "COLUMN_NAME": "ANTIBIOTIC_PREVENT_INP_TIME",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "169",
+     "COLUMN_NAME": "COMBINED_PREVENT_INP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "170",
+     "COLUMN_NAME": "ACCUMULATE_DDD",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "171",
+     "COLUMN_NAME": "CLINICAL_PATHWAY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "172",
+     "COLUMN_NAME": "CLINICAL_PATHWAY_FINISH",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "173",
+     "COLUMN_NAME": "QUIT_REASON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "200",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "174",
+     "COLUMN_NAME": "CLINICAL_PATHWAY_VARIATION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "175",
+     "COLUMN_NAME": "VARIATION_REASON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "200",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "176",
+     "COLUMN_NAME": "CONSULTATION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "177",
+     "COLUMN_NAME": "CONSULTATION_HOSPITAL_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "178",
+     "COLUMN_NAME": "CONSULTATION_OUT_TIMES",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "179",
+     "COLUMN_NAME": "CONSULTATION_OTHERS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "180",
+     "COLUMN_NAME": "CT_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "181",
+     "COLUMN_NAME": "PETCT_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "182",
+     "COLUMN_NAME": "DSCT_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "183",
+     "COLUMN_NAME": "X_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "184",
+     "COLUMN_NAME": "B_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "185",
+     "COLUMN_NAME": "ECHOCARDIOGRAPHY_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "186",
+     "COLUMN_NAME": "MRI_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "187",
+     "COLUMN_NAME": "ISOTOPE_CHECK",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "188",
+     "COLUMN_NAME": "LAST_DOCTOR_CONTROL_QUALITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "189",
+     "COLUMN_NAME": "CONTROL_QUALITY_CREDIT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "190",
+     "COLUMN_NAME": "BRJSH",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "191",
+     "COLUMN_NAME": "YLZH",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "200",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "192",
+     "COLUMN_NAME": "JD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "193",
+     "COLUMN_NAME": "BXFY",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "194",
+     "COLUMN_NAME": "ZFFY",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "195",
+     "COLUMN_NAME": "RYZD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "196",
+     "COLUMN_NAME": "CYZD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "197",
+     "COLUMN_NAME": "NHFY",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "198",
+     "COLUMN_NAME": "NHZBH",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "199",
+     "COLUMN_NAME": "GZBZ",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "200",
+     "COLUMN_NAME": "GZR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "201",
+     "COLUMN_NAME": "GZSJ",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "202",
+     "COLUMN_NAME": "XZBZ",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "3",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "203",
+     "COLUMN_NAME": "CSYJ",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "204",
+     "COLUMN_NAME": "SCBZ",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "205",
+     "COLUMN_NAME": "GUARANTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "8",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "206",
+     "COLUMN_NAME": "GUARANTOR_ORG",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "40",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "207",
+     "COLUMN_NAME": "GUARANTOR_PHONE_NUM",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "208",
+     "COLUMN_NAME": "SBJBM",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "209",
+     "COLUMN_NAME": "SBJGLX",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "3",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "210",
+     "COLUMN_NAME": "SEQID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "15",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "211",
+     "COLUMN_NAME": "ENTRANCE_HOSPITAL",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "212",
+     "COLUMN_NAME": "ICD_0_3",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "213",
+     "COLUMN_NAME": "CDOCTOR_LEADER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "214",
+     "COLUMN_NAME": "SERVICE_AGENCY_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "40",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "215",
+     "COLUMN_NAME": "NEXT_OF_KIN_ADDR_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "40",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "216",
+     "COLUMN_NAME": "HOSPITAL_NAME",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "217",
+     "COLUMN_NAME": "INSUR_STATUS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "218",
+     "COLUMN_NAME": "INSUR_SHR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "219",
+     "COLUMN_NAME": "INSUR_SDATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "220",
+     "COLUMN_NAME": "ADULT_WEIGHT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "221",
+     "COLUMN_NAME": "ADULT_HEIGHT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "222",
+     "COLUMN_NAME": "QXCY_STATUS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "223",
+     "COLUMN_NAME": "DISCHARGE_VERIFY",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "224",
+     "COLUMN_NAME": "OPERATOR_VERIFY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "225",
+     "COLUMN_NAME": "VERIFY_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "226",
+     "COLUMN_NAME": "ZYLSH",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "227",
+     "COLUMN_NAME": "ADMIT_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "228",
+     "COLUMN_NAME": "ADMIT_OPERATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "229",
+     "COLUMN_NAME": "CLINIC_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "230",
+     "COLUMN_NAME": "REFERRAL_HOSPITAL",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "231",
+     "COLUMN_NAME": "CLINICAL_PATHWAY_FINISHED",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "232",
+     "COLUMN_NAME": "WEIGHT_BIRTH2",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "233",
+     "COLUMN_NAME": "WEIGHT_BIRTH3",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "234",
+     "COLUMN_NAME": "WEIGHT_BIRTH4",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "235",
+     "COLUMN_NAME": "DAYSURGERY_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "236",
+     "COLUMN_NAME": "SERVICE_AGENCY_ADDR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "237",
+     "COLUMN_NAME": "BREATH_MACH_TIME2",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "238",
+     "COLUMN_NAME": "BREATH_MACH_TIME3",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "239",
+     "COLUMN_NAME": "CHFCOMP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "500",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "240",
+     "COLUMN_NAME": "PRG_STAS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "241",
+     "COLUMN_NAME": "PRG_PRD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "242",
+     "COLUMN_NAME": "NURS_STAS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "243",
+     "COLUMN_NAME": "LHJYSY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "244",
+     "COLUMN_NAME": "ALLERGY_HISTORY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "245",
+     "COLUMN_NAME": "WORKADD_TOWNSHIP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "246",
+     "COLUMN_NAME": "WORKADD_CITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "247",
+     "COLUMN_NAME": "WORKADD_COUNT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "248",
+     "COLUMN_NAME": "LINKADD_PROVINCE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "249",
+     "COLUMN_NAME": "LINKADD_CITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "250",
+     "COLUMN_NAME": "LINKADD_COUNT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "251",
+     "COLUMN_NAME": "LINKADD_TOWNSHIP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "252",
+     "COLUMN_NAME": "WORKADD_PROVINCE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "253",
+     "COLUMN_NAME": "SYS_NC00244$",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "254",
+     "COLUMN_NAME": "PRE_TOWNSHIP",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "255",
+     "COLUMN_NAME": "PRE_PROVINCE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "256",
+     "COLUMN_NAME": "PRE_COUNT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "257",
+     "COLUMN_NAME": "PRE_CITY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "258",
+     "COLUMN_NAME": "XW_EW",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "259",
+     "COLUMN_NAME": "PDF_LOCK",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "260",
+     "COLUMN_NAME": "DISCHARGE_DISPOSITION2",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "261",
+     "COLUMN_NAME": "PATHWAY_RECORD_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "262",
+     "COLUMN_NAME": "PATHWAY_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "263",
+     "COLUMN_NAME": "DISEASE_RECORD",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "264",
+     "COLUMN_NAME": "MODIFIER_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "265",
+     "COLUMN_NAME": "MODIFIER_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "266",
+     "COLUMN_NAME": "MODIFIER_REASON",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "255",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "267",
+     "COLUMN_NAME": "WZH_PDF_UPLOADFLAG",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "268",
+     "COLUMN_NAME": "SOURCE",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    }
+   ],
+   "PAT_VISIT_EXTEND": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "40",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "PLAN_ADMISSION",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "DAY_WARD",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "DUTY_NURSE1",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "DUTY_NURSE2",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "DUTY_NURSE3",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "8",
+     "COLUMN_NAME": "DUTY_NURSE4",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "9",
+     "COLUMN_NAME": "DUTY_NURSE5",
+     "DATA_TYPE": "NVARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    }
+   ],
+   "OPERATION": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "OPERATION_NO",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "OPERATION_DESC",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "OPERATION_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "HEAL",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "WOUND_GRADE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "8",
+     "COLUMN_NAME": "OPERATING_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "9",
+     "COLUMN_NAME": "ANAESTHESIA_METHOD",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "80",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "10",
+     "COLUMN_NAME": "OPERATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "11",
+     "COLUMN_NAME": "FIRST_ASSISTANT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "12",
+     "COLUMN_NAME": "SECOND_ASSISTANT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "13",
+     "COLUMN_NAME": "ANESTHESIA_DOCTOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "14",
+     "COLUMN_NAME": "OPERATION_SCALE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "15",
+     "COLUMN_NAME": "OPERATING_END_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "16",
+     "COLUMN_NAME": "OPERATION_NURSE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "17",
+     "COLUMN_NAME": "OPTYPE_PRIMARY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "18",
+     "COLUMN_NAME": "OP_PRIMARY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "19",
+     "COLUMN_NAME": "OPERATION_EMER_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "20",
+     "COLUMN_NAME": "DRG_TRNS_TIME",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "21",
+     "COLUMN_NAME": "OPERATION_DESC_DOC",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "22",
+     "COLUMN_NAME": "MR_STATUS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "5",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "23",
+     "COLUMN_NAME": "DRG_FLAG",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "24",
+     "COLUMN_NAME": "DRG_4101_SORT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "25",
+     "COLUMN_NAME": "SOURCE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "26",
+     "COLUMN_NAME": "ENTER_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "27",
+     "COLUMN_NAME": "UPDATE1",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "28",
+     "COLUMN_NAME": "PRIMARY_DAY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "29",
+     "COLUMN_NAME": "OPER_DAY",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "30",
+     "COLUMN_NAME": "OPER_PLAN",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "31",
+     "COLUMN_NAME": "OPER_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    }
+   ],
+   "DIAGNOSIS": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "DIAGNOSIS_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "DIAGNOSIS_NO",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "DIAGNOSIS_DESC",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "240",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "DIAGNOSIS_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "TREAT_DAYS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "8",
+     "COLUMN_NAME": "TREAT_RESULT",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "4",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "9",
+     "COLUMN_NAME": "OPER_TREAT_INDICATOR",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "10",
+     "COLUMN_NAME": "DIAGNOSIS_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "30",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "11",
+     "COLUMN_NAME": "INSERT_INDICATOR",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "12",
+     "COLUMN_NAME": "ADMISSION_CONDITION",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "1",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "13",
+     "COLUMN_NAME": "DIAGNOSIS_CODE2",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "16",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "14",
+     "COLUMN_NAME": "DRG_TRNS_TIME",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "15",
+     "COLUMN_NAME": "DIAGNOSIS_DESC_DOC",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "240",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "16",
+     "COLUMN_NAME": "DRG_4101_SORT",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "17",
+     "COLUMN_NAME": "MR_STATUS",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "5",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "18",
+     "COLUMN_NAME": "DIAG_FLAG",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "2",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "19",
+     "COLUMN_NAME": "SOURCE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "100",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "20",
+     "COLUMN_NAME": "ENTER_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "21",
+     "COLUMN_NAME": "DOCTOR_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "22",
+     "COLUMN_NAME": "PATHOLOGY_NO",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "23",
+     "COLUMN_NAME": "TECHNICIAN_CODE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "50",
+     "NULLABLE": "Y"
+    }
+   ],
+   "PAT_ICU_RECORD": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "ICU_NO",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "ICU_TYPE",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "20",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "INTO_ICU_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "OUT_ICU_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "HOURS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    }
+   ],
+   "MEDICAL_RECORD_REVIEW_TABLE": [
+    {
+     "COLUMN_ID": "1",
+     "COLUMN_NAME": "PATIENT_ID",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "2",
+     "COLUMN_NAME": "VISIT_ID",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "N"
+    },
+    {
+     "COLUMN_ID": "3",
+     "COLUMN_NAME": "MR_STATUS",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "4",
+     "COLUMN_NAME": "MR_FALG",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "5",
+     "COLUMN_NAME": "MR_NUMBER",
+     "DATA_TYPE": "NUMBER",
+     "DATA_LENGTH": "22",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "6",
+     "COLUMN_NAME": "MR_ALTER_USER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "30",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "7",
+     "COLUMN_NAME": "MR_ALTER_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "8",
+     "COLUMN_NAME": "REVIEW_USER",
+     "DATA_TYPE": "VARCHAR2",
+     "DATA_LENGTH": "10",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "9",
+     "COLUMN_NAME": "REVIEW_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    },
+    {
+     "COLUMN_ID": "10",
+     "COLUMN_NAME": "MR_UPDATE_DATE",
+     "DATA_TYPE": "DATE",
+     "DATA_LENGTH": "7",
+     "NULLABLE": "Y"
+    }
+   ]
+  }
+ },
+ "e4_field_mappings": {
+  "note": "视图列→载荷键（=列名大写）→HIS 目标列；UPDATE=#5/#17 SET，INSERT=先 DELETE 后 INSERT；'【目标待确认】'=载荷携带但写库 SQL 未见对应目标",
+  "v_hisshouye_to_pat_visit_and_extend": [
+   {
+    "view_column": "patient_id",
+    "source_expr": "report.r_pat_visit.patient_id",
+    "his_target": "PAT_VISIT.PATIENT_ID（关联键，全链键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "visit_id",
+    "source_expr": "report.r_pat_visit.visit_id",
+    "his_target": "PAT_VISIT.VISIT_ID（关联键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "trt_type",
+    "source_expr": "r_pat_visit1.trt_type",
+    "his_target": "【目标待确认】载荷携带 TRT_TYPE，但两条 update pat_visit SET 均未引用，且 PAT_VISIT 无 TRT_TYPE 列（268 列实测）",
+    "transcode_rule": "CASE 西医→1/中医→2/中西医→3/ELSE→1（默认 1 坑）",
+    "pitfall": "默认 1；目标列未确认，疑被丢弃"
+   },
+   {
+    "view_column": "discharge_date_time",
+    "source_expr": "r_pat_visit.discharge_date_time",
+    "his_target": "不回写（HIS 原生列，UPDATE SET 不含）",
+    "transcode_rule": "直传",
+    "pitfall": "快照秒级截断（视图 11:28:00 vs HIS 11:28:22）"
+   },
+   {
+    "view_column": "spec_level_nurs_days",
+    "source_expr": "r_pat_visit.spec_level_nurs_days",
+    "his_target": "PAT_VISIT.SPEC_LEVEL_NURS_DAYS（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "空值写 0（样本实证）"
+   },
+   {
+    "view_column": "first_level_nurs_days",
+    "source_expr": "r_pat_visit.first_level_nurs_days",
+    "his_target": "PAT_VISIT.FIRST_LEVEL_NURS_DAYS（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "空值写 0"
+   },
+   {
+    "view_column": "second_level_nurs_days",
+    "source_expr": "r_pat_visit.second_level_nurs_days",
+    "his_target": "PAT_VISIT.SECOND_LEVEL_NURS_DAYS（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "空值写 0（样本实证）"
+   },
+   {
+    "view_column": "third_level_nurs_days",
+    "source_expr": "r_pat_visit.third_level_nurs_days",
+    "his_target": "PAT_VISIT.THIRD_LEVEL_NURS_DAYS（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "空值写 0"
+   },
+   {
+    "view_column": "blood_type",
+    "source_expr": "r_pat_visit.blood_type",
+    "his_target": "PAT_VISIT.BLOOD_TYPE（UPDATE）",
+    "transcode_rule": "CASE A→1/B→2/O→3/AB→4/不详→5/未查→6/ELSE 原样",
+    "pitfall": "样本 HIS=6 与视图 6 一致；值域候选"
+   },
+   {
+    "view_column": "blood_type_rh",
+    "source_expr": "r_pat_visit.blood_type_rh",
+    "his_target": "PAT_VISIT.BLOOD_TYPE_RH（UPDATE）",
+    "transcode_rule": "CASE 阴→1/阳→2/不详→3/未查→4/ELSE NULL",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "alergy_drugs",
+    "source_expr": "r_pat_visit.alergy_drugs",
+    "his_target": "PAT_VISIT.ALERGY_DRUGS（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "mr_quality",
+    "source_expr": "r_pat_visit.mr_quality",
+    "his_target": "PAT_VISIT.MR_QUALITY（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "值域待确认（病案质量等级）"
+   },
+   {
+    "view_column": "director",
+    "source_expr": "r_pat_visit.director_id",
+    "his_target": "PAT_VISIT.DIRECTOR（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "attending_doctor",
+    "source_expr": "r_pat_visit.attending_doctor_id",
+    "his_target": "PAT_VISIT.ATTENDING_DOCTOR（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "doctor_in_charge",
+    "source_expr": "r_pat_visit.doctor_in_charge_id",
+    "his_target": "PAT_VISIT.DOCTOR_IN_CHARGE（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "discharge_disposition",
+    "source_expr": "r_pat_visit.discharge_disposition",
+    "his_target": "PAT_VISIT.DISCHARGE_DISPOSITION（UPDATE，实测在 SET 清单中）",
+    "transcode_rule": "字典 emr_first_page_item_dict[DISCHARGE_DISPOSITION].item_value→item_text：医嘱离院→1/医嘱转院→2/医嘱转社区→3/非医嘱离院→4/死亡→5/其他→9",
+    "pitfall": "152 §1.4 遗留问号已闭合：确认回写；149 confirmed 4=非医嘱/5=死亡，JHEMR 字典产码 live 实证一致；无匹配→NULL"
+   },
+   {
+    "view_column": "trans_hospital",
+    "source_expr": "r_pat_visit.zymc_sq",
+    "his_target": "PAT_VISIT.TRANS_HOSPITAL（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "同源复用 entrance_hospital"
+   },
+   {
+    "view_column": "trans_community",
+    "source_expr": "r_pat_visit.zyjg",
+    "his_target": "PAT_VISIT.TRANS_COMMUNITY（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "chief_doctor",
+    "source_expr": "r_pat_visit.chief_doctor_id",
+    "his_target": "PAT_VISIT.CHIEF_DOCTOR（UPDATE #5）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "advanced_studies_doctor",
+    "source_expr": "r_pat_visit.advanced_studies_doctor_id",
+    "his_target": "PAT_VISIT.ADVANCED_STUDIES_DOCTOR（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "practice_doctor_of_graduate",
+    "source_expr": "r_pat_visit.chief_doctor_id（复用）",
+    "his_target": "PAT_VISIT.PRACTICE_DOCTOR_OF_GRADUATE（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "与 chief_doctor 同源（视图复用）"
+   },
+   {
+    "view_column": "practice_doctor",
+    "source_expr": "r_pat_visit.practice_doctor_id",
+    "his_target": "PAT_VISIT.PRACTICE_DOCTOR（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "doctor_of_control_quality",
+    "source_expr": "r_pat_visit.doctor_of_control_quality_id",
+    "his_target": "PAT_VISIT.DOCTOR_OF_CONTROL_QUALITY（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "nurse_of_control_quality",
+    "source_expr": "r_pat_visit.nurse_of_control_quality_id",
+    "his_target": "PAT_VISIT.NURSE_OF_CONTROL_QUALITY（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "date_of_control_quality",
+    "source_expr": "r_pat_visit.date_of_control_quality",
+    "his_target": "PAT_VISIT.DATE_OF_CONTROL_QUALITY（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "treated_in_others_indicator",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.TREATED_IN_OTHERS_INDICATOR（仅 UPDATE #17 旧代设置）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "pathology_no",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.PATHOLOGY_NO（UPDATE）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "duty_nurse1",
+    "source_expr": "r_pat_visit.liability_nurse_id",
+    "his_target": "PAT_VISIT_EXTEND.DUTY_NURSE1（INSERT；另 PAT_VISIT.DUTY_NURSE 由 UPDATE 设置，推断同源）",
+    "transcode_rule": "直传",
+    "pitfall": "样本实证工号 000578/000332"
+   },
+   {
+    "view_column": "duty_nurse2",
+    "source_expr": "r_pat_visit1.liability_nurse_id2",
+    "his_target": "PAT_VISIT_EXTEND.DUTY_NURSE2（INSERT）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "duty_nurse3",
+    "source_expr": "r_pat_visit1.liability_nurse_id3",
+    "his_target": "PAT_VISIT_EXTEND.DUTY_NURSE3（INSERT）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "duty_nurse4",
+    "source_expr": "r_pat_visit1.liability_nurse_id4",
+    "his_target": "PAT_VISIT_EXTEND.DUTY_NURSE4（INSERT）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "duty_nurse5",
+    "source_expr": "r_pat_visit1.liability_nurse_id5",
+    "his_target": "PAT_VISIT_EXTEND.DUTY_NURSE5（INSERT）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "baby_weight",
+    "source_expr": "r_pat_visit1.baby_admin_weight",
+    "his_target": "PAT_VISIT.BODY_WEIGHT（列名变化：baby→body）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "baby_height",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.BODY_HEIGHT（列名变化）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "business_zip_code",
+    "source_expr": "r_pat_visit.work_zip",
+    "his_target": "PAT_VISIT.BUSINESS_ZIP_CODE（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "entrance_hospital",
+    "source_expr": "r_pat_visit.zymc_sq（复用）",
+    "his_target": "PAT_VISIT.ENTTRANCE→ENTRANCE_HOSPITAL（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "与 trans_hospital 同源"
+   },
+   {
+    "view_column": "autopsy_indicator",
+    "source_expr": "r_pat_visit.autopsy_indicator_name",
+    "his_target": "PAT_VISIT.AUTOPSY_INDICATOR（UPDATE）",
+    "transcode_rule": "CASE 否→2/是→1/ELSE NULL",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "adt_room_no",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.ADT_ROOM_NO（UPDATE）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "ddt_room_no",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.DDT_ROOM_NO（UPDATE）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "breath_mach_times",
+    "source_expr": "r_pat_visit1.breath_time_day",
+    "his_target": "PAT_VISIT.BREATH_MACH_TIMES（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "coma_times_b0",
+    "source_expr": "r_pat_visit1.first_coma_day",
+    "his_target": "PAT_VISIT.COMA_TIMES_B0（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "coma_times_b1",
+    "source_expr": "r_pat_visit1.first_coma_hour",
+    "his_target": "PAT_VISIT.COMA_TIMES_B1（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "cona_times_b2",
+    "source_expr": "r_pat_visit1.first_coma_minute",
+    "his_target": "PAT_VISIT.COMA_TIMES_B2（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "视图列名拼写 cona_times_b2"
+   },
+   {
+    "view_column": "coma_times_a0",
+    "source_expr": "r_pat_visit1.back_coma_day",
+    "his_target": "PAT_VISIT.COMA_TIMES_A0（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "coma_times_a1",
+    "source_expr": "r_pat_visit1.back_coma_hour",
+    "his_target": "PAT_VISIT.COMA_TIMES_A1（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "coma_times_a2",
+    "source_expr": "r_pat_visit1.back_coma_minute",
+    "his_target": "PAT_VISIT.COMA_TIMES_A2（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "plan_31_admission",
+    "source_expr": "r_pat_visit.zryjh",
+    "his_target": "PAT_VISIT.PLAN_31_ADMISSION（UPDATE）",
+    "transcode_rule": "CASE 有→2/ELSE→1",
+    "pitfall": "135 已证 1=无/2=有（与首页 plan_admission 编码相反，勿混用）"
+   },
+   {
+    "view_column": "reason_31_admission",
+    "source_expr": "r_pat_visit.zymd",
+    "his_target": "PAT_VISIT.REASON_31_ADMISSION（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "weight_birth",
+    "source_expr": "r_pat_visit1.baby_birth_weight",
+    "his_target": "PAT_VISIT.WEIGHT_BIRTH（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "weight_birth2",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.WEIGHT_BIRTH2（UPDATE #5）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "weight_birth3",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.WEIGHT_BIRTH3（UPDATE #5）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "weight_birth4",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.WEIGHT_BIRTH4（UPDATE #5）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "clinical_pathway_type",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.CLINICAL_PATHWAY_TYPE（UPDATE）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "clinical_pathway",
+    "source_expr": "r_pat_visit1.isinclinicalpathway",
+    "his_target": "PAT_VISIT.CLINICAL_PATHWAY（UPDATE）",
+    "transcode_rule": "CASE 是→1/否→2/ELSE NULL",
+    "pitfall": "值域候选；样本 HIS 1/2 一致"
+   },
+   {
+    "view_column": "clinical_pathway_finish",
+    "source_expr": "r_pat_visit1.isfiniclinicalpathway",
+    "his_target": "PAT_VISIT.CLINICAL_PATHWAY_FINISH（UPDATE）",
+    "transcode_rule": "CASE 完成→1/退出→2/ELSE NULL",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "clinical_pathway_variation",
+    "source_expr": "r_pat_visit1.is_cp_variation",
+    "his_target": "PAT_VISIT.CLINICAL_PATHWAY_VARIATION（UPDATE）",
+    "transcode_rule": "CASE 无→1/有→2/ELSE NULL",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "cdoctor_leader",
+    "source_expr": "r_pat_visit1.medical_team_leader_id",
+    "his_target": "PAT_VISIT.CDOCTOR_LEADER（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "hospital_name",
+    "source_expr": "常量 '山东省第二人民医院'",
+    "his_target": "PAT_VISIT.HOSPITAL_NAME（UPDATE）",
+    "transcode_rule": "常量",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "daysurgery_indicator",
+    "source_expr": "NULL 常量",
+    "his_target": "PAT_VISIT.DAYSURGERY_INDICATOR（UPDATE）",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "breath_mach_time2",
+    "source_expr": "r_pat_visit1.breath_time_h",
+    "his_target": "PAT_VISIT.BREATH_MACH_TIME2（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "breath_mach_time3",
+    "source_expr": "r_pat_visit1.breath_time_m",
+    "his_target": "PAT_VISIT.BREATH_MACH_TIME3（UPDATE）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "cataloger",
+    "source_expr": "r_pat_visit.cataloger_id",
+    "his_target": "PAT_VISIT.CATALOGER（UPDATE #5）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "catalog_date",
+    "source_expr": "r_pat_visit.catalog_date",
+    "his_target": "PAT_VISIT.CATALOG_DATE（UPDATE #5）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "day_ward",
+    "source_expr": "r_pat_visit1.sfrjbf",
+    "his_target": "PAT_VISIT_EXTEND.DAY_WARD（INSERT）",
+    "transcode_rule": "CASE 是→1/否→2/ELSE 原样",
+    "pitfall": "样本 HIS=2 一致；值域候选"
+   },
+   {
+    "view_column": "plan_admission",
+    "source_expr": "r_pat_visit1.sffjhzry",
+    "his_target": "PAT_VISIT_EXTEND.PLAN_ADMISSION（INSERT）",
+    "transcode_rule": "CASE 是→1/否→2/ELSE 原样",
+    "pitfall": "135 核心坑：现用表「是」丢失（快照分叉）+空值默认写 2；HIS 全表 38932 行仍全为 2（本次复核）"
+   },
+   {
+    "view_column": "doctor_code",
+    "source_expr": "r_pat_visit.doctor_in_charge_id（复用）",
+    "his_target": "【目标待确认】载荷 DOCTOR_CODE，UPDATE SET 未引用 PAT_VISIT.DOCtor_CODE（无此列），疑用于 DIAGNOSIS.doctor_code 上下文或丢弃",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "tumor_stage",
+    "source_expr": "r_pat_visit.tumor_stage",
+    "his_target": "PAT_VISIT.TUMOR_STAGE（UPDATE #5）",
+    "transcode_rule": "CASE 0期→0/Ⅰ期→1/Ⅱ期→2/Ⅲ期→3/Ⅳ期→4/IV期→4/ELSE 原样",
+    "pitfall": "值域候选（TNM 分期）"
+   }
+  ],
+  "v_hisshoushu_to_operation": [
+   {
+    "view_column": "patient_id",
+    "source_expr": "report.r_operation_doct.patient_id",
+    "his_target": "OPERATION.PATIENT_ID（键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "visit_id",
+    "source_expr": "report.r_operation_doct.visit_id",
+    "his_target": "OPERATION.VISIT_ID（键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "operation_no",
+    "source_expr": "r_operation_doct.display_no",
+    "his_target": "OPERATION.OPERATION_NO（INSERT；先 DELETE 全删该就诊）",
+    "transcode_rule": "直传",
+    "pitfall": "display_no→operation_no 重命名"
+   },
+   {
+    "view_column": "operation_desc",
+    "source_expr": "r_operation_doct.operation_desc",
+    "his_target": "OPERATION.OPERATION_DESC",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "operation_code",
+    "source_expr": "r_operation_doct.operation_code",
+    "his_target": "OPERATION.OPERATION_CODE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "heal",
+    "source_expr": "r_operation_doct.heal",
+    "his_target": "OPERATION.HEAL",
+    "transcode_rule": "直传",
+    "pitfall": "值域待确认（切口愈合等级）"
+   },
+   {
+    "view_column": "wound_grade",
+    "source_expr": "r_operation_doct.wound_grade",
+    "his_target": "OPERATION.WOUND_GRADE",
+    "transcode_rule": "直传",
+    "pitfall": "值域待确认（伤口等级）"
+   },
+   {
+    "view_column": "operating_date",
+    "source_expr": "r_operation_doct.operating_date",
+    "his_target": "OPERATION.OPERATING_DATE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "anaesthesia_method",
+    "source_expr": "r_operation_doct.anaesthesia_method(+_id)",
+    "his_target": "OPERATION.ANAESTHESIA_METHOD",
+    "transcode_rule": "条件转码：method=id 时查字典 emr_first_page_item_dict[ANAESTHESIA_METHOD].boh_name→boh_code（27 条），否则直传 anaesthesia_method_id；插件另按 anaesthesia_dict 反查名称",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "operator",
+    "source_expr": "r_operation_doct.operator_id",
+    "his_target": "OPERATION.OPERATOR",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "first_assistant",
+    "source_expr": "r_operation_doct.first_assistant_id",
+    "his_target": "OPERATION.FIRST_ASSISTANT",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "second_assistant",
+    "source_expr": "r_operation_doct.second_assistant_id",
+    "his_target": "OPERATION.SECOND_ASSISTANT",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "anesthesia_doctor",
+    "source_expr": "r_operation_doct.anesthesia_doctor_id",
+    "his_target": "OPERATION.ANESTHESIA_DOCTOR",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "operation_nurse",
+    "source_expr": "NULL 常量",
+    "his_target": "OPERATION.OPERATION_NURSE",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "opeype_primary",
+    "source_expr": "NULL 常量（拼写如此）",
+    "his_target": "OPERATION.OPTYPE_PRIMARY",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "载荷键为 OPTYPE_PRIMARY（修正拼写）"
+   },
+   {
+    "view_column": "op_primary",
+    "source_expr": "CASE operation_no=1→'1' ELSE '2'",
+    "his_target": "OPERATION.OP_PRIMARY",
+    "transcode_rule": "一次手术标志转码",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "operation_emer_indicator",
+    "source_expr": "CASE operation_type 1→1/2→2/3→3/ELSE NULL",
+    "his_target": "OPERATION.OPERATION_EMER_INDICATOR",
+    "transcode_rule": "operation_type 直通",
+    "pitfall": "149 confirmed：2=急诊/1=择期，code3 语义待核（151 收口项）；HIS 全库该列空值待查"
+   },
+   {
+    "view_column": "operation_scale",
+    "source_expr": "r_operation_doct.operation_scale",
+    "his_target": "OPERATION.OPERATION_SCALE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "primary_day",
+    "source_expr": "CASE operation_rjss 是→1/否→0",
+    "his_target": "OPERATION.PRIMARY_DAY（INSERT 新代含）",
+    "transcode_rule": "日间手术标志",
+    "pitfall": "值域候选；仅快照列（v_hisshoushu1 无）"
+   },
+   {
+    "view_column": "oper_day",
+    "source_expr": "CASE operation_rjcz 是→1/否→0",
+    "his_target": "OPERATION.OPER_DAY（INSERT 新代含）",
+    "transcode_rule": "日间操作标志",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "oper_plan",
+    "source_expr": "CASE operation_fjhzss 是→1/否→0",
+    "his_target": "OPERATION.OPER_PLAN（INSERT 新代含）",
+    "transcode_rule": "非计划再手术标志",
+    "pitfall": "值域候选"
+   },
+   {
+    "view_column": "（无视图列）",
+    "source_expr": "插件常量/运行时",
+    "his_target": "OPERATION.OPERATING_END_DATE（INSERT）",
+    "transcode_rule": "模板值为运行时间戳",
+    "pitfall": "视图无此列，来源待确认（疑插件填当前时间）"
+   },
+   {
+    "view_column": "（无视图列）",
+    "source_expr": "插件常量 '2'",
+    "his_target": "OPERATION.SOURCE（INSERT）",
+    "transcode_rule": "常量 '2'",
+    "pitfall": "HIS 实测 SOURCE='2' 115394 行 ≈ r_operation_doct 115740 行，证 SOURCE=2 全部来自本回写"
+   }
+  ],
+  "v_hiszhenduan_to_diagnosis": [
+   {
+    "view_column": "patient_id",
+    "source_expr": "report.r_diagnosis_doct.patient_id",
+    "his_target": "DIAGNOSIS.PATIENT_ID（键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "visit_id",
+    "source_expr": "report.r_diagnosis_doct.visit_id",
+    "his_target": "DIAGNOSIS.VISIT_ID（键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "diagnosis_type",
+    "source_expr": "r_diagnosis_doct.diagnosis_type",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_TYPE（INSERT；DELETE 保留 type '2' 不删）",
+    "transcode_rule": "直传",
+    "pitfall": "148 confirmed（1/2/3 等）；DELETE 不删类型 2，疑保护门诊/HIS 侧维护行——样本见 type2 SOURCE=NULL"
+   },
+   {
+    "view_column": "diagnosis_no",
+    "source_expr": "r_diagnosis_doct.diagnosis_no",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_NO",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "diagnosis_desc",
+    "source_expr": "r_diagnosis_doct.diagnosis_desc",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_DESC",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "diagnosis_date",
+    "source_expr": "r_diagnosis_doct.diagnosis_date",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_DATE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "pathology_no",
+    "source_expr": "r_diagnosis_doct.bl_check_no",
+    "his_target": "DIAGNOSIS.PATHOLOGY_NO",
+    "transcode_rule": "重命名 bl_check_no→pathology_no",
+    "pitfall": "触发病理联动：插件查 pitaya.dbo.v_blzlst 回填 doctor_code/technician_code（type 8）"
+   },
+   {
+    "view_column": "treat_days",
+    "source_expr": "NULL 常量",
+    "his_target": "DIAGNOSIS.TREAT_DAYS",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "treat_result",
+    "source_expr": "r_diagnosis_doct.discharge_conditions",
+    "his_target": "DIAGNOSIS.TREAT_RESULT",
+    "transcode_rule": "字典 emr_first_page_item_dict[DISCHARGE_CONDITIONS].item_value→item_text：治愈→1/好转→2/未愈→3/死亡→4/其他→9",
+    "pitfall": "⚠️高危候选：HIS 侧 COMM.DISCHARGE_DISPOSITION_DICT（148 陷阱，内容为治疗结果）编码为 1治愈/2转院/3死亡/4好转/5自愿/6其他/7未愈——与 JHEMR 产码 2/3/4 含义错位；样本 SOURCE=2 行实存 2/9 码；需 151 E2 裁决 DIAGNOSIS.TREAT_RESULT 实际读哪套"
+   },
+   {
+    "view_column": "oper_treat_indicator",
+    "source_expr": "NULL 常量",
+    "his_target": "DIAGNOSIS.OPER_TREAT_INDICATOR",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "diagnosis_code",
+    "source_expr": "r_diagnosis_doct.diagnosis_code",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_CODE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "insert_indicator",
+    "source_expr": "NULL 常量",
+    "his_target": "【目标待确认】未见对应 INSERT 列",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "admission_condition",
+    "source_expr": "r_diagnosis_doct.oper_treat_indicator1_id",
+    "his_target": "DIAGNOSIS.ADMISSION_CONDITION",
+    "transcode_rule": "直传 id",
+    "pitfall": "值域待确认（入院病情 1-4?）"
+   },
+   {
+    "view_column": "diagnosis_code2",
+    "source_expr": "NULL 常量",
+    "his_target": "DIAGNOSIS.DIAGNOSIS_CODE2",
+    "transcode_rule": "恒 NULL",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "（无视图列）",
+    "source_expr": "插件常量 '2'",
+    "his_target": "DIAGNOSIS.SOURCE（INSERT 新代）",
+    "transcode_rule": "常量 '2'",
+    "pitfall": "HIS 实测 SOURCE 有 1/2/NULL 三态（1=另一写入方，2=本回写）"
+   },
+   {
+    "view_column": "（无视图列）",
+    "source_expr": "病理联动回填",
+    "his_target": "DIAGNOSIS.DOCTOR_CODE / TECHNICIAN_CODE（UPDATE type 8）",
+    "transcode_rule": "查 pitaya.dbo.v_blzlst 病理医师/技师工号",
+    "pitfall": "跨系统读 pathology（SQLServer pitaya）；仅 diagnosis_type='8'"
+   }
+  ],
+  "v_hisicu_to_pat_icu_record": [
+   {
+    "view_column": "patient_id",
+    "source_expr": "report.r_grave_ward_detail.patient_id",
+    "his_target": "PAT_ICU_RECORD.PATIENT_ID（键；先 DELETE 全删）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "visit_id",
+    "source_expr": "report.r_grave_ward_detail.visit_id",
+    "his_target": "PAT_ICU_RECORD.VISIT_ID（键）",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "icu_type",
+    "source_expr": "r_grave_ward_detail.ward_name",
+    "his_target": "PAT_ICU_RECORD.ICU_TYPE",
+    "transcode_rule": "字典 emr_first_page_item_dict[WARD_NAME_TYPE].item_value→item_text：内科重症→MICU/外科→SICU/冠心病→CCU/呼吸→RICU/急诊→EICU/新生儿→NICU/儿科→PICU/其他→QT",
+    "pitfall": "8 对映射 live 实证；值域候选"
+   },
+   {
+    "view_column": "into_icu_date",
+    "source_expr": "r_grave_ward_detail.enter_time",
+    "his_target": "PAT_ICU_RECORD.INTO_ICU_DATE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "out_icu_date",
+    "source_expr": "r_grave_ward_detail.exit_time",
+    "his_target": "PAT_ICU_RECORD.OUT_ICU_DATE",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "hours",
+    "source_expr": "r_grave_ward_detail.cumulative_time",
+    "his_target": "PAT_ICU_RECORD.HOURS",
+    "transcode_rule": "直传",
+    "pitfall": "—"
+   },
+   {
+    "view_column": "（无视图列）",
+    "source_expr": "插件常量 0",
+    "his_target": "PAT_ICU_RECORD.ICU_NO（INSERT）",
+    "transcode_rule": "常量 0",
+    "pitfall": "ICU 序号恒 0（多次 ICU 记录合并风险）"
+   }
+  ]
+ },
+ "e5_value_domain_candidates": {
+  "note": "供 151 E2 圈定参考，本计划不导入、不 confirm；HIS 落值即 JHEMR 产码（回写链路无 HIS 侧二次转码）",
+  "candidates": [
+   {
+    "field": "MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION",
+    "transcode": "字典 DISCHARGE_DISPOSITION（医嘱离院1/医嘱转院2/医嘱转社区3/非医嘱离院4/死亡5/其他9）",
+    "dict_field_name": "DISCHARGE_DISPOSITION",
+    "his_status_149": "confirmed（4=非医嘱、5=死亡）；code9 语义待核",
+    "evidence": "JHEMR 字典 6 对 live 实证与 148 完全一致",
+    "priority": "高（151 code9 收口直接引用）"
+   },
+   {
+    "field": "MEDREC.DIAGNOSIS.TREAT_RESULT",
+    "transcode": "字典 DISCHARGE_CONDITIONS（治愈1/好转2/未愈3/死亡4/其他9）",
+    "dict_field_name": "DISCHARGE_CONDITIONS",
+    "his_status_149": "无 confirmed；148 陷阱提示 COMM.DISCHARGE_DISPOSITION_DICT 是治疗结果字典（1治愈/2转院/3死亡/4好转/5自愿/6其他/7未愈）",
+    "evidence": "两套治疗结果编码 2/3/4 含义错位；SOURCE=2 行实存 2/9 码",
+    "priority": "最高（语义冲突风险，151 E2 优先裁决）"
+   },
+   {
+    "field": "MEDREC.OPERATION.OPERATION_EMER_INDICATOR",
+    "transcode": "CASE operation_type 直通 1/2/3",
+    "dict_field_name": null,
+    "his_status_149": "confirmed（2=急诊）；code3 语义待核",
+    "evidence": "视图 CASE 无重映射；JHEMR operation_type 原码透传",
+    "priority": "高（151 手术标志 3 收口项）"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.BLOOD_TYPE / BLOOD_TYPE_RH",
+    "transcode": "CASE A1/B2/O3/AB4/不详5/未查6；阴1/阳2/不详3/未查4",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "视图 CASE 即产码规则；样本 HIS=6/4 一致",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT_EXTEND.PLAN_ADMISSION",
+    "transcode": "CASE sffjhzry 是1/否2/ELSE 原样",
+    "dict_field_name": null,
+    "his_status_149": "无（135 专题）",
+    "evidence": "135 已证丢失链；HIS 38932 行仍全 2",
+    "priority": "高（135 修复建议依赖）"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT_EXTEND.DAY_WARD",
+    "transcode": "CASE sfrjbf 是1/否2/ELSE 原样",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.PLAN_31_ADMISSION",
+    "transcode": "CASE zryjh 有→2/ELSE→1",
+    "dict_field_name": null,
+    "his_status_149": "无（135：1无2有）",
+    "evidence": "与 PLAN_ADMISSION 编码相反",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.CLINICAL_PATHWAY / _FINISH / _VARIATION",
+    "transcode": "是1否2 / 完成1退出2 / 无1有2",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "样本 HIS 1/2 一致",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.AUTOPSY_INDICATOR",
+    "transcode": "否2/是1/ELSE NULL",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "低"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.TUMOR_STAGE",
+    "transcode": "0期0/Ⅰ1/Ⅱ2/Ⅲ3/Ⅳ(IV)4/ELSE 原样",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "低"
+   },
+   {
+    "field": "MEDREC.OPERATION.ANAESTHESIA_METHOD",
+    "transcode": "字典 ANAESTHESIA_METHOD boh_name→boh_code（27 条，条件触发）",
+    "dict_field_name": "ANAESTHESIA_METHOD",
+    "his_status_149": "无",
+    "evidence": "插件另配 anaesthesia_dict 名称反查",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.OPERATION.OP_PRIMARY",
+    "transcode": "operation_no=1→1 ELSE 2",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "低"
+   },
+   {
+    "field": "MEDREC.OPERATION.PRIMARY_DAY / OPER_DAY / OPER_PLAN",
+    "transcode": "rjss/rjcz/fjhzss 是1/否0",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "低"
+   },
+   {
+    "field": "MEDREC.OPERATION.HEAL / WOUND_GRADE",
+    "transcode": "无（直传 r_operation_doct 原值）",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "JHEMR 侧值域即 HIS 落值",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.DIAGNOSIS.ADMISSION_CONDITION",
+    "transcode": "直传 oper_treat_indicator1_id",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.DIAGNOSIS.DIAGNOSIS_TYPE",
+    "transcode": "直传",
+    "dict_field_name": null,
+    "his_status_149": "confirmed（148）",
+    "evidence": "回写不转码",
+    "priority": "低（已有）"
+   },
+   {
+    "field": "MEDREC.PAT_ICU_RECORD.ICU_TYPE",
+    "transcode": "字典 WARD_NAME_TYPE（中文病区名→MICU/SICU/CCU/RICU/EICU/NICU/PICU/QT）",
+    "dict_field_name": "WARD_NAME_TYPE",
+    "his_status_149": "无",
+    "evidence": "8 对 live 实证",
+    "priority": "中"
+   },
+   {
+    "field": "MEDREC.PAT_VISIT.MR_QUALITY",
+    "transcode": "直传 r_pat_visit.mr_quality",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "—",
+    "priority": "低"
+   },
+   {
+    "field": "（载荷）TRT_TYPE（PAT_VISIT 无对应列）",
+    "transcode": "西医1/中医2/中西医3/ELSE 1",
+    "dict_field_name": null,
+    "his_status_149": "无",
+    "evidence": "目标列缺失，值域仅记录不落地",
+    "priority": "低"
+   }
+  ]
+ },
+ "e6_relation_candidates": {
+  "zero_modification_check": "server_test 全目录 121 文件执行前后 find 时间戳+大小基线 diff=0（ZERO_MODIFICATION_CONFIRMED）",
+  "grading_rule": "sql-relation-intake：历史证据最高 C/B 级候选；跨物理实例（JHEMR Vastbase → HIS Oracle）按用户 40 口径 D 级延后，未经审核不得入正式 relationships.csv",
+  "candidates": [
+   {
+    "from": "jhemr.v_hisshouye",
+    "to": "MEDREC.PAT_VISIT",
+    "key": "patient_id+visit_id",
+    "type": "write_lineage(UPDATE)",
+    "grade": "D/candidate（跨系统+写路径；活库聚合与抽样佐证）",
+    "evidence": "testdemo.pbd UPDATE SET 62 列 + 5 键抽样 2 键一致"
+   },
+   {
+    "from": "jhemr.v_hisshouye",
+    "to": "MEDREC.PAT_VISIT_EXTEND",
+    "key": "patient_id+visit_id",
+    "type": "write_lineage(DELETE+INSERT)",
+    "grade": "D/candidate",
+    "evidence": "INSERT 9 列 + EXTEND 仅在已回写就诊存在"
+   },
+   {
+    "from": "jhemr.v_hisshoushu",
+    "to": "MEDREC.OPERATION",
+    "key": "patient_id+visit_id+operation_no",
+    "type": "write_lineage(DELETE+INSERT)",
+    "grade": "D/candidate（增强：聚合验证 SOURCE='2' 115394≈快照 115740）",
+    "evidence": "INSERT 23 列 + SOURCE 聚合"
+   },
+   {
+    "from": "jhemr.v_hiszhenduan",
+    "to": "MEDREC.DIAGNOSIS",
+    "key": "patient_id+visit_id+diagnosis_type+diagnosis_no",
+    "type": "write_lineage(DELETE+INSERT+UPDATE)",
+    "grade": "D/candidate",
+    "evidence": "INSERT 16 列 + SOURCE 三态抽样"
+   },
+   {
+    "from": "jhemr.v_hisicu",
+    "to": "MEDREC.PAT_ICU_RECORD",
+    "key": "patient_id+visit_id(icu_no 恒 0)",
+    "type": "write_lineage(DELETE+INSERT)",
+    "grade": "D/candidate（icu_no 恒 0 有多 ICU 记录合并风险）",
+    "evidence": "INSERT 7 列"
+   },
+   {
+    "from": "jhemr.emr_first_page_item_dict",
+    "to": "4 回写视图",
+    "key": "field_name+item_value/boh_name",
+    "type": "view_dependency（已有）",
+    "grade": "existing（77 资产包 B/static_view_sql/candidate）",
+    "evidence": "无需新增"
+   },
+   {
+    "from": "report.r_*（5 快照表）",
+    "to": "jhemr 现用表（5 张）",
+    "key": "patient_id+visit_id",
+    "type": "snapshot_lineage（机制未知 R4）",
+    "grade": "D/recipe_candidate（仅登记，供后续问嘉和实施后定级）",
+    "evidence": "行数差 + 列结构镜像（v_hiszhenduan1 直读佐证）"
+   },
+   {
+    "from": "pitaya.dbo.v_blzlst",
+    "to": "MEDREC.DIAGNOSIS(doctor_code/technician_code)",
+    "key": "患者ID+住院次数+病理号",
+    "type": "write_lineage(病理医师回填)",
+    "grade": "D/candidate（跨系统 SQLServer→Oracle）",
+    "evidence": "testdemo.pbd #15/#16/#21"
+   }
+  ],
+  "formal_relationships_modified": "无——零回写正式资产（relationships.csv/catalog.json 未动）"
+ },
+ "skipped_and_limitations": [
+  "v_hisshouye1 的 '134 列' 非漂移：系 v_hisshouye1 与 v_HISshouye1（混合大小写独立对象）被 77 采集大小写折叠；本次以两对象分别记录（67+67，其中 tyt_type 为旧版常量列）",
+  "OPERATION/DIAGNOSIS/PAT_ICU_RECORD 未做 5 键逐字段级对账（仅键级+聚合+SOURCE 佐证）——原因：患者数据最小化，聚合证据已足够支撑链路结论；逐字段对账可按需追加",
+  "r_pat_visit1/pat_visit1 无统一刷新时间列，快照新鲜度以行数对比为准",
+  "快照刷新机制（定时/触发/手工）不可知（R4 维持），交用户向嘉和实施确认",
+  "update pat_visit 两代变体哪条在实际执行路径上运行，仅靠字符串无法区分（时间戳相邻 47ms、同 PBD 共存）——已按两代并录；可在 WEBSERVICE_LOG.OPER_XML 与落库值比对中进一步区分",
+  "载荷中 ALLERGY_HISTORY 等 2-3 个额外键未逐一溯源（视图列之外的补充字段）"
+ ]
+}

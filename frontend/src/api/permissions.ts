@@ -1,10 +1,5 @@
 import { http } from "@/utils/http";
 
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
 export interface PermissionResource {
   code: string;
@@ -54,6 +49,37 @@ export interface PermissionAuditLog {
   operator?: string | null;
   reason?: string | null;
   created_at?: string | null;
+}
+
+export interface PermissionRequestItem {
+  id: number;
+  entity_type: "user_role" | "user_data_scope" | string;
+  entity_ref: string;
+  request_type: string;
+  request_content: Record<string, unknown>;
+  reason?: string | null;
+  status: string;
+  requested_by: string;
+  approved_by?: string | null;
+  executed_by?: string | null;
+  created_at?: string | null;
+  request_payload?: Record<string, unknown>;
+  approval_status?: string;
+}
+
+export type { ApiResponse, PageData } from "./types";
+import type { ApiResponse, PageData } from "./types";
+
+export interface PermissionRequestCreate {
+  request_kind: "role" | "data_scope";
+  target_user_identifier: string;
+  role_code?: string;
+  scope_type?: string;
+  system_code?: string;
+  source_code?: string;
+  schema_name?: string;
+  domain?: string;
+  reason: string;
 }
 
 export function seedPermissions(operator = "console") {
@@ -110,18 +136,21 @@ export function getPermissionAuditLogs(params?: Record<string, any>) {
   return http.request<ApiResponse<PermissionAuditLog[]>>("get", "/api/v1/permissions/audit", { params });
 }
 
-export function createPermissionRequest(data: Record<string, any>) {
-  return http.request<ApiResponse<any>>("post", "/api/v1/permission-requests", { data });
+export function createPermissionRequest(data: PermissionRequestCreate) {
+  return http.request<ApiResponse<PermissionRequestItem>>("post", "/api/v1/permission-requests", { data });
 }
-export function getMyPermissionRequests() {
-  return http.request<ApiResponse<any[]>>("get", "/api/v1/permission-requests/mine");
+export function getMyPermissionRequests(params?: { page?: number; page_size?: number }) {
+  return http.request<ApiResponse<PageData<PermissionRequestItem>>>("get", "/api/v1/permission-requests/mine", { params });
 }
-export function getPendingPermissionRequests() {
-  return http.request<ApiResponse<any[]>>("get", "/api/v1/permission-requests/pending");
+export function getPendingPermissionRequests(params?: { page?: number; page_size?: number }) {
+  return http.request<ApiResponse<PageData<PermissionRequestItem>>>("get", "/api/v1/permission-requests/pending", { params });
 }
 export function decidePermissionRequest(id: number, action: "approve" | "reject", note?: string) {
-  return http.request<ApiResponse<any>>("patch", `/api/v1/permission-requests/${id}/${action}`, { data: { note } });
+  return http.request<ApiResponse<PermissionRequestItem>>("patch", `/api/v1/permission-requests/${id}/${action}`, { data: { note } });
 }
 export function executePermissionRequest(id: number) {
-  return http.request<ApiResponse<any>>("post", `/api/v1/permission-requests/${id}/execute`);
+  return http.request<ApiResponse<PermissionRequestItem>>("post", `/api/v1/permission-requests/${id}/execute`);
+}
+export function revokePermissionRequest(id: number) {
+  return http.request<ApiResponse<PermissionRequestItem>>("post", `/api/v1/permission-requests/${id}/revoke`);
 }

@@ -30,7 +30,7 @@ export default defineFakeRoute([
             username: "common",
             nickname: "小林",
             roles: ["common"],
-            permissions: ["permission:btn:add", "permission:btn:edit"],
+            permissions: [],
             accessToken: "eyJhbGciOiJIUzUxMiJ9.common",
             refreshToken: "eyJhbGciOiJIUzUxMiJ9.commonRefresh",
             expires: "2030/10/30 00:00:00"

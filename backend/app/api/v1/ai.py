@@ -6,11 +6,13 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
 from ...models.ai_collab import AiSession, AiToolCall, ViewDraft
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
+from ...services.data_masking import sanitize_text
+from ...services.db_connectors import forbidden_keyword_hits
 
 router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 
@@ -93,6 +95,29 @@ AVAILABLE_TOOLS = [
         },
     },
     {
+        "name": "submit_feedback",
+        "description": "提交绑定 answer/run/context 的准确性反馈（只写平台反馈表）",
+        "method": "POST",
+        "path": "/api/v1/ai/feedback",
+        "permission": "feedback.create",
+        "auth_required": True,
+        "parameters": {
+            "answer_event_id": {"type": "integer"},
+            "rating": {"type": "string", "enum": ["correct", "partially_correct", "incorrect", "insufficient_evidence", "ambiguous"]},
+            "error_types": {"type": "array"},
+            "comment": {"type": "string"},
+        },
+    },
+    {
+        "name": "get_feedback_status",
+        "description": "查询反馈解决状态与新版本引用",
+        "method": "GET",
+        "path": "/api/v1/ai/feedback/{feedback_id}",
+        "permission": "query.view",
+        "auth_required": True,
+        "parameters": {"feedback_id": {"type": "integer"}},
+    },
+    {
         "name": "get_lineage_impact",
         "description": "分析某表被哪些 ODS 视图引用",
         "method": "GET",
@@ -140,13 +165,32 @@ AVAILABLE_TOOLS = [
     },
     {
         "name": "get_system_context",
-        "description": "按系统/数据源获取全量表/字段/关系上下文（供 AI 理解系统结构）",
+        "description": "按系统/数据源获取全量表/字段/关系上下文 + 全量 confirmed 值域与陷阱（149：写 SQL 前必须先取）",
         "method": "GET",
         "path": "/api/v1/ai/system-context",
         "auth_required": True,
         "parameters": {
             "system_code": {"type": "string", "description": "系统编码，如 DATA_CENTER/HIS_SOURCE"},
             "max_tables": {"type": "integer", "description": "最大导出的表数，默认 30"},
+        },
+    },
+    # 149 P1b/P1c：值域知识库主动查询入口（AI 可增量拉取）
+    {
+        "name": "list_value_domains",
+        "description": "查询字段值域知识库（confirmed 值域+陷阱；支持 updated_since 增量与 conflicted 冲突列表）",
+        "method": "GET",
+        "path": "/api/v1/value-domains",
+        "permission": "value_domain.read",
+        "auth_required": True,
+        "parameters": {
+            "system_code": {"type": "string"},
+            "schema_name": {"type": "string"},
+            "table_name": {"type": "string"},
+            "column_name": {"type": "string"},
+            "domain_kind": {"type": "string", "description": "enum/threshold/literal/trap"},
+            "status": {"type": "string", "description": "pending/confirmed/deprecated"},
+            "conflicted": {"type": "boolean"},
+            "updated_since": {"type": "string", "description": "ISO 时间，增量拉取"},
         },
     },
     {
@@ -301,9 +345,85 @@ def list_tools() -> ApiResponse[dict]:
     )
 
 
-@router.get("/mcp/catalog", summary="126 P5：MCP 风格工具目录（查询/指标/数据产品）")
+UNIFIED_TOOLS_144 = [
+    {
+        "name": "resolve_query_intent",
+        "description": "按问题/系统/业务域构建统一 AI context 快照（认证资产优先；149 起携带全量 confirmed 值域+陷阱 value_domains 段）",
+        "method": "POST",
+        "path": "/api/v1/ai/context/resolve",
+        "permission": "ai.context.read",
+        "auth_required": True,
+        "parameters": {
+            "question_summary": {"type": "string"},
+            "system_code": {"type": "string"},
+            "business_domain": {"type": "string"},
+            "max_objects": {"type": "integer", "default": 200},
+        },
+    },
+    {
+        "name": "get_certified_context",
+        "description": "按 context_id 读取可复现上下文（含过期/截断状态）",
+        "method": "GET",
+        "path": "/api/v1/ai/context/{context_id}",
+        "permission": "ai.context.read",
+        "auth_required": True,
+        "parameters": {"context_id": {"type": "string"}},
+    },
+    {
+        "name": "search_certified_queries",
+        "description": "检索现行查询资产（certified 优先标注，禁止重写口径）",
+        "method": "GET",
+        "path": "/api/v1/queries",
+        "permission": "query.view",
+        "auth_required": True,
+        "parameters": {"keyword": {"type": "string"}, "system_code": {"type": "string"}},
+    },
+    {
+        "name": "explain_metric",
+        "description": "解释指标口径：分子/分母/公式/版本/认证状态",
+        "method": "GET",
+        "path": "/api/v1/metrics/{metric_code}",
+        "permission": "query.view",
+        "auth_required": True,
+        "parameters": {"metric_code": {"type": "string"}},
+    },
+    {
+        "name": "execute_data_product",
+        "description": "执行已发布数据产品（参数化、限流、禁止任意 SQL）",
+        "method": "POST",
+        "path": "/api/v1/data-products/{product_code}/execute",
+        "permission": "query.run",
+        "auth_required": True,
+        "parameters": {"product_code": {"type": "string"}, "parameters": {"type": "object"}},
+    },
+    {
+        "name": "validate_query_result",
+        "description": "运行查询版本 G1-G3 验证并回传逐层证据",
+        "method": "POST",
+        "path": "/api/v1/queries/{query_code}/versions/{version}/validate",
+        "permission": "query.create",
+        "auth_required": True,
+        "parameters": {"query_code": {"type": "string"}, "version": {"type": "integer"}},
+    },
+    {
+        "name": "get_lineage_impact",
+        "description": "精确 object_key 血缘影响（typed nodes/edges）",
+        "method": "GET",
+        "path": "/api/v1/lineage/impact",
+        "permission": "asset.lineage.view",
+        "auth_required": True,
+        "parameters": {"object_key": {"type": "string"}, "table": {"type": "string"}},
+    },
+]
+
+
+@router.get("/mcp/catalog", summary="126 P5 + 144 S6：MCP 工具目录（全部真实可执行）")
 def mcp_catalog() -> ApiResponse[dict]:
-    """Subset catalog optimized for MCP/Dify registration of governance exports."""
+    """Catalog where every declared tool maps to a real executable endpoint.
+
+    144 A23: no tool is listed that returns "unsupported" — the two feedback
+    feedback tools map to the plan144 S7 endpoints.
+    """
     names = {
         "list_queries",
         "get_query",
@@ -316,13 +436,15 @@ def mcp_catalog() -> ApiResponse[dict]:
         "get_table_schema",
         "get_relations",
         "sql_risk_scan",
+        "list_value_domains",
     }
-    tools = [t for t in AVAILABLE_TOOLS if t["name"] in names]
+    tools = [t for t in AVAILABLE_TOOLS if t["name"] in names] + UNIFIED_TOOLS_144
     return ApiResponse(
         data={
             "name": "data-asset-governance",
-            "version": "126-p5",
+            "version": "144-s6",
             "tools": tools,
+            "tool_count": len(tools),
             "forbidden": ["arbitrary_sql", "dml", "ddl", "credential_export"],
         }
     )
@@ -377,9 +499,18 @@ def list_tool_calls(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.post("/propose-sql", summary="AI 提交 SQL/视图草稿（仅保存，不执行）")
+@router.post(
+    "/propose-sql",
+    summary="AI 提交 SQL/视图草稿（仅保存，不执行；149 附精确字段值域）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def propose_sql(req: ProposeSqlRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     risk_flags = _scan_sql_risk(req.sql_text)
+    # 149 P1c 补充注入：基于 144 sqlglot（app/services/sql_ast.py）提取字段附精确值域；
+    # 解析失败显式返回 value_domains_not_injected_reason，禁止静默。
+    from ...services.value_domain_service import value_domains_for_sql
+
+    vd = value_domains_for_sql(db, req.sql_text, dialect="oracle")
     draft = ViewDraft(
         session_key=req.session_key,
         title=req.title or "未命名",
@@ -399,16 +530,26 @@ def propose_sql(req: ProposeSqlRequest, db: Session = Depends(get_db)) -> ApiRes
             "draft_id": draft.id,
             "title": draft.title,
             "risk_flags": risk_flags,
+            "value_domains": vd["value_domains"],
+            "value_domain_injection": {
+                "injected": vd["injected"],
+                "matched_count": len(vd["value_domains"]),
+                "parser_version": vd["parser_version"],
+                "value_domains_not_injected_reason": vd["not_injected_reason"],
+            },
             "warning": "草稿已保存，需人工审核后执行",
         }
     )
 
 
 def _scan_sql_risk(sql: str) -> dict:
-    upper = sql.upper()
-    flags = {}
+    # B7：危险词判定用整词（词边界）匹配，复用 db_connectors 的公共实现，
+    # 避免 UPDATED_AT/CREATED_BY 等列名被子串匹配误杀；启发式（LAB_RESULT/
+    # 大表/无 WHERE）保持原口径不搬运连接器校验。
     dangerous = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "TRUNCATE", "CREATE", "GRANT", "REVOKE"]
-    found = [w for w in dangerous if w in upper]
+    found = forbidden_keyword_hits(sql, keywords=dangerous)
+    upper = sql.upper()
+    flags: dict = {}
     if found:
         flags["dangerous_keywords"] = found
         flags["blocked"] = True
@@ -461,7 +602,7 @@ def list_drafts(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.patch("/drafts/{draft_id}", summary="审核草稿（通过/拒绝）")
+@router.patch("/drafts/{draft_id}", summary="审核草稿（通过/拒绝）", dependencies=[Depends(require_permission("asset.ai_draft.review"))])
 def review_draft(
     draft_id: int,
     req: DraftReviewRequest, request: Request,
@@ -479,7 +620,11 @@ def review_draft(
     return ApiResponse(data={"id": draft.id, "status": draft.status, "feedback": draft.feedback})
 
 
-@router.post("/drafts/{draft_id}/execute", summary="Execute approved SQL draft in read-only mode")
+@router.post(
+    "/drafts/{draft_id}/execute",
+    summary="Execute approved SQL draft in read-only mode",
+    dependencies=[Depends(require_permission("ai.sql.execute"))],
+)
 def execute_approved_draft(
     draft_id: int,
     req: DraftExecuteRequest, request: Request,
@@ -518,7 +663,9 @@ def execute_approved_draft(
         db=db,
     )
     if result.get("status") != "success":
-        raise HTTPException(status_code=400, detail={"message": "SQL execution failed", "result": result})
+        # B3：失败回显统一走 sanitize_text，防止 note 携带连接串/路径外泄。
+        sanitized = {**result, "note": sanitize_text(str(result.get("note") or ""), limit=500)}
+        raise HTTPException(status_code=400, detail={"message": "SQL execution failed", "result": sanitized})
 
     draft.status = "executed"
     draft.feedback = (draft.feedback or "") + f"\nexecuted_by={current_user}; source_code={req.source_code}"
@@ -585,7 +732,11 @@ def list_sessions(
 
 # --- 保留的原有接口 ---
 
-@router.post("/export-context", summary="导出脱敏 AI 上下文（表/字段/关系，不含患者数据）")
+@router.post(
+    "/export-context",
+    summary="导出脱敏 AI 上下文（表/字段/关系，不含患者数据）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def export_context(req: ExportRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     if not req.tables:
         raise HTTPException(status_code=400, detail="请至少选择 1 张表")
@@ -662,13 +813,18 @@ def export_context(req: ExportRequest, db: Session = Depends(get_db)) -> ApiResp
 # P10 新增：系统级别上下文 + SQL 风险扫描独立接口
 # ──────────────────────────────────────────────
 
-@router.get("/system-context", summary="按系统导出 AI 上下文（P10 增强）")
+@router.get(
+    "/system-context",
+    summary="按系统导出 AI 上下文（P10 增强；149 附带全量 confirmed 值域+陷阱）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def system_context(
     system_code: str = Query(..., description="系统编码"),
     max_tables: int = Query(30, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     from ...models.asset_system import AssetSystem
+    from ...services.value_domain_service import confirmed_domains_for_injection
     sys = db.scalar(select(AssetSystem).where(AssetSystem.system_code == system_code))
     tables = db.scalars(
         select(AssetTable).where(AssetTable.system_code == system_code).limit(max_tables)
@@ -701,6 +857,10 @@ def system_context(
     if table_names:
         total_relations = len(relations)
 
+    # 149 P1c 主注入路径：该系统全部 confirmed 值域+陷阱（全量，不依赖列级解析；
+    # 未裁决冲突与 pending/deprecated 已在服务层过滤），逐条回带 version_no 供留痕。
+    value_domains = confirmed_domains_for_injection(db, system_code=system_code)
+
     return ApiResponse(data={
         "system_code": system_code,
         "system_name_cn": sys.system_name_cn if sys else system_code,
@@ -719,6 +879,8 @@ def system_context(
             for t in tables
         ],
         "relations": relations,
+        "value_domains": value_domains,
+        "value_domain_count": len(value_domains),
         "safety": "只读元数据，不含患者数据",
     })
 
@@ -740,7 +902,11 @@ _INLINE_TOOL_DISPATCH = {
 }
 
 
-@router.post("/tool-execute", summary="AI 工具执行代理（只读，真实分发或明确不支持）")
+@router.post(
+    "/tool-execute",
+    summary="AI 工具执行代理（只读，真实分发或明确不支持）",
+    dependencies=[Depends(require_permission("ai.sql.execute"))],
+)
 def tool_execute(req: ToolExecuteRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Never return fake executed=True. Dispatch known read-only helpers or mark unsupported."""
     tool_names = [t["name"] for t in AVAILABLE_TOOLS]
@@ -809,3 +975,59 @@ def sql_risk_scan(req: SqlScanRequest) -> ApiResponse[dict]:
         "risk_flags": flags,
         "safe_for_review": not flags.get("blocked", False),
     })
+
+
+# ===== 144 S6: unified AI context (ai-data-context/v1) =====
+
+
+class ContextResolveRequest(BaseModel):
+    question_summary: str | None = Field(None, max_length=500)
+    system_code: str | None = None
+    source_code: str | None = None
+    business_domain: str | None = None
+    max_objects: int = Field(200, ge=1, le=2000)
+
+
+@router.post(
+    "/context/resolve",
+    summary="144 S6：按问题/系统/业务域构建统一上下文快照",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
+def resolve_context(
+    req: ContextResolveRequest, request: Request, db: Session = Depends(get_db)
+) -> ApiResponse[dict]:
+    from ...services.ai_context_builder import build_context_snapshot
+
+    try:
+        doc = build_context_snapshot(
+            db,
+            question_summary=req.question_summary,
+            system_code=req.system_code,
+            source_code=req.source_code,
+            business_domain=req.business_domain,
+            max_objects=req.max_objects,
+            include_sql=False,  # unified context never carries full SQL (144 §4.6)
+            created_by=getattr(request.state, "user_identifier", None),
+        )
+        db.commit()
+    except Exception as exc:  # sanitized error taxonomy only
+        db.rollback()
+        raise HTTPException(status_code=500, detail="上下文构建失败，请稍后重试") from exc
+    return ApiResponse(data=doc)
+
+
+@router.get(
+    "/context/{context_id}",
+    summary="144 S6：读取可复现上下文（含过期/截断状态）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
+def get_context(
+    context_id: str,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    from ...services.ai_context_builder import load_context_snapshot
+
+    doc = load_context_snapshot(db, context_id)
+    if doc is None:
+        raise HTTPException(status_code=404, detail=f"context 不存在: {context_id}")
+    return ApiResponse(data=doc)

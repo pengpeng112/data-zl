@@ -1,0 +1,211 @@
+• Let me read the plan file first.This is a big review task. The user wants me to review each item in the plan, verify against source code (read-only), output 同意/反对/疑问 with reasons and risks, citing section numbers. There are ~50 findings (A1-A11, B1-B9, C1-C7, D1-D9, E1-E15, F1-F8, G1-G3, plus P0-P6 plans, risks, boundaries).
+
+  Given the volume, I should delegate spot-checking to subagents (explore, read-only) to verify the claims against the code, then compose the review myself. The plan claims "已抽验" for some. My job is independent review.
+
+  Let me organize: I'll verify key/high-severity claims myself or via parallel explore agents. Since I cannot read other files in review/, only the 方案.md, and backend/frontend source.
+
+  Let me launch a swarm of explore agents, each verifying a group of claims with exact file:line citations, reporting whether the claim is accurate (code exists as described, severity assessment reasonable).
+
+  Groups:
+  1. A组 backend correctness: db_connectors.py:570-574, quality.py:246-251 & ~945, query_runner.py:279, relation_reviews.py:245-246, jhemr_identity_adapter.py:306-311, identity_sync.py:70-73, db_connectors.py:228-231, query_intake.py:194-201, metric_service.py:235-242, metrics.py:161, db_connectors.py:586-597.
+  2. B组 security: auth.py:71-74, queries.py:596-628 & 53, quality_sql_runner.py:152-153, ai.py:652-653, queries.py:437, governance.py:551-572, admin.py:50-79, relation_reviews.py:207-234, dict_medical_api.py lines, ai.py:500..., quality_templates.py:119-122,192, ai.py:539-546 vs db_connectors.py:18-22, db_connectors.py:313,391,470, auth.py:163 rate limit, and the slowapi exclusion claim (rate_limit.py).
+  3. C组 performance: graph.py:1467-1476,1790-1806, main.py:468 + core/db.py, queries.py:88-95,536-539, metrics.py:159-171,193, quality.py dedup loop, dict_medical_api.py:352-365, tables.py:206-246.
+  4. D组 redundancy: queries.py:30-32 etc., 12处 operator 样板, dict_medical_api.py:151-174 vs 331-350, metrics.py:283-317 vs 320-353, permissions.py:118-128 (verify 0 references — hard but grep), data_product_service.py:201/240, rate_limit.py:14-18, tables.py:331-334, backend/scripts count.
+  5. E组 frontend: dict/medical/index.vue:377-586, systems/index.vue:437-478, quality/index.vue, table-detail/index.vue:447,460, local-accounts, accounts/index.vue:76, query-center/queries/index.vue:593-604,805-821, tables/index.vue:770-779, graph/index.vue:615-757,829-848, mappings/index.vue:383-388, relation-review/index.vue:257-278, utils/http/index.ts:43-45, router/index.ts:81-93, admin/index.vue:481,546, http/index.ts:250-259, user.ts:73-92, tables/index.vue:570-575, systems/index.vue:491.
+  6. F组 frontend types/redundancy: ApiResponse duplicates, identity.ts any, dead code functions, 裸 http 23处, error extractor duplicates, paged list boilerplate, ISO time, dict.ts unknown.
+  7. G组 test blind spots + P-plan sanity (check that referenced helpers like sanitize_text, extractErrorDetail, errorMessage.ts exist; check RESOURCE_CATALOG existence; check `ai.sql.execute` permission code existence; check `_serialize_version_for_read` at queries.py:53; check SqlServer masking helper existence).
+
+  That's 7 subagents. Use AgentSwarm? The prompts are differently shaped, so separate Agent calls in one message. Explore agents are read-only — good, matches "禁止修改任何文件".
+
+  Each prompt needs context: project root F:/python/数据资产, verify claims, report per item: 成立/不成立/部分成立 + evidence. Ask for concise output.
+
+  Then I compose the final per-item review with my own judgment (同意/反对/疑问 + 理由 + 风险), also reviewing plan-level items (P0-P6 approach, §5 risks, §7 exclusions).
+
+  Let me write the prompts carefully, quoting the claims from the plan.
+
+• All six subagents completed. Now I compose the per-item review: 同意/反对/疑问 + 理由 + 风险, citing section numbers or quotes. I need to cover:
+
+  - §0/§1 background & boundaries
+  - §2 findings: A1-A11, B1-B9 + the excluded slowapi item (important — my verification found the exclusion is WRONG!), C1-C7, D1-D9, E1-E15, F1-F8, G1-G3
+  - §3 P0-P6 plan items
+  - §4 acceptance
+  - §5 risks
+  - §6 prompt
+  - §7 exclusions
+
+  Critical findings from verification:
+  1. B-排除项 (slowapi default_limits): subagent found main.py:314-315 mounts SlowAPIMiddleware + app.state.limiter, so slowapi DOES apply default_limits to all undecorated routes. The plan's exclusion claim (based on "production test 60 requests no 429") conflicts with code behavior. Wait — but the drafter claims they tested on production with 60 requests all 200. If default_limits are 200/day+50/hour, 60 requests within an hour should trip 50/hour. Unless rate_limit_enabled is False in prod, or the limiter is disabled. Hmm, subagent says `enabled=_enabled()` depends on settings.rate_limit_enabled default True, test env disabled. If prod has rate_limit_enabled true and middleware mounted, 60 requests should 429. The fact that they didn't suggests either rate_limit_enabled=false in prod, or... Actually wait, SlowAPIMiddleware checks `app.state.limiter` and applies default limits only to routes that are decorated OR... Let me think about slowapi behavior: SlowAPIMiddleware applies limits to routes that have been decorated with @limiter.limit, and also applies default_limits to ALL routes if the limiter has default_limits set — actually yes, slowapi's middleware checks each request against default limits for routes without explicit limits... Let me recall. slowapi Limiter.__init__ has `default_limits`, and the middleware calls `_check_request_limit` for every request; routes not decorated get checked against default_limits if `default_limits` is set... Actually I believe slowapi only rate-limits decorated routes; the default_limits apply to routes decorated with @limiter.limit() without args? No — in slowapi, `default_limits` are applied to ALL routes when the middleware is used. From slowapi docs: "default_limits: default limits to apply to all routes". Yes, with SlowAPIMiddleware, default limits apply to every request for routes that don't have their own limits. So the code supports default_limits being global.
+
+  But then why did the prod test of 60 requests not 429? Possibilities: rate_limit_enabled=False in prod env, or the /api/v1/health endpoint... hmm, 50/hour should trip at request 51. Unless the limiter key is get_remote_address and requests came through proxy so... still same IP. Or the prod test claim itself is fabricated/wrong. This is a genuine conflict: subagent read code; drafter claims empirical test. I should flag this as 反对/疑问 — the exclusion decision rests on empirical claim, but code analysis suggests default_limits DO apply globally when middleware mounted. This is a significant review finding: the plan's exclusion note (§2.2 排除段) may be wrong, and P3-7's comment text "仅对显式 @limiter.limit 路由生效（实测验证）" would enshrine a false statement in code comments. That's worth 反对.
+
+  Actually let me double check slowapi behavior more carefully, since this is a consequential claim. I could read rate_limit.py and main.py myself quickly. Let me read those two files to be certain.
+
+  2. D5: partially wrong — 3 of 7 codes are actually used (query.schedule, product.publish used by frontend v-perms; ai.draft.view used in role preset + test). P3-5 deletion would break frontend button visibility and test_permissions. 反对部分.
+
+  3. F3: ReDialog is alive (used by App.vue) — plan says delete it; wrong. 反对该子项.
+
+  4. F4: counts off (admin 12 not 9, quality 11, missing table-detail 2). Minor.
+
+  5. G3: /graph/diagnostics HAS tests (test_graph.py:253,285,383); claim "无对应测试文件" half wrong. P6-3 would add duplicate smoke. 疑问/部分反对.
+
+  6. E5: doUnbind HAS catch; claim partially wrong.
+
+  7. E11: saveSrollTop has zero references — the branch is dead code; "grep 引用处同步" in P4-9 moot; also both branches never resolve — worse than reported.
+
+  8. B6: template escape is latent (templates not used at runtime) — severity 中 overstated; P1-5 fine but low priority.
+
+  9. B3: quality_sql_runner finding.detail path currently unreachable (error_cnt>0 precondition) — partial.
+
+  10. A4: description of fix (fetchmany(max_rows+1)) would require connector changes; current fetchmany(safe_limit) — the "恰好等于误报" is real. Fix approach in P2 mentions "注意与取数 fetchmany(max_rows+1) 策略配套" — but connectors don't do max_rows+1 currently; so fix is more involved. 疑问.
+
+  11. P1-4: permission codes `ai.sql.execute` / `dict.medical.write` don't exist — need new codes, plan acknowledges "缺失则新增". OK but risk: middleware RBAC prefix for /api/v1/ai requires platform_admin/quality_admin already, adding Depends codes must grant to those roles — noted in §5. Fine.
+
+  12. C1: severity 高 might be overstated — AssetRelation currently only dozens-hundreds of rows; resolve_endpoint only fires SQL for un-backfilled rows. Plan calls it "高/数据量增长后不可用". I'd say 同意修复但严重度中高→中. Also P0-4 in P0 (highest priority batch) — reasonable anyway.
+
+  13. D9: root-level dev.log/dev.err/*.db claim inaccurate — they're under backend/. P3-8 says "根目录 dev.log/dev.err/*.db 加入 .gitignore 并删除本地文件" — path wrong, files are in backend/. 疑问/部分反对. Also P3-8 says `git mv` — but §1/§7 says 零 Git 写操作... git mv is a git operation! Conflict: P3-8 instructs "git mv 保留历史" while §0 principle 4 and §7 say "不做 Git commit/push" — git mv stages changes but isn't commit. It's a git mutation though. Flag as 疑问/边界冲突. Also "删除本地文件" of dev.log — destructive but trivial; and it's in backend/ not root.
+
+  14. §6 prompt references "review/round-2/ 最终报告" — fine. Also "开起步包/153..." typo (should be 开发起步包) — §3 header also has "开起步包" typo: "不动 deploy/、开起步包/、.agents/" — typo worth noting.
+
+  15. E2: verified成立.
+
+  16. B9 exclusion from P-batches: fine to keep as discussion item — 同意.
+
+  17. B2 fix P1-1: reasonable.
+
+  18. E15: partially wrong — extra fields not actually sent back (whitelist). Severity 低 anyway; P-plan doesn't include E15 fix explicitly? P4 covers E1-E12; E15 not in any batch. Actually §3 P4 says (E1-E12), E13-E15 excluded or... E13/E14 explicitly in §7 不做. E15 not mentioned anywhere — falls through cracks. 疑问: E15 既不在 P4(E1-E12) 也不在 §7 不做清单，漏项。Given verification says it's basically harmless, fine but should be recorded.
+
+  19. P5-6 usePagedList: 6-page pilot, reasonable.
+
+  20. P0-1 fix approach: pymssql pyformat — regex extraction of %(name)s order is a reasonable fix; but simpler: pass params dict directly to pymssql execute since pymssql supports pyformat dict binding! pymssql supports `cursor.execute(sql, {'name': val})` with %(name)s. So the fix could just pass the dict. The plan's "按 SQL 文本占位符出现顺序重排参数" works too but more fragile. 疑问/建议: simpler fix available. Also note pyodbc branch keeps dict — pyodbc uses ? positional, dict wouldn't work either; plan says "驱动是 pyodbc 时保持 dict 不变" — pyodbc can't take dict params. Hmm, need care. I'd flag.
+
+  21. A9 fix: retry once on IntegrityError — fine.
+
+  22. C2: middleware session — actual fix direction not detailed in P-batches! C2 is in findings but which P batch fixes it? P0 covers A1,A2,B1,C1,A3. P2 covers A4-A11. C2,C3,C4,C5,C6,C7 — where? §3 doesn't have a batch for C2-C7! Let me check: P0: A1,A2,B1,C1,A3. P1: B2-B8. P2: A4-A11. P3: D1-D9. P4: E1-E12. P5: F1-F8. P6: G1-G3. C2,C3,C4,C5,C6,C7 are NOT covered by any batch! That's a major omission — 6 of 7 performance findings have no execution task. 反对/重大遗漏.
+
+  Let me double-check: P0 header "P0 后端高危修复（A1、A2、B1、C1、A3）" — yes only C1. No batch mentions C2-C7. Confirmed major gap.
+
+  23. B3 in P1-2, B4→P1-3, B5→P1-4, B6→P1-5, B7→P1-6, B8→P1-7. B2→P1-1. OK all B covered except B9 (deliberate).
+
+  24. §4 static check: `git grep -n "startswith" -- backend/app/api/v1/auth.py 无` — but auth.py may legitimately keep startswith elsewhere; also git grep is read-only, fine.
+
+  25. E8 subagent noted saveRow/toggleStatus also silently fail — not in plan. Minor addition.
+
+  26. G1: 成立. P6-1 fine.
+
+  27. F5: plan says "4 个视图各自重写错误提取器" — actually inline duplication, no local functions; the fix (unify import) still valid. 同意实质.
+
+  28. F7: formatTime used by only 2 files (plan says 3); fine.
+
+  29. E13 excluded in §7 — 同意 (low value).
+
+  Also verify A3 fix approach in P0-5: "先 db.rollback() 再用新会话/同会话恢复写 failed" — fine.
+
+  Should I verify the slowapi question myself before making a strong 反对? Yes, it's my biggest objection. Let me read rate_limit.py and main.py middleware mounting.
+
+• Confirmed: SlowAPIMiddleware is mounted and limiter has default_limits 200/day + 50/hour. In slowapi, when SlowAPIMiddleware is used, every request passing through the middleware is checked: routes without explicit limits fall back to default_limits. Actually let me be careful — slowapi's behavior: the middleware calls `self.limiter._check_request_limit(request, ...)`? Let me recall slowapi source (middleware.py):
+
+  ```python
+  class SlowAPIMiddleware:
+      async def __call__(self, scope, receive, send):
+          ...
+          app = scope["app"]
+          limiter = app.state.limiter
+          handler = None
+          # get route name
+          ...
+          name = endpoint.__name__ if endpoint else None
+          # check if exempt
+          if limiter._is_exempt(...): return
+          # check limits
+          try:
+              limiter._check_request_limit(request, endpoint, in_middleware=True)
+          except RateLimitExceeded ...
+  ```
+
+  And `_check_request_limit`: it gathers limits for the route: explicit limits from decorated route; if none and `in_middleware`, it applies `self._default_limits` when... Looking at slowapi Limiter._check_request_limit: 
+
+  ```python
+  if not limits and in_middleware and self._default_limits:
+      limits = self._default_limits
+  ```
+
+  Actually there's also `self._in_middleware_default_limit` ... I recall in slowapi, default_limits DO apply to all routes when the middleware is installed. Yes — the documented behavior: "default_limits ... will be applied to all routes unless overridden". From slowapi docs: "The limiter can be initialized with default limits that apply to all routes". So the code supports the "scan" claim, and the plan's exclusion based on prod empirical test is questionable.
+
+  But why did the prod test show no 429 on 60 hits to /api/v1/health? Possibilities: prod runs with rate_limit_enabled=false, or env contains "test"?, or health endpoint... 50/hour would trip at 51 within an hour. 60 requests → should have tripped. Unless each request came with different remote addr (proxy?). get_remote_address uses request.client.host — behind nginx without proxy middleware, all share nginx IP → same key → should trip even faster. So the empirical claim is inconsistent with the code unless rate_limit_enabled=false in prod. Can't verify prod env. So my review verdict: 反对该排除结论的确定性 — 证据冲突,需要查清生产 rate_limit_enabled 实际值;P3-7 的注释文案"仅对显式 @limiter.limit 路由生效（实测验证）"会把未经证实的结论写进代码,反对该措辞。
+
+  Also health check 60 times: maybe /api/v1/health is decorated with @limiter.exempt? I can grep quickly. Let me check whether any exempt decorators exist.Confirmed: 4 decorated endpoints, no exempt. With SlowAPIMiddleware + default_limits, slowapi applies default limits to all other routes. The plan's exclusion claim ("仅对显式装饰路由生效，实测 60 次零 429") conflicts with the code. The empirical test result can only be explained by prod rate_limit_enabled=false or the request path bypassing... Either way, the exclusion's reasoning is unreliable.
+
+  Actually wait — one more nuance: slowapi's middleware `_check_request_limit` — in some versions, default limits only apply when the route is NOT decorated... and there might be a subtlety: `in_middleware=True` path applies `self._default_limits` only if the route has no limits AND... I'm fairly confident default_limits apply globally with middleware. This is documented slowapi behavior. So my verdict: 反对/重大疑问 on the exclusion.
+
+  Now write the final review. Structure: per-item verdicts. Long but required — user asked 逐条. I'll organize by section, keep each item compact: 判定 + 理由 + 风险.
+
+  Items to cover:
+  - §0 设计原则 (4 principles)
+  - §1 硬边界
+  - §2.1 A1-A11
+  - §2.2 B1-B9 + 排除段
+  - §2.3 C1-C7
+  - §2.4 D1-D9
+  - §2.5 E1-E15
+  - §2.6 F1-F8
+  - §2.7 G1-G3
+  - §3 P0-P6 (with the C2-C7 gap!)
+  - §4 门禁
+  - §5 风险
+  - §6 提示词
+  - §7 不做项
+
+  Key disagreements:
+  1. §2.2 排除段 (slowapi) — 反对。代码事实相反: SlowAPIMiddleware + default_limits → 全局生效。实测零429只可能 rate_limit_enabled=false 或环境差异。P3-7 注释文案错误。
+  2. §3 C2-C7 无对应批次 — 重大遗漏。P0只含C1。反对方案完整性。
+  3. D5/P3-5 — 部分反对: query.schedule/product.publish 被前端 v-perms 引用, ai.draft.view 被角色预设+测试引用。真死码只有3个。
+  4. F3/P5-3 ReDialog — 反对删除, App.vue 在用。
+  5. G3 — 部分反对: /graph/diagnostics 有测试 (test_graph.py), 方案称无; P6-3 会重复建设。
+  6. E5 — 部分: doUnbind 有 catch (只是无确认弹窗)。
+  7. E11/P4-9 — saveSrollTop 全仓 0 引用, 死分支; 且 savedPosition 分支也不 resolve — 比方案描述更糟; "grep 引用处同步"无意义, 应直接删死码。
+  8. E15 漏项 — 不在任何批次也不在§7; 且核验显示多余字段并不回传(白名单), 问题更轻。
+  9. D9/P3-8 — 路径错误: dev.log/dev.err/*.db 在 backend/ 不在根目录; P3-8 用 `git mv` 与§1/§7 "零 Git 写操作" 边界冲突。
+  10. B6 — 成立但当前运行期不可达(模板未被运行时引用), 严重度中→低; P1-5 可做但非"中"优先级。
+  11. B3 — quality_sql_runner 的 finding.detail 路径当前不可达 (error_cnt>0 前置), 但 note 流出成立。
+  12. A4/P2 — 修复需配套连接器 fetchmany(max_rows+1), 目前连接器没有该策略; 方案有提及"注意配套"但没列为任务, 容易只改一半。
+  13. P0-1 — pymssql 直接支持 dict 传参(pyformat), 更简单的修复是 `execute(sql, params)` 而非正则重排; "pyodbc 时保持 dict 不变" 有问题, pyodbc 只支持位置参数。
+  14. E8 — 方案漏了 mappings 的 saveRow/toggleStatus 无 catch; sync-diffs 只有 loadData 无 catch (doSync/updateStatus 有), 描述"×2"不准。
+  15. F4 — 数量分布不准 (admin 12 非 9, 漏 table-detail 2 处), 总数 27 接近 23。
+  16. F5 — "4 个视图各自重写错误提取器" 字面不准 (是 19 个视图内联重复), 修复方向不变。
+  17. C1 严重度"高" — 当前关系量级小(数十~数百), 且已回填行 0 SQL; 定"中"更准, 但修值得。
+  18. B9 留讨论 — 同意。
+  19. §6 提示词引用 "review/round-2/ 最终报告" — 疑问: 该文件目前不存在(方案还是草案v1); 执行 AI 必读清单悬空。Also §6 has typo "开起步包" and §3 header "开起步包" typo.
+
+  Also P1-4: codes don't exist — plan says 新增并登记, OK; risk acknowledged in §5. 同意但需明确默认授予矩阵。
+
+  P4-8 qs arrayFormat change: verified issue real; risk noted in §5. 同意.
+
+  A10: description "== 与 in 双条件" 不准 (第二个是 Python 子串匹配); minor.
+
+  D2: 方案称 12 处, 实际 15 处 (relation_reviews 3 处变体 default="reviewer") — P3-2 说"12 处改用" 会漏 3 处。反对/疑问计数。
+
+  D3: 成立. D4 成立.
+
+  A2 severity "高" — it's performance not correctness; in A组(正确性)归类不当, but P0-3 placement fine.
+
+  C7: "14 个 COUNT" 实为 13 + 其他聚合 ≈17 串行查询; fine.
+
+  E6: 成立. E9: 成立, P4-7 fix (404 only fallback) 同意.
+
+  E10/P4-8: 同意.
+
+  F1, F2, F6, F8: 成立.
+
+  G1, G2: 成立.
+
+  §4 静态复核 git grep startswith auth.py: fine read-only.
+
+  §5 risks: reasonable but missing the C2-C7 omission obviously; P1-4 risk mitigation says default grant to platform_admin — ok.
+
+  Let me also mention A3 verified at quality.py:937-941.
+
+  Verdicts summary at top. Keep each item one line-ish. This will be long but the user asked for 逐条.
+
+  Format: use compact bullets with 判定 tags. Let me write it.
+
+To resume this session: kimi -r session_7d1a77f7-0f5a-45e2-a85d-29db6f76bf2b

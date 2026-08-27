@@ -144,6 +144,30 @@ def cmd_validate(args: argparse.Namespace) -> int:
     # credential leakage
     if re.search(r"(password|passwd|token)\s*[:=]", sql, re.I):
         errors.append("SQL 疑似包含凭据")
+    # ---- 144 §11.2 semantic contract checks ----
+    dialect = str(meta.get("dialect") or "oracle").lower()
+    if dialect in {"postgresql", "vastbase"}:
+        binds = set(x.lower() for x in re.findall(r"%\(([A-Za-z_]\w*)\)s", sql))
+    elif dialect in {"sqlserver", "mssql", "tsql"}:
+        binds = set(x.lower() for x in re.findall(r"@([A-Za-z_]\w*)\b", sql))
+    else:
+        binds = set(x.lower() for x in re.findall(r"(?<![:\w]):([A-Za-z_]\w*)", sql))
+    schema = meta.get("parameter_schema") or {}
+    props: dict = schema.get("properties") if isinstance(schema, dict) else {}
+    props = props or {}
+    declared = {str(k).lower() for k in props}
+    required = {str(k).lower() for k in (schema.get("required") or [])} if isinstance(schema, dict) else set()
+    for missing in sorted(binds - declared):
+        errors.append(f"SQL bind :{missing} 未在 parameter_schema 声明")
+    for unused in sorted(declared - binds):
+        errors.append(f"parameter_schema 声明了 SQL 未使用的参数: {unused}")
+    for req_missing in sorted(required - binds):
+        errors.append(f"required 参数未出现在 SQL bind 中: {req_missing}")
+    for field in ("grain", "period_field"):
+        if not meta.get(field):
+            warnings.append(f"语义契约缺少字段: {field}（144 §11.2 建议填写）")
+    if re.search(r"\bLAB_RESULT\b", upper) and "TEST_NO" not in upper:
+        errors.append("大表 LAB_RESULT 必须以 TEST_NO 限定（144 大表策略）")
     sha = _sha256_text(re.sub(r"\s+", " ", sql.strip().upper()))
     result = {
         "ok": len(errors) == 0,
@@ -152,6 +176,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
         "sql_sha256": sha,
         "query_code": meta.get("query_code"),
         "pack": str(pack),
+        "bind_names": sorted(binds),
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["ok"] else 2

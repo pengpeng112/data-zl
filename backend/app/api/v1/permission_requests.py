@@ -1,9 +1,9 @@
 """Permission and data-scope requests backed by GovernChangeRequest."""
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
@@ -34,10 +34,46 @@ class RequestDecision(BaseModel):
 
 
 def _payload(row: GovernChangeRequest) -> dict:
-    return {"id": row.id, "module": row.module, "entity_type": row.entity_type, "entity_ref": row.entity_ref, "request_type": row.request_type, "request_payload": row.request_payload, "approval_status": row.approval_status, "requested_by": row.requested_by, "approved_by": row.approved_by, "executed_by": row.executed_by, "created_at": row.created_at.isoformat() if row.created_at else None}
+    request_content = row.request_payload or {}
+    return {
+        "id": row.id,
+        "module": row.module,
+        "entity_type": row.entity_type,
+        "entity_ref": row.entity_ref,
+        "request_type": row.request_type,
+        "request_content": request_content,
+        "reason": row.note,
+        "status": row.approval_status,
+        "requested_by": row.requested_by,
+        "approved_by": row.approved_by,
+        "executed_by": row.executed_by,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        # Backward-compatible aliases for clients created before plan 146.
+        "request_payload": request_content,
+        "approval_status": row.approval_status,
+    }
 
 
-@router.post("", dependencies=[Depends(require_permission("permission:request:create"))])
+def _audit(db: Session, *, row: GovernChangeRequest, action: str, operator: str) -> None:
+    db.add(GovernAuditLog(
+        module="permission",
+        entity_type="change_request",
+        entity_ref=str(row.id),
+        action=action,
+        operator=operator,
+        after_data={"status": row.approval_status},
+    ))
+
+
+def _commit(db: Session) -> None:
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
+@router.post("", dependencies=[Depends(require_permission("identity.permission_request.create"))])
 def create_request(req: PermissionRequestCreate, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     if req.request_kind == "role":
@@ -52,34 +88,63 @@ def create_request(req: PermissionRequestCreate, request: Request, db: Session =
         entity_type = "user_data_scope"
     row = GovernChangeRequest(module="permission", entity_type=entity_type, entity_ref=req.target_user_identifier, request_type="grant", request_payload=req.model_dump(mode="json"), approval_status="pending", requested_by=current_user, note=req.reason)
     db.add(row)
-    db.commit()
+    db.flush()
+    _audit(db, row=row, action="create", operator=current_user)
+    _commit(db)
     db.refresh(row)
     return ApiResponse(data=_payload(row))
 
 
-@router.get("/mine")
-def list_mine(request: Request, db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+@router.get("/mine", dependencies=[Depends(require_permission("identity.permission_request.view"))])
+def list_mine(
+    request: Request,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
     current_user = get_current_user(request)
-    rows = db.scalars(select(GovernChangeRequest).where(GovernChangeRequest.module == "permission", GovernChangeRequest.requested_by == current_user).order_by(GovernChangeRequest.created_at.desc())).all()
-    return ApiResponse(data=[_payload(row) for row in rows])
+    stmt = select(GovernChangeRequest).where(
+        GovernChangeRequest.module == "permission",
+        GovernChangeRequest.requested_by == current_user,
+    )
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(GovernChangeRequest.created_at.desc())
+        .offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    return ApiResponse(data={"items": [_payload(row) for row in rows], "total": total, "page": page, "page_size": page_size})
 
 
-@router.get("/pending", dependencies=[Depends(require_permission("permission:request:approve"))])
-def list_pending(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
-    rows = db.scalars(select(GovernChangeRequest).where(GovernChangeRequest.module == "permission", GovernChangeRequest.approval_status == "pending").order_by(GovernChangeRequest.created_at)).all()
-    return ApiResponse(data=[_payload(row) for row in rows])
+@router.get("/pending", dependencies=[Depends(require_permission("identity.permission_request.approve"))])
+def list_pending(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    stmt = select(GovernChangeRequest).where(
+        GovernChangeRequest.module == "permission",
+        GovernChangeRequest.approval_status == "pending",
+    )
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(
+        stmt.order_by(GovernChangeRequest.created_at)
+        .offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    return ApiResponse(data={"items": [_payload(row) for row in rows], "total": total, "page": page, "page_size": page_size})
 
 
-@router.get("/{request_id}")
-def get_request(request_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.get("/{request_id}", dependencies=[Depends(require_permission("identity.permission_request.view"))])
+def get_request(request_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     row = db.get(GovernChangeRequest, request_id)
     if not row or row.module != "permission":
         raise HTTPException(status_code=404, detail="request not found")
+    if row.requested_by != get_current_user(request):
+        require_permission("identity.permission_request.approve")(request, db)
     return ApiResponse(data=_payload(row))
 
 
-@router.patch("/{request_id}/approve", dependencies=[Depends(require_permission("permission:request:approve"))])
-def approve_request(request_id: int, req: RequestDecision, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.patch("/{request_id}/approve", dependencies=[Depends(require_permission("identity.permission_request.approve"))])
+def approve_request(request_id: int, request: Request, req: RequestDecision | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     row = db.get(GovernChangeRequest, request_id)
     if not row or row.module != "permission":
@@ -88,26 +153,29 @@ def approve_request(request_id: int, req: RequestDecision, request: Request, db:
         raise HTTPException(status_code=400, detail="request is not pending")
     if row.requested_by == current_user:
         raise HTTPException(status_code=400, detail="applicant cannot approve own request")
-    row.approval_status, row.approved_by, row.note = "approved", current_user, req.note or row.note
-    db.add(GovernAuditLog(module="permission", entity_type="change_request", entity_ref=str(row.id), action="approve", operator=current_user))
-    db.commit()
+    note = (req.note if req else None) or row.note
+    row.approval_status, row.approved_by, row.note = "approved", current_user, note
+    _audit(db, row=row, action="approve", operator=current_user)
+    _commit(db)
     return ApiResponse(data=_payload(row))
 
 
-@router.patch("/{request_id}/reject", dependencies=[Depends(require_permission("permission:request:approve"))])
-def reject_request(request_id: int, req: RequestDecision, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.patch("/{request_id}/reject", dependencies=[Depends(require_permission("identity.permission_request.approve"))])
+def reject_request(request_id: int, request: Request, req: RequestDecision | None = None, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     row = db.get(GovernChangeRequest, request_id)
     if not row or row.module != "permission" or row.approval_status != "pending":
         raise HTTPException(status_code=404, detail="pending request not found")
     if row.requested_by == current_user:
         raise HTTPException(status_code=400, detail="applicant cannot reject own request")
-    row.approval_status, row.approved_by, row.note = "rejected", current_user, req.note or row.note
-    db.commit()
+    note = (req.note if req else None) or row.note
+    row.approval_status, row.approved_by, row.note = "rejected", current_user, note
+    _audit(db, row=row, action="reject", operator=current_user)
+    _commit(db)
     return ApiResponse(data=_payload(row))
 
 
-@router.post("/{request_id}/execute", dependencies=[Depends(require_permission("permission:request:execute"))])
+@router.post("/{request_id}/execute", dependencies=[Depends(require_permission("identity.permission_request.execute"))])
 def execute_request(request_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     row = db.get(GovernChangeRequest, request_id)
@@ -126,11 +194,12 @@ def execute_request(request_id: int, request: Request, db: Session = Depends(get
     else:
         raise HTTPException(status_code=400, detail="unsupported request type")
     row.approval_status, row.executed_by, row.execution_result = "executed", current_user, "applied"
-    db.commit()
+    _audit(db, row=row, action="execute", operator=current_user)
+    _commit(db)
     return ApiResponse(data=_payload(row))
 
 
-@router.post("/{request_id}/revoke", dependencies=[Depends(require_permission("permission:request:execute"))])
+@router.post("/{request_id}/revoke", dependencies=[Depends(require_permission("identity.permission_request.execute"))])
 def revoke_request(request_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     current_user = get_current_user(request)
     row = db.get(GovernChangeRequest, request_id)
@@ -141,5 +210,6 @@ def revoke_request(request_id: int, request: Request, db: Session = Depends(get_
     else:
         db.query(AssetUserDataScope).filter(AssetUserDataScope.request_id == row.id, AssetUserDataScope.status == "active").update({"status": "revoked", "revoked_by": current_user})
     row.approval_status, row.executed_by = "revoked", current_user
-    db.commit()
+    _audit(db, row=row, action="revoke", operator=current_user)
+    _commit(db)
     return ApiResponse(data=_payload(row))

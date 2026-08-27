@@ -105,11 +105,28 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
             continue
 
         staff_raw = staff_src.raw_data if staff_src and isinstance(staff_src.raw_data, dict) else {}
-        job = person.raw_job or staff_raw.get("JOB")
-        title = person.raw_title or staff_raw.get("TITLE")
-        create_date = person.source_create_date or _parse_create_date(staff_raw.get("CREATE_DATE"))
         employee_raw = employee_src.raw_data if employee_src and isinstance(employee_src.raw_data, dict) else {}
+        # 2026-08-24 用户裁决：分类要素以 FXHIS.SYS_EMPLOYEE 为主、COMM.STAFF_DICT 仅辅助。
+        # 职称优先取 SYS_EMPLOYEE.LEVLCODE 的 EmployeeTitle 字典名（采集时已
+        # 持久化到 person.job_title）；STAFF_DICT.TITLE 只在无员工表证据时兜底。
+        employee_title = person.job_title if employee_src is not None else None
+        staff_title = person.raw_title or staff_raw.get("TITLE")
+        job = person.raw_job or staff_raw.get("JOB")
+        title = employee_title or staff_title
+        create_date = (
+            person.source_create_date
+            or _parse_create_date(staff_raw.get("CREATE_DATE"))
+            or _parse_create_date(employee_raw.get("CREATEDTIME"))
+        )
         modified_time = _parse_create_date(employee_raw.get("MODIFIEDTIME"))
+        title_source = None
+        if title is not None and employee_title and staff_title and str(employee_title).strip() != str(staff_title).strip():
+            title_source = {
+                "resolved": "title_mismatch_employee_authority",
+                "authoritative_source": EMPLOYEE_TABLE,
+                "employee_levlcode_title": str(employee_title).strip(),
+                "staff_dict_title": str(staff_title).strip(),
+            }
 
         staff_flag = _status_flag(staff_src.source_status if staff_src else None)
         employee_flag = _status_flag(employee_src.source_status if employee_src else None)
@@ -135,8 +152,10 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
             modified_time=modified_time,
         )
 
+        # raw_* 列保留 STAFF_DICT 原始证据语义；分类输入（employee 优先）的
+        # 差异写入分类记录 conflict_detail 供审计，不覆盖 raw 证据。
         person.raw_job = (str(job).strip() if job else None) or person.raw_job
-        person.raw_title = (str(title).strip() if title else None) or person.raw_title
+        person.raw_title = (str(staff_title).strip() if staff_title else None) or person.raw_title
         if create_date is not None and person.source_create_date is None:
             person.source_create_date = create_date
         person.classification = result.classification
@@ -157,7 +176,12 @@ def run_classification_preflight(db: Session) -> dict[str, Any]:
         record.raw_title = person.raw_title
         record.classification = result.classification
         record.matched_rule = result.matched_rule
-        record.conflict_detail = {**(result.conflict_detail or {}), **resolved_note} if resolved_note else result.conflict_detail
+        detail = dict(result.conflict_detail or {})
+        if resolved_note:
+            detail.update(resolved_note)
+        if title_source:
+            detail.update(title_source)
+        record.conflict_detail = detail
         record.source_create_date = person.source_create_date
 
         stats["classified"] += 1

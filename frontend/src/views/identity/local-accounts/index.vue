@@ -51,12 +51,12 @@
         <el-table-column prop="last_login_at" label="最近登录" min-width="160" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="toggleEnabled(row)">
+            <el-button link type="primary" :loading="actingIds.has(row.id)" @click="toggleEnabled(row)">
               {{ row.enabled ? "停用" : "启用" }}
             </el-button>
-            <el-button link type="primary" @click="unlock(row)">解锁</el-button>
-            <el-button link type="warning" @click="forceChange(row)">强制改密</el-button>
-            <el-button link type="danger" @click="resetPassword(row)">重置密码</el-button>
+            <el-button link type="primary" :loading="actingIds.has(row.id)" @click="unlock(row)">解锁</el-button>
+            <el-button link type="warning" :loading="actingIds.has(row.id)" @click="forceChange(row)">强制改密</el-button>
+            <el-button link type="danger" :loading="actingIds.has(row.id)" @click="resetPassword(row)">重置密码</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -151,6 +151,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { getPersons } from "@/api/identity";
 import { getPermissionRoles, type PermissionRole } from "@/api/permissions";
@@ -275,42 +276,112 @@ async function doCreate() {
   }
 }
 
+// E5：四操作共用 per-row loading 集合。
+const actingIds = ref(new Set<number>());
+
+async function withRowAction(rowId: number, action: () => Promise<void>) {
+  const next = new Set(actingIds.value);
+  next.add(rowId);
+  actingIds.value = next;
+  try {
+    await action();
+  } finally {
+    const done = new Set(actingIds.value);
+    done.delete(rowId);
+    actingIds.value = done;
+  }
+}
+
 async function toggleEnabled(row: LocalAuthUser) {
-  await patchLocalUser(row.id, { enabled: !row.enabled });
-  ElMessage.success(row.enabled ? "已停用" : "已启用");
-  await loadData();
+  try {
+    await ElMessageBox.confirm(
+      row.enabled ? `确认停用账号 ${row.username}？停用后立即无法登录。` : `确认启用账号 ${row.username}？`,
+      row.enabled ? "停用账号" : "启用账号",
+      { type: "warning" }
+    );
+  } catch {
+    return; // 用户取消
+  }
+  await withRowAction(row.id, async () => {
+    try {
+      await patchLocalUser(row.id, { enabled: !row.enabled });
+      ElMessage.success(row.enabled ? "已停用" : "已启用");
+      await loadData();
+    } catch (error) {
+      ElMessage.error(extractErrorDetail(error, "账号启停失败"));
+    }
+  });
 }
 
 async function unlock(row: LocalAuthUser) {
-  await patchLocalUser(row.id, { unlock: true });
-  ElMessage.success("已解锁");
-  await loadData();
+  try {
+    await ElMessageBox.confirm(`确认解锁账号 ${row.username}？`, "解锁确认", { type: "warning" });
+  } catch {
+    return; // 用户取消
+  }
+  await withRowAction(row.id, async () => {
+    try {
+      await patchLocalUser(row.id, { unlock: true });
+      ElMessage.success("已解锁");
+      await loadData();
+    } catch (error) {
+      ElMessage.error(extractErrorDetail(error, "解锁失败"));
+    }
+  });
 }
 
 async function forceChange(row: LocalAuthUser) {
-  await patchLocalUser(row.id, { must_change_password: true });
-  ElMessage.success("已标记下次强制改密");
-  await loadData();
+  try {
+    await ElMessageBox.confirm(
+      `确认要求账号 ${row.username} 下次登录强制改密？`,
+      "强制改密确认",
+      { type: "warning" }
+    );
+  } catch {
+    return; // 用户取消
+  }
+  await withRowAction(row.id, async () => {
+    try {
+      await patchLocalUser(row.id, { must_change_password: true });
+      ElMessage.success("已标记下次强制改密");
+      await loadData();
+    } catch (error) {
+      ElMessage.error(extractErrorDetail(error, "标记强制改密失败"));
+    }
+  });
 }
 
 async function resetPassword(row: LocalAuthUser) {
-  const { value } = await ElMessageBox.prompt(
-    "请输入新的一次性密码（至少 12 位，含复杂度）。不会写入日志。",
-    `重置密码：${row.username}`,
-    {
-      inputType: "password",
-      confirmButtonText: "重置",
-      cancelButtonText: "取消"
-    }
-  );
-  if (!value || value.length < 12) {
-    ElMessage.error("密码至少 12 位");
+  let value = "";
+  try {
+    const prompt = await ElMessageBox.prompt(
+      "请输入新的一次性密码（8-18 位，数字/字母/符号任意两类）。不会写入日志。",
+      `重置密码：${row.username}`,
+      {
+        inputType: "password",
+        confirmButtonText: "重置",
+        cancelButtonText: "取消",
+        inputPattern: /^(?![0-9]+$)(?![a-zA-Z]+$)(?![^0-9a-zA-Z]+$).{8,18}$/,
+        inputErrorMessage: "密码需为 8-18 位，数字/字母/符号任意两种组合"
+      }
+    );
+    value = prompt.value;
+  } catch {
+    return; // 用户取消
+  }
+  if (!value) {
     return;
   }
-  await patchLocalUser(row.id, { reset_password: value, must_change_password: true });
-  oneTimePassword.value = value;
-  pwdVisible.value = true;
-  await loadData();
+  await withRowAction(row.id, async () => {
+    try {
+      await patchLocalUser(row.id, { reset_password: value, must_change_password: true });
+      oneTimePassword.value = value;
+      pwdVisible.value = true;
+      await loadData();
+    } catch (error) {
+      ElMessage.error(extractErrorDetail(error, "重置密码失败"));
+    }
+  });
 }
 
 async function copyPwd() {

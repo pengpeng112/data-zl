@@ -3,7 +3,7 @@
     <RePageHeader title="医学编码同步差异" subtitle="对诊断、手术等医学编码做来源同步比对，生成差异并支持人工处理。">
       <template #icon><CodeIcon /></template>
       <template #actions>
-        <el-button type="primary" :icon="SyncIcon" :loading="syncLoading" @click="doSync">执行同步</el-button>
+        <el-button v-perms="'dict.medical.execute'" type="primary" :icon="SyncIcon" :loading="syncLoading" @click="doSync">执行同步</el-button>
       </template>
     </RePageHeader>
 
@@ -107,6 +107,7 @@ import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { getMedicalSyncDiffs, runMedicalSync, updateMedicalSyncDiff } from "@/api/dict";
+import { usePagedList } from "@/composables/usePagedList";
 import CheckIcon from "~icons/ri/checkbox-circle-line";
 import CodeIcon from "~icons/ri/code-box-line";
 import IgnoreIcon from "~icons/ri/forbid-2-line";
@@ -114,22 +115,31 @@ import OpenIcon from "~icons/ri/error-warning-line";
 import SearchIcon from "~icons/ri/search-line";
 import SyncIcon from "~icons/ri/git-branch-line";
 
-const loading = ref(false);
 const syncLoading = ref(false);
 const updatingId = ref<number | null>(null);
-const items = ref<any[]>([]);
-const total = ref(0);
-const page = ref(1);
-const pageSize = ref(20);
 const statusFilter = ref("");
 const keyword = ref("");
 const lastResult = ref<any>(null);
 const syncForm = reactive({ source_system: "his_ready_10_10_10_15", target_system: "asset", category_code: "", max_rows: 5000 });
+// F6：分页五件套收敛到 usePagedList（含请求序号守卫与 catch 提示，E8/E7 语义）。
+const { items, total, page, pageSize, loading, loadData, doSearch } = usePagedList<
+  any,
+  { page: number; page_size: number; status?: string; keyword?: string }
+>({
+  pageSize: 20,
+  errorText: "字典同步差异加载失败",
+  extraParams: () => ({
+    status: statusFilter.value || undefined,
+    keyword: keyword.value || undefined
+  }),
+  fetcher: async params => {
+    const res = await getMedicalSyncDiffs(params);
+    return { items: res.data.items ?? [], total: res.data.total ?? 0 };
+  }
+});
 const openCount = computed(() => items.value.filter(item => item.status === "open").length);
 const resolvedCount = computed(() => items.value.filter(item => item.status === "resolved").length);
 const ignoredCount = computed(() => items.value.filter(item => item.status === "ignored").length);
-
-function doSearch() { page.value = 1; loadData(); }
 function diffTypeTag(diffType: string): "danger" | "warning" | "info" { return diffType === "missing_target" ? "danger" : diffType === "name_mismatch" ? "warning" : "info"; }
 function severityTag(severity: string): "danger" | "warning" | "info" { return severity === "high" ? "danger" : severity === "medium" ? "warning" : "info"; }
 function syncStatusTag(status: string): "success" | "warning" | "info" { return status === "resolved" ? "success" : status === "ignored" ? "info" : "warning"; }
@@ -138,19 +148,6 @@ function diffTypeLabel(value: string) { return ({ missing_target: "目标缺失"
 function severityLabel(value: string) { return ({ high: "高", medium: "中", low: "低" } as Record<string, string>)[value] || value || "-"; }
 function statusLabel(value: string) { return ({ open: "未处理", resolved: "已解决", ignored: "已忽略" } as Record<string, string>)[value] || value || "-"; }
 
-async function loadData() {
-  loading.value = true;
-  try {
-    const params: Record<string, any> = { page: page.value, page_size: pageSize.value };
-    if (statusFilter.value) params.status = statusFilter.value;
-    if (keyword.value) params.keyword = keyword.value;
-    const res = await getMedicalSyncDiffs(params);
-    items.value = res.data.items ?? [];
-    total.value = res.data.total ?? 0;
-  } finally {
-    loading.value = false;
-  }
-}
 async function doSync() {
   syncLoading.value = true;
   try {

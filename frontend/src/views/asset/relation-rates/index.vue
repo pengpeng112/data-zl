@@ -36,7 +36,7 @@
             <el-option v-for="opt in sceneOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
           <el-input v-model="filters.keyword" clearable placeholder="表名" class="keyword" @keyup.enter="reload" @clear="reload" />
-          <el-select v-model="rateRange" clearable placeholder="命中率区间" class="rate-range">
+          <el-select v-model="rateRange" clearable placeholder="命中率区间" class="rate-range" @change="reload">
             <el-option label="低（<50%）" value="low" />
             <el-option label="中（50%-80%）" value="mid" />
             <el-option label="高（≥80%）" value="high" />
@@ -46,16 +46,16 @@
       </ReToolbar>
 
       <div class="metric-strip">
-        <span>关系 <b>{{ data.total }}</b></span>
-        <span>有命中率 <b>{{ data.with_rate }}</b></span>
-        <span>平均命中 <b>{{ formatHitRate(data.avg_hit_rate) }}</b></span>
+        <span>关系 <b>{{ total }}</b></span>
+        <span>有命中率 <b>{{ stats.with_rate }}</b></span>
+        <span>平均命中 <b>{{ formatHitRate(stats.avg_hit_rate) }}</b></span>
         <span class="metric-warn" title="当前页命中率<50%的关系数">低命中 <b>{{ lowRateCount }}</b></span>
-        <small v-if="rateRange" class="metric-hint">区间筛选仅作用于当前页</small>
+        <small v-if="rateRange" class="metric-hint">区间筛选在服务端完成，统计与分页同口径</small>
       </div>
 
       <el-table
         v-loading="loading"
-        :data="filteredItems"
+        :data="items"
         stripe
         size="small"
         row-class-name="rate-row"
@@ -106,11 +106,11 @@
         <el-pagination
           background
           layout="total, sizes, prev, pager, next"
-          :total="data.total"
+          :total="total"
           v-model:page-size="pageSize"
           :page-sizes="pageSizes"
           v-model:current-page="page"
-          @current-change="changePage"
+          @current-change="loadData"
           @size-change="changeSize"
         />
       </div>
@@ -120,12 +120,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { usePagedList } from "@/composables/usePagedList";
 import { useRouter } from "vue-router";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import {
   getRelationHitRates,
-  type RelationHitRateData,
   type RelationHitRateItem
 } from "@/api/asset";
 import {
@@ -139,25 +139,57 @@ import {
 import RateIcon from "~icons/ri/pie-chart-2-line";
 
 const router = useRouter();
-const loading = ref(false);
-const page = ref(1);
-const pageSize = ref(30);
 const pageSizes = [30, 50, 100];
 const sceneOptions = SCENE_OPTIONS;
-const rateRange = ref(""); // 命中率区间筛选：空=全部 low<50% mid 50-80% high>=80%
-const data = ref<RelationHitRateData>({
-  total: 0,
-  page: 1,
-  page_size: pageSize.value,
+const rateRange = ref(""); // 命中率区间筛选：空=全部 low<50% mid 50-80% high>=80%（146 E10 服务端过滤）
+// F6：分页五件套收敛到 usePagedList（含请求序号守卫与 catch 提示，E8/E7 语义）。
+const stats = reactive<{ with_rate: number; avg_hit_rate: number | null }>({
   with_rate: 0,
-  avg_hit_rate: null,
-  highlights: [],
-  items: []
+  avg_hit_rate: null
 });
 const filters = reactive({
   system_code: "",
   scene: "",
   keyword: ""
+});
+const { items, total, page, pageSize, loading, loadData, doSearch } = usePagedList<
+  RelationHitRateItem,
+  {
+    page: number;
+    page_size: number;
+    system_code?: string;
+    scene?: string;
+    keyword?: string;
+    hit_rate_min?: number;
+    hit_rate_max?: number;
+  }
+>({
+  pageSize: 30,
+  errorText: "关系命中率加载失败",
+  extraParams: () => ({
+    system_code: filters.system_code || undefined,
+    scene: filters.scene || undefined,
+    keyword: filters.keyword || undefined,
+    hit_rate_min:
+      rateRange.value === "mid" || rateRange.value === "high"
+        ? rateRange.value === "high"
+          ? 0.8
+          : 0.5
+        : undefined,
+    hit_rate_max:
+      rateRange.value === "mid" || rateRange.value === "low"
+        ? rateRange.value === "low"
+          ? 0.5
+          : 0.8
+        : undefined
+  }),
+  fetcher: async params => {
+    const res = await getRelationHitRates(params);
+    stats.with_rate = res.data.with_rate ?? 0;
+    stats.avg_hit_rate = res.data.avg_hit_rate ?? null;
+    if (!filters.scene) buildSceneCards(res.data.highlights || []);
+    return { items: res.data.items || [], total: res.data.total || 0 };
+  }
 });
 
 const sceneCards = ref(
@@ -208,71 +240,36 @@ function buildSceneCards(highlights: RelationHitRateItem[]) {
 }
 
 // 命中率区间筛选（前端过滤当前页数据；全量筛选需后端支持）
-const filteredItems = computed(() => {
-  if (!rateRange.value) return data.value.items;
-  return data.value.items.filter(row => {
-    const r = row.hit_rate;
-    if (r === null || r === undefined) return false;
-    if (rateRange.value === "low") return r < 0.5;
-    if (rateRange.value === "mid") return r >= 0.5 && r < 0.8;
-    if (rateRange.value === "high") return r >= 0.8;
-    return true;
-  });
-});
+// 146 E10：区间过滤已由服务端 hit_rate_min/max 在分页/汇总前完成。
 
 // 低命中率（<50%）关系数，用于指标条异常提示
-const lowRateCount = computed(() => {
-  if (rateRange.value || filters.system_code || filters.scene || filters.keyword) {
-    return filteredItems.value.filter(r => r.hit_rate !== null && r.hit_rate !== undefined && r.hit_rate < 0.5).length;
-  }
-  // 无筛选时用全页数据近似（当前页内的低命中率数）
-  return data.value.items.filter(r => r.hit_rate !== null && r.hit_rate !== undefined && r.hit_rate < 0.5).length;
-});
+// 低命中率（<50%）关系数（当前页口径；服务端区间过滤后该值反映筛选结果）
+const lowRateCount = computed(() =>
+  items.value.filter(r => r.hit_rate !== null && r.hit_rate !== undefined && r.hit_rate < 0.5).length
+);
 
-async function reload() {
-  page.value = 1;
-  await loadRates();
+// F6：reload/翻页/改页大小全部收敛到 usePagedList。
+function reload() {
+  doSearch();
 }
 
-async function changePage(next: number) {
-  page.value = next;
-  await loadRates();
-}
-
-async function changeSize(size: number) {
+function changeSize(size: number) {
   pageSize.value = size;
-  page.value = 1;
-  await loadRates();
-}
-
-async function loadRates() {
-  loading.value = true;
-  try {
-    const res = await getRelationHitRates({
-      system_code: filters.system_code || undefined,
-      scene: filters.scene || undefined,
-      keyword: filters.keyword || undefined,
-      page: page.value,
-      page_size: pageSize.value
-    });
-    data.value = res.data;
-    if (!filters.scene) buildSceneCards(res.data.highlights || []);
-  } finally {
-    loading.value = false;
-  }
+  loadData(1);
 }
 
 function openRelation(row: RelationHitRateItem) {
   if (row.from_table && row.to_table) {
+    // 146 E1：联动图谱路径模式（/asset/relations 兼容 redirect 会原样带参）
     router.push({
-      path: "/asset/relations",
-      query: { from: row.from_table, to: row.to_table }
+      path: "/asset/graph",
+      query: { view_mode: "path", from: row.from_table, to: row.to_table }
     });
   }
 }
 
 onMounted(async () => {
-  await loadRates();
+  await loadData();
 });
 </script>
 

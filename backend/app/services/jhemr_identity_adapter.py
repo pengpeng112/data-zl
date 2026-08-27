@@ -304,16 +304,38 @@ class JhemrIdentityAdapter:
             stderr=subprocess.PIPE,
             creationflags=creationflags,
         )
-        time.sleep(0.5)
-        if proc.poll() is not None:
-            stderr = ""
+        # A6：原 0.5s 单次 sleep 检测不到稍晚退出的隧道。改为等待循环：
+        # ≤10s、0.2s 间隔，本地转发端口可接受连接即就绪；进程退出则读取
+        # stderr 尾行给出可诊断错误（fail closed）。
+        deadline = time.monotonic() + 10.0
+        ready = False
+        while time.monotonic() < deadline:
+            if proc.poll() is not None:
+                stderr_tail = ""
+                try:
+                    stderr_tail = (proc.stderr.read() or b"").decode("utf-8", "replace").strip()[-300:]
+                except Exception:
+                    pass
+                raise JhemrIdentityError(
+                    f"SSH tunnel to {self.jump_host}:{self.jump_port} exited early: "
+                    f"{stderr_tail}"
+                )
             try:
-                stderr = (proc.stderr.read() or b"").decode("utf-8", "replace")
+                with socket.create_connection(("127.0.0.1", local_port), timeout=0.5):
+                    ready = True
+                    break
+            except OSError:
+                time.sleep(0.2)
+        if not ready:
+            proc.terminate()
+            stderr_tail = ""
+            try:
+                stderr_tail = (proc.stderr.read() or b"").decode("utf-8", "replace").strip()[-300:]
             except Exception:
                 pass
             raise JhemrIdentityError(
-                f"SSH tunnel to {self.jump_host}:{self.jump_port} exited early: "
-                f"{stderr.strip()[:300]}"
+                f"SSH tunnel to {self.jump_host}:{self.jump_port} not ready within 10s: "
+                f"{stderr_tail}"
             )
         self._tunnel = proc
         self._local_port = local_port
@@ -894,6 +916,141 @@ class JhemrIdentityAdapter:
                 raise JhemrIdentityError("education_title read-back mismatch")
             conn.commit()
             return {"status": "success", "rows_affected": 1}
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
+    def apply_user_dept_changes(
+        self,
+        *,
+        dept_adds: list[tuple[str, str]],
+        primary_changes: list[tuple[str, str | None, str]],
+    ) -> dict[str, Any]:
+        """Single-transaction user-dept reconciliation (plan-107 additive rule).
+
+        ``dept_adds`` insert missing ``user_dept`` rows (never delete).  A
+        ``primary_changes`` entry updates ``users.user_dept`` and migrates the
+        single ``default_dept_flag`` row to the new primary.  Old values are
+        re-verified under lock; any failure rolls back the whole batch and the
+        final state is read back before commit.
+        """
+        conn = self._ensure_conn()
+        dept_rows_added = 0
+        primary_updated = 0
+        try:
+            for emp_no, old_primary, new_primary in primary_changes:
+                current = self._fetch_one(
+                    "SELECT user_id, user_dept FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+                    (emp_no, self.hospital_no),
+                )
+                if current is None:
+                    raise JhemrIdentityError("primary target missing after plan")
+                current_primary = str(current.get("user_dept") or "").strip() or None
+                if current_primary != (str(old_primary).strip() if old_primary else None):
+                    raise JhemrIdentityError("target_changed_after_plan")
+                affected = self._execute_write(
+                    "UPDATE jhemr.users SET user_dept = %s "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (new_primary, emp_no, self.hospital_no),
+                )
+                if affected != 1:
+                    raise JhemrIdentityError(
+                        f"primary dept update affected {affected} rows; expected 1"
+                    )
+                primary_updated += 1
+
+            for emp_no, dept_code in dept_adds:
+                exists = self._fetch_one(
+                    "SELECT user_id FROM jhemr.user_dept "
+                    "WHERE user_id = %s AND hospital_no = %s AND user_dept = %s FOR UPDATE",
+                    (emp_no, self.hospital_no, dept_code),
+                )
+                if exists is not None:
+                    continue
+                affected = self._execute_write(
+                    "INSERT INTO jhemr.user_dept "
+                    "(user_id, user_dept, hospital_no, default_dept_flag, state, synchro_flag) "
+                    "VALUES (%s, %s, %s, 0, 0, 1)",
+                    (emp_no, dept_code, self.hospital_no),
+                )
+                if affected != 1:
+                    raise JhemrIdentityError(
+                        f"user_dept insert affected {affected} rows; expected 1"
+                    )
+                dept_rows_added += 1
+
+            for emp_no, _old_primary, new_primary in primary_changes:
+                self._execute_write(
+                    "UPDATE jhemr.user_dept SET default_dept_flag = 0 "
+                    "WHERE user_id = %s AND hospital_no = %s AND default_dept_flag = 1 "
+                    "AND user_dept <> %s",
+                    (emp_no, self.hospital_no, new_primary),
+                )
+                flagged = self._fetch_one(
+                    "SELECT user_id FROM jhemr.user_dept "
+                    "WHERE user_id = %s AND hospital_no = %s AND user_dept = %s "
+                    "AND default_dept_flag = 1",
+                    (emp_no, self.hospital_no, new_primary),
+                )
+                if flagged is None:
+                    exists = self._fetch_one(
+                        "SELECT user_id FROM jhemr.user_dept "
+                        "WHERE user_id = %s AND hospital_no = %s AND user_dept = %s",
+                        (emp_no, self.hospital_no, new_primary),
+                    )
+                    if exists is None:
+                        affected = self._execute_write(
+                            "INSERT INTO jhemr.user_dept "
+                            "(user_id, user_dept, hospital_no, default_dept_flag, state, synchro_flag) "
+                            "VALUES (%s, %s, %s, 1, 0, 1)",
+                            (emp_no, new_primary, self.hospital_no),
+                        )
+                        if affected != 1:
+                            raise JhemrIdentityError("default dept row insert failed")
+                        dept_rows_added += 1
+                    else:
+                        affected = self._execute_write(
+                            "UPDATE jhemr.user_dept SET default_dept_flag = 1 "
+                            "WHERE user_id = %s AND hospital_no = %s AND user_dept = %s",
+                            (emp_no, self.hospital_no, new_primary),
+                        )
+                        if affected != 1:
+                            raise JhemrIdentityError("default dept flag update failed")
+
+            for emp_no, dept_code in dept_adds:
+                row = self._fetch_one(
+                    "SELECT user_id FROM jhemr.user_dept "
+                    "WHERE user_id = %s AND hospital_no = %s AND user_dept = %s",
+                    (emp_no, self.hospital_no, dept_code),
+                )
+                if row is None:
+                    raise JhemrIdentityError("user_dept read-back mismatch")
+            for emp_no, _old_primary, new_primary in primary_changes:
+                user = self._fetch_one(
+                    "SELECT user_dept FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (emp_no, self.hospital_no),
+                )
+                if user is None or str(user.get("user_dept") or "").strip() != new_primary:
+                    raise JhemrIdentityError("primary dept read-back mismatch")
+                defaults = self._fetch_all(
+                    "SELECT user_dept FROM jhemr.user_dept "
+                    "WHERE user_id = %s AND hospital_no = %s AND default_dept_flag = 1",
+                    (emp_no, self.hospital_no),
+                )
+                if len(defaults) != 1 or str(defaults[0].get("user_dept") or "").strip() != new_primary:
+                    raise JhemrIdentityError("default dept flag read-back mismatch")
+
+            conn.commit()
+            return {
+                "status": "success",
+                "dept_rows_added": dept_rows_added,
+                "primary_updated": primary_updated,
+            }
         except Exception:
             try:
                 conn.rollback()

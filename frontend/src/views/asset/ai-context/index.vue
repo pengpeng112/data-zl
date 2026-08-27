@@ -62,6 +62,45 @@
       </el-table>
     </el-card>
 
+    <el-card class="context-card" shadow="never">
+      <template #header>按系统导出摘要</template>
+      <div class="filter-bar">
+        <el-select
+          v-model="systemCode"
+          placeholder="选择业务系统"
+          clearable
+          filterable
+          class="system-select"
+          :loading="systemsLoading"
+        >
+          <el-option
+            v-for="sys in systemOptions"
+            :key="sys.system_code"
+            :label="`${sys.system_name_cn || sys.system_code} (${sys.system_code})`"
+            :value="sys.system_code"
+          />
+        </el-select>
+        <el-button type="success" :loading="systemExporting" :disabled="!systemCode" @click="doSystemExport">
+          生成系统摘要
+        </el-button>
+        <el-button v-if="systemSummary" type="info" @click="copySystemSummary">复制摘要 JSON</el-button>
+      </div>
+      <el-alert
+        v-if="systemSummary"
+        class="action-row"
+        type="success"
+        :closable="false"
+        show-icon
+        :title="`已生成 ${systemSummary.system_name_cn || systemSummary.system_code || systemCode} 摘要`"
+      >
+        <template #default>
+          覆盖表 {{ formatNumber(systemSummary.table_count ?? systemSummary.tables?.length ?? 0) }} 张、关系
+          {{ formatNumber(systemSummary.relations?.length ?? 0) }} 条（脱敏，可直接给外网 AI 作系统背景）。
+        </template>
+      </el-alert>
+      <el-alert v-if="systemError" class="action-row" type="error" :closable="false" :title="systemError" show-icon />
+    </el-card>
+
     <el-card class="context-card selected-card" shadow="never">
       <template #header> 已选表 ({{ selectedTables.length }}) </template>
       <el-tag
@@ -104,8 +143,8 @@
       <div v-if="exported" class="action-row">
         <el-alert title="导出成功" type="success" :closable="false" show-icon>
           <template #default>
-            已导出 {{ exportedTables }} 张表、{{ exportedColumns }} 个字段、{{
-              exportedRelations
+            已导出 {{ formatNumber(exportedTables) }} 张表、{{ formatNumber(exportedColumns) }} 个字段、{{
+              formatNumber(exportedRelations)
             }}
             条关系的脱敏元数据。 <br />该数据可安全粘贴给外网 AI 使用。
           </template>
@@ -116,9 +155,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
-import { getTables, exportContext, type TableBrief } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
+import { formatNumber } from "@/utils/format";
+import { getTables, exportContext, getAiSystemContext, listSystems, type AiSystemContext, type AssetSystemItem, type TableBrief } from "@/api/asset";
 
 const keyword = ref("");
 const searching = ref(false);
@@ -126,6 +167,53 @@ const searchResults = ref<TableBrief[]>([]);
 const selectedTables = ref<TableBrief[]>([]);
 const exporting = ref(false);
 const exported = ref(false);
+
+// 146 E1：吸收系统上下文摘要入口
+const systemCode = ref("");
+const systemOptions = ref<AssetSystemItem[]>([]);
+const systemsLoading = ref(false);
+const systemExporting = ref(false);
+const systemSummary = ref<AiSystemContext | null>(null);
+const systemError = ref("");
+
+async function loadSystems() {
+  systemsLoading.value = true;
+  systemError.value = "";
+  try {
+    const res = await listSystems();
+    systemOptions.value = res.data || [];
+  } catch (error) {
+    systemOptions.value = [];
+    systemError.value = extractErrorDetail(error, "系统选项加载失败");
+  } finally {
+    systemsLoading.value = false;
+  }
+}
+
+async function doSystemExport() {
+  if (!systemCode.value) return;
+  systemExporting.value = true;
+  systemError.value = "";
+  try {
+    const res = await getAiSystemContext(systemCode.value);
+    systemSummary.value = res.data;
+  } catch (error) {
+    systemSummary.value = null;
+    systemError.value = extractErrorDetail(error, "系统摘要生成失败");
+  } finally {
+    systemExporting.value = false;
+  }
+}
+
+async function copySystemSummary() {
+  if (!systemSummary.value) return;
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(systemSummary.value, null, 2));
+    ElMessage.success("已复制");
+  } catch {
+    ElMessage.warning("剪贴板不可用，请手动复制");
+  }
+}
 const exportedJson = ref<any>(null);
 const exportedTables = ref(0);
 const exportedColumns = ref(0);
@@ -140,8 +228,9 @@ async function searchTables() {
       page_size: 50
     });
     searchResults.value = res.data.items;
-  } catch {
+  } catch (error) {
     searchResults.value = [];
+    ElMessage.error(extractErrorDetail(error, "表搜索失败，请重试"));
   } finally {
     searching.value = false;
   }
@@ -173,8 +262,8 @@ async function doExport() {
     exportedColumns.value = res.data.columns.length;
     exportedRelations.value = res.data.relations.length;
     exported.value = true;
-  } catch {
-    ElMessage.error("导出失败");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "导出失败"));
   } finally {
     exporting.value = false;
   }
@@ -196,6 +285,10 @@ function downloadJson() {
   a.click();
   URL.revokeObjectURL(url);
 }
+onMounted(() => {
+  void searchTables();
+  void loadSystems();
+});
 </script>
 
 <style scoped>
@@ -225,6 +318,7 @@ function downloadJson() {
   margin-top: 16px;
 }
 
+.system-select { width: 280px; }
 .search-input {
   width: 320px;
 }

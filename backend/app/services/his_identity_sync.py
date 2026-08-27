@@ -426,7 +426,13 @@ def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, sourc
             employment_status=_employee_employment_status(row),
             raw_job=_text(_value(staff, "JOB")) if staff else None,
             raw_title=_text(_value(staff, "TITLE")) if staff else None,
-            source_create_date=_value(staff, "CREATE_DATE") if staff else None,
+            # 2026-08-24 用户裁决：时间/职称以 FXHIS.SYS_EMPLOYEE 为主、
+            # COMM.STAFF_DICT 仅辅助——建档时间先取 STAFF.CREATE_DATE，
+            # 为空时回退 SYS_EMPLOYEE.CREATEDTIME（新职工常见 STAFF 无建档日期）。
+            source_create_date=(
+                (_value(staff, "CREATE_DATE") if staff else None)
+                or _value(row, "CREATEDTIME")
+            ),
             source_modified_time=_value(row, "MODIFIEDTIME"),
         )
 

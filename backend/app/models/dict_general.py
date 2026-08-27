@@ -62,6 +62,8 @@ class DictSystemItem(Base):
     system_item_code = Column(Text, nullable=False)
     system_item_name_cn = Column(Text, nullable=False)
     raw_status = Column(Text)
+    # Platform-level switch; source raw_status stays untouched as evidence.
+    enabled = Column(Boolean, server_default="true")
     raw_extra = Column(JSONB)
     last_sync_at = Column(TIMESTAMP(timezone=True))
 

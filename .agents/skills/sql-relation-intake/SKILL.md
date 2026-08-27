@@ -14,12 +14,15 @@ description: 解析和治理山东省第二人民医院历史 SQL 中的表关�
 1. 读取仓库根目录 `AGENTS.md`。
 2. 读取 `开发起步包/README.md` 和 `开发起步包/55_系统未完成事项统一执行计划.md`。
 3. 读取本技能 `references/relation-intake-guide.md`。
-4. 根据 SQL 所属系统加载对应技能：
-   - 数据中心/ODS：`ods-readonly-sql`
-   - HIS 源端：`hisuser-readonly-sql`
-   - 移动护理：`mobile-nursing-readonly-sql`
-   - Docare 手麻：`docare-anesthesia-readonly-sql`
+4. **按 SQL 目标库选择资产包与系统技能（勿默认 ODS 包）**：ODS/数据中心 → `数据资产_资产包/` + `ods-readonly-sql`；JHEMR/EMR(Vastbase) → `数据资产_JHEMR_Vastbase资产包/`；HIS 源端 → `数据资产_HIS源端资产包/` + `hisuser-readonly-sql`；无纸化 CDMS → 平台元数据 + 79 号证据。跨系统边按 40 号 D 级延后口径（154 号试点先例）。
 5. 只读取与本次表和业务主题有关的元数据、关系文件和证据报告；不要把 `_archive/` 当作当前依据。
+
+## 字段值域硬规则（149 值域知识库，强制）
+
+- 涉及编码/状态/类型/阈值/字典类字段（如 SQL 中出现的离院方式、急诊标志、诊断类别、OPER_STATUS 等编码/状态/阈值字段）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
+- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=对应系统编码` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
 
 ## 标准流程
 

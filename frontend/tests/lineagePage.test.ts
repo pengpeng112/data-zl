@@ -14,7 +14,8 @@ const mockApi = vi.hoisted(() => ({
 }));
 
 vi.mock("vue-router", () => ({
-  useRoute: () => ({ query: {} })
+  useRoute: () => ({ query: {} }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() })
 }));
 
 vi.mock("@/api/asset", () => mockApi);

@@ -1,3 +1,5 @@
+import { formatTime } from "@/utils/format";
+
 export const DEPT_TYPE_OPTIONS = [
   { value: "0", label: "门诊" },
   { value: "1", label: "住院" },
@@ -34,7 +36,5 @@ export function deptReviewLabel(value?: string | null): string {
   return map[String(value || "").toLowerCase()] || value || "-";
 }
 
-export function formatSyncTime(value?: string | null): string {
-  if (!value) return "-";
-  return String(value).replace("T", " ").slice(0, 19);
-}
+// F7：私有 replace("T"," ") 副本收编 → utils/format formatTime 单份实现。
+export const formatSyncTime = formatTime;

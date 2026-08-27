@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import logging
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy import or_, select
@@ -6,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from .db import get_db
 from ..models.governance_base import AssetRolePermission, AssetUserRole
+
+logger = logging.getLogger(__name__)
 
 
 def get_current_user(request: Request) -> str:
@@ -62,3 +65,31 @@ def require_permission(resource_code: str):
         return user_identifier
 
     return dependency
+
+
+def require_query_view_on_get(request: Request, db: Session = Depends(get_db)) -> None:
+    """GET-only query.view gate（153 D1 单份实现）。
+
+    queries/metrics/data-products 三个路由共用：GET 请求要求 query.view 权限，
+    写方法跳过（写端点各自挂端点级权限码）。语义与原先三份局部副本一致。
+    """
+    if request.method == "GET":
+        require_permission("query.view")(request, db)
+
+
+def get_request_operator(request: Request | None = None, db: Session | None = None, default: str = "system") -> str:
+    """解析请求操作人（153 D2 单份实现，取代 15 处样板）。
+
+    优先读中间件写入的 request.state.user_identifier；读不到再走
+    get_current_user（未认证时回落 default，记 debug 日志，不落 identifier 值）。
+    db 参数保留给需要回查的调用方，此处不查库。
+    """
+    identifier = None
+    if request is not None:
+        identifier = getattr(request.state, "user_identifier", None)
+        if not identifier:
+            try:
+                identifier = get_current_user(request) or None
+            except HTTPException:
+                logger.debug("operator resolution fell back to default=%s", default)
+    return identifier or default

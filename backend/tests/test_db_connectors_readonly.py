@@ -67,7 +67,8 @@ def test_oracle_readonly_transaction_timeout_and_row_cap_are_enforced():
     assert rows == [{"PATIENT_ID": "P001"}]
     assert connection.call_timeout == 1234
     assert connection.cursor_instance.executed[0] == ("SET TRANSACTION READ ONLY", None)
-    assert connection.cursor_instance.fetch_size == 10_000
+    # A4：连接器多取 1 行探针（max_rows+1），调用方据此判定截断。
+    assert connection.cursor_instance.fetch_size == 10_001
 
 
 class FakePostgresCursor:
@@ -109,4 +110,5 @@ def test_postgres_preserves_parameters_and_fetches_at_most_requested_rows(monkey
     assert connection.cursor_instance.executed == [
         ("SELECT patient_id FROM asset.asset_patients WHERE patient_id = %(patient_id)s", {"patient_id": "P001"})
     ]
-    assert connection.cursor_instance.fetch_size == 2
+    # A4：多取 1 行探针（max_rows+1）。
+    assert connection.cursor_instance.fetch_size == 3

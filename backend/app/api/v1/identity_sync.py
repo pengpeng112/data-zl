@@ -69,8 +69,13 @@ def identity_sync_alerts(user=Depends(get_current_user), db: Session = Depends(g
     from ...models.identity_sync import IdentitySyncAlert
     try:
         rows = db.scalars(select(IdentitySyncAlert).order_by(IdentitySyncAlert.created_at.desc()).limit(100)).all()
-    except Exception:
-        rows = []
+    except Exception as exc:
+        # A7：查询失败不得伪装成空列表（误导“无告警”）；显式 500，
+        # detail 只含 error_class，不回显异常原文。
+        raise HTTPException(
+            status_code=500,
+            detail=f"identity sync alerts query failed ({type(exc).__name__})",
+        ) from exc
     return ApiResponse(data=[{
         "run_id": row.run_id,
         "alert_type": row.alert_type,

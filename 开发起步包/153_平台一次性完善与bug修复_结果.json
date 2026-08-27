@@ -1,0 +1,99 @@
+{
+  "plan": "153_平台一次性完善与bug修复执行计划",
+  "status": "代码完成，待主 AI 复核与发布",
+  "executed_at": "2026-08-27",
+  "batches": {
+    "P0": {
+      "items": ["A1 pymssql 命名绑参", "A2 COL_NULL_COMMENT SQL 下推", "A3 质检失败 rollback+脱敏 failed_reason", "B1 CSRF 完整 origin 精确匹配", "C1 图谱端点反查批量化(_EndpointResolver)"],
+      "acceptance": "pytest test_quality*/test_graph/test_db_connectors_param_binding/test_auth_csrf -q → 80 passed"
+    },
+    "P1": {
+      "items": ["B2 diff 端点 SQL 掩码", "B3 异常脱敏×3(quality_sql_runner/ai/queries)", "B4 审计×3(角色分配/移除、API Key 创建/启停、批量复核汇总)", "B5 权限码收窄版(ai.sql.execute + dict.medical.*×8端点)", "B6 模板单引号转义×2", "B7 危险词词边界(forbidden_keyword_hits 公共化)", "B8 四连接器 test_connectivity 统一 sanitize_text"],
+      "acceptance": "pytest -k 'security or permissions or queries or ai' → 183 passed; tests/security_audit/ → 9 passed"
+    },
+    "P2": {
+      "items": ["A4 连接器 max_rows+1 探针+runner 严格大于判定", "A5 字段映射数量不等 400", "A6 隧道等待循环(≤10s/0.2s)", "A7 alerts 失败显式 500", "A8 oracle init warning", "A9 版本号唯一键 SAVEPOINT 重试(intake_version_retry)", "A10 metrics 冗余==分支删除", "A11 SqlServer TOP 5000/100000"],
+      "acceptance": "pytest test_query_asset/test_metric_asset/test_identity/test_relation* → 75 passed"
+    },
+    "P3": {
+      "items": ["C3 queries 列表 N+1 批量化+include_sql 每请求一次判定", "C4 board_overview row_number SQL 聚合+active 批量", "C5 finding 查重预载索引", "C6 Excel 导出 5 万上限+分批流式写"],
+      "acceptance": "pytest test_query_asset/test_metric_asset/test_quality/test_dict_medical* → 79 passed(含结构锁定新测试)"
+    },
+    "P4": {
+      "items": ["D1 require_query_view_on_get 上移 core/security", "D2 get_request_operator 收敛 17 处样板", "D3 dict_medical 过滤构造公共函数", "D4 metrics 双 calculate 共用内部函数", "D5 死权限码登记(零删除)", "D6 data_product 同行双查传参复用", "D7 rate_limit 防回归注释", "D8 tables.py datetime 正常 import", "D9 一次性脚本 20 个普通 mv 归档+删 4 个运行产物"],
+      "acceptance": "pytest tests/ -q 全量 → 1111 passed/1 skipped/3 failed(A4 探针旧断言，随后更新复验)"
+    },
+    "P5": {
+      "items": ["E1 dict/medical 8 函数 catch", "E2 systems 三函数取消/失败拆分", "E3 quality 9 处静默+4 加载器补 catch+提示合并", "E4 table-detail 注释保存提示", "E5 accounts 解绑确认+local-accounts 四操作", "E6 搜索重置页码+指标分页", "E7 请求序号守卫(tables/graph×3/openDetail)", "E8 mappings loadData else+save/toggle catch+sync-diffs×2/relation-rates", "E9 legacy 回退仅限 404", "E10 qs arrayFormat=repeat+删手工拼 URL", "E11 scrollBehavior 修复+死分支删除", "E12 admin 原生 confirm→ElMessageBox+6 处补 catch"],
+      "acceptance": "pnpm typecheck(0错) + Vitest 166 passed"
+    },
+    "P6": {
+      "items": ["F1 api/types.ts 单源(8+6 去重)", "F2 identity.ts 实体 interface", "F3 删 7 死 API+listConnectionTargets 择一+ReCol/RePureTableBar", "F4 裸 http 收编 28 处(quality12/admin12/ai-tools2/table-detail2)", "F5 extractErrorDetail 49 处收敛+authHint 3 份+loadSystemNames 2 份+statusLabels", "F6 usePagedList 试点 6 页", "F7 formatTime 2 私有副本收编", "F8 dict.ts 类型+消 11 处 as any"],
+      "acceptance": "typecheck 0 错 + Vitest 166 passed + build gzip 预算 PASS"
+    },
+    "P7": {
+      "items": ["G1 服务直测 6+5+7(状态机/幂等/激活门禁/pin 校验/参数白名单/A9 重试)", "G2 FakeConnector 驱动契约形态捕获", "G3 dashboard/summary+quality/summary 冒烟"],
+      "acceptance": "test_153_g1_g3.py → 21 passed"
+    }
+  },
+  "final_gates": {
+    "backend_full": "1152 passed, 1 skipped, 0 failed (pytest tests/ -q, 24m33s)",
+    "backend_permissions_recheck": "48 passed (security_audit+permissions+dict_medical+governance+admin)",
+    "frontend_typecheck": "0 errors (tsc --noEmit && vue-tsc --noEmit)",
+    "frontend_test": "26 files / 166 tests passed",
+    "frontend_build": "PASS (主入口/图谱异步包/CSS gzip 预算内)"
+  },
+  "new_backend_tests": [
+    "tests/test_db_connectors_param_binding.py (5)",
+    "tests/test_auth_csrf.py (13)",
+    "tests/test_153_g1_g3.py (21)",
+    "tests/test_graph.py +2 (diagnostics 结构锁定/预载解析)",
+    "tests/test_quality.py +1 (COL_NULL_COMMENT 口径锁定)",
+    "tests/test_query_asset.py +3 (A4 截断/B2 diff/C3 结构)",
+    "tests/test_metric_asset.py +2 (A10 命中集/C4 结构)",
+    "tests/security_audit/test_fine_grained_write_permissions.py +2 (B5 矩阵)"
+  ],
+  "new_frontend_files": [
+    "src/api/types.ts",
+    "src/api/admin.ts",
+    "src/utils/statusLabels.ts",
+    "src/utils/systemNames.ts",
+    "src/composables/usePagedList.ts"
+  ],
+  "d5_dead_permission_codes_registered": {
+    "true_dead": ["query.publish", "query.recalc", "evaluation.view"],
+    "frontend_vperms_only": ["query.schedule", "product.publish"],
+    "role_matrix_referenced": ["ai.draft.view"],
+    "action": "零删除(分歧表#3)，供人工裁决"
+  },
+  "p1_caller_impact": {
+    "ai.sql.execute": {
+      "endpoints": ["POST /api/v1/ai/drafts/{id}/execute", "POST /api/v1/ai/tool-execute"],
+      "granted_roles": ["platform_admin", "quality_admin"],
+      "not_granted": ["ai_user"],
+      "read_endpoints_keep": ["ai.context.read on system-context/export-context/propose-sql"]
+    },
+    "dict_medical_write_codes": {
+      "endpoints_gated": 8,
+      "dict_admin_granted": ["edit", "plan.create", "approve", "execute", "retry", "reconcile"],
+      "export_preview_exempt": "POST /push/export-preview(只读预览，登录门禁)"
+    }
+  },
+  "invariance_evidence": {
+    "C1": "test_diagnostics_response_structure_locked + test_overview_object_resolves_backfill_free_relation_via_preload",
+    "C3": "test_list_queries_response_structure_locked + test_diff_endpoint_masks_sql_without_full_read",
+    "C4": "test_board_overview_response_structure_locked + test_board_overview_category_filter_hitset_unchanged"
+  },
+  "deviations": [
+    "A4 探针口径的 3 处既有断言按新契约更新(N→N+1)",
+    "quality_sql_runner 按 max_rows 夹紧保持既有口径；其余调用方 SQL 内建 ROWNUM/LIMIT 不受探针影响",
+    "D9 实际归档 20 个匹配前缀脚本(计划估~58)；.gitignore 条目已存在未重复追加",
+    "F3 全仓扫描 31 个零引用函数，仅按裁决删 7 个+双定义择一；误吞的 146 A1 资产已从 git 恢复并二次删除",
+    "plan146StageC 的 PageData 源码断言更新为再导出形态(F1 配套)",
+    "dict_admin 默认矩阵补入 execute/retry/reconcile 三码(避免合法调用方被锁)",
+    "B2 diff 端点掩码形态新增 sql_available 字段(两形态字段集合一致，测试锁定)"
+  ],
+  "environment_incidents": "执行期间另一 ZCode 会话(156号)多次拉起外部 pytest 进程互踩测试库：一度死锁/唯一键冲突/ schema 被摧毁；处置=杀进程树+DROP SCHEMA+alembic 重建(101 表至 head)+复跑通过；最终门禁在守护循环清除外部进程的干净窗口内完成",
+  "not_done_by_design": ["C2 双Session", "C7 dashboard 串行COUNT", "B9 登录限流", "E13/E14/E15", "usePagedList 全量铺开", "PageParams 全局替换", "SqlServer LIMIT→TOP 已按 A11 用 TOP"],
+  "handover_to_main_ai": ["复核执行报告与 git diff", "安排生产发布(本计划不含发布)", "D5 死权限码清单人工裁决", "如需在生产生效 B5 新码：POST /api/v1/permissions/seed 重新播种"]
+}

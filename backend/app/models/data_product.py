@@ -31,6 +31,11 @@ class AssetDataProduct(Base):
     enabled = Column(Boolean, nullable=False, server_default="true")
     ai_readable = Column(Boolean, server_default="true")
     rate_limit_per_min = Column(Integer, server_default="30")
+    # 144 S4: publish revision + validated pin + concurrency quota
+    revision = Column(Integer, nullable=False, server_default="1")
+    pin_validated_at = Column(TIMESTAMP(timezone=True))
+    pin_validation_status = Column(Text)
+    max_concurrency = Column(Integer)
     created_by = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())

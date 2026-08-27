@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   CANONICAL_SYSTEM_CODES,
-  CATEGORY_LABEL,
-  CATEGORY_ORDER,
   FORBIDDEN_CATEGORY_LABELS,
   isForbiddenCategoryLabel,
   kindLabel,
@@ -17,11 +15,6 @@ describe("plan90 hierarchy", () => {
     expect(CANONICAL_SYSTEM_CODES).toContain("HIS_SOURCE");
     expect(CANONICAL_SYSTEM_CODES).toContain("DOCARE");
     expect(CANONICAL_SYSTEM_CODES).toContain("LIS_SOURCE");
-  });
-
-  it("does not define external_business category order", () => {
-    expect(CATEGORY_ORDER).toHaveLength(0);
-    expect(CATEGORY_LABEL.external_business).toBeUndefined();
   });
 
   it("forbids 其他业务系统 label", () => {

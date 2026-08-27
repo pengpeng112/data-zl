@@ -22,7 +22,7 @@ from ...schemas.quality import (
 )
 from ...services.quality_rule_engine import validate_sql_safety
 from ...services.quality_sql_runner import execute_quality_sql
-from ...services.data_masking import mask_sensitive
+from ...services.data_masking import mask_sensitive, sanitize_text
 from ...services.quality_attribution import resolve_finding_location
 from ...services.quality_rule_catalog import (
     all_seed_rules,
@@ -243,55 +243,54 @@ def _run_rule_col_null_comment(db: Session) -> list[QualityFinding]:
     threshold = 0.5
     findings: list[QualityFinding] = []
 
-    all_cols = db.scalars(
-        select(AssetColumn).where(
+    # A2：聚合下推到 SQL（示范见 _run_rule_table_zero_columns），避免全表
+    # AssetColumn 拉内存分组。缺注释口径不变：comment 为 NULL 或空串均计入。
+    null_comment = (AssetColumn.comment.is_(None)) | (AssetColumn.comment == "")
+    rows = db.execute(
+        select(
+            AssetColumn.system_code,
+            AssetColumn.source_code,
+            AssetColumn.namespace_name,
+            AssetColumn.schema_name,
+            AssetColumn.table_name,
+            func.count(AssetColumn.id).label("total"),
+            func.count(AssetColumn.id).filter(null_comment).label("nulls"),
+        )
+        .where(
             AssetColumn.schema_name.isnot(None),
             AssetColumn.table_name.isnot(None),
         )
+        .group_by(
+            AssetColumn.system_code,
+            AssetColumn.source_code,
+            AssetColumn.namespace_name,
+            AssetColumn.schema_name,
+            AssetColumn.table_name,
+        )
     ).all()
 
-    group: dict[tuple[str, str, str, str, str], dict] = {}
-    for c in all_cols:
-        key = (
-            c.system_code or "",
-            c.source_code or "",
-            c.namespace_name or "",
-            c.schema_name or "",
-            c.table_name or "",
-        )
-        if key not in group:
-            group[key] = {
-                "system": c.system_code,
-                "source": c.source_code,
-                "namespace": c.namespace_name,
-                "schema": c.schema_name,
-                "table": c.table_name,
-                "total": 0,
-                "nulls": 0,
-            }
-        group[key]["total"] += 1
-        if not c.comment:
-            group[key]["nulls"] += 1
-
-    for _key, info in group.items():
-        if info["total"] > 0:
-            null_rate = info["nulls"] / info["total"]
-            if null_rate > (1 - threshold):
-                findings.append(
-                    QualityFinding(
-                        rule_code="COL_NULL_COMMENT",
-                        target_type="column",
-                        target_ref=f"{info['schema']}.{info['table']}",
-                        system_code=info["system"],
-                        source_code=info["source"],
-                        namespace_name=info["namespace"],
-                        schema_name=info["schema"],
-                        table_name=info["table"],
-                        severity="minor",
-                        metric_value=f"null_comment_rate={null_rate:.2%} ({info['nulls']}/{info['total']})",
-                        detail={"total_columns": info["total"], "null_comments": info["nulls"], "ratio": round(null_rate, 4)},
-                    )
+    for system_code, source_code, namespace_name, schema_name, table_name, total, nulls in rows:
+        total = int(total or 0)
+        nulls = int(nulls or 0)
+        if total <= 0:
+            continue
+        null_rate = nulls / total
+        if null_rate > (1 - threshold):
+            findings.append(
+                QualityFinding(
+                    rule_code="COL_NULL_COMMENT",
+                    target_type="column",
+                    target_ref=f"{schema_name}.{table_name}",
+                    system_code=system_code,
+                    source_code=source_code,
+                    namespace_name=namespace_name,
+                    schema_name=schema_name,
+                    table_name=table_name,
+                    severity="minor",
+                    metric_value=f"null_comment_rate={null_rate:.2%} ({nulls}/{total})",
+                    detail={"total_columns": total, "null_comments": nulls, "ratio": round(null_rate, 4)},
                 )
+            )
     return findings
 
 
@@ -818,6 +817,24 @@ def run_quality_check_core(
     total_records = 0
     error_records = 0
     rules_with_findings: set[str] = set()
+    # C5：一次性预载本轮涉及规则的 open/acknowledged findings，查重走内存索引
+    # （dedup key = rule_code + target_type + target_ref，与原逐条 SELECT 口径一致）。
+    dedup_index: dict[tuple[str | None, str | None, str | None], QualityFinding] = {}
+    metadata_rule_codes = [
+        rule.rule_code for rule in rules
+        if (rule.execution_mode or "metadata_only") != "sql_template"
+    ]
+    if metadata_rule_codes:
+        for existing_finding in db.scalars(
+            select(QualityFinding).where(
+                QualityFinding.rule_code.in_(metadata_rule_codes),
+                QualityFinding.status.in_(["open", "acknowledged"]),
+            )
+        ).all():
+            dedup_index.setdefault(
+                (existing_finding.rule_code, existing_finding.target_type, existing_finding.target_ref),
+                existing_finding,
+            )
     try:
         for rule in rules:
             if rule.execution_mode == "sql_template":
@@ -900,14 +917,9 @@ def run_quality_check_core(
                     ]
                 elif isinstance(f.sample_data, dict):
                     f.sample_data = mask_sensitive(f.sample_data)
-                existing = db.scalar(
-                    select(QualityFinding).where(
-                        QualityFinding.rule_code == f.rule_code,
-                        QualityFinding.target_type == f.target_type,
-                        QualityFinding.target_ref == f.target_ref,
-                        QualityFinding.status.in_(["open", "acknowledged"]),
-                    )
-                )
+                # C5：查重走预载索引（dedup_index），替代逐条 SELECT；
+                # 新增行回填索引，同批内重复 target 仍可命中。
+                existing = dedup_index.get((f.rule_code, f.target_type, f.target_ref))
                 if existing:
                     existing.metric_value = f.metric_value
                     existing.detail = f.detail
@@ -917,6 +929,7 @@ def run_quality_check_core(
                     deduped += 1
                 else:
                     db.add(f)
+                    dedup_index[(f.rule_code, f.target_type, f.target_ref)] = f
             if len(new_findings) > 0:
                 rules_with_findings.add(rule.rule_code)
             total_findings += len(new_findings) - deduped
@@ -934,9 +947,14 @@ def run_quality_check_core(
         run.status = "success"
         run.finished_at = datetime.now(timezone.utc)
         db.commit()
-    except Exception:
+    except Exception as exc:
+        # A3：失败分支必须先 rollback 结束失败事务，否则下一次 commit 抛
+        # PendingRollbackError，run 永远停在 running。failed_reason 记录脱敏后的
+        # error_class + 摘要，保留可辨识性。
+        db.rollback()
         run.status = "failed"
         run.finished_at = datetime.now(timezone.utc)
+        run.failed_reason = sanitize_text(f"{type(exc).__name__}: {exc}")
         db.commit()
         raise
 

@@ -1,28 +1,91 @@
-﻿import { http } from "@/utils/http";
+import { http } from "@/utils/http";
 
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
-export interface PageData<T> {
-  total: number;
-  page: number;
-  page_size: number;
-  items: T[];
-}
+export type { ApiResponse, PageData } from "./types";
+import type { ApiResponse, PageData } from "./types";
 
 // 诊断/手术编码体系
+// F8：medical 系列补实体类型（视图层消除 as any）。
+export interface MedicalCodeSet {
+  code_set_code: string;
+  code_set_name_cn?: string | null;
+  name_cn?: string | null;
+  code_set_type?: string | null;
+  category_code?: string | null;
+  standard_system?: string | null;
+  version_no?: string | null;
+  enabled?: boolean | null;
+  status?: string | null;
+}
+
+export interface MedicalCodeItem {
+  id?: number;
+  code_set_code: string;
+  item_code: string;
+  item_name_cn?: string | null;
+  item_name_alias?: string | null;
+  status?: string | null;
+}
+
+export interface MedicalPushConfig {
+  push_enabled: boolean;
+  default_hospital_no?: string | null;
+  [key: string]: unknown;
+}
+
+export interface MedicalPushAction {
+  action_type: string;
+  target_system: string;
+  target_table: string;
+  item_code: string;
+  item_name?: string | null;
+  plan_status: string;
+  meta?: Record<string, unknown>;
+  params?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface MedicalPushPlan {
+  action_count?: number;
+  actions: MedicalPushAction[];
+  summary?: Record<string, number> & { [key: string]: unknown };
+  [key: string]: unknown;
+}
+
+export interface MedicalMappingRowItem {
+  local_code?: string;
+  local_name?: string | null;
+  dict_attribute?: string | null;
+  ybhm?: string | null;
+  national_code?: string;
+  national_name?: string;
+  insurance_code?: string;
+  insurance_name?: string;
+  operation_level?: string | null;
+  operation_category?: string | null;
+  performance_level4_flag?: string | null;
+  performance_minimally_invasive_flag?: string | null;
+  restricted_tech_flag?: string | null;
+  special_disease_code?: string | null;
+  special_disease_name?: string | null;
+  low_risk_category_code?: string | null;
+  low_risk_disease_name?: string | null;
+  infectious_disease_name?: string | null;
+  source_file?: string | null;
+  source_sheet?: string | null;
+  status?: string | null;
+  [key: string]: unknown;
+}
+
 export function getMedicalCodeSets(params?: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown[]>>("get", "/api/v1/dict-medical/code-sets", { params });
+  return http.request<ApiResponse<MedicalCodeSet[]>>("get", "/api/v1/dict-medical/code-sets", { params });
 }
 export function upsertMedicalCodeSet(data: Record<string, unknown>) {
   return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-medical/code-sets", { data });
 }
 // 编码项
 export function getMedicalItems(codeSetCode: string, params?: Record<string, unknown>) {
-  return http.request<ApiResponse<PageData<unknown>>>("get", `/api/v1/dict-medical/code-sets/${codeSetCode}/items`, { params });
+  return http.request<ApiResponse<PageData<MedicalCodeItem>>>("get", `/api/v1/dict-medical/code-sets/${codeSetCode}/items`, { params });
 }
 export function upsertMedicalItem(data: Record<string, unknown>) {
   return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-medical/items", { data });
@@ -32,7 +95,7 @@ export function getMedicalMappings(params?: Record<string, unknown>) {
   return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-medical/mappings", { params });
 }
 export function getMedicalMappingRows(params?: Record<string, unknown>) {
-  return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-medical/mapping-rows", { params });
+  return http.request<ApiResponse<PageData<MedicalMappingRowItem>>>("get", "/api/v1/dict-medical/mapping-rows", { params });
 }
 export function getMedicalMappingOptions(categoryCode: string) {
   return http.request<ApiResponse<Record<string, string[]>>>("get", "/api/v1/dict-medical/mapping-options", {
@@ -65,19 +128,19 @@ export function updateMedicalSyncDiff(id: number, data: Record<string, unknown>)
 
 // 诊断/手术下发 HIS / 海量（96：只增 + 单条停用）
 export function getMedicalPushConfig() {
-  return http.request<ApiResponse<unknown>>("get", "/api/v1/dict-medical/push/config");
+  return http.request<ApiResponse<MedicalPushConfig>>("get", "/api/v1/dict-medical/push/config");
 }
 export function exportMedicalPushPreview(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("post", "/api/v1/dict-medical/push/export-preview", { data });
+  return http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/dict-medical/push/export-preview", { data });
 }
 export function planMedicalPush(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("post", "/api/v1/dict-medical/push/plan", { data });
+  return http.request<ApiResponse<MedicalPushPlan>>("post", "/api/v1/dict-medical/push/plan", { data });
 }
 export function applyMedicalPushOne(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("post", "/api/v1/dict-medical/push/apply-one", { data });
+  return http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/dict-medical/push/apply-one", { data });
 }
 export function stopMedicalPushOne(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("post", "/api/v1/dict-medical/push/stop-one", { data });
+  return http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/dict-medical/push/stop-one", { data });
 }
 // 版本
 export function getDictVersions(params?: Record<string, unknown>) {
@@ -147,29 +210,133 @@ export function reviewImportRows(runId: number, data: { row_ids: number[]; actio
 export function mergeImportRun(runId: number) {
   return http.request<ApiResponse<Record<string, number>>>("post", `/api/v1/dict-medical/imports/${runId}/merge`);
 }
-// ===== 通用字典 API（dict/general 页面使用）=====
+// ===== 通用字典 API（dict/general 页面使用，canonical /api/v1/dictionaries）=====
+
+export interface DictCategory {
+  id: number;
+  category_code: string;
+  category_name_cn: string;
+  standard_system?: string | null;
+  enabled: boolean;
+}
+
+export interface DictStandardItem {
+  id: number;
+  category_code: string;
+  standard_code: string;
+  standard_name_cn: string;
+  status?: string | null;
+}
+
+export interface DictSystemItem {
+  id: number;
+  category_code: string;
+  system_code: string;
+  system_item_code: string;
+  system_item_name_cn: string;
+  source_table?: string | null;
+  raw_status?: string | null;
+  enabled: boolean;
+  last_sync_at?: string | null;
+}
+
+export interface DictItemMapping {
+  id: number;
+  category_code: string;
+  standard_code?: string | null;
+  system_code: string;
+  system_item_code: string;
+  mapping_type?: string | null;
+  confidence?: string | null;
+  review_status?: string | null;
+}
+
+export interface DictImportItem {
+  system_item_code: string;
+  system_item_name_cn: string;
+  source_table?: string | null;
+  source_key_column?: string | null;
+  source_name_column?: string | null;
+}
+
+export interface DictImportResult {
+  dry_run: boolean;
+  created: number;
+  updated: number;
+  rejected: number;
+  errors: Array<{ index: number; system_item_code: string; reason: string }>;
+}
 
 export function getDictCategories() {
-  return http.request<ApiResponse<unknown[]>>("get", "/api/v1/dict-general/categories");
+  return http.request<ApiResponse<DictCategory[]>>("get", "/api/v1/dictionaries/categories");
 }
-export function upsertDictCategory(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-general/categories", { data });
+export function upsertDictCategory(data: {
+  category_code: string;
+  category_name_cn: string;
+  standard_system?: string | null;
+  enabled: boolean;
+}) {
+  return http.request<ApiResponse<{ id: number; category_code: string }>>("put", "/api/v1/dictionaries/categories", { data });
 }
 export function getDictStandardItems(params?: Record<string, unknown>) {
-  return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-general/standard-items", { params });
+  return http.request<ApiResponse<PageData<DictStandardItem>>>("get", "/api/v1/dictionaries/standard-items", { params });
 }
-export function upsertDictStandardItem(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-general/standard-items", { data });
+export function upsertDictStandardItem(data: {
+  category_code: string;
+  standard_code: string;
+  standard_name_cn: string;
+  status?: string | null;
+}) {
+  return http.request<ApiResponse<{ id: number }>>("put", "/api/v1/dictionaries/standard-items", { data });
 }
 export function getDictSystemItems(params?: Record<string, unknown>) {
-  return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-general/system-items", { params });
+  return http.request<ApiResponse<PageData<DictSystemItem>>>("get", "/api/v1/dictionaries/system-items", { params });
+}
+export function upsertDictSystemItem(data: {
+  category_code: string;
+  system_code: string;
+  system_item_code: string;
+  system_item_name_cn: string;
+  enabled: boolean;
+}) {
+  return http.request<ApiResponse<{ id: number; created: boolean }>>("put", "/api/v1/dictionaries/system-items", { data });
+}
+export function setDictSystemItemEnabled(id: number, enabled: boolean) {
+  return http.request<ApiResponse<{ id: number; enabled: boolean }>>("patch", `/api/v1/dictionaries/system-items/${id}/enabled`, { data: { enabled } });
 }
 export function getDictItemMappings(params?: Record<string, unknown>) {
-  return http.request<ApiResponse<PageData<unknown>>>("get", "/api/v1/dict-general/item-mappings", { params });
+  return http.request<ApiResponse<PageData<DictItemMapping>>>("get", "/api/v1/dictionaries/mappings", { params });
 }
-export function upsertDictItemMapping(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("put", "/api/v1/dict-general/item-mappings", { data });
+export function upsertDictItemMapping(data: {
+  category_code: string;
+  standard_code?: string | null;
+  system_code: string;
+  system_item_code: string;
+  mapping_type?: string | null;
+  confidence?: string | null;
+}) {
+  return http.request<ApiResponse<{ id: number }>>("put", "/api/v1/dictionaries/mappings", { data });
 }
-export function importSystemDict(data: Record<string, unknown>) {
-  return http.request<ApiResponse<unknown>>("post", "/api/v1/dict-general/import", { data });
+export function importSystemDict(data: {
+  category_code: string;
+  system_code: string;
+  items: DictImportItem[];
+  dry_run?: boolean;
+}) {
+  return http.request<ApiResponse<DictImportResult>>("post", "/api/v1/dictionaries/import", { data });
+}
+
+// 146 D3：导入运行列表与推送计划向导（视图层不再裸 http.request）
+export function getMedicalImportRuns(params?: Record<string, unknown>) {
+  return http.request<ApiResponse<PageData<ImportRunInfo>>>("get", "/api/v1/dict-medical/import-runs", { params });
+}
+
+export function createMedicalPushPlan(data: { category_code: string; target_systems: string[] }) {
+  return http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/dict-medical/push/plans", { data });
+}
+export function approveMedicalPushPlan(planId: number, note?: string) {
+  return http.request<ApiResponse<Record<string, unknown>>>("post", `/api/v1/dict-medical/push/plans/${planId}/approve`, { data: { note } });
+}
+export function executeMedicalPushPlan(planId: number) {
+  return http.request<ApiResponse<Record<string, unknown>>>("post", `/api/v1/dict-medical/push/plans/${planId}/execute`);
 }

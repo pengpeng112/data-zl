@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
@@ -61,16 +62,31 @@ def _client_ip(request: Request) -> str | None:
     return None
 
 
+def _origin_of(value: str) -> str:
+    """提取并归一化 header 中的 scheme://host[:port]（B1）。
+
+    Origin 本身就是纯 origin；Referer 是完整 URL，取其 origin 部分。
+    返回小写、去尾部斜杠的 origin；无法解析返回空串。
+    """
+    match = re.match(r"^[a-zA-Z][a-zA-Z0-9+.\-]*://[^/?#]+", value.strip())
+    return match.group(0).rstrip("/").lower() if match else ""
+
+
 def _require_csrf(request: Request) -> None:
-    """CSRF defense for cookie-authenticated auth endpoints."""
+    """CSRF defense for cookie-authenticated auth endpoints.
+
+    B1：origin/referer 与允许源的比对必须是完整 origin 精确相等
+    （scheme+host+port 全等、大小写归一），禁止前缀 startswith——
+    否则 http://<allowed>.evil.com 可绕过。
+    """
     if request.headers.get("X-Requested-With"):
         return
-    origin = request.headers.get("Origin") or ""
-    referer = request.headers.get("Referer") or ""
-    allowed = settings.cors_origins or []
-    if origin and any(origin.startswith(o.rstrip("/")) for o in allowed):
+    allowed = [o.strip().rstrip("/").lower() for o in (settings.cors_origins or [])]
+    origin = _origin_of(request.headers.get("Origin") or "")
+    if origin and origin in allowed:
         return
-    if referer and any(referer.startswith(o.rstrip("/")) for o in allowed):
+    referer = _origin_of(request.headers.get("Referer") or "")
+    if referer and referer in allowed:
         return
     # Same-origin absolute path requests without Origin (some tools)
     if not origin and not referer and settings.env in ("dev", "test", "development"):

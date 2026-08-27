@@ -88,9 +88,29 @@ def upsert_product(
         query_code = query_code or m.query_code
 
     row = db.scalar(select(AssetDataProduct).where(AssetDataProduct.product_code == product_code))
+    pin_status = None
+    # 144 S4/A17: explicit pin must reference a runnable version; a changed
+    # pin bumps the product revision instead of silently swapping semantics.
+    if pin_version is not None:
+        qv = db.scalar(
+            select(AssetQueryVersion).where(
+                AssetQueryVersion.query_code == query_code,
+                AssetQueryVersion.version == pin_version,
+            )
+        )
+        if qv is None:
+            raise ValueError(f"pin 版本不存在: {query_code}@{pin_version}")
+        if qv.status in {"blocked", "candidate"}:
+            raise ValueError(
+                f"pin 版本 {query_code}@{pin_version} 状态为 {qv.status}，禁止产品发布"
+            )
+        pin_status = "validated" if qv.is_active else f"pinned:{qv.status}"
     if not row:
         row = AssetDataProduct(product_code=product_code, created_by=created_by)
         db.add(row)
+    else:
+        if row.pin_version != pin_version or row.query_code != query_code:
+            row.revision = int(row.revision or 1) + 1
     row.title = title
     row.description = description
     row.product_type = product_type
@@ -101,6 +121,9 @@ def upsert_product(
     row.parameter_schema = parameter_schema or {}
     row.max_rows = max_rows
     row.enabled = enabled
+    row.pin_validation_status = pin_status
+    if pin_status:
+        row.pin_validated_at = _now()
     row.updated_at = _now()
     db.flush()
     return _ser(row)
@@ -164,6 +187,52 @@ def execute_product(
     source_code: str | None = None,
     execute_sql: bool = False,
     triggered_by: str | None = None,
+    caller_id: str | None = None,
+) -> dict[str, Any]:
+    """Execute published product.
+
+    - metric products return definition/active version by default (no heavy SQL).
+    - execute_sql=True runs the linked active query via read-only runner.
+    - query products always run read-only when called.
+    - 144 S4/A18: per (product, caller) rate/concurrency limits are enforced.
+    """
+    from .data_product_rate_limit import check_rate, concurrency_guard
+
+    p = db.scalar(select(AssetDataProduct).where(AssetDataProduct.product_code == product_code))
+    if not p or not p.enabled:
+        raise LookupError("数据产品不存在或未启用")
+
+    check_rate(
+        product_code,
+        caller_id or (triggered_by or "anonymous"),
+        limit_per_minute=p.rate_limit_per_min,
+    )
+    with concurrency_guard(
+        product_code, caller_id or (triggered_by or "anonymous"), max_concurrency=p.max_concurrency
+    ):
+        # D6：把已查到的产品行传下去，锁内不再按 product_code 重复查询同一行。
+        return _execute_product_locked(
+            db,
+            product=p,
+            product_code=product_code,
+            parameters=parameters,
+            source_code=source_code,
+            execute_sql=execute_sql,
+            triggered_by=triggered_by,
+            caller_id=caller_id,
+        )
+
+
+def _execute_product_locked(
+    db: Session,
+    *,
+    product: AssetDataProduct,
+    product_code: str,
+    parameters: dict | None = None,
+    source_code: str | None = None,
+    execute_sql: bool = False,
+    triggered_by: str | None = None,
+    caller_id: str | None = None,
 ) -> dict[str, Any]:
     """Execute published product.
 
@@ -171,9 +240,7 @@ def execute_product(
     - execute_sql=True runs the linked active query via read-only runner.
     - query products always run read-only when called.
     """
-    p = db.scalar(select(AssetDataProduct).where(AssetDataProduct.product_code == product_code))
-    if not p or not p.enabled:
-        raise LookupError("数据产品不存在或未启用")
+    p = product
 
     # parameter whitelist
     schema = p.parameter_schema or {}
@@ -205,19 +272,27 @@ def execute_product(
             "query_version": mv.query_version,
             "executed": False,
         }
-        if execute_sql and mv.query_code:
-            run = run_query_version(
+        if execute_sql and (mv.query_code or mv.numerator_query_code or mv.denominator_query_code):
+            # 144 S4: real calculation engine — numerator/denominator/formula
+            # are computed and registered, not left to the caller.
+            from .metric_calculation_orchestrator import calculate_metric_version
+
+            period_key = str(params.get("period_key") or params.get("month") or "") or None
+            if not period_key:
+                from datetime import datetime, timezone
+
+                period_key = datetime.now(timezone.utc).strftime("%Y-%m")
+            calc = calculate_metric_version(
                 db,
-                query_code=mv.query_code,
-                version=mv.query_version,
-                source_code=source_code or p.source_code,
-                parameters=params,
-                result_storage=p.result_storage or "none",
-                max_rows=p.max_rows or 1000,
+                metric_code=mv.metric_code,
+                version=mv.version,
+                period_key=period_key,
+                parameters=params or None,
                 triggered_by=triggered_by or "data_product",
+                max_rows=p.max_rows or 1000,
             )
             payload["executed"] = True
-            payload["run"] = run
+            payload["calculation"] = calc
         db.add(
             GovernAuditLog(
                 module="data_product",

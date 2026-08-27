@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 146 D4：welcome 大屏保留独立设计语言（ReKpiPanel/ReDataCard/ReTrendBadge 专属视觉），
+ * 不迁移 --re-* 通用变量、不改样式结构；仅约束数据获取走类型化 API。
+ */
 import ReChart from "@/components/ReChart/index.vue";
 import ReDataCard from "@/components/ReDataCard/index.vue";
 import ReKpiPanel from "@/components/ReKpiPanel/index.vue";
@@ -11,7 +15,7 @@ import {
   type DashboardActivity,
   type DashboardSummary
 } from "@/api/asset";
-import { http } from "@/utils/http";
+import { getPlatformHealth } from "@/api/ops";
 import DatabaseIcon from "~icons/ri/database-2-line";
 import TableIcon from "~icons/ri/table-line";
 import FieldIcon from "~icons/ri/list-check-2";
@@ -327,18 +331,19 @@ const healthText = computed(() => {
 async function checkHealth() {
   try {
     // 经 Nginx 只能走 /api/*；后端同时提供 /health 与 /api/v1/health
-    const res = await http.request<any>("get", "/api/v1/health");
-    // 兼容 ApiResponse 或裸对象
-    const data = res?.data ?? res;
-    const db = data?.database ?? data?.db ?? data?.status;
+    const res = await getPlatformHealth();
+    // 兼容 ApiResponse 包裹或裸对象
+    const data = ((res as { data?: Record<string, unknown> })?.data ?? res) as Record<string, unknown>;
+    const db = (data.database ?? data.db ?? data.status) as unknown;
     const ok =
-      data?.status === "ok" ||
+      data.status === "ok" ||
       db === "connected" ||
-      data?.status === "alive" ||
-      res?.code === 0;
+      data.status === "alive" ||
+      (res as { code?: number }).code === 0;
     healthOk.value = ok !== false;
+    const message = typeof data.message === "string" ? data.message : "";
     healthDetail.value =
-      typeof db === "string" ? `DB: ${db}` : data?.message || "API 可达";
+      typeof db === "string" ? `DB: ${db}` : message || "API 可达";
   } catch (e: any) {
     healthOk.value = false;
     healthDetail.value = e?.response?.status

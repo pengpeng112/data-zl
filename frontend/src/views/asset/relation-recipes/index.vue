@@ -3,12 +3,17 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { hasPerms } from "@/utils/auth";
 import {
+  activateRecipeVersion,
+  approveRecipeVersion,
   copyRecipeVersion,
   createRecipe,
+  deprecateRecipeVersion,
   generateRecipeSql,
   getRecipeVersion,
   listRecipeVersions,
   listRecipes,
+  rejectRecipeVersion,
+  submitRecipeVersion,
   updateRecipeVersion,
   validateRecipeDraft,
   type RecipeItem,
@@ -104,6 +109,28 @@ async function load() {
 function search() {
   page.value = 1;
   void load();
+}
+
+const transitioning = ref(false);
+
+async function transition(row: RecipeItem, action: "submit" | "approve" | "reject" | "activate" | "deprecate") {
+  if (transitioning.value) return;
+  transitioning.value = true;
+  try {
+    let response;
+    if (action === "submit") response = await submitRecipeVersion(row.recipe_id, row.version);
+    else if (action === "approve") response = await approveRecipeVersion(row.recipe_id, row.version);
+    else if (action === "reject") response = await rejectRecipeVersion(row.recipe_id, row.version);
+    else if (action === "activate") response = await activateRecipeVersion(row.recipe_id, row.version);
+    else response = await deprecateRecipeVersion(row.recipe_id, row.version);
+    const labels: Record<string, string> = { submit: "已提交审核", approve: "已批准", reject: "已驳回", activate: "已激活", deprecate: "已停用" };
+    ElMessage.success(`${labels[action]}（当前状态：${response.data?.status || row.status}）`);
+    await load();
+  } catch (error) {
+    ElMessage.error(errorMessage(error, "状态流转失败"));
+  } finally {
+    transitioning.value = false;
+  }
 }
 
 function openCreate() {
@@ -270,6 +297,11 @@ onMounted(load);
             <el-button size="small" text @click="openVersions(row)">版本</el-button>
             <el-button v-perms="'recipe.create'" size="small" text @click="copyVersion(row)">复制版本</el-button>
             <el-button v-perms="'recipe.sql_generate'" size="small" text type="success" @click="previewSql(row)">SQL预览</el-button>
+            <el-button v-if="row.status === 'draft'" v-perms="'recipe.edit'" size="small" text type="warning" @click="transition(row, 'submit')">提交审核</el-button>
+            <el-button v-if="row.status === 'submitted'" v-perms="'recipe.review'" size="small" text type="success" @click="transition(row, 'approve')">批准</el-button>
+            <el-button v-if="row.status === 'submitted'" v-perms="'recipe.review'" size="small" text type="danger" @click="transition(row, 'reject')">驳回</el-button>
+            <el-button v-if="row.status === 'approved'" v-perms="'recipe.activate'" size="small" text type="success" @click="transition(row, 'activate')">激活</el-button>
+            <el-button v-if="row.status === 'active'" v-perms="'recipe.activate'" size="small" text type="info" @click="transition(row, 'deprecate')">停用</el-button>
             <el-button size="small" text @click="exportRecipe(row)">导出JSON</el-button>
           </template>
         </el-table-column>

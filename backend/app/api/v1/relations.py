@@ -95,21 +95,36 @@ def _load_edges(db: Session) -> dict[str, list[tuple[str, dict]]]:
 def relation_path(
     frm: str = Query(..., alias="from"),
     to: str = Query(..., alias="to"),
+    direction: str = Query("both", pattern="^(both|out|in)$"),
+    max_hops: int = Query(4, ge=1, le=8),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     if frm == to:
         return ApiResponse(
             data={"from": frm, "to": to, "path": [frm], "hops": []}
         )
-    edges = _load_edges(db)
+    directed_edges = _load_edges(db)
+    edges: dict[str, list[tuple[str, dict]]] = {}
+    for src, targets in directed_edges.items():
+        for tgt, meta in targets:
+            if direction == "in":
+                edges.setdefault(tgt, []).append((src, meta))
+            else:
+                edges.setdefault(src, []).append((tgt, meta))
+                if direction == "both":
+                    edges.setdefault(tgt, []).append((src, meta))
     q = deque([frm])
+    depth: dict[str, int] = {frm: 0}
     prev: dict[str, tuple[str, dict] | None] = {frm: None}
     while q:
         cur = q.popleft()
+        if depth[cur] >= max_hops:
+            continue
         for nxt, meta in edges.get(cur, []):
             if nxt in prev:
                 continue
             prev[nxt] = (cur, meta)
+            depth[nxt] = depth[cur] + 1
             if nxt == to:
                 hops_rev: list[dict] = []
                 node: str = to
@@ -120,7 +135,7 @@ def relation_path(
                 hops_rev.reverse()
                 path = [h["from"] for h in hops_rev] + [to]
                 return ApiResponse(
-                    data={"from": frm, "to": to, "path": path, "hops": hops_rev}
+                    data={"from": frm, "to": to, "path": path, "hops": hops_rev, "hops_used": depth[to]}
                 )
             q.append(nxt)
     return ApiResponse(
@@ -382,6 +397,8 @@ def list_relation_hit_rates(
     system_code: str | None = Query(None),
     scene: str | None = Query(None),
     keyword: str | None = Query(None),
+    hit_rate_min: float | None = Query(None, ge=0, le=1, description="0-1 命中率下限，在汇总/分页前过滤（146 E10）"),
+    hit_rate_max: float | None = Query(None, ge=0, le=1, description="0-1 命中率上限，在汇总/分页前过滤（146 E10）"),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -408,6 +425,11 @@ def list_relation_hit_rates(
     items = [_hit_rate_item(row) for row in rows]
     if scene:
         items = [item for item in items if item.get("scene") == scene]
+    # 146 E10：区间过滤在 total/summary/分页之前完成；无命中率记录仅在无下限时保留。
+    if hit_rate_min is not None:
+        items = [item for item in items if item.get("hit_rate") is not None and item["hit_rate"] >= hit_rate_min]
+    if hit_rate_max is not None:
+        items = [item for item in items if item.get("hit_rate") is not None and item["hit_rate"] <= hit_rate_max]
     highlights = [item for item in items if item.get("scene") in {
         "exam_inpatient", "exam_outpatient", "lab_inpatient", "lab_outpatient", "exam_mixed", "lab_mixed",
     }]

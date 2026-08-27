@@ -70,13 +70,16 @@ export default {
       }
     },
     {
+      // 146 E1：兼容入口保留 URL，query 原样传递并默认进入图谱路径模式
       path: "/asset/relations",
       name: "AssetRelations",
-      component: () => import("@/views/asset/relations/index.vue"),
+      redirect: to => ({
+        path: "/asset/graph",
+        query: { ...to.query, view_mode: to.query.view_mode ?? "path" }
+      }),
       meta: {
-        title: "关系路径",
-        showLink: true,
-        auths: ["asset.relation.view"]
+        title: "关系路径（兼容入口）",
+        showLink: false
       }
     },
     {
@@ -106,19 +109,23 @@ export default {
       meta: { title: "关系配方库", showLink: true, auths: ["asset.recipe.view"] }
     },
     {
+      // 146 E1：轻入口，仅隐藏菜单，URL 保留
       path: "/asset/lineage",
       name: "AssetLineage",
       component: () => import("@/views/asset/lineage/index.vue"),
       meta: {
         title: "血缘与影响",
-        showLink: true,
+        showLink: false,
         auths: ["asset.lineage.view"]
       }
     },
     {
       path: "/asset/candidates",
       name: "AssetCandidates",
-      redirect: "/asset/relation-review?class=candidate",
+      redirect: to => ({
+        path: "/asset/relation-review",
+        query: { ...to.query, class: to.query.class ?? "candidate" }
+      }),
       meta: {
         title: "候选关系（兼容入口）",
         showLink: false
@@ -161,7 +168,17 @@ export default {
       meta: {
         title: "查询与指标中心",
         showLink: true,
-        auths: ["asset.ai_draft.view"]
+        auths: ["query.view"]
+      }
+    },
+    {
+      path: "/asset/queries/accuracy",
+      name: "AssetQueryAccuracy",
+      component: () => import("@/views/query-center/accuracy/index.vue"),
+      meta: {
+        title: "准确性与反馈",
+        showLink: true,
+        auths: ["query.view"]
       }
     },
     {

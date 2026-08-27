@@ -52,6 +52,7 @@
             />
           </el-select>
           <el-button type="primary" :loading="impactLoading" @click="runImpact">分析</el-button>
+          <el-button :disabled="!impactTable" @click="expandInGraph">在图谱中展开</el-button>
         </div>
       </ReToolbar>
       <p class="impact-hint">先选业务系统和库，表清单会从资产库带出；也可直接输入中文名或表名搜索，不必手敲完整 SCHEMA.TABLE。</p>
@@ -123,7 +124,7 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   getGraphFilterOptions,
   getGraphOptions,
@@ -142,10 +143,12 @@ import {
   type ImpactTableOption
 } from "@/views/asset/lineage/lineagePicker";
 import { ElMessage } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import LineageIcon from "~icons/ri/node-tree";
 import SearchIcon from "~icons/ri/search-line";
 
 const route = useRoute();
+const router = useRouter();
 const systemCode = ref("");
 const schemaName = ref("");
 const impactTable = ref("");
@@ -172,6 +175,13 @@ function runImpact() {
   if (!impactTable.value.trim()) { ElMessage.warning("请选择或搜索要分析的表"); return; }
   impactLoading.value = true;
   getImpactAnalysis(impactTable.value.trim()).then(({ data }) => { impactResult.value = data; }).catch(() => { impactResult.value = null; }).finally(() => { impactLoading.value = false; });
+}
+
+function expandInGraph() {
+  const selected = tableOptions.value.find(item => item.value === impactTable.value);
+  const physicalKey = selected?.value || impactTable.value.trim();
+  if (!physicalKey) { ElMessage.warning("请先选择要展开的表"); return; }
+  router.push({ path: "/asset/graph", query: { center: physicalKey } });
 }
 
 function loadDeps() {
@@ -243,8 +253,9 @@ async function loadTablesFromLibrary(keyword = "") {
       table_name: item.table_name,
       technical_name: item.schema_name && item.table_name ? `${item.schema_name}.${item.table_name}` : item.table_name
     })).filter((item): item is ImpactTableOption => Boolean(item)));
-  } catch {
+  } catch (error) {
     tableOptions.value = [];
+    ElMessage.error(extractErrorDetail(error, "表选项加载失败，请重试"));
   } finally {
     tableSearching.value = false;
   }
@@ -280,8 +291,9 @@ async function searchDepTables(query: string) {
   try {
     const { data } = await searchGraphTables({ q: keyword, limit: 30 });
     depTableOptions.value = (data.items || []).map(optionFromCatalog).filter((item): item is ImpactTableOption => Boolean(item));
-  } catch {
+  } catch (error) {
     depTableOptions.value = [];
+    ElMessage.error(extractErrorDetail(error, "依赖表搜索失败，请重试"));
   } finally {
     depTableSearching.value = false;
   }

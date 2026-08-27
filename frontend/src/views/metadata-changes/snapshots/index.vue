@@ -97,12 +97,36 @@
         <el-table-column prop="snapshot_time" label="快照时间" width="180" />
         <el-table-column prop="table_count" label="表数量" width="100" align="center" />
         <el-table-column prop="column_count" label="字段数量" width="100" align="center" />
+        <el-table-column label="归档" width="140" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.archived_at" type="info" size="small">已归档</el-tag>
+            <el-button
+              v-else
+              v-perms="'metadata.snapshot.collect'"
+              link
+              type="danger"
+              size="small"
+              :loading="archivingIds.has(row.id)"
+              @click="doArchive(row)"
+            >
+              归档
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <ReEmptyState
         v-if="!loading && snapshots.length === 0"
         title="暂无快照"
         description="请选择数据连接或先采集快照。"
+      />
+      <el-alert
+        v-if="archiveNotice"
+        type="info"
+        :closable="false"
+        :title="archiveNotice"
+        show-icon
+        class="hint-alert"
       />
     </el-card>
   </div>
@@ -115,8 +139,9 @@ import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
-import { http } from "@/utils/http";
-import { collectMetadata, getSourceSnapshots } from "@/api/metadata";
+import { listSources } from "@/api/asset";
+import { archiveMetadataSnapshot, collectMetadata, getSourceSnapshots } from "@/api/metadata";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import CollectIcon from "~icons/ri/download-cloud-2-line";
 import FieldIcon from "~icons/ri/list-check-2";
 import ModeIcon from "~icons/ri/git-branch-line";
@@ -140,6 +165,8 @@ const sources = ref<DataSourceOption[]>([]);
 const snapshots = ref<any[]>([]);
 const loading = ref(false);
 const collecting = ref(false);
+const archivingIds = ref(new Set<number>());
+const archiveNotice = ref("");
 const lastResult = ref<any>(null);
 const collectForm = ref({ label: "", mode: "asset_cache" as "asset_cache" | "live_source" });
 const latestSnapshot = computed(() => snapshots.value[0]);
@@ -153,7 +180,7 @@ function schemaFilter() {
 
 async function loadSources() {
   try {
-    const res = await http.request<any>("get", "/api/v1/sources");
+    const res = await listSources();
     sources.value = res.data ?? [];
     if (!sourceCode.value && sources.value.length > 0) {
       sourceCode.value = sources.value[0].source_code;
@@ -183,9 +210,29 @@ async function loadSnapshots() {
     snapshots.value = res.data ?? [];
   } catch (e: any) {
     snapshots.value = [];
-    ElMessage.error(e?.response?.data?.detail || "获取快照失败");
+    ElMessage.error(extractErrorDetail(e, "获取快照失败"));
   } finally {
     loading.value = false;
+  }
+}
+
+async function doArchive(row: any) {
+  const next = new Set(archivingIds.value);
+  next.add(row.id);
+  archivingIds.value = next;
+  archiveNotice.value = "";
+  try {
+    await archiveMetadataSnapshot(row.id);
+    ElMessage.success("已软归档；被变更事件引用的快照会被拒绝");
+    await loadSnapshots();
+  } catch (error: any) {
+    const detail = extractErrorDetail(error, "归档失败");
+    archiveNotice.value = detail;
+    ElMessage.error(detail);
+  } finally {
+    const done = new Set(archivingIds.value);
+    done.delete(row.id);
+    archivingIds.value = done;
   }
 }
 
@@ -208,7 +255,7 @@ async function doCollect() {
     await loadSnapshots();
     lastResult.value = res.data;
   } catch (e: any) {
-    ElMessage.error(e?.response?.data?.detail || "采集失败");
+    ElMessage.error(extractErrorDetail(e, "采集失败"));
   } finally {
     collecting.value = false;
   }

@@ -139,39 +139,11 @@ def list_mapping_rows(
     operation_level: str | None = Query(None, description="院内手术等级"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    if category_code == "operation":
-        local_code_set = "operation_local_clinical"
-        national_code_set = "operation_national_clinical_v3"
-        insurance_code_set = "operation_insurance_v2"
-    else:
-        local_code_set = "diagnosis_local_clinical"
-        national_code_set = "diagnosis_national_clinical_v2"
-        insurance_code_set = "diagnosis_insurance_v2"
-
-    stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == local_code_set)
-    if status:
-        stmt = stmt.where(DictMedicalCodeItem.status == status)
-    if keyword:
-        like = f"%{keyword}%"
-        stmt = stmt.where(
-            DictMedicalCodeItem.item_code.ilike(like)
-            | DictMedicalCodeItem.item_name_cn.ilike(like)
-        )
-    if category_code == "diagnosis" and has_infectious is not None:
-        infectious_expr = func.coalesce(DictMedicalCodeItem.extra.op("->>")("infectious_disease_name"), "")
-        stmt = stmt.where(infectious_expr != "" if has_infectious else infectious_expr == "")
-    if category_code == "operation":
-        def flag_value(value: str | None) -> str | None:
-            return "" if value == "__empty" else value
-
-        if minimally_invasive_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_minimally_invasive_flag"), "") == flag_value(minimally_invasive_flag))
-        if performance_level4_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_level4_flag"), "") == flag_value(performance_level4_flag))
-        if restricted_tech_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("restricted_tech_flag"), "") == flag_value(restricted_tech_flag))
-        if operation_level:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("operation_level"), "") == operation_level)
+    local_code_set, national_code_set, insurance_code_set = _code_sets_for_category(category_code)
+    stmt = _local_code_item_stmt(
+        category_code, keyword, status, has_infectious,
+        minimally_invasive_flag, performance_level4_flag, restricted_tech_flag, operation_level,
+    )
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     local_items = db.scalars(
         stmt.order_by(DictMedicalCodeItem.item_code)
@@ -252,6 +224,49 @@ def list_mapping_options(category_code: str = Query("diagnosis"), db: Session = 
     return ApiResponse(data=data)
 
 
+def _local_code_item_stmt(
+    category_code: str,
+    keyword: str | None,
+    status: str | None,
+    has_infectious: bool | None,
+    minimally_invasive_flag: str | None,
+    performance_level4_flag: str | None,
+    restricted_tech_flag: str | None,
+    operation_level: str | None,
+):
+    """D3：list_mapping_rows 与导出共用的本地编码项过滤构造（单份实现）。
+
+    只负责过滤条件与 code-set 选择；分页（offset/limit）由列表端点自加，
+    导出走全量，两者语义不互串。
+    """
+    local_code_set = _code_sets_for_category(category_code)[0]
+    stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == local_code_set)
+    if status:
+        stmt = stmt.where(DictMedicalCodeItem.status == status)
+    if keyword:
+        like = f"%{keyword}%"
+        stmt = stmt.where(
+            DictMedicalCodeItem.item_code.ilike(like)
+            | DictMedicalCodeItem.item_name_cn.ilike(like)
+        )
+    if category_code == "diagnosis" and has_infectious is not None:
+        infectious_expr = func.coalesce(DictMedicalCodeItem.extra.op("->>")("infectious_disease_name"), "")
+        stmt = stmt.where(infectious_expr != "" if has_infectious else infectious_expr == "")
+    if category_code == "operation":
+        def flag_value(value: str | None) -> str | None:
+            return "" if value == "__empty" else value
+
+        if minimally_invasive_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_minimally_invasive_flag"), "") == flag_value(minimally_invasive_flag))
+        if performance_level4_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_level4_flag"), "") == flag_value(performance_level4_flag))
+        if restricted_tech_flag is not None:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("restricted_tech_flag"), "") == flag_value(restricted_tech_flag))
+        if operation_level:
+            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("operation_level"), "") == operation_level)
+    return stmt
+
+
 def _excel_col_name(index: int) -> str:
     name = ""
     while index:
@@ -260,25 +275,37 @@ def _excel_col_name(index: int) -> str:
     return name
 
 
+# C6：导出行数上限与分批写 sheet 的批大小（防止无界导出打爆内存/响应体）。
+EXPORT_MAX_ROWS = 50_000
+_SHEET_WRITE_BATCH = 5_000
+
+
 def _xlsx_bytes(headers: list[str], rows: list[list[object]], sheet_name: str) -> bytes:
     def cell_xml(row_index: int, col_index: int, value: object) -> str:
         value_text = "" if value is None else str(value)
         ref = f"{_excel_col_name(col_index)}{row_index}"
         return f'<c r="{ref}" t="inlineStr"><is><t>{escape(value_text)}</t></is></c>'
 
-    sheet_rows = []
-    all_rows = [headers, *rows]
-    for row_index, row in enumerate(all_rows, start=1):
-        cells = "".join(cell_xml(row_index, col_index, value) for col_index, value in enumerate(row, start=1))
-        sheet_rows.append(f'<row r="{row_index}">{cells}</row>')
-    dimension = f"A1:{_excel_col_name(len(headers))}{max(len(all_rows), 1)}"
-    sheet_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    def sheet_xml_chunks():
+        # C6：按批产出 sheet XML 片段，避免一次性拼全量字符串。
+        yield f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <dimension ref="{dimension}"/>
+  <dimension ref="A1:{_excel_col_name(len(headers))}{max(len(rows) + 1, 1)}"/>
   <sheetViews><sheetView workbookViewId="0"/></sheetViews>
   <sheetFormatPr defaultRowHeight="15"/>
-  <sheetData>{''.join(sheet_rows)}</sheetData>
-</worksheet>'''
+  <sheetData>'''
+        row_index = 1
+        header_cells = "".join(cell_xml(row_index, col_index, value) for col_index, value in enumerate(headers, start=1))
+        yield f'<row r="{row_index}">{header_cells}</row>'
+        for start in range(0, len(rows), _SHEET_WRITE_BATCH):
+            batch: list[str] = []
+            for offset, row in enumerate(rows[start : start + _SHEET_WRITE_BATCH]):
+                row_index = start + offset + 2
+                cells = "".join(cell_xml(row_index, col_index, value) for col_index, value in enumerate(row, start=1))
+                batch.append(f'<row r="{row_index}">{cells}</row>')
+            yield "".join(batch)
+        yield "</sheetData></worksheet>"
+
     workbook_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/></sheets>
@@ -304,7 +331,9 @@ def _xlsx_bytes(headers: list[str], rows: list[list[object]], sheet_name: str) -
         zf.writestr("_rels/.rels", rels_xml)
         zf.writestr("xl/workbook.xml", workbook_xml)
         zf.writestr("xl/_rels/workbook.xml.rels", workbook_rels_xml)
-        zf.writestr("xl/worksheets/sheet1.xml", sheet_xml)
+        with zf.open("xl/worksheets/sheet1.xml", "w") as sheet_file:
+            for chunk in sheet_xml_chunks():
+                sheet_file.write(chunk.encode("utf-8"))
     return buffer.getvalue()
 
 
@@ -319,36 +348,11 @@ def _mapping_rows_for_export(
     restricted_tech_flag: str | None,
     operation_level: str | None,
 ) -> list[dict]:
-    if category_code == "operation":
-        local_code_set = "operation_local_clinical"
-        national_code_set = "operation_national_clinical_v3"
-        insurance_code_set = "operation_insurance_v2"
-    else:
-        local_code_set = "diagnosis_local_clinical"
-        national_code_set = "diagnosis_national_clinical_v2"
-        insurance_code_set = "diagnosis_insurance_v2"
-
-    stmt = select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == local_code_set)
-    if status:
-        stmt = stmt.where(DictMedicalCodeItem.status == status)
-    if keyword:
-        like = f"%{keyword}%"
-        stmt = stmt.where(DictMedicalCodeItem.item_code.ilike(like) | DictMedicalCodeItem.item_name_cn.ilike(like))
-    if category_code == "diagnosis" and has_infectious is not None:
-        infectious_expr = func.coalesce(DictMedicalCodeItem.extra.op("->>")("infectious_disease_name"), "")
-        stmt = stmt.where(infectious_expr != "" if has_infectious else infectious_expr == "")
-    if category_code == "operation":
-        def flag_value(value: str | None) -> str | None:
-            return "" if value == "__empty" else value
-        if minimally_invasive_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_minimally_invasive_flag"), "") == flag_value(minimally_invasive_flag))
-        if performance_level4_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("performance_level4_flag"), "") == flag_value(performance_level4_flag))
-        if restricted_tech_flag is not None:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("restricted_tech_flag"), "") == flag_value(restricted_tech_flag))
-        if operation_level:
-            stmt = stmt.where(func.coalesce(DictMedicalCodeItem.extra.op("->>")("operation_level"), "") == operation_level)
-
+    local_code_set, national_code_set, insurance_code_set = _code_sets_for_category(category_code)
+    stmt = _local_code_item_stmt(
+        category_code, keyword, status, has_infectious,
+        minimally_invasive_flag, performance_level4_flag, restricted_tech_flag, operation_level,
+    )
     local_items = db.scalars(stmt.order_by(DictMedicalCodeItem.item_code)).all()
     local_codes = [r.item_code for r in local_items]
     mapping_rows = db.scalars(select(DictMedicalCodeMapping).where(
@@ -392,7 +396,8 @@ def _mapping_rows_for_export(
             "source_sheet": extra.get("source_sheet"),
             "status": local.status,
         })
-    return result
+    # C6：导出行数上限，超限截断（保护内存与响应体大小）。
+    return result[:EXPORT_MAX_ROWS]
 
 
 @router.get("/mapping-rows/export", summary="导出诊断/手术映射宽表 Excel")
@@ -510,7 +515,7 @@ def _replace_mapping(db: Session, category_code: str, from_code_set: str, from_c
     ))
 
 
-@router.put("/mapping-rows", summary="按院内编码新增/更新诊断手术映射宽表行")
+@router.put("/mapping-rows", summary="按院内编码新增/更新诊断手术映射宽表行", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def upsert_mapping_row(
     req: MappingRowUpsert,
     request: Request,
@@ -590,7 +595,7 @@ class MappingUpsert(BaseModel):
     confidence: str | None = "unknown"
 
 
-@router.put("/mappings", summary="新增/更新诊断手术编码对照关系")
+@router.put("/mappings", summary="新增/更新诊断手术编码对照关系", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def upsert_mapping(req: MappingUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(DictMedicalCodeMapping).where(
         DictMedicalCodeMapping.category_code == req.category_code,
@@ -694,7 +699,7 @@ def _store_medical_sync_job(
     return job
 
 
-@router.post("/sync/run", summary="Run diagnosis/operation dictionary sync")
+@router.post("/sync/run", summary="Run diagnosis/operation dictionary sync", dependencies=[Depends(require_permission("dict.medical.execute"))])
 def run_medical_sync(req: MedicalSyncRunRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     get_current_user(request)
     from ...services.medical_code_source_collector import collect_medical_code_diffs
@@ -711,7 +716,7 @@ def run_medical_sync(req: MedicalSyncRunRequest, request: Request, db: Session =
     return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
 
 
-@router.post("/sync/jobs/{job_id}/retry", summary="Retry diagnosis/operation dictionary sync job")
+@router.post("/sync/jobs/{job_id}/retry", summary="Retry diagnosis/operation dictionary sync job", dependencies=[Depends(require_permission("dict.medical.retry"))])
 def retry_medical_sync_job(
     job_id: int,
     request: Request,
@@ -771,7 +776,7 @@ def retry_medical_sync_job(
     db.commit()
     return ApiResponse(data={**result, "job_id": job.id, "job_status": job.status})
 
-@router.patch("/sync-diffs/{diff_id}", summary="Update diagnosis/operation sync diff status")
+@router.patch("/sync-diffs/{diff_id}", summary="Update diagnosis/operation sync diff status", dependencies=[Depends(require_permission("dict.medical.reconcile"))])
 def update_medical_diff(
     diff_id: int,
     req: MedicalSyncDiffUpdate,
@@ -816,7 +821,7 @@ class CodeSetUpsert(BaseModel):
     enabled: bool = True
 
 
-@router.put("/code-sets", summary="新增/更新诊断手术编码体系")
+@router.put("/code-sets", summary="新增/更新诊断手术编码体系", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def upsert_code_set(req: CodeSetUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(DictMedicalCodeSet).where(
         DictMedicalCodeSet.code_set_code == req.code_set_code
@@ -858,7 +863,7 @@ class CodeItemUpsert(BaseModel):
     status: str | None = "active"
 
 
-@router.put("/items", summary="新增/更新编码项")
+@router.put("/items", summary="新增/更新编码项", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def upsert_code_item(req: CodeItemUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(DictMedicalCodeItem).where(
         DictMedicalCodeItem.code_set_code == req.code_set_code,
@@ -1179,7 +1184,7 @@ def medical_push_export_preview(
     ))
 
 
-@router.post("/push/plan", summary="生成诊断/手术单行新增下发计划（默认不写业务库）")
+@router.post("/push/plan", summary="生成诊断/手术单行新增下发计划（默认不写业务库）", dependencies=[Depends(require_permission("dict.medical.plan.create"))])
 def medical_push_plan(
     req: MedicalPushPlanRequest,
     request: Request,
@@ -1233,7 +1238,7 @@ def medical_push_plan(
     return ApiResponse(data=plan)
 
 
-@router.post("/push/apply-one", summary="单条下发（101号整改：仅 dry_run，apply 已关闭）", deprecated=True)
+@router.post("/push/apply-one", summary="单条下发（101号整改：仅 dry_run，apply 已关闭）", deprecated=True, dependencies=[Depends(require_permission("dict.medical.execute"))])
 def medical_push_apply_one(
     req: MedicalPushApplyOneRequest,
     request: Request,
@@ -1257,7 +1262,7 @@ def medical_push_apply_one(
     return ApiResponse(data=result)
 
 
-@router.post("/push/stop-one", summary="单条停用（唯一允许的 UPDATE 形态）")
+@router.post("/push/stop-one", summary="单条停用（唯一允许的 UPDATE 形态）", dependencies=[Depends(require_permission("dict.medical.execute"))])
 def medical_push_stop_one(
     req: MedicalPushStopOneRequest,
     request: Request,

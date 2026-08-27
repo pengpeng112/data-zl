@@ -45,6 +45,80 @@
         @reset="resetFilters"
       />
 
+      <el-card v-if="filters.view_mode === 'path'" shadow="never" class="path-panel">
+        <div class="path-form">
+          <el-select
+            v-model="pathForm.from"
+            filterable
+            remote
+            clearable
+            placeholder="起点表（如 HIS.PAT_VISIT）"
+            :remote-method="searchPathOptions"
+            :loading="pathSearching"
+            class="path-select"
+          >
+            <el-option
+              v-for="item in pathOptions"
+              :key="item.physical_key"
+              :label="`${item.technical_name || item.physical_key}${item.display_name && item.display_name !== item.technical_name ? '（' + item.display_name + '）' : ''}`"
+              :value="item.physical_key"
+            />
+          </el-select>
+          <span class="path-arrow">→</span>
+          <el-select
+            v-model="pathForm.to"
+            filterable
+            remote
+            clearable
+            placeholder="终点表"
+            :remote-method="searchPathOptions"
+            :loading="pathSearching"
+            class="path-select"
+          >
+            <el-option
+              v-for="item in pathOptions"
+              :key="item.physical_key"
+              :label="`${item.technical_name || item.physical_key}${item.display_name && item.display_name !== item.technical_name ? '（' + item.display_name + '）' : ''}`"
+              :value="item.physical_key"
+            />
+          </el-select>
+          <el-select v-model="pathForm.direction" class="path-direction" placeholder="方向">
+            <el-option label="双向" value="both" />
+            <el-option label="正向" value="out" />
+            <el-option label="反向" value="in" />
+          </el-select>
+          <el-input-number v-model="pathForm.max_hops" :min="1" :max="8" controls-position="right" />
+          <el-button type="primary" :loading="pathLoading" :disabled="!pathForm.from || !pathForm.to" @click="doPathQuery">查询路径</el-button>
+        </div>
+        <el-alert v-if="pathError" type="error" :closable="false" :title="pathError" show-icon class="path-status">
+          <template #default><el-button size="small" @click="doPathQuery">重试</el-button></template>
+        </el-alert>
+        <el-table v-if="pathResult?.path?.length" :data="pathResult.hops" size="small" class="path-status" border>
+          <el-table-column label="#" type="index" width="50" align="center" />
+          <el-table-column prop="from" label="从" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="to" label="到" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="join_condition" label="关联条件" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="confidence" label="置信度" width="80" align="center" />
+          <el-table-column prop="validation_status" label="验证状态" width="110" align="center" />
+        </el-table>
+        <ReEmptyState
+          v-else-if="pathState === 'none'"
+          title="未找到关联路径"
+          :description="`在方向与 ${pathForm.max_hops} 跳上限内，未发现这两张表之间的可达路径。`"
+          class="path-status"
+        />
+      </el-card>
+
+      <el-card v-if="locate.search_results.length" shadow="never" class="path-panel">
+        <template #header>同名资产候选（{{ locate.search_results.length }}）— 点击选择中心表</template>
+        <el-table :data="locate.search_results" size="small" max-height="220" @row-click="pickLocateCandidate">
+          <el-table-column prop="physical_key" label="物理键" min-width="220" show-overflow-tooltip />
+          <el-table-column prop="display_name" label="中文名" min-width="140" show-overflow-tooltip />
+          <el-table-column prop="system_code" label="系统" width="110" align="center" />
+          <el-table-column prop="schema_name" label="Schema" width="110" />
+        </el-table>
+      </el-card>
+
       <el-alert
         v-if="graphLoadNotice"
         class="graph-load-alert"
@@ -77,6 +151,12 @@
             @edge-click="showEdge"
             @render-error="handleRenderError"
           />
+          <div class="engine-status">
+            <el-tag size="small" :type="graphEngine === 'g6' ? 'success' : 'info'" disable-transitions>
+              当前引擎：{{ graphEngine === "g6" ? "G6 高级图" : "内置 SVG" }}
+            </el-tag>
+            <span v-if="graphEngine === 'svg' && graphLoadNotice" class="engine-reason">降级原因：{{ graphLoadNotice }}</span>
+          </div>
         </template>
         <ReEmptyState
           v-else-if="hasAnyData"
@@ -88,7 +168,7 @@
           title="筛选结果为空"
           description="当前条件未命中任何关系，可清空条件或调整筛选后重试。"
         >
-          <template #extra>
+          <template #action>
             <el-button type="primary" @click="resetFilters">清空条件</el-button>
           </template>
         </ReEmptyState>
@@ -179,7 +259,8 @@ import {
   type GraphErrorInfo,
   type GraphPageState
 } from "@/views/asset/graph/graphErrors";
-import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, listSources, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem } from "@/api/asset";
+import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, getRelationPath, listSources, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem, type RelationPathResult } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
 
 type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
 
@@ -238,9 +319,9 @@ const locate = reactive({
   direction: "both" as "in" | "out" | "both"
 });
 
-const viewModeOptions = computed(() => options.view_modes.filter(item => !item.deprecated && ["overview", "explore", "review"].includes(item.code)).map(item => ({ label: item.label, value: item.code })));
+const viewModeOptions = computed(() => options.view_modes.filter(item => !item.deprecated && ["overview", "path", "explore", "review"].includes(item.code)).map(item => ({ label: item.label, value: item.code })));
 const currentViewMode = computed<GraphViewMode | undefined>(() => options.view_modes.find(item => item.code === filters.view_mode));
-const graphLoadingText = computed(() => filters.view_mode === "overview" ? "正在加载资产概览" : filters.view_mode === "explore" ? "正在加载关系探索" : "正在加载证据视图");
+const graphLoadingText = computed(() => filters.view_mode === "overview" ? "正在加载资产概览" : filters.view_mode === "explore" ? "正在加载关系探索" : filters.view_mode === "path" ? "正在查询关联路径" : "正在加载证据视图");
 const isErrorState = computed(() => ["auth_error", "permission_error", "api_error", "contract_error"].includes(state.value));
 const errorIcon = computed(() => {
   if (state.value === "auth_error") return "error";
@@ -280,6 +361,105 @@ function applyModeDefaults(mode: GraphViewMode) {
     // 概览默认 Neo4j 式力导向：系统分散，有关系则连线
     filters.layout_mode = "layered";
   }
+}
+
+// 146 E1：路径查询子模式（调用既有 /relations/path，双端远程选择 + 方向/跳数 + 三态）
+const pathForm = reactive({
+  from: "",
+  to: "",
+  direction: "both" as "both" | "out" | "in",
+  max_hops: 4
+});
+const pathOptions = ref<GraphTableSearchItem[]>([]);
+const pathSearching = ref(false);
+const pathLoading = ref(false);
+const pathState = ref<"idle" | "found" | "none" | "error">("idle");
+const pathError = ref("");
+const pathResult = ref<RelationPathResult | null>(null);
+
+async function searchPathOptions(query: string) {
+  const keyword = query.trim();
+  if (!keyword) {
+    pathOptions.value = [];
+    return;
+  }
+  pathSearching.value = true;
+  try {
+    const res = await searchGraphTables({ q: keyword, limit: 20 });
+    pathOptions.value = res.data.items || [];
+  } catch {
+    pathOptions.value = [];
+  } finally {
+    pathSearching.value = false;
+  }
+}
+
+function pathGraphData(result: RelationPathResult): GraphData {
+  if (!result.path || result.path.length < 2) return { nodes: [], edges: [] };
+  const seen = new Set<string>();
+  const nodes: GraphNode[] = [];
+  for (const tableName of result.path) {
+    if (seen.has(tableName)) continue;
+    seen.add(tableName);
+    const parts = tableName.split(".");
+    nodes.push({
+      id: tableName,
+      label: parts.length > 1 ? parts[1] : tableName,
+      schema_name: parts.length > 1 ? parts[0] : "?",
+      table_name: parts.length > 1 ? parts[1] : tableName,
+      category: parts.length > 1 ? parts[0] : "?"
+    });
+  }
+  const edges: GraphEdge[] = result.hops.map((hop, index) => ({
+    id: `${hop.from}->${hop.to}#${index}`,
+    source: hop.from,
+    target: hop.to,
+    label: hop.join_condition,
+    join_condition: hop.join_condition,
+    validation_status: hop.validation_status,
+    validation_metrics: hop.validation_metrics
+  }));
+  return { nodes, edges };
+}
+
+async function doPathQuery() {
+  if (!pathForm.from || !pathForm.to) return;
+  pathLoading.value = true;
+  pathError.value = "";
+  try {
+    const res = await getRelationPath(pathForm.from, pathForm.to, {
+      direction: pathForm.direction,
+      max_hops: pathForm.max_hops
+    });
+    pathResult.value = res.data;
+    if (res.data?.path?.length) {
+      graphData.value = pathGraphData(res.data);
+      graphMeta.value = null;
+      selectedNodeId.value = "";
+      centerTable.value = pathForm.from;
+      state.value = "success";
+      pathState.value = "found";
+    } else {
+      graphData.value = { nodes: [], edges: [] };
+      state.value = "empty";
+      pathState.value = "none";
+    }
+  } catch (error) {
+    pathResult.value = null;
+    graphData.value = { nodes: [], edges: [] };
+    state.value = "empty";
+    pathState.value = "error";
+    pathError.value = extractErrorDetail(error, "关联路径查询失败");
+  } finally {
+    pathLoading.value = false;
+  }
+}
+
+function pickLocateCandidate(row: GraphTableSearchItem) {
+  locate.physical_key = row.physical_key;
+  locate.table = row.table_name || row.physical_key;
+  locate.search_results = [];
+  void loadChain();
 }
 
 function changeViewMode(value: string) {
@@ -347,7 +527,8 @@ function applyRouteQueryFilters() {
 }
 
 function routeViewMode() {
-  const code = routeQueryText(route.query.view_mode).trim();
+  // /asset/relations 兼容 redirect 使用 view_mode=path；外部链接也可能带 mode=path。
+  const code = (routeQueryText(route.query.view_mode) || routeQueryText(route.query.mode)).trim();
   const selected = options.view_modes.find(item => item.code === code);
   return selected?.deprecated ? options.view_modes.find(item => item.code === "overview") : selected;
 }
@@ -379,17 +560,25 @@ async function loadOptions() {
   }
 }
 
+// E7：请求序号守卫——并发触发时仅最后一次请求的结果生效（防旧响应覆盖新状态）。
+let loadDataSeq = 0;
+let sourceOptionsSeq = 0;
+let chainSeq = 0;
+
 async function handleSystemChange() {
   // system_code and source_code are distinct dimensions.  A system change
   // resets the child connection and narrows it to the selected system.
   filters.source_code = "";
+  const seq = ++sourceOptionsSeq;
   try {
     const res = await listSources(filters.system_code ? { system_code: filters.system_code } : undefined);
+    if (seq !== sourceOptionsSeq) return;
     options.source_options = (res.data || []).map(source => ({
       value: source.source_code,
       label: source.source_name_cn || source.source_code
     }));
   } catch {
+    if (seq !== sourceOptionsSeq) return;
     options.source_options = [...allSourceOptions.value];
   }
   await loadData();
@@ -432,6 +621,14 @@ function emptyState() {
 }
 
 async function loadData() {
+  if (filters.view_mode === "path") {
+    // 路径模式不加载全量图，等待用户在路径面板发起查询。
+    if (pathState.value !== "found") {
+      state.value = "empty";
+    }
+    return;
+  }
+  const seq = ++loadDataSeq;
   loading.value = true;
   state.value = "loading";
   centerTable.value = "";
@@ -448,6 +645,7 @@ async function loadData() {
         domain: filters.domain || undefined,
         limit: overviewLevel.value === "system" ? 40 : 120
       });
+      if (seq !== loadDataSeq) return;
       const data = overview.data.data;
       graphData.value = data;
       graphMeta.value = data.meta || null;
@@ -471,6 +669,7 @@ async function loadData() {
       include_candidates: filters.include_candidates,
       include_dependencies: filters.include_dependencies
     });
+    if (seq !== loadDataSeq) return;
     const data = res.data;
     if (!validateGraphData(data)) {
       state.value = "contract_error";
@@ -486,13 +685,16 @@ async function loadData() {
       emptyState();
     }
   } catch (err) {
+    if (seq !== loadDataSeq) return;
     graphData.value = { nodes: [], edges: [] };
     graphMeta.value = null;
     const info = classifyGraphError(err);
     state.value = info.state;
     errorInfo.value = info;
   } finally {
-    loading.value = false;
+    if (seq === loadDataSeq) {
+      loading.value = false;
+    }
   }
 }
 
@@ -502,6 +704,7 @@ async function loadChain() {
     filters.view_mode = exploreMode.code;
     applyModeDefaults(exploreMode);
   }
+  const seq = ++chainSeq;
   let physicalKey = locate.physical_key.trim();
   if (!physicalKey && locate.table.trim()) {
     try {
@@ -512,6 +715,7 @@ async function loadChain() {
         schema: filters.schema || undefined,
         limit: 30
       });
+      if (seq !== chainSeq) return;
       locate.search_results = search.data.items;
       if (search.data.items.length !== 1) {
         ElMessage.warning(search.data.items.length ? "找到多个同名资产，请补充业务系统、数据连接或 Owner 后再展开" : "未找到唯一中心资产");
@@ -520,6 +724,7 @@ async function loadChain() {
       physicalKey = search.data.items[0].physical_key;
       locate.physical_key = physicalKey;
     } catch (err) {
+      if (seq !== chainSeq) return;
       const info = classifyGraphError(err);
       state.value = info.state;
       errorInfo.value = info;
@@ -539,6 +744,7 @@ async function loadChain() {
       direction: locate.direction,
       limit: filters.limit
     });
+    if (seq !== chainSeq) return;
     if (!validateGraphData(res.data)) {
       state.value = "contract_error";
       errorInfo.value = contractErrorInfo(new Error("neighbors data structure invalid"));
@@ -557,6 +763,7 @@ async function loadChain() {
       emptyState();
     }
   } catch (err) {
+    if (seq !== chainSeq) return;
     graphData.value = { nodes: [], edges: [] };
     graphMeta.value = null;
     const info = classifyGraphError(err);
@@ -564,7 +771,9 @@ async function loadChain() {
     errorInfo.value = info;
     ElMessage.warning(info.description);
   } finally {
-    loading.value = false;
+    if (seq === chainSeq) {
+      loading.value = false;
+    }
   }
 }
 
@@ -738,7 +947,27 @@ async function init() {
   // options/graph 相互隔离：options 失败也尝试诊断与主图（主图仍会因缺 options 给出明确错误）
   void loadDiagnostics();
   if (ok) {
-    await loadData();
+    if (filters.view_mode === "path") {
+      const from = routeQueryText(route.query.from).trim();
+      const to = routeQueryText(route.query.to).trim();
+      if (from && to) {
+        pathForm.from = from;
+        pathForm.to = to;
+        await doPathQuery();
+      } else {
+        state.value = "empty";
+      }
+    } else {
+      // 146 E1：血缘等轻入口带 center 参数时直接展开中心表邻域。
+      const center = routeQueryText(route.query.center).trim();
+      if (center) {
+        locate.physical_key = center;
+        locate.table = center.split(".").slice(1).join(".") || center;
+        await loadChain();
+      } else {
+        await loadData();
+      }
+    }
   } else if (!errorInfo.value) {
     state.value = "api_error";
     errorInfo.value = classifyGraphError(new Error("options failed"));
@@ -760,6 +989,15 @@ onBeforeUnmount(() => {
   padding: 20px;
   background: var(--re-page-bg);
 }
+
+.path-panel { margin-top: 12px; }
+.engine-status { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.engine-reason { font-size: 12px; color: var(--re-text-secondary); }
+.path-form { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.path-select { width: 280px; }
+.path-direction { width: 100px; }
+.path-arrow { font-weight: 700; color: var(--primary-500); }
+.path-status { margin-top: 12px; }
 
 .graph-load-alert {
   margin-bottom: 12px;

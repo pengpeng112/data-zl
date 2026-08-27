@@ -88,11 +88,7 @@ export function validateRecipeDraft(primaryTablesText: string, joinsText: string
   return { primaryTables, joins };
 }
 
-interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+import type { ApiResponse } from "./types";
 
 export function listRecipes(params?: RecipeListParams) {
   return http.request<ApiResponse<{ total: number; page: number; page_size: number; items: RecipeItem[] }>>("get", "/api/v1/recipes", { params });
@@ -125,3 +121,20 @@ export function copyRecipeVersion(recipeId: string, version?: number) {
 export function generateRecipeSql(recipeId: string, version: number, dialect = "oracle") {
   return http.request<ApiResponse<{ recipe_id: string; version: number; dialect: string; sql: string; executed: false }>>("post", `/api/v1/recipes/${encodeURIComponent(recipeId)}/versions/${version}/sql`, { data: { dialect } });
 }
+
+// ── 状态流转（146 D3：复用后端既有状态机，仅补前端封装）──
+
+function versionAction(recipeId: string, version: number, action: string, data?: Record<string, unknown>) {
+  return http.request<ApiResponse<RecipeItem>>(
+    "post",
+    `/api/v1/recipes/${encodeURIComponent(recipeId)}/versions/${version}/${action}`,
+    { data: data ?? {} }
+  );
+}
+
+export const submitRecipeVersion = (recipeId: string, version: number) => versionAction(recipeId, version, "submit");
+export const approveRecipeVersion = (recipeId: string, version: number) => versionAction(recipeId, version, "approve");
+export const rejectRecipeVersion = (recipeId: string, version: number, reason?: string) =>
+  versionAction(recipeId, version, "reject", reason ? { reason } : undefined);
+export const activateRecipeVersion = (recipeId: string, version: number) => versionAction(recipeId, version, "activate");
+export const deprecateRecipeVersion = (recipeId: string, version: number) => versionAction(recipeId, version, "deprecate");

@@ -1,7 +1,7 @@
 > 类别：模块规划
 >
 > 状态：P1–P5 最小闭环已生产；head `h5c6d7e8f9a0`；镜像 `data-asset:126p5-20260811223311`；全局调度开关已开、单条调度 27 全关；21 条占位已回写官方名称
-> 接手交接：`128_126号查询指标闭环完成情况与接手交接.md`
+> 接手交接：`128_126号查询指标闭环完成情况与接手交接.md`（2026-08-27 已归档至 `_archive/`，接手使命终结）
 >
 > 制定日期：2026-08-11
 >
@@ -10,6 +10,12 @@
 > 关联规范：`87_AI视图SQL生成与平台对接说明.md`、`.agents/skills/sql-relation-intake/SKILL.md`、`.agents/skills/query-governance-intake/SKILL.md`
 
 # AI 查询 SQL 与统计指标闭环治理建设计划
+
+> **144 实施注记（2026-08-23）**：144 S2–S9 已落地以下实现，本文件中与之不一致的描述以运行时 `/docs` 与 144 §16.1 执行记录为准——
+> 参数真实 bind 连接器、状态/来源/大表（AST 含 WHERE 1=1 拒绝）门禁、result/schema digest 与 data_as_of、指标真实计算引擎（批次/维度唯一键）、
+> 精确 object_key 与静态血缘（asset_lineage_edges）、统一 AI context（/api/v1/ai/context/resolve）、反馈—评测闭环（/api/v1/ai/feedback|evaluations）。
+> 旧 AI context 返回完整 SQL 的行为已改为默认仅哈希（需 ai:sql:full_read 权限）。
+
 
 ## 0. 本计划的定位
 

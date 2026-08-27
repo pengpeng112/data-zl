@@ -1,0 +1,71 @@
+{
+  "schema_version": "asset-manifest/v1",
+  "asset_version": "20260823T004440Z",
+  "generated_at": "2026-08-23T00:44:40.150978+00:00",
+  "builder_version": "build_asset_manifest/1",
+  "package": "数据资产_资产包",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "catalog.json",
+      "role": "summary",
+      "bytes": 62558,
+      "rows": 45,
+      "sha256": "cdf823b9b70103c6de2e47e7ff368d3115f42c5aaa763a044020a3185ca80116",
+      "pii_scan": []
+    },
+    {
+      "path": "catalog.json.bak.20260728",
+      "role": "summary",
+      "bytes": 46262,
+      "rows": null,
+      "sha256": "a68a1f1e512359f792a24d925cd5d7eb3e80efd6a58b3596b5e2ef4c13dc4669",
+      "pii_scan": []
+    },
+    {
+      "path": "columns.csv",
+      "role": "full",
+      "bytes": 1569856,
+      "rows": 26894,
+      "sha256": "874ad6ef2e6d585b670d6fa22ad81ad4bf0b0cb07839c72e76b95d3ce7ebfc4f",
+      "pii_scan": []
+    },
+    {
+      "path": "relationships.csv",
+      "role": "full",
+      "bytes": 27743,
+      "rows": 103,
+      "sha256": "82bc7ef3df686a801680d270b0541fe519eecb67c38a0667489e771e4c03cf0b",
+      "pii_scan": []
+    },
+    {
+      "path": "relationships.csv.bak.20260728",
+      "role": "evidence",
+      "bytes": 13385,
+      "rows": null,
+      "sha256": "7e239cc91e4cbbb5f50a03005f753e610a95d88bda2b14371a8a8ebd0c99c78e",
+      "pii_scan": []
+    },
+    {
+      "path": "tables.csv",
+      "role": "full",
+      "bytes": 48315,
+      "rows": 865,
+      "sha256": "73d5c851593feda5a163b7ac9e17d72a7865f916aa5cf9146c9ddd80d57340c1",
+      "pii_scan": []
+    }
+  ],
+  "catalog_summary": {
+    "note": "catalog.json 是核心摘要，不是全量清单；全量见 role=full 的 CSV",
+    "top_keys": [
+      "meta",
+      "relationships",
+      "tables"
+    ]
+  },
+  "pii_scan_conclusion": {
+    "hits": [],
+    "clean": true,
+    "note": "仅模式抽样扫描（前 4MB/文件）；不含凭据原文，命中不代表泄露，需人工确认"
+  }
+}

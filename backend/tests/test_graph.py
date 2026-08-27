@@ -388,6 +388,71 @@ def test_diagnostics_healthy_true(seeded_client: TestClient) -> None:
     assert "data_version" in data
 
 
+def test_diagnostics_response_structure_locked(seeded_client: TestClient) -> None:
+    """C1 行为不变锁：diagnostics 批量化改写后响应结构与口径逐字段一致。"""
+    resp = seeded_client.get("/api/v1/graph/diagnostics")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert set(data.keys()) == {
+        "table_count", "relation_count", "layer_distribution",
+        "validation_status_distribution", "confidence_distribution",
+        "missing_physical_endpoints", "unresolved_endpoints", "unresolved_samples",
+        "duplicate_business_keys", "same_endpoint_multi_edges", "orphan_references",
+        "orphan_samples", "warnings", "healthy", "data_version", "backend_build_id",
+    }
+    assert isinstance(data["healthy"], bool)
+    assert isinstance(data["unresolved_samples"], list)
+    assert isinstance(data["orphan_samples"], list)
+    assert isinstance(data["warnings"], list)
+    assert isinstance(data["layer_distribution"], dict)
+    assert isinstance(data["validation_status_distribution"], dict)
+    assert isinstance(data["confidence_distribution"], dict)
+    # 确定性种子：2 条关系端点完整解析，无未解析端点。
+    assert data["relation_count"] == 2
+    assert data["unresolved_endpoints"] == 0
+    assert data["missing_physical_endpoints"] == 0
+    assert data["duplicate_business_keys"] == 0
+    assert data["orphan_references"] == 0
+
+
+def test_overview_object_resolves_backfill_free_relation_via_preload(seeded_client: TestClient) -> None:
+    """C1：物理字段缺失的关系在 overview object 层经预载索引解析，边照常生成。"""
+    db = SessionLocal()
+    try:
+        rel = db.scalar(select(AssetRelation).where(AssetRelation.rel_id == 900001))
+        assert rel is not None
+        # 抹掉端点物理字段，模拟历史数据未回填场景。
+        rel.from_system_code = None
+        rel.from_source_code = None
+        rel.from_schema_name = None
+        rel.from_table_name = None
+        rel.to_system_code = None
+        rel.to_source_code = None
+        rel.to_schema_name = None
+        rel.to_table_name = None
+        db.commit()
+    finally:
+        db.close()
+
+    objects = seeded_client.get(
+        "/api/v1/graph/overview"
+        "?level=object&system_code=HIS"
+        "&source_code=his_source_10_10_10_15&schema=HIS&limit=80"
+    )
+    assert objects.status_code == 200
+    edges = objects.json()["data"]["data"]["edges"]
+    assert any(
+        edge.get("from_columns") == "PATIENT_ID"
+        and edge["source"].endswith("|HIS|PAT_VISIT")
+        and edge["target"].endswith("|HIS|PAT_MASTER_INDEX")
+        for edge in edges
+    )
+
+    # diagnostics 同样通过预载索引判定该关系已解析。
+    diag = seeded_client.get("/api/v1/graph/diagnostics").json()["data"]
+    assert diag["unresolved_endpoints"] == 0
+
+
 # ── B11 Pydantic 契约：关键字段不被丢弃 ───────────────────────
 
 

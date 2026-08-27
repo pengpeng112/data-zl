@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiQualityErrorLabel, aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds, sameFindingDomain } from "@/views/asset/ai-quality/contracts";
+import { aiQualityErrorLabel, aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds } from "@/views/asset/ai-quality/contracts";
 import { liveDisplayText, objectText, renderReportHtml } from "@/views/asset/ai-quality/reportMarkdown";
 
 describe("AI quality workbench contracts", () => {
@@ -22,14 +22,8 @@ describe("AI quality workbench contracts", () => {
     expect(canSubmitAiQuality({ enabled: true, configured: true, provider: "dify" }, { request_id: "AQ-2", task_type: "finding_batch", finding_ids: [], fields: [], item_count: 51, payload_bytes: 1, input_digest: "x" })).toBe(false);
   });
 
-  it("supports all three task types and requires a same physical domain", () => {
+  it("supports all three task types", () => {
     expect(["finding", "finding_batch", "run_summary"]).toHaveLength(3);
-    const scope = { source_code: "SRC", schema_name: "HIS", table_name: "PAT_VISIT", rule_code: "R1" };
-    expect(sameFindingDomain([{ system_code: "HIS", ...scope }, { system_code: "HIS", ...scope }])).toBe(true);
-    expect(sameFindingDomain([{ system_code: "HIS", ...scope }, { system_code: "ODS", ...scope }])).toBe(false);
-    expect(sameFindingDomain([{ system_code: "HIS", ...scope, source_code: null }])).toBe(false);
-    expect(sameFindingDomain([{ system_code: "HIS", ...scope }, { system_code: "HIS", ...scope, table_name: "ORDERS" }])).toBe(false);
-    expect(sameFindingDomain([{ system_code: "HIS", ...scope, namespace_name: "A" }, { system_code: "HIS", ...scope, namespace_name: "B" }])).toBe(false);
   });
 
   it("uses result review/attach contract and partial status", () => {

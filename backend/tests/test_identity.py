@@ -4,7 +4,7 @@ from sqlalchemy import delete
 from app.core.db import SessionLocal
 from app.models.asset_system import AssetDataSource
 from app.models.governance_ops import SchedulerJob
-from app.models.identity import IdentityDepartmentSource, IdentityPersonDepartment, IdentityPersonSource, IdentitySyncDiff
+from app.models.identity import IdentityDepartmentSource, IdentityPerson, IdentityPersonDepartment, IdentityPersonSource, IdentitySyncDiff
 
 
 def test_list_departments(client: TestClient):
@@ -46,6 +46,46 @@ def test_list_persons_type_filter(client: TestClient):
         assert p["person_type"] == "formal"
 
 
+def test_list_persons_classification_legacy_and_combined_filters(client: TestClient):
+    codes = ["PLAN146_DOC_FORMAL", "PLAN146_DOC_TEMP", "PLAN146_NURSE_FORMAL"]
+    db = SessionLocal()
+    try:
+        db.execute(delete(IdentityPerson).where(IdentityPerson.person_code.in_(codes)))
+        db.add_all([
+            IdentityPerson(person_code=codes[0], person_name_cn="测试医生甲", classification="doctor", person_type="formal"),
+            IdentityPerson(person_code=codes[1], person_name_cn="测试医生乙", classification="doctor", person_type="temporary"),
+            IdentityPerson(person_code=codes[2], person_name_cn="测试护士甲", classification="nurse", person_type="formal"),
+        ])
+        db.commit()
+
+        exact = client.get("/api/v1/identity/persons", params={"classification": "doctor", "keyword": "PLAN146_"})
+        assert exact.status_code == 200
+        assert {item["person_code"] for item in exact.json()["data"]["items"]} == set(codes[:2])
+
+        legacy = client.get("/api/v1/identity/persons", params={"person_type": "doctor", "keyword": "PLAN146_"})
+        assert legacy.status_code == 200
+        assert {item["person_code"] for item in legacy.json()["data"]["items"]} == set(codes[:2])
+
+        combined = client.get(
+            "/api/v1/identity/persons",
+            params={"classification": "doctor", "person_type": "temporary", "keyword": "PLAN146_"},
+        )
+        assert combined.status_code == 200
+        assert [item["person_code"] for item in combined.json()["data"]["items"]] == [codes[1]]
+
+        paged = client.get(
+            "/api/v1/identity/persons",
+            params={"classification": "doctor", "keyword": "PLAN146_", "page": 2, "page_size": 1},
+        )
+        assert paged.status_code == 200
+        assert paged.json()["data"]["total"] == 2
+        assert len(paged.json()["data"]["items"]) == 1
+    finally:
+        db.execute(delete(IdentityPerson).where(IdentityPerson.person_code.in_(codes)))
+        db.commit()
+        db.close()
+
+
 def test_list_persons_keyword(client: TestClient):
     resp = client.get("/api/v1/identity/persons?keyword=test")
     assert resp.status_code == 200
@@ -63,14 +103,15 @@ def test_list_accounts(client: TestClient):
     resp = client.get("/api/v1/identity/accounts")
     assert resp.status_code == 200
     data = resp.json()["data"]
-    assert isinstance(data, list)
+    # 146 E6：服务端分页契约 items/total/page/page_size
+    assert "items" in data and "total" in data and "page" in data and "page_size" in data
 
 
 def test_list_accounts_system_filter(client: TestClient):
     resp = client.get("/api/v1/identity/accounts?system_code=HIS")
     assert resp.status_code == 200
     data = resp.json()["data"]
-    for a in data:
+    for a in data["items"]:
         assert a["system_code"] == "HIS"
 
 

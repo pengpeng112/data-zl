@@ -132,16 +132,91 @@ def _resolve_endpoint_lenient(
     return None, None
 
 
+class _EndpointResolver:
+    """一次性预载 asset_tables 的端点反查索引（C1 批量化）。
+
+    resolve() 的语义与「resolve_endpoint 精确 + _resolve_endpoint_lenient 宽松」
+    逐分支等价：先按 (namespace, schema, table) 精确唯一命中（namespace 缺失
+    视为 NULL/""，schema 缺失视为 NULL），未命中再按 (schema, table) 的唯一
+    非空 (system, source) pair 宽松反查；多命中一律不猜。
+    """
+
+    def __init__(self, rows: list[tuple[str | None, str | None, str | None, str | None, str | None]]):
+        by_table: dict[str | None, list[tuple[str | None, str | None, str | None, str | None]]] = defaultdict(list)
+        for namespace_name, schema_name, table_name, system_code, source_code in rows:
+            by_table[table_name].append((namespace_name, schema_name, system_code, source_code))
+        self._by_table = by_table
+        # 供孤儿引用检测复用同一份预载行，避免再拉一次全表实体。
+        self.schema_table_names = {
+            f"{schema_name}.{table_name}"
+            for namespace_name, schema_name, table_name, _sys, _src in rows
+            if schema_name and table_name
+        }
+
+    @classmethod
+    def load(cls, db: Session) -> _EndpointResolver:
+        rows = db.execute(
+            select(
+                AssetTable.namespace_name,
+                AssetTable.schema_name,
+                AssetTable.table_name,
+                AssetTable.system_code,
+                AssetTable.source_code,
+            )
+        ).all()
+        return cls([tuple(row) for row in rows])
+
+    def resolve_exact(
+        self, namespace_name: str | None, schema_name: str | None, table_name: str | None,
+    ) -> tuple[str | None, str | None]:
+        if not table_name:
+            return None, None
+        entries = self._by_table.get(table_name, [])
+        if schema_name:
+            entries = [e for e in entries if e[1] == schema_name]
+        else:
+            entries = [e for e in entries if e[1] is None]
+        if namespace_name:
+            entries = [e for e in entries if e[0] == namespace_name]
+        else:
+            entries = [e for e in entries if e[0] is None or e[0] == ""]
+        pairs = {(e[2], e[3]) for e in entries}
+        if len(pairs) == 1:
+            return next(iter(pairs))
+        return None, None
+
+    def resolve_lenient(
+        self, schema_name: str | None, table_name: str | None,
+    ) -> tuple[str | None, str | None]:
+        if not schema_name or not table_name:
+            return None, None
+        entries = self._by_table.get(table_name, [])
+        pairs = {(e[2], e[3]) for e in entries if e[1] == schema_name and e[2] and e[3]}
+        if len(pairs) == 1:
+            return next(iter(pairs))
+        return None, None
+
+    def resolve(
+        self, namespace_name: str | None, schema_name: str | None, table_name: str | None,
+    ) -> tuple[str | None, str | None]:
+        system_code, source_code = self.resolve_exact(namespace_name, schema_name, table_name)
+        if system_code is None or source_code is None:
+            system_code, source_code = self.resolve_lenient(schema_name, table_name)
+        return system_code, source_code
+
+
 def _resolve_relation_endpoint(
     db: Session,
     r: AssetRelation,
     side: str,
+    resolver: _EndpointResolver | None = None,
 ) -> tuple[str | None, str | None, str | None, str | None, str | None, str | None]:
     """从一条 AssetRelation 提取端点的五元组 + 展示名。
 
     返回 (system, source, namespace, schema, table, display_id)。
     优先使用已回填的物理字段；缺失时回退到 from_table/to_table 文本拆分；
     仍未解析出 system/source 时按 asset_tables 唯一物理匹配反查（多命中不猜，返回 None）。
+    传入 resolver 时用预载索引反查（C1 批量化，已回填行天然零查询）。
     """
     if side == "from":
         sys_c = r.from_system_code
@@ -167,15 +242,20 @@ def _resolve_relation_endpoint(
     if (not sys_c or not src_c) and schema and table:
         # 按 (namespace, schema, table) 唯一反查 system/source；多命中不猜（返回 None）。
         # 先精确（含 namespace），再宽松（仅 schema+table 唯一 pair）。
-        sys_c, src_c = resolve_endpoint(db, ns, schema, table)
-        if sys_c is None or src_c is None:
-            sys_c, src_c = _resolve_endpoint_lenient(db, schema, table)
+        if resolver is not None:
+            sys_c, src_c = resolver.resolve(ns, schema, table)
+        else:
+            sys_c, src_c = resolve_endpoint(db, ns, schema, table)
+            if sys_c is None or src_c is None:
+                sys_c, src_c = _resolve_endpoint_lenient(db, schema, table)
     display = _display_id(schema, table)
     return sys_c, src_c, ns, schema, table, display
 
 
-def _endpoint_physical_key(db: Session, r: AssetRelation, side: str) -> str | None:
-    sys_c, src_c, ns, schema, table, _ = _resolve_relation_endpoint(db, r, side)
+def _endpoint_physical_key(
+    db: Session, r: AssetRelation, side: str, resolver: _EndpointResolver | None = None,
+) -> str | None:
+    sys_c, src_c, ns, schema, table, _ = _resolve_relation_endpoint(db, r, side, resolver=resolver)
     return _physical_key(sys_c, src_c, ns, schema, table)
 
 
@@ -210,6 +290,19 @@ GRAPH_VIEW_MODES = [
         "description": "按业务系统、数据连接、Schema/Owner 和对象层级浏览完整资产规模。",
         "group_by": "system",
         "layout_mode": "grouped",
+        "confidence": None,
+        "validation_status": None,
+        "include_candidates": False,
+        "include_dependencies": False,
+        "show_review_layer": False,
+        "requires_table": False,
+    },
+    {
+        "code": "path",
+        "label": "路径查询",
+        "description": "选择两张表，按方向和跳数上限查找最短关联路径（146 E1）。",
+        "group_by": "schema",
+        "layout_mode": "layered",
         "confidence": None,
         "validation_status": None,
         "include_candidates": False,
@@ -1450,10 +1543,11 @@ def overview(
         # 对象层展示真实表间关系，上一层 Schema 节点不继续占据画布。
         # 历史关系 namespace 可能为空，因此先按唯一逻辑四元组定位到当前展示节点，
         # 再把边端点替换为资产表的完整物理键，避免同名跨来源串边。
+        endpoint_resolver = _EndpointResolver.load(db)
         seen_edge_ids: set[str] = set()
         for relation in db.scalars(select(AssetRelation)).all():
-            from_ep = _resolve_relation_endpoint(db, relation, "from")
-            to_ep = _resolve_relation_endpoint(db, relation, "to")
+            from_ep = _resolve_relation_endpoint(db, relation, "from", resolver=endpoint_resolver)
+            to_ep = _resolve_relation_endpoint(db, relation, "to", resolver=endpoint_resolver)
             f_sys, f_src, _f_ns, f_schema, f_table, f_display = from_ep
             t_sys, t_src, _t_ns, t_schema, t_table, t_display = to_ep
             if not all((f_sys, f_src, f_schema, f_table, t_sys, t_src, t_schema, t_table)):
@@ -1761,10 +1855,13 @@ def diagnostics(db: Session = Depends(get_db)) -> ApiResponse[dict]:
 
     unresolved_count = 0
     rows = db.scalars(select(AssetRelation)).all()
+    # C1：一次性预载 asset_tables 端点索引，替代逐条关系的反查 SQL；
+    # 已回填物理字段的关系本来就零查询，缺失字段的关系现在也走内存索引。
+    endpoint_resolver = _EndpointResolver.load(db)
     unresolved_samples: list[str] = []
     for r in rows:
-        from_key = _endpoint_physical_key(db, r, "from")
-        to_key = _endpoint_physical_key(db, r, "to")
+        from_key = _endpoint_physical_key(db, r, "from", resolver=endpoint_resolver)
+        to_key = _endpoint_physical_key(db, r, "to", resolver=endpoint_resolver)
         if not from_key or not to_key:
             unresolved_count += 1
             if len(unresolved_samples) < 5:
@@ -1782,12 +1879,9 @@ def diagnostics(db: Session = Depends(get_db)) -> ApiResponse[dict]:
         )
     ) or 0
 
-    # 孤儿引用：关系端点表在 asset_tables 中不存在（视图特殊节点除外）
-    table_names = {
-        f"{t.schema_name}.{t.table_name}"
-        for t in db.scalars(select(AssetTable)).all()
-        if t.schema_name and t.table_name
-    }
+    # 孤儿引用：关系端点表在 asset_tables 中不存在（视图特殊节点除外）；
+    # 复用 endpoint_resolver 预载的 (schema, table) 集合，不再单独拉全表实体。
+    table_names = endpoint_resolver.schema_table_names
     orphan_names: set[str] = set()
     for r in rows:
         for name in (r.from_table, r.to_table):

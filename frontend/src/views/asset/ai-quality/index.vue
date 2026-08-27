@@ -91,7 +91,10 @@
           <div class="selected-box">
             <div v-for="row in selectedRows" :key="row.id">{{ row.problem || row.rule_name }} · {{ objectText(row) }}</div>
           </div>
-          <div class="live-text markdown" v-html="renderReportHtml(liveDisplayText(interruptedText || liveText))" />
+          <div class="report-actions">
+        <el-button size="small" @click="copyReport">复制报告</el-button>
+      </div>
+      <div class="live-text markdown" v-html="renderReportHtml(liveDisplayText(interruptedText || liveText))" />
         </div>
         <div v-else-if="selectedResult" class="report-body">
           <section class="fact">
@@ -239,7 +242,17 @@ async function watchJob(jobId: number | string) {
   livePhase.value = "thinking";
   interruptedText.value = "";
   stopWatch();
+  // 146 E3：轮询 10 分钟上限，指数退避 0.8s→10s，卸载即停止
+  const POLL_TIMEOUT_MS = 10 * 60 * 1000;
+  const startedAt = Date.now();
+  let interval = 800;
   const tick = async () => {
+    if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+      analyzing.value = false;
+      interruptedText.value = liveText.value;
+      ElMessage.error("分析超时（10 分钟），已停止轮询，可稍后刷新查看结果");
+      return;
+    }
     try {
       const detail = (await getAiQualityJob(jobId)).data;
       liveText.value = detail.partial_text || liveText.value;
@@ -257,13 +270,29 @@ async function watchJob(jobId: number | string) {
         ElMessage.error(aiQualityErrorLabel(detail.error_class));
         return;
       }
+      interval = 800; // 成功轮询后重置退避
     } catch {
-      // keep polling through a single transient error
+      interval = Math.min(interval * 2, 10000); // 瞬时失败退避，最多 10s
     }
-    pollTimer = window.setTimeout(tick, 800);
+    pollTimer = window.setTimeout(tick, interval);
   };
   await tick();
 }
+async function copyReport() {
+  const result = selectedResult.value as any;
+  const text = result?.structured_result?.summary || result?.summary || liveText.value || "";
+  if (!text) {
+    ElMessage.warning("暂无可复制的报告内容");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    ElMessage.success("报告已复制");
+  } catch {
+    ElMessage.warning("剪贴板不可用，请手动选择复制");
+  }
+}
+
 async function makeGovernanceReport() {
   reportLoading.value = true;
   try {
@@ -379,4 +408,5 @@ onUnmounted(() => stopWatch());
 @media (max-width: 1200px) {
   .workspace, .split { grid-template-columns: 1fr; }
 }
+.report-actions { display: flex; gap: 8px; margin-bottom: 8px; }
 </style>

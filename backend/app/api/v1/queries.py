@@ -6,7 +6,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user, require_permission
+from ...core.security import get_current_user, get_request_operator, require_permission, require_query_view_on_get
 from ...models.query_asset import (
     AssetQueryDefinition,
     AssetQueryDependency,
@@ -24,14 +24,56 @@ from ...services.query_intake import get_active_version, get_definition, ingest_
 from ...services.query_intake import _serialize_def, _serialize_ver
 from ...services.query_relation_extract import extract_from_query_version
 from ...services.query_runner import run_query_version
+from ...services.data_masking import sanitize_text
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
-router = APIRouter(prefix="/api/v1/queries", tags=["queries"])
+
+
+router = APIRouter(
+    prefix="/api/v1/queries",
+    tags=["queries"],
+    dependencies=[Depends(require_query_view_on_get)],
+)
+
+
+def _has_full_read_permission(request: Request, db: Session) -> bool:
+    """每请求判定一次 ai.sql.full_read（C3），失败返回 False 而非抛 403。"""
+    try:
+        require_permission("ai.sql.full_read")(request, db)
+        return True
+    except HTTPException:
+        return False
+
+
+def _serialize_version_for_read(
+    version: AssetQueryVersion | None,
+    *,
+    include_sql: bool,
+    request: Request,
+    db: Session,
+    has_full_read: bool | None = None,
+) -> dict | None:
+    if version is None:
+        return None
+    data = _serialize_ver(version)
+    if include_sql:
+        # C3：批量序列化时由调用方传入 has_full_read（每请求判定一次），
+        # 避免逐行重复执行权限查询；单条调用不传则按需判定。
+        # 语义保持不变：include_sql=True 且无权限仍然 403（B2 的掩码口径只用于 diff 端点）。
+        allowed = has_full_read if has_full_read is not None else _has_full_read_permission(request, db)
+        if not allowed:
+            raise HTTPException(status_code=403, detail="缺少权限: ai.sql.full_read")
+    else:
+        data.pop("sql_text", None)
+        data.pop("sql_normalized", None)
+        data["sql_available"] = "full_read_permission_required"
+    return data
 
 
 @router.get("", summary="查询主档列表")
 def list_queries(
+    request: Request,
     keyword: str | None = Query(None),
     system_code: str | None = Query(None),
     page: int = Query(1, ge=1),
@@ -56,52 +98,80 @@ def list_queries(
         .offset((page - 1) * page_size)
         .limit(page_size)
     ).all()
+    # C3：active 版本一次 IN 查询批量取，替代逐行 get_active_version 的 N+1。
+    active_by_code: dict[str, AssetQueryVersion] = {}
+    if rows:
+        for v in db.scalars(
+            select(AssetQueryVersion).where(
+                AssetQueryVersion.query_code.in_([d.query_code for d in rows]),
+                AssetQueryVersion.is_active.is_(True),
+            )
+        ).all():
+            active_by_code[v.query_code] = v
     items = []
     for d in rows:
         item = _serialize_def(d)
-        active = get_active_version(db, d.query_code)
-        item["active_version"] = _serialize_ver(active) if active else None
+        active = active_by_code.get(d.query_code)
+        item["active_version"] = _serialize_version_for_read(
+            active, include_sql=False, request=request, db=db
+        )
         items.append(item)
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.get("/ai/context", summary="AI 可读现行查询上下文")
+@router.get(
+    "/ai/context",
+    summary="AI 可读现行查询上下文（兼容层：新 AI 用 /api/v1/ai/context/resolve）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
 def ai_query_context(
+    request: Request,
     system_code: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
+    include_sql: bool = Query(False, description="需要 ai.sql.full_read 权限"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[list[dict]]:
+    # 144 S6: ai_readable filter runs unconditionally (not only with a
+    # system filter); full SQL requires explicit permission (144 §4.6).
+    from ...core.security import require_permission as _require
+    from ...services.ai_context_builder import strip_full_sql
+
+    readable_defs = select(AssetQueryDefinition.query_code).where(
+        AssetQueryDefinition.ai_readable.is_(True)
+    )
+    if system_code:
+        readable_defs = readable_defs.where(AssetQueryDefinition.system_code == system_code)
     stmt = select(AssetQueryVersion).where(
         AssetQueryVersion.is_active.is_(True),
         AssetQueryVersion.status == "active",
+        AssetQueryVersion.query_code.in_(readable_defs),
     )
-    if system_code:
-        defs = select(AssetQueryDefinition.query_code).where(
-            AssetQueryDefinition.system_code == system_code,
-            AssetQueryDefinition.ai_readable.is_(True),
-        )
-        stmt = stmt.where(AssetQueryVersion.query_code.in_(defs))
     rows = db.scalars(stmt.order_by(AssetQueryVersion.query_code).limit(limit)).all()
+    if include_sql:
+        _require("ai.sql.full_read")(request, db)
     out = []
     for v in rows:
         d = get_definition(db, v.query_code)
-        out.append(
-            {
-                "query_code": v.query_code,
-                "title": d.title if d else v.query_code,
-                "purpose": d.purpose if d else None,
-                "system_code": d.system_code if d else None,
-                "source_code": d.source_code if d else None,
-                "version": v.version,
-                "sql_sha256": v.sql_sha256,
-                "dialect": v.dialect,
-                "grain": v.grain,
-                "period_field": v.period_field,
-                "limitations": v.limitations,
-                "parameter_schema": v.parameter_schema,
-                "sql_text": v.sql_text,
-            }
-        )
+        entry = {
+            "query_code": v.query_code,
+            "title": d.title if d else v.query_code,
+            "purpose": d.purpose if d else None,
+            "system_code": d.system_code if d else None,
+            "source_code": d.source_code if d else None,
+            "version": v.version,
+            "certification_status": v.certification_status,
+            "sql_sha256": v.sql_sha256,
+            "dialect": v.dialect,
+            "grain": v.grain,
+            "period_field": v.period_field,
+            "limitations": v.limitations,
+            "parameter_schema": v.parameter_schema,
+        }
+        if include_sql:
+            entry["sql_text"] = v.sql_text
+        else:
+            entry["sql_available"] = "full_read_permission_required"
+        out.append(entry)
     return ApiResponse(data=out)
 
 
@@ -166,11 +236,7 @@ def list_schedules(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     dependencies=[Depends(require_permission("query:create"))],
 )
 def upsert_schedule(req: ScheduleUpsert, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     row = db.scalar(select(AssetQuerySchedule).where(AssetQuerySchedule.query_code == req.query_code))
     if not row:
         row = AssetQuerySchedule(query_code=req.query_code, created_by=user)
@@ -206,11 +272,7 @@ def seed_core_schedules(
     from ...core.config import settings
     from ...models.query_asset import AssetQueryDefinition, AssetQueryVersion
 
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     qrows = db.scalars(
         select(AssetQueryVersion).where(
             AssetQueryVersion.is_active.is_(True),
@@ -261,15 +323,24 @@ def seed_core_schedules(
 
 @router.get("/sources/capabilities", summary="126 P5：多源连接适配能力探测")
 def source_capabilities(db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    """List registered data sources and whether query runner can use them read-only."""
+    """List registered data sources and whether query runner can use them read-only.
+
+    144 S2: unknown/empty dialects fail closed (never default supported) and
+    the response distinguishes configured/tested/readonly/bind-parameter
+    capabilities per dialect instead of a single boolean.
+    """
     from ...models.asset_system import AssetDataSource
+    from ...services.sql_ast import PARSER_VERSION, _DIALECT_MAP
 
     rows = db.scalars(select(AssetDataSource).order_by(AssetDataSource.source_code)).all()
     # Dialects currently supported by quality_sql_runner / query path
-    supported_dialects = {"oracle", "postgresql", "postgres", "mysql", "sqlserver", "mssql"}
+    supported_dialects = {"oracle", "postgresql", "postgres", "vastbase", "mysql", "sqlserver", "mssql"}
+    # dialects whose connectors accept named bind params end-to-end
+    bind_param_dialects = {"oracle", "postgresql", "postgres", "vastbase", "mysql"}
     items = []
     for r in rows:
         dialect = (r.db_type or "").lower()
+        credentials_configured = bool(r.credential_status)
         items.append(
             {
                 "source_code": r.source_code,
@@ -280,8 +351,13 @@ def source_capabilities(db: Session = Depends(get_db)) -> ApiResponse[dict]:
                 "enabled": bool(r.enabled),
                 "write_policy": r.write_policy,
                 "credential_status": r.credential_status,
-                "query_runner_supported": (dialect in supported_dialects) if dialect else True,
+                "credentials_configured": credentials_configured,
+                # fail closed: unknown/empty dialect is NOT supported
+                "query_runner_supported": dialect in supported_dialects,
                 "read_only": (r.write_policy or "readonly") == "readonly",
+                "bind_parameters_supported": dialect in bind_param_dialects,
+                "ast_gate_supported": dialect in _DIALECT_MAP,
+                "parser_version": PARSER_VERSION,
                 "notes": "查询执行必须经登记连接；业务源库禁止 DML/DDL",
             }
         )
@@ -289,7 +365,54 @@ def source_capabilities(db: Session = Depends(get_db)) -> ApiResponse[dict]:
         data={
             "total": len(items),
             "supported_dialects": sorted(supported_dialects),
+            "parser_version": PARSER_VERSION,
             "items": items,
+        }
+    )
+
+
+@router.post(
+    "/{query_code}/versions/{version}/validate",
+    summary="144 S3：运行 G1–G3 元数据/关系/语义验证并落库证据",
+    dependencies=[Depends(require_permission("query:create"))],
+)
+def validate_query_version(query_code: str, version: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    from ...services.query_validation_service import run_query_validation
+
+    try:
+        report = run_query_validation(db, query_code=query_code, version=version)
+        db.commit()
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:  # sanitized: no internals to the client
+        db.rollback()
+        raise HTTPException(status_code=500, detail="验证执行失败，请稍后重试或联系管理员") from exc
+    return ApiResponse(data=report)
+
+
+@router.get(
+    "/{query_code}/versions/{version}/validation",
+    summary="144 S3：查看逐层验证证据（最近一次）",
+)
+def get_query_validation(query_code: str, version: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    qv = db.scalar(
+        select(AssetQueryVersion).where(
+            AssetQueryVersion.query_code == query_code,
+            AssetQueryVersion.version == version,
+        )
+    )
+    if not qv:
+        raise HTTPException(status_code=404, detail=f"查询版本不存在: {query_code}@{version}")
+    return ApiResponse(
+        data={
+            "query_code": query_code,
+            "version": version,
+            "certification_status": qv.certification_status,
+            "validated_at": qv.validated_at.isoformat() if qv.validated_at else None,
+            "validation_digest": qv.validation_digest,
+            "parser_version": qv.parser_version,
+            "unresolved_reason": qv.unresolved_reason,
+            "semantic_contract": qv.semantic_contract,
         }
     )
 
@@ -309,11 +432,7 @@ class CoreImportRequest(BaseModel):
 def import_core_48(
     req: CoreImportRequest, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = import_core_metrics(
             db,
@@ -326,7 +445,10 @@ def import_core_48(
         return ApiResponse(data=result)
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"{type(exc).__name__}: {exc}") from exc
+        # B3：detail 直出 str(exc) 可能带出连接串/路径；统一 sanitize_text 并保留 error_class。
+        raise HTTPException(
+            status_code=400, detail=sanitize_text(f"{type(exc).__name__}: {exc}")
+        ) from exc
 
 
 @router.get("/runs/list", summary="运行记录列表")
@@ -404,7 +526,12 @@ def get_run(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
 
 
 @router.get("/{query_code}", summary="查询主档详情")
-def get_query(query_code: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def get_query(
+    query_code: str,
+    request: Request,
+    include_sql: bool = Query(False),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
     d = get_definition(db, query_code)
     if not d:
         raise HTTPException(status_code=404, detail="查询不存在")
@@ -414,27 +541,59 @@ def get_query(query_code: str, db: Session = Depends(get_db)) -> ApiResponse[dic
         .where(AssetQueryVersion.query_code == query_code)
         .order_by(AssetQueryVersion.version.desc())
     ).all()
+    # 详情：有 ai.sql.full_read 时默认带 SQL（前端不必传 include_sql）；
+    # 无权限掩码不 403。显式 include_sql=true 且无权限仍 403。
+    has_full_read = _has_full_read_permission(request, db)
+    effective_include_sql = include_sql or has_full_read
     return ApiResponse(
         data={
             "definition": _serialize_def(d),
-            "active_version": _serialize_ver(active) if active else None,
-            "versions": [_serialize_ver(v) for v in versions],
+            "active_version": _serialize_version_for_read(
+                active, include_sql=effective_include_sql, request=request, db=db,
+                has_full_read=has_full_read,
+            ),
+            "versions": [
+                _serialize_version_for_read(
+                    v, include_sql=effective_include_sql, request=request, db=db,
+                    has_full_read=has_full_read,
+                )
+                for v in versions
+            ],
         }
     )
 
 
 @router.get("/{query_code}/versions", summary="查询版本列表")
-def list_versions(query_code: str, db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+def list_versions(
+    query_code: str,
+    request: Request,
+    include_sql: bool = Query(False),
+    db: Session = Depends(get_db),
+) -> ApiResponse[list[dict]]:
     rows = db.scalars(
         select(AssetQueryVersion)
         .where(AssetQueryVersion.query_code == query_code)
         .order_by(AssetQueryVersion.version.desc())
     ).all()
-    return ApiResponse(data=[_serialize_ver(v) for v in rows])
+    has_full_read = _has_full_read_permission(request, db)
+    effective_include_sql = include_sql or has_full_read
+    return ApiResponse(data=[
+        _serialize_version_for_read(
+            v, include_sql=effective_include_sql, request=request, db=db,
+            has_full_read=has_full_read,
+        )
+        for v in rows
+    ])
 
 
 @router.get("/{query_code}/versions/{version}", summary="查询版本详情")
-def get_version(query_code: str, version: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def get_version(
+    query_code: str,
+    version: int,
+    request: Request,
+    include_sql: bool = Query(False),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
     v = db.scalar(
         select(AssetQueryVersion).where(
             AssetQueryVersion.query_code == query_code,
@@ -446,7 +605,12 @@ def get_version(query_code: str, version: int, db: Session = Depends(get_db)) ->
     deps = db.scalars(
         select(AssetQueryDependency).where(AssetQueryDependency.query_version_id == v.id)
     ).all()
-    data = _serialize_ver(v)
+    has_full_read = _has_full_read_permission(request, db)
+    effective_include_sql = include_sql or has_full_read
+    data = _serialize_version_for_read(
+        v, include_sql=effective_include_sql, request=request, db=db,
+        has_full_read=has_full_read,
+    ) or {}
     data["dependencies"] = [
         {
             "dep_type": d.dep_type,
@@ -462,7 +626,12 @@ def get_version(query_code: str, version: int, db: Session = Depends(get_db)) ->
 
 
 @router.get("/{query_code}/versions/{version}/diff", summary="与上一版本 SQL 差异摘要")
-def version_diff(query_code: str, version: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def version_diff(
+    query_code: str,
+    version: int,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
     v = db.scalar(
         select(AssetQueryVersion).where(
             AssetQueryVersion.query_code == query_code,
@@ -481,6 +650,9 @@ def version_diff(query_code: str, version: int, db: Session = Depends(get_db)) -
                 AssetQueryVersion.version == version - 1,
             )
         )
+    # B2：diff 端点此前直出 SQL 文本，绕过 ai.sql.full_read 门禁。现与列表口径
+    # 一致：无权限返回掩码 + sql_available 标记（不 403），有权限才返回 SQL 原文。
+    has_full_read = _has_full_read_permission(request, db)
     return ApiResponse(
         data={
             "query_code": query_code,
@@ -490,8 +662,9 @@ def version_diff(query_code: str, version: int, db: Session = Depends(get_db)) -
             "parent_sql_sha256": parent.sql_sha256 if parent else None,
             "same_sql": bool(parent and parent.sql_sha256 == v.sql_sha256),
             "revision_reason": v.revision_reason,
-            "current_sql": v.sql_text,
-            "parent_sql": parent.sql_text if parent else None,
+            "current_sql": v.sql_text if has_full_read else None,
+            "parent_sql": (parent.sql_text if parent else None) if has_full_read else None,
+            "sql_available": None if has_full_read else "full_read_permission_required",
         }
     )
 
@@ -516,11 +689,7 @@ def gate_preview(req: QueryGateRequest) -> ApiResponse[dict]:
     dependencies=[Depends(require_permission("query:create"))],
 )
 def ingest(req: QueryIngestRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = ingest_query(
             db,
@@ -563,11 +732,7 @@ def revise(
     request: Request,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = revise_query(
             db,
@@ -595,11 +760,7 @@ def revise(
     dependencies=[Depends(require_permission("query:run"))],
 )
 def run(req: QueryRunRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    user = "system"
-    try:
-        user = get_current_user(request) or user
-    except Exception:
-        pass
+    user = get_request_operator(request, default="system")
     try:
         result = run_query_version(
             db,

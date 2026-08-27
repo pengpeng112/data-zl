@@ -2,9 +2,11 @@
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
-import { computed, onMounted, ref } from "vue";
-import { http } from "@/utils/http";
+import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
+import { listOpsEvents } from "@/api/ops";
+import { getMedicalImportRuns } from "@/api/dict";
+import { exportAuditLogs, getAuditLogsSummary, getGovernAuditLogs } from "@/api/ops";
 import AuditIcon from "~icons/ri/file-list-3-line";
 import ErrorIcon from "~icons/ri/error-warning-line";
 import RefreshIcon from "~icons/ri/refresh-line";
@@ -65,26 +67,33 @@ async function fetchData() {
   loading.value = true;
   try {
     if (activeTab.value === "events") {
-      const res = await http.request<any>("get", "/api/v1/ops/events", {
-        params: { page: page.value, page_size: pageSize.value }
-      });
+      const res = await listOpsEvents({ page: page.value, page_size: pageSize.value });
       eventData.value = res.data?.items || [];
       total.value = res.data?.total || 0;
     } else if (activeTab.value === "dict") {
-      const res = await http.request<any>("get", "/api/v1/dict-medical/import-runs", {
-        params: { page: page.value, page_size: pageSize.value }
-      });
+      const res = await getMedicalImportRuns({ page: page.value, page_size: pageSize.value });
       dictImportData.value = res.data?.items || [];
       total.value = res.data?.total || 0;
     } else {
-      const res = await http.request<any>("get", "/api/v1/govern/audit-logs", {
-        params: { module: "ops", page: page.value, page_size: pageSize.value }
+      const res = await getGovernAuditLogs({
+        module: "ops",
+        operator: auditFilters.operator || undefined,
+        action: auditFilters.action || undefined,
+        entity_ref: auditFilters.entity_ref || undefined,
+        created_from: auditFilters.created_from || undefined,
+        created_to: auditFilters.created_to || undefined,
+        page: page.value,
+        page_size: pageSize.value
       });
       tableData.value = res.data?.items || [];
       total.value = res.data?.total || 0;
     }
-  } catch {
-    ElMessage.error("获取日志失败");
+  } catch (error) {
+    tableData.value = [];
+    eventData.value = [];
+    dictImportData.value = [];
+    total.value = 0;
+    ElMessage.error(String((error as any)?.response?.data?.detail || "获取日志失败"));
   } finally {
     loading.value = false;
   }
@@ -104,6 +113,40 @@ function handleSizeChange(s: number) {
   pageSize.value = s;
   page.value = 1;
   fetchData();
+}
+
+const summaryText = ref("");
+
+const auditFilters = reactive({ operator: "", action: "", entity_ref: "", created_from: "", created_to: "" });
+
+function doFilter() {
+  page.value = 1;
+  fetchData();
+}
+
+async function loadSummary() {
+  try {
+    const res = await getAuditLogsSummary({ module: "ops" });
+    summaryText.value = `共 ${res.data.total} 条；按动作：${Object.entries(res.data.by_action).slice(0, 6).map(([k, v]) => `${k} ${v}`).join("、")}`;
+  } catch {
+    summaryText.value = "";
+    ElMessage.error("统计加载失败");
+  }
+}
+
+async function doExport() {
+  try {
+    const res = await exportAuditLogs({ module: "ops" });
+    const blob = new Blob([res as unknown as BlobPart], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "audit-logs.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch {
+    ElMessage.error("导出失败");
+  }
 }
 
 onMounted(fetchData);
@@ -139,6 +182,19 @@ onMounted(fetchData);
     </section>
 
     <el-card class="audit-card" shadow="never">
+      <div v-if="activeTab === 'audit'" class="audit-filters">
+        <el-input v-model="auditFilters.operator" placeholder="操作人" clearable size="small" class="f-op" @keyup.enter="doFilter" @clear="doFilter" />
+        <el-input v-model="auditFilters.action" placeholder="动作，如 approve" clearable size="small" class="f-act" @keyup.enter="doFilter" @clear="doFilter" />
+        <el-input v-model="auditFilters.entity_ref" placeholder="实体引用包含" clearable size="small" class="f-ent" @keyup.enter="doFilter" @clear="doFilter" />
+        <el-date-picker v-model="auditFilters.created_from" type="datetime" placeholder="开始时间" size="small" class="f-time" value-format="YYYY-MM-DDTHH:mm:ss" @change="doFilter" />
+        <el-date-picker v-model="auditFilters.created_to" type="datetime" placeholder="结束时间" size="small" class="f-time" value-format="YYYY-MM-DDTHH:mm:ss" @change="doFilter" />
+        <el-button size="small" type="primary" @click="doFilter">筛选</el-button>
+      </div>
+      <div class="audit-actions">
+        <el-button size="small" @click="loadSummary">全量统计</el-button>
+        <el-button size="small" type="primary" @click="doExport">导出 CSV</el-button>
+      </div>
+      <el-alert v-if="summaryText" type="info" :closable="false" :title="summaryText" show-icon class="summary-alert" />
       <el-tabs v-model="activeTab" @tab-change="onTabChange">
         <el-tab-pane label="治理审计" name="audit" />
         <el-tab-pane label="执行日志" name="events" />
@@ -279,4 +335,10 @@ onMounted(fetchData);
     overflow-x: auto;
   }
 }
+.audit-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+.summary-alert { margin-bottom: 8px; }
+.audit-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.f-op, .f-act { width: 140px; }
+.f-ent { width: 180px; }
+.f-time { width: 200px; }
 </style>

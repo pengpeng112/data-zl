@@ -1,0 +1,1064 @@
+{
+  "source_dll": "E:\\fancyhis\\HisApi\\HisApi\\Fancy.His.Micro.dll",
+  "dll_size": 17125376,
+  "utf16_strings_total": 5359,
+  "sql_statements": [
+    {
+      "sql": "select * from PUB_ITEM_COMPARE T6 where",
+      "count": 5,
+      "length": 39
+    },
+    {
+      "sql": "SELECT TMP_TABLE1.*,",
+      "count": 4,
+      "length": 20
+    },
+    {
+      "sql": "select 0 as BIGLIQUIDFLAG,",
+      "count": 4,
+      "length": 26
+    },
+    {
+      "sql": "select * from PUB_ITEM_COMPARE_OIL T6 where",
+      "count": 3,
+      "length": 43
+    },
+    {
+      "sql": "SELECT COUNT(1) FROM (",
+      "count": 2,
+      "length": 22
+    },
+    {
+      "sql": "SELECT DISTINCT",
+      "count": 2,
+      "length": 15
+    },
+    {
+      "sql": "SELECT DISTINCT b.patient_id, b.visit_id, b.oper_id",
+      "count": 2,
+      "length": 51
+    },
+    {
+      "sql": "SELECT DISTINCT o.patient_id, o.visit_id, o.start_date_time, v.discharge_date_time",
+      "count": 2,
+      "length": 82
+    },
+    {
+      "sql": "SELECT DISTINCT v.patient_id, v.visit_id, TO_CHAR(v.discharge_date_time,'YYYY-MM') AS",
+      "count": 2,
+      "length": 85
+    },
+    {
+      "sql": "SELECT m.patient_id, m.visit_id, m.oper_id, m.start_date_time, m.end_date_time,",
+      "count": 2,
+      "length": 79
+    },
+    {
+      "sql": "SELECT patient_id, visit_id, admission_date_time, discharge_date_time,",
+      "count": 2,
+      "length": 70
+    },
+    {
+      "sql": "WITH base_oper AS (",
+      "count": 2,
+      "length": 19
+    },
+    {
+      "sql": "WITH ops AS (",
+      "count": 2,
+      "length": 13
+    },
+    {
+      "sql": "WITH rescue_evt AS (",
+      "count": 2,
+      "length": 20
+    },
+    {
+      "sql": "WITH visits AS (",
+      "count": 2,
+      "length": 16
+    },
+    {
+      "sql": "DELETE FROM MR_BILL_COSTS WHERE patient_id ='",
+      "count": 1,
+      "length": 45
+    },
+    {
+      "sql": "DELETE FROM UNSETTLE_REC WHERE(PATIENT_ID ='",
+      "count": 1,
+      "length": 44
+    },
+    {
+      "sql": "DELETE orders_group_rec where patient_id ='",
+      "count": 1,
+      "length": 43
+    },
+    {
+      "sql": "DELETE pat_visit_temp WHERE(PATIENT_ID ='",
+      "count": 1,
+      "length": 41
+    },
+    {
+      "sql": "DELETE pats_in_hospital WHERE patient_id ='",
+      "count": 1,
+      "length": 43
+    },
+    {
+      "sql": "DELETE pre_dischged_pats WHERE patient_id ='",
+      "count": 1,
+      "length": 44
+    },
+    {
+      "sql": "INSERT INTO MR_BILL_COSTS(patient_id, visit_id, mr_bill_class, costs, charges)",
+      "count": 1,
+      "length": 78
+    },
+    {
+      "sql": "INSERT INTO PAT_VISIT(PATIENT_ID,VISIT_ID,DEPT_ADMISSION_TO,ADMISSION_DATE_TIME,IDENTITY,CHARGE_TYPE,ADMISSION_CAUSE,NEWBORN,PATIENT_CLASS) VALUES('",
+      "count": 1,
+      "length": 148
+    },
+    {
+      "sql": "INSERT INTO PAT_VISIT(PATIENT_ID,VISIT_ID,DEPT_ADMISSION_TO,ADMISSION_DATE_TIME,OCCUPATION,MARITAL_STATUS,IDENTITY,ARMED_SERVICES,CHARGE_TYPE,SERVICE_AGENCY,NEXT_OF_KIN,RELATIONSHIP,NEXT_OF_KIN_ADDR,NEXT_OF_KIN_ZIPCODE,NEXT_OF_KIN_PHONE,PATIENT_CLASS,ADMISSION_CAUSE,CONSULTING_DATE,PAT_ADM_CONDITION,CONSULTING_DOCTOR,ADMITTED_BY,WORKADD_PROVINCE,WORKADD_CITY,WORKADD_COUNT,WORKADD_TOWNSHIP,BUSINESS_ZIP_CODE,PHONE_NUMBER_BUSINESS,PATIENT_AREA_ADDRESS,PRE_PROVINCE,PRE_CITY,PRE_COUNT,PRE_TOWNSHIP,PAT_PHONE,PAT_ZIP,LINKADD_PROVINCE,LINKADD_CITY,LINKADD_COUNT,LINKADD_TOWNSHIP,PATIENT_AREA) VALUES('",
+      "count": 1,
+      "length": 599
+    },
+    {
+      "sql": "INSERT INTO PAT_VISIT(PATIENT_ID,VISIT_ID,DEPT_ADMISSION_TO,ADMISSION_DATE_TIME,OCCUPATION,MARITAL_STATUS,IDENTITY,ARMED_SERVICES,CHARGE_TYPE,SERVICE_AGENCY,NEXT_OF_KIN,RELATIONSHIP,NEXT_OF_KIN_ADDR,NEXT_OF_KIN_ZIPCODE,NEXT_OF_KIN_PHONE,PATIENT_CLASS,ADMISSION_CAUSE,CONSULTING_DATE,PAT_ADM_CONDITION,CONSULTING_DOCTOR,ADMITTED_BY,WORKADD_PROVINCE,WORKADD_CITY,WORKADD_COUNT,WORKADD_TOWNSHIP,BUSINESS_ZIP_CODE,PHONE_NUMBER_BUSINESS,PATIENT_AREA_ADDRESS,PRE_PROVINCE,PRE_CITY,PRE_COUNT,PRE_TOWNSHIP,PAT_PHONE,PAT_ZIP,LINKADD_PROVINCE,LINKADD_CITY,LINKADD_COUNT,LINKADD_TOWNSHIP,SERVICE_AGENCY_ADDR,GUARANTOR,GUARANTOR_ORG,GUARANTOR_PHONE_NUM,PAT_STREET_ADDRESS,SERVICE_AGENCY_CODE,NEXT_OF_KIN_ADDR_CODE,MAILING_ADDRESS,PATIENT_AREA,SOURCE,SEQID) VALUES('",
+      "count": 1,
+      "length": 753
+    },
+    {
+      "sql": "INSERT INTO adt_log(ward_code, dept_code, log_date_time, patient_id, visit_id, action) VALUES('",
+      "count": 1,
+      "length": 95
+    },
+    {
+      "sql": "SELECT * FROM INP_BILL_DETAIL a",
+      "count": 1,
+      "length": 31
+    },
+    {
+      "sql": "SELECT * FROM INP_ITEM_BATCH_DICT",
+      "count": 1,
+      "length": 33
+    },
+    {
+      "sql": "SELECT * FROM JMPZ_PZFY_V t WHERE t.INSERT_TIME >= '",
+      "count": 1,
+      "length": 52
+    },
+    {
+      "sql": "SELECT * FROM OPS_SHEET1",
+      "count": 1,
+      "length": 24
+    },
+    {
+      "sql": "SELECT * FROM PUB_PATIENT_INJURY_TEMP",
+      "count": 1,
+      "length": 37
+    },
+    {
+      "sql": "SELECT * FROM V_CLINIC_NO_FORM",
+      "count": 1,
+      "length": 30
+    },
+    {
+      "sql": "SELECT * FROM V_HIS_INFECTION_EMR_MEDICAL_INFO WHERE VISIT_SERIAL_NUMBER = '",
+      "count": 1,
+      "length": 76
+    },
+    {
+      "sql": "SELECT * FROM jhemr.v_birth_list t where t.patient_id='",
+      "count": 1,
+      "length": 55
+    },
+    {
+      "sql": "SELECT * FROM(",
+      "count": 1,
+      "length": 14
+    },
+    {
+      "sql": "SELECT A.PATIENT_ID,A.VISIT_ID,B.CONSULTATION_ID",
+      "count": 1,
+      "length": 48
+    },
+    {
+      "sql": "SELECT A1.*,A2.TEMPLATE_CLASS FROM",
+      "count": 1,
+      "length": 34
+    },
+    {
+      "sql": "SELECT CLASS_NAME as CLASSNAME,SORT,CLASS_NO as CLASSNO,EXAM_CLASS as EXAMCLASS",
+      "count": 1,
+      "length": 79
+    },
+    {
+      "sql": "SELECT COUNT(1)",
+      "count": 1,
+      "length": 15
+    },
+    {
+      "sql": "SELECT DISTINCT op.patient_id, op.visit_id, op.oper_id,",
+      "count": 1,
+      "length": 55
+    },
+    {
+      "sql": "SELECT DISTINCT p.patient_id, p.visit_id",
+      "count": 1,
+      "length": 40
+    },
+    {
+      "sql": "SELECT DISTINCT r.patient_id, r.visit_id",
+      "count": 1,
+      "length": 40
+    },
+    {
+      "sql": "SELECT DISTINCT r.patient_id, r.visit_id, r.start_date_time",
+      "count": 1,
+      "length": 59
+    },
+    {
+      "sql": "SELECT DISTINCT u.patient_id, u.visit_id",
+      "count": 1,
+      "length": 40
+    },
+    {
+      "sql": "SELECT INP_BILL_DETAIL.ITEM_CLASS, INP_BILL_DETAIL.ITEM_CODE, SUM(INP_BILL_DETAIL.COSTS) COSTS, sum(CHARGES) CHARGES",
+      "count": 1,
+      "length": 116
+    },
+    {
+      "sql": "SELECT INP_BILL_DETAIL_JZ.ITEM_CLASS, INP_BILL_DETAIL_JZ.ITEM_CODE, SUM(INP_BILL_DETAIL_JZ.COSTS), sum(CHARGES)",
+      "count": 1,
+      "length": 111
+    },
+    {
+      "sql": "SELECT ITEM_CLASS as ItemClass,ITEM_CODE as ItemCode,SUM(COSTS) as Costs,SUM(CHARGES) as Charges FROM (",
+      "count": 1,
+      "length": 103
+    },
+    {
+      "sql": "SELECT ITEM_NAME as ITEMNAME, ITEM_SPEC as ITEMSPEC, FIRM_ID as FIRMID, 1 AMOUNT, PRICE,1 as ITEMCLASS",
+      "count": 1,
+      "length": 102
+    },
+    {
+      "sql": "SELECT ORDER_CLASS_CODE CLASSCODE,ORDER_CLASS_NAME CLASSNAME FROM ORDER_CLASS_DICT",
+      "count": 1,
+      "length": 82
+    },
+    {
+      "sql": "SELECT PATIENT_ID,VISIT_ID,MR_BILL_CLASS,sum(round(COSTS,2)) COSTS,sum(round(CHARGES,2)) CHARGES",
+      "count": 1,
+      "length": 96
+    },
+    {
+      "sql": "SELECT TRANSACT_TYPE as TransactType FROM EINV_RCPT_MASTER WHERE RCPT_NO = '",
+      "count": 1,
+      "length": 76
+    },
+    {
+      "sql": "SELECT WARD_CODE FROM SYS_WARDAREA_WARD WHERE WARD_AREA_CODE='",
+      "count": 1,
+      "length": 62
+    },
+    {
+      "sql": "SELECT a.COSTS as Costs,a.CHARGES as Charges, b.FEE_CLASS_NAME as FeeClassName,a.ITEM_CODE as ItemCode,a.ITEM_NAME as ItemName, a.CATALOGUE_STATUS as CatalogueStatus FROM INP_BILL_DETAIL a LEFT JOIN inp_rcpt_fee_dict b",
+      "count": 1,
+      "length": 218
+    },
+    {
+      "sql": "SELECT a.PATIENT_ID, a.VISIT_ID, MAX(b.OPERATING_DATE) OPERATING_DATE",
+      "count": 1,
+      "length": 69
+    },
+    {
+      "sql": "SELECT a.WARDCODE,",
+      "count": 1,
+      "length": 18
+    },
+    {
+      "sql": "SELECT count (1) FROM B_T_POSTTRANSEVAL a, B_t_REQd b",
+      "count": 1,
+      "length": 53
+    },
+    {
+      "sql": "SELECT count(1) FROM B_t_REQd a",
+      "count": 1,
+      "length": 31
+    },
+    {
+      "sql": "SELECT diag_code DiagCode,DIAG_DESC DiagDesc,insur_diag_code InsurDiagCode,insur_diag_desc InsurDiagDesc,CN DiagIndicator,count(1) num",
+      "count": 1,
+      "length": 134
+    },
+    {
+      "sql": "SELECT discharge_date_expcted FROM pre_dischged_pats WHERE patient_id='",
+      "count": 1,
+      "length": 71
+    },
+    {
+      "sql": "SELECT dv.patient_id, dv.visit_id,",
+      "count": 1,
+      "length": 34
+    },
+    {
+      "sql": "SELECT dv.patient_id, dv.visit_id, dv.",
+      "count": 1,
+      "length": 38
+    },
+    {
+      "sql": "SELECT jshid,yd_gz_data FROM OPS_SETTLE_TEST where yd_gz_data is not null",
+      "count": 1,
+      "length": 73
+    },
+    {
+      "sql": "SELECT m.patient_id, m.visit_id, m.oper_id,",
+      "count": 1,
+      "length": 43
+    },
+    {
+      "sql": "SELECT o.patient_id, o.visit_id,",
+      "count": 1,
+      "length": 32
+    },
+    {
+      "sql": "SELECT o.patient_id, o.visit_id, o.oper_id, o.start_date_time,",
+      "count": 1,
+      "length": 62
+    },
+    {
+      "sql": "SELECT p.PATIENT_ID as PATIENTID,p.VISIT_ID, COUNT(1) AS ORDER_COUNT",
+      "count": 1,
+      "length": 68
+    },
+    {
+      "sql": "SELECT patient_id FROM HIS.DIAGNOSIS WHERE diagnosis_type='3'",
+      "count": 1,
+      "length": 61
+    },
+    {
+      "sql": "SELECT patient_id, visit_id, death_date_time, TO_CHAR(discharge_date_time,'YYYY-MM') AS",
+      "count": 1,
+      "length": 87
+    },
+    {
+      "sql": "SELECT patient_id, visit_id, oper_id, MIN(req_date_time) AS req_time",
+      "count": 1,
+      "length": 68
+    },
+    {
+      "sql": "SELECT r.patient_id, r.visit_id, r.start_date_time,",
+      "count": 1,
+      "length": 51
+    },
+    {
+      "sql": "SELECT t.INSUR_CODE,t.HOSPITAL FROM hospital_config_new t",
+      "count": 1,
+      "length": 57
+    },
+    {
+      "sql": "SELECT t.insur_code,t.hospital FROM hospital_config_new t",
+      "count": 1,
+      "length": 57
+    },
+    {
+      "sql": "SELECT t1.PATIENT_ID,t1.VISIT_ID,OPER_CODE,KSBM,JBBM,JBMC",
+      "count": 1,
+      "length": 57
+    },
+    {
+      "sql": "UPDATE INP_BILL_DETAIL SET RCPT_NO='",
+      "count": 1,
+      "length": 36
+    },
+    {
+      "sql": "UPDATE LEND_BED_LOG SET LEND_END_DATE = SYSDATE WHERE WARD_CODE = '",
+      "count": 1,
+      "length": 67
+    },
+    {
+      "sql": "UPDATE OUTP_RCPT_MASTER_YD SET CLINIC_NO='",
+      "count": 1,
+      "length": 42
+    },
+    {
+      "sql": "UPDATE PATS_IN_HOSPITAL SET SETTLED_INDICATOR = 1 WHERE(PATIENT_ID ='",
+      "count": 1,
+      "length": 69
+    },
+    {
+      "sql": "UPDATE bed_rec SET bed_status = '0',patient_id ='",
+      "count": 1,
+      "length": 49
+    },
+    {
+      "sql": "UPDATE inp_overdraft_reg_detail SET disabled_date = sysdate Where patient_id = '",
+      "count": 1,
+      "length": 80
+    },
+    {
+      "sql": "UPDATE inp_overdraft_reg_master SET total_sanctified_amount = 0 Where patient_id ='",
+      "count": 1,
+      "length": 83
+    },
+    {
+      "sql": "UPDATE orders SET stop_date_time = SYSDATE, order_status = '3' WHERE patient_id ='",
+      "count": 1,
+      "length": 82
+    },
+    {
+      "sql": "UPDATE transfer SET discharge_date_time = SYSDATE, doctor_in_charge='",
+      "count": 1,
+      "length": 69
+    },
+    {
+      "sql": "WITH death_visits AS (",
+      "count": 1,
+      "length": 22
+    },
+    {
+      "sql": "WITH organ_pts AS (",
+      "count": 1,
+      "length": 19
+    },
+    {
+      "sql": "WITH readm AS (",
+      "count": 1,
+      "length": 15
+    },
+    {
+      "sql": "WITH unplanned AS (",
+      "count": 1,
+      "length": 19
+    },
+    {
+      "sql": "delete bill_misc_item_patch where (patient_id ='",
+      "count": 1,
+      "length": 48
+    },
+    {
+      "sql": "insert into price_list_log ( item_class , item_code , item_name , item_spec , units , price , prefer_price , foreigner_price , performed_by , fee_type_mask ,",
+      "count": 1,
+      "length": 157
+    },
+    {
+      "sql": "select (select a.name from staff_dict a where a.id = t.user_id) name,t.user_id UserId,t.local_no LocalNo from CASHER_NO_REC t where t.auto_flag IN('2','3') order by t.user_id",
+      "count": 1,
+      "length": 174
+    },
+    {
+      "sql": "select (select dept_name from dept_dict where dept_code = a.a1) DeptName, --",
+      "count": 1,
+      "length": 76
+    },
+    {
+      "sql": "select * from",
+      "count": 1,
+      "length": 13
+    },
+    {
+      "sql": "select * from PATS_IN_HOSPITAL where ADM_WARD_DATE_TIME is not null",
+      "count": 1,
+      "length": 67
+    },
+    {
+      "sql": "select * from SYS_EMPLOYEE where EMPLTYPE='",
+      "count": 1,
+      "length": 43
+    },
+    {
+      "sql": "select * from V_OPS_IPC_PATIENT",
+      "count": 1,
+      "length": 31
+    },
+    {
+      "sql": "select A1.GROUP_ITEM_CODE,MAX(B1.EMPLOYEE_CODE) EMPLOYEE_CODE",
+      "count": 1,
+      "length": 61
+    },
+    {
+      "sql": "select AREA_CODE as DicCode, AREA_NAME as DicName,null as DicType,null as GbCode,null as GbName from AREA_DICT where AREA_CODE='",
+      "count": 1,
+      "length": 128
+    },
+    {
+      "sql": "select C1.YARDCODE from SYS_YARD_DEPT A1",
+      "count": 1,
+      "length": 40
+    },
+    {
+      "sql": "select COUNTRY_CODE as DicCode, COUNTRY_NAME as DicName,null as DicType,null as GbCode,null as GbName from COUNTRY_DICT",
+      "count": 1,
+      "length": 119
+    },
+    {
+      "sql": "select COUNTRY_CODE as DicCode, COUNTRY_NAME as DicName,null as DicType,null as GbCode,null as GbName from COUNTRY_DICT where COUNTRY_CODE='",
+      "count": 1,
+      "length": 140
+    },
+    {
+      "sql": "select DEPT_DICT.DEPT_NAME DEPTNAME,PAT_MASTER_INDEX.NAME,PAT_MASTER_INDEX.SEX,floor(months_between(sysdate,PAT_MASTER_INDEX.DATE_OF_BIRTH)/12) AGE,PAT_MASTER_INDEX.INP_NO INPNO,PATS_IN_HOSPITAL.PATIENT_ID PatientId,PATS_IN_HOSPITAL.VISIT_ID VisitId",
+      "count": 1,
+      "length": 249
+    },
+    {
+      "sql": "select DRUG_CODE as DrugCode,DRUG_NAME as DrugName,DRUG_ALIAS_NAME as DrugAliasName,DRUG_SPEC as DrugSpec,PACKAGE_UNITS as PackageUnits,",
+      "count": 1,
+      "length": 136
+    },
+    {
+      "sql": "select EMPLNAME as EmployeeName ,DEPTCODE as DeptCode,EmplType from SYS_EMPLOYEE WHERE EMPLCODE = :emplCode AND VALIDSTATE = '1'",
+      "count": 1,
+      "length": 128
+    },
+    {
+      "sql": "select ID_TYPE_CODE as DicCode, ID_TYPE_NAME as DicName,null as DicType,null as GbCode,null as GbName from MEDREC.ID_TYPE_DICT where ID_TYPE_CODE='",
+      "count": 1,
+      "length": 147
+    },
+    {
+      "sql": "select LEVLCODE from SYS_EMPLOYEE WHERE EMPLCODE = :emplCode AND VALIDSTATE = '1'",
+      "count": 1,
+      "length": 81
+    },
+    {
+      "sql": "select NATION_CODE as DicCode, NATION_NAME as DicName,null as DicType,null as GbCode,null as GbName from NATION_DICT where NATION_CODE='",
+      "count": 1,
+      "length": 136
+    },
+    {
+      "sql": "select ZDMC as DicType, YBBM as DicCode,YBMC as DicName,GBBM as GbCode,GBMC as GbName from comm.outp_mr_dict",
+      "count": 1,
+      "length": 108
+    },
+    {
+      "sql": "select a.*, B.overdraft",
+      "count": 1,
+      "length": 23
+    },
+    {
+      "sql": "select a.operation_desc,decode(a.wound_grade, '",
+      "count": 1,
+      "length": 47
+    },
+    {
+      "sql": "select a1.* from SYS_EMPLOYEE a1",
+      "count": 1,
+      "length": 32
+    },
+    {
+      "sql": "select aa.DEPT_CODE deptCode,",
+      "count": 1,
+      "length": 29
+    },
+    {
+      "sql": "select admission_date_time from pat_visit where patient_id ='",
+      "count": 1,
+      "length": 61
+    },
+    {
+      "sql": "select b.EMPL_CODE from SYS_USER_DEPT a left join SYS_USER b on a.USERID =b.ID where a.DEPTID in(",
+      "count": 1,
+      "length": 97
+    },
+    {
+      "sql": "select b.item_name ItemName",
+      "count": 1,
+      "length": 27
+    },
+    {
+      "sql": "select b.operation OperationName,'' WoundGrade,a.scheduled_date_time StartDateTime,",
+      "count": 1,
+      "length": 83
+    },
+    {
+      "sql": "select count(1) from (",
+      "count": 1,
+      "length": 22
+    },
+    {
+      "sql": "select dept_code from review_refund",
+      "count": 1,
+      "length": 35
+    },
+    {
+      "sql": "select distinct c.mrn, c.series",
+      "count": 1,
+      "length": 31
+    },
+    {
+      "sql": "select germ_name germname, input_code inputcode, suspected_or_confirmed suspectedorconfirmed from ordadm.orders_anti_germ_dict where 1=1",
+      "count": 1,
+      "length": 136
+    },
+    {
+      "sql": "select inpbill.inp_prepay_acct_no.nextval from dual",
+      "count": 1,
+      "length": 51
+    },
+    {
+      "sql": "select inpbill.inp_settle_acct_no.nextval from dual",
+      "count": 1,
+      "length": 51
+    },
+    {
+      "sql": "select ip_address from client_installation where location='",
+      "count": 1,
+      "length": 59
+    },
+    {
+      "sql": "select max(DECODE(report_item_name, '",
+      "count": 1,
+      "length": 37
+    },
+    {
+      "sql": "select sum(c.amount)",
+      "count": 1,
+      "length": 20
+    },
+    {
+      "sql": "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPARTMENT t1 on t.PERFORMED_BY=t1.DEPTCODE and t1.isdeleted=0 left join BILL_ITEM_CLASS_DICT c on t.ITEM_CLASS=c.CLASS_CODE",
+      "count": 1,
+      "length": 239
+    }
+  ],
+  "sql_total": 124,
+  "tables": [
+    {
+      "table": "SYS_EMPLOYEE",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 4,
+      "sample_sql_head": [
+        "select * from SYS_EMPLOYEE where EMPLTYPE='",
+        "select EMPLNAME as EmployeeName ,DEPTCODE as DeptCode,EmplType from SYS_EMPLOYEE WHERE EMPLCODE = :emplCode AND VALIDSTA"
+      ]
+    },
+    {
+      "table": "PAT_VISIT",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 4,
+      "sample_sql_head": [
+        "INSERT INTO PAT_VISIT(PATIENT_ID,VISIT_ID,DEPT_ADMISSION_TO,ADMISSION_DATE_TIME,IDENTITY,CHARGE_TYPE,ADMISSION_CAUSE,NEW",
+        "INSERT INTO PAT_VISIT(PATIENT_ID,VISIT_ID,DEPT_ADMISSION_TO,ADMISSION_DATE_TIME,OCCUPATION,MARITAL_STATUS,IDENTITY,ARMED"
+      ]
+    },
+    {
+      "table": "INP_BILL_DETAIL",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 3,
+      "sample_sql_head": [
+        "SELECT * FROM INP_BILL_DETAIL a",
+        "SELECT a.COSTS as Costs,a.CHARGES as Charges, b.FEE_CLASS_NAME as FeeClassName,a.ITEM_CODE as ItemCode,a.ITEM_NAME as It"
+      ]
+    },
+    {
+      "table": "COUNTRY_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 2,
+      "sample_sql_head": [
+        "select COUNTRY_CODE as DicCode, COUNTRY_NAME as DicName,null as DicType,null as GbCode,null as GbName from COUNTRY_DICT",
+        "select COUNTRY_CODE as DicCode, COUNTRY_NAME as DicName,null as DicType,null as GbCode,null as GbName from COUNTRY_DICT "
+      ]
+    },
+    {
+      "table": "MR_BILL_COSTS",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 2,
+      "sample_sql_head": [
+        "DELETE FROM MR_BILL_COSTS WHERE patient_id ='",
+        "INSERT INTO MR_BILL_COSTS(patient_id, visit_id, mr_bill_class, costs, charges)"
+      ]
+    },
+    {
+      "table": "PATS_IN_HOSPITAL",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 2,
+      "sample_sql_head": [
+        "UPDATE PATS_IN_HOSPITAL SET SETTLED_INDICATOR = 1 WHERE(PATIENT_ID ='",
+        "select * from PATS_IN_HOSPITAL where ADM_WARD_DATE_TIME is not null"
+      ]
+    },
+    {
+      "table": "DUAL",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 2,
+      "sample_sql_head": [
+        "select inpbill.inp_prepay_acct_no.nextval from dual",
+        "select inpbill.inp_settle_acct_no.nextval from dual"
+      ]
+    },
+    {
+      "table": "HOSPITAL_CONFIG_NEW",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 2,
+      "sample_sql_head": [
+        "SELECT t.INSUR_CODE,t.HOSPITAL FROM hospital_config_new t",
+        "SELECT t.insur_code,t.hospital FROM hospital_config_new t"
+      ]
+    },
+    {
+      "table": "V_HIS_INFECTION_EMR_MEDICAL_INFO",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM V_HIS_INFECTION_EMR_MEDICAL_INFO WHERE VISIT_SERIAL_NUMBER = '"
+      ]
+    },
+    {
+      "table": "JMPZ_PZFY_V",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM JMPZ_PZFY_V t WHERE t.INSERT_TIME >= '"
+      ]
+    },
+    {
+      "table": "B_T_POSTTRANSEVAL",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT count (1) FROM B_T_POSTTRANSEVAL a, B_t_REQd b"
+      ]
+    },
+    {
+      "table": "B_T_REQD",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT count(1) FROM B_t_REQd a"
+      ]
+    },
+    {
+      "table": "HIS.DIAGNOSIS",
+      "library_class": "owner:HIS",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT patient_id FROM HIS.DIAGNOSIS WHERE diagnosis_type='3'"
+      ]
+    },
+    {
+      "table": "PUB_PATIENT_INJURY_TEMP",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM PUB_PATIENT_INJURY_TEMP"
+      ]
+    },
+    {
+      "table": "OPS_SETTLE_TEST",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT jshid,yd_gz_data FROM OPS_SETTLE_TEST where yd_gz_data is not null"
+      ]
+    },
+    {
+      "table": "OPS_SHEET1",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM OPS_SHEET1"
+      ]
+    },
+    {
+      "table": "SYS_WARDAREA_WARD",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT WARD_CODE FROM SYS_WARDAREA_WARD WHERE WARD_AREA_CODE='"
+      ]
+    },
+    {
+      "table": "SYS_USER_DEPT",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select b.EMPL_CODE from SYS_USER_DEPT a left join SYS_USER b on a.USERID =b.ID where a.DEPTID in("
+      ]
+    },
+    {
+      "table": "SYS_USER",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select b.EMPL_CODE from SYS_USER_DEPT a left join SYS_USER b on a.USERID =b.ID where a.DEPTID in("
+      ]
+    },
+    {
+      "table": "PUB_ITEM_COMPARE_OIL",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select * from PUB_ITEM_COMPARE_OIL T6 where"
+      ]
+    },
+    {
+      "table": "PUB_ITEM_COMPARE",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select * from PUB_ITEM_COMPARE T6 where"
+      ]
+    },
+    {
+      "table": "PRICE_LIST_LOG",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "insert into price_list_log ( item_class , item_code , item_name , item_spec , units , price , prefer_price , foreigner_p"
+      ]
+    },
+    {
+      "table": "V_OPS_IPC_PATIENT",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select * from V_OPS_IPC_PATIENT"
+      ]
+    },
+    {
+      "table": "V_CLINIC_NO_FORM",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM V_CLINIC_NO_FORM"
+      ]
+    },
+    {
+      "table": "OUTP_RCPT_MASTER_YD",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE OUTP_RCPT_MASTER_YD SET CLINIC_NO='"
+      ]
+    },
+    {
+      "table": "NATION_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select NATION_CODE as DicCode, NATION_NAME as DicName,null as DicType,null as GbCode,null as GbName from NATION_DICT whe"
+      ]
+    },
+    {
+      "table": "MEDREC.ID_TYPE_DICT",
+      "library_class": "MEDREC(老HIS病案owner)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select ID_TYPE_CODE as DicCode, ID_TYPE_NAME as DicName,null as DicType,null as GbCode,null as GbName from MEDREC.ID_TYP"
+      ]
+    },
+    {
+      "table": "AREA_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select AREA_CODE as DicCode, AREA_NAME as DicName,null as DicType,null as GbCode,null as GbName from AREA_DICT where ARE"
+      ]
+    },
+    {
+      "table": "COMM.OUTP_MR_DICT",
+      "library_class": "老HIS(COMM owner)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select ZDMC as DicType, YBBM as DicCode,YBMC as DicName,GBBM as GbCode,GBMC as GbName from comm.outp_mr_dict"
+      ]
+    },
+    {
+      "table": "DEPT_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select (select dept_name from dept_dict where dept_code = a.a1) DeptName, --"
+      ]
+    },
+    {
+      "table": "UNSETTLE_REC",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "DELETE FROM UNSETTLE_REC WHERE(PATIENT_ID ='"
+      ]
+    },
+    {
+      "table": "ADT_LOG",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "INSERT INTO adt_log(ward_code, dept_code, log_date_time, patient_id, visit_id, action) VALUES('"
+      ]
+    },
+    {
+      "table": "TRANSFER",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE transfer SET discharge_date_time = SYSDATE, doctor_in_charge='"
+      ]
+    },
+    {
+      "table": "INP_OVERDRAFT_REG_MASTER",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE inp_overdraft_reg_master SET total_sanctified_amount = 0 Where patient_id ='"
+      ]
+    },
+    {
+      "table": "INP_OVERDRAFT_REG_DETAIL",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE inp_overdraft_reg_detail SET disabled_date = sysdate Where patient_id = '"
+      ]
+    },
+    {
+      "table": "BED_REC",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE bed_rec SET bed_status = '0',patient_id ='"
+      ]
+    },
+    {
+      "table": "LEND_BED_LOG",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE LEND_BED_LOG SET LEND_END_DATE = SYSDATE WHERE WARD_CODE = '"
+      ]
+    },
+    {
+      "table": "ORDERS",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "UPDATE orders SET stop_date_time = SYSDATE, order_status = '3' WHERE patient_id ='"
+      ]
+    },
+    {
+      "table": "STAFF_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select (select a.name from staff_dict a where a.id = t.user_id) name,t.user_id UserId,t.local_no LocalNo from CASHER_NO_"
+      ]
+    },
+    {
+      "table": "CASHER_NO_REC",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select (select a.name from staff_dict a where a.id = t.user_id) name,t.user_id UserId,t.local_no LocalNo from CASHER_NO_"
+      ]
+    },
+    {
+      "table": "INPUT_NODRUG_LIST",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
+      ]
+    },
+    {
+      "table": "SYS_DEPARTMENT",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
+      ]
+    },
+    {
+      "table": "BILL_ITEM_CLASS_DICT",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
+      ]
+    },
+    {
+      "table": "JHEMR.V_BIRTH_LIST",
+      "library_class": "owner:JHEMR",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM jhemr.v_birth_list t where t.patient_id='"
+      ]
+    },
+    {
+      "table": "INP_RCPT_FEE_DICT",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT a.COSTS as Costs,a.CHARGES as Charges, b.FEE_CLASS_NAME as FeeClassName,a.ITEM_CODE as ItemCode,a.ITEM_NAME as It"
+      ]
+    },
+    {
+      "table": "EINV_RCPT_MASTER",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT TRANSACT_TYPE as TransactType FROM EINV_RCPT_MASTER WHERE RCPT_NO = '"
+      ]
+    },
+    {
+      "table": "PRE_DISCHGED_PATS",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT discharge_date_expcted FROM pre_dischged_pats WHERE patient_id='"
+      ]
+    },
+    {
+      "table": "REVIEW_REFUND",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select dept_code from review_refund"
+      ]
+    },
+    {
+      "table": "ORDER_CLASS_DICT",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT ORDER_CLASS_CODE CLASSCODE,ORDER_CLASS_NAME CLASSNAME FROM ORDER_CLASS_DICT"
+      ]
+    },
+    {
+      "table": "CLIENT_INSTALLATION",
+      "library_class": "未归类(待核)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select ip_address from client_installation where location='"
+      ]
+    },
+    {
+      "table": "INP_ITEM_BATCH_DICT",
+      "library_class": "HisRead/HisV2Open(老HIS风格)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "SELECT * FROM INP_ITEM_BATCH_DICT"
+      ]
+    },
+    {
+      "table": "SYS_YARD_DEPT",
+      "library_class": "masterdb(新HIS主库,SYS_/PUB_)",
+      "sql_ref_count": 1,
+      "sample_sql_head": [
+        "select C1.YARDCODE from SYS_YARD_DEPT A1"
+      ]
+    }
+  ],
+  "table_total": 52,
+  "library_class_summary": {
+    "masterdb(新HIS主库,SYS_/PUB_)": 9,
+    "HisRead/HisV2Open(老HIS风格)": 12,
+    "未归类(待核)": 27,
+    "owner:HIS": 1,
+    "MEDREC(老HIS病案owner)": 1,
+    "老HIS(COMM owner)": 1,
+    "owner:JHEMR": 1
+  }
+}

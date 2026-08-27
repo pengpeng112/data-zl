@@ -7,11 +7,21 @@
 
 ## AI 技能路由（持续维护入口）
 
+- 用户要求**连接数据库、查系统清单、查表清单/表结构/字段结构**，或提到 `/sjzc`、连库、表结构、有哪些库/表时，必须先使用全局技能 `~/.zcode/skills/sjzc/SKILL.md`（统一连库与表结构入口：无参列全部系统由 AI 判断、带系统名直连；含限量只读 live 核验通道；全局命令，任意目录会话可用）。
 - 用户要求日常取数、保存 SQL、复用查询、修订口径、导入历史查询，或提到 `取数/`、`queryctl`、`query_code`、查询资产时，必须先使用 `.agents/skills/query-governance-intake/SKILL.md`（126 查询资产闭环），并阅读 `取数/START_HERE.md`。
 - 用户提供历史 SQL、报表 SQL、视图 SQL，或要求分析 JOIN、补充/纳入表关系、沉淀关系图谱时，必须先使用仓库技能 `.agents/skills/sql-relation-intake/SKILL.md`。
 - 该技能负责“SQL 解析 → 最新资产获取 → 元数据核对 → 正式关系查重 → 候选分级 → 验证/配方建议”。历史 SQL 只能先作为证据；未经审核不得直接写入正式关系。
 - 普通取数 SQL 在完成查询资产检索后，再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
+- 用户要求**处理 HIS/医院系统日常运维问题**（报错排查、故障处理、操作指导），或提到 `HIS日常问题处理知识库`、运维问题台账时，先读 `F:\python\Wx_ltjl\docs\知识库\HIS日常问题处理知识库.md`（84条运维台账知识库：现象/涉及表/排查SQL/风险分级，🔴写操作带护栏；映射 `开发起步包/HIS问题表映射.csv`；活库核验配合 sjzc 技能只读执行）。
 - 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方/查询资产接口，平台不可用时读取技能引用的仓库机器可读资产。
+
+## 三仓库互通（L1 速查）
+
+> 三仓库 = 本仓库（数据与连接中枢）+ `F:\python\Wx_ltjl`（运维知识与沟通中枢）+ `D:\Users\Administrator\Desktop\嘉和`（嘉和系逆向排障中枢）。完整调用关系/任务路由/互相吸收通道见 **L2 地图**：`F:\python\数据资产\三仓库互通地图.md`（本仓库根目录，跨仓库任务时才读）。
+
+- 共享枢纽：**sjzc 技能**（本仓库孵化后全局化，连库/表结构）｜**8.83 平台与受控凭据**（本仓库 `.ssh\config_ai` + `/etc/data-asset/credentials/`，**嘉和连库依赖此设施**）｜**wechat-chat-records 技能**（wx_ltjl 孵化，聊天记录）｜8.53 跳板（HIS 源库，`02` §2）
+- 别人调用本仓库最常用：连库/表结构/值域 → sjzc 与平台 API；跳板与凭据基础设施；OA 源端资产包（143 号）
+- 跨仓库改动按**对方**仓库规则登记（对方：INDEX.md / CHANGELOG；本仓库：开发起步包 README 目录更新记录）
 
 ## 仓库性质（最重要）
 
@@ -24,55 +34,20 @@
 **只做 Track A：AI 探库（数据中心 8.216 + HIS）→ 表结构与表间关系 → 关系图谱。**
 - 视图生成、内网服务部署**延后**，探库跑通再启动（见 `01` 蓝图）。
 
-**进度**：
-- ✅ **连接已打通**：跳板机 8.53（SSH 免密）→ 源库 8.216（thick 模式），DB 版本 11.2.0.4.0。
-- ✅ **元数据已采集**：`08_数据中心元数据快照.json`（32 schema / 865 表 / 26894 字段 / 404 视图 DDL）。实测发现数据中心业务库远超初始描述，含 `HIS`(273表)、`CDA`(86表+149视图)、`ODS`(119视图)、`MTL`(老EMR)、`JHEMR`(新EMR)、`YDHL`(移动护理)、`SM`(手麻)、`LIS`、`PACS`、`PORTAL_EMPI`(患者主索引) 等。
-- ✅ **表结构与关联已梳理**：`09_数据资产_表结构与关联关系.md`（合并两份已确认文档 + 经 08 校验：33 张核心表 32 张在 8.216 验证通过）+ 机器可读资产包 `数据资产_资产包/`（tables/columns/relationships.csv + catalog.json，由 `tools/build_asset_package.py` 生成）。
-- ✅ **核心关系已数据库验证并回写资产包**：`10_关系验证报告.md` / `10_关系验证结果.json`（25 项核心关系；确认 EXAM_MASTER 需拆住院/门诊子集，LAB_TEST_MASTER 需拆住院检验与 VISIT_ID=0/NULL 检验）。`relationships.csv` / `catalog.json` 已带 `validation_level/status/metrics/note`。
-- ✅ **视图 DDL 静态关系已解析 + HIS 已分类**：`11_视图关系解析与HIS分类报告.md` / `数据资产_关系图谱/`（ODS 119 视图 → 772 条依赖、732 条候选 join；HIS 273 表分类，66 张被 ODS 引用）。
-- ✅ **高频候选关系已排序并完成首批验证**：`12_候选关系验证报告.md` / `12_候选关系验证结果.json`（13 项候选验证，7 条提升入正式资产；`relationships.csv` 现 35 条正式关系）。
-- ✅ **手麻人员映射专题已验证**：`13_手麻人员映射验证报告.md` / `13_手麻人员映射验证结果.json`（确认外科医生/助手多为姓名、麻醉医生/护士多为工号、`HIS.STAFF_DICT.NAME` 存在重名；排班表仅 `STATE IN (2,3)` 可强关联手术主表）。
-- ✅ **PACS/LIS/YDHL 三库关系已专题验证**：`14_PACS_LIS_YDHL关系验证报告.md` / `14_PACS_LIS_YDHL关系验证结果.json`（PACS 内部关系成立但未发现直接挂 HIS.EXAM_MASTER 的同键；LIS 通过 `BARCODE=TEST_NO` 挂 HIS 检验；YDHL 通过 `MRN=INP_NO` + `SERIES=VISIT_ID` 挂 HIS 住院，护理事实表通过 `PATIENT_UID` 挂 `INPATIENTS`）。
-- ✅ **关系补验并回写资产包**：`15_关系补验与资产回写报告.md` / `15_关系补验与资产回写结果.json`（确认 JHEMR 按 `PATIENT_ID+VISIT_ID` 精确挂 HIS 住院；PACS 内部关系、LIS 内部关系、YDHL 深层关系已补验；正式关系 `relationships.csv` 现 47 条）。
-- ✅ **HISUSER 业务库已探查**：`16_hisuser业务库探查报告.md` / `16_hisuser业务库探查结果.json` / `16_hisuser业务库元数据快照.json`（确认 `hisuser` 自身 schema 不是业务主 schema；HIS 业务表分散在 `MEDREC/ORDADM/LAB/EXAM/COMM/DRUG_USER/PHARMACY/...` 等 owner；两份 HIS 文档 435 张候选表中 415 张在业务库可见，药房药库 67 张全部可见）。
-- ✅ **药房药库与发药主线已验证**：`19_药房药库关系验证报告.md` / `19_药房药库关系验证结果.json`（确认 `DRUG_USER` 新药库/发药申请主线、`PHARMACY` 旧处方/住院发药主线；两套表不是简单一对一同步）。
-- ✅ **HIS 主业务 owner 关系已补验**：`21_HIS主业务owner关系补验报告.md` / `21_HIS主业务owner关系补验结果.json`（验证 `MEDREC/ORDADM/LAB/EXAM/INPBILL/OUTPBILL/OUTPADM/INPADM` 21 条源端关系；确认源端口径与 ODS 主线一致，但暂不直接回写 ODS 资产包）。
-- ✅ **HIS 源端字段主题与 ODS 覆盖差异已梳理**：`22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json`（12 个 owner、1234 张表、19831 字段；105 张源端表与 ODS.HIS 同名覆盖，1129 张未按同名表覆盖）。
-- ✅ **HIS 源端资产范围已复核**：`23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json`（用户确认 `COMM/MEDADM` 纳入；`ST_*`、日志、接口中间表排除；医嘱执行、预交金纳入；`VISIT_ID=0/NULL` 检验/检查按门诊口径）。
-- ✅ **独立 HIS 源端资产包草案已生成**：`25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `数据资产_HIS源端资产包/`（1234 表、19831 字段、33 条关系；含 `source_owner/table_role/include_status/exclude_reason/ods_same_name_covered`）。
-- ✅ **文档入口已重整**：阶段性整改、交接和状态文档已归档；当前目录、状态和更新历史以 `开发起步包/README.md` 为准，未完成事项以 `55_系统未完成事项统一执行计划.md` 为准。
-- ✅ **用户治理口径已沉淀**：`40_数据治理复核口径与方法记录.md` 记录表清洗、待确认表收敛、强制保留表、B/C 关系采纳、D 关系跨系统延后等用户确认规则；后续 HIS/数据中心/周边系统治理分析必须优先沿用。
-- ⏭ **下一步**：未完成事项、优先级和验收条件统一以 `55_系统未完成事项统一执行计划.md` 为准；不得引用已归档的 29/41/42/46 作为执行入口。
+**进度**：Track A 探库与关系验证主线已完成（连接打通→元数据快照→核心/候选/三库/源端专题验证→HIS 源端与 JHEMR 资产包→治理口径沉淀），完整已完成史与证据链见 `开发起步包/README.md` 及各编号报告；**未完成事项、优先级、验收条件以 `55_系统未完成事项统一执行计划.md` 为唯一权威入口**（不得引用已归档的 29/41/42/46 作为执行入口）。
 
 **关键捷径**：`03_view_registry.json` + `08` 里的 `V_EMR_*`/`CDR_*` 视图 SQL **本身就是关系样本**——它们编码了 HIS 表如何用 `PATIENT_ID+VISIT_ID`、`TEST_NO`、`EXAM_NO` 等关联。关系图谱以这些视图为种子扩展，不要从零推断。
 
-## 导航
+## 导航（高频入口；全量目录见 `开发起步包/README.md`）
 
 | 想做什么 | 先读哪里 |
 |---|---|
-| 总入口 / 连接 / 已知坑 | `02`（§2 连接、§4 核心主线、§5 数据坑、§7 资产包） |
-| 平台总目标与架构 | `01_平台执行方案.md` |
+| 总入口 / 连接 / 已知坑 / 核心主线 | `02`（§2 连接、§4 核心主线、§5 数据坑、§7 资产包） |
 | **表结构与关联关系（权威）** | `09_数据资产_表结构与关联关系.md`（含置信度 A/B/C、Mermaid 图） |
-| 数据库实测关系验证 | `10_关系验证报告.md` / `10_关系验证结果.json` |
-| 静态关系扩展 + HIS 分类 | `11_视图关系解析与HIS分类报告.md` / `开发起步包/数据资产_关系图谱/` |
-| 高频候选关系验证 | `12_候选关系验证报告.md` / `12_候选关系验证结果.json` |
-| 手麻人员映射专题 | `13_手麻人员映射验证报告.md` / `13_手麻人员映射验证结果.json` |
-| PACS/LIS/YDHL 三库关系 | `14_PACS_LIS_YDHL关系验证报告.md` / `14_PACS_LIS_YDHL关系验证结果.json` |
-| 关系补验与资产回写 | `15_关系补验与资产回写报告.md` / `15_关系补验与资产回写结果.json` |
-| HISUSER 业务库探查 | `16_hisuser业务库探查报告.md` / `16_hisuser业务库探查结果.json` / `16_hisuser业务库元数据快照.json` |
-| 药房药库关系验证 | `19_药房药库关系验证报告.md` / `19_药房药库关系验证结果.json` |
-| HIS 主业务 owner 关系补验 | `21_HIS主业务owner关系补验报告.md` / `21_HIS主业务owner关系补验结果.json` |
-| HIS 源端字段主题与 ODS 覆盖差异 | `22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json` |
-| HIS 源端资产范围复核与下一步计划 | `23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json` |
-| HIS 源端资产包 | `25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `开发起步包/数据资产_HIS源端资产包/` |
-| **应用整改主入口** | `55_系统未完成事项统一执行计划.md` |
+| **实测全量元数据（关系图谱底座）** | `开发起步包/08_数据中心元数据快照.json`；机器可读资产包 `开发起步包/数据资产_资产包/`（tables/columns/relationships.csv + catalog.json） |
+| **未完成工作与应用整改主入口** | `55_系统未完成事项统一执行计划.md`（唯一权威） |
 | **用户确认的数据治理复核口径** | `40_数据治理复核口径与方法记录.md`（表清洗、强制保留、待确认清零、B/C 关系采纳、D 跨系统延后） |
-| **未完成工作与接手说明** | `55_系统未完成事项统一执行计划.md` + `开发起步包/README.md` |
-| 机器可读资产包（导入资产系统） | `开发起步包/数据资产_资产包/`（tables/columns/relationships.csv + catalog.json，关系含数据库实测验证等级） |
-| **实测全量元数据（关系图谱底座）** | `开发起步包/08_数据中心元数据快照.json` |
-| 现有视图→HIS 表关系（图谱种子） | `03_view_registry.json` |
-| 标准化目标表清单 + 数据中心源库 | `06_前置机与数据中心分析报告.md` |
-| 待探业务系统 + 探库开放问题 | `07_业务系统与探查开放问题.md` |
+| 其余编号报告 / 状态 / 更新历史 | `开发起步包/README.md`（权威目录，含各专题报告索引） |
 
 > 元数据权威性：手头的表结构文档已陈旧（字段扩展未维护、含废弃表），**以 `08` 快照的活元数据为准**，手文档仅作命名/含义参考。快照可由跳板机重跑 `harvest_stage2.py` 重新生成。
 
@@ -86,9 +61,13 @@
 3. **`HIS.LAB_RESULT` 约 1 亿行**，查询必须用 `TEST_NO` 子查询限定，禁止全表扫描；大表（>1000 万行）只采元数据。
 4. **`HIS.OPERATION.OPER_ID` 全为 NULL**，手术主从关联改用 `SM.MED_OPERATION_NAME`。
 5. **`HIS.EXAM_MASTER.EXAM_CLASS` 存中文**（`'CT'`/`'磁共振'`），不是字典内码——过滤按中文，不要 join 字典。
-6. `EXAM_REPORT` 无 `PATIENT_ID`，必须经 `EXAM_NO` 关联 `EXAM_MASTER`。
-7. HIS 万能主键：`PATIENT_ID + VISIT_ID`（住院）/ `OUTPATIENT_NUM`（门诊）；检验 `TEST_NO`、检查 `EXAM_NO`。
-8. 跨库捷径：前置机已建 DBLINK `sjzx` 指向源 ODS，可 `SELECT ... FROM V_EMR_xxx@sjzx`。
+6. **字段值域禁止猜测，取数前必须先查值域知识库**（149 已落地）：优先平台 `GET /api/v1/ai/system-context`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱）；平台不可达读 `开发起步包/数据资产_资产包/value_domains.json`（超 max_age_days=7 须提示重导）；最后读 `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。三处均无 → SQL 注释【值域待确认：…】禁止假设。关键口径：
+   - 离院方式 `PAT_VISIT.DISCHARGE_DISPOSITION`：**4=非医嘱离院、5=死亡**（JHEMR `report.r_pat_visit` 交叉验证；`COMM.DISCHARGE_DISPOSITION_DICT` 是治疗结果字典，不可混用；`DEATH_DATE_TIME` 源端不填）。
+   - 手术急诊标志 `OPERATION.OPERATION_EMER_INDICATOR`：**2=急诊手术**（1=择期）。
+   - 病理数据在 ODS `BL` schema，不在 EXAM；门诊疾病谱用 `OUTPDOCT.OUTP_MR_DIAG_DESC`；麻醉台数用 `MED_OPERATION_MASTER`+`OPER_STATUS>=35`。
+7. `EXAM_REPORT` 无 `PATIENT_ID`，必须经 `EXAM_NO` 关联 `EXAM_MASTER`。
+8. HIS 万能主键：`PATIENT_ID + VISIT_ID`（住院）/ `OUTPATIENT_NUM`（门诊）；检验 `TEST_NO`、检查 `EXAM_NO`。
+9. 跨库捷径：前置机已建 DBLINK `sjzx` 指向源 ODS，可 `SELECT ... FROM V_EMR_xxx@sjzx`。
 
 ## 值域映射模式（写视图时统一写法）
 
@@ -121,6 +100,7 @@ nvl((SELECT zd.国标编码 FROM cda.cda_dictionary zd
   - **孤儿文件**（实际存在、清单未登记）：补登记；若判断为废弃则迁入 `_archive/`。
   - **幽灵条目**（清单有、文件不存在）：修正或删除该行。
 - 发现不一致**先修正目录**，再开始正文工作。
+- 涉及跨仓库能力/枢纽/吸收通道变更时，检查并更新《三仓库互通地图.md》（根目录，L2 单一权威源，含口径快照日期）。
 
 ### 2. 新增文档（强制 4 步，缺一不可）
 1. **编号**：续用当前最大编号 +1（查清单尾部），前缀 `NN_中文名.md`；配套结果文件用同号 `_结果.json`。

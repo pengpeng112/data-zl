@@ -261,6 +261,8 @@ import OverviewPanel from './components/OverviewPanel.vue';
 import PushWizard from './components/PushWizard.vue';
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
+import { authHintForStatus } from "@/utils/statusLabels";
 import {
   getMedicalCodeSets,
   upsertMedicalCodeSet,
@@ -297,13 +299,9 @@ async function loadCodeSets() {
   authHint.value = "";
   try {
     const res = await getMedicalCodeSets({ category_code: categoryCode.value });
-    codeSets.value = ((res as any).data || []).map(normalizeCodeSet);
+    codeSets.value = (res.data || []).map(normalizeCodeSet);
   } catch (error: any) {
-    if (error?.response?.status === 401) {
-      authHint.value = "接口未授权：请先登录并使用部署脚本生成的 Token。";
-    } else if (error?.response?.status === 403) {
-      authHint.value = "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
-    }
+    authHint.value = authHintForStatus(error?.response?.status) || "";
   } finally {
     loading.value = false;
   }
@@ -313,8 +311,10 @@ async function loadItems(row: any) {
   row._itemsLoading = true;
   try {
     const res = await getMedicalItems(row.code_set_code, { page: row._itemsPage, page_size: row._itemsPageSize });
-    row._items = (res as any).data.items || [];
-    row._itemsTotal = (res as any).data.total || 0;
+    row._items = res.data.items || [];
+    row._itemsTotal = res.data.total || 0;
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "编码项加载失败"));
   } finally {
     row._itemsLoading = false;
   }
@@ -379,6 +379,8 @@ async function saveCodeSet() {
     ElMessage.success(codeSetDialog.isEdit ? "编辑成功" : "新增成功");
     codeSetDialog.visible = false;
     loadCodeSets();
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "编码体系保存失败"));
   } finally {
     codeSetDialog.submitting = false;
   }
@@ -429,6 +431,8 @@ async function saveItem() {
     itemDialog.visible = false;
     const row = codeSets.value.find(item => item.code_set_code === itemDialog.form.code_set_code);
     if (row) loadItems(row);
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "编码项保存失败"));
   } finally {
     itemDialog.submitting = false;
   }
@@ -462,7 +466,7 @@ function parseItemCodes() {
 async function loadPushConfig() {
   try {
     const res = await getMedicalPushConfig();
-    const data = (res as any).data || {};
+    const data = (res.data || {}) as { push_enabled?: boolean; default_hospital_no?: string };
     pushConfig.push_enabled = !!data.push_enabled;
     if (data.default_hospital_no) pushForm.hospital_no = data.default_hospital_no;
   } catch {
@@ -485,11 +489,13 @@ async function runPushPlan() {
       hospital_no: pushForm.hospital_no,
       include_jhdict: true
     });
-    const data = (res as any).data;
+    const data = res.data;
     pushSummary.value = data;
     pushActions.value = data.actions || [];
     lastResultJson.value = JSON.stringify(data.summary || {}, null, 2);
     ElMessage.success(`已生成 ${data.action_count || 0} 条动作`);
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "下发计划生成失败"));
   } finally {
     pushLoading.value = false;
   }
@@ -503,8 +509,10 @@ async function runPushExport() {
       item_codes: parseItemCodes().length ? parseItemCodes() : null,
       max_items: pushForm.max_items
     });
-    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success("导出预览完成");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "导出预览失败"));
   } finally {
     pushLoading.value = false;
   }
@@ -514,8 +522,10 @@ async function dryRunOne(row: any) {
   pushLoading.value = true;
   try {
     const res = await applyMedicalPushOne({ action: row, mode: "dry_run" });
-    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success("dry-run 完成");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "dry-run 执行失败"));
   } finally {
     pushLoading.value = false;
   }
@@ -546,8 +556,10 @@ async function applyOne(row: any) {
       his_source_code: "his_source_10_10_10_15",
       jhemr_source_code: "jhemr_vastbase_10_10_8_177"
     });
-    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success("apply 已提交");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "apply 执行失败"));
   } finally {
     pushLoading.value = false;
   }
@@ -578,8 +590,10 @@ async function stopOne(mode: "dry_run" | "apply") {
       his_source_code: "his_source_10_10_10_15",
       jhemr_source_code: "jhemr_vastbase_10_10_8_177"
     });
-    lastResultJson.value = JSON.stringify((res as any).data, null, 2);
+    lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success(mode === "dry_run" ? "停用 dry-run 完成" : "停用 apply 已提交");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "停用操作失败"));
   } finally {
     pushLoading.value = false;
   }

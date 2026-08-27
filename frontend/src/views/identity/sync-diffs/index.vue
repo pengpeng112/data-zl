@@ -172,8 +172,8 @@
       </el-drawer>
 
       <el-pagination
-        v-model:current-page="params.page"
-        v-model:page-size="params.page_size"
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
         :total="total"
         layout="total, prev, pager, next, sizes"
         :page-sizes="[10, 20, 50, 100]"
@@ -279,6 +279,7 @@ import {
   syncHisIdentity,
   updateIdentitySyncDiff
 } from "@/api/identity";
+import { usePagedList } from "@/composables/usePagedList";
 import CheckIcon from "~icons/ri/checkbox-circle-line";
 import CollectIcon from "~icons/ri/download-cloud-2-line";
 import DiffIcon from "~icons/ri/git-branch-line";
@@ -286,9 +287,6 @@ import HisIcon from "~icons/ri/database-2-line";
 import IgnoreIcon from "~icons/ri/forbid-2-line";
 import OpenIcon from "~icons/ri/error-warning-line";
 
-const items = ref<any[]>([]);
-const total = ref(0);
-const loading = ref(false);
 const collectLoading = ref(false);
 const syncLoading = ref(false);
 const hisSyncLoading = ref(false);
@@ -305,7 +303,23 @@ const selectedDiffs = ref<any[]>([]);
 const selectedCrs = ref<any[]>([]);
 const batchLoading = ref(false);
 
-const params = reactive({ status: "open", diff_type: "" as string, page: 1, page_size: 20 });
+const params = reactive({ status: "open", diff_type: "" as string });
+// F6：分页五件套收敛到 usePagedList（含请求序号守卫与 catch 提示，E8/E7 语义）。
+const { items, total, page, pageSize, loading, loadData, doSearch } = usePagedList<
+  any,
+  { page: number; page_size: number; status?: string; diff_type?: string }
+>({
+  pageSize: 20,
+  errorText: "人员同步差异加载失败",
+  extraParams: () => ({
+    status: params.status || undefined,
+    diff_type: params.diff_type || undefined
+  }),
+  fetcher: async query => {
+    const res = await getSyncDiffs(query);
+    return { items: res.data.items ?? [], total: res.data.total ?? 0 };
+  }
+});
 const collectForm = reactive({
   source_code: "his_source_10_10_10_15",
   source_system: "HIS",
@@ -377,21 +391,6 @@ function crStatusTag(value: string): "success" | "warning" | "info" | "danger" {
   return "info";
 }
 
-async function loadData() {
-  loading.value = true;
-  try {
-    const res = await getSyncDiffs({
-      status: params.status || undefined,
-      diff_type: params.diff_type || undefined,
-      page: params.page,
-      page_size: params.page_size
-    });
-    items.value = res.data.items ?? [];
-    total.value = res.data.total ?? 0;
-  } finally {
-    loading.value = false;
-  }
-}
 async function loadChangeRequests() {
   crLoading.value = true;
   try {
@@ -403,13 +402,8 @@ async function loadChangeRequests() {
     crLoading.value = false;
   }
 }
-function doSearch() {
-  params.page = 1;
-  loadData();
-}
 function onPageSizeChange() {
-  params.page = 1;
-  loadData();
+  loadData(1);
 }
 async function doCollect() {
   collectLoading.value = true;

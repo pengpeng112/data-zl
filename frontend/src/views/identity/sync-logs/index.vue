@@ -148,8 +148,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import ReStatCard from "@/components/ReStatCard/index.vue";
-import { http } from "@/utils/http";
+import { getIdentitySyncRun, getIdentitySyncRuns } from "@/api/identity";
 import { formatDateTime, formatDuration, syncStatusTag } from "@/views/identity/sync-logs/syncLogLabels";
 
 interface SubtaskItem {
@@ -206,21 +207,23 @@ async function loadRuns(nextPage?: number) {
   if (nextPage) page.value = nextPage;
   loading.value = true;
   try {
-    const res = await http.request<any>("get", "/api/v1/identity-sync/runs", {
-      params: {
-        page: page.value,
-        page_size: pageSize,
-        status: statusFilter.value || undefined,
-        emp_no: empNoFilter.value.trim() || undefined
-      }
+    const res = await getIdentitySyncRuns({
+      page: page.value,
+      page_size: pageSize,
+      status: statusFilter.value || undefined,
+      emp_no: empNoFilter.value.trim() || undefined
     });
-    const payload = res.data || {};
+    const payload = (res.data || {}) as {
+      items?: any[];
+      total?: number;
+      overview?: { open_alerts?: number; circuit_breakers?: Record<string, unknown> };
+    };
     runs.value = payload.items || [];
     total.value = payload.total || 0;
     overview.value = payload.overview || { open_alerts: 0, circuit_breakers: {} };
   } catch (error: any) {
     runs.value = [];
-    ElMessage.error(error?.response?.data?.detail || "同步日志加载失败");
+    ElMessage.error(extractErrorDetail(error, "同步日志加载失败"));
   } finally {
     loading.value = false;
   }
@@ -228,11 +231,11 @@ async function loadRuns(nextPage?: number) {
 
 async function openRun(row: RunItem) {
   try {
-    const res = await http.request<any>("get", `/api/v1/identity-sync/runs/${row.run_id}`);
+    const res = await getIdentitySyncRun(row.run_id);
     detail.value = res.data;
     drawerVisible.value = true;
   } catch (error: any) {
-    ElMessage.error(error?.response?.data?.detail || "运行详情加载失败");
+    ElMessage.error(extractErrorDetail(error, "运行详情加载失败"));
   }
 }
 

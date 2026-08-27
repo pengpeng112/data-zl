@@ -289,3 +289,41 @@ def test_readonly_sql_safety_ignores_literals_but_rejects_real_extra_statement()
     assert unsafe["valid"] is False
     assert "禁止多语句" in unsafe["errors"]
     assert "禁止关键字: DELETE" in unsafe["errors"]
+
+
+def test_col_null_comment_rule_threshold_and_payload(db_session):
+    """A2 行为锁：SQL 下推后 null_rate>0.5 阈值与 metric/detail 口径不变。"""
+    from app.api.v1.quality import _run_rule_col_null_comment
+    from app.models.asset import AssetColumn
+
+    def _col(table: str, ordinal: int, name: str, comment: str | None):
+        return AssetColumn(
+            system_code="TEST_QC",
+            source_code="test_qc_source",
+            namespace_name=None,
+            schema_name="TEST_QC",
+            table_name=table,
+            column_id=ordinal,
+            column_name=name,
+            comment=comment,
+        )
+
+    db_session.add_all([
+        # rate = 2/3 ≈ 0.667 > 0.5 → 命中（NULL 与空串都算缺注释）。
+        _col("HIGH_NULL", 1, "A", None),
+        _col("HIGH_NULL", 2, "B", ""),
+        _col("HIGH_NULL", 3, "C", "有注释"),
+        # rate = 1/2 = 0.5，不大于 0.5 → 不命中（边界）。
+        _col("BOUNDARY", 1, "A", None),
+        _col("BOUNDARY", 2, "B", "有注释"),
+        # rate = 0 → 不命中。
+        _col("FULL", 1, "A", "注释A"),
+        _col("FULL", 2, "B", "注释B"),
+    ])
+    db_session.flush()
+
+    findings = [f for f in _run_rule_col_null_comment(db_session) if f.system_code == "TEST_QC"]
+    assert [f.table_name for f in findings] == ["HIGH_NULL"]
+    assert findings[0].metric_value == "null_comment_rate=66.67% (2/3)"
+    assert findings[0].detail == {"total_columns": 3, "null_comments": 2, "ratio": 0.6667}
+    assert findings[0].target_ref == "TEST_QC.HIGH_NULL"

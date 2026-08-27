@@ -1,0 +1,117 @@
+• The user wants me to read review/round-1/方案.md only, and give a review. Let me read the file.I'm a read-only reviewer. I must read only review/round-1/方案.md (done), not other files under review/. I need to review the 方案 (which is itself a review plan for reviewing a prompt for 146 plan). Output 逐条【同意/反对/疑问+理由+风险】, each citing section numbers or quotes.
+
+  Note: I can't read 146 计划 itself (it's in 开发起步包/, not review/ — technically I could read it since the user only forbade other files under review/. But the user said "通读 review/round-1/方案.md，独立审查" and "不要读取 review/ 下其他任何文件". Reading 146 would help verify consistency. The 方案 §4 summarizes 146 constraints. The user asked for independent review based on the 方案 document. I could read the 146 plan to verify §4's claims — that's allowed (only review/ other files are forbidden). But maybe the intent is to review this 方案 document standalone. Reading 146 would strengthen the review of question "提示词是否覆盖 146 全部硬边界". However, the user's instruction is narrow: read 方案.md, review it. Reading the referenced 146 plan is reasonable diligence and not forbidden. But "独立审查" — independent review. I think reading the 146 plan would materially help judge §4 accuracy and the review questions. Yet the user might want a quick, focused review. Given ambiguity and auto mode (no asking), I'll do a light check: read the 146 plan to verify key constraints? The 方案 explicitly says "全文见 开发起步包/146_...". Reviewing consistency claims without the source is weaker. I'll read it — it's within the repo, not review/.
+
+  Actually, let me be careful about context budget. The 146 plan could be long. Let me check its size first, or just read it. I'll read it — worth it for a substantive review.
+
+  Let me read the 146 file.411 F:/python/数据资产/开发起步包/146_界面完善详细执行计划_复核版.md
+Now I have both documents. The task: review 方案.md (the round-1 review plan) 逐条 — that is, review the 方案 document itself. The 方案's goal is to review the draft prompt (§3) against the 146 plan, answering the 6 review questions in §5, and produce a revised prompt meeting §6 acceptance criteria.
+
+  I should review 方案.md section by section: is it sound, complete, correct? Note interesting fact: 146 §10 already contains a nearly identical prompt. The user's draft (方案 §3) differs slightly from 146 §10. A good review point: 方案 doesn't mention that 146 §10 already ships an official prompt — the review should diff draft vs §10.
+
+  Key observations:
+
+  §1 目标: reasonable. But scope: it says "产出一份修订版执行提示词" — fine.
+
+  §2 边界: 
+  - "审查产物仅入 review/round-1/，不入库" — conflicts? AGENTS.md requires README registration for new docs... but review/ is outside 开发起步包, so fine.
+  - Mentions 144 uncommitted changes in working tree with migration chain — good context.
+
+  §3 被审文本: full prompt draft. Compare with 146 §10: the draft adds explicit items like "不得删除 /asset/relations 等兼容路径", "不信任请求体中的 operator", "对敏感字段脱敏" (146 §10 says 脱敏 too), "没有合法隔离库时标记 BLOCKED_TEST_DB" (146 §10 has similar), and the 6-item report vs §10's "最终只汇报：28 组完成矩阵、变更文件、测试原始结果、真实 BLOCKED、未授权而未执行的生产/Git 动作，以及安全边界执行情况" — draft adds "业务源库写入为 0 的安全确认". Draft omits 146 §10's mention of "先做 README 目录自检"? No — draft has "先执行目录自检和 git dirty 基线检查". Draft §3 includes "重点遵守 146 已确定的契约" list matching §10.
+
+  Differences draft vs 146 §10 worth flagging:
+  - Draft adds E-path "不得删除 /asset/relations 等兼容路径" — but §5 question 2 already flags potential conflict with E1's redirect改造. Actually E1 says keep URL hidden with redirect — no conflict really; question 2 frames it as a question.
+  - Draft drops "README 目录自检"? No, it has "先执行目录自检" — ambiguous: 146 S0.1 says read 5 docs; AGENTS.md requires 目录自检. OK.
+
+  §4 摘要: summarizes 146 constraints. Check accuracy:
+  - "§0.1 用户裁减" summary — accurate-ish. It says "既有 confirm 可一对一组件化但不增加步骤" ✓.
+  - "§1 S0：读五份文档" — 146 S0.1 lists AGENTS.md, README, 55, 146, 144 S8/前端 — five ✓. "迁移前证明 APP_TEST_DB_URL 指向隔离库" ✓.
+  - §7 summary ✓. §8 高冲突文件 list matches ✓. §9 rg 门禁 ✓.
+  - Missing from §4 summary: 146 §9.2's 最终命令 includes `pnpm install` before vitest — draft prompt §3 doesn't mention pnpm install; AGENTS.md acceptance commands require pnpm. Minor.
+  - §4 omits 146 §0.1 item 3's detail that Token 模态框/prompt→表单 保留 — actually §4 does mention it ("asset/admin Token 一次性模态框与 prompt→表单保留"). ✓
+  - §4 omits: D5 权限闭环细节, E 组 11 项细节 — but it's a summary, acceptable; though §6 requires "所有 §0.1/0.2/§7/§8/§9 约束显式或引用式进入提示词" — summary doesn't need everything.
+
+  Gaps in the 方案 itself I should flag:
+
+  1. 方案未指出：146 §10 已经内置了一份执行提示词；§3 草稿与 §10 高度相似但有差异。复核应明确以 §10 为基线做 diff，避免修订版与计划内置版本并存造成"哪个为准"的歧义。验收标准 §6 也没提"与 146 §10 的关系"（是替换 §10 文本还是仅外部使用？）。风险：两个版本漂移。
+
+  2. §5 问题 2 提到 "兼容路径的'不得删除'与 E1 的 redirect 改造" 可能矛盾 — 实际上 146 E1 明确 "/asset/relations 保留隐藏兼容路由，使用函数式 redirect"，二者不矛盾；但草稿 §3 写 "不得删除 /asset/relations 等兼容路径" 可能被执行 AI 误读为"不得改造为 redirect"。方案把这个问题留给评审是对的，但方案应给出倾向性判断。
+
+  3. §6 验收标准要求 "含 alembic down_revision 纪律" — 这是方案新增的、超出 146 正文的要求（146 只要求手写迁移、不用 autogenerate——来自 AGENTS.md 代码约束 #4）。down_revision 纪律其实源自 AGENTS.md "Alembic 手写" 和迁移链 aa11bb22cc33→g7b8c9d0e1f2 的现状，合理，但方案 §5 问题 1 问"是否覆盖 146 全部硬边界"时，应注意区分"146 正文"与"AGENTS.md 仓库约束"两个来源。风险：若修订版提示词引入 146 没有的新要求，需确认不与 §6 末条"不引入任何与用户裁减（§0.1）冲突的新要求"冲突——down_revision 不冲突，OK。
+
+  4. §6 "最终汇报六项可判定" — 草稿 §3 的六项中 "业务源库写入为 0 的安全确认" 如何证明？执行 AI 自证"零写入"不可独立验证（没有审计日志可查）。方案 §5 问题 4 已触及"业务源库零连接的证明口径"，好。可判定性弱，属于疑问。
+
+  5. §3 草稿缺失点（方案应在修订版中补，但方案自身未列出检查清单）：
+     - 草稿未提 "pnpm install" 前置（146 §9.2 有）。
+     - 草稿未提 146 §8 "单一 AI 执行 / 子代理只允许只读审查或互不重叠测试" —— 草稿完全没有子代理约束！方案 §4 摘要引用了 §8 高冲突文件清单，但 §5 的 6 个问题没有任何一个显式问"子代理纪律是否进入提示词"。而本仓库 AGENTS.md 又鼓励主 AI + Luna 子代理协作——这正是一个真实的冲突点：146 §8 说"本计划由一个 AI 一次执行，不再并行派多个修改者"，与 AGENTS.md 的协作策略存在张力。方案 §5 问题 2 问"提示词与 146 正文之间有无相互矛盾"但没问"提示词与 AGENTS.md 协作策略的矛盾"。这是方案覆盖面的一个缺口。重要！
+     - 草稿 §3 没有 "行号漂移按符号名定位"（146 S0.3）——小事。
+     - 草稿 §3 未提 rg 门禁具体条款（"视图无裸 http.request、无静默失败 catch、无新增 ElMessageBox.confirm"）——§6 验收标准要求 §9 约束进入提示词，草稿只说了"每组增加针对性测试"+最终命令，没有 rg 门禁。方案 §5 问题 1 能覆盖，但 §6 应更明确列出。
+     - 144 回归：§6 要求 "144 测试必须继续通过" ✓ 方案有这条。草稿 §3 有 "不得把未执行或既有失败写成 PASS" 和 144 兼容，但没明说 "144 测试必须继续通过" 作为门禁 — B4 验收里有。OK.
+
+  6. §2 "审查产物仅入 review/round-1/，不入库" — 与 AGENTS.md 文档管理规则的关系：review/ 不在 开发起步包/ 内，不需要 README 登记，自洽。同意。
+
+  7. §1 目标 "发现其中与仓库现状、146 计划、安全边界不一致或缺失之处" — 仓库现状的核对需要读实际代码（如验证 §4 摘要里"66 张被引用"之类的声明），方案没有说明复核时允许/需要读源码到什么程度。§2 说 "本轮只审'提示词与 146 计划'本身，不改任何应用代码" —— 不改代码，但读代码核对事实（如 query.view 权限、diff 接口行为）是否在做？§4 声称"14 项已核清"来自 146 §7 的转述。方案未区分"转述 146 结论"与"本轮独立验证"。疑问：本轮复核要不要抽查源码验证 146 §7 的裁决仍成立？如果不查，§1 的"与仓库现状不一致"就只能基于 146 自述。风险：146 自身若有过时点，复核会发现不了。但考虑成本，接受转述也可——方案应明示这一点。
+
+  8. §5 问题 3 "一次性 28 组长任务执行的工程风险（上下文耗尽、断点续跑、基线冻结）" — §6 对应要求 "含 S0 基线冻结与逐阶段执行记录/断点续跑机制" ✓ 一致。好。
+
+  9. §5 问题 5 "验收与汇报要求是否可判定" 与 §6 "最终汇报六项可判定" 一致 ✓。
+
+  10. 草稿 §3 "不得删除 /asset/queries、/asset/queries/accuracy、/asset/relations 等兼容路径" — "等"字开口，执行 AI 可能把其它路径也当作禁删，阻碍 A1 的 candidates redirect、E1 的菜单收敛（A1 是"保留 /asset/candidates 的隐藏兼容 redirect"，需要改路由）。方案 §5 问题 2 已涵盖一类矛盾，但 "等" 字的开放性与 A1/E1 的"改造路由"是更具体的冲突，值得点名。
+
+  11. 草稿 §3 "保留并加强表单校验" — "加强" 是草稿自拟词，146 §0.1.4 是 "必须实施"，无冲突，OK。
+
+  12. §6 验收标准 "与 146 正文零冲突" — 强表述，合理。但方案没有说明"冲突时以 146 和当前代码为准"（146 头部声明）如何传导给修订版提示词——草稿 §3 没有写"冲突时以 146 正文和当前代码为准"。遗漏点：修订版应加裁决顺序。方案未在 §5/§6 提出。
+
+  13. 方案未涉及：草稿要求 "一次性连续完成...不要停下来等待确认"，与执行 AI 遇到真实歧义（如 146 与代码冲突）时该怎么办没有出口。§5 问题 3 部分覆盖（断点续跑），但没有"升级/上报机制"。轻微。
+
+  14. 草稿 §3 的安全边界 "只修改 frontend、闭环必需的 backend/app、backend/tests、手写 Alembic migration，以及 README、55、146 三份权威文档" — 146 §0.2/范围还允许什么？146 范围一致 ✓。但 AGENTS.md 要求文档变更同步 README 目录——草稿已含。还有：seed/ 目录？C1 要求 "核对/补充权限...新增资源幂等" D5 "同步后端 require_permission、资源目录和默认角色" —— 权限种子可能在 backend/seed/，不在草稿允许范围内！草稿只允许 backend/app、backend/tests。146 D5 "已有资源不重复 seed，新增资源幂等" 暗示需要改 seed。这是一个真实的边界缺口：方案 §5 问题 1 应能捕获，但方案没有指出。让我快速确认 seed 位置 — backend/seed/ 存在于目录树。权限资源 seed 可能在 backend/app 内也可能在 seed/。不确定，但作为疑问提出合理。
+
+  实际上让我快速 grep 一下 seed 里的权限相关，确认这个点是否成立。只读操作，允许。
+
+  15. 方案 §6 "不引入任何与用户裁减（§0.1）冲突的新要求" ✓ 好条款。
+
+  Let me quickly verify the seed/permissions question to make point 14 solid.
+
+• `backend/scripts/seed_platform_rbac.py` exists — so RBAC seed lives in `backend/scripts/`, which is NOT in the draft prompt's allowed write scope ("只修改 frontend、闭环必需的 backend/app、backend/tests、手写 Alembic migration"). 146 D5 says "同步后端 require_permission、资源目录和默认角色；已有资源不重复 seed，新增资源幂等" — if the resource catalog/seed is in backend/scripts/seed_platform_rbac.py, the draft's scope blocks it. Let me quickly check whether the resource catalog is inside app/ or scripts/.Good — RESOURCE_CATALOG and ROLE_DEFAULT_PERMISSIONS live in `backend/app/api/v1/permissions.py`, which IS within the draft's allowed scope (`backend/app`). So my concern #14 is mostly resolved: seed data definitions live in app/, the script just consumes them. The draft scope is adequate. I'll downgrade that to a minor note.
+
+  Now compose the review. The task: 逐条 review of 方案.md, each item 【同意/反对/疑问 + 理由 + 风险】, citing section numbers or quotes. "逐条" — go through the 方案's sections (1-6) and within them the specific claims/questions/criteria. Let me structure:
+
+  - §1 目标: 同意, with caveat.
+  - §2 边界: 同意 mostly; 疑问 about whether 本轮复核是否抽查源码验证 146 §7 裁决（§1 说"与仓库现状不一致"但 §2 只审文本）。
+  - §3 被审文本: several findings — this is the core. Items:
+    1. 反对/疑问: 方案未指出 146 §10 已内置几乎相同的官方提示词；修订版与 §10 的关系（替换/并存）未定义。风险：双版本漂移。
+    2. 草稿缺子代理纪律（146 §8 "本计划由一个 AI 一次执行，不再并行派多个修改者…子代理只允许只读审查或互不重叠的测试"）——草稿 §3 全文未提；方案 §4 摘要了 §8 高冲突文件但 §5 六问无一显式覆盖"子代理/多修改者纪律是否进提示词"。且与 AGENTS.md "主 AI + Luna 协作"策略存在张力，方案未识别。这是方案最大的覆盖缺口。风险：执行 AI 派多个子代理并行改 query-center/index.vue 等高冲突文件。
+    3. 草稿缺 rg 门禁条款（146 §9.1 "无裸 http.request、无静默失败 catch、无新增 ElMessageBox.confirm"）——§6 验收标准要求 §9 约束进提示词，方案 §5 问题 1 隐含覆盖但没点名；修订版必须显式列 rg 门禁。
+    4. 草稿缺 "冲突时以 146 正文和当前代码为准" 的裁决顺序（146 头部声明）。方案 §5 问题 2 问矛盾但没问裁决顺序。
+    5. 草稿 "不得删除 /asset/queries、/asset/queries/accuracy、/asset/relations 等兼容路径" 的 "等" 字开放，与 A1（candidates 路由改 redirect）、E1（/asset/relations 改函数式 redirect、菜单收敛）存在表述冲突——§5 问题 2 已触及，同意保留该问题，但建议在修订版直接写成"不得删除 URL；可按 A1/E1 改为隐藏 redirect"。
+    6. 草稿缺 146 S0.3 "行号漂移按符号名定位"、S0.4 "基线失败保留证据"。小项，可并入。
+    7. 草稿缺 pnpm install 前置（146 §9.2）；AGENTS.md 验收命令也含 pnpm install。小项。
+    8. 144 回归：草稿有 "144 测试继续通过"吗？草稿 §3 写 "不得把未执行或既有失败写成 PASS"、"必须在现有改动上增量开发"，但没把 "144 既有测试必须继续通过" 列为显式门禁。§6 验收标准有 "含 144 成果兼容与回归约束（144 测试必须继续通过）" ✓ 方案已要求。同意。
+  - §4 摘要准确性核对（我对照了 146 全文）：
+    - 同意：§4 对 §0.1/0.2/S0/§7/§8/§9 的转述与 146 原文一致，未发现失实。具体核对点：28 组计数 5+4+3+5+11 ✓（146 §0 表格）；高冲突文件清单 ✓；rg 门禁 ✓；最终命令 ✓。
+    - 疑问：§4 称 "§7 后端契约裁决矩阵（14 项已核清…）" — 我数 146 §7 表格为 14 行 ✓。
+    - 遗漏：§4 摘要未含 146 §0.1.3 的"既有 confirm 可一对一组件化但不增加步骤"——实际 §4 有 ("既有 confirm 可一对一组件化但不增加步骤") ✓。未含 E 阶段 11 组细节，但作为摘要可接受。
+  - §5 六问逐条：
+    1. 同意问题 1（覆盖性），但建议补充子代理纪律、裁决顺序两个具体检查点。
+    2. 同意问题 2，并给出我的判断：E1 与 "不得删除 /asset/relations" 不实质矛盾（E1 明确"保留隐藏兼容路由…函数式 redirect"），真正风险是草稿 "等兼容路径" 的开放表述与 A1/E1 的"改造"冲突。
+    3. 同意问题 3；§6 已有对应要求（S0 基线冻结、断点续跑），自洽。补充：草稿 "不要停下来等待确认" 无歧义上报出口，长任务遇 146 与代码冲突时无升级机制，问题 3 应覆盖。
+    4. 同意问题 4；补充我验证过的点：alembic 隔离库判定 146 S0.5 已明确 APP_TEST_DB_URL；草稿 §3 表述 "迁移只能在明确的隔离测试库验证；没有合法隔离库时标记 BLOCKED_TEST_DB" 与 146 一致 ✓。但 "业务源库写入为 0 的安全确认"（草稿汇报第 6 项）不可独立证明——执行 AI 自证零写入无审计佐证，§6 "可判定" 标准下此项弱。
+    5. 同意问题 5；28 组 DONE/BLOCKED 矩阵可判定；"测试原始结果" 可判定；但 "实际变更文件" 应与 S0 git 基线 diff 对照才闭环，方案可在修订版要求 "git status 前后对比"。
+    6. 同意问题 6；我的具体建议见上（§10 diff、子代理纪律、裁决顺序、rg 门禁、pnpm install、变更文件 diff 对照）。
+  - §6 验收标准：
+    - 同意第 1 条 "与 146 正文零冲突"。
+    - 疑问第 3 条 "含 alembic down_revision 纪律" — 146 正文只要求 "手写迁移、不用生成器覆盖"（§8 "禁止…用生成器覆盖手写迁移"），未提 down_revision 链纪律；该要求源自 AGENTS.md 代码约束 #4（手写 upgrade/downgrade）与 §2 所述迁移链现状（aa11bb22cc33→g7b8c9d0e1f2），合理但应注明来源，且确认不与 §6 第 6 条 "不引入与用户裁减冲突的新要求" 冲突（不冲突）。风险：执行 AI 若被要求接在 g7b8c9d0e1f2 之后，而 144 改动未提交，迁移链归属需明确。
+    - 同意其余条款。补充缺失：验收标准未要求 "修订版与 146 §10 的关系处理"（替换 §10 文本还是外部使用）——应加一条。
+  - 总体结论。
+
+  Also note: 方案 §2 说 "审查产物仅入 review/round-1/，不入库" — 同意；review/ 不在 开发起步包/ 目录管理范围内，不触发 README 登记义务，自洽。
+
+  One more check on 草稿 vs 146 §10 differences: 草稿汇报六项 vs §10 "最终只汇报：28 组完成矩阵、变更文件、测试原始结果、真实 BLOCKED、未授权而未执行的生产/Git 动作，以及安全边界执行情况" — 草稿六项与 §10 基本一致，第 6 项 "业务源库写入为 0" 是 §10 "安全边界执行情况" 的强化。OK.
+
+  Also: 草稿 §3 安全边界允许修改 "README、55、146 三份权威文档" — 146 §0.2/范围说 "不含部署和生产执行"，146 头部范围 "frontend/，以及闭环必需的 backend/app、backend/tests、手写 Alembic 迁移"。三份权威文档的修改权限是草稿新增的，146 §9.3.6 要求 "更新本文件执行记录、README 状态/更新记录和 55 末尾执行日志"，所以一致 ✓。
+
+  I verified seed: RESOURCE_CATALOG in backend/app/api/v1/permissions.py — within allowed scope ✓. Good, drop that concern, mention briefly as verified non-issue.
+
+  Format: 逐条 with 【同意/反对/疑问】. Keep organized by 方案 section. Write in Chinese. Cite quotes.
+
+To resume this session: kimi -r session_b9e04cac-15c7-47ac-9119-4b702f9b35a0

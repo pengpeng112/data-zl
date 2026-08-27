@@ -7,6 +7,7 @@ from app.core.db import SessionLocal
 from app.services.identity_sync_orchestrator import run_nightly_pipeline
 from app.services.identity_signature_sync import sync_missing_jhemr_signatures
 from app.services.identity_title_sync import sync_jhemr_education_titles_daily
+from app.services.identity_dept_sync import sync_jhemr_user_depts_daily
 from app.services.identity_sync_audit import AuditWriteError, finalize_run, upsert_subtask
 from app.services.identity_sync_status import normalize_status, redacted_summary, runner_exit_code, stdout_summary
 
@@ -56,6 +57,17 @@ def main() -> int:
         else:
             title_result = sync_jhemr_education_titles_daily(run_id=run_id, db=db)
 
+        # User-dept reconciliation (multi-department sync) follows the same
+        # required-subtask contract: group-only HIS changes never bump
+        # SYS_EMPLOYEE.MODIFIEDTIME, so this full-scope compare is the only
+        # channel that carries them to JHEMR user_dept.
+        if main_status == "skipped":
+            dept_result = {"status": "skipped", "reason": main_result.get("reason", "lock_held"), "failed": 0, "error_classes": {}}
+        elif main_status in {"failed", "misconfigured", "overdue"}:
+            dept_result = {"status": "skipped", "reason": "main_account_sync_not_successful", "failed": 0, "error_classes": {}}
+        else:
+            dept_result = sync_jhemr_user_depts_daily(run_id=run_id, db=db)
+
         if run_id:
             upsert_subtask(
                 db,
@@ -73,6 +85,19 @@ def main() -> int:
             upsert_subtask(
                 db,
                 run_id=run_id,
+                subtask_code="jhemr_user_dept_sync",
+                target_system="JHEMR",
+                status=normalize_status(dept_result.get("status")),
+                planned_count=int(dept_result.get("planned_count") or 0),
+                succeeded_count=int(dept_result.get("dept_rows_added") or 0) + int(dept_result.get("primary_updated") or 0),
+                skipped_count=int(dept_result.get("skipped_equal") or 0) + int(dept_result.get("skipped_no_user") or 0),
+                failed_count=int(dept_result.get("failed") or 0),
+                error_classes=dept_result.get("error_classes") or {},
+                report_summary=redacted_summary(dept_result),
+            )
+            upsert_subtask(
+                db,
+                run_id=run_id,
                 subtask_code="jhemr_education_title_sync",
                 target_system="JHEMR",
                 status=normalize_status(title_result.get("status")),
@@ -83,7 +108,7 @@ def main() -> int:
                 error_classes=title_result.get("error_classes") or {},
                 report_summary=redacted_summary(title_result),
             )
-        overall = finalize_run(db, run_id=run_id, main_result=main_result, signature_result=signature_result, title_result=title_result)
+        overall = finalize_run(db, run_id=run_id, main_result=main_result, signature_result=signature_result, title_result=title_result, dept_result=dept_result)
         result = stdout_summary(overall_status=overall, run_id=run_id, main=main_result, signature=signature_result, title=title_result)
         print(json.dumps(result, ensure_ascii=True, default=str))
         return runner_exit_code(overall)

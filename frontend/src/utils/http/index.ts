@@ -40,8 +40,11 @@ const defaultConfig: AxiosRequestConfig = {
     "X-Requested-With": "XMLHttpRequest"
   },
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
+  // E10：arrayFormat=repeat → ?a=1&a=2（FastAPI list 查询参数口径）；
+  // 此前 qs 默认 indices（a[0]=1&a[1]=2）后端解析不出数组。
   paramsSerializer: {
-    serialize: stringify as unknown as CustomParamsSerializer
+    serialize: ((params: Record<string, unknown>) =>
+      stringify(params, { arrayFormat: "repeat" })) as unknown as CustomParamsSerializer
   }
 };
 

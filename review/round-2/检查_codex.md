@@ -1,0 +1,5 @@
+- §3 P2（A4）：仅把 `truncated` 改为 `len(rows) > max_rows` 仍无法识别截断，因为当前 [query_runner.py:275-279](/F:/python/数据资产/backend/app/services/query_runner.py:275) 只 `fetchmany(safe_limit)`，必须同时取 `max_rows+1`，否则恰好满页和被截断结果都会被判为未截断。  
+- §3 P0（P0-1）：按正则提取 `%(name)s` 后转 tuple 仍可能被 SQL 注释、字符串字面量和重复占位符干扰，而现有测试仅覆盖简单逆序字典，不能证明 [db_connectors.py:570-574](/F:/python/数据资产/backend/app/services/db_connectors.py:570) 在真实 SQL 下不会错绑。  
+- §1 与 §3 P3（P3-8）：方案声称所有批次只改 `backend/、frontend/、tests/`，但 P3-8 还要修改根目录 `.gitignore` 并删除 `dev.log/dev.err/*.db`，执行边界自相矛盾且存在误删用户文件风险。  
+- §3 P1（P1-4）：给写端点新增 `Depends` 后仅默认授予 `platform_admin`，无法覆盖现有调度器、服务账号或历史调用方，可能把原本依赖 [main.py](/F:/python/数据资产/backend/app/main.py) 前缀兜底的合法调用直接变成 403，方案没有逐调用方授权清单和回滚门禁。  
+- §3 P3（P3-5）：从 `RESOURCE_CATALOG` 删除“死权限码”却明确不处理数据库已有角色授权行，会留下目录与持久化权限不一致的孤儿记录，且可能被后续 seed 或权限查询重新带回，不能仅靠 grep 代码引用证明清理安全。

@@ -24,6 +24,13 @@ compatibility: 需要能够读取当前仓库文件；可选调用平台只读 A
 
 不要把 `_archive/` 文档作为当前依据。文档与活元数据冲突时，以当前平台目录或 `08_数据中心元数据快照.json` 为准；关系是否可用于正式 SQL，则以已验证关系和治理口径为准。
 
+## 字段值域硬规则（149 值域知识库，强制）
+
+- 涉及编码/状态/类型/阈值/字典类字段（如 `SM.MED_OPERATION_MASTER.OPER_STATUS`（>=35 完成口径、-80 取消须排除）、镜像 HIS 表的离院方式/急诊标志/诊断类别字段）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
+- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=DATA_CENTER` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+
 ## 工作流程
 
 ### 1. 收敛需求
@@ -157,6 +164,11 @@ python ..\.agents\skills\ods-readonly-sql\scripts\run_ods_readonly.py `
 - 数据库方言：Oracle 11g
 - 使用 Owner/对象：
 - 时间口径与过滤条件：
+
+## 库位双轨警示（158 号新HIS 逆向实证）
+
+- `SYS_EMPLOYEE`：ODS 侧 = `COMM.SYS_EMPLOYEE`（平台元数据核验存在）；凡科新HIS 侧 = 其 masterdb 裸名同名表（两套并行数据）。跨系统对账/人员取数必须带 owner（ODS 用 COMM）并注明 source，禁止裸表名导致串库。
+- 同类双轨风险表：`PAT_VISIT`（ODS/HIS 源库 vs 新HIS HisRead 直连）——凡引用老 HIS 表的查询资产，标注来源 source_code（对应平台 table API 的 source_code 参数，146 E5）。
 
 ## 表关系依据
 

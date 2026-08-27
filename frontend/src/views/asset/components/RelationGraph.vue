@@ -9,7 +9,17 @@
       <span class="legend-item"><i class="node-dot center" />定位/高亮节点</span>
     </div>
 
-    <div ref="viewportEl" class="graph-viewport" :style="{ height }" @wheel.prevent="onWheel">
+    <div
+      ref="viewportEl"
+      class="graph-viewport"
+      :class="{ 'is-panning': panning.active }"
+      :style="{ height }"
+      @wheel.prevent="onWheel"
+      @pointerdown="onPanStart"
+      @pointermove="onPanMove"
+      @pointerup="onPanEnd"
+      @pointercancel="onPanEnd"
+    >
       <svg class="graph-svg" :viewBox="viewBox" role="img" aria-label="数据资产关系图谱">
         <defs>
           <marker id="arrow-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -350,91 +360,6 @@ function buildRadial(nodes: any[], edges: any[]) {
   return materializeLayout(nodes, edges, positions, [], width, height);
 }
 
-/**
- * Neo4j 风格力导向布局：模拟物理排斥力 + 弹簧吸引力，节点自然散布。
- * 简化版 d3-force：多次迭代直到收敛。
- */
-function buildForce(nodes: any[], edges: any[]) {
-  const width = 1200;
-  const height = 800;
-  const cx = width / 2;
-  const cy = height / 2;
-  const n = nodes.length;
-  if (n === 0) return materializeLayout(nodes, edges, new Map(), [], width, height);
-
-  // 初始位置：圆环散布（避免重叠起点）
-  const pos = new Map<string, { x: number; y: number; vx: number; vy: number }>();
-  nodes.forEach((node, i) => {
-    const angle = (Math.PI * 2 * i) / Math.max(n, 1);
-    const r = 80 + Math.random() * 60;
-    pos.set(node.id, { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, vx: 0, vy: 0 });
-  });
-
-  // 边的目标距离（弹簧自然长度）
-  const linkDist = 180;
-  const iterations = 220;
-
-  for (let iter = 0; iter < iterations; iter++) {
-    const alpha = 1 - iter / iterations; // 降温
-
-    // 排斥力（所有节点对）
-    for (let i = 0; i < n; i++) {
-      const a = pos.get(nodes[i].id)!;
-      for (let j = i + 1; j < n; j++) {
-        const b = pos.get(nodes[j].id)!;
-        let dx = a.x - b.x;
-        let dy = a.y - b.y;
-        let dist2 = dx * dx + dy * dy;
-        if (dist2 < 1) { dist2 = 1; dx = Math.random(); dy = Math.random(); }
-        const dist = Math.sqrt(dist2);
-        const force = 6500 / dist2; // 库仑式排斥
-        const fx = (dx / dist) * force * alpha;
-        const fy = (dy / dist) * force * alpha;
-        a.vx += fx; a.vy += fy;
-        b.vx -= fx; b.vy -= fy;
-      }
-    }
-
-    // 弹簧吸引力（有边的节点对）
-    edges.forEach(edge => {
-      const s = pos.get(edge.source);
-      const t = pos.get(edge.target);
-      if (!s || !t) return;
-      let dx = t.x - s.x;
-      let dy = t.y - s.y;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const diff = dist - linkDist;
-      const force = diff * 0.04 * alpha;
-      const fx = (dx / dist) * force;
-      const fy = (dy / dist) * force;
-      s.vx += fx; s.vy += fy;
-      t.vx -= fx; t.vy -= fy;
-    });
-
-    // 中心引力（防止节点飞太远）
-    nodes.forEach(node => {
-      const p = pos.get(node.id)!;
-      p.vx += (cx - p.x) * 0.008 * alpha;
-      p.vy += (cy - p.y) * 0.008 * alpha;
-    });
-
-    // 应用速度 + 阻尼 + 边界
-    nodes.forEach(node => {
-      const p = pos.get(node.id)!;
-      p.x += Math.max(-30, Math.min(30, p.vx)) * 0.6;
-      p.y += Math.max(-30, Math.min(30, p.vy)) * 0.6;
-      p.vx *= 0.35;
-      p.vy *= 0.35;
-      p.x = Math.max(80, Math.min(width - 80, p.x));
-      p.y = Math.max(70, Math.min(height - 70, p.y));
-    });
-  }
-
-  const positions = new Map<string, { x: number; y: number }>();
-  pos.forEach((p, id) => positions.set(id, { x: p.x, y: p.y }));
-  return materializeLayout(nodes, edges, positions, [], width, height);
-}
-
 function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { x: number; y: number }>, bands: LayoutBand[], width: number, height: number) {
   // 度数（关联边数）用于圆点大小：枢纽表更醒目（与 G6 版一致）
   const degreeMap = new Map<string, number>();
@@ -510,12 +435,41 @@ const layout = computed(() => {
   if (props.layoutMode === "grouped") return buildGrouped(data.nodes, data.edges);
   if (props.layoutMode === "radial") return buildRadial(data.nodes, data.edges);
   if (props.layoutMode === "hierarchy") return buildHierarchy(data.nodes, data.edges);
-  return buildCircular(data.nodes, data.edges);
+  return buildLayered(data.nodes, data.edges);
 });
 
 function onWheel(event: WheelEvent) {
   const next = zoom.value + (event.deltaY > 0 ? -0.08 : 0.08);
   zoom.value = Math.max(0.45, Math.min(1.8, next));
+}
+
+// 146 E2：画布内 pointer pan（空白处拖拽平移，不拦截节点/边点击）
+const panning = ref({ active: false, startX: 0, startY: 0, baseX: 0, baseY: 0 });
+
+function onPanStart(event: PointerEvent) {
+  if (event.button !== 0) return;
+  const target = event.target as HTMLElement;
+  if (target.closest(".node-layer, .edge-layer, .group-band")) return;
+  panning.value = {
+    active: true,
+    startX: event.clientX,
+    startY: event.clientY,
+    baseX: pan.value.x,
+    baseY: pan.value.y
+  };
+  (event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId);
+}
+
+function onPanMove(event: PointerEvent) {
+  if (!panning.value.active) return;
+  pan.value = {
+    x: panning.value.baseX + (event.clientX - panning.value.startX),
+    y: panning.value.baseY + (event.clientY - panning.value.startY)
+  };
+}
+
+function onPanEnd() {
+  panning.value.active = false;
 }
 
 function emitNode(node: GraphNode) {
@@ -545,11 +499,16 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   width: 100%;
   min-height: 360px;
   overflow: auto;
-  cursor: default;
+  cursor: grab;
   /* 130p2：Neo4j 式点阵画布 */
   background-color: #fbfcfe;
   background-image: radial-gradient(circle, #ccd5e1 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+.graph-viewport.is-panning {
+  cursor: grabbing;
+  user-select: none;
 }
 
 .graph-svg {

@@ -16,14 +16,6 @@ export const CANONICAL_SYSTEM_CODES = [
   "ULTRASOUND_ENDOSCOPY"
 ] as const;
 
-/** @deprecated 大类已废除；保留空映射避免旧 import 崩溃 */
-export const CATEGORY_ORDER: readonly string[] = [];
-
-/** @deprecated 禁止再展示「其他业务系统」等大类 */
-export const CATEGORY_LABEL: Record<string, string> = {
-  catalog_anomaly: "目录异常"
-};
-
 export function kindLabel(kind: TreeKind | string) {
   const labels: Record<string, string> = {
     system: "业务系统",

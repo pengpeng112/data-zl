@@ -164,9 +164,11 @@ def finalize_run(
     main_result: dict[str, Any],
     signature_result: dict[str, Any],
     title_result: dict[str, Any] | None = None,
+    dept_result: dict[str, Any] | None = None,
 ) -> str:
     """Write the combined fact and return the only supported overall status."""
     title_result = title_result or {"status": "success"}
+    dept_result = dept_result or {"status": "success"}
     overall = aggregate_overall_status(
         main_result.get("status"),
         signature_result.get("status"),
@@ -174,6 +176,8 @@ def finalize_run(
         lock_reason=main_result.get("reason"),
         title_status=title_result.get("status"),
         title_required=True,
+        dept_status=dept_result.get("status"),
+        dept_required=True,
     )
     if db is None or not run_id:
         return overall
