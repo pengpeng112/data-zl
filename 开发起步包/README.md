@@ -65,7 +65,7 @@
 | 优先级 | 文件 | 状态 | 用途 |
 |---:|---|---|---|
 | P0 | `55_系统未完成事项统一执行计划.md` | 进行中 | 唯一未完成事项总入口；多 AI 精准取数专项由 144 承接，应用收口由 130 承接，目录—血缘—质量协同完善由 138 补充 |
-| P0 | `153_平台一次性完善与bug修复执行计划.md` + 同号 `_执行报告.md`/`_结果.json` | 代码完成并已 Git 提交（2026-08-27）；待生产发布 | 平台代码一次性整改 P0–P7 全部执行完毕（multi-review round-2 定稿，25 项裁决）+ 主 AI 复核修复（ssh_jump 缩进/A4 采集夹紧/详情 SQL/表目录分页）；执行明细见同号执行报告；生产发布与 permissions/seed 另窗 |
+| P0 | `153_平台一次性完善与bug修复执行计划.md` + 同号 `_执行报告.md`/`_结果.json` | 已生产发布 p153（2026-08-27，`36b8743`） | 平台代码一次性整改 P0–P7 + 复核修复已上 8.83（镜像/前端 `p153-20260827224726`，permissions/seed 已补码）；149 值域种子仍未授权导入 |
 | P0 | `151_两字典表批量接入值域知识库与待核值域收口执行计划.md` | 已复核待执行 | PORTAL_SYS_DICT 族与 JHEMR EMR_FIRST_PAGE_ITEM_DICT 批量接入值域库（一律 pending）+ 149 待核值域收口；E2 圈定引用 152 E5 清单 |
 | P0 | `149_字段值域知识库与AI自动注入执行计划.md` | P1–P3 已执行（2026-08-25，隔离库）；生产导入待授权 | 值域知识库：证据一对多、conflict 检测、context/resolve+system-context 全量注入、propose-sql 补充注入、P2 种子 21 条、八技能路由+value_domains.json+148 导出视图 |
 | P0 | `152_JHEMR病案首页回写HIS链路关系与结构梳理执行计划.md` / 同号 `_结果.json` | **已执行完成（2026-08-26）** | JHEMR 4 回写视图→SATRDA server_test→HIS MEDREC 六表链路 E1–E6：视图 DDL 零漂移、testdemo.pbd 22 条写库 SQL 全量提取（确认含 discharge_disposition）、4 张字段映射表+19 条值域候选（供 151 E2，TREAT_RESULT 双编码冲突最高优先）、8 条关系候选未入正式资产 |
@@ -209,6 +209,7 @@
 
 | 日期 | 操作 | 内容 |
 |---|---|---|
+| 2026-08-27 | 生产发布 p153（用户授权升级部署到服务器） | 8.83 后端镜像 `data-asset:p153-20260827224726`（基线 p144-149 + 本地 HEAD `36b8743` 的 app/alembic/scripts），前端 `current→p153-20260827224726`（previous 回指 p144-149-20260826）。发布前备份 `data_asset_pre_p153_20260827224716.dump`（SHA-256 前 16 位 66dce69210309237）。alembic 仍为 `b0c1d2e3f4a5`（本轮零新迁移）。permissions/seed 补码：+32 资源/+181 角色权限（quality_admin 含 ai.sql.execute，dict_admin 含 retry/reconcile，ai_user 不含 execute）。冒烟：health 200、OpenAPI 333、前端 index 资源 0 缺失、未授权 401、evil Origin 登录 403 CSRF。未导入 149 值域种子。业务源库零写入。回滚：镜像 deptsync3-20260827211250 + 前端 previous p144-149 + dump。 |
 | 2026-08-27 | 153 复核修复后提交 GitHub | 主 AI 只读复核后落地：修复 ssh_jump 远程脚本缩进（A4）、元数据采集夹紧探针行、查询详情默认对 full_read 用户返回 SQL、表目录树点击/改页大小重置第 1 页、B2 无权限掩码测试。随后将 144/146/149/153/156 等工作区改动提交并推送 origin/master。 |
 | 2026-08-27 | 158 号建议落地（感控视图入技能/双轨警示/join 候选） | 活库列级核验 FXHIS.V_EMR_* 感控视图族（5 视图+V_CRBREPORT，另发现每张均有 _copy1 备份副本）与 HISUSER.PLATE_EMR_PDF，沉淀进 hisuser-readonly-sql 技能；ods-readonly-sql 增库位双轨警示（SYS_EMPLOYEE/PAT_VISIT）；124 SQL 静态抽取 4 条 join 边入 relation_candidates.json（对端属未登记 masterdb，按跨系统待验证记录不进 draft）；值域正式入库待平台通道（149 红线）。 |
 | 2026-08-27 | 新增 158 号凡科新HIS SQL 字典与数据流核验 | 对 E:ancyhis（只读）执行 T1–T6：字符串堆 SQL 字典（124 条/52 表）、JHApi Refit 36 路由+base=192.168.102.3:8002 定案（回答嘉和 35 号文档待办#5）、519 实体→Table 特性精确映射、sjzc 活库交叉核验（5/6 通过，含新发现 FXHIS.V_EMR_* 感控视图族与 HISUSER.PLATE_EMR_PDF 可用）、值域候选待确认标注；新增 3 个无凭据工具（tools/fancyhis_*.py）；未运行 Host、未解密、未写任何源库。 |
