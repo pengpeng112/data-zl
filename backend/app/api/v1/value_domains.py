@@ -199,6 +199,117 @@ def list_value_domains(
     )
 
 
+@router.get("/export", summary="值域 CSV 导出（166 F6：列白名单+防注入+审计；先于 /{domain_id} 注册——B7）")
+def export_value_domains(
+    system_code: str | None = Query(None),
+    schema_name: str | None = Query(None),
+    table_name: str | None = Query(None),
+    column_name: str | None = Query(None),
+    code: str | None = Query(None),
+    domain_kind: str | None = Query(None),
+    status: str | None = Query(None, description="pending/confirmed/deprecated"),
+    include_conflicted: bool = Query(False, description="默认排除 conflicted（外发防未裁决口径扩散）"),
+    db: Session = Depends(get_db),
+    operator: str = Depends(require_permission("value_domain.read")),
+) -> Response:
+    """导出六硬约束（B1/B12）：显式权限码+审计行+时间/筛选标签文件名+公式注入转义+列白名单。"""
+    import csv
+    import io as _io
+    import re
+    from datetime import datetime, timezone as _tz
+
+    from fastapi.responses import StreamingResponse
+
+    from ...models.governance_base import GovernAuditLog as _Gal
+
+    # ⑤列白名单逐列常量（166 F6 定稿；不含 evidence/note 等富文本）
+    columns = (
+        "system_code", "schema_name", "table_name", "column_name", "code",
+        "meaning", "domain_kind", "scope_condition", "status", "version_of", "updated_at",
+    )
+    export_limit = 5000
+
+    stmt = select(AssetColumnValueDomain)
+    if system_code:
+        stmt = stmt.where(AssetColumnValueDomain.system_code == system_code)
+    if schema_name:
+        stmt = stmt.where(AssetColumnValueDomain.schema_name == schema_name)
+    if table_name:
+        stmt = stmt.where(AssetColumnValueDomain.table_name == table_name)
+    if column_name:
+        stmt = stmt.where(AssetColumnValueDomain.column_name == column_name)
+    if code:
+        stmt = stmt.where(AssetColumnValueDomain.code == code)
+    if domain_kind:
+        stmt = stmt.where(AssetColumnValueDomain.domain_kind == domain_kind)
+    if status:
+        stmt = stmt.where(AssetColumnValueDomain.status == status)
+    # ⑥外发口径：默认排除 conflicted（未裁决口径不外发扩散）
+    if not include_conflicted:
+        stmt = stmt.where(AssetColumnValueDomain.conflict_status != "conflicted")
+
+    rows = db.scalars(
+        stmt.order_by(AssetColumnValueDomain.updated_at.desc(), AssetColumnValueDomain.id.desc())
+        .limit(export_limit)
+    ).all()
+
+    def _cell(value: object) -> str:
+        if value is None:
+            return ""
+        text = str(value).replace("\r", " ").replace("\n", " ")
+        if text[:1] in ("=", "+", "-", "@"):
+            return f"'{text}"
+        return text
+
+    def _tag(label: str, value: str | None) -> str:
+        if not value:
+            return ""
+        safe = re.sub(r"[^A-Za-z0-9_-]", "", value)[:32]
+        return f"-{label}-{safe}" if safe else ""
+
+    buffer = _io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(columns)
+    for r in rows:
+        writer.writerow([
+            _cell(r.system_code), _cell(r.schema_name), _cell(r.table_name),
+            _cell(r.column_name), _cell(r.code), _cell(r.meaning),
+            _cell(r.domain_kind), _cell(r.scope_condition), _cell(r.status),
+            _cell(r.current_version_id), _cell(r.updated_at.isoformat() if r.updated_at else None),
+        ])
+
+    stamp = datetime.now(_tz.utc).strftime("%Y%m%d-%H%M%S")
+    filename = f"value-domains-{stamp}{_tag('status', status)}{_tag('sys', system_code)}.csv"
+    db.add(
+        _Gal(
+            module="value_domain",
+            entity_type="column_value_domain",
+            entity_ref="export",
+            action="export",
+            after_data={
+                "filters": {
+                    k: v for k, v in {
+                        "system_code": system_code, "schema_name": schema_name,
+                        "table_name": table_name, "column_name": column_name,
+                        "code": code, "domain_kind": domain_kind, "status": status,
+                        "include_conflicted": include_conflicted,
+                    }.items() if v is not None
+                },
+                "rows": len(rows),
+                "filename": filename,
+            },
+            operator=operator,
+        )
+    )
+    db.commit()
+    buffer.seek(0)
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
 @router.get("/{domain_id}", summary="值域详情（含全部证据）")
 def get_value_domain(
     domain_id: int,

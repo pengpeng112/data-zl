@@ -74,57 +74,60 @@ function fmtUnit(n: number | null | undefined): string | undefined {
 const kpis = computed<KpiItem[]>(() => {
   const d = dash.value;
   if (!d) {
+    // 146 E10（R5）：失败态细化——加载失败与加载中的 KPI 占位文案区分
+    const helper = loadError.value ? "加载失败，请点右上角刷新重试" : "加载中…";
+    const failTone = loadError.value ? ("danger" as const) : ("primary" as const);
     return [
       {
         label: "业务系统与数据资源",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
-        tone: "primary",
+        tone: failTone,
         icon: DatabaseIcon
       },
       {
         label: "资产表",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
-        tone: "accent",
+        tone: failTone,
         icon: TableIcon
       },
       {
         label: "字段资产",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
-        tone: "info",
+        tone: failTone,
         icon: FieldIcon
       },
       {
         label: "正式关系",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
-        tone: "primary",
+        tone: failTone,
         icon: RelationIcon
       },
       {
         label: "人员主档",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
-        tone: "accent",
+        tone: failTone,
         icon: UserIcon
       },
       {
         label: "待人工复核",
         value: "—",
-        helper: "加载中…",
-        trend: "…",
+        helper,
+        trend: loadError.value ? "失败" : "…",
         trendDirection: "flat",
         tone: "danger",
         icon: AlertIcon

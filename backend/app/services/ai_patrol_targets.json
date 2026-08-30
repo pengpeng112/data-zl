@@ -1,0 +1,61 @@
+{
+  "schema_version": "ai-patrol-targets/v1",
+  "generated_at": "2026-08-30T00:15:00+08:00",
+  "source": "platform_quality_run_49_readonly_snapshot",
+  "targets": [
+    {
+      "system_code": "DATA_CENTER",
+      "source_code": "ods_8_216",
+      "schema_name": "HIS",
+      "table_name": "PAT_VISIT",
+      "name_cn": "病人住院主记录",
+      "column_count": 268,
+      "issue_label": "字段登记异常 declared=268, actual=0；关系孤儿率 0.29%/0.55%",
+      "finding_ids": [12077, 12613, 12617],
+      "evidence": {
+        "rule_id": "TABLE_ZERO_COLUMNS",
+        "finding_id": 12077,
+        "metric_value": "declared=268, actual=0",
+        "captured_at": "2026-08-29T02:00:02.562464+08:00",
+        "data_as_of": "2026-08-29T02:00:06.860334+08:00",
+        "snapshot_version": "quality-run-49"
+      }
+    },
+    {
+      "system_code": "DATA_CENTER",
+      "source_code": "ods_sm",
+      "schema_name": "SM",
+      "table_name": "MED_OPERATION_MASTER",
+      "name_cn": "病人手术主记录",
+      "column_count": 147,
+      "issue_label": "字段登记异常 declared=147, actual=0；关系孤儿率 0.066%/0.19%",
+      "finding_ids": [11218, 12610, 12619],
+      "evidence": {
+        "rule_id": "TABLE_ZERO_COLUMNS",
+        "finding_id": 11218,
+        "metric_value": "declared=147, actual=0",
+        "captured_at": "2026-08-29T02:00:02.541265+08:00",
+        "data_as_of": "2026-08-29T02:00:06.860334+08:00",
+        "snapshot_version": "quality-run-49"
+      }
+    },
+    {
+      "system_code": "DATA_CENTER",
+      "source_code": "ods_ydhl",
+      "schema_name": "YDHL",
+      "table_name": "INPATIENTS",
+      "name_cn": "移动护理镜像区数据表",
+      "column_count": 134,
+      "issue_label": "字段登记异常 declared=134, actual=0；关系孤儿率 0.7%",
+      "finding_ids": [12580, 12612],
+      "evidence": {
+        "rule_id": "TABLE_ZERO_COLUMNS",
+        "finding_id": 12580,
+        "metric_value": "declared=134, actual=0",
+        "captured_at": "2026-08-29T02:00:02.574934+08:00",
+        "data_as_of": "2026-08-29T02:00:06.860334+08:00",
+        "snapshot_version": "quality-run-49"
+      }
+    }
+  ]
+}

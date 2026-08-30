@@ -104,7 +104,9 @@ def test_ai_execution_and_context_routes_permissions():
 
     # 执行类端点（新码）。
     assert route_permissions.get(("post", "/drafts/{draft_id}/execute")) == {"ai.sql.execute"}
-    assert route_permissions.get(("post", "/tool-execute")) == {"ai.sql.execute"}
+    # 161 P2-3（round-2 P8 裁决）：tool-execute 当前只分发只读工具，挂 ai.context.read；
+    # 未来新增真实执行类工具时随端点一并改回 ai.sql.execute。
+    assert route_permissions.get(("post", "/tool-execute")) == {"ai.context.read"}
     # 只读上下文端点（既有读码，禁止执行码套读接口）。
     assert route_permissions.get(("get", "/system-context")) == {"ai.context.read"}
     assert route_permissions.get(("post", "/export-context")) == {"ai.context.read"}
@@ -124,6 +126,25 @@ def test_ai_sql_execute_code_registered_and_granted():
     assert "ai.sql.execute" in ROLE_DEFAULT_PERMISSIONS["quality_admin"]
     # 执行码不得授予 ai_user（裁决 #8：锁死 AI 协作角色的直连执行）。
     assert "ai.sql.execute" not in ROLE_DEFAULT_PERMISSIONS["ai_user"]
+
+
+def test_probe_finding_manage_matrix_166():
+    """166 F7（A8）：probe.finding.manage 在目录+授予 platform_admin/quality_admin；
+    ai_user/asset_viewer 无 manage、无 value_domain.confirm（矩阵定稿实证）。"""
+    from app.api.v1.permissions import RESOURCE_CATALOG, ROLE_DEFAULT_PERMISSIONS
+
+    codes = {item["code"] for item in RESOURCE_CATALOG}
+    assert "probe.finding.manage" in codes
+    assert "probe.finding.manage" in ROLE_DEFAULT_PERMISSIONS["platform_admin"] or codes.issubset(
+        set(ROLE_DEFAULT_PERMISSIONS["platform_admin"])
+    )
+    assert "probe.finding.manage" in ROLE_DEFAULT_PERMISSIONS["quality_admin"]
+    for role in ("ai_user", "asset_viewer"):
+        assert "probe.finding.manage" not in ROLE_DEFAULT_PERMISSIONS[role]
+        assert "value_domain.confirm" not in ROLE_DEFAULT_PERMISSIONS[role]
+    # 探查域读码四角色保持 165 A8 口径
+    for role in ("platform_admin", "quality_admin", "ai_user", "asset_viewer"):
+        assert "probe.finding.read" in ROLE_DEFAULT_PERMISSIONS[role] or role == "platform_admin"
 
 
 def test_asset_editor_can_pass_recipe_module_gate():

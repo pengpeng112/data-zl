@@ -43,6 +43,17 @@ def blob_strings(ca_row) -> list[str]:
     return [m.group().decode("ascii", "replace") for m in ASCII_RUN.finditer(raw)]
 
 
+def normalize_route(value: str | None) -> str | None:
+    """Remove CustomAttribute blob marker bytes before a Refit route."""
+    if not value:
+        return None
+    slash = value.find("/")
+    if slash < 0:
+        return None
+    route = value[slash:].strip()
+    return route if re.match(r"^/[A-Za-z0-9_{}?&=./:-]+$", route) else None
+
+
 def main() -> int:
     pe = dnfile.dnPE(DLL)
 
@@ -95,7 +106,10 @@ def main() -> int:
 
         elif cname in HTTP_ATTR_NAMES:
             verb = cname.replace("Attribute", "")
-            route = next((s for s in strings if "/" in s or s.isalpha()), None)
+            route = next(
+                (normalized for s in strings if (normalized := normalize_route(s))),
+                None,
+            )
             if table == "MethodDef" and row_index in method_owner:
                 td_idx, ns, tname = method_owner[row_index]
                 entry = {

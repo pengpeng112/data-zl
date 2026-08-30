@@ -11,7 +11,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, relations, systems, tables, value_domains
+from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, probe, relations, systems, tables, value_domains
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -559,6 +559,7 @@ app.include_router(systems.router)
 app.include_router(recipes.router)
 # 149 P1b: 字段值域知识库（独立路由模块，不塞 tables.py）
 app.include_router(value_domains.router)
+app.include_router(probe.router)
 
 @app.get("/", summary="根")
 def root() -> dict[str, str]:

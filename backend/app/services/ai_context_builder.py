@@ -18,6 +18,10 @@ from typing import Any, Iterable
 CONTEXT_SCHEMA_VERSION = "ai-data-context/v1"
 DEFAULT_TTL_HOURS = 24
 DEFAULT_MAX_OBJECTS = 200
+AI_SQL_MAX_TABLES = 20
+AI_SQL_MAX_RELATIONS = 40
+AI_SQL_MAX_PAYLOAD_BYTES = 24 * 1024
+FORMAL_RELATION_STATUSES = {"validated", "A", "A_rechecked"}
 
 
 def is_ai_readable(obj: dict[str, Any]) -> bool:
@@ -100,6 +104,9 @@ def build_context_snapshot(
             "to_table": r.to_table,
             "validation_status": r.validation_status,
             "cardinality": r.cardinality,
+            "from_columns": r.from_columns,
+            "to_columns": r.to_columns,
+            "join_condition": r.join_condition,
         }
         for r in db.scalars(
             select(AssetRelation).where(AssetRelation.validation_status.in_(["validated", "A", "A_rechecked"])).limit(200)
@@ -232,6 +239,113 @@ def build_context_snapshot(
     )
     db.flush()
     return doc
+
+
+def _table_pair(value: str | None, schema_name: str | None = None, table_name: str | None = None) -> tuple[str, str] | None:
+    if schema_name and table_name:
+        return schema_name.upper(), table_name.upper()
+    parts = [part.strip().upper() for part in (value or "").split(".") if part.strip()]
+    return (parts[-2], parts[-1]) if len(parts) >= 2 else None
+
+
+def _column_list(value: str | None) -> list[str]:
+    return [part.strip().upper() for part in (value or "").replace("+", ",").split(",") if part.strip()]
+
+
+def build_ai_sql_context(
+    db,
+    *,
+    system_code: str,
+    selected_tables: list[str],
+    max_tables: int = AI_SQL_MAX_TABLES,
+    max_relations: int = AI_SQL_MAX_RELATIONS,
+    max_payload_bytes: int = AI_SQL_MAX_PAYLOAD_BYTES,
+) -> dict[str, Any]:
+    """Build a bounded, non-persisted SQL-authoring context from formal evidence only."""
+    from sqlalchemy import select
+    from ..models.asset import AssetRelation
+    from .query_validation_service import build_metadata_index
+    from .value_domain_service import confirmed_domains_for_injection
+
+    wanted = {_table_pair(value) for value in selected_tables}
+    wanted.discard(None)
+    if not wanted:
+        raise ValueError("at least one schema.table must be selected")
+    index = build_metadata_index(db)
+    eligible: list[tuple[Any, tuple[str, str], tuple[str, str], list[str], list[str]]] = []
+    for relation in db.scalars(select(AssetRelation)).all():
+        if relation.validation_status not in FORMAL_RELATION_STATUSES:
+            continue
+        if (relation.relation_layer or "formal") != "formal":
+            continue
+        if relation.from_system_code and relation.from_system_code != system_code:
+            continue
+        if relation.to_system_code and relation.to_system_code != system_code:
+            continue
+        left = _table_pair(relation.from_table, relation.from_schema_name, relation.from_table_name)
+        right = _table_pair(relation.to_table, relation.to_schema_name, relation.to_table_name)
+        from_columns, to_columns = _column_list(relation.from_columns), _column_list(relation.to_columns)
+        if not left or not right or not relation.join_condition or not from_columns or len(from_columns) != len(to_columns):
+            continue
+        left_meta, right_meta = index.get(left), index.get(right)
+        if not left_meta or not right_meta:
+            continue
+        if left_meta.get("system_code") != system_code or right_meta.get("system_code") != system_code:
+            continue
+        if not set(from_columns).issubset(left_meta["columns"]) or not set(to_columns).issubset(right_meta["columns"]):
+            continue
+        visit_key = {"PATIENT_ID", "VISIT_ID"}
+        if (visit_key & set(from_columns)) and not visit_key.issubset(from_columns):
+            continue
+        if (visit_key & set(to_columns)) and not visit_key.issubset(to_columns):
+            continue
+        eligible.append((relation, left, right, from_columns, to_columns))
+
+    closure = set(wanted)
+    for _, left, right, _, _ in eligible:
+        if left in wanted:
+            closure.add(right)
+        if right in wanted:
+            closure.add(left)
+    ordered_tables = sorted(wanted) + sorted(closure - wanted)
+    ordered_tables = ordered_tables[:max_tables]
+    allowed = set(ordered_tables)
+    relations = []
+    for relation, left, right, from_columns, to_columns in eligible:
+        if left not in allowed or right not in allowed:
+            continue
+        relations.append({
+            "id": relation.id,
+            "from_table": ".".join(left), "from_columns": from_columns,
+            "to_table": ".".join(right), "to_columns": to_columns,
+            "join_condition": relation.join_condition,
+            "cardinality": relation.cardinality,
+            "validation_status": relation.validation_status,
+        })
+        if len(relations) >= max_relations:
+            break
+    domains = [row for row in confirmed_domains_for_injection(db, system_code=system_code)
+               if ((row.get("schema_name") or "").upper(), (row.get("table_name") or "").upper()) in allowed]
+    result = {
+        "dialect": "oracle", "system_code": system_code,
+        "tables": [{"schema_name": pair[0], "table_name": pair[1], "columns": sorted(index[pair]["columns"])} for pair in ordered_tables if pair in index],
+        "relations": relations, "value_domains": domains,
+        "limits": {"tables": max_tables, "relations": max_relations, "payload_bytes": max_payload_bytes},
+        "truncated": len(closure) > max_tables or len(eligible) > max_relations,
+    }
+    while len(json.dumps(result, ensure_ascii=False).encode("utf-8")) > max_payload_bytes:
+        result["truncated"] = True
+        if result["value_domains"]:
+            result["value_domains"].pop()
+        elif len(result["relations"]) > 1:
+            result["relations"].pop()
+        elif result["tables"]:
+            result["tables"][-1]["columns"] = result["tables"][-1]["columns"][:20]
+            break
+        else:
+            break
+    result["payload_bytes"] = len(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+    return result
 
 
 def load_context_snapshot(db, context_id: str) -> dict[str, Any] | None:

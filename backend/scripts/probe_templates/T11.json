@@ -1,0 +1,42 @@
+{
+ "code": "T11",
+ "probe_type": "R-XSYS",
+ "name": "TREAT_RESULT 双编码语义一致率",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT TREAT_RESULT AS CODE, COUNT(*) AS CNT FROM MEDREC.DIAGNOSIS WHERE DIAGNOSIS_DATE >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND DIAGNOSIS_DATE < TO_DATE(:END_DATE,'YYYY-MM-DD') GROUP BY TREAT_RESULT"
+  },
+  {
+   "side": "b",
+   "source_code": "jhemr_vastbase_10_10_8_177",
+   "dialect": "vastbase",
+   "sql": "SELECT discharge_conditions AS CODE, COUNT(*) AS CNT FROM report.r_diagnosis_doct WHERE diagnosis_date >= CAST(:START_DATE AS date) AND diagnosis_date < CAST(:END_DATE AS date) GROUP BY discharge_conditions"
+  }
+ ],
+ "derive": {
+  "metric": "treat_result_bucket_max_diff_rate",
+  "formula": "max(|a_bucket-b_bucket|)/max(a_total,b_total)*100",
+  "unit": "%",
+  "compare": "by_code",
+  "mapping": {
+   "治愈": "1",
+   "好转": "2",
+   "未愈": "3",
+   "死亡": "4",
+   "其他": "9"
+  },
+  "unmapped_to": "metrics_summary"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 5.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "TREAT_RESULT HIS↔JHEMR 语义桶差异率（152 E5 映射）",
+ "large_table_guard": null
+}

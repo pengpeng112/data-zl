@@ -18,7 +18,15 @@
       </div>
     </section>
 
-    <div class="workspace">
+    <section class="engine-banner">
+      <div><span class="status-dot" :class="{ ready: hospitalReady }" /><strong>院内模型引擎</strong></div>
+      <span>{{ modelName }}</span><span>{{ aiStatus?.hospital_llm?.host || "地址未配置" }}</span>
+      <span>本会话成功 {{ aiStatus?.success_count ?? 0 }} 次</span>
+      <span class="quiet">只传平台规则、聚合指标和脱敏元数据</span>
+    </section>
+    <el-segmented v-model="activeView" class="view-switch" :options="[{ label: '问题分析', value: 'analysis' }, { label: 'AI 巡查演示', value: 'patrol' }]" />
+
+    <div v-if="activeView === 'analysis'" class="workspace">
       <el-card class="panel" shadow="never">
         <template #header>
           <div class="card-title">
@@ -27,20 +35,20 @@
           </div>
         </template>
         <div class="filters">
-          <el-select v-model="findingStatus" clearable placeholder="状态" @change="loadFindings">
+          <el-select v-model="findingStatus" clearable placeholder="状态" @change="() => { findingsPage = 1; loadFindings(); }">
             <el-option label="待处理" value="open" />
             <el-option label="已分派" value="assigned" />
             <el-option label="已确认" value="acknowledged" />
           </el-select>
-          <el-select v-model="findingSeverity" clearable placeholder="程度" @change="loadFindings">
+          <el-select v-model="findingSeverity" clearable placeholder="程度" @change="() => { findingsPage = 1; loadFindings(); }">
             <el-option label="严重" value="critical" />
             <el-option label="重要" value="major" />
             <el-option label="一般" value="minor" />
           </el-select>
-          <el-button @click="loadFindings">刷新</el-button>
+          <el-button @click="() => { findingsPage = 1; loadFindings(); }">刷新</el-button>
         </div>
-        <el-table v-loading="findingsLoading" :data="findings" row-key="id" size="small" height="420" @selection-change="onSelectionChange">
-          <el-table-column type="selection" width="44" :selectable="rowSelectable" />
+        <el-table v-loading="findingsLoading" :data="findings" row-key="id" size="small" height="380" @selection-change="onSelectionChange">
+          <el-table-column type="selection" width="44" :selectable="rowSelectable" reserve-selection />
           <el-table-column label="问题是什么" min-width="240">
             <template #default="{ row }">
               <div class="problem">{{ row.problem || row.rule_name || "质量问题" }}</div>
@@ -63,6 +71,15 @@
             <template #default="{ row }">{{ severityLabel(row.severity) }}</template>
           </el-table-column>
         </el-table>
+        <!-- 146 E3（R5）：待分析问题服务端分页；勾选经 reserve-selection 跨页保留 -->
+        <el-pagination
+          v-model:current-page="findingsPage"
+          class="pager"
+          :page-size="findingsPageSize"
+          :total="findingsTotal"
+          layout="total, prev, pager, next"
+          @current-change="loadFindings"
+        />
         <div class="analyze-bar">
           <el-button v-perms="'asset.quality.ai.analyze'" type="primary" :disabled="!selectedFindingIds.length" :loading="submitting || previewLoading" @click="analyzeSelected">
             分析所选问题
@@ -128,7 +145,7 @@
       </el-card>
     </div>
 
-    <el-card class="panel" shadow="never">
+    <el-card v-if="activeView === 'analysis'" class="panel" shadow="never">
       <template #header><span>最近分析</span></template>
       <el-table v-loading="jobsLoading" :data="jobs" size="small" @row-click="selectJob">
         <el-table-column prop="id" label="任务" width="70" />
@@ -136,7 +153,7 @@
           <template #default="{ row }">{{ row.task_type === "run_summary" ? "总览报告" : "问题分析" }}</template>
         </el-table-column>
         <el-table-column label="状态" width="100">
-          <template #default="{ row }">{{ row.status === "succeeded" ? "已完成" : row.status }}</template>
+          <template #default="{ row }">{{ aiQualityJobStatusLabel(row.status) }}</template>
         </el-table-column>
         <el-table-column label="对象" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">{{ (row.finding_ids || []).length ? `问题 ${row.finding_ids.join("、")}` : "平台规则/关系总览" }}</template>
@@ -147,7 +164,56 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 146 E3（R5）：任务列表服务端分页（后端 /jobs 已支持 page/page_size/total） -->
+      <el-pagination
+        v-model:current-page="jobsPage"
+        class="pager"
+        :page-size="jobsPageSize"
+        :total="jobsTotal"
+        layout="total, prev, pager, next"
+        @current-change="loadJobs"
+      />
     </el-card>
+
+    <div v-else class="patrol-view">
+      <div class="patrol-grid">
+        <el-card class="plan-card" shadow="never">
+          <div class="eyebrow">巡查计划</div>
+          <h3>每日 02:00</h3>
+          <el-tag type="info">演示形态（未启用调度）</el-tag>
+          <p>定时执行未启用，当前通过一键巡查手动演示。</p>
+          <el-button v-perms="'asset.quality.ai.analyze'" type="primary" class="demo-button" :loading="patrolRunning" @click="startPatrol">一键巡查</el-button>
+          <el-button class="sql-link" @click="$router.push('/asset/ai-sql')">去 AI 写 SQL</el-button>
+        </el-card>
+        <el-card class="targets-card" shadow="never">
+          <template #header><div class="card-title"><span>固定巡查目标</span><el-tag>{{ patrolTargets.length }} 张表</el-tag></div></template>
+          <div v-for="target in patrolTargets" :key="`${target.source_code}.${target.schema_name}.${target.table_name}`" class="target-row">
+            <div><strong>{{ target.name_cn }}</strong><small>{{ target.system_code }} / {{ target.schema_name }}.{{ target.table_name }}</small></div>
+            <div class="target-evidence"><el-tag type="warning" size="small">{{ target.issue_label }}</el-tag><small>证据 {{ target.evidence.rule_id }} · #{{ target.evidence.finding_id }} · 截至 {{ formatTime(target.evidence.data_as_of) }}</small></div>
+          </div>
+        </el-card>
+      </div>
+      <el-alert v-if="offlineReplay" title="离线回放" type="warning" :description="`引擎当前不可用，展示最近成功巡查；最后成功 ${formatTime(aiStatus?.last_success_at)}`" show-icon :closable="false" />
+      <el-card class="panel patrol-results" shadow="never">
+        <template #header><div class="card-title"><span>巡查进度与结论</span><span class="quiet">{{ patrolProgressText }}</span></div></template>
+        <el-timeline v-if="patrolJobs.length">
+          <el-timeline-item v-for="item in patrolJobs" :key="item.id" :type="item.status === 'succeeded' ? 'success' : item.status === 'failed' ? 'danger' : 'primary'" :timestamp="item.table">
+            <strong>{{ aiQualityJobStatusLabel(item.status) }}</strong>
+            <div v-if="item.result" class="patrol-conclusion">{{ item.result.summary }}</div>
+            <div v-else-if="item.partial_text" class="patrol-conclusion markdown" v-html="renderReportHtml(item.partial_text)" />
+          </el-timeline-item>
+        </el-timeline>
+        <el-empty v-else description="尚无巡查记录，点一键巡查试试" />
+      </el-card>
+      <el-card class="panel" shadow="never">
+        <template #header><span>巡查历史</span></template>
+        <el-table :data="patrolRuns" size="small">
+          <el-table-column prop="patrol_run_id" label="批次" min-width="230" />
+          <el-table-column label="时间" width="180"><template #default="{ row }">{{ formatTime(row.started_at) }}</template></el-table-column>
+          <el-table-column prop="summary" label="结果" />
+        </el-table>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -159,15 +225,21 @@ import {
   getQualityFindings, getAiQualityStatus, testAiQualityConnection,
   previewAiQuality, createAiQualityJob, createGovernanceReport, getAiQualityJobs, getAiQualityJob,
   reviewAiQualityResult,
-  type AiQualityJob, type AiQualityStatus, type AiQualityResultItem, type QualityFindingItem
+  getAiPatrolTargets, getAiPatrolRuns, runAiPatrol,
+  type AiQualityJob, type AiQualityStatus, type AiQualityResultItem, type QualityFindingItem,
+  type AiPatrolTarget, type AiPatrolRun
 } from "@/api/asset";
-import { aiQualityErrorLabel, aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds, usesHospitalLlm } from "./contracts";
+import { aiQualityErrorLabel, aiQualityJobStatusLabel, aiQualityStatusLabel, canSubmitAiQuality, limitFindingIds, usesHospitalLlm } from "./contracts";
 import { liveDisplayText, objectText, renderReportHtml, severityLabel } from "./reportMarkdown";
 
 const aiStatus = ref<AiQualityStatus | null>(null);
 const connectionTesting = ref(false);
 const findings = ref<QualityFindingItem[]>([]);
 const findingsLoading = ref(false);
+// 146 E3（R5）：待分析问题服务端分页状态；勾选跨页保留（reserve-selection + row-key）。
+const findingsPage = ref(1);
+const findingsPageSize = 50;
+const findingsTotal = ref(0);
 const findingStatus = ref("open");
 const findingSeverity = ref("");
 const selectedFindingIds = ref<number[]>([]);
@@ -176,6 +248,9 @@ const submitting = ref(false);
 const reportLoading = ref(false);
 const jobs = ref<AiQualityJob[]>([]);
 const jobsLoading = ref(false);
+const jobsPage = ref(1);
+const jobsPageSize = 20;
+const jobsTotal = ref(0);
 const selectedResult = ref<AiQualityResultItem | null>(null);
 const acceptedRecommendationIndexes = ref<number[]>([]);
 const reviewNote = ref("");
@@ -184,11 +259,18 @@ const liveText = ref("");
 const livePhase = ref("");
 const interruptedText = ref("");
 let pollTimer: number | undefined;
+const activeView = ref<"analysis" | "patrol">("analysis");
+const patrolTargets = ref<AiPatrolTarget[]>([]);
+const patrolRuns = ref<AiPatrolRun[]>([]);
+const patrolJobs = ref<Array<AiQualityJob & { table: string }>>([]);
+const patrolRunning = ref(false);
+const offlineReplay = ref(false);
 
 const statusText = computed(() => aiQualityStatusLabel(aiStatus.value));
 const hospitalReady = computed(() => usesHospitalLlm(aiStatus.value) && Boolean(aiStatus.value?.configured));
 const modelName = computed(() => aiStatus.value?.hospital_llm?.model || "未配置");
-const selectedRows = computed(() => findings.value.filter(row => selectedFindingIds.value.includes(row.id)));
+const selectedRows = computed(() => selectedFindingRows.value);
+const patrolProgressText = computed(() => patrolJobs.value.length ? `${patrolJobs.value.filter(item => item.status === "succeeded").length}/${patrolJobs.value.length} 完成` : "等待演示");
 const noiseText = computed(() => {
   const flag = selectedResult.value?.structured_result?.false_positive;
   if (!flag) return "需人工判断";
@@ -203,22 +285,58 @@ async function loadFindings() {
   findingsLoading.value = true;
   try {
     const data = (await getQualityFindings({
-      page: 1, page_size: 50,
+      page: findingsPage.value,
+      page_size: findingsPageSize,
       status: findingStatus.value || undefined,
       severity: findingSeverity.value || undefined
     })).data;
     findings.value = data.items || [];
+    findingsTotal.value = data.total || 0;
   } finally { findingsLoading.value = false; }
 }
 async function loadJobs() {
   jobsLoading.value = true;
-  try { jobs.value = ((await getAiQualityJobs({ page: 1, page_size: 20 })).data.items || []); }
-  finally { jobsLoading.value = false; }
+  try {
+    const data = (await getAiQualityJobs({ page: jobsPage.value, page_size: jobsPageSize })).data;
+    jobs.value = data.items || [];
+    jobsTotal.value = data.total || 0;
+  } finally { jobsLoading.value = false; }
 }
+async function loadPatrol() {
+  try {
+    const [targets, runs] = await Promise.all([getAiPatrolTargets(), getAiPatrolRuns({ page: 1, page_size: 10 })]);
+    patrolTargets.value = targets.data.targets || [];
+    patrolRuns.value = runs.data.items || [];
+  } catch { ElMessage.warning("巡查演示配置暂不可用"); }
+}
+async function refreshPatrolJobs() {
+  patrolJobs.value = await Promise.all(patrolJobs.value.map(async item => {
+    try { return { ...(await getAiQualityJob(item.id)).data, table: item.table } as AiQualityJob & { table: string }; }
+    catch { return item; }
+  }));
+}
+async function startPatrol() {
+  patrolRunning.value = true;
+  offlineReplay.value = false;
+  try {
+    const data = (await runAiPatrol()).data;
+    patrolJobs.value = data.jobs.map(item => ({ id: item.job_id, job_id: item.job_id, table: item.table, task_type: "finding_batch", status: "queued" } as AiQualityJob & { table: string }));
+    await refreshPatrolJobs();
+    await loadPatrol();
+    ElMessage.success(data.errors.length ? "巡查已提交，个别目标失败" : "巡查已提交");
+  } catch {
+    offlineReplay.value = Boolean(patrolRuns.value.length);
+    ElMessage.error(offlineReplay.value ? "模型不可达，已切换最近成功回放" : "巡查提交失败");
+  } finally { patrolRunning.value = false; }
+}
+function formatTime(value?: string | null) { return value ? new Date(value).toLocaleString("zh-CN", { hour12: false }) : "-"; }
 function rowSelectable(row: QualityFindingItem) {
   return selectedFindingIds.value.length < 50 || selectedFindingIds.value.includes(row.id);
 }
+// 146 E3（R5）：selection-change 携带保留选择+当前页全量勾选行，跨页累计不丢行。
+const selectedFindingRows = ref<QualityFindingItem[]>([]);
 function onSelectionChange(rows: QualityFindingItem[]) {
+  selectedFindingRows.value = rows;
   selectedFindingIds.value = limitFindingIds(rows.map(row => row.id));
 }
 async function testConnection() {
@@ -371,7 +489,7 @@ function reviewLabel(status?: string) {
 }
 onMounted(async () => {
   await loadStatus();
-  await Promise.all([loadFindings(), loadJobs()]);
+  await Promise.all([loadFindings(), loadJobs(), loadPatrol()]);
 });
 onUnmounted(() => stopWatch());
 </script>
@@ -382,6 +500,10 @@ onUnmounted(() => stopWatch());
   display: flex; align-items: center; gap: 10px;
 }
 .toolbar { justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; }
+.engine-banner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; padding: 14px 18px; border-radius: 12px; color: var(--el-text-color-primary); background: linear-gradient(120deg, var(--el-color-primary-light-9), var(--el-fill-color-light)); border: 1px solid var(--el-color-primary-light-7); }
+.status-dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: var(--el-color-warning); }
+.status-dot.ready { background: var(--el-color-success); box-shadow: 0 0 0 5px rgba(103, 194, 58, .12); }
+.view-switch { margin-bottom: 14px; }
 .toolbar-meta { color: var(--el-text-color-regular); }
 .quiet { color: var(--el-text-color-secondary); font-size: 12px; }
 .workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 12px; margin-bottom: 12px; }
@@ -409,4 +531,18 @@ onUnmounted(() => stopWatch());
   .workspace, .split { grid-template-columns: 1fr; }
 }
 .report-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+.pager { display: flex; justify-content: flex-end; margin-top: 10px; }
+.patrol-grid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+.plan-card h3 { margin: 8px 0; font-size: 26px; }
+.plan-card p { color: var(--el-text-color-secondary); line-height: 1.6; }
+.eyebrow { color: var(--el-color-primary); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.demo-button { width: 100%; margin-top: 12px; background: linear-gradient(110deg, var(--el-color-primary), #7357ff); border: 0; }
+.sql-link { width: 100%; margin: 8px 0 0; }
+.target-row { display: grid; grid-template-columns: minmax(200px, .7fr) minmax(0, 1.3fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter); }
+.target-row:last-child { border-bottom: 0; }
+.target-row small, .target-evidence small { display: block; margin-top: 5px; color: var(--el-text-color-secondary); }
+.target-evidence .el-tag { max-width: 100%; }
+.patrol-results { margin: 12px 0; }
+.patrol-conclusion { margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--el-fill-color-light); line-height: 1.65; }
+@media (max-width: 1280px) { .patrol-grid, .target-row { grid-template-columns: 1fr; } }
 </style>

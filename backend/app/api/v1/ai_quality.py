@@ -5,7 +5,9 @@ import hmac
 import secrets
 import threading
 import time
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import desc, func, select
@@ -21,11 +23,13 @@ from ...models.quality import (AiQualityJob, AiQualityJobFinding, AiQualityResul
 from ...schemas.ai_quality import (AiQualityAttachRequest, AiQualityCreateRequest,
                                    AiQualityJobItem, AiQualityPreviewRequest,
                                    AiQualityResultItem, AiQualityReviewRequest)
+from ...schemas.ai_quality import AiPatrolRunRequest
 from ...schemas.common import ApiResponse, PageData
 from ...services.ai_quality_payload import build_payload
 from ...services.ai_quality_result import output_digest, validate_output
 from ...services.dify_quality_client import DifyClientError, DifyQualityClient
-from ...services.hospital_llm_analysis import analysis_from_llm_text, attach_platform_examples, build_analysis_prompt
+from ...services.hospital_llm_analysis import analysis_from_llm_text, attach_platform_examples, build_analysis_prompt, build_patrol_analysis_prompt
+from ...services.ai_patrol_targets import load_patrol_targets
 from ...services.hospital_llm_client import HospitalLlmClient, HospitalLlmError
 from ...services.hospital_llm_report import build_governance_brief
 from ...services.quality_attribution import parse_relation_id, resolve_finding_location
@@ -34,6 +38,7 @@ from ...services.relation_metrics import mixed_relation_hint
 
 router = APIRouter(prefix="/api/v1/quality/ai", tags=["quality-ai"])
 INPUT_SCHEMA = "quality-analysis-input/v1"
+_STATUS_CACHE = {"at": 0.0, "success_count": 0}
 
 
 def _audit(db, action, entity, ref, operator, after=None):
@@ -85,6 +90,7 @@ def _finding_payload(db: Session, ids: list[int]) -> dict:
             "total_cnt": r.total_cnt,
             "error_cnt": r.error_cnt,
             "error_rate": r.error_rate,
+            "found_at": r.found_at.isoformat() if r.found_at else None,
         }
         hint = mixed_relation_hint(rel_id)
         if hint:
@@ -186,6 +192,23 @@ def _status_payload(db: Session | None = None):
     provider = "hospital_llm" if settings.hospital_llm_enabled and hospital_configured else (
         "dify" if settings.dify_quality_enabled and dify_configured else "none"
     )
+    success_count = 0
+    if db is not None:
+        now = time.monotonic()
+        if now - float(_STATUS_CACHE["at"]) >= 60:
+            _STATUS_CACHE["success_count"] = db.scalar(
+                select(func.count()).select_from(GovernAuditLog).where(
+                    GovernAuditLog.module == "quality_ai", GovernAuditLog.action == "succeeded"
+                )
+            ) or 0
+            _STATUS_CACHE["at"] = now
+        success_count = int(_STATUS_CACHE["success_count"])
+    parsed_host = urlsplit(settings.hospital_llm_base_url or "")
+    raw_host = parsed_host.hostname or ""
+    host_parts = raw_host.split(".")
+    masked_host = ".".join([*host_parts[:-1], "***"]) if len(host_parts) > 1 else ("***" if raw_host else "")
+    if parsed_host.port:
+        masked_host = f"{masked_host}:{parsed_host.port}"
     message = None
     if provider == "hospital_llm":
         message = "已接通院内模型。选中问题后可直接分析，只出建议、不改库、不执行 SQL。"
@@ -206,12 +229,13 @@ def _status_payload(db: Session | None = None):
         "timeout_seconds": settings.hospital_llm_read_timeout_seconds if provider == "hospital_llm" else settings.dify_read_timeout_seconds,
         "quota_state": "unknown",
         "last_success_at": last_success,
+        "success_count": success_count,
         "message": message,
         "hospital_llm": {
             "enabled": settings.hospital_llm_enabled,
             "configured": hospital_configured,
             "model": settings.hospital_llm_model,
-            "host": "10.255.255.10:9000",
+            "host": masked_host,
         },
     }
 
@@ -331,8 +355,8 @@ def job_detail(job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     return ApiResponse(data=_job_payload(db, job))
 
 
-def _new_job(req: AiQualityCreateRequest, db: Session, operator: str, payload: dict, *, retry_job=None, prompt_version: str):
-    key_material = f"quality|{req.task_type}|{sorted(req.finding_ids)}|{req.run_id}|{payload['input_digest']}|{prompt_version}"
+def _new_job(req: AiQualityCreateRequest, db: Session, operator: str, payload: dict, *, retry_job=None, prompt_version: str, patrol_run_id: str | None = None):
+    key_material = f"quality|{req.task_type}|{sorted(req.finding_ids)}|{req.run_id}|{payload['input_digest']}|{prompt_version}|{patrol_run_id or ''}"
     job_key = hashlib.sha256(key_material.encode()).hexdigest()
     job = retry_job or db.scalar(select(AiQualityJob).where(AiQualityJob.job_key == job_key))
     if job and retry_job is None:
@@ -344,7 +368,8 @@ def _new_job(req: AiQualityCreateRequest, db: Session, operator: str, payload: d
         schema_version=INPUT_SCHEMA, input_digest=payload["input_digest"], request_id=req.request_id,
         input_summary={"finding_count": len(req.finding_ids), "finding_ids": sorted(req.finding_ids),
                        "run_id": req.run_id, "payload_bytes": payload["payload_bytes"],
-                       "dropped_count": len(payload["dropped_fields"]), "provider": "hospital_llm" if _hospital_ready() else "dify"},
+                       "dropped_count": len(payload["dropped_fields"]), "provider": "hospital_llm" if _hospital_ready() else "dify",
+                       "patrol_run_id": patrol_run_id},
         requested_by=operator)
     job.status, job.attempt, job.started_at = "running", (job.attempt or 0) + 1, datetime.now(timezone.utc)
     db.add(job)
@@ -376,11 +401,13 @@ def _finish_hospital_job(job_id: int, payload: dict, operator: str, request_id: 
         job = db.get(AiQualityJob, job_id)
         if not job:
             return
-        prompt = build_analysis_prompt(
-            task_type=job.task_type,
+        is_patrol = bool((job.input_summary or {}).get("patrol_run_id"))
+        prompt_builder = build_patrol_analysis_prompt if is_patrol else build_analysis_prompt
+        prompt = prompt_builder(
             request_id=request_id,
             input_digest=payload["input_digest"],
             payload_json=payload["payload_json"],
+            **({} if is_patrol else {"task_type": job.task_type}),
         )
         pieces: list[str] = []
         last_flush = time.monotonic()
@@ -455,7 +482,7 @@ def _finish_hospital_job(job_id: int, payload: dict, operator: str, request_id: 
         db.close()
 
 
-def _submit_hospital(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None):
+def _submit_hospital(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None, patrol_run_id: str | None = None):
     if retry_job is None:
         _require_preview_request_id(req.request_id)
     try:
@@ -464,7 +491,8 @@ def _submit_hospital(req: AiQualityCreateRequest, db: Session, operator: str, *,
         raise HTTPException(422, str(exc)) from exc
     if retry_job is None and not hmac.compare_digest(payload["input_digest"], req.input_digest):
         raise HTTPException(422, "input_digest does not match server preview")
-    job, built = _new_job(req, db, operator, payload, retry_job=retry_job, prompt_version="hospital-llm-analysis-v1")
+    prompt_version = "hospital-patrol-analysis-v1" if patrol_run_id else "hospital-llm-analysis-v1"
+    job, built = _new_job(req, db, operator, payload, retry_job=retry_job, prompt_version=prompt_version, patrol_run_id=patrol_run_id)
     if built is None:
         return job
     if job.status == "running":
@@ -479,9 +507,9 @@ def _submit_hospital(req: AiQualityCreateRequest, db: Session, operator: str, *,
     return job
 
 
-def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None):
+def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_job=None, patrol_run_id: str | None = None):
     if _hospital_ready():
-        return _submit_hospital(req, db, operator, retry_job=retry_job)
+        return _submit_hospital(req, db, operator, retry_job=retry_job, patrol_run_id=patrol_run_id)
     if not settings.dify_quality_enabled:
         raise HTTPException(409, "AI quality analysis is disabled")
     if retry_job is None:
@@ -500,7 +528,7 @@ def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_jo
     except ValueError as exc: raise HTTPException(422, str(exc)) from exc
     if not hmac.compare_digest(payload["input_digest"], req.input_digest):
         raise HTTPException(422, "input_digest does not match server preview")
-    key_material = f"quality|{req.task_type}|{sorted(req.finding_ids)}|{req.run_id}|{payload['input_digest']}|{settings.dify_quality_prompt_version}"
+    key_material = f"quality|{req.task_type}|{sorted(req.finding_ids)}|{req.run_id}|{payload['input_digest']}|{settings.dify_quality_prompt_version}|{patrol_run_id or ''}"
     job_key = hashlib.sha256(key_material.encode()).hexdigest()
     job = retry_job or db.scalar(select(AiQualityJob).where(AiQualityJob.job_key == job_key))
     if job and retry_job is None:
@@ -509,7 +537,7 @@ def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_jo
         return job
     job = job or AiQualityJob(job_key=job_key, task_type=req.task_type, prompt_version=settings.dify_quality_prompt_version,
         schema_version=INPUT_SCHEMA, input_digest=payload["input_digest"], request_id=req.request_id,
-        input_summary={"finding_count": len(req.finding_ids), "finding_ids": sorted(req.finding_ids), "run_id": req.run_id, "payload_bytes": payload["payload_bytes"], "dropped_count": len(payload["dropped_fields"])}, requested_by=operator)
+        input_summary={"finding_count": len(req.finding_ids), "finding_ids": sorted(req.finding_ids), "run_id": req.run_id, "payload_bytes": payload["payload_bytes"], "dropped_count": len(payload["dropped_fields"]), "patrol_run_id": patrol_run_id}, requested_by=operator)
     job.status, job.attempt, job.started_at = "running", (job.attempt or 0) + 1, datetime.now(timezone.utc)
     db.add(job); db.flush()
     for fid in sorted(set(req.finding_ids)):
@@ -547,6 +575,84 @@ def _submit(req: AiQualityCreateRequest, db: Session, operator: str, *, retry_jo
 def create_job(req: AiQualityCreateRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     job = _submit(req, db, get_current_user(request))
     return ApiResponse(data=_job_payload(db, job))
+
+
+@router.get("/patrol/targets", dependencies=[Depends(require_permission("asset.quality.ai.view"))])
+def patrol_targets() -> ApiResponse[dict]:
+    try:
+        targets = load_patrol_targets()
+    except (OSError, ValueError) as exc:
+        raise HTTPException(503, "patrol target snapshot is unavailable") from exc
+    return ApiResponse(data={
+        "plan": {"cron": "0 2 * * *", "label": "每日 02:00", "status": "demo_only", "scheduler_enabled": False},
+        "targets": targets,
+    })
+
+
+@router.get("/patrol/runs", dependencies=[Depends(require_permission("asset.quality.ai.view"))])
+def patrol_runs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+) -> ApiResponse[PageData[dict]]:
+    rows = list(db.scalars(
+        select(AiQualityJob)
+        .where(AiQualityJob.input_summary["patrol_run_id"].as_string().isnot(None))
+        .order_by(AiQualityJob.created_at.desc())
+    ).all())
+    grouped: dict[str, list[AiQualityJob]] = defaultdict(list)
+    for row in rows:
+        run_id = str((row.input_summary or {}).get("patrol_run_id") or "")
+        if run_id:
+            grouped[run_id].append(row)
+    items = []
+    for run_id, run_jobs in grouped.items():
+        succeeded = [job for job in run_jobs if job.status == "succeeded"]
+        items.append({
+            "patrol_run_id": run_id,
+            "started_at": min((job.created_at for job in run_jobs if job.created_at), default=None),
+            "tables_total": len(run_jobs),
+            "tables_done": len([job for job in run_jobs if job.status in {"succeeded", "failed", "blocked", "unknown"}]),
+            "summary": f"{len(succeeded)}/{len(run_jobs)} 张表分析成功",
+            "jobs": [job.id for job in run_jobs],
+        })
+    items.sort(key=lambda item: item["started_at"] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    total = len(items)
+    start = (page - 1) * page_size
+    return ApiResponse(data=PageData(total=total, page=page, page_size=page_size, items=items[start:start + page_size]))
+
+
+@router.post("/patrol/run", status_code=202, dependencies=[Depends(require_permission("asset.quality.ai.analyze"))])
+def patrol_run(req: AiPatrolRunRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    operator = get_current_user(request)
+    run_id = req.patrol_run_id or f"patrol-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}-{secrets.token_hex(3)}"
+    try:
+        targets = load_patrol_targets()
+    except (OSError, ValueError) as exc:
+        raise HTTPException(503, "patrol target snapshot is unavailable") from exc
+    if not targets:
+        raise HTTPException(409, "patrol target snapshot is empty")
+    created = []
+    errors = []
+    for target in targets:
+        try:
+            preview_req = AiQualityPreviewRequest(task_type="finding_batch", finding_ids=target["finding_ids"])
+            request_id = _new_request_id()
+            built = _make(preview_req, db, request_id)
+            create_req = AiQualityCreateRequest(
+                task_type="finding_batch",
+                finding_ids=target["finding_ids"],
+                request_id=request_id,
+                input_digest=built["input_digest"],
+            )
+            # 使用 preview 签发的 request_id + digest 进入现有 _submit；不可绕 HMAC 链。
+            job = _submit(create_req, db, operator, patrol_run_id=run_id)
+            created.append({"table": f"{target['schema_name']}.{target['table_name']}", "job_id": job.id})
+        except HTTPException as exc:
+            errors.append({"table": f"{target['schema_name']}.{target['table_name']}", "status": exc.status_code})
+    _audit(db, "patrol_submit", "ai_patrol_run", run_id, operator, {"jobs": len(created), "errors": len(errors)})
+    db.commit()
+    return ApiResponse(data={"patrol_run_id": run_id, "jobs": created, "errors": errors})
 
 
 @router.post("/jobs/{job_id}/retry", dependencies=[Depends(require_permission("asset.quality.ai.analyze"))])

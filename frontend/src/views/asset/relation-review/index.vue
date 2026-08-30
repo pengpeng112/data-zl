@@ -382,19 +382,19 @@ onMounted(() => {
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filters" size="small">
         <el-form-item label="所属系统">
-          <el-select v-model="filters.system_code" placeholder="全部" clearable class="system-filter" @change="loadRelations">
+          <el-select v-model="filters.system_code" placeholder="全部" clearable class="system-filter" @change="doSearch">
             <el-option v-for="s in systemOptions" :key="s.system_code" :label="s.system_name_cn || s.system_code" :value="s.system_code" />
           </el-select>
         </el-form-item>
         <el-form-item label="置信度">
-          <el-select v-model="filters.confidence" placeholder="全部" clearable class="confidence-filter" @change="loadRelations">
+          <el-select v-model="filters.confidence" placeholder="全部" clearable class="confidence-filter" @change="doSearch">
             <el-option label="A - 高" value="A" />
             <el-option label="B - 中" value="B" />
             <el-option label="C - 低" value="C" />
           </el-select>
         </el-form-item>
         <el-form-item label="验证状态">
-          <el-select v-model="filters.review_status" placeholder="全部" clearable class="status-filter" @change="loadRelations">
+          <el-select v-model="filters.review_status" placeholder="全部" clearable class="status-filter" @change="doSearch">
             <el-option label="已验证" value="verified" />
             <el-option label="未验证" value="unverified" />
             <el-option label="已批准" value="approved" />
@@ -402,7 +402,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item label="关键词">
-          <el-input v-model="filters.keyword" placeholder="搜索中英文表名/字段/条件" clearable class="keyword-filter" @keyup.enter="loadRelations" @clear="loadRelations" />
+          <el-input v-model="filters.keyword" placeholder="搜索中英文表名/字段/条件" clearable class="keyword-filter" @keyup.enter="doSearch" @clear="doSearch" />
         </el-form-item>
         <el-form-item>
           <el-button @click="resetFilters">重置</el-button>
@@ -506,7 +506,8 @@ onMounted(() => {
         v-if="!loading && !relations.length"
         :description="relationClass === 'pending' ? '当前没有带关联字段的待审关系。无字段的视图推断在「视图推断」页签。' : '当前页签没有数据'"
       />
-      <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 50, 100, 200]" layout="total, sizes, prev, pager, next" class="pager" @current-change="loadRelations" @size-change="loadRelations" />
+      <!-- 161 P0-1：size-change 必须回到第 1 页；事件首参判定规则——"值/事件对象"须包装，"页码"保留 -->
+      <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 50, 100, 200]" layout="total, sizes, prev, pager, next" class="pager" @current-change="loadRelations" @size-change="() => loadRelations(1)" />
     </el-card>
 
     <el-dialog v-model="dialogVisible" title="编辑关系" width="600px">

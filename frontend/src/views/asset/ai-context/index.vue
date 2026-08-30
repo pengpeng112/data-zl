@@ -31,14 +31,17 @@
       </div>
 
       <el-table
+        ref="searchTableRef"
         v-loading="searching"
         :data="searchResults"
         stripe
         class="result-table"
         max-height="300"
+        :row-key="ctxRowKey"
         @selection-change="onSelect"
       >
-        <el-table-column type="selection" width="40" />
+        <!-- 146 E10（R5）：勾选与右侧已选标签双向同步（reserve-selection + row-key） -->
+        <el-table-column type="selection" width="40" reserve-selection />
         <el-table-column prop="schema_name" label="Schema" width="80" />
         <el-table-column
           prop="table_name"
@@ -236,22 +239,38 @@ async function searchTables() {
   }
 }
 
+function ctxRowKey(row: TableBrief) {
+  return `${row.source_code || ""}|${row.schema_name || ""}|${row.table_name}`;
+}
+
+const searchTableRef = ref();
+
 function onSelect(rows: TableBrief[]) {
   selectedTables.value = rows;
 }
 
+// 146 E10（R5）：移除已选标签时同步取消表格勾选，避免两侧状态漂移
 function removeTable(t: TableBrief) {
   selectedTables.value = selectedTables.value.filter(
     r => !(r.schema_name === t.schema_name && r.table_name === t.table_name)
   );
+  const row = searchResults.value.find(
+    r => ctxRowKey(r) === ctxRowKey(t)
+  );
+  if (row) searchTableRef.value?.toggleRowSelection?.(row, false);
 }
 
 async function doExport() {
+  if (!selectedTables.value.length) {
+    ElMessage.warning("请先勾选需要导出的表");
+    return;
+  }
   exporting.value = true;
   try {
-    const names = selectedTables.value.map(
-      t => `${t.schema_name}.${t.table_name}`
-    );
+    // 146 E10（R5）：按 (schema, table) 去重后再导出，避免跨来源同名表重复提交
+    const names = Array.from(new Set(
+      selectedTables.value.map(t => `${t.schema_name}.${t.table_name}`)
+    ));
     const res = await exportContext({
       tables: names,
       include_relations: true,
@@ -270,8 +289,11 @@ async function doExport() {
 }
 
 function copyJson() {
-  navigator.clipboard.writeText(JSON.stringify(exportedJson.value, null, 2));
-  ElMessage.success("已复制到剪贴板");
+  // 146 E10（R5）：剪贴板降级——不可用时明确提示而非静默失败
+  navigator.clipboard
+    .writeText(JSON.stringify(exportedJson.value, null, 2))
+    .then(() => ElMessage.success("已复制到剪贴板"))
+    .catch(() => ElMessage.warning("剪贴板不可用，请使用“下载 JSON”后复制"));
 }
 
 function downloadJson() {
@@ -282,7 +304,10 @@ function downloadJson() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "asset-context.json";
+  // 146 E10（R5）：下载节点先挂载到文档再触发，兼容部分浏览器不派发点击的问题
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 onMounted(() => {

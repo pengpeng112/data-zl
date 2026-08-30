@@ -1,5 +1,11 @@
 {
   "source": "Fancy.His.Micro.dll SQL string heap (158 T1)",
+  "source_file": "开发起步包/数据资产_新HIS逆向资产包/fancyhis_sql_dictionary.json",
+  "source_artifact_sha256": "0c6304fff64e065bec74731e2736e4a6c54d350bec19fa01a14806baaba19929",
+  "system_code": "FANCY_HIS_UNREGISTERED",
+  "dialect": "mixed_or_unknown",
+  "intake_status": "candidate_bundle",
+  "formal_asset_write": false,
   "edge_total": 4,
   "edges": [
     {
@@ -7,44 +13,76 @@
       "from_column": "ID",
       "to_table": "CASHER_NO_REC",
       "to_column": "USER_ID",
-      "evidence_sql_head": [
-        "select (select a.name from staff_dict a where a.id = t.user_id) name,t.user_id UserId,t.local_no LocalNo from CASHER_NO_"
-      ],
+      "from_columns": ["ID"],
+      "to_columns": ["USER_ID"],
+      "join_condition": "STAFF_DICT.ID = CASHER_NO_REC.USER_ID",
+      "source_sql_sha256": "c570b545fb74099a96fae111bcf690ce8a53f8116ff1bfa35419f0cac9196562",
       "evidence_count": 1,
-      "formal_table_pair_exists": false
+      "qualifiers": [],
+      "existing_relation_id": null,
+      "intake_status": "candidate",
+      "confidence": "C",
+      "metadata_evidence": "新HIS masterdb 尚未登记，未完成表字段核对",
+      "validation_evidence": null,
+      "risk_note": "仅历史生产 SQL 证据；目标库未登记，禁止进入正式关系或平台 draft",
+      "directional": false
     },
     {
       "from_table": "SYS_USER_DEPT",
       "from_column": "USERID",
       "to_table": "SYS_USER",
       "to_column": "ID",
-      "evidence_sql_head": [
-        "select b.EMPL_CODE from SYS_USER_DEPT a left join SYS_USER b on a.USERID =b.ID where a.DEPTID in("
-      ],
+      "from_columns": ["USERID"],
+      "to_columns": ["ID"],
+      "join_condition": "SYS_USER_DEPT.USERID = SYS_USER.ID",
+      "source_sql_sha256": "f61b795a7b661afa94ef7a688ecad416285eec19d3bbc457d6b7eb1332271968",
       "evidence_count": 1,
-      "formal_table_pair_exists": false
+      "qualifiers": [],
+      "existing_relation_id": null,
+      "intake_status": "candidate",
+      "confidence": "C",
+      "metadata_evidence": "新HIS masterdb 尚未登记，未完成表字段核对",
+      "validation_evidence": null,
+      "risk_note": "仅历史生产 SQL 证据；目标库未登记，禁止进入正式关系或平台 draft",
+      "directional": false
     },
     {
       "from_table": "INPUT_NODRUG_LIST",
       "from_column": "PERFORMED_BY",
       "to_table": "SYS_DEPARTMENT",
       "to_column": "DEPTCODE",
-      "evidence_sql_head": [
-        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
-      ],
+      "from_columns": ["PERFORMED_BY"],
+      "to_columns": ["DEPTCODE"],
+      "join_condition": "INPUT_NODRUG_LIST.PERFORMED_BY = SYS_DEPARTMENT.DEPTCODE",
+      "source_sql_sha256": "7d7ce882e050a2398422869bbb40a8dbfebc65cdcf1ba6ecd9314686bb4f5b18",
       "evidence_count": 1,
-      "formal_table_pair_exists": false
+      "qualifiers": [],
+      "existing_relation_id": null,
+      "intake_status": "candidate",
+      "confidence": "C",
+      "metadata_evidence": "新HIS masterdb 尚未登记，未完成表字段核对",
+      "validation_evidence": null,
+      "risk_note": "仅历史生产 SQL 证据；目标库未登记，禁止进入正式关系或平台 draft",
+      "directional": false
     },
     {
       "from_table": "INPUT_NODRUG_LIST",
       "from_column": "ITEM_CLASS",
       "to_table": "BILL_ITEM_CLASS_DICT",
       "to_column": "CLASS_CODE",
-      "evidence_sql_head": [
-        "select t.*,t1.deptname as PERFORMED_BY_NAME,c.CLASS_NAME as Item_Class_Name from input_nodrug_list t left join SYS_DEPAR"
-      ],
+      "from_columns": ["ITEM_CLASS"],
+      "to_columns": ["CLASS_CODE"],
+      "join_condition": "INPUT_NODRUG_LIST.ITEM_CLASS = BILL_ITEM_CLASS_DICT.CLASS_CODE",
+      "source_sql_sha256": "7d7ce882e050a2398422869bbb40a8dbfebc65cdcf1ba6ecd9314686bb4f5b18",
       "evidence_count": 1,
-      "formal_table_pair_exists": false
+      "qualifiers": [],
+      "existing_relation_id": null,
+      "intake_status": "candidate",
+      "confidence": "C",
+      "metadata_evidence": "新HIS masterdb 尚未登记，未完成表字段核对",
+      "validation_evidence": null,
+      "risk_note": "仅历史生产 SQL 证据；目标库未登记，禁止进入正式关系或平台 draft",
+      "directional": false
     }
   ]
 }

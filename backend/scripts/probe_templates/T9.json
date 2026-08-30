@@ -1,0 +1,35 @@
+{
+ "code": "T9",
+ "probe_type": "R-KEY",
+ "name": "HIS 出院就诊键在 JHEMR 覆盖率",
+ "severity_default": "P3",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND DISCHARGE_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') AND ROWNUM <= 1000"
+  },
+  {
+   "side": "b",
+   "source_code": "jhemr_vastbase_10_10_8_177",
+   "dialect": "vastbase",
+   "sql": "SELECT patient_id, visit_id FROM report.r_pat_visit WHERE (patient_id, visit_id) IN (__KEYS__)",
+   "mode": "key_lookup"
+  }
+ ],
+ "derive": {
+  "metric": "visit_key_hit_rate_jhemr",
+  "formula": "matched/total*100",
+  "unit": "%",
+  "compare": "key_membership"
+ },
+ "trigger": {
+  "op": "lt",
+  "threshold": 99.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "HIS 出院就诊键在 JHEMR r_pat_visit 覆盖率",
+ "large_table_guard": null
+}

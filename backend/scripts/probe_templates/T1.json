@@ -1,0 +1,27 @@
+{
+ "code": "T1",
+ "probe_type": "R-REF",
+ "name": "EXAM 申请医生工号缺失率",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT COUNT(*) AS TOTAL, SUM(CASE WHEN DOCTOR_USER IS NULL THEN 1 ELSE 0 END) AS MISS FROM EXAM.EXAM_MASTER WHERE REQ_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND REQ_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD')"
+  }
+ ],
+ "derive": {
+  "metric": "doctor_code_missing_rate",
+  "formula": "miss/total*100",
+  "unit": "%"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 1.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "EXAM.EXAM_MASTER.DOCTOR_USER 缺失率",
+ "large_table_guard": null
+}

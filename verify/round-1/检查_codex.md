@@ -1,0 +1,5 @@
+- **T4 / C9**：查重目标误指 ODS/HIS 的 `relationships.csv`（104 行），JHEMR 试点应优先对照 JHEMR Vastbase 资产包（284 行），否则会产生大量伪“新增关系”。
+- **T4**：任务要求按 A/B/C/D 分级，但当前 `sql-relation-intake` 技能采用 `existing/candidate/partial/recipe_candidate/rejected`，交付口径会与现行技能不一致。
+- **T4**：不能预设 `04-上报工具.md` 全属 JHEMR，必须逐条识别物理系统和数据库方言后再选择元数据、值域技能及查重资产包。
+- **T5 / C6**：当前工作区高度 dirty 且 `AGENTS.md` 本身已有未提交修改，直接瘦身或以 Git 回退会覆盖其他在途成果，必须先制作文件级基线并逐段合并。
+- **T2-T3 / C10**：任务只要求更新 `开发起步包/README.md`，却遗漏地图自身 §6 更新记录及 `55` 要求的执行日志，完成后的审计链将不完整。

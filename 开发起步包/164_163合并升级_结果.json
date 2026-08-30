@@ -1,0 +1,274 @@
+{
+ "meta": {
+  "plan": "164_163合并升级_测试任务与值域界面与跨系统数据质控专项计划.md (v1.1)",
+  "basis": [
+   "163_全仓未完成项一次性收口执行计划.md (R0-R7)",
+   "164 §4 (R8)"
+  ],
+  "executed_at": "2026-08-29",
+  "head_start": "13ef9e8",
+  "executor": "163/164 执行会话（单执行者，R5 委派 Luna 子代理并经主 AI 独立验收）",
+  "zero_privilege": "未发布/未写业务源库/未写生产平台库（只读+事后核验）/未 confirm 值域/零 Git 写/ai-hms_qhd 零代码改动"
+ },
+ "batches": {
+  "R0": {
+   "status": "DONE",
+   "summary": "HEAD 确认；15433 托管隧道；security_audit 9 passed；熔断分支未到点跳过（08:30 自动化已自行登记）"
+  },
+  "R1": {
+   "status": "DONE",
+   "summary": "NF-1 断言改 await loadData(1)（36b8743 证据）；plan127 25 passed"
+  },
+  "R2": {
+   "status": "DONE",
+   "summary": "151 E1-E6 全链：145 类/92 字段探索；圈定 8 主题 53 行 pending；脚本+7 测试；导入收敛 0；code9=69 例/标志 3=期限手术(6109 台)/E5' TREAT_RESULT 双编码错位实证；导出 18 confirmed+1 conflicted --check PASS"
+  },
+  "R3": {
+   "status": "DONE",
+   "summary": "ECG 档一：65 对象/1119 列隔离导入精确匹配+幂等 0；生产 dry-run 零写入（将新增 65/1119 candidate）；候选 9 条（7C+2D）仅清单文件"
+  },
+  "R4": {
+   "status": "WARN",
+   "summary": "日间非夜窗；夜间执行清单已登记 output_r163/r4_night_checklist.md，夜窗补跑后闭合"
+  },
+  "R5": {
+   "status": "DONE",
+   "summary": "146 剩余 22 项全部 DONE（Luna 执行+主 AI 复核）；typecheck 0 错/194 tests/build 预算 PASS；146 终态 28/28 组 DONE"
+  },
+  "R6": {
+   "status": "DONE",
+   "summary": "130 覆盖表(24 吸收/A14 现状符合/A25 部分/A28 BLOCKED)；H7=1/3（08-27 success）；177 adapter 重试存在(jhemr_identity_adapter.py:306)；生产 unbound=0；死权限码 11 个；149 后置维持"
+  },
+  "R7": {
+   "status": "DONE",
+   "summary": "后端 1183 passed/1 skipped/0 failed；前端三件套独立复跑全绿；161 四项 grep 全绿；alembic 单头 b0c1d2e3f4a5；隔离库终态 19c/54p/1conf+ECG 65/1119"
+  },
+  "R8": {
+   "status": "WARN",
+   "summary": "批次 A 执行 7/26（通过 5/失败 2；P2×2+P3×1），19 未执行；B-G 未开始；checkpoint=ai-hms_qhd/evidence/GUI-20260829-01/；结论「不通过（当前状态）」如实登记"
+  }
+ },
+ "gates": {
+  "backend_full": {
+   "passed": 1183,
+   "skipped": 1,
+   "failed": 0,
+   "duration_s": 1519.09
+  },
+  "frontend": {
+   "typecheck_errors": 0,
+   "tests": 194,
+   "build": "PASS",
+   "gzip": {
+    "main": "656.1/700",
+    "graph": "404.2/430",
+    "css": "98.6/110"
+   }
+  },
+  "plan127": {
+   "passed": 25
+  },
+  "security_audit_smoke": {
+   "passed": 9
+  },
+  "alembic_head": "b0c1d2e3f4a5",
+  "grep_161": {
+   "loadRelations_direct": 0,
+   "user_system_literal": 0,
+   "tool_execute_assert": true,
+   "ai_py_codes": [
+    "ai.context.read",
+    "ai.sql.execute"
+   ]
+  }
+ },
+ "r2_value_domains": {
+  "explored": {
+   "portal_types": 145,
+   "portal_user_rows": 1215,
+   "his_rows": 1772,
+   "types_only_in_his": 50,
+   "jhemr_fields": 92
+  },
+  "circled": {
+   "themes": 8,
+   "rows": 53,
+   "portal": 2,
+   "jhemr": 51,
+   "gates": "≤20 类/≤200 行 达标"
+  },
+  "import": {
+   "created": 53,
+   "rerun_converge": 0,
+   "final_state": {
+    "confirmed": 19,
+    "pending": 54,
+    "conflicted": 1,
+    "injected_confirmed": 18
+   }
+  },
+  "code9": {
+   "count": 69,
+   "range": "2025-05-01~2026-07-02",
+   "jhemr_semantic": "其他",
+   "cross_check": "4 命中中 3 一致 1 不一致(HIS=9/JHEMR=非医嘱离院)"
+  },
+  "oper_emer_3": {
+   "count_2025": 6109,
+   "semantic": "期限手术",
+   "evidence": "JHEMR OPERATION_TYPE 择期1/急诊2/期限3"
+  },
+  "treat_result": {
+   "comm_dict": "1治愈/2转院/3死亡/4好转/5自愿/6其他/7未愈",
+   "jhemr_dict": "1治愈/2好转/3未愈/4死亡/9其他",
+   "finding": "2/3/4 完全错位；实际数字码走 JHEMR 语义（SOURCE 拆分分布比一致）",
+   "his_mixed_storage": true
+  },
+  "export": {
+   "confirmed_injected": 18,
+   "pending": 54,
+   "conflicted": 1,
+   "check": "PASS",
+   "drift_vs_head": "19→18：DISCHARGE_DISPOSITION#1 三方语义冲突按设计置 conflicted 待人工（W3）"
+  }
+ },
+ "r3_ecg": {
+  "package": {
+   "objects": 65,
+   "columns": 1119,
+   "sources": [
+    "ecg_sqlserver_10_10_10_80",
+    "cardionet_sqlserver_10_10_10_80"
+   ]
+  },
+  "rehearsal": {
+   "insert_match": true,
+   "idempotent_second_run": {
+    "inserts": 0,
+    "updates": 0
+   }
+  },
+  "production_dryrun": {
+   "would_insert": {
+    "tables": 65,
+    "columns": 1119
+   },
+   "updates": 0,
+   "verified_zero_write": true
+  },
+  "relation_candidates": {
+   "internal_C": 7,
+   "cross_system_D": 2,
+   "file_only": true
+  }
+ },
+ "r8_gui": {
+  "env": "http://127.0.0.1:13000 (E2E, health 200)",
+  "head": "74c7b47f",
+  "viewport": "1440x900",
+  "executed": 7,
+  "passed": 5,
+  "failed": 2,
+  "not_executed": 19,
+  "blocked": 0,
+  "defects": [
+   {
+    "id": "DEF-A-002",
+    "severity": "P2",
+    "summary": "登录按钮点击无响应（真实坐标点击 0 请求 0 报错）；回车可提交"
+   },
+   {
+    "id": "DEF-A-003",
+    "severity": "P2",
+    "summary": "全应用无退出登录控件（DOM 全文无 退出/logout）"
+   },
+   {
+    "id": "DEF-A-001",
+    "severity": "P3",
+    "summary": "登录页空提交无必填提示"
+   }
+  ],
+  "conclusion": "不通过（当前状态）：P2×2 且覆盖率 26.9%；checkpoint 续跑"
+ },
+ "exceptions": [
+  "15432=ai-hms E2E 外部转发(192.168.98.99:5432)，非 8.83 隧道；本会话用 15433 托管隧道",
+  "首轮全量 pytest 挂死=隧道中断（12 连 E）；托管隧道+流式日志重跑全绿",
+  "backend/.env APP_DB_URL=10.20.1.153 旧 schema 平台库≠生产 8.83；脚本已改自建 engine 显式 URL；首次 dry-run 误连只读零副作用",
+  "PORTAL 离院方式 1=自行离开 vs 149 confirmed 1=医嘱离院 vs JHEMR 医嘱离院=1 三方冲突→conflicted 待人工（W3）",
+  "code9 69 例含 1 例 HIS/JHEMR 不一致实例；生产 unbound token 已清零"
+ ],
+ "waiting_domain": [
+  "W1",
+  "W2",
+  "W3",
+  "W4",
+  "W5",
+  "W6",
+  "W7",
+  "W8",
+  "W9",
+  "W10",
+  "W11",
+  "W12",
+  "W13",
+  "W14",
+  "W15(R8 续跑)",
+  "W16(10.20.1.153 治理)"
+ ],
+ "dod_self_check": "见 164_163合并升级_执行报告.md §10（163 §8 全过；164 §8 R8 项按诚实口径 WARN）",
+ "addendum_20260829_pm": {
+  "W3": {
+   "status": "DONE",
+   "operations": 8,
+   "export": "confirmed 26 / conflicted 0 / check PASS",
+   "rulings": [
+    "conflict resolved keep 医嘱离院",
+    "code9=其他",
+    "emerg3=期限手术",
+    "TREAT_RESULT JHEMR 语义五码（含纠正 PORTAL 1=好转→治愈）"
+   ],
+   "authorization": "用户 2026-08-29 授权按规处理；生产空库随 W1 导入"
+  },
+  "W10": {
+   "status": "DONE",
+   "scheme": "C",
+   "setting": "identity_cb_max_align=150",
+   "tests": {
+    "new": 7,
+    "full_suite": "1190 passed / 0 failed"
+   },
+   "deploy": {
+    "image": "data-asset:w10c-202608291223",
+    "base": "data-asset:p153-20260827224726",
+    "verified": [
+     "healthy",
+     "max_align=150",
+     "333 routes",
+     "logs clean"
+    ],
+    "rollback": "DATA_ASSET_IMAGE=p153 镜像 + env.bak-w10c-20260829"
+   },
+   "expect": "今夜 02:00 cron 112 对齐通过熔断"
+  },
+  "R4": {
+   "status": "SCHEDULED",
+   "automation": "automation-a841ec6d",
+   "at": "2026-08-29 22:00"
+  },
+  "R8": {
+   "status": "WARN",
+   "executed": 10,
+   "passed": 7,
+   "failed": 2,
+   "manual_verify": 1,
+   "not_executed": 16,
+   "new_defect": "DEF-A-004 P3 清空搜索不自动恢复"
+  }
+ },
+ "r8_removed_20260829": {
+  "by": "用户指示",
+  "kept": "批次 A 存档（evidence/GUI-20260829-01/，移交 W11）",
+  "cancelled": "批次 A 补测+B–G",
+  "waiting_domain_updates": "W15 撤销；164 完成定义=R0–R7+R4"
+ }
+}

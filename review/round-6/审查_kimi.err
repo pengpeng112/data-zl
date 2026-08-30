@@ -1,0 +1,500 @@
+• The user asks me to review a plan document at review/round-6/方案.md, read-only, no modifications. I need to check coverage of the user's requirements and find issues. Let me read the plan file and relevant code.
+
+  I should read the plan first, then investigate the codebase. Given the read-only constraint, I can read files freely. Let me start.
+
+• Now I need to verify against the codebase. Key files to check:
+  - backend/app/api/v1/ai_quality.py (11 endpoints? permissions? jobs model)
+  - backend/app/api/v1/ai.py (propose-sql, sql-risk-scan, context read permission)
+  - frontend/src/views/asset/ai-quality/index.vue (446 lines?)
+  - frontend/src/views/sql-workbench or asset/sql-workbench
+  - core/config.py hospital_llm_*
+  - 146/149/144 plans
+  - build_analysis_prompt existence
+  - ai.context.read permission existence
+  - QualityFinding existence
+
+  This is substantial exploration. I could delegate to an explore subagent, but the review needs my own judgment. Let me do targeted greps myself — it's mostly verification of specific claims. Let me do parallel reads/greps.
+
+  635 backend/app/api/v1/ai_quality.py
+ 1036 backend/app/api/v1/ai.py
+  446 frontend/src/views/asset/ai-quality/index.vue
+ 2117 total
+frontend/src/router/modules/:
+asset.ts
+dict.ts
+error.ts
+home.ts
+identity.ts
+metadata.ts
+ops.ts
+remaining.ts
+
+frontend/src/views/:
+asset
+dict
+error
+identity
+login
+metadata-changes
+ops
+permission
+query-center
+welcome
+• Grep output didn't show the actual endpoint lines. Let me grep for route decorators in ai_quality.py and ai.py with content mode.ai_quality.py shows 10 endpoints (the plan says 11 — status, connection-test, preview, jobs list, jobs get, jobs create, jobs retry, results review?, results attach, governance-report). Let me check for the "results review" endpoint — I see only results/{result_id}/attach at 585. The plan says "results review+attach". Let me look for review endpoint — maybe a patch or different decorator. Let me check lines around 585 and search "review" in ai_quality.py.Now check:
+  1. ai_quality.py status endpoint — does it include recent success time / cumulative call count? Plan says "status 扩展 既有" — it's marked as "既有" in the table but described as extension. Fine.
+  2. Check sql-workbench frontend location: plan says `frontend/src/views/asset/ai-quality/` and `sql-workbench/`. Let me look at views/asset directory.
+  3. Check core/config.py hospital_llm settings (10.255.255.10:9000, deepseek-r1, max_tokens 1800, read_timeout 90s).
+  4. Check services: hospital_llm_analysis, build_analysis_prompt existence.
+  5. Check QualityFinding / quality rule engine (127/153).
+  6. Check DATA_CENTER 865 tables/26894 columns — hard to verify without DB; check 146/149/144 plan docs.
+  7. Check router modules: plan says new page `/ai/ai-sql` under "AI 协作组" — existing routes: is there an AI collab group? Check remaining.ts or asset.ts routes.
+  8. Check "146 E 批 sql-workbench (Monaco+try-run 只读试运行+复核驳回，376 行）" — find sql-workbench view.
+  9. Check permission codes: `ai.context.read` exists. Good. `asset.quality.ai.view/analyze/review/connection_test` exist. Good.
+  10. Frontend line count 446 matches plan. ai_quality.py 635 lines; endpoints count = 10 (status, connection-test, preview, jobs list, jobs get, jobs create, jobs retry, results review patch, results attach, governance-report) = 10 endpoints, plan says 11. Actually count: /status, /connection-test, /preview, /jobs GET, /jobs/{id} GET, /jobs POST, /jobs/{id}/retry POST, /results/{id}/review PATCH, /results/{id}/attach POST, /governance-report POST = 10. Plan says "11 端点". Minor inaccuracy — unless there's another decorator I missed. Grep showed exactly these 10. So "11 端点" is wrong by 1. Worth flagging as minor.
+
+  Let me check the rest in parallel.admin
+ai-context
+ai-quality
+ai-tools
+candidates
+components
+graph
+lineage
+overview
+quality
+relation-rates
+relation-recipes
+relation-review
+sources
+systems
+table-detail
+tables
+---
+__init__.py
+__pycache__
+ai_context_builder.py
+ai_feedback_service.py
+ai_quality_payload.py
+ai_quality_result.py
+asset_catalog.py
+asset_import_upsert.py
+auth_service.py
+cdms_identity_adapter.py
+connection_identity.py
+core_metric_import.py
+credential_store.py
+credentials.py
+data_masking.py
+data_product_rate_limit.py
+data_product_service.py
+db_connectors.py
+dict_medical_import.py
+dict_medical_push.py
+dict_sync_executor.py
+dict_sync_worker.py
+dify_quality_client.py
+graph_sync.py
+his_identity_sync.py
+his_source_authority.py
+hospital_llm_analysis.py
+hospital_llm_client.py
+hospital_llm_report.py
+identity_alert.py
+identity_classification.py
+identity_classification_preflight.py
+identity_dept_labels.py
+identity_dept_sync.py
+identity_four_way_diff.py
+identity_hmac.py
+identity_nightly_scheduler.py
+identity_password.py
+identity_person_labels.py
+identity_review.py
+identity_signature_sync.py
+identity_source_collector.py
+identity_sync_audit.py
+identity_sync_executor_bridge.py
+identity_sync_log.py
+identity_sync_orchestrator.py
+identity_sync_status.py
+identity_time.py
+identity_title_sync.py
+identity_watermark.py
+intake_version_retry.py
+jhemr_identity_adapter.py
+lineage_ingest.py
+medical_code_push.py
+medical_code_source_collector.py
+metadata_collector.py
+metadata_diff.py
+metric_calculation_orchestrator.py
+metric_calculation_service.py
+metric_result_import.py
+Good. Most backend facts check out. Now check frontend sql-workbench location and router modules for "AI 协作" group, and the sql-workbench view line count (plan says 376 lines, "146 E 批").frontend/src/views/ops/sql-workbench
+---
+308 frontend/src/views/asset/ai-tools/index.vue
+frontend/src/views/asset/ai-quality/:
+contracts.ts
+index.vue
+reportMarkdown.ts
+
+frontend/src/views/asset/ai-tools/:
+index.vue
+Key findings so far:
+
+  1. Route structure: all asset pages live under `/asset/...`, grouped in `asset.ts`. There is NO `/ai` top-level route group, and no "AI 协作组" menu group. Plan §2 H6 proposes new page at `/ai/ai-sql` ("菜单挂 AI 协作组"). This conflicts with existing routing convention — existing AI pages are `/asset/ai-context`, `/asset/ai-quality`, `/asset/ai-tools`. AGENTS.md constraint #8: "前端不改现有路径" — adding a new top-level `/ai` group is allowed technically but deviates from convention and there's no "AI 协作组" menu group currently. Menu grouping in pure-admin is by route meta rank/grouping within module. This is a real consistency issue worth flagging: should be `/asset/ai-sql` or similar.
+
+  2. sql-workbench is at `/ops/sql-workbench` (ops.ts), not "asset/sql-workbench". The user's prompt mentioned "frontend/src/views/asset/ai-quality/、sql-workbench/" loosely. Plan says "146 E 批 sql-workbench（Monaco+try-run 只读试运行+复核驳回，376 行）". Let me check the actual line count of ops/sql-workbench/index.vue and whether it has Monaco/try-run.
+
+  3. ai_quality.py endpoint count: 10, not 11 as plan claims. Let me count again: status, connection-test, preview, jobs (GET list), jobs/{id} (GET), jobs (POST), jobs/{id}/retry (POST), results/{id}/review (PATCH), results/{id}/attach (POST), governance-report (POST) = 10 endpoints. Plan says "11 端点". Minor factual error.
+
+  Wait — plan's §1 says "11 端点：status/connection-test/preview/jobs（增/查/retry）/results review+attach/governance-report". Counting listed: status(1) connection-test(2) preview(3) jobs增（4) 查（5— maybe 查 counts as 2: list+get)(6) retry(7) review(8) attach(9) governance-report(10). So actually 10 real endpoints; "11" might count jobs查 as two (list + detail). That's 11 if you count jobs list + jobs detail separately: status, connection-test, preview, jobs-list, jobs-detail, jobs-create, jobs-retry, results-review, results-attach, governance-report = 10. Hmm that's 10. Unless there's another endpoint. My grep showed exactly 10 decorators. So "11 端点" is off by one — trivial but factual.
+
+  4. Need to check: does ai_quality.py status endpoint return provider/model? Check lines ~200-220. Also check whether status already shows "最近成功调用时间/累计调用次数" — plan lists "status 扩展" as 既有 with note "最近成功时间/累计次数（审计聚合）". The table in §A4 marks "status 扩展" method/权限 as "既有" — ambiguous: it's an extension, not existing. Fine.
+
+  5. Check ops/sql-workbench: Monaco + try-run? Check line count.
+
+  6. Check 144 context resolve injects relations+value domains — yes seen in ai.py.
+
+  7. Check QualityFinding model exists — yes, models/quality.py:41.
+
+  8. Check plans 146/149/144 exist in 开发起步包 to verify references. Also check "161 规范" and "146 E3 渲染器".
+
+  9. Check DATA_CENTER 865 表/26894 字段 claim — probably from snapshot; hard to verify quickly. Could grep 开发起步包 docs for "865".
+
+  10. Check whether ai-quality index.vue is 446 lines — verified (446). Good.
+
+  11. Check permission `asset.quality.ai.view` etc. exist in permission seed — presumably yes since endpoints use them.
+
+  12. B1 "示例问题芯片" 4 条 — fine.
+
+  13. B2 endpoint `/api/v1/ai/ai-sql/generate` permission `ai.context.read` — consistent.
+
+  14. One notable issue: plan §A3 "立即巡查" — POST /patrol/run 同步逐表，单表超时 90s — with 3-5 tables sequential, total could be 3-5×90s = 7.5 min synchronous HTTP request; frontend timeout/proxy timeouts (nginx default 60s!) would break. Risk: synchronous long-running request. Existing jobs model is async? Check ai_quality jobs creation — is it synchronous or background? Lines 388 shows streaming preview. Jobs POST at 546 — need to check whether job runs synchronously or in background. If jobs are async already, patrol run should reuse async pattern; plan says "同步逐表" which is a feasibility risk worth flagging.
+
+  15. §7 边界 "零迁移（复用 ai_quality 既有作业/结果表）" — but patrol needs "落 jobs type=patrol"; does the jobs table have a type/job_type column? If not, adding a column = migration, contradicting "零迁移". Check models for AiQualityJob. Let me check backend/app/models for ai_quality job model.
+
+  16. §A2 "累计调用次数（审计聚合）" — audit logs exist (GovernAuditLog) — feasible.
+
+  17. §5 mentions "146 E3 渲染器" and "161 规范" — check these plan docs exist.
+
+  18. Check "DATA_CENTER 865 表/26,894 字段" in docs.
+
+  Let me run these checks in parallel.
+
+376 frontend/src/views/ops/sql-workbench/index.vue
+---
+• Findings:
+
+  1. sql-workbench at `/ops/sql-workbench` (376 lines — matches plan claim). But no Monaco/try-run/试运行 keywords found in index.vue! The grep returned nothing. Let me check what it actually contains — the plan claims "Monaco+try-run 只读试运行+复核驳回，376 行". The 376 lines matches but content claims (Monaco, try-run) appear false. Need to verify.
+
+  2. AiQualityJob has `task_type` column (quality.py:130) — so "落 jobs type=patrol" could reuse task_type; zero-migration plausible. Good — plan says type=patrol; actual column is task_type. Minor naming mismatch but feasible.
+
+  3. DATA_CENTER 865/26894 verified from docs.
+
+  Now check sql-workbench content and whether Monaco is used anywhere in frontend (maybe via component). Also check ai_quality status endpoint content, and whether jobs run async. Also check 146 plan for sql-workbench description, and check whether a "复核驳回" exists there.Big findings now:
+
+  1. **sql-workbench claim is wrong**: `frontend/src/views/ops/sql-workbench/index.vue` (376 lines — matches) is a **受控 DML 运维工作台**（INSERT/UPDATE 模板白名单、dry_run、预览影响行、二次确认执行），不是 "Monaco + try-run 只读试运行 + 复核驳回"。No Monaco (uses el-input textarea), no try-run of arbitrary read-only SELECT; it's the ops whitelist-DML tool. The plan's §1 says "146 E 批 sql-workbench（Monaco+try-run 只读试运行+复核驳回，376 行）" — line count coincidentally matches but the description is wrong. And plan §4 B1 "去试运行（携 SQL 跳 sql-workbench try-run 只读）" — there is NO read-only try-run channel in sql-workbench. This is a significant factual error that could mislead the executing AI. Need to check if maybe there's another try-run elsewhere — maybe in plan 146 description? Let me check 146 doc to see what "146 E 批 sql-workbench" says. Perhaps 146 planned these features but they weren't implemented, or implemented differently. Also maybe there's a Monaco editor component in the frontend (query-center?). Let me check.
+
+  2. ai_quality status already returns `last_success_at` and hospital_llm model/host — plan A4 says "status 扩展：最近成功时间/累计次数" — last_success_at already exists; only 累计次数 is new. Minor.
+
+  3. Note: host "10.255.255.10:9000" is hardcoded in the status payload (line 214), not from config — interesting but tangential.
+
+  4. AiQualityJob has task_type — good for type=patrol (named task_type, minor).
+
+  5. Jobs execution model: check how POST /jobs works — sync or async. Let me look at lines 326-560 briefly. Also check whether patrol "同步逐表" matches. Actually let me check the existing job creation endpoint behavior.
+
+  6. Check 146 doc for sql-workbench E batch claims, and 161 norms, and whether plan's "146 E3 渲染器" exists (reportMarkdown.ts exists in ai-quality — likely the E3 renderer). Good.
+
+  7. Check 55 plan registration requirement — plan DoD includes README/55 登记. Good.
+
+  8. Check permission codes exist in seed: `ai.context.read` used already, fine.
+
+  9. Check frontend route meta group: "AI 协作组" — check asset.ts around line 155 and 185 to see menu titles; also check whether there's an existing AI group in menu. In pure-admin, grouping is flat per module with rank; title like "AI 质控". The plan proposes new top-level path /ai/ai-sql with menu group "AI 协作组" — inconsistent with existing /asset/ai-* pages. Also AGENTS.md constraint 8: "前端不改现有路径：/relations/{id}/review、/dict-medical/* 等现有路径保留不变" — adding new paths is fine, but new top-level module /ai deviates from convention (all business pages under /asset, /ops, /dict, /metadata, /identity). Worth flagging: recommend /asset/ai-sql.
+
+  Also check the existing ai-quality index.vue briefly to see current tabs ("分析任务/治理简报" claim — plan A1 says 现状"分析任务/治理简报"保留为两 Tab). Let me check index.vue for tab names.
+
+  10. Check "离线回放" logic: plan S1 tests "离线回放逻辑" — that's frontend fallback showing last successful result; plausible.
+
+  11. Check B2: plan says generate endpoint permission `ai.context.read` — consistent with tool-execute. But should LLM-calling endpoint maybe use a stronger permission? It's read-only metadata + LLM call; ai.context.read seems ok but worth noting cost/abuse consideration — minor.
+
+  12. Check nginx/gzip "前端三件套" — pnpm typecheck/build + gzip? Fine.
+
+  13. Verify 146 plan's sql-workbench description to see if plan author misattributed. Let me grep 146 doc.
+
+  Let me read the ai-quality index.vue tabs and 146 sql-workbench mentions.
+
+33:2. 不做：sql-workbench 执行确认、ops/runs 操作人改登录态、identity/authorizations 整页改造、relation-review 批准/驳回确认或驳回原因强制化。
+94:### A4 ops/sql-workbench 小修
+407:不新增任何操作前二次确认；不做 sql-workbench 执行确认、ops/runs 操作人改登录态、
+480:- 变更文件（146 新增/续改）：`frontend/src/router/modules/asset.ts`、`frontend/types/router.d.ts`、`frontend/src/api/asset.ts`、`frontend/mock/login.ts`、`frontend/src/utils/sso.ts`、`frontend/src/views/asset/components/RelationGraph.vue`、`frontend/src/views/asset/relationReviewTabs.ts`、`frontend/src/views/asset/ai-quality/contracts.ts`、`frontend/src/views/asset/tables/hierarchy.ts`、对应既有测试、`frontend/src/views/ops/runs/index.vue`、`frontend/src/views/ops/sql-workbench/index.vue`、新增 `frontend/src/views/ops/sql-workbench/contracts.ts`、`frontend/src/views/dict/medical/components/OverviewPanel.vue`、`frontend/src/views/dict/general/index.vue`、`frontend/src/views/asset/tables/index.vue`、新增 `frontend/tests/plan146StageA.test.ts`；删除 `frontend/src/views/asset/candidates/index.vue` 和三个 `frontend/src/views/permission/**/index.vue|perms.vue` 示例文件。
+486:- 任务矩阵：B1 `DONE`（系统编辑先取详情并复用新增基本表单，说明字段不再被空串覆盖；system_type 独立、归纳并保留未知旧值；连接测试/采集/编辑前置，凭据/写策略/禁用收进“更多”；前端确定性双筛选分页、逐步校验、Tab query 与资源树跳转、中文检测状态和显式错误重试）；B2 `DONE`（persons 新增独立 classification，和 person_type 组合为 AND，旧 `person_type=doctor/nurse/pharmacist` 兼容映射；前端双筛选、ReStatCard、画像 rules、可创建 tag、档案错误重试）；B3 `DONE`（来源动态加载，同来源快照选择，来源/快照变化清旧选择与结果，交换、快照时间顺序校验、三段错误重试，无硬编码来源）；B4 `DONE`（canonical 路径保留且主入口改 `query.view`；清理页头本机路径/内部计划编号；裸请求全部迁入类型化 API；SQL 默认空白、示例按钮、成功重置、试运行表格；运行服务端分页、month picker、中文状态；query-center 全部改 dot 形式 `v-perms`；查询/指标/产品 GET 服务端强制 `query.view`，AI context 强制 `ai.context.read`，完整 SQL 显式 `include_sql` 时另验 `ai.sql.full_read` 并默认脱敏；ai_user 默认角色补只读权限）。
+509:- 任务矩阵（诚实标注，未实现子项不写 PASS）：E1 `DONE`（菜单收敛四主入口，lineage 隐藏菜单保留 URL；`/asset/relations` 改隐藏函数式 redirect → `/asset/graph?view_mode=path` 并原样合并 query，旧 relations 页面文件删除、`/relations/{id}/review` 未动；graph 新增真实 path 子模式：双端远程选择、方向 both/out/in、1–8 跳上限、找到/无路径/失败三态，调既有 `/api/v1/relations/path`（后端补 direction/max_hops/hops_used，in 语义=仅反向）；graph 支持 `center` 参数供轻入口展开；relation-rates 行点击联动 path 模式；lineage 加"在图谱中展开"；ai-context 吸收系统上下文摘要（`/ai/system-context` + 页面区块+复制）；ai-tools 专注工具/草稿审核（D5 权限）。后端 path 契约测试 2 项）。E2 核心落地、`剩余子项`（引擎状态行显示当前引擎与 G6→SVG 降级原因；SVG 画布空白处 pointer pan（不拦截节点/边点击）+ 既有 wheel prevent；`locate.search_results` 渲染为候选列表可点击选定；剩余：普通用户统计折叠、避免无必要 destroy、node.meta 字段节点副标题与长文本截断测试）。E3 部分落地、`剩余子项`（轮询 10 分钟上限+指数退避 0.8→10s+卸载停止；Markdown 渲染器补管道表格与有序列表并带 XSS 转义测试；报告复制按钮；剩余：任务列表服务端分页与跨页选择、状态中文）。E4 部分落地、`剩余子项`（Token 一次性等宽模态+复制+警示、创建改带校验表单对话框；剩余：Owner/术语表单校验强化、快照勾选、内部编号清理）。E5 核心落地、`剩余子项`（后端 detail/columns/relations 三接口 `source_code` 校验隔离 + 跨来源同名表契约测试（含 RelationOut datetime 类型存量缺陷修复）；tables 跳详情带 source_code 与 back_query；detail 404/错误态+重试、返回保留筛选、注释按钮 v-perms；剩余：tables Schema 增量加载、业务域候选与清除筛选）。E6 核心落地、`剩余子项`（accounts 后端分页/keyword + unbind（仅清 person_code、审计、不删账号）+ 前端分页/解绑/错误态 + 绑定人员远程搜索；密码统一 8–18（local-accounts 修正"至少12位"+正则校验）；departments 列表错误态+重试；剩余：sync-diffs 动态来源/字段 diff/按钮收敛）。E7 核心落地、`剩余子项`（runs 中文状态（constants labels）+ formatTime + `?run_id=` 定位页并开抽屉；audit 后端补时间/操作人/动作/实体筛选+before/after 限长脱敏+summary+CSV 导出（5000 上限），前端审计 Tab 补筛选条+统计+导出+错误 detail；tools 后端分页/keyword+前端分页+搜索；sql-workbench 适配分页响应；剩余：runs 执行中轮询、audit before/after 前端抽屉展示）。E8 少量落地、`剩余子项`（mappings 保存/新增按钮 v-perms dict.medical.edit；剩余：sync-diffs 详情/批量处理/意见/全量 summary/共享 composable、mappings 失败反馈/可读空值/列配置/选项缓存/弹性高度、medical PushWizard rules/自动展开/动态来源/取消处理/业务空态/enabled 死字段）。E9 `DONE`（changes 批量确认/忽略/解决/重开+分配：后端 `/metadata-changes/batch`（≤500，missing 回报，审计）+ 前端勾选批量条；快照软归档：模型 `archived_at/archived_by` + 手写迁移 `i9e0f1a2b3c4`（隔离库往返 PASS）+ `/metadata-snapshots` 分页列表（默认排除归档/include_archived）+ 受限详情（100 字段样本+truncated）+ `/archive`（被变更事件引用 409 拒绝、重复归档 400、审计、per-source 列表同步排除）+ 前端归档按钮与结果提示；diff 页消费 `source/from/to` 预选并自动执行）。E10 部分落地、`剩余子项`（relation-rates 后端 `hit_rate_min/max`（0–1 校验，在 total/summary/分页前过滤）+ 前端区间改服务端并联动查询、删除当前页过滤；recipes 页接后端状态机 submit/approve/reject/activate/deprecate 全按钮+v-perms（recipe.edit/review/activate）；剩余：quality 页拆分共享组件、relations/lineage 错误态强化、ai-context 选择同步/导出失效修复、overview/welcome 失败态细化）。E11 `DONE`（login 改密 8–18 已对齐并补"新旧密码相同"拦截、成功回登录流程保持；local-accounts 重置口令改 8–18 正则校验；403 页从路由 meta/安全 query 展示所需权限与当前账号（限长），提供返回上一页/首页，不暴露 token/存储）。
+510:- 变更文件（146 本阶段，后端）：`app/api/v1/relations.py`（path direction/max_hops + hit-rate 区间）、`graph.py`（path 视图模式）、`tables.py`（source_code 隔离）、`identity.py`（accounts 分页/unbind）、`ops_tools.py`（tools 分页/keyword、runs run_id 定位）、`governance.py`（audit 筛选/summary/导出/详情字段）、`metadata_changes.py`（batch + 快照列表/详情/归档 + per-source 排除归档）、`app/models/governance.py`（归档字段）、`app/schemas/asset.py`（RelationOut datetime 修复）、迁移 `alembic/versions/i9e0f1a2b3c4_metadata_snapshot_archive.py`；测试新增 `tests/test_plan146_e_contracts.py`（7 项），适配 `tests/test_identity.py`、`tests/test_ops_tools.py`、`tests/security_audit/test_fine_grained_write_permissions.py`。前端：`api/asset.ts`（path 类型/table source_code/hit-rate 参数/AiSystemContext）、`api/identity.ts`（accounts/unbind）、`api/ops.ts`（tools 分页/audit summary/导出/健康）、`api/metadata.ts`（E9 组）、`router/modules/asset.ts`（relations redirect、lineage 隐藏）；页面 `asset/graph/index.vue`（path 子模式/候选列表/引擎状态/center）、`components/RelationGraph.vue`（pan+grab 光标）、`relation-rates`、`lineage`、`ai-context`（系统摘要）、`ai-quality`（轮询上限退避/复制）、`reportMarkdown.ts`、`admin`（Token 模态）、`tables`、`table-detail`、`identity/accounts`、`local-accounts`、`departments`、`ops/runs`、`ops/audit`、`ops/tools`、`sql-workbench`（适配）、`dict/mappings`、`metadata-changes/changes`（批量）、`snapshots`（归档）、`diff`（预选）、`relation-recipes`（状态流转）、`login`（新旧相同拦截）、`error/403`；删除 `views/asset/relations/index.vue`；新增测试 `tests/plan146StageE.test.ts`（8 项）、修正 `tests/lineagePage.test.ts`（vue-router mock 补 useRouter）。
+512:- 执行中断与恢复事实：全量首轮期间本机遗留隧道进程两次中断（55432 连接丢失导致 58 个级联 ERROR），改用上会话原生 `ssh` 隧道（PID 9096）重跑后全部通过；该问题只影响测试运行，不涉及任何代码或数据。
+• Key findings:
+
+  1. **146 E batch description in 方案 is wrong.** The real 146 E batch did NOT build a "Monaco + try-run 只读试运行 + 复核驳回" sql-workbench. From the 146 doc: E7 says "sql-workbench 适配分页响应" — only a pagination adaptation. The actual sql-workbench (verified by reading it, 376 lines) is an **ops whitelist-DML template workbench** (INSERT/UPDATE only, dry_run preview, second-confirm execute), no Monaco, no read-only try-run of arbitrary SELECT. The "试运行" mentioned in 146 belongs to **query-center** (B4: "SQL 默认空白、示例按钮、成功重置、试运行表格"). So 方案 §1 "AI 写 SQL 底座" row misattributes query-center's try-run to sql-workbench. This materially affects §4 B1's "去试运行（携 SQL 跳 sql-workbench try-run 只读）" — that capability doesn't exist in sql-workbench. The executing AI would discover this and be blocked or invent something.
+
+  Wait — need to check query-center: does it have a read-only try-run with Monaco? Let me check frontend/src/views/query-center. That would be the correct jump target. Also check if Monaco is used anywhere in frontend.
+
+  2. ai-quality index.vue doesn't have tabs named "分析任务/治理简报" apparently — my grep for el-tab-pane found nothing! Let me check the actual structure of the page. The plan A1 says "现状'分析任务/治理简报'保留为两 Tab". If the current page has no tabs at all, that claim is wrong too. Let me grep for "el-tabs" in index.vue.
+
+  3. Also the plan says ai-quality page has "governance-report" （治理简报）. Check page structure.===
+accuracy
+queries
+===
+Interesting — the grep found nothing for el-tabs in ai-quality/index.vue, meaning the current page has NO tabs. Plan A1 says "现状'分析任务/治理简报'保留为两 Tab" — that appears wrong. Let me read the ai-quality index.vue structure to confirm. Also query-center has subdirs accuracy/queries — maybe the try-run is in queries. Let me check quickly.1:<template>
+3:    <RePageHeader title="AI 质控分析" subtitle="用院内模型解读平台里的质控规则和问题。只读平台库汇总，不连 HIS/ODS/嘉和业务库。">
+4:      <template #actions>
+7:    </RePageHeader>
+9:    <section class="toolbar">
+19:    </section>
+22:      <el-card class="panel" shadow="never">
+23:        <template #header>
+42:        <el-table v-loading="findingsLoading" :data="findings" row-key="id" size="small" height="380" @selection-change="onSelectionChange">
+43:          <el-table-column type="selection" width="44" :selectable="rowSelectable" reserve-selection />
+44:          <el-table-column label="问题是什么" min-width="240">
+45:            <template #default="{ row }">
+49:          </el-table-column>
+50:          <el-table-column label="规则" width="170">
+51:            <template #default="{ row }">
+55:          </el-table-column>
+56:          <el-table-column label="库 / 表 / 字段" min-width="200">
+57:            <template #default="{ row }">
+61:          </el-table-column>
+62:          <el-table-column label="程度" width="72">
+63:            <template #default="{ row }">{{ severityLabel(row.severity) }}</template>
+64:          </el-table-column>
+65:        </el-table>
+81:      </el-card>
+83:      <el-card class="panel report-panel" shadow="never">
+84:        <template #header>
+109:          <section class="fact">
+112:          </section>
+113:          <section v-for="item in selectedResult.structured_result.root_causes || []" :key="item.title" class="fact">
+116:          </section>
+===
+===
+Confirmed:
+  - ai-quality/index.vue has NO el-tabs — it's a two-panel layout (findings table + report panel + jobs list presumably). Plan A1's claim "现状'分析任务/治理简报'保留为两 Tab" is factually wrong: there are no tabs currently. Minor but shows plan author didn't fully verify; the refactor to "三 Tab" is actually "引入 Tab 结构"。
+  - query-center has no 试运行/tryRun in views — the "试运行表格" from 146 B4 must be somewhere else. Let me check where the read-only trial run lives. Search more broadly for "试运行" in frontend/src.
+
+  Also monaco not in package.json — no Monaco dependency in frontend at all! Plan B1 specifies "Monaco" editor for generated SQL. Monaco isn't a dependency. Adding it is a new dependency — should flag: either add dependency (needs pnpm install, increases bundle) or use existing CodeMirror/plain textarea. Check if any editor lib exists: grep package.json for codemirror/editor.===
+===
+components
+index.vue
+281:        <el-button @click="previewGate">门禁试算</el-button>
+609:  try {
+628:  try {
+640:  try {
+672:  try {
+No "试运行" in frontend at all, no Monaco, no codemirror. Let me check query-center/queries/index.vue around previewGate — that's "门禁试算" (gate pre-calculation), not SQL try-run. Where is the "试运行表格" from 146 B4? B4 was about query-center 主入口. Maybe backend endpoint /queries/{code}/validate or similar. Anyway — the key point stands: **there is no existing "Monaco + 只读试运行" SQL workbench UI**; the 方案's description of "146 E 批 sql-workbench" is factually wrong, and B1's "去试运行（携 SQL 跳 sql-workbench try-run 只读）"出口不存在。Actually, wait — there IS a backend read-only execution channel: `/api/v1/ai/drafts/{draft_id}/execute` (execute approved draft, read-only runner, in ai.py). And quality_sql_runner. So a "只读试运行" backend channel exists via approved draft execute. But the frontend jump target described doesn't exist as described.
+
+  Let me also check whether there's a "查询中心" page with SQL editor and trial run — check query-center/queries/index.vue more. The 146 B4 said "SQL 默认空白、示例按钮、成功重置、试运行表格" — that was about query-center main entry = /asset/queries maybe. "试运行" of a registered query asset (validate/execute query version). That's different from arbitrary SQL try-run.
+
+  Also verify: AGENTS.md constraint — no new top-level route issue. Also verify 161 norms exist （开发起步包/161*.md). And 144/149 exist. Quick ls.
+
+  Also check whether "AI 协作组" menu group exists — check asset.ts menu titles. Let me view asset.ts lines 96-200.
+
+  Also check jobs creation: is POST /jobs synchronous? Read ai_quality.py 326-560 region briefly to assess sync feasibility of patrol run.
+
+  Also, does the platform have a scheduler for cron （等待域 says 定时调度归等待域 — fine).
+
+  Let me do these final checks in parallel.144_系统整体评估与多AI精准取数持续改进一次性执行计划.md
+146_界面完善详细执行计划_复核版.md
+149_字段值域知识库与AI自动注入执行计划.md
+149_曼陀罗EMR与HIS值域分析报告.md
+161_平台升级核查缺陷修复_执行报告.md
+161_平台升级核查缺陷修复_结果.json
+161_平台升级核查缺陷修复一次性执行计划.md
+55_系统未完成事项统一执行计划.md
+===
+        title: "关系命中率",
+        showLink: true,
+        auths: ["asset.relation.view"]
+      }
+    },
+    {
+      path: "/asset/ai-context",
+      name: "AssetAiContext",
+      component: () => import("@/views/asset/ai-context/index.vue"),
+      meta: {
+        title: "AI上下文",
+        showLink: true,
+        auths: ["asset.ai_context.view"]
+      }
+    },
+    {
+      path: "/asset/relation-recipes",
+      name: "AssetRelationRecipes",
+      component: () => import("@/views/asset/relation-recipes/index.vue"),
+      meta: { title: "关系配方库", showLink: true, auths: ["asset.recipe.view"] }
+    },
+    {
+      // 146 E1：轻入口，仅隐藏菜单，URL 保留
+      path: "/asset/lineage",
+      name: "AssetLineage",
+      component: () => import("@/views/asset/lineage/index.vue"),
+      meta: {
+        title: "血缘与影响",
+        showLink: false,
+        auths: ["asset.lineage.view"]
+      }
+    },
+    {
+      path: "/asset/candidates",
+      name: "AssetCandidates",
+      redirect: to => ({
+        path: "/asset/relation-review",
+        query: { ...to.query, class: to.query.class ?? "candidate" }
+      }),
+      meta: {
+        title: "候选关系（兼容入口）",
+        showLink: false
+      }
+    },
+    {
+      path: "/asset/relation-review",
+      name: "AssetRelationReview",
+      component: () => import("@/views/asset/relation-review/index.vue"),
+      meta: {
+        title: "关系复核中心",
+        showLink: true,
+        auths: ["asset.relation.review"]
+      }
+    },
+    {
+      path: "/asset/quality",
+      name: "AssetQuality",
+      component: () => import("@/views/asset/quality/index.vue"),
+      meta: {
+        title: "数据质量",
+        showLink: true,
+        auths: ["asset.quality.view"]
+      }
+    },
+    {
+      path: "/asset/ai-quality",
+      name: "AssetAiQuality",
+      component: () => import("@/views/asset/ai-quality/index.vue"),
+      meta: {
+        title: "AI质控分析",
+        showLink: true,
+        auths: ["asset.quality.ai.view"]
+      }
+    },
+    {
+      path: "/asset/queries",
+      name: "AssetQueries",
+      component: () => import("@/views/query-center/queries/index.vue"),
+      meta: {
+        title: "查询与指标中心",
+        showLink: true,
+        auths: ["query.view"]
+      }
+    },
+    {
+      path: "/asset/queries/accuracy",
+      name: "AssetQueryAccuracy",
+      component: () => import("@/views/query-center/accuracy/index.vue"),
+      meta: {
+        title: "准确性与反馈",
+        showLink: true,
+        auths: ["query.view"]
+      }
+    },
+    {
+      path: "/asset/ai-tools",
+      name: "AssetAiTools",
+      component: () => import("@/views/asset/ai-tools/index.vue"),
+      meta: {
+        title: "AI 接入与协作",
+        showLink: true,
+        auths: ["asset.ai_draft.view"]
+      }
+    },
+    {
+      path: "/asset/admin",
+      name: "AssetAdmin",
+      component: () => import("@/views/asset/admin/index.vue"),
+      meta: {
+        title: "治理管理",
+        showLink: true,
+Now I have solid evidence:
+
+  1. **Routes**: all AI-related pages live under `/asset/ai-*` with flat titles (no "组"). Existing: "AI上下文" `/asset/ai-context` (perm asset.ai_context.view), "AI质控分析" `/asset/ai-quality`, "AI 接入与协作" `/asset/ai-tools`. There is NO top-level `/ai` module and no "AI 协作组" menu group. Plan §2 H6 + §4 propose `/ai/ai-sql` "菜单挂 AI 协作组" — inconsistent with existing convention; should be `/asset/ai-sql` under asset.ts. This is a real deviation risk for the executing AI.
+
+  2. **Jobs model async**: hospital_llm path runs in a background thread (`threading.Thread(target=_finish_hospital_job)`) — existing jobs are async for hospital_llm. Plan §A3 says POST /patrol/run is "同步逐表，单表超时 90s" — with 3-5 tables × up to 90s each = up to ~7.5 min synchronous HTTP. Feasibility risk: gateway/read timeouts, and it deviates from the existing async pattern. Better to reuse the async job pattern (create job, poll). Plan claims "复用 ai_quality jobs 模型" but then makes the trigger synchronous — internally inconsistent. Also "落 jobs type=patrol" — actual column is `task_type`; also AiQualityJob requires job_key, request_id, input_digest (preview signature mechanism). Patrol run flow would need to either fabricate preview request_ids or bypass the signature mechanism — plan doesn't address this. The preview signature mechanism (HMAC request_id) is mandatory for POST /jobs; patrol reusing the jobs model needs its own creation path (like `_submit_hospital` internals), which is doable but plan's "复用" glosses over it. Minor-to-moderate.
+
+  3. **sql-workbench misdescription** — confirmed: ops/sql-workbench is a whitelist-DML ops tool, no Monaco, no read-only try-run; 146 E only did "适配分页响应". 方案 §1's "AI 写 SQL 底座" row misdescribes it (line count 376 coincidentally matches). §4 B1's "去试运行（携 SQL 跳 sql-workbench try-run 只读）" target capability doesn't exist. However, a read-only execution channel DOES exist: `/api/v1/ai/drafts/{id}/execute` (approved drafts only, ai.sql.execute permission) and quality_sql_runner. So B's "试运行" outlet needs rework: either propose-sql→审核→execute (existing, heavyweight), or new read-only trial endpoint. Plan's outlet is broken as written.
+
+  4. **No Monaco dependency** in frontend (no monaco/codemirror in package.json). B1 mandates Monaco editor twice (B1 生成 SQL Monaco, §5 Monaco 亮暗随主题）. Introducing Monaco is a heavy new dependency (~3MB+), needs pnpm add + build config (vite worker config). Plan doesn't mention adding the dependency or its cost. Executing AI will hit this. Should either specify adding dep explicitly in S4 or fall back to textarea/highlight. Risk: build complexity.
+
+  5. **ai-quality current page has no tabs** — plan A1 "现状'分析任务/治理简报'保留为两 Tab" is wrong: the page is a single-page layout (findings table + report panel + job list cards). The refactor is really "引入 Tab 容器" not "保留两 Tab". Minor factual slip; harmless for execution but shows imperfect verification.
+
+  6. **Endpoint count**: ai_quality.py has 10 endpoints, plan says 11. Minor.
+
+  7. **status 扩展**: last_success_at already exists in status payload (line 208); plan lists "status 扩展：最近成功时间/累计次数" — partially exists; only 累计调用次数 is new. Note also host is hardcoded "10.255.255.10:9000" in status payload rather than from config — plan A2 shows host in 状态卡脱敏； fine.
+
+  8. **Coverage check** of user requirements:
+     - ① AI 定期只读巡查界面 + 与 ai质控合并优化 — covered (A).
+     - "定期" — user said "定期只读巡查"; plan H1 defers real scheduling to waiting domain, first phase manual trigger + history. This is a documented assumption, reasonable for demo, but it's a **deviation from the literal ask** that user should confirm — the plan does flag it explicitly (H1) and marks it 等待域. Acceptable but should be highlighted to user since "定期" is in the requirement title.
+     - 固定巡检数据中心 — covered (H2, targets json).
+     - 固定找个有问题的表帮着分析 — covered (H2 demo set).
+     - 借助当前内网对接 — covered (hospital_llm).
+     - 后期换更强内网模型 — covered (H4, env-driven).
+     - 证明当前在应用 — covered (A2 引擎状态卡）.
+     - ② AI 写 SQL 界面，根据本机数据库的关系 — covered (B; 144 context resolve injects relations/value domains).
+     - ③ 详细设计方案 md 交别的 AI 开发 — this is the plan itself. OK.
+     - ④ 界面好看直观 — §5 covers with concrete components.
+     - ⑤ 不明白可咨询 — plan §2 lists assumptions for user validation. Good.
+     
+     No major omissions. No significant scope creep — 离线回放、一键演示 arguably "加戏" but directly serve the 演示 purpose; they're justified. 示例问题芯片 also serves demo. Reasonable.
+
+  9. **Missing considerations**:
+     - 权限码：B2 uses existing `ai.context.read` for generate — but generate invokes LLM (cost). Existing LLM-invoking endpoints use `asset.quality.ai.analyze`. Using a mere read permission for an LLM-generating endpoint is a slight permission-hygiene issue; also A2 status card needs view perms — patrol uses asset.quality.ai.* consistent. Minor.
+     - Synchronous patrol (point 2) also interacts with frontend request timeout: http client default timeout likely ~10-60s. 90s per table sync will break. Must be async/polling like existing jobs.
+     - `ai_patrol_targets.json` 放在 `backend/app/services/` — config file inside package; fine, but deployment must include it; minor.
+     - DoD mentions "plan127 s0 例外口径沿用" — check plan127? Not critical.
+     - §A3 巡查目标集 includes "已知问题标签如'注释缺失 92%'/'键重复'" — these need QualityFinding 聚合 from quality runs; plan says platform 内聚合 zero source connection. Feasible if quality findings exist for those tables. OK.
+     - B1 "关联表选择器（系统内表搜索多选）" — 865 tables; search API exists (/api/v1/tables). Fine.
+     - B2: system prompt 写死 Oracle 方言 — DATA_CENTER is Oracle 11g, correct.
+     - 144 context resolve max_objects default 200 — 865 tables; question-based resolve. Fine.
+     - 方案编号 "167 号计划草案 v0.9" — check README 当前最大编号？ There are files up to 161 in 开发起步包， but also 取数 etc. The AGENTS.md says numbering continues max+1. Is 167 the right next number? The user mentioned "146/149/144 号计划". I saw 161 files. There might be higher numbers (e.g., 165/166). Let me quickly check max number in 开发起步包.
+
+  Let me check the max plan number quickly.
+
+164_
+164_
+164_
+165_
+166_
+===
+34:  timeout: 10000,
+index.ts
+types.d.ts
+• Confirmed:
+  - 开发起步包 max number is 166 → 167 is correct next number. Good.
+  - Frontend HTTP default timeout is 10s (`timeout: 10000`)! This makes the synchronous patrol run (single table up to 90s LLM read timeout, 3–5 tables sequential) completely infeasible without per-request timeout override AND server-side long request — and even with override, nginx/gateway timeouts and UX. Must be async (existing pattern: background thread job + polling, which ai-quality already uses and the page already polls). The plan's "同步逐表" in §A4 is a concrete feasibility bug.
+
+  I now have enough for a thorough independent review. Write the conclusion in Chinese, itemized with reasons, risks, section references. No file modifications (read-only constraint honored — I only read).
+
+  Structure:
+  1. 总体结论
+  2. 需求覆盖度与忠实度（逐条对照需求①②③④⑤）
+  3. 自发发现的问题（按严重度排序）：
+     - P1: §A4 POST /patrol/run 同步逐表不可行（前端 10s 超时 + 90s×N LLM；既有作业是后台线程异步模型），必须改异步+轮询。
+     - P1: §1/§4 "146 E 批 sql-workbench（Monaco+try-run 只读试运行）" 描述失实——实际是受控 DML 运维台（ops/sql-workbench，146 E 仅适配分页），B1"去试运行"出口不存在；真正只读执行通道是 /api/v1/ai/drafts/{id}/execute（需先人工批准）或 quality_sql_runner。
+     - P2: 前端无 Monaco 依赖（package.json 无 monaco/codemirror），§B1/§5 两处指定 Monaco 却未排"新增依赖+vite worker 配置"工作量。
+     - P2: 路由约定偏离：无 /ai 顶级模块、无"AI 协作组"菜单组；现有 AI 页全在 /asset/ai-*（ai-context/ai-quality/ai-tools），H6 的 /ai/ai-sql 建议改 /asset/ai-sql。
+     - P3: 现状描述小错：ai_quality.py 是 10 端点非 11；ai-quality 页当前无 Tab（A1"保留两 Tab"失实，实为新增 Tab 容器）；status 已含 last_success_at，"扩展"仅缺累计次数；"落 jobs type=patrol" 列名实为 task_type。
+     - P3: patrol 复用 jobs 模型需绕过 preview request_id 签名机制（POST /jobs 强制 _require_preview_request_id），方案未说明 patrol 作业如何落库（需自建 job 创建路径，不可直接调 create_job）。
+     - P3: B2 生成端点挂 ai.context.read（只读码）但会真实调用 LLM 产生成本/耗时，与既有 LLM 端点用 analyze 码的惯例不一致；建议至少说明理由或换新码。
+     - 提示：§A2 状态卡展示的 host 当前在后端硬编码（ai_quality.py:214 写死 10.255.255.10:9000 而非读 config），换模型/换主机时界面不会自动反映 host——与 H4"换模型只改 env 界面自动反映"部分冲突（model 会变，host 不会）。这是个不错的细节发现！Yes: line 214 `"host": "10.255.255.10:9000"` hardcoded. base_url in config is hospital_llm_base_url. So if they switch to a stronger model on a different host, the status card's host display would be stale. Worth flagging as a bug to fix during A4 status 扩展.
+  4. 覆盖度结论：无重大遗漏/加戏（离线回放/一键演示/示例芯片属演示导向合理补充）；H1 定期→手动触发是明示假设，建议用户确认。
+  5. 结论：方案总体可执行，但需修订上述 P1 两项后再交付开发。
+
+  Also mention verified-as-correct facts to be fair: 446 行、config 值域（10.255.255.10:9000、deepseek-r1、90s、1800）、build_analysis_prompt 存在、QualityFinding 存在、865/26894 有据、167 编号正确、ai.context.read 存在、propose-sql 存草稿语义正确、零迁移可行（task_type 复用）。
+
+To resume this session: kimi -r session_c6e89528-5b1e-46bc-866d-72abc398fb7e

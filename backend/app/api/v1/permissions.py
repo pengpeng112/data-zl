@@ -134,6 +134,11 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "value_domain.read", "name_cn": "值域查看", "type": "page", "parent_code": "value_domain"},
     {"code": "value_domain.submit", "name_cn": "值域候选提交", "type": "button", "parent_code": "value_domain.read"},
     {"code": "value_domain.confirm", "name_cn": "值域人工确认", "type": "button", "parent_code": "value_domain.read"},
+    # ===== 165: 数据问题 AI 探查（A8：read 归 165；manage 归 166 F7） =====
+    {"code": "probe", "name_cn": "数据探查", "type": "menu", "parent_code": None},
+    {"code": "probe.finding.read", "name_cn": "探查问题查看", "type": "page", "parent_code": "probe"},
+    # 166 F7：人工终态流转（quality_admin 授 manage 为 A8 刻意决策——探查域归质量线）
+    {"code": "probe.finding.manage", "name_cn": "探查问题终态流转", "type": "button", "parent_code": "probe.finding.read"},
 ]
 
 
@@ -168,7 +173,7 @@ BUILTIN_ROLES: list[dict] = [
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     "platform_admin": [r["code"] for r in RESOURCE_CATALOG],
-    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read"],
+    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read", "probe", "probe.finding.read"],
     "asset_editor": [
         "asset",
         "asset.table.view",
@@ -195,7 +200,7 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "value_domain.submit",
         "value_domain.confirm",
     ],
-    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute"],
+    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute", "probe", "probe.finding.read", "probe.finding.manage"],
     "identity_admin": [
         "identity",
         "identity.person.view",
@@ -238,6 +243,8 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "query144", "query.view", "ai.context.read",
         # 149: AI 协作角色可读可提交 pending，但绝不授予 value_domain.confirm
         "value_domain", "value_domain.read", "value_domain.submit",
+        # 165 A8: 探查发现只读（manage 归 166）
+        "probe", "probe.finding.read",
     ],
 }
 

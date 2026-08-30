@@ -52,7 +52,8 @@ PACS（gecris，数据库 10.10.10.191 MySQL）**不在数据库里存图像文�
 ```sql
 -- ① DR(DX) 设备清单（实测 5 台有效：150/170/178/185/187；192 是"DX退费"非设备）
 SELECT ModalityID, ModalityName, modalitymodel
-FROM ModalityInfo WHERE ModalityLocation = 'DX';
+FROM gecris.ModalityInfo
+WHERE ModalityLocation = 'DX';
 
 -- ② 按时间窗取已完成 DR 检查 + StudyInstanceUID（改日期与 ModalityID 即可）
 SELECT e.ExamID,
@@ -60,16 +61,17 @@ SELECT e.ExamID,
        e.PreExamExamDate,
        m.ModalityName,
        e.StudyInstanceUID          -- 通道③ DICOM 用
-FROM ExamInfo e
-JOIN ModalityInfo m ON e.ModalityID = m.ModalityID
-JOIN PatientInfo p ON p.PatientIntraID = e.PatientIntraID
+FROM gecris.ExamInfo e
+JOIN gecris.ModalityInfo m ON e.ModalityID = m.ModalityID
+JOIN gecris.PatientInfo p ON p.PatientIntraID = e.PatientIntraID
 WHERE e.ModalityID IN (150,170,178,185,187)
   AND e.ExamSatus = '6'
-  AND e.PreExamExamDate BETWEEN '2026-08-01' AND '2026-08-31';
+  AND e.PreExamExamDate >= '2026-08-01 00:00:00'
+  AND e.PreExamExamDate <  '2026-09-01 00:00:00';
 
 -- ③ 通道①完整 URL（视图自带厂家服务账号，直接可开）
 SELECT IMAGE_ID, IMAGE_SAVE_PATH
-FROM EMR_EXAM_IMAGE_PATH
+FROM gecris.EMR_EXAM_IMAGE_PATH
 WHERE IMAGE_ID = <ExamID>;
 -- 视图口径：PreExamExamDate >= '2026-01-01' 且 ExamSatus='6'
 
@@ -93,7 +95,8 @@ SQL 写作注意：PACS 侧连接层使用参数格式化时 `LIKE '%x%'` 的 `%
 http://10.10.10.196/ZFP?mode=proxy#view&un=administrator&pw=<厂家内置令牌>&study_instance_uid=<MPPS.SUID>
 ```
 
-- 令牌为 PACS 厂家存在库内视图里的服务账号凭据，**不要抄进代码/文档**，运行时从视图读取；
+- 令牌为 PACS 厂家存在库内视图里的服务账号凭据，**不要抄进代码/文档，也不要把完整 URL 返回前端**；URL 查询、拼装和上游请求应在受控后端完成，对前端只暴露短时 opaque 地址或服务端代理流；
+- 完整 URL 会进入浏览器历史、反向代理/访问日志及潜在 Referer。网关必须关闭该路径的 query 日志、设置 `Referrer-Policy: no-referrer`，并对厂家令牌制定轮换方案；禁止把 `IMAGE_SAVE_PATH` 原值写审计日志；
 - 返回 HTML 查看器页（实测 200，2KB 零脚印前端），适合浏览器嵌入，**不是文件下载接口**；
 - `#view` 是 URL fragment，编程访问时需按 `mode=proxy%23view` 处理。
 
@@ -121,42 +124,77 @@ curl -o report.pdf "http://10.10.10.191:8054/iws/imageServer/report/20260827/125
 
 ```bash
 # 连通性：C-ECHO
-echoscu -c 1 -aet BLOODDIALYSIS 10.10.10.201 104
+echoscu -b BLOODDIALYSIS -c AE_ARCH@10.10.10.201:104
 
 # C-FIND：按 StudyInstanceUID 找 Series
-findscu -c -aet BLOODDIALYSIS -W \
-  -k QueryRetrieveLevel=SERIES \
-  -k StudyInstanceUID=<StudyInstanceUID> \
-  -k SeriesInstanceUID -k Modality -k SeriesNumber \
-  10.10.10.201 104
+findscu -b BLOODDIALYSIS -c AE_ARCH@10.10.10.201:104 \
+  -M StudyRoot -L SERIES \
+  -m StudyInstanceUID=<StudyInstanceUID> \
+  -r SeriesInstanceUID -r Modality -r SeriesNumber
 
-# C-MOVE：把整个 Study 拉到本机（需先在 AE_ARCH 登记你的 AET/IP/Port）
-movescu -c -aet BLOODDIALYSIS -aem BLOODDIALYSIS \
-  -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=<StudyInstanceUID> \
-  --store-tls=false 10.10.10.201 104
+# 终端 A：启动接收端（需先在 AE_ARCH 登记 BLOODDIALYSIS -> 本机IP:11112）
+storescp -b BLOODDIALYSIS:11112 --directory ./dicom-out
+
+# 终端 B：C-MOVE 整个 Study 到已登记的接收端
+movescu -b BLOODDIALYSIS -c AE_ARCH@10.10.10.201:104 \
+  --dest BLOODDIALYSIS -M StudyRoot -L STUDY \
+  -m StudyInstanceUID=<StudyInstanceUID>
 ```
+
+以上参数按 dcm4che 5 官方 `echoscu/findscu/movescu/storescp` 语法整理；现场安装版本仍应先运行各命令的 `--help` 核对。`movescu` 本身不保存影像，必须有独立 Storage SCP 接收 C-STORE。
 
 ### 5.2 Python（pynetdicom + pydicom）
 
 ```python
-from pynetdicom import AE, QueryRetrieveLevel
-from pynetdicom.sop_class import StudyRootQueryRetrieveInformationModelFind, StudyRootQueryRetrieveInformationModelMove
+from pathlib import Path
 
-ae = AE(ae_title=b"BLOODDIALYSIS")
-ae.add_requested_context(StudyRootQueryRetrieveInformationModelFind)
+from pydicom.dataset import Dataset
+from pynetdicom import AE, StoragePresentationContexts, evt
+from pynetdicom.sop_class import StudyRootQueryRetrieveInformationModelMove
 
-ds = {
-    "QueryRetrieveLevel": QueryRetrieveLevel.STUDY,
-    "StudyInstanceUID": "<StudyInstanceUID>",
-    "PatientID": None, "StudyDate": None, "Modality": None,
-}
-assoc = ae.associate("10.10.10.201", 104, ae_title=b"AE_ARCH")
-if assoc.is_established:
-    responses = assoc.send_c_find(ds, StudyRootQueryRetrieveInformationModelFind)
-    for status, identifier in responses:
-        if status and identifier:
-            print(identifier.get("StudyInstanceUID", ""), identifier.get("Modality", ""))
-    assoc.release()
+output_dir = Path("dicom-out")
+output_dir.mkdir(mode=0o700, exist_ok=True)
+
+
+def handle_store(event):
+    dataset = event.dataset
+    dataset.file_meta = event.file_meta
+    # 仅以 SOP Instance UID 命名，避免把患者标识写入文件名或日志。
+    dataset.save_as(output_dir / f"{dataset.SOPInstanceUID}.dcm", enforce_file_format=True)
+    return 0x0000
+
+
+ae = AE(ae_title="BLOODDIALYSIS")
+ae.add_requested_context(StudyRootQueryRetrieveInformationModelMove)
+ae.supported_contexts = StoragePresentationContexts
+store_scp = ae.start_server(
+    ("0.0.0.0", 11112),
+    block=False,
+    evt_handlers=[(evt.EVT_C_STORE, handle_store)],
+)
+
+query = Dataset()
+query.QueryRetrieveLevel = "STUDY"
+query.StudyInstanceUID = "<StudyInstanceUID>"
+
+try:
+    assoc = ae.associate("10.10.10.201", 104, ae_title="AE_ARCH")
+    if not assoc.is_established:
+        raise RuntimeError("DICOM association rejected")
+    try:
+        for status, _ in assoc.send_c_move(
+            query,
+            "BLOODDIALYSIS",
+            StudyRootQueryRetrieveInformationModelMove,
+        ):
+            if status is None:
+                raise RuntimeError("C-MOVE timeout or invalid response")
+            if status.Status not in (0x0000, 0xFF00, 0xFF01):
+                raise RuntimeError(f"C-MOVE failed: 0x{status.Status:04X}")
+    finally:
+        assoc.release()
+finally:
+    store_scp.shutdown()
 ```
 
 - **C-MOVE** 需在归档侧登记目的端 AETitle/IP/Port（前置条件 #3）；若不便登记，可协商 **C-GET**（连接反向建立，无需预先登记）；

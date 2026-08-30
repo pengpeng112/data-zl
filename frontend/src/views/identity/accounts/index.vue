@@ -186,7 +186,7 @@ async function doUnbind(row: any) {
   // E5：解绑前确认（doUnbind 已有 catch+loading，仅补确认弹窗）。
   try {
     await ElMessageBox.confirm(
-      `确认解绑账号 ${row.account_code || row.id}？账号保留，仅清空人员关联。`,
+      `确认解绑账号 ${row.account_id || row.id}？账号保留，仅清空人员关联。`,
       "解绑确认",
       { type: "warning" }
     );

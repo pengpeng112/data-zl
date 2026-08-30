@@ -1,0 +1,223 @@
+{
+ "meta": {
+  "generated_at": "2026-08-29T00:45:16.078348+00:00",
+  "executor": "163 R3-4",
+  "policy": "清单文件入 155 结果，库中零新增行（生产）；正式关系走 sql-relation-intake 人工复核",
+  "counts": {
+   "internal_C": 7,
+   "cross_system_D": 2
+  }
+ },
+ "candidates": [
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.ORDER_TBL",
+   "from_columns": [
+    "ORDER_SEQ"
+   ],
+   "to_table": "ECG.STUDY_TBL",
+   "to_columns": [
+    "ORDER_SEQ"
+   ],
+   "join_condition": "申请→检查（155 链路：ORDER_TBL PK ORDER_SEQ ──ORDER_SEQ/ORDER_NO──> STUDY_TBL）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.STUDY_TBL",
+   "from_columns": [
+    "STUDY_SEQ"
+   ],
+   "to_table": "ECG.MEASUREMENT_TBL",
+   "to_columns": [
+    "STUDY_SEQ"
+   ],
+   "join_condition": "检查→测量（STUDY_SEQ 串联）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.STUDY_TBL",
+   "from_columns": [
+    "STUDY_SEQ"
+   ],
+   "to_table": "ECG.REPORT_TBL",
+   "to_columns": [
+    "STUDY_SEQ"
+   ],
+   "join_condition": "检查→报告（STUDY_SEQ 串联）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.STUDY_TBL",
+   "from_columns": [
+    "STUDY_SEQ"
+   ],
+   "to_table": "ECG.REPORT_HISTORY_TBL",
+   "to_columns": [
+    "STUDY_SEQ"
+   ],
+   "join_condition": "检查→报告历史（STUDY_SEQ 串联）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.REPORT_TBL",
+   "from_columns": [
+    "REPORT_SEQ"
+   ],
+   "to_table": "ECG.DATA_TBL",
+   "to_columns": [
+    "REPORT_SEQ"
+   ],
+   "join_condition": "报告→波形数据（REPORT_SEQ 串联）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.STUDY_TBL",
+   "from_columns": [
+    "STUDY_SEQ"
+   ],
+   "to_table": "ECG.DATA_TBL",
+   "to_columns": [
+    "STUDY_SEQ"
+   ],
+   "join_condition": "检查→波形数据（STUDY_SEQ 直连）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "ecg_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.ORDER_TBL",
+   "from_columns": [
+    "PATIENT_ID",
+    "VISIT_ID"
+   ],
+   "to_table": "ECG.PAT_VISIT",
+   "to_columns": [
+    "PATIENT_ID",
+    "VISIT_ID"
+   ],
+   "join_condition": "心电申请↔HIS 就诊万能键（同名键，跨系统对齐候选）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "D",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "cross-system: 40 号口径 D 级延后，仅人工复核",
+   "layer": "cross_system_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "cardionet_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.患者检查申请信息_TABLE",
+   "from_columns": [
+    "住院号",
+    "住院次数"
+   ],
+   "to_table": "ECG.PAT_VISIT",
+   "to_columns": [
+    "PATIENT_ID",
+    "VISIT_ID"
+   ],
+   "join_condition": "cardioNet 申请表住院号+次数 ↔ HIS 万能键（全中文列名接口库）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "D",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "cross-system: 40 号口径 D 级延后，仅人工复核",
+   "layer": "cross_system_candidate"
+  },
+  {
+   "system_code": "ECG",
+   "source_code": "cardionet_sqlserver_10_10_10_80",
+   "namespace": "dbo",
+   "from_table": "ECG.患者检查申请信息_TABLE",
+   "from_columns": [
+    "申请号"
+   ],
+   "to_table": "ECG.患者检查报告信息_TABLE",
+   "to_columns": [
+    "申请号"
+   ],
+   "join_condition": "cardioNet 申请↔报告（接口库内部，申请号串联）",
+   "qualifiers": "",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "source_sql_sha256": "",
+   "existing_relation_id": "",
+   "warnings": "no declared FK; sequence-key inference from 155 snapshot",
+   "layer": "relation_candidate"
+  }
+ ],
+ "columns": [
+  "system_code",
+  "source_code",
+  "namespace",
+  "from_table",
+  "from_columns",
+  "to_table",
+  "to_columns",
+  "join_condition",
+  "qualifiers",
+  "intake_status",
+  "confidence",
+  "source_sql_sha256",
+  "existing_relation_id",
+  "warnings",
+  "layer"
+ ]
+}

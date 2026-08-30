@@ -28,6 +28,7 @@ from .identity_sync import (  # noqa: F401
 )
 from .dict_medical_push import DictMedicalImportRow, DictMedicalPushPlan, DictMedicalPushAction, DictMedicalPushRun  # noqa: F401
 from .dict_sync_outbox import DictSyncOutboxEvent  # noqa: F401
+from .probe import AssetProbeRun, AssetProbeFinding  # noqa: F401
 from .quality import AiQualityJob, AiQualityJobFinding, AiQualityResult  # noqa: F401
 from .value_domain import (  # noqa: F401
     AssetColumnValueDomain,

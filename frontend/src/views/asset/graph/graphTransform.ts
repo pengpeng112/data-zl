@@ -339,16 +339,18 @@ export function graphEdgeStyle(edge: Partial<GraphEdge & ApiGraphEdge>): GraphEd
   const confidence = edgeConfidence(edge);
   const relationType = edgeRelationTypeValue(edge);
   const status = edgeValidationStatus(edge);
-  // 129号：pastel 底图上的彩色细边（参考知识图谱：绿/蓝/橙/紫区分关系状态）
+  const opacity = confidence === "A" ? 0.96 : confidence === "B" ? 0.78 : confidence === "C" ? 0.62 : confidence === "D" ? 0.46 : 0.72;
+  // P0-6 互斥视觉语法：颜色=关系层，线型=关系类型，透明度=置信度。
+  // 延续 129 配色：正式蓝、已验证绿、候选橙、D 灰紫、依赖中性灰。
   if (edgeRelationTypeValue(edge) === "structure") {
-    return { stroke: "#94a3b8", lineWidth: 1.3, opacity: 0.45 };
+    return { stroke: "#94a3b8", lineWidth: 1.3, opacity };
   }
-  if (isDeferredEdge(edge)) return { stroke: "#9b7ec8", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.8 };
-  if (relationType === "dependency") return { stroke: GRAPH_COLOR_NEUTRAL_LIGHT, lineWidth: 1.2, lineDash: [2, 5], opacity: 0.55 };
-  if (["sample_pass", "verified"].includes(status)) return { stroke: "#58a05c", lineWidth: 2.6, opacity: 0.96 };
-  if (confidence === "B" || confidence === "C") return { stroke: "#dd8b2e", lineWidth: 1.8, lineDash: [8, 5], opacity: 0.92 };
-  if (confidence === "A") return { stroke: "#3f7cac", lineWidth: 2.2, opacity: 0.94 };
-  return { stroke: GRAPH_COLOR_NEUTRAL, lineWidth: 1.2, opacity: 0.86 };
+  if (relationType === "dependency") return { stroke: GRAPH_COLOR_NEUTRAL_LIGHT, lineWidth: 1.2, lineDash: [2, 5], opacity };
+  if (relationType === "candidate") return { stroke: "#dd8b2e", lineWidth: 1.8, lineDash: [8, 5], opacity };
+  if (isDeferredEdge(edge)) return { stroke: "#9b7ec8", lineWidth: 1.8, lineDash: [8, 5], opacity };
+  if (["sample_pass", "verified"].includes(status)) return { stroke: "#58a05c", lineWidth: 2.6, opacity };
+  if (confidence === "B" || confidence === "C") return { stroke: "#dd8b2e", lineWidth: 1.8, opacity };
+  return { stroke: confidence === "A" ? "#3f7cac" : GRAPH_COLOR_NEUTRAL, lineWidth: confidence === "A" ? 2.2 : 1.4, opacity };
 }
 
 export type GraphEdge = {

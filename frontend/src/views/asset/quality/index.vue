@@ -384,47 +384,17 @@
           <template #header>
             <span>最近检查记录</span>
           </template>
-          <el-table
-            v-loading="tasksLoading"
-            :data="checkRuns"
-            stripe
-            size="small"
-            class="clickable-row"
-            @row-click="openFindingsForRun"
-          >
-            <el-table-column prop="id" label="ID" width="60" />
-            <el-table-column prop="started_at" label="开始时间" width="170" />
-            <el-table-column prop="triggered_by" label="触发方式" width="80" />
-            <el-table-column prop="total_rules" label="规则数" width="80" align="center" />
-            <el-table-column prop="total_findings" label="发现问题" width="100" align="center" />
-            <el-table-column prop="total_records" label="扫描记录" width="100" align="center" />
-            <el-table-column prop="error_records" label="异常记录" width="100" align="center" />
-            <el-table-column label="通过率" width="100" align="center">
-              <template #default="{ row }">
-                <span v-if="row.pass_rate != null" :class="passRateClass(row.pass_rate)">
-                  {{ formatPercent(row.pass_rate) }}
-                </span>
-                <span v-else>-</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="状态" width="80">
-              <template #default="{ row }">
-                <el-tag
-                  :type="row.status === 'success' ? 'success' : row.status === 'running' ? 'warning' : 'danger'"
-                  size="small"
-                >
-                  {{ runStatusLabel(row.status) }}
-                </el-tag>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-pagination
-            v-model:current-page="tasksPage"
-            class="mt15"
+          <!-- 146 E10（R5）：批次/记录共用 CheckRunsTable 组件 -->
+          <CheckRunsTable
+            :runs="checkRuns"
+            :loading="tasksLoading"
+            clickable
+            show-triggered-by
+            :page="tasksPage"
             :page-size="tasksPageSize"
             :total="tasksTotal"
-            layout="total, prev, pager, next"
-            @current-change="loadCheckRuns"
+            @row-click="openFindingsForRun"
+            @page-change="loadCheckRuns"
           />
         </el-card>
       </el-tab-pane>
@@ -660,47 +630,18 @@
           <template #header>
             <span>检查执行记录</span>
           </template>
-          <el-table v-loading="recordsLoading" :data="records" stripe size="small">
-            <el-table-column prop="id" label="ID" width="60" />
-            <el-table-column prop="task_id" label="任务ID" width="80" />
-            <el-table-column label="业务系统" width="180">
-              <template #default="{ row }">
-                {{ row.system_name_cn || systemNameMap[row.system_code] || row.system_code || '-' }}
-                <small class="system-code-inline">{{ row.system_code }}</small>
-              </template>
-            </el-table-column>
-            <el-table-column prop="started_at" label="开始时间" width="170" />
-            <el-table-column prop="total_rules" label="规则数" width="80" align="center" />
-            <el-table-column prop="total_findings" label="发现问题" width="100" align="center" />
-            <el-table-column prop="total_records" label="扫描记录" width="100" align="center" />
-            <el-table-column prop="error_records" label="异常记录" width="100" align="center" />
-            <el-table-column label="通过率" width="100" align="center">
-              <template #default="{ row }">
-                <span v-if="row.pass_rate != null" :class="passRateClass(row.pass_rate)">
-                  {{ formatPercent(row.pass_rate) }}
-                </span>
-                <span v-else>-</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="状态" width="80">
-              <template #default="{ row }">
-                <el-tag
-                  :type="row.status === 'success' ? 'success' : row.status === 'running' ? 'warning' : 'danger'"
-                  size="small"
-                >
-                  {{ runStatusLabel(row.status) }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="failed_reason" label="失败原因" min-width="150" show-overflow-tooltip />
-          </el-table>
-          <el-pagination
-            v-model:current-page="recordsPage"
-            class="mt15"
+          <!-- 146 E10（R5）：批次/记录共用 CheckRunsTable 组件 -->
+          <CheckRunsTable
+            :runs="records"
+            :loading="recordsLoading"
+            show-task-id
+            show-system
+            show-failed-reason
+            :system-name-map="systemNameMap"
+            :page="recordsPage"
             :page-size="recordsPageSize"
             :total="recordsTotal"
-            layout="total, prev, pager, next"
-            @current-change="loadRecords"
+            @page-change="loadRecords"
           />
         </el-card>
       </el-tab-pane>
@@ -807,6 +748,25 @@ import {
   ruleCategoryTag,
   ruleTargetText
 } from "@/views/asset/quality/qualityRuleLabels";
+// 146 E10（R5）：共享类型与展示工具抽入 qualityContracts / CheckRunsTable
+import CheckRunsTable from "@/views/asset/quality/CheckRunsTable.vue";
+import {
+  findingStatusLabel as statusLabel,
+  findingStatusTag as statusTag,
+  formatPercent,
+  formatSampleData,
+  passRateClass,
+  passRateTone,
+  runStatusLabel,
+  severityLabel,
+  severityTag as sevTag,
+  type CheckRunItem,
+  type FindingItem,
+  type MetricsData,
+  type RuleCreateForm,
+  type RuleItem,
+  type SystemSummaryItem
+} from "@/views/asset/quality/qualityContracts";
 import AlertIcon from "~icons/ri/alarm-warning-line";
 import CheckIcon from "~icons/ri/checkbox-circle-line";
 import ErrorIcon from "~icons/ri/error-warning-line";
@@ -824,108 +784,9 @@ async function loadSystemNames() {
 }
 
 // ============================================================
-// Types
+// Types：146 E10（R5）起由 qualityContracts 共享提供（SystemSummaryItem/RuleItem/
+// RuleCreateForm/CheckRunItem/FindingItem/MetricsData），此处不再重复定义。
 // ============================================================
-interface SystemSummaryItem {
-  system_code: string;
-  system_name_cn?: string;
-  total_findings: number;
-  open_count: number;
-  resolved_count: number;
-  critical_count: number;
-}
-
-interface RuleItem {
-  id: number;
-  rule_code: string;
-  rule_name: string;
-  rule_category: string;
-  check_scope: string;
-  constraint_level: string;
-  business_domain: string;
-  execution_mode: string;
-  system_code?: string;
-  namespace_name?: string;
-  target_table: string;
-  target_field: string;
-  related_table?: string;
-  related_field?: string;
-  check_sql: string;
-  description: string;
-  enabled: boolean;
-}
-
-interface RuleCreateForm {
-  rule_code: string;
-  rule_name: string;
-  rule_category: string;
-  check_scope: string;
-  constraint_level: string;
-  business_domain: string;
-  execution_mode: string;
-  target_table: string;
-  target_field: string;
-  check_sql: string;
-  description: string;
-  enabled: boolean;
-}
-
-interface CheckRunItem {
-  id: number;
-  task_id: string;
-  system_code: string;
-  system_name_cn?: string;
-  started_at: string;
-  triggered_by: string;
-  total_rules: number;
-  total_findings: number;
-  total_records: number;
-  error_records: number;
-  pass_rate: number | null;
-  status: string;
-  failed_reason: string;
-}
-
-interface FindingItem {
-  id: number;
-  rule_code: string;
-  rule_name?: string;
-  rule_category?: string;
-  rule_description?: string;
-  problem?: string;
-  target_display?: string;
-  target_ref?: string;
-  system_name_cn?: string;
-  source_name_cn?: string;
-  schema_name?: string;
-  namespace_name?: string;
-  table_name: string;
-  table_name_cn?: string;
-  column_name: string;
-  related_schema?: string;
-  related_table?: string;
-  related_table_cn?: string;
-  related_field?: string;
-  severity: string;
-  status: string;
-  metric_value?: string;
-  error_cnt: number;
-  error_rate: number | null;
-  assigned_to: string;
-  sample_data: any;
-}
-
-interface MetricsData {
-  total_rules: number;
-  enabled_rules?: number;
-  suggested_rules?: number;
-  sql_rules: number;
-  pass_rate: number | null;
-  rules_pass_rate?: number | null;
-  resolution_rate?: number | null;
-  rule_categories: { category: string; count: number }[];
-  top_tables: { table: string; count: number }[];
-}
 
 // ============================================================
 // Tab state
@@ -1101,9 +962,7 @@ function filterRuleCategory(value: string) {
   loadRules(1);
 }
 
-function formatPercent(value: number | null | undefined): string {
-  return value == null ? "-" : `${Number(value).toFixed(1)}%`;
-}
+// formatPercent 由 qualityContracts 共享提供。
 
 function loadRules(page?: number) {
   if (page) rulesPage.value = page;
@@ -1303,15 +1162,7 @@ function loadCheckRuns(page?: number) {
     });
 }
 
-function runStatusLabel(s: string): string {
-  const m: Record<string, string> = {
-    success: "成功",
-    failed: "失败",
-    running: "运行中",
-    pending: "待执行"
-  };
-  return m[s] || s;
-}
+// runStatusLabel 由 qualityContracts 共享提供。
 
 // ============================================================
 // Tab 4: 问题整改
@@ -1339,66 +1190,8 @@ const findingStatusDialogVisible = ref(false);
 const findingStatusFindingId = ref<number | null>(null);
 const findingStatusForm = reactive({ status: "", note: "" });
 
-type TagType = "primary" | "success" | "warning" | "danger" | "info";
-
-function sevTag(s: string | null): TagType {
-  const m: Record<string, TagType> = {
-    critical: "danger",
-    major: "warning",
-    minor: "primary",
-    info: "info"
-  };
-  return m[s ?? ""] || "info";
-}
-
-function severityLabel(s: string | null): string {
-  const m: Record<string, string> = {
-    critical: "严重",
-    major: "重要",
-    minor: "一般",
-    info: "信息"
-  };
-  return m[s ?? ""] || s || "";
-}
-
-function statusLabel(s: string | null): string {
-  const m: Record<string, string> = {
-    open: "待处理",
-    assigned: "已分派",
-    confirmed: "已确认",
-    fixed: "已修复",
-    rechecked: "已复核",
-    acknowledged: "已确认",
-    resolved: "已解决",
-    ignored: "已忽略",
-    rule_error: "规则错误",
-  };
-  return m[s ?? ""] || s || "";
-}
-
-function statusTag(s: string | null): TagType {
-  const m: Record<string, TagType> = {
-    open: "danger",
-    assigned: "warning",
-    confirmed: "primary",
-    fixed: "success",
-    rechecked: "success",
-    acknowledged: "warning",
-    resolved: "success",
-    ignored: "info",
-    rule_error: "danger",
-  };
-  return m[s ?? ""] || "info";
-}
-
-function formatSampleData(data: any): string {
-  if (!data) return "无";
-  try {
-    return typeof data === "string" ? data : JSON.stringify(data, null, 2);
-  } catch {
-    return String(data);
-  }
-}
+// 146 E10（R5）：sevTag/severityLabel/statusLabel/statusTag/formatSampleData
+// 由 qualityContracts 共享提供（import 处已别名），本文件不再重复定义。
 
 function ensureRunOptions() {
   if (findingRunOptions.value.length) return;
@@ -1527,16 +1320,7 @@ function loadRecords(page?: number) {
 // ============================================================
 const dashboardReady = ref(false);
 
-function passRateTone(rate: number | null | undefined): "accent" | "warning" | "danger" {
-  if (rate == null) return "warning";
-  if (rate >= 95) return "accent";
-  if (rate >= 80) return "warning";
-  return "danger";
-}
-
-function passRateClass(rate: number | null | undefined): string {
-  return `metric-${passRateTone(rate)}`;
-}
+// passRateTone/passRateClass 由 qualityContracts 共享提供。
 
 const ruleCategoryChartOption = computed(() => {
   let categories: any[] = metrics.value.rule_categories || [];

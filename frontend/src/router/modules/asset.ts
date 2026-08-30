@@ -162,6 +162,16 @@ export default {
       }
     },
     {
+      path: "/asset/ai-sql",
+      name: "AssetAiSql",
+      component: () => import("@/views/asset/ai-sql/index.vue"),
+      meta: {
+        title: "AI 写 SQL",
+        showLink: true,
+        auths: ["ai.context.read"]
+      }
+    },
+    {
       path: "/asset/queries",
       name: "AssetQueries",
       component: () => import("@/views/query-center/queries/index.vue"),

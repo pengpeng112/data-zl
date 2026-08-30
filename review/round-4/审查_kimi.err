@@ -1,0 +1,129 @@
+• Let me read the two plan files and the referenced context files. This is a substantial review task. I could delegate, but I need to do the review myself with evidence. Let me read the key files directly — plans 165, 166, and context: 149 §8, 146 §11, 163, AGENTS.md (already have), backend models, quality.py.
+
+  Given volume, maybe delegate exploration of backend files to explore agents while I read the plans. Let me start reading the main plans myself and parallel-spawn explore agents for backend consistency checks.
+
+  Let me first read 165 and 166 plans.
+
+• Now I need to verify against: 149 §8 and its API, 146 §11 E7, 163 铁律， backend models style, quality.py QualityFinding system, permission system (RESOURCE_CATALOG/ROLE_DEFAULT), db_connectors, 164 §2. Let me delegate exploration to explore agents in parallel to conserve context, plus read key files myself.
+
+  Let me spawn explore agents:
+  1. Agent: examine 149 号计划 §8 and backend value-domain API (routes/endpoints, PATCH confirm/deprecate, permissions codes like value_domain:confirm), report exact endpoint paths and permission codes.
+  2. Agent: examine backend QualityFinding system (backend/app/api/v1/quality.py), models style in backend/app/models, permission system (RESOURCE_CATALOG, ROLE_DEFAULT seed), audit export pattern from 146 E7 (find the export endpoint implementation).
+  3. Agent: read 163 铁律 §1 and 164 §2, plus check db_connectors read-only gate, scripts patterns.
+
+  Also check frontend conventions: v-perms directive, router modules, api layer. Maybe fold into agent 2 or a 4th agent.
+
+  I'll launch 4 explore agents in parallel. Actually I should keep briefings concrete with paths.
+
+• Now I have all the evidence. Let me compose the review, section by section, for 165 and 166.
+
+  Key findings to use:
+
+  **165 plan review:**
+
+  Feasibility:
+  1. Data model: `asset_probe_findings` unique key `(probe_type, system_pair, object_desc, metric_name, window_start)` — object_desc as part of unique key is vague; window_start alone (not window_end) — mostly OK but worth a question. Also QualityFinding has no unique constraint, dedup at app layer — 165's unique key approach is actually better/different but consistent style with query_asset (uq naming). Model style consistent (Column, asset schema). Fine.
+
+  2. Relapse semantics: status=resolved → relapse → status back to open. But AI rule #4 says AI only writes open/last_seen/relapse_count; resolved→open flip on relapse is AI writing... that's consistent with relapse rule. But what about status=confirmed/false_positive rows reappearing? Plan only defines resolved relapse; confirmed rows reappearing — unspecified. Question.
+
+  3. Executor semantics: run_probe.py via "平台连接器（复用 db_connectors 只读门禁）" — agent found scripts don't reuse db_connectors; harvest scripts connect directly. But db_connectors is a service-layer module importable from scripts; quality_sql_runner uses it. Feasible but the claim "复用" requires the script to import app services — plausible. However db_connectors requires AssetDataSource rows & credentials resolve from platform DB — the script must run against the platform DB config. Note.
+
+  4. db_connectors restrictions: `validate_readonly_sql` bans comments and multi-statements; probe templates SQL must be single SELECT without comments — plan says SQL 注释【值域待确认】 is an AGENTS.md convention for handwritten SQL, but templates through db_connectors can't contain comments. Minor question.
+
+  5. T8: "服务端聚合 IN，≤1000" — fine. MAX_READONLY_ROWS 10000 fine for aggregate output.
+
+  6. Oracle old version: templates across HIS (Oracle 11g via ssh_jump?), JHEMR vastbase, ODS. dialect field in template — good. T6/T7 depend on metadata discovery — acknowledged.
+
+  7. E4 API: permission code `probe.finding.read` — dot style consistent. But E4 权限码 registered where? 165 says 生产建表 apply（两表+权限码种子）in X1 — so permission seed in migration? Explorer 1 found convention: new permission codes need RESOURCE_CATALOG + ROLE_DEFAULT_PERMISSIONS + handwritten Alembic seed. 165 E4 doesn't mention RESOURCE_CATALOG/ROLE_DEFAULT sync or the security_audit hardcoded list — 166 F7 claims to own the seed ("权限码种子走幂等 seed，非迁移；165 两表由 165 负责"). Contradiction: 166 §1.4 says "不新增数据库迁移（权限码种子走幂等 seed，非迁移）" but the established convention (149 precedent) is Alembic migration seed for permission resources. And 165 X1 says "生产建表 apply（两表+权限码种子）" — implying 165's migration carries permission seed. Both plans claim/ambiguous ownership of permission seed → dependency/ordering contradiction. Also 166 F7 says "RESOURCE_CATALOG+ROLE_DEFAULT 幂等 seed" — as an idempotent script, but precedent is Alembic. Conflict with 144 §8.4 convention (new codes default only to platform_admin) — 166 F7 grants quality_admin read+manage and ai_user read by default, deviating from 144 convention; though deviation may be intentional, worth flagging.
+
+  8. E4 "审计只读不记" — consistent (reads not audited).
+
+  9. 165 §5 "不引入新第三方依赖" — run_probe for Oracle needs oracledb thick mode — already existing dependency. OK.
+
+  10. Night window: E3 night-only, but验收命令 example shows command without enforcement mechanism — the plan says "探查执行一律夜间窗口" but run_probe.py doesn't describe enforcement of night window (a --force flag? time check?). Question.
+
+  11. 165 E1 tests "SQLite/测试库" — conftest requires real PG test DB; SQLite possible for pure model unit tests but quality model uses BigInteger without sqlite variant in some places; identity models used with_variant. New models would need the variant trick or tests must use the real test DB tunnel. Minor friction: plan says "单测（SQLite/测试库）" — acceptable but needs APP_TEST_DB_URL tunnel per 162/163. 163 hard rule: 测试库仅限隧道 data_asset_test. OK.
+
+  12. Unique key includes window_start: relapse detection compares "同键新 run" — if window advances monthly, same issue in new window = new row, not relapse. The relapse semantics only trigger within same window re-run?? Wait: "status=resolved 的行在同键新 run 再次出现" — same key includes window_start, but a new run has a new window, so same (probe_type, system_pair, object_desc, metric_name, window_start) would never recur with same window_start unless you re-run the same window. So relapse detection across windows must search prior rows with same (probe_type, system_pair, object_desc, metric_name) ignoring window. The unique key as defined actually makes relapse semantics ambiguous: if new window → new row with relapse? Plan says relapse = status resolved row 在同键新 run 再次出现. If "同键" includes window_start, relapse can never trigger on a new window. Real design flaw — flag as 疑问/反对 on §2 复发语义 vs 唯一键 contradiction. Actually maybe they mean same key except window. This is a genuine spec ambiguity worth flagging strongly.
+
+  13. probe_findings status includes confirmed/false_positive/resolved + open; fine.
+
+  14. T12 R-DOM "偏差证据可导入值域库 pending" — 149 POST endpoint exists with value_domain.submit permission; AI can submit. Consistent with 149 (AI submit only). OK, and "永不自动 confirm" consistent.
+
+  15. 零患者明细： evidence_sql stored — SQL text may contain schema/table but no patient literals if parameterized. But T8 "服务端聚合 IN (≤1000 住院号)" — IN list of 住院号 (inpatient IDs) — 住院号 is patient identifier! Storing that SQL as evidence_sql would embed up to 1000 patient visit IDs literally → violates 铁律 #2 "证据 SQL 本身不得含患者标识字面量（一律参数化/聚合输出）". T8's design conflicts with its own rule unless the IN list is server-side temp table or parameterized and evidence stores only the template. Flag as 安全漏洞/矛盾.
+
+  16. AGENTS.md constraint #6 大表禁全扫 — plan mentions ROWNUM/LIMIT. OK.
+
+  17. E2 acceptance "每条模板一条单测（SQL 解析/参数齐全/聚合形态断言）" feasible via validate_readonly_sql.
+
+  18. 165 §2 says 服务层 probe_service — consistent with services pattern.
+
+  19. E4 API tests ≥4 fine; but需要权限码在测试环境可用 — conftest seeds platform_admin token with all perms? conftest seeds platform_admin role — fine for 403 tests need a user without permission; precedent exists (test_value_domains_api ai_user 403).
+
+  20. 165 X1 "生产建表 apply（两表+权限码种子）" — consistent with 163 W2 chain; OK. But note migration includes permission seed → conflicts with 166 F7 claim that seed is a separate idempotent script, non-migration. Yes, that's item 7.
+
+  **166 plan review:**
+
+  1. F1 表详情页值域区块 —接入点存在 (table-detail/index.vue). Feasible. But needs API: value domains filtered by table — GET /api/v1/value-domains supports table_name/column_name filters. OK.
+
+  2. F2 值域管理页 — filters listed "system/schema/table/column/code/status/version" — backend supports system_code/schema_name/table_name/column_name/code/status/conflicted; "version" filter not supported by backend list endpoint (no version filter param). Minor mismatch. 详情抽屉 evidence chain: source_type/snippet_ref/method/competing meanings/历史版本 — snippet_ref is on evidence subtable, returned in detail endpoint (details含全部证据) OK; version_no computed via vds.version_no_of — available. "version_no" display in F1 — 主表无 version_no 列，由计算提供 — need to confirm detail response includes it; likely yes. Minor.
+
+  3. F3 permission `value_domain:confirm` — colon style vs actual dot `value_domain.confirm`. Normalizer makes it match, but public contract is dot. 166 uses both dot (probe.finding.read) and colon (value_domain:confirm) — inconsistent style; recommend dot. Works technically due to normalization. Flag.
+
+  4. F4 probe findings page consumes 165 E4 — filters match 165 E4 (probe_type/system_pair/severity/status/窗+分页). Consistent. Good.
+
+  5. F5 transition endpoint: POST /api/v1/probe-findings/{id}/transition with state machine open→任一终态、resolved→false_positive 不允许. But QualityFinding PATCH has no state machine validation — 166 adds one, fine (new endpoint). But "复发行只读提示走重新裁决" — hmm. Also 165 rule: AI writes open; human transitions via 166. Consistent. State machine: can confirmed→resolved? open→任一终态 only? What about transitions between terminal states? Spec partial — question. Also 165 relapse flips resolved→open automatically — F5 says "resolved→false_positive 不允许" fine.
+
+  6. F6 export: claims reuse 146 E7 audit export pattern with 脱敏列白名单、≤5000行、审计留痕、文件名含时间窗、防公式注入. Reality: existing audit export has whitelist (yes), 5000 limit (yes), but NO audit trail of export itself, fixed filename without time window, NO formula injection protection, and NO permission code on the endpoint. So 166's "复用模式" actually requires going beyond the existing pattern on 3 of 5 hard constraints — the plan text lists these as hard constraints, which is good, but the claim "复用 146 E7 audit 导出模式" overstates; more importantly, if they "复刻" the existing endpoint they might inherit no-permission-code and no-audit. The plan does say audit 留痕 required, so it's an improvement — fine, but flag the discrepancy so executor doesn't copy blindly. Also xlsx: openpyxl available. CSV standard lib. OK.
+
+  7. F7 permission seed: discussed above — contradiction with 165 X1 and with Alembic precedent. Also ROLE_DEFAULT granting quality_admin manage deviates from 144 convention (default platform_admin only). ai_user only read — consistent with AI 不裁决终态. Good. But note: security_audit test has hardcoded code list — F7 mentions sync. OK.
+
+  8. §5 mock switch `APP_PROBE_API_READY` — frontend can't read non-VITE_ env vars; mock system is vite-plugin-fake-server dev-only. So the switch as named won't work; must be VITE_PROBE_API_READY or mock routes. Also "165 完成后隔离库联调一轮" — feasible. Flag naming bug.
+
+  9. 166 §1.2 "值域 API 全用 149 既有端点" — true, endpoints exist. "探查列表/详情用 165 E4 只读端点" — OK. New backend limited to export×2 + transition + seed — consistent.
+
+  10. D1 验收 "路由守卫测试（无权限 403）" — no precedent for router guard tests; real router has side effects. Explorer suggests filterNoPermissionTree pure function test or source assertion. Flag feasibility risk (minor, has workaround).
+
+  11. Dependency/ordering: 166 can develop with mocks in parallel;联调 needs 165 E1/E4. Stated. But API contract: 165 E4 response shapes (field names, pagination envelope) are not specified in either plan — 166 mock must guess contract → risk of mock/real mismatch. Both plans lack a concrete response schema (e.g., does list return {items,total,page,page_size}? existing list endpoints conventions). Flag as gap: contract should be pinned (e.g., reuse existing pagination schema).
+
+  12. F4 details show evidence_sql — 零患者明细 depends on 165 enforcement; UI just displays. If 165 T8 embeds patient IDs in evidence_sql, 166 would render them — combined leak path. Reinforces 165 issue #15.
+
+  13. 导出脱敏： probe findings contain object_desc (could contain 表/字段 or 工号姓名？ object_desc like "EXAM_MASTER.DOCTOR_USER" fine; but could a finding's object_desc contain a doctor name? R-REF aggregate should be counts; digest only. OK if 165 holds).
+
+  14. 166 §6 DoD "新增测试 ≥13" consistent with batches (3+3+2+1+...). Fine.
+
+  15. 166 F6 值域导出 CSV only while findings xlsx/CSV — fine.
+
+  16. One more: 165 E4 "审计只读不记" but export endpoints in 166 do write audit — fine.
+
+  17. 165 status field severity P1/P2/P3 vs QualityFinding severity convention (probably similar). Fine.
+
+  18. 165 E3 验收 "偏差>5% 记 WARN" — consistent with 163 WARN 口径.
+
+  19. Ordering contradiction: 166 D5 seed dry-run — but if 165's migration (X1, production, waiting domain) carries permission seed, then in隔离库 166's seed script may duplicate. Also 165 E4 API tests need permission codes present in test DB — 165 E4 must seed codes in隔离库 itself (E1 migration?) — if seed belongs to 166 F7 (a later, separate plan possibly executed in parallel), 165 E4's 403 tests may fail without codes. Actually 165 E4 says "权限 probe.finding.read" — codes must exist for 165's own tests. So 165 implicitly needs the seed too. Both plans touching permission seed = duplicate ownership. Definite flag.
+
+  Also frontend route auths: new pages need codes; F7 covers.
+
+  20. 166 F5 "resolved→false_positive 不允许" but 165 relapse sets resolved→open automatically — consistent.
+
+  21. 165 §3 T5 "报告回写 35.5%" baseline etc. consistent with 164 §2 numbers. Verified: 83.2%, 5.97%, 99.93%, 35.5%, NULL 689, code1 94.6% all match. Good — 同意.
+
+  22. 165 §1.3 "生产建表 apply 与生产首轮探查归等待域" + X1 chain matches 163 W2. 同意.
+
+  23. 165 E1 "迁移手写 upgrade/downgrade" consistent AGENTS. 同意.
+
+  24. 165 §4 run_probe "经平台连接器（复用 db_connectors 只读门禁）" — feasible (quality_sql_runner precedent) but note scripts currently connect directly; also db_connectors validate bans SQL comments — templates fine. Also Oracle thick mode needed for HIS source via ssh_jump — db_connectors supports ssh_jump. OK.
+
+  25. One feasibility question for 165: findings table `object_desc` free text in unique key — long/varchar unbounded unique keys on PG fine but indexes have size limits (2704 bytes); object_desc unbounded could exceed index limit. Minor technical question.
+
+  26. 166 F2 "pending 待确认计数徽标" — backend list endpoint can filter status=pending; count via page total. OK.
+
+  27. 166 F1 "version_no" — computed, available in API responses presumably; minor.
+
+  28. Time window in export filename — new vs existing fixed name; plan requires it, fine as improvement.
+
+  Now organize output: 【165 计划】 and 【166 计划】 sections, each item 同意/反对/疑问 + 理由 + 风险， citing section numbers. Keep it structured but readable. This is a text-only deliverable, no file writes (user said read-only reviewer, don't modify files).
+
+  Let me write the review in Chinese, reasonably comprehensive but not bloated.
+
+To resume this session: kimi -r session_329ba0b9-c5f5-4914-b02e-ead9455f584b

@@ -1,0 +1,38 @@
+{
+ "code": "T12",
+ "probe_type": "R-DOM",
+ "name": "离院方式值域合规",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT DISCHARGE_DISPOSITION AS CODE, COUNT(*) AS CNT FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND DISCHARGE_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') AND DISCHARGE_DISPOSITION IS NOT NULL GROUP BY DISCHARGE_DISPOSITION"
+  }
+ ],
+ "derive": {
+  "metric": "discharge_disposition_out_of_domain_rate",
+  "formula": "out/total*100",
+  "unit": "%",
+  "allowed": [
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "9"
+  ],
+  "finding_per_value": true,
+  "max_findings": 50
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 0.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION 值域合规",
+ "large_table_guard": null,
+ "note": "只产 probe finding（偏差清单），不写值域库（A6）；导入=pending 人工走 149 submit"
+}

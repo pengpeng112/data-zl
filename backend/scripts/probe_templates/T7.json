@@ -1,0 +1,37 @@
+{
+ "code": "T7",
+ "probe_type": "R-CNT",
+ "name": "影像线申请↔ODS 报告月对账",
+ "severity_default": "P3",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT TO_CHAR(REQ_DATE_TIME,'YYYY-MM') AS K, COUNT(*) AS CNT FROM EXAM.EXAM_MASTER WHERE REQ_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND REQ_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') GROUP BY TO_CHAR(REQ_DATE_TIME,'YYYY-MM')"
+  },
+  {
+   "side": "b",
+   "source_code": "ods_8_216",
+   "dialect": "oracle",
+   "sql": "",
+   "mode": "blocked",
+   "reason": "ODS.PACSREPORT 70 列无申请键/患者键（2026-08-29 核验）；结果侧键位未定位，按 BLOCKED 登记（164 §5 口径），定位后补 side-b"
+  }
+ ],
+ "derive": {
+  "metric": "pacs_month_cnt_max_diff_rate",
+  "formula": "max(|a_k-b_k|)/max(a_k)*100",
+  "unit": "%",
+  "compare": "by_month_key"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 5.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "EXAM.EXAM_MASTER 与 ODS.PACSREPORT 月度数量对账",
+ "large_table_guard": null,
+ "blocked": true
+}

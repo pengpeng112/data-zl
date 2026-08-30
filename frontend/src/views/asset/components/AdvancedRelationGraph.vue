@@ -10,7 +10,7 @@
       <span><i class="edge-line dashed review" />D/待分析</span>
       <span><i class="edge-line dotted muted" />视图依赖</span>
     </div>
-    <div ref="containerRef" class="advanced-graph-canvas" :style="{ height }" />
+    <div ref="containerRef" class="advanced-graph-canvas" :style="{ height }" tabindex="0" @keydown.enter="activateSelected" />
   </div>
 </template>
 
@@ -33,7 +33,7 @@ function graphCanvasPixelRatio(): number {
   return Math.min(Math.max(dpr, 2), 3);
 }
 
-type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
+type LayoutMode = "force" | "layered" | "grouped" | "radial" | "hierarchy";
 
 type G6Graph = InstanceType<typeof Graph>;
 
@@ -59,7 +59,7 @@ const props = withDefaults(
     groupBy: "schema",
     focusKeyword: "",
     showReviewLayer: false,
-    layoutMode: "layered",
+    layoutMode: "force",
     aggregateGroups: false,
     aggregationThreshold: 10,
     viewMode: "table"
@@ -68,6 +68,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "node-click": [node: GraphNode];
+  "node-activate": [node: GraphNode];
   "edge-click": [edge: GraphEdge];
   "render-error": [];
 }>();
@@ -78,6 +79,12 @@ let renderVersion = 0;
 let renderQueue: Promise<void> = Promise.resolve();
 let resizeObserver: ResizeObserver | null = null;
 let lastCanvasSize = { width: 0, height: 0 };
+// 146 E2（R5）：记录当前实例创建时是否带布局引擎。
+// 预设坐标（layered/hierarchy）之间切换只需 setData 重渲染，不再销毁重建，
+// 避免选中节点、微调布局等高频操作触发不必要的 destroy。
+let graphCreatedAt: "engine-layout" | "preset" | null = null;
+let pendingNodeClick: ReturnType<typeof setTimeout> | null = null;
+let lastNodeClick = { id: "", at: 0 };
 
 function containerSize() {
   const el = containerRef.value;
@@ -213,7 +220,7 @@ function layoutOptions() {
   if (props.layoutMode === "grouped") {
     return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
   }
-  // 默认 layered → 改为 Neo4j 风格的 d3-force 力导向布局
+  // force = Neo4j 式知识图谱；layered 仅保留给 path 预计算坐标。
   // 节点自然散布、弹簧连接、可拖拽交互，类似 Neo4j Browser 的图谱展示
   return {
     type: "force",
@@ -230,6 +237,26 @@ function layoutOptions() {
     forceSimulation: undefined
   };
 }
+
+async function focusNode(nodeId: string) {
+  if (!graph || !nodeId) return;
+  const instance = graph as any;
+  if (typeof instance.focusElement === "function") await instance.focusElement(nodeId, { duration: 280 });
+  else await instance.fitView?.({ padding: 80 }, false);
+  if (typeof instance.setElementState === "function") {
+    await instance.setElementState(nodeId, ["selected"]);
+    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      window.setTimeout(() => void instance.setElementState?.(nodeId, []), 900);
+    }
+  }
+}
+
+function activateSelected() {
+  const node = normalized.value.nodes.find(item => item.id === props.selectedNodeId);
+  if (node) emit("node-activate", node as GraphNode);
+}
+
+defineExpose({ focusNode });
 
 function edgeStyle(edge: any, showLabel = false) {
   const visual = graphEdgeStyle(edge);
@@ -396,7 +423,21 @@ function createGraph() {
   instance.on(NodeEvent.CLICK, (event: any) => {
       const id = resolveElementId(event);
       const raw = resolveRawElement(id, "node") || normalized.value.nodes.find(node => node.id === id);
-      if (raw) emit("node-click", raw as GraphNode);
+      if (!raw || !id) return;
+      const now = Date.now();
+      if (lastNodeClick.id === id && now - lastNodeClick.at <= 250) {
+        if (pendingNodeClick) clearTimeout(pendingNodeClick);
+        pendingNodeClick = null;
+        lastNodeClick = { id: "", at: 0 };
+        emit("node-activate", raw as GraphNode);
+        return;
+      }
+      lastNodeClick = { id, at: now };
+      if (pendingNodeClick) clearTimeout(pendingNodeClick);
+      pendingNodeClick = setTimeout(() => {
+        emit("node-click", raw as GraphNode);
+        pendingNodeClick = null;
+      }, 250);
     });
   instance.on(EdgeEvent.CLICK, (event: any) => {
       const id = resolveElementId(event);
@@ -404,6 +445,7 @@ function createGraph() {
       if (raw) emit("edge-click", raw as GraphEdge);
     });
   graph = instance;
+  graphCreatedAt = layout ? "engine-layout" : "preset";
   return instance;
 }
 
@@ -411,13 +453,17 @@ async function performRender(version: number) {
   await nextTick();
   if (version !== renderVersion || !containerRef.value) return;
   try {
-    if (usesPresetPositions() && graph) {
+    const wantsLayout = Boolean(layoutOptions());
+    // 146 E2（R5）：仅在“带布局引擎 ↔ 预设坐标”两类模式切换时才必须重建实例；
+    // 同类模式（如 layered→hierarchy、选中节点变化）复用现有实例 setData 重渲染。
+    if (graph && graphCreatedAt && graphCreatedAt !== (wantsLayout ? "engine-layout" : "preset")) {
       try {
         graph.destroy();
       } catch {
         // 销毁失败不阻断重建
       }
       graph = null;
+      graphCreatedAt = null;
     }
     const instance = createGraph();
     if (!instance || version !== renderVersion) return;
@@ -440,6 +486,7 @@ async function performRender(version: number) {
       // 失败实例不得继续接收后续 setData。
     }
     graph = null;
+    graphCreatedAt = null;
     emit("render-error");
   }
 }
@@ -490,6 +537,8 @@ onBeforeUnmount(() => {
     // destroy 异常不阻断卸载
   }
   graph = null;
+  graphCreatedAt = null;
+  if (pendingNodeClick) clearTimeout(pendingNodeClick);
 });
 </script>
 

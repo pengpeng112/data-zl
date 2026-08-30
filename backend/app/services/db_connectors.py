@@ -605,6 +605,17 @@ class SqlServerConnector(DatabaseConnector):
                 # pymssql 原生支持 dict 命名参数绑定（A1）；此前按 tuple(params.values())
                 # 插入序绑参，占位符顺序与 dict 顺序不一致时会绑错值。pyodbc 分支保持
                 # 上面的 dict 透传不变。
+                # 161 P1-1（round-2 P2）：144 校验器对 sqlserver 按 @name 提取占位符，
+                # 而 pymssql 只认 %(name)s pyformat——@name 风格 SQL 带参执行会静默
+                # 失绑，此处 fail-closed（:name 等其他形态与无参资产不受影响）。
+                if (
+                    params
+                    and "%(" not in sql
+                    and re.search(r"@[A-Za-z_][A-Za-z0-9_]*\b", sql)
+                ):
+                    raise ValueError(
+                        "pymssql 连接需 %(name)s 占位符风格绑定参数；当前 SQL 使用 @name 风格，请修订 SQL"
+                    )
                 cursor.execute(sql, params or {})
             # A4：多取 1 行探针（见 DatabaseConnector.execute_readonly 契约）。
             rows = cursor.fetchmany(safe_limit + 1) if hasattr(cursor, "fetchmany") else cursor.fetchall()[: safe_limit + 1]

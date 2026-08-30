@@ -8,8 +8,11 @@ Rules (144 §4.1):
 """
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 _ORACLE_BIND_RE = re.compile(r"(?<![:\w]):([A-Za-z_][A-Za-z0-9_]*)")
 _PG_BIND_RE = re.compile(r"%\(([A-Za-z_][A-Za-z0-9_]*)\)s")
@@ -35,6 +38,13 @@ def extract_bind_names(sql: str, dialect: str = "oracle") -> set[str]:
     if dialect_l in {"postgresql", "vastbase"}:
         names.update(_PG_BIND_RE.findall(text))
     elif dialect_l in {"sqlserver", "mssql", "tsql"}:
+        if _PG_BIND_RE.search(text):
+            # 161 P1-1（round-2 P2）：sqlserver 资产混入 %(name)s（pyformat）形态——
+            # pymssql 执行侧只认 pyformat 且已 fail-closed，这里提前告警线索，不阻塞。
+            logger.warning(
+                "占位符风格冲突：sqlserver SQL 同时包含 @name 与 %(name)s 形态；"
+                "pymssql 执行侧将拒绝该 SQL，请统一为 %(name)s"
+            )
         names.update(_TSQL_BIND_RE.findall(text))
     else:
         # oracle colon binds; skip '::' casts by the negative lookbehind

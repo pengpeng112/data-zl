@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from ...core.config import settings
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.asset import AssetColumn, AssetRelation, AssetTable
 from ...models.asset_system import AssetDataSource, AssetSourceSchema, AssetSystem
 from ...models.candidate import AssetCandidateRelation
@@ -42,13 +43,18 @@ from ...schemas.graph import (
     GraphTableSearchItem,
 )
 from ...services.relation_identity import resolve_endpoint, split_qualified_name
+from ...services.data_masking import sanitize_text
 from ...services.asset_catalog import (
     load_system_name_map,
     normalize_system_code,
     system_code_filter_values,
 )
 
-router = APIRouter(prefix="/api/v1/graph", tags=["graph"])
+router = APIRouter(
+    prefix="/api/v1/graph",
+    tags=["graph"],
+    dependencies=[Depends(require_permission("asset.graph.view"))],
+)
 
 # 旧前端曾经把 HIS.PAT_VISIT 映射到 MEDREC.PAT_VISIT；保留仅用于旧 table 参数兼容。
 LEGACY_TABLE_ALIASES = {
@@ -315,12 +321,12 @@ GRAPH_VIEW_MODES = [
         "label": "关系探索",
         "description": "先选择唯一中心资产，再按方向和 1/2 跳展开关系。",
         "group_by": "schema",
-        "layout_mode": "radial",
-        "confidence": "A",
+        "layout_mode": "force",
+        "confidence": None,
         "validation_status": None,
         "include_candidates": False,
         "include_dependencies": False,
-        "show_review_layer": False,
+        "show_review_layer": True,
         "requires_table": True,
     },
     {
@@ -789,6 +795,9 @@ def _graph_meta(
     warnings: list[str] | None = None,
     center_physical_key: str | None = None,
     direction_semantics: str | None = None,
+    shown_count: int | None = None,
+    actual_count: int | None = None,
+    continuation_cursor: str | None = None,
 ) -> GraphMeta:
     return GraphMeta(
         total_relations=total_relations,
@@ -806,6 +815,9 @@ def _graph_meta(
         warnings=warnings or [],
         center_physical_key=center_physical_key,
         direction_semantics=direction_semantics,
+        shown_count=shown_count,
+        actual_count=actual_count,
+        continuation_cursor=continuation_cursor,
     )
 
 
@@ -1136,6 +1148,11 @@ def edge_detail(
         db, from_schema, from_table, to_schema, to_table,
         edge.from_columns, edge.to_columns, column_map,
     )
+    if edge.join_condition:
+        edge.sql_hash = hashlib.sha256(edge.join_condition.encode("utf-8")).hexdigest()
+        edge.sql_snippet = sanitize_text(edge.join_condition, limit=200)
+    # 详情响应只暴露脱敏摘要；原始 SQL 不出接口，也不得进入日志。
+    edge.join_condition = None
     return ApiResponse(data=edge)
 
 
@@ -1147,11 +1164,20 @@ def neighbors(
     system_code: str | None = Query(None),
     source_code: str | None = Query(None),
     schema: str | None = Query(None),
-    depth: int = Query(1, ge=1, le=2),
+    depth: int = Query(2, ge=1, le=3),
     direction: str = Query("both", pattern="^(in|out|both)$"),
     limit: int = Query(100, ge=1, le=200),
+    include: list[str] | None = Query(None, description="客户端已持有的五段物理键，可重复传入"),
+    cursor: str | None = Query(None, description="继续加载游标（稳定边偏移量）"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[GraphData]:
+    try:
+        offset = max(0, int(cursor or "0"))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="cursor 必须是非负整数") from exc
+    include_keys = set(include or [])
+    if any(len(value.split("|")) != 5 for value in include_keys):
+        raise HTTPException(status_code=422, detail="include 必须使用五段物理键")
     target = _resolve_neighbor_target(
         db,
         physical_key=center_physical_key or physical_key,
@@ -1208,7 +1234,9 @@ def neighbors(
                 conds.append(AssetRelation.to_table.in_(frontier_texts))
         if not conds:
             break
-        stmt = select(AssetRelation).where(or_(*conds)).order_by(AssetRelation.id).limit(limit)
+        # asset_relations 是治理关系资产而非业务大表；完整收集命中边，才能返回真实 actual_count。
+        # 最终响应仍严格按 limit/cursor 分页，不把全量关系下发给客户端。
+        stmt = select(AssetRelation).where(or_(*conds)).order_by(AssetRelation.id)
         rows = db.scalars(stmt).all()
         next_frontier: set[tuple[str, str, str, str]] = set()
         for r in rows:
@@ -1220,27 +1248,39 @@ def neighbors(
                 f_sys2, f_src2, _f_ns, f_schema2, f_tbl2, _disp = _resolve_relation_endpoint(db, r, side)
                 if f_sys2 and f_src2 and f_schema2 and f_tbl2 and (f_sys2, f_src2, f_schema2, f_tbl2) not in frontier:
                     next_frontier.add((f_sys2, f_src2, f_schema2, f_tbl2))
-            if len(collected) >= limit:
-                break
         frontier = next_frontier
-        if len(collected) >= limit:
-            break
 
-    nodes, edges, _ = _nodes_and_edges_for_relations(db, collected)
+    actual_count = len(collected)
+    has_more = actual_count > offset + limit
+    page_relations = collected[offset:offset + limit]
+    nodes, edges, _ = _nodes_and_edges_for_relations(db, page_relations)
+    in_degree: dict[str, int] = defaultdict(int)
+    out_degree: dict[str, int] = defaultdict(int)
+    for edge in edges:
+        out_degree[edge.source] += 1
+        in_degree[edge.target] += 1
+    for node in nodes:
+        node.in_degree = in_degree[node.id]
+        node.out_degree = out_degree[node.id]
+    # 已持有节点不重复下发；连接新节点所需的边仍保留，由客户端按边 ID 去重。
+    response_nodes = [node for node in nodes if node.id not in include_keys]
     return ApiResponse(
         data=GraphData(
-            nodes=nodes,
+            nodes=response_nodes,
             edges=edges,
             meta=_graph_meta(
                 total_relations=db.scalar(select(func.count()).select_from(AssetRelation)) or 0,
-                matched_relations=len(collected),
+                matched_relations=actual_count,
                 returned_relations=len(edges),
-                truncated=len(collected) > limit,
+                truncated=has_more,
                 unresolved_count=0,
-                filters={"physical_key": target, "depth": depth, "direction": direction, "limit": limit},
+                filters={"center_physical_key": target, "depth": depth, "direction": direction, "limit": limit},
                 enrichment=_enrichment_stats(nodes),
                 center_physical_key=target,
                 direction_semantics="all/in/out",
+                shown_count=len(response_nodes),
+                actual_count=actual_count,
+                continuation_cursor=str(offset + limit) if has_more else None,
             ),
         )
     )

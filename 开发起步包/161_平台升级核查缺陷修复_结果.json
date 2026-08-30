@@ -1,0 +1,125 @@
+{
+ "task": "161 平台升级核查缺陷修复一次性执行（Q0→Q3）",
+ "executed_at": "2026-08-28",
+ "executor": "GLM-5.3-Flash(ZCode)，按 162 交接执行包",
+ "head": "13ef9e8（全程未漂移）",
+ "status": "代码完成，待主 AI 复核与发布",
+ "batches": [
+  {
+   "batch": "Q0",
+   "items": ["P0-1 relation-review 事件绑定 6 处修复", "P0-2 防回归测试：test_ssh_jump_remote_script_compiles + plan161RelationReviewBindings.test.ts"],
+   "acceptance": {
+    "backend": "pytest tests/test_db_connectors_readonly.py -q → 9 passed",
+    "frontend": "pnpm typecheck 0 错；vitest 27 files/168 tests passed"
+   },
+   "deviations": ["unit_standalone 不在 conftest 纯逻辑豁免名单，免库冒烟改用 tests/security_audit"]
+  },
+  {
+   "batch": "Q1",
+   "items": ["P1-1 pymssql @name 带参 fail-closed 断言 + 校验器风格冲突 warning", "P1-2 import_results 归因 get_request_operator", "P1-3 A9 真实 PG 形态断言测试", "P1-4 A2 NULL/'' 口径注释"],
+   "acceptance": {
+    "backend": "pytest tests/test_153_g1_g3.py tests/test_query_asset.py tests/security_audit/ tests/test_data_products.py -q → 46 passed"
+   },
+   "deviations": ["P1-1 初版断言过宽误伤 153-A1 契约测试 3 个，收敛为 @name 冲突形态并补正向门禁测试 test_pymssql_rejects_tsql_named_binds_with_params"]
+  },
+  {
+   "batch": "Q2",
+   "items": ["P2-1 doUnbind account_id", "P2-2 sync-diffs 动作 catch 走 extractErrorDetail（dict doSync + identity doCollect/doSync/doReview）", "P2-3 tool-execute 权限码改挂 ai.context.read + 断言同步"],
+   "acceptance": {
+    "frontend": "pnpm typecheck 0 错；vitest 27/168 全过",
+    "backend": "pytest tests/security_audit/ tests/test_ai_collab.py -q → 22 passed"
+   },
+   "deviations": ["P2-2 严格按计划点名函数族；identity 页其余 5 类 catch 与 dict 页 updateStatus 未点名未动"]
+  },
+  {
+   "batch": "Q3",
+   "items": ["P3-1 ai.draft.execute 死码登记", "P3-2 X-Requested-With 前提文档化", "P3-3 unbound token 运维待办登记", "全量门禁"],
+   "acceptance": {
+    "backend_full": "pytest tests/ -q → 1175 passed / 1 failed / 1 skipped（24:47；唯一 failed 为既有 plan127 断裂，见 new_findings[0]）",
+    "frontend": "typecheck 0 错；vitest 27/168；build gzip 预算 PASS（main 656.0/700、graph 404.2/430、css 98.1/110）",
+    "static": ["@change=\"loadRelations\"=0", "其余 loadRelations 直绑=0", "user = \"system\"=0", "tool-execute 断言=ai.context.read"]
+   },
+   "deviations": []
+  }
+ ],
+ "defects": [
+  {"id": "P1", "severity": "高", "status": "fixed", "files": ["frontend/src/views/asset/relation-review/index.vue"], "evidence": "6 处绑定改 doSearch/箭头包装；grep 直绑=0；plan161 扫描测试过"},
+  {"id": "P2", "severity": "中", "status": "fixed", "files": ["backend/app/services/db_connectors.py", "backend/app/services/query_parameter_validator.py", "backend/tests/test_db_connectors_param_binding.py"], "evidence": "@name+带参且无 %( → ValueError（触碰驱动前拒绝）；校验器 warning；A1 契约 8 tests 零误伤"},
+  {"id": "P3", "severity": "低", "status": "fixed", "files": ["backend/app/api/v1/data_products.py"], "evidence": "get_request_operator(request, default=\"system\")；grep user = \"system\"=0"},
+  {"id": "P4", "severity": "低", "status": "fixed", "files": ["frontend/src/views/identity/accounts/index.vue"], "evidence": ":189 account_code→account_id；typecheck 0 错"},
+  {"id": "P5", "severity": "低", "status": "kept_by_ruling", "files": [], "evidence": "分歧表#12：same_sql/sha256 为 144 可比对设计，保留"},
+  {"id": "P6", "severity": "低", "status": "fixed", "files": ["backend/tests/test_153_g1_g3.py"], "evidence": "test_a9_unique_violation_recognizes_real_pg_shapes：类名+pgcode 双命中/仅类名/负例 三断言"},
+  {"id": "P7", "severity": "低", "status": "fixed_comment_only", "files": ["backend/app/api/v1/quality.py"], "evidence": "A2 注释块补 PG GROUP BY NULL 与 '' 不归并口径（分歧表#14）"},
+  {"id": "P8", "severity": "低", "status": "fixed", "files": ["backend/app/api/v1/ai.py", "backend/tests/security_audit/test_fine_grained_write_permissions.py"], "evidence": "ai.py:505 ai.context.read + 分流注释；测试 :109 期望码同步；security_audit+ai_collab 22 passed"},
+  {"id": "P9", "severity": "低", "status": "fixed_doc_only", "files": ["backend/app/api/v1/auth.py"], "evidence": "_require_csrf docstring 登记旁路前提（分歧表#15）"},
+  {"id": "P10", "severity": "低", "status": "registered", "files": [], "evidence": "见 registrations.unbound_token_todo"},
+  {"id": "P11", "severity": "低", "status": "fixed", "files": ["frontend/src/views/dict/sync-diffs/index.vue", "frontend/src/views/identity/sync-diffs/index.vue"], "evidence": "4 处动作 catch → extractErrorDetail(error, 原文案)；import ×2；按计划点名函数族执行"},
+  {"id": "P12", "severity": "低", "status": "registered", "files": [], "evidence": "146 域 audit_logs_summary limit，登记至 55 待办池，不夹带"}
+ ],
+ "registrations": {
+  "dead_permission_code": {
+   "code": "ai.draft.execute",
+   "references": ["backend/app/api/v1/permissions.py:110（RESOURCE_CATALOG 条目：AI 草稿只读执行(旧)）", "backend/app/api/v1/permissions.py:237（角色授权清单）"],
+   "endpoint_mounts": 0,
+   "action": "只登记不删（D5 同口径）"
+  },
+  "unbound_token_todo": "生产查 asset_api_keys 中 unbound 且 last_used_at 近期使用者，决定绑定角色或停用（运维决策，本会话零生产操作）",
+  "audit_logs_summary_limit_todo": "governance.py:354 audit_logs_summary 全量拉内存无 limit——146 域待办，已登记 55"
+ },
+ "new_findings": [
+  {
+   "id": "NF-1",
+   "severity": "中",
+   "title": "plan127 s0 契约测试与 36b8743 F4 修复冲突（既有断裂，非本轮引入）",
+   "evidence": "tests/plan127/test_s0_contract_unit.py::test_table_list_system_filter_accepts_his_alias 断言 handleTreeClick 含 await loadData()；git show 36b8743 显示 -await loadData(); +await loadData(1);（F4 树点击重置页码）；测试文件自 d3e6b55 未改；两文件 git diff HEAD 为空——开工前 HEAD 即失败",
+   "why_round2_green": "round-2 回归（1152/0F）跑在 36b8743 落库之前；36b8743 后无人补跑全量（55 既有待办）",
+   "suggestion": "plan127 s0 断言更新为接受 await loadData(1)（F4 为已发布新语义）；不建议回退 F4"
+  },
+  {
+   "id": "NF-2",
+   "severity": "低",
+   "title": "A1 契约 :name 风格与 pymssql pyformat 的口径细节",
+   "evidence": "153-A1 pymssql 契约测试用 :name + dict 透传（Fake 驱动层）；P1-1 断言因此收敛到 @name 冲突形态；如后续统一 sqlserver 占位符口径需连带调整 A1 测试与 144 校验器"
+  },
+  {
+   "id": "NF-3",
+   "severity": "低",
+   "title": "tests/unit_standalone（他会话未跟踪产物）不在 conftest 纯逻辑豁免名单",
+   "evidence": "免库环境跑该子目录会被 APP_TEST_DB_URL 门禁拦截；本轮全量中其测试全绿；如需免库可执行，后续加进 _PURE_LOGIC_SUBDIRS（本轮不动他会话产物）"
+  },
+  {
+   "id": "NF-4",
+   "severity": "低",
+   "title": "F1 防回归锁现存在两份",
+   "evidence": "test_db_connectors_param_binding.py::test_ssh_jump_remote_script_is_valid_python（36b8743，inspect 版）与本轮 test_db_connectors_readonly.py::test_ssh_jump_remote_script_compiles（findall 版，覆盖全部脚本字面量）互补不冲突"
+  }
+ ],
+ "changed_files": [
+  "backend/app/api/v1/ai.py",
+  "backend/app/api/v1/auth.py",
+  "backend/app/api/v1/data_products.py",
+  "backend/app/api/v1/quality.py",
+  "backend/app/services/db_connectors.py",
+  "backend/app/services/query_parameter_validator.py",
+  "backend/tests/security_audit/test_fine_grained_write_permissions.py",
+  "backend/tests/test_153_g1_g3.py",
+  "backend/tests/test_db_connectors_readonly.py",
+  "backend/tests/test_db_connectors_param_binding.py",
+  "frontend/src/views/asset/relation-review/index.vue",
+  "frontend/src/views/dict/sync-diffs/index.vue",
+  "frontend/src/views/identity/accounts/index.vue",
+  "frontend/src/views/identity/sync-diffs/index.vue",
+  "frontend/tests/plan161RelationReviewBindings.test.ts（新增）"
+ ],
+ "boundaries": {
+  "alembic_migrations": 0,
+  "deploy": 0,
+  "git_write": 0,
+  "business_db_connections": 0,
+  "new_dependencies": 0,
+  "verify_review_untouched": true,
+  "credentials_on_disk": false,
+  "preexisting_dirty_files_touched": false
+ },
+ "test_db": "隧道 15432 → 8.83 隔离测试库 data_asset_test（凭据仅会话环境变量）"
+}

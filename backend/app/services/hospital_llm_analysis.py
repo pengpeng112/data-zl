@@ -41,6 +41,16 @@ ANALYSIS_PROMPT_HEADER = """你是医院数据资产质控助手。
 如果材料里有 already_split_to 或 handling_hint，结论必须写明：混合关系已经拆开，去看拆后的正式关系，不要建议按混合关系改业务数据。
 """
 
+PATROL_INPUT_SCHEMA = "patrol-analysis-input/v1"
+PATROL_PROMPT_VERSION = "hospital-patrol-analysis-v1"
+PATROL_PROMPT_HEADER = """你是医院数据资产 AI 巡查演示助手。
+输入只包含数据资产平台登记的表元数据、质量指标快照和脱敏 findings，不含患者数据。
+只依据给定证据分析，禁止虚构统计值、表名、字段名或时间。
+本任务是只读分析：不得执行 SQL、调度任务或修改任何业务与平台数据。
+按【结论】【风险等级】【证据引用】【局限说明】【处理建议】输出中文；证据引用必须复述 finding_id、rule_code、metric_value 与 found_at。
+如果证据不足，明确写“证据不足”，不得用常识补数字。生成内容只供人工复核，不执行 SQL、不修改任何数据库。
+"""
+
 
 def build_analysis_prompt(*, task_type: str, request_id: str, input_digest: str, payload_json: str) -> str:
     return "\n".join([
@@ -48,6 +58,18 @@ def build_analysis_prompt(*, task_type: str, request_id: str, input_digest: str,
         f"任务类型：{task_type}",
         f"request_id={request_id}",
         "平台库传入的问题和字段例子：",
+        payload_json,
+    ])
+
+
+def build_patrol_analysis_prompt(*, request_id: str, input_digest: str, payload_json: str) -> str:
+    return "\n".join([
+        PATROL_PROMPT_HEADER,
+        f"input_schema={PATROL_INPUT_SCHEMA}",
+        f"prompt_version={PATROL_PROMPT_VERSION}",
+        f"request_id={request_id}",
+        f"input_digest={input_digest}",
+        "巡查证据：",
         payload_json,
     ])
 

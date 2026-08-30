@@ -1,0 +1,27 @@
+{
+ "code": "T10",
+ "probe_type": "R-REF",
+ "name": "手术麻醉医生缺失率",
+ "severity_default": "P3",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT COUNT(*) AS TOTAL, SUM(CASE WHEN ANESTHESIA_DOCTOR IS NULL THEN 1 ELSE 0 END) AS MISS FROM MEDREC.OPERATION WHERE OPERATING_DATE >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND OPERATING_DATE < TO_DATE(:END_DATE,'YYYY-MM-DD')"
+  }
+ ],
+ "derive": {
+  "metric": "anes_doctor_missing_rate",
+  "formula": "miss/total*100",
+  "unit": "%"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 1.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "MEDREC.OPERATION.ANESTHESIA_DOCTOR 缺失率",
+ "large_table_guard": null
+}

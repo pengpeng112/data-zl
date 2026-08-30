@@ -123,3 +123,21 @@ def test_metadata_collector_clamps_probe_row():
     rows = [{"n": i} for i in range(6)]
     assert len(MetadataCollectorAdapter._clamp_rows(rows, 5)) == 5
     assert MetadataCollectorAdapter._clamp_rows(rows, 5)[-1] == {"n": 4}
+
+
+def test_pymssql_rejects_tsql_named_binds_with_params():
+    """161 P1-1（round-2 P2）：@name 风格 SQL 带参在 pymssql 分支 fail-closed。
+
+    144 校验器对 sqlserver 按 @name 提取占位符，而 pymssql 只认 %(name)s
+    pyformat——两口径混用会静默失绑，必须在触碰驱动前拒绝。:name 等其他形态
+    （A1 契约，见上方测试）与无参资产不受影响。
+    """
+    import pytest
+
+    connector, cursor = _pymssql_connector()
+    with pytest.raises(ValueError, match="pymssql"):
+        connector.execute_readonly(
+            "SELECT CNT FROM t WHERE code = @code", {"code": "X"}, max_rows=10
+        )
+    # 拒绝必须发生在调用驱动之前。
+    assert cursor.executed == []

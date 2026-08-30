@@ -65,7 +65,10 @@
               :key="node.id"
               :class="node.className"
               :transform="`translate(${node.x}, ${node.y})`"
+              tabindex="0"
               @click.stop="emitNode(node.raw)"
+              @dblclick.stop="emit('node-activate', node.raw)"
+              @keydown.enter="emit('node-activate', node.raw)"
             >
               <circle :r="node.width / 2" />
               <text
@@ -75,6 +78,13 @@
                 text-anchor="middle"
                 :y="node.width / 2 + 14 + lineIndex * 15"
               >{{ line }}</text>
+              <!-- 146 E2（R5）：字段节点副标题 = 已计算的 node.meta（数据类型/键类型），长文本截断保证可读 -->
+              <text
+                v-if="node.meta && shouldRenderGraphMeta(node.meta)"
+                class="node-meta"
+                text-anchor="middle"
+                :y="node.width / 2 + 14 + node.label.split('\n').length * 15 + 2"
+              >{{ truncateGraphMeta(node.meta) }}</text>
             </g>
           </g>
         </g>
@@ -90,8 +100,9 @@ import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graph
 import { formatGraphNodeLabel, linkAdjacentOverviewNodes, transformGraphByMode } from "@/views/asset/graph/graphTransform";
 import { nodeDisplayName, parsePhysicalKey } from "@/views/asset/graph/graphPhysical";
 import { computeCircularSpreadPositions, computeHierarchyPositions } from "@/views/asset/graph/hierarchyLayout";
+import { shouldRenderGraphMeta, truncateGraphMeta } from "@/views/asset/components/graphNodeMeta";
 
-type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
+type LayoutMode = "force" | "layered" | "grouped" | "radial" | "hierarchy";
 
 interface LayoutNode {
   id: string;
@@ -148,7 +159,7 @@ const props = withDefaults(
     groupBy: "schema",
     focusKeyword: "",
     showReviewLayer: false,
-    layoutMode: "layered",
+    layoutMode: "force",
     aggregateGroups: false,
     aggregationThreshold: 10,
     viewMode: "table"
@@ -157,6 +168,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "node-click": [node: GraphNode];
+  "node-activate": [node: GraphNode];
   "edge-click": [edge: GraphEdge];
 }>();
 
@@ -653,6 +665,17 @@ watch(() => [props.nodes, props.edges, props.selectedNodeId, props.layoutMode, p
   paint-order: stroke;
   stroke: rgba(255, 255, 255, 0.94);
   stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+/* 146 E2（R5）：字段节点副标题（node.meta）——次要信息弱化展示 */
+.node-meta {
+  fill: #475569;
+  font-size: 11px;
+  font-weight: 500;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.94);
+  stroke-width: 3px;
   stroke-linejoin: round;
 }
 </style>

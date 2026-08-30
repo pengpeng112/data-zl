@@ -140,7 +140,7 @@ import ReEmptyState from "@/components/ReEmptyState/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import ReWorkflow from "@/components/ReWorkflow/index.vue";
-import { onMounted, reactive, ref } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   approveOpsRun,
@@ -209,19 +209,50 @@ function formatJson(value: unknown) {
   return JSON.stringify(value ?? {}, null, 2);
 }
 
-async function fetchData() {
-  loading.value = true;
+async function fetchData(silent = false) {
+  if (!silent) loading.value = true;
   try {
     const params: Record<string, any> = {};
     if (filterStatus.value) params.approval_status = filterStatus.value;
     const res = await getOpsRuns(params);
     tableData.value = res.data?.items || [];
   } catch {
-    ElMessage.error("获取执行申请失败");
+    if (!silent) ElMessage.error("获取执行申请失败");
   } finally {
-    loading.value = false;
+    if (!silent) loading.value = false;
+  }
+  // 146 E7（R5）：存在执行中（executing）的申请时静默轮询刷新终态
+  scheduleExecutingPoll();
+}
+
+// 146 E7（R5）：执行中轮询——5s 间隔静默刷新，10 分钟上限，卸载即停止
+let executingPollTimer: number | undefined;
+let executingPollStartedAt = 0;
+const EXECUTING_POLL_INTERVAL_MS = 5000;
+const EXECUTING_POLL_MAX_MS = 10 * 60 * 1000;
+
+function stopExecutingPoll() {
+  if (executingPollTimer) {
+    window.clearTimeout(executingPollTimer);
+    executingPollTimer = undefined;
   }
 }
+
+function scheduleExecutingPoll() {
+  stopExecutingPoll();
+  const hasExecuting = tableData.value.some(row => row.approval_status === "executing");
+  if (!hasExecuting) {
+    executingPollStartedAt = 0;
+    return;
+  }
+  if (!executingPollStartedAt) executingPollStartedAt = Date.now();
+  if (Date.now() - executingPollStartedAt > EXECUTING_POLL_MAX_MS) return;
+  executingPollTimer = window.setTimeout(() => {
+    void fetchData(true);
+  }, EXECUTING_POLL_INTERVAL_MS);
+}
+
+onBeforeUnmount(stopExecutingPoll);
 
 function resetFilter() {
   filterStatus.value = "";
@@ -359,6 +390,7 @@ onMounted(() => {
       tableData.value = res.data?.items || [];
       const row = tableData.value.find((item: any) => item.id === target);
       if (row) handleAudit(row);
+      scheduleExecutingPoll();
     }).catch(() => undefined);
   } else {
     fetchData();

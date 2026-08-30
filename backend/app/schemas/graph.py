@@ -49,6 +49,8 @@ class GraphNode(BaseModel):
     nullable: str | None = None
     is_primary_key: bool = False
     is_relation_key: bool = False
+    in_degree: int = 0
+    out_degree: int = 0
 
 
 class GraphFieldMapping(BaseModel):
@@ -101,6 +103,8 @@ class GraphEdge(BaseModel):
     deferred_reason: str | None = None
     note: str | None = None
     validation_note: str | None = None
+    sql_hash: str | None = None
+    sql_snippet: str | None = None
 
 
 class GraphMeta(BaseModel):
@@ -122,6 +126,9 @@ class GraphMeta(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     center_physical_key: str | None = None
     direction_semantics: str | None = None
+    shown_count: int | None = None
+    actual_count: int | None = None
+    continuation_cursor: str | None = None
 
 
 class GraphData(BaseModel):

@@ -55,6 +55,21 @@
 
         <el-button type="primary" @click="doSearch">查询</el-button>
         <el-button @click="() => resetFilters()">重置</el-button>
+        <!-- 146 E8（R5）：列配置——可选列组按需显示 -->
+        <el-dropdown trigger="click" :hide-on-click="false">
+          <el-button>列配置<el-icon class="el-icon--right"><arrow-down /></el-icon></el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-checkbox-group v-model="visibleColumnGroups" class="column-config">
+                <el-checkbox value="national">国家临床版编码</el-checkbox>
+                <el-checkbox value="insurance">医保版编码</el-checkbox>
+                <el-checkbox v-if="isDiagnosis" value="diagnosisExtra">诊断扩展属性</el-checkbox>
+                <el-checkbox v-if="isOperation" value="operationExtra">手术下发属性</el-checkbox>
+                <el-checkbox value="source">来源文件</el-checkbox>
+              </el-checkbox-group>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
         <el-alert v-if="authHint" :title="authHint" type="warning" show-icon :closable="false" class="auth-alert" />
       </div>
 
@@ -69,7 +84,7 @@
         :data="items"
         stripe
         border
-        height="calc(100vh - 330px)"
+        :height="tableHeight"
         row-key="local_code"
         :row-class-name="tableRowClassName"
         class="full-width"
@@ -82,35 +97,41 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="dict_attribute" label="字典属性" width="120" fixed="left" show-overflow-tooltip />
+        <el-table-column prop="dict_attribute" label="字典属性" width="120" fixed="left" show-overflow-tooltip :formatter="blankFormatter" />
         <el-table-column prop="local_code" :label="localCodeLabel" width="175" fixed="left" show-overflow-tooltip />
         <el-table-column prop="local_name" :label="localNameLabel" min-width="240" fixed="left" show-overflow-tooltip />
-        <el-table-column v-if="isOperation" prop="operation_level" label="院内手术等级" width="110" align="center" />
-        <el-table-column prop="national_code" :label="nationalCodeLabel" width="185" show-overflow-tooltip />
-        <el-table-column prop="national_name" :label="nationalNameLabel" min-width="260" show-overflow-tooltip />
-        <el-table-column prop="insurance_code" :label="insuranceCodeLabel" width="185" show-overflow-tooltip />
-        <el-table-column prop="insurance_name" :label="insuranceNameLabel" min-width="230" show-overflow-tooltip />
+        <el-table-column v-if="isOperation" prop="operation_level" label="院内手术等级" width="110" align="center" :formatter="blankFormatter" />
+        <template v-if="visibleColumnGroups.includes('national')">
+          <el-table-column prop="national_code" :label="nationalCodeLabel" width="185" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="national_name" :label="nationalNameLabel" min-width="260" show-overflow-tooltip :formatter="blankFormatter" />
+        </template>
+        <template v-if="visibleColumnGroups.includes('insurance')">
+          <el-table-column prop="insurance_code" :label="insuranceCodeLabel" width="185" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="insurance_name" :label="insuranceNameLabel" min-width="230" show-overflow-tooltip :formatter="blankFormatter" />
+        </template>
 
-        <template v-if="isDiagnosis">
+        <template v-if="isDiagnosis && visibleColumnGroups.includes('diagnosisExtra')">
           <el-table-column prop="ybhm" label="JHEMR 灰码" width="110" align="center">
-            <template #default="{ row }"><el-tag v-if="row.ybhm === '灰码'" type="warning" size="small">灰码</el-tag></template>
+            <template #default="{ row }"><el-tag v-if="row.ybhm === '灰码'" type="warning" size="small">灰码</el-tag><span v-else>—</span></template>
           </el-table-column>
-          <el-table-column prop="special_disease_code" label="门诊慢特病编码" width="150" show-overflow-tooltip />
-          <el-table-column prop="special_disease_name" label="门诊慢特病名称" min-width="170" show-overflow-tooltip />
-          <el-table-column prop="low_risk_category_code" label="ICD低风险编码类目" width="160" show-overflow-tooltip />
-          <el-table-column prop="low_risk_disease_name" label="ICD低风险病种名称" min-width="190" show-overflow-tooltip />
-          <el-table-column prop="infectious_disease_name" label="传染病诊断" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="special_disease_code" label="门诊慢特病编码" width="150" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="special_disease_name" label="门诊慢特病名称" min-width="170" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="low_risk_category_code" label="ICD低风险编码类目" width="160" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="low_risk_disease_name" label="ICD低风险病种名称" min-width="190" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="infectious_disease_name" label="传染病诊断" min-width="160" show-overflow-tooltip :formatter="blankFormatter" />
         </template>
 
-        <template v-if="isOperation">
-          <el-table-column prop="operation_category" label="手术类别" width="140" show-overflow-tooltip />
-          <el-table-column prop="performance_level4_flag" label="绩效四级" width="90" align="center" />
-          <el-table-column prop="performance_minimally_invasive_flag" label="绩效微创" width="90" align="center" />
-          <el-table-column prop="restricted_tech_flag" label="限制技术" width="90" align="center" />
+        <template v-if="isOperation && visibleColumnGroups.includes('operationExtra')">
+          <el-table-column prop="operation_category" label="手术类别" width="140" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="performance_level4_flag" label="绩效四级" width="90" align="center" :formatter="blankFormatter" />
+          <el-table-column prop="performance_minimally_invasive_flag" label="绩效微创" width="90" align="center" :formatter="blankFormatter" />
+          <el-table-column prop="restricted_tech_flag" label="限制技术" width="90" align="center" :formatter="blankFormatter" />
         </template>
 
-        <el-table-column prop="source_file" label="来源文件" min-width="260" show-overflow-tooltip />
-        <el-table-column prop="source_sheet" label="来源工作表" width="150" show-overflow-tooltip />
+        <template v-if="visibleColumnGroups.includes('source')">
+          <el-table-column prop="source_file" label="来源文件" min-width="260" show-overflow-tooltip :formatter="blankFormatter" />
+          <el-table-column prop="source_sheet" label="来源工作表" width="150" show-overflow-tooltip :formatter="blankFormatter" />
+        </template>
         <el-table-column label="操作" width="138" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="openDialog(row)">编辑</el-button>
@@ -186,8 +207,9 @@
 
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
-import { computed, reactive, ref, onMounted } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { ArrowDown } from "@element-plus/icons-vue";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import { authHintForStatus } from "@/utils/statusLabels";
 import { exportMedicalMappingRows, getMedicalMappingOptions, getMedicalMappingRows, upsertMedicalMappingRow } from "@/api/dict";
@@ -209,6 +231,21 @@ const operationLevel = ref("");
 const authHint = ref("");
 const mappingFormRef = ref<FormInstance>();
 const optionData = reactive<Record<string, string[]>>({ dict_attributes: ["院内扩展"], operation_category: [], operation_level: [], performance_level4_flag: [], performance_minimally_invasive_flag: [], restricted_tech_flag: [] });
+// 146 E8（R5）：列配置——可选列组（国家临床版/医保版/诊断扩展/手术属性/来源文件）
+const visibleColumnGroups = ref<string[]>(["national", "insurance", "diagnosisExtra", "operationExtra", "source"]);
+// 146 E8（R5）：弹性高度——随视口自适应并设下限，避免固定 calc 在筛选换行时溢出
+const tableHeight = ref(520);
+function refreshTableHeight() {
+  tableHeight.value = Math.max(360, Math.min(window.innerHeight - 330, 900));
+}
+refreshTableHeight();
+window.addEventListener("resize", refreshTableHeight);
+onBeforeUnmount(() => window.removeEventListener("resize", refreshTableHeight));
+// 146 E8（R5）：可读空值——空单元格统一显示“—”
+function blankFormatter(row: any, _column: any, cellValue: any) {
+  const text = cellValue == null ? "" : String(cellValue).trim();
+  return text || "—";
+}
 const formRules: FormRules = {
   local_code: [{ required: true, whitespace: true, message: "请输入院内编码", trigger: "blur" }],
   local_name: [{ required: true, whitespace: true, message: "请输入院内名称", trigger: "blur" }],
@@ -290,17 +327,32 @@ function openDialog(row?: any) {
   loadOptions();
 }
 
+// 146 E8（R5）：下拉值域按类别缓存，打开弹窗不重复请求；失败时提示可重试
+const optionsCache = new Map<string, Record<string, string[]>>();
+
 async function loadOptions() {
+  const cached = optionsCache.get(categoryCode.value);
+  if (cached) {
+    Object.assign(optionData, cached);
+    return;
+  }
   try {
     const res = await getMedicalMappingOptions(categoryCode.value);
-    Object.assign(optionData, res.data || {});
+    const payload = res.data || {};
+    Object.assign(optionData, payload);
     if (!optionData.dict_attributes?.includes("院内扩展")) optionData.dict_attributes = ["院内扩展", ...(optionData.dict_attributes || [])];
-  } catch { ElMessage.warning("下拉值域加载失败，请刷新后重试"); }
+    optionsCache.set(categoryCode.value, JSON.parse(JSON.stringify(optionData)));
+  } catch {
+    ElMessage.warning("下拉值域加载失败，请重新打开编辑框重试");
+  }
 }
 
 async function saveRow() {
   const valid = await mappingFormRef.value?.validate().catch(() => false);
-  if (!valid) return;
+  if (!valid) {
+    ElMessage.warning("请先完善必填项（院内编码/名称、字典属性）");
+    return;
+  }
   dialog.submitting = true;
   try {
     await upsertMedicalMappingRow(dialog.form);
@@ -404,6 +456,7 @@ onMounted(loadData);
 .keyword-input { width: 260px; }
 .small-filter { width: 138px; }
 .auth-alert { flex: 1; min-width: 260px; }
+.column-config { display: grid; gap: 4px; padding: 4px 12px; }
 .summary-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; color: var(--el-text-color-regular); font-size: 13px; }
 .hint { color: var(--el-text-color-secondary); }
 .pager { margin-top: 16px; justify-content: flex-end; }

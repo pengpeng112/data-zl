@@ -169,11 +169,12 @@
     </el-card>
 
     <el-dialog v-model="termDialogVisible" title="业务术语" width="450px">
-      <el-form>
-        <el-form-item label="术语">
-          <el-input v-model="termForm.term" placeholder="如 住院号" />
+      <!-- 146 E4（R5）：术语表单带必填校验，保存前 validate -->
+      <el-form ref="termFormRef" :model="termForm" :rules="termRules" label-width="90px">
+        <el-form-item label="术语" prop="term">
+          <el-input v-model="termForm.term" placeholder="如 住院号" maxlength="100" />
         </el-form-item>
-        <el-form-item label="映射目标">
+        <el-form-item label="映射目标" prop="mapping_target">
           <el-input
             v-model="termForm.mapping_target"
             placeholder="如 HIS.PAT_MASTER_INDEX.INP_NO"
@@ -185,7 +186,7 @@
       </el-form>
       <template #footer>
         <el-button @click="termDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveTerm">保存</el-button>
+        <el-button type="primary" :loading="termSaving" @click="saveTerm">保存</el-button>
       </template>
     </el-dialog>
 
@@ -200,21 +201,25 @@
           >新建快照</el-button
         >
       </template>
-      <el-table v-loading="snapLoading" :data="snapshots" stripe size="small">
+      <el-table
+        ref="snapTableRef"
+        v-loading="snapLoading"
+        :data="snapshots"
+        stripe
+        size="small"
+        row-key="id"
+        @selection-change="onSnapshotSelectionChange"
+      >
+        <!-- 146 E4（R5）：快照对比改勾选选择，最多勾两条 -->
+        <el-table-column type="selection" width="44" reserve-selection />
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="label" label="标签" width="200" />
         <el-table-column prop="table_count" label="表数" width="80" />
         <el-table-column prop="column_count" label="字段数" width="80" />
         <el-table-column prop="relation_count" label="关系数" width="80" />
         <el-table-column prop="snapshot_time" label="时间" width="170" />
-        <el-table-column label="操作" width="260">
-          <template #default="{ row }">
-            <el-button size="small" @click="selectCompare(row)"
-              >对比选中</el-button
-            >
-          </template>
-        </el-table-column>
       </el-table>
+      <p class="snap-hint">勾选两个快照后点击“对比快照”生成差异（再次勾选第三条将清空重新选择）。</p>
       <div v-if="compareIds.length === 2" class="mt15">
         <el-button type="warning" size="small" @click="runCompare">
           对比快照 #{{ compareIds[0] }} vs #{{ compareIds[1] }}
@@ -275,14 +280,15 @@
     </el-card>
 
     <el-dialog v-model="ownerDialogVisible" title="表 Owner" width="450px">
-      <el-form>
-        <el-form-item label="表名">
+      <!-- 146 E4（R5）：Owner 表单带必填与表名格式校验，保存前 validate -->
+      <el-form ref="ownerFormRef" :model="ownerForm" :rules="ownerRules" label-width="90px">
+        <el-form-item label="表名" prop="full_table_name">
           <el-input
             v-model="ownerForm.full_table_name"
             placeholder="如 HIS.PAT_VISIT"
           />
         </el-form-item>
-        <el-form-item label="负责人">
+        <el-form-item label="负责人" prop="owner_name">
           <el-input v-model="ownerForm.owner_name" />
         </el-form-item>
         <el-form-item label="部门">
@@ -297,7 +303,7 @@
       </el-form>
       <template #footer>
         <el-button @click="ownerDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveOwner">保存</el-button>
+        <el-button type="primary" :loading="ownerSaving" @click="saveOwner">保存</el-button>
       </template>
     </el-dialog>
     <el-dialog v-model="keyDialog.visible" title="创建 API Token" width="460px" destroy-on-close>
@@ -376,6 +382,7 @@ const ownerPageSize = ref<number>(30);
 const ownerKeyword = ref("");
 
 const ownerDialogVisible = ref(false);
+const ownerSaving = ref(false);
 const ownerForm = ref({
   full_table_name: "",
   owner_name: "",
@@ -385,13 +392,32 @@ const ownerForm = ref({
 });
 const editId = ref<number | null>(null);
 
+// 146 E4（R5）：Owner 表单校验强化——表名/负责人必填，表名要求 SCHEMA.TABLE 形态
+const ownerFormRef = ref();
+const ownerRules = {
+  full_table_name: [
+    { required: true, whitespace: true, message: "请填写表名", trigger: "blur" },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        const text = String(value || "").trim();
+        if (!text || !text.includes(".")) {
+          callback(new Error("表名需为 SCHEMA.TABLE 形态，如 HIS.PAT_VISIT"));
+          return;
+        }
+        callback();
+      },
+      trigger: "blur"
+    }
+  ],
+  owner_name: [{ required: true, whitespace: true, message: "请填写负责人", trigger: "blur" }]
+};
+
 function loadKeys() {
   listAdminKeys()
     .then(({ data }) => {
       keys.value = data as any;
     })
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "API Key 列表加载失败"));
     });
 }
@@ -446,7 +472,6 @@ function toggleKey(row: KeyItem) {
   toggleAdminKey(row.id, !row.enabled)
     .then(() => loadKeys())
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "API Key 启停失败"));
     });
 }
@@ -491,7 +516,10 @@ function openOwnerDialog(row?: OwnerItem) {
   ownerDialogVisible.value = true;
 }
 
-function saveOwner() {
+async function saveOwner() {
+  const valid = await ownerFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
+  ownerSaving.value = true;
   upsertAdminOwner(ownerForm.value)
     .then(() => {
       ElMessage.success("已保存");
@@ -499,13 +527,14 @@ function saveOwner() {
       loadOwners();
     })
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "表 Owner 保存失败"));
+    })
+    .finally(() => {
+      ownerSaving.value = false;
     });
 }
 
 function delOwner(row: OwnerItem) {
-  // E12：原生 confirm 改 ElMessageBox（统一交互）。
   ElMessageBox.confirm(`确定删除表 ${row.full_table_name} 的 Owner 登记？`, "删除确认", {
     type: "warning"
   })
@@ -535,7 +564,27 @@ const termPage = ref<number>(1);
 const termPageSize = ref<number>(30);
 const termKeyword = ref("");
 const termDialogVisible = ref(false);
+const termSaving = ref(false);
 const termForm = ref({ term: "", mapping_target: "", description: "" });
+// 146 E4（R5）：术语表单校验强化——术语/映射目标必填
+const termFormRef = ref();
+const termRules = {
+  term: [{ required: true, whitespace: true, message: "请填写业务术语", trigger: "blur" }],
+  mapping_target: [
+    { required: true, whitespace: true, message: "请填写映射目标", trigger: "blur" },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        const text = String(value || "").trim();
+        if (text && !text.includes(".")) {
+          callback(new Error("映射目标建议为 库.表.字段 或 库.表 形态"));
+          return;
+        }
+        callback();
+      },
+      trigger: "blur"
+    }
+  ]
+};
 
 function loadTerms() {
   termsLoading.value = true;
@@ -568,7 +617,10 @@ function openTermDialog(row?: TermItem) {
   termDialogVisible.value = true;
 }
 
-function saveTerm() {
+async function saveTerm() {
+  const valid = await termFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
+  termSaving.value = true;
   upsertAdminTerm(termForm.value)
     .then(() => {
       ElMessage.success("已保存");
@@ -576,13 +628,14 @@ function saveTerm() {
       loadTerms();
     })
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "业务术语保存失败"));
+    })
+    .finally(() => {
+      termSaving.value = false;
     });
 }
 
 function delTerm(row: TermItem) {
-  // E12：原生 confirm 改 ElMessageBox。
   ElMessageBox.confirm(`确定删除术语「${row.term}」？`, "删除确认", {
     type: "warning"
   })
@@ -608,6 +661,7 @@ interface SnapItem {
 
 const snapshots = ref<SnapItem[]>([]);
 const snapLoading = ref(false);
+const snapTableRef = ref();
 const compareIds = ref<number[]>([]);
 const compareResult = ref<any>(null);
 
@@ -633,14 +687,19 @@ function createSnapshot() {
       loadSnapshots();
     })
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "快照创建失败"));
     });
 }
 
-function selectCompare(row: SnapItem) {
-  if (compareIds.value.length >= 2) compareIds.value = [];
-  compareIds.value.push(row.id);
+// 146 E4（R5）：快照勾选驱动对比；最多勾两条，超出时撤销最后一条并提示
+function onSnapshotSelectionChange(rows: SnapItem[]) {
+  if (rows.length > 2) {
+    const last = rows[rows.length - 1];
+    snapTableRef.value?.toggleRowSelection(last, false);
+    ElMessage.warning("最多勾选两个快照进行对比");
+    return;
+  }
+  compareIds.value = rows.map(row => row.id);
   compareResult.value = null;
 }
 
@@ -651,7 +710,6 @@ function runCompare() {
       compareResult.value = data;
     })
     .catch(error => {
-      // E12：无 catch 链补齐。
       ElMessage.error(extractErrorDetail(error, "快照对比失败"));
     });
 }
@@ -728,4 +786,5 @@ onMounted(() => {
 }
 .token-once { margin: 0; padding: 12px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; word-break: break-all; background: var(--el-fill-color-light); border-radius: 6px; }
 .mb8 { margin-bottom: 8px; }
+.snap-hint { margin: 8px 0 0; color: var(--el-text-color-secondary); font-size: 12px; }
 </style>

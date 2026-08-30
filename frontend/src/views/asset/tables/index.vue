@@ -76,12 +76,21 @@
               clearable
               @keyup.enter="doSearch"
             />
-            <el-input
+            <!-- 146 E5（R5）：业务域改候选下拉（后端图谱选项驱动，可手输），并提供清除筛选 -->
+            <el-select
               v-model="params.domain"
               placeholder="业务域"
               clearable
-              @keyup.enter="doSearch"
-            />
+              filterable
+              allow-create
+              default-first-option
+              :loading="domainCandidatesLoading"
+              @change="doSearch"
+              @clear="doSearch"
+            >
+              <el-option v-for="item in domainCandidates" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+            <el-button @click="clearFilters">清除筛选</el-button>
             <el-select v-model="pageSize" class="page-size-select" @change="onPageSizeChange">
               <el-option :value="20" label="20 条" />
               <el-option :value="50" label="50 条" />
@@ -175,6 +184,7 @@ import { useRouter } from "vue-router";
 import {
   getAssetTree,
   getAssetTreeTables,
+  getGraphOptions,
   getTableColumns,
   getTables,
   listSystems,
@@ -182,6 +192,7 @@ import {
   type AssetTreeNode,
   type AssetTreeTable,
   type ColumnInfo,
+  type GraphOptionItem,
   type TableBrief
 } from "@/api/asset";
 import { usePagedList } from "@/composables/usePagedList";
@@ -231,8 +242,14 @@ const rawTree = ref<AssetTreeNode[]>([]);
 /** schemaId -> 已加载的表节点 */
 const schemaTableChildren = ref<Record<string, TreeItem[]>>({});
 const schemaTablesLoading = ref<Record<string, boolean>>({});
+// 146 E5（R5）：Schema 表清单增量加载状态（schemaId -> 已加载页与总数）
+const SCHEMA_TABLES_PAGE_SIZE = 100;
+const schemaTablesState = ref<Record<string, { page: number; total: number }>>({});
 const columnChildren = ref<Record<string, TreeItem[]>>({});
 const searchHits = ref<TreeItem[]>([]);
+// 146 E5（R5）：业务域候选（来自图谱选项接口，可手输兜底）
+const domainCandidates = ref<GraphOptionItem[]>([]);
+const domainCandidatesLoading = ref(false);
 const columns = ref<ColumnInfo[]>([]);
 const selectedTable = ref<
   (TableBrief & { system_category_cn?: string; system_name_cn?: string; source_system_cn?: string }) | null
@@ -445,7 +462,8 @@ const treeData = computed<TreeItem[]>(() => {
 
       const lazyTables = schemaTableChildren.value[schemaId];
       if (lazyTables?.length) {
-        schemaNode.children = lazyTables.map(t => ({
+        const lazyState = schemaTablesState.value[schemaId];
+        const childNodes: TreeItem[] = lazyTables.map(t => ({
           ...t,
           children: t.table
             ? columnChildren.value[
@@ -453,6 +471,21 @@ const treeData = computed<TreeItem[]>(() => {
               ]
             : undefined
         }));
+        // 146 E5（R5）：还有未加载的表时追加“加载更多”增量节点
+        if (lazyState && lazyTables.length < lazyState.total) {
+          childNodes.push({
+            id: `loadmore:${schemaId}`,
+            label: schemaTablesLoading.value[schemaId]
+              ? "加载中…"
+              : `加载更多（已加载 ${lazyTables.length}/${lazyState.total} 张）`,
+            kind: "schema",
+            system_code: sysCode,
+            system_name_cn: sysNode.system_name_cn,
+            source_code: schemaSourceCode,
+            schema_name: schema.namespace
+          });
+        }
+        schemaNode.children = childNodes;
         schemaNode.tablesLoaded = true;
       } else if (schema.tables_loaded || (schema.tables && schema.tables.length)) {
         for (const table of schema.tables || []) {
@@ -597,22 +630,35 @@ async function loadTree() {
     const res = await getAssetTree({ include_tables: false });
     rawTree.value = res.data || [];
     schemaTableChildren.value = {};
+    schemaTablesState.value = {};
   } finally {
     treeLoading.value = false;
   }
 }
 
-async function loadSchemaTables(node: TreeItem) {
+/**
+ * 146 E5（R5）：Schema 表清单增量加载。
+ * 首次展开加载第 1 页（100 条）；存在“加载更多”节点时按页追加，避免一次拉取数百条。
+ */
+async function loadSchemaTables(node: TreeItem, append = false) {
   if (node.kind !== "schema" || !node.source_code) return;
   const sid = node.id;
-  if (schemaTableChildren.value[sid]?.length || schemaTablesLoading.value[sid]) return;
+  if (schemaTablesLoading.value[sid]) return;
+  const state = schemaTablesState.value[sid];
+  if (append) {
+    if (!state || state.page * SCHEMA_TABLES_PAGE_SIZE >= state.total) return;
+  } else if (state || schemaTableChildren.value[sid]?.length) {
+    // 首页已加载过，避免展开即重复请求
+    return;
+  }
+  const nextPage = append && state ? state.page + 1 : 1;
   schemaTablesLoading.value = { ...schemaTablesLoading.value, [sid]: true };
   try {
     const res = await getAssetTreeTables({
       source_code: node.source_code,
       schema_name: node.schema_name || "",
-      page: 1,
-      page_size: 500
+      page: nextPage,
+      page_size: SCHEMA_TABLES_PAGE_SIZE
     });
     const sourceStub: AssetTreeNode = {
       source_code: node.source_code,
@@ -624,26 +670,32 @@ async function loadSchemaTables(node: TreeItem) {
       table_count: res.data.total,
       schemas: []
     };
+    const prev = append ? schemaTableChildren.value[sid] || [] : [];
+    const nextNodes = (res.data.items || []).map(table => {
+      const key = tableNodeKey(node.source_code || "", node.schema_name || "", table.table_name);
+      return {
+        id: `table:${key}`,
+        label: table.table_name_cn
+          ? `${table.table_name} · ${table.table_name_cn}`
+          : table.table_name,
+        kind: "table" as const,
+        system_code: node.system_code,
+        system_name_cn: node.system_name_cn,
+        source_system: node.source_system,
+        source_code: node.source_code,
+        schema_name: node.schema_name,
+        table_name: table.table_name,
+        table: toTableBrief(sourceStub, node.schema_name || "", table),
+        count: table.column_count ?? undefined
+      };
+    });
     schemaTableChildren.value = {
       ...schemaTableChildren.value,
-      [sid]: (res.data.items || []).map(table => {
-        const key = tableNodeKey(node.source_code || "", node.schema_name || "", table.table_name);
-        return {
-          id: `table:${key}`,
-          label: table.table_name_cn
-            ? `${table.table_name} · ${table.table_name_cn}`
-            : table.table_name,
-          kind: "table" as const,
-          system_code: node.system_code,
-          system_name_cn: node.system_name_cn,
-          source_system: node.source_system,
-          source_code: node.source_code,
-          schema_name: node.schema_name,
-          table_name: table.table_name,
-          table: toTableBrief(sourceStub, node.schema_name || "", table),
-          count: table.column_count ?? undefined
-        };
-      })
+      [sid]: [...prev, ...nextNodes.filter(n => !prev.some(p => p.id === n.id))]
+    };
+    schemaTablesState.value = {
+      ...schemaTablesState.value,
+      [sid]: { page: nextPage, total: res.data.total || 0 }
     };
   } finally {
     schemaTablesLoading.value = { ...schemaTablesLoading.value, [sid]: false };
@@ -735,6 +787,17 @@ function applyTreeScope(node: TreeItem) {
 async function handleTreeClick(node: TreeItem) {
   if (node.id === "search-hits") return;
 
+  // 146 E5（R5）：“加载更多”增量节点只追加下一页，不改变右侧筛选范围
+  if (node.id.startsWith("loadmore:")) {
+    const schemaNode: TreeItem = {
+      ...node,
+      id: node.id.replace(/^loadmore:/, ""),
+      kind: "schema"
+    };
+    await loadSchemaTables(schemaNode, true);
+    return;
+  }
+
   const schemaNode: TreeItem = node.id.startsWith("placeholder:")
     ? { ...node, id: node.id.replace(/^placeholder:/, ""), kind: "schema" }
     : node;
@@ -799,6 +862,28 @@ function doSearch() {
   loadData(1);
 }
 
+// 146 E5（R5）：清除筛选——清空关键词/业务域并回到第 1 页
+function clearFilters() {
+  params.keyword = "";
+  params.domain = "";
+  doSearch();
+}
+
+// 146 E5（R5）：业务域候选来自图谱选项接口（后端驱动，不硬编码）；失败静默保留手输
+async function loadDomainCandidates() {
+  domainCandidatesLoading.value = true;
+  try {
+    const { data } = await getGraphOptions();
+    domainCandidates.value = data.domain_options?.length
+      ? data.domain_options
+      : (data.domains || []).map(value => ({ value, label: value }));
+  } catch {
+    domainCandidates.value = [];
+  } finally {
+    domainCandidatesLoading.value = false;
+  }
+}
+
 function reloadAll() {
   loadTree();
   loadData();
@@ -814,6 +899,7 @@ function goDetail(row: TableBrief) {
 }
 
 onMounted(async () => {
+  void loadDomainCandidates();
   await loadTree();
   await nextTick();
   loadData();
@@ -916,7 +1002,7 @@ onMounted(async () => {
 
 .filter-bar {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 180px 110px;
+  grid-template-columns: minmax(220px, 1fr) 170px auto 110px;
   gap: 8px;
   width: 100%;
 }

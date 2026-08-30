@@ -12,6 +12,19 @@
       </template>
     </RePageHeader>
 
+    <el-alert
+      v-if="summaryError"
+      class="mb20"
+      type="error"
+      :closable="false"
+      :title="`汇总指标加载失败：${summaryError}`"
+      show-icon
+    >
+      <template #default>
+        <el-button size="small" type="primary" plain @click="loadSummary">重试汇总</el-button>
+      </template>
+    </el-alert>
+
     <section class="stat-grid">
       <ReStatCard label="数据表" :value="summary.tables" tone="primary" helper="纳入资产目录">
         <template #icon><TableIcon /></template>
@@ -34,12 +47,16 @@
           <small v-if="domainHint" class="chart-hint">{{ domainHint }}</small>
         </template>
         <ReChart :option="domainChartOption" :empty="!domainRows.length && !domainError" height="340px" :dark="false" />
-        <el-alert v-if="domainError" type="error" :closable="false" :title="domainError" class="mt8" />
+        <el-alert v-if="domainError" type="error" :closable="false" :title="domainError" class="mt8" show-icon>
+          <template #default><el-button size="small" @click="reloadAll">重试</el-button></template>
+        </el-alert>
       </el-card>
       <el-card v-loading="statusLoading" shadow="never" class="overview-card">
         <template #header>关系验证状态分布</template>
         <ReChart :option="statusChartOption" :empty="!statusRows.length && !statusError" height="340px" :dark="false" />
-        <el-alert v-if="statusError" type="error" :closable="false" :title="statusError" class="mt8" />
+        <el-alert v-if="statusError" type="error" :closable="false" :title="statusError" class="mt8" show-icon>
+          <template #default><el-button size="small" @click="reloadAll">重试</el-button></template>
+        </el-alert>
       </el-card>
       <el-card v-loading="partitionLoading" shadow="never" class="overview-card">
         <template #header>
@@ -47,7 +64,9 @@
           <small class="chart-hint">Oracle 对应 Owner，其他库对应数据库/架构或命名空间</small>
         </template>
         <ReChart :option="schemaRelChartOption" :empty="!schemaRows.length && !partitionError" height="340px" :dark="false" />
-        <el-alert v-if="partitionError" type="error" :closable="false" :title="partitionError" class="mt8" />
+        <el-alert v-if="partitionError" type="error" :closable="false" :title="partitionError" class="mt8" show-icon>
+          <template #default><el-button size="small" @click="reloadAll">重试</el-button></template>
+        </el-alert>
       </el-card>
       <el-card v-loading="coreLoading" shadow="never" class="overview-card">
         <template #header>
@@ -55,7 +74,9 @@
           <small class="chart-hint">按已治理关系数量排序，不等同于业务重要性认定</small>
         </template>
         <ReChart :option="coreTableChartOption" :empty="!coreTableRows.length && !coreError" height="340px" :dark="false" />
-        <el-alert v-if="coreError" type="error" :closable="false" :title="coreError" class="mt8" />
+        <el-alert v-if="coreError" type="error" :closable="false" :title="coreError" class="mt8" show-icon>
+          <template #default><el-button size="small" @click="reloadAll">重试</el-button></template>
+        </el-alert>
       </el-card>
     </section>
   </div>
@@ -67,6 +88,7 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import { computed, onMounted, ref } from "vue";
 import { getOverviewCharts, getSummary, type SummaryData } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import type { EChartsCoreOption } from "echarts/core";
 import DashboardIcon from "~icons/ri/dashboard-3-line";
 import ListIcon from "~icons/ri/list-check-2";
@@ -97,6 +119,8 @@ const domainError = ref("");
 const statusError = ref("");
 const partitionError = ref("");
 const coreError = ref("");
+// 146 E10（R5）：汇总指标失败态
+const summaryError = ref("");
 
 const statusLabels: Record<string, string> = {
   verified: "已验证",
@@ -160,11 +184,13 @@ const coreTableChartOption = computed<EChartsCoreOption>(() => ({
 }));
 
 async function loadSummary() {
+  summaryError.value = "";
   try {
     const res = await getSummary();
     summary.value = res.data;
-  } catch {
-    /* keep default summary */
+  } catch (error) {
+    // 146 E10（R4→R5）：总览汇总失败不再静默——显式错误 + 重试
+    summaryError.value = extractErrorDetail(error, "汇总接口加载失败");
   }
 }
 

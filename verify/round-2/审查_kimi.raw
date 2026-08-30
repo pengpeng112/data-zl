@@ -1,0 +1,85 @@
+• 改动包很大，我先定位各关键改动的 diff 区块。
+
+• 继续读 quality、permissions、dict_medical、A9 相关区块。
+
+• 抽查核实子代理报告的高危项（relation-review 事件实参被当页码）。
+
+• 核查完毕。以下为独立审查结论（未修改任何文件）。
+
+  # 逐项核查结论
+
+  ## A4 连接器 max_rows+1 契约外溢
+
+  **【确认有问题｜高】A4 改坏了 SSH 跳板 Oracle 内嵌脚本的缩进，远端脚本直接 SyntaxError。**
+  `backend/app/services/db_connectors.py:186-202`：工作区把内嵌 `remote_script` 的 `try:` 从列 0 改成列 8（`        try:`），但 `cur = None` 仍在列 0、`cols = ...`/`finally:` 仍在列 4/0。实测验证：
+
+  ```
+  cd backend && python -c "compile(re.search(r'remote_script = r\"\"\"(.*?)\"\"\"', open('app/services/db_connectors.py',encoding='utf-8').read(), re.S).group(1),'s','exec')"
+  → SYNTAX ERROR: unexpected indent (line 29)
+  ```
+
+  `git show HEAD:backend/app/services/db_connectors.py` 确认基线缩进正常，是本批 A4 编辑引入。后果：任何走 `_run_via_ssh_jump` 的 Oracle 取数（本仓库主路径就是跳板机取 HIS/ODS）100% 失败。1152 测试全绿是因为该路径无测试覆盖（FakeConnector 掩盖，与 quality_sql_runner host 修复注释自曝的问题同源）。
+
+  **A4 契约本身【无问题】**：query_runner `truncated = len(rows) > max_rows` 严格大于 + 探针行丢弃（query_runner.py:278 附近）正确；quality_sql_runner 按 `[:max(1, max_rows)]` 夹紧保持口径。其余调用方逐一排查：identity_*、medical_code_* 的 SQL 均自带 `ROWNUM <= :max_rows` 内建限制，探针行不会物化；metadata_collector 无界查询最多多带 1 行元数据（无害）；row_presence 只判真假。无调用方以 `len(rows)==max_rows` 做翻页信号（已 grep 证实）。**外溢风险本身可控，唯一真实伤亡就是上面的缩进。**
+
+  **【疑问｜中】A1 pymssql dict 绑参与 144 校验器占位符风格不一致（背景交叉）**：144 的 `query_parameter_validator.py:16,38` 对 sqlserver 按 T-SQL `@name` 提取绑参，而 A1 改后的 `cursor.execute(sql, params or {})`（db_connectors.py:605）走 pymssql，只认 `%(name)s` pyformat。带参 sqlserver 查询资产必炸。queries.py 的 `bind_param_dialects` 也不含 sqlserver 但只是展示字段，无运行时拦截。建议：要么校验器拒绝 sqlserver 带参（fail closed），要么统一占位符风格。
+
+  ## B1 CSRF 归一化
+
+  **【无问题】**。`auth.py:65-91`：`_origin_of` 提取 scheme://host[:port]、小写、去尾斜杠，与 allowed 精确全等，消除 `http://<allowed>.evil.com` 前缀绕过；dev/test 无 Origin 兜底保留。唯一行为差异：`cors_origins` 若含 `*` 通配将不再匹配（fail-closed 方向，可接受）。新测试 test_auth_csrf.py 13 例覆盖该矩阵。
+
+  ## B2 diff 掩码契约
+
+  **【无问题，一处低危残留】**。`queries.py:655-658`：`current_sql/parent_sql` 无权限置 null + `sql_available="full_read_permission_required"`，与变更说明契约一致；不 403、有权限回原文，口径正确。残留：无权限时仍暴露 `same_sql` 布尔与两侧 `sql_sha256`（可推断两版本 SQL 是否逐字节相同）——低危信息泄露，建议裁决是否有意保留。
+
+  ## B5 权限码运行时影响
+
+  **【无问题（按自报风险成立）】**。`_permission_matches`（security.py:35-41）有 dot→colon 归一化，`require_permission("query:create")` 与目录 `query.create` 能匹配；`dict.medical.execute/retry/reconcile` 已入 RESOURCE_CATALOG（permissions.py:65-67）且 dict_admin 默认矩阵补齐（:211）；`ai.sql.execute` 仅授 quality_admin，ai_user 确认失去 drafts/execute 与 tool-execute——与自报风险 2 一致，生产必须重跑 `seed_permissions`（该端点是幂等补齐模式，permissions.py:355 起），否则 fail-closed 锁死。platform_admin 有 role 级旁路（security.py:54）不受影响。
+
+  ## C1/C3/C4 响应不变性
+
+  - **C1【无问题】**：`_EndpointResolver` 与 `resolve_endpoint`+`_resolve_endpoint_lenient`（relation_identity.py:54-85、graph.py:111-132）逐分支比对等价（schema 缺失=IS NULL、namespace 缺失=NULL/""、pair 去重唯一命中、多命中不猜、exact 部分命中落 lenient）。diagnostics 孤儿检测复用同一预载集合，字段集合不变。
+  - **C3【疑问｜低】**：`list_queries` 的 `active_version` 现在**永远**掩码 sql_text（列表端点没有 include_sql 入参），而旧版列表直出完整 SQL。前端列表不消费该字段（已核实 query-center 只用 query_code/title/version/status），无即时断裂；但这是变更说明「影响面」未声明的契约收窄，且 UI 详情态前端从不传 `include_sql=true`——有 ai.sql.full_read 权限的用户在前端也永远看不到 SQL 原文，若 153 本意是"UI 只给哈希"则成立，否则是功能回退，需对照计划裁决。批量 IN 查询与 `get_active_version`（query_intake.py:31，db.scalar 无排序）在数据异常（同 code 多个 is_active）时同样不确定，语义未劣化。
+  - **C4【无问题】**：row_number(id desc) rn=1 与旧"id 倒序首行命中"等价；cell 七字段在子查询中齐全（metrics.py:172-210）；A10 删 `==` 分支逻辑正确（相等蕴含包含）。
+
+  ## A9 SAVEPOINT 重试
+
+  **【无问题，一处低危盲区】**：`intake_version_retry.py` begin_nested/flush/commit、撞唯一键后 nested.rollback + 重读 max 重试一次，外层定义行不受影响；非唯一键 IntegrityError 原样抛出。盲区：`_is_unique_violation` 只认 pgcode 23505 和类名含 "uniqueviolation"，**SQLite 的唯一冲突识别不出**（类名是 IntegrityError）——测试库上该重试路径不可达，等于无真实覆盖；若任何部署用 SQLite 则重试永不生效。低危（生产是 PG 系）。
+
+  ## D2 operator 收敛
+
+  **【无问题+一处确认回归】**。`get_request_operator`（security.py:80-95）与旧样板语义等价（get_current_user 只抛 HTTPException，窄化 catch 安全）。**【确认有问题｜低】`data_products.py:184-191` import_results 是 17 处收敛中唯一丢归因的**：旧代码 `get_current_user(request)` 成功时记真实操作人，新代码硬编码 `user = "system"`（request 参数仍在签名但不再使用），审计 created_by 退化。其余替换点（queries/metrics/relation_reviews/admin/governance）均保持等价。
+
+  ## 前端 E 批与 F6
+
+  E 批错误处理（含 qs `arrayFormat:"repeat"`、scrollBehavior 死分支修复）**【无问题】**——qs repeat 与后端唯一数组参数（quality.py:979 `rule_codes: list[str]`）的 FastAPI 解析形态匹配，旧 indices 格式本来是静默丢参；逐页核对无漏 catch/双提示/loading 泄漏。
+
+  F6 usePagedList **【确认有问题】**，同一根因三处：`loadData(targetPage?)` 把首个实参当页码（usePagedList.ts:35-36），而多个模板事件把选中值/事件对象直接绑了进去：
+
+  1. **【高】relation-review/index.vue:385,390,397,405,509**：三个 el-select `@change="loadRelations"`（传 `"A"`/`"HIS"` 等当页码→后端 `page: int = Query(ge=1)` 直接 422，筛选功能整页报废）、`@keyup.enter`/`@clear`（传 Event 对象）、`@size-change`（传 30/50/100 跳错页）。已读源文件坐实。修复：筛选/搜索改 `doSearch`，size-change 改 `() => loadRelations(1)`。
+  2. **【中】asset/tables/index.vue:85**：页大小下拉 `@change="loadData"`，选「50 条」即跳第 50 页。
+  3. **【中】asset/tables/index.vue:766**：树节点点击丢了旧版 `page=1` 重置（diff 6001 删除），在第 5 页切树范围会带旧页码请求出空页。
+
+  其余 4 个试点页（dict/general、dict/sync-diffs、identity/sync-diffs、relation-rates）已核对无此模式。166 例 Vitest 全绿但盖不住这类模板事件绑定回归。
+
+  ---
+
+  # 问题清单
+
+  | 编号 | 严重度 | 文件:行 | 问题 | 建议 |
+  |---|---|---|---|---|
+  | 1 | 高 | backend/app/services/db_connectors.py:187-202 | A4 编辑致 SSH 跳板 remote_script 缩进错乱，`python3 -c exec` 即 unexpected indent，跳板 Oracle 取数路径全灭，测试无覆盖 | 恢复 `try:` 列 0 对齐（参照 `git show HEAD:` 同段），并给 remote_script 加一个本地 compile 冒烟测试 |
+  | 2 | 高 | frontend/src/views/asset/relation-review/index.vue:385,390,397,405,509 | `@change/@keyup.enter/@clear/@size-change` 直接绑 `loadRelations`（=`loadData(targetPage)`），选中值/事件对象被当页码 → 422 或跳错页 | 筛选搜索改绑 `doSearch`；size-change 改 `() => loadRelations(1)`；其余 4 试点页同模式再扫一遍 |
+  | 3 | 中 | frontend/src/views/asset/tables/index.vue:85 | 页大小 el-select `@change="loadData"` 把 20/50/100 当页码 | 改 `@change="() => loadData(1)"` 或复用脚本已有的 onPageSizeChange |
+  | 4 | 中 | frontend/src/views/asset/tables/index.vue:766 | 树点击丢失旧版 `params.page=1` 重置语义，深页码切范围出空页 | `loadData()` 改 `loadData(1)` |
+  | 5 | 中 | backend/app/services/db_connectors.py:605 × query_parameter_validator.py:16 | 【背景交叉】A1 pymssql dict 绑参需 `%(name)s`，144 校验器对 sqlserver 按 `@name` 提取，带参 sqlserver 资产必失败且无门禁拦截 | 统一占位符口径，或在校验器对 sqlserver 带参 fail-closed |
+  | 6 | 低 | backend/app/api/v1/data_products.py:184-191 | D2 收敛中 import_results 丢掉操作人归因，恒为 "system" | 补 `get_request_operator(request, default="system")`（需保留 None 守卫） |
+  | 7 | 低 | backend/app/api/v1/queries.py:655-657 | B2 掩码后仍暴露 `same_sql` 与双端 sql_sha256，可推断版本间 SQL 是否相同 | 裁决是否有意；若收紧则无权限时一并置 null |
+  | 8 | 低 | backend/app/services/intake_version_retry.py:17-21 | `_is_unique_violation` 不认 SQLite 唯一冲突，A9 重试路径在测试库不可达、零真实覆盖 | 加 mocked IntegrityError 单测，或补充 sqlite 错误串识别 |
+  | 9 | 低 | backend/app/api/v1/queries.py（list_queries/ai/context） | C3 后列表 active_version 永久掩码 sql_text 且前端从不传 include_sql=true，full_read 权限在 UI 成为死权限；影响面未声明 | 对照 153 计划裁决；若保留掩码，变更说明「影响面」补登该契约收窄 |
+  | 10 | 低 | backend/app/api/v1/quality.py:243-296 | 【边界】A2 SQL 下推后 GROUP BY 不再把 NULL 与 "" 归并（PG 系），同表 system/source 混 NULL/"" 时会拆成两条 finding | 可接受则忽略；要完全对齐旧口径需 COALESCE 归一 |
+  | 11 | 低 | frontend/src/views/identity/accounts/index.vue（doUnbind） | 确认文案用 `row.account_code`，后端实际返回 `account_id`，弹窗显示 id 而非账号编码；接口类型声明与载荷漂移 | 改用 `row.account_id` 并与 api/identity.ts 类型对齐 |
+  | 12 | 低 | backend/app/api/v1/governance.py:1544-1570 | 【背景·146】audit-logs/summary 对全量筛选结果无 limit 拉内存统计 | 加上限或改 SQL 聚合 |
+
+  **总体判断**：B1/B2/B5/C1/C4/A9/A7/B4/B6 等安全与性能主体改动质量合格、与变更说明自述一致；但有 2 个高危必须修后再发——**#1 跳板取数脚本语法错误（后端主通道级故障）** 和 **#2 relation-review 筛选整页 422**。变更说明自报风险清单漏掉了这两项（尤其是 #1，比自报的任何一条都严重）。
+

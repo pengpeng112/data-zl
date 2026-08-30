@@ -1,0 +1,234 @@
+• Let me read the 方案.md file and the referenced files for fact-checking.
+
+• Now I need to verify facts against 开发起步包/README.md and 55_系统未完成事项统一执行计划.md (顶部📌区). These files may be large. Let me read them — possibly delegate, but I can read directly. The README is the authoritative catalog and likely large. Let me read both; maybe read README fully (could be >1000 lines) and 55's top section.
+
+• Both files are large. I need the full content for fact-checking. The README is 466 lines and 102KB; the read hit 50k char preview cap. 55 file is 1089 lines. Let me read the rest of README from line 336 onward, and the 55 file's top 📌 section (first ~100 lines) plus probably rest relevant. The review scope says verify §2 claims against README status table and 55's top 📌 area. Let me read README lines 336-466 and 55 lines 1-200 (the 📌 blocks at top).
+
+  Actually the first Read of 55 returned only preview of first 1000 lines but truncated at 50k chars. I need the top section fully — the preview showed lines 1-7. Let me read 55 lines 1-150 via Read with n_lines.The Read tool is capping at 50k chars preview. The full output is in output_path file. Let me read the remainder via the output_path file with line offsets, or read README from line 336 onward.This is awkward — reading the tool-result file itself hits the same cap. The file is 102KB total and Read caps at 50k per call. I need to page the README with line_offset. Read with line_offset 336 n_lines 130 should work — the byte cap (100KB) is fine since it's only 130 lines, but char cap of 50000 might truncate again if lines are long. The output path file has 336 lines for first portion... wait, the tool-result file itself is the full 466-line README (102KB). Reading it got capped too. Let me just read the original README with line_offset=336, n_lines=131. That should be ~28KB, under 50k cap.Now I need the README status table (lines 24-~200) fully. The preview cut off at line 35. Let me read lines 24-335 of README in chunks. Also need the 55 file top 📌 section (lines 1-150ish) — the preview showed lines 1-7. Also check specific claims:
+
+  - 156 待办② 177 Vastbase connection retry — README line for 156 says "已加连接重试" vs 55 📌 line 9 "建议与 153 A6 合并".
+  - 08-28 熔断事件， A方案裁决， 08-29 08:30 自动任务.
+  - 161: 1175P/1S/1F, 13 files, NF-1.
+  - 159: 4 成功 3 受阻； ②③ 山大地纬重采+服务器同步； 273,631 旧结果作废.
+  - 155: ECG 57 tables/931 columns, cardioNet 2 tables, sa 凭据 0600.
+  - 曼陀罗 1,354 对象/30,624 SQL; DRG 161 表/4,341 列.
+  - 146: 28 组中 20 DONE + 3 个 h/i 迁移， 剩余 8 组 22 项.
+  - 153: p153=36b8743 发布.
+  - 149: 21 条种子 confirmed 19/pending 2 — plan says "隔离库，21 条种子" consistent.
+  - 130: A01–A28.
+  - legacy_unmanaged 3,756 人.
+
+  Let me read README lines 24-335. That's ~300 lines which might exceed 50k chars. Split: 36-200, 200-335. Actually preview showed up to line 35 only because char cap. Lines 36-335 in two chunks.Now read README lines 186-335 (module plans continuation + likely update log start).Now the 55 file top 📌 section. I got lines 1-7 preview. Let me read 55 file lines 1-120 to get the 📌 blocks (including line 9 about 177 重试建议与 153 A6 合并）.I have the key evidence. Now check specific factual claims in the 方案：
+
+  Claim-by-claim verification:
+
+  **§2.1 claims:**
+  - "126 P1–P5（p126p5 已生产）" — README line 39: 126 P1–P5 已生产 ✓
+  - "139/142（四源导入收口）" ✓ (README line 45, 55 line 35)
+  - "143（OA 第五源）" ✓
+  - "144 代码与隔离验收（S0–S12）" ✓ (README 162, 55 line 31)
+  - "146 主体（28 组中 20 DONE + 3 个 h/i 迁移）" — README line 159: "28 组执行完毕：20 DONE / 8 组剩余子项" — wait, README says "28 组执行完毕：20 DONE / 8 组剩余子项" and 迁移 h8d9e0f1a2b3、i9e0f1a2b3c4 — that's 2 migrations (h and i), not 3. 方案 says "3 个 h/i 迁移". Actually 146 added migrations h8d9e0f1a2b3 and i9e0f1a2b3c4 = 2 migrations. "3 个 h/i 迁移" appears to be a factual error — h/i are 2 migrations. Let me double-check: README line 159: "迁移 h8d9e0f1a2b3、i9e0f1a2b3c4 隔离库往返 PASS" — 2 migrations. Line 238/239: C2 migration h8d9e0f1a2b3, D/E i9e0f1a2b3c4. So "3 个" is wrong → 事实错误. Could "3 个" include something else? Unlikely. Flag it.
+
+  Also "28 组中 20 DONE" — README says "28 组执行完毕：20 DONE / 8 组剩余子项". 55 line 6 says 5 阶段 28 个任务组. So 20 DONE + 8 剩余 = 28 ✓. 方案 §2.1 says "20 DONE + 3 个 h/i 迁移" — the "3 个" is the error.
+
+  - "149 P1–P3（隔离库，21 条种子）" ✓ (55 line 16: 21 条 confirmed 19/pending 2)
+  - "152（E1–E6 梳理）" — README line 73: 已执行完成 ✓
+  - "153（P0–P7 已发布 p153=36b8743→8.83）" ✓ (55 line 18, README 68/217)
+  - "155 探查与平台登记部分（ECG 系统+双源+凭据 0600）" ✓ (55 line 10)
+  - "156（多科室子任务+一次性补齐 60）" ✓ (55 line 9: 47+13=60)
+  - "157（技术说明定稿）" ✓
+  - "158（凡科逆向）" ✓
+  - "159（七系统采集，4 成功 3 受阻）" ✓
+  - "160（执行包就绪）" ✓
+  - "161（Q0→Q3 代码完成，2026-08-28 本会话，后端 1175P/1S+前端三件套全绿）" — 55 line 4: "后端 1175 passed/1 skipped/1 failed". 方案 §2.1 says "后端 1175P/1S+前端三件套全绿" — omits the 1F. But §2.2 lists NF-1 as 全量唯一失败. In §2.1 claiming 161 as "已完成并生产/收口（无需动作）" is wrong in two ways: ① 1175P/1S/1F not "全绿"-implied; actually they wrote "后端 1175P/1S" which mis-states by omitting 1F — though arguably NF-1 covered in 2.2. But bigger issue: 161 is NOT 已完成 — README line 69 status: "代码完成，待主 AI 复核与发布". §2.1 header says "已完成并生产/收口（无需动作，防重复执行）" and lists 161 there, while §2.2 also lists "161 全部修复（13 文件）代码完成，门禁绿". So 161 appears in both 2.1 and 2.2 — contradiction/重复归类. Also "13 文件" — not verified; README doesn't state 13 files. 55 line 4 doesn't say 13 files either. Hmm, "161 全部修复（13 文件）" — can't verify from the two allowed sources; flag as 疑问.
+
+  Also §2.1 says 161 "后端 1175P/1S+前端三件套全绿" — README line 69 says "后端 1175P/1S + 既有 plan127 断裂 1F...前端 typecheck 0 错/168 tests/build 预算 PASS". So 方案's "1175P/1S" omits the 1F in the 已完成 category — misleading; and §2.4 line 42 says "161 会话已跑（1175P/1S/1F）" which is accurate. So 2.1 has a mild inaccuracy.
+
+  - "曼陀罗 EMR 接入（1,354 对象/30,624 SQL）" ✓ (55 line 24)
+  - "DRG 接入（161 表/4,341 列）" ✓ (55 line 21)
+  - "sjzc 全局技能" ✓
+  - "HIS 知识库补采" ✓
+  - "148→平台导出视图" ✓
+
+  **§2.2:**
+  - NF-1 described as "全量唯一失败（既有断裂）" ✓ consistent with 55 line 4 and README 69.
+  - "deptsync3 手术镜像层（156）已发布但未入主线" — 55 line 8: "p153-20260827224726...已确认完整包含 156 的 6 个科室同步文件". So deptsync3 content IS included in p153 which is published to production! The 方案 says deptsync3 "已发布但未入主线，下次常规发布吸收". Hmm — "已发布" correct (via p153); "未入主线" presumably means Git 主线 (since 153 Git commit at 36b8743... wait README 218: 主 AI 复核后提交并推送 origin/master, which included 144/146/149/153/156 等工作区改动）. Hmm, README line 218: "随后将 144/146/149/153/156 等工作区改动提交并推送 origin/master" — so 156's 6 files may already be in Git master. The 方案's "下次常规发布吸收" claim seems stale: p153 already contains the deptsync3 files (55 line 8), and 156's changes were committed+pushed (README line 218). Actually 156 待办① said "153 完成后补跑全量 pytest 并在下一次常规发布吸收手术层" — but 55 line 8 says p153 already 完整包含 156 的 6 个科室同步文件. So the "deptsync3 未入主线/待吸收" claim in 方案 §2.2 contradicts 55 line 8. Actually deptsync3 image was published 08-27 21:12, then p153 (22:47) was built on p144-149 base + 36b8743 which included... 55 line 8 explicitly: "p153-20260827224726（153 号 AI 08-27 22:47 发布）已确认完整包含 156 的 6 个科室同步文件". So "deptsync3 手术镜像层...已发布但未入主线...下次常规发布吸收" is factually wrong — the surgical layer is already in the published production image. This is a real 事实错误 to flag. Unless "主线" means Git master — but README 218 says 156 工作区改动已提交推送. Either way the claim is stale/wrong.
+
+  - "144 生产黄金用例种子 + G5 调度开关" ✓ (55 line 13/31)
+  - "149 值域种子生产导入 用户另行授权" ✓
+
+  **§2.3:**
+  - 151 E1–E6 ✓ (README 71: 已复核待执行）
+  - 146 §11 E 剩余子项： 方案 says "E2/E3/E4/E5/E6/E7/E8/E10 八组约 22 个前端小项". README 159: "E2–E8/E10 剩余子项清单见 §11 E". R5 says "E2 3 项/E3 2 项/E4 3 项/E5 2 项/E6 1 项/E7 2 项/E8 5 项/E10 4 项" = 22. The 146 §11 detail isn't in README/55; can't verify 22 项 breakdown from allowed sources but consistent. Note "约 22 个前端小项+少量后端" vs R5 "22 项逐项" — fine.
+
+  **§2.4:**
+  - 130 "待用户复核" ✓ (README 167)
+  - 122 H7 第三夜： "状态行写'第三夜纳入 130 只读验收'" — README line 42: "只读观察第三夜" and 55 line 3: "H7=2/3". 方案 says "夜跑至今每日在跑（08-28 熔断事件佐证）" ✓ (55 line 8). OK.
+  - 156 待办② "README 156 行称'已加连接重试'，55 📌 行9 称'建议与 153 A6 合并'——两处矛盾，代码 grep 未见 adapter 级重试" — README line 75: "177 间歇连接黑洞已加连接重试"; 55 line 9: "建议与 153 A6 合并做 adapter 级连接重试". Also README line 222: "177 Vastbase 间歇连接黑洞（矩阵实测，工具已加 6×2s 重试）". So README says 工具已加 6×2s 重试 — that's a tool-level retry, not adapter-level. The claimed "矛盾" is partially overstated: README says 工具 (harvest tool?) has retry; 55 suggests adapter-level retry merged with 153 A6. These aren't strictly contradictory (tool retry exists; adapter retry not done). 方案's framing "两处矛盾" is a bit of a misreading but their action （核实） is safe. Flag as 疑问/部分反对 on characterization; the R6 action itself fine.
+
+  Wait — 55 line 9 待办② says "建议与 153 A6 合并做 adapter 级连接重试". But 153 has already been executed and published (p153). Did 153 A6 include it? A6 is... unknown. The suggestion to merge with 153 A6 is moot since 153 done. 方案 handles by R6 核实 — reasonable. But note: "代码 grep 未见 adapter 级重试" — the 方案 claims a code-level grep result from 本会话实测. Can't verify but plausible.
+
+  - 156 待办① 补跑全量 pytest "161 会话已跑（1175P/1S/1F）" ✓ consistent.
+  - unbound token ✓ (55 line 4 P3 登记）
+  - "D5/161 死权限码清单 | 153 D5 待人工裁决 + 161 新登记 ai.draft.execute" ✓ (55 line 18-19: D5 死权限码清单； line 4: ai.draft.execute 死码）
+  - 146 域 audit_logs_summary limit ✓ (55 line 4: 146 audit limit 待办）
+  - 08-28 每夜熔断 "用户已裁决 A 方案；08-29 08:30 自动任务复核并回调阈值 50" ✓ (55 line 8: 阈值临时调至 130, 08-29 08:30 自动化任务复核并回调阈值 50). 方案 says "回调阈值 50" ✓. 方案 R0 "失败则如实呈报不自行重试" matches 55 "失败则保留阈值并汇报，不自行重试" ✓.
+
+  **§2.5 阻断清单：**
+  - 生产发布窗口（161+149 种子+144 G5+deptsync3 吸收）— deptsync3 吸收 questionable per above.
+  - 凭据轮换（门诊 SSH 口令/DRG hisserver 口令/OA admin/ECG sa）✓ (55 lines 22, 10, 34; README)
+  - 112 Phase D 业务库写入 ✓
+  - 值域 confirm 仅人工 ✓
+  - DRG 第二实例 hisserver 探索（用户称待后续）✓ (55 line 21)
+  - 154 B2/B3 ✓ (55 line 11)
+  - 157 ZFP 服务端代理 ✓ (55 line 22)
+  - legacy_unmanaged 3,756 人扩面 ✓ (55 line 9 待办③)
+  - 人工复核池（142 的 61 草稿+40 停用配方、曼陀罗 16 候选、OA 5 草稿）— 55 line 3: "合计 61 条复核草稿与 40 份停用配方待人工独立复核". 142: 56 draft. 137: 14 review draft. 143: 5 OA 草稿... 56+5=61? Actually 55 line 3 says 61 条复核草稿 = 56 (139/142) + 5 (OA 143)? And 方案 says "142 的 61 草稿+40 停用配方、曼陀罗 16 候选、OA 5 草稿" — this double counts: it puts 61 on 142 AND separately lists OA 5 草稿. If 61 = 56+5, then attributing 61 to 142 and adding OA 5 again double counts. 55 line 34: OA +5 带验证证据 draft. 55 line 35: +56 draft review. So total 61 = 56+5. 方案's "142 的 61 草稿...OA 5 草稿" is a factual miscount (should be 142 的 56 + OA 的 5 = 61). Flag as 事实错误 (minor).
+  - 137 三新源 BLOCKED_CREDENTIAL — hmm, 137's three blocked sources were core2db/体检/职业病， which were subsequently completed by 139/142 (08-22)! 55 line 46: "历史已执行但部分阻断：三系统探库...其三个凭据阻断由 139 新一轮执行承接" and 139 收口 via 142. So listing "137 三新源 BLOCKED_CREDENTIAL" in the 阻断/等待域 as if still outstanding is a factual error — those three sources were already探查并导入 by 139 (which added 病理 as fourth). The 137 block is historical evidence, not a pending item. 55 line 38 says "三个新来源因未安全注入受控只读凭据均记为 BLOCKED_CREDENTIAL 并跳过" — but that was 08-19/20, resolved 08-21/22 by 139. README line 46 says 136/137 保留为历史事实， blocked items 由 139 承接. And 139/142 completed. So 方案 §2.5 listing 137 三新源 BLOCKED_CREDENTIAL as a current waiting item is wrong → 事实错误/遗漏误判.
+
+  Hmm wait, let me double check: 139 四系统 = core2db、体检、病理、职业病 — 137's three blocked = core2db/体检/职业病. Yes, covered. So 方案 errs.
+
+  **§2.5 also missing?** What about 129 图谱生产发布 (README line 41/168: 129 本地完成待纳入 130 发布； 55 line 13 says 127/129 代码随 p144-149 生效）. Actually 55 line 13: "144（除生产黄金用例种子/G5 调度开关）、146、127/129 代码随本包生效" — so 127/129 published with p144-149. OK so not pending. But 方案 §2.2 生产发布窗口 includes "161+149 种子+144 G5+deptsync3 吸收" — 144's 生产黄金用例种子 mentioned in 2.2 ✓.
+
+  Other pending items possibly missed:
+  - 150 医保课题申报 (external, deadline 09-04) — not AI-executable repo work; arguably fine to exclude, but it's an open item with a deadline. Not in README's 未完成入口？ README line 77 lists it as P0 外部申报草稿. 方案 doesn't mention it at all. Could flag as 疑问 （是否应列入等待域清单以保持完整）. The 方案 §1 scope is "开发起步包 全部编号文档" — 150 is a numbered doc with pending external action. Omission candidate.
+  - 160 职称执行包 — "待信息科/DBA 执行" — 方案 §2.1 lists 160 as 已完成（执行包就绪，使命完成）. README line 76: "执行包已就绪，待信息科/DBA 执行". It's an external handoff pending. Putting it in "已完成无需动作" is defensible since AI side is done; but it does have a pending external action similar to 150. Consistency question.
+  - 149 前端 A/B 待用户拍板 — covered in U8 ✓.
+  - 144 前端运营？ covered.
+  - 156 待办③ legacy covered ✓.
+  - 155 待办①②③ — ①② in U3, ③ sa 轮换 in waiting ✓.
+  - 159 ① 口令轮换 (waiting ✓), ②③ in U4 ✓.
+  - 146 §11 E — U5 ✓.
+  - 152 E6 草稿复核 — in waiting via 154 B2 dependency? 方案 §2.5 lists "154 B2/B3（依赖 152 E6 草稿人工复核进度）" ✓.
+  - 127 剩余 （生产 Review 批准、配方 active、历史质量问题重建） — 55 line 117 lists these as needing new authorization. Are they in 方案？ §2.5 lists 生产发布窗口 and 人工复核池... but "生产配方 active、历史质量问题重建" not explicitly listed. Hmm. 127 status per README 169: "代码/测试库门禁完成，待 130 收口". And 55 line 13 says 127 代码随 p144-149 生效. But 生产数据 apply/状态闭环 (55 line 117: 生产 Review 批准、生产配方 active、历史质量问题重建均须新授权） — the 方案 doesn't list these. Possible 遗漏 in the waiting-domain list. Also README line 38 （部分完成：质量与治理）: "配方仍 0、复核 3 条仍 draft、负责人/术语仍 0... 按 130 做 dry-run、幂等平台初始化" — these are pending 130 items. The 方案 §2.4 mentions 130 coverage check but doesn't enumerate these specific 127/130 U04 items in waiting list. Since the 方案's §2.4 R6 does a 130 覆盖度核对表， it partially covers. But strictly the waiting list omits 127 的 生产配方 active/历史问题重建 etc. Flag as 疑问/遗漏.
+
+  - 112 Phase D ✓ listed.
+  - HRP 直连补采 (55 line 111)? P1 老项 "HRP 直连与 WA_* 补采" — is that still open? 55 line 111 完成判定： 使用只读凭据完成字段补采... HRP connection completed 436 (2026-07-14 HRP 凭据连接成功）. 52 复核报告 current. Probably done/superseded. Not clearly pending. Skip.
+  - "生产 RBAC APP_RBAC_REQUIRE_BOUND_TOKEN=true" (55 line 109) — P1 生产项： 未绑定凭据 403 须在 production set true. Is that in waiting list? 方案 §2.4 unbound token 查询 relates. The production toggle of rbac_require_bound_token — that's a production config change pending. Not explicitly in 方案 waiting list. Could be part of 发布窗口. Marginal — flag as 疑问 maybe. Actually 153/130 might have covered. Not sure. I could mention as a question.
+
+  Also 122 H7 "第三夜" — note 55 line 8 熔断事件 08-28: 主任务熔断失败. H7 观察 was 3 夜窗口 from 08-10/11... it's now 08-28, 夜跑每日在跑. H7=2/3 status is stale in README (08-24 统计）. 方案's approach (R6 只读查夜跑记录登记终态） is fine.
+
+  **§3 裁决：**
+  - U1 纳入 R1: reasonable. Risk: 修改断言 vs 161's "未夹带修复，待裁决" — the 方案 itself makes the裁决建议； if user approves plan, that's the裁决. OK. But note §6 risk table doesn't mention R1 test-assertion change risk. Minor.
+  - U2: "用户批准本计划即视为预先完成 E2 拍板" — this is a significant authorization design. 55 line 15/16: 149/151 user rulings: 字典一律 pending 不自动 confirm、首批 ≤200 条. E2 圈定 was a user stop point (README 71: "E2 圈定引用 152 E5 清单"; 方案 §2.3: "E2 圈定是用户停点"). The 方案 converts the stop point into "approve this plan = approve E2 rule" with 附录 A keyword rules. Is this 越权？ It's a pre-approval mechanism — arguably legitimate IF the user explicitly approves 附录 A. Risk: blanket approval of a plan may not constitute informed approval of specific value-domain selection; mitigations: pending-only, ≤20 类 ≤200 条， conflict flag, dry-run, 待定位清单. Also §6 gives fallback: 不批则 R2 仅 E1. Design has a safety valve. But there's a subtlety: 附录 A pre-selects categories like 科室/病区， 医生职称， 费别 — importing department/staff-title dictionaries as value domains could be large and low-value; but capped at 200. Also "离院方式" etc. overlap with already-confirmed 149 seeds — script has 不改 confirmed/冲突置位 gates. Overall design is reasonably safe; I'd say 同意 with conditions, or 疑问 on whether user realizes E2 pre-approval is bundled.
+
+  Also: E5 "code9/手术标志3 只读核查" — matches 55 line 16 pending 2 （离院方式 code9、手术标志 3) ✓.
+
+  - U3: "平台库写入=批准本计划即授权" — this is the biggest authorization sensitivity. 155 待办① said "元数据导入待排期" (README 129: 元数据导入待排期）. Precedent: DRG/曼陀罗/139/OA imports were each done after explicit user authorization ("用户授权" noted each time). The 方案 proposes plan-approval = authorization for platform DB writes (asset_tables/columns import with audit, include_status=candidate, draft relations only). Platform library writes are within the platform's own governance (asset_action_executors whitelist + 审批 per AGENTS 约束1: "写操作必须通过 asset_action_executors 白名单 + 审批"). Hmm — AGENTS says 平台库写操作必须经审批+审计+白名单 (55 line 86). Does metadata import go through that? 139/143 imports were "用户重新授权后" executed with backup/dry-run. So the pattern is explicit per-import authorization. Bundling into plan approval is a stretch but defensible if the plan is explicit (it is: U3 显式列出）. Risk: 155's ECG import touches production platform DB from a session; mitigations in R3: 幂等、审计、candidate status, draft relations. Notably R3 lacks explicit 备份/dry-run gates that 139 S8–S12 had （新备份→dry-run 门禁→apply→二次 dry-run). R3 验收 says 计数/候选全 draft/审计在库 — but no pre-import backup or dry-run step mentioned! That's a genuine safety gap vs the established pattern (139/142/143 all had 备份+dry-run+二次 dry-run). Flag as 反对/疑问： R3 should add platform DB backup + dry-run gate before write.
+
+  Also R3 source: "从 8.83 exports 快照（或 sjzc live）取 EDSChinaDB 57 表/931 列" — fine, snapshot preferred.
+
+  - U4: 159 ②③ — 55 line 22 lists these as "三项外部待办未擅自执行" including ①口令轮换. 方案 puts ②③ in R4, ① in waiting ✓. R4 "夜间用修订后 Oracle 采集器只读重采" ✓ matches. "受控同步 8.83...先备份服务器旧副本" ✓ reasonable. 159 📌 says "待夜间重采" — 方案 §6 risk says 可日间执行只读限量 — deviation from "夜间" guidance but AGENTS says 探库任务夜间执行； 方案 risk table says "采集可日间执行（只读限量）" — that contradicts AGENTS "探库任务夜间执行并加超时". Hmm, AGENTS: "探库任务夜间执行并加超时" — yes. So the fallback "日间执行" conflicts with AGENTS hard rule. Flag.
+
+  - U5 146 剩余 22 项： 146 §11 E 明示可续做 ✓ (README 159/238). R5 runs typecheck + test per group. Fine.
+
+  - U6 R6 只读核对： fine. Note unbound token 查询 is production DB read — read-only, fine.
+
+  - U7 exclusions ✓ good.
+  - U8 排除 ✓ consistent with user rulings (55 line 15).
+
+  **§4 executability:**
+  - 通用铁律 good: 测试库隧道 55432, 零 Git 写， pnpm, checkpoint.
+  - R0 baseline. OK.
+  - R1: modifies backend/tests/plan127/test_s0_contract_unit.py. 验收 pytest tests/plan127/ 全绿 + 受影响回归. OK. But DoD §7 says 后端全量 0 failed （基线=161 后 1175+新增） — wait, baseline is 1175P/1S/1F; after R1 fix, should be 1176 passed? "0 failed（基线=161 后 1175+新增）" fine.
+  - R2: detailed, references 151 §6 三命令. Includes 隔离库验证 then... wait — R2 E4 says "隔离库 dry-run→实导→再 dry-run 收敛 0" — 实导 into 隔离库 (data_asset_test)? But 151's goal is the 值域库 which lives... 149 P1-P3 were in 隔离库； production import of 值域种子 is separately gated. 151 E3/E4 import into which DB? 55 line 15: 151 = 字典批量接入值域库. If 值域库 = platform asset DB, then importing into 隔离库 only means production still not done — then what's the deliverable? The 方案 R2 doesn't write to production platform (only U3 authorizes platform writes). So R2 ends with value domains only in test库 — consistent with "149 值域种子生产导入 用户另行授权" (§2.2/2.5). But then E6 `export_value_domains_json.py --regenerate-148` — that exports from... the 隔离库？ value_domains.json is the offline fallback in 数据资产_资产包/ which per AGENTS is exported from 平台 (single-direction export from platform value domain库）. If R2 regenerates 148/value_domains.json from the TEST database while production wasn't updated, the repo fallback file would diverge from production — could be a real issue: 148 is "平台导出视图，勿手改" and value_domains.json is "由平台单向导出". Regenerating from test库 and committing? (No git write allowed, so it stays local — still modifies working tree files that are presumably checked in.) This is a subtle consistency risk worth flagging as 疑问. Actually wait — 149 P2 种子 21 条 were imported in 隔离库 only, and value_domains.json + 148 重写 already happened (55 line 16: P3 ... +value_domains.json+148 已重写为导出视图） — so those files were already regenerated from the 隔离库 state. So precedent: files reflect 隔离库 content. Then R2 E6 doing the same is consistent with precedent. OK, but production导入待授权 means repo fallback ≠ production until authorized import — pre-existing condition. I'll mention lightly or skip. Maybe fold into a question on R2.
+
+  - R3: as noted, lacks 备份+dry-run gates. Also "include_status=candidate" — matches precedent (README 148 line: include_status=candidate).
+  - R4: night execution, replace 273,631 旧结果 — "替换已作废的 273,631 旧结果" — README 226: 旧索引快照撤销待重采. OK. "SYSTEM 隔离" ✓.
+  - R5: 22 items, per-group verification. "同页一次触碰" ✓.
+  - R6: read-only. Note "149 P4/前端 A/B 状态确认登记" — but U8 excluded those; R6 including a status check is fine (read-only).
+  - R7: full gates + 总报告 + README/55 登记「代码完成，待主 AI 复核与发布」. But wait — 铁律 says 零 Git 写 but README/55 文档登记 is file edit, allowed. OK.
+
+  One-shot executability concerns:
+  - R2+R3+R4+R5 in one session: R4 requires 夜间 window — "一次性执行" single session can't span night if started daytime; §6 says 可日间执行. Also total workload: R5's 22 frontend items + R2's multi-step value domain pipeline + R3 + R4 + R6 — this is a LOT for one session. §6 acknowledges R5 overflow with checkpoint resume. Feasibility risk: 疑问.
+  - R4 "替换已作废的 273,631 旧结果" — involves deleting/replacing local artifact files — fine.
+  - R3 dependencies: sql-relation-intake mode for candidates.
+  - R1 modifies a test file — zero risk basically.
+
+  Authorization safety assessment for U2/U3 (focus ④):
+  - U2 design: approval of plan = E2 pre-approval. Safety features: pending-only, caps, conflict flag, dry-run, fallback to E1-only if附录 A rejected. Reasonably safe, but bundling means the user might approve the plan without scrutinizing 附录 A; the 方案 does surface it as a separate appendix explicitly marked "草案，呈用户批准" — acceptable transparency. I'd say 同意 with caveat.
+  - U3 design: approval of plan = platform write authorization. Precedent requires explicit authorization per import (139 needed re-authorization). The plan mitigates: candidate status, draft relations, audit, idempotent, rollback possible. But missing backup/dry-run gates that the cited precedents (139/143/DRG/曼陀罗） all had. Also U3 says "与 DRG/曼陀罗/139 同模式（用户授权后导入）" — but those were individually authorized AFTER exploration with explicit user approval at execution time; here authorization is bundled in advance. That's a policy deviation worth flagging — 疑问/部分反对： recommend either keeping explicit per-action confirmation at execution or adding backup+dry-run+二次核验 gates to make bundled authorization safe.
+
+  Also §2.2 "161 全部修复（13 文件）" — 13 files unverifiable from allowed sources; README 214 lists the changes but no file count. Actually 156 手术镜像 was "仅 6 文件". For 161, 55 line 4 lists P0-1 6 处 + P1 4 项 + P2 3 项... "13 文件" might be right but not in README/55. Mark as 无法从两份权威来源核实 (minor).
+
+  Also §2.1 "161...后端 1175P/1S+前端三件套全绿" — should be 1175P/1S/1F; the 1F is mentioned in 2.2 NF-1 so it's not hidden, but listing 161 under "已完成...无需动作" while it needs 主 AI 复核+发布 (it's in 2.2 as well) is an internal contradiction. Flag.
+
+  Also §2.1 "156...一次性补齐 60" ✓. "162（交接执行包，使命完成）" ✓.
+
+  §2.1 "146 主体（28 组中 20 DONE + 3 个 h/i 迁移）" — "3 个 h/i 迁移" error: README says 2 migrations (h8d9e0f1a2b3, i9e0f1a2b3c4). Also "28 组执行完毕：20 DONE / 8 组剩余子项" — phrasing "28 组中 20 DONE" OK.
+
+  Hmm wait, could "3 个 h/i 迁移" refer to something else — h and i prefixes... 146 migrations: h8d9e0f1a2b3 (C2) and i9e0f1a2b3c4 (D/E). Two. So "3 个" is wrong. Flag as 事实错误.
+
+  Also §2.2 deptsync3: as analyzed, 55 line 8 says p153 已确认完整包含 156 的 6 个科室同步文件 — so deptsync3 layer already in production via p153. 方案 says "已发布但未入主线|下次常规发布吸收". If "主线" = git master: README 218 says 156 工作区改动已提交推送 origin/master (08-27). Hmm — that commit was "144/146/149/153/156 等工作区改动". 156's code was in working tree at that time? 156 development happened 08-27 too, surgery image deptsync3-20260827211250 (21:12), p153 published 22:47. README 218 (153 复核修复后提交 GitHub) — sequence unclear but says includes 156 改动. And Git 36b8743 was base of p153 which 包含 156 的 6 文件. So both production and master already absorbed it. The 方案's "deptsync3 未入主线，下次常规发布吸收" is stale → 事实错误. Actually careful: README 218 could predate 156's completion? Both 08-27. 55 line 8 (08-28 entry) explicitly confirms p153 contains the 6 files — production absorption done. So the 待办 is obsolete. Also 156 待办① "补跑全量 pytest" — done by 161 ✓ (the 方案 agrees).
+
+  Also check §2.4 122 H7: "状态行写'第三夜纳入 130 只读验收'" — README 42 says "只读观察第三夜；不重复历史补跑". Close enough.
+
+  §2.4 "08-28 每夜熔断 | 用户已裁决 A 方案；08-29 08:30 自动任务复核并回调阈值 50 | R0 检查该复核结果" — 方案 draft date 2026-08-28; 复核任务 fires 08-29 08:30. If the 执行 AI runs the plan on 08-28, the R0 check would find nothing yet. The plan should note timing dependency — R0 can only check if executed after 08-29 08:30. Flag as 疑问 (execution timing). Actually R0 says "检查 08-29 08:30 熔断复核自动化任务结果（只读，失败如实呈报）" — if run before that time, it's just absent. Minor sequencing note.
+
+  Also the plan number: "定稿后作为编号 163 计划" — current max number is 162 ✓ (README shows up to 162). ✓.
+
+  Now §4 one-shot executability overall: R0-R7 covers doc edits + code fix + value domain pipeline + ECG platform import + night re-collection + 22 frontend items + 6 read-only reports + full gates. That's very heavy for a single session; checkpoints mitigate. Also ordering: R4 depends on 修订后 Oracle 采集器 — is that fix already in working tree? 159 复核已修采集器 (README 216: "撤销山大地纬错误索引计数并修正 Oracle 采集笛卡尔连接...已修"). ✓.
+
+  DoD: "零越权（发布/轮换/confirm/业务写/Git 写均未发生）" ✓ good. But U3 platform write is authorized-by-plan — DoD fine.
+
+  验收充分性： R2 验收 "见 151 §6 三命令" — external reference, acceptable. R3 验收计数+ draft + 审计 — but no 健康检查/二次 dry-run. R4 验收 新旧计数对照+SHA256SUMS 校验 ✓. R5 验收 ✓. R6 验收 "每项一段证据+结论" — qualitative, OK for read-only. R7 ✓.
+
+  One more check: §3 U1 says "回退 F4 会重新引入生产缺陷" — consistent with 55 line 4 "勿回退 F4". ✓
+
+  §2.2 row NF-1 "全量唯一失败（既有断裂）" ✓.
+
+  Now also check claim §2.1 "149 P1–P3（隔离库，21 条种子）" ✓; "153（P0–P7 已发布 p153=36b8743→8.83）" ✓; "152（E1–E6 梳理）" ✓.
+
+  Also §1 says "对 开发起步包 全部编号文档做完成度盘点" but §2 doesn't mention e.g. 112/115/96/106/122/124/125/127/129/130 statuses individually — some folded into waiting/coverage. E.g., 112 appears in 2.5 ✓. 96? 43: "部分完成：诊断/手术字典...96、112、115" — 方案 waiting includes 112 Phase D but not 96/115 下发闭环待验收. Probably covered under 112 Phase D umbrella. 127 余项 (README 169 待 130 收口； 55 line 117 剩余： 生产发布与 A25 视觉验收、生产 Review 批准、生产配方 active、历史质量问题重建） — 方案 §2.5 发布窗口 doesn't enumerate 127-specific items (A25 视觉验收、生产配方 active、历史问题重建）. These need authorization → should be in waiting list. 遗漏 flag.
+
+  Also 129: README 168 "本地开发完成，待纳入 130 发布" — but 55 line 13 says 127/129 代码随 p144-149 生效 (08-26). So 129 published. OK fine.
+
+  150 (external deadline 09-04) — omission from waiting list; arguably external but should be listed for completeness since 方案 claims 全部编号文档盘点. Flag as 遗漏/疑问.
+
+  160 similarly "待信息科/DBA 执行" — external pending; 方案 marks 160 已完成（执行包就绪）. Acceptable categorization （包就绪=AI 侧完成） but inconsistent with how it treats other external-pending items. Light flag.
+
+  Structure the output: 逐条 【同意/反对/疑问+理由+风险】, citing sections. I'll organize by the four review focuses, listing each item with verdict.
+
+  Let me draft the review.
+
+  Items:
+
+  ① §2 完成度盘点事实核查：
+  1. §2.1 "146 主体（28 组中 20 DONE + 3 个 h/i 迁移）" — 反对（事实错误）: README 当前模块计划 146 行 only 2 migrations h8d9e0f1a2b3、i9e0f1a2b3c4. "3 个" no basis.
+  2. §2.1 listing 161 under "已完成并生产/收口（无需动作）" — 反对（分类错误+数字不全）: README 69/55 line4 status "代码完成，待主 AI 复核与发布", and gates are 1175P/1S/1F not "1175P/1S…全绿"; 161 also appears in §2.2 — double-classified. Risk: 防重复执行 list containing an unpublished item may mislead.
+  3. §2.2 "deptsync3 手术镜像层（156）已发布但未入主线｜下次常规发布吸收" — 反对（已过时）: 55 line 8 (08-28) "p153-20260827224726…已确认完整包含 156 的 6 个科室同步文件"; README 218 records 156 工作区改动已提交推送 origin/master. 该待办已闭合； putting it in 待发布 could cause duplicate handling. (Also 156 待办①已由 161 补跑 — 方案 §2.4 recognizes that, internally inconsistent with keeping deptsync3 open.)
+
+  Wait, careful: 待办① was "153 完成后补跑全量 pytest 并在下一次常规发布吸收手术层". 方案 splits: pytest done (2.4), 吸收 pending (2.2). But evidence says absorption already happened in p153. So 反对.
+
+  4. §2.5 "137 三新源 BLOCKED_CREDENTIAL" — 反对（事实错误）: README 46 "其三个凭据阻断由 139 新一轮执行承接" and 139/142 completed 08-22 (4 sources imported). 137 block is historical, not pending. Risk: phantom item in waiting list.
+  5. §2.5 "人工复核池（142 的 61 草稿+40 停用配方、曼陀罗 16 候选、OA 5 草稿）" — 反对/疑问（计数错误）: 61 = 56 (142) + 5 (143 OA) per 55 line 3/34/35; attributing 61 to 142 AND listing OA 5 separately double-counts.
+  6. §2.4 "两处矛盾" characterization of 156 待办② — 疑问（定性偏重）: README 75/222 says "工具已加 6×2s 重试"（采集工具级），55 line 9 suggests adapter 级重试与 153 A6 合并 — 两者层级不同，非直接矛盾；方案自己也说"代码 grep 未见 adapter 级重试"，与两份记录其实一致。R6 核实动作本身合理。Also note 153 A6 已随 153 执行完毕，"与 A6 合并"已无对象——R6 结论应明确 A6 是否已含重试。
+  7. §2.2 "161 全部修复（13 文件）" — 疑问： "13 文件" 在 README/55 无出处，无法核实。
+  8. §2.5 遗漏： 127 余项（生产 Review 批准/生产配方 active/历史质量问题重建/A25 视觉验收，55 line 117 均须新授权）、150 医保申报（外部截止 09-04）、160 职称包待信息科执行。方案自称"全部编号文档盘点"但等待域未列这些。Also maybe 96/115 字典下发闭环. Flag as 疑问/遗漏.
+
+  ② §3 裁决：
+  9. U1 — 同意： matches 55 line 4 recommendation; risk noted that修改断言需注释 F4 语义 (R1 has it).
+  10. U2 — 疑问（授权设计可接受但需显式）: bundling E2 拍板 into plan approval; safeguards present (pending-only/≤200/冲突置位/dry-run/降级 E1). Risk: 用户可能未细读附录 A; also 151 original E2 references 152 E5 候选清单 (README 71, 55 line 14 TREAT_RESULT 双编码冲突最高优先） — 附录 A 关键词规则未显式纳入 152 E5 的 19 条候选（TREAT_RESULT 冲突为最高优先），圈定规则与既有候选清单的关系未说明 — risk of missing the highest-priority item. Actually 方案 §2.3 says "151 E1–E6 两字典表批量接入+149 待核值域收口（code9/手术标志3)" and E2' uses 附录 A keywords. But 151's E2 was to reference 152 E5 清单 (19 条候选， TREAT_RESULT 双编码冲突最高优先 per 55 line 14). 附录 A mentions keyword categories but doesn't mention TREAT_RESULT 双编码冲突处理 or the 19 candidates. Hmm — E5 covers code9/手术标志3 核查. The TREAT_RESULT conflict resolution is a 151 E2-adjacent item ("151 E2 最高优先裁决"). If E2 is replaced by keyword auto-rule, who handles TREAT_RESULT double-coding adjudication? It's a confirm-level decision (human). The plan should state it goes to 待定位清单/人工. Flag as 疑问.
+  11. U3 — 反对（授权模式偏离先例+缺门禁）: precedents (139/142/143/DRG/曼陀罗） each had explicit per-import user authorization + 备份→dry-run→apply→二次 dry-run gates; 方案 bundles authorization into plan approval and R3 lacks 平台库备份与 dry-run 门禁. Recommend adding backup+dry-run+二次核验 before import, or keep explicit authorization. Risk: production platform DB write without the established gate chain.
+  12. U4 — 疑问： R4 fine per 55 line 22, but §6 fallback "采集可日间执行" conflicts with AGENTS 硬约束 "探库任务夜间执行并加超时". Also R4 says "夜间用修订后采集器" ✓.
+  13. U5 — 同意： README 159/238 support 续做； 22 项 breakdown not verifiable from the two sources but consistent.
+  14. U6 — 同意.
+  15. U7/U8 — 同意， but 遗漏 per item 8.
+
+  ③ §4 可执行性与验收：
+  16. 一次性执行可行性 — 疑问： R2（多步值域管线）+R3（平台导入）+R4（夜间重采+服务器同步）+R5（22 前端项）+R6（6 报告）单会话体量过大；R4 夜间窗口与"一次性"天然冲突；checkpoint 缓解但 R4 BLOCKED 概率高。Risk: 半成品批次。
+  17. R3 验收缺健康检查/二次 dry-run（同 11）。
+  18. R0 时序 — 疑问： 熔断复核任务 08-29 08:30 才跑；若执行日在 08-28，R0 无结果可查，计划未说明该情形处理（应允许"未到时点=登记跳过"）。
+  19. R2 E6 从隔离库重导出 value_domains.json/148 — 疑问： 149 先例如此，但生产未导入期间仓库兜底文件与生产平台库会持续漂移；且导出对象是测试库需在执行卡中写明，避免误从生产导出或误写生产。风险中等。
+  20. R1 验收 — 同意 （具体、可跑）。
+  21. DoD — 同意 mostly; note "R3/R4 计数与校验达标" fine.
+
+  ④ 授权敏感点：
+  - U2: as item 10 — design reasonably safe with fallback; require user to explicitly approve 附录 A (plan has it as separate appendix ✓). Verdict: 同意有条件/疑问.
+  - U3: as item 11 — the most sensitive; 反对 as currently designed (missing backup/dry-run; bundled authorization deviates from established per-import explicit authorization pattern). Suggest fix.
+
+  Also DoD "零越权" good.
+
+  I should present clearly with citations. Note overall verdict at top. Keep it organized but thorough. Language: Chinese.
+
+To resume this session: kimi -r session_de1d4608-a7dd-489e-b3b4-1d2c6bbc7e42

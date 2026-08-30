@@ -96,6 +96,14 @@ class Settings(BaseSettings):
     identity_cb_max_update: int = 100
     identity_cb_max_deactivate: int = 20
     identity_cb_max_change_ratio: float = 0.3
+    # W10 方案 C（2026-08-29 用户授权）：JHEMR 现存用户首次纳管对齐不计入
+    # max_new / max_change_ratio，单设上限防群体性误对齐（55 📌 熔断裁决项）。
+    # 默认 150：须低于 max_candidates(200)，否则该维度不可达；当前批次 112 可过。
+    identity_cb_max_align: int = 150
+    # W10 二次修复（2026-08-30 用户授权选项1）：水位连续性阈值原写死 48h，
+    # 连续失败后形成"失败→水位不推进→更失败"死锁；改为可配置以便恢复性
+    # 运行临时放宽（方案 A 同款临时阈值先例），默认值保持 48 不变。
+    identity_cb_max_watermark_gap_hours: int = 48
     identity_cb_max_failure_rate: float = 0.2
     identity_cb_consecutive_failure_limit: int = 3
 

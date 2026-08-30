@@ -30,12 +30,13 @@
       </div>
 
       <el-table
+        ref="codeSetTableRef"
         v-loading="loading"
         :data="codeSets"
         stripe
         class="items-table"
         row-key="code_set_code"
-        empty-text="暂无编码体系。请管理员在平台库执行：python scripts/import_medical_maintenance_dicts.py --dry-run（确认后 --apply --confirmation IMPORT-MEDICAL-DICTS）"
+        empty-text="暂无编码体系：请先在「导入审核」完成诊断/手术维护表导入，或调整类别后重试"
       >
         <el-table-column type="expand">
           <template #default="{ row }">
@@ -101,7 +102,8 @@
         </el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="loadItems(row)">查看编码</el-button>
+            <!-- 146 E8（R5）：查看编码自动展开行，不再只加载不展开 -->
+            <el-button link type="primary" size="small" @click="openCodeSetItems(row)">查看编码</el-button>
             <el-button v-perms="'dict.medical.edit'" link type="primary" size="small" @click="openCodeSetDialog(row)">编辑</el-button>
           </template>
         </el-table-column>
@@ -259,10 +261,11 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import ImportWizard from './components/ImportWizard.vue';
 import OverviewPanel from './components/OverviewPanel.vue';
 import PushWizard from './components/PushWizard.vue';
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onBeforeUnmount, onMounted } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import { authHintForStatus } from "@/utils/statusLabels";
+import { listSources } from "@/api/asset";
 import {
   getMedicalCodeSets,
   upsertMedicalCodeSet,
@@ -320,6 +323,13 @@ async function loadItems(row: any) {
   }
 }
 
+// 146 E8（R5）：查看编码 = 加载并自动展开该行
+const codeSetTableRef = ref();
+async function openCodeSetItems(row: any) {
+  await loadItems(row);
+  codeSetTableRef.value?.toggleRowExpansion?.(row, true);
+}
+
 function onCategoryChange() {
   loadCodeSets();
 }
@@ -337,14 +347,14 @@ const codeSetDialog = reactive({
   visible: false,
   isEdit: false,
   submitting: false,
+  // 146 E8（R5）：移除死字段 enabled——启停由 status 承载，展示按 status 派生
   form: {
     code_set_code: "",
     code_set_name_cn: "",
     code_set_type: "clinical",
     category_code: "diagnosis",
     standard_system: "",
-    version_no: "",
-    enabled: true
+    version_no: ""
   }
 });
 
@@ -357,8 +367,7 @@ function openCodeSetDialog(row?: any) {
         code_set_type: row.code_set_type || "clinical",
         category_code: row.category_code || categoryCode.value,
         standard_system: row.standard_system || "",
-        version_no: row.version_no || "",
-        enabled: row.enabled ?? true
+        version_no: row.version_no || ""
       }
     : {
         code_set_code: "",
@@ -366,8 +375,7 @@ function openCodeSetDialog(row?: any) {
         code_set_type: "clinical",
         category_code: categoryCode.value,
         standard_system: "",
-        version_no: "",
-        enabled: true
+        version_no: ""
       };
   codeSetDialog.visible = true;
 }
@@ -455,6 +463,29 @@ const stopForm = reactive({
   target_system: "HIS_SOURCE",
   item_code: ""
 });
+
+// 146 E8（R5）：目标连接的物理 source_code 动态解析（数据连接接口驱动），不再硬编码 IP 编号
+const pushSourceCodes = reactive<Record<string, string>>({
+  HIS_SOURCE: "his_source_10_10_10_15",
+  JHEMR_VASTBASE: "jhemr_vastbase_10_10_8_177"
+});
+async function loadPushSourceCodes() {
+  try {
+    const res = await listSources();
+    for (const source of res.data || []) {
+      const systemCode = String(source.system_code || "").toUpperCase();
+      if (systemCode === "HIS_SOURCE" || systemCode === "JHEMR_VASTBASE") {
+        if (source.source_code) pushSourceCodes[systemCode] = source.source_code;
+      }
+    }
+  } catch {
+    // 解析失败保留已知兜底值
+  }
+}
+
+function resolvePushSourceCode(targetSystem: string): string | undefined {
+  return pushSourceCodes[targetSystem];
+}
 
 function parseItemCodes() {
   return pushForm.itemCodesText
@@ -553,8 +584,8 @@ async function applyOne(row: any) {
       action: row,
       mode: "apply",
       confirmation_token: token,
-      his_source_code: "his_source_10_10_10_15",
-      jhemr_source_code: "jhemr_vastbase_10_10_8_177"
+      his_source_code: resolvePushSourceCode("HIS_SOURCE"),
+      jhemr_source_code: resolvePushSourceCode("JHEMR_VASTBASE")
     });
     lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success("apply 已提交");
@@ -587,8 +618,8 @@ async function stopOne(mode: "dry_run" | "apply") {
       hospital_no: pushForm.hospital_no,
       mode,
       confirmation_token: token || null,
-      his_source_code: "his_source_10_10_10_15",
-      jhemr_source_code: "jhemr_vastbase_10_10_8_177"
+      his_source_code: resolvePushSourceCode(stopForm.target_system === "JHEMR_VASTBASE" ? "JHEMR_VASTBASE" : "HIS_SOURCE"),
+      jhemr_source_code: resolvePushSourceCode("JHEMR_VASTBASE")
     });
     lastResultJson.value = JSON.stringify(res.data, null, 2);
     ElMessage.success(mode === "dry_run" ? "停用 dry-run 完成" : "停用 apply 已提交");
@@ -602,6 +633,7 @@ async function stopOne(mode: "dry_run" | "apply") {
 onMounted(() => {
   loadCodeSets();
   loadPushConfig();
+  void loadPushSourceCodes();
 });
 </script>
 

@@ -1,0 +1,337 @@
+• Let me start by reading the specified files.303073 verify/round-2/diff_1_backend.patch
+464781 verify/round-2/diff_2_frontend.patch
+ 54377 verify/round-2/diff_3_new_files.txt
+822231 total
+Large files. This is a substantial review task — good candidate for delegating portions to subagents, but the user asks for a focused review across specific items. I could do it myself with Grep/Read of specific diff hunks. Let me first find the diff sections for the 153 files.
+
+  Let me grep the backend patch for the file list boundaries.
+
+• Now, the focused areas. This is a big review task. I'll delegate chunks to explore subagents? But the task requires reading diffs and cross-checking source files — subagents can do that. However, the review items are interconnected; maybe I can handle it directly with targeted reads. The diff hunks for key items:
+
+  - A4: db_connectors.py (4614-4823), quality_sql_runner.py (5303-5351), query_runner.py (5540-5890)
+  - B1: auth.py (480-530)
+  - B2: queries.py (3260-3750)
+  - B5: ai.py (81-480), dict_medical_api.py (1132-1432), permissions.py (2950-3082)
+  - C1: graph.py (1666-1854)
+  - C3: queries.py
+  - C4: metrics.py (2458-2684)
+  - A9: query_intake.py (5378-5540), metric_service.py (5154-5303), plus new file intake_version_retry.py in diff_3
+  - D2: security.py (4041-4092), data_products.py (530-621), metrics.py
+  - Frontend: diff_2 for E batch error handling, F6 usePagedList.
+
+  Given the volume, I'll read the relevant hunks myself with Read at offsets. Let me do parallel reads.Notable observations already:
+
+  1. In db_connectors.py, the Oracle subprocess connector (lines 4689-4695): the diff changed `try:` indentation oddly:
+  ```
+  -try:
+  -    cur = conn.cursor()
+  -    cur.execute("SET TRANSACTION READ ONLY")
+  -    cur.execute(payload["sql"], payload.get("params") or {})
+  -    rows = cur.fetchmany(int(payload.get("max_rows") or 1000))
+  +        try:
+  +            cur = conn.cursor()
+  +            ...
+  +            rows = cur.fetchmany(int(payload.get("max_rows") or 1000) + 1)
+       cols = [d[0] for d in cur.description]
+  ```
+  The context lines `cols = [d[0]...` are at original indentation (4 spaces in the embedded script?). The `try:` moved from 0 indent to 8 spaces indent, but `cols = ...` line remains unchanged at old indentation. That could break the embedded Python script syntax! Wait — this is an embedded script inside a string (subprocess). The diff shows the hunk around line 4680-4695 in the patch. The `-` lines show `try:` at column 0, and `+` shows `        try:` at 8 spaces. The unchanged context line `    cols = [d[0] for d in cur.description]` appears with 4 spaces. If the `try` block moved to 8 spaces but `cols` stayed at 4 spaces, that would be a syntax error in the embedded script... unless the embedded script itself was restructured. Need to check the actual source file backend/app/services/db_connectors.py around the embedded script.
+
+  Actually wait — the hunk header says `@@ -160,11 +184,12 @@` and shows context `conn = oracledb.connect(` at column 0, `)`, `conn.call_timeout = ...`, `cur = None`. So the embedded script lines are at column 0 originally. The new version has `        try:` at 8 spaces. But `cols` line at 4 spaces unchanged. That means inside the embedded script: `cur = None` at col 0, then `        try:` at col 8 — that's an IndentationError (unexpected indent) unless... Hmm, maybe there's context above not shown. Let me read the actual file to verify.
+
+  2. A4 contract: `truncated = len(rows) > max_rows` in query_runner — good. But note in query_runner, `rows[: max(0, sample_limit)]` for samples — if rows were exactly max_rows+1, they sliced to max_rows first. OK.
+
+  But potential issue: `row_count = int(stats[0]) if stats else len(rows)` — fine.
+
+  Also in query_runner: `truncated = len(rows) > max_rows` computed before slicing; correct.
+
+  3. A4 in quality_sql_runner: `rows = [dict(r) for r in rows][:max(1, max_rows)]` — clamps. OK. But note: what if max_rows is 0? max(1, 0)=1. Edge.
+
+  4. Other execute_readonly callers — need to check who else calls execute_readonly and relies on exact N rows: e.g. metadata inventory, ai.py SQL execute, test_connectivity. The probe row could leak into responses elsewhere. Need to grep for execute_readonly usages.
+
+  5. B8 sanitize_text on connectivity errors — sanitize_text truncation? Previously `str(e)[:200]`. Need to check sanitize_text signature (limit param). In quality_sql_runner they call `sanitize_text(f"...", limit=500)`. Fine.
+
+  Also for SqlServerConnector.test_connectivity, previous behavior collapsed message to "sqlserver connectivity failed" when secret present; now sanitize_text — does sanitize_text remove passwords generically? Need to check data_masking.sanitize_text.
+
+  6. A1 pymssql: previously `cursor.execute(sql, tuple(params.values()))`, now `cursor.execute(sql, params or {})`. pymssql supports named params with `%(name)s` style. But does the SQL text use `:name` style? If SQL uses `:name` Oracle-style placeholders and pymssql receives dict... pymssql expects `%(name)s` or `%s`. If the SQL in the system uses `:param` style, pymssql with dict params won't work. Need to check what placeholder style the platform uses for sqlserver. Also the comment says "pymssql 原生支持 dict 命名参数绑定". Need to check whether SQL with named placeholders is passed. But note the bigger risk: when `params or {}` is empty dict, `cursor.execute(sql, {})` — pymssql with empty dict is fine.
+
+  Also there's `hasattr(cursor, "fetchmany") else cursor.fetchall()[: safe_limit + 1]` — fine.
+
+  Let me now read the other hunks: auth.py B1 (480-530), ai.py (81-480), queries.py (3260-3750), graph.py C1 (1666-1854), metrics.py (2458-2684), permissions.py (2950-3082), dict_medical_api.py (1132-1432), security.py D2 (4041-4092), data_products.py (530-621), query_intake.py (5378-5540), metric_service.py (5154-5303), quality.py (3082-3260), relation_reviews.py (3750-3849), identity_sync.py (1961-1981), jhemr_identity_adapter.py (4963-5154).
+
+  That's a lot. This is a perfect case for delegating to parallel subagents. But I'm the reviewer; I can delegate chunks to explore agents with precise instructions. The instructions say I may read source files for context. Let me delegate:
+
+  - Agent 1: A4 probe contract spillover — find all callers of execute_readonly across backend/app and check which rely on exact max_rows semantics (grep source). I can do this myself quickly with Grep. Actually Grep is fast. Let me do that myself.
+
+  Let me continue reading hunks myself in parallel — it's efficient enough. Read auth.py, security.py, data_products.py hunks.B1 CSRF: looks correct — exact match on normalized origin. Note: `_origin_of` on Origin header — Origin is already just origin; regex extracts scheme://host. Port included. Lowercased. `allowed` entries lowercased and rstripped. One subtlety: settings.cors_origins may contain entries like "http://host:8080" — fine. Could contain "*" — then exact match fails, requests would be rejected; acceptable fail-closed. Also non-standard: Origin could be "null" for sandboxed; rejected. Fine.
+
+  One potential issue: previously `origin.startswith(o.rstrip("/"))` — startswith meant port differences still matched host prefix... now exact. The claim is correct improvement. Any regression? If cors_origins includes trailing path? Unlikely. B1 无问题, but note dev fallback unchanged.
+
+  data_products.py: `import_results` at line 613 — the old code set `user` from get_current_user with try/except; new code just `user = "system"` — wait the diff shows `-` lines removing the try block but `user = "system"` remains as context. So D2 was NOT applied to import_results? The new file retains `user = "system"` hardcoded and removed the request-based resolution — that's a semantic regression: previously operator was resolved from request when available, now always "system". Hmm — actually the diff removed:
+  ```
+  -    try:
+  -        if request is not None:
+  -            user = get_current_user(request) or user
+  -    except Exception:
+  -        pass
+  ```
+  leaving `user = "system"`. That is a real behavior change: import_results operator now always "system" even for authenticated users. Is this a problem? It's audit attribution. Medium severity, flag as 疑问/问题. Wait — maybe `request` param also removed from signature? The hunk only shows body change; signature `request: Request` might still exist. Removing attribution seems unintended. Let me check source file later.
+
+  security.py D2: `get_request_operator` — note it catches only HTTPException; get_current_user may raise other exceptions? Check get_current_user implementation. Also original boilerplate caught all `Exception`. Semantics: original `user = get_current_user(request) or user` — if get_current_user returns "" falsy → default. Same. OK.
+
+  `require_query_view_on_get`: calls `require_permission("query.view")(request, db)` — require_permission returns dependency function with signature (request, db). Calling directly OK.
+
+  Now read ai.py (B3/B5/B7), queries.py (B2/B3/C3), permissions.py (B5), dict_medical_api.py (B5/B6/C6/D3).ai.py: B5 adds require_permission to propose-sql (ai.context.read), drafts review (asset.ai_draft.review), drafts execute (ai.sql.execute), export-context (ai.context.read), system-context (ai.context.read), tool-execute (ai.sql.execute). Need to verify these codes exist in permissions.py RESOURCE_CATALOG and default matrices (变更说明 says permissions.py adds ai.sql.execute and quality_admin/dict_admin defaults). Also need to check what roles get ai.sql.execute — self-reported risk #2 says ai_user loses drafts/execute and tool-execute (fail-closed). Need to check whether any default role gets the new codes, else endpoints unusable until seed rerun. That's acknowledged. But check: does platform_admin bypass permission checks in require_permission? Check security.require_permission implementation — probably has admin bypass. Let me read security.py source.
+
+  Also B7: `_scan_sql_risk` now word-boundary — good. But note: flags["dangerous_keywords"] may now contain duplicates (finditer returns every occurrence). Previously `found` was unique list of words. Now duplicates possible e.g. "UPDATE ... UPDATE" → ["UPDATE","UPDATE"]. Minor cosmetic; low.
+
+  Also note in ai.py propose_sql: `value_domains_for_sql` is 149 stuff — background.
+
+  Now read queries.py hunk (3260-3750) — B2 diff mask, B3 detail sanitize, C3 N+1 batching.queries.py observations:
+
+  - B2 diff: `current_sql: v.sql_text if has_full_read else None`, `sql_available: None if has_full_read else "full_read_permission_required"`. Matches 变更说明 contract. Note: `same_sql` computed from hashes still exposed even without permission — minor info leak? sha256 equal reveals whether two versions have identical SQL. Low severity, likely acceptable. Also sql_sha256 values exposed. Acceptable.
+
+  - C3 list_queries: `_serialize_version_for_read(active, include_sql=False, ...)` — sets `sql_available = "full_read_permission_required"` and pops sql_text/sql_normalized. Previously `_serialize_ver` returned full sql_text in list! So the change removes sql_text from list responses unless include_sql... wait list_queries doesn't expose include_sql param — it always calls include_sql=False. Previously the list returned active_version WITH sql_text. Now no sql_text at all and no way to request it in list. That's an API contract change for the frontend — but intended per B2/C3 masking direction? 变更说明 says "C3 列表 N+1 批量化+include_sql 每请求一次判定". List doesn't accept include_sql. Could break frontend query-center if it displays sql_text from list. Need to check frontend usage. Also ai/context default include_sql=False now — previously always returned sql_text. This is a contract change; claimed under 影响面？ 变更说明 only mentions diff endpoint adds sql_available; "diagnostics 响应字段集合不变". It doesn't mention list/active_version losing sql_text. Potential undocumented contract break — flag as 疑问/中.
+
+  - `get_query` include_sql=True path: has_full_read computed; if not allowed → 403 via _serialize_version_for_read. OK.
+
+  - One subtle issue in `_serialize_version_for_read`: when include_sql=True and allowed, data contains sql_text from _serialize_ver. Fine. When include_sql=False, sets sql_available="full_read_permission_required" — consistent.
+
+  - Note the batch in list_queries: `AssetQueryVersion.query_code.in_([...]), is_active.is_(True)` — get_active_version semantics: need to check original get_active_version — does it also filter status=="active" or order by version desc limit 1? If multiple is_active=True rows per code exist, batch takes whichever comes last in iteration order (nondeterministic), while get_active_version presumably orders. Check query_intake.get_active_version.
+
+  Now graph.py C1, metrics.py C4/D2, quality.py, permissions.py, dict_medical_api.py, query_intake.py A9, metric_service.py A9, relation_reviews.py, identity_sync.py A7, jhemr adapter A6, admin/governance B4, db_connectors embedded script indentation check.C1 graph resolver: need to verify semantic equivalence with original `resolve_endpoint` and `_resolve_endpoint_lenient`. Key subtlety: original `resolve_endpoint` SQL probably used NULL-safe comparisons. In the resolver: if namespace missing, filter `e[0] is None or e[0] == ""` — matches comment. Original SQL: need to read source graph.py for resolve_endpoint and _resolve_endpoint_lenient to compare. Also original lenient: `pairs = {(e[2], e[3]) for e in entries if e[1] == schema_name and e[2] and e[3]}` — need to check original SQL filters (maybe `system_code.isnot(None)` etc.).
+
+  Also potential discrepancy: `resolve()` falls back to lenient when exact returns (None, None) — but exact returns pair only if unique; what if exact found a pair but one side None? pairs contains (system, source) tuples; could contain (None, "SRC")? Then resolve returns that, and `if system_code is None or source_code is None` triggers lenient fallback. Matches old behavior where `if sys_c is None or src_c is None: lenient`. OK.
+
+  But subtle: old exact SQL likely compared `namespace_name == ns` where ns might be ""? In _resolve_relation_endpoint, ns comes from relation fields or split; could be None. Old SQL `resolve_endpoint(db, ns, schema, table)` — need to read to confirm NULL/"" handling: resolver treats missing namespace as NULL or "". Check source.
+
+  C4 board_overview: old code: `stmt.order_by(id.desc())` then first-wins per (metric_code, period_key) — equivalent to row_number rn=1 by id desc. But cell dict includes run_batch etc. New subquery selects specific columns — need to confirm all cell fields present: metric_value, numerator_value, denominator_value, status, limitations_note, is_recalc, run_batch — and the cell dict construction (partially shown) uses r.metric_value etc. Old also might include calculated_at or period? Need to see full cell dict — truncated in diff context (lines after 2555 show partial). Also `periods` set — fine. Need to check the cell dict keys in source to confirm field parity. Also old code had no `.where` on id ordering ties — same.
+
+  One thing: the diff at line 2553-2556 shows `-        if r.period_key in m: continue` removed and `periods.add(r.period_key)` kept — fine since rn==1 unique.
+
+  Potential C4 issue: SQLAlchemy row_number over with partition_by tuple — fine. SQLite (tests) supports window functions (3.25+). OK.
+
+  A10: `category in (d.category or "")` — semantics: equality implies substring only if... wait "x == y ⟹ x in y" — if category == d.category then category in d.category is True. Yes, removing `==` branch is safe. But subtle: old `(d.category or "") == category or category in (d.category or "")` ≡ second disjunct. Correct.
+
+  D4/_calculate_metric_shared: PermissionError → 403; LookupError → 404; ValueError → 422. But these calculate endpoints are 144 (background). Still, note `except PermissionError` — calculate_metric_version may raise PermissionError from query runner state gate; mapping to 403 with str(exc) detail — detail not sanitized? str(exc) from PermissionError raised internally with Chinese messages, no secrets. Low.
+
+  Now, D2 operator convergence in metrics/queries/data_products — get_request_operator semantics vs original boilerplate. Original: try get_current_user except Exception → default. New: first reads request.state.user_identifier, then calls get_current_user which... reads state anyway presumably. Catches only HTTPException vs original broad Exception. Check get_current_user — does it raise non-HTTP exceptions? Read security.py source.
+
+  Also data_products.py import_results lost operator attribution — confirm in source.
+
+  Now remaining hunks: quality.py (A2/A3/C5), permissions.py (B5), dict_medical_api.py (B5/B6/C6/D3), query_intake.py + metric_service.py (A9), relation_reviews.py (A5/B4), identity_sync.py (A7), admin.py/governance.py (B4), jhemr adapter (A6), and new file intake_version_retry.py in diff_3. Also frontend diff_2. Also check db_connectors embedded oracle script indentation.
+
+  Given volume, delegate some parallel verification to subagents? I still have many hunks to read. Reading is fast; let me continue with parallel Reads.
+
+• quality.py A2: note the old comment semantics: `if not c.comment` — covers NULL, empty string. New SQL: `comment IS NULL OR comment == ''` — equivalent for strings, but old Python `not c.comment` would also treat... only None/"". Equivalent. But grouping key: old grouped by (system or "", source or "", namespace or "", ...) — Python-side grouping normalizes None to "". SQL GROUP BY treats NULL as its own group — multiple NULLs group together in standard SQL GROUP BY (yes, NULLs group together). So equivalent. However one subtle diff: old code normalized None→"" for grouping, merging e.g. (system=None) and (system="") into one group. SQL GROUP BY treats NULL and "" as separate groups! In Oracle, "" is NULL so same; but backend DB — what DB does the platform use? Likely SQLite for tests, production maybe Vastbase/Postgres. In Postgres, NULL and "" are distinct groups. So a table with mixed system_code None/"" columns would split into two findings instead of one. Edge case; low severity. Also target_ref/finding fields pass raw values; if system None vs "" the finding field differs from before (None vs original raw value — old code used raw c.system_code in info... actually old stored first-seen raw values too). Low.
+
+  C5: dedup_index key includes rule_code... wait key is (rule_code, target_type, target_ref) — matches old SELECT. But preload filters `status.in_(["open","acknowledged"])` and rule_code in metadata_rule_codes only. The dedup only runs for metadata rules (execution_mode != sql_template)? In loop, `for rule in rules: if rule.execution_mode == "sql_template": ...` then the dedup block applies to metadata findings (new_findings). OK. setdefault picks first — old `db.scalar(select...)` without order_by picks arbitrary. Equivalent-ish. 
+
+  One issue: preloaded dedup_index contains findings for ALL metadata rules of this run across all statuses open/acknowledged — fine. But what about findings created in this same run for sql_template rules with same key? Different rule_code set; fine.
+
+  A3: rollback then set run fields then commit then raise. After db.rollback(), the `run` object — is it still attached/persistent? run was added and flushed earlier presumably. After rollback, run becomes expired/detached? If run was committed earlier in this function... If run was added but not committed, rollback removes it from DB; then setting attributes and db.commit() — run may be in session still as persistent? After rollback, pending objects are expunged? Actually rollback reverts pending objects to transient? No — objects added but not flushed become... after rollback, the session expires all objects; pending objects (never flushed) remain pending? Hmm. If run was flushed (to get id), after rollback it's "persistent but the row is gone"? The row was never committed; rollback removes the inserted row. run object stays in session as persistent with expired state; on commit, SQLAlchemy will... persistent object with changes → UPDATE, which matches 0 rows → stale? Actually SQLAlchemy will issue UPDATE for dirty persistent object; row doesn't exist → no error by default (rowcount not checked for updates unless versioning). So the failed status might silently not persist! But wait — was run committed before the try? Need to read source run_quality_check_core to see if run is committed/flushed before try block. Let me check source.
+
+  Also note: old code in except did `run.status="failed"; db.commit()` without rollback — that's the bug being fixed. New fix correct provided run survives rollback. If run was committed at creation (e.g., db.commit() after creating run earlier), then after rollback the row exists (committed) and update works. Need to check source ordering.
+
+  Now read source files for: run_quality_check_core run creation, resolve_endpoint/_resolve_endpoint_lenient originals, get_active_version, data_products import_results, sanitize_text, security.get_current_user/require_permission (normalizer for colon vs dot codes!). Important: permissions catalog uses dot codes "query.view" etc. but endpoints use require_permission("query:view")? In queries.py endpoints use require_permission("query:create") and "query:run" with colon, while new catalog codes are "query.create" dot form. Comment says "colon-form equivalents (query:view 等) match via the security normalizer". Need to verify security.py has such a normalizer — the security.py diff shown didn't add a normalizer! The diff only added require_query_view_on_get and get_request_operator. Check source require_permission for normalization. If no normalizer, require_permission("query:create") would check "query:create" but catalog/grants use "query.create" → mismatch → 403 for everyone except platform_admin (who might bypass). But maybe existing behavior predates 153 (144 background). The comment about the normalizer is in 144-added lines (background). Still worth verifying since B5 runtime impact depends on it: dict_medical endpoints use codes like "dict.medical.execute"? Need to see dict_medical_api.py hunk.
+
+  Let me read the source security.py and dict_medical hunk.Let me set up a todo list and continue. Key verification points so far:
+
+  - security.py has `_permission_matches` normalizer (dot→colon) — so dot codes in catalog match colon codes in require_permission. Good. But note require_permission("query:create") vs granted "query.create" → normalized both to "query:create". OK.
+
+  - However: granted list construction: `f"{row.resource}:{row.action}"` — if seed stores resource="query" action="create", fine; if seed stores full code "query.create" as resource with action "access"/"" → granted = "query.create" → matches "query:create" via normalizer. OK.
+
+  - B5 runtime impact: quality_admin got ai.sql.execute; ai_user did NOT get ai.sql.execute nor ai.context.read... wait ai_user got "query144","query.view","ai.context.read". But drafts/execute requires ai.sql.execute and tool-execute requires ai.sql.execute — ai_user loses those (self-reported risk #2). dict_admin got execute/retry/reconcile codes. Codes dict.medical.execute etc. — are they in RESOURCE_CATALOG? The catalog diff didn't add dict.medical.* codes... The catalog shows existing dict.medical.view/edit/plan.create/approve presumably already present (they were in old dict_admin defaults). New codes dict.medical.execute/retry/reconcile — are they in RESOURCE_CATALOG? The visible diff added only dict.general.import etc. If dict.medical.execute isn't in RESOURCE_CATALOG, the frontend permission UI won't show it but role defaults grant it — require_permission checks AssetRolePermission rows, seeded from ROLE_DEFAULT_PERMISSIONS. Whether seed creates rows for codes not in catalog — check seed logic. Also need to check seed applies to existing installs (risk #2 acknowledged: need rerun seed).
+
+  Let me now check remaining backend hunks: query_intake A9 + intake_version_retry (diff_3), metric_service A9, relation_reviews A5/B4, admin/governance B4, identity_sync A7, jhemr A6, and data_products import_results attribution, and db_connectors embedded script indentation. Then frontend.
+
+  Also verify run_quality_check_core run creation/flush before try (A3 rollback validity) — read source quality.py around that function.
+
+  Plan: parallel Reads of patch hunks + source files.Now check A4 spillover: find all callers of execute_readonly in backend/app. Also verify the embedded Oracle subprocess script indentation in db_connectors.py source. And A1 pymssql param style — check how SQL placeholders are written for sqlserver (does anything generate %(name)s or :name?). Also check sanitize_text in data_masking.CRITICAL FINDING confirmed: db_connectors.py lines 186-202 — the embedded remote_script now has:
+
+  ```
+  cur = None
+          try:
+              cur = conn.cursor()
+              ...
+              rows = cur.fetchmany(int(payload.get("max_rows") or 1000) + 1)
+      cols = [d[0] for d in cur.description]
+      print(json.dumps([...
+  finally:
+      ...
+  ```
+
+  `cur = None` at col 0, then `        try:` at col 8 — this is an IndentationError in the remote script! Wait — actually Python allows... no. `cur = None` at column 0, next line indented at column 8 with no block opener → IndentationError: unexpected indent. And `cols = ...` at col 4, `finally:` at col 0 without matching try at col 0... Actually the finally at col 0 can't match try at col 8. This remote script is broken — Oracle-over-SSH connector path will fail at exec() with IndentationError/SyntaxError. But wait, tests pass (1152)? Tests probably FakeConnector, never exec the remote script. This is a REAL HIGH severity bug: the SSH jump Oracle connector is the actual production path (AGENTS.md says Windows can't connect directly, all DB ops via jump host). Let me double check by extracting the script and compiling. Actually I can verify: lines 186-192 in the source file — the raw string starts at col... the script content lines: "cur = None" col 0, "        try:" col 8. Yes indentation error.
+
+  Let me verify with python compile to be certain.
+
+  Also A4 spillover callers:
+  - identity_title_sync.py:135 `count_rows = his.execute_readonly(EMPLOYEE_COUNT_SQL, max_rows=1)` — now returns up to 2 rows; count query returns 1 row, fine.
+  - Many callers pass `params={"max_rows": max_rows}` and SQL embeds `:max_rows` / ROWNUM limit — the extra probe row means callers get max_rows+1 rows even though SQL limited to max_rows... wait no: if SQL itself limits to :max_rows rows (ROWNUM <= :max_rows), then fetchmany(max_rows+1) returns at most max_rows rows because the result set only has max_rows. So no spillover for those. The probe only matters when SQL is unbounded. Callers like medical_code_push max_rows=5 — SQL likely bounded too.
+  - his_identity_sync.py:176 similar.
+  - metadata_collector line 145: `execute_readonly(sql, binds, max_rows=10000)` — inventory queries on ALL_TABLES etc., may be unbounded; now returns up to 10001 rows — caller probably iterates all; extra row harmless (just one more table/column processed? Actually could add one phantom row to metadata). Minor.
+
+  Wait, actually more important: Oracle direct connector (line 292 area, `_connect` path via oracledb locally on 8.83) — fetchmany(safe_limit+1). Callers that page: do any callers implement pagination by checking `len(rows) == max_rows` to decide whether to fetch more? Let me check identity_source_collector / medical_code_source_collector loops. his_identity_sync.py:176 returns rows directly. Let me look at a couple of these callers to see whether max_rows+1 rows would propagate into sync writes (e.g., identity sync inserting max_rows+1 staff rows — harmless-ish but changes semantics of "limit"). Check identity_source_collector:199 context.
+
+  Also quality_sql_runner clamps to [:max(1, max_rows)] — but note `max_rows` could legitimately be intended 0? unlikely.
+
+  query_runner: truncated = len(rows) > max_rows — correct strict. But note: rows sliced AFTER computing truncated; samples/digest on sliced rows. But `run.row_count` = stats or len(rows) — after slice, len ≤ max_rows. Good.
+
+  Now check the SqlServer pymssql A1: cursor.execute(sql, params or {}) — pymssql param style is pyformat `%(name)s`. Does the SQL written for sqlserver use `:name` or `%(name)s`? Check build_bind_parameters in query_parameter_validator and how dialect sqlserver SQL is written. If platform SQL convention is `:name` (Oracle style), pymssql would break. Check query_parameter_validator.build_bind_parameters and any sqlserver query assets. Also `_DIALECT_MAP` in sql_ast and bind_param_dialects excludes sqlserver — meaning for sqlserver, bind params not supported... but query_runner still passes bind_params to connector for sqlserver! In run_query_version, bind_params built for any dialect; then execute_readonly(sql_text, params=bind_params). For sqlserver with named params :name, pymssql dict binding expects %(name)s → would fail or mis-bind. But bind_param_dialects excludes sqlserver... is there a guard blocking params for sqlserver? Check query_parameter_validator.
+
+  Also note pyodbc branch: `cursor.execute(sql, params or {})` — pyodbc uses qmark `?` positional; passing dict to pyodbc execute → error (pyodbc expects sequence). Wait the pyodbc branch kept "dict 透传不变"? Comment says pyodbc branch keeps dict pass-through. pyodbc's execute(sql, dict) — pyodbc does NOT accept dict params. Hmm, but that was pre-existing? The diff shows the else (pymssql) branch changed; pyodbc branch unchanged (`cursor.execute(sql, params or {})`). Pre-existing.
+
+  Now the SSH connector params: `cur.execute(payload["sql"], payload.get("params") or {})` — oracledb named binds `:name` — fine.
+
+  Let me now verify the indentation issue by compiling, and read query_parameter_validator for dialect handling.SYNTAX ERROR: unexpected indent (remote_script, line 29)
+A4 probe + SSH script broken — HIGH, confirmed by compile.
+
+  query_parameter_validator: sqlserver binds extracted as `@name` (T-SQL style). pymssql named binding is `%(name)s` pyformat — `@name` is NOT supported by pymssql `execute(sql, dict)`! Actually pymssql supports `%s` positional and `%(name)s` named. Passing SQL with `@name` placeholders and a dict — pymssql would attempt % formatting: `"...@name..." % {...}` raises TypeError (format requires a mapping? Actually `@` isn't a format spec → ValueError unsupported format character). So A1's change to `cursor.execute(sql, params or {})` for pymssql will break when sqlserver SQL uses `@name` params. But note `bind_param_dialects` in queries.py excludes sqlserver — only informational, no runtime gate. So a query asset on sqlserver with @params would crash. But is that a regression? Previously `tuple(params.values())` with `@name` would also fail (pymssql % formatting with tuple → also error). So not a regression per se, but A1's claimed fix "pymssql 原生支持 dict 命名参数绑定" is only true if SQL uses %(name)s style, while the validator expects @name for sqlserver. Mismatch between A1 connector and 144 validator — real inconsistency 【背景? A1 is 153, validator is 144 background】. Severity 中.
+
+  Also pyodbc branch: `cursor.execute(sql, params or {})` — pyodbc doesn't accept dict. Pre-existing, not in diff.
+
+  Now check `_serialize_ver` — does it include sql_text/sql_normalized fields (for C3 pop)? Read query_intake.py _serialize_ver and A9 hunks. Also diff hunk for query_intake/metric_service A9 (5378-5540, 5154-5303), and new file intake_version_retry.py from diff_3.A9 review of flush_new_version_with_retry:
+
+  1. `_is_unique_violation(exc)` — check implementation (need to see top of file).
+  2. Concern: retry loop — after `nested.rollback()`, `current_max_version()` re-reads; on retry, build_version creates new instance. But the definition's other state... fine.
+  3. Bigger concern: `db.begin_nested()` requires the session to support SAVEPOINT. With SQLite tests — supported. But there's a subtlety: if the IntegrityError occurs during `db.flush()` inside nested, nested.rollback() rolls back to savepoint — good. But `_is_unique_violation` check happens AFTER rollback; the check `if attempt == 1 or not _is_unique_violation(exc): raise` — on non-unique IntegrityError, raise after rollback — fine.
+  4. Concurrency reality: with a single transaction isolation READ COMMITTED, a concurrent insert committed after our `current_max_version()` read — retry once handles one collision. OK.
+  5. Potential issue: `version.validated_at = _now()` moved inside build — fine.
+  6. One real issue: in metric_service, on retry, `next_ver` is recomputed, but `parent` was fetched before; fine.
+  7. Another: in ingest_query, the gate evaluated once; if the retry happens the version object is rebuilt — ok.
+
+  But there's a subtle correctness issue in the retry helper: `current_max_version()` on the SAME session after nested.rollback — a concurrent transaction's new row is visible only if committed; re-read gets new max. OK.
+
+  However: what about `db.begin_nested()` when session is in "partial rollback" state from IntegrityError? The flush raises, session enters inactive-ish state until rollback of nested — they do nested.rollback() in except. But between flush() raising and nested.rollback(), they don't call anything else. Fine.
+
+  Actually wait — one real flaw: after nested.commit()... begin_nested + flush + nested.commit releases savepoint. Fine.
+
+  Also: does the unique constraint actually exist on (query_id, version)? If the race also involves `is_active` supersede... beyond scope.
+
+  One more: `_is_unique_violation` — need to read lines 1-23 of diff_3. Let me read the top of diff_3 anyway for the new test files later if needed. Quick grep.A9 helper notes:
+  - `_is_unique_violation` handles pgcode 23505 and "uniqueviolation" class name. SQLite raises `sqlite3.IntegrityError` with class name "IntegrityError" → not detected as unique violation → on SQLite, a unique collision would be re-raised instead of retried. Tests use SQLite — so the retry path is untestable on SQLite unless mocked; and if production DB is SQLite, retry never triggers. Production DB is Vastbase/Postgres presumably. Minor: document. Severity 低-中. Also note: "uniqueviolation" in class name lower — sqlite3.IntegrityError contains "integrityerror" not "uniqueviolation" → correct that it won't match.
+
+  - get_active_version uses db.scalar without ordering — arbitrary if multiple is_active rows. C3 batch `active_by_code` assigns in iteration order — last one wins, arbitrary. Equivalent-ish nondeterminism. Low.
+
+  Now remaining backend checks:
+  1. graph.py original resolve_endpoint/_resolve_endpoint_lenient — compare semantics with _EndpointResolver. Read source.
+  2. quality.py run creation before try (A3 rollback).
+  3. data_products import_results operator regression — confirm in source.
+  4. admin.py/governance.py/relation_reviews.py B4/A5 hunks (smaller, quick read).
+  5. identity_sync.py A7 hunk, jhemr A6 hunk.
+  6. C4 cell dict field parity — read source metrics.py board_overview fully.
+
+  Then frontend diff_2 — big; delegate to an explore subagent? The frontend review (E batch error handling + F6 usePagedList six pages) is substantial and self-contained. I'll delegate it to a subagent with precise instructions, while I finish backend. Actually the subagent needs access to the diff and source — fine, give paths.
+
+  Let me first read source files in parallel: graph.py resolve_endpoint + _resolve_endpoint_lenient, quality.py run_quality_check_core beginning, metrics.py board_overview cell dict.A3: `run` is committed at line 814 (db.commit()) before try. So after rollback in except, run row exists in DB (committed), session expires it, attribute set → UPDATE on commit works. A3 fix is valid. 
+
+  C1 lenient equivalence: original `_resolve_endpoint_lenient` selects rows where schema== and table==, pairs of non-empty (system, source), unique. Resolver `resolve_lenient` — identical. 
+
+  resolve_endpoint original — need to see it. It's imported? Let me check where resolve_endpoint is defined (maybe in a shared module). Grep quickly.C1 exact equivalence confirmed:
+  - resolve_endpoint: table match; schema truthy → ==, else IS NULL (resolver: e[1] is None — matches); namespace truthy → ==, else IS NULL OR =="" (resolver matches). Pairs dedup, unique → return. Resolver identical. ✔
+
+  One nuance: resolver's `resolve()` falls back to lenient if exact pair has None element OR no unique match. Old code: `sys_c, src_c = resolve_endpoint(...)`; if either None → lenient. Exact may return a pair containing None values (e.g. (None, "SRC")) — old code: sys_c None → lenient. Resolver: `if system_code is None or source_code is None: lenient`. Same. ✔ C1 无问题 (response invariance holds for resolution logic; diagnostics reuses preloaded schema_table_names — same set as old `db.scalars(select(AssetTable))` filtered — ✔).
+
+  Now check metrics board_overview cell dict parity in source (the diff cut mid-construction). And data_products import_results. And remaining hunks: relation_reviews (A5/B4), identity_sync (A7), jhemr (A6), admin/governance (B4). Let me read source metrics board_overview cell construction and data_products import_results, plus patch hunks 3750-3849 (relation_reviews), 1961-1981 (identity_sync), 4963-5154 (jhemr), 1432-1666 (governance), 1-81 (admin).C4 board_overview cell dict has exactly 7 fields, all selected in subquery — field parity holds. `total_results` now = number of cells (latest per group), but OLD code: `total_results` — was it sum of cells too or len(rows)? Need old code. Old code: `rows = db.scalars(stmt...).all()` then dedup loop; `total_results` in old response — the diff didn't show the return statement changing, so old was also `sum(len(v) for v in cells.values())`? The return block at 237-244 is unchanged (not in diff context lines? diff ended at line 2577 with `period_count` — the return wasn't shown). Since not in diff, unchanged. But semantics: old `total_results` computed the same way presumably. But wait — old code counted `periods`/cells from deduped rows; same. One subtle diff: old code iterated rows ordered by id desc, first-wins per group — equal to rn=1. ✔. But tie on same id impossible. Also old `if not codes` early return — unchanged.
+
+  One difference: old query had no DISTINCT and the dedup key was r.period_key in m — same grouping. ✔ C4 响应不变 confirmed. One caveat: `func.row_number().over(...)` requires window function support — SQLite ≥3.25 ok; if production DB is Vastbase (PG-based) ok.
+
+  data_products.py import_results: confirmed regression — `user = "system"` hardcoded, request param retained but unused. Previously attributed operator from request when available. D2 replaced 15-17 sites but this one dropped attribution entirely. 严重度 低-中 (audit attribution only). Actually wait — maybe intentional because request defaults None (called by scripts). Still a semantic change vs old. Flag as 中? It's minor audit info; call it 低/中. I'd say 低.
+
+  Also note in data_products.py, `request: Request = None` with default None — old code guarded `if request is not None`. New code doesn't use request at all.
+
+  Now relation_reviews hunk (A5/B4), identity_sync A7, jhemr A6, admin/governance B4. Read patch sections: 1-81 admin, 1432-1666 governance, 1961-1981 identity_sync, 3750-3849 relation_reviews, 4963-5154 jhemr.These look fine. relation_reviews A5 fine. admin B4 fine (no token in audit — confirmed).
+
+  Now governance B4 (1432-1666) and jhemr A6 (4963-5154). Also B6 quality_templates + dict template escaping. Let me read governance hunk and jhemr hunk quickly.governance/jhemr hunks look OK (jhemr is 156 scope, writes to JHEMR DB —次范围, but reviewed anyway; logic has FOR UPDATE re-verify and read-back — reasonable; note it's 156 scope, skip deep review).
+
+  A4 remaining: check caller loops that depend on exact-N semantics — e.g., identity_source_collector pagination. Let me check a couple: identity_source_collector:271, and metadata_collector:145, and whether any caller uses len(rows)==max_rows as "has more" signal.A4 spillover analysis:
+  - Most callers self-limit via `ROWNUM <= :max_rows` in SQL, so the +1 probe never materializes (result set ≤ max_rows). ✔
+  - metadata_collector queries all_tab_columns etc. with max_rows=10000; unbounded result sets (no ROWNUM) — now may return 10001 rows. Harmless (just one extra metadata row). No truncation semantics consumed. Low.
+  - No caller uses `len(rows) == max_rows` as a pagination signal based on what I've seen. Let me do a quick check for patterns like ">= max_rows" or "== max_rows" in services.
+
+  Also check row_presence.py:128 execute_readonly. And identity_title_sync count max_rows=1 — count query single row. OK.
+
+  Quick grep for "== max_rows" or "len(rows)".row_presence probe_one: max_rows=1, now returns up to 2 rows; only checks truthiness — fine.
+
+  No caller uses len==max_rows pagination signal. A4 spillover: only real casualty is the broken SSH script. Also quality_sql_runner clamps, query_runner handles. Good.
+
+  Now frontend. This is a large area (E batch error handling across ~15 vue files + F6 usePagedList six pages). Delegate to an explore subagent with precise instructions to review diff_2_frontend.patch focused on E and F6. Give it the focus list and ask for findings with file:line. Let me get the diff file structure first to give the subagent anchors.Interesting — I notice the frontend diff has no `composables/usePagedList.ts` in the modified list (it's a new file? should be in diff_3 new files). Check diff_3 for usePagedList. Also check relation-rates at 4196, sync-diffs 7624, identity/sync-diffs 8763, dict/general 6119, asset/tables 5857, relation-review 4478 — the six F6 pages.
+
+  Delegate frontend review to a subagent. Give precise anchors. Also I want to verify one cross-stack contract issue I found: queries list no longer returns sql_text in active_version — does frontend query-center use active_version.sql_text? Check frontend/src/views/query-center/queries/index.vue usage. I can ask the subagent to check that too.
+
+  Launch explore subagent for frontend.Subagent found real frontend issues. I should spot-verify the top finding (#1 relation-review @change="loadRelations") since severity 高. Let me quickly verify source lines.
+
+• Confirmed: `loadData(targetPage?: number)` — `if (targetPage !== undefined) page.value = targetPage;`. `@change="loadRelations"` on el-select passes the selected value (string) → page.value = "A" → request page=A → FastAPI 422. HIGH confirmed. Same for @keyup.enter (KeyboardEvent) and @size-change (number = new page size → jumps to page 50/100).
+
+  Verify asset/tables #2/#3 quickly? The subagent gave precise lines; pattern is same. I'll trust with the same root cause but let me spot-check tables:85 quickly... it's cheap.Both confirmed. tables:85 `@change="loadData"` — el-select change passes the new value (20/50/100) → page jumps to 50. Confirmed. Tree click `loadData()` without page reset — confirmed (line 766), old code set page=1 (per subagent, diff 6001).
+
+  Also #2 note: pageSize change also doesn't reset page to 1 AND jumps page. Right.
+
+  Now let me finish remaining spot checks:
+  1. B5: dict.medical.execute/retry/reconcile codes in RESOURCE_CATALOG? Check permissions.py source for "dict.medical.execute" in RESOURCE_CATALOG.
+  2. B6 quality_templates single-quote escaping — quick look at hunk 5351-5378.
+  3. C3: list_queries active_version sql_text removal — undocumented contract change (frontend OK per subagent). Note as 低.
+  4. Check whether seed actually applies ROLE_DEFAULT_PERMISSIONS to existing DBs (B5 runtime). Quick grep for ROLE_DEFAULT_PERMISSIONS usage.B6: escaping in quality_templates is fine. But dict_medical templates B6 — 变更说明 says dict_medical_api.py B6 模板单引号转义×2 — I didn't see it in the hunk I read (that hunk covered 1132-1432 partially; the B6 change might be further down in the dict_medical_api diff beyond line 1431? The dict_medical_api diff ends at 1432 where governance begins. The hunk I read ended at line 1431 with push/stop-one. I didn't see B6 单引号转义 hunks — maybe between the hunks I read (I read continuously 1132-1431). Hmm, the diff I read covered everything from 1136 to 1431; I saw D3, C6, B5 eight endpoints. B6 "模板单引号转义×2" not visible... maybe in seed/ or in a different part. Not critical; B6 pattern verified in quality_templates. Skip.
+
+  B5 seed: seed_permissions exists as endpoint (manual trigger) — consistent with self-reported risk "生产需重跑 permissions/seed". Whether seed adds new codes to existing roles — read a bit more? The seed iterates BUILTIN_ROLES and presumably ROLE_DEFAULT_PERMISSIONS adding missing grants. It's idempotent add — fine. The runtime impact is as self-reported (fail-closed until seed rerun). Confirmed codes exist in catalog. ai.sql.execute granted to quality_admin only; ai_user loses draft execute/tool-execute — matches self-report #2.
+
+  One more B5 check: dict_medical 8 endpoints added codes; but wait — dict_medical router might already have router-level auth? Previously "仅登录". Now require codes. Frontend hides buttons by perms; ok.
+
+  Now remaining items:
+  - C3 contract: list active_version sql_text removal — frontend unaffected (subagent). Note as 低 (undocumented in 影响面).
+  - A4: also check the direct Oracle connector path used on 8.83 (non-SSH) — line ~292 fetchmany(safe_limit+1) fine.
+  - The embedded SSH script syntax error — verify there's a test that would have caught it? tests/test_db_connectors_readonly.py probably uses FakeConnector. Also confirm OracleConnector.execute_readonly actually calls _run_via_ssh_jump when ssh config present. Yes by design.
+
+  Wait — but 1152 tests passed. Is the broken SSH path covered by any test? Unlikely. This is the top finding.
+
+  Also double-check: was the indentation broken *by this diff* or pre-existing? The diff at 4684-4695 clearly shows the change: `-try:` → `+        try:`. So introduced by this A4 edit. Actually why would indentation change at all? Looks like the editor accidentally indented. Definitely introduced by this change set. Confirm with git: `git diff` for that file region or git show HEAD version. Let me verify HEAD version has `try:` at column 0.oracledb.init_oracle_client(lib_dir=payload["oracle_client_lib_dir"])
+conn = oracledb.connect(
+    user=payload["user"],
+    password=payload["password"],
+    dsn=f'{payload["host"]}:{payload["port"]}/{payload["database"]}',
+)
+conn.call_timeout = int(payload.get("timeout_ms") or 60000)
+cur = None
+try:
+    cur = conn.cursor()
+    cur.execute("SET TRANSACTION READ ONLY")
+    cur.execute(payload["sql"], payload.get("params") or {})
+    rows = cur.fetchmany(int(payload.get("max_rows") or 1000))
+    cols = [d[0] for d in cur.description]
+    print(json.dumps([
+        {col: normalize(value) for col, value in zip(cols, row)}
+        for row in rows
+    ], ensure_ascii=False))
+finally:
+    if cur is not None:
+        cur.close()
+Confirmed: HEAD version has `try:` at col 0, `cols` at col 4 inside. Working tree broke it: `        try:` at col 8 with `cols` still at col 4 → IndentationError. 100% confirmed HIGH bug introduced by A4 edit, and it kills the SSH jump Oracle path (the primary production path for reaching HIS/ODS from 8.83).
+
+  Wait — which path does the platform actually use on 8.83? On 8.83, Oracle client exists locally (/opt/oracle), so maybe direct connection is used and SSH jump is for other cases (Windows本机). Either way the SSH path is broken code. Also note: even if fixed indentation, `cols` line is at col 4 — inside try at col 8 the body must be at col ≥... if try were at col 8, body would need col ≥12 but lines are at col 12 (`cur = conn.cursor()` at col 12? In the working tree: `        try:` col 8, `            cur = conn.cursor()` col 12 — yes body at 12). And `cols` at col 4 would be outside try, then `finally:` at col 0 — mismatch. The whole tail needs re-indentation. Whatever — it's broken, report it.
+
+  Now also verify quality.py A3 — run committed before try (line 814 db.commit()) ✔ so rollback+update works.
+
+  D2: get_request_operator catches only HTTPException; get_current_user raises only HTTPException (source line 18). ✔ Equivalent to old broad catch. But subtle: old boilerplate `user = get_current_user(request) or user` — get_current_user raises if no identifier. New one reads state directly first — same value. ✔. data_products import_results: attribution dropped → issue (低).
+
+  A7 identity_sync: 500 on failure, error_class only ✔.
+
+  B2 diff mask: also exposes same_sql boolean and hashes without permission — minor info leak, note as 低.
+
+  B1: also note `_origin_of` strips port? No — keeps port. cors_origins entries must include exact port. If settings.cors_origins contains entries with paths (e.g. "http://host/path") — unlikely. Fine. One more subtlety: multiple Origins? No.
+
+  Also A8 init warning — logs lib_dir path only, fine.
+
+  A1 pymssql mismatch with 144 validator (@name vs %(name)s) — 中【背景交叉】. Actually the validator is 144 (background) but A1 is 153. The mismatch: extract_bind_names for sqlserver uses `@name` regex; connector pymssql needs `%(name)s`. Any query asset on sqlserver with params will fail at driver. Flag as 中, cross-item.
+
+  C5 dedup_index: also preloads only for metadata_rule_codes, but the loop dedups findings only from metadata rules — consistent. One subtlety: old query didn't filter rule.execution_mode; new preload restricts to metadata codes — the dedup block only executes for metadata rules anyway. ✔.
+
+  A2: NULL vs "" grouping split on Postgres — 低.
+
+  Also queries.py C3: `_serialize_version_for_read` include_sql=False sets `sql_available` — but list_queries always include_sql=False and no query param to opt in; get_query/list_versions/get_version have include_sql param. OK.
+
+  ai_query_context: N+1 remains (`get_definition(db, v.query_code)` per row) — C3 claimed list N+1 batching; ai/context still N+1 but that's 144 endpoint, not claimed. Fine.
+
+  Now B4 governance role assign/remove audit — I only saw audit-logs refactor (146 background) in governance hunk. The B4 role assign/remove audit might be further in the hunk (1432-1666; I read to 1551). Let me check the rest quickly.B4 governance audit looks fine. One issue in audit-logs summary (146 背景): `audit_logs_summary` loads ALL filtered rows into memory without limit — background item, minor.
+
+  Enough backend. Update todos and write final report.
+
+To resume this session: kimi -r session_4c75a7e1-c893-4196-802a-a87f8c6b1a9f

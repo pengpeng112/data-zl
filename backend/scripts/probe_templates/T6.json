@@ -1,0 +1,34 @@
+{
+ "code": "T6",
+ "probe_type": "R-CNT",
+ "name": "检验线 HIS 申请↔LIS 结果月对账",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT TO_CHAR(REQUESTED_DATE_TIME,'YYYY-MM') AS K, COUNT(*) AS CNT FROM LAB.LAB_TEST_MASTER WHERE REQUESTED_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND REQUESTED_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') GROUP BY TO_CHAR(REQUESTED_DATE_TIME,'YYYY-MM')"
+  },
+  {
+   "side": "b",
+   "source_code": "lis_sqlserver_10_10_10_73",
+   "dialect": "sqlserver",
+   "sql": "SELECT CONVERT(varchar(7), sampledate, 120) AS K, COUNT(*) AS CNT FROM dbo.lab_report WHERE sampledate >= :START_DATE AND sampledate < :END_DATE GROUP BY CONVERT(varchar(7), sampledate, 120)"
+  }
+ ],
+ "derive": {
+  "metric": "lab_month_cnt_max_diff_rate",
+  "formula": "max(|a_k-b_k|)/max(a_k)*100",
+  "unit": "%",
+  "compare": "by_month_key"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 5.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "LAB.LAB_TEST_MASTER 与 LIS.lab_report 月度数量对账",
+ "large_table_guard": "LAB_RESULT 必须按申请键+月窗子查询限定，禁全表 GROUP BY"
+}

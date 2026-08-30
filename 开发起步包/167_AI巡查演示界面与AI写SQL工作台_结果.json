@@ -1,0 +1,12 @@
+{
+  "schema_version": "r167-result/v1",
+  "status": "COMPLETED_AND_DEPLOYED",
+  "completed_at": "2026-08-30T08:30:00+08:00",
+  "stages": {"S0": "PASS", "S1": "PASS", "S2": "PASS", "S3a": "PASS", "S3": "PASS", "S4": "PASS", "S5": "PASS", "S6": "PASS"},
+  "tests": {"backend_full": {"passed": 1287, "skipped": 1, "failed": 0, "seconds": 2620.02, "database": "data_asset_test"}, "frontend_full": {"files": 31, "passed": 210, "failed": 0}, "typecheck": "PASS", "build": "PASS", "gzip_budget": "PASS"},
+  "real_llm_call": {"provider": "hospital_llm", "model": "deepseek-r1", "reachable": true, "duration_ms": 8996, "summary": "只读分析已接通。", "mock": false, "patient_data": false},
+  "screenshots": ["output_r167/screenshots/ai-quality-patrol.png", "output_r167/screenshots/ai-sql-workbench.png"],
+  "regression": {"existing_ai_quality_removed": 0, "sql_workbench_touched": false, "new_dependencies": 0, "migrations": 0, "sql_execution_path_added": false, "quality_task_used": false},
+  "deployment": {"backend_image": "data-asset:r167-20260830", "container_health": "healthy", "frontend_release": "r167-20260830", "routes": 343, "ai_sql_route": true, "patrol_route": true, "alembic_current": "c1d2e3f4a5b6", "r167_migrations": 0, "predecessor_165_migration_applied": true, "backup": "/opt/data-asset/backups/data_asset_pre_r167_20260830.dump", "backup_bytes": 10758931, "rollback_backend": "data-asset:w10c-202608291223", "rollback_frontend": "p144-149-20260826"},
+  "exceptions": "output_r167/exceptions.json"
+}

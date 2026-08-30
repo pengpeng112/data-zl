@@ -1,0 +1,27 @@
+{
+ "code": "T4",
+ "probe_type": "R-REF",
+ "name": "门诊诊断医生缺失率",
+ "severity_default": "P3",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT COUNT(*) AS TOTAL, SUM(CASE WHEN DOCTOR IS NULL THEN 1 ELSE 0 END) AS MISS FROM OUTPDOCT.OUTP_MR_DIAG_DESC WHERE VISIT_DATE >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND VISIT_DATE < TO_DATE(:END_DATE,'YYYY-MM-DD')"
+  }
+ ],
+ "derive": {
+  "metric": "outp_diag_doctor_missing_rate",
+  "formula": "miss/total*100",
+  "unit": "%"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 1.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "OUTPDOCT.OUTP_MR_DIAG_DESC.DOCTOR 缺失率",
+ "large_table_guard": null
+}

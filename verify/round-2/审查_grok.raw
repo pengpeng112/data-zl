@@ -1,0 +1,197 @@
+我按只读审查执行：先读 `verify/round-2/变更说明.md` 和三个改动包，再对照源文件核对关键契约，不改任何文件。变更说明已定位到 153 号锚点。接下来在三个改动包里按 A4、B1、B2、B5、C 批性能、A9、D2、前端 E/F6 逐项抽查。已避开 `verify/` 下其他审查文件。接下来对照工作区源码与 patch 核对关键契约。独立只读核查完成。范围锚定 153 号清单；未读 `verify/` 下其他审查文件，未改任何文件。
+
+---
+
+## 分项核查
+
+### A4 连接器 `max_rows+1` 契约外溢
+
+**【确认有问题】** 严重度：**高**  
+`OracleConnector._run_via_ssh_jump` 的远程脚本在改 `fetchmany(...+1)` 时把 `try` 缩进打坏，远端 Python 无法编译。HIS/ODS 主路径是 `ssh_jump`，这条通道会整段失败，而不是“多 1 行”。
+
+证据：`backend/app/services/db_connectors.py:187-201`
+
+```187:201:backend/app/services/db_connectors.py
+        try:
+            cur = conn.cursor()
+            ...
+            rows = cur.fetchmany(int(payload.get("max_rows") or 1000) + 1)
+    cols = [d[0] for d in cur.description]
+    print(json.dumps([
+        ...
+    ], ensure_ascii=False))
+finally:
+    if cur is not None:
+        cur.close()
+    conn.close()
+```
+
+验证：
+
+```powershell
+cd F:\python\数据资产\backend
+python -c "import pathlib,ast; s=pathlib.Path('app/services/db_connectors.py').read_text(encoding='utf-8'); start=s.index('remote_script = r'); src=s[s.index('import datetime', start):s.index('\"\"\"', s.index('import datetime', start))]; ast.parse(src)"
+```
+
+**【确认有问题】** 严重度：**中**  
+直连各驱动（Oracle/PG/MySQL/SQL Server）确实 `fetchmany(safe_limit+1)`，且 **不在连接器内切片**。`query_runner` / `quality_sql_runner` 已夹紧；但 `metadata_collector.py` 多处无 SQL `ROWNUM/LIMIT`，把返回列表当全集写入：
+
+- `list_schemas(max_rows=500)` → 可能 501 个 schema
+- `list_tables(max_rows=5000)` → 可能 5001 张表
+- `list_columns` / `collect_all` 批采 `max_rows=10000` → 可能多 1 列；同时 `_safe_max_rows` 硬顶 10000，探针使硬顶变成 **10001**
+
+有 `ROWNUM <= :max_rows` 的调用方（身份采集等）SQL 先限行，外溢不明显。`row_presence.probe_one(max_rows=1)` 只看空/非空，功能上无害。
+
+验证：`rg "execute_readonly" backend/app/services -g "*.py"`，核对每处是否切片或 SQL 自带 LIMIT。
+
+---
+
+### B1 CSRF 归一化
+
+**【无问题】** 严重度：—  
+`_origin_of` 取 `scheme://host[:port]` 后小写、去尾斜杠，再与 `cors_origins` 精确相等。`http://localhost:5173.evil.com` 会被拦住。测试覆盖了大小写、Referer 路径、端口不一致。
+
+证据：`backend/app/api/v1/auth.py:65-94`；`backend/tests/test_auth_csrf.py`
+
+**【疑问】** 严重度：**低**  
+任意非空 `X-Requested-With` 仍直接放行（历史行为）。前端 `utils/http/index.ts:40` 默认带该头，SPA 请求实际不走 Origin 精确匹配。防护仍依赖 CORS 白名单。B1 只修了“无自定义头”的表单/工具面。
+
+验证：`cd backend; .\.venv\Scripts\python.exe -m pytest tests/test_auth_csrf.py -q`
+
+---
+
+### B2 diff 掩码契约
+
+**【无问题】**（端点实现）严重度：—  
+`GET /queries/{code}/versions/{v}/diff`：无 `ai.sql.full_read` 时 `current_sql/parent_sql=null` + `sql_available="full_read_permission_required"`，不 403；有权限返回原文。字段集合与测试锁定一致。
+
+证据：`backend/app/api/v1/queries.py:645-660`
+
+**【疑问】** 严重度：**低**  
+`test_diff_endpoint_masks_sql_without_full_read` 注释写“无角色 token 验掩码”，实际用的是 `platform_admin` client，只断言了 **有权限出原文**，掩码分支没有自动化覆盖。
+
+证据：`backend/tests/test_query_asset.py:186-213`
+
+前端未消费 diff 接口，掩码形态对 UI 无直接冲击。
+
+---
+
+### B5 权限码运行时影响
+
+**【确认有问题】** 严重度：**中**（发布门禁，代码意图如此）  
+运行时 fail-closed，**已有库内角色矩阵不会自动长出新码**：
+
+| 变化 | 运行时后果 |
+|---|---|
+| `POST /ai/drafts/{id}/execute`、`POST /ai/tool-execute` 改为 `ai.sql.execute` | `ai_user` 默认矩阵仍是 `ai.draft.execute`，**没有** `ai.sql.execute` → 执行/工具代理 403 |
+| `dict_medical` 写端点加 `dict.medical.edit/execute/retry/reconcile/...` | 未重跑 `permissions/seed` 的 `dict_admin` 会 403 |
+| `quality_admin` 默认矩阵新增 `ai.sql.execute` | 同样要 seed 才生效 |
+
+证据：`backend/app/api/v1/ai.py:623-627,905-909`；`permissions.py:125-128,198,236-241`
+
+**【疑问】** 严重度：**低**  
+`tool-execute` 里 `sql_risk_scan` / `list_tools` 也挂在 `ai.sql.execute` 上，只读扫描被执行码一并关掉。`ai.draft.execute` 仍在目录和 `ai_user` 矩阵里，但已无端点使用（死码）。
+
+验证：`pytest tests/security_audit/test_fine_grained_write_permissions.py tests/test_153_g1_g3.py -q`；生产查 `asset_role_permissions` 是否含 `ai.sql.execute`。
+
+---
+
+### C1 / C3 / C4 响应不变性
+
+**C1 【无问题】**  
+`_EndpointResolver` 精确分支对齐 `resolve_endpoint`（schema 缺失用 `IS NULL`；namespace 缺失用 `NULL|""`），宽松分支对齐 `_resolve_endpoint_lenient`（要求非空 system/source）。精确失败（含多命中）再走宽松，与旧控制流一致。diagnostics 结构锁测试存在。
+
+证据：`graph.py:135-205` vs `relation_identity.py:54-86`
+
+**C3 【确认有问题】** 严重度：**中**  
+批量化本身（active 版本 `IN` 一次取）可接受；但 `_serialize_version_for_read(include_sql=False)` **剥掉 `sql_text/sql_normalized` 并恒打 `sql_available`**，应用到：
+
+- 列表（旧：`_serialize_ver` **总是带 SQL**）
+- `GET /queries/{code}` 默认 `include_sql=False`（旧：详情总是带 SQL）
+
+前端 `fetchQueryDetail` **不传** `include_sql`，详情抽屉会一直落到“完整 SQL 需权限”，连 `platform_admin` 也看不到现行 SQL。
+
+证据：
+
+- `queries.py:49-71,111-117,527-561`
+- `frontend/src/api/query-center.ts:205-209`
+- `frontend/src/views/query-center/queries/index.vue:307,707-709`
+
+C3 结构锁测试把“列表无 sql_text”写成新口径（`test_query_asset.py:216-231`），与变更说明“响应逐字段不变”不一致。这是安全收紧，不是字段级不变。
+
+**C4 【无问题】**  
+`row_number() OVER (PARTITION BY metric_code, period_key ORDER BY id DESC)` 等价于旧代码 `order_by(id.desc())` + “已有 period 则 skip”。cells 字段集合未减。`category in (d.category or "")` 与旧 `== or in` 对默认 `"48项核心制度"` 命中集相同。多条 `is_active` 时批量 dict 与 `db.scalar` 同样无 `ORDER BY`，原有不确定性未恶化。
+
+证据：`metrics.py:149-245`
+
+---
+
+### A9 SAVEPOINT 重试
+
+**【无问题】** 严重度：—  
+`begin_nested` → flush → 仅 `23505` / `UniqueViolation` 回滚 SAVEPOINT 后重读 max 再试一次；其它 IntegrityError 原样抛出。`build_version(next_ver)` 每次新实例，定义行在外层事务。psycopg3 走类名 `UniqueViolation` 兜底。
+
+证据：`backend/app/services/intake_version_retry.py:17-49`；`query_intake.py:251-254`；`metric_service.py:286-289`
+
+**【疑问】** 严重度：**低**  
+只重试一次；撞的如果是别的唯一键也会空转一次。默认 READ COMMITTED 下再读 max 通常能看到对方已提交版本。
+
+验证：`pytest tests/test_153_g1_g3.py -k version -q`
+
+---
+
+### D2 `get_request_operator` 收敛
+
+**【无问题】**  
+优先 `request.state.user_identifier`，否则 `get_current_user`，只捕 `HTTPException`（`get_current_user` 仅抛这个）。调用点 default 保留：`system` / `reviewer` / `api`。`relation_reviews` 三处 `reviewer` 正确。无 `user_identifier` 时回落 default，与旧 `except Exception: pass` 在当前实现下等价。
+
+证据：`security.py:80-95`；`relation_reviews.py` 批准/驳回/批量
+
+---
+
+### 前端 E 批错误处理
+
+**【无问题】**（主路径）  
+http 拦截器错误只 `reject`、不弹 toast，`usePagedList` / 页面 `extractErrorDetail` 不会双弹。FastAPI `detail` 为对象时会 `JSON.stringify`。关系复核 E9 只在主端点 **404** 回退 legacy，避免把 403/500 吞成“成功走旧接口”。
+
+证据：`frontend/src/utils/http/index.ts:229-233`；`errorMessage.ts:54-65`；`relation-review/index.vue` E9 分支
+
+**【疑问】** 严重度：**低**  
+`dict/sync-diffs`、`identity/sync-diffs` 的同步/采集 catch 仍是固定文案，未走 `extractErrorDetail`（与列表加载不对称）。覆盖面声称“E1–E12 全页”并不均匀。
+
+---
+
+### F6 `usePagedList` 六页分页/搜索
+
+composable 本身：搜索 `doSearch` 重置 `page=1`；请求序号守卫；失败不清空旧数据；`extraParams` 之后覆盖 `page/page_size`。dict/general 的 `onError` 返回 `false` 避免双提示。relation-rates 区间改为服务端 `hit_rate_min/max`（后端 `relations.py:400-432` 支持），比旧“只滤当前页”更正确。
+
+**【确认有问题】** 严重度：**中**  
+`asset/tables/index.vue` 树点击 `handleTreeClick` 删了 `params.page = 1`，改成 `await loadData()` **不重置页码**。在第 N 页点另一个 Owner/表，可能空页。搜索入口 `doSearch()` 会 `loadData(1)`，树筛选与搜索语义不一致。
+
+证据：`tables/index.vue:735-766` vs `791-799`  
+工具栏 `el-select v-model="pageSize" @change="loadData"` 同样不回第 1 页；底部分页 `@size-change="onPageSizeChange"` 会回第 1 页。同一页两种改页大小语义。
+
+**【疑问】** 严重度：**低**  
+六页组件级“清空筛选 / loading 竞态 / 改 pageSize”主要靠人工点验；Vitest 不覆盖这些交互。
+
+---
+
+## 问题清单
+
+| 编号 | 严重度 | 文件:行 | 问题 | 建议 |
+|---|---|---|---|---|
+| 1 | 高 | `backend/app/services/db_connectors.py:187-201` | A4 改 ssh_jump 远程脚本缩进，`try/cols/finally` 对不齐，远端 `IndentationError`，跳板 Oracle 只读查询不可用 | 把远程脚本恢复为合法 `try/finally`，仅把 `fetchmany` 改为 `max_rows+1`；用 `ast.parse` 锁脚本 |
+| 2 | 中 | `db_connectors.py:92-93,114-120,296` + `metadata_collector.py:67-145` | A4 连接器返回 `max_rows+1` 且硬顶变成 10001；元数据采集无 SQL LIMIT、未切片，可能多收 1 个 schema/表/列 | 连接器对外仍返回 ≤max_rows，探针只给 runner；或采集端一律 `rows[:max_rows]` |
+| 3 | 中 | `queries.py:49-71,527-561`；`frontend/src/api/query-center.ts:205-209`；`query-center/queries/index.vue:307,707` | C3 把详情默认改成不带 SQL；前端详情不传 `include_sql=true`，有权限用户也看不到现行 SQL | 详情请求加 `include_sql=true`，或默认对有 `ai.sql.full_read` 的请求返回原文；结构锁测试覆盖详情 |
+| 4 | 中 | `ai.py:626,908`；`permissions.py:198,236-241` | B5 新码未写入已有角色矩阵则 fail-closed：`ai_user` 失执行、未 seed 的 `dict_admin`/`quality_admin` 写接口 403 | 发布清单强制 `POST /permissions/seed`（或等价补码）；确认生产矩阵后再切流量 |
+| 5 | 中 | `frontend/src/views/asset/tables/index.vue:766,86` | F6 树点击/工具栏改 pageSize 不重置 `page=1`，搜索会重置，分页语义分裂 | 树筛选与改页大小走 `loadData(1)` / `doSearch`，与 composable 约定对齐 |
+| 6 | 低 | `tests/test_query_asset.py:186-213` | B2 掩码分支无自动化：用例名/注释与断言（admin 出原文）不符 | 用无 `ai.sql.full_read` 的 token 断言 `current_sql is None` 且 `sql_available` |
+| 7 | 低 | `auth.py:82-83` | B1 后 CSRF 对带 `X-Requested-With` 的请求仍跳过 Origin 精确匹配（前端默认带此头） | 文档化该前提；或仅接受 `XMLHttpRequest` 且收紧 CORS |
+| 8 | 低 | `ai.py:905-909` | `tool-execute` 用执行码覆盖只读 `list_tools`/`sql_risk_scan` | 只读工具挂 `ai.context.read`，真实跑 SQL 再要 `ai.sql.execute` |
+| 9 | 低 | `query_intake.py` / `intake_version_retry.py:36-48` | A9 只重试一次；非版本号唯一键冲突也会空转一轮 | 可接受则在注释写明；或区分 unique constraint 名 |
+
+---
+
+**未当作缺陷的项：** B1 精确 origin、B2 掩码实现、C1 预载语义、C4 窗口函数口径、A9 SAVEPOINT 主逻辑、D2 operator 默认值、E 批脱敏与 E9 404 回退、F6 `doSearch`/`seq` 主语义、`quality_sql_runner`/`query_runner` 的 A4 夹紧。
+
+**【背景】**（非 153 清单但同包可见）：`queries.py` 的 `/ai/context` 无条件 `ai_readable` 过滤、metrics calculate 端点、`dict_general` 全端点挂码等混在 backend patch 中；未逐项深挖。若其中有“仅登录即可写”被突然收口，与 B5 同类，发布前同样需要 seed。

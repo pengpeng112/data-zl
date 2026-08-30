@@ -1,4 +1,5 @@
 ﻿<script setup lang="ts">
+import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
@@ -21,11 +22,31 @@ interface AuditLog {
   action: string;
   operator: string;
   created_at: string;
+  before_data?: unknown;
+  after_data?: unknown;
 }
 
 defineOptions({ name: "OpsAudit" });
 
 const activeTab = ref("audit");
+// 146 E7（R5）：审计详情抽屉（before/after 前端展示）
+const detailVisible = ref(false);
+const detailRow = ref<AuditLog | null>(null);
+
+function openAuditDetail(row: AuditLog) {
+  detailRow.value = row;
+  detailVisible.value = true;
+}
+
+function formatJsonField(value: unknown) {
+  if (value === undefined || value === null || value === "") return "（无记录）";
+  try {
+    const parsed = typeof value === "string" ? JSON.parse(value) : value;
+    return JSON.stringify(parsed, null, 2);
+  } catch {
+    return String(value);
+  }
+}
 const tableData = ref<AuditLog[]>([]);
 const eventData = ref<any[]>([]);
 const dictImportData = ref<any[]>([]);
@@ -229,6 +250,11 @@ onMounted(fetchData);
         </el-table-column>
         <el-table-column prop="operator" label="操作人" width="140" show-overflow-tooltip />
         <el-table-column prop="created_at" label="时间" width="190" />
+        <el-table-column label="操作" width="80" fixed="right" align="center">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="openAuditDetail(row)">详情</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <el-table
@@ -280,6 +306,26 @@ onMounted(fetchData);
         />
       </div>
     </el-card>
+
+    <!-- 146 E7（R5）：审计 before/after 前端抽屉展示（后端已限长脱敏） -->
+    <ReDetailDrawer v-model="detailVisible" title="审计详情" :subtitle="detailRow ? `#${detailRow.id} · ${detailRow.action}` : ''" size="520px">
+      <template v-if="detailRow">
+        <el-descriptions :column="1" border size="small">
+          <el-descriptions-item label="日志ID">{{ detailRow.id }}</el-descriptions-item>
+          <el-descriptions-item label="模块">{{ detailRow.module || "-" }}</el-descriptions-item>
+          <el-descriptions-item label="实体类型">{{ detailRow.entity_type || "-" }}</el-descriptions-item>
+          <el-descriptions-item label="实体引用">{{ detailRow.entity_ref || "-" }}</el-descriptions-item>
+          <el-descriptions-item label="动作">{{ actionLabel(detailRow.action) }}</el-descriptions-item>
+          <el-descriptions-item label="操作人">{{ detailRow.operator || "-" }}</el-descriptions-item>
+          <el-descriptions-item label="时间">{{ detailRow.created_at || "-" }}</el-descriptions-item>
+        </el-descriptions>
+        <el-divider />
+        <p class="muted">before_data（已脱敏）</p>
+        <pre class="json-box">{{ formatJsonField(detailRow.before_data) }}</pre>
+        <p class="muted">after_data（已脱敏）</p>
+        <pre class="json-box">{{ formatJsonField(detailRow.after_data) }}</pre>
+      </template>
+    </ReDetailDrawer>
   </div>
 </template>
 
@@ -341,4 +387,15 @@ onMounted(fetchData);
 .f-op, .f-act { width: 140px; }
 .f-ent { width: 180px; }
 .f-time { width: 200px; }
+.muted { margin: 8px 0 4px; color: var(--el-text-color-secondary); font-size: 12px; }
+.json-box {
+  max-height: 220px;
+  padding: 8px;
+  overflow: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--el-fill-color-light, #f5f7fa);
+  border-radius: 6px;
+}
 </style>

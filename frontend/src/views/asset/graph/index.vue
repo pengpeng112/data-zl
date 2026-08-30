@@ -38,6 +38,7 @@
         @view-mode-change="changeViewMode"
         @engine-change="changeEngine"
         @load-chain="loadChain"
+        @global-search="globalSearch"
         @back-global="backToGlobal"
         @load-data="loadData"
         @refresh="refreshGraphOnly"
@@ -128,13 +129,21 @@
         :title="graphLoadNotice"
       />
       <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
+      <GraphLegendFilters
+        v-model:relation-types="legendRelationTypes"
+        v-model:confidences="legendConfidences"
+        v-model:show-review-layer="filters.show_review_layer"
+        class="graph-legend-filter"
+      />
+      <div class="graph-workspace">
       <div v-loading="loading" :element-loading-text="graphLoadingText" class="graph-wrap">
         <template v-if="graphData.nodes.length && (graphData.edges.length || filters.view_mode === 'overview')">
           <component
             :is="graphEngine === 'g6' ? AdvancedRelationGraph : RelationGraph"
+            ref="graphRef"
             :key="renderKey"
-            :nodes="graphData.nodes"
-            :edges="graphData.edges"
+            :nodes="visibleGraphData.nodes"
+            :edges="visibleGraphData.edges"
             :focus-keyword="filters.keyword"
             :group-by="filters.group_by"
             :center-table="centerTable"
@@ -146,8 +155,9 @@
             :view-mode="filters.view_mode"
             :system-names="systemNameMap"
             :source-names="sourceNameMap"
-            height="calc(100vh - 400px)"
+            height="calc(100vh - 280px)"
             @node-click="selectNode"
+            @node-activate="toggleNodeExpansion"
             @edge-click="showEdge"
             @render-error="handleRenderError"
           />
@@ -173,6 +183,14 @@
           </template>
         </ReEmptyState>
       </div>
+      <GraphInspector
+        :open="inspectorOpen"
+        :node="selectedNode"
+        :edge="selectedEdge"
+        @close="inspectorOpen = false"
+        @open-table="openTable"
+      />
+      </div>
     </template>
 
     <!-- 错误面板：auth/permission/api/contract 统一展示，可重试 -->
@@ -195,59 +213,17 @@
       <el-skeleton :rows="6" animated />
     </div>
 
-    <ReDetailDrawer
-      v-model="nodeDrawerVisible"
-      title="节点详情"
-      :subtitle="selectedNodeDisplayKey || ''"
-      :status="selectedNode?.review_status || selectedNode?.include_status || ''"
-      status-type="info"
-      size="520px"
-    >
-      <el-descriptions v-if="selectedNode" :column="1" border size="small">
-        <el-descriptions-item label="节点（物理键）">{{ selectedNode.id }}</el-descriptions-item>
-        <el-descriptions-item label="展示名">{{ selectedNodeDisplayKey }}</el-descriptions-item>
-        <el-descriptions-item label="业务系统">{{ systemNameMap[selectedNode.system_code || ''] || selectedNode.system_code || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="数据连接">{{ sourceNameMap[selectedNode.source_code || ''] || selectedNode.source || selectedNode.source_code || '-' }}<span v-if="selectedNode.source_code && sourceNameMap[selectedNode.source_code] && sourceNameMap[selectedNode.source_code] !== selectedNode.source_code">（{{ selectedNode.source_code }}）</span></el-descriptions-item>
-        <el-descriptions-item label="Schema / Owner">{{ selectedNode.schema_name || selectedNode.namespace_name || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="表名">{{ selectedNode.table_name || selectedNode.label }}</el-descriptions-item>
-        <el-descriptions-item label="中文名">{{ selectedNode.table_name_cn || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="表角色">{{ selectedNode.table_role || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="业务域">{{ selectedNode.business_domain || selectedNode.domain || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="来源说明">{{ selectedNode.source || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="字段数">{{ selectedNode.column_count ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item v-if="selectedNode.category === 'field' || selectedNode.object_type === 'column'" label="字段名">{{ selectedNode.column_name || '-' }}</el-descriptions-item>
-        <el-descriptions-item v-if="selectedNode.category === 'field' || selectedNode.object_type === 'column'" label="数据类型">{{ selectedNode.data_type || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="行数统计">{{ selectedNode.row_count_stats || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="粒度">{{ selectedNode.grain || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="主键">{{ selectedNode.pk || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="纳入状态">{{ selectedNode.include_status || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="复核状态">{{ selectedNode.review_status || '-' }}</el-descriptions-item>
-      </el-descriptions>
-      <template #footer>
-        <el-button v-if="selectedNode && overviewLevel === 'object' && selectedNode.object_type !== 'column'" type="primary" @click="loadFieldGraph(selectedNode)">查看字段图谱</el-button>
-        <el-button v-if="selectedNode && selectedNode.object_type !== 'column'" @click="openTable(selectedNode)">打开表详情</el-button>
-        <el-button @click="selectedNodeId = ''">取消高亮</el-button>
-      </template>
-    </ReDetailDrawer>
-
-    <GraphEvidenceDrawer
-      v-model="drawerVisible"
-      :edge="selectedEdge"
-      :edge-key="selectedEdgeDetailKey"
-      :system-names="systemNameMap"
-      :source-names="sourceNameMap"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
 import ReEmptyState from "@/components/ReEmptyState/index.vue";
 import AdvancedRelationGraph from "@/views/asset/components/AdvancedRelationGraph.vue";
-import GraphEvidenceDrawer from "@/views/asset/components/GraphEvidenceDrawer.vue";
+import GraphInspector from "@/views/asset/components/GraphInspector.vue";
+import GraphLegendFilters from "@/views/asset/components/GraphLegendFilters.vue";
 import GraphToolbar, { type GraphEngine } from "@/views/asset/components/GraphToolbar.vue";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import { normalizeGraphData } from "@/views/asset/graph/graphNormalize";
@@ -261,14 +237,15 @@ import {
 } from "@/views/asset/graph/graphErrors";
 import { getGraph, getGraphDiagnostics, getGraphFilterOptions, getGraphNeighbors, getGraphOptions, getGraphOverview, getRelationPath, listSources, searchGraphTables, type GraphData, type GraphEdge, type GraphMeta, type GraphNode, type GraphOptionsData, type GraphViewMode, type GraphTableSearchItem, type RelationPathResult } from "@/api/asset";
 import { extractErrorDetail } from "@/utils/errorMessage";
+import { collapseExpansion, createExploreState, mergeExpansion } from "@/views/asset/graph/graphExploreState";
 
-type LayoutMode = "layered" | "grouped" | "radial" | "hierarchy";
+type LayoutMode = "force" | "layered" | "grouped" | "radial" | "hierarchy";
 
 const route = useRoute();
 const router = useRouter();
 const loading = ref(false);
-const drawerVisible = ref(false);
-const nodeDrawerVisible = ref(false);
+const inspectorOpen = ref(false);
+const graphRef = ref<{ focusNode?: (id: string) => Promise<void> } | null>(null);
 const selectedEdge = ref<GraphEdge | null>(null);
 const selectedNode = ref<GraphNode | null>(null);
 const selectedNodeId = ref("");
@@ -279,6 +256,10 @@ const graphEngine = ref<GraphEngine>("g6");
 const graphLoadNotice = ref("");
 const diagnosticWarnings = ref<string[]>([]);
 const graphData = ref<GraphData>({ nodes: [], edges: [] });
+let exploreState = createExploreState(graphData.value);
+const expansionPending = new Set<string>();
+const legendRelationTypes = ref(["formal", "candidate", "dependency"]);
+const legendConfidences = ref(["A", "B", "C", "D"]);
 const graphMeta = ref<GraphMeta | null>(null);
 const renderKey = ref(0);
 const options = reactive<GraphOptionsData>({ systems: [], sources: [], schemas: [], domains: [], validation_statuses: [], confidences: [], relation_types: [], view_modes: [] });
@@ -307,7 +288,7 @@ const filters = reactive({
   include_candidates: false,
   include_dependencies: false,
   show_review_layer: false,
-  layout_mode: "layered" as LayoutMode,
+  layout_mode: "force" as LayoutMode,
   aggregate_groups: false
 });
 
@@ -315,7 +296,7 @@ const locate = reactive({
   table: "",
   physical_key: "",
   search_results: [] as GraphTableSearchItem[],
-  depth: 1 as 1 | 2,
+  depth: 2 as 1 | 2 | 3,
   direction: "both" as "in" | "out" | "both"
 });
 
@@ -330,6 +311,14 @@ const errorIcon = computed(() => {
 });
 const errorDescription = computed(() => errorInfo.value?.description || "");
 const hasAnyData = computed(() => graphData.value.nodes.length > 0 || graphData.value.edges.length > 0);
+const visibleGraphData = computed<GraphData>(() => ({
+  ...graphData.value,
+  edges: graphData.value.edges.filter(edge => {
+    const relationType = edge.relation_type || "formal";
+    const confidence = edge.confidence || "A";
+    return legendRelationTypes.value.includes(relationType) && legendConfidences.value.includes(confidence);
+  })
+}));
 const selectedNodeDisplayKey = computed(() => selectedNode.value?.display_id || selectedNode.value?.id || "");
 const selectedEdgeDetailKey = computed(() => {
   const layer = selectedEdge.value?.relation_layer;
@@ -359,7 +348,7 @@ function applyModeDefaults(mode: GraphViewMode) {
     filters.confidence = "";
     filters.validation_status = "";
     // 概览默认 Neo4j 式力导向：系统分散，有关系则连线
-    filters.layout_mode = "layered";
+    filters.layout_mode = "force";
   }
 }
 
@@ -751,12 +740,13 @@ async function loadChain() {
       return;
     }
     graphData.value = res.data;
+    exploreState = createExploreState(res.data);
     graphMeta.value = res.data.meta || null;
     applyGraphLoadPolicy(res.data);
     centerTable.value = physicalKey;
     selectedNodeId.value = res.data.nodes[0]?.id || physicalKey;
     filters.keyword = physicalKey;
-    filters.layout_mode = "radial";
+    filters.layout_mode = "force";
     if (res.data.nodes.length && res.data.edges.length) {
       state.value = "success";
     } else {
@@ -774,6 +764,84 @@ async function loadChain() {
     if (seq === chainSeq) {
       loading.value = false;
     }
+  }
+}
+
+async function globalSearch() {
+  const query = locate.table.trim();
+  if (!query) return ElMessage.warning("请输入表名、中文名、Schema 或五段物理键");
+  try {
+  let physicalKey = query.split("|").length === 5 ? query : "";
+  if (!physicalKey) {
+    const response = await searchGraphTables({
+      q: query,
+      system_code: filters.system_code || undefined,
+      source_code: filters.source_code || undefined,
+      schema: filters.schema || undefined,
+      limit: 30
+    });
+    locate.search_results = response.data.items;
+    if (response.data.items.length !== 1) {
+      ElMessage.warning(response.data.items.length ? "存在多个同名资产，请从候选列表选择" : "未找到匹配资产");
+      return;
+    }
+    physicalKey = response.data.items[0].physical_key;
+  }
+  locate.physical_key = physicalKey;
+  const loaded = graphData.value.nodes.find(node => node.id === physicalKey);
+  if (!loaded) {
+    loading.value = true;
+    try {
+      const response = await getGraphNeighbors({
+        center_physical_key: physicalKey,
+        depth: 1,
+        direction: locate.direction,
+        limit: filters.limit,
+        include: graphData.value.nodes.map(node => node.id)
+      });
+      graphData.value = mergeExpansion(graphData.value, response.data, `search:${physicalKey}`, exploreState);
+      graphMeta.value = response.data.meta || graphMeta.value;
+    } finally {
+      loading.value = false;
+    }
+  }
+  selectedNode.value = graphData.value.nodes.find(node => node.id === physicalKey) || null;
+  selectedEdge.value = null;
+  selectedNodeId.value = physicalKey;
+  centerTable.value = physicalKey;
+  inspectorOpen.value = true;
+  filters.keyword = physicalKey;
+  await nextTick();
+  await graphRef.value?.focusNode?.(physicalKey);
+  } catch (error) {
+    const info = classifyGraphError(error);
+    state.value = info.state;
+    errorInfo.value = info;
+    ElMessage.warning(info.state === "permission_error" ? "你没有查看关系图谱的权限，请联系管理员申请 asset.graph.view" : info.description);
+  }
+}
+
+async function toggleNodeExpansion(node: GraphNode) {
+  if (filters.view_mode !== "explore" || expansionPending.has(node.id)) return;
+  if (exploreState.expanded.has(node.id)) {
+    graphData.value = collapseExpansion(graphData.value, node.id, exploreState, [selectedNodeId.value, centerTable.value, ...(pathResult.value?.path || [])]);
+    return;
+  }
+  expansionPending.add(node.id);
+  try {
+    const response = await getGraphNeighbors({
+      center_physical_key: node.id,
+      depth: 1,
+      direction: locate.direction,
+      limit: filters.limit,
+      include: graphData.value.nodes.map(item => item.id)
+    });
+    graphData.value = mergeExpansion(graphData.value, response.data, node.id, exploreState);
+    graphMeta.value = response.data.meta || graphMeta.value;
+  } catch (error) {
+    ElMessage.warning(extractErrorDetail(error, "邻域展开失败，当前画布已保留"));
+  } finally {
+    expansionPending.delete(node.id);
   }
 }
 
@@ -820,7 +888,7 @@ function resetFilters() {
   locate.physical_key = "";
   locate.search_results = [];
   fieldParentKey.value = "";
-  locate.depth = 1;
+  locate.depth = 2;
   locate.direction = "both";
   errorInfo.value = null;
   loadData();
@@ -861,7 +929,7 @@ async function loadFieldGraph(node: GraphNode) {
     filters.layout_mode = "radial";
     selectedNodeId.value = parent;
     centerTable.value = parent;
-    nodeDrawerVisible.value = false;
+    inspectorOpen.value = false;
     state.value = graphData.value.nodes.length ? "success" : "empty";
   } catch (err) {
     const info = classifyGraphError(err); state.value = info.state; errorInfo.value = info;
@@ -873,7 +941,7 @@ async function goOverviewLevel(level: "system" | "source" | "schema" | "object")
   fieldParentKey.value = "";
   centerTable.value = "";
   selectedNodeId.value = "";
-  nodeDrawerVisible.value = false;
+  inspectorOpen.value = false;
   if (level === "system") {
     filters.system_code = "";
     filters.source_code = "";
@@ -883,13 +951,13 @@ async function goOverviewLevel(level: "system" | "source" | "schema" | "object")
     filters.schema = "";
     overviewLevel.value = "schema";
   }
-  filters.layout_mode = level === "object" ? "radial" : "layered";
+  filters.layout_mode = level === "object" ? "radial" : "grouped";
   await loadData();
 }
 
 function selectNode(node: GraphNode) {
   if (node.category === "field" || node.object_type === "column") {
-    selectedNode.value = node; selectedNodeId.value = node.id; nodeDrawerVisible.value = true; return;
+    selectedNode.value = node; selectedNodeId.value = node.id; selectedEdge.value = null; inspectorOpen.value = true; return;
   }
   if (filters.view_mode === "overview") {
     if (node.category === "system" || (node.is_aggregate && !node.schema_name && !node.table_name)) {
@@ -897,7 +965,7 @@ function selectNode(node: GraphNode) {
       filters.source_code = "";
       filters.schema = "";
       overviewLevel.value = "schema";
-      filters.layout_mode = "layered";
+      filters.layout_mode = "grouped";
       void loadData();
       return;
     }
@@ -906,7 +974,7 @@ function selectNode(node: GraphNode) {
       filters.source_code = node.source_code || "";
       filters.schema = "";
       overviewLevel.value = "schema";
-      filters.layout_mode = "layered";
+      filters.layout_mode = "grouped";
       void loadData();
       return;
     }
@@ -914,7 +982,7 @@ function selectNode(node: GraphNode) {
       filters.system_code = node.system_code || filters.system_code;
       filters.schema = node.schema_name || "";
       overviewLevel.value = "object";
-      filters.layout_mode = "layered";
+      filters.layout_mode = "grouped";
       void loadData();
       return;
     }
@@ -925,12 +993,13 @@ function selectNode(node: GraphNode) {
   }
   selectedNode.value = node;
   selectedNodeId.value = node.id;
-  nodeDrawerVisible.value = true;
+  selectedEdge.value = null;
+  inspectorOpen.value = true;
 }
 
 function showEdge(edge: GraphEdge) {
   selectedEdge.value = edge;
-  drawerVisible.value = true;
+  inspectorOpen.value = true;
 }
 
 // 108号 P1-06：G6 失败自动回退 SVG
@@ -1003,6 +1072,9 @@ onBeforeUnmount(() => {
   margin-bottom: 12px;
   border-radius: var(--radius-base);
 }
+.graph-legend-filter { margin-bottom: 8px; }
+.graph-workspace { display:flex; align-items:stretch; gap:10px; }
+.graph-workspace .graph-wrap { flex:1; min-width:0; }
 
 .graph-breadcrumb {
   display: flex;
@@ -1024,7 +1096,7 @@ onBeforeUnmount(() => {
 }
 
 .graph-wrap {
-  min-height: calc(100vh - 400px);
+  min-height: calc(100vh - 280px);
   padding: 14px;
   overflow: hidden;
   /* 129号：知识图谱白底样式（参考图：浅色画布 + pastel 节点） */
@@ -1034,6 +1106,11 @@ onBeforeUnmount(() => {
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 24px rgb(15 23 42 / 8%);
+}
+
+@media (max-width: 1000px) {
+  .graph-workspace { display:block; }
+  .graph-workspace :deep(.inspector) { width:auto; min-width:0; margin-top:10px; }
 }
 
 .graph-wrap :deep(.el-loading-mask) {

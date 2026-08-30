@@ -173,6 +173,37 @@ class TestQueryIntakeDirect:
             )
         assert db.flush_calls == 1
 
+    def test_a9_unique_violation_recognizes_real_pg_shapes(self):
+        """161 P1-3（round-2 P6）：_is_unique_violation 两条识别路径对真实 PG 形态均可达。
+
+        既有假会话测试以字符串 pgcode="23505" 走 pgcode 路径；生产 psycopg 抛出的
+        真实形态是 psycopg2.errors.UniqueViolation 异常类（类名识别路径）。若实现
+        退化为只认其中一条路径，SQLite/PG 形态差异会让 A9 重试静默失效。
+        """
+        from sqlalchemy.exc import IntegrityError
+
+        from app.services.intake_version_retry import _is_unique_violation
+
+        class UniqueViolation(Exception):
+            """psycopg 真实形态：类名即语义，且带 pgcode 属性（双路径同时命中）。"""
+
+            pgcode = "23505"
+
+        class UniqueViolationNoPgcode(Exception):
+            """仅类名路径：无 pgcode 属性（getattr 默认 None）仍须识别。"""
+
+        class ForeignKeyViolation(Exception):
+            """非唯一键负例：pgcode 与类名均不命中。"""
+
+            pgcode = "23503"
+
+        def _err(orig):
+            return IntegrityError("stmt", None, orig)
+
+        assert _is_unique_violation(_err(UniqueViolation("duplicate key value"))) is True
+        assert _is_unique_violation(_err(UniqueViolationNoPgcode("duplicate key value"))) is True
+        assert _is_unique_violation(_err(ForeignKeyViolation("violates foreign key"))) is False
+
 
 # ══════════════════════════════════════════════════════════════
 # G1-2：metric_service 直测

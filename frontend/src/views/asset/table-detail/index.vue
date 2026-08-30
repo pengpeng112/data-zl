@@ -191,6 +191,93 @@
       </el-table>
     </el-card>
 
+    <el-card class="detail-card section-card" shadow="never">
+      <template #header>
+        字段值域 ({{ valueDomainRows.length }})
+        <span v-if="noDomainColumns.length" class="muted-count">
+          / {{ noDomainColumns.length }} 个字段暂无值域
+        </span>
+      </template>
+      <div v-if="valueDomainLoading" class="graph-loading">值域加载中...</div>
+      <template v-else>
+        <el-collapse v-if="groupedValueDomains.length > 0">
+          <el-collapse-item
+            v-for="group in groupedValueDomains"
+            :key="group.column"
+            :name="group.column"
+          >
+            <template #title>
+              <span class="vd-column-name">{{ group.column }}</span>
+              <el-tag size="small" type="info" class="vd-count">{{ group.rows.length }} 项</el-tag>
+              <el-tag
+                v-if="group.rows.some(r => r.domain_kind === 'trap')"
+                size="small"
+                type="danger"
+                class="vd-count"
+              >
+                含陷阱
+              </el-tag>
+              <el-tag
+                v-if="group.rows.some(r => r.conflict_status === 'conflicted')"
+                size="small"
+                type="warning"
+                class="vd-count"
+              >
+                冲突
+              </el-tag>
+            </template>
+            <el-table :data="group.rows" size="small" stripe>
+              <el-table-column prop="code" label="值码" width="100" show-overflow-tooltip />
+              <el-table-column prop="meaning" label="含义" min-width="180" show-overflow-tooltip />
+              <el-table-column label="类型" width="80" align="center">
+                <template #default="{ row }">
+                  <el-tag size="small" :type="row.domain_kind === 'trap' ? 'danger' : 'info'">
+                    {{ vdKindLabel(row.domain_kind) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="scope_condition"
+                label="适用条件"
+                min-width="120"
+                show-overflow-tooltip
+              />
+              <el-table-column label="状态" width="86" align="center">
+                <template #default="{ row }">
+                  <el-tag
+                    size="small"
+                    :type="
+                      row.status === 'confirmed'
+                        ? 'success'
+                        : row.status === 'pending'
+                          ? 'warning'
+                          : 'info'
+                    "
+                  >
+                    {{ vdStatusLabel(row.status) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="version_no" label="版本" width="64" align="center" />
+              <el-table-column label="来源" width="130" show-overflow-tooltip>
+                <template #default="{ row }">
+                  {{ row.evidence_count }} 条证据
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-collapse-item>
+        </el-collapse>
+        <el-empty
+          v-else
+          description="暂无值域"
+          :image-size="80"
+        />
+        <div v-if="noDomainColumns.length" class="no-domain-hint">
+          以下字段暂无值域：{{ noDomainColumns.join("、") }}
+        </div>
+      </template>
+    </el-card>
+
     <el-drawer v-model="edgeDrawerVisible" title="关系详情" size="500px">
       <el-descriptions
         v-if="selectedEdgeDetail"
@@ -307,12 +394,14 @@ import {
   getGraphNeighbors,
   updateTableAnnotation,
   updateColumnAnnotation,
+  listValueDomains,
   type TableDetail,
   type ColumnInfo,
   type RelationInfo,
   type GraphData,
   type GraphNode,
-  type GraphEdge
+  type GraphEdge,
+  type ValueDomainItem
 } from "@/api/asset";
 import { extractErrorDetail } from "@/utils/errorMessage";
 
@@ -329,6 +418,65 @@ const columns = ref<ColumnInfo[]>([]);
 const relations = ref<RelationInfo[]>([]);
 const neighborGraph = ref<GraphData>({ nodes: [], edges: [] });
 const neighborLoading = ref(true);
+
+// 166 F1：值域区块（列粒度分组；B9 必带当前表 system_code 防同名表串源）
+const valueDomainRows = ref<ValueDomainItem[]>([]);
+const valueDomainLoading = ref(true);
+
+const groupedValueDomains = computed(() => {
+  const groups = new Map<string, ValueDomainItem[]>();
+  for (const row of valueDomainRows.value) {
+    const list = groups.get(row.column_name) || [];
+    list.push(row);
+    groups.set(row.column_name, list);
+  }
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([column, rows]) => ({ column, rows }));
+});
+
+const noDomainColumns = computed(() => {
+  const covered = new Set(valueDomainRows.value.map(r => r.column_name));
+  return columns.value.map(c => c.column_name).filter(name => !covered.has(name));
+});
+
+function vdKindLabel(kind: string): string {
+  return { enum: "枚举", threshold: "阈值", literal: "字面量", trap: "陷阱" }[kind] || kind;
+}
+
+function vdStatusLabel(status: string): string {
+  return { pending: "待确认", confirmed: "已确认", deprecated: "已废弃" }[status] || status;
+}
+
+async function loadValueDomains() {
+  valueDomainLoading.value = true;
+  valueDomainRows.value = [];
+  const systemCode = detail.value?.system_code;
+  if (!systemCode) {
+    // B9：无 system_code 不发请求（防串源），显示暂无值域
+    valueDomainLoading.value = false;
+    return;
+  }
+  try {
+    // page_size=200 循环拉全，上限 5 页防失控（B9）
+    const MAX_PAGES = 5;
+    for (let pageNo = 1; pageNo <= MAX_PAGES; pageNo++) {
+      const res = await listValueDomains({
+        system_code: systemCode,
+        schema_name: schema,
+        table_name: table,
+        page: pageNo,
+        page_size: 200
+      } as any);
+      valueDomainRows.value.push(...res.data.items);
+      if (res.data.items.length < 200) break;
+    }
+  } catch {
+    valueDomainRows.value = [];
+  } finally {
+    valueDomainLoading.value = false;
+  }
+}
 const edgeDrawerVisible = ref(false);
 const selectedEdgeDetail = ref<GraphEdge | null>(null);
 
@@ -374,6 +522,7 @@ async function loadAll() {
     detail.value = dRes.data;
     columns.value = cRes.data;
     relations.value = rRes.data;
+    loadValueDomains();
   } catch (error: any) {
     detail.value = null;
     columns.value = [];
@@ -499,6 +648,21 @@ onMounted(loadAll);
   padding: 40px;
   color: var(--re-text-secondary);
   text-align: center;
+}
+
+.vd-column-name {
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+.vd-count {
+  margin-left: 6px;
+}
+
+.no-domain-hint {
+  margin-top: 8px;
+  color: var(--re-text-secondary);
+  font-size: 12px;
 }
 
 .dialog-action-row,

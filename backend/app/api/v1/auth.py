@@ -78,6 +78,11 @@ def _require_csrf(request: Request) -> None:
     B1：origin/referer 与允许源的比对必须是完整 origin 精确相等
     （scheme+host+port 全等、大小写归一），禁止前缀 startswith——
     否则 http://<allowed>.evil.com 可绕过。
+
+    161 P3-2（round-2 P9 裁决：文档化、不改行为）：任意非空 X-Requested-With
+    头直接放行 Origin 校验，是既定前提——前端 axios 默认携带该头，SPA 实际不走
+    Origin 匹配；本防护面向不带自定义头的表单/工具类请求。收紧会破坏非浏览器
+    工具，故仅在此登记。
     """
     if request.headers.get("X-Requested-With"):
         return

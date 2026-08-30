@@ -3,10 +3,20 @@
     <RePageHeader title="人员同步差异" subtitle="采集 HIS/HRP 等来源人员与科室数据，生成差异并进行人工处理；默认 HIS dry-run 不写入。">
       <template #icon><DiffIcon /></template>
       <template #actions>
-        <el-button v-perms="'identity.sync.run'" :loading="reviewLoading" type="warning" :icon="DiffIcon" @click="doReview">生成复核差异</el-button>
-        <el-button v-perms="'identity.sync.run'" :loading="hisSyncLoading" type="success" :icon="HisIcon" @click="doHisSync">HIS 预同步</el-button>
-        <el-button v-perms="'identity.sync.run'" :loading="collectLoading" :icon="CollectIcon" @click="doCollect">采集来源</el-button>
+        <!-- 146 E6（R5）：按钮收敛——保留主动作“生成差异”，其余同步动作收进下拉 -->
         <el-button v-perms="'identity.sync.run'" type="primary" :loading="syncLoading" :icon="DiffIcon" @click="doSync">生成差异</el-button>
+        <el-dropdown v-perms="'identity.sync.run'" trigger="click" @command="(cmd: string) => runSyncAction(cmd)">
+          <el-button :icon="MoreIcon">
+            更多同步动作<el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="collect" :disabled="collectLoading">采集来源</el-dropdown-item>
+              <el-dropdown-item command="his_sync" :disabled="hisSyncLoading">HIS 预同步（默认 dry-run）</el-dropdown-item>
+              <el-dropdown-item command="review" :disabled="reviewLoading">生成复核差异</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </template>
     </RePageHeader>
 
@@ -28,7 +38,21 @@
     <el-card shadow="never" class="diff-card">
       <ReToolbar title="同步参数" class="diff-toolbar">
         <div class="action-bar">
-          <el-input v-model="collectForm.source_code" placeholder="source_code" clearable class="control source" />
+          <!-- 146 E6（R5）：来源改动态加载（数据连接接口驱动），不再手输 source_code -->
+          <el-select
+            v-model="collectForm.source_code"
+            filterable
+            placeholder="选择来源数据连接"
+            :loading="sourceOptionsLoading"
+            class="control source"
+          >
+            <el-option
+              v-for="item in sourceOptions"
+              :key="item.source_code"
+              :label="item.source_name_cn ? `${item.source_name_cn}（${item.source_code}）` : item.source_code"
+              :value="item.source_code"
+            />
+          </el-select>
           <el-select v-model="collectForm.entity_type" class="control entity">
             <el-option label="科室" value="identity_department" />
             <el-option label="人员" value="identity_person" />
@@ -148,16 +172,30 @@
         </el-table-column>
       </el-table>
 
-      <el-drawer v-model="detailVisible" title="差异详情（不自动覆盖主数据）" size="40%">
+      <el-drawer v-model="detailVisible" title="差异详情（不自动覆盖主数据）" size="48%">
         <template v-if="detailRow">
           <p><b>类型</b>：{{ diffTypeLabel(detailRow.diff_type) }}</p>
           <p><b>编码</b>：{{ detailRow.entity_code }}</p>
           <p><b>建议</b>：{{ detailRow.merge_suggestion?.note || "—" }}</p>
           <p><b>prefer</b>：{{ detailRow.merge_suggestion?.prefer_source_table || "—" }}</p>
           <el-divider />
-          <p class="muted">before_data</p>
+          <!-- 146 E6（R5）：字段级 diff（差异前 → 差异后，仅展示不一致字段） -->
+          <p class="muted">字段差异（before → after）</p>
+          <el-table v-if="detailFieldDiff.length" :data="detailFieldDiff" size="small" border max-height="260">
+            <el-table-column prop="field" label="字段" min-width="140" show-overflow-tooltip />
+            <el-table-column prop="before" label="差异前" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="after" label="差异后" min-width="150" show-overflow-tooltip />
+            <el-table-column label="是否变化" width="90" align="center">
+              <template #default="{ row }">
+                <el-tag size="small" :type="row.changed ? 'warning' : 'info'">{{ row.changed ? "不一致" : "一致" }}</el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+          <p v-else class="muted">无可比对的字段数据（before/after 为空）。</p>
+          <el-divider />
+          <p class="muted">before_data 原始 JSON</p>
           <pre class="json-box">{{ formatJson(detailRow.before_data) }}</pre>
-          <p class="muted">after_data</p>
+          <p class="muted">after_data 原始 JSON</p>
           <pre class="json-box">{{ formatJson(detailRow.after_data) }}</pre>
           <div
             v-if="detailRow.status === 'open' && (detailRow.entity_type === 'identity_person' || detailRow.entity_type === 'identity_department')"
@@ -263,6 +301,7 @@ import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
+import { ArrowDown } from "@element-plus/icons-vue";
 import {
   approveIdentityChangeRequest,
   batchApproveIdentityChangeRequests,
@@ -279,13 +318,50 @@ import {
   syncHisIdentity,
   updateIdentitySyncDiff
 } from "@/api/identity";
+import { listSources } from "@/api/asset";
 import { usePagedList } from "@/composables/usePagedList";
-import CheckIcon from "~icons/ri/checkbox-circle-line";
-import CollectIcon from "~icons/ri/download-cloud-2-line";
+import {
+  buildSyncDiffFieldDiff,
+  syncSeverityLabel,
+  syncSeverityTag,
+  syncDiffStatusLabel,
+  syncDiffStatusTag
+} from "@/composables/useSyncDiffPanel";
+import { extractErrorDetail } from "@/utils/errorMessage";
 import DiffIcon from "~icons/ri/git-branch-line";
-import HisIcon from "~icons/ri/database-2-line";
+import MoreIcon from "~icons/ri/more-line";
+import CheckIcon from "~icons/ri/checkbox-circle-line";
 import IgnoreIcon from "~icons/ri/forbid-2-line";
 import OpenIcon from "~icons/ri/error-warning-line";
+
+// 146 E6（R5）：来源选项动态加载（数据连接接口驱动）
+const sourceOptions = ref<Array<{ source_code: string; source_name_cn?: string | null }>>([]);
+const sourceOptionsLoading = ref(false);
+async function loadSourceOptions() {
+  sourceOptionsLoading.value = true;
+  try {
+    const res = await listSources();
+    sourceOptions.value = (res.data || []).map(item => ({
+      source_code: item.source_code,
+      source_name_cn: item.source_name_cn
+    }));
+    if (sourceOptions.value.length && !sourceOptions.value.some(item => item.source_code === collectForm.source_code)) {
+      collectForm.source_code = sourceOptions.value[0].source_code;
+    }
+  } catch {
+    // 来源选项加载失败时保留当前默认值，动作发起时由后端校验
+    sourceOptions.value = [];
+  } finally {
+    sourceOptionsLoading.value = false;
+  }
+}
+
+// 146 E6（R5）：按钮收敛后的统一动作分发
+function runSyncAction(command: string) {
+  if (command === "collect") void doCollect();
+  else if (command === "his_sync") void doHisSync();
+  else if (command === "review") void doReview();
+}
 
 const collectLoading = ref(false);
 const syncLoading = ref(false);
@@ -296,6 +372,8 @@ const proposingId = ref<number | null>(null);
 const lastResult = ref<any>(null);
 const detailVisible = ref(false);
 const detailRow = ref<any>(null);
+// 146 E6（R5）：详情抽屉字段级 diff（共享 composable 提供）
+const detailFieldDiff = computed(() => buildSyncDiffFieldDiff(detailRow.value?.before_data, detailRow.value?.after_data));
 const changeRequests = ref<any[]>([]);
 const crLoading = ref(false);
 const crActingId = ref<number | null>(null);
@@ -346,18 +424,16 @@ const resultTitle = computed(() => {
 });
 
 function severityTag(severity: string): "danger" | "warning" | "info" {
-  return severity === "high" ? "danger" : severity === "medium" ? "warning" : "info";
-}
-function statusTag(status: string): "success" | "warning" | "info" {
-  return status === "resolved" ? "success" : status === "ignored" ? "info" : "warning";
+  return syncSeverityTag(severity);
 }
 function severityLabel(value: string) {
-  const map: Record<string, string> = { high: "高", medium: "中", low: "低" };
-  return map[value] || value || "-";
+  return syncSeverityLabel(value);
+}
+function statusTag(status: string): "success" | "warning" | "info" {
+  return syncDiffStatusTag(status);
 }
 function statusLabel(value: string) {
-  const map: Record<string, string> = { open: "未处理", resolved: "已解决", ignored: "已忽略" };
-  return map[value] || value || "-";
+  return syncDiffStatusLabel(value);
 }
 function entityTypeLabel(value: string) {
   const map: Record<string, string> = { identity_department: "科室", identity_person: "人员", identity_all: "全部" };
@@ -412,8 +488,9 @@ async function doCollect() {
     lastResult.value = res.data;
     ElMessage.success("来源采集完成");
     loadData();
-  } catch {
-    ElMessage.error("来源采集失败");
+  } catch (error) {
+    // 161 P2-2（round-2 P11）：动作 catch 与列表加载对称，走 extractErrorDetail。
+    ElMessage.error(extractErrorDetail(error, "来源采集失败"));
   } finally {
     collectLoading.value = false;
   }
@@ -430,8 +507,8 @@ async function doSync() {
     lastResult.value = runs.length === 1 ? runs[0] : { runs };
     ElMessage.success("差异生成完成");
     loadData();
-  } catch {
-    ElMessage.error("差异生成失败");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "差异生成失败"));
   } finally {
     syncLoading.value = false;
   }
@@ -456,8 +533,8 @@ async function doReview() {
     lastResult.value = res.data;
     ElMessage.success(`复核差异已生成：${res.data?.diffs_created ?? 0} 条（不自动覆盖）`);
     loadData();
-  } catch {
-    ElMessage.error("生成复核差异失败");
+  } catch (error) {
+    ElMessage.error(extractErrorDetail(error, "生成复核差异失败"));
   } finally {
     reviewLoading.value = false;
   }
@@ -622,6 +699,7 @@ async function doExecuteCr(row: any) {
 }
 
 onMounted(() => {
+  void loadSourceOptions();
   loadData();
   loadChangeRequests();
 });

@@ -18,6 +18,11 @@ class AiQualityCreateRequest(AiQualityPreviewRequest):
     input_digest: str = Field(min_length=64, max_length=64, pattern=r"^[0-9a-f]{64}$")
 
 
+class AiPatrolRunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    patrol_run_id: str | None = Field(default=None, pattern=r"^patrol-[0-9]{8}T[0-9]{6}(?:-[a-f0-9]{6})?$")
+
+
 class AiQualityReviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["accepted", "rejected", "partial"]

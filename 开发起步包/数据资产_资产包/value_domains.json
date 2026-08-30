@@ -1,15 +1,15 @@
 {
   "schema_version": "value-domains/v1",
-  "generated_at": "2026-08-24T23:57:45.365263+00:00",
+  "generated_at": "2026-08-29T04:21:50.979878+00:00",
   "max_age_days": 7,
   "counts": {
-    "injected_confirmed": 19,
-    "confirmed": 19,
-    "pending": 2,
+    "injected_confirmed": 26,
+    "confirmed": 26,
+    "pending": 51,
     "deprecated": 0,
     "conflicted": 0
   },
-  "content_sha256": "sha256:971d5601229388fe04d843690463b6d1a9655985133e0f0a023ed857da294876",
+  "content_sha256": "sha256:806eb4f24d483dfd4251449d6e1576ecce8391c383f73da3566da0506ff3ac9e",
   "domains": [
     {
       "id": 18,
@@ -25,7 +25,7 @@
       "scope_condition": "病理免疫组化统计：HIS 收费明细主项目",
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.243828+08:00"
+      "updated_at": "2026-08-29T12:21:37.087971+08:00"
     },
     {
       "id": 19,
@@ -41,7 +41,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.255986+08:00"
+      "updated_at": "2026-08-29T12:21:37.101955+08:00"
     },
     {
       "id": 11,
@@ -57,7 +57,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.153353+08:00"
+      "updated_at": "2026-08-29T12:21:36.950300+08:00"
     },
     {
       "id": 12,
@@ -73,7 +73,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.165609+08:00"
+      "updated_at": "2026-08-29T12:21:36.965686+08:00"
     },
     {
       "id": 13,
@@ -89,7 +89,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.177920+08:00"
+      "updated_at": "2026-08-29T12:21:36.995826+08:00"
     },
     {
       "id": 14,
@@ -105,7 +105,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.193377+08:00"
+      "updated_at": "2026-08-29T12:21:37.022218+08:00"
     },
     {
       "id": 15,
@@ -121,7 +121,87 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.205700+08:00"
+      "updated_at": "2026-08-29T12:21:37.038282+08:00"
+    },
+    {
+      "id": 22,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT",
+      "code": "1",
+      "meaning": "治愈",
+      "note": "PORTAL 字典 DISCHARGE_STATUS_CODE（出院情况编码）；GB_CODE=1（1）；TREAT_RESULT 陷阱：数字码走 JHEMR DISCHARGE_CONDITIONS 语义（SOURCE 拆分实证）；COMM.DISCHARGE_DISPOSITION_DICT（2转院/3死亡/4好转）与本字段不符勿用；PORTAL DISCHARGE_STATUS_CODE 1=好转 为被否证据",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 2,
+      "updated_at": "2026-08-29T12:21:41.069034+08:00"
+    },
+    {
+      "id": 74,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT",
+      "code": "2",
+      "meaning": "好转",
+      "note": "TREAT_RESULT 陷阱：数字码走 JHEMR DISCHARGE_CONDITIONS 语义（SOURCE 拆分实证）；COMM.DISCHARGE_DISPOSITION_DICT（2转院/3死亡/4好转）与本字段不符勿用；PORTAL DISCHARGE_STATUS_CODE 1=好转 为被否证据",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 1,
+      "updated_at": "2026-08-29T12:21:41.087677+08:00"
+    },
+    {
+      "id": 75,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT",
+      "code": "3",
+      "meaning": "未愈",
+      "note": "TREAT_RESULT 陷阱：数字码走 JHEMR DISCHARGE_CONDITIONS 语义（SOURCE 拆分实证）；COMM.DISCHARGE_DISPOSITION_DICT（2转院/3死亡/4好转）与本字段不符勿用；PORTAL DISCHARGE_STATUS_CODE 1=好转 为被否证据",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 1,
+      "updated_at": "2026-08-29T12:21:41.108459+08:00"
+    },
+    {
+      "id": 76,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT",
+      "code": "4",
+      "meaning": "死亡",
+      "note": "TREAT_RESULT 陷阱：数字码走 JHEMR DISCHARGE_CONDITIONS 语义（SOURCE 拆分实证）；COMM.DISCHARGE_DISPOSITION_DICT（2转院/3死亡/4好转）与本字段不符勿用；PORTAL DISCHARGE_STATUS_CODE 1=好转 为被否证据",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 1,
+      "updated_at": "2026-08-29T12:21:41.126970+08:00"
+    },
+    {
+      "id": 77,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT",
+      "code": "9",
+      "meaning": "其他",
+      "note": "TREAT_RESULT 陷阱：数字码走 JHEMR DISCHARGE_CONDITIONS 语义（SOURCE 拆分实证）；COMM.DISCHARGE_DISPOSITION_DICT（2转院/3死亡/4好转）与本字段不符勿用；PORTAL DISCHARGE_STATUS_CODE 1=好转 为被否证据",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 1,
+      "updated_at": "2026-08-29T12:21:41.144660+08:00"
     },
     {
       "id": 8,
@@ -137,7 +217,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.114677+08:00"
+      "updated_at": "2026-08-29T12:21:36.903769+08:00"
     },
     {
       "id": 9,
@@ -153,7 +233,23 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.127796+08:00"
+      "updated_at": "2026-08-29T12:21:36.917794+08:00"
+    },
+    {
+      "id": 10,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "OPERATION",
+      "column_name": "OPERATION_EMER_INDICATOR",
+      "code": "3",
+      "meaning": "期限手术（限期）",
+      "note": "148 标注语义待核（2025 泌尿科 10 台；另有空值约 5 台）；人工核实前不得用于统计口径",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 2,
+      "updated_at": "2026-08-29T12:21:41.049425+08:00"
     },
     {
       "id": 7,
@@ -169,7 +265,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.101784+08:00"
+      "updated_at": "2026-08-29T12:21:36.890458+08:00"
     },
     {
       "id": 1,
@@ -180,12 +276,12 @@
       "column_name": "DISCHARGE_DISPOSITION",
       "code": "1",
       "meaning": "医嘱离院",
-      "note": "占绝对多数（2026-08 实测 3,169+ 例）",
+      "note": "占绝对多数（2026-08 实测 3,169+ 例）；W3 裁决(2026-08-29 用户授权)：采信 confirmed=医嘱离院，PORTAL 字典 1=自行离开 语义错误仅存被否证据",
       "domain_kind": "enum",
       "scope_condition": null,
       "status": "confirmed",
-      "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.010660+08:00"
+      "version_no": 2,
+      "updated_at": "2026-08-29T12:21:40.999474+08:00"
     },
     {
       "id": 2,
@@ -201,7 +297,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.025726+08:00"
+      "updated_at": "2026-08-29T12:21:36.798443+08:00"
     },
     {
       "id": 3,
@@ -217,7 +313,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.042922+08:00"
+      "updated_at": "2026-08-29T12:21:36.820723+08:00"
     },
     {
       "id": 4,
@@ -233,7 +329,23 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.055991+08:00"
+      "updated_at": "2026-08-29T12:21:36.836500+08:00"
+    },
+    {
+      "id": 5,
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "PAT_VISIT",
+      "column_name": "DISCHARGE_DISPOSITION",
+      "code": "9",
+      "meaning": "其他",
+      "note": "148 标注语义待核：2025-08 仅出现 2 例；人工核实前不得用于统计口径",
+      "domain_kind": "enum",
+      "scope_condition": null,
+      "status": "confirmed",
+      "version_no": 2,
+      "updated_at": "2026-08-29T12:21:41.028671+08:00"
     },
     {
       "id": 6,
@@ -249,7 +361,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.085909+08:00"
+      "updated_at": "2026-08-29T12:21:36.872783+08:00"
     },
     {
       "id": 21,
@@ -265,7 +377,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.280035+08:00"
+      "updated_at": "2026-08-29T12:21:37.130600+08:00"
     },
     {
       "id": 20,
@@ -281,7 +393,7 @@
       "scope_condition": null,
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.267482+08:00"
+      "updated_at": "2026-08-29T12:21:37.116734+08:00"
     },
     {
       "id": 16,
@@ -297,7 +409,7 @@
       "scope_condition": "麻醉台数统计：MED_OPERATION_MASTER 且 OPER_STATUS>=35",
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.219471+08:00"
+      "updated_at": "2026-08-29T12:21:37.052144+08:00"
     },
     {
       "id": 17,
@@ -313,7 +425,7 @@
       "scope_condition": "手术统计排除口径：OPER_STATUS=-80",
       "status": "confirmed",
       "version_no": 1,
-      "updated_at": "2026-08-25T07:57:17.232504+08:00"
+      "updated_at": "2026-08-29T12:21:37.067081+08:00"
     }
   ]
 }

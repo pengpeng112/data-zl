@@ -57,7 +57,17 @@
       </ReToolbar>
       <p class="impact-hint">先选业务系统和库，表清单会从资产库带出；也可直接输入中文名或表名搜索，不必手敲完整 SCHEMA.TABLE。</p>
 
-      <div v-if="impactResult" class="impact-result">
+      <div v-if="impactError" class="impact-result">
+        <ReEmptyState
+          variant="error"
+          title="影响分析失败"
+          :description="impactError"
+          retryable
+          @retry="runImpact"
+        />
+      </div>
+
+      <div v-else-if="impactResult" class="impact-result">
         <section class="impact-stats">
           <ReStatCard label="引用视图数" :value="impactResult.total_views" tone="primary" />
           <ReStatCard label="关联关系数" :value="impactResult.total_relations" tone="accent" />
@@ -107,7 +117,16 @@
         <template #actions><el-button type="primary" :icon="SearchIcon" @click="loadDeps">查询</el-button></template>
       </ReToolbar>
 
-      <el-table v-loading="depsLoading" :data="depsItems" stripe class="medical-data-table">
+      <!-- 146 E10（R5）：依赖表加载失败显式错误态 + 重试（不再静默） -->
+      <ReEmptyState
+        v-if="depsError"
+        variant="error"
+        title="视图依赖加载失败"
+        :description="depsError"
+        retryable
+        @retry="loadDeps"
+      />
+      <el-table v-else v-loading="depsLoading" :data="depsItems" stripe class="medical-data-table">
         <el-table-column prop="view_name" label="ODS 视图" min-width="220" show-overflow-tooltip />
         <el-table-column prop="referenced_schema" label="被引用 Schema" width="140" />
         <el-table-column prop="referenced_table" label="被引用表" min-width="220" show-overflow-tooltip />
@@ -154,6 +173,9 @@ const schemaName = ref("");
 const impactTable = ref("");
 const impactLoading = ref(false);
 const impactResult = ref<ImpactResult | null>(null);
+// 146 E10（R5）：影响分析/视图依赖的真实错误态（失败原因 + 重试）
+const impactError = ref("");
+const depsError = ref("");
 const optionsLoading = ref(false);
 const schemaLoading = ref(false);
 const tableSearching = ref(false);
@@ -174,7 +196,14 @@ const depTableOptions = ref<ImpactTableOption[]>([]);
 function runImpact() {
   if (!impactTable.value.trim()) { ElMessage.warning("请选择或搜索要分析的表"); return; }
   impactLoading.value = true;
-  getImpactAnalysis(impactTable.value.trim()).then(({ data }) => { impactResult.value = data; }).catch(() => { impactResult.value = null; }).finally(() => { impactLoading.value = false; });
+  impactError.value = "";
+  getImpactAnalysis(impactTable.value.trim())
+    .then(({ data }) => { impactResult.value = data; })
+    .catch(error => {
+      impactResult.value = null;
+      impactError.value = extractErrorDetail(error, "影响分析失败，请稍后重试");
+    })
+    .finally(() => { impactLoading.value = false; });
 }
 
 function expandInGraph() {
@@ -186,8 +215,14 @@ function expandInGraph() {
 
 function loadDeps() {
   depsLoading.value = true;
+  depsError.value = "";
   getViewDependencies({ page: depPage.value, page_size: depPageSize.value, view: depView.value || undefined, referenced_table: depTable.value || undefined })
     .then(({ data }) => { depsItems.value = data.items; depsTotal.value = data.total; })
+    .catch(error => {
+      depsItems.value = [];
+      depsTotal.value = 0;
+      depsError.value = extractErrorDetail(error, "视图依赖加载失败，请稍后重试");
+    })
     .finally(() => { depsLoading.value = false; });
 }
 
@@ -202,6 +237,8 @@ async function loadCatalogOptions() {
       ? data.schema_options
       : (data.schemas || []).map(value => ({ value, label: value }));
     if (!systemCode.value) schemaOptions.value = allSchemaOptions.value;
+  } catch {
+    // 选项属于可选资源：失败降级为手输模式，不阻断主流程（D1 口径）
   } finally {
     optionsLoading.value = false;
   }

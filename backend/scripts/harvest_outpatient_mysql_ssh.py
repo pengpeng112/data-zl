@@ -8,27 +8,54 @@ import csv
 import io as _io
 import json
 import os
+import shlex
 import sys
+import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 import paramiko
 
 JUMP = ("10.10.8.83", 22)
-JUMP_KEY = r"C:\Users\Administrator\.ssh\id_ed25519_ai"
 TARGET = "10.10.8.161"
 MYSQL = "/usr/bin/mysql"
 SYSTEM_DATABASES = ("information_schema", "mysql", "performance_schema", "sys")
 
 
-def run_tsv(target, sql: str) -> list[dict]:
-    cmd = f"{MYSQL} -N -B --raw -e {json.dumps(sql)}"
-    _, stdout, stderr = target.exec_command(cmd, timeout=300)
-    text = stdout.read().decode("utf-8", "replace")
-    err = stderr.read().decode("utf-8", "replace").strip()
-    if err:
-        raise RuntimeError(f"mysql error: {err[:300]}")
-    reader = csv.DictReader(_io.StringIO(text), delimiter="\t", quoting=csv.QUOTE_NONE)
-    return [dict(row) for row in reader]
+def _load_known_hosts(client: paramiko.SSHClient, env_name: str) -> None:
+    """Load trusted host keys and fail closed when the host is unknown."""
+    client.load_system_host_keys()
+    default_file = Path.home() / ".ssh" / "known_hosts"
+    configured = os.environ.get(env_name)
+    if configured:
+        client.load_host_keys(configured)
+    elif default_file.exists():
+        client.load_host_keys(str(default_file))
+    client.set_missing_host_key_policy(paramiko.RejectPolicy())
+
+
+def _mysql_option_value(value: str) -> str:
+    if "\x00" in value or "\n" in value or "\r" in value:
+        raise ValueError("MySQL credential values may not contain NUL or newlines")
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _mysql_command(option_file: str, sql: str) -> str:
+    return " ".join(
+        [
+            shlex.quote(MYSQL),
+            f"--defaults-extra-file={shlex.quote(option_file)}",
+            "-N",
+            "-B",
+            "--raw",
+            "-e",
+            shlex.quote(sql),
+        ]
+    )
+
+
+def _sql_literal(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
 
 
 def main() -> int:
@@ -37,18 +64,19 @@ def main() -> int:
     db_user = os.environ.get("OUTPATIENT_DB_USER", "root")
     db_pass = os.environ["OUTPATIENT_DB_PASSWORD"]
     output = os.environ.get("OUTPATIENT_OUTPUT", "outpatient_snapshot.json")
+    jump_key = os.environ.get(
+        "OUTPATIENT_JUMP_KEY_FILE",
+        str(Path.home() / ".ssh" / "id_ed25519_ai"),
+    )
 
     jump = paramiko.SSHClient()
-    jump.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    jump.connect(JUMP[0], JUMP[1], username="root", key_filename=JUMP_KEY, timeout=15, allow_agent=False, look_for_keys=False)
-    channel = jump.get_transport().open_channel("direct-tcpip", (TARGET, 22), ("127.0.0.1", 0))
     target = paramiko.SSHClient()
-    target.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    target.connect(TARGET, 22, username=ssh_user, password=ssh_pass, sock=channel, timeout=15, allow_agent=False, look_for_keys=False)
-    target.exec_command(f"export MYSQL_PWD={db_pass}")  # env applies per-session below
+    option_file = f"/tmp/data_asset_mysql_{uuid.uuid4().hex}.cnf"
+    _load_known_hosts(jump, "OUTPATIENT_JUMP_KNOWN_HOSTS")
+    _load_known_hosts(target, "OUTPATIENT_TARGET_KNOWN_HOSTS")
 
     def mysql_tsv(sql: str) -> list[dict]:
-        cmd = f"if [ -s /tmp/.mpw ]; then MYSQL_PWD=$(cat /tmp/.mpw) {MYSQL} -u{db_user} -N -B --raw -e {json.dumps(sql)}; else {MYSQL} -u{db_user} -N -B --raw -e {json.dumps(sql)}; fi"
+        cmd = _mysql_command(option_file, sql)
         _, stdout, stderr = target.exec_command(cmd, timeout=600)
         text = stdout.read().decode("utf-8", "replace")
         err = stderr.read().decode("utf-8", "replace").strip()
@@ -56,19 +84,34 @@ def main() -> int:
             raise RuntimeError(f"mysql error: {err[:300]}")
         return [dict(row) for row in csv.DictReader(_io.StringIO(text), delimiter="\t", quoting=csv.QUOTE_NONE)]
 
-    # keep the password off the command line: write 0600 temp file once
-    sftp = target.open_sftp()
-    # empty file => auth_socket passwordless root path
-    with sftp.file("/tmp/.mpw", "w") as fh:
-        fh.write(db_pass if os.environ.get("OUTPATIENT_DB_USE_PASSWORD", "1") == "1" else "")
-    sftp.chmod("/tmp/.mpw", 0o600)
-
     try:
+        jump.connect(JUMP[0], JUMP[1], username="root", key_filename=jump_key, timeout=15, allow_agent=False, look_for_keys=False)
+        transport = jump.get_transport()
+        if transport is None:
+            raise RuntimeError("SSH jump transport unavailable")
+        channel = transport.open_channel("direct-tcpip", (TARGET, 22), ("127.0.0.1", 0))
+        target.connect(TARGET, 22, username=ssh_user, password=ssh_pass, sock=channel, timeout=15, allow_agent=False, look_for_keys=False)
+
+        # A unique 0600 option file keeps credentials out of command arguments.
+        option_lines = ["[client]", f"user={_mysql_option_value(db_user)}"]
+        if os.environ.get("OUTPATIENT_DB_USE_PASSWORD", "1") == "1":
+            option_lines.append(f"password={_mysql_option_value(db_pass)}")
+        sftp = target.open_sftp()
+        try:
+            with sftp.file(option_file, "x") as fh:
+                # Tighten permissions before any credential bytes are written.
+                sftp.chmod(option_file, 0o600)
+                fh.write("\n".join(option_lines) + "\n")
+        finally:
+            sftp.close()
+
         version = mysql_tsv("SELECT VERSION() v")[0]["v"]
-        exclude = ",".join(f"'{d}'" for d in SYSTEM_DATABASES)
+        exclude = ",".join(_sql_literal(d) for d in SYSTEM_DATABASES)
         databases = [r["schema_name"] for r in mysql_tsv(
             f"SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ({exclude}) ORDER BY schema_name")]
-        db_filter = ",".join(f"'{d}'" for d in databases)
+        if not databases:
+            raise RuntimeError("no non-system MySQL databases are visible to the supplied account")
+        db_filter = ",".join(_sql_literal(d) for d in databases)
 
         tables = mysql_tsv(f"""
             SELECT TABLE_SCHEMA database_name, TABLE_NAME table_name, TABLE_TYPE table_type,
@@ -114,9 +157,23 @@ def main() -> int:
              ORDER BY TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX
         """)
     finally:
-        target.exec_command("rm -f /tmp/.mpw")
+        cleanup_error = None
+        if target.get_transport() is not None:
+            cleanup_sftp = None
+            try:
+                cleanup_sftp = target.open_sftp()
+                cleanup_sftp.remove(option_file)
+            except FileNotFoundError:
+                pass
+            except Exception as exc:
+                cleanup_error = exc
+            finally:
+                if cleanup_sftp is not None:
+                    cleanup_sftp.close()
         target.close()
         jump.close()
+        if cleanup_error is not None:
+            raise RuntimeError("failed to remove remote temporary MySQL option file") from cleanup_error
 
     views = [t for t in tables if str(t.get("table_type", "")).upper() == "VIEW"]
     real_tables = [t for t in tables if str(t.get("table_type", "")).upper() != "VIEW"]

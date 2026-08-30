@@ -186,6 +186,7 @@ def import_results(
     request: Request = None,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
-    user = "system"
+    # 161 P1-2（round-2 P3）：审计归因取真实操作人，缺省兜底 system。
+    user = get_request_operator(request, default="system")
     data = import_all_result_csvs(db, dry_run=dry_run, created_by=user)
     return ApiResponse(data=data)

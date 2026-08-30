@@ -1,0 +1,32 @@
+{
+ "code": "T5",
+ "probe_type": "R-CNT",
+ "name": "检查线申请→执行→报告回写率",
+ "severity_default": "P1",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT COUNT(*) AS APPLIED, SUM(CASE WHEN EXAM_DATE_TIME IS NOT NULL THEN 1 ELSE 0 END) AS EXECUTED, SUM(CASE WHEN REPORT_DATE_TIME IS NOT NULL THEN 1 ELSE 0 END) AS REPORTED FROM EXAM.EXAM_MASTER WHERE REQ_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND REQ_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD')"
+  }
+ ],
+ "derive": {
+  "metric": "exam_report_writeback_rate",
+  "formula": "reported/applied*100",
+  "unit": "%",
+  "extra_metrics": [
+   "applied",
+   "executed",
+   "reported"
+  ]
+ },
+ "trigger": {
+  "op": "lt",
+  "threshold": 90.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "EXAM.EXAM_MASTER 报告时间回写率",
+ "large_table_guard": null
+}

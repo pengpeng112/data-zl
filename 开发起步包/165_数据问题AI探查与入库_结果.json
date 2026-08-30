@@ -1,0 +1,47 @@
+{
+  "plan": "165_数据问题AI探查与入库执行计划.md (v1.2)",
+  "closed_at": "2026-08-30",
+  "outcome": "E1-E6 隔离库完成；生产 apply 待授权（X1-X4）",
+  "window": {"kind": "last-full-month+today-cut", "start": "2026-07-01", "end": "2026-08-30"},
+  "runs": [
+    {"run_id": "probe-20260830-082738", "status": "failed", "note": "缺陷一：写侧未指 --write-db，零落库"},
+    {"run_id": "probe-20260830-082838", "status": "failed", "note": "同上"},
+    {"run_id": "probe-20260830-092312", "status": "partial_trial", "note": "缺陷二暴露（T2 恒0.0）；定性试跑，两表清空重做，JSON 留存 runs/，审计行保留", "probe_count": 12, "finding_new": 5},
+    {"run_id": "probe-20260830-094723", "status": "partial", "role": "正式首轮", "probe_count": 12, "finding_new": 6, "finding_updated": 0, "relapse_count": 0, "blocked": ["T7 计划内 BLOCKED（ODS.PACSREPORT 无申请键，164 §5 口径）"]},
+    {"run_id": "probe-20260830-094820", "status": "partial", "role": "同窗收敛轮", "probe_count": 12, "finding_new": 0, "finding_updated": 6, "relapse_count": 0, "convergence": "PASS", "blocked": ["T7 同上"]}
+  ],
+  "findings": [
+    {"probe_type": "R-REF", "system_pair": "HIS(单库)", "object_desc": "EXAM.EXAM_MASTER.DOCTOR_USER 缺失率", "metric_name": "doctor_code_missing_rate", "metric_value": 81.3745, "unit": "%", "severity": "P2", "template": "T1"},
+    {"probe_type": "R-REF", "system_pair": "HIS(单库)", "object_desc": "MEDREC.OPERATION.ANESTHESIA_DOCTOR 缺失率", "metric_name": "anes_doctor_missing_rate", "metric_value": 10.5801, "unit": "%", "severity": "P3", "template": "T10"},
+    {"probe_type": "R-XSYS", "system_pair": "HIS↔JHEMR", "object_desc": "TREAT_RESULT HIS↔JHEMR 语义桶差异率（152 E5 映射）", "metric_name": "treat_result_bucket_max_diff_rate", "metric_value": 43.2157, "unit": "%", "severity": "P2", "template": "T11"},
+    {"probe_type": "R-CNT", "system_pair": "HIS(单库)", "object_desc": "EXAM.EXAM_MASTER 报告时间回写率", "metric_name": "exam_report_writeback_rate", "metric_value": 34.4784, "unit": "%", "severity": "P1", "template": "T5"},
+    {"probe_type": "R-CNT", "system_pair": "HIS↔LIS", "object_desc": "LAB.LAB_TEST_MASTER 与 LIS.lab_report 月度数量对账", "metric_name": "lab_month_cnt_max_diff_rate", "metric_value": 5.8018, "unit": "%", "severity": "P2", "template": "T6"},
+    {"probe_type": "R-REF", "system_pair": "HIS(单库)", "object_desc": "EXAM 申请医生姓名与 STAFF_DICT 不一致率", "metric_name": "doctor_name_mismatch_rate", "metric_value": 4.9302, "unit": "%", "severity": "P2", "template": "T2"}
+  ],
+  "finding_status": "全部 open（执行器只写 open/观测/relapse；终态归人工 X3/166）",
+  "baseline_comparison": [
+    {"template": "T1", "run": 81.3745, "baseline_164s2": 83.2, "deviation_pp": 1.83, "verdict": "PASS"},
+    {"template": "T2", "run": 4.9302, "baseline_164s2": 5.97, "deviation_pp": 1.04, "verdict": "PASS(pp)；相对口径17.4%注记 WARN-3（窗口不一致）"},
+    {"template": "T5", "run": 34.4784, "baseline_164s2": 35.5, "deviation_pp": 1.02, "verdict": "PASS"},
+    {"template": "T10", "run": 10.5801, "baseline_164s2": null, "verdict": "无对应基线（164 §2 未测手术线），如实记录"}
+  ],
+  "defects_fixed": [
+    {"id": 1, "code": "EXEC_WRITE_DB_IMPORT_ORDER", "desc": "app.core.db import 时建 engine，main() 设 APP_DB_URL 无效，写侧恒指 .env 旧库", "fix": "_preset_write_db() argv 预置 + main() 引擎/参数一致性断言拒绝执行"},
+    {"id": 2, "code": "EXEC_T2_METRIC_BRANCH_MISSING", "desc": "run_single_source 缺 name_mismatch_rate 分支，T2 恒 0.0", "fix": "新增分支按 NONNULL/MISMATCH 计算"}
+  ],
+  "audit": {"govern_audit_logs_module_probe": 3, "per_run": 1, "operator": "probe:<run_id>"},
+  "gates": {"pytest_probe": "91 passed / 0 failed (2026-08-30)", "pytest_full": "1288 passed / 1 skipped / 0 failed, 1642.38s (2026-08-30 第二遍；第一遍因并行会话重建容器致隧道失效挂起，WARN-5)"},
+  "restore_rounds_after_regression": [
+    {"run_id": "probe-20260830-111903", "role": "恢复首轮", "finding_new": 6, "status": "partial(T7 计划内 BLOCKED)"},
+    {"run_id": "probe-20260830-111935", "role": "恢复收敛轮", "finding_new": 0, "finding_updated": 6, "status": "partial(T7 同上)", "convergence": "PASS"}
+  ],
+  "final_db_state": {"probe_runs": 2, "probe_findings": 6, "probe_audit_rows": 2},
+  "evidence": {
+    "runs_dir": "开发起步包/output_r165/runs/",
+    "progress": "开发起步包/output_r165/progress.md",
+    "exceptions": "开发起步包/output_r165/exceptions.json",
+    "console_logs": ["e3_day_run1_console.log（缺陷轮）", "e3_day_run_first_console.log（首轮）", "e3_day_run_converge_console.log（收敛轮）"]
+  },
+  "waiting_domain": {"X1": "生产建表+read 种子 apply（备份→dry-run→apply→二次 dry-run→/health）", "X2": "生产首轮夜间探查", "X3": "终态人工裁决（166 界面）", "X4": "常态化调度周期（用户定）"},
+  "red_lines": "业务源库零写入；生产平台库零连接；凭据零落盘；零 Git 写；evidence 零患者字面量"
+}

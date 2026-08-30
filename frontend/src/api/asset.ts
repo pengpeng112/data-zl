@@ -75,6 +75,8 @@ export interface TableBrief {
 }
 
 export interface TableDetail {
+  system_code?: string | null;
+  source_code?: string | null;
   schema_name: string;
   table_name: string;
   table_name_cn?: string | null;
@@ -693,6 +695,8 @@ export interface GraphNode {
   nullable?: boolean | string | null;
   is_primary_key?: boolean | null;
   is_relation_key?: boolean | null;
+  in_degree?: number;
+  out_degree?: number;
 }
 
 export interface GraphFieldMapping {
@@ -741,6 +745,8 @@ export interface GraphEdge {
   deferred_reason?: string | null;
   note?: string | null;
   validation_note?: string | null;
+  sql_hash?: string | null;
+  sql_snippet?: string | null;
 }
 
 export interface GraphMeta {
@@ -760,6 +766,9 @@ export interface GraphMeta {
   warnings?: string[];
   center_physical_key?: string | null;
   direction_semantics?: string | null;
+  shown_count?: number | null;
+  actual_count?: number | null;
+  continuation_cursor?: string | null;
 }
 
 export interface GraphData {
@@ -773,7 +782,7 @@ export interface GraphViewMode {
   label: string;
   description?: string | null;
   group_by: "system" | "source" | "schema" | "domain";
-  layout_mode: "layered" | "grouped" | "radial" | "hierarchy";
+  layout_mode: "force" | "layered" | "grouped" | "radial" | "hierarchy";
   confidence?: string | null;
   validation_status?: string | null;
   include_candidates: boolean;
@@ -871,6 +880,8 @@ export const getGraphNeighbors = (params: {
   depth?: number;
   direction?: "in" | "out" | "both";
   limit?: number;
+  include?: string[];
+  cursor?: string;
 }) => {
   return http.get<ApiResponse<GraphData>, object>("/api/v1/graph/neighbors", {
     params
@@ -1033,94 +1044,6 @@ export interface QualitySummary {
   minor_count: number;
   info_count: number;
   top_tables: { table: string; count: number }[];
-}
-
-export interface GraphFieldMapping {
-  from_column?: string | null;
-  from_column_name_cn?: string | null;
-  to_column?: string | null;
-  to_column_name_cn?: string | null;
-}
-
-export interface GraphEdge {
-  id: string;
-  source: string;
-  target: string;
-  display_source?: string | null;
-  display_target?: string | null;
-  from_system_code?: string | null;
-  from_source_code?: string | null;
-  from_schema_name?: string | null;
-  from_table_name?: string | null;
-  from_table_name_cn?: string | null;
-  from_table_role?: string | null;
-  from_include_status?: string | null;
-  to_system_code?: string | null;
-  to_source_code?: string | null;
-  to_schema_name?: string | null;
-  to_table_name?: string | null;
-  to_table_name_cn?: string | null;
-  to_table_role?: string | null;
-  to_include_status?: string | null;
-  label?: string | null;
-  relation_type?: string | null;
-  relation_layer?: string | null;
-  db_id?: number | null;
-  rel_id?: number | null;
-  join_condition?: string | null;
-  from_columns?: string | null;
-  to_columns?: string | null;
-  field_mappings?: GraphFieldMapping[];
-  cardinality?: string | null;
-  business_domain?: string | null;
-  confidence?: string | null;
-  validation_level?: string | null;
-  validation_status?: string | null;
-  validation_metrics?: string | null;
-  is_deferred?: boolean | null;
-  deferred_reason?: string | null;
-  note?: string | null;
-  validation_note?: string | null;
-}
-
-export interface GraphMeta {
-  total_relations: number;
-  matched_relations: number;
-  returned_relations: number;
-  truncated: boolean;
-  unresolved_endpoints?: number;
-  filters?: Record<string, unknown>;
-  data_version?: string | null;
-  backend_build_id?: string | null;
-  query_ms?: number | null;
-  matched_total?: number | null;
-  returned_nodes?: number | null;
-  estimated_total?: number | null;
-  enrichment?: Record<string, number>;
-  warnings?: string[];
-  center_physical_key?: string | null;
-  direction_semantics?: string | null;
-}
-
-export interface GraphData {
-  nodes: GraphNode[];
-  edges: GraphEdge[];
-  meta?: GraphMeta | null;
-}
-
-export interface GraphViewMode {
-  code: string;
-  label: string;
-  description?: string | null;
-  group_by: "system" | "source" | "schema" | "domain";
-  layout_mode: "layered" | "grouped" | "radial" | "hierarchy";
-  confidence?: string | null;
-  validation_status?: string | null;
-  include_candidates: boolean;
-  include_dependencies: boolean;
-  show_review_layer: boolean;
-  requires_table: boolean;
-  deprecated?: boolean;
 }
 
 export interface GraphOptionItem {
@@ -1430,6 +1353,7 @@ export interface AiQualityStatus {
   quota_state?: string | null;
   message?: string | null;
   sample?: string | null;
+  success_count?: number;
   hospital_llm?: {
     enabled?: boolean;
     configured?: boolean;
@@ -1503,6 +1427,27 @@ export interface AiQualityResultItem {
   accepted_recommendations?: number[] | null;
 }
 
+export interface AiPatrolTarget {
+  system_code: string;
+  source_code: string;
+  schema_name: string;
+  table_name: string;
+  name_cn: string;
+  column_count: number;
+  issue_label: string;
+  finding_ids: number[];
+  evidence: { rule_id: string; finding_id: number; metric_value: string; captured_at: string; data_as_of: string; snapshot_version: string };
+}
+
+export interface AiPatrolRun {
+  patrol_run_id: string;
+  started_at?: string | null;
+  tables_total: number;
+  tables_done: number;
+  summary: string;
+  jobs: Array<number | string>;
+}
+
 const AI_QUALITY_BASE = "/api/v1/quality/ai";
 export const getAiQualityStatus = () => http.get<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/status`);
 export const testAiQualityConnection = () => http.post<ApiResponse<AiQualityStatus>, object>(`${AI_QUALITY_BASE}/connection-test`);
@@ -1519,6 +1464,20 @@ export const reviewAiQualityResult = (resultId: number | string, data: { status:
   http.patch<ApiResponse<AiQualityResultItem>, object>(`${AI_QUALITY_BASE}/results/${encodeURIComponent(String(resultId))}/review`, { data });
 export const attachAiQualityResult = (resultId: number | string, data: { recommendation_indexes: number[]; note?: string }) =>
   http.post<ApiResponse<AiQualityResultItem>, object>(`${AI_QUALITY_BASE}/results/${encodeURIComponent(String(resultId))}/attach`, { data });
+export const getAiPatrolTargets = () => http.get<ApiResponse<{ plan: { label: string; status: string; scheduler_enabled: boolean }; targets: AiPatrolTarget[] }>, object>(`${AI_QUALITY_BASE}/patrol/targets`);
+export const getAiPatrolRuns = (params?: { page?: number; page_size?: number }) => http.get<ApiResponse<PageData<AiPatrolRun>>, object>(`${AI_QUALITY_BASE}/patrol/runs`, { params });
+export const runAiPatrol = (data: { patrol_run_id?: string } = {}) => http.post<ApiResponse<{ patrol_run_id: string; jobs: { table: string; job_id: number | string }[]; errors: { table: string; status: number }[] }>, object>(`${AI_QUALITY_BASE}/patrol/run`, { data });
+
+export interface AiSqlGenerateResult {
+  sql: string;
+  risk: Record<string, unknown>;
+  dialect: "oracle";
+  executed: false;
+  context_digest: { tables: number; relations: number; value_domains: number; payload_bytes: number; truncated: boolean };
+}
+export interface AiSqlHistoryItem { id: number; request: { question_summary: string; selected_tables: string[]; context_digest: Record<string, number> }; response_summary: string; called_at?: string | null }
+export const generateAiSql = (data: { question: string; system_code: "DATA_CENTER"; selected_tables: string[] }) => http.post<ApiResponse<AiSqlGenerateResult>, object>("/api/v1/ai/ai-sql/generate", { data });
+export const getAiSqlHistory = (params?: { page?: number; page_size?: number }) => http.get<ApiResponse<PageData<AiSqlHistoryItem>>, object>("/api/v1/ai/ai-sql/history", { params });
 
 // --- P4A AI 工具与草稿 ---
 
@@ -1609,3 +1568,131 @@ export const getAiSessions = (params?: {
     { params }
   );
 };
+
+/* ============================================================
+ * 166 D1：值域知识库 API（149 既有端点族消费面；导出为 166 F6 新增）
+ * ============================================================ */
+
+/** 值域记录（149 /api/v1/value-domains 列表项） */
+export interface ValueDomainItem {
+  id: number;
+  system_code: string;
+  source_code: string;
+  schema_name: string;
+  table_name: string;
+  column_name: string;
+  code: string;
+  meaning: string;
+  note: string | null;
+  domain_kind: string;
+  scope_condition: string | null;
+  status: string;
+  conflict_status: string;
+  confirmed_by: string | null;
+  confirmed_at: string | null;
+  current_version_id: number | null;
+  version_no: number;
+  evidence_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface ValueDomainEvidence {
+  id: number;
+  source_type: string;
+  source_system: string | null;
+  observed_meaning: string | null;
+  method: string | null;
+  sample_count: number | null;
+  observed_at: string | null;
+  actor: string | null;
+  snippet_ref: string | null;
+}
+
+export interface ValueDomainDetail extends ValueDomainItem {
+  evidences?: ValueDomainEvidence[];
+}
+
+export interface ValueDomainVersion {
+  id: number;
+  version_no: number;
+  snapshot: Record<string, unknown>;
+  change_reason: string;
+  evidence_ref: string | null;
+  actor: string | null;
+  created_at: string | null;
+}
+
+export interface ValueDomainListFilters {
+  system_code?: string;
+  source_code?: string;
+  schema_name?: string;
+  table_name?: string;
+  column_name?: string;
+  code?: string;
+  domain_kind?: string;
+  status?: string;
+  conflicted?: boolean;
+  updated_since?: string;
+}
+
+/** 值域列表（B5：无 version 筛选，版本走 /versions 子资源；page_size 上限 200） */
+export const listValueDomains = (
+  params: ValueDomainListFilters & { page?: number; page_size?: number }
+) => {
+  return http.get<
+    ApiResponse<{ total: number; page: number; page_size: number; items: ValueDomainItem[] }>,
+    object
+  >("/api/v1/value-domains", { params });
+};
+
+/** 值域详情（含证据链） */
+export const getValueDomainDetail = (domainId: number) => {
+  return http.get<ApiResponse<ValueDomainDetail>, object>(
+    `/api/v1/value-domains/${domainId}`
+  );
+};
+
+/** 值域版本时间线（B5：详情子资源） */
+export const getValueDomainVersions = (domainId: number) => {
+  return http.get<
+    ApiResponse<{ domain_id: number; current_version_no: number; items: ValueDomainVersion[] }>,
+    object
+  >(`/api/v1/value-domains/${domainId}/versions`);
+};
+
+/** 人工确认（conflicted 行须先 resolve-conflict，否则 409） */
+export const confirmValueDomain = (domainId: number, reason?: string) => {
+  return http.patch<ApiResponse<ValueDomainItem>, object>(
+    `/api/v1/value-domains/${domainId}/confirm`,
+    { data: { reason: reason || null } }
+  );
+};
+
+/** 废弃（reason 必填） */
+export const deprecateValueDomain = (domainId: number, reason: string) => {
+  return http.patch<ApiResponse<ValueDomainItem>, object>(
+    `/api/v1/value-domains/${domainId}/deprecate`,
+    { data: { reason } }
+  );
+};
+
+/** 冲突裁决（B4：conflicted 行闭环，confirm 前置） */
+export const resolveValueDomainConflict = (
+  domainId: number,
+  body: { meaning: string; reason: string; note?: string }
+) => {
+  return http.patch<ApiResponse<ValueDomainItem>, object>(
+    `/api/v1/value-domains/${domainId}/resolve-conflict`,
+    { data: body }
+  );
+};
+
+/** 166 F6：值域 CSV 导出（按当前筛选；默认排除 conflicted） */
+export function exportValueDomains(params: ValueDomainListFilters & { include_conflicted?: boolean }) {
+  return http.request<Blob>("get", "/api/v1/value-domains/export", {
+    params,
+    responseType: "blob",
+    timeout: 120000
+  });
+}

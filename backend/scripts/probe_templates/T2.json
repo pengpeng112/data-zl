@@ -1,0 +1,27 @@
+{
+ "code": "T2",
+ "probe_type": "R-REF",
+ "name": "EXAM 申请医生姓名与 STAFF_DICT 不一致率",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT COUNT(*) AS NONNULL, SUM(CASE WHEN sd.NAME IS NULL OR TRIM(e.DOCTOR_NAME) <> TRIM(sd.NAME) THEN 1 ELSE 0 END) AS MISMATCH FROM EXAM.EXAM_MASTER e LEFT JOIN COMM.STAFF_DICT sd ON e.DOCTOR_USER = sd.EMP_NO WHERE e.REQ_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND e.REQ_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') AND e.DOCTOR_USER IS NOT NULL"
+  }
+ ],
+ "derive": {
+  "metric": "doctor_name_mismatch_rate",
+  "formula": "mismatch/nonnull*100",
+  "unit": "%"
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 1.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "EXAM.EXAM_MASTER.DOCTOR_NAME 与 COMM.STAFF_DICT 不一致率",
+ "large_table_guard": null
+}

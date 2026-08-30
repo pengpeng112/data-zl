@@ -1,0 +1,192 @@
+{
+  "plan": "166_值域与探查问题展示导出功能开发计划.md",
+  "version": "v1.1+附录A",
+  "executed_at": "2026-08-30",
+  "result": "生产发布完成（2026-08-30 用户授权当日发布）",
+  "prerequisites": {
+    "165_e1_e6": "完成（165 执行报告+隔离库 6 findings/2 runs 实查在库）",
+    "163_164": "完成（README/55 登记+git log 佐证）",
+    "probe_skeleton_in_repo": [
+      "app/api/v1/probe.py",
+      "app/services/probe_service.py",
+      "app/models/probe.py",
+      "405 占位先于 /{id}"
+    ]
+  },
+  "batches": {
+    "D1": {
+      "routes": [
+        "/value-domains (数据治理组, auths=value_domain.read, rank15)",
+        "/probe-findings (质量管理组, auths=probe.finding.read, rank16)"
+      ],
+      "api_layer": [
+        "src/api/probe.ts 新建",
+        "src/api/asset.ts 值域端点族扩展"
+      ],
+      "acceptance": {
+        "typecheck": "PASS(tsc+vue-tsc)",
+        "d1_tests": "4/4",
+        "affected_existing": "15/15"
+      }
+    },
+    "D2": {
+      "F1_table_detail": "关联关系卡片后值域区块（唯一触点）；system_code 必带(B9)+page_size=200 循环拉全上限 5 页+列粒度分组+暂无值域列提示",
+      "F2_page": "筛选(无 version—B5)/冲突 Tab/pending 徽标/详情抽屉(证据链+版本)",
+      "F3_actions": "confirm(可选 reason;conflicted 点击引导先裁决)/resolve-conflict(B4)/deprecate(reason 必填)，均 v-perms='value_domain.confirm'",
+      "acceptance": {
+        "component_tests": "7/7",
+        "v_perms_assert": "3 处点号码",
+        "typecheck": "PASS"
+      }
+    },
+    "D3": {
+      "F4_page": "筛选+分页+复发徽标+sanitizeEvidenceText 脱敏管道+代码块转义+复制按钮+runs Tab(error_summary 脱敏)",
+      "F5_backend": "POST /api/v1/probe-findings/{id}/transition + probe_service.transition_finding(只增)",
+      "acceptance": {
+        "backend": "transition 专项 22 过（12 合法迁移参数化+同态422+非法值422+action422+reason422+404+执行器403+审计+快照+纯矩阵+直调）",
+        "backend_with_165_regression": "40 passed",
+        "frontend": "8/8（含 XSS 断言：载荷文本呈现/零注入节点；v-perms≥4）",
+        "typecheck": "PASS"
+      }
+    },
+    "D4": {
+      "findings_export": "POST+body 筛选，替换 405 占位保持先于 /{id}；白名单 19 列(无 evidence_sql 含 evidence_digest)；5000 上限",
+      "value_domains_export": "GET 先于 /{domain_id}；白名单 11 列；默认排除 conflicted；文件名含 status 标签",
+      "acceptance": {
+        "backend_tests": "8/8",
+        "six_constraints": "逐条实证(报告§4)",
+        "frontend_166": "19/19",
+        "typecheck": "PASS"
+      }
+    },
+    "D5": {
+      "seed": "probe.finding.manage 入 RESOURCE_CATALOG+quality_admin(A8 刻意决策)+platform_admin(目录推导)",
+      "acceptance": {
+        "seed_second_run_created": 0,
+        "matrix_live": "ai_user/asset_viewer: read 200+manage 403+confirm 403; quality_admin manage 200",
+        "security_audit": "全绿(含新增矩阵断言)",
+        "tests": "14 passed"
+      }
+    },
+    "D6": {
+      "backend_full": "1323 passed / 1 skipped / 0 failed（基线1288+新增35，27m53s）",
+      "frontend_full": "229 passed / 34 files（裸分页修复后复跑）",
+      "typecheck": "PASS",
+      "build_gzip": {
+        "main_js": "656.6/700 KB",
+        "graph_js": "404.6/430 KB",
+        "css": "101.3/110 KB",
+        "verdict": "PASS"
+      }
+    }
+  },
+  "new_tests": {
+    "backend": 35,
+    "frontend": 19,
+    "total": 51,
+    "minimum_required": 16
+  },
+  "backend_increment_audit": {
+    "endpoints_added": 3,
+    "seeds_added": 1,
+    "model_changes": 0,
+    "migrations": 0,
+    "files_touched_in_165_modules": [
+      "app/api/v1/probe.py(只增+405替换为真实现)",
+      "app/services/probe_service.py(只增)",
+      "app/api/v1/value_domains.py(只增)"
+    ],
+    "deviation_from_164_R2b": "round-4 B13 批准的显式偏离（166 头部声明）"
+  },
+  "lianTiao": {
+    "evidence_json": "output_r166/lianTiao_evidence.json",
+    "capture_script": "output_r166/capture_r166.py",
+    "empty_state_shots": [
+      "f4-empty-state.png",
+      "f2-empty-state.png"
+    ],
+    "data_state_shots": [
+      "f4-list-throwaway.png",
+      "f4-detail-evidence.png",
+      "f5-transition-dialog.png",
+      "f2-list-throwaway.png",
+      "f2-conflict-tab.png",
+      "f1-table-detail-value-domains.png"
+    ],
+    "full_transitions": {
+      "legal_ok": "12/12",
+      "audit_rows": 13,
+      "rejects_live": {
+        "same_status": 422,
+        "invalid_value": 422,
+        "reason_missing": 422
+      }
+    },
+    "export_samples": {
+      "findings_rows": 1,
+      "evidence_sql_absent": true,
+      "value_domains_status_pending_rows": 1,
+      "conflicted_excluded_default": true
+    },
+    "cleanup": {
+      "findings_left": 0,
+      "value_domains_left": 0,
+      "tables_left": 0,
+      "audit_kept_as_evidence": 19
+    },
+    "integration_bug_found_and_fixed": "前端按 ApiResponse 消费 165 裸分页响应（res.data.items TypeError）→裸 body 修复三处+门禁复跑全绿（exceptions W5）"
+  },
+  "exceptions": [
+    "W1 405占位测试计划内替换更新",
+    "W2 测试基建 localStorage/导入环（测试域修复）",
+    "W3 get_finding 只增两字段",
+    "W4 165库内证据被回归清空未重建(夜间窗铁律)",
+    "W5 裸分页集成缺陷修复",
+    "W6 采集脚本工程问题"
+  ],
+  "red_lines": "人工操作零代点/零迁移/零 Git 写/凭据零落盘/three-endpoint 上限遵守/隔离库显式 URL",
+  "waiting_domain": [
+    "生产 manage 种子 apply",
+    "前后端发布走既有流程",
+    "值域与终态流转转人工运营(165 X3 载体)"
+  ],
+  "p2_list": [
+    "对账矩阵看板",
+    "metric 趋势曲线",
+    "QualityFinding 页互链",
+    "AI 探查触发入口(依赖 165 X4)",
+    "值域批量导入模板"
+  ],
+  "release": {
+    "authorized": "2026-08-30 用户「授权你 继续执行」",
+    "backup": "/opt/data-asset/backups/data_asset_pre_r166_202608301345.dump (10,970,231 bytes, 106 TABLE DATA, pg_restore --list 校验)",
+    "seed_apply": {
+      "first_run": {
+        "resources": 1,
+        "grants": 2,
+        "roles": [
+          "platform_admin",
+          "quality_admin"
+        ]
+      },
+      "second_run_converged": 0
+    },
+    "backend": {
+      "method": "四文件 scp+docker cp+restart（与 sync_local_to_server.py 同机制）",
+      "diff_audit": "四文件 vs 生产恰为 166 语义（probe -3/+198、value_domains +111、probe_service +62、permissions +4），models 零差异",
+      "health": "200 database connected",
+      "openapi": "三端点注册+405 占位消失",
+      "unauth_smoke": "三端点裸 curl 均 401"
+    },
+    "frontend": {
+      "release_dir": "releases/r166-20260830",
+      "atomic_switch": "current→r166, previous→r167-20260830",
+      "assets_check": "ASSETS_OK",
+      "e2e": "首页 200 / index-s9RlzpGz.js 200（与本地构建 hash 一致）/ /api 代理 health 200"
+    },
+    "carrier_note": "前端 dist 为工作区整体构建，含 168 号 P0 图谱改造前端改动（后端零夹带；该部分经 229 tests+build 门禁，168 自列截图验收仍归 168）",
+    "rollback": "前端 previous 软链+reload；后端 w10c2 镜像重建或文件还原+restart；DB 用 dump",
+    "x2_note": "165 X2 生产首轮夜间探查不在本次范围（夜间窗+授权等待）；X3 人工裁决界面已随发布就绪",
+    "metadata_note": "docker cp 热更不改镜像 tag/health build_id（仍 p153）——下次镜像制发布归档"
+  }
+}

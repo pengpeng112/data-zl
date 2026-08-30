@@ -361,10 +361,51 @@ def _get_role_mapping(db: Session, target_system: str, classification: str) -> d
     return {"role_code": row.role_code, "role_name_cn": row.role_name_cn, "extra_config": row.extra_config or {}}
 
 
-def _compute_change_stats(db: Session, candidates: list[dict]) -> dict[str, Any]:
+def _fetch_jhemr_existing_emp_nos(candidates: list[dict]) -> set[str] | None:
+    """W10 方案 C：查候选中 JHEMR 已存在账号（现存用户首次纳管对齐）。
+
+    返回 None 表示存在性检查失败——调用方按全部「真实新建号」处理（保守，
+    熔断按旧语义触发），绝不因检查失败而放宽门禁。
+    """
+    if not candidates:
+        return set()
+    try:
+        from .jhemr_identity_adapter import JhemrIdentityAdapter
+
+        adapter = JhemrIdentityAdapter(
+            credential_ref=settings.identity_sync_jhemr_credential_ref,
+            hospital_no=settings.identity_sync_jhemr_hospital_no,
+            jump_host=settings.his_source_jump_host,
+            jump_port=settings.his_source_jump_port,
+            jump_user=settings.his_source_jump_user,
+            jump_key=settings.his_source_jump_key or None,
+            db_host=settings.identity_sync_jhemr_host,
+            db_port=settings.identity_sync_jhemr_port,
+            db_name=settings.identity_sync_jhemr_dbname,
+        )
+        existing: set[str] = set()
+        with adapter:
+            for c in candidates:
+                if adapter.user_exists(c["emp_no"]):
+                    existing.add(c["emp_no"])
+        return existing
+    except Exception:
+        return None
+
+
+def _compute_change_stats(
+    db: Session,
+    candidates: list[dict],
+    *,
+    jhemr_existing: set[str] | None = None,
+) -> dict[str, Any]:
     """Compute real new/update/deactivate composition and watermark freshness.
 
-    - new: candidate without an active managed relation in BOTH targets
+    - new: candidate without an active managed relation in BOTH targets AND
+      absent from JHEMR（真实新建号；jhemr_existing=None 时退回旧口径）
+    - align_existing: W10 方案 C——JHEMR 账号已存在的首次纳管（additive align，
+      补角色组/科室/登录方式），不计入 max_new 与 max_change_ratio，受
+      identity_cb_max_align 单独约束
     - update: candidate already managed in at least one target (state/dept resync)
     - deactivate: managed persons no longer eligible (status/classification change)
     - watermark_gap_hours: hours since the last successful HIS collection
@@ -380,11 +421,14 @@ def _compute_change_stats(db: Session, candidates: list[dict]) -> dict[str, Any]
 
     new_count = 0
     update_count = 0
+    align_existing_count = 0
     for c in candidates:
         fp_cdms = compute_account_fingerprint(c["emp_no"], "CDMS", settings.identity_hmac_key_ref)
         fp_jhemr = compute_account_fingerprint(c["emp_no"], "JHEMR", settings.identity_hmac_key_ref)
         if fp_cdms in managed_fps or fp_jhemr in managed_fps:
             update_count += 1
+        elif jhemr_existing is not None and c["emp_no"] in jhemr_existing:
+            align_existing_count += 1
         else:
             new_count += 1
 
@@ -425,6 +469,7 @@ def _compute_change_stats(db: Session, candidates: list[dict]) -> dict[str, Any]
     return {
         "new": new_count,
         "update": update_count,
+        "align_existing": align_existing_count,
         "deactivate": deactivate_count,
         "scope": max(int(scope), 1),
         "watermark_gap_hours": round(watermark_gap_hours, 2),
@@ -447,6 +492,9 @@ def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str,
         return {"triggered": True, "dimension": "max_new", "value": stats["new"], "limit": settings.identity_cb_max_new}
     if stats.get("update", 0) > settings.identity_cb_max_update:
         return {"triggered": True, "dimension": "max_update", "value": stats["update"], "limit": settings.identity_cb_max_update}
+    # W10 方案 C：现存用户对齐单独设上限（防群体性误对齐），不计入 max_new/ratio
+    if stats.get("align_existing", 0) > settings.identity_cb_max_align:
+        return {"triggered": True, "dimension": "max_align", "value": stats["align_existing"], "limit": settings.identity_cb_max_align}
     if stats.get("deactivate", 0) > settings.identity_cb_max_deactivate:
         return {"triggered": True, "dimension": "max_deactivate", "value": stats["deactivate"], "limit": settings.identity_cb_max_deactivate}
     scope = max(int(stats.get("scope", total)), 1)
@@ -454,8 +502,9 @@ def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str,
     if change_ratio > settings.identity_cb_max_change_ratio:
         return {"triggered": True, "dimension": "max_change_ratio", "value": round(change_ratio, 3), "limit": settings.identity_cb_max_change_ratio}
     # Watermark continuity check (plan 107 section 3)
-    if stats.get("watermark_gap_hours", 0) > 48:
-        return {"triggered": True, "dimension": "watermark_continuity", "value": stats["watermark_gap_hours"], "limit": 48}
+    wm_limit = settings.identity_cb_max_watermark_gap_hours
+    if stats.get("watermark_gap_hours", 0) > wm_limit:
+        return {"triggered": True, "dimension": "watermark_continuity", "value": stats["watermark_gap_hours"], "limit": wm_limit}
     # Source row count conservation (plan 107 section 3)
     if stats.get("source_row_delta_pct", 0) > 20:
         return {"triggered": True, "dimension": "source_row_conservation", "value": stats["source_row_delta_pct"], "limit": 20}
@@ -562,13 +611,20 @@ def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", ref
             return {"status": "success", "run_id": run_id, "candidates": 0, "deactivate": 0, "success_count": 0, "failed_count": 0, "skipped_count": 0, "preflight": preflight_stats}
 
         # PREFLIGHT: threshold checks with real change composition
-        stats = _compute_change_stats(db, candidates)
+        # W10 方案 C：先做 JHEMR 存在性检查（失败→None→全部按真实新建保守处理）
+        jhemr_existing = _fetch_jhemr_existing_emp_nos(candidates)
+        stats = _compute_change_stats(db, candidates, jhemr_existing=jhemr_existing)
         stats["deactivate"] = len(deactivate_candidates)
+        stats["align_check"] = "ok" if jhemr_existing is not None else "failed_fallback_all_new"
         threshold_result = check_thresholds(candidates + deactivate_candidates, stats)
         if threshold_result.get("triggered"):
             run_record.status = "failed"
             run_record.circuit_breaker_triggered = True
             run_record.circuit_breaker_dimension = threshold_result["dimension"]
+            run_record.report_summary = {
+                "threshold": threshold_result,
+                "stats": {k: v for k, v in stats.items() if k != "watermark_gap_hours"},
+            }
             run_record.finished_at = _now()
             db.commit()
             try:

@@ -1,0 +1,42 @@
+{
+ "code": "T8",
+ "probe_type": "R-XSYS",
+ "name": "JHEMR↔HIS 离院方式分布对账",
+ "severity_default": "P2",
+ "window_kind": "month",
+ "sides": [
+  {
+   "side": "a",
+   "source_code": "his_source_10_10_10_15",
+   "dialect": "oracle",
+   "sql": "SELECT DISCHARGE_DISPOSITION AS CODE, COUNT(*) AS CNT FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= TO_DATE(:START_DATE,'YYYY-MM-DD') AND DISCHARGE_DATE_TIME < TO_DATE(:END_DATE,'YYYY-MM-DD') AND DISCHARGE_DISPOSITION IS NOT NULL GROUP BY DISCHARGE_DISPOSITION"
+  },
+  {
+   "side": "b",
+   "source_code": "jhemr_vastbase_10_10_8_177",
+   "dialect": "vastbase",
+   "sql": "SELECT discharge_disposition AS CODE, COUNT(*) AS CNT FROM report.r_pat_visit WHERE discharge_date_time >= CAST(:START_DATE AS date) AND discharge_date_time < CAST(:END_DATE AS date) AND discharge_disposition IS NOT NULL GROUP BY discharge_disposition"
+  }
+ ],
+ "derive": {
+  "metric": "discharge_disposition_cross_diff_rate",
+  "formula": "sum(|a-b|)/sum(a)*100",
+  "unit": "%",
+  "compare": "by_code",
+  "mapping": {
+   "医嘱离院": "1",
+   "医嘱转院": "2",
+   "医嘱转社区卫生服务机构/乡镇卫生院": "3",
+   "非医嘱离院": "4",
+   "死亡": "5",
+   "其他": "9"
+  }
+ },
+ "trigger": {
+  "op": "gt",
+  "threshold": 1.0,
+  "value_type": "rate"
+ },
+ "object_desc_tpl": "离院方式 HIS↔JHEMR 分布差异率",
+ "large_table_guard": null
+}

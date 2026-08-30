@@ -1,4 +1,4 @@
-"""plan156: extract relation candidates from view/routine SQL of the 7-source snapshots.
+"""plan159: extract relation candidates from view/routine SQL of the 7-source snapshots.
 
 Read-only offline analysis over local snapshot JSONs (no DB access).
 - Oracle snapshots: view_definitions (ALL_VIEWS/USER_VIEWS TEXT).
@@ -9,7 +9,9 @@ promoted to formal relations without review, per sql-relation-intake rules).
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import logging
 import re
 import sys
 from collections import defaultdict
@@ -17,6 +19,10 @@ from pathlib import Path
 
 import sqlglot
 from sqlglot import exp
+
+# Routine bodies can contain unsupported vendor syntax.  Do not echo SQL text
+# into logs when sqlglot falls back to Command nodes; counts below record it.
+logging.getLogger("sqlglot").setLevel(logging.ERROR)
 
 PACKAGE = Path(__file__).resolve().parents[1] / "开发起步包" / "数据资产_七系统源端资产包"
 
@@ -69,6 +75,39 @@ def build_owner_index(data: dict) -> dict[str, set[str]]:
     return index
 
 
+def build_tsql_object_index(data: dict) -> dict[str, set[str]]:
+    """table name -> fully qualified DB.SCHEMA.TABLE names from the snapshot."""
+    index: dict[str, set[str]] = defaultdict(set)
+    for table in data.get("tables", []) + data.get("views", []):
+        database = str(table.get("database_name", "")).upper()
+        schema = str(table.get("schema_name", "")).upper()
+        name = str(table.get("table_name", "")).upper()
+        if database and schema and name:
+            index[name].add(f"{database}.{schema}.{name}")
+    return index
+
+
+def qualify_tsql_name(
+    name: str,
+    object_index: dict[str, set[str]],
+    default_database: str,
+    default_schema: str,
+) -> str | None:
+    parts = name.upper().split(".")
+    if len(parts) == 3:
+        return name.upper() if name.upper() in object_index.get(parts[-1], set()) else None
+    if len(parts) == 2:
+        candidate = f"{default_database}.{name.upper()}"
+        return candidate if candidate in object_index.get(parts[-1], set()) else None
+    if len(parts) == 1:
+        local = f"{default_database}.{default_schema}.{name.upper()}"
+        if local in object_index.get(parts[0], set()):
+            return local
+        matches = object_index.get(parts[0], set())
+        return next(iter(matches)) if len(matches) == 1 else None
+    return None
+
+
 def qualify_oracle_name(name: str, owner_index: dict[str, set[str]], default_owner: str) -> str:
     """Prefix single-part table names with the owning schema when unique."""
     if "." in name:
@@ -81,22 +120,25 @@ def qualify_oracle_name(name: str, owner_index: dict[str, set[str]], default_own
     return name
 
 
-def extract_edges(sql_text: str, dialect: str) -> tuple[set[tuple], int]:
-    """Return {(tbl_a, col_a, tbl_b, col_b)} equal-join edges and statement count."""
+def extract_edges(sql_text: str, dialect: str) -> tuple[set[tuple], int, bool]:
+    """Return equal-join edges, statement count, and whether parsing succeeded."""
     edges: set[tuple] = set()
     statements = 0
     try:
         expressions = sqlglot.parse(sql_text, dialect=dialect)
     except Exception:
-        return edges, 0
+        return edges, 0, False
     for tree in expressions:
         if tree is None:
             continue
-        statements += 1
         if isinstance(tree, exp.Command):
             continue
+        statements += 1
         alias_map: dict[str, str] = {}
+        cte_names = {cte.alias_or_name.upper() for cte in tree.find_all(exp.CTE)}
         for table in tree.find_all(exp.Table):
+            if not table.db and table.name.upper() in cte_names:
+                continue
             full = normalize_table(table, dialect)
             if not full:
                 continue
@@ -125,7 +167,7 @@ def extract_edges(sql_text: str, dialect: str) -> tuple[set[tuple], int]:
             if lhs[0] == rhs[0]:
                 continue
             edges.add((lhs[0], lhs[1], rhs[0], rhs[1]))
-    return edges, statements
+    return edges, statements, statements > 0
 
 
 def main() -> int:
@@ -140,11 +182,13 @@ def main() -> int:
             "dialect": config["dialect"],
             "edges": [],
             "dependency_edges": [],
+            "unresolved_edges": [],
             "objects_parsed": 0,
             "objects_total": 0,
             "parse_errors": 0,
         }
         owner_index = build_owner_index(data) if config["dialect"] == "oracle" else {}
+        tsql_object_index = build_tsql_object_index(data) if config["dialect"] == "tsql" else {}
         default_owner = ""
         if config["dialect"] == "oracle":
             source_meta = data.get("source", {})
@@ -172,11 +216,15 @@ def main() -> int:
                 if not sql_text:
                     system_result["parse_errors"] += 1
                     continue
+                source_sql_sha256 = hashlib.sha256(sql_text.encode("utf-8")).hexdigest()
                 if config["dialect"] == "tsql" and kind == "routines":
                     sql_text = strip_tsql_routine_header(sql_text)
                 try:
-                    edges, statements = extract_edges(sql_text, config["dialect"])
+                    edges, statements, parsed = extract_edges(sql_text, config["dialect"])
                 except Exception:
+                    system_result["parse_errors"] += 1
+                    continue
+                if not parsed:
                     system_result["parse_errors"] += 1
                     continue
                 system_result["objects_parsed"] += 1
@@ -184,6 +232,21 @@ def main() -> int:
                     if config["dialect"] == "oracle":
                         a_table = qualify_oracle_name(a_table, owner_index, default_owner)
                         b_table = qualify_oracle_name(b_table, owner_index, default_owner)
+                    elif config["dialect"] == "tsql":
+                        resolved_a = qualify_tsql_name(a_table, tsql_object_index, db, schema)
+                        resolved_b = qualify_tsql_name(b_table, tsql_object_index, db, schema)
+                        if not resolved_a or not resolved_b:
+                            system_result["unresolved_edges"].append({
+                                "from_table": a_table,
+                                "from_column": a_col,
+                                "to_table": b_table,
+                                "to_column": b_col,
+                                "evidence_object": obj_label,
+                                "source_sql_sha256": source_sql_sha256,
+                                "reason": "identifier_not_resolved_to_snapshot_object",
+                            })
+                            continue
+                        a_table, b_table = resolved_a, resolved_b
                     # Oracle 字典/物化视图内部对象不是业务关系，跳过
                     if ORACLE_INTERNAL_TABLE_RE.match(a_table.rsplit("@", 1)[0].rsplit(".", 1)[-1]) or a_table.rsplit("@", 1)[0].split(".")[0] in {"SYS", "SYSTEM"}:
                         continue
@@ -196,12 +259,30 @@ def main() -> int:
                         slot = {
                             "from_table": a_table, "from_column": a_col,
                             "to_table": b_table, "to_column": b_col,
+                            "from_columns": [a_col],
+                            "to_columns": [b_col],
+                            "join_condition": f"{a_table}.{a_col} = {b_table}.{b_col}",
+                            "source_file": str(snapshot_path.relative_to(PACKAGE.parent.parent)).replace("\\", "/"),
+                            "source_sql_sha256s": [],
+                            "system_code": key,
+                            "dialect": config["dialect"],
                             "evidence_objects": [],
-                            "directional": True,
+                            "evidence_kind": "view_or_routine_equal_join",
+                            "intake_status": "candidate",
+                            "confidence": "C",
+                            "qualifiers": [],
+                            "existing_relation_id": None,
+                            "metadata_evidence": "both identifiers resolved to snapshot objects",
+                            "validation_evidence": None,
+                            "risk_note": "static SQL evidence only; cardinality and qualifiers not validated",
+                            "review_required": True,
+                            "directional": False,
                         }
                         edge_registry[norm] = slot
                     if obj_label not in slot["evidence_objects"]:
                         slot["evidence_objects"].append(obj_label)
+                    if source_sql_sha256 not in slot["source_sql_sha256s"]:
+                        slot["source_sql_sha256s"].append(source_sql_sha256)
 
         system_result["edges"] = sorted(
             edge_registry.values(),
@@ -224,6 +305,7 @@ def main() -> int:
             "objects_total": info["objects_total"],
             "parse_errors": info["parse_errors"],
             "dependency_edges": len(info["dependency_edges"]),
+            "unresolved_edges": len(info["unresolved_edges"]),
         }
         for key, info in result.items()
     }

@@ -92,8 +92,12 @@
       "sha256": "26a38cfadcd063de"
     },
     "fancyhis_attributes.json": {
-      "size": 87119,
-      "sha256": "2c14245c2feac3c0"
+      "size": 87107,
+      "sha256": "9fc27f8cdf0f46de"
+    },
+    "relation_candidates.json": {
+      "size": 3644,
+      "sha256": "b138ceefee25e975"
     }
   }
 }

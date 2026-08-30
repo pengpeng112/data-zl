@@ -1,0 +1,1445 @@
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: F:\python\数据资产
+model: gpt-5.6-sol
+provider: custom
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a04097-206f-7c72-949e-5c3d9c0d0e9c
+--------
+user
+只读快速核查 verify/round-1/变更说明.md 与 任务包_原文.md，最多 5 条关键风险，每条一句话并注明出自哪个任务（T1-T6）或断言（C1-C10）。可对照仓库根 AGENTS.md、三仓库互通地图.md 抽查。
+codex
+我先按仓库规约做目录入口自检，再读取两份目标文档，并用根目录规约与互通地图做必要抽查；全程只读，最后压缩为不超过 5 条风险。
+2026-08-27T00:20:49.252870Z ERROR codex_core::tools::router: error=request_user_input is unavailable in Default mode
+2026-08-27T00:20:49.259464Z ERROR codex_core::tools::router: error=request_user_input is unavailable in Default mode
+2026-08-27T00:20:59.091698Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command "Get-ChildItem -Name '开发起步包' | Sort-Object"`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\nGet-ChildItem -Name '开发起步包' | Sort-Object\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+2026-08-27T00:21:06.935566Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command "cmd /c type \"开发起步包\\README.md\""`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\ncmd /c type \\\\\\\"开发起步包\\\\README.md\\\\\\\"\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+2026-08-27T00:21:12.750581Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command Get-Location`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\nGet-Location\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+codex
+当前终端进程启动被 Windows runner 拒绝（错误 1920），我在重试只读读取；若仍不可用，我会明确说明无法核查，不会臆测风险。
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'pwd; ls' in F:\python\数据资产
+ succeeded in 0ms:
+pwd: ignoring non-option arguments
+/f/python/数据资产
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "type \"开发起步包\\README.md\"" in F:\python\数据资产
+ exited 1 in 0ms:
+ϵͳ�Ҳ���ָ����·����
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "type \"开发起步包\\55_系统未完成事项统一执行计划.md\"" in F:\python\数据资产
+ exited 1 in 0ms:
+ϵͳ�Ҳ���ָ����·����
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'dir /b "开发起步包"' in F:\python\数据资产
+ exited 1 in 0ms:
+ϵͳ�Ҳ���ָ�����ļ���
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "dir /s /b \"verify\\round-1\\变更说明.md\" \"verify\\round-1\\任务包_原文.md\" \"三仓库互通地图.md\"" in F:\python\数据资产
+ exited 1 in 0ms:
+ϵͳ�Ҳ���ָ����·����
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files -g 'AGENTS.md' -g 'README.md' -g '55_系统未完成事项统一执行计划.md' -g '变更说明.md' -g '任务包_原文.md' -g '三仓库互通地图.md'" in F:\python\数据资产
+ exited 1 in 0ms:
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'rg --files | head -50' in F:\python\数据资产
+ succeeded in 20ms:
+start_backend.bat
+GIT_SETUP.md
+start_frontend.bat
+AGENTS.md
+verify\round-1\检查_codex.md
+verify\round-1\检查_codex.err
+verify\round-1\审查_zcode.md
+verify\round-1\审查_kimi.raw
+verify\round-1\审查_kimi.err
+verify\round-1\审查_grok.raw
+verify\round-1\审查_grok.err
+verify\round-1\哈希.md
+verify\round-1\变更说明.md
+verify\round-1\任务包_原文.md
+review\round-2\分歧表.md
+drivers\Vastbase-G100-2.15_pg-2026033109.jar
+backend\encoding_check.txt
+review\round-2\检查_codex.md
+review\round-2\检查_codex.err
+review\round-2\最终报告.md
+review\round-2\方案.md
+review\round-2\审查_zcode.md
+review\round-2\审查_kimi.raw
+review\round-2\审查_kimi.md
+review\round-2\审查_kimi.err
+review\round-2\审查_grok.raw
+review\round-2\审查_grok.md
+review\round-2\审查_grok.err
+review\round-2\哈希.md
+review\round-0-legacy-20260823\分歧表.md
+review\round-0-legacy-20260823\修订版提示词.md
+review\round-0-legacy-20260823\审查_grok.err
+review\round-1\codex_check.md
+review\round-1\codex_check.err
+review\round-1\分歧表_本轮.md
+review\round-0-legacy-20260823\审查_grok.raw
+review\round-1\哈希.md
+backend\README.md
+backend\alembic.ini
+review\round-0-legacy-20260823\检查_codex.err
+review\round-0-legacy-20260823\最终报告.md
+review\round-0-legacy-20260823\审查_kimi.raw
+review\round-0-legacy-20260823\审查_kimi.md
+review\round-0-legacy-20260823\审查_kimi.err
+review\round-1\审查_grok_本轮.raw
+review\round-1\审查_grok_本轮.md
+review\round-1\审查_grok_本轮.err
+review\round-1\审查_kimi_本轮.md
+review\round-1\审查_kimi_本轮.err
+review\round-1\审查_kimi_本轮.raw
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,240p' 'AGENTS.md'" in F:\python\数据资产
+ succeeded in 0ms:
+# AGENTS.md
+
+> 本仓库包含**文档资产参考包 + 可运行代码**。
+> - 文档：`开发起步包/` 下编号资产 + `数据资产_*/` 资产包 + `tools/`
+> - 代码：`backend/`（FastAPI）、`frontend/`（Vue3）、`deploy/`（部署方案）
+> - 会话开始前先读本文件，再读 `开发起步包/README.md`（唯一目录索引）和 `开发起步包/55_系统未完成事项统一执行计划.md`（唯一未完成事项入口）。按任务需要再读 `02`。
+
+## AI 技能路由（持续维护入口）
+
+- 用户要求**连接数据库、查系统清单、查表清单/表结构/字段结构**，或提到 `/sjzc`、连库、表结构、有哪些库/表时，必须先使用全局技能 `~/.zcode/skills/sjzc/SKILL.md`（统一连库与表结构入口：无参列全部系统由 AI 判断、带系统名直连；含限量只读 live 核验通道；全局命令，任意目录会话可用）。
+- 用户要求日常取数、保存 SQL、复用查询、修订口径、导入历史查询，或提到 `取数/`、`queryctl`、`query_code`、查询资产时，必须先使用 `.agents/skills/query-governance-intake/SKILL.md`（126 查询资产闭环），并阅读 `取数/START_HERE.md`。
+- 用户提供历史 SQL、报表 SQL、视图 SQL，或要求分析 JOIN、补充/纳入表关系、沉淀关系图谱时，必须先使用仓库技能 `.agents/skills/sql-relation-intake/SKILL.md`。
+- 该技能负责“SQL 解析 → 最新资产获取 → 元数据核对 → 正式关系查重 → 候选分级 → 验证/配方建议”。历史 SQL 只能先作为证据；未经审核不得直接写入正式关系。
+- 普通取数 SQL 在完成查询资产检索后，再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
+- 用户要求**处理 HIS/医院系统日常运维问题**（报错排查、故障处理、操作指导），或提到 `HIS日常问题处理知识库`、运维问题台账时，先读 `F:\python\Wx_ltjl\docs\知识库\HIS日常问题处理知识库.md`（84条运维台账知识库：现象/涉及表/排查SQL/风险分级，🔴写操作带护栏；映射 `开发起步包/HIS问题表映射.csv`；活库核验配合 sjzc 技能只读执行）。
+- 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方/查询资产接口，平台不可用时读取技能引用的仓库机器可读资产。
+
+## 三仓库互通（L1 速查）
+
+> 三仓库 = 本仓库（数据与连接中枢）+ `F:\python\Wx_ltjl`（运维知识与沟通中枢）+ `D:\Users\Administrator\Desktop\嘉和`（嘉和系逆向排障中枢）。完整调用关系/任务路由/互相吸收通道见 **L2 地图**：`F:\python\数据资产\三仓库互通地图.md`（本仓库根目录，跨仓库任务时才读）。
+
+- 共享枢纽：**sjzc 技能**（本仓库孵化后全局化，连库/表结构）｜**8.83 平台与受控凭据**（本仓库 `.ssh\config_ai` + `/etc/data-asset/credentials/`，**嘉和连库依赖此设施**）｜**wechat-chat-records 技能**（wx_ltjl 孵化，聊天记录）｜8.53 跳板（HIS 源库，`02` §2）
+- 别人调用本仓库最常用：连库/表结构/值域 → sjzc 与平台 API；跳板与凭据基础设施；OA 源端资产包（143 号）
+- 跨仓库改动按**对方**仓库规则登记（对方：INDEX.md / CHANGELOG；本仓库：开发起步包 README 目录更新记录）
+
+## 仓库性质（最重要）
+
+- **本仓库包含可运行代码**：`backend/`（FastAPI + SQLAlchemy + Alembic）、`frontend/`（Vue3 + Element Plus + Vite）、`deploy/`（部署方案）。代码仓库路径即本目录根。
+- 文档资产：`开发起步包/` 下编号资产 + `tools/` + `数据资产_*/` 资产包。
+- **已移除**：科研系统(labsop)、三甲 DataX 抽取流程、三甲 V1.3 合规核查。
+
+## 当前阶段目标（第一步，已与用户确认）
+
+**只做 Track A：AI 探库（数据中心 8.216 + HIS）→ 表结构与表间关系 → 关系图谱。**
+- 视图生成、内网服务部署**延后**，探库跑通再启动（见 `01` 蓝图）。
+
+**进度**：
+- ✅ **连接已打通**：跳板机 8.53（SSH 免密）→ 源库 8.216（thick 模式），DB 版本 11.2.0.4.0。
+- ✅ **元数据已采集**：`08_数据中心元数据快照.json`（32 schema / 865 表 / 26894 字段 / 404 视图 DDL）。实测发现数据中心业务库远超初始描述，含 `HIS`(273表)、`CDA`(86表+149视图)、`ODS`(119视图)、`MTL`(老EMR)、`JHEMR`(新EMR)、`YDHL`(移动护理)、`SM`(手麻)、`LIS`、`PACS`、`PORTAL_EMPI`(患者主索引) 等。
+- ✅ **表结构与关联已梳理**：`09_数据资产_表结构与关联关系.md`（合并两份已确认文档 + 经 08 校验：33 张核心表 32 张在 8.216 验证通过）+ 机器可读资产包 `数据资产_资产包/`（tables/columns/relationships.csv + catalog.json，由 `tools/build_asset_package.py` 生成）。
+- ✅ **核心关系已数据库验证并回写资产包**：`10_关系验证报告.md` / `10_关系验证结果.json`（25 项核心关系；确认 EXAM_MASTER 需拆住院/门诊子集，LAB_TEST_MASTER 需拆住院检验与 VISIT_ID=0/NULL 检验）。`relationships.csv` / `catalog.json` 已带 `validation_level/status/metrics/note`。
+- ✅ **视图 DDL 静态关系已解析 + HIS 已分类**：`11_视图关系解析与HIS分类报告.md` / `数据资产_关系图谱/`（ODS 119 视图 → 772 条依赖、732 条候选 join；HIS 273 表分类，66 张被 ODS 引用）。
+- ✅ **高频候选关系已排序并完成首批验证**：`12_候选关系验证报告.md` / `12_候选关系验证结果.json`（13 项候选验证，7 条提升入正式资产；`relationships.csv` 现 35 条正式关系）。
+- ✅ **手麻人员映射专题已验证**：`13_手麻人员映射验证报告.md` / `13_手麻人员映射验证结果.json`（确认外科医生/助手多为姓名、麻醉医生/护士多为工号、`HIS.STAFF_DICT.NAME` 存在重名；排班表仅 `STATE IN (2,3)` 可强关联手术主表）。
+- ✅ **PACS/LIS/YDHL 三库关系已专题验证**：`14_PACS_LIS_YDHL关系验证报告.md` / `14_PACS_LIS_YDHL关系验证结果.json`（PACS 内部关系成立但未发现直接挂 HIS.EXAM_MASTER 的同键；LIS 通过 `BARCODE=TEST_NO` 挂 HIS 检验；YDHL 通过 `MRN=INP_NO` + `SERIES=VISIT_ID` 挂 HIS 住院，护理事实表通过 `PATIENT_UID` 挂 `INPATIENTS`）。
+- ✅ **关系补验并回写资产包**：`15_关系补验与资产回写报告.md` / `15_关系补验与资产回写结果.json`（确认 JHEMR 按 `PATIENT_ID+VISIT_ID` 精确挂 HIS 住院；PACS 内部关系、LIS 内部关系、YDHL 深层关系已补验；正式关系 `relationships.csv` 现 47 条）。
+- ✅ **HISUSER 业务库已探查**：`16_hisuser业务库探查报告.md` / `16_hisuser业务库探查结果.json` / `16_hisuser业务库元数据快照.json`（确认 `hisuser` 自身 schema 不是业务主 schema；HIS 业务表分散在 `MEDREC/ORDADM/LAB/EXAM/COMM/DRUG_USER/PHARMACY/...` 等 owner；两份 HIS 文档 435 张候选表中 415 张在业务库可见，药房药库 67 张全部可见）。
+- ✅ **药房药库与发药主线已验证**：`19_药房药库关系验证报告.md` / `19_药房药库关系验证结果.json`（确认 `DRUG_USER` 新药库/发药申请主线、`PHARMACY` 旧处方/住院发药主线；两套表不是简单一对一同步）。
+- ✅ **HIS 主业务 owner 关系已补验**：`21_HIS主业务owner关系补验报告.md` / `21_HIS主业务owner关系补验结果.json`（验证 `MEDREC/ORDADM/LAB/EXAM/INPBILL/OUTPBILL/OUTPADM/INPADM` 21 条源端关系；确认源端口径与 ODS 主线一致，但暂不直接回写 ODS 资产包）。
+- ✅ **HIS 源端字段主题与 ODS 覆盖差异已梳理**：`22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json`（12 个 owner、1234 张表、19831 字段；105 张源端表与 ODS.HIS 同名覆盖，1129 张未按同名表覆盖）。
+- ✅ **HIS 源端资产范围已复核**：`23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json`（用户确认 `COMM/MEDADM` 纳入；`ST_*`、日志、接口中间表排除；医嘱执行、预交金纳入；`VISIT_ID=0/NULL` 检验/检查按门诊口径）。
+- ✅ **独立 HIS 源端资产包草案已生成**：`25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `数据资产_HIS源端资产包/`（1234 表、19831 字段、33 条关系；含 `source_owner/table_role/include_status/exclude_reason/ods_same_name_covered`）。
+- ✅ **文档入口已重整**：阶段性整改、交接和状态文档已归档；当前目录、状态和更新历史以 `开发起步包/README.md` 为准，未完成事项以 `55_系统未完成事项统一执行计划.md` 为准。
+- ✅ **用户治理口径已沉淀**：`40_数据治理复核口径与方法记录.md` 记录表清洗、待确认表收敛、强制保留表、B/C 关系采纳、D 关系跨系统延后等用户确认规则；后续 HIS/数据中心/周边系统治理分析必须优先沿用。
+- ⏭ **下一步**：未完成事项、优先级和验收条件统一以 `55_系统未完成事项统一执行计划.md` 为准；不得引用已归档的 29/41/42/46 作为执行入口。
+
+**关键捷径**：`03_view_registry.json` + `08` 里的 `V_EMR_*`/`CDR_*` 视图 SQL **本身就是关系样本**——它们编码了 HIS 表如何用 `PATIENT_ID+VISIT_ID`、`TEST_NO`、`EXAM_NO` 等关联。关系图谱以这些视图为种子扩展，不要从零推断。
+
+## 导航
+
+| 想做什么 | 先读哪里 |
+|---|---|
+| 总入口 / 连接 / 已知坑 | `02`（§2 连接、§4 核心主线、§5 数据坑、§7 资产包） |
+| 平台总目标与架构 | `01_平台执行方案.md` |
+| **表结构与关联关系（权威）** | `09_数据资产_表结构与关联关系.md`（含置信度 A/B/C、Mermaid 图） |
+| 数据库实测关系验证 | `10_关系验证报告.md` / `10_关系验证结果.json` |
+| 静态关系扩展 + HIS 分类 | `11_视图关系解析与HIS分类报告.md` / `开发起步包/数据资产_关系图谱/` |
+| 高频候选关系验证 | `12_候选关系验证报告.md` / `12_候选关系验证结果.json` |
+| 手麻人员映射专题 | `13_手麻人员映射验证报告.md` / `13_手麻人员映射验证结果.json` |
+| PACS/LIS/YDHL 三库关系 | `14_PACS_LIS_YDHL关系验证报告.md` / `14_PACS_LIS_YDHL关系验证结果.json` |
+| 关系补验与资产回写 | `15_关系补验与资产回写报告.md` / `15_关系补验与资产回写结果.json` |
+| HISUSER 业务库探查 | `16_hisuser业务库探查报告.md` / `16_hisuser业务库探查结果.json` / `16_hisuser业务库元数据快照.json` |
+| 药房药库关系验证 | `19_药房药库关系验证报告.md` / `19_药房药库关系验证结果.json` |
+| HIS 主业务 owner 关系补验 | `21_HIS主业务owner关系补验报告.md` / `21_HIS主业务owner关系补验结果.json` |
+| HIS 源端字段主题与 ODS 覆盖差异 | `22_HIS源端字段主题与ODS覆盖差异报告.md` / `22_HIS源端字段主题与ODS覆盖差异结果.json` |
+| HIS 源端资产范围复核与下一步计划 | `23_HIS源端资产范围复核与下一步计划报告.md` / `23_HIS源端资产范围复核与下一步计划结果.json` |
+| HIS 源端资产包 | `25_HIS源端资产包生成报告.md` / `25_HIS源端资产包生成结果.json` / `开发起步包/数据资产_HIS源端资产包/` |
+| **应用整改主入口** | `55_系统未完成事项统一执行计划.md` |
+| **用户确认的数据治理复核口径** | `40_数据治理复核口径与方法记录.md`（表清洗、强制保留、待确认清零、B/C 关系采纳、D 跨系统延后） |
+| **未完成工作与接手说明** | `55_系统未完成事项统一执行计划.md` + `开发起步包/README.md` |
+| 机器可读资产包（导入资产系统） | `开发起步包/数据资产_资产包/`（tables/columns/relationships.csv + catalog.json，关系含数据库实测验证等级） |
+| **实测全量元数据（关系图谱底座）** | `开发起步包/08_数据中心元数据快照.json` |
+| 现有视图→HIS 表关系（图谱种子） | `03_view_registry.json` |
+| 标准化目标表清单 + 数据中心源库 | `06_前置机与数据中心分析报告.md` |
+| 待探业务系统 + 探库开放问题 | `07_业务系统与探查开放问题.md` |
+
+> 元数据权威性：手头的表结构文档已陈旧（字段扩展未维护、含废弃表），**以 `08` 快照的活元数据为准**，手文档仅作命名/含义参考。快照可由跳板机重跑 `harvest_stage2.py` 重新生成。
+
+## 探库/写 SQL 时的硬约束（高代价易错点）
+
+不读会静默出错的事实（综合自多份文档）：
+
+1. **本机 Windows 不能直连数据库**，所有 DB 操作必须经跳板机 `10.10.8.53:40022`（见 `02` §2）。账号密码不要写入新代码仓库；内部凭据按既有安全渠道获取。
+   - 2026-07-31：平台服务器 `root@10.10.8.83:22` 已恢复公钥访问，本机密钥为 `C:\Users\Administrator\.ssh\id_ed25519_ai`；已用 `BatchMode=yes` 验证。后续 AI 优先使用公钥，禁止把 SSH 密码写入命令、文档或日志。详细交接见 `开发起步包/48_跳板机与HIS连接交接说明.md`。
+2. **源库 Oracle 旧版**：`oracledb` 必须 thick 模式 + `/opt/oracle/instantclient_21`，否则 `DPY-3010`；旧版不支持 `FETCH FIRST`，用 `ROWNUM <= N`。
+3. **`HIS.LAB_RESULT` 约 1 亿行**，查询必须用 `TEST_NO` 子查询限定，禁止全表扫描；大表（>1000 万行）只采元数据。
+4. **`HIS.OPERATION.OPER_ID` 全为 NULL**，手术主从关联改用 `SM.MED_OPERATION_NAME`。
+5. **`HIS.EXAM_MASTER.EXAM_CLASS` 存中文**（`'CT'`/`'磁共振'`），不是字典内码——过滤按中文，不要 join 字典。
+6. **字段值域禁止猜测，取数前必须先查值域知识库**（149 已落地）：优先平台 `GET /api/v1/ai/system-context`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱）；平台不可达读 `开发起步包/数据资产_资产包/value_domains.json`（超 max_age_days=7 须提示重导）；最后读 `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。三处均无 → SQL 注释【值域待确认：…】禁止假设。关键口径：
+   - 离院方式 `PAT_VISIT.DISCHARGE_DISPOSITION`：**4=非医嘱离院、5=死亡**（JHEMR `report.r_pat_visit` 交叉验证；`COMM.DISCHARGE_DISPOSITION_DICT` 是治疗结果字典，不可混用；`DEATH_DATE_TIME` 源端不填）。
+   - 手术急诊标志 `OPERATION.OPERATION_EMER_INDICATOR`：**2=急诊手术**（1=择期）。
+   - 病理数据在 ODS `BL` schema，不在 EXAM；门诊疾病谱用 `OUTPDOCT.OUTP_MR_DIAG_DESC`；麻醉台数用 `MED_OPERATION_MASTER`+`OPER_STATUS>=35`。
+7. `EXAM_REPORT` 无 `PATIENT_ID`，必须经 `EXAM_NO` 关联 `EXAM_MASTER`。
+8. HIS 万能主键：`PATIENT_ID + VISIT_ID`（住院）/ `OUTPATIENT_NUM`（门诊）；检验 `TEST_NO`、检查 `EXAM_NO`。
+9. 跨库捷径：前置机已建 DBLINK `sjzx` 指向源 ODS，可 `SELECT ... FROM V_EMR_xxx@sjzx`。
+
+## 值域映射模式（写视图时统一写法）
+
+```sql
+nvl((SELECT zd.国标编码 FROM cda.cda_dictionary zd
+     WHERE zd.字典名称='性别代码' AND zd.院内编码=pmi.sex), '9')
+```
+- 所有 `V_EMR_*` 视图依赖 `CDA.CDA_DICTIONARY`（院内码→国标码）。
+- 固定机构字段：`'49557032X' AS ORG_CODE`、`'山东省第二人民医院' AS ORG_NAME`、`'370104' AS DISTRICT_CODE`；ID = `'49557032X'||'|'||patient_id||'|'||visit_id`。（历史文档里的 `YLV21051` 已过期，勿用。）
+
+## 已知严重数据问题（详见 `02` §5）
+
+- `EMR_ANES_AFTER_RECORD` ID 重复约 30%；`EMR_OUTPATIENT_RECIPE_ITEM.OR_ID` 100% 孤儿；`EMR_OUTPATIENT_DIAG` 0 行；4 张表 `ADMISSION_ID` 缺失。
+
+## 安全红线
+
+- 源库一律只读，仅 `SELECT`，禁止任何 DML/DDL；高风险操作需人工确认。
+- 连接密码**不要写进任何新代码仓库或 git**；用 `.env` + 密钥管理，`.gitignore` 排除。本快照文档里的明文凭证仅为查阅方便。
+- 姓名/身份证/电话/地址**脱敏后**才能进 AI、日志、报告。
+- 探库任务夜间执行并加超时。
+
+## 文档管理与目录维护（强制，每次会话执行）
+
+> 文档量大且持续增长，必须维护**单一权威目录**（`开发起步包/README.md`）。该文件同时记录状态、用途、归档和更新历史；禁止再新建平行状态总表。
+> **任何 AI（含本助手）每次会话开始时，先做"目录自检"再动文档；每次新增/废弃文档必须同步清单。不遵守 = 后续 AI 无法定位资产。**
+
+### 1. 启动自检（会话第一步，必做）
+- 读 `开发起步包/README.md`（权威目录）与 `55_系统未完成事项统一执行计划.md`。
+- 用 Glob 列 `开发起步包/*` 实际文件，与 README 各分组比对：
+  - **孤儿文件**（实际存在、清单未登记）：补登记；若判断为废弃则迁入 `_archive/`。
+  - **幽灵条目**（清单有、文件不存在）：修正或删除该行。
+- 发现不一致**先修正目录**，再开始正文工作。
+
+### 2. 新增文档（强制 4 步，缺一不可）
+1. **编号**：续用当前最大编号 +1（查清单尾部），前缀 `NN_中文名.md`；配套结果文件用同号 `_结果.json`。
+2. **登记**：立即在 README 对应分组追加一行（编号 / 状态 / 文件 / 用途）。
+3. **归类**：文档首行加 `> 类别：xxx`（类别定义见 README），并确认归入清单正确分组。
+4. **记录**：立即在 README「目录更新记录」追加日期、操作和原因。
+
+### 3. 归类汇总
+- README 按当前入口、权威口径、证据链、资产包、模块计划和归档分组；状态定义维护在 README。
+- 新类别或新分组须同步更新 README。
+
+### 4. 无用文档迁移（只迁不删）
+- 过时 / 被取代 / 废弃 / 临时文档 → 移入 `开发起步包/_archive/`。
+- 在 README「目录更新记录」及 `_archive/README.md` 记录：原序号 + 文件名 + 归档原因 + 日期。
+- 主清单不再列归档文件；迁移前确认无其他文档引用。
+
+### 5. 文档体例
+- UTF-8 Markdown，中文文件名 + 编号前缀（可跳号）。
+- 以"索引 + 源文件路径"组织，不堆全量内容。
+- 凭据脱敏；明文密码不进新代码仓库。
+- 后续建代码仓库：脚本 ASCII 描述性命名（`verify_*/check_*/test_*`），4 空格缩进。
+
+---
+
+## 代码开发约束
+
+> 以下约束适用于 `backend/`、`frontend/`、`deploy/` 目录的开发。
+
+### AI 协作与成本策略（用户确认，2026-08-11）
+
+- 后续开发默认采用“主 AI 负责总体规划、架构判断、任务拆分、关键修复和最终验收；Luna 负责边界清晰的审查、编码和专项测试”的协作方式，以降低模型使用成本。
+- 主 AI 必须先从 `README.md` 和 `55_系统未完成事项统一执行计划.md` 收敛真实未完成项，再把互不冲突、可独立验收的子任务交给 Luna；不得让多个 AI 同时修改同一文件。
+- Luna 的任务必须写清文件范围、安全边界、禁止动作和验收命令。生产发布、平台正式 apply、业务库写入、权限调整、Git push/tag 等外部动作仍需遵守原授权门禁，不能因使用子 AI 而扩大权限。
+- 主 AI 必须复核 Luna 的结论和代码，统一运行验收门禁并负责最终交付；不得直接把子 AI 输出视为已完成成果。
+
+1. **源库只读**：所有数据库连接默认只读 `SELECT`，禁止 DML/DDL。写操作必须通过 `asset_action_executors` 白名单 + 审批。
+2. **凭据脱敏**：密码、Token、身份证、姓名、电话、地址**不写代码、不写日志、不进 git**。审计写入前脱敏。
+3. **单一 schema**：所有新表继续在 `asset` schema 内用 `asset_<模块>_<实体>` 前缀，不得拆物理 schema。
+4. **Alembic 手写**：迁移必须手写 `upgrade()` 和 `downgrade()`，禁用 `--autogenerate`。
+5. **AI 不执行写操作**：AI 工具仅调用只读探查端点 + 强制审计，不接入 `asset_action_executors` 写操作执行器。
+6. **大表禁全扫**：`HIS.LAB_RESULT` 等大表必须用 `ROWNUM <= N` 或子查询限定。
+7. **保留旧表**：`asset_api_keys`/`asset_table_owners`/`asset_business_terms`/`asset_metadata_snapshots` 是旧 MVP 表，保留不删。
+8. **前端不改现有路径**：`/relations/{id}/review`、`/dict-medical/*` 等现有路径保留不变。
+9. **前端技术栈与约定**：基于 `pure-admin-thin` 模板，Vue3 + Element Plus + Pinia + Tailwind + Vite + TypeScript。typecheck 同时跑 `tsc --noEmit` 和 `vue-tsc`，必须两者都过。API 层在 `src/api/*.ts`，按模块分文件（asset/dict/identity/metadata/ops/routes/user）；新增接口优先扩展现有文件而非新建。路由模块在 `src/router/modules/`，视图在 `src/views/<模块>/`。
+
+### 验收命令
+
+后端：
+```powershell
+cd F:\python\数据资产\backend
+.\.venv\Scripts\python.exe -m pytest tests/ -q
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+
+前端（**必须用 pnpm**，仓库 `package.json` 有 `preinstall: only-allow pnpm`，锁文件为 `pnpm-lock.yaml`，用 npm/yarn 会失败或引入幻影依赖）：
+```powershell
+cd F:\python\数据资产\frontend
+pnpm install
+pnpm run typecheck
+pnpm run build
+```
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,240p' 'verify/round-1/变更说明.md'" in F:\python\数据资产
+ succeeded in 0ms:
+# 变更说明（核查包：对象为任务包而非代码 diff）
+
+## 核查对象
+`verify/round-1/任务包_原文.md`——另一 AI 制定的本仓库任务包（T1-T6，全部为文档/流程类动作，不涉业务代码）。本包要验证：①其"现状"断言是否与仓库事实一致；②其动作是否与 AGENTS.md/55/153/149 等既有约束冲突；③执行风险点。
+
+## 断言清单（验证方法）
+
+| # | 任务包断言 | 验证方法 |
+|---|---|---|
+| C1 | 根无 CLAUDE.md | ls（已证：不存在） |
+| C2 | 三仓库互通地图.md 存在且含 20 系统/11,182 表/143,707 字段/151 条 SQL/31 篇 docs/47+ 验证关系等时点数字、无口径日期 | 读地图全文核对 |
+| C3 | 嘉和 sql\ 四分册 151 条带程序集+方法出处的 SQL | ls 四分册 + 统计条目数 |
+| C4 | sql-relation-intake 技能存在且具备全流程 | ls + SKILL.md 已在 152 使用过 |
+| C5 | 152 号 E6 有八条 D 级候选 | 读 152 结果 JSON |
+| C6 | AGENTS.md 198 行、进度清单约 20 行、导航表 25 行 | wc + 读原文 |
+| C7 | wechat-local-backup-search 只在 wx_ltjl AGENTS.md 描述、不在 L2 地图 | grep 两文件 |
+| C8 | F:\python\JHEMR 与 嘉和\JHEMR 关系可核实性 | ls + 读两目录入口文件 |
+| C9 | 查重目标= 开发起步包\数据资产_资产包\relationships.csv | **疑点**：该包是 ODS/HIS 体系（104 行）；JHEMR SQL 应查 数据资产_JHEMR_Vastbase资产包\relationships.csv（284 行）。需裁决 |
+| C10 | "每项完成先 README 登记"符合仓库四步 | AGENTS.md 文档管理节 |
+
+## 我方自认风险（供审查方重点检验）
+- R1 T5 瘦身：AGENTS.md 当前工作区 dirty（含 144/146/149 未提交改动叠加），git 回退不可行（会把未提交改动一并回退）；引用 grep 范围要含 开起步包/*.md、review/、verify/、backend/frontend README。
+- R2 T4 若 04 分册混有非 JHEMR 系统 SQL（如老 HIS），system_code 与查重集需按实际目标库拆分，任务包假定单一 EMR 库可能不成立。
+- R3 T2 数字弱化清单需逐个过地图原文，防漏改或误改精确值（凭据路径等）。
+- R4 T6② 凭据轮换建议涉及 8.83 受控凭据文件——建议文本可以给，但绝不能在建议里粘贴任何真实凭据。
+- R5 任务包要求 153/149 不在本次范围——与 55 现状一致，无冲突；但 T4 试点报告编号"续当前最大+1"=154，需确认 153 之后无其他新号被占用（今天本会话已建 153）。
+
+## 验证证据（步骤 3，已执行/待执行）
+- 已执行：CLAUDE.md 不存在；四分册+README 存在；两资产包行数（104/284）；AGENTS.md=198 行；wechat-local-backup-search 含 HANDOVER.md；两个 JHEMR 目录均存在。
+- 待执行：地图全文核对、04 分册条目统计与目标库抽样、wx_ltjl AGENTS.md 引用核对、152 JSON 候选数、引用 grep、55/README 交叉。
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,240p' 'verify/round-1/任务包_原文.md'" in F:\python\数据资产
+ succeeded in 0ms:
+# 任务包_原文（核查对象，用户 2026-08-27 转交的另一 AI 产出）
+
+三仓库检查处理提示词-数据资产
+
+给执行 AI（任意模型）：本文自包含，按序执行；每完成一项先在 开发起步包\README.md 目录更新记录登记再继续。 创建：2026-08-27 ｜ 来源：《三仓库问题清单与评审提示词》v1（本仓库根目录，含全部问题的现状/原因/需求）。
+
+## 角色与边界
+
+你是接手数据资产仓库（F:\python\数据资产）的执行 AI，处理三仓库并行问题中本仓库的任务包。
+写入范围仅限本仓库（含根级《三仓库互通地图.md》——三仓库中唯一由本仓维护的互通文件）；F:\python\Wx_ltjl、D:\Users\Administrator\Desktop\嘉和 只读，涉及处只输出建议文本（T6）。
+平台生产（10.10.8.83）零改动：不部署、不迁移、不改容器/前端；153 号整改与 149 值域导入不在本次范围（仅 T6 出顺序建议）。
+业务源库一律只读；元数据核对允许用全局 sjzc 技能的 tables/columns 通道（~/.zcode/skills/sjzc/），live 通道仅限量只读 SELECT（沿用 152 号先例），禁止一切 DML/DDL。
+
+## 第一步：必读（按序）
+
+1. 根 AGENTS.md（技能路由 / 硬约束 / 安全红线 / 启动自检）
+2. 开发起步包\README.md（权威目录）+ 55_系统未完成事项统一执行计划.md（未完成事项唯一入口）
+3. 根 三仓库互通地图.md（L2 地图，本次 T2/T3 的修改对象）
+4. 根 三仓库问题清单与评审提示词.md（v1，全部问题背景）
+5. 本文件任务清单
+
+## 任务清单（每项含现状 / 原因 / 动作）
+
+### T1 [可执行] 补根级 CLAUDE.md（问题 A1）
+- 现状：本仓库只有 AGENTS.md，无 CLAUDE.md——Claude 类工具打开本目录时读不到启动上下文。
+- 原因：多 AI 接力建设，各工具自动入口不同，未统一约定。
+- 动作：新建根级 CLAUDE.md，3-5 行，内容=转发（"先读 AGENTS.md 并遵守其技能路由与安全红线"），不复制正文。
+
+### T2 [可执行] L2 地图时效防护（问题 A2）
+- 现状：《三仓库互通地图.md》含大量时点数字（20 系统、11,182 表、143,707 字段、151 条 SQL、31 篇 docs、47+ 验证关系），无口径日期，无过期触发机制。
+- 原因：地图是 2026-08-26 的汇总快照；各源数字随仓库演进，无同步机制。
+- 动作：
+  1. 地图头部加"口径快照日期：2026-08-26（数字类信息以该日为准，精确值以各仓库权威文件为准）"；
+  2. 逐项评估地图内数字：可弱化的改"约/N+"（如 47+ 验证关系），必须精确的（如凭据路径）保留；
+  3. 在根 AGENTS.md「启动自检」节追加一行："涉及跨仓库能力/枢纽/吸收通道变更时，检查并更新《三仓库互通地图.md》"。
+
+### T3 [可执行] 地图收录边界判定（问题 A4）
+- 现状：F:\python\wechat-local-backup-search（企微本地库解密，三仓库共用的解密方案源头，HANDOVER.md）只在 wx_ltjl AGENTS.md 描述，不在 L2 地图；地图未定义收录判据。
+- 原因：地图初版按用户点名的三仓库建。
+- 动作：在地图新增"周边关联目录（不入主表）"小节：先写明收录判据（建议：被 ≥2 仓库依赖的能力源头目录才入图，以行级条目而非独立仓库条目收录），再按判据登记 wechat-local-backup-search 一行（路径/角色/被谁依赖/详见 wx_ltjl AGENTS.md）；F:\python\JHEMR 与 嘉和\JHEMR\ 的关系若能核实也加注一行，核实不了就标注"待核实"。
+
+### T4 [可执行·试点] 嘉和 sql/ 沉淀入关系图谱试点（问题 A3a）
+- 现状：嘉和 sql\ 四分册共 151 条带程序集+方法出处的 SQL；本仓库 .agents\skills\sql-relation-intake\SKILL.md 具备"解析→元数据核对→查重→候选分级"能力；唯一先例是 152 号消费 22 条 PBD SQL。
+- 原因：吸收通道刚定义，无排期；批量入库有污染正式资产的风险，须先试点。
+- 动作：
+  1. 选一分册（建议 04-上报工具.md——EMR 库、与平台 JHEMR 资产对齐；也可自行论证换册）取 ≤20 条完整可执行语句（跳过片段级）；
+  2. 走 sql-relation-intake 全流程：解析 JOIN/写链 → 元数据核对（平台元数据或离线资产包 CSV）→ 与 开发起步包\数据资产_资产包\relationships.csv 正式关系查重 → 候选分级（A/B/C/D 按技能规则）；
+  3. 产出试点报告（新文件放 开发起步包\，编号续当前最大 +1，按 README 四步登记）：候选清单、分级理由、与 152 号 E6 的八条 D 级候选的去重结论、全量 151 条的分批沉淀方案建议；
+- 红线：未经审核不得写入正式关系（relationships.csv / catalog.json 不动）。嘉和 sql\ 与其仓库全部文件只读。
+
+### T5 [可执行·谨慎] 根 AGENTS.md 瘦身（问题 C1）
+- 现状：AGENTS.md 约 198 行；「当前阶段目标」的 ✅ 进度清单（约 20 行）与 55 号重复（55 号是权威入口），导航表 25 行与 开发起步包\README.md 重复。
+- 原因：历史演进中 AGENTS.md 承担了状态汇报功能，双份清单易漂移。
+- 动作：
+  1. 先 grep 全仓库对将压缩内容的引用（确认无文档引用被删的具体条目行）；
+  2. 进度清单压缩为：阶段目标 3 行 + "进度与未完成事项以 55 号为唯一权威入口"指针；导航表去重，仅保留高频入口（连接/硬约束/权威表结构/55 号/治理口径），其余指向开发起步包 README；
+  3. 安全红线、硬约束、技能路由一字不动；
+  4. 完成后在开发起步包 README 登记，注明压缩范围与可回退方式（git 或备份副本）。
+- 若发现引用复杂、压缩风险高，允许降级为"只输出压缩方案"并说明。
+
+### T6 [仅输出建议] 挂起事项与跨仓库项
+只给建议文本：①153 号与 149 值域导入的执行顺序与依赖（谁先谁后、有无阻塞、安全窗口）；②OA SQLServer admin 凭据轮换方案框架（143 号建议的专用只读账号如何落地、切换步骤、回退）；③wx_ltjl / 嘉和的入口文件与各自瘦身方案意见（站在被影响方视角）。
+
+## 红线（摘要，完整版根 AGENTS.md；违反即停）
+- 源库一律只读 SELECT，禁 DML/DDL；大表（LAB_RESULT 等）禁全扫。
+- 平台生产（8.83）不动：不部署、不迁移、不重启容器。
+- 凭据不进代码/日志/git；姓名/身份证等脱敏后才可入报告。
+- 新增文档四步：编号 → README 登记 → 归类标注 → 更新记录。
+- 前端必须 pnpm；Alembic 手写不用 autogenerate（本次预计不涉代码，仅备忘）。
+- 不做 git 提交/push。
+
+## 登记与交付
+- 每完成一项：先在 开发起步包\README.md 目录更新记录追加一行再继续。
+- 最终交付（会话末输出文本）：
+  1. 任务完成清单（含未完成项与原因、T5 是否降级）；
+  2. T4 试点结果摘要（候选 N 条、分级分布、分批方案要点）；
+  3. T6 建议文本全文；
+  4. 自检声明：列出实际打开核实的文件清单；未核实之处标注"仅推断"。
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,240p' '三仓库互通地图.md'" in F:\python\数据资产
+ succeeded in 0ms:
+# 三仓库互通地图（L2·按需加载）
+
+> **定位**：本机三个工作目录（wx_ltjl / 数据资产 / 嘉和）的统一互通、互调与互相吸收地图，**单一权威源**。
+> **分级**：L1 = 各仓库启动文件中的速查块（会话必读）；L2 = 本文件（跨仓库任务时才读）；L3 = 各仓库深处文档（任务相关才读，入口见 §3 路由矩阵）。
+> 三仓库启动文件：`F:\python\Wx_ltjl\AGENTS.md`、`F:\python\数据资产\AGENTS.md`、`D:\Users\Administrator\Desktop\嘉和\START_HERE.md`（各含 L1 速查块指向本文件）。
+> 创建：2026-08-26。维护：任一仓库对外能力 / 共享枢纽 / 吸收通道变化时更新本文件并在 §6 登记；L1 速查块仅在速查事实变化时同步。
+
+## 1. 三仓库定位
+
+| 仓库 | 路径 | 角色（对外提供什么） |
+|---|---|---|
+| **wx_ltjl** | `F:\python\Wx_ltjl` | 运维知识与沟通中枢：HIS 日常问题知识库（84 条台账/排查 SQL/风险分级）、微信/企微聊天记录检索、OA 工单获取（WF_WORK 直查 + oa_client.py）、周报生成、腾讯文档镜像（30 篇手册） |
+| **数据资产** | `F:\python\数据资产` | 数据与连接中枢：20 系统统一连库（sjzc）、全系统表结构/元数据/表间关系资产包（11,182 表/143,707 字段/47+ 验证关系）、值域知识库、查询资产（queryctl/取数）、平台 backend/frontend 与 8.83 基础设施 |
+| **嘉和** | `D:\Users\Administrator\Desktop\嘉和` | 嘉和系逆向与排障中枢：EMR(JHEMR)/无纸化/老HIS(satrda)/互联互通上报工具的 31 篇排障 docs、反编译 SQL 资产库（151 条带程序集出处）、系统↔库↔表映射（docs/26）、反编译工具链 |
+
+## 2. 共享枢纽（三仓库通用，跨仓库任务先想这里）
+
+1. **sjzc 技能**（`~/.zcode/skills/sjzc/`，全局任意目录可用）：统一连库与表结构查询（HIS/ODS/JHEMR/无纸化 CDMS/OA/LIS/PACS 等 20 系统，Oracle+Vastbase+SQLServer+MySQL），含限量只读 live 核验通道。表结构/连库类需求一律走它，不要另起连接。
+2. **平台服务器 10.10.8.83**（别名 `data-asset-83`）：SSH config `F:\python\数据资产\.ssh\config_ai`（密钥 `C:\Users\Administrator\.ssh\id_ed25519_ai`）；源库凭据集中在 `/etc/data-asset/credentials/`（jhemr_vastbase / paperless_cdms / oa_sqlserver 等，平台受控解析，不落盘不回显）。**嘉和仓库的连库/跳板（其 docs/01）完全依赖这套基础设施**。
+3. **wechat-chat-records 技能**（`~/.zcode/skills/wechat-chat-records/`，wx_ltjl 孵化）：个人微信+企微聊天记录、收发文件检索，任意会话可用。
+4. **HIS 源库直探**：跳板 `10.10.8.53:40022`（连接细节见数据资产 `开发起步包\02` §2；Oracle 11.2 需 thick 模式）。
+
+## 3. 任务路由矩阵（要做什么 → 去哪拿）
+
+| 需求 | 入口 |
+|---|---|
+| 查任何系统表结构/字段/连库/限量核验 | sjzc 技能（§2.1）；平台 API `GET /api/v1/ai/system-context` |
+| 写 SQL 前查值域口径 | 数据资产 `开发起步包\数据资产_资产包\value_domains.json` 或 `148_病案首页关键值域与离院方式口径字典.md`（禁止猜值域） |
+| HIS/医院系统日常运维问题 | wx_ltjl `docs\知识库\HIS日常问题处理知识库.md`（数据资产 AGENTS 技能路由已指） |
+| 嘉和 EMR/无纸化/上报工具排障与机制 | 嘉和 `START_HERE.md` §2 导航表 → docs（接收链 21 / wzh 主站 22 / 通用接口 24 / 上报九环节 25 / 系统库映射 26） |
+| 带程序集+方法出处的可执行 SQL | 嘉和 `sql\` 四分册（CDMS/通用接口/老HIS/上报工具） |
+| 微信/企微聊天记录、收发文件追溯 | wechat-chat-records 技能；细节 wx_ltjl `docs\使用说明\聊天记录获取指南.md` |
+| OA 派工发现与单据抓取 | wx_ltjl AGENTS「标准工作流 B」；OA 表结构 `开发起步包\数据资产_OA源端资产包\columns.csv`（143 号） |
+| 表间关系/元数据权威资产 | 数据资产 `开发起步包\数据资产_资产包\`（tables/columns/relationships.csv + catalog.json）、`08_数据中心元数据快照.json` |
+| 取数/保存 SQL/复用查询 | 数据资产 `取数\START_HERE.md`（queryctl 查询资产闭环） |
+| 跳板/凭据/连接基础设施 | §2.2（config_ai + `/etc/data-asset/credentials/` + 8.53 跳板） |
+| 周报生成/腾讯文档手册 | wx_ltjl AGENTS「核心工作流：周报生成」；`docs\腾讯文档镜像\` |
+
+## 4. 互相吸收通道（持续，按需触发）
+
+1. 嘉和 `sql\` 反编译 SQL 与写链结论 → 数据资产 `.agents/skills/sql-relation-intake/SKILL.md` 沉淀为关系图谱候选（先例：152 号 E4–E6 用嘉和侧 PBD 提取 SQL 产出映射表/值域候选/D 级关系候选）。
+2. 嘉和日常问题排障结论（docs/28~30 类）若属 HIS 运维台账范畴 → 转 wx_ltjl 知识库候选条目（按其知识库格式，勿直接改活文档）。
+3. wx_ltjl 知识库条目涉及表 ↔ 数据资产 `开发起步包\HIS问题表映射.csv` 双向同步；缺口表走 sjzc live 补采入平台（先例：his_kb_backfill_20260824）。
+4. 数据资产值域知识库 → 嘉和侧写 SQL 前查值域，禁止猜值域。
+5. 数据资产 backend 对 JHEMR_VASTBASE 的字典推送（计划 96）与身份同步（计划 103/107）为默认关闭的受控通道，开启须用户授权。
+
+## 5. 跨仓库协作规则
+
+- 跨仓库改动必须按**对方**仓库规则登记：wx_ltjl → `INDEX.md`；数据资产 → `开发起步包\README.md` 目录更新记录；嘉和 → `CHANGELOG.md`。
+- 各仓库安全红线在跨仓库任务中同样生效（源库只读、凭据不落盘、生产改动须批准、`WF_SEQUENCE` 禁触等），以对方仓库启动文件为权威。
+- 本文件是互通事实的单一权威源；三仓库 L1 速查块与本文件冲突时，以本文件为准并同步修正 L1。
+
+## 6. 更新记录
+
+| 日期 | 操作者 | 内容 |
+|---|---|---|
+| 2026-08-26 | ZCode(GLM-5.3) | 创建：合并原三仓库启动文件中的同源互通章节（各自视角）为单一权威地图；三启动文件改载 L1 速查块指向本文件，启动文件瘦身 |
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files | rg '("'^|['"\\\\/])152_.*结果\\.json"'$|(''^|['"\\\\/])04-.*\\.md"'$|JHEMR|wechat-local-backup-search|开发起步包['"\\\\/]README|55_系统未完成'" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� 04-.*\.md$��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "find . -maxdepth 3 -type f | sort | sed -n '1,220p'" in F:\python\数据资产
+ succeeded in 643ms:
+find: ‘./.pytest_cache’: Permission denied
+find: ‘./backend/.pytest_cache’: Permission denied
+./.agents/plan139_git_dirty_baseline.txt
+./.git/COMMIT_EDITMSG
+./.git/FETCH_HEAD
+./.git/HEAD
+./.git/ORIG_HEAD
+./.git/config
+./.git/description
+./.git/hooks/applypatch-msg.sample
+./.git/hooks/commit-msg.sample
+./.git/hooks/fsmonitor-watchman.sample
+./.git/hooks/post-update.sample
+./.git/hooks/pre-applypatch.sample
+./.git/hooks/pre-commit.sample
+./.git/hooks/pre-merge-commit.sample
+./.git/hooks/pre-push.sample
+./.git/hooks/pre-rebase.sample
+./.git/hooks/pre-receive.sample
+./.git/hooks/prepare-commit-msg.sample
+./.git/hooks/push-to-checkout.sample
+./.git/hooks/sendemail-validate.sample
+./.git/hooks/update.sample
+./.git/index
+./.git/info/exclude
+./.git/logs/HEAD
+./.git/opencode
+./.gitattributes
+./.gitignore
+./.ssh/README.md
+./.ssh/README_SERVER_ACCESS.md
+./.ssh/config_ai
+./.ssh/deploy_key
+./.ssh/deploy_key.pub
+./.ssh/deploy_key.pub.txt
+./.ssh/host_8_83_scan.tmp
+./.ssh/known_hosts
+./.ssh/known_hosts_8_83
+./.ssh/server_8_83_root
+./.ssh/server_8_83_root.pub
+./.zcode/plans/plan-sess_1c299854-9c2c-4cc1-a091-b1873b1e7a6c.md
+./AGENTS.md
+./GIT_SETUP.md
+./_offline_build_123/signature125_payload.tar
+./_offline_build_123/wheels/pillow-12.2.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+./_tmp_j10_contract.py
+./_tmp_j7_apply.py
+./_tmp_j7_fix_layer.py
+./_tmp_j7_fix_metrics.py
+./_tmp_j7_inspect.sh
+./_tmp_j7_query.py
+./_tmp_j7_smoke.py
+./_tmp_j7_smoke2.py
+./_tmp_j7_unused.py
+./_tmp_j7_unused2.py
+./_tmp_j7_unused3.py
+./_tmp_j7_verify.py
+./_tmp_j7_verify_release.sh
+./_tmp_j8_demo_analysis.py
+./_tmp_j9_ai_perm.py
+./_tmp_j9_ai_perm2.py
+./_tmp_j9_grant_ai.py
+./backend/.env
+./backend/.env.example
+./backend/.env.test.example
+./backend/.env.ui
+./backend/.venv/.gitignore
+./backend/.venv/pyvenv.cfg
+./backend/README.md
+./backend/_oa_work/oa_analysis_summary.json
+./backend/_oa_work/oa_snapshot.json
+./backend/_oa_work/validation_results_raw.json
+./backend/_plan139_work/COORDINATION.md
+./backend/_plan139_work/core2db_snapshot.json
+./backend/_plan139_work/definition_sha256_original.json
+./backend/_plan139_work/occupational_disease_snapshot.json
+./backend/_plan139_work/pathology_snapshot.json
+./backend/_plan139_work/physical_exam_snapshot.json
+./backend/_plan139_work/plan139_build_package.py.superseded
+./backend/_plan139_work/platform_assets_export.json
+./backend/_plan139_work/sanitize_evidence.py
+./backend/alembic.ini
+./backend/alembic/README
+./backend/alembic/env.py
+./backend/alembic/script.py.mako
+./backend/app/__init__.py
+./backend/app/main.py
+./backend/dev.err
+./backend/dev.log
+./backend/docs/api.md
+./backend/encoding_check.txt
+./backend/identity_test.db
+./backend/identity_unit_test.db
+./backend/requirements-dev.txt
+./backend/requirements.lock
+./backend/requirements.txt
+./backend/scripts/__init__.py
+./backend/scripts/_apply_his_identity_and_hrp.py
+./backend/scripts/_apply_his_identity_result.json
+./backend/scripts/_apply_identity_retry_and_hrp_cred.py
+./backend/scripts/_browser_accept_auth_probe.py
+./backend/scripts/_browser_accept_probe.py
+./backend/scripts/_check_outsource2_tmp.py
+./backend/scripts/_check_outsource_tmp.py
+./backend/scripts/_cols_check.py
+./backend/scripts/_continue_l10_mount_deploy.py
+./backend/scripts/_cs3.py
+./backend/scripts/_cs4.py
+./backend/scripts/_debug_dashboard.py
+./backend/scripts/_debug_tree.py
+./backend/scripts/_deploy_continue_and_import.py
+./backend/scripts/_graph_dup.py
+./backend/scripts/_graph_probe.py
+./backend/scripts/_graph_test.py
+./backend/scripts/_graph_test2.py
+./backend/scripts/_his_probe.py
+./backend/scripts/_hot_browser_fixes.py
+./backend/scripts/_hot_tree_l16.py
+./backend/scripts/_hrp_find_and_harvest.py
+./backend/scripts/_hrp_ods_fallback_harvest.py
+./backend/scripts/_m1m2_full_pytest.txt
+./backend/scripts/_m1m2_pytest_summary.txt
+./backend/scripts/_m1m2_test_env.ps1
+./backend/scripts/_metric_validate.py
+./backend/scripts/_metrics_snapshot.py
+./backend/scripts/_probe_catalog_baseline.py
+./backend/scripts/_probe_test_db.py
+./backend/scripts/_readonly_probe_sources.py
+./backend/scripts/_rerun_import_only.py
+./backend/scripts/_ro_check_oracle.py
+./backend/scripts/_ro_continue_l10_l11.py
+./backend/scripts/_ro_continue_l10_l11_v2.py
+./backend/scripts/_ro_deep_sample_and_register.py
+./backend/scripts/_ro_find_sys_employee.py
+./backend/scripts/_ro_fix_and_probe_v2.py
+./backend/scripts/_ro_fix_cred_mount.py
+./backend/scripts/_ro_fix_oracle_client_and_probe.py
+./backend/scripts/_ro_his_dryrun_fxhis.py
+./backend/scripts/_ro_platform_connector_check.py
+./backend/scripts/_ro_query.py
+./backend/scripts/_ro_sample_fxhis_employee.py
+./backend/scripts/_ro_thick_debug.py
+./backend/scripts/_ro_verify_counts.py
+./backend/scripts/_run_alembic_146.py
+./backend/scripts/_run_metrics.py
+./backend/scripts/_run_metrics2.py
+./backend/scripts/_run_push_tests.py
+./backend/scripts/_run_pytest_146.py
+./backend/scripts/_server_test_medical_push.py
+./backend/scripts/_smoke_medical_push.py
+./backend/scripts/_smoke_platform_state.py
+./backend/scripts/_tmp_find_signature_candidate.py
+./backend/scripts/_tmp_signature_insert_shape.py
+./backend/scripts/apply_plan137_conflict_resolution.py
+./backend/scripts/backfill_catalog_display_names.py
+./backend/scripts/backfill_connection_targets.py
+./backend/scripts/backfill_relation_endpoints.py
+./backend/scripts/backfill_status_conflict_sync.py
+./backend/scripts/bind_token.py
+./backend/scripts/build_plan139_asset_package.py
+./backend/scripts/create_admin_token.py
+./backend/scripts/create_local_admin.py
+./backend/scripts/create_platform_admin.py
+./backend/scripts/diff_live_snapshot_vs_08.py
+./backend/scripts/disable_jhemr_account.py
+./backend/scripts/e2e_graph_acceptance.py
+./backend/scripts/e2e_graph_browser.py
+./backend/scripts/e2e_graph_g7_acceptance.py
+./backend/scripts/extract_graph_prod_sample.py
+./backend/scripts/fix_datacenter_registration.py
+./backend/scripts/fix_null_column_sources.py
+./backend/scripts/fix_plan139_review_attribution.py
+./backend/scripts/graph_prod_sample.json
+./backend/scripts/harvest_docare_oracle_readonly.py
+./backend/scripts/harvest_his_views_readonly.py
+./backend/scripts/harvest_lis_sqlserver_readonly.py
+./backend/scripts/harvest_mysql_readonly.py
+./backend/scripts/harvest_pacs_mysql_readonly.py
+./backend/scripts/harvest_paperless_oracle_readonly.py
+./backend/scripts/harvest_sqlserver_readonly.py
+./backend/scripts/harvest_ultrasound_endoscopy_sqlserver_readonly.py
+./backend/scripts/import_candidates.py
+./backend/scripts/import_diagnosis_mapping_and_dispatch.py
+./backend/scripts/import_explored_sources_to_platform.py
+./backend/scripts/import_his_ready_governance.py
+./backend/scripts/import_his_view_relation_drafts.py
+./backend/scripts/import_hrp_assets.py
+./backend/scripts/import_jhemr_vastbase_assets.py
+./backend/scripts/import_medical_maintenance_dicts.py
+./backend/scripts/import_normalized_to_platform.py
+./backend/scripts/import_ods_core_governance.py
+./backend/scripts/import_ods_core_relations.py
+./backend/scripts/import_plan139_sources_to_platform.py
+./backend/scripts/import_query_sql_relation_reviews.py
+./backend/scripts/import_relation_recipes.py
+./backend/scripts/import_value_domains_seed.py
+./backend/scripts/intake_his_view_relations.py
+./backend/scripts/mint_e2e_session.py
+./backend/scripts/normalize_business_systems.py
+./backend/scripts/plan130_governance_closeout.py
+./backend/scripts/plan139_common.py
+./backend/scripts/probe_row_presence_readonly.py
+./backend/scripts/reconcile_plan90_catalog.py
+./backend/scripts/repro_graph_render.py
+./backend/scripts/ro_identity_nightly_observe.py
+./backend/scripts/ro_single_signature_precheck.py
+./backend/scripts/run_batch_signature_sync.py
+./backend/scripts/run_business_line_l13_l15.py
+./backend/scripts/run_dict_sync_worker.py
+./backend/scripts/run_identity_modified_nightly.py
+./backend/scripts/run_plan139_validations.py
+./backend/scripts/run_single_signature_sync.py
+./backend/scripts/seed_enum_values.py
+./backend/scripts/seed_ops_tools.py
+./backend/scripts/seed_plan144_golden_cases.py
+./backend/scripts/seed_platform_rbac.py
+./backend/scripts/seed_quality_hospital_rules.py
+./backend/scripts/seed_quality_rules.py
+./backend/scripts/seed_roles.py
+./backend/scripts/seed_systems.py
+./backend/scripts/sync_his_review_views.py
+./backend/scripts/sync_jhemr_education_titles.py
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg -n \"wechat-local-backup-search|20 系统|11,182|143,707|151 条|47\\+|口径快照|2026-08-26\" \"三仓库互通地图.md\" AGENTS.md verify/round-1" in F:\python\数据资产
+ exited 2 in 0ms:
+rg: 系统|11,182|143,707|151: 文件名、目录名或卷标语法不正确。 (os error 123)
+rg: 条|47\+|口径快照|2026-08-26": 文件名、目录名或卷标语法不正确。 (os error 123)
+rg: "三仓库互通地图.md": 文件名、目录名或卷标语法不正确。 (os error 123)
+AGENTS.md:94:   - 2026-07-31：平台服务器 `root@10.10.8.83:22` 已恢复公钥访问，本机密钥为 `C:\Users\Administrator\.ssh\id_ed25519_ai`；已用 `BatchMode=yes` 验证。后续 AI 优先使用公钥，禁止把 SSH 密码写入命令、文档或日志。详细交接见 `开发起步包/48_跳板机与HIS连接交接说明.md`。
+AGENTS.md:166:### AI 协作与成本策略（用户确认，2026-08-11）
+verify/round-1\任务包_原文.md:1:# 任务包_原文（核查对象，用户 2026-08-27 转交的另一 AI 产出）
+verify/round-1\任务包_原文.md:5:给执行 AI（任意模型）：本文自包含，按序执行；每完成一项先在 开发起步包\README.md 目录更新记录登记再继续。 创建：2026-08-27 ｜ 来源：《三仓库问题清单与评审提示词》v1（本仓库根目录，含全部问题的现状/原因/需求）。
+verify/round-1\任务包_原文.md:30:- 现状：《三仓库互通地图.md》含大量时点数字（20 系统、11,182 表、143,707 字段、151 条 SQL、31 篇 docs、47+ 验证关系），无口径日期，无过期触发机制。
+verify/round-1\任务包_原文.md:31:- 原因：地图是 2026-08-26 的汇总快照；各源数字随仓库演进，无同步机制。
+verify/round-1\任务包_原文.md:33:  1. 地图头部加"口径快照日期：2026-08-26（数字类信息以该日为准，精确值以各仓库权威文件为准）"；
+verify/round-1\任务包_原文.md:46:  1. 选一分册（建议 04-上报工具.md——EMR 库、与平台 JHEMR 资产对齐；也可自行论证换册）取 ≤20 条完整可执行语句（跳过片段级）；
+verify/round-1\任务包_原文.md:52:- 现状：AGENTS.md 约 198 行；「当前阶段目标」的 ✅ 进度清单（约 20 行）与 55 号重复（55 号是权威入口），导航表 25 行与 开发起步包\README.md 重复。
+verify/round-1\变更说明.md:11:| C2 | 三仓库互通地图.md 存在且含 20 系统/11,182 表/143,707 字段/151 条 SQL/31 篇 docs/47+ 验证关系等时点数字、无口径日期 | 读地图全文核对 |
+verify/round-1\变更说明.md:15:| C6 | AGENTS.md 198 行、进度清单约 20 行、导航表 25 行 | wc + 读原文 |
+verify/round-1\审查_kimi.err:31:  - C2: 地图 contains 20 系统、11,182 表、143,707 字段、151 条 SQL、31 篇 docs、47+ 验证关系 — all present (lines 12-14, 18). 无口径日期 — confirmed, header has 创建：2026-08-26 but no "口径日期" for numbers. C2 确认. But note: the claim "31 篇 docs" is in line 14 — yes. So C2 confirmed.
+verify/round-1\审查_kimi.err:53:150_国家医保局2026年度课题申报书_医保数据赋能科学研究.md
+verify/round-1\审查_kimi.err:65:  - C2 确认: map contains all six figures (lines 12-14, 18) and no 口径日期 — only 创建：2026-08-26.
+verify/round-1\审查_kimi.err:69:  - C6: AGENTS.md = 198 lines 确认. 进度清单约 20 行 / 导航表 25 行 — from AGENTS.md content I have in system prompt: 进度清单 has ✅ items... Let me count from the rendered AGENTS.md: progress items ✅ lines: 连接已打通, 元数据已采集, 表结构与关联, 核心关系, 视图DDL, 高频候选, 手麻, PACS/LIS/YDHL, 关系补验, HISUSER, 药房药库, HIS主业务owner, HIS源端字段主题, HIS源端资产范围复核, 独立HIS源端资产包, 文档入口已重整, 用户治理口径 — that's 17 ✅ lines + 1 ⏭ = ~18. "约 20 行" reasonable. 导航表 rows: count | rows in导航 table — I count about 24 rows. "25 行" approx. OK, roughly confirmed.
+verify/round-1\检查_codex.err:11:session id: 01a04097-206f-7c72-949e-5c3d9c0d0e9c
+verify/round-1\检查_codex.err:17:2026-08-27T00:20:49.252870Z ERROR codex_core::tools::router: error=request_user_input is unavailable in Default mode
+verify/round-1\检查_codex.err:18:2026-08-27T00:20:49.259464Z ERROR codex_core::tools::router: error=request_user_input is unavailable in Default mode
+verify/round-1\检查_codex.err:19:2026-08-27T00:20:59.091698Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command "Get-ChildItem -Name '开发起步包' | Sort-Object"`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\nGet-ChildItem -Name '开发起步包' | Sort-Object\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+verify/round-1\检查_codex.err:20:2026-08-27T00:21:06.935566Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command "cmd /c type \"开发起步包\\README.md\""`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\ncmd /c type \\\\\\\"开发起步包\\\\README.md\\\\\\\"\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+verify/round-1\检查_codex.err:21:2026-08-27T00:21:12.750581Z ERROR codex_core::tools::router: error=exec_command failed for `"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" -Command Get-Location`: CreateProcess { message: "Rejected(\"Failed to create unified exec process: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (系统无法访问此文件。) | cwd=F:\\\\python\\\\数据资产 | cmd=C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe -NoProfile -Command \\\"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\\nGet-Location\\\" | env_u16_len=5549 | si_flags=256 | creation_flags=525312 (Windows error 1920)\")" }
+verify/round-1\检查_codex.err:23:当前终端进程启动被 Windows runner 拒绝（错误 1920），我在重试只读读取；若仍不可用，我会明确说明无法核查，不会臆测风险。
+verify/round-1\检查_codex.err:55: succeeded in 20ms:
+verify/round-1\检查_codex.err:71:drivers\Vastbase-G100-2.15_pg-2026033109.jar
+verify/round-1\检查_codex.err:85:review\round-0-legacy-20260823\分歧表.md
+verify/round-1\检查_codex.err:86:review\round-0-legacy-20260823\修订版提示词.md
+verify/round-1\检查_codex.err:87:review\round-0-legacy-20260823\审查_grok.err
+verify/round-1\检查_codex.err:91:review\round-0-legacy-20260823\审查_grok.raw
+verify/round-1\检查_codex.err:95:review\round-0-legacy-20260823\检查_codex.err
+verify/round-1\检查_codex.err:96:review\round-0-legacy-20260823\最终报告.md
+verify/round-1\检查_codex.err:97:review\round-0-legacy-20260823\审查_kimi.raw
+verify/round-1\检查_codex.err:98:review\round-0-legacy-20260823\审查_kimi.md
+verify/round-1\检查_codex.err:99:review\round-0-legacy-20260823\审查_kimi.err
+verify/round-1\检查_codex.err:203:   - 2026-07-31：平台服务器 `root@10.10.8.83:22` 已恢复公钥访问，本机密钥为 `C:\Users\Administrator\.ssh\id_ed25519_ai`；已用 `BatchMode=yes` 验证。后续 AI 优先使用公钥，禁止把 SSH 密码写入命令、文档或日志。详细交接见 `开发起步包/48_跳板机与HIS连接交接说明.md`。
+verify/round-1\检查_codex.err:275:### AI 协作与成本策略（用户确认，2026-08-11）
+verify/round-1\检查_codex.err:322:| C2 | 三仓库互通地图.md 存在且含 20 系统/11,182 表/143,707 字段/151 条 SQL/31 篇 docs/47+ 验证关系等时点数字、无口径日期 | 读地图全文核对 |
+verify/round-1\检查_codex.err:326:| C6 | AGENTS.md 198 行、进度清单约 20 行、导航表 25 行 | wc + 读原文 |
+verify/round-1\检查_codex.err:346:# 任务包_原文（核查对象，用户 2026-08-27 转交的另一 AI 产出）
+verify/round-1\检查_codex.err:350:给执行 AI（任意模型）：本文自包含，按序执行；每完成一项先在 开发起步包\README.md 目录更新记录登记再继续。 创建：2026-08-27 ｜ 来源：《三仓库问题清单与评审提示词》v1（本仓库根目录，含全部问题的现状/原因/需求）。
+verify/round-1\检查_codex.err:375:- 现状：《三仓库互通地图.md》含大量时点数字（20 系统、11,182 表、143,707 字段、151 条 SQL、31 篇 docs、47+ 验证关系），无口径日期，无过期触发机制。
+verify/round-1\检查_codex.err:376:- 原因：地图是 2026-08-26 的汇总快照；各源数字随仓库演进，无同步机制。
+verify/round-1\检查_codex.err:378:  1. 地图头部加"口径快照日期：2026-08-26（数字类信息以该日为准，精确值以各仓库权威文件为准）"；
+verify/round-1\检查_codex.err:391:  1. 选一分册（建议 04-上报工具.md——EMR 库、与平台 JHEMR 资产对齐；也可自行论证换册）取 ≤20 条完整可执行语句（跳过片段级）；
+verify/round-1\检查_codex.err:397:- 现状：AGENTS.md 约 198 行；「当前阶段目标」的 ✅ 进度清单（约 20 行）与 55 号重复（55 号是权威入口），导航表 25 行与 开发起步包\README.md 重复。
+verify/round-1\检查_codex.err:433:> 创建：2026-08-26。维护：任一仓库对外能力 / 共享枢纽 / 吸收通道变化时更新本文件并在 §6 登记；L1 速查块仅在速查事实变化时同步。
+verify/round-1\检查_codex.err:440:| **数据资产** | `F:\python\数据资产` | 数据与连接中枢：20 系统统一连库（sjzc）、全系统表结构/元数据/表间关系资产包（11,182 表/143,707 字段/47+ 验证关系）、值域知识库、查询资产（queryctl/取数）、平台 backend/frontend 与 8.83 基础设施 |
+verify/round-1\检查_codex.err:445:1. **sjzc 技能**（`~/.zcode/skills/sjzc/`，全局任意目录可用）：统一连库与表结构查询（HIS/ODS/JHEMR/无纸化 CDMS/OA/LIS/PACS 等 20 系统，Oracle+Vastbase+SQLServer+MySQL），含限量只读 live 核验通道。表结构/连库类需求一律走它，不要另起连接。
+verify/round-1\检查_codex.err:470:3. wx_ltjl 知识库条目涉及表 ↔ 数据资产 `开发起步包\HIS问题表映射.csv` 双向同步；缺口表走 sjzc live 补采入平台（先例：his_kb_backfill_20260824）。
+verify/round-1\检查_codex.err:484:| 2026-08-26 | ZCode(GLM-5.3) | 创建：合并原三仓库启动文件中的同源互通章节（各自视角）为单一权威地图；三启动文件改载 L1 速查块指向本文件，启动文件瘦身 |
+verify/round-1\检查_codex.err:492:"C:\\Windows\\system32\\cmd.exe" /c "find . -maxdepth 3 -type f | sort | sed -n '1,220p'" in F:\python\数据资产
+verify/round-1\检查_codex.err:538:./_offline_build_123/wheels/pillow-12.2.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "wc -l AGENTS.md 'verify/round-1/变更说明.md' 'verify/round-1/任务包_原文.md' '三仓库互通地图.md'" in F:\python\数据资产
+ succeeded in 248ms:
+  198 AGENTS.md
+   30 verify/round-1/变更说明.md
+   78 verify/round-1/任务包_原文.md
+   57 三仓库互通地图.md
+  363 total
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files | rg '152|sql-relation-intake|relationships\\.csv|JHEMR|04-' | head -120" in F:\python\数据资产
+ exited 255 in 0ms:
+'sql-relation-intake' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���
+���������ļ���
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files | rg '152|relationships|JHEMR|04-'" in F:\python\数据资产
+ exited 255 in 0ms:
+'relationships' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���
+���������ļ���
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files -g '*152*'" in F:\python\数据资产
+ exited 1 in 0ms:
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files -g '*relationships*'" in F:\python\数据资产
+ exited 1 in 0ms:
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files -g '*JHEMR*'" in F:\python\数据资产
+ exited 1 in 0ms:
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "rg --files -g '*04-*'" in F:\python\数据资产
+ exited 1 in 0ms:
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if [ -e '开发起步包' ]; then echo EXISTS; else echo MISSING; fi" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� -e��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if [ -e '开发起步包/README.md' ]; then echo EXISTS; else echo MISSING; fi" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� -e��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if [ -e '开发起步包/55_系统未完成事项统一执行计划.md' ]; then echo EXISTS; else echo MISSING; fi" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� -e��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if [ -e '.agents/skills/sql-relation-intake/SKILL.md' ]; then echo EXISTS; else echo MISSING; fi" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� -e��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if [ -e 'verify/round-1/../三仓库互通地图.md' ]; then echo EXISTS; else echo MISSING; fi" in F:\python\数据资产
+ exited 1 in 0ms:
+��ʱ��Ӧ�� -e��
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'if exist "开发起步包" (echo EXISTS) else (echo MISSING)' in F:\python\数据资产
+ succeeded in 0ms:
+MISSING
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if exist \".agents\\skills\\sql-relation-intake\\SKILL.md\" (echo EXISTS) else (echo MISSING)" in F:\python\数据资产
+ succeeded in 0ms:
+MISSING
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "if exist \"verify\\round-1\\152*\" (echo EXISTS) else (echo NO152)" in F:\python\数据资产
+ succeeded in 0ms:
+NO152
+
+codex
+目标文档与根规约已核对；当前工作树实际缺少任务包依赖的 `开发起步包/` 和仓库内 `sql-relation-intake` 技能入口，这会直接影响部分断言的可执行性，我再做一次路径与 Git 状态确认后给结论。
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'dir /b' in F:\python\数据资产
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'git status --short' in F:\python\数据资产
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'dir /b ".agents"' in F:\python\数据资产
+ succeeded in 0ms:
+.agents
+.gitattributes
+.gitignore
+.pytest_cache
+.ssh
+.zcode
+AGENTS.md
+backend
+deploy
+drivers
+frontend
+GIT_SETUP.md
+review
+start_backend.bat
+start_frontend.bat
+tools
+verify
+_offline_build_123
+_tmp_j10_contract.py
+_tmp_j7_apply.py
+_tmp_j7_fix_layer.py
+_tmp_j7_fix_metrics.py
+_tmp_j7_inspect.sh
+_tmp_j7_query.py
+_tmp_j7_smoke.py
+_tmp_j7_smoke2.py
+_tmp_j7_unused.py
+_tmp_j7_unused2.py
+_tmp_j7_unused3.py
+_tmp_j7_verify.py
+_tmp_j7_verify_release.sh
+_tmp_j8_demo_analysis.py
+_tmp_j9_ai_perm.py
+_tmp_j9_ai_perm2.py
+_tmp_j9_grant_ai.py
+���ֿ⻥ͨ��ͼ.md
+���ֿ��鴦����ʾ��-�����ʲ�.md
+���ֿ������嵥��������ʾ��.md
+ȡ��
+�����𲽰�
+�����ϱ�
+
+ succeeded in 0ms:
+ M .agents/skills/docare-anesthesia-readonly-sql/SKILL.md
+ M .agents/skills/hisuser-readonly-sql/SKILL.md
+ M .agents/skills/mobile-nursing-readonly-sql/SKILL.md
+ M .agents/skills/ods-readonly-sql/SKILL.md
+ M .agents/skills/query-governance-intake/SKILL.md
+ M .agents/skills/sql-relation-intake/SKILL.md
+ M AGENTS.md
+ M backend/alembic/env.py
+ M backend/app/api/v1/ai.py
+ M backend/app/api/v1/data_products.py
+ M backend/app/api/v1/dict_general_api.py
+ M backend/app/api/v1/dict_medical_api.py
+ M backend/app/api/v1/governance.py
+ M backend/app/api/v1/graph.py
+ M backend/app/api/v1/identity.py
+ M backend/app/api/v1/lineage.py
+ M backend/app/api/v1/metadata_changes.py
+ M backend/app/api/v1/metrics.py
+ M backend/app/api/v1/ops_tools.py
+ M backend/app/api/v1/permission_requests.py
+ M backend/app/api/v1/permissions.py
+ M backend/app/api/v1/queries.py
+ M backend/app/api/v1/relations.py
+ M backend/app/api/v1/tables.py
+ M backend/app/core/config.py
+ M backend/app/main.py
+ M backend/app/models/__init__.py
+ M backend/app/models/ai_collab.py
+ M backend/app/models/data_product.py
+ M backend/app/models/dict_general.py
+ M backend/app/models/governance.py
+ M backend/app/models/lineage.py
+ M backend/app/models/metric_asset.py
+ M backend/app/models/query_asset.py
+ M backend/app/schemas/asset.py
+ M backend/app/services/data_product_service.py
+ M backend/app/services/his_identity_sync.py
+ M backend/app/services/identity_classification_preflight.py
+ M backend/app/services/metric_service.py
+ M backend/app/services/quality_sql_runner.py
+ M backend/app/services/query_intake.py
+ M backend/app/services/query_runner.py
+ M backend/requirements.txt
+ M backend/tests/conftest.py
+ M backend/tests/security_audit/test_fine_grained_write_permissions.py
+ M backend/tests/test_identity.py
+ M backend/tests/test_lineage.py
+ M backend/tests/test_metadata_changes.py
+ M backend/tests/test_ops_tools.py
+ M frontend/mock/login.ts
+ M frontend/src/api/asset.ts
+ M frontend/src/api/dict.ts
+ M frontend/src/api/identity.ts
+ M frontend/src/api/metadata.ts
+ M frontend/src/api/ops.ts
+ M frontend/src/api/permissions.ts
+ M frontend/src/api/recipes.ts
+ M frontend/src/components/ReEmptyState/index.vue
+ M frontend/src/router/modules/asset.ts
+ M frontend/src/utils/sso.ts
+ M frontend/src/views/asset/admin/index.vue
+ M frontend/src/views/asset/ai-context/index.vue
+ M frontend/src/views/asset/ai-quality/contracts.ts
+ M frontend/src/views/asset/ai-quality/index.vue
+ M frontend/src/views/asset/ai-quality/reportMarkdown.ts
+ M frontend/src/views/asset/ai-tools/index.vue
+ D frontend/src/views/asset/candidates/index.vue
+ M frontend/src/views/asset/components/RelationGraph.vue
+ M frontend/src/views/asset/graph/index.vue
+ M frontend/src/views/asset/lineage/index.vue
+ M frontend/src/views/asset/overview/index.vue
+ M frontend/src/views/asset/relation-rates/index.vue
+ M frontend/src/views/asset/relation-recipes/index.vue
+ M frontend/src/views/asset/relation-review/index.vue
+ M frontend/src/views/asset/relation-review/relationReviewTabs.ts
+ D frontend/src/views/asset/relations/index.vue
+ M frontend/src/views/asset/systems/index.vue
+ M frontend/src/views/asset/table-detail/index.vue
+ M frontend/src/views/asset/tables/hierarchy.spec.ts
+ M frontend/src/views/asset/tables/hierarchy.ts
+ M frontend/src/views/asset/tables/index.vue
+ M frontend/src/views/dict/general/index.vue
+ M frontend/src/views/dict/mappings/index.vue
+ M frontend/src/views/dict/medical/components/OverviewPanel.vue
+ M frontend/src/views/dict/medical/components/PushWizard.vue
+ M frontend/src/views/dict/sync-diffs/index.vue
+ M frontend/src/views/error/403.vue
+ M frontend/src/views/identity/accounts/index.vue
+ M frontend/src/views/identity/departments/index.vue
+ M frontend/src/views/identity/local-accounts/index.vue
+ M frontend/src/views/identity/permission-requests/index.vue
+ M frontend/src/views/identity/persons/index.vue
+ M frontend/src/views/identity/sync-logs/index.vue
+ M frontend/src/views/login/index.vue
+ M frontend/src/views/metadata-changes/changes/index.vue
+ M frontend/src/views/metadata-changes/diff/index.vue
+ M frontend/src/views/metadata-changes/snapshots/index.vue
+ M frontend/src/views/ops/audit/index.vue
+ M frontend/src/views/ops/runs/index.vue
+ M frontend/src/views/ops/sql-workbench/index.vue
+ M frontend/src/views/ops/tools/index.vue
+ D frontend/src/views/permission/button/index.vue
+ D frontend/src/views/permission/button/perms.vue
+ D frontend/src/views/permission/page/index.vue
+ M frontend/src/views/query-center/queries/index.vue
+ M frontend/src/views/welcome/index.vue
+ M frontend/tests/aiQuality.test.ts
+ M frontend/tests/hierarchy.test.ts
+ M frontend/tests/lineagePage.test.ts
+ M frontend/tests/relationReviewTabs.test.ts
+ M frontend/types/router.d.ts
+ M tools/queryctl.py
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/126_AI\346\237\245\350\257\242SQL\344\270\216\347\273\237\350\256\241\346\214\207\346\240\207\351\227\255\347\216\257\346\262\273\347\220\206\345\273\272\350\256\276\350\256\241\345\210\222.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/128_126\345\217\267\346\237\245\350\257\242\346\214\207\346\240\207\351\227\255\347\216\257\345\256\214\346\210\220\346\203\205\345\206\265\344\270\216\346\216\245\346\211\213\344\272\244\346\216\245.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/138_\346\225\260\346\215\256\347\233\256\345\275\225\350\241\200\347\274\230\350\264\250\351\207\217\345\215\217\345\220\214\346\262\273\347\220\206\344\270\216\347\263\273\347\273\237\345\256\214\345\226\204\346\224\271\350\277\233\350\256\241\345\210\222.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/55_\347\263\273\347\273\237\346\234\252\345\256\214\346\210\220\344\272\213\351\241\271\347\273\237\344\270\200\346\211\247\350\241\214\350\256\241\345\210\222.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/87_AI\350\247\206\345\233\276SQL\347\224\237\346\210\220\344\270\216\345\271\263\345\217\260\345\257\271\346\216\245\350\257\264\346\230\216.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/README.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/_archive/README.md"
+?? backend/alembic/versions/b2c3d4e5f6a7_plan144_query_run_provenance.py
+?? backend/alembic/versions/c3d4e5f6a7b8_plan144_query_certification.py
+?? backend/alembic/versions/d4e5f6a7b8c9_plan144_metric_calculation.py
+?? backend/alembic/versions/e5f6a7b8c9d0_plan144_static_lineage.py
+?? backend/alembic/versions/f6a7b8c9d0e1_plan144_ai_context_snapshots.py
+?? backend/alembic/versions/g7b8c9d0e1f2_plan144_ai_accuracy_loop.py
+?? backend/alembic/versions/h8d9e0f1a2b3_dict_system_item_enabled.py
+?? backend/alembic/versions/i9e0f1a2b3c4_metadata_snapshot_archive.py
+?? backend/app/api/v1/ai_accuracy.py
+?? backend/app/models/ai_accuracy.py
+?? backend/app/services/ai_context_builder.py
+?? backend/app/services/ai_feedback_service.py
+?? backend/app/services/data_product_rate_limit.py
+?? backend/app/services/lineage_ingest.py
+?? backend/app/services/metric_calculation_orchestrator.py
+?? backend/app/services/metric_calculation_service.py
+?? backend/app/services/object_identity.py
+?? backend/app/services/query_evaluation_service.py
+?? backend/app/services/query_parameter_validator.py
+?? backend/app/services/query_result_digest.py
+?? backend/app/services/query_semantic_validator.py
+?? backend/app/services/query_source_policy.py
+?? backend/app/services/query_validation_service.py
+?? backend/app/services/query_version_ref_guard.py
+?? backend/app/services/sql_ast.py
+?? backend/scripts/seed_plan144_golden_cases.py
+?? backend/tests/plan144/
+?? backend/tests/plan144_db/
+?? backend/tests/test_dict_general.py
+?? backend/tests/test_identity_sys_employee_primary.py
+?? backend/tests/test_permission_requests.py
+?? backend/tests/test_plan146_d5_permissions.py
+?? backend/tests/test_plan146_e_contracts.py
+?? frontend/src/api/query-center.ts
+?? frontend/src/constants/
+?? frontend/src/utils/errorMessage.ts
+?? frontend/src/utils/format.ts
+?? frontend/src/views/asset/systems/contracts.ts
+?? frontend/src/views/dict/general/contracts.ts
+?? frontend/src/views/identity/permission-requests/contracts.ts
+?? frontend/src/views/metadata-changes/diff/contracts.ts
+?? frontend/src/views/metadata-changes/labels.ts
+?? frontend/src/views/ops/sql-workbench/contracts.ts
+?? frontend/src/views/query-center/accuracy/
+?? frontend/src/views/query-center/queries/components/
+?? frontend/tests/plan146StageA.test.ts
+?? frontend/tests/plan146StageB.test.ts
+?? frontend/tests/plan146StageC.test.ts
+?? frontend/tests/plan146StageD.test.ts
+?? frontend/tests/plan146StageE.test.ts
+?? frontend/tests/queryCenter144.test.ts
+?? review/
+?? verify/
+?? "\344\270\211\344\273\223\345\272\223\344\272\222\351\200\232\345\234\260\345\233\276.md"
+?? "\344\270\211\344\273\223\345\272\223\346\243\200\346\237\245\345\244\204\347\220\206\346\217\220\347\244\272\350\257\215-\346\225\260\346\215\256\350\265\204\344\272\247.md"
+?? "\344\270\211\344\273\223\345\272\223\351\227\256\351\242\230\346\270\205\345\215\225\344\270\216\350\257\204\345\256\241\346\217\220\347\244\272\350\257\215.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/144_\347\263\273\347\273\237\346\225\264\344\275\223\350\257\204\344\274\260\344\270\216\345\244\232AI\347\262\276\345\207\206\345\217\226\346\225\260\346\214\201\347\273\255\346\224\271\350\277\233\344\270\200\346\254\241\346\200\247\346\211\247\350\241\214\350\256\241\345\210\222.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/145_\345\205\250\347\263\273\347\273\237\347\225\214\351\235\242\345\256\214\345\226\204\345\210\206\346\236\220\344\270\216\350\256\276\350\256\241\344\274\230\345\214\226\346\226\271\346\241\210.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/146_\347\225\214\351\235\242\345\256\214\345\226\204\350\257\246\347\273\206\346\211\247\350\241\214\350\256\241\345\210\222_\345\244\215\346\240\270\347\211\210.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/147_146\347\225\214\351\235\242\345\256\214\345\226\204\344\270\255\346\226\255\344\272\244\346\216\245\344\270\216\347\273\255\350\267\221\346\217\220\347\244\272\350\257\215.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_fill_form.py"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_\345\233\275\345\256\266\345\214\273\344\277\235\345\261\2002026\345\271\264\345\272\246\350\257\276\351\242\230\347\224\263\346\212\245\344\271\246_\345\214\273\344\277\235\346\225\260\346\215\256\350\265\213\350\203\275\347\247\221\345\255\246\347\240\224\347\251\266.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_\345\233\275\345\256\266\345\214\273\344\277\235\345\261\200\350\257\276\351\242\230\347\224\263\346\212\245\344\271\246_\345\214\273\344\277\235\346\225\260\346\215\256\350\265\213\350\203\275\347\247\221\345\255\246\347\240\224\347\251\266.docx"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_\345\233\275\345\256\266\345\214\273\344\277\235\345\261\200\350\257\276\351\242\230\347\224\263\346\212\245\350\241\250_\345\214\273\344\277\235\346\225\260\346\215\256\350\265\213\350\203\275\347\247\221\345\255\246\347\240\224\347\251\266.docx"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_\347\224\263\346\212\245\344\271\246\346\250\241\346\235\277.docx"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/150_\347\224\263\346\212\245\344\271\246\346\250\241\346\235\277.wps"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/152_JHEMR\347\227\205\346\241\210\351\246\226\351\241\265\345\233\236\345\206\231HIS\351\223\276\350\267\257\345\205\263\347\263\273\344\270\216\347\273\223\346\236\204\346\242\263\347\220\206\346\211\247\350\241\214\350\256\241\345\210\222.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/152_JHEMR\347\227\205\346\241\210\351\246\226\351\241\265\345\233\236\345\206\231HIS\351\223\276\350\267\257\346\242\263\347\220\206_\347\273\223\346\236\234.json"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/153_\345\271\263\345\217\260\344\270\200\346\254\241\346\200\247\345\256\214\345\226\204\344\270\216bug\344\277\256\345\244\215\346\211\247\350\241\214\350\256\241\345\210\222.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/HIS\351\227\256\351\242\230\350\241\250\346\230\240\345\260\204.csv"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/tools/build_asset_manifest.py"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_\350\265\204\344\272\247\345\214\205/manifest.json"
+
+ exited 1 in 0ms:
+ϵͳ�Ҳ���ָ�����ļ���
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c 'git ls-files | rg "开发起步包|sql-relation-intake|152_|数据资产_JHEMR|relationships.csv"' in F:\python\数据资产
+ succeeded in 0ms:
+.agents/skills/sql-relation-intake/SKILL.md
+.agents/skills/sql-relation-intake/agents/openai.yaml
+.agents/skills/sql-relation-intake/references/relation-intake-guide.md
+.agents/skills/sql-relation-intake/scripts/extract_sql_relations.py
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_HIS_READY\345\244\215\346\240\270\345\214\205/his_ready_relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_HIS_READY\345\244\215\346\240\270\345\214\205/his_ready_validated_relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_HIS\346\272\220\347\253\257\350\265\204\344\272\247\345\214\205/his_source_relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_JHEMR_Vastbase\350\265\204\344\272\247\345\214\205/relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_ODS_HIS\345\275\222\344\270\200\344\274\230\345\214\226\345\214\205/cross_system_pending_relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_ODS_HIS\345\275\222\344\270\200\344\274\230\345\214\226\345\214\205/normalized_relationships.csv"
+"\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/\346\225\260\346\215\256\350\265\204\344\272\247_\350\265\204\344\272\247\345\214\205/relationships.csv"
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,220p' '开发起步包/152_JHEMR病案首页回写HIS链路关系梳理_结果.json'" in F:\python\数据资产
+ exited 2 in 0ms:
+sed: can't read 开发起步包/152_JHEMR病案首页回写HIS链路关系梳理_结果.json: No such file or directory
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "wc -l '开发起步包/数据资产_资产包/relationships.csv' '开发起步包/数据资产_JHEMR_Vastbase资产包/relationships.csv'" in F:\python\数据资产
+ succeeded in 0ms:
+  104 开发起步包/数据资产_资产包/relationships.csv
+  284 开发起步包/数据资产_JHEMR_Vastbase资产包/relationships.csv
+  388 total
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,180p' '.agents/skills/sql-relation-intake/SKILL.md'" in F:\python\数据资产
+ succeeded in 101ms:
+---
+name: sql-relation-intake
+description: 解析和治理山东省第二人民医院历史 SQL 中的表关系，核对当前元数据与既有关系，生成可审核候选、验证计划和关系配方建议。用户提供既有 SQL、报表 SQL、视图 SQL、存储过程中的 SELECT，或要求“分析 JOIN”“纳入表关系”“沉淀关系图谱”“查重关系”“把 SQL 交给后续 AI 使用”时使用。只允许生成候选和只读验证 SQL；未经审核不得直接改正式关系资产、发布关系配方或执行源库写操作。
+---
+
+# SQL 关系摄取与治理
+
+## 目标
+
+把历史 SQL 当作“关系证据”，而不是直接当作“关系真相”。完成 SQL 解析、活元数据核对、正式关系查重、风险分级和候选交付，使后续 AI 始终从仓库或平台获取最新关系。
+
+## 首次使用时读取
+
+1. 读取仓库根目录 `AGENTS.md`。
+2. 读取 `开发起步包/README.md` 和 `开发起步包/55_系统未完成事项统一执行计划.md`。
+3. 读取本技能 `references/relation-intake-guide.md`。
+4. 根据 SQL 所属系统加载对应技能：
+   - 数据中心/ODS：`ods-readonly-sql`
+   - HIS 源端：`hisuser-readonly-sql`
+   - 移动护理：`mobile-nursing-readonly-sql`
+   - Docare 手麻：`docare-anesthesia-readonly-sql`
+5. 只读取与本次表和业务主题有关的元数据、关系文件和证据报告；不要把 `_archive/` 当作当前依据。
+
+## 字段值域硬规则（149 值域知识库，强制）
+
+- 涉及编码/状态/类型/阈值/字典类字段（如 SQL 中出现的离院方式、急诊标志、诊断类别、OPER_STATUS 等编码/状态/阈值字段）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
+- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=对应系统编码` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+
+## 标准流程
+
+### 1. 登记来源
+
+记录 SQL 的业务用途、来源系统、数据库方言、来源文件和可追溯说明。对 SQL 计算 SHA-256；不得把口令、Token、身份证、姓名、电话、地址或患者条件值写入证据文件。包含敏感内容时先生成脱敏副本。
+
+### 2. 静态解析
+
+先运行：
+
+```powershell
+python .agents/skills/sql-relation-intake/scripts/extract_sql_relations.py `
+  --sql-file D:\temp\query.sql `
+  --system-code HIS_SOURCE `
+  --output D:\temp\relation_candidates.json
+```
+
+脚本输出表、别名、等值 JOIN、附加条件、SQL 指纹及与正式关系的初步查重结果。它是确定性预解析器，不替代人工语义判断；动态 SQL、旧式逗号连接、相关子查询、`UNION` 分支、函数包裹键和隐式关联必须人工补充。
+
+### 3. 获取当前资产
+
+按以下优先级获取，不依赖聊天记忆：
+
+1. 平台 AI 上下文和关系配方接口可用时，读取当前平台资产；
+2. 平台不可用时，读取仓库机器可读资产；
+3. 元数据快照只作为表字段存在性证据；
+4. 报告只作为关系验证和业务限制证据。
+
+具体路径、平台端点和系统路由见 `references/relation-intake-guide.md`。
+
+### 4. 核对和查重
+
+对每个关系确认：
+
+- Owner、表、字段真实存在；
+- 别名解析正确；
+- 组合键完整；
+- JOIN 中的状态、非空、日期、类型转换和子集条件没有丢失；
+- 是否已有同向或反向正式关系；
+- 是否只是已有关系的新证据；
+- 是否属于多表配方而非单条关系边；
+- 是否跨物理实例且缺少已验证 DBLINK/同步对象。
+
+同名字段不构成关系证据。历史 SQL 与活元数据冲突时保留冲突记录，不得自动修正后冒充原 SQL。
+
+### 5. 分级
+
+- `existing`：与正式关系等价，只补充来源证据。
+- `candidate`：表字段存在且 JOIN 可解释，但未做活库验证。
+- `partial`：仅在状态、非零键、时间窗口或特定业务子集成立。
+- `recipe_candidate`：多个 JOIN、去重、聚合或过滤共同构成可复用查询逻辑。
+- `rejected`：字段不存在、组合键明显缺失、跨库不可达或已被证据否定。
+
+历史 SQL 本身最高只能给 C/B 级候选证据，不得仅凭“曾经跑过”标记 A/A+ 或 `verified`。
+
+### 6. 验证
+
+只有用户明确要求验证时，才按所属系统的只读 SQL 技能生成和执行限量验证 SQL。验证父键覆盖率、孤儿率、重复键和 JOIN 放大量；巨表必须先用业务键、时间范围或受限父键集合缩小。
+
+不得执行 DML、DDL、锁表、存储过程或无界扫描。不得把未脱敏患者明细带入 AI、日志或报告。
+
+### 7. 交付与回写边界
+
+默认只交付候选 JSON/表格和建议，不修改正式资产。
+
+用户明确要求“纳入”时：
+
+1. 将新关系写入平台 `asset_relation_reviews` 草稿/待审区，或生成可审查导入文件；
+2. 将复杂逻辑写成 `asset_relation_recipes` 草稿；
+3. 展示与正式关系的 diff；
+4. 经审核和验证后，才更新正式 `relationships.csv`、catalog 或发布配方；
+5. 若新增编号文档，严格同步 `开发起步包/README.md` 的目录和更新记录。
+
+技能自身不得绕过审核直接发布。
+
+## 交付格式
+
+```markdown
+## 来源
+- 系统/方言：
+- SQL SHA-256：
+- 业务用途：
+- 是否已脱敏：
+
+## 解析结果
+| from | to | JOIN 键 | 附加条件 | 查重 | 分级 |
+
+## 元数据与关系证据
+| 候选 | 表字段存在 | 既有关系 | 证据来源 | 风险 |
+
+## 建议动作
+- 补证据 / 进入候选审核 / 生成验证 SQL / 关系配方草稿 / 驳回
+
+## 回写情况
+- 默认：未修改正式资产。
+```
+
+明确区分“解析到”“元数据确认”“活库验证”“审核发布”，不要混用这些状态。
+
+exec
+"C:\\Windows\\system32\\cmd.exe" /c "sed -n '1,180p' '开发起步包/55_系统未完成事项统一执行计划.md'" in F:\python\数据资产
+ succeeded in 0ms:
+> 类别：待办
+>
+> ⏳状态：**144 已登记为多 AI 精准取数与持续反馈专项入口；139 已于 2026-08-22 完成收口（见 142），同日医院 OA（万户 ezOFFICE）作为第五源完成引擎验证与平台导入（见 143，OA admin 高权限口令待轮换）；合计 61 条复核草稿与 40 份停用配方待人工独立复核；138 首期已批准纳入 130（确定性静态血缘；闭环后置）；130 其余现有应用收口仍按原范围管理；136/137 保留为上一轮三源凭据阻断的历史事实**；126 P1–P5 已生产，127/129 待统一发布，H7=2/3；业务库写侧保持关闭 | 最后复核：2026-08-22
+> 📌 当前唯一执行说明：本文件仍是唯一未完成事项总入口。全系统界面完善读已复核的 `146_界面完善详细执行计划_复核版.md`，必须保留 144 既有 dirty 成果和兼容路径，且不含生产发布/Git 写操作；多 AI 精准取数、结果溯源、反馈和回归评测读 `144_系统整体评估与多AI精准取数持续改进一次性执行计划.md`；其复用 126 查询底座和 138 首期静态血缘，并由 130 的统一发布窗口承接生产升级，不取代本文件。四系统只读探查已完成收口（最终报告读 `142_四系统资产导入与139收口执行报告.md`；其 56 条 review 草稿与 40 份停用配方进入正常人工复核流程，不得由原执行者自批）；现有应用连续开发/升级读 `130_系统完成度盘点与一次性开发升级执行计划.md`；数据目录—血缘—质量协同完善读 `138_数据目录血缘质量协同治理与系统完善改进计划.md`。各计划不得互相夹带未授权业务目标写入；更早条目仅保留演进证据。
+> 📌 2026-08-23 146 独立复核完成：按当前源码、后端契约和 144 未提交成果把界面完善清单修订为 5 阶段 28 个任务组；保留 `/asset/queries`、`/asset/queries/accuracy`、`/asset/relations` 等兼容入口，补齐 metadata 零写 diff-preview、dict/general 契约、persons 双维筛选、服务端权限、隔离测试与一次性执行提示词。计划会话未改应用代码、未连接数据库/服务器、未运行迁移、未执行 Git 写操作。
+> 📌 2026-08-26 新增 152：JHEMR 病案首页回写 HIS 链路关系与结构梳理。用户提供 4 个回写视图（v_HISshouye/shoushu/zhenduan/icu，按 patient_id+visit_id 取数）与老 HIS 程序 `server_test` 路径；离线证据已核实——77 资产包 4 视图 67/21/14/6 列与依赖（report.* 快照 + emr_first_page_item_dict）、SATRDA 中间件唯一活跃端点 POST /pbtest/api/his/basy（log20260817–0823 共 7046 次）、testdemo.pbd 明文写库 SQL（pat_visit UPDATE + pat_visit_extend/OPERATION/DIAGNOSIS/pat_icu_record 先删后插全量替换）。计划含 E1–E6 一次性执行提示词；E5 候选值域清单供 151 E2 圈定参考；server_test 为在用生产程序，执行全程只读。读 `152_JHEMR病案首页回写HIS链路关系与结构梳理执行计划.md`。
+> 📌 2026-08-26 新增 153：平台一次性完善与 bug 修复计划（multi-review round-2 定稿，待免费执行 AI 一次性执行）。P0 高危（pymssql 绑参/质量规则下推/失败 rollback/CSRF 精确匹配/图谱 N+1）→P1 安全收口（diff SQL 门禁/脱敏/审计/权限码收窄）→P2 正确性×8→P3 性能批→P4 冗余收敛→P5/P6 前端错误处理+类型（按页一次改完）→P7 测试补强；零迁移零部署零 Git 写，执行提示词在 153 §6。评审：三方全勤、25 项分歧全裁决（2 项生产实测终审、6 处草案错误被外部纠正），产物 `review/round-2/`。完成后需主 AI 复核再发布；B9 登录限流键用户已裁决保持默认（2026-08-26）。读 `153_平台一次性完善与bug修复执行计划.md`。
+> 📌 2026-08-26 生产发布 p144-149 完成（用户授权"更新升级到服务器"）：8.83 生产后端镜像升至 `data-asset:p144-149-20260826094113`（130p1 基础 + sqlglot 离线层 + 144/146/147/149 代码）、alembic aa11bb22cc33→b0c1d2e3f4a5（9 迁移）、前端 current→p144-149-20260826；门禁后端 1091P/1S/0F+前端双 typecheck/build/预算全过，生产库先备份（20260826092720），容器 healthy、OpenAPI 333 路由、Oracle live 通道实测连通。**144（除生产黄金用例种子/G5 调度开关）、146、127/129 代码随本包生效**；149 仅代码+表结构上线，值域种子生产导入仍待授权；Git 未 commit/push。回滚三件套（旧镜像/前端 previous/DB dump）齐备。业务源库零写入。
+> 📌 2026-08-26 152 E1–E6 已执行完成（结果 `152_JHEMR病案首页回写HIS链路梳理_结果.json`）：4 主视图 DDL 零漂移（"134列"系大小写折叠双对象）；testdemo.pbd 22 条写库 SQL 全量提取，update pat_visit 确认含 discharge_disposition；HIS 侧 6 表仅 MEDREC owner、124 写列全存在，OPERATION.SOURCE='2' 115394 行≈快照行数证链路活跃，PAT_VISIT_EXTEND 仍全 2（135 复核成立）；产出 4 张字段映射表、19 条值域候选（**TREAT_RESULT 存在 JHEMR(1治愈/2好转/3未愈/4死亡/9其他)与 HIS COMM 字典(1治愈/2转院/3死亡/4好转…)双编码冲突，151 E2 最高优先裁决**；DISCHARGE_DISPOSITION 字典产码与 149 confirmed 一致并带 code9 对）、8 条 D 级关系候选（未入正式资产）。业务源库 0 写、server_test 零改动、无 Git 操作。
+> 📌 2026-08-25 149 建议裁决落地 + 新增 151：用户按建议批准（前端 B 后置到生产发布后、生产发布与连接器修复捆绑走 130 窗口、待核值域走只读核查、确认人机制挂起、Git 本地分批只提 149 范围、AGENTS §6 已修正、148 原文归档、P4 延后）；同日用户新增两字典表值域源（PORTAL_SYS_DICT 族 + JHEMR EMR_FIRST_PAGE_ITEM_DICT），经仓库离线复核后立为 `151_两字典表批量接入值域知识库与待核值域收口执行计划.md`（字典一律 pending 不自动 confirm、首批 ≤200 条、合并收口 code9/手术标志 3 核查，含执行提示词，待其他 AI 执行）。
+> 📌 2026-08-25 149 P1–P3 执行完成（隔离测试库验证，未动生产/业务库）：三表模型+手写迁移 `b0c1d2e3f4a5`（六元组唯一约束、证据一对多、版本时间线、value_domain.read/submit/confirm 权限码种子，ai_user 仅 read+submit）；`/api/v1/value-domains` 路由（证据必填先查后插、同键异义置 conflict+competing meanings、confirm/deprecate/resolve-conflict、conflicted 不进注入、全量审计）；主注入=context/resolve `value_domains` 段+system-context 全量 confirmed+陷阱（逐条带 version_no）、补充注入=propose-sql 用 144 sqlglot 附精确值域（解析失败显式 `value_domains_not_injected_reason`）；P2 种子 21 条（confirmed 19/pending 2：离院方式 code9、手术标志 3）幂等收敛 0；P3 八技能硬规则（含全局 sjzc、query-governance-intake 并入 resolve 步骤）+`数据资产_资产包/value_domains.json`（版本/哈希/龄期 7 天）+148 已重写为平台导出视图。验收：全量 pytest 1091 passed/1 skipped、迁移往返、种子 dry-run 幂等、export --check PASS。未动：前端 A/B（待拍板）、P4 ingest 告警、生产平台库导入（须另行授权）。细节读 `149` §12。
+> 📌 2026-08-24 新增 149：字段值域知识库与 AI 自动注入专项（multi-review v4 四方复核修订版）。针对 2026-08-24 离院方式值域写反事故：asset_column_value_domains+证据一对多子表+conflict 冲突检测（P1）、context/resolve+system-context 写 SQL 前全量注入（主路径，不依赖列级解析；propose-sql 用 144 sqlglot 补充）、P2 导入 148 已确认值域（待核入 pending）、P3 八技能路由+value_domains.json 兜底+148 转导出视图、P4 ingest 告警二期；前端 A/B 方案待用户拍板。计划详情读 `149_字段值域知识库与AI自动注入执行计划.md`，复核裁决读 `review/round-1/最终报告_本轮.md`。
+> 📌 2026-08-24 HIS 知识库缺口补采完成（用户授权）：5 个平台缺口对象（FXHIS.SPECIAL_CONSUL_MASTER/SPECIAL_ANTIMICROBIALS_DETAILS/SYS_PAYMENT_COMPARE、COMM.INPUT_DRUG_LISTS_FOR_PRE 视图、FXHIS.CLI_REQUEST_DRUG_VIEW 双 owner 视图）经 sjzc live 只读拉取元数据后补入平台资产（111 列含中英文注释、幂等、审计 his_kb_backfill_20260824，include_status=candidate 待正式复核流程）。K038 静配摆药：PHARMACY.DRUG_DISPENSE_* 族平台已有，FXHIS.JMPZ_DISPENSE_REC_* 3 视图为候选待业务确认。owner 清点修正此前"系统性盲区"判断为"零散缺口"（六 owner 1224 对象 vs 平台 1236 表）。
+> 📌 2026-08-24 新增 sjzc 技能+修复平台连接器真 bug：新增 .agents/skills/sjzc（统一连库/表结构：无参列全部系统、带参直连、live 受控只读核验，四库型实测打通）；排查中发现 quality_sql_runner._build_connector 误用 host_masked 作连接主机（应为 target_host）——126/144 查询执行路径对全部真实源会 ORA-12545（FakeConnector 测试掩盖），本地已修复+回归，生产部署待发布窗口；新技能已登记 AGENTS 技能路由/README。（2026-08-24 补：应用户要求 sjzc 已全局化迁至 ~/.zcode/skills/sjzc/，仓库副本移除、AGENTS/README 登记同步；脚本在仓库外目录实测通过，系统字段数与权威快照口径对齐。）
+> 📌 2026-08-24 003539 签名覆盖完成（用户授权+DBA 补权后）：DBA 授予 xtwh 对 jhemr.users_pic 的 UPDATE 后重试成功——旧值校验 3489 通过、UPDATE 恰好 1 行、回读 4147 字节与规范化新图一致（150×68 JPEG，SHA-256 前 16 位 2a8332484851b7e3，HIS 源为本人当日签名）；平台审计行 24784（executed / authorized_manual_overwrite_legacy_reused / rows=1）落库。旧签名备份保留于 8.83 /opt/data-asset/evidence/signature-00****39-legacy-20260824.jpg（3489B，abb8ac43d16918e5…，可回退）。至此 003539 全链收口：分类 doctor→001 组、权限/登录三方式、签名本人化均已到位；夜间任务后续按幂等规则正常跳过该账号签名。
+> 📌 2026-08-24 003539 签名覆盖尝试与权限阻断：用户明确授权"写入覆盖"后执行——HIS 新签名已按 125 号规范化工序生成（4147B、150×68 JPEG、SHA-256 前 16 位 2a8332484851b7e3），行锁+旧值（3489）校验+审计（manual-sigoverwrite-20260824）齐备，但 JHEMR 同步账号 xtwh 对 jhemr.users_pic 的 UPDATE 权限已被收紧（has_table_privilege=false，125 时期可写，后续 DBA 收权），UPDATE 报 InsufficientPrivilege，零行受影响、事务无残留。新图与旧图均已存 8.83 受控目录 /opt/data-asset/evidence/（0600、工号掩码文件名）。待决：①DBA 重新授予 xtwh 对 jhemr.users_pic 的 UPDATE（一句话 GRANT）后我方即可带审计重试；或②用户经 JHEMR 管理界面手工替换签名（新图文件已就绪）。DBA 授权重试成功后本条更新结果。
+> 📌 2026-08-24 003539 签名同步处置（留档，未覆盖）：用户指令同步 HIS 签名图到 JHEMR；预检发现 JHEMR users_pic 已存在 2025-07-04 旧图（200×80 JPEG，疑似工号复用后前任遗留，非本人签名），而 HIS 已有本人新签名（当日 11:43，368×166）。按 125 号"只补缺不覆盖"规则执行平台单账号通道（manual-sigcheck-20260824，DIRECT_CONNECTION 同生产）：结果 skipped_existing=1/零业务写入/审计行 24782（already_has_signature）已落库、夜间水位未推进；旧图字节已备份至 8.83 受控目录（0600，SHA-256 前 16 位 abb8ac43d16918e5，文件名工号掩码）。是否覆盖旧图待用户明确授权（备份可回退）；未授权前夜间签名子任务对该账号也将持续跳过（旧签名继续生效，存在病历签错人风险，需尽快裁决）。
+> 📌 2026-08-24 人员同步主表口径落地（用户裁决）：分类/时间输入以 FXHIS.SYS_EMPLOYEE 为主、COMM.STAFF_DICT 仅辅助——preflight 职称优先取 SYS_EMPLOYEE.LEVLCODE→EmployeeTitle 字典名（与 STAFF_DICT.TITLE 冲突时员工表权威并在分类记录 conflict_detail 写 title_mismatch_employee_authority 审计注记，STAFF 原始证据保留在 raw_title）；建档时间回退链 STAFF.CREATE_DATE→SYS_EMPLOYEE.CREATEDTIME；夜间增量继续按 SYS_EMPLOYEE.MODIFIEDTIME。触发场景：003539 新职工因两表建档时间均空被误隔离 master_data_missing（今晨 HIS 已补 STAFF.CREATE_DATE 与 MODIFIEDTIME，LEVLCODE=233=主治医师）。改动 his_identity_sync._build_plan + identity_classification_preflight；新增 tests/test_identity_sys_employee_primary.py（8 项，SQLite 内存库模式）；相关回归 identity 全家 105 passed + 相邻 82 passed。JHEMR 侧残缺账号（user_type=1、无组绑定、sublogin/subsign 各 1 行）系平台外手工建号，需按 115 白名单流程另行修复；生产生效需随下次发布窗口部署本改动。另：SYS_EMPLOYEE.EMPLTYPE 值域（A1 707/N1 517/A2 457…）暂无字典佐证，未用于分类，待信息科提供编码含义后可升级为直接分类依据。
+> 📌 2026-08-23 144 S0–S12 执行完毕（代码/隔离验收完成，生产未执行）：参数 bind 真实到达连接器、candidate/blocked/superseded 状态门禁、sqlglot AST 大表策略（WHERE 1=1 拒绝）、result/schema digest 与 data_as_of、指标真实计算引擎（Numeric/维度/批次唯一键）、产品 pin 校验+caller 限流、asset_lineage_edges 静态血缘、统一 AI context（/api/v1/ai/context/resolve）、回答-反馈-评测闭环（黄金用例 31 条种子脚本就绪）、前端查询中心类型化+溯源+参数表单+准确性页、manifest 工具与 queryctl 语义契约、query-governance-intake 技能升级。迁移 b2c3d4e5f6a7→g7b8c9d0e1f2（6 个单一职责 revision，隔离库往返 PASS）。既有 active 资产已兼容标记 legacy_unverified，不中断运行。生产平台 apply、服务器发布、Git push/tag 未获用户授权未执行；生产黄金用例正式种子与 G5/调度开关启用待发布窗口。
+> 📌 2026-08-22 新增 144：综合后端查询/指标/产品、前端 AI 体验、机器资产包、AI context 和血缘代码只读评估，确认参数未传连接器、非现行引用门禁、真实指标计算、结果 digest/data_as_of、精确对象键、统一 context、反馈与黄金用例回归是当前多 AI 查数 P0。144 给出文件级任务、S0–S12、A01–A32 和一次性执行提示词；现有 active 资产采用 legacy_unverified 兼容迁移，不突然停用，不自动批准关系。制定计划会话未连接业务源、未改数据库/服务器/调度、未 push/tag。
+> 📌 2026-08-21 用户授权（139）：门诊病历 core2db、体检 EIS/JZCIS/ZONEKINGNET、病理 pitaya/QPIS、职业病 tjdatabase4 的独立只读账号已经创建并保存到 8.83 服务器受控凭据文件。授权另一位 AI 按 139 尽量一次完成四源可见表/视图/字段/约束/模块元数据采集、全部视图依赖与 JOIN/配方分析，并在备份、测试、dry-run 和幂等门禁通过后把成功来源写入平台 `asset` schema；单源问题如实记录后跳过继续。四个业务源库仍严禁 DML/DDL/EXECUTE；view-JOIN 只进复核草稿，复杂逻辑只进停用配方，不得同轮自动升正式。
+> 📌 2026-08-22 OA 第五源纳入（143）：用户授权后按 139 同一管线完成医院 OA（10.10.10.69，万户 ezOFFICE）只读探查与导入：EZ_FLOW 工作流引擎 12 项限量聚合验证全过（HI_TASKINST/HI_ACTINST/RU_TASK/RU_EXECUTION→HI_PROCINST 命中 99.96–100%，WF_WORK→ORG_EMPLOYEE 99.91%），4 条引擎链作为带验证证据的 review 草稿入库；平台 20 系统/11,182 表/143,707 字段/1,301 关系/91 复核；二次 dry-run 全 0、健康 200 未重启。遗留：admin 口令轮换、表单-流程桥接（WF_WORK.WORKTABLE_ID/WORKRECORD_ID）专项、5 条 OA 草稿人工复核。
+> 📌 2026-08-22 最终收口（139 完成，见 142）：用户于当日重新授权"将该会话和当前会话最后的一次未完成的任务授权你完成"后，由单一执行者完成 140 遗留修复（构建器分叉合并、140 勘误补记、被中断测试补完）与 139 S8–S12：平台实时计数重读→新备份（data_asset_pre_plan139_apply_20260822013602.dump，SHA-256 64f3e14e…）→dry-run 门禁（删除=0、正式 view-JOIN 新增=0、active recipe=0）→apply（+4 系统/+1,731 表/+24,021 字段/+592 声明 FK/+56 draft review/+40 draft recipe/+729 视图依赖）→二次 dry-run 全 0→四源抽查含 V_BLZLST 全命中→/health 200（仅资产导入，未重建镜像）。全量 pytest v2=914 通过/7 失败（全为 HEAD 既有，属 130 范围）；alembic 往返 PASS；业务源库 DML/DDL/EXECUTE=0；无 Git commit/push。授权记录与原停止令均保留于 `backend/_plan139_work/COORDINATION.md`。
+> 📌 2026-08-22 收口（139 终止）：139 实际由两个并行 AI 会话执行至 S7 附近（四源元数据采集、本地资产包 `数据资产_四系统源端资产包/`、54 项纯逻辑测试完成；源库与平台零写入，无凭据或患者信息泄露；分层治理与诚实性核查通过）。备份提交 `c3a5d18` 曾于 08-21 22:23 被越权推送至 origin/master（内容秘密扫描干净，建议接受现状并记为执行纪律问题）。用户裁决终止后续：平台导入 S8–S12、资产包重建、聚合验证、执行者编号报告均不再执行；用户停止令与服务器 plan139-test 沙箱容器停用记录见 `backend/_plan139_work/COORDINATION.md`，全部核查结论见 `140_plan139四系统探查执行核查与收口报告.md`。两个分叉构建脚本（build_plan139_asset_package.py 与 plan139_build_package.py）如恢复执行须先合并。
+> 📌 2026-08-21 用户裁决（138）：批准将 138 纳入 130 的统一开发和服务器发布窗口；考虑到数据流动难以完整分析，首期只做关系/血缘语义隔离、统一对象键、确定性表级静态依赖、证据及查询—指标—产品引用。复杂字段级、运行血缘、真实消费端、质量整改复验闭环和自动通知全部后置；方向不确定不连线，未解析项登记后继续。
+> 📌 2026-08-19/20 补充（136→137 新来源与关系专项）：按 136 的只读、草稿先行、冲突不升正式门禁完成 HIS 视图关系摄取和平台收口；三个新来源因未安全注入受控只读凭据均记为 `BLOCKED_CREDENTIAL` 并跳过，未把阻断误记成功。口令不进入 Markdown/Git/日志，高权限账号不作为长期启用凭据。
+> 📌 2026-08-13 补充（Dify AI 质控设计）：用户要求增加与内网 Dify 对接的数据质量分析界面。只读连通确认 8.83 到 `10.10.8.53` Dify 根入口 307、`/v1/parameters` 无 Key 返回 401；未使用 Key、未发送数据。130 已增加 U10、§2.4、S5、A21–A28：独立 AI 质控页面、手动单条/同域批量/批次摘要、安全 preview、三张任务结果表、Workflow JSON 契约、RBAC、SSRF/脱敏/幂等/审计及人工复核。Dify 不直连业务库，不接收 sample_data，不自动改 finding/规则或执行 SQL；Key 只存服务器受控文件。
+> 📌 2026-08-13 补充（完成度盘点与目录收敛）：已只读核对实际目录、Git、隔离测试库和 8.83 生产。生产后端仍为 `data-asset:126p5-20260811223311`，前端为 `graph-pastel-20260812`，平台迁移 head=`h5c6d7e8f9a0`；129 四级字段图谱尚未生产发布。生产查询/指标/产品=27/48/54，关系/字段/表=537/89730/7766，配方=0、关系复核=3 且均 draft、负责人/术语=0。H7 的 2026-08-12 第二夜 success，当前 2/3。详见 130 §1–§4。
+> 📌 2026-08-12 补充（129 图谱八次完善，本地）：按 `截图/images.jpg` 完成 Neo4j 式白底柔色关系图谱；前端支持业务系统→库（数据连接/Owner）→表→字段渐进下钻，表层展示正式表间关系，字段层展示数据类型、主键和关系键。Luna 实现前端、主 AI 复核并补后端字段契约与表关系边；前端 83 项测试、双 typecheck、build/gzip PASS，后端只读冒烟 PASS。隔离测试库因 `asset_data_products` 清理权限与历史脏数据未能完成全绿 pytest；未生产发布、未执行源库 DML/DDL。详见 129 §9。
+> 📌 2026-08-11 补充（128 交接文档）：`128_126号查询指标闭环完成情况与接手交接.md` 汇总 126 P1–P5 生产事实、API/页面、未完成项与接手自检，供其他 AI 接收。
+> 📌 2026-08-11 补充（126 P5）：看板/MCP 目录/多源能力/调度种子；`APP_QUERY_SCHEDULE_ENABLED=true` 且 27 条单调度全关；21 占位标题官方化；镜像/前端 `126p5-20260811223311`。详见 126 §23.6。
+> 📌 2026-08-11 补充（126 P4 收口并生产升级）：数据产品表 `h5c6d7e8f9a0`；发布 `126complete-20260811220449`；查询 27/指标 48（27 active + 21 待补录占位）/产品 54/历史结果；镜像 `data-asset:126complete-20260811220449`。详见 126 §23.5。
+> 📌 2026-08-11 补充（127 号 S9 续跑）：用户授权继续后完成测试库迁移往返 PASS、Review 流 A14/A15/A16 PASS（链接 formal、不升 candidate、draft 保持）、配方 dry-run+测试库导入幂等 PASS、pytest `620 passed/1 skipped`（排除 identity_nightly）、前端 typecheck+76 Vitest+build/gzip PASS。**仍未**生产发布、生产关系批准、生产配方 active、历史问题重建。详见 127 §17.3。
+> 📌 2026-08-11 补充（127 号 S0–S8 执行）：按第 8/16/18 节已核实根因实施代码整改（不重复诊断）。质量 rules 分页、by-system 真实归属、metrics 数组、SQL TOTAL/ERROR、overview/charts、图谱 labelPlacement=center、relation-reviews 批准链接 formal（禁升 537/538）、配方导入修复、AI 取消虚假 executed。测试库专项与契约测试见后续 S9 条。
+> 📌 2026-08-11 补充（127 号质量与治理功能整改计划）：生产平台、源码和生产图谱截图的只读复核确认，质量规则/总览/看板、资产总览、关系复核、关系配方、AI 协作和治理管理存在接口契约、状态模型、初始化与交互可用性问题；121 的历史自动化发布记录保留，但“节点名称可读”的用户视觉验收重新打开。详细根因、通用质量规则、关系确认建议、S0–S9、A1–A25 及与 126 的兼容边界见 `127_数据质量与资产治理功能复核整改执行计划.md`。
+> 📌 2026-08-11 补充（126 P3 + 48 项导入）：生产迁移 `g4b5c6d7e8f9`；影响分析/JOIN 候选/调度表（默认关）；27 条核心制度 SQL→查询+指标已入库；专项 21 passed。调度未启用。详见 126 §23.4。
+> 📌 2026-08-11 补充（126 P1+P2 已生产升级）：查询/指标资产闭环已落地并发布 8.83；迁移 `f3a4b5c6d7e8`；前端 `126p12-20260811213058`。
+> 📌 2026-08-11 补充（126 P1 本地落地）：查询五表 `e2f3a4b5c6d7`、queryctl、技能路由、前端查询中心。
+> 📌 2026-08-11 补充（126 号长期规划原文）：日常查询 SQL/指标闭环、固定 `取数` 工作区、Q1–Q8 已答复；先 SQL 后指标、自动门禁、结果默认可不存。
+> 📌 2026-08-11 补充（名称一致性与 master 收口）：以系统总览 `system_name_cn` 为显示名称唯一基准，系统内统一使用 HIS、HRP、数据中心、嘉和电子病历、移动护理、Docare手术麻醉、LIS、PACS、无纸化病案、超声内镜；“业务系统”和“数据连接”保留为上下级不同维度，图谱筛选/分组/抽屉、目录、质量、元数据、运维等页面均改为中文显示名，物理编码保持稳定。ODS 镜像导入统一归 `DATA_CENTER` 并增加防反弹测试。最新隔离库全量 pytest `697 passed/1 skipped/0 failed`，迁移 `head→-1→head`，前端 `76 passed`、双 typecheck、build/gzip 预算 PASS；代码/构建提交 `e60c586`、`b8bb8f5` 已推送 `origin/master`。生产未发布、业务源库写入 0；H7 后续观察由用户自行跟进，不再阻塞本轮开发/Git收口。
+> 📌 2026-08-11 补充（解除测试库与 R8 阻断）：合法隔离库 `data_asset_test` 经备份后完成最小所有权/权限修复，迁移 `head→-1→head` 和完整 pytest 连续两轮通过（每轮 692 passed/1 skipped）；同生产运行时的 Linux x86_64/Python 3.11 离线包含 56 个逐包哈希 wheel、pnpm 11.9.0 v11 store 和实际 Linux dist，前后端 `--network none` 从零安装/构建通过；全新 PostgreSQL 14 完成幂等升级、回退再升级及 `/health=200`。补齐 `python-multipart`/`openpyxl`/`et_xmlfile` 运行依赖，纯标准库离线门禁专项 43 passed/2 skipped。未发布生产，业务源库写入 0；该条历史阻断已解除。
+> 📌 2026-08-11 较早阶段记录（Luna 低成本开发+主 AI 复核）：本地完成每日 HIS 职称必需子任务、关系配方在线编辑/版本查看/复制/JSON与SQL导出、按钮权限绑定和离线包失败关闭校验；主审修复整批事务/审计恢复、真实权限源、权限资源种子、身份/质量写接口后端细粒度授权、配方角色门禁、版本详情及连续构建旧哈希残留。安全专项 7 passed、职称专项 17 passed、离线校验 14 passed、前端 75 passed+双 typecheck+干净 build/gzip 预算 PASS。当时 `APP_TEST_DB_URL` 与 R8 实包演练仍 BLOCKED，已由上一条后续执行解除；生产发布/调度/数据库写入 0，H7 仍 1/3。
+> 📌 2026-08-10 补充（用户授权 push + F10 apply + 历史签名补跑）：`6be5408` 已 push；F10 平台归并 apply（his_source→HIS、ods_ydhl→DATA_CENTER，备份 `data_asset_pre_f10_20260810195654.dump`）；历史签名 `batch-signature-20260810120039` inserted=15/failed=0/水位 committed；JHEMR 写 15、HIS 写 0。详见 `123` §6。
+> 📌 2026-08-10 补充（121 G8 图谱生产发布 PASS + G7 全绿）：用户授权后完成前端原子发布 `g8-20260810192501-e1e24a6bf5cea97a`（入口 `index-CiBgcxMS.js`，图谱 `AdvancedRelationGraph-BBkJnBCT.js`，方向文案「全部方向/引用它/它引用」）；后端保持 `data-asset:signature125-20260810161506`；nginx `root` 指向 `frontend-dist/current`；`e2e_graph_acceptance` ACCEPTANCE PASS、`e2e_graph_g7_acceptance` **G7_ACCEPTANCE PASS**；previous=`pre-g8-flat-20260806`；业务源库写入 0；无迁移。详见 `121` §11.5。
+> 📌 2026-08-10 补充（125 签名时区/150px 已发布并单账号完成）：H4 发布 `data-asset:signature125-20260810161506`（Pillow 12.2.0 + 时区/150px 代码）；H5 只读 dry-run 指纹 `a316d2a5892d` PNG542×195→JPEG150×54、目标空；H6 受控写入 success inserted=1、action executed rows=1、回读 4093 字节、水位未推进；HIS 写 0。H7 已完成 08-11 首夜，当前 1/3；历史批量补跑随后经单独授权完成 inserted=15/failed=0，不得重复执行。详见 `125` §13。
+> 📌 2026-08-10 补充（123 收口执行）：隔离库 `data_asset_test` 迁移往返至 `d1e2f3a4b5c6`；安全写路由扫描/F2 角色矩阵/撤权立即失效/脱敏/known_hosts 测试落地；前端 typecheck+Vitest69+build 全绿；图谱基础 e2e PASS、G7 硬门禁 PASS（G8 后方向文案已切新版）；122 只读观察 host_cron+水位+单账号签名成功保留，历史补跑 NOT EXECUTED；F10 dry-run source=15/change=2/conflicts=7，apply 未授权；离线包因 PyPI/Docker 阻断 BLOCKED。业务源库写入 0。详情见 `123` §6.1–6.2。
+> 📌 2026-08-10 补充：HIS 职称到 JHEMR 的一次性正式同步已完成并记录于 `124_HIS职称同步JHEMR执行与复用说明.md`。固定口径为 `FXHIS.SYS_EMPLOYEE.EMPLCODE=jhemr.users.user_id`，`LEVLCODE` 经 `PORTAL_USER.PORTAL_SYS_DICT(type_code='EmployeeTitle')` 取 `DICT_NAME` 覆盖 `education_title`；317 条差异已更新，提交后 2043 条匹配全部一致，HIS 写入 0。当前应用镜像未升级，独立每日职称子任务仍未发布，后续不得把一次性执行误记为长期调度完成。
+> 📌 2026-08-09 补充：用户确认 119 号解决“能渲染”后，图谱仍存在节点方块化、名称不可读、方向/跳数/系统层级筛选混乱。生产只读核查同时发现每日人员主同步成功，但 JHEMR 签名子任务固定 16 条权限失败被 overall success 掩盖。120 保留为综合核查底稿；详细执行分别以 `121_关系图谱知识图谱式重构执行修复计划.md`、`122_每日人员同步任务状态审计与签名失败整改执行计划.md` 为模块子计划。未经再次授权不得发布生产、修改 cron/权限或补跑业务写入。本文件仍为唯一未完成事项总入口。
+> 📌 2026-08-03 补充：另有一条并行轨道 `111_当前代码全面核查问题整改执行计划.md`（含 `113` 严格执行提示词）正在做代码安全整改，进度为 S0–S8 代码完成、S9 文档/Git 收口；仅本地整改+纯逻辑子进程测试，未触碰生产/业务库。本文件仍为唯一未完成事项执行入口。
+> 📌 2026-08-04 补充：`116_系统剩余事项合并收口执行计划.md` 合并 85/97/100/101/111/112 的剩余工作，作为交给其他 AI 的统一执行子计划；本文件仍保留总入口、优先级和最终裁决权。
+> 📌 2026-08-04 补充（111/113 执行）：S0–S8 代码经纯逻辑子进程测试验证全绿；S9 文档收口已完成（归档空目录、README 108 状态对齐、秘密扫描通过、目录更新记录登记）；全量数据库 pytest 因本机无隔离 `APP_TEST_DB_URL` 阻断，`requirements.lock`/断网演练缺目标/隔离环境阻断；未 commit/push/tag，生产/业务库零写。
+> 📌 2026-08-04 补充（118 独立复核）：已修字典写后回读与 sequence 标识符校验；纯逻辑 22 passed/1 skipped。待处理清单见 118_111与112独立复核修复与待处理交接.md（U1–U22）；116 仍为合并收口子计划。本文件仍为唯一未完成事项入口。
+> 📌执行入口：本文件是唯一的未完成事项执行计划。开始任何开发前，先读 `README.md`、`AGENTS.md`、本文件。
+> 📌发布部署：发布门禁、离线部署、回滚和代码同步以 `58_发布部署与代码同步整改计划.md` 为唯一执行计划。
+> 📌登录与接入：本地账号认证、RBAC 闭环与业务系统只读接入以 `59_用户登录与业务系统接入执行计划.md` 为模块执行计划；同步记录见 `61`。
+> 📌最终封板：2026-07-15 起剩余 F1–F11 的详细执行步骤统一以 `85_系统最终封板与全量验收详细执行计划.md` 为准；不得重新执行已完成的 77–84 号探库和平台导入。
+>
+> **当前裁决优先级（2026-07-14）**：本文件下方“2026-07-14 用户裁决后的线性执行批次”覆盖旧 T1–T15 中尚未完成或已失效的描述；旧清单与日志仅保留历史证据。
+>
+> **历史复核发现（2026-07-11，逐行核实源码）**：
+> - 大部分 P0/P1 代码改动**已完成**：Token 哈希存储（`q3d4e5f6a7b8` 迁移 + `governance.py:15`）、`admin/init` 公开端点已删、前端硬编码 Token 已删、未绑定 Token 兼容模式（`rbac_require_bound_token=False`；生产须显式设为 `true`）、ops 操作人服务端派生（`ops_tools.py` 用 `current_user`）、测试库强制（`conftest.py:12-14`）、前端三大契约修复（关系复核 `res.data?.items` + 标题正常、metadata diff 参数对齐、dict/medical 路由修正）、调度真实调用采集（`main.py` `_run_metadata_collect` 调 `_collect_metadata_snapshot`）、Nginx CORS 反射已删、`deploy/offline/` + `deploy/systemd/` 已建。
+> - **当时列出的剩余工作**中，QualityFinding、Git 基线、资产归一、配方库最小版等后来已完成；2026-07-14 起只按 E1–E11 判断当前状态，禁止继续引用本段作为待办。
+> - 已删除对 `46_文档完成状态总表.md` 的幽灵引用（该文件已归档且物理不存在）。
+
+# 系统未完成事项统一执行计划（线性清单版）
+
+## 0. 目标与硬边界
+
+**目标**：从当前状态连续推进到可发布基线 + 数据治理闭环，不中途停顿、不分阶段交付。
+
+**硬边界（全程不可违反，违反即回滚）**：
+1. HIS/ODS/HRP 业务源库仅 `SELECT`，禁止任何写操作。
+2. 密码/Token/身份证/姓名/电话/地址不进代码、日志、git、新文档。
+3. 平台库写操作必须经审批+审计+白名单（`asset_action_executors`）。
+4. 迁移手写 `upgrade()`/`downgrade()`，禁 `--autogenerate`；新表只在 `asset` schema，前缀 `asset_<模块>_<实体>`。
+5. 前端必须用 pnpm；typecheck 同时过 `tsc --noEmit` 和 `vue-tsc --noEmit`；不改现有路径（`/relations/{id}/review`、`/dict-medical/*` 等）。
+6. AI 工具不接入写操作执行器，只调只读端点。
+7. 保留旧表不删：`asset_api_keys`/`asset_table_owners`/`asset_business_terms`/`asset_metadata_snapshots`。
+
+**每步完成判定（5 条缺一不可）**：① 改动有 `文件:行号`；② 验收命令实测通过（超时/失败不得写成通过）；③ 涉及结构变更配手写 Alembic 迁移；④ 每步至少一个针对性测试；⑤ 更新 README 目录更新记录 + 本文件末尾执行日志。
+
+## 2026-07-14 用户裁决后的线性执行批次（当前唯一执行序列）
+
+> 执行顺序：`E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 → E11`。允许在不共享文件、不共享生产变更窗口时并行准备，但生产操作、数据库迁移和 Git 推送必须串行留痕。
+  - 2026-08-01: Phase B code complete (107). 114 tests pass. Nightly=false. Awaiting Phase C review + Phase D controlled validation.
+- 2026-08-01: Phase B P0/P1 fixes (107). Permission enforcement on trigger endpoints (identity.sync.trigger), retry logic, readback integration, watermark/row-conservation fuses, four-way diff module, alert dispatch, DBA privilege recommendation. 74 identity nightly tests pass. Nightly=false. Config cleaned (removed deprecated confirmation_token). Awaiting Phase C independent review + Phase D controlled validation.
+
+### 2026-07-14 服务器发布后的真实剩余项
+
+| 优先级 | 剩余工作 | 已有基础 | 完成判定 |
+|---|---|---|---|
+| P0 | 修复全量数据库测试 | 独立验收镜像已建；当前 `240 passed / 40 failed / 3 errors` | 补稳定测试种子、修订配方 `content_hash` 测试和旧状态机预期后，全量 pytest 通过 |
+| P0 | E9 权限与审批角色矩阵 | API、页面、迁移已发布 | 匿名/普通用户/申请人/审核员/管理员/越权/自审禁止全部实测通过，审计链完整 |
+| P0 | E10 配方真实闭环验收 | CRUD、版本、审核、SQL 预览代码已发布 | 新增→编辑→提交→审核→激活→停用、并发冲突和危险 SQL 拒绝均通过 |
+| P0 | E11 浏览器与真实数据验收 | 统一资源树、系统页、图谱诊断已发布 | HIS/HRP/数据中心层级、懒加载、空/错/正常图、节点边详情在浏览器实测通过 |
+| P0 | Git 收口和推送 | **PASS**：敏感扫描、分组提交、远端无分叉和 master 推送完成 | `e60c586`、`b8bb8f5` 已推送；本轮未生产发布，故未创建/移动 release tag |
+| P1 | 生产 RBAC 与容器持久化 | 容器 healthy，迁移已到 `w9d0e1f2a3b4` | `APP_RBAC_REQUIRE_BOUND_TOKEN=true`；未绑定凭据 403；凭据卷和 Oracle Client 挂载经容器重建仍有效 |
+| P1 | 离线可复现与断网演练 | pytest wheelhouse 已有，正式发布包尚未形成完整校验集 | Linux 锁文件、后端 wheelhouse、前端离线产物、SHA256SUMS 完整；干净断网环境从零部署成功 |
+| P1 | HRP 直连与 WA_* 补采 | ODS.HRP 镜像和 52/64 口径已有 | 使用只读凭据完成字段补采/dry-run，缺口清零或形成不可获取清单；源库写入 0 |
+| P1 | 系统历史归并正式 apply | dry-run 为 8 源、3 系统、0 冲突；`75` 已增强脚本 | 再次核对映射与数量守恒后仅写平台库执行 apply；保留回滚证据，不写业务源库 |
+| P1 | 迁移往返验证 | 生产 head 曾至 `w9d0e1f2a3b4`；本地新增 `x0e1f2a3b4c5`（75） | 在独立测试库验证含 `x0e1f2a3b4c5` 的 upgrade/downgrade；禁止在生产试降级 |
+| P0 | 75 系统连接/运维 SQL/字典 | S1–S6 代码已落地（见 `75` 执行日志） | 测试库 upgrade + 全量 pytest；前端已 typecheck；生产归并/字典 apply/写开关须再授权 |
+| P0 | 126 查询+指标+P3–P5 治理底座 | **生产已发布 126p5**；看板/MCP/多源/调度基础设施齐；单调度全关 | 可选：单条调度启用；21 条 SQL 业务补录；深度多源适配 |
+| P2 | 126 深度多源/看板增强 | P5 最小闭环已就绪 | 厂商适配器、契约回归、图表增强；非当前阻塞 |
+| P0 | 127 数据质量与资产治理功能可用性整改 | S0–S9 测试门禁 PASS（620 pytest/76 vitest/build）；生产未发布 | 剩余：生产发布与 A25 视觉验收、生产 Review 批准、生产配方 active、历史质量问题重建（均须新授权）；含 identity_nightly 的完整 690+ 全量可选回归 |
+
+> 已完成且不再重复：平台库生产备份与 upgrade、后端/前端发布、Nginx 与健康检查、基础 UI 人工验收、系统归并 dry-run、pytest 独立验收镜像、业务源库只读门禁。TLS 与人工凭据轮换按用户决定不列阻塞项。
+
+### 一、用户裁决与边界
+
+| 原事项 | 用户决定 | 当前处理 |
+|---|---|---|
+| T13 人工凭据轮换及签字 | 不需要 | 从发布阻塞中取消；不得伪造轮换记录。仍禁止把现有凭据写入代码、日志、Git 或文档 |
+| HTTPS/TLS | 继续使用 HTTP | 从本轮阻塞中取消；记录“内网 HTTP 风险已由用户接受”，不得擅自配置证书或强制 Secure Cookie |
+| Git push | 可以推送 | 已获得本次明确授权；执行前仍需秘密扫描、确认分支/tag/工作区和远端差异，禁止 force-push |
+| Linux lock/wheelhouse/校验清单 | 可做 | 纳入 E4 |
+| 干净断网 Linux 演练 | 可做 | 纳入 E5 |
+| 全量验收 | 可做 | 纳入 E6 |
+| HRP 直连与 WA_* 补采 | 可做 | 撤销“HRP 先不同步”，纳入 E7；源库永远只读 |
+| HIS/ODS/周边/人员/夜间质量 | 可做 | 已完成的成果不重复写入或全量重跑；纳入 E8 做回归核验和缺口修复 |
+| 前端人工视觉验收 | 已完成 | 标记完成，不再列待办；只有发现明确缺陷才修复 |
+| 人员画像/审批流/按钮级权限 | 继续开发 | 纳入 E9 |
+| 关系配方在线编辑/自动建视图 | 可做 | 纳入 E10；只写平台库，生成视图先预览/审批，禁止直接在业务源库 DDL |
+| 运维写通道 | 可做但生产开关继续关闭 | 仅验证默认关闭和安全门禁，不启用生产写开关 |
+
+### E1 工作区收敛与发布内容确认
+
+1. 运行 `git status --short`、`git diff --stat`、`git log -5 --oneline`、`git tag -n`。
+2. 审核当前未提交项：临时 `_browser_*` / `_debug_*` / `_hot_*` / `_continue_*` 脚本不得默认进入发布；71 号报告按 README 登记状态处理。
+3. 对待提交文件执行敏感信息扫描；不得输出密文，只记录命中路径和整改结论。
+4. 将需要保留的代码、测试、迁移、部署文件和文档按逻辑分组提交；临时脚本归档或保持忽略，不得混入生产提交。
+
+**验收**：工作区 clean；`git diff release-20260713..HEAD --stat` 已人工审阅；无凭据进入 Git；记录最终 HEAD SHA。
+
+### E2 推送分支与发布 tag（用户已授权）
+
+1. 先 `git fetch`，确认远端没有需要人工裁决的分叉。
+2. 非快进、远端领先或冲突时停止，禁止 rebase/force-push 擅自改历史。
+3. 推送当前分支；若 `release-20260713` 已指向旧基线，不移动旧 tag。对新增功能应创建新的不可变 tag（建议 `release-20260714`），完成验收后再推送新 tag。
+4. 记录远端分支 SHA、tag SHA 和推送时间，不记录凭据。
+
+**验收**：本地 HEAD 与远端目标分支一致；远端 tag 可解析；`git status` clean。
+
+### E3 生产安全配置与运行时持久化
+
+1. 设置并验证 `APP_RBAC_REQUIRE_BOUND_TOKEN=true`，重启服务。
+2. 使用未绑定 Token/JWT 调用受保护写接口，必须返回 403；有效管理员凭据按权限返回成功。
+3. 用只读挂载持久化 `/etc/data-asset/credentials`；用既有脚本持久化 Oracle Instant Client 19.1 链接与容器启动参数。
+4. HTTP 保持不变；`APP_AUTH_COOKIE_SECURE` 必须与 HTTP 部署兼容，不得误设导致 Refresh Cookie 丢失。记录用户已接受内网 HTTP。
+5. 运维写通道三个生产开关保持关闭，增加启动/冒烟断言，验证业务源库连接器只有只读能力。
+
+**验收**：容器完整重建一次后 ODS/HIS 只读连接仍正常；未绑定凭据写接口 403；登录/刷新正常；运维写开关均为 false。
+
+### E4 生成 Linux 可复现离线依赖包
+
+1. 在与目标环境兼容的 Linux 构建机生成锁文件（含哈希）、wheelhouse、前端 pnpm 离线 store 和构建产物。
+2. 生成文件清单、版本信息和 `SHA256SUMS`；wheelhouse、store、dist 不进入 Git。
+3. 校验 Python、Node、pnpm、CPU 架构与目标服务器兼容。
+
+**验收**：锁文件可复现；所有离线文件校验通过；无公网依赖遗漏；产物位置和哈希摘要进入发布记录但不写凭据。
+
+### E5 干净断网 Linux 环境完整演练
+
+1. 使用全新 VM/容器，断开公网后严格按 `deploy/offline/README.md` 从零安装。
+2. 初始化/迁移平台库，安装后端、前端和 Nginx；使用脱敏测试配置，不连接或写入业务源库。
+3. 验证 `/health/live`、`/health`、首页、登录、RBAC、回滚和二次安装幂等性。
+
+**验收**：断网状态从零部署成功；健康检查 200；失败步骤可回滚；输出命令摘要、耗时、包哈希和问题清单。
+
+### E6 全量代码与发布验收
+
+1. 后端：独立测试库运行全量 pytest；失败必须分类为本轮回归、历史用例或环境问题，禁止把失败写成通过。
+2. 数据库：`alembic upgrade head`，并对本轮新增迁移验证 downgrade/upgrade。
+3. 前端：`pnpm run typecheck`、`pnpm run build` 和现有前端测试。
+4. 安全：敏感串、公开初始化端点、生产 Mock、危险 CORS、业务源库写能力扫描。
+5. 运行时：登录、刷新、权限、资产树、关系图、质量、人员、配方库、运维开关冒烟。
+
+**验收**：所有必须项全绿；如存在经用户接受的遗留，逐项记录风险、证据和责任边界。
+
+### E7 HRP 直连与 WA_* 核心字段补采
+
+codex
+- **T4 / C9**：查重目标误指 ODS/HIS 的 `relationships.csv`（104 行），JHEMR 试点应优先对照 JHEMR Vastbase 资产包（284 行），否则会产生大量伪“新增关系”。
+- **T4**：任务要求按 A/B/C/D 分级，但当前 `sql-relation-intake` 技能采用 `existing/candidate/partial/recipe_candidate/rejected`，交付口径会与现行技能不一致。
+- **T4**：不能预设 `04-上报工具.md` 全属 JHEMR，必须逐条识别物理系统和数据库方言后再选择元数据、值域技能及查重资产包。
+- **T5 / C6**：当前工作区高度 dirty 且 `AGENTS.md` 本身已有未提交修改，直接瘦身或以 Git 回退会覆盖其他在途成果，必须先制作文件级基线并逐段合并。
+- **T2-T3 / C10**：任务只要求更新 `开发起步包/README.md`，却遗漏地图自身 §6 更新记录及 `55` 要求的执行日志，完成后的审计链将不完整。
+tokens used
+133,884

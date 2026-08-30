@@ -1,0 +1,295 @@
+• Let me read the plan file and relevant context.
+
+• Now I need to verify claims in the plan against the actual codebase. Key claims to check:
+
+  1. Frontend files: `graph/index.vue` (~1070 lines, 4 modes), `components/AdvancedRelationGraph.vue` (~535 lines, G6 5.x, SVG fallback), `RelationGraph.vue`, GraphToolbar, graphNodeMeta, path mode features.
+  2. Backend endpoints: `/api/v1/relations/list|list-counts|path|field-mappings|hit-rates|batch-review`; path with direction/max_hops; missing neighborhood endpoint.
+  3. package.json has @antv/g6 5.1.
+  4. Data: relations have validation_status/confidence/relation_type/evidence; ~11,182 tables.
+  5. 4 view modes: overview/path/explore/review.
+  6. G-07 URL serialization claim.
+  7. Referenced constraints: 164 §6 red line (offline dependency audit), "前端不改现有路径".
+
+  This is a review task — substantial verification across frontend and backend. I could delegate to explore agents, but I need to judge details myself. Let me do targeted checks. The plan file is short; verification requires reading several files. Let me parallelize with a few explore agents or do direct reads. Direct reads of a couple of large files (1070 lines) is fine. Let me do a mix: grep for endpoints, read package.json, check file sizes.
+
+  Let me run checks directly — efficient enough with parallel tool calls.
+
+ 1070 frontend/src/views/asset/graph/index.vue
+ 1070 total
+graphErrors.ts
+graphEvidence.ts
+graphLoadPolicy.ts
+graphNormalize.ts
+graphPhysical.ts
+graphTransform.ts
+hierarchyLayout.ts
+index.vue
+• The components directory doesn't exist at `frontend/src/views/asset/graph/components/` — instead files are directly under `graph/` (graphErrors.ts, graphEvidence.ts, ..., index.vue). So claims about `components/AdvancedRelationGraph.vue` (535 lines), `RelationGraph.vue`, `GraphToolbar`, `graphNodeMeta` may be wrong paths or nonexistent. Let me search.Components live in `frontend/src/views/asset/components/`, not `frontend/src/views/asset/graph/components/`. The plan §2 says "只改 `frontend/src/views/asset/graph/`、`components/`（图谱域）" — ambiguous but §3 says `components/AdvancedRelationGraph.vue` — could be interpreted as `asset/components/`. Minor path imprecision.
+
+  Check line counts of AdvancedRelationGraph.vue and RelationGraph.vue, and check path endpoint params (direction/max_hops), batch-review endpoint, graph index.vue 4 modes, G-07 URL serialization, table count 11,182, and 164 constraints.  535 frontend/src/views/asset/components/AdvancedRelationGraph.vue
+  677 frontend/src/views/asset/components/RelationGraph.vue
+  252 frontend/src/views/asset/components/GraphToolbar.vue
+   23 frontend/src/views/asset/components/graphNodeMeta.ts
+ 1487 total
+Good. Facts largely check out. Now check:
+  - view modes list (4 modes: overview/path/explore/review) — check view mode definitions.
+  - G-07 URL serialization claim (P2-2 says "G-07 已有基础") — check whether URL query serialization exists in graph page.
+  - 164 constraints referenced ("164 §6 红线", "前端不改现有路径"). Check what document 164 is.
+  - batch-review endpoint exists? grep earlier showed `@router.post(` at relations.py:467 — check name. Also relation_reviews.py posts.
+  - Table count 11,182 claim.
+  - AdvancedRelationGraph.vue: G6 5.x, SVG fallback, pan/destroy — spot check.
+  - Existing remote search (P0-1 says "复用现有远程搜索") — check locate.search_results seen at line 112 suggests a locate/search feature already exists in index.vue! Line 112: `v-if="locate.search_results.length"` — there's already a search/locate panel. Plan P0-1 says "顶栏全局搜索聚焦 ... 复用现有远程搜索" — acknowledges reuse. But pain point ① says "无全局搜索聚焦节点" — need to check what locate does; maybe it exists but doesn't focus/center. Let me check.
+
+  Let me check these in parallel.Key facts verified so far:
+  - index.vue 1070 lines ✓; AdvancedRelationGraph.vue 535 lines ✓ (but path is `asset/components/`, not `graph/components/`); RelationGraph.vue 677 lines (plan says "简化版" — 677 lines, bigger than AdvancedRelationGraph; the "简化版" characterization may be wrong — need check).
+  - G6 ^5.1.1 ✓
+  - Backend endpoints: list, list-counts, path, hit-rates, batch-review, field-mappings ✓; no neighborhood ✓; path has direction/max_hops (le=8) ✓ matches "1–8 跳".
+  - 4 view modes overview/path/explore/review ✓ (line 322).
+  - URL query params already exist: keyword, validation_status, confidence, group_by, show_review_layer, view_mode (lines 515-533) — P2-2 "G-07 已有基础" plausible; but plan says "模式+中心节点+过滤组合进 query" — center node not yet in query presumably.
+  - Existing locate search: there IS already a locate feature with remote search + candidate picking (lines 112-114, 314, 459-461). Plan's pain point ① "无全局搜索聚焦节点" — need to check what locate does. It seems there's already a search box passed to GraphToolbar (`:locate="locate"`). So claim ① may overstate: there is a search, maybe it doesn't focus/center on node or requires mode switch. The plan P0-1 says "复用现有远程搜索" so it acknowledges. But the pain-point phrasing "无全局搜索聚焦节点" is半准确 — there is a search-to-center mechanism? Need to check what happens after pickLocateCandidate — does it center/focus? Let me look.
+
+  Also check:
+  - "11,182 表" claim.
+  - AdvancedRelationGraph: G6, SVG fallback, layout engine state — spot check.
+  - RelationGraph.vue "简化版" characterization.
+  - 164 §6 red line: found "离线依赖审计+用户单独授权" in 164 ✓. Also "前端不改现有路径" — AGENTS.md has it （代码开发约束 §8) ✓; plan attributes to "164 既有约束" — check 164 mentions frontend path constraint? Maybe. Minor.
+  - G-07 reference — search.
+  - check review round dirs for prior rounds context (round-5 implies rounds 1-4 exist). Not strictly needed.
+  - P0-6 "复用现有权限 value 域" — check how existing relations endpoints do permission. list endpoint? Let me check quickly.
+  - Recursive CTE on Oracle? Backend DB: what is asset platform DB? Vastbase (Postgres-compatible) per drivers/ Vastbase jar. Recursive CTE supported in Postgres/Vastbase ✓. But plan says "PG 递归 CTE" in P2-1 — consistent.
+  - hops≤3 for neighborhood with limit 50 — fine.
+
+  Let me check locate behavior and a few more.Interesting findings:
+  - AdvancedRelationGraph.vue already has a legend with edge-type visual distinctions (A/正式， 已验证， B/C, D/待分析， 视图依赖） lines 4-11. Plan pain point ③ "边样式区分度低（类型/置信度/待审状态视觉不分离）" — but the legend shows there IS edge styling by confidence/status already. And line 220: "默认 layered → 改为 Neo4j 风格的 d3-force 力导向布局" — the default layout is ALREADY force (d3-force)! So P0-3 "力导向布局替代当前布局" may be partly already done. Need to check more — read the layout section of AdvancedRelationGraph.vue lines ~180-260 and check which modes use which layoutMode.
+  - There's already a graphLoadPolicy with shouldUseSvg/shouldAggregate — SVG fallback & aggregation exist (graphLoadPolicy.ts). Plan P1-3 says "同 schema 节点聚合超节点" as future — but aggregate_groups already exists (filters.aggregate_groups). Need to check extent.
+  - URL query filters already applied (keyword, validation_status, confidence, group_by, show_review_layer, view_mode) — G-07 深链 exists ✓.
+  - Locate search exists with candidate picking and loadChain — so "无全局搜索聚焦" is partially inaccurate; maybe locate only works in explore mode (requires center table) and doesn't focus on already-loaded graph. That's likely the real gap. The plan's pain point ① is directionally right but slightly overstated.
+
+  Let me read more of AdvancedRelationGraph.vue layout code, check where layoutMode comes from in index.vue, check graphLoadPolicy.ts, and check RelationGraph.vue "简化版" claim. Also check line 200 comment: "不用 G6 force（会挤到中心重叠）" for hierarchy/knowledge-graph modes, but default layered → force? Wait, line 220 says "默认 layered → 改为 Neo4j 风格的 d3-force 力导向布局" — interesting, seems someone already switched default to force. And line 184: isPresetLayout = hierarchy || layered... but then line 220 contradicts? Need to read the actual code.Big finding: the default layout in AdvancedRelationGraph.vue is ALREADY a d3-force "Neo4j 风格" layout (lines 220-235). So P0-3 "力导向布局替代当前布局" partially mischaracterizes the current state — force layout already exists as default. What might be missing: 重新布局 button, layout freeze on drag (need to check), 斥力按度数自适应. The plan's pain point and P0-3 overstate the gap.
+
+  Also already existing:
+  - Edge legend with confidence/status distinctions (A/正式， 已验证， B/C, D/待分析， 视图依赖） — but legend is not clickable filter (plan P0-4's click-to-toggle is new) and draft breathing animation is new. So P0-4 is partially new (filter interactivity), but "边样式区分度低" pain point is inaccurate — visual distinction exists per legend.
+  - GraphLoadPolicy: auto-aggregate (>140 nodes) and SVG fallback (>220) already exist. P1-3 "超节点聚合" partially exists (aggregate_groups filter). LOD not present presumably.
+  - locate search with candidates exists.
+
+  Check remaining:
+  - RelationGraph.vue "简化版" — 677 lines, likely the SVG engine. Plan calls it "简化版" — it's the SVG fallback engine. Characterization roughly fine but it's not "simplified", it's the SVG renderer. Minor.
+  - Node property drawer exists? Plan pain point ④ "无属性面板（要点开抽屉跳离上下文）" — index.vue line 202 shows selectedNode with review_status etc. — there's some selection detail. Check what happens on node click. Also GraphEvidenceDrawer.vue exists (evidence drawer). So "无属性面板" — there is a drawer; plan acknowledges ("要点开抽屉跳离上下文"). OK fair.
+  - Does the graph support double-click expand already? Check index.vue/AdvancedRelationGraph for dblclick handlers.
+  - 11,182 tables claim — check where that number comes from. Grep "11182" or "1.1万".
+  - Check whether overview dblclick/drill exists (node click drill in overview).
+  - Check backend permission on relations endpoints for P0-6 "复用现有权限 value 域" — list endpoint require_permission? relations.py imports require_permission (batch-review uses asset.relation.review). Read endpoints may not require permission. Minor.
+  - vitest: does frontend have vitest configured? Check package.json scripts. Plan §6 requires "vitest（新增≥8 组件/工具测试）". Check if vitest exists in the project.
+  - Check backend tests dir for relations tests ✓ exists.
+  - Check "55" registration requirement — DoD mentions README/55 登记， consistent with AGENTS.md doc rules. But this is code change, not doc; fine.
+
+  Let me check dblclick, vitest, 11182, RelationGraph purpose.7:  "scripts": {
+8-    "dev": "vite",
+9-    "serve": "pnpm dev",
+10-    "prebuild": "rimraf dist",
+11-    "build": "vite build --configLoader runner",
+12-    "postbuild": "node build/check-bundle-budget.mjs",
+13-    "prebuild:staging": "rimraf dist",
+14-    "build:staging": "vite build --mode staging --configLoader runner",
+15-    "prereport": "rimraf dist",
+16-    "report": "vite build --configLoader runner",
+17-    "size:check": "node build/check-bundle-budget.mjs",
+18-    "preview": "vite preview",
+19-    "preview:build": "pnpm build && vite preview",
+20-    "typecheck": "tsc --noEmit && vue-tsc --noEmit --skipLibCheck",
+21-    "svgo": "svgo -f . -r",
+22-    "clean:cache": "rimraf .eslintcache && rimraf pnpm-lock.yaml && rimraf node_modules && pnpm store prune && pnpm install",
+27:    "test": "vitest run",
+28:    "test:watch": "vitest",
+103:    "@vue/test-utils": "^2.4.11",
+113:    "jsdom": "^29.1.1",
+140:    "vitest": "^4.1.9",
+More findings:
+  - No dblclick handler in AdvancedRelationGraph.vue (no dblclick/node:click? Actually "node:click" not found either — check click handling; maybe uses other event names). So double-click expand is genuinely missing ✓ (P0-2 valid).
+  - vitest exists ✓ (test: vitest run).
+  - 11,182 tables ✓ (from 143/55/README).
+  - RelationGraph.vue is the SVG fallback engine (not "简化版" exactly — it's the SVG lightweight renderer). Plan's "简化版" characterization roughly OK.
+
+  Now key remaining checks:
+  1. Node click behavior / selected detail: does clicking a node show a drawer? index.vue line ~202 shows selectedNode status. Plan says 属性面板 new. There's GraphEvidenceDrawer. Fine.
+  2. What layout does explore mode use currently? index.vue passes layoutMode? Search for layoutMode in index.vue.
+  3. Check whether locate search works across all modes or only explore (requires center table). applyViewMode shows explore requires locate. In overview mode, can you search? The toolbar has :locate="locate". Pain point ① "无全局搜索聚焦节点" — search exists (locate) but centers only in explore/chain mode; no focus-on-already-loaded-graph. So the plan's characterization is roughly fair but slightly overstated since a search box exists in the toolbar already.
+  4. Check backend relations.py top: does the list endpoint require permission? For P0-6 "复用现有权限 value 域" phrasing is odd ("权限 value 域"?). Let me check the router-level dependencies.
+  5. Check 164 "前端不改现有路径" attribution — the constraint in AGENTS.md is from 代码开发约束 §8, possibly from doc 164. Quick grep "不改现有路径" in 开发起步包.
+  6. Neo4j background claim in §0 — user said in PPT discussion Neo4j is target architecture. Can't verify from repo easily; maybe grep Neo4j in 开发起步包. Not critical — it's session context. But plan states it as fact; check if any doc mentions Neo4j as target.
+
+  Let me run these checks.Very important finding: `129_图谱修复权限整改布局美化交接.md` line 92: 用户已反馈过"图谱布局是正方形，要求改成 Neo4j 风格（力导向、自然散布）" — and the default layout was already changed to d3-force (line 220 comment "改为 Neo4j 风格的 d3-force 力导向布局"). So force layout is ALREADY implemented. P0-3's claim "G6 force 布局替代当前布局" mischaracterizes the current state — it's largely done. Remaining sub-items （重新布局按钮、拖拽冻结、斥力按度数自适应、连线距离分 relation_type) may be new, but the plan presents force layout as a to-do rather than "已部分存在，需补 X/Y/Z".
+
+  Also node click → ReDetailDrawer (a drawer!) exists: selectNode opens nodeDrawerVisible with ReDetailDrawer. So pain point ④ "无属性面板（要点开抽屉跳离上下文）" — acknowledges drawer. OK.
+
+  Also check 129 doc more — it may document other already-done Neo4j-style features that the plan duplicates (e.g. 度数圆点大小 already done per line 187-197 comment "Neo4j 知识图谱视觉——节点统一为圆点，度数越高圆越大"). Let me skim 129 doc.
+
+  Also check:
+  - selectNode logic around line 892: for some categories it returns early (opens node drawer), else... line 928 opens nodeDrawer, 933 opens evidence drawer (edge click presumably).
+  - Whether overview dblclick/drill exists — node-click in overview drills down (selectNode likely handles drill). Let me read selectNode 880-935.
+  - Also check GraphToolbar for existing search input (locate prop).
+
+  Then compile the review. I have enough for most; let me read selectNode and skim 129.I'm doing a review task, read-only. TodoList not really needed — it's an investigation with a final report. I'll skip it or do minimal. Let me finish a couple more checks then write the review.
+
+  Remaining checks:
+  1. GraphToolbar search input (locate prop) — is there a search box in the toolbar already? Quick grep.
+  2. Check backend graph API for explore/chain endpoint — P0-6 says "缺邻域渐进加载端点". There's /graph/overview and probably a chain endpoint. The locate loadChain uses some endpoint. Neighborhood vs existing chain: check what loadChain calls. Grep for graph/ endpoints in backend and api/asset.ts.
+  3. 164 "前端不改现有路径" attribution — grep.
+  4. Check the plan's claim about "证据链/来源 SQL 摘要" availability in edge data — edges have evidence? backend edge meta includes evidence_kind etc. Minor.
+  5. Whether explore mode currently uses force default — filters.layout_mode default is "layered"? index.vue line 297 area: filters default. layout_mode default? Line 886/900 set "layered". layoutOptions: usesPresetPositions returns true for "layered" → null (preset positions) — wait, line 184: hierarchy OR layered → preset. But line 220 comment says "默认 layered → 改为 force"?? Contradiction: if layered returns null at line 201-203, then line 222 force return only happens for layout modes not in {hierarchy, layered, radial, grouped}. Hmm, but the comment says default layered→force. Actually usesPresetPositions includes "layered", so force is returned only for other values. Which layout_mode values exist? Let me check filters.layout_mode default and where it's set. Line 861: radial for field. 886: layered for overview levels. What about explore/review modes? Need to check applyModeDefaults. Let me grep layout_mode in index.vue and graph files.Critical finding: `backend/app/api/v1/graph.py:1142` — `GET /api/v1/graph/neighbors` "某表邻居图" ALREADY EXISTS! Plan §3 claims "缺邻域渐进加载端点" and P0-6 proposes a NEW endpoint `/api/v1/relations/neighborhood`. Need to check what /graph/neighbors does — does it support hops? limit? If it only does 1-hop neighbors, then "缺邻域渐进加载" may be partially wrong (1-hop exists, multi-hop missing). Let me read it.
+
+  Also explore mode search exists (locate-row in toolbar, explore only). And there's a keyword search for other modes. So pain point ① "无全局搜索聚焦节点" is quite inaccurate — there IS a center-table search in explore mode with depth/direction segments (loadChain = /graph/neighbors probably!). Wait — loadChain might already call /graph/neighbors with depth! Let me check the frontend API and the neighbors endpoint signature.This is the most significant finding: the plan's central backend claim is wrong.
+
+  - `GET /api/v1/graph/neighbors` already exists: center table (physical_key), depth 1–2, direction in/out/both, limit ≤200. This IS a neighborhood endpoint. The frontend explore mode (loadChain) already calls it (asset.ts:875) with depth/direction segments in the toolbar (GraphToolbar locate-row: depth segmented, direction segmented).
+  - Plan §3 says "后端：…缺邻域渐进加载端点" and P0-6 proposes building `GET /api/v1/relations/neighborhood?center=...&hops=1&limit=50` as new work. In reality:
+    - A neighbors endpoint exists with depth (1–2 hops), direction, limit ≤200.
+    - What's genuinely missing: (a) hops ≤3 (current le=2), (b) perhaps per-node degree in response, (c) incremental "expand from an arbitrary node within an already-loaded graph" semantics vs "reload whole chain from center", (d) maybe response shape for merging into existing graph.
+    So P0-6 as "new endpoint" is largely redundant; the correct framing is "extend /graph/neighbors (hops 3, degree, incremental merge)". The plan author apparently didn't check graph.py — they only looked at relations.py endpoints (their §3 list only enumerates /relations/* endpoints and ignores /graph/* endpoints entirely: overview, neighbors, edges/{id}, tables/search, filter-options, diagnostics). That's a material omission: the plan's "现状盘点" of the backend misses the entire graph.py API surface which is exactly the API the graph page uses.
+
+  Also front-end pain point ①: explore mode already has center-table search + depth + direction (toolbar locate-row). "无全局搜索聚焦节点" — partially inaccurate: there is search in explore; missing is cross-mode focus/highlight of already-loaded node. P0-1 "复用现有远程搜索" — /graph/tables/search exists ✓.
+
+  P0-3 force layout: default layout_mode filter is "layered" (line 310) and modes set layout_mode; usesPresetPositions treats "layered" as preset → null (no engine). Wait — but 129 doc says default changed from force-atlas2 to force. Current code: layoutOptions returns null for hierarchy/layered (preset positions via hierarchyLayout.ts?), radial → radial, grouped → force-atlas2, else force. Comment at line 220 "默认 layered → 改为 force" conflicts with line 184/201 which returns null for layered. The comment seems stale — line 200 comment says "知识图谱/分层树状：坐标预计算后写入节点，不用 G6 force". So current actual behavior: layered uses preset coordinates (no force simulation). Which modes use "layered"? Overview levels use layered/radial. What does explore/review use? Line 356: filters.layout_mode = mode.layout_mode (from backend options.view_modes). Unknown values. Need to check what layout_mode explore uses. If explore uses "layered" → preset, then force is NOT currently active for explore, and P0-3's "replace current layout with force" is more valid. But line 220's comment says "默认 layered → 改为 Neo4j 风格的 d3-force" — meaning the fallthrough default (any non-preset mode) is force. So if explore's layout_mode from backend is e.g. "force" or something not in {hierarchy,layered,radial,grouped}, it gets d3-force.
+
+  Let me check backend filter-options/options for view_modes layout_mode values. Quick grep in graph.py for layout_mode.Backend view_modes:
+  - overview → grouped (force-atlas2)
+  - path → layered (preset)
+  - explore → radial
+  - review → grouped (force-atlas2)
+  - (344: some other deprecated mode → layered, maybe "table")
+
+  So explore currently uses **radial** layout, review/overview use **grouped (force-atlas2)**. Neither uses the fallthrough d3-force default! So force layout (d3-force) is currently only the fallthrough for unknown modes — meaning P0-3's "introduce force layout to explore/review" is actually a real change (explore radial → force, review grouped(force-atlas2) → force). But the plan §3 现状盘点 doesn't describe this accurately either — it says "G6 force 布局替代当前布局" without noting explore=radial, review=force-atlas2 already force-family. force-atlas2 IS a force-directed layout, so review mode already has force-directed layout. Pain point list omits this. P0-3 partially duplicates existing behavior (review already force-atlas2; whether switching to d3-force is an improvement is debatable).
+
+  Now check a couple more things:
+  1. 164 attribution of "前端不改现有路径" — AGENTS.md 代码开发约束 §8 says it; does 164 say it? Quick grep.
+  2. Does overview mode have drill already — yes (selectNode drills).
+  3. Check whether GraphEvidenceDrawer shows edge evidence — yes exists.
+  4. Check "value 域" permission phrasing in P0-6: "复用现有权限 value 域" — weird phrasing; existing /graph/neighbors has NO require_permission dependency (neighbors signature only has db). Read endpoints apparently don't require permission. So "复用现有权限" is vague but fine.
+  5. Check line 322 view modes deprecation: 4 modes ✓.
+
+  Also check review/round-5 for other files (the review context: rounds 1-4). Maybe there are earlier review reports worth checking consistency. Quick ls.
+
+  Also the plan §5 step 1 order: "后端 neighborhood API+契约测试 → 前端属性侧栏/图例过滤（纯 UI，先行）" — self-contradictory ordering (says API first then says UI 先行）. Minor.
+
+  Also §6 acceptance: "新增≥8 组件/工具测试" including "邻域 API 契约" — fine.
+
+  Security: neighborhood API with center=schema.table string — plan uses legacy alias style; existing neighbors uses physical_key 5-part. Plan's center param format "<schema.table>" would hit the multi-ambiguity problem that physical_key was designed to solve (1144-1146: physical unique). The plan ignores the physical_key convention — a design inconsistency worth flagging.
+
+  Performance: recursive CTE on Vastbase (PG-compatible) OK. But note existing neighbors implementation is iterative BFS with per-hop queries — recursive CTE not strictly needed. Fine.
+
+  One more: does the frontend have tests dir with graph tests (tests/advancedRelationGraph.test.ts mentioned in 129)? vitest configured ✓. Enough.
+
+  Check 164 for "不改现有路径":review/:
+round-0-legacy-20260823
+round-1
+round-2
+round-3
+round-4
+round-5
+
+review/round-5/:
+哈希.md
+审查_grok.err
+审查_grok.raw
+审查_kimi.err
+审查_kimi.raw
+审查_zcode.md
+方案.md
+检查_codex.err
+检查_codex.md
+advancedRelationGraph.test.ts
+aiQuality.test.ts
+asset.test.ts
+authLogin.test.ts
+deptLabels.test.ts
+graphEvidence.test.ts
+graphPage.test.ts
+graphPageMount.test.ts
+graphTransform.test.ts
+hierarchy.test.ts
+hierarchyLayout.test.ts
+lineagePage.test.ts
+lineagePicker.test.ts
+permissions.test.ts
+personLabels.test.ts
+plan146StageA.test.ts
+plan146StageB.test.ts
+plan146StageC.test.ts
+plan146StageD.test.ts
+plan146StageE.test.ts
+I have enough. Let me also verify one small thing: plan says "164 既有约束'前端不改现有路径'" — actually that constraint is in AGENTS.md 代码开发约束 §8 ("前端不改现有路径：/relations/{id}/review、/dict-medical/* 等现有路径保留不变"). 164 doesn't contain it per grep. So attribution slightly off but constraint is real (AGENTS.md). Fine.
+
+  Also confirm explore mode search exists — yes, locate-row in toolbar for explore with depth/direction segments. So pain point ① "无全局搜索聚焦节点" overstates; real gap = no focus on already-loaded node in overview/review, and no跨模式 unified search.
+
+  Also the plan's §3 backend inventory lists only /relations/* endpoints and misses the entire /api/v1/graph/* surface (the actual graph API: graph, neighbors, overview, edges/{id}, tables/search, filter-options, options, diagnostics). This leads to the biggest error: P0-6 proposes a new neighborhood endpoint while /graph/neighbors (depth 1–2, direction, limit≤200) already exists and is already wired to the frontend explore mode. The correct P0-6 should be "extend /graph/neighbors: hops 2→3, add per-node degree, support incremental merge" — not a new /relations/neighborhood.
+
+  Also check: does the plan's P0-2 double-click expand need an endpoint? It could reuse /graph/neighbors. So the plan's batch-1 sequencing "搜索聚焦/双击展开（依赖 API）" is built on a false dependency premise.
+
+  Additional smaller issues:
+
+  1. §3 path error: `components/AdvancedRelationGraph.vue` actual path is `frontend/src/views/asset/components/` (not `graph/components/`). §2 says 只改 `frontend/src/views/asset/graph/`、`components/` — ambiguous. Minor.
+
+  2. RelationGraph.vue called "简化版" — actually it's the SVG fallback engine (677 lines, more than AdvancedRelationGraph's 535). Characterization misleading but harmless.
+
+  3. Pain point ③ "边样式区分度低（类型/置信度/待审状态视觉不分离）" — contradicted by existing legend (A/正式、已验证、B/C、D/待分析、视图依赖 distinct styles, both engines). The genuinely new part of P0-4 is clickable legend filtering and draft breathing animation. Overstated pain point.
+
+  4. P0-3: current layout reality: overview=grouped(force-atlas2), path=layered(preset), explore=radial, review=grouped(force-atlas2). Force-family layouts already power 3 of 4 modes. "力导向布局替代当前布局" mischaracterizes; real work = tune params, re-layout button, drag freeze. Also 129 doc history: user already asked for Neo4j style and force was deployed; the plan ignores this history — risk of re-doing done work and breaking the hierarchy preset behavior (line 200 comment: preset used because force squeezes center overlap for knowledge/hierarchy). Actually careful: line 200 says for hierarchy/layered they deliberately avoid force because of overlap. P0-3 says overview keeps hierarchy ✓.
+
+  5. P0-6 center param format `<schema.table>` ignores physical_key 5-part convention that exists precisely because schema.table is ambiguous across systems (graph.py:1144-1146). New API should take physical_key. Also "复用现有权限 value 域" is vague — current read endpoints (/graph/neighbors) have no require_permission at all; plan should state the actual auth posture.
+
+  6. Recursive CTE: existing neighbors uses iterative per-hop SELECT BFS; recursive CTE on Vastbase is fine, but plan could note reuse. Also hops≤3 hard cap vs existing depth le=2 — raising to 3 needs perf validation; plan has mitigation ✓.
+
+  7. §5 sequencing contradiction: "后端 neighborhood API+契约测试 → 前端属性侧栏/图例过滤（纯 UI，先行）" — arrow says API first, parenthetical says UI first. Minor editorial.
+
+  8. §6 acceptance "2k 节点/8k 边 ≥30fps" but graphLoadPolicy currently auto-switches to SVG at ≥220 nodes / ≥320 edges and aggregates at ≥140/180. So a "2k nodes G6" scenario contradicts the existing load policy — the policy thresholds would force SVG long before 2k. Either the plan must change load policy thresholds (not mentioned) or the acceptance scenario is unreachable. Real inconsistency.
+
+  9. P1-3 "超节点聚合" partially exists (aggregate_groups filter + auto-aggregate at thresholds). Plan presents as new. Should reference graphLoadPolicy.ts.
+
+  10. §0 background claim about PPT/Neo4j target architecture: 01 doc does list Neo4j as optional/phase-2 (lines 122-123, 1771 "第一版不部署，第二阶段视需求增加"), so plan's optional-read-model stance is consistent with 01 ✓. The "用户同日 PPT 讨论" session context can't be verified from repo — flag as unverifiable but plausible; not a problem for the plan itself since it makes Neo4j optional.
+
+  11. DoD requires "README/55 登记" — consistent with AGENTS.md doc rules ✓. But the plan itself （方案.md) is a review artifact; fine.
+
+  12. Requirement coverage: user asked "分析如何完善、更直观、像 neo4j 知识图谱、详细改造计划" — plan delivers: 现状盘点、痛点、P0-P2、实施步骤、验收、风险 ✓. Coverage good. No major 加戏 except Neo4j read-model (P2-1) — but user explicitly said "想 neo4j知识图谱", and §0 context supports it; marked optional, not 加戏. Coverage verdict: faithful, well-scoped; the main defect is factual accuracy of 现状盘点， not scope.
+
+  13. One more: P0-1 "拼音前缀搜索" — does /graph/tables/search support pinyin? Unknown; plan says "复用现有远程搜索" plus pinyin prefix — pinyin may be new work not acknowledged. Minor. Could check quickly... let me check graph.py tables/search for pinyin. Quick grep.
+
+  Also "G-07 已有基础" ✓ verified (164 执行报告 G-07 深链刷新通过 + route query parsing exists).
+
+  Let me check pinyin quickly, then write the final review.
+
+• Pinyin: table_search only does ilike on table_name/table_name_cn/schema/namespace — NO pinyin support. So P0-1's "拼音前缀搜索（复用现有远程搜索）" is not a pure reuse; pinyin requires new work (unacknowledged dependency/effort). Minor flag.
+
+  Now compile the final independent review. Structure:
+  1. 总体结论
+  2. ① 需求覆盖度与忠实度
+  3. ② 自发发现的问题（分严重度），逐条附理由/风险/引用节号
+
+  Key issues ranked:
+  - 【高】P0-6 重复造轮子：/api/v1/graph/neighbors 已存在（graph.py:1142，depth 1–2、direction、limit≤200），前端 explore 已接线（asset.ts:875、GraphToolbar locate-row）。方案 §3"缺邻域渐进加载端点"不成立；§3 后端盘点只列 /relations/* 而漏掉整个 /graph/* API 面（overview/neighbors/edges/tables/search/filter-options/diagnostics），这是图谱页真正用的 API。风险：新建 /relations/neighborhood 造成两套邻域 API 并存、口径分裂；第一批排期建立在错误前提上。
+  - 【高】P0-6 center 参数格式 `<schema.table>` 与仓库 physical_key 五段式约定冲突——物理键正是为解决跨系统同名表歧义而设（graph.py:1144-1146 注释）。
+  - 【中高】P0-3 现状误判：当前 4 模式布局为 overview=grouped(force-atlas2)、path=layered（预算坐标）、explore=radial、review=grouped(force-atlas2)（graph.py:288-344）；d3-force 已是组件兜底默认（AdvancedRelationGraph.vue:220-235），force-atlas2 本身是力导向家族。即 3/4 模式已是力导向或辐射式。"G6 force 布局替代当前布局"夸大了缺口；且 129 号文档记录用户 2026-08-12 已要求并已部署过 Neo4j 风格力导向改造，方案未引用这段历史，有重做已完成工作的风险。真正的新工作只剩：参数调优、"重新布局"按钮、拖拽冻结。另注意 AdvancedRelationGraph.vue:200 注释：hierarchy/layered 刻意不用 force（会挤到中心重叠）——方案未提这一既有教训。
+  - 【中】痛点③"边样式区分度低…视觉不分离"与现状不符：两个引擎图例已区分 A/正式、已验证、B/C、D/待分析、视图依赖（AdvancedRelationGraph.vue:4-11、RelationGraph.vue:4-10）。P0-4 真正新增的是"可点击图例过滤"和 draft 呼吸动画。痛点表述失真会导致验收基准错误（§6 "draft 边视觉可辨率 100%"其实现状可能已接近达成）。
+  - 【中】§6 性能验收"2k 节点/8k 边 ≥30fps"与既有 graphLoadPolicy 冲突：≥140 节点自动聚合、≥220 节点强制 SVG（graphLoadPolicy.ts:17-20）。不先改负载策略阈值，2k 节点 G6 场景根本不会出现，验收不可达；方案只字未提调整该策略。
+  - 【中】痛点①"无全局搜索聚焦节点"不准确：explore 模式工具栏已有中心表搜索+深度+方向（GraphToolbar.vue:16-19），其他模式有 keyword 搜索（:43）。真正缺口是"已加载图上聚焦/高亮"与跨模式统一搜索。方向对但归因失真。
+  - 【低】P1-3"超节点聚合"部分已存在：aggregate_groups 筛选 + 自动聚合策略（graphLoadPolicy.ts）。方案当新功能列。
+  - 【低】P0-1"拼音前缀搜索"标注"复用现有远程搜索"，但 tables/search 仅 ilike 表名/中文名/schema/namespace（graph.py:1741），无拼音能力——这是一项未承认的新增工作量（且无 pinyin 字段/依赖，零新依赖红线下需说明实现方式）。
+  - 【低】§3 组件路径写为 `components/AdvancedRelationGraph.vue`，实际在 `frontend/src/views/asset/components/`（graph/ 目录下只有 .ts 工具与 index.vue）；§2 改动范围表述含糊。另 RelationGraph.vue 称"简化版"，实为 677 行 SVG 降级引擎（比 G6 版还长），性质是 fallback 引擎而非简化版。
+  - 【低】"复用现有权限 value 域"（P0-6）措辞含糊且与现状不符：/graph/neighbors 等读端点当前没有任何 require_permission 依赖，方案应明说沿用"读端点不鉴权/仅登录"现状还是补鉴权。
+  - 【低】§5 第一批内部顺序自相矛盾："后端 API+契约测试 → 前端侧栏/图例（纯 UI，先行）"。
+  - 【低】引用归属：§2 把"前端不改现有路径"归给 164，实际出自 AGENTS.md 代码开发约束 §8（164 文档中无此条）；G-07 引用属实（164 执行报告 G-07 深链刷新通过 + index.vue 已有 route.query 解析）。§0 的 PPT/Neo4j 目标架构属会话上下文，仓库内无法核验，但 01 蓝图确实将 Neo4j 列为"第一版不部署、第二阶段视需求"（01:1771），与方案可选件立场一致。
+
+  Verify positives:
+  - 行数/文件属实 (index.vue 1070 ✓, AdvancedRelationGraph 535 ✓)
+  - G6 ^5.1.1 ✓
+  - /relations path direction/max_hops 1-8 ✓; batch-review 权限 asset.relation.review ✓（方案 §7"权限码不变"可行）
+  - 11,182 表 ✓（55/README/143）
+  - 4 视图模式 ✓
+  - vitest 存在 ✓（test: vitest run）
+  - 164 离线依赖审计+单独授权红线 ✓ (164:80/90)
+  - 无 dblclick 处理器 ✓（P0-2 真缺口）
+  - P2-1 Neo4j 可选件立场与 01 一致 ✓
+
+  覆盖度结论：需求要求"分析+详细改造计划"，方案交付了盘点/痛点/三层设计/步骤/验收/风险，忠实度高；无私自加戏——P2-1 Neo4j 读模型有用户原话与 01 蓝图支撑，且明确可选。主要缺陷不是范围而是现状盘点的 factual accuracy，集中在后端 API 面与布局/图例现状，导致 P0-3/P0-6 两项核心工作项建立在错误前提上。建议：修订 §3 盘点（补 /graph/* API 面、129 历史、graphLoadPolicy），P0-6 改为"扩展 /graph/neighbors（hops 2→3、度数、增量合并、physical_key 入参）"，P0-3 改为"explore/review 布局参数调优+重布局+拖拽冻结"，并调整 §6 性能验收与负载策略的口径。
+
+  Write final answer in Chinese, structured, citing section numbers and file:line.
+
+To resume this session: kimi -r session_4ffd751e-3181-4c1e-b34a-2e57a8c3df5b

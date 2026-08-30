@@ -199,7 +199,9 @@ def test_table_list_system_filter_accepts_his_alias():
     assert "table_name?: string" in tree_api
     tree_src = _read("../frontend/src/views/asset/tables/index.vue")
     click_fn = tree_src.split("async function handleTreeClick")[1].split("async function loadData")[0]
-    assert "await loadData()" in click_fn
+    # 161 NF-1：F4 树点击重置页码为已发布语义（36b8743：-await loadData(); +await loadData(1);），
+    # 旧契约断言随之更新；不回退 F4（163 Q1 裁决）。
+    assert "await loadData(1)" in click_fn
     assert "await hydrateColumnChildren(node.table);\n    return;" not in click_fn
 
 

@@ -35,7 +35,11 @@ def read_credential_file(file_name: str) -> dict[str, str]:
     text = Path(file_name).read_text(encoding="utf-8").strip()
     if text.startswith("{"):
         data = json.loads(text)
-        return {k: str(data[k]) for k in ("user", "username", "password") if data.get(k) is not None}
+        user = data.get("user") or data.get("username")
+        result = {"password": str(data["password"])} if data.get("password") is not None else {}
+        if user is not None:
+            result["user"] = str(user)
+        return result
     if "\n" not in text and ":" in text:
         user, password = text.split(":", 1)
         return {"user": user.strip(), "password": password.strip()}
@@ -71,7 +75,7 @@ def discover_owners(cursor, include_user: bool) -> list[str]:
             continue
         owners.append(name)
     current = _current_user(cursor)
-    if include_user and current and current not in owners:
+    if include_user and current and current not in SYSTEM_OWNERS and not current.startswith(SYSTEM_OWNER_PREFIXES) and current not in owners:
         owners.insert(0, current)
     return owners
 
@@ -109,13 +113,14 @@ def main() -> int:
 
     import oracledb
 
-    lib_dir = os.environ.get("APP_ORACLE_CLIENT_LIB_DIR", "/opt/oracle")
-    if lib_dir and os.path.isdir(lib_dir):
-        try:
-            oracledb.init_oracle_client(lib_dir=lib_dir)
-        except Exception as exc:  # already initialized is fine
-            if "already" not in str(exc).lower():
-                print(f"oracle client init failed: {exc}", file=sys.stderr)
+    lib_dir = os.environ.get("APP_ORACLE_CLIENT_LIB_DIR", "/opt/oracle/instantclient_21")
+    if not lib_dir or not os.path.isdir(lib_dir):
+        raise SystemExit(f"Oracle thick client directory unavailable: {lib_dir}")
+    try:
+        oracledb.init_oracle_client(lib_dir=lib_dir)
+    except Exception as exc:  # already initialized is fine
+        if "already" not in str(exc).lower():
+            raise SystemExit(f"Oracle thick client initialization failed: {exc}") from exc
 
     credentials = _credentials()
     dsn = args.dsn or os.environ.get("ORA_HARVEST_DSN", "")
@@ -243,7 +248,9 @@ def main() -> int:
             """, binds)
             indexes = rows(cursor, f"""
                 SELECT i.OWNER, i.TABLE_NAME, i.INDEX_NAME, i.UNIQUENESS, c.COLUMN_NAME, c.COLUMN_POSITION
-                  FROM ALL_INDEXES i JOIN ALL_IND_COLUMNS c ON c.INDEX_OWNER=i.OWNER AND c.INDEX_NAME=c.INDEX_NAME
+                   FROM ALL_INDEXES i JOIN ALL_IND_COLUMNS c
+                     ON c.INDEX_OWNER=i.OWNER AND c.INDEX_NAME=i.INDEX_NAME
+                    AND c.TABLE_OWNER=i.TABLE_OWNER AND c.TABLE_NAME=i.TABLE_NAME
                  WHERE i.TABLE_OWNER IN ({owner_sql}) ORDER BY i.OWNER, i.TABLE_NAME, i.INDEX_NAME, c.COLUMN_POSITION
             """, binds)
             view_definitions = rows(cursor, f"SELECT OWNER, VIEW_NAME, TEXT FROM ALL_VIEWS WHERE OWNER IN ({owner_sql}) ORDER BY OWNER, VIEW_NAME", binds)

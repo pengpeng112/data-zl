@@ -245,6 +245,10 @@ def _run_rule_col_null_comment(db: Session) -> list[QualityFinding]:
 
     # A2：聚合下推到 SQL（示范见 _run_rule_table_zero_columns），避免全表
     # AssetColumn 拉内存分组。缺注释口径不变：comment 为 NULL 或空串均计入。
+    # 口径注记（161 P1-4 / round-2 P7）：PG GROUP BY 下 NULL 与 '' 是不同分组、
+    # 不归并——同表 system/source 混用 NULL/'' 时会拆成两条 finding（旧内存归并
+    # `or ""` 口径则合成一组）。分歧表#14 裁决接受该微差；如需归并改用
+    # COALESCE(AssetColumn.comment, '')，行为不改。
     null_comment = (AssetColumn.comment.is_(None)) | (AssetColumn.comment == "")
     rows = db.execute(
         select(

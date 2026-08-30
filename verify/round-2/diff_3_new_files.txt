@@ -1,0 +1,1429 @@
+===== NEW FILE: backend/app/services/intake_version_retry.py =====
+"""A9：并发摄取时版本号唯一键冲突的单次重试助手。
+
+并发场景下两个摄入同时读到相同 max_ver 并各自 +1，后提交方会撞
+(query_id/metric_id, version) 唯一键。用 SAVEPOINT（begin_nested）只回滚
+版本行插入、重读 max_ver 再试一次；外层事务中已写入的定义行不受影响。
+仅处理唯一键冲突（PostgreSQL SQLSTATE 23505 / UniqueViolation），其它
+IntegrityError（外键、CHECK 等）原样抛出，不做盲目重试。
+"""
+from __future__ import annotations
+
+from typing import Callable
+
+from sqlalchemy.exc import IntegrityError
+
+
+def _is_unique_violation(exc: IntegrityError) -> bool:
+    orig = getattr(exc, "orig", None)
+    if getattr(orig, "pgcode", None) == "23505":
+        return True
+    return "uniqueviolation" in type(orig).__name__.lower()
+
+
+def flush_new_version_with_retry(
+    db,
+    *,
+    build_version: Callable[[int], object],
+    current_max_version: Callable[[], int],
+) -> tuple[object, int]:
+    """插入带自增版本号的新版本行；唯一键撞号时重读 max 重试一次。
+
+    - build_version(next_ver)：构造全新未入会的模型实例（version=next_ver）。
+    - current_max_version()：从数据库重读当前最大版本号。
+    返回 (版本行, 实际使用的版本号)。
+    """
+    for attempt in range(2):
+        next_ver = int(current_max_version()) + 1
+        version = build_version(next_ver)
+        nested = db.begin_nested()
+        db.add(version)
+        try:
+            db.flush()
+            nested.commit()
+            return version, next_ver
+        except IntegrityError as exc:
+            nested.rollback()
+            if attempt == 1 or not _is_unique_violation(exc):
+                raise
+    raise RuntimeError("unreachable: version retry loop exhausted")
+
+===== NEW FILE: backend/tests/test_auth_csrf.py =====
+"""B1 回归：CSRF Origin/Referer 必须完整 origin 精确相等。
+
+历史缺陷：`origin.startswith(allowed.rstrip("/"))` 前缀匹配可被
+`http://<allowed>.evil.com` 绕过。修法：提取 scheme://host[:port] 后全等比较
+（大小写归一、去尾部斜杠）。测试矩阵含"有/无 X-Requested-With"两组用例
+（裁决 #23/#24）。
+"""
+
+import pytest
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
+
+from app.api.v1.auth import _require_csrf
+
+
+class _CIHeaders(dict):
+    """大小写不敏感的 header 映射，模拟 Starlette Request.headers。"""
+
+    def get(self, key, default=None):  # type: ignore[override]
+        for k, v in self.items():
+            if k.lower() == str(key).lower():
+                return v
+        return default
+
+
+class _StubRequest:
+    def __init__(self, headers: dict[str, str]):
+        self.headers = _CIHeaders(headers)
+
+
+def _check(headers: dict[str, str]) -> None:
+    _require_csrf(_StubRequest(headers))
+
+
+# ── 无 X-Requested-With：origin/referer 校验（真正的 CSRF 面） ──────────────
+
+
+def test_origin_exact_match_passes():
+    # cors_origins 默认含 http://localhost:5173
+    _check({"Origin": "http://localhost:5173"})
+
+
+def test_origin_case_and_trailing_slash_normalized():
+    _check({"Origin": "HTTP://LocalHost:5173/"})
+    _check({"Origin": "http://LOCALHOST:5173"})
+
+
+def test_origin_evil_prefix_suffix_blocked():
+    """B1 核心回归：startswith 时代该用例会被放行。"""
+    with pytest.raises(HTTPException) as exc_info:
+        _check({"Origin": "http://localhost:5173.evil.com"})
+    assert exc_info.value.status_code == 403
+
+
+def test_origin_evil_subpath_blocked():
+    with pytest.raises(HTTPException):
+        _check({"Origin": "http://localhost:5173.evil.com/x"})
+
+
+def test_origin_unrelated_host_blocked():
+    with pytest.raises(HTTPException):
+        _check({"Origin": "https://evil.example.com"})
+
+
+def test_origin_port_mismatch_blocked():
+    with pytest.raises(HTTPException):
+        _check({"Origin": "http://localhost:5174"})
+
+
+def test_referer_same_origin_path_passes():
+    _check({"Referer": "http://localhost:5173/views/graph/index"})
+
+
+def test_referer_evil_blocked():
+    with pytest.raises(HTTPException):
+        _check({"Referer": "http://localhost:5173.evil.com/views/index"})
+
+
+def test_referer_case_normalized_passes():
+    _check({"Referer": "HTTP://LocalHost:5173/"})
+
+
+# ── 有 X-Requested-With：非 cookie 表单面，直接放行 ────────────────────────
+
+
+def test_xhr_header_passes_with_evil_origin():
+    _check({"X-Requested-With": "XMLHttpRequest", "Origin": "https://evil.example.com"})
+
+
+def test_xhr_header_passes_without_origin():
+    _check({"X-Requested-With": "XMLHttpRequest"})
+
+
+# ── 端到端：login 端点 CSRF 门（在鉴权之前生效） ──────────────────────────
+
+
+def test_login_evil_origin_rejected_before_auth(client: TestClient):
+    resp = client.post(
+        "/api/v1/auth/login",
+        json={"username": "nobody", "password": "whatever"},
+        headers={"Origin": "http://localhost:5173.evil.com"},
+    )
+    assert resp.status_code == 403
+    assert "CSRF" in resp.json()["detail"]
+
+
+def test_login_allowed_origin_passes_csrf_gate(client: TestClient):
+    # 通过 CSRF 门后进入鉴权（凭据错误 → 401），不得是 403。
+    resp = client.post(
+        "/api/v1/auth/login",
+        json={"username": "nobody", "password": "whatever"},
+        headers={"Origin": "http://localhost:5173"},
+    )
+    assert resp.status_code != 403
+
+===== NEW FILE: backend/tests/test_db_connectors_param_binding.py =====
+"""A1 回归：SqlServer pymssql 分支参数绑定形态。
+
+历史缺陷：pymssql 分支按 tuple(params.values()) 插入序绑参，SQL 占位符顺序与
+dict 插入顺序不一致时会绑错值。修法（153 号裁决 #5）：pymssql 原生支持 dict
+命名绑定，直接 cursor.execute(sql, params)；pyodbc 分支保持 dict 透传不变。
+"""
+
+from app.services.db_connectors import SqlServerConnector
+
+
+class FakeSqlServerCursor:
+    description = [("CNT",), ("VAL",)]
+
+    def __init__(self):
+        self.executed: list[tuple[str, object]] = []
+        self.fetch_size = None
+
+    def execute(self, sql, params=None):
+        self.executed.append((sql, params))
+
+    def fetchmany(self, size):
+        self.fetch_size = size
+        return [(1, "x")]
+
+    def close(self):
+        pass
+
+
+class FakeSqlServerConnection:
+    def __init__(self):
+        self.cursor_instance = FakeSqlServerCursor()
+
+    def cursor(self):
+        return self.cursor_instance
+
+
+def _pymssql_connector() -> tuple[SqlServerConnector, FakeSqlServerCursor]:
+    connector = SqlServerConnector(host="unused", port=1433, database="unused")
+    connector._conn = FakeSqlServerConnection()
+    connector._driver = "pymssql"
+    return connector, connector._conn.cursor_instance
+
+
+def test_pymssql_passes_dict_params_verbatim():
+    """pymssql 分支必须把 dict 原样交给驱动做命名绑定，禁止 tuple(values())。"""
+    connector, cursor = _pymssql_connector()
+    # 占位符出现顺序与 dict 插入顺序刻意相反（b 在前、a 在后）。
+    params = {"b": "second", "a": "first"}
+    connector.execute_readonly(
+        "SELECT CNT FROM t WHERE b = :b AND a = :a", params, max_rows=10
+    )
+
+    sql, bound = cursor.executed[-1]
+    assert sql == "SELECT CNT FROM t WHERE b = :b AND a = :a"
+    # 命名绑定：驱动收到的必须是 {name: value}，键与值一一对应，
+    # 与占位符顺序无关；tuple("second","first") 的插入序绑定正是 A1 缺陷。
+    assert isinstance(bound, dict)
+    assert bound == {"b": "second", "a": "first"}
+
+
+def test_pymssql_placeholder_order_independent_binding():
+    """参数值绑定正确性：两个占位符交换位置后，dict 依然按名字绑定。"""
+    connector, cursor = _pymssql_connector()
+    connector.execute_readonly(
+        "SELECT VAL FROM t WHERE a = :a AND b = :b",
+        {"a": "first", "b": "second"},
+        max_rows=5,
+    )
+    _, bound = cursor.executed[-1]
+    assert isinstance(bound, dict)
+    assert bound["a"] == "first"
+    assert bound["b"] == "second"
+
+
+def test_pymssql_empty_params_still_safe():
+    """无参数时不因空 dict 报错，行为与 execute(sql) 等价。"""
+    connector, cursor = _pymssql_connector()
+    connector.execute_readonly("SELECT CNT FROM t", None, max_rows=10)
+    sql, bound = cursor.executed[-1]
+    assert sql == "SELECT CNT FROM t"
+    assert bound in (None, {})
+
+
+def test_pymssql_row_cap_enforced():
+    connector, cursor = _pymssql_connector()
+    connector.execute_readonly("SELECT CNT FROM t", {"a": 1}, max_rows=999999)
+    # A4：多取 1 行探针（max_rows+1）。
+    assert cursor.fetch_size == 10_001
+
+
+def test_pyodbc_branch_keeps_dict_passthrough():
+    """pyodbc 分支维持既有 dict 透传语义（裁决 #5：pyodbc 不动）。"""
+    connector = SqlServerConnector(host="unused", port=1433, database="unused")
+    connector._conn = FakeSqlServerConnection()
+    connector._driver = "pyodbc"
+    cursor = connector._conn.cursor_instance
+    connector.execute_readonly(
+        "SELECT CNT FROM t WHERE a = :a", {"a": "first"}, max_rows=10
+    )
+    sql, bound = cursor.executed[-1]
+    assert sql == "SELECT CNT FROM t WHERE a = :a"
+    assert bound == {"a": "first"}
+
+===== NEW FILE: backend/tests/test_153_g1_g3.py =====
+"""153 G1/G2/G3 测试补强。
+
+- G1：query_intake / metric_service / data_product_service 各 ≥5 条直接单测
+  （版本状态机 / 幂等 / 激活门禁 / pin 校验 / 参数白名单）。
+- G2：FakeConnector 教训测试——execute_readonly 交给驱动的 SQL/参数/取数形态捕获。
+- G3：dashboard/summary 冒烟（此前无测试）。
+"""
+from __future__ import annotations
+
+import pytest
+from fastapi.testclient import TestClient
+
+SAFE_SQL = "SELECT PATIENT_ID FROM HIS.PAT_VISIT WHERE ROWNUM <= 5"
+BLOCK_SQL = "DELETE FROM HIS.PAT_VISIT"
+
+
+# ══════════════════════════════════════════════════════════════
+# G1-1：query_intake 直测（版本状态机/幂等/修订/A9 重试）
+# ══════════════════════════════════════════════════════════════
+
+
+def _ingest(db, code: str, sql: str = SAFE_SQL, **kw):
+    from app.services.query_intake import ingest_query
+
+    return ingest_query(
+        db,
+        query_code=code,
+        title=kw.pop("title", code),
+        sql_text=sql,
+        system_code=kw.pop("system_code", "DATA_CENTER"),
+        source_code=kw.pop("source_code", "ods_8_216"),
+        dialect="oracle",
+        **kw,
+    )
+
+
+class TestQueryIntakeDirect:
+    def test_blocked_sql_never_activates(self, db_session):
+        result = _ingest(db_session, "QRY_G1_BLOCK", sql=BLOCK_SQL)
+        assert result["version"]["status"] == "blocked"
+        assert result["version"]["is_active"] is False
+
+    def test_validated_sql_auto_activates_and_supersedes(self, db_session):
+        first = _ingest(db_session, "QRY_G1_ACTIVATE")
+        assert first["version"]["is_active"] is True
+        from app.services.query_intake import revise_query
+
+        second = revise_query(
+            db_session,
+            query_code="QRY_G1_ACTIVATE",
+            sql_text="SELECT PATIENT_ID, VISIT_ID FROM HIS.PAT_VISIT WHERE ROWNUM <= 5",
+            revision_reason="G1 换代",
+        )
+        assert second["version"]["is_active"] is True
+        assert second["version"]["version"] > first["version"]["version"]
+        db_session.commit()
+        from app.services.query_intake import get_active_version
+
+        active = get_active_version(db_session, "QRY_G1_ACTIVATE")
+        assert active.version == second["version"]["version"]
+
+    def test_same_sql_hash_idempotent(self, db_session):
+        first = _ingest(db_session, "QRY_G1_IDEM")
+        again = _ingest(db_session, "QRY_G1_IDEM")
+        assert again["idempotent"] is True
+        assert again["version"]["version"] == first["version"]["version"]
+
+    def test_state_gate_blocks_non_active_and_requires_recalc_reason(self, db_session):
+        from app.models.query_asset import AssetQueryVersion
+        from app.services.query_intake import revise_query
+        from app.services.query_runner import ensure_runnable_query_version
+
+        blocked_dict = _ingest(db_session, "QRY_G1_GATE", sql=BLOCK_SQL)["version"]
+        blocked_row = db_session.get(AssetQueryVersion, blocked_dict["id"])
+        # blocked 版本任何情况下禁止执行（即使 recalc）。
+        with pytest.raises(PermissionError):
+            ensure_runnable_query_version(blocked_row)
+        with pytest.raises(PermissionError):
+            ensure_runnable_query_version(blocked_row, recalc=True, recalc_reason="blocked 不放行")
+
+        # 换代：旧版本转 superseded；blocked 即使 recalc 也禁止，active 现行版直接放行。
+        revised = revise_query(
+            db_session,
+            query_code="QRY_G1_GATE",
+            sql_text=SAFE_SQL + " AND VISIT_ID = '1'",
+            revision_reason="G1 换代",
+        )["version"]
+        active_row = db_session.get(AssetQueryVersion, revised["id"])
+        ensure_runnable_query_version(active_row)
+        superseded_row = db_session.get(AssetQueryVersion, blocked_dict["id"])
+        if superseded_row.status == "superseded":
+            with pytest.raises(PermissionError):
+                ensure_runnable_query_version(superseded_row)
+            ensure_runnable_query_version(superseded_row, recalc=True, recalc_reason="历史重算窗口 2026-01")
+
+    def test_a9_unique_violation_retry_helper(self):
+        """A9：撞唯一键时 SAVEPOINT 内重试一次（假会话，纯逻辑直测）。"""
+        from sqlalchemy.exc import IntegrityError
+
+        from app.services.intake_version_retry import flush_new_version_with_retry
+
+        class _FakeNested:
+            def commit(self):
+                pass
+
+            def rollback(self):
+                pass
+
+        class _FakeDb:
+            def __init__(self):
+                self.flush_calls = 0
+                self.added: list = []
+
+            def begin_nested(self):
+                return _FakeNested()
+
+            def add(self, obj):
+                self.added.append(obj)
+
+            def flush(self):
+                self.flush_calls += 1
+                if self.flush_calls == 1:
+                    # 模拟并发对手已提交同版本号：唯一键冲突（pgcode=23505）
+                    orig = Exception("duplicate key value violates unique constraint")
+                    orig.pgcode = "23505"  # type: ignore[attr-defined]
+                    raise IntegrityError("dup", None, orig)
+
+        class _Row:
+            def __init__(self, version: int):
+                self.version = version
+
+        db = _FakeDb()
+        version, used = flush_new_version_with_retry(
+            db, build_version=_Row, current_max_version=lambda: 1
+        )
+        assert used == 2  # 首轮 next=2 冲突 → 重读 max（仍 1）→ next=2 重试成功
+        assert version.version == 2
+        assert db.flush_calls == 2
+        # 每次尝试构造全新行：首轮行随 SAVEPOINT 回滚丢弃，重试行保留。
+        assert len(db.added) == 2
+
+    def test_a9_non_unique_integrity_error_not_retried(self):
+        from sqlalchemy.exc import IntegrityError
+
+        from app.services.intake_version_retry import flush_new_version_with_retry
+
+        class _FakeNested:
+            def commit(self):
+                pass
+
+            def rollback(self):
+                pass
+
+        class _FakeDb:
+            def __init__(self):
+                self.flush_calls = 0
+
+            def begin_nested(self):
+                return _FakeNested()
+
+            def add(self, obj):
+                pass
+
+            def flush(self):
+                self.flush_calls += 1
+                # 外键冲突（非唯一键）不得盲目重试
+                raise IntegrityError("fk", None, Exception("violates foreign key constraint"))
+
+        db = _FakeDb()
+        with pytest.raises(IntegrityError):
+            flush_new_version_with_retry(
+                db, build_version=lambda v: object(), current_max_version=lambda: 0
+            )
+        assert db.flush_calls == 1
+
+
+# ══════════════════════════════════════════════════════════════
+# G1-2：metric_service 直测
+# ══════════════════════════════════════════════════════════════
+
+
+class TestMetricServiceDirect:
+    def _make_query(self, db, code: str, sql: str = SAFE_SQL):
+        return _ingest(db, code, sql=sql)
+
+    def test_auto_active_with_runnable_ref(self, db_session):
+        self._make_query(db_session, "QRY_G1M_OK")
+        from app.services.metric_service import ingest_metric
+
+        r = ingest_metric(
+            db_session,
+            metric_code="MET_G1_ACTIVE",
+            title="激活指标",
+            meaning="G1 直测",
+            numerator_desc="分子",
+            denominator_desc="分母",
+            query_code="QRY_G1M_OK",
+            formula="x",
+            created_by="g1",
+        )
+        assert r["version"]["status"] == "active"
+        assert r["version"]["is_active"] is True
+
+    def test_activation_gate_rejects_blocked_query_ref(self, db_session):
+        self._make_query(db_session, "QRY_G1M_BLK", sql=BLOCK_SQL)
+        from app.services.metric_service import ingest_metric
+
+        r = ingest_metric(
+            db_session,
+            metric_code="MET_G1_GATE",
+            title="门禁指标",
+            query_code="QRY_G1M_BLK",
+            formula="x",
+            created_by="g1",
+        )
+        # 144 S4/A04：blocked 查询引用不得背书 active 指标（状态机落到 blocked）。
+        assert r["version"]["status"] == "blocked"
+        assert r["version"]["is_active"] is False
+
+    def test_content_hash_idempotent(self, db_session):
+        self._make_query(db_session, "QRY_G1M_IDEM")
+        from app.services.metric_service import ingest_metric
+
+        kw = dict(
+            metric_code="MET_G1_IDEM",
+            title="幂等指标",
+            query_code="QRY_G1M_IDEM",
+            formula="x",
+            created_by="g1",
+        )
+        ingest_metric(db_session, **kw)
+        again = ingest_metric(db_session, **kw)
+        assert again["idempotent"] is True
+
+    def test_register_result_inserts_new_batch_never_overwrites(self, db_session):
+        self._make_query(db_session, "QRY_G1M_RES")
+        from app.services.metric_service import ingest_metric, register_metric_result
+
+        ingest_metric(
+            db_session,
+            metric_code="MET_G1_RES",
+            title="结果指标",
+            meaning="G1 直测",
+            numerator_desc="分子",
+            denominator_desc="分母",
+            query_code="QRY_G1M_RES",
+            formula="x",
+            created_by="g1",
+        )
+        r1 = register_metric_result(db_session, metric_code="MET_G1_RES", period_key="2026-01", metric_value="10")
+        r2 = register_metric_result(db_session, metric_code="MET_G1_RES", period_key="2026-01", metric_value="20")
+        # 144 S4：登记永远插入新批次（不覆盖历史行）。
+        assert r1["id"] != r2["id"]
+        assert r2["prev_result_id"] == r1["id"]
+
+    def test_missing_query_ref_stays_candidate(self, db_session):
+        from app.services.metric_service import ingest_metric
+
+        r = ingest_metric(
+            db_session,
+            metric_code="MET_G1_MISSING",
+            title="缺引用指标",
+            query_code="QRY_G1M_NOPE",
+            formula="x",
+            created_by="g1",
+        )
+        assert r["version"]["status"] in {"candidate", "blocked"}
+        assert r["version"]["is_active"] is False
+
+
+# ══════════════════════════════════════════════════════════════
+# G1-3：data_product_service 直测（pin 校验/参数白名单/引用校验）
+# ══════════════════════════════════════════════════════════════
+
+
+class TestDataProductServiceDirect:
+    def _query(self, db, code: str, sql: str = SAFE_SQL):
+        return _ingest(db, code, sql=sql)
+
+    def test_query_product_requires_query_code(self, db_session):
+        from app.services.data_product_service import upsert_product
+
+        with pytest.raises(ValueError, match="query_code"):
+            upsert_product(db_session, product_code="PRD_G1_X", title="t", product_type="query")
+
+    def test_query_product_requires_active_query(self, db_session):
+        from app.services.data_product_service import upsert_product
+
+        with pytest.raises(ValueError, match="无 active 查询"):
+            upsert_product(
+                db_session,
+                product_code="PRD_G1_X",
+                title="t",
+                product_type="query",
+                query_code="QRY_G1P_NOPE",
+            )
+
+    def test_pin_blocked_version_rejected(self, db_session):
+        # active 查询（v1）+ blocked 修订版（v2）：pin 到 v2 应被拒绝。
+        self._query(db_session, "QRY_G1P_BLK")
+        from app.services.query_intake import revise_query
+        from app.services.data_product_service import upsert_product
+
+        blocked_revision = revise_query(
+            db_session,
+            query_code="QRY_G1P_BLK",
+            sql_text=BLOCK_SQL,
+            revision_reason="引入 blocked 修订",
+        )["version"]
+        assert blocked_revision["status"] == "blocked"
+        with pytest.raises(ValueError, match="禁止产品发布"):
+            upsert_product(
+                db_session,
+                product_code="PRD_G1P_BLK",
+                title="t",
+                product_type="query",
+                query_code="QRY_G1P_BLK",
+                pin_version=blocked_revision["version"],
+            )
+
+    def test_pin_nonexistent_version_rejected(self, db_session):
+        self._query(db_session, "QRY_G1P_PIN")
+        from app.services.data_product_service import upsert_product
+
+        with pytest.raises(ValueError, match="pin 版本不存在"):
+            upsert_product(
+                db_session,
+                product_code="PRD_G1P_PIN",
+                title="t",
+                product_type="query",
+                query_code="QRY_G1P_PIN",
+                pin_version=999,
+            )
+
+    def test_pin_change_bumps_revision(self, db_session):
+        r = self._query(db_session, "QRY_G1P_REV")
+        from app.services.data_product_service import upsert_product
+
+        kw = dict(product_code="PRD_G1P_REV", title="t", product_type="query", query_code="QRY_G1P_REV")
+        upsert_product(db_session, **kw)
+        upsert_product(db_session, pin_version=r["version"]["version"], **kw)
+        db_session.commit()
+        from app.models.data_product import AssetDataProduct
+
+        row = db_session.query(AssetDataProduct).filter_by(product_code="PRD_G1P_REV").one()
+        assert row.revision >= 2
+
+    def test_execute_unknown_product_raises_lookup(self, db_session):
+        from app.services.data_product_service import execute_product
+
+        with pytest.raises(LookupError):
+            execute_product(db_session, product_code="PRD_G1P_NONE")
+
+    def test_parameter_whitelist_unknown_and_missing_required(self, db_session):
+        from app.services.data_product_service import _execute_product_locked
+        from app.models.data_product import AssetDataProduct
+
+        row = AssetDataProduct(
+            product_code="PRD_G1P_WL",
+            title="白名单",
+            product_type="query",
+            query_code="QRY_G1P_ANY",
+            parameter_schema={"month": {"type": "string", "required": True}},
+            enabled=True,
+        )
+        with pytest.raises(ValueError, match="不在白名单"):
+            _execute_product_locked(
+                db_session, product=row, product_code=row.product_code, parameters={"rogue": 1}
+            )
+        with pytest.raises(ValueError, match="缺少必填参数"):
+            _execute_product_locked(
+                db_session, product=row, product_code=row.product_code, parameters={}
+            )
+
+
+# ══════════════════════════════════════════════════════════════
+# G2：FakeConnector 教训测试——execute_readonly 交给驱动的形态捕获
+# ══════════════════════════════════════════════════════════════
+
+
+class TestExecuteReadonlyDriverContract:
+    def test_oracle_passes_named_params_verbatim_and_fetches_probe_row(self):
+        """G2：驱动收到的必须是与占位符同名的 dict（非 tuple），取数含 +1 探针。"""
+        from app.services.db_connectors import OracleConnector
+
+        class Cursor:
+            description = [("PATIENT_ID",)]
+            executed: list = []
+            fetch_size = None
+
+            def execute(self, sql, params=None):
+                Cursor.executed.append((sql, params))
+
+            def fetchmany(self, size):
+                Cursor.fetch_size = size
+                return [("P001",)]
+
+            def close(self):
+                pass
+
+        class Conn:
+            call_timeout = None
+            _cursor = Cursor()
+
+            def cursor(self):
+                return self._cursor
+
+            def rollback(self):
+                pass
+
+        connector = OracleConnector(host="h", port=1521, database="d")
+        connector._conn = Conn()
+        rows = connector.execute_readonly(
+            "SELECT PATIENT_ID FROM HIS.PAT_VISIT WHERE PATIENT_ID = :patient_id",
+            {"patient_id": "P001"},
+            max_rows=7,
+        )
+        sql, params = Cursor.executed[-1]
+        assert sql.endswith(":patient_id")
+        assert isinstance(params, dict) and params == {"patient_id": "P001"}
+        assert Cursor.fetch_size == 8  # max_rows + 1 探针
+        assert rows == [{"PATIENT_ID": "P001"}]
+
+
+# ══════════════════════════════════════════════════════════════
+# G3：dashboard/summary 冒烟（此前无测试；D8 动过该端点的 datetime）
+# ══════════════════════════════════════════════════════════════
+
+
+def test_dashboard_summary_smoke(client: TestClient):
+    resp = client.get("/api/v1/dashboard/summary")
+    assert resp.status_code == 200, resp.text
+    data = resp.json()["data"]
+    # D8：generated_at 由 datetime.now(timezone.utc).isoformat() 产出（含 T 与时区偏移）。
+    assert data["generated_at"]
+    assert "T" in data["generated_at"]
+    for key in ("tables", "columns", "relations", "domains"):
+        assert isinstance(data["assets"][key], (int, float))
+    assert isinstance(data["systems"], int)
+    assert isinstance(data["domain_top"], list)
+
+
+def test_quality_summary_smoke(client: TestClient):
+    resp = client.get("/api/v1/quality/summary")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["total_findings"] >= 0
+    assert isinstance(data["top_tables"], list)
+
+===== NEW FILE: backend/app/services/identity_dept_sync.py =====
+"""Daily JHEMR user-dept reconciliation subtask (multi-department sync).
+
+Closes the plan-107 gap where a HIS ``COMM.STAFF_VS_GROUP`` change alone does
+not bump ``SYS_EMPLOYEE.MODIFIEDTIME``, so the person never re-enters the
+nightly candidate set and the new ward group never reaches JHEMR
+``user_dept``.  Like the title subtask, the comparison is full-scope over the
+managed population and the target write is additive-only:
+
+* missing ``jhemr.user_dept`` rows are inserted (``default_dept_flag=0``);
+* a changed HIS primary department updates ``jhemr.users.user_dept`` and
+  migrates the single ``default_dept_flag`` row (change-only, verified);
+* existing department rows are never deleted (plan 107 §5.4 additive rule).
+
+The expected-side source is the platform identity tables refreshed by the
+nightly HIS collection that runs immediately before this subtask.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from ..core.config import settings
+from .identity_hmac import compute_account_fingerprint
+from .identity_sync_audit import AuditWriteError, create_action, finish_action
+from .identity_sync_status import error_code_masked, increment_error, short_fingerprint
+from .jhemr_identity_adapter import JhemrIdentityAdapter
+
+SUBTASK_CODE = "jhemr_user_dept_sync"
+TARGET_MAX_ROWS = 20_000
+
+
+class DeptSyncError(RuntimeError):
+    """A fail-closed dept subtask error."""
+
+
+def _text(value: Any) -> str | None:
+    value = None if value is None else str(value).strip()
+    return value or None
+
+
+def _adapter() -> JhemrIdentityAdapter:
+    return JhemrIdentityAdapter(
+        credential_ref=settings.identity_sync_jhemr_credential_ref,
+        hospital_no=settings.identity_sync_jhemr_hospital_no,
+        jump_host=settings.his_source_jump_host,
+        jump_port=settings.his_source_jump_port,
+        jump_user=settings.his_source_jump_user,
+        jump_key=settings.his_source_jump_key or None,
+        db_host=settings.identity_sync_jhemr_host,
+        db_port=settings.identity_sync_jhemr_port,
+        db_name=settings.identity_sync_jhemr_dbname,
+    )
+
+
+def _conflict_flag_set(value: Any) -> bool:
+    return _text(value) in {"true", "t", "1", "conflict"}
+
+
+def _read_expected_platform(db) -> dict[str, dict[str, Any]]:
+    """Expected dept_codes per managed person from platform identity tables.
+
+    Reuses the orchestrator's own ``_get_person_depts`` so the whitelist
+    semantics (primary = SYS_EMPLOYEE authority; additionals only from
+    STAFF_VS_GROUP group-class whitelist) stay single-sourced.
+    """
+    from sqlalchemy import select
+    from ..models.identity import IdentityPerson
+    from ..models.identity_sync import IdentityProtectedAccount
+    from .identity_sync_orchestrator import ELIGIBLE_CLASSIFICATIONS, _get_person_depts
+
+    protected = {r for r in db.scalars(select(IdentityProtectedAccount.account_id)).all() if r}
+    persons = db.scalars(
+        select(IdentityPerson).where(
+            IdentityPerson.employment_status == "active",
+            IdentityPerson.classification.in_(sorted(ELIGIBLE_CLASSIFICATIONS)),
+        )
+    ).all()
+    expected: dict[str, dict[str, Any]] = {}
+    for person in persons:
+        emp = _text(person.person_code)
+        if not emp or emp in protected or _conflict_flag_set(person.conflict_flag):
+            continue
+        primary, additionals = _get_person_depts(db, emp, person.classification)
+        if not primary:
+            continue
+        depts = [primary] + [d for d in additionals if d and d != primary]
+        expected[emp] = {"depts": depts, "primary": primary}
+    return expected
+
+
+def _read_target(adapter: JhemrIdentityAdapter) -> tuple[dict[str, str | None], dict[str, set[str]], dict[str, Any]]:
+    tenant = settings.identity_sync_jhemr_hospital_no
+    count_row = adapter._fetch_one(
+        "SELECT COUNT(*) AS row_count FROM jhemr.users WHERE hospital_no = %s", (tenant,)
+    ) or {}
+    user_count = int(count_row.get("row_count") or 0)
+    if user_count > TARGET_MAX_ROWS:
+        raise DeptSyncError("target_row_limit_exceeded")
+    user_rows = adapter._fetch_all(
+        "SELECT user_id, user_dept FROM jhemr.users "
+        "WHERE hospital_no = %s LIMIT %s", (tenant, TARGET_MAX_ROWS)
+    )
+    if len(user_rows) != user_count:
+        raise DeptSyncError("target_count_mismatch")
+    target_users: dict[str, str | None] = {}
+    for row in user_rows:
+        user_id = _text(row.get("user_id"))
+        if not user_id or user_id in target_users:
+            raise DeptSyncError("target_user_id_ambiguous")
+        target_users[user_id] = _text(row.get("user_dept"))
+
+    dept_rows = adapter._fetch_all(
+        "SELECT user_id, user_dept FROM jhemr.user_dept "
+        "WHERE hospital_no = %s LIMIT %s", (tenant, TARGET_MAX_ROWS)
+    )
+    target_depts: dict[str, set[str]] = {}
+    seen_pairs: set[tuple[str, str]] = set()
+    for row in dept_rows:
+        user_id = _text(row.get("user_id"))
+        dept = _text(row.get("user_dept"))
+        if not user_id or not dept:
+            continue
+        if (user_id, dept) in seen_pairs:
+            raise DeptSyncError("target_user_dept_ambiguous")
+        seen_pairs.add((user_id, dept))
+        target_depts.setdefault(user_id, set()).add(dept)
+
+    privilege = adapter._fetch_one(
+        "SELECT "
+        "has_table_privilege(current_user, 'jhemr.user_dept', 'SELECT') AS can_select_user_dept, "
+        "has_table_privilege(current_user, 'jhemr.user_dept', 'INSERT') AS can_insert_user_dept, "
+        "has_column_privilege(current_user, 'jhemr.users', 'user_dept', 'UPDATE') AS can_update_primary, "
+        "has_column_privilege(current_user, 'jhemr.user_dept', 'default_dept_flag', 'UPDATE') AS can_update_default_flag",
+        (),
+    ) or {}
+    if not all(bool(privilege.get(key)) for key in (
+        "can_select_user_dept", "can_insert_user_dept", "can_update_primary", "can_update_default_flag",
+    )):
+        raise DeptSyncError("target_privilege_missing")
+    return target_users, target_depts, {"target_users": user_count, "target_dept_rows": len(dept_rows)}
+
+
+def build_dept_plan(
+    expected: dict[str, dict[str, Any]],
+    target_users: dict[str, str | None],
+    target_depts: dict[str, set[str]],
+) -> dict[str, Any]:
+    """Pure comparison: additive dept rows + change-only primary alignment."""
+    dept_adds: list[tuple[str, str]] = []
+    primary_changes: list[tuple[str, str | None, str]] = []
+    skipped_equal = 0
+    skipped_no_user = 0
+    for emp in sorted(expected):
+        info = expected[emp]
+        if emp not in target_users:
+            skipped_no_user += 1
+            continue
+        current_primary = target_users[emp]
+        actual = target_depts.get(emp, set())
+        for dept in info["depts"]:
+            if dept not in actual:
+                dept_adds.append((emp, dept))
+        if current_primary != info["primary"]:
+            primary_changes.append((emp, current_primary, info["primary"]))
+        if current_primary == info["primary"] and all(d in actual for d in info["depts"]):
+            skipped_equal += 1
+    return {
+        "dept_adds": dept_adds,
+        "primary_changes": primary_changes,
+        "skipped_equal": skipped_equal,
+        "skipped_no_user": skipped_no_user,
+    }
+
+
+def _dept_value_fingerprint(user_id: str, kind: str, value: str) -> str:
+    return compute_account_fingerprint(
+        f"{user_id}\x1f{kind}\x1f{value}", "JHEMR_DEPT_VALUE", settings.identity_hmac_key_ref,
+    )
+
+
+def _action_type_for(kind: str) -> str:
+    return "user_dept_add" if kind == "dept" else "primary_dept_change"
+
+
+def reconcile_pending_dept_actions(
+    db,
+    expected: dict[str, dict[str, Any]],
+    target_users: dict[str, str | None],
+    target_depts: dict[str, set[str]],
+) -> dict[str, int]:
+    """Close prior planned actions only when the committed target is provable."""
+    from sqlalchemy import select
+    from ..models.identity_sync import IdentitySyncAction
+
+    rows = list(db.scalars(
+        select(IdentitySyncAction).where(
+            IdentitySyncAction.subtask_code == SUBTASK_CODE,
+            IdentitySyncAction.action_type.in_(["user_dept_add", "primary_dept_change"]),
+            IdentitySyncAction.status == "planned",
+        ).limit(TARGET_MAX_ROWS)
+    ).all())
+    if len(rows) >= TARGET_MAX_ROWS:
+        raise DeptSyncError("pending_audit_row_limit_exceeded")
+    by_account: dict[str, str] = {
+        compute_account_fingerprint(emp, "JHEMR", settings.identity_hmac_key_ref): emp
+        for emp in expected
+    }
+    reconciled = 0
+    unresolved = 0
+    for row in rows:
+        emp = by_account.get(str(row.account_fingerprint or ""))
+        params = row.params_summary or {}
+        kind = params.get("dept_kind")
+        value = params.get("dept_value")
+        proven = bool(
+            emp and kind and value
+            and params.get("value_fingerprint") == _dept_value_fingerprint(emp, kind, value)
+            and (
+                (kind == "dept" and value in target_depts.get(emp, set()))
+                or (kind == "primary" and target_users.get(emp) == value)
+            )
+        )
+        if proven:
+            finish_action(
+                db, row, status="executed", rows_affected=1,
+                reason_code="reconciled_after_completion_audit_failure",
+            )
+            reconciled += 1
+        else:
+            unresolved += 1
+    return {"reconciled": reconciled, "unresolved": unresolved}
+
+
+def sync_jhemr_user_depts_daily(
+    *, run_id: str | None, db=None, plan_only: bool = False,
+) -> dict[str, Any]:
+    """Run the required daily user-dept subtask with HMAC-only reporting."""
+    result: dict[str, Any] = {
+        "status": "running", "run_id": run_id, "planned_count": 0,
+        "dept_rows_added": 0, "primary_updated": 0,
+        "skipped_equal": 0, "skipped_no_user": 0,
+        "failed": 0, "target_committed_pending_audit": 0,
+        "error_classes": {}, "failed_fingerprints": [],
+    }
+    if db is None or not run_id:
+        increment_error(result["error_classes"], "audit_config", "MissingAuditContext")
+        result["status"] = "misconfigured"
+        return result
+    try:
+        expected = _read_expected_platform(db)
+        result["source"] = {"managed_persons": len(expected)}
+        if not expected:
+            result["status"] = "success"
+            result["reason"] = "no_managed_persons"
+            return result
+    except Exception as exc:
+        increment_error(result["error_classes"], "source_select", exc)
+        result["status"] = "failed"
+        return result
+
+    adapter: JhemrIdentityAdapter | None = None
+    try:
+        adapter = _adapter()
+        adapter.connect()
+        target_users, target_depts, metadata = _read_target(adapter)
+        result["target"] = metadata
+        reconciliation = reconcile_pending_dept_actions(db, expected, target_users, target_depts)
+        result["reconciled_pending_audit"] = reconciliation["reconciled"]
+        if reconciliation["unresolved"]:
+            raise DeptSyncError("pending_audit_unresolved")
+        plan = build_dept_plan(expected, target_users, target_depts)
+        dept_adds = plan["dept_adds"]
+        primary_changes = plan["primary_changes"]
+        result["planned_count"] = len(dept_adds) + len(primary_changes)
+        result["skipped_equal"] = plan["skipped_equal"]
+        result["skipped_no_user"] = plan["skipped_no_user"]
+        result["plan"] = {"dept_adds": len(dept_adds), "primary_changes": len(primary_changes)}
+        if plan_only or (not dept_adds and not primary_changes):
+            result["status"] = "success"
+            if not dept_adds and not primary_changes:
+                result["reason"] = "no_changes"
+            elif plan_only:
+                result["reason"] = "plan_only"
+            return result
+
+        actions: list[tuple[str, str, Any]] = []
+        try:
+            for emp, dept in dept_adds:
+                fingerprint = compute_account_fingerprint(emp, "JHEMR", settings.identity_hmac_key_ref)
+                action = create_action(
+                    db, run_id=run_id, fingerprint=fingerprint,
+                    subtask_code=SUBTASK_CODE, action_type="user_dept_add",
+                    target_table="jhemr.user_dept",
+                    value_fingerprint=_dept_value_fingerprint(emp, "dept", dept),
+                    emp_no=emp,
+                )
+                if action is None:
+                    raise AuditWriteError("action_audit_missing")
+                actions.append((emp, fingerprint, action))
+            for emp, old_primary, new_primary in primary_changes:
+                fingerprint = compute_account_fingerprint(emp, "JHEMR", settings.identity_hmac_key_ref)
+                action = create_action(
+                    db, run_id=run_id, fingerprint=fingerprint,
+                    subtask_code=SUBTASK_CODE, action_type="primary_dept_change",
+                    target_table="jhemr.users",
+                    value_fingerprint=_dept_value_fingerprint(emp, "primary", new_primary),
+                    emp_no=emp,
+                )
+                if action is None:
+                    raise AuditWriteError("action_audit_missing")
+                actions.append((emp, fingerprint, action))
+        except AuditWriteError:
+            for _emp, _fingerprint, action in actions:
+                try:
+                    finish_action(
+                        db, action, status="failed",
+                        error_class="audit_write",
+                        reason_code="planned_batch_aborted_before_target_write",
+                    )
+                except AuditWriteError:
+                    break
+            raise
+
+        try:
+            batch_result = adapter.apply_user_dept_changes(
+                dept_adds=dept_adds,
+                primary_changes=primary_changes,
+            )
+        except Exception as exc:
+            result["failed"] = len(actions)
+            increment_error(result["error_classes"], "target_write", exc)
+            for _emp, fingerprint, action in actions:
+                if len(result["failed_fingerprints"]) < 3:
+                    result["failed_fingerprints"].append(short_fingerprint(fingerprint))
+                try:
+                    finish_action(
+                        db, action, status="failed",
+                        error_class="target_write",
+                        error_code=error_code_masked(exc),
+                    )
+                except AuditWriteError:
+                    increment_error(result["error_classes"], "audit_write", "AuditWriteError")
+                    raise
+            result["status"] = "failed"
+            return result
+
+        result["dept_rows_added"] = int(batch_result.get("dept_rows_added") or 0)
+        result["primary_updated"] = int(batch_result.get("primary_updated") or 0)
+        completion_done = 0
+        try:
+            for _emp, _fingerprint, action in actions:
+                finish_action(db, action, status="executed", rows_affected=1)
+                completion_done += 1
+        except AuditWriteError:
+            result["target_committed_pending_audit"] = len(actions) - completion_done
+            increment_error(result["error_classes"], "target_committed_pending_audit", "AuditWriteError")
+            raise
+        result["status"] = "success"
+    except AuditWriteError:
+        increment_error(result["error_classes"], "audit_write", "AuditWriteError")
+        result["status"] = "failed"
+    except Exception as exc:
+        increment_error(result["error_classes"], "target_select_or_metadata", exc)
+        result["status"] = "misconfigured" if isinstance(exc, DeptSyncError) else "failed"
+    finally:
+        if adapter is not None:
+            try:
+                adapter.close()
+            except Exception:
+                increment_error(result["error_classes"], "target_close", "AdapterCloseError")
+    return result
+
+===== NEW FILE: frontend/src/api/types.ts =====
+/**
+ * 153 F1：API 层通用类型单份定义。
+ *
+ * 此前 ApiResponse 在 8 个 api 文件、PageData 在 6 个 api 文件重复定义；
+ * 统一收敛于此，各文件以 `export type { ... } from "./types"` 再导出，
+ * 既有 `from "./asset"` 等导入路径保持兼容。
+ */
+
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+export interface PageData<T> {
+  total: number;
+  page: number;
+  page_size: number;
+  items: T[];
+  /** 部分分页端点附带聚合统计（如 identity 台账列表）。 */
+  stats?: {
+    total?: number;
+    active?: number;
+    inactive?: number;
+    source_count?: number;
+  };
+}
+
+===== NEW FILE: frontend/src/api/admin.ts =====
+/**
+ * 治理管理 API（153 F4：asset/admin 页 12 处裸 http 收编）。
+ */
+import { http } from "@/utils/http";
+import type { ApiResponse, PageData } from "./types";
+
+export interface AdminKeyItem {
+  id: number;
+  key_name: string;
+  user_identifier: string | null;
+  has_legacy_token: boolean;
+  enabled: boolean;
+  created_at: string | null;
+  last_used_at: string | null;
+}
+
+export interface AdminOwnerItem {
+  id: number;
+  full_table_name: string;
+  owner_name: string | null;
+  department: string | null;
+  contact: string | null;
+  note: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminTermItem {
+  id: number;
+  term: string;
+  mapping_type: string | null;
+  mapping_target: string;
+  description: string | null;
+  created_at: string | null;
+}
+
+export interface AdminSnapshotItem {
+  id: number;
+  label: string | null;
+  snapshot_time: string | null;
+  scope: string | null;
+  table_count: number;
+  column_count: number;
+  relation_count: number;
+}
+
+export const listAdminKeys = () => {
+  return http.get<ApiResponse<AdminKeyItem[]>, object>("/api/v1/admin/keys");
+};
+
+export const createAdminKey = (data: { key_name: string; user_identifier: string }) => {
+  return http.post<
+    ApiResponse<{ id: number; key_name: string; token: string; warning: string }>,
+    object
+  >("/api/v1/admin/keys", { data });
+};
+
+export const toggleAdminKey = (keyId: number, enabled: boolean) => {
+  return http.patch<ApiResponse<AdminKeyItem>, object>(
+    `/api/v1/admin/keys/${keyId}`,
+    null,
+    { params: { enabled } }
+  );
+};
+
+export const listAdminOwners = (params: {
+  page?: number;
+  page_size?: number;
+  keyword?: string;
+}) => {
+  return http.get<ApiResponse<PageData<AdminOwnerItem>>, object>("/api/v1/admin/owners", {
+    params
+  });
+};
+
+export const upsertAdminOwner = (data: {
+  full_table_name: string;
+  owner_name?: string | null;
+  department?: string | null;
+  contact?: string | null;
+  note?: string | null;
+}) => {
+  return http.put<ApiResponse<{ id: number; full_table_name: string }>, object>(
+    "/api/v1/admin/owners",
+    { data }
+  );
+};
+
+export const deleteAdminOwner = (ownerId: number) => {
+  return http.delete<ApiResponse<{ deleted: number }>, object>(
+    `/api/v1/admin/owners/${ownerId}`
+  );
+};
+
+export const listAdminTerms = (params: {
+  page?: number;
+  page_size?: number;
+  keyword?: string;
+}) => {
+  return http.get<ApiResponse<PageData<AdminTermItem>>, object>("/api/v1/admin/terms", {
+    params
+  });
+};
+
+export const upsertAdminTerm = (data: {
+  term: string;
+  mapping_target: string;
+  description?: string;
+}) => {
+  return http.put<ApiResponse<{ id: number; term: string }>, object>("/api/v1/admin/terms", {
+    data
+  });
+};
+
+export const deleteAdminTerm = (termId: number) => {
+  return http.delete<ApiResponse<{ deleted: number }>, object>(
+    `/api/v1/admin/terms/${termId}`
+  );
+};
+
+export const listAdminSnapshots = (params?: { page?: number; page_size?: number }) => {
+  return http.get<ApiResponse<PageData<AdminSnapshotItem>>, object>(
+    "/api/v1/admin/snapshots",
+    { params }
+  );
+};
+
+export const createAdminSnapshot = (data?: { label?: string }) => {
+  return http.post<
+    ApiResponse<{ id: number; label: string; table_count: number; column_count: number; relation_count: number }>,
+    object
+  >("/api/v1/admin/snapshots", { data: data ?? {} });
+};
+
+export const compareAdminSnapshots = (id1: number, id2: number) => {
+  return http.get<ApiResponse<Record<string, unknown>>, object>(
+    "/api/v1/admin/snapshots/compare",
+    { params: { id1, id2 } }
+  );
+};
+
+===== NEW FILE: frontend/src/utils/statusLabels.ts =====
+/**
+ * 153 F5：状态映射与鉴权提示的共享工具（仅收敛既有重复，不造新抽象层）。
+ */
+import type { TagType } from "@/views/metadata-changes/labels";
+
+export type { TagType };
+
+/** 通用状态中文标签（open/assigned/resolved…，多页共用口径）。 */
+export function commonStatusLabel(value?: string | null): string {
+  const map: Record<string, string> = {
+    open: "未处理",
+    assigned: "已分派",
+    confirmed: "已确认",
+    fixed: "已修复",
+    rechecked: "已复核",
+    acknowledged: "已确认",
+    resolved: "已解决",
+    ignored: "已忽略",
+    rule_error: "规则错误",
+    active: "启用",
+    inactive: "停用",
+    enabled: "启用",
+    disabled: "停用",
+    pending: "待处理",
+    approved: "已批准",
+    rejected: "已驳回",
+    executed: "已执行",
+    draft: "草稿",
+    success: "成功",
+    failed: "失败",
+    running: "运行中"
+  };
+  return map[value ?? ""] ?? value ?? "-";
+}
+
+/** 通用状态标签色。 */
+export function commonStatusTag(value?: string | null): TagType {
+  const map: Record<string, TagType> = {
+    open: "danger",
+    assigned: "warning",
+    confirmed: "primary",
+    fixed: "success",
+    rechecked: "success",
+    acknowledged: "warning",
+    resolved: "success",
+    ignored: "info",
+    rule_error: "danger",
+    active: "success",
+    inactive: "info",
+    enabled: "success",
+    disabled: "info",
+    pending: "danger",
+    approved: "warning",
+    executed: "success",
+    rejected: "info",
+    draft: "danger",
+    success: "success",
+    failed: "danger",
+    running: "warning"
+  };
+  return map[value ?? ""] ?? "info";
+}
+
+/**
+ * 401/403 → 鉴权提示文案（返回 null 表示非鉴权错误）。
+ * 此前在 dict/medical 与 dict/mappings 各自内联 3 份。
+ */
+export function authHintForStatus(
+  status?: number
+): "接口未授权：请先登录并使用部署脚本生成的 Token。" | "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。" | null {
+  if (status === 401) return "接口未授权：请先登录并使用部署脚本生成的 Token。";
+  if (status === 403) return "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
+  return null;
+}
+
+===== NEW FILE: frontend/src/utils/systemNames.ts =====
+/**
+ * 153 F5：loadSystemNames 两份合一（quality/tables 各自内联）。
+ */
+import { listSystems } from "@/api/asset";
+
+export async function fetchSystemNameMap(): Promise<Record<string, string>> {
+  try {
+    const res = await listSystems();
+    const map: Record<string, string> = {};
+    for (const item of res.data || []) {
+      if (item.system_code) map[item.system_code] = item.system_name_cn || item.system_code;
+    }
+    return map;
+  } catch {
+    // 目录接口不可用时回退空映射（调用方以编码展示）。
+    return {};
+  }
+}
+
+===== NEW FILE: frontend/src/composables/usePagedList.ts =====
+/**
+ * 153 F6：分页列表五件套 + 请求序号守卫（试点 6 页：dict/general、tables、
+ * relation-review、sync-diffs×2、relation-rates）。
+ *
+ * 五件套 = items / total / page / loading / loadData；附带：
+ * - doSearch：搜索入口统一重置 page=1（E6 语义对齐）；
+ * - 请求序号守卫：并发触发时仅最后一次请求的结果生效（E7 语义对齐）；
+ * - 错误处理：catch 后经 extractErrorDetail（脱敏）提示，可用 onError 覆盖。
+ */
+import { ref, type Ref } from "vue";
+import { ElMessage } from "element-plus";
+import { extractErrorDetail } from "@/utils/errorMessage";
+
+export interface PagedListOptions<T, P extends { page: number; page_size: number }> {
+  /** 取数函数：接收含 page/page_size 的查询参数，返回 { items, total }。 */
+  fetcher: (params: P) => Promise<{ items: T[]; total: number }>;
+  /** 附加查询参数（不含分页字段）。 */
+  extraParams?: () => Partial<P>;
+  /** 默认错误提示文案。 */
+  errorText?: string;
+  /** 覆盖默认错误处理（返回 false 时不走默认提示）。 */
+  onError?: (error: unknown) => boolean | void;
+}
+
+export function usePagedList<T, P extends { page: number; page_size: number }>(
+  options: PagedListOptions<T, P> & { pageSize?: number },
+) {
+  const items: Ref<T[]> = ref([]);
+  const total = ref(0);
+  const page = ref(1);
+  const pageSize = ref(options.pageSize ?? 20);
+  const loading = ref(false);
+  let seq = 0;
+
+  async function loadData(targetPage?: number) {
+    if (targetPage !== undefined) page.value = targetPage;
+    const current = ++seq;
+    loading.value = true;
+    try {
+      const extra = (options.extraParams?.() ?? {}) as Partial<P>;
+      const res = await options.fetcher({
+        ...extra,
+        page: page.value,
+        page_size: pageSize.value,
+      } as P);
+      if (current !== seq) return;
+      items.value = res.items || [];
+      total.value = res.total || 0;
+    } catch (error) {
+      if (current !== seq) return;
+      const handled = options.onError?.(error);
+      if (handled !== false) {
+        ElMessage.error(extractErrorDetail(error, options.errorText ?? "列表加载失败"));
+      }
+    } finally {
+      if (current === seq) {
+        loading.value = false;
+      }
+    }
+  }
+
+  function doSearch() {
+    page.value = 1;
+    loadData();
+  }
+
+  return { items, total, page, pageSize, loading, loadData, doSearch };
+}
+

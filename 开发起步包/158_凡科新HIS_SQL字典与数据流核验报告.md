@@ -17,7 +17,7 @@
 ## 2. T2 JHApi 数据流定案（新HIS→嘉和）
 
 - dnfile 全量 TypeDef 11,718；JHApi 相关类型 73 个，**5 个 Refit 接口全部找到**。
-- **36 条路由全部提取**（CustomAttribute blob 解出）：`IInPatientManager`→`/api/InPatient/*`（11 个：Add/Update Register·InDept·ChangeDept·Discharge、ChangeAreaBed、Cancel×3）；`IIPCOrderManager`→`/api/inPatient/*`（addMedicalOrder/diagnosisOrder/nurseOrder/otherOrder/addOrder）；`IJHPubManager`→`/api/pub/*`（Add/Update/Cancel ExamApply 等 13）；`ITermManager`→术语注册/更新路由；**`IInPatientEsbManager.SendMessage`→`POST /fancy/esb-interaction/esb/esbmsgmethod`**（ESB 单通道）。
+- **36 条路由全部提取并规范化**（CustomAttribute blob 解出）：初版有 8 条带 blob 前导标记（引号、`!` 或空格），本次已由确定性规则截取首个 `/` 后的路径并验证 36/36 均以 `/` 开头；`IInPatientManager`→`/api/InPatient/*`；`IIPCOrderManager`→`/api/inPatient/*`；`IJHPubManager`→`/api/pub/*`；`ITermManager`→术语路由；**`IInPatientEsbManager.SendMessage`→`POST /fancy/esb-interaction/esb/esbmsgmethod`**。
 - **Base URL 定案：`http://192.168.102.3:8002/`**（`appconfig.Prod.json → references.iThirdOpenApiManager`，JHApi 属 `References.ThirdOpenApi` 命名空间）——即新HIS→嘉和走**第三方开放平台**，**不是** 179:86 通用接口直连（回答参考文档待办#5）。
 - 链路图（文字版）：
   `新HIS住院/医嘱/申请单事件 → Fancy.His.Micro(JHApi Refit) → HTTP 192.168.102.3:8002 开放平台 → 嘉和EMR(177 jhemr/179服务)`；旁路：`IInPatientEsbManager → /fancy/esb-interaction/esb/esbmsgmethod`（ESB，同 base 或开放平台转发，待联调抓包定案）。
@@ -91,7 +91,7 @@ E:\fancyhis 全程只读（仅读 DLL/配置文件字节）；未运行 Fancy.Hi
 | 建议 | 处理结果 |
 |---|---|
 | 感控视图族/PLATE_EMR_PDF 入取数口径 | ✅ 活库列级核验完成（V_EMR_PATIENT_INFO 33 列/ADMISSION 19/DISCHARGE 18/ACTIVITY 32/VITAL_SIGNS_RECORD 20 + V_CRBREPORT；键含 PATIENT_ID+SERIAL_NUMBER）；已沉淀进 `.agents/skills/hisuser-readonly-sql/SKILL.md`（含"勿用 _copy1 备份副本"警示——本次新发现 FXHIS 下每张视图均有 _copy1） |
-| 关系候选摄取 | ✅ 局部完成：124 条 SQL 的别名限定等值 join 仅抽得 **4 条边**（SYS_USER_DEPT.USERID=SYS_USER.ID、STAFF_DICT.ID=CASHER_NO_REC.USER_ID、INPUT_NODRUG_LIST.PERFORMED_BY=SYS_DEPARTMENT.DEPTCODE、INPUT_NODRUG_LIST.ITEM_CLASS=BILL_ITEM_CLASS_DICT.CLASS_CODE，存 `relation_candidates.json`）——多数 SQL 为动态拼接无法静态抽 join。**不入平台 draft**：对端表属新HIS masterdb（平台未登记），按 plan139 口径记跨系统待验证证据，待 masterdb 登记后再走 sql-relation-intake |
+| 关系候选摄取 | ✅ 局部完成：124 条 SQL 的别名限定等值 join 仅抽得 **4 条边**，多数动态 SQL 无法静态抽取。`relation_candidates.json` 已补 source SQL SHA-256、来源文件、system/dialect、JOIN 条件、C 级状态、无方向标记、元数据/验证缺口和风险说明，并移除原始 SQL 片段。**不入平台 draft**：对端表属新HIS masterdb（平台未登记），待登记并核字段/组合键后再走 sql-relation-intake |
 | 值域补录 | ⏸ 平台侧：候选已在 §5（3 状态字面量+10 字典表）；value_domains.json 为平台导出视图勿手改（149 红线），正式入库需平台值域写通道，列为待授权待办 |
 | 防串库修订 | ✅ `.agents/skills/ods-readonly-sql/SKILL.md` 增"库位双轨警示"（SYS_EMPLOYEE ODS=COMM vs 新HIS masterdb；PAT_VISIT 同类），要求带 owner+source_code |
 | 嘉和排障入口 | ✅ 已在 §2/§7（8002 开放平台 36 路由清单在 fancyhis_attributes.json） |

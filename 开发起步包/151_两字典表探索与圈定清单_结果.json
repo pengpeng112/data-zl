@@ -1,0 +1,1293 @@
+{
+ "meta": {
+  "executed_at": "2026-08-29",
+  "executor": "163_R2 (checkpoint session)",
+  "channel": "sjzc live 受控只读 (ods_8_216 / jhemr_vastbase_10_10_8_177)",
+  "gate": "163 附录 A 已勾选（2026-08-28 用户批准）→ E2' 自动圈定；导入一律 pending 永不 confirm",
+  "sources": {
+   "portal": "DATA_CENTER (ods_8_216, Oracle) PORTAL_USER/HIS.PORTAL_SYS_DICT 族",
+   "jhemr": "JHEMR_VASTBASE (jhemr_vastbase_10_10_8_177, Vastbase) jhemr.emr_first_page_item_dict"
+  }
+ },
+ "exploration": {
+  "portal_dict_types_total": 50,
+  "portal_dict_types": [
+   {
+    "TYPE_ID": "1788158580466491394",
+    "TYPE_CODE": "11",
+    "TYPE_NAME": "11",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "N"
+   },
+   {
+    "TYPE_ID": "1752135220310421506",
+    "TYPE_CODE": "123123",
+    "TYPE_NAME": "123123",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1763395038705725441",
+    "TYPE_CODE": "123131123131",
+    "TYPE_NAME": "已废弃",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1763124740894875649",
+    "TYPE_CODE": "2",
+    "TYPE_NAME": "打",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1812786885592616961",
+    "TYPE_CODE": "Allergyclassification",
+    "TYPE_NAME": "过敏分类",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1812787707588120577",
+    "TYPE_CODE": "Allergydrugs",
+    "TYPE_NAME": "过敏药品",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1812788332891738114",
+    "TYPE_CODE": "Allergyinformationsource",
+    "TYPE_NAME": "过敏信息来源",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1812788638627139585",
+    "TYPE_CODE": "Severity",
+    "TYPE_NAME": "严重程度",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1750776222709551106",
+    "TYPE_CODE": "order_code",
+    "TYPE_NAME": "医嘱用药",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1761917609458356226",
+    "TYPE_CODE": "test123",
+    "TYPE_NAME": "测试1",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1762365413477150721",
+    "TYPE_CODE": "yntz",
+    "TYPE_NAME": "院内通知",
+    "CLASS_TYPE_CODE": "CLASS_CODE",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1753320836729528322",
+    "TYPE_CODE": "dept_type_code",
+    "TYPE_NAME": "科室类型",
+    "CLASS_TYPE_CODE": "Dept",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1853992636524834818",
+    "TYPE_CODE": "dept_type_code1",
+    "TYPE_NAME": "dept_type_code1",
+    "CLASS_TYPE_CODE": "Dept",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813827230006775809",
+    "TYPE_CODE": "CHEMOTHERAPY_METHODS_CODE",
+    "TYPE_NAME": "化疗方式编码",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1815228843015540738",
+    "TYPE_CODE": "CONSULTAION_STATE",
+    "TYPE_NAME": "会诊状态",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1821106473703325698",
+    "TYPE_CODE": "CONSULTATION_TYPE",
+    "TYPE_NAME": "会诊类型",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1821352450016169985",
+    "TYPE_CODE": "CONSULTATION_URGENT",
+    "TYPE_NAME": "会诊紧急程度",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1821105951004966914",
+    "TYPE_CODE": "CONSULTATIONtYPE",
+    "TYPE_NAME": "会诊类型（作废）",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813826908890861569",
+    "TYPE_CODE": "DEPARTURE_METHOD_CODE",
+    "TYPE_NAME": "离院方式编码",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813755421341257729",
+    "TYPE_CODE": "DIAG_TYPE",
+    "TYPE_NAME": "诊断类别",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813826438654857217",
+    "TYPE_CODE": "DISCHARGE_STATUS_CODE",
+    "TYPE_NAME": "出院情况编码",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1817866368322375681",
+    "TYPE_CODE": "HerbalSingleUsage",
+    "TYPE_NAME": "草药单味用法",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1815668293365403650",
+    "TYPE_CODE": "ITEM_TYPE",
+    "TYPE_NAME": "医嘱项目类别",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1818988404981698562",
+    "TYPE_CODE": "JF",
+    "TYPE_NAME": "煎服",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813530850872791042",
+    "TYPE_CODE": "ORDER_TYPE",
+    "TYPE_NAME": "医嘱类别代码",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1814553002317189122",
+    "TYPE_CODE": "Order_Status",
+    "TYPE_NAME": "医嘱状态",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1816436183916089346",
+    "TYPE_CODE": "PROJECT",
+    "TYPE_NAME": "护士站-项目退费-退费费用类型",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1816437030276304898",
+    "TYPE_CODE": "REASON",
+    "TYPE_NAME": "护士站-项目退费-退费原因",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1813827404615651329",
+    "TYPE_CODE": "RECEIVING_INSTITUTION_CODE",
+    "TYPE_NAME": "接收机构编码",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1819303631979876353",
+    "TYPE_CODE": "REFUND",
+    "TYPE_NAME": "医生站-费用管理-退费",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1820767015162421249",
+    "TYPE_CODE": "REFUND_TYPE",
+    "TYPE_NAME": "医生站-费用管理-退费原因",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1815312340837208066",
+    "TYPE_CODE": "SHIFT_STATE",
+    "TYPE_NAME": "转科申请状态",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1820640331448729602",
+    "TYPE_CODE": "STAFF_ROLE",
+    "TYPE_NAME": "职工角色",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1814171647586603009",
+    "TYPE_CODE": "TEND",
+    "TYPE_NAME": "护理级别",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1818989097087995906",
+    "TYPE_CODE": "YGYQ",
+    "TYPE_NAME": "用法要求",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1847185688785629185",
+    "TYPE_CODE": "hospPurpose",
+    "TYPE_NAME": "入院目的",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1847184653610430465",
+    "TYPE_CODE": "hospState",
+    "TYPE_NAME": "入院病情",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1831878403703328769",
+    "TYPE_CODE": "hospType",
+    "TYPE_NAME": "入院类别",
+    "CLASS_TYPE_CODE": "HOSPITALIZED",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1827944730567229442",
+    "TYPE_CODE": "CALLBACK_SETTLE_TYPE",
+    "TYPE_NAME": "实际结算类型",
+    "CLASS_TYPE_CODE": "MZSFC",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1828249456835936257",
+    "TYPE_CODE": "YNSEE",
+    "TYPE_NAME": "是否看诊",
+    "CLASS_TYPE_CODE": "MZSFC",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1849010796504330241",
+    "TYPE_CODE": "ps",
+    "TYPE_NAME": "皮试2",
+    "CLASS_TYPE_CODE": "MZSFC",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1844277809401344001",
+    "TYPE_CODE": "MZYJFYZT",
+    "TYPE_NAME": "门诊医技费用状态",
+    "CLASS_TYPE_CODE": "YJL",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1844653669652410369",
+    "TYPE_CODE": "REFUND_FLAG",
+    "TYPE_NAME": "可退标记状态",
+    "CLASS_TYPE_CODE": "YJL",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1844569284848693249",
+    "TYPE_CODE": "TFYY",
+    "TYPE_NAME": "退费原因（医生站申请退费也用这个）",
+    "CLASS_TYPE_CODE": "YJL",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1839104801941635074",
+    "TYPE_CODE": "ZT",
+    "TYPE_NAME": "门诊医技执行状态",
+    "CLASS_TYPE_CODE": "YJL",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1843563038649659393",
+    "TYPE_CODE": "ZYYJZXZT",
+    "TYPE_NAME": "住院医技执行状态",
+    "CLASS_TYPE_CODE": "YJL",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1752216453207838721",
+    "TYPE_CODE": "xx",
+    "TYPE_NAME": "xxx",
+    "CLASS_TYPE_CODE": "hh",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1776787405164843010",
+    "TYPE_CODE": "accounting_type",
+    "TYPE_NAME": "会计帐类别",
+    "CLASS_TYPE_CODE": "med_storage",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1773149066306064385",
+    "TYPE_CODE": "adjust_reason",
+    "TYPE_NAME": "调价原因",
+    "CLASS_TYPE_CODE": "med_storage",
+    "ENABLE_STATE": "Y"
+   },
+   {
+    "TYPE_ID": "1776817517805506562",
+    "TYPE_CODE": "apply_return_drug",
+    "TYPE_NAME": "申请退药",
+    "CLASS_TYPE_CODE": "med_storage",
+    "ENABLE_STATE": "Y"
+   }
+  ],
+  "portal_dual_schema": {
+   "portal_user": {
+    "rows": 1215,
+    "distinct_type_code": 122
+   },
+   "his": {
+    "rows": 1772,
+    "distinct_type_code": 193
+   },
+   "registry": 145,
+   "type_code_only_in_his": [
+    "Allergyfoods",
+    "BGFCF",
+    "CCCF",
+    "CFLY",
+    "CQFS",
+    "CYZT",
+    "ChargeType",
+    "DPFS",
+    "DiagnosisCardType",
+    "GXQX",
+    "HZJG",
+    "HZZT",
+    "JSDJ",
+    "JSLX",
+    "JSQX",
+    "JSYP",
+    "JY",
+    "KSLB",
+    "KSSX",
+    "MZBL",
+    "MZCFLB",
+    "MZFL",
+    "MZSJCQCFLB",
+    "MZSJCQDXYP",
+    "MZSJCQJSYP",
+    "MZSJCQJY",
+    "MZSJCQKJYWLX",
+    "MZSJCQMZYP",
+    "MZSJCQYPLB",
+    "MZSJCQZC",
+    "MZYP",
+    "NLDW",
+    "QXZZ",
+    "SETTLE_TYPE",
+    "SLDW",
+    "Sex",
+    "WTDM",
+    "YBDJ",
+    "YBLY",
+    "YPLB",
+    "YPPZ",
+    "YPPZBJ",
+    "YPSTATE",
+    "YQBZ",
+    "YSJB",
+    "YSKJHF",
+    "YSKJHF1",
+    "YSLB",
+    "YYBSYCF",
+    "ZYBL"
+   ],
+   "type_code_only_in_portal_user": [],
+   "conclusion": "PORTAL_USER 字典行是 HIS 份子集（50 类仅 HIS 有数据、0 类仅 PORTAL_USER 有）；TYPE 登记表在 PORTAL_USER。按 151 §1.1 以 PORTAL_USER 为准，仅 HIS 有的类入待定位证据"
+  },
+  "portal_class_11": [
+   "药品类",
+   "科室类",
+   "住院类",
+   "结算类",
+   "医技类",
+   "（其余 6 类见 live 采集，略）"
+  ],
+  "jhemr_field_count": 92,
+  "jhemr_fields": {
+   "ABOUTOPRATION": 3,
+   "ANAESTHESIA_METHOD": 27,
+   "ANAESTHESIA_METHOD--": 2,
+   "AREA": 52,
+   "BLOOD_TYPE": 6,
+   "BLOOD_TYPE_RH": 4,
+   "CLASSIFY": 4,
+   "CLINICALPATHWAYMANAGE": 2,
+   "CLINICALPATHWAYMANAGE--": 2,
+   "CLINICFIT": 4,
+   "COUNTRY": 238,
+   "CP_CONTROL": 3,
+   "DEAD_ADDRESS": 4,
+   "DIFFERENTIATION": 9,
+   "DISCHARGE_CONDITIONS": 5,
+   "DISCHARGE_DISPOSITION": 6,
+   "DischargeMethod": 4550,
+   "DISCHARGE_PASS": 1,
+   "DISEASE_HOSPITAL": 4,
+   "EDUCATION_LEVEL": 14,
+   "EMR_PAT_ADM_CONDITION": 4,
+   "EMRTYPE": 4,
+   "HAVENO": 2,
+   "HAVENO1": 2,
+   "HAVENO2": 2,
+   "HEAL": 5,
+   "HIGH_DIAGNOSIS_BASIS": 14,
+   "HIGH_DIAGNOSIS_UNIT": 7,
+   "HORMONE_RECEPTOR_ER": 2,
+   "HORMONE_RECEPTOR_PR": 2,
+   "ICD_TCD_TYPE": 2,
+   "ICU": 1,
+   "ID_TYPE": 8,
+   "INFECTIONNAME": 13,
+   "IN_HOSPITAL_CASE": 4,
+   "IN_ICU_INFO": 9,
+   "ISBLOOD_TRAN_REACT": 3,
+   "ISCHOOSEDAY": 3,
+   "ISCOMPLICATION": 3,
+   "ISINDICATOR": 2,
+   "ISINFUSION_REACT": 3,
+   "ISOPERATION": 1,
+   "ISRETURNICU": 3,
+   "ISRETURNOPERATION": 3,
+   "MAINDIAG_CONDITIONS": 3,
+   "MARITAL_STATUS": 8,
+   "MEDICAL_PAY_WAY": 12,
+   "MEDICAL_PAY_WAY--": 5,
+   "MR_QUALITY": 3,
+   "NARCOMPLICATION": 3,
+   "NARCOSISTYPE": 7,
+   "NATION": 59,
+   "OCCUPATION": 13,
+   "OPERATING_GRADE": 4,
+   "OPERATING_GRADE--": 2,
+   "OPERATION_SCALE": 4,
+   "OPERATION_SCALE--": 2,
+   "OPERATION_TYPE": 3,
+   "OPERATION_TYPE--": 1,
+   "PATHOLOGY_TYPE": 3,
+   "PREGNANCY": 4,
+   "QUALITY_IMPORTANCE": 3,
+   "RELATIONSHIP": 10,
+   "RESTRAINT_CAUSE": 7,
+   "RESTRAINT_TOOLS": 6,
+   "RESTRAINT_TYPE": 4,
+   "RETURN_INTERVAL_TIME": 4,
+   "RUYUAN_PASS": 1,
+   "SEX": 4,
+   "SPACEINTIME": 4,
+   "TCAAD": 3,
+   "TOPDIAGNOSIS": 9,
+   "TREAT_CLASS": 4,
+   "TRT_TYPE": 3,
+   "TUMBLING_DAMAGE_DEGREE": 4,
+   "TUMBLING_REASON": 4,
+   "TUMOR_STAGE_M": 3,
+   "TUMOR_STAGE_M-": 6,
+   "TUMOR_STAGE_N": 5,
+   "TUMOR_STAGE_N-": 10,
+   "TUMOR_STAGE_OTHER": 6,
+   "TUMOR_STAGE_OTHER-": 5,
+   "TUMOR_STAGE_T": 6,
+   "TUMOR_STAGE_T-": 12,
+   "TUMOR_STAGE_TNM": 5,
+   "USE_ANT_DRUG_COMB": 4,
+   "VALIDATEINFO_TYPE": 3,
+   "WARD_NAME_TYPE": 8,
+   "WOUND_GRADE": 5,
+   "WOUND_GRADE_HEAL": 13,
+   "YESNO": 2,
+   "YESNO1": 2
+  },
+  "jhemr_structure_live": {
+   "schema": "jhemr",
+   "columns": [
+    "field_name",
+    "item_value",
+    "item_text",
+    "default_flag",
+    "show_order",
+    "input_code",
+    "boh_code",
+    "boh_name",
+    "dict_name",
+    "del_flag",
+    "…"
+   ],
+   "vs_old_doc": "较老文档§176 多 boh_name/dict_name/del_flag 列；ITEM_VALUE=库内存值、ITEM_TEXT=对照码（DISCHARGE_DISPOSITION 反向存储实证：item_value=中文名，item_text=数字码）"
+  },
+  "samples": {
+   "portal_user_sample": "A03 本院 / A02 外院（Allergyinformationsource，GB 码同名）",
+   "his_sample": "smallest_unit: zhi 支（GB=zhi_gb 支国标）；centralized_purchasing: 1 国采…"
+  }
+ },
+ "circled": {
+  "portal": {
+   "types_selected": [
+    {
+     "type_code": "DEPARTURE_METHOD_CODE",
+     "type_name": "离院方式编码",
+     "target": {
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "PAT_VISIT",
+      "column_name": "DISCHARGE_DISPOSITION"
+     },
+     "expect": "与 149 confirmed（1=医嘱离院）语义冲突：PORTAL 字典 1=自行离开 → 预期触发 conflicted 待人工裁决"
+    },
+    {
+     "type_code": "DISCHARGE_STATUS_CODE",
+     "type_name": "出院情况编码",
+     "target": {
+      "system_code": "HIS_SOURCE",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "MEDREC",
+      "table_name": "DIAGNOSIS",
+      "column_name": "TREAT_RESULT"
+     },
+     "expect": "与 JHEMR DISCHARGE_CONDITIONS（治愈=1）码义错位 → E5' 专项，导入 pending"
+    }
+   ],
+   "rows": [
+    {
+     "type_code": "DEPARTURE_METHOD_CODE",
+     "type_name": "离院方式编码",
+     "dict_code": "1",
+     "dict_name": "自行离开",
+     "gb_code": "1",
+     "gb_name": "1",
+     "enable_state": "Y"
+    },
+    {
+     "type_code": "DISCHARGE_STATUS_CODE",
+     "type_name": "出院情况编码",
+     "dict_code": "1",
+     "dict_name": "好转",
+     "gb_code": "1",
+     "gb_name": "1",
+     "enable_state": "Y"
+    }
+   ]
+  },
+  "jhemr": {
+   "fields_selected": [
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_pat_visit",
+      "column_name": "discharge_disposition"
+     },
+     "note": "与 148 六对完全一致（item_value=库内中文名，item_text=数字码）"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_diagnosis_doct",
+      "column_name": "discharge_conditions"
+     },
+     "note": "JHEMR 治疗结果（治愈1/好转2/未愈3/死亡4/其他9）→ 152 E5 候选2 对应 HIS TREAT_RESULT 上游"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_operation_doct",
+      "column_name": "anaesthesia_method"
+     },
+     "note": "27 条；152 E5 候选11：条件转码 boh_name→boh_code"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_operation_doct",
+      "column_name": "wound_grade"
+     },
+     "note": "切口等级 0/I/II/III/-"
+    },
+    {
+     "field_name": "HEAL",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_operation_doct",
+      "column_name": "heal"
+     },
+     "note": "切口愈合 甲/乙/丙/未知/-"
+    },
+    {
+     "field_name": "OPERATION_TYPE",
+     "target": {
+      "system_code": "JHEMR_VASTBASE",
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "schema_name": "report",
+      "table_name": "r_operation_doct",
+      "column_name": "operation_type"
+     },
+     "note": "择期1/急诊2/期限3 → 直接支撑 151 E5 手术标志3 收口（3=期限手术）"
+    }
+   ],
+   "rows": [
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "医嘱离院",
+     "item_text": "1",
+     "boh_code": "1",
+     "boh_name": "医嘱离院",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "医嘱转院",
+     "item_text": "2",
+     "boh_code": "2",
+     "boh_name": "医嘱转院，拟接收医疗机构名称：",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "医嘱转社区卫生服务机构/乡镇卫生院",
+     "item_text": "3",
+     "boh_code": "3",
+     "boh_name": "医嘱转社区卫生服务机构/乡镇卫生院，拟接收医疗机构名称：",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "非医嘱离院",
+     "item_text": "4",
+     "boh_code": "4",
+     "boh_name": "非医嘱离院",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "死亡",
+     "item_text": "5",
+     "boh_code": "5",
+     "boh_name": "死亡",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_DISPOSITION",
+     "item_value": "其他",
+     "item_text": "9",
+     "boh_code": "9",
+     "boh_name": "其他",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "item_value": "治愈",
+     "item_text": "1",
+     "boh_code": "1",
+     "boh_name": "治愈",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "item_value": "好转",
+     "item_text": "2",
+     "boh_code": "2",
+     "boh_name": "好转",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "item_value": "未愈",
+     "item_text": "3",
+     "boh_code": "3",
+     "boh_name": "未愈",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "item_value": "死亡",
+     "item_text": "4",
+     "boh_code": "4",
+     "boh_name": "死亡",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "DISCHARGE_CONDITIONS",
+     "item_value": "其他",
+     "item_text": "9",
+     "boh_code": "9",
+     "boh_name": "其他",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "吸入麻醉 （气管内插管、喉罩、面罩）",
+     "item_text": "吸入麻醉 （气管内插管、喉罩、面罩）",
+     "boh_code": "0101",
+     "boh_name": "吸入麻醉 （气管内插管、喉罩、面罩）",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "静脉麻醉 （全凭静脉麻醉）",
+     "item_text": "静脉麻醉 （全凭静脉麻醉）",
+     "boh_code": "0102",
+     "boh_name": "静脉麻醉 （全凭静脉麻醉）",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "静吸复合麻醉",
+     "item_text": "静吸复合麻醉",
+     "boh_code": "0103",
+     "boh_name": "静吸复合麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "基础麻醉 （直肠注入、肌肉注射）",
+     "item_text": "基础麻醉 （直肠注入、肌肉注射）",
+     "boh_code": "0104",
+     "boh_name": "基础麻醉 （直肠注入、肌肉注射）",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "椎管内麻醉",
+     "item_text": "椎管内麻醉",
+     "boh_code": "0201",
+     "boh_name": "椎管内麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "蛛网膜下腔阻滞",
+     "item_text": "蛛网膜下腔阻滞",
+     "boh_code": "020101",
+     "boh_name": "蛛网膜下腔阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "硬膜外间隙阻滞（含骶管阻滞）",
+     "item_text": "硬膜外间隙阻滞（含骶管阻滞）",
+     "boh_code": "020102",
+     "boh_name": "硬膜外间隙阻滞（含骶管阻滞）",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "蛛网膜下-硬膜外复合麻醉",
+     "item_text": "蛛网膜下-硬膜外复合麻醉",
+     "boh_code": "020103",
+     "boh_name": "蛛网膜下-硬膜外复合麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "神经及神经丛阻滞",
+     "item_text": "神经及神经丛阻滞",
+     "boh_code": "0202",
+     "boh_name": "神经及神经丛阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "颈丛阻滞",
+     "item_text": "颈丛阻滞",
+     "boh_code": "020201",
+     "boh_name": "颈丛阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "臂丛阻滞及上肢神经阻滞",
+     "item_text": "臂丛阻滞及上肢神经阻滞",
+     "boh_code": "020202",
+     "boh_name": "臂丛阻滞及上肢神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "腰骶神经丛阻滞及下肢神经阻滞",
+     "item_text": "腰骶神经丛阻滞及下肢神经阻滞",
+     "boh_code": "020203",
+     "boh_name": "腰骶神经丛阻滞及下肢神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "躯干神经阻滞：肋间神经阻滞",
+     "item_text": "躯干神经阻滞：肋间神经阻滞",
+     "boh_code": "020204",
+     "boh_name": "躯干神经阻滞：肋间神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "椎旁神经阻滞",
+     "item_text": "椎旁神经阻滞",
+     "boh_code": "020205",
+     "boh_name": "椎旁神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "会阴神经阻滞",
+     "item_text": "会阴神经阻滞",
+     "boh_code": "020206",
+     "boh_name": "会阴神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "交感神经阻滞：星状神经节阻滞",
+     "item_text": "交感神经阻滞：星状神经节阻滞",
+     "boh_code": "020207",
+     "boh_name": "交感神经阻滞：星状神经节阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "胸腰交感神经阻滞",
+     "item_text": "胸腰交感神经阻滞",
+     "boh_code": "020208",
+     "boh_name": "胸腰交感神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "脑神经阻滞：三叉神经阻滞、舌咽神经阻滞",
+     "item_text": "脑神经阻滞：三叉神经阻滞、舌咽神经阻滞",
+     "boh_code": "020209",
+     "boh_name": "脑神经阻滞：三叉神经阻滞、舌咽神经阻滞",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "表面麻醉",
+     "item_text": "表面麻醉",
+     "boh_code": "0301",
+     "boh_name": "表面麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "局部浸润麻醉",
+     "item_text": "局部浸润麻醉",
+     "boh_code": "0302",
+     "boh_name": "局部浸润麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "局部阻滞麻醉",
+     "item_text": "局部阻滞麻醉",
+     "boh_code": "0303",
+     "boh_name": "局部阻滞麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "静脉局部麻醉",
+     "item_text": "静脉局部麻醉",
+     "boh_code": "0304",
+     "boh_name": "静脉局部麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "不同药物的复合麻醉",
+     "item_text": "不同药物的复合麻醉",
+     "boh_code": "0501",
+     "boh_name": "不同药物的复合：普鲁卡因静脉复合全麻，神经安定镇痛麻醉等",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "不同方法的复合麻醉",
+     "item_text": "不同方法的复合麻醉",
+     "boh_code": "0502",
+     "boh_name": "不同方法的复合：静吸复合全麻，针药复合麻醉，全身-硬膜外复合麻醉，脊髓-硬膜外复合麻醉等",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "特殊方法的复合麻醉",
+     "item_text": "特殊方法的复合麻醉",
+     "boh_code": "0503",
+     "boh_name": "特殊方法的复合：全麻复合全身降温（低温麻醉）， 控制性降压等",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "其他",
+     "item_text": "其他",
+     "boh_code": "99",
+     "boh_name": "其他",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "ANAESTHESIA_METHOD",
+     "item_value": "-",
+     "item_text": "-",
+     "boh_code": "-",
+     "boh_name": "有手术无麻醉",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "item_value": "0",
+     "item_text": "0",
+     "boh_code": "0",
+     "boh_name": "体表无切口",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "item_value": "I",
+     "item_text": "1",
+     "boh_code": "I",
+     "boh_name": "无菌切口",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "item_value": "II",
+     "item_text": "2",
+     "boh_code": "II",
+     "boh_name": "沾染切口",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "item_value": "III",
+     "item_text": "3",
+     "boh_code": "III",
+     "boh_name": "感染切口",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "WOUND_GRADE",
+     "item_value": "-",
+     "item_text": "4",
+     "boh_code": "-",
+     "boh_name": "-",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "HEAL",
+     "item_value": "甲",
+     "item_text": "1",
+     "boh_code": "1",
+     "boh_name": "切口愈合良好",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "HEAL",
+     "item_value": "乙",
+     "item_text": "2",
+     "boh_code": "2",
+     "boh_name": "切口愈合欠佳",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "HEAL",
+     "item_value": "丙",
+     "item_text": "3",
+     "boh_code": "3",
+     "boh_name": "切口化脓",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "HEAL",
+     "item_value": "未知",
+     "item_text": "4",
+     "boh_code": "4",
+     "boh_name": "出院时切口愈合情况不确定",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "HEAL",
+     "item_value": "-",
+     "item_text": "5",
+     "boh_code": "5",
+     "boh_name": "-",
+     "default_flag": "0"
+    },
+    {
+     "field_name": "OPERATION_TYPE",
+     "item_value": "择期手术",
+     "item_text": "1",
+     "boh_code": "None",
+     "boh_name": "None",
+     "default_flag": "None"
+    },
+    {
+     "field_name": "OPERATION_TYPE",
+     "item_value": "急诊手术",
+     "item_text": "2",
+     "boh_code": "None",
+     "boh_name": "None",
+     "default_flag": "None"
+    },
+    {
+     "field_name": "OPERATION_TYPE",
+     "item_value": "期限手术",
+     "item_text": "3",
+     "boh_code": "None",
+     "boh_name": "None",
+     "default_flag": "None"
+    }
+   ]
+  }
+ },
+ "circled_summary": {
+  "portal_types": 2,
+  "portal_rows": 2,
+  "jhemr_fields": 6,
+  "jhemr_rows": 51,
+  "total_rows": 53,
+  "gate_le20_types": true,
+  "gate_le200_rows": true
+ },
+ "pending_location": {
+  "portal_keyword_missed": {
+   "desc": "附录 A 关键词在 PORTAL_SYS_DICT_TYPE 145 类中无对应 TYPE_NAME/TYPE_CODE",
+   "items": [
+    "性别",
+    "诊疗类型/住院类型",
+    "麻醉方式",
+    "切口愈合",
+    "抢救成功",
+    "血型",
+    "输血反应",
+    "肿瘤分期/分型",
+    "医生职称",
+    "费别/医保类型"
+   ]
+  },
+  "portal_matched_no_target": [
+   {
+    "type_code": "TEND",
+    "type_name": "护理级别",
+    "rows": 4,
+    "reason": "无单一可信目标列（HIS/MEDREC 侧护理级别字段未定位）"
+   },
+   {
+    "type_code": "hospType",
+    "type_name": "入院类别",
+    "rows": 4,
+    "reason": "语义为就诊类型（门诊/急诊/转科/转院），目标列未定位"
+   },
+   {
+    "type_code": "hospState",
+    "type_name": "入院病情",
+    "rows": 0,
+    "reason": "PORTAL_USER 0 行（HIS 份 3 行）；目标列 ADMISSION_CONDITION 映射留待定位"
+   },
+   {
+    "type_code": "hospPurpose",
+    "type_name": "入院目的",
+    "rows": 2,
+    "reason": "目标列未定位"
+   },
+   {
+    "type_code": "dept_type_code",
+    "type_name": "科室类型",
+    "rows": 10,
+    "reason": "SYS_DEPARTMENT 类型字段未定位到唯一列"
+   },
+   {
+    "type_code": "Allergyclassification/Allergydrugs/Allergyinformationsource",
+    "type_name": "过敏三项",
+    "rows": 13,
+    "reason": "过敏表字段未定位到唯一列"
+   }
+  ],
+  "jhemr_not_imported": [
+   {
+    "field_name": "DischargeMethod",
+    "values": 4550,
+    "reason": "字段名含 Discharge 但 DICT_NAME=离院方式转归字典，实为转归机构（机构名↔组织机构代码）字典，非离院方式——无把握不导入"
+   },
+   {
+    "field_name": "WOUND_GRADE_HEAL",
+    "values": 13,
+    "reason": "切口等级+愈合组合变体，r_operation_doct 拆分存储（wound_grade/heal），组合字段无落点"
+   },
+   {
+    "field_name": "ANAESTHESIA_METHOD--",
+    "values": null,
+    "reason": "主字段变体（--后缀），防重复不导入"
+   },
+   {
+    "field_name": "NARCOSISTYPE/OPERATION_SCALE/OPERATING_GRADE(+--)/ABOUTOPRATION/TREAT_CLASS",
+    "values": null,
+    "reason": "麻醉/手术相关但 152 E5 无转码点映射，目标列无把握"
+   },
+   {
+    "field_name": "其余 80+ 字段（SEX/BLOOD_TYPE/MARITAL_STATUS/TUMOR_STAGE_*/WARD_NAME_TYPE 等）",
+    "values": null,
+    "reason": "附录 A rule2 关键词（离院/出院/手术/麻醉/切口）之外，按规则不圈定；清单已全量留存供下批"
+   }
+  ]
+ },
+ "compare_152_e5": [
+  {
+   "no": 1,
+   "candidate": "MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION",
+   "verdict": "命中（双源）",
+   "detail": "JHEMR FIELD 六对与 148 一致→导入 pending；PORTAL DEPARTURE_METHOD_CODE 1=自行离开与 confirmed 1=医嘱离院冲突→导入触发 conflicted 待人工"
+  },
+  {
+   "no": 2,
+   "candidate": "MEDREC.DIAGNOSIS.TREAT_RESULT",
+   "verdict": "命中（冲突）",
+   "detail": "PORTAL DISCHARGE_STATUS_CODE 1=好转 vs JHEMR 治愈=1 vs COMM 2/3/4 错位 → E5' 专项呈报"
+  },
+  {
+   "no": 3,
+   "candidate": "MEDREC.OPERATION.OPERATION_EMER_INDICATOR",
+   "verdict": "命中（JHEMR）",
+   "detail": "JHEMR OPERATION_TYPE 择期1/急诊2/期限3 → 补全 code3=期限手术；导入 pending"
+  },
+  {
+   "no": 4,
+   "candidate": "MEDREC.PAT_VISIT.BLOOD_TYPE / BLOOD_TYPE_RH",
+   "verdict": "未命中（已有产码规则）",
+   "detail": "152 视图 CASE 即产码（A1/B2/O3/AB4/不详5/未查6；阴1/阳2/不详3/未查4），JHEMR BLOOD_TYPE 字典属 UI 侧；不入首批"
+  },
+  {
+   "no": 5,
+   "candidate": "MEDREC.PAT_VISIT_EXTEND.PLAN_ADMISSION",
+   "verdict": "未命中",
+   "detail": "附录关键词无命中；135 专题已证，维持"
+  },
+  {
+   "no": 6,
+   "candidate": "MEDREC.PAT_VISIT_EXTEND.DAY_WARD",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 7,
+   "candidate": "MEDREC.PAT_VISIT.PLAN_31_ADMISSION",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 8,
+   "candidate": "MEDREC.PAT_VISIT.CLINICAL_PATHWAY / _FINISH / _VARIATION",
+   "verdict": "未命中",
+   "detail": "关键词无命中；CASE 产码已在 152 记录"
+  },
+  {
+   "no": 9,
+   "candidate": "MEDREC.PAT_VISIT.AUTOPSY_INDICATOR",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 10,
+   "candidate": "MEDREC.PAT_VISIT.TUMOR_STAGE",
+   "verdict": "未命中（待定位）",
+   "detail": "JHEMR TUMOR_STAGE_T/N/M/TNM/OTHER 系列存在但视图产码为 0-4 直转，无把握不导入"
+  },
+  {
+   "no": 11,
+   "candidate": "MEDREC.OPERATION.ANAESTHESIA_METHOD",
+   "verdict": "命中（JHEMR）",
+   "detail": "27 条导入 JHEMR r_operation_doct.anaesthesia_method pending"
+  },
+  {
+   "no": 12,
+   "candidate": "MEDREC.OPERATION.OP_PRIMARY",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 13,
+   "candidate": "MEDREC.OPERATION.PRIMARY_DAY / OPER_DAY / OPER_PLAN",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 14,
+   "candidate": "MEDREC.OPERATION.HEAL / WOUND_GRADE",
+   "verdict": "命中（JHEMR）",
+   "detail": "两字段各 5 值导入 pending；WOUND_GRADE_HEAL 组合变体入待定位"
+  },
+  {
+   "no": 15,
+   "candidate": "MEDREC.DIAGNOSIS.ADMISSION_CONDITION",
+   "verdict": "未命中（待定位）",
+   "detail": "JHEMR EMR_PAT_ADM_CONDITION(4值)/PORTAL hospState(0行) 目标映射无把握"
+  },
+  {
+   "no": 16,
+   "candidate": "MEDREC.DIAGNOSIS.DIAGNOSIS_TYPE",
+   "verdict": "未命中（已有）",
+   "detail": "152 注已有值域；无新增"
+  },
+  {
+   "no": 17,
+   "candidate": "MEDREC.PAT_ICU_RECORD.ICU_TYPE",
+   "verdict": "未命中（待定位）",
+   "detail": "dict_field=WARD_NAME_TYPE 属病区类型，ICU_TYPE 映射无把握"
+  },
+  {
+   "no": 18,
+   "candidate": "MEDREC.PAT_VISIT.MR_QUALITY",
+   "verdict": "未命中",
+   "detail": "关键词无命中"
+  },
+  {
+   "no": 19,
+   "candidate": "（载荷）TRT_TYPE",
+   "verdict": "未命中",
+   "detail": "PAT_VISIT 无对应列（152 原注）；JHEMR TRT_TYPE(3值) 目标无把握"
+  }
+ ]
+}

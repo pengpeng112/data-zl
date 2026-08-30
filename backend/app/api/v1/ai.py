@@ -1,4 +1,7 @@
 from datetime import datetime, timezone
+import hashlib
+import json
+import re
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
@@ -895,6 +898,93 @@ class SqlScanRequest(BaseModel):
     sql_text: str
 
 
+class AiSqlGenerateRequest(BaseModel):
+    question: str = Field(..., min_length=2, max_length=2000)
+    system_code: str = Field("DATA_CENTER", pattern="^DATA_CENTER$")
+    selected_tables: list[str] = Field(..., min_length=1, max_length=20)
+
+
+def _clean_generated_sql(text: str) -> str:
+    visible = re.sub(r"<think>[\s\S]*?</think>", "", text or "", flags=re.I).strip()
+    fenced = re.search(r"```(?:sql|oracle)?\s*([\s\S]*?)```", visible, flags=re.I)
+    candidate = (fenced.group(1) if fenced else visible).strip()
+    start = re.search(r"\b(?:SELECT|WITH)\b", candidate, flags=re.I)
+    if not start:
+        return ""
+    candidate = candidate[start.start():].strip()
+    candidate = re.split(r"\n\s*(?:说明|解释|注意)\s*[:：]", candidate, maxsplit=1)[0].strip()
+    return candidate.rstrip(";").strip() + ";"
+
+
+def _llm_was_truncated(reply) -> bool:
+    choices = (getattr(reply, "raw", None) or {}).get("choices") or []
+    return bool(choices and (choices[0] or {}).get("finish_reason") == "length")
+
+
+@router.post(
+    "/ai-sql/generate",
+    summary="依据正式关系与值域生成 Oracle 只读 SQL（永不执行）",
+    dependencies=[Depends(require_permission("ai.context.read"))],
+)
+def generate_ai_sql(req: AiSqlGenerateRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    from ...services.ai_context_builder import build_ai_sql_context
+    from ...services.hospital_llm_client import HospitalLlmClient, HospitalLlmError
+
+    question = sanitize_text(req.question, limit=1000).strip()
+    question = re.sub(r"<[^>]{0,200}>", "", question).strip()
+    if len(question) < 2:
+        raise HTTPException(422, "需求描述清洗后为空")
+    context = build_ai_sql_context(db, system_code=req.system_code, selected_tables=req.selected_tables)
+    context_json = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
+    prompt = (
+        "你是 Oracle 11g 只读 SQL 编写助手。只能输出一条 SELECT 或只读 CTE，禁止 DDL/DML，"
+        "明细必须用 ROWNUM <= N 限量；只可使用上下文给出的表、字段与正式 JOIN 三要素。"
+        "不确定的值域不得猜测。不要解释，不要 Markdown 围栏，不得执行 SQL。\n"
+        f"用户需求（已脱敏）：{question}\n上下文：{context_json}"
+    )
+    client = HospitalLlmClient()
+    sql = ""
+    reply = None
+    try:
+        for attempt in range(2):
+            reply = client.complete(prompt + ("\n上次输出被截断或格式无效，请重新完整输出一条 SQL。" if attempt else ""), max_tokens=1800)
+            sql = _clean_generated_sql(reply.text)
+            if sql and not _llm_was_truncated(reply):
+                break
+    except HospitalLlmError as exc:
+        raise HTTPException(503, f"院内模型暂不可用：{exc.error_class}") from exc
+    if not sql or (reply is not None and _llm_was_truncated(reply)):
+        raise HTTPException(502, "模型未返回完整 SQL")
+    risk = _scan_sql_risk(sql)
+    user = get_current_user(request)
+    question_hash = hashlib.sha256(question.encode("utf-8")).hexdigest()
+    session_key = f"ai-sql:{user}"
+    db.add(AiToolCall(
+        session_key=session_key,
+        tool_name="ai_sql_generate",
+        request={
+            "question_summary": question[:120], "question_sha256": question_hash,
+            "system_code": req.system_code, "selected_tables": req.selected_tables,
+            "context_digest": {"tables": len(context["tables"]), "relations": len(context["relations"]), "value_domains": len(context["value_domains"]), "payload_bytes": context["payload_bytes"]},
+        },
+        response_summary=f"generated={len(sql)} chars; blocked={bool(risk.get('blocked'))}",
+    ))
+    db.commit()
+    return ApiResponse(data={
+        "sql": sql, "risk": risk, "dialect": "oracle", "executed": False,
+        "context_digest": {"tables": len(context["tables"]), "relations": len(context["relations"]), "value_domains": len(context["value_domains"]), "payload_bytes": context["payload_bytes"], "truncated": context["truncated"]},
+    })
+
+
+@router.get("/ai-sql/history", dependencies=[Depends(require_permission("ai.context.read"))])
+def ai_sql_history(request: Request, page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    session_key = f"ai-sql:{get_current_user(request)}"
+    stmt = select(AiToolCall).where(AiToolCall.session_key == session_key, AiToolCall.tool_name == "ai_sql_generate")
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    rows = db.scalars(stmt.order_by(AiToolCall.called_at.desc()).offset((page - 1) * page_size).limit(page_size)).all()
+    return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": [{"id": row.id, "request": row.request, "response_summary": row.response_summary, "called_at": row.called_at.isoformat() if row.called_at else None} for row in rows]})
+
+
 # Tools that can be safely dispatched inline (metadata-only, no source DB write)
 _INLINE_TOOL_DISPATCH = {
     "sql_risk_scan",
@@ -905,7 +995,10 @@ _INLINE_TOOL_DISPATCH = {
 @router.post(
     "/tool-execute",
     summary="AI 工具执行代理（只读，真实分发或明确不支持）",
-    dependencies=[Depends(require_permission("ai.sql.execute"))],
+    # 161 P2-3（round-2 P8 裁决）：当前 AVAILABLE_TOOLS 全部为只读组包工具（无真实
+    # 执行类工具），整端点挂只读码 ai.context.read，不再让执行码套读接口；未来新增
+    # 真实执行类工具时，改挂 ai.sql.execute 并在函数体内按工具名分流。
+    dependencies=[Depends(require_permission("ai.context.read"))],
 )
 def tool_execute(req: ToolExecuteRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Never return fake executed=True. Dispatch known read-only helpers or mark unsupported."""
