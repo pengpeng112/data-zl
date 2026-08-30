@@ -188,5 +188,28 @@
     "rollback": "前端 previous 软链+reload；后端 w10c2 镜像重建或文件还原+restart；DB 用 dump",
     "x2_note": "165 X2 生产首轮夜间探查不在本次范围（夜间窗+授权等待）；X3 人工裁决界面已随发布就绪",
     "metadata_note": "docker cp 热更不改镜像 tag/health build_id（仍 p153）——下次镜像制发布归档"
+  },
+  "github": {
+    "commit": "c166347",
+    "pushed": "master -> github.com/pengpeng112/data-zl",
+    "files": 239,
+    "insertions": 107132,
+    "excluded": "docx/wps/锁文件/output_r*/_r163_work 保持未跟踪(惯例)"
+  },
+  "image_release": {
+    "image": "data-asset:r166-20260830 (+latest-hot)",
+    "base": "data-asset:w10c2-202608301011",
+    "dockerfile": "deploy/docker/Dockerfile.hotpatch",
+    "build_dir": "/opt/data-asset/builds/r166",
+    "container": "healthy",
+    "health": {
+      "build_id": "r166-20260830",
+      "frontend_build_id": "r166-20260830",
+      "database": "connected"
+    },
+    "routes_total": 345,
+    "env_backup": "/tmp/backend.env.bak_r166",
+    "incident": "首建误用服务器旧版脚本(忽略镜像变量,167 已登记偏差)致容器约 1 分钟运行 sync-20260804162036-r5 旧镜像；仓库版脚本覆盖两处副本后按 r166 重建恢复；服务器侧偏差至此归档",
+    "rollback": "DATA_ASSET_IMAGE=data-asset:w10c2-202608301011 bash run_data_asset_api.sh"
   }
 }
