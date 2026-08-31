@@ -22,6 +22,17 @@ export default {
       }
     },
     {
+      // 170：数据资产系统图——六步持续治理链路全景（高质量专题数据集叙事）
+      path: "/asset/system-map",
+      name: "AssetSystemMap",
+      component: () => import("@/views/asset/system-map/index.vue"),
+      meta: {
+        title: "数据资产系统图",
+        showLink: true,
+        auths: ["asset.overview.view"]
+      }
+    },
+    {
       path: "/asset/systems",
       name: "AssetSystems",
       component: () => import("@/views/asset/systems/index.vue"),
