@@ -1,10 +1,10 @@
 {
   "schema_version": "asset-manifest/v1",
-  "asset_version": "20260823T004440Z",
-  "generated_at": "2026-08-23T00:44:40.150978+00:00",
-  "builder_version": "build_asset_manifest/1",
+  "asset_version": "20260831T235725Z",
+  "generated_at": "2026-08-31T23:57:21.436541+00:00",
+  "builder_version": "sync_asset_package/171-followup-1",
   "package": "数据资产_资产包",
-  "file_count": 6,
+  "file_count": 10,
   "files": [
     {
       "path": "catalog.json",
@@ -25,17 +25,25 @@
     {
       "path": "columns.csv",
       "role": "full",
+      "bytes": 10518423,
+      "rows": 178618,
+      "sha256": "976c07740ec19f80c212ba14168a5d5ddd7860ad5b070bcb2a14c9dc7d7cffa4",
+      "pii_scan": []
+    },
+    {
+      "path": "columns.csv.bak.20260901",
+      "role": "evidence",
       "bytes": 1569856,
-      "rows": 26894,
+      "rows": null,
       "sha256": "874ad6ef2e6d585b670d6fa22ad81ad4bf0b0cb07839c72e76b95d3ce7ebfc4f",
       "pii_scan": []
     },
     {
       "path": "relationships.csv",
       "role": "full",
-      "bytes": 27743,
-      "rows": 103,
-      "sha256": "82bc7ef3df686a801680d270b0541fe519eecb67c38a0667489e771e4c03cf0b",
+      "bytes": 517395,
+      "rows": 1329,
+      "sha256": "f27ef797e5f14ede80379069de1aec17f3ae9c8909f4e1497ac78e9ce8603687",
       "pii_scan": []
     },
     {
@@ -47,14 +55,51 @@
       "pii_scan": []
     },
     {
+      "path": "relationships.csv.bak.20260901",
+      "role": "evidence",
+      "bytes": 27743,
+      "rows": null,
+      "sha256": "82bc7ef3df686a801680d270b0541fe519eecb67c38a0667489e771e4c03cf0b",
+      "pii_scan": []
+    },
+    {
       "path": "tables.csv",
       "role": "full",
+      "bytes": 1124773,
+      "rows": 12811,
+      "sha256": "a4396cb268694c2bdcae969b4ce8c6ad8568ed640de7b4b38a20aa8426391710",
+      "pii_scan": []
+    },
+    {
+      "path": "tables.csv.bak.20260901",
+      "role": "evidence",
       "bytes": 48315,
-      "rows": 865,
+      "rows": null,
       "sha256": "73d5c851593feda5a163b7ac9e17d72a7865f916aa5cf9146c9ddd80d57340c1",
+      "pii_scan": []
+    },
+    {
+      "path": "value_domains.json",
+      "role": "full",
+      "bytes": 16097,
+      "rows": null,
+      "sha256": "d94998c17f7f48b67d79f60903b48696a4c4f926fc392ff297ff3c7348de9f07",
       "pii_scan": []
     }
   ],
+  "sync_source": {
+    "note": "2026-09-01 经隧道从生产 data_asset 只读全量刷新（用户授权同步）",
+    "prod_counts": {
+      "asset_systems": 26,
+      "asset_tables": 12767,
+      "asset_relations": 1329,
+      "asset_columns": 178547,
+      "asset_column_value_domains": 77,
+      "asset_quality_rules": 422
+    },
+    "annotations_note": "tables.csv 旧包策展注记（domain/grain/pk/confidence/note/source=curated）按 schema+table 保留；新行 source=platform",
+    "relationships_note": "from_table/to_table 为生产权威三段式（系统.Schema.表）"
+  },
   "catalog_summary": {
     "note": "catalog.json 是核心摘要，不是全量清单；全量见 role=full 的 CSV",
     "top_keys": [
