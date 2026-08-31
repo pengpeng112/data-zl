@@ -1,0 +1,76 @@
+{
+  "plan": "开发起步包/171_系统前后端全面修复与测试一次性执行计划.md",
+  "version": "v1.1",
+  "executed_by": "GLM 执行会话（2026-08-31 23:14 起，round-7 裁决定稿后一次性执行 T0→R4）",
+  "t0_baseline": {
+    "git_head_before": "19d2027f3469a59454ea8fc25e24e0722e4b815b",
+    "git_status": {"M": 34, "??": 40},
+    "git_stash": 0,
+    "isolated_db_reseed": "隧道断开重建（166 附录 A.1）；export170 工装 import 修复后从生产只读重导（systems=26 sources=28 columns=178547 value_domains=77 audit=192 quality_rules=422）→ import170 tables=12702 relations=1329 token ready",
+    "frontend_vitest": {"files": 39, "tests": 245, "failed": 0},
+    "others_domain_hash_baseline": "output_r171/baseline.txt（19 文件 git hash-object）"
+  },
+  "t1_frontend_gates": {
+    "typecheck": "exit 0（tsc+vue-tsc；首次发现 system-map tone 类型错 W2 修复后过）",
+    "test": "首轮 245/245 → R3 新增后终态 253/253，0 failed",
+    "build_gzip": {"main": "656.8/700", "graph": "404.5/430", "css": "102.3/110", "verdict": "PASS"},
+    "rerun_after_fixes": "typecheck exit 0 + 253 tests 0 failed + 预算 PASS（W6 修复后复跑）"
+  },
+  "t2_backend_full": "1341 passed / 1 skipped / 0 failed（27m43s，显式 APP_TEST_DB_URL=127.0.0.1:15432/data_asset_test；归因案件 0——无他人域失败）",
+  "t2_5_reseed": "import170 二次重灌：tables=12702 relations=1329 columns=178547 value_domains=77 audit=192 quality_rules=422 | token ready",
+  "t3_browser_six_checks": {
+    "1_systemmap": "screenshot170 复跑：statCards=6、六步卡片全渲染、has12702/has1329=true、errPanel=false、errors=[]；步骤跳转实测 图谱→/#/asset/graph ✓ 值域→/#/value-domains ✓",
+    "2_graph": "探针 B0-B5：overview 无错误面板（cdark 1.3%）；搜索聚焦 HIS.PAT_VISIT 真实 neighbors 200（32 节点，cdark 1.5-8.7%）；depth 1→2 真实切换 200（60 节点，cdark 4.6%）；双击增量触发真实 API；Inspector 无 label JSON dump",
+    "3_value_domains": "列表 20 行 + 冲突 Tab 存在（0 冲突行），无回归",
+    "4_old_pages": "/#/asset/quality 与 /#/asset/admin 均无错误面板、正常渲染",
+    "5_auth_smoke": "无 token graph/overview=401、ai/system-context=401；伪 token=403；health 容器内 200",
+    "6_menu_visibility": "platform_admin 登录态左侧菜单含「数据资产系统图」；R3 功能测证 filterNoPermissionTree：*:*:* 与精确 asset.overview.view 可见、无关码/空权限隐藏",
+    "live_defects_found_and_fixed": ["W6 误报错误面板（focusNode 竞态+errorInfo 不清）", "W7 RePageHeader 未导入页头丢失"],
+    "screenshots": "output_r171/screenshots/（B0-B5、system-map、graph_overview、t3_3/4/6、r171_rerun_A1-A3 共 15 张）"
+  },
+  "r3_test_hardening": {
+    "new_file": "frontend/tests/plan171R3.test.ts（8 用例：Inspector displayName 兜底链 2 + 菜单可见性功能测 4 + 误报面板回归锁 2）",
+    "red_to_green": "对 git HEAD 旧版 GraphInspector 实测红（2 failed：裸插值 label 与缺失兜底链）→ 工作区版绿（6/6）→ 字节级还原（restore_ok=YES）",
+    "depth_control_record": "output_r171/r3_depth_control_record.md（el-segmented 三档，无需更换控件）"
+  },
+  "r1_commits": [
+    {"hash": "da7255e", "domain": "169 图谱", "files": 18, "note": "asset.ts 仅 hunk1（getGraphOverview 30s）；含 171 T3 两活体缺陷修复与 plan169G2 断言加严"},
+    {"hash": "bec3ad4", "domain": "167 AI SQL", "files": 7, "note": "asset.ts 仅 hunk2（generateAiSql 120s）"},
+    {"hash": "8c49b32", "domain": "170 system-map", "files": 3, "note": "页面+路由+测试"},
+    {"hash": "d12aaee", "domain": "171 卫生+R3", "files": 2, "note": ".gitignore 五项（docs//~$/.release_*/_r163_work，*.log 原有全局覆盖）+ plan171R3.test.ts"}
+  ],
+  "r1_verification": "四提交逐一 git show --name-only 过他人域正则（identity|conftest|layout|useTag|useDataThemeChange|store/modules/app|captureMode）零匹配；.gitignore 生效（status 74→72 行，.release_r169/_r163_work/check-ignore 确认）；asset.ts 工作区与 HEAD 零 diff（双 hunk 均已按域入库）",
+  "r2_release": {
+    "backend_167": "在产核验（未重发）：生产 ai.py/ai_context_builder.py md5 与工作区一致（镜像 r169 会话 08-30 22:55 热补），容器 08-31 08:56 启动晚于热补 → 运行时已加载（W7）",
+    "frontend": "dist（00:39 构建，index-CHucUjDA.js）→ /opt/data-asset/frontend-dist/releases/r171-20260901；ASSETS_OK；current→r171-20260901、previous→r169-20260831-storage-fix；nginx -t+reload 成功"
+  },
+  "t5_production_verify": {
+    "container": "data-asset-api 镜像 data-asset:r169-20260830 Up healthy（含 167+169 热补文件且进程后于热补启动）",
+    "frontend_current": "releases/r171-20260901（previous=r169-20260831-storage-fix 保留可回滚：ln -sfn releases/r169-20260831-storage-fix current && nginx -s reload）",
+    "e2e_http": "首页 200；入口 index-CHucUjDA.js 200（与本地构建同 hash）；system-map 路由在 bundle（2 处）；API 无 token 401（鉴权在位）",
+    "production_kpi": "生产只读导出（T0）=system-map 展示数（26/12702/1329/422/77），隔离库 T3 同数渲染双证",
+    "pending_authorized_user": "生产浏览器级 graph 首屏截图 + system-map 实拍（P2 呈用户，171 T5『授权用户或带凭据实测』）"
+  },
+  "r4_leftover_check": {
+    "165_X2": "生产首轮夜间探查仍待授权——生产 asset_probe_findings=0、08-30 后 probe 审计 0 行（未执行实证）",
+    "165_T7": "PACSREPORT 无申请键 BLOCKED 维持——run_probe.py side-b 阻断机制仍在，待补 side-b 后纳入",
+    "168_P1": "Minimap/视口历史/LOD/review 队列/跨系统快捷层等 P1 组维持开放（本轮未动）",
+    "166_P2": "对账矩阵看板/metric 趋势/QualityFinding 互链/AI 探查触发入口/值域批量导入维持开放（本轮未动）",
+    "r169_release_integrity": "镜像 healthy ✓；前端 current 现指向 r171（r169-storage-fix 归 previous 保留）✓；overview 耗时 1ms 级（round-7 实测）✓；graph 在产授权用户截图待用户（P2）"
+  },
+  "dod_selfcheck": {
+    "R1_三域提交零越界": "PASS（4 提交+git show 核对+.gitignore 生效）",
+    "T1_T2_T25_T3_T4_全过": "PASS（证据落 output_r171/）",
+    "R2_发布完成_T5_复验": "PASS（前端原子切换完成；167 后端已在产核验 W7；浏览器级截图归 P2）",
+    "R4_核对表_报告_结果json_README55": "PASS（本文件+执行报告+登记）",
+    "他人域零触碰": "PASS（19 文件终检哈希与 T0 基线完全一致；stash=0；他人域文件保持工作区未提交原样）"
+  },
+  "p2_to_user": [
+    "生产浏览器级验收：授权用户登录生产实测 /#/asset/graph 首屏<3s 出图一次截图 + /#/asset/system-map 实拍（171 T5 收尾件）",
+    "git push：R1 四提交+文档提交留本地，待用户/主 AI 复核后推送（171 §5 铁律）",
+    "他人域（登录签名/layout+660 行）仍为未提交半成品，归属原会话处置",
+    "165 X2 生产首轮夜间探查待授权；165 T7 待补 PACSREPORT side-b；168 P1/166 P2 后置项维持开放",
+    "169 工装 A3/A4 场景的状态/位置依赖（W5）可择机改造为确定性触发（非必须）"
+  ],
+  "exceptions": "output_r171/exceptions.json（W1-W9 全量）"
+}
