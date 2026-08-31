@@ -43,6 +43,7 @@ import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { generateAiSql, getAiSqlHistory, getTables, type AiSqlGenerateResult, type AiSqlHistoryItem, type TableBrief } from "@/api/asset";
+import { extractErrorDetail } from "@/utils/errorMessage";
 
 const question = ref("");
 const selectedTables = ref<string[]>([]);
@@ -57,16 +58,20 @@ const tableKey = (row: TableBrief) => `${row.system_code}|${row.source_code}|${r
 async function searchTables(keyword: string) {
   tableLoading.value = true;
   try { tableOptions.value = (await getTables({ keyword, system_code: "DATA_CENTER", page: 1, page_size: 30 })).data.items || []; }
+  catch (error) { ElMessage.error(extractErrorDetail(error, "表目录加载失败，请稍后重试")); }
   finally { tableLoading.value = false; }
 }
-async function loadHistory() { history.value = (await getAiSqlHistory({ page: 1, page_size: 20 })).data.items || []; }
+async function loadHistory() {
+  try { history.value = (await getAiSqlHistory({ page: 1, page_size: 20 })).data.items || []; }
+  catch (error) { ElMessage.error(extractErrorDetail(error, "生成历史加载失败")); }
+}
 async function generate() {
   generating.value = true;
   try {
     result.value = (await generateAiSql({ question: question.value, system_code: "DATA_CENTER", selected_tables: selectedTables.value })).data;
     await loadHistory();
     ElMessage.success("SQL 已生成，尚未执行");
-  } catch { ElMessage.error("生成失败，请检查模型状态与所选表"); }
+  } catch (error) { ElMessage.error(extractErrorDetail(error, "生成失败，请检查模型状态与所选表")); }
   finally { generating.value = false; }
 }
 async function copySql() {

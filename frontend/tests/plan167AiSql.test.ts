@@ -29,4 +29,10 @@ describe("plan167 AI SQL workbench", () => {
     expect(api).toContain('"/api/v1/ai/ai-sql/history"');
     expect(page).not.toContain("sql-workbench");
   });
+  it("allows the hospital model to exceed the global 10s timeout and surfaces real errors", () => {
+    const generateApi = api.slice(api.indexOf("export const generateAiSql"), api.indexOf("export const getAiSqlHistory"));
+    expect(generateApi).toContain("timeout: 120000");
+    expect(page).toContain("extractErrorDetail");
+    expect(page).not.toContain('catch { ElMessage.error("生成失败');
+  });
 });

@@ -49,3 +49,34 @@ def test_ai_sql_context_obeys_all_caps(db_session):
     assert len(context["tables"]) <= 1
     assert len(context["relations"]) <= 1
     assert context["payload_bytes"] <= 24 * 1024
+
+
+def test_ai_sql_context_accepts_current_verified_status(db_session):
+    _table(db_session, "R167", "PAT_VISIT", ["PATIENT_ID", "VISIT_ID"])
+    _table(db_session, "R167", "ORDERS", ["PATIENT_ID", "VISIT_ID"])
+    _relation(db_session, status="verified", layer="formal")
+    db_session.commit()
+    context = build_ai_sql_context(
+        db_session,
+        system_code="DATA_CENTER",
+        selected_tables=["R167.PAT_VISIT"],
+    )
+    assert len(context["relations"]) == 1
+    assert context["relations"][0]["validation_status"] == "verified"
+
+
+def test_ai_sql_context_really_fits_small_budget(db_session):
+    columns = ["PATIENT_ID", "VISIT_ID"] + [f"EXTRA_{index:03d}" for index in range(120)]
+    _table(db_session, "R167", "PAT_VISIT", columns)
+    _table(db_session, "R167", "ORDERS", columns)
+    _relation(db_session, status="verified", layer="formal")
+    db_session.commit()
+    context = build_ai_sql_context(
+        db_session,
+        system_code="DATA_CENTER",
+        selected_tables=["R167.PAT_VISIT"],
+        max_payload_bytes=2200,
+    )
+    assert context["payload_bytes"] <= 2200
+    assert context["truncated"] is True
+    assert {"PATIENT_ID", "VISIT_ID"}.issubset(context["tables"][0]["columns"])

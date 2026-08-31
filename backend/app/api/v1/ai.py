@@ -927,6 +927,7 @@ def _llm_was_truncated(reply) -> bool:
     dependencies=[Depends(require_permission("ai.context.read"))],
 )
 def generate_ai_sql(req: AiSqlGenerateRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    from ...core.config import settings
     from ...services.ai_context_builder import build_ai_sql_context
     from ...services.hospital_llm_client import HospitalLlmClient, HospitalLlmError
 
@@ -934,14 +935,28 @@ def generate_ai_sql(req: AiSqlGenerateRequest, request: Request, db: Session = D
     question = re.sub(r"<[^>]{0,200}>", "", question).strip()
     if len(question) < 2:
         raise HTTPException(422, "需求描述清洗后为空")
-    context = build_ai_sql_context(db, system_code=req.system_code, selected_tables=req.selected_tables)
-    context_json = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
-    prompt = (
+    prompt_prefix = (
         "你是 Oracle 11g 只读 SQL 编写助手。只能输出一条 SELECT 或只读 CTE，禁止 DDL/DML，"
         "明细必须用 ROWNUM <= N 限量；只可使用上下文给出的表、字段与正式 JOIN 三要素。"
         "不确定的值域不得猜测。不要解释，不要 Markdown 围栏，不得执行 SQL。\n"
-        f"用户需求（已脱敏）：{question}\n上下文：{context_json}"
+        f"用户需求（已脱敏）：{question}\n上下文："
     )
+    # 客户端限制的是完整 prompt，而非 context 单体。167 初版按 24 KiB 构建
+    # context，再叠加提示词后可能超过生产 24000-byte 门禁。
+    context_budget = settings.hospital_llm_max_payload_bytes - len(prompt_prefix.encode("utf-8")) - 256
+    if context_budget < 1024:
+        raise HTTPException(503, "院内模型上下文预算配置过小")
+    try:
+        context = build_ai_sql_context(
+            db,
+            system_code=req.system_code,
+            selected_tables=req.selected_tables,
+            max_payload_bytes=context_budget,
+        )
+    except ValueError as exc:
+        raise HTTPException(422, "所选表上下文过大，请减少选表后重试") from exc
+    context_json = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
+    prompt = prompt_prefix + context_json
     client = HospitalLlmClient()
     sql = ""
     reply = None

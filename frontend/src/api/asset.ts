@@ -1480,7 +1480,12 @@ export interface AiSqlGenerateResult {
   context_digest: { tables: number; relations: number; value_domains: number; payload_bytes: number; truncated: boolean };
 }
 export interface AiSqlHistoryItem { id: number; request: { question_summary: string; selected_tables: string[]; context_digest: Record<string, number> }; response_summary: string; called_at?: string | null }
-export const generateAiSql = (data: { question: string; system_code: "DATA_CENTER"; selected_tables: string[] }) => http.post<ApiResponse<AiSqlGenerateResult>, object>("/api/v1/ai/ai-sql/generate", { data });
+export const generateAiSql = (data: { question: string; system_code: "DATA_CENTER"; selected_tables: string[] }) =>
+  http.post<ApiResponse<AiSqlGenerateResult>, object>(
+    "/api/v1/ai/ai-sql/generate",
+    { data },
+    { timeout: 120000 }
+  );
 export const getAiSqlHistory = (params?: { page?: number; page_size?: number }) => http.get<ApiResponse<PageData<AiSqlHistoryItem>>, object>("/api/v1/ai/ai-sql/history", { params });
 
 // --- P4A AI 工具与草稿 ---

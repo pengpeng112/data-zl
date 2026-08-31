@@ -21,7 +21,15 @@ DEFAULT_MAX_OBJECTS = 200
 AI_SQL_MAX_TABLES = 20
 AI_SQL_MAX_RELATIONS = 40
 AI_SQL_MAX_PAYLOAD_BYTES = 24 * 1024
-FORMAL_RELATION_STATUSES = {"validated", "A", "A_rechecked"}
+# 平台关系资产的现行审核动作落 ``verified``，早期导入资产还会保留
+# ``sample_verified`` / ``manual_reviewed``；144 初版只接受查询版本风格的
+# validated/A/A_rechecked，导致生产关系在 AI SQL 上下文中被误排除。
+# relation_layer=formal 仍是第一道门，候选/依赖/同步映射不会因状态兼容而进入。
+FORMAL_RELATION_STATUSES = {
+    "validated", "a", "a_rechecked", "formal", "active",
+    "verified", "approved", "manual_reviewed", "sample_verified",
+    "user_confirmed", "user_confirmed_mapping", "user_confirmed_parallel_sources",
+}
 
 
 def is_ai_readable(obj: dict[str, Any]) -> bool:
@@ -274,9 +282,9 @@ def build_ai_sql_context(
     index = build_metadata_index(db)
     eligible: list[tuple[Any, tuple[str, str], tuple[str, str], list[str], list[str]]] = []
     for relation in db.scalars(select(AssetRelation)).all():
-        if relation.validation_status not in FORMAL_RELATION_STATUSES:
+        if (relation.validation_status or "").lower() not in FORMAL_RELATION_STATUSES:
             continue
-        if (relation.relation_layer or "formal") != "formal":
+        if (relation.relation_layer or "formal").lower() != "formal":
             continue
         if relation.from_system_code and relation.from_system_code != system_code:
             continue
@@ -333,18 +341,39 @@ def build_ai_sql_context(
         "limits": {"tables": max_tables, "relations": max_relations, "payload_bytes": max_payload_bytes},
         "truncated": len(closure) > max_tables or len(eligible) > max_relations,
     }
-    while len(json.dumps(result, ensure_ascii=False).encode("utf-8")) > max_payload_bytes:
+    def payload_size() -> int:
+        return len(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+
+    # 先删低优先级值域，再压缩非 JOIN 字段；正式 JOIN 证据最后才裁剪。
+    # 旧实现只截一次最后一张表后直接 break，仍可能返回超限 payload，随后被
+    # HospitalLlmClient 以 payload_too_large 拒绝。
+    while payload_size() > max_payload_bytes:
         result["truncated"] = True
         if result["value_domains"]:
             result["value_domains"].pop()
+            continue
+
+        required_by_table: dict[str, set[str]] = {}
+        for relation in result["relations"]:
+            required_by_table.setdefault(relation["from_table"], set()).update(relation["from_columns"])
+            required_by_table.setdefault(relation["to_table"], set()).update(relation["to_columns"])
+        reducible = None
+        for table in sorted(result["tables"], key=lambda row: len(row["columns"]), reverse=True):
+            table_key = f"{table['schema_name']}.{table['table_name']}"
+            required = required_by_table.get(table_key, set())
+            minimum = max(20, len(required))
+            if len(table["columns"]) > minimum:
+                reducible = (table, required, minimum)
+                break
+        if reducible:
+            table, required, minimum = reducible
+            optional = [column for column in table["columns"] if column not in required]
+            table["columns"] = sorted(required) + optional[: max(0, minimum - len(required))]
         elif len(result["relations"]) > 1:
             result["relations"].pop()
-        elif result["tables"]:
-            result["tables"][-1]["columns"] = result["tables"][-1]["columns"][:20]
-            break
         else:
-            break
-    result["payload_bytes"] = len(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+            raise ValueError("AI SQL context cannot fit the configured payload budget")
+    result["payload_bytes"] = payload_size()
     return result
 
 
