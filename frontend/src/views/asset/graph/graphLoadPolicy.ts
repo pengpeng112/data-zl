@@ -38,3 +38,14 @@ export function decideGraphLoadPolicy(input: GraphLoadPolicyInput): GraphLoadPol
     notice: [prefix, ...actions].filter(Boolean).join("，")
   };
 }
+/**
+ * 169 G2：overview 失败自动降级决策（纯函数，页面 loadData 调用）。
+ * 仅当当前层级可降（非 system）且本会话未降过时降级一次——防止与
+ * 错误面板形成"重试→再超时"死循环（round-3 P1）。
+ */
+export function shouldDowngradeOverview(
+  level: string,
+  alreadyDowngraded: boolean
+): boolean {
+  return level !== "system" && !alreadyDowngraded;
+}

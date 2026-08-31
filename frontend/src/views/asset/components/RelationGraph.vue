@@ -72,7 +72,7 @@
             >
               <circle :r="node.width / 2" />
               <text
-                v-for="(line, lineIndex) in node.label.split('\n')"
+                v-for="(line, lineIndex) in String(node.label || '').split('\n')"
                 :key="`${node.id}:${lineIndex}`"
                 class="node-title"
                 text-anchor="middle"
@@ -83,7 +83,7 @@
                 v-if="node.meta && shouldRenderGraphMeta(node.meta)"
                 class="node-meta"
                 text-anchor="middle"
-                :y="node.width / 2 + 14 + node.label.split('\n').length * 15 + 2"
+                :y="node.width / 2 + 14 + String(node.label || '').split('\n').length * 15 + 2"
               >{{ truncateGraphMeta(node.meta) }}</text>
             </g>
           </g>
@@ -197,7 +197,7 @@ function nodeGroup(node: any) {
   if (props.groupBy === "source") return node.category || props.sourceNames?.[sourceCode] || sourceCode || "未分数据连接";
   const physical = parsePhysicalKey(node.id || node.physical_key);
   if (physical?.schema) return physical.schema;
-  return node.category || node.schema_name || node.display_id?.split(".")[0] || node.id.split(".")[0] || "UNKNOWN";
+  return node.category || node.schema_name || node.display_id?.split(".")[0] || String(node.id || "").split(".")[0] || "UNKNOWN";
 }
 
 function compactLabel(node: any) {
@@ -317,19 +317,37 @@ function nodeClass(node: any) {
   ].filter(Boolean).join(" ");
 }
 
+/**
+ * 标签行数（compactLabel 以换行符拆行，上限 6：5 行名+计数/tech 行）。
+ * 169 G4：行距必须装下标签栈（14 offset + 半径 ~28 + 行数×15 + 24 余量），
+ * 固定 92px 曾致多行标签跨行压到下一行节点（round-3 P3）。
+ */
+function labelLineCount(node: any): number {
+  const text = compactLabel(node) || "";
+  return Math.min(6, Math.max(1, text.split("\n").length));
+}
+
+function layeredRowGap(items: any[]): number {
+  const maxLines = Math.max(1, ...items.map(labelLineCount));
+  return Math.max(92, 46 + maxLines * 15 + 24);
+}
+
 function buildLayered(nodes: any[], edges: any[]) {
   const groupNames = Array.from(new Set(nodes.map(nodeGroup))).sort();
   const byGroup = groupNames.map(group => nodes.filter(node => nodeGroup(node) === group));
   const width = Math.max(1100, groupNames.length * 260 + 120);
+  // 高度按各组自身行距求和（列内 y 连续排布），取最长的组
+  const groupGaps = byGroup.map(items => layeredRowGap(items));
   const maxRows = Math.max(...byGroup.map(items => items.length), 1);
-  const height = Math.max(620, maxRows * 92 + 140);
+  const height = Math.max(620, maxRows * Math.max(...groupGaps, 92) + 140);
   const positions = new Map<string, { x: number; y: number }>();
   const bands: LayoutBand[] = [];
   byGroup.forEach((items, col) => {
     const x = 110 + col * 260;
+    const gap = groupGaps[col];
     bands.push({ name: groupNames[col], x: x - 96, y: 58, width: 210, height: height - 118, count: items.length });
     items.forEach((node, row) => {
-      positions.set(node.id, { x, y: 116 + row * 92 });
+      positions.set(node.id, { x, y: 116 + row * gap });
     });
   });
   return materializeLayout(nodes, edges, positions, bands, width, height);
@@ -447,6 +465,11 @@ const layout = computed(() => {
   if (props.layoutMode === "grouped") return buildGrouped(data.nodes, data.edges);
   if (props.layoutMode === "radial") return buildRadial(data.nodes, data.edges);
   if (props.layoutMode === "hierarchy") return buildHierarchy(data.nodes, data.edges);
+  // 169 G4：SVG 降级时 explore（force 语义）不该落成网格——有中心表走 radial
+  // 中心辐射（与 G6 radial 配置对齐），无中心表的 force 才落分层网格。
+  if (props.layoutMode === "force" && props.viewMode === "explore" && props.centerTable) {
+    return buildRadial(data.nodes, data.edges);
+  }
   return buildLayered(data.nodes, data.edges);
 });
 

@@ -221,20 +221,22 @@ function layoutOptions() {
     return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
   }
   // force = Neo4j 式知识图谱；layered 仅保留给 path 预计算坐标。
-  // 节点自然散布、弹簧连接、可拖拽交互，类似 Neo4j Browser 的图谱展示
+  // 169 G3（round-3 P2 裁决）：G6 v5 type:"force" 是 @antv/layout 的 ForceLayout，
+  // 只认 types.d.ts 声明的选项——原 alpha/alphaDecay/alphaMin/forceSimulation/nodeSpacing
+  // 全是死配置；nodeStrength:-280 负权重经 repulsive 把斥力变吸引、gravity:10 持续向心、
+  // edgeStrength:0.45 较默认 50 削弱 99%，三者叠加导致节点中心坍缩成墨团（实测中心暗密度 99.5%）。
+  // 修正：正斥力主导 + 弱向心 + 默认量级边引力；nodeSize 对齐节点真实直径上界（66），
+  // 让 preventOverlap 的碰撞检测真正生效（types.d.ts:100-102 要求 nodeSize=节点实际大小）。
   return {
     type: "force",
-    linkDistance: 180,
-    nodeStrength: -280,
-    edgeStrength: 0.45,
-    collideStrength: 1,
+    linkDistance: 150,
+    nodeStrength: 1200,
+    edgeStrength: 50,
+    gravity: 1,
     preventOverlap: true,
-    nodeSize: 88,
-    nodeSpacing: 36,
-    alpha: 0.35,
-    alphaDecay: 0.022,
-    alphaMin: 0.008,
-    forceSimulation: undefined
+    nodeSize: 68,
+    collideStrength: 1,
+    maxSpeed: 3
   };
 }
 
@@ -342,10 +344,8 @@ function graphData() {
           labelFill: "#111827",
           labelFontSize: isCenter || Boolean(node.is_aggregate || node.isAggregate) ? 13 : 12,
           labelFontWeight: node.id === props.selectedNodeId ? 700 : 650,
-          labelWordWrap: false,
-          labelMaxWidth: 168,
-          labelMaxLines: 5,
-          labelTextOverflow: "clip",
+          // 169 G3（P4）：labelWordWrap/maxWidth/maxLines/textOverflow 系死配置删除——
+          // 文本已由 formatGraphNodeLabel 预换行（graphTransform.ts），G6 层不再处理换行
           labelLineHeight: 18,
           labelTextAlign: "center",
           labelTextBaseline: "top",

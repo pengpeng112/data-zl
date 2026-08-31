@@ -898,7 +898,11 @@ export const getGraphOverview = (params?: {
   object_type?: "table" | "view";
   limit?: number;
 }) => {
-  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", { params });
+  // 169 G2：overview 聚合可能扫全库关系，超时单独放宽（全局 10s 曾致首屏误报）
+  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", {
+    params,
+    timeout: 30000
+  });
 };
 
 export const getGraphFilterOptions = (params?: {

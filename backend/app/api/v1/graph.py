@@ -1560,6 +1560,9 @@ def overview(
     matched_assets = db.scalar(select(func.count()).select_from(base.order_by(None).subquery())) or 0
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
+    # 169 P5：聚合分支的关系计数口径（真实关系数，非表数；空结果分支的安全默认 0）
+    total_relations_filtered = 0
+    matched_relations = 0
     if level == "object":
         rows = db.scalars(base.order_by(AssetTable.schema_name, AssetTable.table_name).limit(limit)).all()
         object_candidates: dict[tuple[str, str, str, str], list[str]] = defaultdict(list)
@@ -1679,10 +1682,15 @@ def overview(
             rel_stmt = select(AssetRelation)
             if domain:
                 rel_stmt = rel_stmt.where(AssetRelation.domain == domain)
+            # 169 P1：复用端点解析缓存（与 object 层 1586 行同款）——此前逐条
+            # _resolve_relation_endpoint 触发 N+1 全表反查，12702 表规模下 23.5s。
+            endpoint_resolver = _EndpointResolver.load(db)
+            total_relations_filtered = db.scalar(select(func.count()).select_from(rel_stmt.order_by(None).subquery())) or 0
             pair_counts: dict[tuple[str, str], int] = {}
+            matched_relations = 0
             for rel in db.scalars(rel_stmt).all():
-                f_sys, f_src, _f_ns, f_sch, _f_tbl, _f_disp = _resolve_relation_endpoint(db, rel, "from")
-                t_sys, t_src, _t_ns, t_sch, _t_tbl, _t_disp = _resolve_relation_endpoint(db, rel, "to")
+                f_sys, f_src, _f_ns, f_sch, _f_tbl, _f_disp = _resolve_relation_endpoint(db, rel, "from", resolver=endpoint_resolver)
+                t_sys, t_src, _t_ns, t_sch, _t_tbl, _t_disp = _resolve_relation_endpoint(db, rel, "to", resolver=endpoint_resolver)
                 f_id = _level_key(f_sys, f_src, f_sch)
                 t_id = _level_key(t_sys, t_src, t_sch)
                 if not f_id or not t_id or f_id == t_id:
@@ -1690,6 +1698,7 @@ def overview(
                 if f_id not in node_ids or t_id not in node_ids:
                     continue
                 pair_counts[(f_id, t_id)] = pair_counts.get((f_id, t_id), 0) + 1
+                matched_relations += 1
             for (f_id, t_id), edge_count in sorted(pair_counts.items()):
                 edges.append(GraphEdge(
                     id=f"overview-rel:{f_id}->{t_id}",
@@ -1712,11 +1721,13 @@ def overview(
             warnings=[] if edges else ["当前表层暂无已治理的表间关系；仍可选择表查看字段图谱"],
         )
     else:
+        # 169 P5：total/matched 填真实关系数（此前误填表数 12702，工具栏「总数/命中」误导）；
+        # truncated=聚合去重导致的关系数落差（returned < matched），与 object 层口径一致。
         meta = _graph_meta(
-            matched_assets,
-            matched_assets,
+            total_relations_filtered,
+            matched_relations,
             len(edges),
-            matched_assets > len(nodes),
+            matched_relations > len(edges),
             0,
             filters,
             query_ms=round((perf_counter() - started) * 1000, 2),

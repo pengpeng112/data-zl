@@ -69,5 +69,7 @@ describe("Neo4j 式图谱 P0 状态契约", () => {
     expect(text).toContain("SQL Hash");
     expect(text).toContain("sql_snippet");
     expect(text).not.toContain("join_condition");
+    expect(text).toContain("{{ displayName }}");
+    expect(text).toContain('typeof label.formatter === "string"');
   });
 });

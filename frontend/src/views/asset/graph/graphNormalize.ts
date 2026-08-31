@@ -61,7 +61,7 @@ function groupName(node: GraphNode, groupBy: GraphGroupBy, options: NormalizedGr
   if (groupBy === "system") return system || "未分业务系统";
   if (groupBy === "source") return source || "未分数据连接";
   if (groupBy === "domain") return node.business_domain || node.domain || "未分业务域";
-  return node.schema_name || node.namespace_name || node.category || (parsePhysicalKey(node.id)?.schema) || node.id.split(".")[0] || "UNKNOWN";
+  return node.schema_name || node.namespace_name || node.category || (parsePhysicalKey(node.id)?.schema) || String(node.id || "").split(".")[0] || "UNKNOWN";
 }
 
 function matchesKeyword(node: GraphNode, keyword?: string) {

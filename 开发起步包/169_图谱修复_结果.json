@@ -1,0 +1,53 @@
+{
+  "plan": "169_关系图谱叠加与首屏不可用修复执行计划.md",
+  "executed_at": "2026-08-30",
+  "result": "主 AI 复核完成并生产发布",
+  "batches": {
+    "G1_backend": {
+      "P1_resolver_reuse": "graph.py 聚合分支复用 _EndpointResolver（与 object 层同款）",
+      "P5_meta": "total/matched/returned/truncated 全部填真实关系语义",
+      "perf": {"runs_s": [0.032, 0.012, 0.012], "median_s": 0.012, "before_s": 23.5, "speedup": "1959x", "object_level_s": 0.014, "threshold_s": 1.5},
+      "tests": "45 passed（新增 4：源码护栏/meta 口径/空库安全/schema 层）"
+    },
+    "G2_first_screen_resilience": {
+      "changes": ["index.vue 工具栏错误态保留（v-if 去 isErrorState，错误面板独立 v-if）", "getGraphOverview timeout 30s", "失败自动降级 system 层一次（shouldDowngradeOverview 纯函数+防重入+手动恢复）"],
+      "tests": "4 passed（plan169G2）",
+      "visual": "A1 实拍：无错误面板、canvas 出图、toolbar=true 并存"
+    },
+    "G3_force_layout": {
+      "before": {"nodeStrength": -280, "gravity": 10, "edgeStrength": 0.45, "nodeSize": 88, "dead": ["alpha", "alphaDecay", "alphaMin", "forceSimulation", "nodeSpacing"]},
+      "after": {"nodeStrength": 1200, "gravity": 1, "edgeStrength": 50, "nodeSize": 68, "maxSpeed": 3, "dead_removed_all": true},
+      "P4_label_dead_config_removed": ["labelWordWrap", "labelMaxWidth", "labelMaxLines", "labelTextOverflow"],
+      "tests": "3 passed（plan169G3 白名单对照+参数范围+死配置绝迹）+119 回归按新契约更新",
+      "pixel_gate": {"threshold": 0.35, "A2_1hop": 0.015, "A3_2hop": 0.015, "A4_expand": 0.006, "before_round3": 0.995, "verdict": "PASS（未调阈值）"},
+      "visual_ai": "A2≈25-35 节点散开标签可读 PAT_VISIT 中心突出；A3≈80-100 节点仍散开无堆叠"
+    },
+    "G4_svg_fallback": {
+      "explore_radial_branch": "layout computed: force+explore+centerTable→buildRadial",
+      "dynamic_row_gap": "max(92, 46+maxLines*15+24) 按组内标签行数",
+      "tests": "2 passed（plan169G4 含挂载实测 y 间距>=140px）"
+    },
+    "G5_gates": {
+      "backend_full": "1327 passed / 1 skipped / 0 failed（28m20s；基线 1323+新增 4）",
+      "frontend_full": "238 tests / 37 files + typecheck PASS",
+      "build_gzip": {"main": "656.6/700", "graph": "404.5/430", "css": "101.3/110", "verdict": "PASS"},
+      "five_screenshots": ["A1_overview_first_screen", "A2_explore_focus_1hop", "A3_explore_2hop", "A4_incremental_expand", "A5b_inspector_opened"]
+    }
+  },
+  "new_tests": {"backend": 4, "frontend": 9, "total": 13, "required": 10},
+  "extra_fix": "GraphInspector 中文名四级回落（label 对象不再渲染成 JSON）——验收新发现 W4",
+  "exceptions": ["W1 纯函数替代整页挂载", "W2 伪会话三坑（类名/refresh 队列/pytest 清库）", "W3 119 断言按新契约更新", "W4 Inspector 顺手修", "W5 depth 控件未点中由默认 2 跳覆盖"],
+  "evidence_dir": "开发起步包/output_r169/（screenshots/验收_原始输出.json/pytest_full.txt/uvicorn.log/验收截图.py/exceptions.json）",
+  "red_lines": "隔离库验证显式 URL/源库零连接/生产零写/零 Git 写/零迁移/零新依赖/pnpm/像素阈值未调",
+  "waiting_domain": "保留人工审核 SQL 草稿执行链、未来调度与更强模型切换",
+  "production": {
+    "released_at": "2026-08-31",
+    "backend_image": "data-asset:r169-20260830",
+    "frontend_current": "r169-20260830",
+    "frontend_previous": "r167-20260830",
+    "health": "database connected; build_id/frontend_build_id r169-20260830",
+    "overview_smoke": {"status": 200, "duration_s": 0.228},
+    "ai_sql_smoke": {"status": 200, "duration_s": 18.916, "executed": false, "formal_relations": 4, "payload_bytes": 10255},
+    "backup": "/opt/data-asset/backups/data_asset_pre_r169-20260830_20260831.dump"
+  }
+}

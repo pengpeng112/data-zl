@@ -5,7 +5,7 @@
       <el-tab-pane label="节点" name="node" :disabled="!node">
         <el-descriptions v-if="node" :column="1" border size="small">
           <el-descriptions-item label="五段物理键">{{ node.id }}</el-descriptions-item>
-          <el-descriptions-item label="中文名">{{ node.table_name_cn || node.label }}</el-descriptions-item>
+          <el-descriptions-item label="中文名">{{ displayName }}</el-descriptions-item>
           <el-descriptions-item label="技术名">{{ node.technical_name || node.display_id || '-' }}</el-descriptions-item>
           <el-descriptions-item label="入度 / 出度">{{ node.in_degree ?? 0 }} / {{ node.out_degree ?? 0 }}</el-descriptions-item>
           <el-descriptions-item label="业务域">{{ node.business_domain || node.domain || '-' }}</el-descriptions-item>
@@ -42,6 +42,16 @@ const loading = ref(false);
 const detailError = ref("");
 const edge = computed(() => detail.value || props.edge);
 const valueDomainSummary = computed(() => props.node?.note ? String(props.node.note).slice(0, 160) : "按需查看表详情（当前未加载值域）");
+// 169 G5 顺手修：label 可能是 G6 标签配置对象（{formatter: ...}）而非字符串，
+// 直接插值会渲染整段 JSON——取 formatter 文本，对象则兜底 display_id。
+const displayName = computed(() => {
+  const node: any = props.node || {};
+  if (node.table_name_cn) return String(node.table_name_cn);
+  const label = node.label;
+  if (typeof label === "string" && label) return label;
+  if (label && typeof label === "object" && typeof label.formatter === "string") return label.formatter;
+  return node.display_id || "-";
+});
 watch(() => props.node, value => { if (value) tab.value = "node"; });
 watch(() => props.edge, async value => {
   if (!value) return;

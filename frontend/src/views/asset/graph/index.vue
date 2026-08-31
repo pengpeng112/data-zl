@@ -5,8 +5,8 @@
       subtitle="知识图谱：业务系统 → Schema/库 → 表 → 字段。单击节点下钻，拖拽查看关系。"
     />
 
-    <!-- 加载/成功：工具栏 + 图表 -->
-    <template v-if="!isErrorState && state !== 'loading'">
+    <!-- 工具栏 + 图表：169 G2 错误态保留工具栏（用户可切 explore 等轻量模式自救），仅 loading 隐藏 -->
+    <template v-if="state !== 'loading'">
       <div v-if="filters.view_mode === 'overview'" class="graph-breadcrumb" aria-label="图谱下钻路径">
         <el-button text :disabled="overviewLevel === 'system'" @click="goOverviewLevel('system')">业务系统</el-button>
         <template v-if="['schema', 'object', 'field'].includes(overviewLevel)">
@@ -193,8 +193,9 @@
       </div>
     </template>
 
-    <!-- 错误面板：auth/permission/api/contract 统一展示，可重试 -->
-    <div v-else-if="errorInfo" class="graph-error-panel">
+    <!-- 错误面板：auth/permission/api/contract 统一展示，可重试（169 G2：独立 v-if，与工具栏并存；
+         171 T3：仅在错误态显示——成功/空态后旧 errorInfo 不得继续盖版） -->
+    <div v-if="errorInfo && isErrorState" class="graph-error-panel">
       <el-result
         :icon="errorIcon"
         :title="errorInfo.title"
@@ -209,7 +210,7 @@
     </div>
 
     <!-- 初始 loading -->
-    <div v-else class="graph-loading-page">
+    <div v-else-if="state === 'loading'" class="graph-loading-page">
       <el-skeleton :rows="6" animated />
     </div>
 
@@ -221,13 +222,14 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "v
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import ReEmptyState from "@/components/ReEmptyState/index.vue";
+import RePageHeader from "@/components/RePageHeader/index.vue";
 import AdvancedRelationGraph from "@/views/asset/components/AdvancedRelationGraph.vue";
 import GraphInspector from "@/views/asset/components/GraphInspector.vue";
 import GraphLegendFilters from "@/views/asset/components/GraphLegendFilters.vue";
 import GraphToolbar, { type GraphEngine } from "@/views/asset/components/GraphToolbar.vue";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import { normalizeGraphData } from "@/views/asset/graph/graphNormalize";
-import { decideGraphLoadPolicy } from "@/views/asset/graph/graphLoadPolicy";
+import { decideGraphLoadPolicy, shouldDowngradeOverview } from "@/views/asset/graph/graphLoadPolicy";
 import {
   classifyGraphError,
   contractErrorInfo,
@@ -251,6 +253,8 @@ const selectedNode = ref<GraphNode | null>(null);
 const selectedNodeId = ref("");
 const centerTable = ref("");
 const overviewLevel = ref<"system" | "source" | "schema" | "object" | "field">("system");
+// 169 G2：overview 失败自动降级 system 层的一次性防重入标志
+let overviewDowngraded = false;
 const fieldParentKey = ref("");
 const graphEngine = ref<GraphEngine>("g6");
 const graphLoadNotice = ref("");
@@ -625,15 +629,36 @@ async function loadData() {
   try {
     if (filters.view_mode === "overview") {
       await loadCascadeOptions();
-      const overview = await getGraphOverview({
-        level: overviewLevel.value,
-        parent_physical_key: overviewLevel.value === "field" ? fieldParentKey.value : undefined,
-        system_code: filters.system_code || undefined,
-        source_code: filters.source_code || undefined,
-        schema: filters.schema || undefined,
-        domain: filters.domain || undefined,
-        limit: overviewLevel.value === "system" ? 40 : 120
-      });
+      // 169 G2：当前层级失败自动降级到业务系统层重试一次（后端已修复 N+1，
+      // 此为韧性层：层级参数/过滤异常时不再直接进错误面板死循环）
+      const fetchOverview = () =>
+        getGraphOverview({
+          level: overviewLevel.value,
+          parent_physical_key: overviewLevel.value === "field" ? fieldParentKey.value : undefined,
+          system_code: filters.system_code || undefined,
+          source_code: filters.source_code || undefined,
+          schema: filters.schema || undefined,
+          domain: filters.domain || undefined,
+          limit: overviewLevel.value === "system" ? 40 : 120
+        });
+      let overview;
+      try {
+        overview = await fetchOverview();
+      } catch (overviewError) {
+        if (seq !== loadDataSeq) return;
+        if (shouldDowngradeOverview(overviewLevel.value, overviewDowngraded)) {
+          overviewDowngraded = true;
+          overviewLevel.value = "system";
+          filters.system_code = "";
+          filters.source_code = "";
+          filters.schema = "";
+          filters.domain = "";
+          ElMessage.warning("当前层级加载失败，已自动降级到业务系统层重试");
+          overview = await fetchOverview();
+        } else {
+          throw overviewError;
+        }
+      }
       if (seq !== loadDataSeq) return;
       const data = overview.data.data;
       graphData.value = data;
@@ -792,15 +817,27 @@ async function globalSearch() {
   if (!loaded) {
     loading.value = true;
     try {
+      // overview 节点形如 overview|system|HIS，并非 neighbors 接口要求的五段物理键。
+      // 168 初版把它们作为 include 发送会稳定触发 422；即使后端放行，也会把表邻域
+      // 叠在系统聚合图上。首次进入 explore 时应以纯表邻域替换，已有表邻域时才增量合并。
+      const heldPhysicalKeys = graphData.value.nodes
+        .map(node => node.id)
+        .filter(id => id.split("|").length === 5);
       const response = await getGraphNeighbors({
         center_physical_key: physicalKey,
         depth: 1,
         direction: locate.direction,
         limit: filters.limit,
-        include: graphData.value.nodes.map(node => node.id)
+        include: heldPhysicalKeys
       });
-      graphData.value = mergeExpansion(graphData.value, response.data, `search:${physicalKey}`, exploreState);
+      if (heldPhysicalKeys.length) {
+        graphData.value = mergeExpansion(graphData.value, response.data, `search:${physicalKey}`, exploreState);
+      } else {
+        graphData.value = response.data;
+        exploreState = createExploreState(response.data);
+      }
       graphMeta.value = response.data.meta || graphMeta.value;
+      applyGraphLoadPolicy(response.data);
     } finally {
       loading.value = false;
     }
@@ -812,7 +849,13 @@ async function globalSearch() {
   inspectorOpen.value = true;
   filters.keyword = physicalKey;
   await nextTick();
-  await graphRef.value?.focusNode?.(physicalKey);
+  // 171 T3 根因修复：画布聚焦是视觉增强，其失败（如 G6 异步渲染竞态）不是接口错误，
+  // 单独隔离，避免搜索成功后误报"图谱接口请求失败"面板
+  try {
+    await graphRef.value?.focusNode?.(physicalKey);
+  } catch {
+    /* 聚焦失败不影响数据已加载的事实，静默降级 */
+  }
   } catch (error) {
     const info = classifyGraphError(error);
     state.value = info.state;
@@ -871,6 +914,7 @@ function showSamplePass() {
 }
 
 function resetFilters() {
+  overviewDowngraded = false; // 169 G2：手动重置恢复自动降级资格
   const overviewMode = options.view_modes.find(item => item.code === "overview") || options.view_modes.find(item => item.code === "table");
   filters.view_mode = overviewMode?.code || "overview";
   overviewLevel.value = "system";
@@ -895,6 +939,7 @@ function resetFilters() {
 }
 
 function retryPage() {
+  overviewDowngraded = false; // 169 G2：手动重试恢复自动降级资格
   errorInfo.value = null;
   loadData();
 }

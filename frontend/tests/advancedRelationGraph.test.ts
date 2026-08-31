@@ -116,9 +116,12 @@ describe("AdvancedRelationGraph G6 输入契约（119 回归）", () => {
     // 130p2：Neo4j 式圆点节点——标题（caption）置于节点下方
     expect(graph.data.nodes[0].style.labelPlacement).toBe("bottom");
     expect(graph.data.nodes[0].type).toBe("circle");
-    expect(graph.data.nodes[0].style.labelMaxLines).toBeGreaterThanOrEqual(4);
-    expect(graph.data.nodes[0].style.labelWordWrap).toBe(false);
-    expect(graph.data.nodes[0].style.labelTextOverflow).not.toBe("...");
+    // 169 P4：labelMaxLines/labelWordWrap/labelTextOverflow 系死配置已删（G6 不消费，
+    // 文本由 formatGraphNodeLabel 预换行）——改为断言死配置不再下发+预换行仍生效
+    expect(graph.data.nodes[0].style.labelMaxLines).toBeUndefined();
+    expect(graph.data.nodes[0].style.labelWordWrap).toBeUndefined();
+    expect(graph.data.nodes[0].style.labelTextOverflow).toBeUndefined();
+    expect(label0).toContain("\n");
     expect(graph.data.nodes[0].style.labelFontSize).toBeGreaterThanOrEqual(12);
     expect(graph.options.devicePixelRatio).toBeGreaterThanOrEqual(2);
     expect(wrapper.emitted("render-error")).toBeUndefined();
