@@ -4,16 +4,28 @@
   "executed_by": "GLM 执行会话（2026-08-31 23:14 起，round-7 裁决定稿后一次性执行 T0→R4）",
   "t0_baseline": {
     "git_head_before": "19d2027f3469a59454ea8fc25e24e0722e4b815b",
-    "git_status": {"M": 34, "??": 40},
+    "git_status": {
+      "M": 34,
+      "??": 40
+    },
     "git_stash": 0,
     "isolated_db_reseed": "隧道断开重建（166 附录 A.1）；export170 工装 import 修复后从生产只读重导（systems=26 sources=28 columns=178547 value_domains=77 audit=192 quality_rules=422）→ import170 tables=12702 relations=1329 token ready",
-    "frontend_vitest": {"files": 39, "tests": 245, "failed": 0},
+    "frontend_vitest": {
+      "files": 39,
+      "tests": 245,
+      "failed": 0
+    },
     "others_domain_hash_baseline": "output_r171/baseline.txt（19 文件 git hash-object）"
   },
   "t1_frontend_gates": {
     "typecheck": "exit 0（tsc+vue-tsc；首次发现 system-map tone 类型错 W2 修复后过）",
     "test": "首轮 245/245 → R3 新增后终态 253/253，0 failed",
-    "build_gzip": {"main": "656.8/700", "graph": "404.5/430", "css": "102.3/110", "verdict": "PASS"},
+    "build_gzip": {
+      "main": "656.8/700",
+      "graph": "404.5/430",
+      "css": "102.3/110",
+      "verdict": "PASS"
+    },
     "rerun_after_fixes": "typecheck exit 0 + 253 tests 0 failed + 预算 PASS（W6 修复后复跑）"
   },
   "t2_backend_full": "1341 passed / 1 skipped / 0 failed（27m43s，显式 APP_TEST_DB_URL=127.0.0.1:15432/data_asset_test；归因案件 0——无他人域失败）",
@@ -25,7 +37,10 @@
     "4_old_pages": "/#/asset/quality 与 /#/asset/admin 均无错误面板、正常渲染",
     "5_auth_smoke": "无 token graph/overview=401、ai/system-context=401；伪 token=403；health 容器内 200",
     "6_menu_visibility": "platform_admin 登录态左侧菜单含「数据资产系统图」；R3 功能测证 filterNoPermissionTree：*:*:* 与精确 asset.overview.view 可见、无关码/空权限隐藏",
-    "live_defects_found_and_fixed": ["W6 误报错误面板（focusNode 竞态+errorInfo 不清）", "W7 RePageHeader 未导入页头丢失"],
+    "live_defects_found_and_fixed": [
+      "W6 误报错误面板（focusNode 竞态+errorInfo 不清）",
+      "W7 RePageHeader 未导入页头丢失"
+    ],
     "screenshots": "output_r171/screenshots/（B0-B5、system-map、graph_overview、t3_3/4/6、r171_rerun_A1-A3 共 15 张）"
   },
   "r3_test_hardening": {
@@ -34,10 +49,30 @@
     "depth_control_record": "output_r171/r3_depth_control_record.md（el-segmented 三档，无需更换控件）"
   },
   "r1_commits": [
-    {"hash": "da7255e", "domain": "169 图谱", "files": 18, "note": "asset.ts 仅 hunk1（getGraphOverview 30s）；含 171 T3 两活体缺陷修复与 plan169G2 断言加严"},
-    {"hash": "bec3ad4", "domain": "167 AI SQL", "files": 7, "note": "asset.ts 仅 hunk2（generateAiSql 120s）"},
-    {"hash": "8c49b32", "domain": "170 system-map", "files": 3, "note": "页面+路由+测试"},
-    {"hash": "d12aaee", "domain": "171 卫生+R3", "files": 2, "note": ".gitignore 五项（docs//~$/.release_*/_r163_work，*.log 原有全局覆盖）+ plan171R3.test.ts"}
+    {
+      "hash": "da7255e",
+      "domain": "169 图谱",
+      "files": 18,
+      "note": "asset.ts 仅 hunk1（getGraphOverview 30s）；含 171 T3 两活体缺陷修复与 plan169G2 断言加严"
+    },
+    {
+      "hash": "bec3ad4",
+      "domain": "167 AI SQL",
+      "files": 7,
+      "note": "asset.ts 仅 hunk2（generateAiSql 120s）"
+    },
+    {
+      "hash": "8c49b32",
+      "domain": "170 system-map",
+      "files": 3,
+      "note": "页面+路由+测试"
+    },
+    {
+      "hash": "d12aaee",
+      "domain": "171 卫生+R3",
+      "files": 2,
+      "note": ".gitignore 五项（docs//~$/.release_*/_r163_work，*.log 原有全局覆盖）+ plan171R3.test.ts"
+    }
   ],
   "r1_verification": "四提交逐一 git show --name-only 过他人域正则（identity|conftest|layout|useTag|useDataThemeChange|store/modules/app|captureMode）零匹配；.gitignore 生效（status 74→72 行，.release_r169/_r163_work/check-ignore 确认）；asset.ts 工作区与 HEAD 零 diff（双 hunk 均已按域入库）",
   "r2_release": {
@@ -72,5 +107,155 @@
     "165 X2 生产首轮夜间探查待授权；165 T7 待补 PACSREPORT side-b；168 P1/166 P2 后置项维持开放",
     "169 工装 A3/A4 场景的状态/位置依赖（W5）可择机改造为确定性触发（非必须）"
   ],
-  "exceptions": "output_r171/exceptions.json（W1-W9 全量）"
+  "exceptions": "output_r171/exceptions.json（W1-W9 全量）",
+  "final_closeout_20260901": {
+    "git_push": {
+      "status": "done",
+      "remote": "ssh://git@ssh.github.com:443/pengpeng112/data-zl.git master",
+      "range": "19d2027..b942cca",
+      "commits": [
+        "da7255e",
+        "bec3ad4",
+        "8c49b32",
+        "d12aaee",
+        "6d354d6",
+        "b942cca"
+      ],
+      "workaround": "port22 fake-ip 断流3次, 改443+deploy_key(IdentitiesOnly)",
+      "ahead_after": 0
+    },
+    "t5_browser_screenshots": {
+      "status": "done",
+      "channel": "ssh -L 18432:127.0.0.1:80 + throwaway ApiKey verify-t5-r171-prod(platform_admin)",
+      "system_map": {
+        "statCards": 6,
+        "errPanel": false,
+        "kpi": [
+          26,
+          12767,
+          178547,
+          1329,
+          186,
+          26
+        ],
+        "six_step_chain": true
+      },
+      "graph_first_screen": {
+        "canvas": 4,
+        "errPanel": false,
+        "nodes_visible": "14+",
+        "ink_blob": false
+      },
+      "evidence": [
+        "screenshots/T5_prod_system-map.png",
+        "screenshots/T5_prod_graph_rgb.jpg",
+        "t5_prod_实拍.json"
+      ],
+      "note": "表数12767较T0导出12702多65为09-01资产同步正常增长"
+    },
+    "x2_production_first_run": {
+      "status": "done",
+      "run_id": "probe-20260901-191051",
+      "window": [
+        "2026-08-01",
+        "2026-09-01"
+      ],
+      "authorization": "用户2026-09-01明示X2当日可跑, 按165 v1.2先例记日间豁免; 120s/60min上限不变, 此后全量仍夜间",
+      "topology": "本机run_probe+E3同款sjzc受控连接器源侧, 写侧隧道15434→生产data_asset",
+      "probe_count": 12,
+      "ok": 11,
+      "blocked": 1,
+      "blocked_code": "T7",
+      "finding_new": 6,
+      "finding_updated": 0,
+      "relapse_count": 0,
+      "findings": [
+        {
+          "id": 1,
+          "type": "R-REF",
+          "object": "EXAM.EXAM_MASTER.DOCTOR_USER 缺失率",
+          "value": 81.4,
+          "sev": "P2",
+          "e3_baseline": 81.37
+        },
+        {
+          "id": 2,
+          "type": "R-REF",
+          "object": "MEDREC.OPERATION.ANESTHESIA_DOCTOR 缺失率",
+          "value": 10.22,
+          "sev": "P3",
+          "e3_baseline": 10.58
+        },
+        {
+          "id": 3,
+          "type": "R-XSYS",
+          "object": "TREAT_RESULT HIS↔JHEMR 语义桶差异率",
+          "value": 46.25,
+          "sev": "P2",
+          "e3_baseline": 43.22
+        },
+        {
+          "id": 4,
+          "type": "R-REF",
+          "object": "EXAM.EXAM_MASTER.DOCTOR_NAME 与 STAFF_DICT 不一致率",
+          "value": 4.81,
+          "sev": "P2",
+          "e3_baseline": 4.93
+        },
+        {
+          "id": 5,
+          "type": "R-CNT",
+          "object": "EXAM.EXAM_MASTER 报告时间回写率(缺口)",
+          "value": 34.29,
+          "sev": "P1",
+          "e3_baseline": 34.48
+        },
+        {
+          "id": 6,
+          "type": "R-CNT",
+          "object": "LAB.LAB_TEST_MASTER 与 LIS.lab_report 月度对账差",
+          "value": 6.66,
+          "sev": "P2",
+          "e3_baseline": 5.8
+        }
+      ],
+      "audit_log_id": 198,
+      "ui_evidence": [
+        "x2_prod/probe-20260901-191051.json",
+        "screenshots/X2_prod_probe-findings.png",
+        "x2_prod/x2_findings_实拍.json"
+      ],
+      "ui_dom": {
+        "rows": 6,
+        "hasRunId": true,
+        "errPanel": false
+      }
+    },
+    "cleanup": {
+      "token_deleted": {
+        "asset_api_keys": 1,
+        "asset_user_roles": 1,
+        "remaining": 0
+      },
+      "tunnels_closed": [
+        18432,
+        15434
+      ],
+      "tunnels_kept": [
+        15432,
+        11433
+      ]
+    },
+    "p2_new": [
+      {
+        "id": "edge-label-object-object",
+        "where": "RelationGraph.vue:274,432",
+        "symptom": "overview聚合边标签渲染[object Object]",
+        "root_cause": "edge.label为G6样式对象{text:...}被直接String()",
+        "fix": "取值前归一 typeof===object?label.text:label, 两处同改+vitest",
+        "severity": "P2 显示级",
+        "decision": "待用户点头随下批发布"
+      }
+    ]
+  }
 }
