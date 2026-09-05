@@ -18,46 +18,123 @@
     </div>
 
     <div class="global-search-row">
-      <el-input v-model="locate.table" placeholder="搜索表名、中文名、Schema 或五段物理键" clearable @keyup.enter="emit('global-search')" />
+      <el-input
+        :model-value="locate.table"
+        placeholder="搜索表名、中文名、Schema 或五段物理键"
+        clearable
+        @update:model-value="emit('update:locate', { ...locate, table: String($event ?? '') })"
+        @keyup.enter="emit('global-search')"
+      />
       <el-button type="primary" :loading="loading" @click="emit('global-search')">搜索并聚焦</el-button>
       <template v-if="filters.view_mode === 'explore'">
-      <el-segmented v-model="locate.depth" :disabled="!locate.physical_key" :options="depthOptions" @change="emit('load-chain')" />
-      <el-segmented v-model="locate.direction" :disabled="!locate.physical_key" class="direction-segmented" :options="directionOptions" @change="emit('load-chain')" />
+      <el-segmented
+        :model-value="locate.depth"
+        :disabled="!locate.physical_key"
+        :options="depthOptions"
+        @update:model-value="emit('update:locate', { ...locate, depth: Number($event) as 1 | 2 | 3 })"
+        @change="emit('load-chain')"
+      />
+      <el-segmented
+        :model-value="locate.direction"
+        :disabled="!locate.physical_key"
+        class="direction-segmented"
+        :options="directionOptions"
+        @update:model-value="emit('update:locate', { ...locate, direction: $event as 'in' | 'out' | 'both' })"
+        @change="emit('load-chain')"
+      />
       </template>
     </div>
 
     <el-drawer v-model="advancedVisible" title="高级筛选" size="420px" append-to-body>
     <div class="filter-grid">
-      <el-select v-model="filters.system_code" placeholder="业务系统" clearable filterable @change="emit('system-change')">
+      <el-select
+        :model-value="filters.system_code"
+        placeholder="业务系统"
+        clearable
+        filterable
+        @update:model-value="emit('update:filters', { ...filters, system_code: String($event ?? '') })"
+        @change="emit('system-change')"
+      >
         <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="filters.source_code" placeholder="数据连接（可选）" clearable filterable @change="emit('load-data')">
+      <el-select
+        :model-value="filters.source_code"
+        placeholder="数据连接（可选）"
+        clearable
+        filterable
+        @update:model-value="emit('update:filters', { ...filters, source_code: String($event ?? '') })"
+        @change="emit('load-data')"
+      >
         <el-option v-for="item in sourceOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="filters.schema" placeholder="Schema / Owner" clearable filterable @change="emit('load-data')">
+      <el-select
+        :model-value="filters.schema"
+        placeholder="Schema / Owner"
+        clearable
+        filterable
+        @update:model-value="emit('update:filters', { ...filters, schema: String($event ?? '') })"
+        @change="emit('load-data')"
+      >
         <el-option v-for="item in schemaOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="filters.domain" placeholder="业务域（正交筛选）" clearable filterable @change="emit('load-data')">
+      <el-select
+        :model-value="filters.domain"
+        placeholder="业务域（正交筛选）"
+        clearable
+        filterable
+        @update:model-value="emit('update:filters', { ...filters, domain: String($event ?? '') })"
+        @change="emit('load-data')"
+      >
         <el-option v-for="item in domainOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-if="filters.view_mode === 'review'" v-model="filters.validation_status" placeholder="验证状态" clearable @change="emit('load-data')">
+      <el-select
+        v-if="filters.view_mode === 'review'"
+        :model-value="filters.validation_status"
+        placeholder="验证状态"
+        clearable
+        @update:model-value="emit('update:filters', { ...filters, validation_status: String($event ?? '') })"
+        @change="emit('load-data')"
+      >
         <el-option v-for="item in options.validation_statuses" :key="item" :label="statusLabel(item)" :value="item" />
       </el-select>
-      <el-select v-if="filters.view_mode === 'review'" v-model="filters.confidence" placeholder="置信度" clearable @change="emit('load-data')">
+      <el-select
+        v-if="filters.view_mode === 'review'"
+        :model-value="filters.confidence"
+        placeholder="置信度"
+        clearable
+        @update:model-value="emit('update:filters', { ...filters, confidence: String($event ?? '') })"
+        @change="emit('load-data')"
+      >
         <el-option v-for="item in options.confidences" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-input-number v-model="filters.limit" :min="20" :max="500" :step="20" controls-position="right" />
+      <el-input-number
+        :model-value="filters.limit"
+        :min="20"
+        :max="500"
+        :step="20"
+        controls-position="right"
+        @update:model-value="emit('update:filters', { ...filters, limit: Number($event) })"
+      />
       <el-button type="primary" :loading="loading" @click="emit('load-data')">应用筛选</el-button>
       <el-button @click="emit('reset')">重置</el-button>
     </div>
     </el-drawer>
 
     <div v-if="filters.view_mode === 'review'" class="switch-row">
-      <el-checkbox v-model="filters.include_candidates" @change="emit('load-data')">候选关系</el-checkbox>
-      <el-checkbox v-model="filters.include_dependencies" @change="emit('load-data')">视图依赖</el-checkbox>
       <el-checkbox
-        v-model="filters.show_review_layer"
+        :model-value="filters.include_candidates"
+        @update:model-value="emit('update:filters', { ...filters, include_candidates: Boolean($event) })"
+        @change="emit('load-data')"
+      >候选关系</el-checkbox>
+      <el-checkbox
+        :model-value="filters.include_dependencies"
+        @update:model-value="emit('update:filters', { ...filters, include_dependencies: Boolean($event) })"
+        @change="emit('load-data')"
+      >视图依赖</el-checkbox>
+      <el-checkbox
+        :model-value="filters.show_review_layer"
         :disabled="!currentViewMode?.show_review_layer"
+        @update:model-value="emit('update:filters', { ...filters, show_review_layer: Boolean($event) })"
         @change="emit('refresh')"
       >显示 D 类跨系统（虚线灰紫）</el-checkbox>
       <el-button text type="success" @click="emit('sample-pass')">只看通过关系</el-button>
@@ -162,6 +239,8 @@ const statsExpanded = ref(isGovernanceUser());
 const advancedVisible = ref(false);
 
 const emit = defineEmits<{
+  "update:locate": [value: LocateState];
+  "update:filters": [value: GraphFilters];
   "view-mode-change": [value: string];
   "engine-change": [value: GraphEngine];
   "load-chain": [];
@@ -193,7 +272,7 @@ function statusLabel(status: string) {
 }
 
 function changeDisplay(command: string) {
-  props.filters.layout_mode = command as LayoutMode;
+  emit("update:filters", { ...props.filters, layout_mode: command as LayoutMode });
   emit("refresh");
 }
 </script>

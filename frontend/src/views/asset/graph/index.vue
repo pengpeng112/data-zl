@@ -35,6 +35,8 @@
         :loading="loading"
         :selected-node-id="selectedNodeId"
         :meta="graphMeta"
+        @update:filters="onUpdateFilters"
+        @update:locate="onUpdateLocate"
         @view-mode-change="changeViewMode"
         @engine-change="changeEngine"
         @load-chain="loadChain"
@@ -458,6 +460,17 @@ function pickLocateCandidate(row: GraphTableSearchItem) {
 function changeViewMode(value: string) {
   filters.view_mode = value;
   applyViewMode();
+}
+
+// 178 R2（C6）：工具栏单向数据流——子组件不再直接改 props，
+// 统一 emit update:filters / update:locate，父组件对已有 reactive 对象
+// 做 Object.assign 合并（保留引用，不整体替换）。
+function onUpdateFilters(next: typeof filters) {
+  Object.assign(filters, next);
+}
+
+function onUpdateLocate(next: typeof locate) {
+  Object.assign(locate, next);
 }
 
 function changeEngine(value: GraphEngine) {
