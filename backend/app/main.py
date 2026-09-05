@@ -11,7 +11,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, queries, recipes, relation_reviews, probe, relations, systems, tables, value_domains
+from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, quality_controls, quality_issues, quality_observations, queries, recipes, relation_reviews, probe, relations, systems, tables, value_domains
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -407,6 +407,16 @@ def _resolve_jwt_roles(db, jwt_payload: dict) -> list[str]:
     return list(jwt_payload.get("roles") or [])
 
 
+# 174 S4：质量治理台账三前缀走端点级细粒度 RBAC（每个路由显式 require_permission，
+# 含普通处理人角色），因此豁免 /api/v1/quality 粗前缀的 quality_admin 门禁；
+# 三个模块任一路由缺失显式权限码都会被 security_audit 静态扫描抓出。
+FINE_GRAINED_Rbac_PREFIXES_174 = (
+    "/api/v1/quality-issues",
+    "/api/v1/quality-controls",
+    "/api/v1/quality-observations",
+)
+
+
 def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
     """
     L9: 高权限 URL 前缀默认拒绝；未绑定角色的 Token 不得访问管理写模块。
@@ -416,6 +426,8 @@ def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
         return None
     if path in {"/api/v1/auth/login", "/api/v1/auth/refresh", "/get-async-routes"}:
         return None
+    if any(path.startswith(p) for p in FINE_GRAINED_Rbac_PREFIXES_174):
+        return None  # 174：端点级细粒度权限接管（见上方注释）
 
     method_u = (method or "GET").upper()
     for role_key, url_prefix in ROLE_PATH_MAP.items():
@@ -560,6 +572,10 @@ app.include_router(recipes.router)
 # 149 P1b: 字段值域知识库（独立路由模块，不塞 tables.py）
 app.include_router(value_domains.router)
 app.include_router(probe.router)
+# 174 S5: 数据质量主动治理台账（Control/Observation/Issue 三前缀）
+app.include_router(quality_controls.router)
+app.include_router(quality_observations.router)
+app.include_router(quality_issues.router)
 
 @app.get("/", summary="根")
 def root() -> dict[str, str]:

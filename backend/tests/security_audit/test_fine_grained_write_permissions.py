@@ -67,6 +67,57 @@ def test_identity_and_quality_write_routes_have_fine_grained_permissions():
         assert not invalid, f"unexpected permission code in {filename}: {invalid}"
 
 
+def _permissions_on_function(node: ast.AST) -> set[str]:
+    """Decorator 与 Depends(require_permission(...)) 参数两种挂码方式都收集。"""
+    return {
+        child.args[0].value
+        for child in ast.walk(node)
+        if isinstance(child, ast.Call)
+        and isinstance(child.func, ast.Name)
+        and child.func.id == "require_permission"
+        and child.args
+        and isinstance(child.args[0], ast.Constant)
+        and isinstance(child.args[0].value, str)
+    }
+
+
+def test_quality_governance_174_routes_have_endpoint_permissions():
+    """174：三前缀豁免粗 RBAC 后，每个路由必须挂 quality.* 端点级权限（含 Depends 形态）。"""
+    allowed_prefixes = ("quality.issue.", "quality.control.", "quality.observation.")
+    http_methods = WRITE_METHODS | {"get"}
+    for filename in ("quality_issues.py", "quality_controls.py", "quality_observations.py"):
+        path = BACKEND_DIR / "app" / "api" / "v1" / filename
+        tree = ast.parse(path.read_text(encoding="utf-8-sig"), filename=str(path))
+        missing: list[str] = []
+        invalid: list[str] = []
+        found = 0
+        for node in tree.body:
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for decorator in node.decorator_list:
+                if not isinstance(decorator, ast.Call) or not isinstance(decorator.func, ast.Attribute):
+                    continue
+                method = decorator.func.attr.lower()
+                if method not in http_methods or not decorator.args:
+                    continue
+                try:
+                    route_path = ast.literal_eval(decorator.args[0])
+                except (ValueError, SyntaxError):
+                    continue
+                found += 1
+                permissions = _permissions_on_function(node)
+                label = f"{method.upper()} {route_path}"
+                if not permissions:
+                    missing.append(label)
+                    continue
+                bad = sorted(p for p in permissions if not p.startswith(allowed_prefixes))
+                if bad:
+                    invalid.append(f"{label}: {bad}")
+        assert found, f"no routes discovered in {filename}"
+        assert not missing, f"fine-grained permission missing in {filename}: {missing}"
+        assert not invalid, f"unexpected permission code in {filename}: {invalid}"
+
+
 def test_ai_execution_and_context_routes_permissions():
     """153 B5：AI 真实执行端点挂 ai.sql.execute；只读上下文端点只挂 ai.context.read。"""
     import ast as _ast

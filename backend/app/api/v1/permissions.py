@@ -139,6 +139,20 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "probe.finding.read", "name_cn": "探查问题查看", "type": "page", "parent_code": "probe"},
     # 166 F7：人工终态流转（quality_admin 授 manage 为 A8 刻意决策——探查域归质量线）
     {"code": "probe.finding.manage", "name_cn": "探查问题终态流转", "type": "button", "parent_code": "probe.finding.read"},
+    # ===== 174: 数据质量主动治理台账（Control→Observation→Issue 闭环） =====
+    {"code": "quality_governance", "name_cn": "质量治理台账", "type": "menu", "parent_code": None},
+    {"code": "quality.issue.read", "name_cn": "质量问题查看（本人/本科室）", "type": "page", "parent_code": "quality_governance"},
+    {"code": "quality.issue.read_all", "name_cn": "质量问题查看（全院）", "type": "page", "parent_code": "quality_governance"},
+    {"code": "quality.issue.create", "name_cn": "质量问题手工登记", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.issue.assign", "name_cn": "质量问题分派", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.issue.handle", "name_cn": "质量问题处理", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.issue.verify", "name_cn": "质量问题复测验证", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.issue.accept_risk", "name_cn": "质量问题风险接受", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.issue.export", "name_cn": "质量问题导出", "type": "button", "parent_code": "quality.issue.read"},
+    {"code": "quality.control.read", "name_cn": "质控清单查看", "type": "page", "parent_code": "quality_governance"},
+    {"code": "quality.control.manage", "name_cn": "质控清单管理", "type": "button", "parent_code": "quality.control.read"},
+    {"code": "quality.control.run", "name_cn": "质控执行", "type": "button", "parent_code": "quality.control.read"},
+    {"code": "quality.observation.read", "name_cn": "质量观测查看", "type": "page", "parent_code": "quality_governance"},
 ]
 
 
@@ -173,7 +187,7 @@ BUILTIN_ROLES: list[dict] = [
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     "platform_admin": [r["code"] for r in RESOURCE_CATALOG],
-    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read", "probe", "probe.finding.read"],
+    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read", "probe", "probe.finding.read", "quality_governance", "quality.issue.read", "quality.control.read", "quality.observation.read"],
     "asset_editor": [
         "asset",
         "asset.table.view",
@@ -200,7 +214,9 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "value_domain.submit",
         "value_domain.confirm",
     ],
-    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute", "probe", "probe.finding.read", "probe.finding.manage"],
+    "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute", "probe", "probe.finding.read", "probe.finding.manage",
+                      # 174：质量治理台账全量（含 read_all/verify/accept_risk/export）
+                      "quality_governance", "quality.issue.read", "quality.issue.read_all", "quality.issue.create", "quality.issue.assign", "quality.issue.handle", "quality.issue.verify", "quality.issue.accept_risk", "quality.issue.export", "quality.control.read", "quality.control.manage", "quality.control.run", "quality.observation.read"],
     "identity_admin": [
         "identity",
         "identity.person.view",
@@ -245,6 +261,8 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "value_domain", "value_domain.read", "value_domain.submit",
         # 165 A8: 探查发现只读（manage 归 166）
         "probe", "probe.finding.read",
+        # 174: 质量治理台账只读（数据范围仍受后端本人/本科室过滤）
+        "quality_governance", "quality.issue.read", "quality.control.read", "quality.observation.read",
     ],
 }
 
