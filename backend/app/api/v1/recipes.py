@@ -10,7 +10,7 @@ from ...core.security import get_current_user, require_permission
 from ...models.recipe import AssetRelationRecipe
 from ...schemas.common import ApiResponse
 from ...schemas.recipe import RecipeCreate, RecipeDraftUpdate, RecipeReview, RecipeSqlGenerateRequest
-from ...services.recipe_service import assert_transition, canonical_recipe_payload, generate_select_sql, recipe_hash
+from ...services.recipe_service import assert_transition, canonical_recipe_payload, generate_select_sql, recipe_hash, validate_recipe_tables
 
 router = APIRouter(prefix="/api/v1/recipes", tags=["recipes"])
 
@@ -65,6 +65,7 @@ def create_recipe(req: RecipeCreate, request: Request, db: Session = Depends(get
     user = get_current_user(request)
     if db.scalar(select(AssetRelationRecipe).where(AssetRelationRecipe.recipe_id == req.recipe_id)):
         raise HTTPException(status_code=409, detail="recipe_id 已存在，请创建新版本")
+    validate_recipe_tables(req.primary_tables)
     payload = req.recipe_json or {"primary_tables": req.primary_tables, "joins": req.joins}
     row = AssetRelationRecipe(recipe_id=req.recipe_id, version=1, recipe_name=req.recipe_name, status="draft", domain=req.domain, source_system=req.source_system, business_domain=req.business_domain, description=req.description, primary_tables=req.primary_tables, joins=req.joins, recipe_json=canonical_recipe_payload(payload), content_hash=recipe_hash(payload), created_by=user, updated_by=user, ai_readable=False)
     db.add(row); db.commit(); db.refresh(row)

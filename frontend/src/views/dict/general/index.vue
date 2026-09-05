@@ -188,7 +188,7 @@
       </el-form>
       <template #footer>
         <el-button @click="catDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="catDialog.submitting" @click="saveCategory">保存</el-button>
+        <el-button v-perms="'dict.general.edit'" type="primary" :loading="catDialog.submitting" @click="saveCategory">保存</el-button>
       </template>
     </el-dialog>
 
@@ -215,7 +215,7 @@
       </el-form>
       <template #footer>
         <el-button @click="stdItemDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="stdItemDialog.submitting" @click="saveStdItem">保存</el-button>
+        <el-button v-perms="'dict.general.edit'" type="primary" :loading="stdItemDialog.submitting" @click="saveStdItem">保存</el-button>
       </template>
     </el-dialog>
 
@@ -244,7 +244,7 @@
       </el-form>
       <template #footer>
         <el-button @click="sysItemDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="sysItemDialog.submitting" @click="saveSysItem">保存</el-button>
+        <el-button v-perms="'dict.general.edit'" type="primary" :loading="sysItemDialog.submitting" @click="saveSysItem">保存</el-button>
       </template>
     </el-dialog>
 
@@ -285,7 +285,7 @@
       </el-form>
       <template #footer>
         <el-button @click="mapDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="mapDialog.submitting" @click="saveMapping">保存</el-button>
+        <el-button v-perms="'dict.general.edit'" type="primary" :loading="mapDialog.submitting" @click="saveMapping">保存</el-button>
       </template>
     </el-dialog>
 

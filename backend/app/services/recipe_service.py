@@ -94,11 +94,26 @@ _IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$#]*(\.[A-Za-z_][A-Za-z0-9_$#]*)
 _CONDITION = re.compile(r"^[A-Za-z0-9_$#.\s=<>!()+\-*/]+$")
 
 
-def generate_select_sql(primary_tables: list, joins: list) -> str:
+def extract_recipe_table_names(primary_tables: list) -> list[str]:
     names = [
         str(item.get("table") or item.get("name") or "") if isinstance(item, dict) else str(item)
         for item in primary_tables
     ]
+    return names
+
+
+def validate_recipe_tables(primary_tables: list) -> None:
+    """Create-time guard: reject non-identifier table keys with 422 instead of
+    letting them surface as a 400 at SQL-generation time (173 P3-5). An empty
+    list stays valid — drafts may be created before tables are chosen."""
+    bad = [name for name in extract_recipe_table_names(primary_tables or [])
+           if not _IDENTIFIER.fullmatch(name)]
+    if bad:
+        raise HTTPException(status_code=422, detail=f"primary_tables 含非法表标识: {bad[:3]}")
+
+
+def generate_select_sql(primary_tables: list, joins: list) -> str:
+    names = extract_recipe_table_names(primary_tables)
     if not names or any(not _IDENTIFIER.fullmatch(name) for name in names):
         raise HTTPException(status_code=400, detail="配方包含非法或缺失的表标识")
     joins = normalize_recipe_joins(joins)

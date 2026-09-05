@@ -266,7 +266,7 @@
       />
       <template #footer>
         <el-button @click="confirmDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="acting" @click="submitConfirm">确认</el-button>
+        <el-button v-perms="'value_domain.confirm'" type="primary" :loading="acting" @click="submitConfirm">确认</el-button>
       </template>
     </el-dialog>
 

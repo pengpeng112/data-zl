@@ -225,6 +225,21 @@ function nodeMeta(node: any) {
   return parts || "-";
 }
 
+/**
+ * 边标签必须是纯文本：normalizeGraphData 会把 label 包成
+ * ECharts 风格对象（{show, formatter, ...}），直接 String() 会渲染成
+ * "[object Object]"（171 P2 / 177 C4）。按 字符串 label → label.formatter →
+ * from_columns 字符串 顺序取值，取不到返回空串。
+ */
+function edgeLabelText(edge: any): string {
+  if (typeof edge?.label === "string") return edge.label;
+  if (edge?.label && typeof edge.label === "object") {
+    const fmt = (edge.label as Record<string, unknown>).formatter;
+    if (typeof fmt === "string") return fmt;
+  }
+  return typeof edge?.from_columns === "string" ? edge.from_columns : "";
+}
+
 function aggregateData(nodes: any[], edges: any[]) {
   if (["system", "schema", "domain", "deferred"].includes(props.viewMode)) {
     const transformed = transformGraphByMode({ nodes: props.nodes, edges: props.edges }, props.viewMode, props.showReviewLayer);
@@ -271,7 +286,7 @@ function aggregateData(nodes: any[], edges: any[]) {
       existing.edge_count = (existing.edge_count || 1) + 1;
       existing.label = `${existing.edge_count} 条关系`;
     } else {
-      edgeMap.set(key, { ...edge, id: `agg:${key}`, source, target, label: edge.label || edge.from_columns || "" });
+      edgeMap.set(key, { ...edge, id: `agg:${key}`, source, target, label: edgeLabelText(edge) });
     }
   }
   return { nodes: nextNodes, edges: Array.from(edgeMap.values()) };
@@ -429,7 +444,7 @@ function materializeLayout(nodes: any[], edges: any[], positions: Map<string, { 
       return {
         id: edge.id,
         path: `M ${s.x} ${s.y} C ${midX + curve} ${s.y}, ${midX - curve} ${t.y}, ${t.x} ${t.y}`,
-        label: String(edge.label || edge.from_columns || "").slice(0, 16),
+        label: edgeLabelText(edge).slice(0, 16),
         labelX: midX,
         labelY: midY - 8,
         // 129号：辐射模式下显示全部边标签（知识图谱样式）；其他模式仅选中节点相关边

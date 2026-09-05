@@ -303,10 +303,10 @@ describe("plan166 D2 value-domain management page (F2/F3)", () => {
     w.unmount();
   });
 
-  it("keeps dot-form v-perms on all three manual action buttons (B3)", () => {
+  it("keeps dot-form v-perms on all four manual action buttons (B3; 177 C3 补挂确认对话框提交)", () => {
     const src = source("src/views/asset/value-domains/index.vue");
     const matches = src.match(/v-perms="'value_domain\.confirm'"/g) || [];
-    expect(matches.length).toBe(3);
+    expect(matches.length).toBe(4);
     expect(src).not.toContain("value_domain:confirm");
   });
 });

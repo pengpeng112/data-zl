@@ -254,17 +254,26 @@ def list_first_level_systems(db: Session, *, include_merged: bool = False) -> li
         status = (row.status or "active").lower()
         if not include_merged and status in {"merged", "deleted", "inactive"}:
             continue
+        # keep the stored code verbatim (by_code keys are upper-cased); a
+        # normalized code here breaks readback/detail navigation for systems
+        # created with mixed-case codes (173 P2-1).
         result.append({
             "id": row.id,
-            "system_code": code,
+            "system_code": row.system_code,
             "system_name_cn": row.system_name_cn or code,
             "system_type": row.system_type,
             "status": row.status,
             "target_host": row.target_host,
-            "connection_count": 0,
+            "connection_count": int(
+                db.scalar(select(func.count()).where(
+                    AssetDataSource.system_code == row.system_code,
+                    (AssetDataSource.source_kind.is_(None))
+                    | (AssetDataSource.source_kind != "legacy_alias"),
+                )) or 0
+            ),
             "table_count": int(
                 db.scalar(select(func.count()).where(
-                    AssetTable.system_code == code,
+                    AssetTable.system_code == row.system_code,
                     (AssetTable.row_presence_status.is_(None))
                     | (AssetTable.row_presence_status != "confirmed_empty"),
                 )) or 0
