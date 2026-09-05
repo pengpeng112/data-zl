@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import text
 
 from alembic import context
 
@@ -68,6 +69,17 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+def _ensure_asset_schema(connection) -> None:
+    """173 P3-6 / 178 C7：空库 upgrade 前自建 asset schema（幂等）。
+
+    全部迁移都建表在 asset schema；全新 PostgreSQL 库无该 schema 时首条
+    CREATE TABLE ... asset.* 即失败。IF NOT EXISTS 保证已有 schema 的库
+    上重复执行为 no-op。
+    """
+    connection.execute(text("CREATE SCHEMA IF NOT EXISTS asset"))
+    connection.commit()
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -89,13 +101,14 @@ def run_migrations_offline() -> None:
     )
 
     with context.begin_transaction():
+        context.execute(text("CREATE SCHEMA IF NOT EXISTS asset"))
         context.run_migrations()
 
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
-    In this scenario we need to create an Engine
+    In this scenario we create an Engine
     and associate a connection with the context.
 
     """
@@ -106,6 +119,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        _ensure_asset_schema(connection)
         context.configure(
             connection=connection, target_metadata=target_metadata
         )
