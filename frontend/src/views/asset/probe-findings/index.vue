@@ -6,6 +6,7 @@
     >
       <template #actions>
         <el-button @click="loadAll">刷新</el-button>
+        <el-button v-perms="'quality.issue.read'" @click="goLedger">查看台账</el-button>
         <el-button v-perms="'probe.finding.read'" @click="doExport">导出 CSV</el-button>
       </template>
     </RePageHeader>
@@ -183,6 +184,15 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+          <el-button
+            v-if="ledgerIssueId !== null"
+            type="info"
+            plain
+            size="small"
+            @click="goLedgerIssue"
+          >
+            查看质量台账
+          </el-button>
         </div>
 
         <el-tabs v-model="drawerTab" class="section-gap">
@@ -235,14 +245,15 @@
       />
       <template #footer>
         <el-button @click="transitionDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="acting" @click="submitTransition">确认迁移</el-button>
+        <el-button v-perms="'probe.finding.transition'" type="primary" :loading="acting" @click="submitTransition">确认迁移</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { ArrowDown } from "@element-plus/icons-vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
@@ -256,9 +267,13 @@ import {
   type ProbeFindingListItem,
   type ProbeRun
 } from "@/api/probe";
+import { listQualityObservations, type QualityObservationItem } from "@/api/quality";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import { sanitizeEvidenceText } from "@/views/asset/probe-findings/sanitize";
+import { findingIdFromRouteQuery, probeFindingSourceRef } from "@/views/quality/sourceRef";
 
+const router = useRouter();
+const route = useRoute();
 const PROBE_TYPES = ["R-REF", "R-CNT", "R-KEY", "R-XSYS", "R-DOM"];
 const STATUSES = ["open", "confirmed", "false_positive", "resolved"];
 
@@ -287,6 +302,11 @@ const transitionDialogVisible = ref(false);
 const transitionAction = ref("");
 const pendingToStatus = ref("");
 const transitionReason = ref("");
+
+// 178 R4③：当前选中发现反查到的台账 issue_id（null=未命中/不可用 → 隐藏按钮）
+const ledgerIssueId = ref<number | null>(null);
+// 178 R4②：同一 finding_id 未命中只 warning 一次
+let lastMissingFindingId: number | null = null;
 
 const sanitizedEvidenceSql = computed(() => sanitizeEvidenceText(detail.value?.evidence_sql));
 
@@ -349,6 +369,11 @@ function loadAll() {
   loadList();
 }
 
+/** 174 S7：关联台账入口（不改变本页筛选与导出行为） */
+function goLedger() {
+  router.push("/quality/issues");
+}
+
 function applyFilter() {
   page.value = 1;
   loadList();
@@ -372,6 +397,7 @@ async function openDetail(row: ProbeFindingListItem) {
   drawerVisible.value = true;
   detail.value = null;
   runs.value = [];
+  ledgerIssueId.value = null;
   try {
     const [dRes, rRes] = await Promise.all([
       getProbeFinding(row.id),
@@ -379,10 +405,65 @@ async function openDetail(row: ProbeFindingListItem) {
     ]);
     detail.value = dRes;
     runs.value = rRes.items;
+    void resolveLedgerIssue(row.id);
   } catch (error: any) {
     ElMessage.error(extractErrorDetail(error, "发现详情加载失败"));
   }
 }
+
+/**
+ * 178 R4③：反查质量台账——不新增后端，用现有 listQualityObservations
+ * ({source_kind:'probe_finding'}) 客户端匹配 asset_probe_findings:{id} 取
+ * issue_id；total>100 时最多补拉一页。未命中 / 403（缺
+ * quality.observation.read）/ 网络失败一律隐藏按钮，不打错误态。
+ */
+async function resolveLedgerIssue(findingId: number) {
+  ledgerIssueId.value = null;
+  const expectedRef = probeFindingSourceRef(findingId);
+  const matchRef = (rows: QualityObservationItem[]) =>
+    rows.find(item => item.source_record_ref === expectedRef && typeof item.issue_id === "number");
+  try {
+    let res = await listQualityObservations({ source_kind: "probe_finding", page: 1, page_size: 100 });
+    let hit = matchRef(res.items || []);
+    if (!hit && (res.total || 0) > 100) {
+      res = await listQualityObservations({ source_kind: "probe_finding", page: 2, page_size: 100 });
+      hit = matchRef(res.items || []);
+    }
+    ledgerIssueId.value = hit ? (hit.issue_id as number) : null;
+  } catch (error) {
+    ledgerIssueId.value = null;
+    console.warn("[probe-findings] quality ledger lookup unavailable", error);
+  }
+}
+
+function goLedgerIssue() {
+  if (ledgerIssueId.value === null) return;
+  router.push(`/quality/issues/${ledgerIssueId.value}`);
+}
+
+/** 178 R4②：消费路由 query.finding_id（台账观测正向跳转的落地端） */
+async function consumeRouteFinding() {
+  const id = findingIdFromRouteQuery(route.query.finding_id);
+  if (id === null) return;
+  const row = items.value.find(item => item.id === id);
+  if (row) {
+    lastMissingFindingId = null;
+    await openDetail(row);
+    return;
+  }
+  if (lastMissingFindingId !== id) {
+    // 不自动清筛选去全库盲扫；同一 id 只提示一次
+    ElMessage.warning("未在当前筛选结果中找到该发现");
+    lastMissingFindingId = id;
+  }
+}
+
+watch(
+  () => route.query.finding_id,
+  () => {
+    void consumeRouteFinding();
+  }
+);
 
 function onDrawerClosed() {
   detail.value = null;
@@ -462,7 +543,11 @@ async function doExport() {
   }
 }
 
-onMounted(loadAll);
+onMounted(async () => {
+  await loadList();
+  // 178 R4②：首跳（含 KeepAlive 冷挂载）时在列表加载后消费 finding_id
+  await consumeRouteFinding();
+});
 </script>
 
 <style scoped>

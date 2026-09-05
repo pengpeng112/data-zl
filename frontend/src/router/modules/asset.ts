@@ -153,11 +153,12 @@ export default {
       }
     },
     {
+      // 174：路径与语义不变，仅菜单显示名改为“元数据质控”（区别于质量治理台账）
       path: "/asset/quality",
       name: "AssetQuality",
       component: () => import("@/views/asset/quality/index.vue"),
       meta: {
-        title: "数据质量",
+        title: "元数据质控",
         showLink: true,
         auths: ["asset.quality.view"]
       }
