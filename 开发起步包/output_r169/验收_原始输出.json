@@ -1,0 +1,101 @@
+{
+  "steps": [
+    {
+      "step": "A1_overview_first_screen",
+      "note": "目检：无错误面板、系统聚合层出图",
+      "dom": {
+        "canvas": 4,
+        "svgCircles": 0,
+        "errorPanel": false,
+        "toolbar": true,
+        "neighborCalls": 0
+      },
+      "api": {},
+      "dark": 0.0122,
+      "center_dark": 0.0076,
+      "threshold": 0.35,
+      "pass": null,
+      "console": []
+    },
+    {
+      "step": "A2_explore_focus_1hop",
+      "note": "门槛：真实 PAT_VISIT 邻域且 center_dark<35%",
+      "dom": {
+        "canvas": 4,
+        "svgCircles": 0,
+        "errorPanel": true,
+        "toolbar": true,
+        "neighborCalls": 1
+      },
+      "api": {
+        "status": 200,
+        "nodes": 32,
+        "edges": 36,
+        "center": "DATA_CENTER|ods_8_216|HIS|HIS|PAT_VISIT"
+      },
+      "dark": 0.0602,
+      "center_dark": 0.1473,
+      "threshold": 0.35,
+      "pass": true,
+      "console": []
+    },
+    {
+      "step": "A3_explore_2hop",
+      "note": "门槛：真实 PAT_VISIT 2跳邻域且 center_dark<35%",
+      "dom": {
+        "canvas": 4,
+        "svgCircles": 0,
+        "errorPanel": true,
+        "toolbar": true,
+        "neighborCalls": 1
+      },
+      "api": {},
+      "dark": 0.0602,
+      "center_dark": 0.1473,
+      "threshold": 0.35,
+      "pass": false,
+      "console": [
+        "A3-depth-fail:Timeout 30000ms exceeded while waiting for event \"response\""
+      ]
+    },
+    {
+      "step": "A4_incremental_expand",
+      "note": "门槛：真实增量 API 200 且 center_dark<35%",
+      "dom": {
+        "canvas": 4,
+        "svgCircles": 0,
+        "errorPanel": true,
+        "toolbar": true,
+        "neighborCalls": 2
+      },
+      "api": {
+        "status": 200,
+        "nodes": 1,
+        "edges": 3,
+        "center": "DATA_CENTER|ods_8_216|HIS|HIS|PAT_VISIT"
+      },
+      "dark": 0.0114,
+      "center_dark": 0.0063,
+      "threshold": 0.35,
+      "pass": false,
+      "console": []
+    },
+    {
+      "step": "A5_inspector_legend",
+      "note": "目检：Inspector 打开、图例芯片可见",
+      "dom": {
+        "canvas": 4,
+        "svgCircles": 0,
+        "errorPanel": true,
+        "toolbar": true,
+        "neighborCalls": 2
+      },
+      "api": {},
+      "dark": 0.0114,
+      "center_dark": 0.0063,
+      "threshold": 0.35,
+      "pass": null,
+      "console": []
+    }
+  ]
+}

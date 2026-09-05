@@ -1,0 +1,25 @@
+{
+  "steps": [],
+  "system_map": {
+    "dom": {
+      "statCards": 6,
+      "steps": [
+        "资产可知",
+        "关系可信",
+        "标准统一",
+        "质控可检",
+        "过程可溯",
+        "结果可复用"
+      ],
+      "errPanel": false,
+      "alert": "",
+      "has12702": true,
+      "has1329": true
+    },
+    "errors": [],
+    "shot": "F:\\python\\数据资产\\开发起步包\\output_r170\\screenshots\\system-map.png"
+  },
+  "graph_overview": {
+    "errors": []
+  }
+}

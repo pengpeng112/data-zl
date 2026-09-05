@@ -1,0 +1,25 @@
+=== T0 基线 2026-09-01 18:50:06 ===
+HEAD: b942ccac6ce36cd055cbdf35858c521b12cc038f
+M/?? counts: 14 / 26
+branch: master
+
+--- 他人域文件清单（零触碰对照基准）---
+ M backend/app/services/identity_sync_audit.py
+ M backend/app/services/identity_sync_log.py
+ M backend/app/services/identity_sync_status.py
+ M backend/app/services/jhemr_identity_adapter.py
+ M backend/scripts/run_identity_modified_nightly.py
+ M backend/tests/test_identity_sync.py
+ M backend/tests/test_identity_sync_122_unit.py
+ M frontend/src/layout/components/lay-content/index.vue
+ M frontend/src/layout/components/lay-setting/index.vue
+ M frontend/src/layout/hooks/useDataThemeChange.ts
+ M frontend/src/layout/hooks/useTag.ts
+ M frontend/src/layout/index.vue
+ M frontend/src/store/modules/app.ts
+?? backend/app/services/identity_login_sign_sync.py
+?? backend/tests/identity_login_sign_sync/
+?? frontend/src/layout/captureMode.ts
+
+--- 他人域文件 md5 ---
+31 开发起步包/output_r171/他人域基线.txt

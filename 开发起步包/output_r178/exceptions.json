@@ -1,0 +1,46 @@
+{
+  "batch": "178",
+  "executed_at": "2026-09-04",
+  "exceptions": [
+    {
+      "id": "W-01",
+      "batch": "R0",
+      "severity": "WARN",
+      "item": "开工两问（CDMS 004066 表现 A/B/C；150 课题三选一）未获用户答复",
+      "reason": "按 178 §3 R0 用 AskUserQuestion 问过一次，用户未选择即继续（不空转等待）。",
+      "disposition": "R5 CDMS 整批 SKIP（G7 仍开）；G9 记「仍开」；均写入 wait_domain.md"
+    },
+    {
+      "id": "W-02",
+      "batch": "R1",
+      "severity": "WARN",
+      "item": "N1 夜跑核验 FAIL：2026-09-04 02:00 RUN-b3324c242e78 仍熔断",
+      "reason": "F-1（max_update=150）已放行 update 维度（110<150），但生产仍为 F-2 前语义，110 例行 resync 计入 update，change_ratio=110/110=1.0>0.3 触发 max_change_ratio 维度；签名/职称/科室三子任务被 main_account_sync_not_successful 一刀切 skip。",
+      "disposition": "按 178 铁律不调阈值、不热进 F-2、不改 env/cron；run_id/维度/计数全部落 nightly_n1.md，根治归 G3（发布 F-2）"
+    },
+    {
+      "id": "W-03",
+      "batch": "R0/R3",
+      "severity": "INFO",
+      "item": "本地 15432 端口被外部转发（PID 36052）占用",
+      "reason": "178 §3 R0 明确不杀别人转发。",
+      "disposition": "自建本地 15532→8.83:5432 隧道（PID 39464，会话结束前关闭）；隔离库 URL 全程经变量传递不回显"
+    },
+    {
+      "id": "W-04",
+      "batch": "R3",
+      "severity": "INFO",
+      "item": "未做「从零空库 upgrade head」全量实验",
+      "reason": "无空闲 postgres 实例；178 禁止新建 8.83 业务库、禁止 drop schema。",
+      "disposition": "按计划「没有空库不记失败」跳过；已用隔离库 no-op upgrade（asset schema 已存在，IF NOT EXISTS 幂等不炸、current 保持 d5e6f7a8b9c0）验证等价面"
+    },
+    {
+      "id": "W-05",
+      "batch": "R7",
+      "severity": "INFO",
+      "item": "alembic_version 表在隔离库位于 public schema 而非 asset schema",
+      "reason": "R3 核验时发现 data_asset_test 的 alembic_version 在 public（alembic 默认），177 报告表述「asset.alembic_version」不准确但不影响任何结论；本批 alembic current=d5e6f7a8b9c0 与生产一致。",
+      "disposition": "仅记录口径，不改任何表"
+    }
+  ]
+}

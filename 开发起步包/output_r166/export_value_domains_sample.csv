@@ -1,0 +1,2 @@
+system_code,schema_name,table_name,column_name,code,meaning,domain_kind,scope_condition,status,version_of,updated_at
+DATA_CENTER,R166,R166_THROWAWAY,DISCHARGE_DISPOSITION,4,[throwaway-r166] 非医嘱离院,enum,,pending,1,2026-08-30T13:21:47.346241+08:00

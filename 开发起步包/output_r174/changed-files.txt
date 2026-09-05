@@ -1,0 +1,40 @@
+# 174 数据质量主动治理台账 — 本任务实际改动文件（2026-09-02）
+
+## 新增（后端）
+backend/alembic/versions/d5e6f7a8b9c0_add_quality_governance_ledger_174.py   # 手写迁移：五表+序列+部分唯一索引+权限种子
+backend/app/models/quality_governance.py                                       # 五表模型
+backend/app/services/quality_governance_service.py                             # 领域服务：状态机/归并/复发/抑制/乐观锁/数据范围
+backend/app/services/quality_governance_adapters.py                            # probe_template/quality_rule/manual 三类适配器
+backend/app/api/v1/quality_controls.py                                         # /api/v1/quality-controls
+backend/app/api/v1/quality_observations.py                                     # /api/v1/quality-observations（含 ingest）
+backend/app/api/v1/quality_issues.py                                           # /api/v1/quality-issues（命令+导出+assignment-options）
+backend/app/scripts/__init__.py                                                # 种子工具包
+backend/app/scripts/seed_quality_governance.py                                 # seed_quality_governance --dry-run/--apply
+backend/tests/test_quality_governance_service.py                               # 36 测试：状态机/归并/复发/抑制/种子幂等
+backend/tests/test_quality_governance_api.py                                   # 20 测试：RBAC/数据范围/命令/导出
+
+## 修改（后端）
+backend/app/main.py                          # 注册三路由 + FINE_GRAINED_Rbac_PREFIXES_174 中间件豁免
+backend/app/api/v1/permissions.py            # RESOURCE_CATALOG +12 权限码；角色矩阵（quality_admin 全量/viewer/ai_user 只读）
+
+## 新增（前端）
+frontend/src/api/quality.ts                  # 台账 API 层（类型+请求）
+frontend/src/views/quality/issues/index.vue          # 质量台账列表（范围切换/筛选/建单/导出）
+frontend/src/views/quality/issue-detail/index.vue    # 问题详情（allowed_actions/时间线/观测/命令对话框）
+frontend/src/views/quality/controls/index.vue        # 质控清单页
+frontend/src/views/quality/observations/index.vue    # 观测记录页
+frontend/tests/plan174QualityLedger.test.ts  # 9 源码断言测试
+
+## 修改（前端）
+frontend/src/router/modules/quality.ts               # 默认入口 /probe-findings→/quality/issues；+5 路由；旧路径保留
+frontend/src/router/modules/asset.ts                 # /asset/quality 显示名→元数据质控（路径不变）
+frontend/src/views/asset/probe-findings/index.vue    # +查看台账入口（原筛选/导出不动）
+
+## 工具与工件
+tools/s9_e2e_r174.py                         # S9 端到端 13 场景脚本
+开发起步包/output_r174/                       # 执行工件（progress/exceptions/test-results/changed-files/s9_e2e_results）
+
+## 未触碰（用户已有改动，零接触）
+backend/app/services/cdms_identity_adapter.py、identity_sync_*、jhemr_identity_adapter.py、
+backend/scripts/run_identity_modified_nightly.py、backend/tests/conftest.py、
+backend/tests/test_identity_sync*.py、frontend/src/layout/**、backend/_r172_work/ 等全部保持原样。

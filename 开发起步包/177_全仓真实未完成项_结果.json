@@ -1,0 +1,79 @@
+{
+  "plan": "177_全仓真实未完成项一次性执行计划",
+  "report": "177_全仓真实未完成项_执行报告.md",
+  "executed_at": "2026-09-03",
+  "baseline_head": "96ed027",
+  "batches": {
+    "R0": "DONE",
+    "R1": "DEFERRED (2026-09-04 02:00 未到)",
+    "R2": "DONE (C1-C5 修复, C6 WARN 跳过)",
+    "R3": "DONE (I1/I2 复核通过, I3 F-2 实现)",
+    "R4": "DONE",
+    "R5": "SKIP (用户未选 004066 表现 A/B/C)",
+    "R6": "DONE (wait_domain.md)",
+    "R7": "DONE (DoD 见报告 §5)"
+  },
+  "r2_fixes": {
+    "C1_import170_sequence_reset": {
+      "file": "开发起步包/output_r170/import170.py",
+      "mechanism": "DO 块全量 setval(asset.* nextval/identity 列, greatest(max(id),1), true) + last_value>=max(id) 硬校验",
+      "verified": "重灌 107 序列 behind=0; POST /api/v1/queries/ingest 500→200; audit max(id)=194=last_value"
+    },
+    "C2_systems_list_readback": {
+      "file": "backend/app/services/asset_catalog.py",
+      "root_cause_corrected": "非 CANONICAL 分区返回 by_code 的 upper() 规范化键（列表有该系统但编码被改写 → readback/详情 404），非'仅遍历 CANONICAL 常量'",
+      "fix": "返回 row.system_code 原值 + connection_count 真实计数（原硬编码 0）",
+      "tests": ["tests/test_r177_fixes.py::test_non_canonical_system_readback_keeps_stored_code", "tests/test_r177_fixes.py::test_canonical_systems_ordered_before_non_canonical"]
+    },
+    "C3_vperms_six_buttons": {
+      "files": ["frontend/src/views/asset/probe-findings/index.vue", "frontend/src/views/asset/value-domains/index.vue", "frontend/src/views/dict/general/index.vue"],
+      "codes_used": {"probe-findings 确认迁移": "probe.finding.transition", "value-domains 确认": "value_domain.confirm", "dict/general 4×保存": "dict.general.edit"},
+      "deviation": "177 草案的 dict.general.manage 不存在于权限种子，按同页既有码用 dict.general.edit",
+      "tests": ["frontend/tests/plan177R2.test.ts (3 用例)", "plan166StageD2 B3 计数锁 3→4 库存更新"]
+    },
+    "C4_graph_edge_label": {
+      "file": "frontend/src/views/asset/components/RelationGraph.vue",
+      "root_cause": "组件先经 graphNormalize 产出 ECharts 风格 label 对象({show,formatter,...})，274/432 两处直接消费对象 → [object Object]",
+      "fix": "edgeLabelText(): string label → label.formatter → from_columns string → ''",
+      "tests": ["frontend/tests/plan177R2.test.ts (2 用例)"]
+    },
+    "C5_recipe_create_validation": {
+      "files": ["backend/app/api/v1/recipes.py (create 前置校验)", "backend/app/services/recipe_service.py (共享 extract_recipe_table_names/validate_recipe_tables)"],
+      "semantics": "非法表标识 422；空表清单仍是合法草稿",
+      "tests": ["tests/test_r177_fixes.py::test_recipe_create_rejects_invalid_table_identifiers", "tests/test_r177_fixes.py::test_recipe_create_accepts_valid_and_empty_tables"]
+    },
+    "C6_graph_toolbar_props": "WARN 跳过：需父组件 graph/index.vue 配合（共享响应式对象设计），父组件不在白名单"
+  },
+  "r3_identity": {
+    "I1_cdms_ffree3": "diff 复核通过（模板/INSERT/建户/align 幂等四处）；持久化=G1",
+    "I2_login_sign_subtask": "模块+adapter+runner 五处接线复核通过（additive/fail-closed/行锁/行数上限）；生产接 cron=G2",
+    "I3_f2_semantics": {
+      "file": "backend/app/services/identity_sync_orchestrator.py",
+      "rule": "managed + modified_time(HIS 增量命中) → update; managed + 无增量标记 + 存在性检查成功 → resync_unchanged(单列, 不计 max_update/ratio); 存在性检查失败(None) → 回退旧口径保守计 update",
+      "tests_file": "backend/tests/test_identity_cb_resync_f2.py",
+      "tests": 9,
+      "key_assertions": ["110 纯 resync 不熔断", "110 真实 update 仍熔断(阈值100)", "检查失败回退", "105+5 混合拆桶", "ratio 排除 resync", "max_candidates 兜底", "未托管不受影响"]
+    }
+  },
+  "gates": {
+    "backend_full_pytest": "1415 passed / 1 skipped / 0 failed (1920s)",
+    "identity_specialized": "126 passed / 0 failed",
+    "backend_targeted": "49 passed / 0 failed",
+    "alembic_current_isolated": "d5e6f7a8b9c0 (head, = 生产)",
+    "frontend_typecheck": "tsc + vue-tsc 双过",
+    "frontend_vitest": "267/267",
+    "frontend_build": "主入口/图谱异步包/CSS gzip 预算三绿",
+    "reimport_after_pytest": "systems=26 tables=12702 relations=1329 value_domains=77 quality_rules=422 sequences_reset=107 behind=0"
+  },
+  "exceptions": ["W-01 C6 WARN 跳过", "W-02 三处与 177 正文表述的实证偏差(根因更精确/权限码用 edit/文件路径 components)", "W-03 R1 未到时点延后", "W-04 R5 用户未选表现 SKIP"],
+  "zero_violation": {
+    "git_write": 0,
+    "prod_publish": 0,
+    "prod_env_or_cron_changed": 0,
+    "business_source_writes": 0,
+    "value_domain_auto_confirm": 0,
+    "probe_finding_terminal_state_clicked": 0,
+    "other_domain_files_changed": "layout/captureMode 13 文件哈希终检=R0 基线"
+  },
+  "wait_domains": "G1-G17 见 output_r177/wait_domain.md；新增就绪项：G1(I1)、G2(I2)、G3(F-2 代码+测试)"
+}

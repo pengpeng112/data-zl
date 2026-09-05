@@ -1,6 +1,6 @@
 > 类别：资产（源端用户权限模型参考）
 >
-> 状态：**已完成（2026-09-01 用户授权"记录人员权限关系"；关系已落平台复核草稿 id 99-101；本地证据齐）**
+> 状态：**已完成 + 两次补执行（2026-09-02 权限补齐 27/27 ALL_OK §5；同日用户报障 004066 定位建户模板漏 FFREE3 → 46 户数据修复+模板根修，见 §6）**
 >
 > 关联：171 号后续；sjzc 技能（`paperless_cdms_oracle_10_10_10_93` live 只读）；155 号 ECG 草稿先例
 
@@ -73,3 +73,47 @@ FROM CDMS.T_MSS_AUTHMAPPING WHERE FID = '<工号>' ORDER BY FTYPE
 ## 4. 红线自检
 
 源库全程只读（live SELECT）；生产平台写入仅 `asset_relation_reviews` 草稿层（用户明确授权"更新资产系统的关系"，走 155 先例不碰正式关系）；无凭据落盘；姓名/身份证未进日志（文档仅工号+姓名，身份证不收录）。
+
+## 5. 补执行记录（2026-09-02，用户授权「根据每天同步的任务处理」）
+
+**结果：33 人名单中 27 人已全部开通无纸化权限与角色（CDMS 只读复核 ALL_27_OK）。**
+
+### 5.1 根因（为什么"之前导入过但角色和科室都没有成功"）
+
+- 平台身份主档 persons 里 26 人 `classification=legacy_unmanaged`：`classify_person` 的 **LEGACY_CUTOFF（存量线 2026-07-20）检查优先于一切职称/岗位规则**（identity_classification.py），老员工一律进存量桶。
+- 夜间同步 candidate 过滤 `classification in {doctor,nurse,pharmacist}` → 这批人**从不被认领**；CDMS 侧账号系早期人工建户（无 AUTHMAPPING 权限行），夜间任务的 `align_existing_user`（幂等补缺角色/科室/基础权限）从未对他们执行。
+- 结论：非 bug，是「存量人员不自动纳管」的设计策略挡住了这批下乡人员；本批人员证据链充分（JOB=医生/临床/中医临床/影像诊断，职称=主治/副主任医师），按 doctor 定向纳管。
+
+### 5.2 执行方式（与夜间任务同代码路径）
+
+一次性脚本 `r172_reconcile_xiaxiang.py`（工装归档 `output_r171/`）在生产容器 data-asset-api 内、以 `/etc/cron.d/data-asset-identity-nightly` 完全相同的门禁 env 集合执行：`_process_single_candidate(reconcile_existing=True)` → executor bridge → 已在户走 `align_existing_user`（UPDATE FDEPT + INSERT 缺失权限行，不删除）/ 无户走 `apply_single_user`（建户+全权限，单事务回读验证）。
+
+- dry-run（只读）27 人科室链与补齐计划全部核对通过后执行 apply。
+- **24 人 ALIGN 补齐**（角色 FTYPE=0 医疗质控 a1c9192f… + 主/附加科室 FTYPE=2 + 100005/A00001/1 基础行，多人含病区医生组附加科室）
+- **3 人新建户**：李进叶 001324（影像科 0503）、安鹏 003176（影像科 0503）、李威 002124（病理科 050202）
+- run_id=`RUN-f2513dc373c1`（triggered_by=r172_xiaxiang_reconcile，success 27/0）；审计留痕：CDMS/JHEMR actions 各 executed 27、managed_relations +54 行 active。
+- 独立只读复核（r172_verify.py，大写键名）：27/27 在户、FDEPT=主科室、期望权限行零缺失。
+- JHEMR 侧同步对齐（管线双目标固有行为，幂等补缺）。
+
+### 5.3 剩余人工项
+
+- **赵慧工号存疑维持 172 裁决**：名单 001172 平台主档在（影像诊断/主治医师）但 CDMS 无户；同名 000110 已本次补齐。需人工确认名单身份证对应哪个工号后再补 001172（脚本可复用）。
+- legacy_unmanaged 存量纳管策略未改动（本批为白名单式定向纳管，不改 LEGACY_CUTOFF）；若未来要把更多存量人员纳入夜间同步，属策略变更需另行裁决。
+- 平台 persons.classification 未改动（仍 legacy_unmanaged，夜间 preflight 会维持该值）；managed_relations 已登记 active，后续 MODIFIEDTIME 变更不会引起重复处理（分类过滤先挡）。
+
+## 6. FFREE3 事件：平台建户模板漏列导致账号不可用（2026-09-02 用户报障 004066）
+
+**现象**：用户反馈工号 004066「还是不对」，参照 004019（可用）。
+
+**对比诊断**（output_r171/r172_full.py 全列 diff + r172_probe2.py 全库登录事实统计）：
+- 两人 AUTHMAPPING 权限行完全同构（角色/科室/100005/A00001/1 全齐）、FUSERSTATE 均 0——权限层无差异。
+- 真实差异在 EMP_DICT：004019=FSYSID 1/**FFREE3='1'**/有登录记录；004066=FSYSID 2/**FFREE3=NULL**/从未登录。
+- **全库硬证据**：1735 个登录过的账号 99.7% FFREE3='1'；**从未登录的 46 户全部是「FFREE3=NULL」零例外**。FSYSID/FUSERTYPE 均非开关（登录用户 0/1/2 值都有）。
+
+**根因**：平台建户模板 `_SQL_INSERT_EMP` 未包含 FFREE3 列（模板参考账号 904/1036 已不在库、当年抄模板漏列）。夜间同步 8-08/8-20/8-30 批量建的 43 户 + r172 §5 新建 3 户，共 46 户全部 FFREE3=NULL → 无纸化系统不可用。
+
+**修复（2026-09-02，两段）**：
+1. 数据修复（r172_fix_ffree3.py，容器内执行+审计留痕 asset_govern_audit_logs r172_ffree3_fix）：46 户 `UPDATE FFREE3 NULL→'1'`（幂等 WHERE FFREE3 IS NULL），复核 46/46；崔忠丽 003888 历史手工 133 行权限未动。
+2. 模板根修（cdms_identity_adapter.py 四处）：CDMS_BASE_TEMPLATE 加 FFREE3='1'、_SQL_INSERT_EMP 补列、apply binds 补值、align_existing_user 加幂等 FFREE3 对齐（存量户自动修复）。identity 域测试全绿（identity_nightly 74P + identity_sync 72P）；**容器已热修生效**（容器版原=git HEAD 零差异，docker cp 后三验通过），明晚 02:00 夜间任务建新户自动带 FFREE3。工作区代码变更待主 AI 复核随下批提交发布（镜像重建后持久）。
+
+**遗留**：46 户中 43 户（下乡名单外）此前一直不可用属同源故障已一并修复；若厂商确认 FFREE3 有其他语义需再评估（当前以全库登录事实为据）。

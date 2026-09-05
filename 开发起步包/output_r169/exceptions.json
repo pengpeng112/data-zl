@@ -1,0 +1,46 @@
+{
+  "plan": "169_关系图谱叠加与首屏不可用修复执行计划.md（v1.0）",
+  "executed_at": "2026-08-30",
+  "items": [
+    {
+      "id": "W1",
+      "severity": "WARN",
+      "stage": "G2",
+      "title": "自动降级的整页挂载测试改为纯函数+源码断言组合",
+      "detail": "计划原文建议 vi.mock 首拒次成断言页面出图；实际整页挂载在 jsdom 拉起 G6 动态 chunk 风险高（round-3 复现即遭 HMR/时序干扰）。按本仓 B10 先例改为：shouldDowngradeOverview 纯函数六用例+loadData 接线/防重入/手动恢复源码断言，等价覆盖判定与接线。",
+      "action": "继续执行"
+    },
+    {
+      "id": "W2",
+      "severity": "WARN",
+      "stage": "G3 验收环境",
+      "title": "伪会话三坑依次排除：pure/el-segmented 类名混淆、refresh 401 队列、pytest 清库殃及 token/基准数据",
+      "detail": "①视图模式控件是 EP 原生 .el-segmented（顶栏主题控件才是 .pure-segmented，round-3 曾因此误判控件不可达）；②localStorage accessToken='' 的伪会话在时序不利时业务请求被 refresh 队列 reject——改走 auth.ts 迁移期 cookie（authorized-token）通道注入 token 根治；③G1 全量 pytest 的 autouse 夹具清空隔离库（附录 A.2 预告行为），基准数据 12702 表与验收 token 被清——从 verify/round-3/graph_data_export.json 重灌+重建 token 后验收通过。三坑均属验收工装，未动产品代码（cookie 通道是产品既有迁移兼容逻辑）。",
+      "action": "继续执行（166 附录 A.2 同款坑，本轮重演实证）"
+    },
+    {
+      "id": "W3",
+      "severity": "WARN",
+      "stage": "G5",
+      "title": "119 号旧断言与 169 P4 计划内删除冲突，按新契约更新",
+      "detail": "tests/advancedRelationGraph.test.ts 原断言 labelMaxLines>=4/labelWordWrap===false——169 P4 明文删除这三项死配置（round-3 三方裁决 G6 不消费）。断言更新为：三项 undefined（不再下发）+labelText 含预换行符（formatGraphNodeLabel 行为保持）。非弱化：从断言死配置存在改为断言死配置绝迹。",
+      "action": "继续执行（与 165 405 占位测试计划内更新同类）"
+    },
+    {
+      "id": "W4",
+      "severity": "WARN",
+      "stage": "G5",
+      "title": "顺手修 Inspector 中文名渲染 label 对象 JSON（验收新发现，图谱直观性范畴）",
+      "detail": "A5 验收发现 GraphInspector 中文名列在 table_name_cn 为空时直接插值 node.label——聚合节点 label 是 G6 标签配置对象，渲染成整段 JSON。新增 displayName computed（table_name_cn→字符串 label→label.formatter→display_id 四级回落）。超出计划六项清单但属用户主诉直观性范畴的最小修复（一处 computed），已登记并纳入测试（119 契约测试同文件外，无新增专项——typecheck+目检覆盖）。",
+      "action": "继续执行"
+    },
+    {
+      "id": "W5",
+      "severity": "WARN",
+      "stage": "G3",
+      "title": "A3 depth 控件未点中，2 跳场景由默认深度覆盖",
+      "detail": "验收脚本 depth segmented 点击超时（locate.depth 需 physical_key 且类名再探成本高）；A3 截图实测 80-100 节点（远多于 1 跳 30 个）且目检散开无堆叠——load-chain 默认深度即 2 跳，场景实质覆盖。像素门槛对该场景 PASS 有效。",
+      "action": "继续执行"
+    }
+  ]
+}

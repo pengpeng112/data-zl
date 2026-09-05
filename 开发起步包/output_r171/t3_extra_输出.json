@@ -1,0 +1,61 @@
+{
+  "steps": [
+    {
+      "platform_admin_sees_menu": true,
+      "shot": "F:\\python\\数据资产\\开发起步包\\output_r171\\screenshots\\t3_6_menu_visibility.png",
+      "step": "t3_6_menu_visibility"
+    },
+    {
+      "url_contains": true,
+      "url": "http://127.0.0.1:8848/#/asset/graph",
+      "step": "t3_1_step_jump_图谱"
+    },
+    {
+      "url_contains": true,
+      "url": "http://127.0.0.1:8848/#/value-domains",
+      "step": "t3_1_step_jump_值域"
+    },
+    {
+      "statCards": 6,
+      "steps": 6,
+      "step": "t3_1_systemmap_dom"
+    },
+    {
+      "rows": 20,
+      "tabs": [
+        "全部",
+        "冲突 0",
+        "通知",
+        "消息(3)",
+        "待办(4)"
+      ],
+      "errPanel": false,
+      "conflict_tab_rows": 0,
+      "shot": "F:\\python\\数据资产\\开发起步包\\output_r171\\screenshots\\t3_3_value_domains.png",
+      "step": "t3_3_value_domains"
+    },
+    {
+      "errPanel": false,
+      "bodyLen": 567,
+      "shot": "F:\\python\\数据资产\\开发起步包\\output_r171\\screenshots\\t3_4_quality.png",
+      "step": "t3_4_quality"
+    },
+    {
+      "errPanel": false,
+      "bodyLen": 844,
+      "shot": "F:\\python\\数据资产\\开发起步包\\output_r171\\screenshots\\t3_4_admin.png",
+      "step": "t3_4_admin"
+    },
+    {
+      "graph_overview_no_token": 401,
+      "ai_system_context_no_token": 401,
+      "graph_overview_bad_token": 403,
+      "health": 200,
+      "step": "t3_5_auth_smoke"
+    },
+    {
+      "errors": [],
+      "step": "page_errors"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "plan": "开发起步包/171_系统前后端全面修复与测试一次性执行计划.md v1.1",
+  "executed_at": "2026-08-31 23:14 ~ 2026-09-01 01:00",
+  "warnings": [
+    {
+      "id": "W1",
+      "stage": "T0",
+      "desc": "output_r170 工装 export170.py/import170.py 的 import 行写错模块（from app.models.asset import AssetDataSource——实际在 app.models.asset_system），生产容器与本地均 ImportError；且 export170.json 本地缺失、隧道断开",
+      "action": "重建隧道（166 附录 A.1 命令）；修正两脚本 import；从生产容器只读重新导出 export170.json（systems=26 sources=28 columns=178547 value_domains=77 audit=192 quality_rules=422）后重灌成功 tables=12702 relations=1329 token ready"
+    },
+    {
+      "id": "W2",
+      "stage": "T1",
+      "desc": "typecheck 发现 system-map/index.vue:31 tone=\"success\" 不在 ReStatCard 允许类型（primary|accent|info|warning|danger），属 system-map 域既有缺陷（round-7 修了测试但未跑 typecheck）",
+      "action": "域内修复：tone 改 accent（未动被 15 页面共用的 ReStatCard 组件）；复跑 typecheck exit 0"
+    },
+    {
+      "id": "W3",
+      "stage": "R1",
+      "desc": "171 §2 R1 各域清单小于实际域足迹：167 域还有 ai-sql/index.vue、plan167AiSql.test.ts、167 执行报告、api/asset.ts 的 generateAiSql 120s hunk；169 域还有 graphNormalize.ts、backend test_graph_overview_fix_169.py、plan169G2/G3/G4、api/asset.ts 的 overview 30s hunk、router/utils.ts hash 兜底（r169-storage-fix 在产已验证）",
+      "action": "按 R1『每文件 diff 复核归属』条款逐文件核验后入对应域 commit；asset.ts 双 hunk 以补丁按域分别 staging（169 批 6 行/167 批 7 行）；四提交 git show --name-only 均过他人域正则零匹配"
+    },
+    {
+      "id": "W4",
+      "stage": "T3/R1",
+      "desc": "复跑 169 验收工装（验收截图.py）覆盖写 output_r169/验收_原始输出.json 与 A1-A5 同名截图，原始数值以 169 执行报告引文（A2/A3/A4=1.5%/1.5%/0.6%）为准；另 output_r* 目录按仓库先例（从未入库）不提交，171 R1『output_r169 报告』落为三份编号文档",
+      "action": "已如实登记；output_r169 现存 JSON/截图为 171 复跑版（数值同样全过：复跑密度 14.7%/4.6%/0.6% 均<35%）"
+    },
+    {
+      "id": "W5",
+      "stage": "T3",
+      "desc": "169 工装 A3（点 2 跳）与 A4（画布中心双击）为状态/位置依赖：默认档已是 2 跳时点按不触发 change（30s 超时）；双击是否命中节点随布局浮动",
+      "action": "以聚焦探针（t3_graph_probe.py）等价复验收口：B2 1 跳→B3 1→2 跳真实 /neighbors 200（32→60 节点、cdark 4.4%/4.6%）、B4 双击触发真实 API 200；交互链路（node-activate→toggleNodeExpansion）与搜索聚焦同端点已三重实证"
+    },
+    {
+      "id": "W6",
+      "stage": "T3",
+      "desc": "T3 抓出 169 域 2 个活体缺陷：① 搜索聚焦成功后误报『图谱接口请求失败』面板——根因双叠：globalSearch 把 focusNode 画布竞态失败按 classifyGraphError 归为 api_error + 成功路径从不清 errorInfo（面板永不消失，后端全 200）；② graph 页用 <RePageHeader> 未 import，页头静默丢失（Vue warn）",
+      "action": "域内修复：focusNode 独立 try 隔离；错误面板 v-if 加 isErrorState 门控；补 RePageHeader import。plan169G2 旧断言锁的是缺陷行为，随修复同步加严（新绑定更严格）；t3_repro_panel.py 复验三检查点面板均消失；修复后全套门禁复跑全绿"
+    },
+    {
+      "id": "W7",
+      "stage": "R2",
+      "desc": "发布前侦察推翻 round-7 前置之一：167 后端三文件（ai.py/ai_context_builder.py）生产 md5 与工作区完全一致（镜像 r169 会话 08-30 22:55 已热补），容器 08-31 08:56 启动晚于热补 10h → 运行时已加载新代码",
+      "action": "R2 后端从『scp+docker cp+restart 发布』改为『在产核验』（md5×2+进程时间三证），避免无意义生产重启；前端按计划原子切换 r171-20260901（previous=r169-20260831-storage-fix）"
+    },
+    {
+      "id": "W8",
+      "stage": "T3/T5",
+      "desc": "生产 /api/health 经 nginx 返回 401（应用层全局鉴权），HTTP 层健康以 docker healthcheck（healthy）为准；生产浏览器级 graph 首屏/system-map 实测截图需真实用户凭据",
+      "action": "容器 healthy 已证；浏览器级生产截图归 P2 呈用户（171 T5『授权用户或带凭据实测』措辞内）；生产 KPI 真实数经 T0 生产只读导出（12702/1329/26…）+T3 隔离库同数渲染双证"
+    },
+    {
+      "id": "W9",
+      "stage": "全局",
+      "desc": "测试计数与 166 时代基线不同（后端 1288→1341、前端 229→245→253）：均为 169/167/170(system-map)/171 各域新增测试所致，无删减；按铁律②以『0 failed+仅增不减』判过",
+      "action": "已核对各域新增测试清单（plan169G2-G4/后端169/167 域/systemMap/plan171R3）与计数增量一致"
+    }
+  ]
+}

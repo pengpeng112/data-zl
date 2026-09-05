@@ -1,0 +1,830 @@
+{
+ "hits": {
+  "v_html": [
+   {
+    "file": "src/views/asset/probe-findings/sanitize.ts",
+    "line": 6,
+    "text": "* 渲染一律走文本插值（Vue 自动转义），本仓禁 v-html——XSS 断言测试锁死。"
+   },
+   {
+    "file": "src/views/asset/ai-quality/index.vue",
+    "line": 114,
+    "text": "<div class=\"live-text markdown\" v-html=\"renderReportHtml(liveDisplayText(interruptedText || liveText))\" />"
+   },
+   {
+    "file": "src/views/asset/ai-quality/index.vue",
+    "line": 203,
+    "text": "<div v-else-if=\"item.partial_text\" class=\"patrol-conclusion markdown\" v-html=\"renderReportHtml(item.partial_text)\" />"
+   }
+  ],
+  "no_perms_write": [
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 189,
+    "text": "<el-button type=\"primary\" :loading=\"termSaving\" @click=\"saveTerm\">保存</el-button>"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 306,
+    "text": "<el-button type=\"primary\" :loading=\"ownerSaving\" @click=\"saveOwner\">保存</el-button>"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 329,
+    "text": "<el-button type=\"primary\" @click=\"tokenOnce.visible = false\">我已保存，关闭</el-button>"
+   },
+   {
+    "file": "src/views/asset/probe-findings/index.vue",
+    "line": 238,
+    "text": "<el-button type=\"primary\" :loading=\"acting\" @click=\"submitTransition\">确认迁移</el-button>"
+   },
+   {
+    "file": "src/views/asset/value-domains/index.vue",
+    "line": 269,
+    "text": "<el-button type=\"primary\" :loading=\"acting\" @click=\"submitConfirm\">确认</el-button>"
+   },
+   {
+    "file": "src/views/dict/general/index.vue",
+    "line": 191,
+    "text": "<el-button type=\"primary\" :loading=\"catDialog.submitting\" @click=\"saveCategory\">保存</el-button>"
+   },
+   {
+    "file": "src/views/dict/general/index.vue",
+    "line": 218,
+    "text": "<el-button type=\"primary\" :loading=\"stdItemDialog.submitting\" @click=\"saveStdItem\">保存</el-button>"
+   },
+   {
+    "file": "src/views/dict/general/index.vue",
+    "line": 247,
+    "text": "<el-button type=\"primary\" :loading=\"sysItemDialog.submitting\" @click=\"saveSysItem\">保存</el-button>"
+   },
+   {
+    "file": "src/views/dict/general/index.vue",
+    "line": 288,
+    "text": "<el-button type=\"primary\" :loading=\"mapDialog.submitting\" @click=\"saveMapping\">保存</el-button>"
+   },
+   {
+    "file": "src/views/dict/medical/components/ImportWizard.vue",
+    "line": 158,
+    "text": "<el-button type=\"primary\" @click=\"step = 3\">进入审核</el-button>"
+   },
+   {
+    "file": "src/views/dict/medical/components/ImportWizard.vue",
+    "line": 223,
+    "text": "<el-button @click=\"step = 1; runInfo = null\">导入新文件</el-button>"
+   },
+   {
+    "file": "src/views/dict/medical/components/PushWizard.vue",
+    "line": 170,
+    "text": "<el-button v-else type=\"success\" @click=\"step = 3\">进入执行</el-button>"
+   },
+   {
+    "file": "src/views/identity/accounts/index.vue",
+    "line": 132,
+    "text": "<el-button type=\"primary\" :loading=\"bindLoading\" @click=\"doBind\">确认绑定</el-button>"
+   },
+   {
+    "file": "src/views/identity/persons/index.vue",
+    "line": 100,
+    "text": "<el-button type=\"primary\" :loading=\"profileSaving\" @click=\"submitProfileChange\">提交画像变更审批</el-button>"
+   },
+   {
+    "file": "src/views/identity/roles/index.vue",
+    "line": 117,
+    "text": "<el-button type=\"primary\" :loading=\"roleSaving\" @click=\"saveRole\">保存</el-button>"
+   },
+   {
+    "file": "src/views/ops/runs/index.vue",
+    "line": 107,
+    "text": "<el-button type=\"primary\" :loading=\"submitting\" @click=\"handleSubmit\">提交</el-button>"
+   }
+  ],
+  "hardcoded": [
+   {
+    "file": "src/components/ReDialog/index.ts",
+    "line": 55,
+    "text": "* https://github.com/pure-admin/vue-pure-admin/blob/main/src/App.vue#L4"
+   },
+   {
+    "file": "src/components/ReDialog/index.ts",
+    "line": 56,
+    "text": "* https://github.com/pure-admin/vue-pure-admin/blob/main/src/App.vue#L12"
+   },
+   {
+    "file": "src/components/ReDialog/index.ts",
+    "line": 57,
+    "text": "* https://github.com/pure-admin/vue-pure-admin/blob/main/src/App.vue#L22"
+   },
+   {
+    "file": "src/components/ReDialog/type.ts",
+    "line": 22,
+    "text": "/** https://element-plus.org/zh-CN/component/dialog.html#attributes */"
+   },
+   {
+    "file": "src/components/ReDialog/type.ts",
+    "line": 104,
+    "text": "/** https://element-plus.org/zh-CN/component/button.html#button-attributes */"
+   },
+   {
+    "file": "src/components/ReDialog/type.ts",
+    "line": 169,
+    "text": "* @see {@link https://element-plus.org/zh-CN/component/dialog.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%A4%B4%E9%83%A8}"
+   },
+   {
+    "file": "src/components/ReIcon/src/hooks.ts",
+    "line": 7,
+    "text": "* @see 点击查看文档图标篇 {@link https://pure-admin.cn/pages/icon/}"
+   },
+   {
+    "file": "src/components/ReIcon/src/iconfont.ts",
+    "line": 3,
+    "text": "// 封装iconfont组件，默认`font-class`引用模式，支持`unicode`引用、`font-class`引用、`symbol`引用 （https://www.iconfont.cn/help/detail?spm=a313x.7781069.1998910419.20&helptype=code）"
+   },
+   {
+    "file": "src/components/ReIcon/src/offlineIcon.ts",
+    "line": 5,
+    "text": "// https://icon-sets.iconify.design/ep/?keyword=ep"
+   },
+   {
+    "file": "src/components/ReIcon/src/offlineIcon.ts",
+    "line": 8,
+    "text": "// https://icon-sets.iconify.design/ri/?keyword=ri"
+   },
+   {
+    "file": "src/components/ReIcon/src/offlineIcon.ts",
+    "line": 13,
+    "text": "// Element Plus Icon: https://github.com/element-plus/element-plus-icons"
+   },
+   {
+    "file": "src/components/ReIcon/src/offlineIcon.ts",
+    "line": 15,
+    "text": "// Remix Icon: https://github.com/Remix-Design/RemixIcon"
+   },
+   {
+    "file": "src/components/ReIcon/src/types.ts",
+    "line": 2,
+    "text": "// iconify (https://docs.iconify.design/icon-components/vue/#properties)"
+   },
+   {
+    "file": "src/components/ReSegmented/src/type.ts",
+    "line": 9,
+    "text": "* @see {@link 用法参考 https://pure-admin.cn/pages/icon/#%E9%80%9A%E7%94%A8%E5%9B%BE%E6%A0%87-userendericon-hooks }"
+   },
+   {
+    "file": "src/plugins/echarts.ts",
+    "line": 37,
+    "text": "* @description 按需引入echarts，具体看 https://echarts.apache.org/handbook/zh/basics/import/#%E5%9C%A8-typescript-%E4%B8%AD%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5"
+   },
+   {
+    "file": "src/plugins/echarts.ts",
+    "line": 38,
+    "text": "* @see 温馨提示：必须将 `$echarts` 添加到全局 `globalProperties` ，具体看 https://pure-admin-utils.netlify.app/hooks/useECharts/useECharts#%E4%BD%BF%E7%94%A8%E5%89%8D%E6%8F%90"
+   },
+   {
+    "file": "src/plugins/elementPlus.ts",
+    "line": 1,
+    "text": "// 按需引入element-plus（该方法稳定且明确。当然也支持：https://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5）"
+   },
+   {
+    "file": "src/plugins/elementPlus.ts",
+    "line": 6,
+    "text": "* 导出来源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/component.ts#L111-L211"
+   },
+   {
+    "file": "src/plugins/elementPlus.ts",
+    "line": 113,
+    "text": "* 导出来源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/plugin.ts#L11-L16"
+   },
+   {
+    "file": "src/router/index.ts",
+    "line": 41,
+    "text": "* 如何匹配所有文件请看：https://github.com/mrmlnc/fast-glob#basic-syntax"
+   },
+   {
+    "file": "src/router/index.ts",
+    "line": 42,
+    "text": "* 如何排除文件请看：https://cn.vitejs.dev/guide/features.html#negative-patterns"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 25,
+    "text": "// https://cn.vitejs.dev/guide/features.html#glob-import"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 263,
+    "text": "* https://github.com/pure-admin/vue-pure-admin/issues/67"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 351,
+    "text": "/** 获取路由历史模式 https://next.router.vuejs.org/zh/guide/essentials/history-mode.html */"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 353,
+    "text": "// len为1 代表只有历史模式 为2 代表历史模式中存在base参数 https://next.router.vuejs.org/zh/api/#%E5%8F%82%E6%95%B0-1"
+   },
+   {
+    "file": "src/utils/globalPolyfills.ts",
+    "line": 1,
+    "text": "// 如果项目出现 `global is not defined` 报错，可能是您引入某个库的问题，比如 aws-sdk-js https://github.com/aws/aws-sdk-js"
+   },
+   {
+    "file": "src/utils/propTypes.ts",
+    "line": 25,
+    "text": "// 从 vue-types v5.0 开始，extend()方法已经废弃，当前已改为官方推荐的ES6+方法 https://dwightjack.github.io/vue-types/advanced/extending-vue-types.html#the-extend-method"
+   },
+   {
+    "file": "src/utils/sso.ts",
+    "line": 5,
+    "text": "* 简版前端单点登录，根据实际业务自行编写，平台启动后本地可以跳转到已注册页面进行测试，例如 http://localhost:8848/#/asset/overview?username=sso&roles=admin&accessToken=eyJhbGciOiJIUzUxMiJ9.admin"
+   },
+   {
+    "file": "src/utils/http/index.ts",
+    "line": 42,
+    "text": "// 数组格式参数序列化（https://github.com/axios/axios/issues/5142）"
+   },
+   {
+    "file": "src/utils/localforage/index.ts",
+    "line": 9,
+    "text": "// 首选IndexedDB作为第一驱动，不支持IndexedDB会自动降级到localStorage（WebSQL被弃用，详情看https://developer.chrome.com/blog/deprecating-web-sql）"
+   },
+   {
+    "file": "src/utils/localforage/index.ts",
+    "line": 107,
+    "text": "* 二次封装 [localforage](https://localforage.docschina.org/) 支持设置过期时间，提供完整的类型提示"
+   },
+   {
+    "file": "src/utils/localforage/types.d.ts",
+    "line": 1,
+    "text": "// https://github.com/localForage/localForage/blob/master/typings/localforage.d.ts"
+   }
+  ],
+  "console": [
+   {
+    "file": "src/layout/hooks/useNav.ts",
+    "line": 112,
+    "text": "if (!route.children) return console.error(errorInfo);"
+   },
+   {
+    "file": "src/utils/print.ts",
+    "line": 191,
+    "text": "console.error(err);"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 8,
+    "text": "console.warn(\"tree must be an array\");"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 31,
+    "text": "console.warn(\"menuTree must be an array\");"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 58,
+    "text": "console.warn(\"tree must be an array\");"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 85,
+    "text": "console.warn(\"menuTree must be an array\");"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 111,
+    "text": "console.warn(\"menuTree must be an array\");"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 144,
+    "text": "console.warn(\"data must be an array\");"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 482,
+    "text": "console.error(\"[AdvancedRelationGraph] render failed:\", err);"
+   },
+   {
+    "file": "src/views/asset/system-map/index.vue",
+    "line": 235,
+    "text": "console.warn(\"[system-map]\", extractErrorDetail((f as PromiseRejectedResult).reason, \"部分指标加载失败\"));"
+   }
+  ],
+  "empty_catch": [],
+  "as_any": [
+   {
+    "file": "src/api/dict.ts",
+    "line": 8,
+    "text": "// F8：medical 系列补实体类型（视图层消除 as any）。"
+   },
+   {
+    "file": "src/router/index.ts",
+    "line": 79,
+    "text": "routes: constantRoutes.concat(...(remainingRouter as any)),"
+   },
+   {
+    "file": "src/router/index.ts",
+    "line": 102,
+    "text": "for (const route of initConstantRoutes.concat(...(remainingRouter as any))) {"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 211,
+    "text": "const asyncRouteList = storageLocal().getItem(key) as any;"
+   },
+   {
+    "file": "src/router/utils.ts",
+    "line": 340,
+    "text": "? modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any))"
+   },
+   {
+    "file": "src/store/modules/multiTags.ts",
+    "line": 31,
+    "text": "] as any),"
+   },
+   {
+    "file": "src/store/modules/permission.ts",
+    "line": 32,
+    "text": "this.constantMenus.concat(routes) as any"
+   },
+   {
+    "file": "src/store/modules/user.ts",
+    "line": 83,
+    "text": "setToken(data.data as any);"
+   },
+   {
+    "file": "src/store/modules/user.ts",
+    "line": 119,
+    "text": "setToken(data.data as any);"
+   },
+   {
+    "file": "src/utils/globalPolyfills.ts",
+    "line": 3,
+    "text": "if (typeof (window as any).global === \"undefined\") {"
+   },
+   {
+    "file": "src/utils/globalPolyfills.ts",
+    "line": 4,
+    "text": "(window as any).global = window;"
+   },
+   {
+    "file": "src/utils/print.ts",
+    "line": 108,
+    "text": "if ((child[i] as any).selected == true) {"
+   },
+   {
+    "file": "src/utils/tree.ts",
+    "line": 95,
+    "text": "return getNodeByUniqueId(childrenList as any[], uniqueId);"
+   },
+   {
+    "file": "src/utils/http/index.ts",
+    "line": 206,
+    "text": "config.headers = {} as any;"
+   },
+   {
+    "file": "src/utils/http/index.ts",
+    "line": 208,
+    "text": "(config.headers as any)[\"Authorization\"] = formatToken(token);"
+   },
+   {
+    "file": "src/layout/frame.vue",
+    "line": 42,
+    "text": "const _frame = iframe as any;"
+   },
+   {
+    "file": "src/layout/components/lay-sidebar/components/SidebarBreadCrumb.vue",
+    "line": 69,
+    "text": "router.push(redirect as any);"
+   },
+   {
+    "file": "src/layout/components/lay-tag/index.vue",
+    "line": 203,
+    "text": "concatPath(router.options.routes as any, value);"
+   },
+   {
+    "file": "src/layout/components/lay-tag/index.vue",
+    "line": 250,
+    "text": "}) as any;"
+   },
+   {
+    "file": "src/layout/components/lay-tag/index.vue",
+    "line": 538,
+    "text": "if (unref(showTags as any) === key) return;"
+   },
+   {
+    "file": "src/layout/components/lay-tag/index.vue",
+    "line": 539,
+    "text": "(showTags as any).value = key;"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 418,
+    "text": "keys.value = data as any;"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 487,
+    "text": "owners.value = data.items as any;"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 597,
+    "text": "terms.value = data.items as any;"
+   },
+   {
+    "file": "src/views/asset/admin/index.vue",
+    "line": 672,
+    "text": "snapshots.value = data.items as any;"
+   },
+   {
+    "file": "src/views/asset/ai-quality/index.vue",
+    "line": 400,
+    "text": "const result = selectedResult.value as any;"
+   },
+   {
+    "file": "src/views/asset/ai-tools/index.vue",
+    "line": 202,
+    "text": "systemOptions.value = data as any;"
+   },
+   {
+    "file": "src/views/asset/ai-tools/index.vue",
+    "line": 218,
+    "text": "systemContext.value = data as any;"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 245,
+    "text": "const instance = graph as any;"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 422,
+    "text": "} as any);"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 470,
+    "text": "instance.setData(graphData() as any);"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 472,
+    "text": "if (layout) instance.setOptions({ layout } as any);"
+   },
+   {
+    "file": "src/views/asset/components/AdvancedRelationGraph.vue",
+    "line": 475,
+    "text": "await instance.fitView({ padding: 56 } as any, false);"
+   },
+   {
+    "file": "src/views/asset/probe-findings/index.vue",
+    "line": 335,
+    "text": "const res = await listProbeFindings(params as any);"
+   },
+   {
+    "file": "src/views/asset/probe-findings/index.vue",
+    "line": 453,
+    "text": "const blob = (await exportProbeFindings(body as any)) as unknown as Blob;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 836,
+    "text": "const rows = (data as any) || [];"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 855,
+    "text": "const raw = (data as any) || {};"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 980,
+    "text": "listQualityRules(params as any)"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 985,
+    "text": "rules.value = payload as any;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 988,
+    "text": "rules.value = (payload?.items || []) as any;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 1154,
+    "text": "checkRuns.value = (data.items || []) as any;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 1200,
+    "text": "findingRunOptions.value = (data.items || []) as any;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 1223,
+    "text": "findings.value = data.items as any;"
+   },
+   {
+    "file": "src/views/asset/quality/index.vue",
+    "line": 1307,
+    "text": "records.value = (data.items || []) as any;"
+   },
+   {
+    "file": "src/views/asset/relation-review/index.vue",
+    "line": 91,
+    "text": "return extra as any;"
+   },
+   {
+    "file": "src/views/asset/system-map/index.vue",
+    "line": 216,
+    "text": "const res = await listValueDomains({ status: \"confirmed\", page: 1, page_size: 1 } as any);"
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 470,
+    "text": "} as any);"
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 572,
+    "text": "annotForm.table_name_cn = (detail.value as any)?.table_name_cn || \"\";"
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 573,
+    "text": "annotForm.business_desc_cn = (detail.value as any)?.business_desc_cn || \"\";"
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 574,
+    "text": "annotForm.table_role = (detail.value as any)?.table_role || \"\";"
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 579,
+    "text": "column_name_cn: (col as any).column_name_cn || \"\","
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 580,
+    "text": "business_desc_cn: (col as any).business_desc_cn || \"\","
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 581,
+    "text": "value_desc_cn: (col as any).value_desc_cn || \"\""
+   },
+   {
+    "file": "src/views/asset/table-detail/index.vue",
+    "line": 589,
+    "text": "updateTableAnnotation((detail.value as any)?.id, { ...annotForm })"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 719,
+    "text": "const schema = (table as any).schema_name || \"\";"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 720,
+    "text": "const sourceCode = (table as any).source_code || \"\";"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 722,
+    "text": "const path = (table as any).path as string | undefined;"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 725,
+    "text": "source_name_cn: (table as any).source_name_cn || sourceCode,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 726,
+    "text": "system_code: (table as any).system_code || \"\","
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 727,
+    "text": "system_name_cn: (table as any).system_name_cn,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 728,
+    "text": "system_category: (table as any).system_category,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 729,
+    "text": "source_system: (table as any).source_system,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 741,
+    "text": "system_code: (table as any).system_code,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 742,
+    "text": "system_name_cn: (table as any).system_name_cn,"
+   },
+   {
+    "file": "src/views/asset/tables/index.vue",
+    "line": 743,
+    "text": "source_system: (table as any).source_system,"
+   },
+   {
+    "file": "src/views/asset/value-domains/index.vue",
+    "line": 431,
+    "text": "const res = await listValueDomains(buildParams() as any);"
+   },
+   {
+    "file": "src/views/asset/value-domains/index.vue",
+    "line": 447,
+    "text": "listValueDomains({ status: \"pending\", page: 1, page_size: 1 } as any),"
+   },
+   {
+    "file": "src/views/asset/value-domains/index.vue",
+    "line": 448,
+    "text": "listValueDomains({ conflicted: true, page: 1, page_size: 1 } as any)"
+   },
+   {
+    "file": "src/views/asset/value-domains/index.vue",
+    "line": 607,
+    "text": "const blob = (await exportValueDomains(params as any)) as unknown as Blob;"
+   },
+   {
+    "file": "src/views/ops/audit/index.vue",
+    "line": 117,
+    "text": "ElMessage.error(String((error as any)?.response?.data?.detail || \"获取日志失败\"));"
+   }
+  ],
+  "secrets": [],
+  "inline_event": []
+ },
+ "dead_views": [
+  "src/views/asset/admin/index.vue",
+  "src/views/asset/ai-context/index.vue",
+  "src/views/asset/ai-quality/index.vue",
+  "src/views/asset/ai-sql/index.vue",
+  "src/views/asset/ai-tools/index.vue",
+  "src/views/asset/components/AdvancedRelationGraph.vue",
+  "src/views/asset/components/GraphEvidenceDrawer.vue",
+  "src/views/asset/components/GraphInspector.vue",
+  "src/views/asset/components/GraphLegendFilters.vue",
+  "src/views/asset/components/GraphToolbar.vue",
+  "src/views/asset/components/RelationGraph.vue",
+  "src/views/asset/graph/index.vue",
+  "src/views/asset/lineage/index.vue",
+  "src/views/asset/overview/index.vue",
+  "src/views/asset/probe-findings/index.vue",
+  "src/views/asset/quality/CheckRunsTable.vue",
+  "src/views/asset/quality/index.vue",
+  "src/views/asset/relation-rates/index.vue",
+  "src/views/asset/relation-recipes/index.vue",
+  "src/views/asset/relation-review/index.vue",
+  "src/views/asset/sources/index.vue",
+  "src/views/asset/system-map/index.vue",
+  "src/views/asset/systems/index.vue",
+  "src/views/asset/table-detail/index.vue",
+  "src/views/asset/tables/index.vue",
+  "src/views/asset/value-domains/index.vue",
+  "src/views/dict/general/index.vue",
+  "src/views/dict/mappings/index.vue",
+  "src/views/dict/medical/index.vue",
+  "src/views/dict/medical/components/ImportWizard.vue",
+  "src/views/dict/medical/components/OverviewPanel.vue",
+  "src/views/dict/medical/components/PushWizard.vue",
+  "src/views/dict/sync-diffs/index.vue",
+  "src/views/error/403.vue",
+  "src/views/error/404.vue",
+  "src/views/error/500.vue",
+  "src/views/identity/accounts/index.vue",
+  "src/views/identity/authorizations/index.vue",
+  "src/views/identity/departments/index.vue",
+  "src/views/identity/local-accounts/index.vue",
+  "src/views/identity/permission-requests/index.vue",
+  "src/views/identity/persons/index.vue",
+  "src/views/identity/roles/index.vue",
+  "src/views/identity/sync-diffs/index.vue",
+  "src/views/identity/sync-logs/index.vue",
+  "src/views/login/index.vue",
+  "src/views/metadata-changes/changes/index.vue",
+  "src/views/metadata-changes/diff/index.vue",
+  "src/views/metadata-changes/snapshots/index.vue",
+  "src/views/ops/audit/index.vue",
+  "src/views/ops/runs/index.vue",
+  "src/views/ops/sql-workbench/index.vue",
+  "src/views/ops/tools/index.vue",
+  "src/views/query-center/accuracy/index.vue",
+  "src/views/query-center/queries/index.vue",
+  "src/views/query-center/queries/components/ProductParamForm.vue",
+  "src/views/query-center/queries/components/RunProvenancePanel.vue",
+  "src/views/welcome/index.vue"
+ ],
+ "dead_api": [
+  {
+   "file": "src/api/asset.ts",
+   "name": "getRelationAuthorityRule"
+  },
+  {
+   "file": "src/api/asset.ts",
+   "name": "upsertSource"
+  },
+  {
+   "file": "src/api/asset.ts",
+   "name": "retryAiQualityJob"
+  },
+  {
+   "file": "src/api/asset.ts",
+   "name": "attachAiQualityResult"
+  },
+  {
+   "file": "src/api/asset.ts",
+   "name": "getAiSessions"
+  },
+  {
+   "file": "src/api/dict.ts",
+   "name": "upsertMedicalMapping"
+  },
+  {
+   "file": "src/api/dict.ts",
+   "name": "getDictVersions"
+  },
+  {
+   "file": "src/api/identity.ts",
+   "name": "getProfileChangeRequests"
+  },
+  {
+   "file": "src/api/identity.ts",
+   "name": "createIdentityChangeRequest"
+  },
+  {
+   "file": "src/api/metadata.ts",
+   "name": "getChangeImpact"
+  },
+  {
+   "file": "src/api/metadata.ts",
+   "name": "getMetadataSnapshots"
+  },
+  {
+   "file": "src/api/metadata.ts",
+   "name": "getMetadataSnapshotDetail"
+  },
+  {
+   "file": "src/api/ops.ts",
+   "name": "submitSqlTemplate"
+  },
+  {
+   "file": "src/api/ops.ts",
+   "name": "approveSqlTemplate"
+  },
+  {
+   "file": "src/api/ops.ts",
+   "name": "rejectSqlTemplate"
+  },
+  {
+   "file": "src/api/ops.ts",
+   "name": "listSqlRuns"
+  },
+  {
+   "file": "src/api/ops.ts",
+   "name": "getSqlRun"
+  },
+  {
+   "file": "src/api/query-center.ts",
+   "name": "reviewFeedback"
+  },
+  {
+   "file": "src/api/query-center.ts",
+   "name": "fetchFeedback"
+  },
+  {
+   "file": "src/api/query-center.ts",
+   "name": "resolveContext"
+  },
+  {
+   "file": "src/api/query-center.ts",
+   "name": "fetchContext"
+  },
+  {
+   "file": "src/api/query-center.ts",
+   "name": "fetchLineageImpact"
+  },
+  {
+   "file": "src/api/recipes.ts",
+   "name": "getRecipe"
+  },
+  {
+   "file": "src/api/user.ts",
+   "name": "getAuthMe"
+  }
+ ]
+}

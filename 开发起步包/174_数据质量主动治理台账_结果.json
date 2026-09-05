@@ -1,0 +1,116 @@
+{
+  "plan_code": "174",
+  "plan_title": "数据质量主动治理台账",
+  "status": "开发与隔离验收完成，生产迁移/种子/部署待授权",
+  "started_at": "2026-09-02T20:50:00+08:00",
+  "finished_at": "2026-09-02T23:05:00+08:00",
+  "git_baseline": {
+    "head": "96ed027",
+    "branch": "master",
+    "user_changes_preserved": true,
+    "note": "工作区用户已有改动（identity/layout/文档域）零接触；本任务未执行任何 Git 写操作"
+  },
+  "alembic_before": "c1d2e3f4a5b6",
+  "alembic_after": "d5e6f7a8b9c0",
+  "batches": {
+    "S0_baseline": "done",
+    "S1_contract_migration": "done",
+    "S2_domain_service": "done",
+    "S3_source_adapters": "done",
+    "S4_permissions_identity": "done",
+    "S5_api_export": "done",
+    "S6_seed_tool": "done",
+    "S7_frontend": "done",
+    "S8_static_acceptance": "done",
+    "S9_isolated_e2e": "done",
+    "S10_delivery": "done"
+  },
+  "changed_files": {
+    "backend_new": [
+      "backend/alembic/versions/d5e6f7a8b9c0_add_quality_governance_ledger_174.py",
+      "backend/app/models/quality_governance.py",
+      "backend/app/services/quality_governance_service.py",
+      "backend/app/services/quality_governance_adapters.py",
+      "backend/app/api/v1/quality_controls.py",
+      "backend/app/api/v1/quality_observations.py",
+      "backend/app/api/v1/quality_issues.py",
+      "backend/app/scripts/__init__.py",
+      "backend/app/scripts/seed_quality_governance.py",
+      "backend/tests/test_quality_governance_service.py",
+      "backend/tests/test_quality_governance_api.py"
+    ],
+    "backend_modified": [
+      "backend/app/main.py",
+      "backend/app/api/v1/permissions.py"
+    ],
+    "frontend_new": [
+      "frontend/src/api/quality.ts",
+      "frontend/src/views/quality/issues/index.vue",
+      "frontend/src/views/quality/issue-detail/index.vue",
+      "frontend/src/views/quality/controls/index.vue",
+      "frontend/src/views/quality/observations/index.vue",
+      "frontend/tests/plan174QualityLedger.test.ts"
+    ],
+    "frontend_modified": [
+      "frontend/src/router/modules/quality.ts",
+      "frontend/src/router/modules/asset.ts",
+      "frontend/src/views/asset/probe-findings/index.vue"
+    ],
+    "tools": [
+      "tools/s9_e2e_r174.py"
+    ],
+    "total_new_lines": 8395
+  },
+  "tests": {
+    "backend_targeted": {"service": "36 passed", "api": "20 passed"},
+    "backend_full": {"command": ".venv/Scripts/python.exe -m pytest tests/ -q", "result": "1397 passed, 1 skipped, 0 failed", "duration_s": 1945},
+    "backend_baseline_reference": "171 号基线 1341 passed + 1 skipped（无回归，新增 56）",
+    "frontend_targeted": "plan174QualityLedger 9 passed",
+    "frontend_full_vitest": "262 passed (41 files)",
+    "frontend_typecheck": "tsc --noEmit + vue-tsc 双过",
+    "frontend_build": "PASS（main 657.2KB / graph 404.5KB / css 103.5KB，gzip 预算三绿）"
+  },
+  "migration_roundtrip": {
+    "isolated_db": "postgresql://127.0.0.1:15432/data_asset_test（8.83 隧道）",
+    "upgrade": "c1d2e3f4a5b6 -> d5e6f7a8b9c0 成功",
+    "downgrade": "对象全部消失（5 表+序列+部分唯一索引+12 权限码+30 角色授权），旧表未动",
+    "re_upgrade": "全部恢复；单头 d5e6f7a8b9c0"
+  },
+  "seed_dry_run": {
+    "dry_run": {"controls_created": 17, "meeting_issues_created": 5, "t7_monitoring_gap": "monitoring_gap_created", "committed": false},
+    "apply_first": {"controls_created": 17, "meeting_issues_created": 5, "t7_monitoring_gap": "monitoring_gap_created", "committed": true},
+    "apply_second": {"controls_created": 0, "controls_existing": 17, "meeting_issues_created": 0, "meeting_issues_existing": 5, "t7_monitoring_gap": "duplicate"},
+    "t1_t12": "12 探查模板全部建 Control（T7 blocked + monitoring_gap）",
+    "meeting_controls": ["DQ-HIS-MR-DEATH-001", "DQ-HIS-MR-LEGACY-001", "DQ-LIS-KEY-001", "DQ-US-VISIT-001", "DQ-DOC-VISIT-001"],
+    "note": "隔离库无生产 probe findings；生产入账按当前数据查询零硬编码（exceptions W2）"
+  },
+  "s9_e2e": {"scenarios": 13, "passed": 13, "failed": 0, "evidence": "开发起步包/output_r174/s9_e2e_results.json"},
+  "security_checks": {
+    "sensitive_info": "新文件零凭据/零患者敏感信息（grep 扫描）",
+    "source_db_writes": "零源库连接、零 DML/DDL（源侧执行仍归 run_probe.py 受控通道）",
+    "full_scan_risk": "无源表 SQL（种子只读平台 asset schema 与模板 JSON）",
+    "migration_scope": "d5e6f7a8b9c0 全部对象限定 asset schema；downgrade 对称",
+    "export_constraints": "六硬约束实证（权限+审计+时间戳文件名+公式注入+白名单+5000 上限+POST body）"
+  },
+  "exceptions": [
+    {"code": "W1_PROD_MIGRATION_COMPLETE", "summary": "2026-09-03 生产 alembic upgrade + seed --apply 已完成"},
+    {"code": "W2_PROD_FINDINGS_IMPORT_COMPLETE", "summary": "生产 6 条 open ProbeFinding 已幂等入账"},
+    {"code": "W3_INCREMENTAL_EVIDENCE_COMPLETE", "summary": "LIS/超声/Docare 已由 175 号只读聚合取证并写入观测；自动跨系统执行器与人工值域确认仍待后续"},
+    {"code": "W4_CONTROL_RUN_EXECUTOR", "summary": "run 端点只校验+审计+提示，探查真实执行归夜间执行器（设计裁决）"}
+  ],
+  "production_actions": {
+    "executed": [
+      "生产库迁移 d5e6f7a8b9c0",
+      "生产 seed --apply（含现有 open finding 入账）",
+      "生产部署（后端 data-asset:r175-20260903 / 前端 r175-20260903）",
+      "175 号 pending 值域、draft 关系与质量观测摄取"
+    ],
+    "skipped_pending_authorization": ["Git commit/push"]
+  },
+  "deliverables": {
+    "report": "开发起步包/174_数据质量主动治理台账_执行报告.md",
+    "result_json": "开发起步包/174_数据质量主动治理台账_结果.json",
+    "artifacts": "开发起步包/output_r174/（progress/exceptions/test-results/changed-files/s9_e2e_results）",
+    "readme_55_synced": true
+  }
+}

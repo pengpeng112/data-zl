@@ -1,0 +1,91 @@
+{
+  "steps": [
+    {
+      "count": 65,
+      "sample": [
+        "dbo|dbo|患者检查报告信息_TABLE",
+        "dbo|dbo|患者检查申请信息_TABLE",
+        "dbo|dbo|患者检查报告信息"
+      ],
+      "step": "A1_missing_in_test"
+    },
+    {
+      "count": 0,
+      "step": "A2_id_conflicts"
+    },
+    {
+      "rows": 65,
+      "cols": 30,
+      "step": "A3_inserted"
+    },
+    {
+      "prod": {
+        "asset_systems": 26,
+        "asset_tables": 12767,
+        "asset_relations": 1329,
+        "asset_columns": 178547,
+        "asset_column_value_domains": 77,
+        "asset_quality_rules": 422
+      },
+      "test": {
+        "asset_systems": 26,
+        "asset_tables": 12767,
+        "asset_relations": 1329,
+        "asset_columns": 178547,
+        "asset_column_value_domains": 77,
+        "asset_quality_rules": 422
+      },
+      "step": "A4_metrics"
+    },
+    {
+      "result": true,
+      "step": "A5_isolated_matches_prod"
+    },
+    {
+      "count": 0,
+      "sample": [],
+      "step": "C_reverse_local_extra"
+    },
+    {
+      "files": [
+        "tables.csv",
+        "columns.csv",
+        "relationships.csv"
+      ],
+      "suffix": ".bak.20260901",
+      "step": "B1_backups"
+    },
+    {
+      "rows": 12767,
+      "annotations_kept": 865,
+      "step": "B3_tables_csv"
+    },
+    {
+      "rows": 178547,
+      "step": "B4_columns_csv"
+    },
+    {
+      "rows": 1329,
+      "step": "B5_relationships_csv"
+    },
+    {
+      "files": 10,
+      "step": "B6_manifest"
+    }
+  ],
+  "verdict": {
+    "isolated_matches_prod": true,
+    "reverse_local_extra": 0,
+    "package_tables": 12767,
+    "package_columns": 178547,
+    "package_relationships": 1329,
+    "prod_counts": {
+      "asset_systems": 26,
+      "asset_tables": 12767,
+      "asset_relations": 1329,
+      "asset_columns": 178547,
+      "asset_column_value_domains": 77,
+      "asset_quality_rules": 422
+    }
+  }
+}

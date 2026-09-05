@@ -1,0 +1,71 @@
+{
+ "passed": 13,
+ "failed": 0,
+ "results": [
+  {
+   "scenario": "1-FAIL首次建单",
+   "passed": true,
+   "detail": "issue=DQI-202609-000075"
+  },
+  {
+   "scenario": "2-同run_key幂等",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "3-PASS不建单",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "4-分派科室人员",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "5-数据范围隔离",
+   "passed": true,
+   "detail": "sees_own=True, all_scope_403=True"
+  },
+  {
+   "scenario": "6-提交待复测",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "7-验证关闭",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "8-复发新问题",
+   "passed": true,
+   "detail": "recurrence_no=1"
+  },
+  {
+   "scenario": "9-ERROR/BLOCKED不关闭",
+   "passed": true,
+   "detail": "status=assigned"
+  },
+  {
+   "scenario": "10-风险接受必填",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "scenario": "11-抑制到期恢复",
+   "passed": true,
+   "detail": "within=suppressed, after=issue_created"
+  },
+  {
+   "scenario": "12-导出安全",
+   "passed": true,
+   "detail": "injection_guard=True, whitelist_ok=True"
+  },
+  {
+   "scenario": "13-旧API回归",
+   "passed": true,
+   "detail": "probe=True"
+  }
+ ]
+}

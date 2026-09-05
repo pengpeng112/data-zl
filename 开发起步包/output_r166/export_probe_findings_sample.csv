@@ -1,0 +1,2 @@
+id,probe_type,system_pair,object_desc,window_start,window_end,metric_name,metric_value,metric_unit,threshold,severity,status,first_seen_run,last_seen_run,relapse_count,resolved_by,resolved_at,note,evidence_digest
+1,R-XSYS,HIS↔JHEMR,[throwaway-r166] 联调用对象：全流转演示,2026-07-01,2026-07-31,throwaway_metric,42.500000,%,1.000000,P2,resolved,probe-t-r166throwaway,probe-t-r166throwaway,0,throwaway-admin-r166,2026-08-30 13:29:26.499245+08:00,[throwaway-r166],7b4e2481b27cde3034c9b31ae5850294102c8cb2dd6274afd9ccb4146a60b6a9

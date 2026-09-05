@@ -1,0 +1,59 @@
+{
+  "task": "173 全栈一次性模拟测试·问题发现（单会话 T0→T6）",
+  "date": "2026-09-01",
+  "baseline": {
+    "head": "96ed0270ad854d32008ba6c5b792d1de87112714",
+    "openapi": {"paths": 345, "operations": 393},
+    "real_routes": 400,
+    "isolated_db": {"name": "data_asset_test", "asset_tables": 103, "catalog_tables": 12767, "relations": 1329, "systems": 26},
+    "pytest_171_baseline": "1341 passed / 1 skipped (171 报告，本会话未跑全量)",
+    "vitest_171_baseline": 253
+  },
+  "coverage": {
+    "c_line": {"http_occurrences": 289, "extracted": 286, "parse_coverage_pct": 99.0, "auto_matched": 271, "manual_resolved": 15, "path_method_drift": 0},
+    "a_line": {"rules_run": 10, "real_hits": "P2x1组(6按钮) + P3x8组"},
+    "s_line": {"probes_sent": 1328, "routes_probed": 395, "server_error_5xx": 0, "auth_bypass_real": 0, "contract_contradiction_real": 0, "public_exact_design_2xx": 6},
+    "s_success_paths": {"cases": 38, "pass": 37, "fail": 1, "fail_note": "唯一失败=P2-1 系统列表过滤(升级为问题)", "audit_written_cases": 16},
+    "t4": {"rbac_checks": 68, "rbac_violations": 0, "health_probes": 12, "health_5xx": 0, "typecheck_exit": 0, "build_exit": 0, "build_seconds": 49.1, "build_gzip_kb": {"max_js_chunk": 183.1, "max_css_chunk": 65.8, "sum_js_chunks": 398.1}, "alembic_empty_db": "fail_without_schema+pass_after_create_schema(103表,c1d2e3f4a5b6)", "lint_readonly": {"problems": 4260, "errors": 4236, "prettier_class": 4216, "no_mutating_props": 20}},
+    "v_line": {"weak_pages": 6, "tests": 18, "passed": 18, "location": "output_r173/vtests (不进门禁)"}
+  },
+  "problems": {
+    "P0": {"count": 0, "note": "书面说明：无生产影响/无安全旁路/无 5xx(干净环境)/无数据损坏"},
+    "P1": [
+      {"id": "P1-1", "title": "import170 重灌未重置序列→隔离库全部写审计端点 500", "root_cause": "asset_govern_audit_logs 序列 last_value=17 vs max(id)=194，duplicate key pkey", "evidence": "engine handle_error 3/3 捕获 duplicate key；queries/ingest 等 11 端点 500→setval 后 37/38 通过", "impact": "重灌后的隔离库上全量 pytest 必大面积失败；171 T2.5 验签只对 tables/relations 计数未验序列"}
+    ],
+    "P2": [
+      {"id": "P2-1", "title": "新建系统 200 成功但 GET /api/v1/systems 永不显示（CANONICAL_SYSTEMS 过滤）", "backend": "app/services/asset_catalog.py:205-216", "frontend": "src/views/asset/systems/index.vue:152,243", "evidence": "success_paths c_systems_upsert readback 断言失败（PUT 200+DB 行存在+列表缺失）"},
+      {"id": "P2-2", "title": "6 写按钮同页 v-perms 不一致", "files": ["views/asset/probe-findings/index.vue:238", "views/asset/value-domains/index.vue:269", "views/dict/general/index.vue:191,218,247,288"]}
+    ],
+    "P3": [
+      {"id": "P3-1", "title": "24 个死 API 封装（运行时+测试零引用）"},
+      {"id": "P3-2", "title": "4 页零按钮级权限策略（admin/persons/roles/ops-runs）"},
+      {"id": "P3-3", "title": "GraphToolbar.vue:21-59 共 20 处 vue/no-mutating-props"},
+      {"id": "P3-4", "title": "只读 lint 4236 errors（4216 prettier 格式类）"},
+      {"id": "P3-5", "title": "recipes create 静默接受非法 primary_tables（校验延迟到 sql 生成）"},
+      {"id": "P3-6", "title": "alembic 空库需预建 asset schema（迁移不自包含）"},
+      {"id": "P3-7", "title": "QualityFindingItem 与 qualityContracts.ts 平行类型双声明"},
+      {"id": "P3-8", "title": "视图层 console×2 + as any×70（聚合）"}
+    ]
+  },
+  "uncertain": [
+    {"id": "U1", "topic": "CSRF 三态：无 Origin 未 403（仅外源 Origin 403）——期望码表 vs 实现"},
+    {"id": "U2", "topic": "GET / 与 /api/v1/ai/tools PUBLIC_EXACT 公开面设计确认"},
+    {"id": "U3", "topic": "PATCH /govern/executors enabled 为 Query 参数、body 被静默忽略的 API 约定"}
+  ],
+  "env_repair": {
+    "_desc": "本会话在隔离库 data_asset_test 已执行的环境修复（P1-1 根因修复，非仓库代码改动）",
+    "sequence_fix_sql": "对 information_schema.columns 中 asset schema 全部 nextval 列：select setval(pg_get_serial_sequence('asset.'||table_name, column_name), greatest(coalesce(max(列),0),1), true) —— 共 102 条序列",
+    "throwaway_cleanup": "r173 前缀行全部清理（终检 leftovers=0）；探针 ApiKey/UserRole 已删（r173 keys 残留 0）",
+    "residue": "asset_govern_audit_logs 新增约 76 行探针审计（append-only 设计保留）；temp database data_asset_test_r173empty 已 DROP"
+  },
+  "others_domain": {
+    "files_tracked": 16,
+    "hash_final_check": "与 T0 基线完全一致（零触碰证明）",
+    "repo_changes": "仅 .gitignore 追加 backend/_r173_work/ 一行（计划允许的最小改动）"
+  },
+  "exceptions": "output_r173/exceptions.json (W1-W5)",
+  "partial_batches": "无——T0→T6 全批完成",
+  "evidence_dir": "开发起步包/output_r173/"
+}

@@ -1,0 +1,22 @@
+{
+  "T5_prod_system-map": {
+    "dom": {
+      "statCards": 6,
+      "errPanel": false,
+      "canvas": 0,
+      "hasMenu": true,
+      "sample": ""
+    },
+    "errors": []
+  },
+  "T5_prod_graph_first_screen": {
+    "dom": {
+      "statCards": 0,
+      "errPanel": false,
+      "canvas": 4,
+      "hasMenu": true,
+      "sample": ""
+    },
+    "errors": []
+  }
+}

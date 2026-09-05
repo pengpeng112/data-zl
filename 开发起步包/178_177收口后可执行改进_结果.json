@@ -1,0 +1,112 @@
+{
+  "batch": "178",
+  "plan": "开发起步包/178_177收口后可执行改进一次性执行计划.md（v1.1）",
+  "executed_at": "2026-09-04 晚",
+  "baseline_head": "96ed0270ad854d32008ba6c5b792d1de87112714",
+  "one_line": "N1 夜跑 FAIL 呈报（维度位移 max_update→max_change_ratio，根治=G3）；C6/C7/L1 三项代码全部落地且门禁全绿；R5 未选表现 SKIP；零 Git 写/零发布/零业务源写/他人域零触碰。",
+  "batches": {
+    "R0": {
+      "status": "DONE",
+      "workspace_snapshot": "output_r178/workspace_snapshot.txt",
+      "other_domain_13_hashes_match_177_baseline": true,
+      "port_15432_external_held": "未杀，自建 15532",
+      "user_questions_answered": false,
+      "user_questions_disposition": "R5 CDMS SKIP；G9 仍开"
+    },
+    "R1": {
+      "status": "DONE_VERDICT_FAIL",
+      "channel": "ssh 8.83 → docker exec data-asset-api python（SELECT only，凭据零落盘）",
+      "container": "data-asset-api Up 28h healthy",
+      "env": { "APP_IDENTITY_CB_MAX_UPDATE": 150, "APP_IDENTITY_CB_MAX_NEW": 130 },
+      "latest_nightly_run": {
+        "run_id": "RUN-b3324c242e78",
+        "started_at": "2026-09-04 02:00",
+        "triggered_by": "host_cron_modified_sync",
+        "status": "failed",
+        "circuit_breaker_triggered": true,
+        "circuit_breaker_dimension": "max_change_ratio",
+        "candidates_total": 110,
+        "subtasks": "signature/user_dept/education_title 全部 skipped（main_account_sync_not_successful）",
+        "signature_backfill": "未发生"
+      },
+      "root_cause": "生产仍为 F-2 前语义：110 例行 resync 计入 update；F-1(150) 已放行 update 维度（110<150），change_ratio=110/110=1.0>0.3 熔断",
+      "disposition": "未调阈值/未热进 F-2/未改 env/cron；呈报走 G3",
+      "evidence": "output_r178/nightly_n1.md"
+    },
+    "R2_C6": {
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/asset/components/GraphToolbar.vue",
+        "frontend/src/views/asset/graph/index.vue",
+        "frontend/tests/plan178R2.test.ts"
+      ],
+      "precheck_git_diff_clean": true,
+      "props_vmdls_converted": 13,
+      "changeDisplay_mutation_removed": true,
+      "literal_key_payload": false,
+      "vue_no_mutating_props_errors": 0,
+      "batch_vitest": "7 files 47/47（plan178R2+graphPage+graphPageMount+plan169G2/G3/G4+graphNeo4jP0）"
+    },
+    "R3_C7": {
+      "status": "DONE",
+      "files": [
+        "backend/alembic/env.py",
+        "backend/tests/conftest.py（仅追加 alembic_env 到 _PURE_LOGIC_SUBDIRS）",
+        "backend/tests/alembic_env/conftest.py（新增）",
+        "backend/tests/alembic_env/test_schema_ddl.py（新增）"
+      ],
+      "ddl": "CREATE SCHEMA IF NOT EXISTS asset（online 先建 schema；offline run_migrations 前发同句）",
+      "pure_logic_tests": "4/4",
+      "isolated_db_upgrade_head": "no-op 通过（无 Running upgrade）",
+      "isolated_db_current": "d5e6f7a8b9c0 (head) 不变",
+      "history_revisions_touched": 0,
+      "from_scratch_empty_db_test": "未做（无空库，按计划不记失败）"
+    },
+    "R4_L1": {
+      "status": "DONE_ALL_THREE",
+      "files": [
+        "frontend/src/views/quality/sourceRef.ts（新增纯函数）",
+        "frontend/src/views/quality/issue-detail/index.vue（①）",
+        "frontend/src/views/quality/observations/index.vue（①）",
+        "frontend/src/views/asset/probe-findings/index.vue（②③）",
+        "frontend/tests/plan178R4.test.ts（新增）"
+      ],
+      "forward_link": "scoped-slot 读 row.source_record_ref → /probe-findings?finding_id={id}（两页）",
+      "query_consumption": "useRoute + watch + onMounted 列表加载后消费；未命中同一 id 仅 warning 一次；不清筛选盲扫",
+      "reverse_lookup": "listQualityObservations({source_kind:'probe_finding',page_size:100}) 客户端匹配 asset_probe_findings:{id} 取 issue_id（total>100 补拉 page=2 一次）→「查看质量台账」按钮跳 /quality/issues/{issue_id}",
+      "hide_on_no_match_or_403": true,
+      "new_backend_endpoints": 0,
+      "tests": "plan178R4 6 用例 + plan174QualityLedger + plan166StageD2 = 22/22"
+    },
+    "R5_CDMS": { "status": "SKIP", "reason": "用户未选 004066 表现（开工提问未获答复）" },
+    "R6": {
+      "status": "DONE",
+      "wait_domain": "output_r178/wait_domain.md（G1–G17 全 17 项 + N1 佐证 + 新增 C6/C7/L1 待 G13）"
+    },
+    "R7": {
+      "backend_targeted": "tests/alembic_env + tests/test_r177_fixes.py + tests/test_identity_cb_resync_f2.py = 17 passed / 0 failed",
+      "backend_full": "pytest tests/ -q = 1419 passed / 1 skipped / 0 failed（2053.39s，隔离库）",
+      "alembic_isolated": "upgrade head no-op；current=d5e6f7a8b9c0",
+      "frontend_typecheck": "tsc + vue-tsc 双过 exit 0",
+      "frontend_vitest_full": "44 files 278/278（177 基线 267 + 新增 11）",
+      "frontend_build": "gzip 预算三绿：657.2/700 KB 主入口、404.5/430 KB 图谱异步包、103.5/110 KB CSS",
+      "other_domain_hashes_final": "13/13 与 R0 基线一致",
+      "git_writes": 0,
+      "prod_changes": 0,
+      "business_source_writes": 0
+    }
+  },
+  "dod_178_s5": {
+    "nightly_n1_with_run_id": true,
+    "c6_done": true,
+    "c7_done": true,
+    "l1_all_three_done": true,
+    "gates": "全过（如实报数）",
+    "report_and_json_and_outputs": true,
+    "readme_55_registered_once_in_r7": true,
+    "other_domain_untouched": true,
+    "wait_domain_g1_g17_full": true
+  },
+  "waiting_domain_escalation": "G3（发布 F-2）紧迫度上升：N1 实证 F-1 只放行了一个维度，max_change_ratio 仍熔断，签名/职称/科室子任务连续被一刀切 skip",
+  "evidence_dir": "开发起步包/output_r178/"
+}

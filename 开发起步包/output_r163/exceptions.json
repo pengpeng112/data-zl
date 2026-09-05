@@ -1,0 +1,23 @@
+[
+ {
+  "step": "R0",
+  "item": "test-db-tunnel",
+  "expected": "15432 ssh 隧道（162 §1.1 口径）",
+  "actual": "15432 被 python.exe PID 21552 占用且对 postgres 口令认证失败（非本会话进程，来路不明）；改用本会话自建 ssh -L 15433 隧道，trust 认证连通 data_asset_test（101 表/alembic b0c1d2e3f4a5）",
+  "note": "已定位：15432 监听者为外部转发脚本 122_fwd_external.py（python.exe PID 21552）指向 192.168.98.99:5432 的其他库，与本仓无关，未杀进程；本会话隧道 15433 保留"
+ },
+ {
+  "step": "R0",
+  "item": "APP_TEST_DB_URL 构造",
+  "expected": "162 §1.1：取服务器 APP_DB_URL 改库名",
+  "actual": "该串（postgres 口令）经 15432 伪隧道认证失败；服务器本机 127.0.0.1:5432 对 postgres 为 trust 免密，最终 URL=postgresql+psycopg://postgres@127.0.0.1:15433/data_asset_test，全程零口令落盘",
+  "note": "与 162 记录口径不一致，如实登记"
+ },
+ {
+  "step": "R3",
+  "item": "import_ecg_metadata.py --url 时序",
+  "expected": "--url 覆盖目标库",
+  "actual": "首次 dry-run 因 app 导入链在模块加载时按 backend/.env 绑定 engine，误连 .env 指向的 10.20.1.153:5432/data_asset（旧 schema 缺 name_cn_source）；dry-run 只读零写、无副作用。已改为脚本自建 engine 显式接 URL，复跑指向 8.83 data_asset 成功",
+  "note": "重要：backend/.env 的 APP_DB_URL=10.20.1.153（医院内网旧库）≠ 生产 8.83 本机库；后续脚本一律显式 URL，勿信 .env"
+ }
+]

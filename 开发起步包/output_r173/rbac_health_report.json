@@ -1,0 +1,341 @@
+{
+ "matrix_size": 34,
+ "matrix": [
+  {
+   "method": "GET",
+   "path": "/api/v1/tables",
+   "perm": "asset.table.view",
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "allow"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/nodes",
+   "perm": null,
+   "viewer_status": 404,
+   "admin_status": 404,
+   "expect": "allow_or_404"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/systems",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations",
+   "perm": null,
+   "viewer_status": 403,
+   "admin_status": 404,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/rules",
+   "perm": "asset.quality.rule.read",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules",
+   "perm": "asset.quality.rule.manage",
+   "viewer_status": 403,
+   "admin_status": 422,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries",
+   "perm": "query.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/ingest",
+   "perm": "query.ingest",
+   "viewer_status": 403,
+   "admin_status": 422,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics",
+   "perm": "query.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/data-products",
+   "perm": "query.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/departments",
+   "perm": "identity.dept.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/persons",
+   "perm": "identity.person.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/roles",
+   "perm": "identity.role.manage",
+   "viewer_status": 403,
+   "admin_status": 404,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/code-sets",
+   "perm": "dict.medical.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/sync-diffs",
+   "perm": "dict.sync_diff.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/audit-logs",
+   "perm": "ops.audit.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/runs",
+   "perm": "ops.run.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/sql/runs",
+   "perm": "ops.sql.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/tools",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "public"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/system-context",
+   "perm": "ai.context.read",
+   "viewer_status": 403,
+   "admin_status": 422,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/sessions",
+   "perm": "ai.session.read",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/keys",
+   "perm": "asset.admin.manage",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/terms",
+   "perm": "asset.admin.manage",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/roles",
+   "perm": "identity.role.manage",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-snapshots",
+   "perm": "metadata.change.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-runs",
+   "perm": "probe.run.read",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-findings",
+   "perm": "probe.finding.read",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes",
+   "perm": "asset.recipe.view",
+   "viewer_status": 403,
+   "admin_status": 200,
+   "expect": "deny"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/candidates",
+   "perm": "asset.table.view",
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/lineage/impact",
+   "perm": null,
+   "viewer_status": 422,
+   "admin_status": 422,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dashboard/summary",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "any"
+  },
+  {
+   "method": "GET",
+   "path": "/health",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "public"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/health",
+   "perm": null,
+   "viewer_status": 200,
+   "admin_status": 200,
+   "expect": "public"
+  }
+ ],
+ "violations": [],
+ "health_probes": [
+  {
+   "probe": "malformed_json_login",
+   "status": 422,
+   "ok": true
+  },
+  {
+   "probe": "huge_header_no_token",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "bad_json_queries_ingest",
+   "status": 422,
+   "ok": true
+  },
+  {
+   "probe": "wrong_content_type_tables",
+   "status": 200,
+   "ok": true
+  },
+  {
+   "probe": "unicode_path",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "null_byte_path",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "deep_path",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "empty_auth",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "weird_auth_scheme",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "options_method",
+   "status": 401,
+   "ok": true
+  },
+  {
+   "probe": "head_health",
+   "status": 405,
+   "ok": true
+  },
+  {
+   "probe": "put_on_readonly",
+   "status": 405,
+   "ok": true
+  }
+ ],
+ "health_all_4xx_ok": true
+}

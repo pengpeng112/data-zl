@@ -1,0 +1,2402 @@
+[
+ {
+  "method": "GET",
+  "path": "/openapi.json",
+  "name": "openapi",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/docs",
+  "name": "swagger_ui_html",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/docs/oauth2-redirect",
+  "name": "swagger_ui_redirect",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/redoc",
+  "name": "redoc_html",
+  "in_schema": false
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/auth/login",
+  "name": "login",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/auth/refresh",
+  "name": "refresh",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/auth/logout",
+  "name": "logout",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/auth/me",
+  "name": "me",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/auth/change-password",
+  "name": "change_password",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/auth/users",
+  "name": "list_users",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/auth/users",
+  "name": "create_user",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/auth/users/{user_id}",
+  "name": "patch_user",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/auth/login-events",
+  "name": "login_events",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph",
+  "name": "graph",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/edges/{edge_id}",
+  "name": "edge_detail",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/neighbors",
+  "name": "neighbors",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/overview",
+  "name": "overview",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/filter-options",
+  "name": "filter_options",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/tables/search",
+  "name": "table_search",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/options",
+  "name": "options",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph/diagnostics",
+  "name": "diagnostics",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph-analysis/upstream-downstream",
+  "name": "upstream_downstream",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph-analysis/shortest-path",
+  "name": "shortest_path",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph-analysis/impact",
+  "name": "impact_analysis",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/graph-analysis/cycles",
+  "name": "cycle_detection",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/health/live",
+  "name": "health_live",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/health/live",
+  "name": "health_live",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/health",
+  "name": "health",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/health",
+  "name": "health",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/public/stats",
+  "name": "public_stats",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/summary",
+  "name": "summary",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/overview/charts",
+  "name": "overview_charts",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dashboard/summary",
+  "name": "dashboard_summary",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/tables",
+  "name": "list_tables",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/tables/{schema}/{table}",
+  "name": "get_table",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/tables/{schema}/{table}/columns",
+  "name": "get_columns",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/columns/search",
+  "name": "search_columns",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/tables/{schema}/{table}/relations",
+  "name": "get_table_relations",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/tables/{table_id}/annotation",
+  "name": "update_table_annotation",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/columns/{column_id}/annotation",
+  "name": "update_column_annotation",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/annotations/missing",
+  "name": "missing_annotations",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/suggest-annotations",
+  "name": "suggest_annotations",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/path",
+  "name": "relation_path",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/list",
+  "name": "list_relations",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/list-counts",
+  "name": "list_relation_counts",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/hit-rates",
+  "name": "list_relation_hit_rates",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/authority-rule",
+  "name": "get_relation_authority_rule",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/relations/batch-review",
+  "name": "batch_review_relations",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/relations/{relation_id}",
+  "name": "update_relation",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/relations/{relation_id}/review",
+  "name": "review_relation",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relations/field-mappings",
+  "name": "list_field_mappings",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relation-reviews/counts",
+  "name": "review_counts",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relation-reviews",
+  "name": "list_reviews",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relation-reviews/{review_id}",
+  "name": "get_review",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/relation-reviews/{review_id}/approve",
+  "name": "approve",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/relation-reviews/{review_id}/reject",
+  "name": "reject",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/relation-reviews/batch",
+  "name": "batch_review",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/relation-reviews/{review_id}/field-mappings",
+  "name": "field_mappings",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/lineage/views",
+  "name": "view_dependencies",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/lineage/sync",
+  "name": "sync_static_lineage",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/lineage/impact",
+  "name": "impact_analysis",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/lineage/impact/legacy",
+  "name": "impact_analysis_legacy",
+  "in_schema": false
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/candidates",
+  "name": "list_candidates",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/candidates/{candidate_id}/promote",
+  "name": "promote_candidate",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/candidates/{candidate_id}/reject",
+  "name": "reject_candidate",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/rules",
+  "name": "list_rules",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/checks/run",
+  "name": "run_quality_check",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/checks/runs",
+  "name": "list_check_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/findings",
+  "name": "list_findings",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/quality/findings/{finding_id}",
+  "name": "update_finding",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/summary",
+  "name": "quality_summary",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/summary/by-system",
+  "name": "quality_summary_by_system",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/rules",
+  "name": "create_rule",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/quality/rules/{rule_id}",
+  "name": "patch_rule",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/rules/{rule_id}/enable",
+  "name": "toggle_rule",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/quality/rules/{rule_id}",
+  "name": "delete_rule",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/rules/{rule_id}/validate-sql",
+  "name": "validate_rule_sql",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/rules/from-template",
+  "name": "rule_from_template",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/rules/auto-generate",
+  "name": "auto_generate_rules",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/findings/{finding_id}/assign",
+  "name": "assign_finding",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/findings/{finding_id}/recheck",
+  "name": "recheck_finding",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/metrics",
+  "name": "quality_metrics",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/ai/status",
+  "name": "status",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/connection-test",
+  "name": "connection_test",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/preview",
+  "name": "preview",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/ai/jobs",
+  "name": "jobs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/ai/jobs/{job_id}",
+  "name": "job_detail",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/jobs",
+  "name": "create_job",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/ai/patrol/targets",
+  "name": "patrol_targets",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/quality/ai/patrol/runs",
+  "name": "patrol_runs",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/patrol/run",
+  "name": "patrol_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/jobs/{job_id}/retry",
+  "name": "retry_job",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/quality/ai/results/{result_id}/review",
+  "name": "review_result",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/results/{result_id}/attach",
+  "name": "attach_result",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/quality/ai/governance-report",
+  "name": "create_governance_report",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries",
+  "name": "list_queries",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/ai/context",
+  "name": "ai_query_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/impact/table",
+  "name": "impact_table",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}/relation-candidates",
+  "name": "relation_candidates",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/schedules/list",
+  "name": "list_schedules",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/schedules",
+  "name": "upsert_schedule",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/schedules/seed-core",
+  "name": "seed_core_schedules",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/sources/capabilities",
+  "name": "source_capabilities",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/{query_code}/versions/{version}/validate",
+  "name": "validate_query_version",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}/versions/{version}/validation",
+  "name": "get_query_validation",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/import/core-48",
+  "name": "import_core_48",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/runs/list",
+  "name": "list_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/runs/{run_id}",
+  "name": "get_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}",
+  "name": "get_query",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}/versions",
+  "name": "list_versions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}/versions/{version}",
+  "name": "get_version",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/queries/{query_code}/versions/{version}/diff",
+  "name": "version_diff",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/gate",
+  "name": "gate_preview",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/ingest",
+  "name": "ingest",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/{query_code}/revise",
+  "name": "revise",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/queries/run",
+  "name": "run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metrics",
+  "name": "list_metrics",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metrics/ai/context",
+  "name": "ai_metric_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metrics/board/overview",
+  "name": "board_overview",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metrics/{metric_code}",
+  "name": "get_metric_detail",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metrics/ingest",
+  "name": "ingest",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metrics/results",
+  "name": "post_result",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metrics/{metric_code}/versions/{version}/calculate",
+  "name": "calculate_metric_endpoint",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metrics/{metric_code}/calculate",
+  "name": "calculate_metric_active_endpoint",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metrics/{metric_code}/results",
+  "name": "list_results",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/data-products",
+  "name": "list_products",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/data-products/ai/context",
+  "name": "ai_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/data-products/{product_code}",
+  "name": "get_product",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/data-products",
+  "name": "create_product",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/data-products/publish-core",
+  "name": "publish_core",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/data-products/{product_code}/execute",
+  "name": "exec_product",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/data-products/import/metric-results",
+  "name": "import_results",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/tools",
+  "name": "list_tools",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/mcp/catalog",
+  "name": "mcp_catalog",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/sessions",
+  "name": "start_session",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/tool-call",
+  "name": "log_tool_call",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/tool-calls",
+  "name": "list_tool_calls",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/propose-sql",
+  "name": "propose_sql",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/drafts",
+  "name": "list_drafts",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/ai/drafts/{draft_id}",
+  "name": "review_draft",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/drafts/{draft_id}/execute",
+  "name": "execute_approved_draft",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/sessions",
+  "name": "list_sessions",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/export-context",
+  "name": "export_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/system-context",
+  "name": "system_context",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/ai-sql/generate",
+  "name": "generate_ai_sql",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/ai-sql/history",
+  "name": "ai_sql_history",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/tool-execute",
+  "name": "tool_execute",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/sql-risk-scan",
+  "name": "sql_risk_scan",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/context/resolve",
+  "name": "resolve_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/context/{context_id}",
+  "name": "get_context",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/answers",
+  "name": "register_answer",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/feedback",
+  "name": "submit_feedback_api",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/ai/feedback/{feedback_id}/review",
+  "name": "review_feedback_api",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/feedback/{feedback_id}",
+  "name": "get_feedback_api",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ai/evaluations/run",
+  "name": "run_evaluation_api",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ai/evaluations/dashboard",
+  "name": "dashboard_api",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/keys",
+  "name": "list_keys",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/admin/keys",
+  "name": "create_key",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/admin/keys/{key_id}",
+  "name": "toggle_key",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/owners",
+  "name": "list_owners",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/admin/owners",
+  "name": "upsert_owner",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/admin/owners/{owner_id}",
+  "name": "delete_owner",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/terms",
+  "name": "list_terms",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/admin/terms",
+  "name": "upsert_term",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/admin/terms/{term_id}",
+  "name": "delete_term",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/terms/lookup",
+  "name": "lookup_term",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/admin/snapshots",
+  "name": "create_snapshot",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/snapshots",
+  "name": "list_snapshots",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/admin/snapshots/compare",
+  "name": "compare_snapshots",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/admin/init/backfill-p6",
+  "name": "backfill_p6",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/admin/init/import-his-source",
+  "name": "import_his_source",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/roles",
+  "name": "list_roles",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/govern/roles",
+  "name": "upsert_role",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/govern/roles/{role_code}",
+  "name": "delete_role",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/roles/{role_code}/permissions",
+  "name": "list_permissions",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/govern/roles/{role_code}/permissions",
+  "name": "add_permission",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/govern/roles/{role_code}/permissions/{perm_id}",
+  "name": "remove_permission",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/change-requests",
+  "name": "list_change_requests",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/govern/change-requests",
+  "name": "create_change_request",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/govern/change-requests/{cr_id}/approve",
+  "name": "approve_change_request",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/govern/change-requests/{cr_id}/reject",
+  "name": "reject_change_request",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/audit-logs",
+  "name": "list_audit_logs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/audit-logs/summary",
+  "name": "audit_logs_summary",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/audit-logs/export",
+  "name": "audit_logs_export",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/executors",
+  "name": "list_executors",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/govern/executors",
+  "name": "upsert_executor",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/govern/executors/{executor_code}",
+  "name": "toggle_executor",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/user-roles",
+  "name": "list_user_roles",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/govern/user-roles",
+  "name": "assign_user_role",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/govern/user-roles/{ur_id}",
+  "name": "remove_user_role",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/enum-values",
+  "name": "list_enum_values",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/govern/enum-values",
+  "name": "upsert_enum_value",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/govern/scheduler/jobs",
+  "name": "create_scheduler_job",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/scheduler/jobs",
+  "name": "list_scheduler_jobs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/scheduler/jobs/{job_id}",
+  "name": "get_scheduler_job",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/events",
+  "name": "list_events",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/govern/events",
+  "name": "create_event",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/govern/events/{event_id}",
+  "name": "update_event",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/govern/change-rules",
+  "name": "list_change_rules",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/govern/change-rules",
+  "name": "upsert_change_rule",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/sources/{source_code}/collect-metadata",
+  "name": "collect_metadata",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/sources/{source_code}/metadata-jobs/{job_id}/retry",
+  "name": "retry_metadata_collect_job",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metadata-changes",
+  "name": "list_changes",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/metadata-changes/{change_id}",
+  "name": "update_change",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metadata-changes/summary",
+  "name": "changes_summary",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metadata-changes/diff-preview",
+  "name": "diff_preview",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metadata-changes/diff",
+  "name": "run_diff",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metadata-changes/{change_id}/impact",
+  "name": "change_impact",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/sources/{source_code}/snapshots",
+  "name": "source_snapshots",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metadata-changes/batch",
+  "name": "batch_update_changes",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metadata-snapshots",
+  "name": "list_metadata_snapshots",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/metadata-snapshots/{snapshot_id}",
+  "name": "metadata_snapshot_detail",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/metadata-snapshots/{snapshot_id}/archive",
+  "name": "archive_metadata_snapshot",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/tools",
+  "name": "list_tools",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/ops/tools",
+  "name": "upsert_tool",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs",
+  "name": "create_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs/{run_id}/submit",
+  "name": "submit_run",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/ops/runs/{run_id}/approve",
+  "name": "approve_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs/{run_id}/approve",
+  "name": "approve_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/runs",
+  "name": "list_runs",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/ops/runs/{run_id}/reject",
+  "name": "reject_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs/{run_id}/reject",
+  "name": "reject_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs/{run_id}/dry-run",
+  "name": "dry_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/runs/{run_id}/execute",
+  "name": "execute_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/runs/{run_id}/audit",
+  "name": "get_run_audit",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/validate",
+  "name": "sql_validate",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/templates",
+  "name": "sql_create_template",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/templates/{tool_code}/submit",
+  "name": "sql_submit_template",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/templates/{tool_code}/approve",
+  "name": "sql_approve_template",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/templates/{tool_code}/reject",
+  "name": "sql_reject_template",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/runs",
+  "name": "sql_create_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/ops/sql/runs/{run_id}/preview",
+  "name": "sql_preview_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/sql/runs",
+  "name": "sql_list_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/sql/runs/{run_id}",
+  "name": "sql_get_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/events",
+  "name": "list_ops_events",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/events/{event_id}",
+  "name": "get_ops_event",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/ops/config",
+  "name": "ops_config",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/permissions/seed",
+  "name": "seed_permissions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/resources",
+  "name": "list_resources",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/roles",
+  "name": "list_roles",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/permissions/roles",
+  "name": "upsert_role",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/roles/{role_code}/matrix",
+  "name": "get_role_matrix",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/permissions/roles/{role_code}/matrix",
+  "name": "update_role_matrix",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/user-roles",
+  "name": "list_user_roles",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/permissions/users/{user_identifier}/roles",
+  "name": "replace_user_roles",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/users/{user_identifier}/permissions",
+  "name": "get_user_permissions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/me",
+  "name": "get_me_permissions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/api-keys",
+  "name": "list_api_keys",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permissions/audit",
+  "name": "list_permission_audit",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/permissions/api-keys/{key_id}/bind",
+  "name": "bind_api_key",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/permission-requests",
+  "name": "create_request",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permission-requests/mine",
+  "name": "list_mine",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permission-requests/pending",
+  "name": "list_pending",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/permission-requests/{request_id}",
+  "name": "get_request",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/permission-requests/{request_id}/approve",
+  "name": "approve_request",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/permission-requests/{request_id}/reject",
+  "name": "reject_request",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/permission-requests/{request_id}/execute",
+  "name": "execute_request",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/permission-requests/{request_id}/revoke",
+  "name": "revoke_request",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/departments",
+  "name": "list_departments",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/persons",
+  "name": "list_persons",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/accounts",
+  "name": "list_accounts",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/identity/accounts/{account_id}/binding",
+  "name": "unbind_account",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/sync-diffs",
+  "name": "list_sync_diffs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/sync-diffs/{diff_id}",
+  "name": "get_sync_diff",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/review/generate",
+  "name": "generate_identity_review",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/persons/{person_code}",
+  "name": "person_profile",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/persons/{person_code}/profile-change-requests",
+  "name": "create_profile_change_request",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/persons/{person_code}/profile-change-requests",
+  "name": "list_profile_change_requests",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/departments/{dept_code}",
+  "name": "department_profile",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/collect-sources",
+  "name": "trigger_collection",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync/his",
+  "name": "sync_his_identity_endpoint",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync/run",
+  "name": "run_identity_sync",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync/jobs/{job_id}/retry",
+  "name": "retry_identity_sync_job",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/identity/accounts/bind",
+  "name": "bind_account",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/change-requests",
+  "name": "create_identity_cr",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/change-requests",
+  "name": "list_identity_crs",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/identity/change-requests/{cr_id}/approve",
+  "name": "approve_identity_cr",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/change-requests/{cr_id}/execute",
+  "name": "execute_identity_cr",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync-diffs/{diff_id}/propose-master",
+  "name": "propose_master_from_diff",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync-diffs/batch-propose-master",
+  "name": "batch_propose_master_from_diffs",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/sync-diffs/batch-status",
+  "name": "batch_update_sync_diff_status",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/change-requests/batch-approve",
+  "name": "batch_approve_identity_cr",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity/change-requests/batch-execute",
+  "name": "batch_execute_identity_cr",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/identity/sync-diffs/{diff_id}",
+  "name": "update_sync_diff",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity/inconsistencies",
+  "name": "list_inconsistencies",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/status",
+  "name": "sync_status",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/nightly/status",
+  "name": "nightly_status",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/alerts",
+  "name": "identity_sync_alerts",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity-sync/nightly/trigger",
+  "name": "nightly_trigger",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity-sync/validation/trigger",
+  "name": "validation_trigger",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/identity-sync/candidates",
+  "name": "select_candidates",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/runs",
+  "name": "list_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/runs/{run_id}",
+  "name": "get_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/batches",
+  "name": "list_batches",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/identity-sync/gates",
+  "name": "gate_checks",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dictionaries/categories",
+  "name": "list_categories",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dictionaries/categories",
+  "name": "upsert_category",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dictionaries/standard-items",
+  "name": "list_standard_items",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dictionaries/standard-items",
+  "name": "upsert_standard_item",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dictionaries/system-items",
+  "name": "list_system_items",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dictionaries/system-items",
+  "name": "upsert_system_item",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/dictionaries/system-items/{item_id}/enabled",
+  "name": "set_system_item_enabled",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dictionaries/import",
+  "name": "import_system_items",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dictionaries/mappings",
+  "name": "list_item_mappings",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dictionaries/mappings",
+  "name": "upsert_item_mapping",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dictionaries/versions",
+  "name": "list_versions",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dictionaries/versions",
+  "name": "upsert_version",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/code-sets",
+  "name": "list_code_sets",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/code-sets/{code_set_code}/items",
+  "name": "list_items",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/mappings",
+  "name": "list_mappings",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/mapping-rows",
+  "name": "list_mapping_rows",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/mapping-options",
+  "name": "list_mapping_options",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/mapping-rows/export",
+  "name": "export_mapping_rows",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dict-medical/mapping-rows",
+  "name": "upsert_mapping_row",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dict-medical/mappings",
+  "name": "upsert_mapping",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/sync-diffs",
+  "name": "list_medical_diffs",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/sync/run",
+  "name": "run_medical_sync",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/sync/jobs/{job_id}/retry",
+  "name": "retry_medical_sync_job",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/dict-medical/sync-diffs/{diff_id}",
+  "name": "update_medical_diff",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dict-medical/code-sets",
+  "name": "upsert_code_set",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/dict-medical/items",
+  "name": "upsert_code_item",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/change-requests",
+  "name": "create_dict_cr",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/change-requests",
+  "name": "list_dict_crs",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/dict-medical/change-requests/{cr_id}/approve",
+  "name": "approve_dict_cr",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/change-requests/{cr_id}/execute",
+  "name": "execute_dict_cr",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/versions",
+  "name": "list_versions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/import-runs",
+  "name": "list_import_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/import-runs/{run_id}",
+  "name": "get_import_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/sync-logs",
+  "name": "list_sync_logs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/push/config",
+  "name": "medical_push_config",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/export-preview",
+  "name": "medical_push_export_preview",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/plan",
+  "name": "medical_push_plan",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/apply-one",
+  "name": "medical_push_apply_one",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/stop-one",
+  "name": "medical_push_stop_one",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/imports/diagnosis-mapping",
+  "name": "upload_diagnosis_mapping",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/imports/{run_id}",
+  "name": "get_import_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/imports/{run_id}/rows",
+  "name": "list_import_rows",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/imports/{run_id}/rows/review",
+  "name": "review_rows",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/imports/{run_id}/merge",
+  "name": "merge_run",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/plans",
+  "name": "create_plan",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/push/plans/{plan_id}",
+  "name": "get_plan",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/plans/{plan_id}/approve",
+  "name": "approve",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/dict-medical/push/plans/{plan_id}/integrity",
+  "name": "check_integrity",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/dict-medical/push/plans/{plan_id}/execute",
+  "name": "execute_plan",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/systems",
+  "name": "list_systems",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/systems",
+  "name": "upsert_system",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/systems/{system_code}",
+  "name": "patch_system",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/systems/{system_code}/detail",
+  "name": "system_detail",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/systems-with-connections",
+  "name": "create_system_with_connections",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/systems/{system_code}/connections",
+  "name": "add_system_connection",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/sources/peripheral/bootstrap",
+  "name": "bootstrap_peripheral_sources",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/systems/{system_code}",
+  "name": "delete_system",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/sources",
+  "name": "list_sources",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/sources",
+  "name": "upsert_source",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/sources/{source_code}",
+  "name": "patch_source",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/sources/{source_code}/check",
+  "name": "check_source",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/sources/{source_code}",
+  "name": "delete_source",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/sources/{source_code}",
+  "name": "get_source",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/sources/{source_code}/credential",
+  "name": "update_source_credential",
+  "in_schema": true
+ },
+ {
+  "method": "DELETE",
+  "path": "/api/v1/sources/{source_code}/credential",
+  "name": "clear_source_credential",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/db-types",
+  "name": "list_db_types",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/connections",
+  "name": "list_connections",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/connections/{connection_id}",
+  "name": "get_connection",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/connections/test-draft",
+  "name": "test_connection_draft",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/connections/{connection_id}/test",
+  "name": "test_saved_connection",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/connections-targets",
+  "name": "list_connection_targets",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/assets/tree",
+  "name": "assets_tree",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/assets/tree/tables",
+  "name": "assets_tree_tables",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/assets/tree/search",
+  "name": "assets_tree_search",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/recipes/ai/context",
+  "name": "ai_context",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/recipes",
+  "name": "list_recipes",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/recipes/{recipe_id}/versions",
+  "name": "list_versions",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}",
+  "name": "get_version",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/recipes/{recipe_id}",
+  "name": "get_recipe",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes",
+  "name": "create_recipe",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions",
+  "name": "copy_version",
+  "in_schema": true
+ },
+ {
+  "method": "PUT",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}",
+  "name": "update_version",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/submit",
+  "name": "submit",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/approve",
+  "name": "approve",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/reject",
+  "name": "reject",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/activate",
+  "name": "activate",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/deprecate",
+  "name": "deprecate",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/recipes/{recipe_id}/versions/{version}/sql",
+  "name": "generate_sql",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/value-domains",
+  "name": "list_value_domains",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/value-domains/export",
+  "name": "export_value_domains",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/value-domains/{domain_id}",
+  "name": "get_value_domain",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/value-domains/{domain_id}/versions",
+  "name": "list_value_domain_versions",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/value-domains",
+  "name": "create_value_domain",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/value-domains/{domain_id}/evidences",
+  "name": "add_evidence",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/value-domains/{domain_id}/confirm",
+  "name": "confirm_value_domain",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/value-domains/{domain_id}/deprecate",
+  "name": "deprecate_value_domain",
+  "in_schema": true
+ },
+ {
+  "method": "PATCH",
+  "path": "/api/v1/value-domains/{domain_id}/resolve-conflict",
+  "name": "resolve_conflict",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/probe-runs",
+  "name": "list_runs",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/probe-runs/{run_id}",
+  "name": "get_run",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/probe-findings",
+  "name": "list_findings",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/probe-findings/export",
+  "name": "export_findings",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/api/v1/probe-findings/{finding_id}",
+  "name": "get_finding",
+  "in_schema": true
+ },
+ {
+  "method": "POST",
+  "path": "/api/v1/probe-findings/{finding_id}/transition",
+  "name": "transition_finding_endpoint",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/",
+  "name": "root",
+  "in_schema": true
+ },
+ {
+  "method": "GET",
+  "path": "/get-async-routes",
+  "name": "get_async_routes",
+  "in_schema": true
+ }
+]

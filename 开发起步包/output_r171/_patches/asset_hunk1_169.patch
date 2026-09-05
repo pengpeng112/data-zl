@@ -1,0 +1,17 @@
+diff --git a/frontend/src/api/asset.ts b/frontend/src/api/asset.ts
+index a865fc8..9f306c8 100644
+--- a/frontend/src/api/asset.ts
++++ b/frontend/src/api/asset.ts
+@@ -898,7 +898,11 @@ export const getGraphOverview = (params?: {
+   object_type?: "table" | "view";
+   limit?: number;
+ }) => {
+-  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", { params });
++  // 169 G2：overview 聚合可能扫全库关系，超时单独放宽（全局 10s 曾致首屏误报）
++  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", {
++    params,
++    timeout: 30000
++  });
+ };
+ 
+ export const getGraphFilterOptions = (params?: {

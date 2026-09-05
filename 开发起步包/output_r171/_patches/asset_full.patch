@@ -1,0 +1,31 @@
+diff --git a/frontend/src/api/asset.ts b/frontend/src/api/asset.ts
+index a865fc8..9f306c8 100644
+--- a/frontend/src/api/asset.ts
++++ b/frontend/src/api/asset.ts
+@@ -898,7 +898,11 @@ export const getGraphOverview = (params?: {
+   object_type?: "table" | "view";
+   limit?: number;
+ }) => {
+-  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", { params });
++  // 169 G2：overview 聚合可能扫全库关系，超时单独放宽（全局 10s 曾致首屏误报）
++  return http.get<ApiResponse<GraphOverviewResponse>, object>("/api/v1/graph/overview", {
++    params,
++    timeout: 30000
++  });
+ };
+ 
+ export const getGraphFilterOptions = (params?: {
+@@ -1476,7 +1480,12 @@ export interface AiSqlGenerateResult {
+   context_digest: { tables: number; relations: number; value_domains: number; payload_bytes: number; truncated: boolean };
+ }
+ export interface AiSqlHistoryItem { id: number; request: { question_summary: string; selected_tables: string[]; context_digest: Record<string, number> }; response_summary: string; called_at?: string | null }
+-export const generateAiSql = (data: { question: string; system_code: "DATA_CENTER"; selected_tables: string[] }) => http.post<ApiResponse<AiSqlGenerateResult>, object>("/api/v1/ai/ai-sql/generate", { data });
++export const generateAiSql = (data: { question: string; system_code: "DATA_CENTER"; selected_tables: string[] }) =>
++  http.post<ApiResponse<AiSqlGenerateResult>, object>(
++    "/api/v1/ai/ai-sql/generate",
++    { data },
++    { timeout: 120000 }
++  );
+ export const getAiSqlHistory = (params?: { page?: number; page_size?: number }) => http.get<ApiResponse<PageData<AiSqlHistoryItem>>, object>("/api/v1/ai/ai-sql/history", { params });
+ 
+ // --- P4A AI 工具与草稿 ---

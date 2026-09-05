@@ -1,0 +1,22 @@
+{
+  "_desc": "r173 S0 三产物之一：期望码表（先于一切探针；round-8 裁决 #8/#9）。只有 5xx、鉴权 200 旁路、声明-实现双向矛盾、写路径业务断言失败进问题清单。",
+  "expected_codes": {
+    "no_token": "401（Authorization 头缺失）",
+    "bad_token": "403（Authorization: Bearer r173-bad-token-000）",
+    "pagination_ge1": "page=0 或负数→422 属 pydantic 契约（ge=1），非 bug",
+    "validation_missing_required": "422（body 缺必填/类型错/路径参数畸形）",
+    "path_param_not_found": "404 或业务码（资源不存在），非 5xx 即符合契约",
+    "stream_export_endpoints": "流式/CSV/Excel 导出仅做鉴权探针（无 token=401/坏 token=403），不做 JSON 内容断言",
+    "csrf_three": "POST /api/v1/auth/login|refresh|logout 无 Origin 头=403（CSRF 设计）；有合法 Origin 才走正常校验",
+    "async_routes": "GET /get-async-routes 返回空数组（设计）",
+    "ops_write_disabled": "APP_OPS_WRITE_ENABLED=false 下 ops 写端点返回 4xx 设计拒绝（若出现则按设计归类，不算 5xx）",
+    "http_204": "204 无 body（按设计归类）",
+    "redirect_307_308": "trailing-slash 重定向按 FastAPI 设计归类"
+  },
+  "problem_criteria": [
+    "5xx（任何未捕获服务器错误）",
+    "鉴权 200 旁路（无 token/坏 token 拿到 2xx）",
+    "OpenAPI 声明与实现双向矛盾（声明的参数/响应码与实测系统性不符）",
+    "写路径成功后业务断言失败（回读不一致/幂等破坏/审计缺失）"
+  ]
+}

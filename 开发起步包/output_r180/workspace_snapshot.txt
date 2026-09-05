@@ -1,0 +1,111 @@
+=== R0 workspace snapshot (180 batch, 2026-09-05 10:17:53) ===
+HEAD: 96ed0270ad854d32008ba6c5b792d1de87112714
+stash: 0 entries
+status entries: 106
+
+ M .gitignore
+ M backend/alembic/env.py
+ M backend/app/api/v1/permissions.py
+ M backend/app/api/v1/recipes.py
+ M backend/app/main.py
+ M backend/app/services/asset_catalog.py
+ M backend/app/services/cdms_identity_adapter.py
+ M backend/app/services/identity_sync_audit.py
+ M backend/app/services/identity_sync_log.py
+ M backend/app/services/identity_sync_orchestrator.py
+ M backend/app/services/identity_sync_status.py
+ M backend/app/services/jhemr_identity_adapter.py
+ M backend/app/services/recipe_service.py
+ M backend/scripts/run_identity_modified_nightly.py
+ M backend/tests/conftest.py
+ M backend/tests/security_audit/test_fine_grained_write_permissions.py
+ M backend/tests/test_identity_sync.py
+ M backend/tests/test_identity_sync_122_unit.py
+ M frontend/src/layout/components/lay-content/index.vue
+ M frontend/src/layout/components/lay-setting/index.vue
+ M frontend/src/layout/hooks/useDataThemeChange.ts
+ M frontend/src/layout/hooks/useTag.ts
+ M frontend/src/layout/index.vue
+ M frontend/src/router/modules/asset.ts
+ M frontend/src/router/modules/quality.ts
+ M frontend/src/store/modules/app.ts
+ M frontend/src/views/asset/components/GraphToolbar.vue
+ M frontend/src/views/asset/components/RelationGraph.vue
+ M frontend/src/views/asset/graph/index.vue
+ M frontend/src/views/asset/probe-findings/index.vue
+ M frontend/src/views/asset/value-domains/index.vue
+ M frontend/src/views/dict/general/index.vue
+ M frontend/tests/plan166StageD2.test.ts
+ M 开发起步包/148_病案首页关键值域与离院方式口径字典.md
+ D 开发起步包/150_fill_form.py
+ D 开发起步包/150_国家医保局2026年度课题申报书_医保数据赋能科学研究.md
+ M 开发起步包/172_CDMS无纸化用户权限模型与下乡名单核对.md
+ M 开发起步包/55_系统未完成事项统一执行计划.md
+ M 开发起步包/README.md
+?? backend/_r172_work/
+?? backend/_r175_work/
+?? backend/alembic/versions/d5e6f7a8b9c0_add_quality_governance_ledger_174.py
+?? backend/app/api/v1/quality_controls.py
+?? backend/app/api/v1/quality_issues.py
+?? backend/app/api/v1/quality_observations.py
+?? backend/app/models/quality_governance.py
+?? backend/app/scripts/
+?? backend/app/services/identity_login_sign_sync.py
+?? backend/app/services/quality_governance_adapters.py
+?? backend/app/services/quality_governance_service.py
+?? backend/scripts/import_ecg_relation_reviews.py
+?? backend/scripts/import_plan175_governance.py
+?? backend/tests/alembic_env/
+?? backend/tests/identity_login_sign_sync/
+?? backend/tests/test_identity_cb_resync_f2.py
+?? backend/tests/test_quality_governance_api.py
+?? backend/tests/test_quality_governance_service.py
+?? backend/tests/test_r177_fixes.py
+?? frontend/src/api/quality.ts
+?? frontend/src/layout/captureMode.ts
+?? frontend/src/views/quality/
+?? frontend/tests/competitionCaptureMode.test.ts
+?? frontend/tests/plan174QualityLedger.test.ts
+?? frontend/tests/plan177R2.test.ts
+?? frontend/tests/plan178R2.test.ts
+?? frontend/tests/plan178R4.test.ts
+?? frontend/审查_grok.err
+?? frontend/审查_grok.raw
+?? review/round-7/
+?? review/round-8/
+?? tools/capture_ai_patrol_gif.py
+?? tools/capture_competition_ai_demos.py
+?? tools/capture_competition_screens.py
+?? tools/capture_four_governance_screens.py
+?? tools/capture_governance_gifs.py
+?? tools/s9_e2e_r174.py
+?? verify/round-3/
+?? 开发起步包/173_全栈一次性模拟测试问题发现计划.md
+?? 开发起步包/173_全栈模拟测试_结果.json
+?? 开发起步包/173_全栈模拟测试_问题清单.md
+?? 开发起步包/174_CDMS无纸化赋权未成功_交付说明.md
+?? 开发起步包/174_数据质量主动治理台账_执行报告.md
+?? 开发起步包/174_数据质量主动治理台账_结果.json
+?? 开发起步包/174_数据质量主动治理台账方案.md
+?? 开发起步包/175_三系统质控关系值域增量只读探索_结果.json
+?? 开发起步包/175_三系统质控关系值域增量只读探索报告.md
+?? 开发起步包/176_夜间身份同步连续熔断根因排查与修复报告.md
+?? 开发起步包/177_全仓真实未完成项_执行报告.md
+?? 开发起步包/177_全仓真实未完成项_结果.json
+?? 开发起步包/177_全仓真实未完成项一次性执行计划.md
+?? 开发起步包/178_177收口后可执行改进_执行报告.md
+?? 开发起步包/178_177收口后可执行改进_结果.json
+?? 开发起步包/178_177收口后可执行改进一次性执行计划.md
+?? 开发起步包/179_G13分域提交与G1G3生产发布runbook.md
+?? 开发起步包/180_G13分域提交与G1G3生产发布一次性执行计划.md
+?? 开发起步包/output_r163/
+?? 开发起步包/output_r165/
+?? 开发起步包/output_r166/
+?? 开发起步包/output_r167/
+?? 开发起步包/output_r169/
+?? 开发起步包/output_r170/
+?? 开发起步包/output_r171/
+?? 开发起步包/output_r173/
+?? 开发起步包/output_r174/
+?? 开发起步包/output_r177/
+?? 开发起步包/output_r178/

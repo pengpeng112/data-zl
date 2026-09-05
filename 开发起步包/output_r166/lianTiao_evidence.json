@@ -1,0 +1,94 @@
+{
+  "note": "联调机器可读证据（按 2026-08-30 各步运行时实测输出重建：capture 脚本原按步覆写本文件，cleanup 步覆盖了前文；各字段值均取自当时工具输出原文，未事后推造。终版脚本已改为按 stage 合并。）",
+  "stages": [
+    {
+      "stage": "empty_state_precheck",
+      "detail": "D6 全量回归后隔离库实测计数（psycopg 直查）",
+      "counts": {
+        "asset_probe_findings": 0,
+        "asset_probe_runs": 0,
+        "asset_column_value_domains": 0,
+        "asset_tables": 0
+      },
+      "shots": ["screenshots/f4-empty-state.png", "screenshots/f2-empty-state.png"]
+    },
+    {
+      "stage": "seed_throwaway",
+      "ok": true,
+      "value_domain_submit": 201,
+      "value_domain_conflict": {"submit": 201, "clash": 409, "expect_clash_409": true}
+    },
+    {
+      "stage": "with_data_shots",
+      "shots": [
+        "screenshots/f4-list-throwaway.png (rows=1)",
+        "screenshots/f4-detail-evidence.png",
+        "screenshots/f5-transition-dialog.png",
+        "screenshots/f2-list-throwaway.png (rows=2, 冲突徽标=1)",
+        "screenshots/f2-conflict-tab.png",
+        "screenshots/f1-table-detail-value-domains.png (DISCHARGE_DISPOSITION 分组+暂无值域提示)"
+      ],
+      "console_errors_note": "3 条启动早期 401（SPA 引导请求，页面数据加载与渲染不受影响）",
+      "integration_bug": "首拍 f4 报 res.data.items TypeError（前端按 ApiResponse 消费 165 裸分页响应）→修复三处后重拍全部正常（exceptions W5）"
+    },
+    {
+      "stage": "full_transitions",
+      "legal_total": 12,
+      "legal_ok": 12,
+      "legal_pairs": [
+        "open->confirmed", "open->false_positive", "open->resolved",
+        "confirmed->open", "confirmed->false_positive", "confirmed->resolved",
+        "false_positive->open", "false_positive->confirmed", "false_positive->resolved",
+        "resolved->open", "resolved->confirmed", "resolved->false_positive"
+      ],
+      "per_pair_check": "逐条 http=200 且 GET 复查 after==to（脚本内置断言，12/12 ok）",
+      "audit_rows_for_finding": 13,
+      "rejects_in_run": [
+        {"case": "same_status", "http": 200, "note": "采集脚本假设缺陷：循环终态非 resolved，该次实为合法迁移；真同态 422 由 post_checks 补验"},
+        {"case": "invalid_value", "http": 422},
+        {"case": "reason_missing", "http": 422}
+      ]
+    },
+    {
+      "stage": "export_findings",
+      "http": 200,
+      "content_disposition": "attachment; filename=probe-findings-20260830-052929-status-open.csv",
+      "header": ["id", "probe_type", "system_pair", "object_desc", "window_start", "window_end", "metric_name", "metric_value", "metric_unit", "threshold", "severity", "status", "first_seen_run", "last_seen_run", "relapse_count", "resolved_by", "resolved_at", "note", "evidence_digest"],
+      "data_rows_with_status_open_filter": 0,
+      "note": "当时 finding 已被流转为非 open，筛后 0 行=筛选生效实证"
+    },
+    {
+      "stage": "export_value_domains",
+      "http": 200,
+      "content_disposition": "attachment; filename=value-domains-20260830-052930-status-pending.csv",
+      "header": ["system_code", "schema_name", "table_name", "column_name", "code", "meaning", "domain_kind", "scope_condition", "status", "version_of", "updated_at"],
+      "data_rows": 1,
+      "note": "conflicted 行被默认排除"
+    },
+    {
+      "stage": "post_checks",
+      "same_status_current": "resolved",
+      "same_status_http": 422,
+      "export_unfiltered": {
+        "http": 200,
+        "content_disposition": "attachment; filename=probe-findings-20260830-052956.csv",
+        "data_rows": 1,
+        "evidence_sql_absent": true,
+        "first_data_line_has_throwaway": true
+      }
+    },
+    {
+      "stage": "cleanup",
+      "findings_left": 0,
+      "value_domains_left": 0,
+      "tables_left": 0,
+      "audit_kept_as_evidence": {
+        "probe/transition": 13,
+        "probe/export": 2,
+        "value_domain/submit": 2,
+        "value_domain/conflict_detected": 1,
+        "value_domain/export": 1
+      }
+    }
+  ]
+}

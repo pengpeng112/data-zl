@@ -1,0 +1,341 @@
+{
+ "_desc": "r173 S0 三产物之二：副作用黑名单（round-8 裁决 #5/#6）。黑名单端点永不真实执行——只发【无 token】与【必炸 schema 残缺请求】两种，禁合法 JSON。写成功路径仅限纯平台库写端点。",
+ "reasons": {
+  "real_source": "会连真实业务源库/外部系统",
+  "llm": "真实调用院内 LLM",
+  "scheduler_heavy": "调度者或重活（全库扫描/批量导入/快照）",
+  "business_db_write": "面向业务库的写形态（即使当前仅 dry-run）"
+ },
+ "blacklist": [
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/connection-test",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/jobs",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/jobs/{job_id}/retry",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/patrol/run",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/checks/run",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules/auto-generate",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/connections/test-draft",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/connections/{connection_id}/test",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/run",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/{product_code}/execute",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/drafts/{draft_id}/execute",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/ai-sql/generate",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/tool-execute",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/export-context",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/evaluations/run",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/his",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/run",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/jobs/{job_id}/retry",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/review/generate",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity-sync/nightly/trigger",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity-sync/validation/trigger",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/sync/run",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/sync/jobs/{job_id}/retry",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plan",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/apply-one",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/stop-one",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}/approve",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}/execute",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/export-preview",
+   "reason": "business_db_write"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/imports/diagnosis-mapping",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/submit",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/approve",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ops/runs/{run_id}/approve",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/reject",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ops/runs/{run_id}/reject",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/dry-run",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/execute",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/runs",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/runs/{run_id}/preview",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permission-requests/{request_id}/execute",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/scheduler/jobs",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/snapshots",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/init/import-his-source",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/lineage/sync",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/import/core-48",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/import/metric-results",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests/{cr_id}/execute",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests/batch-execute",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/refresh",
+   "reason": "csrf_special: 无 Origin=403 设计；只做无 Origin 与残缺两种"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/check",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/collect-metadata",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/metadata-jobs/{job_id}/retry",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/peripheral/bootstrap",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/collect-sources",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/init/backfill-p6",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/preview",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/governance-report",
+   "reason": "llm"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/{metric_code}/calculate",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/{metric_code}/versions/{version}/calculate",
+   "reason": "real_source"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/schedules/seed-core",
+   "reason": "scheduler_heavy"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/publish-core",
+   "reason": "scheduler_heavy"
+  }
+ ],
+ "stream_auth_only": [
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/audit-logs/export"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains/export"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/mapping-rows/export"
+  }
+ ],
+ "_amended": "T3 执行中补录（2026-09-01）：sources check/collect、identity/collect-sources、quality-ai preview/governance-report(LLM)、metrics calculate、admin backfill、seed-core/publish-core——补录前对上述端点仅发过无token/残缺body请求，从未真实执行"
+}

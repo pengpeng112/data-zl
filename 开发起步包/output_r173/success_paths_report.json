@@ -1,0 +1,251 @@
+{
+ "cases": [
+  {
+   "case": "c_systems_upsert",
+   "result": "ASSERT_FAIL",
+   "evidence": "readback missing r173sys",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_systems_patch",
+   "result": "PASS",
+   "info": "patch ok 200",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_systems_conn",
+   "result": "PASS",
+   "info": "{'id': 48, 'system_code': 'r173sys3', 'source_code': 'r173src3', 'source_name_cn",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_systems_with_conns",
+   "result": "PASS",
+   "info": "{'system_code': 'r173sys4', 'sources': ['r173src4'], 'credentials_activated': []",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_sources_upsert",
+   "result": "PASS",
+   "info": "r173源改",
+   "audit_delta": 3
+  },
+  {
+   "case": "c_admin_keys",
+   "result": "PASS",
+   "info": "key id=10 created+disabled",
+   "audit_delta": 2
+  },
+  {
+   "case": "c_admin_terms",
+   "result": "PASS",
+   "info": "{'id': 4, 'term': 'r173术语A', 'mapping_type': 'column', 'mapping_target': 'HIS.R1",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_admin_owners",
+   "result": "PASS",
+   "info": "{'id': 4, 'full_table_name': 'R173_SCHEMA.R173_TAB', 'owner_name': 'r173'}",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_executors",
+   "result": "PASS",
+   "info": "executor upsert+idempotent+disable",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_enum_values",
+   "result": "PASS",
+   "info": "enum upsert x2",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_change_rules",
+   "result": "PASS",
+   "info": "events list status 200",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_events",
+   "result": "PASS",
+   "info": "{'id': 4, 'event_type': 'r173_evt'}",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_roles",
+   "result": "PASS",
+   "info": "role upsert+perm add/del",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_govern_user_roles",
+   "result": "PASS",
+   "info": "{'id': 12, 'user_identifier': 'r173user', 'role_code': 'r173grole2'}",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_govern_change_requests",
+   "result": "PASS",
+   "info": "{'id': 6, 'approval_status': 'draft'}",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_permissions_roles",
+   "result": "PASS",
+   "info": "{'role_code': 'r173prole', 'granted': ['asset.table.view']}",
+   "audit_delta": 3
+  },
+  {
+   "case": "c_permissions_user_roles",
+   "result": "PASS",
+   "info": "{'user_identifier': 'r173puser', 'roles': ['r173prole']}",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_dict_med_code_sets",
+   "result": "PASS",
+   "info": "code-set upsert x2",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_dict_med_items",
+   "result": "PASS",
+   "info": "item upsert",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_dict_med_mappings",
+   "result": "PASS",
+   "info": "mapping upsert",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_dict_categories",
+   "result": "PASS",
+   "info": "category upsert x2",
+   "audit_delta": 2
+  },
+  {
+   "case": "c_dict_std_items",
+   "result": "PASS",
+   "info": "std item upsert",
+   "audit_delta": 2
+  },
+  {
+   "case": "c_dict_sys_items",
+   "result": "PASS",
+   "info": "patch enabled -> 404",
+   "audit_delta": 3
+  },
+  {
+   "case": "c_queries_ingest",
+   "result": "PASS",
+   "info": "ingest+readback",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_queries_gate",
+   "result": "PASS",
+   "info": "{'status': 'validated', 'auto_activate': True, 'errors': [], 'warnings': [], 'tables': ['H",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_queries_validate",
+   "result": "PASS",
+   "info": "{'schema_version': 'query-validation/v1', 'overall': 'stale', 'layers': [{'layer': 'G1_str",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_metrics_ingest",
+   "result": "PASS",
+   "info": "{'idempotent': False, 'created_definition': True, 'activated': True, 'gate_error",
+   "audit_delta": 2
+  },
+  {
+   "case": "c_recipes",
+   "result": "PASS",
+   "info": "created 200, version 200",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_recipes_sql",
+   "result": "PASS",
+   "info": "{'recipe_id': 'r173-rec4', 'version': 1, 'dialect': 'oracle', 'sql': 'SELECT *\\nFROM HIS.P",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_ai_sessions",
+   "result": "PASS",
+   "info": "session_key ok",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_ai_answers",
+   "result": "PASS",
+   "info": "{'id': 6, 'answer_event_id': 6, 'question_digest': '4bb4044b7f3b0962ee390578988b",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_ai_feedback",
+   "result": "PASS",
+   "info": "feedback on answer 7: {'id': 4, 'feedback_id': 4, 'status': 'submitted', 'answer_e",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_ai_tool_call",
+   "result": "PASS",
+   "info": "logged 200, list 200",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_ai_risk_scan",
+   "result": "PASS",
+   "info": "{'sql_length': 21, 'risk_flags': {'dangerous_keywords': ['DROP'], 'blocked': True}, 'safe_",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_quality_rules",
+   "result": "PASS",
+   "info": "{'id': 425, 'rule_code': 'R173_RULE_1'}",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_quality_rules_template",
+   "result": "PASS",
+   "info": "{'sql': 'SELECT COUNT(*) AS TOTAL_CNT, NVL((SELECT COUNT(*) FROM (SELECT PATIENT",
+   "audit_delta": 0
+  },
+  {
+   "case": "c_value_domains",
+   "result": "PASS",
+   "info": "{'created': True, 'attached': False, 'id': 80, 'system_code': 'HIS', 'source_cod",
+   "audit_delta": 1
+  },
+  {
+   "case": "c_identity_cr",
+   "result": "PASS",
+   "info": "{'id': 7, 'approval_status': 'draft'}",
+   "audit_delta": 1
+  }
+ ],
+ "pass": 37,
+ "total": 38,
+ "cleanup_errors": [
+  {
+   "sql": "delete from asset.asset_relation_recipes where recipe_id like 'r173%'delete from",
+   "err": "(psycopg.errors.SyntaxError) syntax error at or near \"delete\"\nLINE 1: ...sset_relation_recipes where recipe_id like 'r17"
+  }
+ ],
+ "leftovers": {
+  "systems": 0,
+  "api_keys": 0,
+  "quality_rules": 0,
+  "recipes": 3,
+  "queries": 0,
+  "auth_users": 0,
+  "ai_tool_calls": 0,
+  "value_domains": 0
+ },
+ "audit_written_cases": 16
+}

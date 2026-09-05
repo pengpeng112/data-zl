@@ -1,0 +1,189 @@
+{
+ "run_id": "probe-20260901-191051",
+ "status": "partial",
+ "window": [
+  "2026-08-01",
+  "2026-09-01"
+ ],
+ "probe_count": 12,
+ "finding_new": 6,
+ "finding_updated": 0,
+ "relapse_count": 0,
+ "summary": {
+  "T1": {
+   "code": "T1",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 81.4023,
+   "metrics": {},
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 3.5
+  },
+  "T10": {
+   "code": "T10",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 10.2232,
+   "metrics": {},
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 2.4
+  },
+  "T11": {
+   "code": "T11",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 46.2479,
+   "metrics": {
+    "a": {
+     "None": 35263.0,
+     "1": 3461.0,
+     "3": 445.0,
+     "9": 6663.0,
+     "2": 17417.0,
+     "4": 449.0
+    },
+    "b": {
+     "2": 17579.0,
+     "4": 458.0,
+     "3": 445.0,
+     "None": 6074.0,
+     "9": 6742.0,
+     "1": 3481.0
+    }
+   },
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 4.2
+  },
+  "T12": {
+   "code": "T12",
+   "status": "ok",
+   "triggered": false,
+   "metric_value": 0.0,
+   "metrics": {},
+   "unmapped": [],
+   "elapsed_s": 1.9
+  },
+  "T2": {
+   "code": "T2",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 4.8068,
+   "metrics": {},
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 2.9
+  },
+  "T3": {
+   "code": "T3",
+   "status": "ok",
+   "triggered": false,
+   "metric_value": 0.0,
+   "metrics": {},
+   "unmapped": [],
+   "elapsed_s": 2.0
+  },
+  "T4": {
+   "code": "T4",
+   "status": "ok",
+   "triggered": false,
+   "metric_value": 0.0,
+   "metrics": {},
+   "unmapped": [],
+   "elapsed_s": 1.9
+  },
+  "T5": {
+   "code": "T5",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 34.2896,
+   "metrics": {
+    "applied": null,
+    "executed": null,
+    "reported": null
+   },
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 2.7
+  },
+  "T6": {
+   "code": "T6",
+   "status": "ok",
+   "triggered": true,
+   "metric_value": 6.6605,
+   "metrics": {
+    "a": {
+     "None": 79409.0
+    },
+    "b": {
+     "None": 74120.0
+    }
+   },
+   "unmapped": [],
+   "finding_outcomes": [
+    "created"
+   ],
+   "relapse": false,
+   "elapsed_s": 4.5
+  },
+  "T7": {
+   "code": "T7",
+   "status": "error",
+   "triggered": false,
+   "error": "BLOCKED: ODS.PACSREPORT 70 列无申请键/患者键（2026-08-29 核验）；结果侧键位未定位，按 BLOCKED 登记（164 §5 口径），定位后补 side-b",
+   "elapsed_s": 0.0
+  },
+  "T8": {
+   "code": "T8",
+   "status": "ok",
+   "triggered": false,
+   "metric_value": 0.8781,
+   "metrics": {
+    "a": {
+     "1": 4544.0,
+     "5": 24.0,
+     "4": 170.0,
+     "2": 3.0
+    },
+    "b": {
+     "5": 25.0,
+     "2": 3.0,
+     "1": 4581.0,
+     "4": 174.0
+    }
+   },
+   "unmapped": [],
+   "elapsed_s": 3.7
+  },
+  "T9": {
+   "code": "T9",
+   "status": "ok",
+   "triggered": false,
+   "metric_value": 100.0,
+   "metrics": {
+    "sampled": 50,
+    "matched": 50
+   },
+   "unmapped": [],
+   "elapsed_s": 3.7
+  }
+ },
+ "generated_at": "2026-09-01T11:11:26.998469+00:00"
+}

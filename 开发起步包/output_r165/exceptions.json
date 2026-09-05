@@ -1,0 +1,67 @@
+{
+  "session": "r165-E3-first-night-probe",
+  "recorded_at": "2026-08-30T08:30:00+08:00",
+  "precheck": [
+    {"item": "probe_templates 12 个 T*.json", "result": "PASS"},
+    {"item": "backend/scripts/run_probe.py 存在", "result": "PASS"},
+    {"item": "127.0.0.1:15432 LISTENING", "result": "PASS（已存在，无需重建隧道）"},
+    {"item": "alembic current = c1d2e3f4a5b6 (head)", "result": "PASS"}
+  ],
+  "warnings": [
+    {
+      "level": "WARN",
+      "code": "EXEC_UNDEFINED_TABLE",
+      "message": "测试库 data_asset_test 缺少 asset.asset_probe_runs 表，执行器 register_run 阶段 INSERT 失败，两轮均在零模板执行状态下崩溃退出（exit 1）",
+      "detail": "psycopg.errors.UndefinedTable: 关系 \"asset.asset_probe_runs\" 不存在；alembic 账面版本为 head=c1d2e3f4a5b6，但实际 schema 中无 asset.asset_probe_runs 表（账面与实际 schema 脱节）",
+      "affected_runs": ["probe-20260830-082738", "probe-20260830-082838"],
+      "action_taken": "仅登记；按红线未修复、未补做迁移、未重试",
+      "recorded_at": "2026-08-30T08:30:00+08:00"
+    },
+    {
+      "level": "WARN",
+      "code": "PLAN_DEVIATION_DAYTIME_E3",
+      "message": "用户 2026-08-30 明确授权：E3 首轮+同窗收敛两轮于当日日间执行（计划升 v1.2，§1 铁律 1 加一次性豁免注记）；源侧仍 8.83 受控连接器只读、120s/60min 限额不变；豁免仅本轮有效，此后全量 run 与生产 X2 仍夜间",
+      "detail": "另核实：08:27 两轮失败的 asset_probe_runs 表缺失为暂态（07:03 晨检两表在且空、08:27 缺失、08:50+ 复核恢复，asset schema 103 表、head=c1d2e3f4a5b6），疑似并发会话迁移往返撞窗；本轮执行期间隔离库由单执行者独占",
+      "affected_runs": ["本轮日间 E3 run（见 progress.md 当日条目）"],
+      "action_taken": "计划 v1.2 修订 + 本登记 + 继续执行",
+      "recorded_at": "2026-08-30T09:00:00+08:00"
+    },
+    {
+      "level": "WARN",
+      "code": "EXEC_WRITE_DB_IMPORT_ORDER_BUG_FIXED",
+      "message": "E3 三次失败（08:27/08:28/09:03 probe-*）根因确认为 run_probe.py 缺陷并已修复：app.core.db 在 import 时即以 .env 的 APP_DB_URL 创建 engine，main() 内再设 os.environ 无效，导致写侧从未指向 --write-db（data_asset_test）而是 .env 默认库（164 号已发现其指向 10.20.1.153 旧库），asset_probe_runs 在该库不存在→UndefinedTable。此前「并发会话迁移往返撞窗」推测不成立，予以更正",
+      "detail": "修复：①导入前 _preset_write_db() 从 argv 预置 APP_DB_URL；②main() 内新增双保险断言（SessionLocal 引擎 host/port/db ≠ --write-db 即 SystemExit 拒绝执行）。修复属 E1 执行器正确性范畴；三次失败事务均回滚，.env 默认库零写入（UndefinedTable 在 INSERT 解析期失败）",
+      "affected_runs": ["probe-20260830-082738", "probe-20260830-082838", "09:03 轮 run_id 见 e3_day_run1_console.log"],
+      "action_taken": "修复 + 本更正登记 + 重启 E3",
+      "recorded_at": "2026-08-30T09:10:00+08:00"
+    },
+    {
+      "level": "WARN",
+      "code": "EXEC_T2_METRIC_BRANCH_MISSING_FIXED",
+      "message": "首轮试跑 probe-20260830-092312 发现第二处执行器缺陷并已修复：run_single_source 指标分支缺 name_mismatch_rate，T2（doctor_name_mismatch_rate，SQL 别名 NONNULL/MISMATCH，公式 mismatch/nonnull*100）恒得 0.0，对照 164 §2 基线 5.97% 判定为计算缺陷而非真实零。已新增分支按 MISMATCH/NONNULL 计算",
+      "detail": "处置：probe-20260830-092312 定性为试跑（T2 值无效，其余 11 模板值有效）；清空隔离库 asset.asset_probe_findings 与 asset.asset_probe_runs 两表后重做首轮（govern 审计行保留不删，试跑 JSON 留存 output_r165/runs/ 作证据）；首轮/收敛两轮以新 run_id 归属",
+      "affected_runs": ["probe-20260830-092312（试跑，T2 缺陷）"],
+      "action_taken": "修复 + 两表清空 + 重做首轮（同一 --window last-full-month --today-cut 窗口）",
+      "recorded_at": "2026-08-30T09:35:00+08:00"
+    },
+    {
+      "level": "WARN",
+      "code": "BASELINE_T2_RELATIVE_DEVIATION_NOTE",
+      "message": "基线对照口径注记：T2 本轮 4.93% vs 164 §2 基线 5.97%，按百分点主口径偏差 1.04pp 判 PASS；按相对口径偏差 17.4% 超 5%。成因为窗口不一致（164 基线为 2026 年初至 8 月末，本轮为 2026-07-01→08-30），非执行异常；pp 主口径判定成立，相对口径如实注记",
+      "affected_runs": ["probe-20260830-094723"],
+      "action_taken": "报告 §4 双口径披露，不重跑",
+      "recorded_at": "2026-08-30T10:00:00+08:00"
+    },
+    {
+      "level": "WARN",
+      "code": "ISODB_TUNNEL_DEATH_AND_DATA_LOSS",
+      "message": "①10:20 前后并行 W10 会话在 8.83 容器操作致旧隧道（07:03 建立）转发失效，首轮后启动的全量回归在无超时 DB 连接上挂起 >70 分钟，已终止；②重建隧道后发现隔离库 probe 两表与 asset_govern_audit_logs 全表 0 行（schema 103 表与 head c1d2e3f4a5b6 完好）——多表数据被清空，最可能为挂死全量回归自身的测试夹具清理，亦不排除并行会话，无法精确归因",
+      "detail": "磁盘证据完好（output_r165/runs/ 三个 run JSON、console 日志、progress.md、本文件）；处置：先重跑全量回归（隧道已修复），完成后重做 E3 双轮（新 run_id）恢复入库证据为最终库态",
+      "affected_runs": ["probe-20260830-092312/094723/094820 的入库行与审计行（库内已失，磁盘证据在）"],
+      "action_taken": "终止挂起任务 + 重建隧道 + 调整顺序（全量回归→双轮重做收尾）+ 本登记",
+      "recorded_at": "2026-08-30T11:10:00+08:00",
+      "resolved_at": "2026-08-30T11:22:00+08:00",
+      "resolution": "全量回归重跑通过（1288 passed/1 skipped/0 failed，27 分 22 秒）；收尾双轮 probe-20260830-111903（new=6）+ probe-20260830-111935（new=0/updated=6）恢复入库证据；最终库态 2 run/6 findings/2 审计行"
+    }
+  ]
+}

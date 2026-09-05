@@ -1,0 +1,38 @@
+{
+  "plan_no": 175,
+  "date": "2026-09-02",
+  "mode": "readonly_live_aggregate",
+  "source_writes": 0,
+  "window": {"start": "2026-01-01", "end_exclusive": "2027-01-01"},
+  "quality_findings": [
+    {"control_code": "DQ-LIS-KEY-001", "total": 392287, "inp_no_missing": 0, "visit_id_missing": 11, "test_no_missing": 0, "report_no_missing": 0, "rate": 0.00002804, "status": "FAIL"},
+    {"control_code": "DQ-US-VISIT-001", "total": 50947, "visit_missing_or_zero": 39, "booked_visit_missing": 37, "booking_orphan": 37, "non_null_visit_mismatch": 0, "status": "FAIL"},
+    {"control_code": "DQ-DOC-VISIT-001", "total_emergency": 968, "unscheduled": 755, "unscheduled_visit_1": 750, "unscheduled_visit_not_1": 5, "default_1_coverage": 0.99337748, "status": "FAIL_WITH_EXCEPTIONS"}
+  ],
+  "relation_candidates": [
+    {"system_code": "ULTRASOUND_ENDOSCOPY", "from": "AnyImage.grid.BHosCheckUS.BookID", "to": "MedcareUS.dbo.预约登记.编号", "status": "partial_candidate", "qualifier": "2026 inpatient window; 37 booking orphans", "formal_write": false},
+    {"system_code": "DOCARE", "from": "MEDSURGERY.MED_OPERATION_SCHEDULE(PATIENT_ID,VISIT_ID,OPER_ID)", "to": "MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)", "status": "existing_scoped_relation", "qualifier": "schedule STATE IN (2,3)", "formal_write": false},
+    {"system_code": "LIS_SOURCE", "from": "dbo.CDR_INSPECTION_REPORT(INP_NO,VISIT_ID)", "to": "HIS inpatient key", "status": "cross_system_D_blocked", "qualifier": "requires controlled two-source in-memory comparison", "formal_write": false}
+  ],
+  "value_domain_candidates": {"status": "pending_only", "auto_confirmed": 0, "fields": ["LIS.dbo.CDR_INSPECTION_REPORT.VISIT_TYPE_CODE", "LIS.dbo.CDR_INSPECTION_REPORT.REPORT_STATUS", "ULTRASOUND_ENDOSCOPY.AnyImage.grid.BHosCheckUS.PatSource", "ULTRASOUND_ENDOSCOPY.AnyImage.grid.BHosCheckUS.Printed", "DOCARE.MEDSURGERY.MED_OPERATION_MASTER.EMERGENCY_INDICATOR", "DOCARE.MEDSURGERY.MED_OPERATION_MASTER.OPER_STATUS"]},
+  "production_ledger_write": {
+    "executed": true,
+    "date": "2026-09-03",
+    "migration": "d5e6f7a8b9c0",
+    "controls": 17,
+    "detectors": 17,
+    "observations": 15,
+    "issues": 12,
+    "events": 15,
+    "plan175_pending_domains_created": 18,
+    "plan175_evidence_created": 18,
+    "plan175_relation_drafts_created": 1,
+    "plan175_issue_codes": ["DQI-202609-000008", "DQI-202609-000009", "DQI-202609-000010"],
+    "idempotent_second_apply": true,
+    "backend_image": "data-asset:r175-20260903",
+    "frontend_release": "r175-20260903",
+    "backup": "/opt/data-asset/backups/data_asset_pre_r175_20260903.dump",
+    "health": "healthy",
+    "source_writes": 0
+  }
+}

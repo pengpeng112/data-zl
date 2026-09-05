@@ -1,0 +1,31 @@
+ M backend/app/services/identity_sync_audit.py
+ M backend/app/services/identity_sync_log.py
+ M backend/app/services/identity_sync_status.py
+ M backend/app/services/jhemr_identity_adapter.py
+ M backend/scripts/run_identity_modified_nightly.py
+ M backend/tests/test_identity_sync.py
+ M backend/tests/test_identity_sync_122_unit.py
+ M frontend/src/layout/components/lay-content/index.vue
+ M frontend/src/layout/components/lay-setting/index.vue
+ M frontend/src/layout/hooks/useDataThemeChange.ts
+ M frontend/src/layout/hooks/useTag.ts
+ M frontend/src/layout/index.vue
+ M frontend/src/store/modules/app.ts
+?? backend/app/services/identity_login_sign_sync.py
+?? backend/tests/identity_login_sign_sync/
+?? frontend/src/layout/captureMode.ts
+fbe6b6f8559a0a0865f0462c6f69b6e0 *backend/app/services/identity_sync_audit.py
+f2becae75211db3ef18b13380c62f1f3 *backend/app/services/identity_sync_log.py
+851f118c58502f2c0939111ac905d375 *backend/app/services/identity_sync_status.py
+9453474422449b12ec7ec4ae5a734bdf *backend/app/services/jhemr_identity_adapter.py
+63daf260da40765059d8ccbb75b8f565 *backend/scripts/run_identity_modified_nightly.py
+e95bd509d8d59a917f62d3c8baa10ad8 *backend/tests/test_identity_sync.py
+67c432b905d4d71113d0efe1d2bc8927 *backend/tests/test_identity_sync_122_unit.py
+6dfe9a6c99343d3fd6e502d7f952df72 *frontend/src/layout/components/lay-content/index.vue
+43b1e707b7a3ada5d3c4a7e9b5b06733 *frontend/src/layout/components/lay-setting/index.vue
+4d14b182c0eec0baf25bbdc0cbc16ac5 *frontend/src/layout/hooks/useDataThemeChange.ts
+d55c9567b2ad0e678ed8d39b1ad2aea1 *frontend/src/layout/hooks/useTag.ts
+a9e2f260729cd4d7da086e9f8f5f5a82 *frontend/src/layout/index.vue
+5742a0b390f22cb1dea46d95cb8ca62c *frontend/src/store/modules/app.ts
+95c0bf2d52d37c14ca2c98eda1db4312 *backend/app/services/identity_login_sign_sync.py
+3ef6efde3fae30e35c6e9f616e645e05 *frontend/src/layout/captureMode.ts

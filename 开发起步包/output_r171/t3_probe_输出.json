@@ -1,0 +1,95 @@
+{
+  "steps": [
+    {
+      "step": "B0_overview",
+      "note": "首屏 overview（复验 T3② 出图+面板）",
+      "api": {},
+      "dark": 0.0086,
+      "center_dark": 0.0131,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    },
+    {
+      "step": "B1_search_focus",
+      "note": "搜索聚焦 HIS.PAT_VISIT（默认档）",
+      "api": {
+        "status": 200,
+        "nodes": 32,
+        "edges": 36
+      },
+      "dark": 0.0414,
+      "center_dark": 0.0865,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    },
+    {
+      "step": "B2_depth_1hop",
+      "note": "depth 切 1 跳（真实 change 请求）",
+      "api": {
+        "status": 200,
+        "nodes": 32,
+        "edges": 36
+      },
+      "dark": 0.0649,
+      "center_dark": 0.0442,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    },
+    {
+      "step": "B3_depth_2hop",
+      "note": "depth 1→2 跳（A3 复验）",
+      "api": {
+        "status": 200,
+        "nodes": 60,
+        "edges": 81
+      },
+      "dark": 0.0811,
+      "center_dark": 0.0462,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    },
+    {
+      "step": "B4_incremental",
+      "note": "画布中心双击增量展开（A4 复验）",
+      "api": {
+        "status": 200,
+        "nodes": 0,
+        "edges": 2
+      },
+      "dark": 0.0111,
+      "center_dark": 0.0063,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    },
+    {
+      "step": "B5_inspector",
+      "note": "Inspector 中文名兜底链（活体）",
+      "api": {
+        "has_json_dump": false,
+        "snippet": "Inspector | 收起 › | 节点 | 关系"
+      },
+      "dark": 0.0111,
+      "center_dark": 0.0063,
+      "panel_exists": false,
+      "panel_visible": false,
+      "panel_text": "",
+      "canvas": 4,
+      "console": []
+    }
+  ]
+}

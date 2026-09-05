@@ -1,0 +1,15 @@
+{
+ "views_total": 58,
+ "route_refs": 46,
+ "weak_pages": [
+  "views/error/404.vue",
+  "views/error/500.vue",
+  "views/identity/authorizations/index.vue",
+  "views/identity/departments/index.vue",
+  "views/identity/roles/index.vue",
+  "views/query-center/accuracy/index.vue"
+ ],
+ "unresolved_route_refs": [
+  "@/layout/redirect.vue"
+ ]
+}

@@ -1,0 +1,25 @@
+{
+  "failed": [],
+  "non200": [],
+  "console": [],
+  "panel": [
+    {
+      "tag": "after_overview_load",
+      "exists": false,
+      "visible": false,
+      "text": ""
+    },
+    {
+      "tag": "after_mode_switch",
+      "exists": false,
+      "visible": false,
+      "text": ""
+    },
+    {
+      "tag": "after_search_focus",
+      "exists": false,
+      "visible": false,
+      "text": ""
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "batch": "177",
+  "executed_at": "2026-09-03",
+  "exceptions": [
+    {
+      "id": "W-01",
+      "batch": "R2/C6",
+      "severity": "WARN",
+      "item": "GraphToolbar.vue props 突变（vue/no-mutating-props 20 处）未修",
+      "reason": "父组件 graph/index.vue 传入自身响应式 filters/locate 并直接读取（共享对象设计）；纯子组件改 emit 必破坏筛选功能，父组件不在 177 R2 文件白名单。本地 computed 嫁接只灭 lint 不改数据流，属假修不做。",
+      "disposition": "跳过，留主 AI 裁决：若接受把 graph/index.vue 纳入下批白名单，可做完整父子 emit 改造"
+    },
+    {
+      "id": "W-02",
+      "batch": "R2",
+      "severity": "INFO",
+      "item": "两处与 177 正文表述的实证偏差（修复方向不变）",
+      "reason": "① C2 实测根因=非 CANONICAL 分区返回 upper() 规范化编码（列表有该系统但编码被改，readback/详情 404），非'仅遍历 CANONICAL 常量'——第二循环自 6e5dc55 已存在；② C3 建议权限码 dict.general.manage 不存在，同页既有码为 dict.general.edit；③ RelationGraph.vue 实际在 views/asset/components/ 而非 177 所写 views/asset/graph/；④ C5 共享校验函数落在 recipe_service.py（白名单只列了 recipes.py），系同一 create 校验修复的合理落点（generate_select_sql 复用同一提取函数），无功能扩张",
+      "disposition": "按 177 自身优先级规则（同页怎么挂就怎么挂/文件白名单精神）执行，结果等效且更精确"
+    },
+    {
+      "id": "W-03",
+      "batch": "R1",
+      "severity": "DEFERRED",
+      "item": "176 今夜 02:00 主同步熔断验证未做",
+      "reason": "本会话时点 2026-09-03 晚，夜跑尚未发生",
+      "disposition": "按 177 批次序留待 2026-09-04 02:00 后只读补验（口径见 177 R1）"
+    },
+    {
+      "id": "W-04",
+      "batch": "R5",
+      "severity": "SKIP",
+      "item": "CDMS 004066 赋权整批跳过",
+      "reason": "用户未选表现 A/B/C；未授权写 KESHID/核密码",
+      "disposition": "G7 等待域"
+    }
+  ]
+}

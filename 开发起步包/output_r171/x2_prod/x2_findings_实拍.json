@@ -1,0 +1,10 @@
+{
+  "dom": {
+    "rows": 6,
+    "hasRunId": true,
+    "hasOpen": true,
+    "hasMenu": true,
+    "errPanel": false
+  },
+  "errors": []
+}

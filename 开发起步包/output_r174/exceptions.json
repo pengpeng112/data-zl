@@ -1,0 +1,34 @@
+{
+  "plan_code": "174",
+  "generated_at": "2026-09-02",
+  "exceptions": [
+    {
+      "code": "W1_PROD_MIGRATION_PENDING",
+      "reason": "生产平台（8.83 data_asset 库）尚未执行 alembic upgrade head（d5e6f7a8b9c0）与 seed --apply；按方案需用户另行明确授权",
+      "evidence": "本任务仅在隔离库 data_asset_test 完成迁移与种子验证",
+      "required_authority": "用户明确授权生产迁移",
+      "next_action": "授权后：备份 → alembic upgrade head → seed dry-run 核对 → seed --apply → 容器热更/镜像发布"
+    },
+    {
+      "code": "W2_PROD_FINDINGS_IMPORT",
+      "reason": "生产现有 6 条 open ProbeFinding 的幂等入账依赖生产 seed --apply（隔离库无生产数据）",
+      "evidence": "隔离库 probe_findings 为空，适配器零硬编码、按当前数据查询",
+      "required_authority": "随 W1 一并授权",
+      "next_action": "生产 apply 后核对 probe_findings_sync.issues_created 与 165 X2 基线（6 条 open）一致"
+    },
+    {
+      "code": "W3_UNVERIFIED_RULES_BLOCKED",
+      "reason": "DQ-HIS-MR-DEATH-001/DQ-LIS-KEY-001/DQ-US-VISIT-001/DQ-DOC-VISIT-001 的自动 SQL 未做活库核验，detector 按方案保持 blocked",
+      "evidence": "seed 中四条 detector_status=blocked + blocked_reason 注明核验项",
+      "required_authority": "sjzc/只读技能活库取证后由质量管理员解锁",
+      "next_action": "按 174 §10.2 先核验再自动化；未核验前只有手工 Issue 跟踪"
+    },
+    {
+      "code": "W4_CONTROL_RUN_EXECUTOR",
+      "reason": "POST /quality-controls/{id}/run 只做校验+审计+执行提示，不直接执行探查（源侧执行必须走既有夜间执行器+受控连接器，API 内不连源库）",
+      "evidence": "quality_controls.py run 端点返回 executor_hint，响应注明不伪造结果",
+      "required_authority": "无需授权（设计裁决）",
+      "next_action": "保持现状；如需 API 触发异步探查另行立项"
+    }
+  ]
+}

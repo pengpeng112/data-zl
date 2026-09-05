@@ -1,0 +1,10 @@
+{
+  "_desc": "r173 执行偏差台账（WARN 级，不阻断，逐条记录后继续）",
+  "items": [
+    {"id": "W1", "batch": "T1", "desc": "计划原文工装路径 tools/check_api_contract_r173.py 与 round-8 #19 裁决（全部工装进 output_r173/ 与 backend/_r173_work/）冲突", "resolution": "按裁决放 backend/_r173_work/，.gitignore 已覆盖"},
+    {"id": "W2", "batch": "T1", "desc": "FastAPI 新版 _IncludedRouter 包装导致 app.routes 不展平，首版实路由表仅 6 条", "resolution": "展平 original_router 后得 400 条；教训已写入 contract_diff_report.md"},
+    {"id": "W3", "batch": "T1", "desc": "C 线字段级静态比对双方均可解析仅 9 对（后端广泛使用 ApiResponse[dict] 泛型）", "resolution": "≥30 采样点转 S 线运行时交叉核验（route_probe_report.json field_keys_sample，实测捕获 71 个 GET 200 的 data keys）"},
+    {"id": "W4", "batch": "T3", "desc": "S0 副作用黑名单初版遗漏 12 个端点（sources check/collect-metadata、identity/collect-sources、quality-ai preview/governance-report、metrics calculate×2、sources peripheral bootstrap、admin backfill-p6、queries seed-core、data-products publish-core）", "resolution": "代码定性后已补录（blacklist 63 条）；补录前对这些端点仅发过无token/必炸残缺请求且当时全部被 401/403/422 拦截（route_probe_report.json 可证），零真实执行、零副作用"},
+    {"id": "W5", "batch": "T0", "desc": "15432 隧道为 171 会话遗留（未新建 SSH）；APP_TEST_DB_URL 每命令运行时经 get_test_db_url.sh 从服务器推导，凭据零落盘零回显", "resolution": "符合 162 §1.2 通道约定"}
+  ]
+}
