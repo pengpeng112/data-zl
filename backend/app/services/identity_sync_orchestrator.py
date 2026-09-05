@@ -406,7 +406,13 @@ def _compute_change_stats(
     - align_existing: W10 方案 C——JHEMR 账号已存在的首次纳管（additive align，
       补角色组/科室/登录方式），不计入 max_new 与 max_change_ratio，受
       identity_cb_max_align 单独约束
-    - update: candidate already managed in at least one target (state/dept resync)
+    - update: managed candidate with a real change signal — HIS
+      MODIFIEDTIME increment touched the person（真正的字段变更），
+      or the JHEMR existence check failed（fail-closed 保守回退旧口径）
+    - resync_unchanged: 176 F-2——托管在册且不在 HIS 增量内的例行 resync
+      （空增量夜的全托管圈约 110 人），单列计数，不计入 max_update 与
+      max_change_ratio（比照 W10 对 align_existing 的处理）。仍受
+      max_candidates 总量约束；JHEMR 存在性检查失败时不享受该豁免。
     - deactivate: managed persons no longer eligible (status/classification change)
     - watermark_gap_hours: hours since the last successful HIS collection
     - scope: all eligible active persons (denominator for change ratio)
@@ -422,11 +428,15 @@ def _compute_change_stats(
     new_count = 0
     update_count = 0
     align_existing_count = 0
+    resync_unchanged_count = 0
     for c in candidates:
         fp_cdms = compute_account_fingerprint(c["emp_no"], "CDMS", settings.identity_hmac_key_ref)
         fp_jhemr = compute_account_fingerprint(c["emp_no"], "JHEMR", settings.identity_hmac_key_ref)
         if fp_cdms in managed_fps or fp_jhemr in managed_fps:
-            update_count += 1
+            if jhemr_existing is not None and not c.get("modified_time"):
+                resync_unchanged_count += 1
+            else:
+                update_count += 1
         elif jhemr_existing is not None and c["emp_no"] in jhemr_existing:
             align_existing_count += 1
         else:
@@ -470,6 +480,7 @@ def _compute_change_stats(
         "new": new_count,
         "update": update_count,
         "align_existing": align_existing_count,
+        "resync_unchanged": resync_unchanged_count,
         "deactivate": deactivate_count,
         "scope": max(int(scope), 1),
         "watermark_gap_hours": round(watermark_gap_hours, 2),
@@ -490,6 +501,9 @@ def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str,
         return {"triggered": True, "dimension": "max_candidates", "value": total, "limit": settings.identity_cb_max_candidates}
     if stats.get("new", 0) > settings.identity_cb_max_new:
         return {"triggered": True, "dimension": "max_new", "value": stats["new"], "limit": settings.identity_cb_max_new}
+    # 176 F-2：update 只含真实变更（HIS 增量命中）或存在性检查失败的保守回退；
+    # 托管在册例行 resync 在 stats["resync_unchanged"] 单列，不计入本维度与
+    # 下方 change_ratio（比照 align_existing 的豁免方式），仍受 max_candidates 约束。
     if stats.get("update", 0) > settings.identity_cb_max_update:
         return {"triggered": True, "dimension": "max_update", "value": stats["update"], "limit": settings.identity_cb_max_update}
     # W10 方案 C：现存用户对齐单独设上限（防群体性误对齐），不计入 max_new/ratio

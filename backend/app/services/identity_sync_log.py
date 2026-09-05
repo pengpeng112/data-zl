@@ -16,6 +16,8 @@ SUBTASK_LABELS = {
     "main_account_sync": "主账号同步",
     "jhemr_signature_sync": "嘉和签名同步",
     "jhemr_education_title_sync": "嘉和职称同步",
+    "jhemr_user_dept_sync": "嘉和多科室同步",
+    "jhemr_login_sign_sync": "嘉和登录签名方式补齐",
 }
 SYSTEM_LABELS = {
     "CDMS": "合理用药",

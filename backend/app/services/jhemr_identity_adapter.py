@@ -1058,6 +1058,170 @@ class JhemrIdentityAdapter:
                 pass
             raise
 
+    def apply_login_sign_gaps(
+        self,
+        repairs: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Fill missing login/sign control rows. Additive only; one transaction.
+
+        Each repair may insert ``users_control_mode`` if absent, insert missing
+        ``users_sublogin`` / ``users_subsign`` ways ``0/2/4``, and set
+        ``default_flag=1`` on ``sign_way=0`` only when the user currently has
+        no default. Existing extra ways and existing defaults are not changed.
+        """
+        conn = self._ensure_conn()
+        control_inserted = 0
+        sublogin_inserted = 0
+        subsign_inserted = 0
+        default_repaired = 0
+        try:
+            for item in repairs:
+                emp_no = str(item.get("user_id") or "").strip()
+                if not emp_no:
+                    raise JhemrIdentityError("login_sign repair missing user_id")
+                user = self._fetch_one(
+                    "SELECT user_id FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+                    (emp_no, self.hospital_no),
+                )
+                if user is None:
+                    raise JhemrIdentityError("login_sign target missing after plan")
+
+                if item.get("insert_control"):
+                    existing_cm = self._fetch_one(
+                        "SELECT user_id FROM jhemr.users_control_mode "
+                        "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+                        (emp_no, self.hospital_no),
+                    )
+                    if existing_cm is None:
+                        affected = self._execute_write(
+                            "INSERT INTO jhemr.users_control_mode "
+                            "(user_id, hospital_no, in_sign_way, login_way, in_pic_mode, "
+                            "sign_box, default_loginway, double_login, "
+                            "last_modify_date, last_modify_user_id) "
+                            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP, %s)",
+                            (
+                                emp_no,
+                                self.hospital_no,
+                                CONTROL_MODE_DEFAULTS["in_sign_way"],
+                                CONTROL_MODE_DEFAULTS["login_way"],
+                                CONTROL_MODE_DEFAULTS["in_pic_mode"],
+                                CONTROL_MODE_DEFAULTS["sign_box"],
+                                CONTROL_MODE_DEFAULTS["default_loginway"],
+                                CONTROL_MODE_DEFAULTS["double_login"],
+                                self.sync_operator_id,
+                            ),
+                        )
+                        if affected != 1:
+                            raise JhemrIdentityError("users_control_mode insert failed")
+                        control_inserted += 1
+
+                for login_way in item.get("login_ways") or []:
+                    way = str(login_way)
+                    existing_sl = self._fetch_one(
+                        "SELECT user_id FROM jhemr.users_sublogin "
+                        "WHERE user_id = %s AND hospital_no = %s "
+                        "AND file_visit_type = '2' AND login_way = %s FOR UPDATE",
+                        (emp_no, self.hospital_no, way),
+                    )
+                    if existing_sl is not None:
+                        continue
+                    affected = self._execute_write(
+                        "INSERT INTO jhemr.users_sublogin "
+                        "(user_id, hospital_no, file_visit_type, login_way, last_modify_time) "
+                        "VALUES (%s, %s, '2', %s, CURRENT_TIMESTAMP)",
+                        (emp_no, self.hospital_no, way),
+                    )
+                    if affected != 1:
+                        raise JhemrIdentityError("users_sublogin insert failed")
+                    sublogin_inserted += 1
+
+                for sign in item.get("sign_ways") or []:
+                    way = str(sign["sign_way"])
+                    default_flag = str(sign.get("default_flag") or "0")
+                    existing_ss = self._fetch_one(
+                        "SELECT user_id FROM jhemr.users_subsign "
+                        "WHERE user_id = %s AND hospital_no = %s "
+                        "AND file_visit_type = '2' AND sign_way = %s FOR UPDATE",
+                        (emp_no, self.hospital_no, way),
+                    )
+                    if existing_ss is not None:
+                        continue
+                    picmode = str(sign.get("picmode") or "2")
+                    affected = self._execute_write(
+                        "INSERT INTO jhemr.users_subsign "
+                        "(user_id, hospital_no, file_visit_type, sign_way, picmode, "
+                        "default_flag, last_modify_time) "
+                        "VALUES (%s, %s, '2', %s, %s, %s, CURRENT_TIMESTAMP)",
+                        (emp_no, self.hospital_no, way, picmode, default_flag),
+                    )
+                    if affected != 1:
+                        raise JhemrIdentityError("users_subsign insert failed")
+                    subsign_inserted += 1
+
+                if item.get("fix_default"):
+                    defaults = self._fetch_all(
+                        "SELECT sign_way FROM jhemr.users_subsign "
+                        "WHERE user_id = %s AND hospital_no = %s "
+                        "AND file_visit_type = '2' AND default_flag = '1'",
+                        (emp_no, self.hospital_no),
+                    )
+                    if not defaults:
+                        affected = self._execute_write(
+                            "UPDATE jhemr.users_subsign SET default_flag = '1', "
+                            "last_modify_time = CURRENT_TIMESTAMP "
+                            "WHERE user_id = %s AND hospital_no = %s "
+                            "AND file_visit_type = '2' AND sign_way = '0'",
+                            (emp_no, self.hospital_no),
+                        )
+                        if affected != 1:
+                            raise JhemrIdentityError("users_subsign default repair failed")
+                        default_repaired += 1
+
+                cm = self._fetch_one(
+                    "SELECT user_id FROM jhemr.users_control_mode "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (emp_no, self.hospital_no),
+                )
+                if cm is None:
+                    raise JhemrIdentityError("users_control_mode read-back mismatch")
+                logins = {
+                    str(r.get("login_way"))
+                    for r in self._fetch_all(
+                        "SELECT login_way FROM jhemr.users_sublogin "
+                        "WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
+                        (emp_no, self.hospital_no),
+                    )
+                }
+                if not {"0", "2", "4"}.issubset(logins):
+                    raise JhemrIdentityError("users_sublogin read-back mismatch")
+                signs = self._fetch_all(
+                    "SELECT sign_way, default_flag FROM jhemr.users_subsign "
+                    "WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
+                    (emp_no, self.hospital_no),
+                )
+                sign_ways = {str(r.get("sign_way")) for r in signs}
+                if not {"0", "2", "4"}.issubset(sign_ways):
+                    raise JhemrIdentityError("users_subsign read-back mismatch")
+                default_count = sum(1 for r in signs if str(r.get("default_flag")) == "1")
+                if default_count < 1:
+                    raise JhemrIdentityError("users_subsign default read-back mismatch")
+
+            conn.commit()
+            return {
+                "status": "success",
+                "control_inserted": control_inserted,
+                "sublogin_inserted": sublogin_inserted,
+                "subsign_inserted": subsign_inserted,
+                "default_repaired": default_repaired,
+            }
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
     def lock_account(self, user_id: str) -> dict[str, Any]:
         """Lock one JHEMR login: account_status=8 and locked_time, never DELETE.
 

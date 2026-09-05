@@ -22,6 +22,8 @@ def test_main_success_signature_16_failures_is_partial_and_exit_two(capsys):
          patch.object(runner, "run_nightly_pipeline", return_value={"status": "success", "run_id": "R-122"}), \
          patch.object(runner, "sync_missing_jhemr_signatures", return_value={"status": "failed", "failed": 16, "source_signatures": 16, "error_classes": {"target_user_lookup_select": {"InsufficientPrivilege": 16}}}), \
          patch.object(runner, "sync_jhemr_education_titles_daily", return_value={"status": "success", "failed": 0}), \
+         patch.object(runner, "sync_jhemr_user_depts_daily", return_value={"status": "success", "failed": 0}), \
+         patch.object(runner, "sync_jhemr_login_sign_daily", return_value={"status": "success", "failed": 0}), \
          patch.object(runner, "upsert_subtask"), \
          patch.object(runner, "finalize_run", return_value="partial_success"):
         assert runner.main() == 2
@@ -36,6 +38,8 @@ def test_all_success_exit_zero():
          patch.object(runner, "run_nightly_pipeline", return_value={"status": "success", "run_id": "R-OK"}), \
          patch.object(runner, "sync_missing_jhemr_signatures", return_value={"status": "success", "failed": 0, "inserted": 2}), \
          patch.object(runner, "sync_jhemr_education_titles_daily", return_value={"status": "success", "failed": 0}), \
+         patch.object(runner, "sync_jhemr_user_depts_daily", return_value={"status": "success", "failed": 0}), \
+         patch.object(runner, "sync_jhemr_login_sign_daily", return_value={"status": "success", "failed": 0}), \
          patch.object(runner, "upsert_subtask"), \
          patch.object(runner, "finalize_run", return_value="success"):
         assert runner.main() == 0
@@ -46,10 +50,12 @@ def test_main_failure_exit_one_and_signature_not_started():
     with patch.object(runner, "SessionLocal", return_value=MagicMock()), \
          patch.object(runner, "run_nightly_pipeline", return_value={"status": "failed", "run_id": "R-FAIL"}), \
          patch.object(runner, "sync_missing_jhemr_signatures") as signature, \
+         patch.object(runner, "sync_jhemr_login_sign_daily") as login_sign, \
          patch.object(runner, "upsert_subtask"), \
          patch.object(runner, "finalize_run", return_value="failed"):
         assert runner.main() == 1
         signature.assert_not_called()
+        login_sign.assert_not_called()
 
 
 def test_lock_held_is_skipped_not_success():

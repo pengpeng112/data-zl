@@ -165,10 +165,12 @@ def finalize_run(
     signature_result: dict[str, Any],
     title_result: dict[str, Any] | None = None,
     dept_result: dict[str, Any] | None = None,
+    login_sign_result: dict[str, Any] | None = None,
 ) -> str:
     """Write the combined fact and return the only supported overall status."""
     title_result = title_result or {"status": "success"}
     dept_result = dept_result or {"status": "success"}
+    login_sign_result = login_sign_result or {"status": "success"}
     overall = aggregate_overall_status(
         main_result.get("status"),
         signature_result.get("status"),
@@ -178,6 +180,8 @@ def finalize_run(
         title_required=True,
         dept_status=dept_result.get("status"),
         dept_required=True,
+        login_sign_status=login_sign_result.get("status"),
+        login_sign_required=True,
     )
     if db is None or not run_id:
         return overall
@@ -190,12 +194,16 @@ def finalize_run(
         run.status = overall
         run.failed_count = int(run.failed_count or 0) + int(signature_result.get("failed") or 0)
         run.failed_count = int(run.failed_count or 0) + int(title_result.get("failed") or 0)
+        run.failed_count = int(run.failed_count or 0) + int(login_sign_result.get("failed") or 0)
         run.skipped_count = int(run.skipped_count or 0) + int(signature_result.get("skipped_existing") or 0) + int(signature_result.get("skipped_no_user") or 0)
         run.skipped_count = int(run.skipped_count or 0) + int(title_result.get("skipped_equal") or 0) + int(title_result.get("skipped_no_user") or 0)
+        run.skipped_count = int(run.skipped_count or 0) + int(login_sign_result.get("skipped_equal") or 0) + int(login_sign_result.get("skipped_no_user") or 0)
         run.report_summary = redacted_summary({
             "main_account_sync": main_result,
             "jhemr_signature_sync": signature_result,
             "jhemr_education_title_sync": title_result,
+            "jhemr_user_dept_sync": dept_result,
+            "jhemr_login_sign_sync": login_sign_result,
             "overall_status": overall,
         })
         run.last_error_class = next(iter((title_result.get("error_classes") or signature_result.get("error_classes") or {}).keys()), None)

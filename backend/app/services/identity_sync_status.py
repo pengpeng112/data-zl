@@ -15,7 +15,13 @@ SYNC_STATUSES = frozenset({
     "success", "partial_success", "failed", "skipped", "running",
     "overdue", "misconfigured",
 })
-SUBTASK_CODES = ("main_account_sync", "jhemr_signature_sync", "jhemr_education_title_sync")
+SUBTASK_CODES = (
+    "main_account_sync",
+    "jhemr_signature_sync",
+    "jhemr_education_title_sync",
+    "jhemr_user_dept_sync",
+    "jhemr_login_sign_sync",
+)
 EXIT_CODES = {
     "success": 0,
     "skipped": 0,
@@ -50,17 +56,20 @@ def aggregate_overall_status(
     title_required: bool = True,
     dept_status: Any = "success",
     dept_required: bool = True,
+    login_sign_status: Any = "success",
+    login_sign_required: bool = True,
 ) -> str:
     """Aggregate all required durable subtasks without hiding failures."""
     main = normalize_status(main_status)
     signature = normalize_status(signature_status)
     title = normalize_status(title_status)
     dept = normalize_status(dept_status)
+    login_sign = normalize_status(login_sign_status)
     if lock_reason == "lock_held" or main == "skipped":
         return "skipped"
     if main in {"failed", "misconfigured", "overdue"}:
         return main
-    if main == "running" or signature == "running" or title == "running" or dept == "running":
+    if main == "running" or signature == "running" or title == "running" or dept == "running" or login_sign == "running":
         return "running"
     if signature_required and signature in {"failed", "misconfigured", "overdue"}:
         return "partial_success" if main == "success" else signature
@@ -68,7 +77,9 @@ def aggregate_overall_status(
         return "partial_success" if main == "success" else title
     if dept_required and dept in {"failed", "misconfigured", "overdue"}:
         return "partial_success" if main == "success" else dept
-    if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}) and (not dept_required or dept in {"success", "skipped"}):
+    if login_sign_required and login_sign in {"failed", "misconfigured", "overdue"}:
+        return "partial_success" if main == "success" else login_sign
+    if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}) and (not dept_required or dept in {"success", "skipped"}) and (not login_sign_required or login_sign in {"success", "skipped"}):
         return "success"
     if main == "skipped" and signature in {"skipped", "success"}:
         return "skipped"

@@ -377,7 +377,11 @@ class TestJhemrAdapterConstants:
         import inspect
         import re
         from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
-        for fn in (JhemrIdentityAdapter.create_user_full, JhemrIdentityAdapter.align_existing_user):
+        for fn in (
+            JhemrIdentityAdapter.create_user_full,
+            JhemrIdentityAdapter.align_existing_user,
+            JhemrIdentityAdapter.apply_login_sign_gaps,
+        ):
             source = inspect.getsource(fn).replace('"', " ").replace("\n", " ")
             statements = re.findall(
                 r'INSERT INTO jhemr\.users_sub(?:login|sign)\s*\(([^)]*)\)', source

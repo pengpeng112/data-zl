@@ -43,6 +43,10 @@ CDMS_BASE_TEMPLATE: dict[str, str] = {
     "FUSERTYPE": "0",
     "FUSERSTATE": "0",
     "HOSPITALAREACODE": "A00001",
+    # 2026-09-02（172 §6）：全库 1735 个登录过账号 99.7% FFREE3='1'，而夜间同步
+    # 建户后从未登录的 46 户全部 FFREE3=NULL（用户报障 004066，参照 004019）。
+    # 建户必须带 FFREE3='1'，否则账号在无纸化系统不可用。
+    "FFREE3": "1",
 }
 
 CDMS_BASE_AUTH: list[dict[str, str]] = [
@@ -81,8 +85,8 @@ _SQL_COUNT_EMP = (
 
 _SQL_INSERT_EMP = (
     "INSERT INTO CDMS.T_MSS_EMP_DICT "
-    "(FLOGINNAME, FUSERNAME, FDEPT, FPWD, FSYSID, FUSERTYPE, FUSERSTATE, HOSPITALAREACODE) "
-    "VALUES (:floginname, :fusername, :fdept, :fpwd, :fsysid, :fusertype, :fuserstate, :hospitalareacode)"
+    "(FLOGINNAME, FUSERNAME, FDEPT, FPWD, FSYSID, FUSERTYPE, FUSERSTATE, HOSPITALAREACODE, FFREE3) "
+    "VALUES (:floginname, :fusername, :fdept, :fpwd, :fsysid, :fusertype, :fuserstate, :hospitalareacode, :ffree3)"
 )
 
 # FID carries the employee login; FUSER is the fixed operator admin;
@@ -346,6 +350,7 @@ class CdmsIdentityAdapter:
                 "FUSERTYPE": CDMS_BASE_TEMPLATE["FUSERTYPE"],
                 "FUSERSTATE": CDMS_BASE_TEMPLATE["FUSERSTATE"],
                 "HOSPITALAREACODE": CDMS_BASE_TEMPLATE["HOSPITALAREACODE"],
+                "FFREE3": CDMS_BASE_TEMPLATE["FFREE3"],
             },
         })
 
@@ -432,6 +437,7 @@ class CdmsIdentityAdapter:
                 "fusertype": CDMS_BASE_TEMPLATE["FUSERTYPE"],
                 "fuserstate": CDMS_BASE_TEMPLATE["FUSERSTATE"],
                 "hospitalareacode": CDMS_BASE_TEMPLATE["HOSPITALAREACODE"],
+                "ffree3": CDMS_BASE_TEMPLATE["FFREE3"],
             })
             rows_affected["T_MSS_EMP_DICT"] = cursor.rowcount
             actions_log.append({"action": "insert", "table": "T_MSS_EMP_DICT", "emp_no": emp_no})
@@ -552,6 +558,16 @@ class CdmsIdentityAdapter:
             )
             if cursor.rowcount:
                 actions.append({"action": "update_primary_dept"})
+
+            # 172 §6：FFREE3 是无纸化账号可用开关（NULL → 无法登录使用）。
+            # 旧模板建户漏写该列；align 时幂等补齐，避免存量户永久不可用。
+            cursor.execute(
+                "UPDATE CDMS.T_MSS_EMP_DICT SET FFREE3 = :ffree3 "
+                "WHERE FLOGINNAME = :emp_no AND NVL(FFREE3, ' ') <> :ffree3",
+                {"ffree3": CDMS_BASE_TEMPLATE["FFREE3"], "emp_no": emp_no},
+            )
+            if cursor.rowcount:
+                actions.append({"action": "update_ffree3"})
 
             cursor.execute(_SQL_SELECT_AUTH, {"emp_no": emp_no})
             existing = {(str(r[4]), str(r[5])) for r in cursor.fetchall()}

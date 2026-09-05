@@ -8,6 +8,7 @@ from app.services.identity_sync_orchestrator import run_nightly_pipeline
 from app.services.identity_signature_sync import sync_missing_jhemr_signatures
 from app.services.identity_title_sync import sync_jhemr_education_titles_daily
 from app.services.identity_dept_sync import sync_jhemr_user_depts_daily
+from app.services.identity_login_sign_sync import sync_jhemr_login_sign_daily
 from app.services.identity_sync_audit import AuditWriteError, finalize_run, upsert_subtask
 from app.services.identity_sync_status import normalize_status, redacted_summary, runner_exit_code, stdout_summary
 
@@ -68,6 +69,16 @@ def main() -> int:
         else:
             dept_result = sync_jhemr_user_depts_daily(run_id=run_id, db=db)
 
+        # Login/sign-way fill is independent of SYS_EMPLOYEE.MODIFIEDTIME.
+        # Half-accounts created by HIS daytime sync have empty subsign rows
+        # and cannot log into EMR until 0/2/4 are inserted.
+        if main_status == "skipped":
+            login_sign_result = {"status": "skipped", "reason": main_result.get("reason", "lock_held"), "failed": 0, "error_classes": {}}
+        elif main_status in {"failed", "misconfigured", "overdue"}:
+            login_sign_result = {"status": "skipped", "reason": "main_account_sync_not_successful", "failed": 0, "error_classes": {}}
+        else:
+            login_sign_result = sync_jhemr_login_sign_daily(run_id=run_id, db=db)
+
         if run_id:
             upsert_subtask(
                 db,
@@ -108,7 +119,33 @@ def main() -> int:
                 error_classes=title_result.get("error_classes") or {},
                 report_summary=redacted_summary(title_result),
             )
-        overall = finalize_run(db, run_id=run_id, main_result=main_result, signature_result=signature_result, title_result=title_result, dept_result=dept_result)
+            upsert_subtask(
+                db,
+                run_id=run_id,
+                subtask_code="jhemr_login_sign_sync",
+                target_system="JHEMR",
+                status=normalize_status(login_sign_result.get("status")),
+                planned_count=int(login_sign_result.get("planned_count") or 0),
+                succeeded_count=(
+                    int(login_sign_result.get("control_inserted") or 0)
+                    + int(login_sign_result.get("sublogin_inserted") or 0)
+                    + int(login_sign_result.get("subsign_inserted") or 0)
+                    + int(login_sign_result.get("default_repaired") or 0)
+                ),
+                skipped_count=int(login_sign_result.get("skipped_equal") or 0) + int(login_sign_result.get("skipped_no_user") or 0),
+                failed_count=int(login_sign_result.get("failed") or 0),
+                error_classes=login_sign_result.get("error_classes") or {},
+                report_summary=redacted_summary(login_sign_result),
+            )
+        overall = finalize_run(
+            db,
+            run_id=run_id,
+            main_result=main_result,
+            signature_result=signature_result,
+            title_result=title_result,
+            dept_result=dept_result,
+            login_sign_result=login_sign_result,
+        )
         result = stdout_summary(overall_status=overall, run_id=run_id, main=main_result, signature=signature_result, title=title_result)
         print(json.dumps(result, ensure_ascii=True, default=str))
         return runner_exit_code(overall)
