@@ -147,3 +147,10 @@ backend/_oa_work/
 ~$*
 .release_*/
 backend/_r163_work/
+
+# 173: 一次性全栈模拟测试工装目录（只测不修，产物在 开发起步包/output_r173/）
+backend/_r173_work/
+
+# 172/175 一次性工作目录（同 _r163_work 口径）
+backend/_r172_work/
+backend/_r175_work/
