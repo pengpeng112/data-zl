@@ -109,3 +109,14 @@ status entries: 106
 ?? 开发起步包/output_r174/
 ?? 开发起步包/output_r177/
 ?? 开发起步包/output_r178/
+
+=== A-segment closeout 10:21:17 ===
+809f0b2 docs(173-180): full-stack test findings, CDMS/174/175/176/177/178 reports, 179/180 release plans, output evidence dirs (150 draft files removed as-is per G9 pending)
+013b6a4 feat(quality): 174 ledger frontend (issues/controls/observations/issue-detail) + 178 probe-finding cross links (includes 177 C3 v-perms line in probe-findings)
+ab18625 fix(178): GraphToolbar stops mutating props (update:locate/update:filters + Object.assign in parent)
+ce8e9a8 fix(alembic): ensure asset schema exists before online/offline migrations
+f691abb feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+5664365 fix(177): catalog readback upper-key 404, recipe create 422, edge label [object Object], v-perms (probe-findings v-perms line rides with quality frontend commit)
+a9925dd feat(175): lis/us/docare governance + ecg review import scripts
+9a1616b feat(174): quality governance ledger backend (5 tables, 3 API prefixes, seed)
+5487ebf chore(hygiene): ignore one-shot work dirs
