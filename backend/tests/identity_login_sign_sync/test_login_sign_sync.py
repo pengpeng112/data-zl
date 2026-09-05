@@ -30,21 +30,21 @@ def test_build_plan_fills_empty_account_like_004069():
     assert item["fix_default"] is False
 
 
-def test_build_plan_inserts_missing_ways_without_overwriting_existing_default():
+def test_build_plan_skips_manually_configured_users_without_filling_gaps():
+    """003531 事故治本（2026-09-05）：已有任意登录/签名方式行 = 已配置，
+    不再按 0/2/4 模板补缺——旧语义曾给人工 2/4/8 配置后插 sign_way=0
+    (default=1) 产生双默认，EMR 报「必须设置两种以上的签名模式」。"""
     plan = service.build_login_sign_plan(
-        expected={"E1"},
-        target_users={"E1"},
-        control_users={"E1"},
-        logins={"E1": {"2"}},
-        signs={"E1": {"2"}},
-        defaults={"E1": 1},
+        expected={"E1", "E2"},
+        target_users={"E1", "E2"},
+        control_users={"E1", "E2"},
+        logins={"E1": {"2"}, "E2": {"0", "2", "4", "8"}},
+        signs={"E1": {"2"}, "E2": {"2", "4", "8"}},
+        defaults={"E1": 1, "E2": 1},
     )
-    item = plan["repairs"][0]
-    assert item["insert_control"] is False
-    assert item["login_ways"] == ["0", "4"]
-    assert [s["sign_way"] for s in item["sign_ways"]] == ["0", "4"]
-    assert item["sign_ways"][0]["default_flag"] == "0"
-    assert item["fix_default"] is False
+    assert plan["repairs"] == []
+    assert plan["skipped_configured"] == 2
+    assert plan["skipped_equal"] == 2
 
 
 def test_build_plan_repairs_missing_default_on_existing_way_zero():

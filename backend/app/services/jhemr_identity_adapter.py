@@ -818,13 +818,19 @@ class JhemrIdentityAdapter:
             else:
                 actions.append({"action": "skip_exists", "table": "users_control_mode"})
 
+            # 2026-09-05（003531 事故治本）：登录/签名方式已有任意行 = 人工或既有
+            # 系统配置过，整体跳过模板补缺。此前按 0/2/4 模板补缺曾给人工配置的
+            # 2/4/8 用户后插 sign_way=0(default=1)，造成双默认与 control_mode/
+            # subsign 漂移，EMR 报「必须设置两种以上的签名模式」。仅完全没有
+            # 方式行时才落模板。
             existing_sl = self._fetch_all(
                 "SELECT login_way FROM jhemr.users_sublogin WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
                 (user_id, self.hospital_no),
             )
-            existing_ways = {str(r.get("login_way")) for r in existing_sl}
-            for sub in SUBLOGIN_DEFAULTS:
-                if sub["login_way"] not in existing_ways:
+            if existing_sl:
+                actions.append({"action": "skip_configured", "table": "users_sublogin", "rows": len(existing_sl)})
+            else:
+                for sub in SUBLOGIN_DEFAULTS:
                     self._execute_write(
                         "INSERT INTO jhemr.users_sublogin "
                         "(user_id, hospital_no, file_visit_type, login_way, last_modify_time) "
@@ -837,9 +843,10 @@ class JhemrIdentityAdapter:
                 "SELECT sign_way FROM jhemr.users_subsign WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
                 (user_id, self.hospital_no),
             )
-            existing_sign_ways = {str(r.get("sign_way")) for r in existing_ss}
-            for sub in SUBSIGN_DEFAULTS:
-                if sub["sign_way"] not in existing_sign_ways:
+            if existing_ss:
+                actions.append({"action": "skip_configured", "table": "users_subsign", "rows": len(existing_ss)})
+            else:
+                for sub in SUBSIGN_DEFAULTS:
                     self._execute_write(
                         "INSERT INTO jhemr.users_subsign "
                         "(user_id, hospital_no, file_visit_type, sign_way, picmode, "

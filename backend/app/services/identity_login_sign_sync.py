@@ -7,7 +7,11 @@ client refuse login. This subtask is full-scope over the managed clinical
 population, like the dept subtask, and is additive-only:
 
 * missing ``users_control_mode`` is inserted with template ``0,2,4``;
-* missing login ways ``0/2/4`` and sign ways ``0/2/4`` are inserted;
+* users with **any** existing login/sign way rows are left untouched
+  (2026-09-05 003531 incident guard: template-filling partial gaps broke
+  manually configured users like ``2/4/8`` by inserting ``sign_way=0``
+  with ``default_flag=1``); only accounts with no way rows at all receive
+  the full ``0/2/4`` template;
 * ``default_flag=1`` is set on ``sign_way=0`` only when the user currently
   has no default;
 * extra existing ways and existing defaults are never deleted or replaced.
@@ -185,10 +189,16 @@ def build_login_sign_plan(
     signs: dict[str, set[str]],
     defaults: dict[str, int],
 ) -> dict[str, Any]:
-    """Pure comparison: insert missing 0/2/4 rows; repair missing default only."""
+    """Pure comparison: full template only for accounts with no way rows.
+
+    2026-09-05（003531 事故治本）：已有任意登录/签名方式行的用户视为已配置，
+    不再按 0/2/4 模板补缺（防止给人工 2/4/8 配置后插 sign_way=0 产生双默认）。
+    仍会修 ``fix_default``（已有 0 行且完全无默认时补默认标记）。
+    """
     repairs: list[dict[str, Any]] = []
     skipped_equal = 0
     skipped_no_user = 0
+    skipped_configured = 0
     expected_logins = set(EXPECTED_LOGIN_WAYS)
     expected_signs = set(EXPECTED_SIGN_WAYS)
     sign_defaults = {item["sign_way"]: item for item in SUBSIGN_DEFAULTS}
@@ -198,9 +208,16 @@ def build_login_sign_plan(
             skipped_no_user += 1
             continue
         insert_control = emp not in control_users
-        missing_logins = sorted(expected_logins - logins.get(emp, set()))
+        existing_login_set = logins.get(emp, set())
         existing_signs = signs.get(emp, set())
-        missing_sign_ways = [way for way in EXPECTED_SIGN_WAYS if way not in existing_signs]
+        if existing_login_set or existing_signs:
+            # 已配置守卫：任何方式行存在即跳过模板补缺
+            missing_logins: list[str] = []
+            missing_sign_ways: list[str] = []
+            skipped_configured += 1
+        else:
+            missing_logins = sorted(expected_logins)
+            missing_sign_ways = list(EXPECTED_SIGN_WAYS)
         has_default = int(defaults.get(emp, 0)) >= 1
         sign_way_items = []
         for way in missing_sign_ways:
@@ -231,6 +248,7 @@ def build_login_sign_plan(
         "repairs": repairs,
         "skipped_equal": skipped_equal,
         "skipped_no_user": skipped_no_user,
+        "skipped_configured": skipped_configured,
         "template": {
             "control": CONTROL_MODE_DEFAULTS,
             "login_ways": list(EXPECTED_LOGIN_WAYS),
