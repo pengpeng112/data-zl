@@ -1,0 +1,51 @@
+....s................................................................... [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+........................................................................ [ 20%]
+........................................................................ [ 25%]
+........................................................................ [ 30%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 45%]
+........................................................................ [ 50%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 85%]
+........................................................................ [ 90%]
+........................................................................ [ 95%]
+...........................................................              [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  F:\python\数据资产\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\slowapi\extension.py:720
+.venv\Lib\site-packages\slowapi\extension.py:720
+.venv\Lib\site-packages\slowapi\extension.py:720
+.venv\Lib\site-packages\slowapi\extension.py:720
+  F:\python\数据资产\backend\.venv\Lib\site-packages\slowapi\extension.py:720: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(func):
+
+app\api\v1\probe.py:23
+  F:\python\数据资产\backend\app\api\v1\probe.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FindingOut(BaseModel):
+
+app\api\v1\probe.py:45
+  F:\python\数据资产\backend\app\api\v1\probe.py:45: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class RunOut(BaseModel):
+
+.venv\Lib\site-packages\pypinyin\pinyin_dict.py:15
+  F:\python\数据资产\backend\.venv\Lib\site-packages\pypinyin\pinyin_dict.py:15: DeprecationWarning: codecs.open() is deprecated. Use open() instead.
+    with open(_json_path, encoding='utf8') as fp:
+
+.venv\Lib\site-packages\pypinyin\phrases_dict.py:16
+  F:\python\数据资产\backend\.venv\Lib\site-packages\pypinyin\phrases_dict.py:16: DeprecationWarning: codecs.open() is deprecated. Use open() instead.
+    with open(_json_path, encoding='utf8') as fp:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1426 passed, 1 skipped, 9 warnings in 1922.35s (0:32:02)
+PYTEST_EXIT=0

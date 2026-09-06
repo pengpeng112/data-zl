@@ -1,0 +1,172 @@
+
+===R185_R5_BEGIN===
+{
+  "N1_runs": [
+    {
+      "run_id": "RUN-69e87f7f27dd",
+      "status": "failed",
+      "circuit_breaker_triggered": "True",
+      "circuit_breaker_dimension": "max_change_ratio",
+      "candidates_total": "110",
+      "success_count": "0",
+      "failed_count": "0",
+      "skipped_count": "0",
+      "started_at": "2026-09-06T02:00:03.294696+08:00",
+      "finished_at": "2026-09-06T02:00:52.970347+08:00"
+    },
+    {
+      "run_id": "RUN-2df6cd6db381",
+      "status": "success",
+      "circuit_breaker_triggered": "False",
+      "circuit_breaker_dimension": null,
+      "candidates_total": "110",
+      "success_count": "111",
+      "failed_count": "0",
+      "skipped_count": "3995",
+      "started_at": "2026-09-06T08:44:06.220310+08:00",
+      "finished_at": "2026-09-06T08:44:57.575155+08:00"
+    }
+  ],
+  "N1_subtasks": [
+    {
+      "id": "103",
+      "run_id": "RUN-69e87f7f27dd",
+      "subtask_code": "jhemr_education_title_sync",
+      "target_system": "JHEMR",
+      "status": "skipped",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "skipped_count": "0",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'reason': 'main_account_sync_not_successful', 'status': 'skipped', 'error_classes': {}}",
+      "started_at": "2026-09-06T02:00:53.016909+08:00",
+      "finished_at": "2026-09-06T02:00:53.017125+08:00",
+      "created_at": "2026-09-06T02:00:53.015904+08:00"
+    },
+    {
+      "id": "101",
+      "run_id": "RUN-69e87f7f27dd",
+      "subtask_code": "jhemr_signature_sync",
+      "target_system": "JHEMR",
+      "status": "skipped",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "skipped_count": "0",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'reason': 'main_account_sync_not_successful', 'status': 'skipped', 'error_classes': {}}",
+      "started_at": "2026-09-06T02:00:53.007985+08:00",
+      "finished_at": "2026-09-06T02:00:53.008124+08:00",
+      "created_at": "2026-09-06T02:00:53.007290+08:00"
+    },
+    {
+      "id": "102",
+      "run_id": "RUN-69e87f7f27dd",
+      "subtask_code": "jhemr_user_dept_sync",
+      "target_system": "JHEMR",
+      "status": "skipped",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "skipped_count": "0",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'reason': 'main_account_sync_not_successful', 'status': 'skipped', 'error_classes': {}}",
+      "started_at": "2026-09-06T02:00:53.012083+08:00",
+      "finished_at": "2026-09-06T02:00:53.012201+08:00",
+      "created_at": "2026-09-06T02:00:53.011453+08:00"
+    },
+    {
+      "id": "100",
+      "run_id": "RUN-69e87f7f27dd",
+      "subtask_code": "main_account_sync",
+      "target_system": "CDMS,JHEMR",
+      "status": "failed",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "skipped_count": "0",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'reason': 'threshold_exceeded', 'run_id': 'RUN-69e87f7f27dd', 'status': 'failed', 'dimension': 'max_change_ratio'}",
+      "started_at": "2026-09-06T02:00:53.000771+08:00",
+      "finished_at": "2026-09-06T02:00:53.000986+08:00",
+      "created_at": "2026-09-06T02:00:52.999543+08:00"
+    },
+    {
+      "id": "107",
+      "run_id": "RUN-2df6cd6db381",
+      "subtask_code": "jhemr_education_title_sync",
+      "target_system": "JHEMR",
+      "status": "success",
+      "planned_count": "1",
+      "succeeded_count": "1",
+      "skipped_count": "2110",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-2df6cd6db381', 'source': {'dictionary_rows': 60, 'dictionary_codes': 60}, 'status': 'success', 'updated': 1, 'error_classes': {}, 'planned_count': 1, 'skipped_equal': 2064, 'skipped_no_user': 46, 'failed_fingerprints': [], 'reconciled_pending_audit': 0, 'target_committed_pending_audit': 0}",
+      "started_at": "2026-09-06T08:45:27.569337+08:00",
+      "finished_at": "2026-09-06T08:45:27.569446+08:00",
+      "created_at": "2026-09-06T08:45:27.568700+08:00"
+    },
+    {
+      "id": "105",
+      "run_id": "RUN-2df6cd6db381",
+      "subtask_code": "jhemr_signature_sync",
+      "target_system": "JHEMR",
+      "status": "success",
+      "planned_count": "1886",
+      "succeeded_count": "4",
+      "skipped_count": "1882",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-2df6cd6db381', 'status': 'success', 'inserted': 4, 'watermark': {'status': 'committed', 'candidate': '2026-09-04T23:11:06+00:00', 'watermark_key': 'jhemr_signature_sync'}, 'error_classes': {}, 'planned_count': 1886, 'processed_count': 1886, 'skipped_no_user': 34, 'skipped_existing': 1848, 'source_signatures': 1886, 'failed_fingerprints': []}",
+      "started_at": "2026-09-06T08:45:27.560618+08:00",
+      "finished_at": "2026-09-06T08:45:27.560757+08:00",
+      "created_at": "2026-09-06T08:45:27.559825+08:00"
+    },
+    {
+      "id": "106",
+      "run_id": "RUN-2df6cd6db381",
+      "subtask_code": "jhemr_user_dept_sync",
+      "target_system": "JHEMR",
+      "status": "success",
+      "planned_count": "12",
+      "succeeded_count": "12",
+      "skipped_count": "216",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'plan': {'dept_adds': 10, 'primary_changes': 2}, 'failed': 0, 'run_id': 'RUN-2df6cd6db381', 'source': {'managed_persons': 220}, 'status': 'success', 'target': {'target_users': 3958, 'target_dept_rows': 13304}, 'error_classes': {}, 'planned_count': 12, 'skipped_equal': 215, 'dept_rows_added': 10, 'primary_updated': 2, 'skipped_no_user': 1, 'failed_fingerprints': [], 'reconciled_pending_audit': 0, 'target_committed_pending_audit': 0}",
+      "started_at": "2026-09-06T08:45:27.564754+08:00",
+      "finished_at": "2026-09-06T08:45:27.564868+08:00",
+      "created_at": "2026-09-06T08:45:27.564107+08:00"
+    },
+    {
+      "id": "104",
+      "run_id": "RUN-2df6cd6db381",
+      "subtask_code": "main_account_sync",
+      "target_system": "CDMS,JHEMR",
+      "status": "success",
+      "planned_count": "110",
+      "succeeded_count": "111",
+      "skipped_count": "3",
+      "failed_count": "0",
+      "error_classes": "{}",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-2df6cd6db381', 'status': 'success', 'skipped': 3, 'success': 111, 'candidates': 110, 'deactivate': 4, 'failed_count': 0, 'skipped_count': 3, 'success_count': 111}",
+      "started_at": "2026-09-06T08:44:57.599641+08:00",
+      "finished_at": "2026-09-06T08:44:57.599812+08:00",
+      "created_at": "2026-09-06T08:44:57.598234+08:00"
+    }
+  ],
+  "N1_rows_after_0906_noon": [],
+  "N1b": {
+    "exists": false,
+    "path": "/opt/data-asset/evidence/docare_mismatch/list_20260906.md"
+  },
+  "N2": {
+    "error": "FileNotFoundError: [Errno 2] No such file or directory: '/etc/data-asset/credentials/docare_10_10_10_68'"
+  }
+}
+===R185_R5_END===
+
+=== N2 rerun (correct cred) ===
+[{"PATIENT_ID": "c0632940", "VISIT_ID": "3", "OPER_ID": "1", "OPER_STATUS": "0", "SCHEDULED_DATE_TIME": "2026-08-31T13:00:00", "START_DATE_TIME": null, "END_DATE_TIME": null, "OPERATING_ROOM": "040902", "OPERATION_NAME": "踝关节内固定装置去除术"}]

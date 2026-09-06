@@ -1,0 +1,99 @@
+{
+  "repo": "F:\\python\\数据资产",
+  "scanned": [
+    {
+      "path": "F:\\python\\数据资产\\AGENTS.md",
+      "kind": "agents",
+      "lines": 182
+    },
+    {
+      "path": "F:\\python\\数据资产\\CLAUDE.md",
+      "kind": "claude_forward",
+      "lines": 5
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\docare-anesthesia-readonly-sql\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 75
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\hisuser-readonly-sql\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 233
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\mobile-nursing-readonly-sql\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 85
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\ods-readonly-sql\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 219
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\ods-schema-analysis\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 46
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\ops-runbook\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 111
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\project-task-resume\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 86
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\query-governance-intake\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 67
+    },
+    {
+      "path": "F:\\python\\数据资产\\.agents\\skills\\sql-relation-intake\\SKILL.md",
+      "kind": "project_skill",
+      "lines": 124
+    },
+    {
+      "path": "C:\\Users\\Administrator\\.zcode\\skills\\multi-review\\SKILL.md",
+      "kind": "global_skill",
+      "lines": 99
+    },
+    {
+      "path": "C:\\Users\\Administrator\\.zcode\\skills\\multi-verify\\SKILL.md",
+      "kind": "global_skill",
+      "lines": 122
+    },
+    {
+      "path": "C:\\Users\\Administrator\\.zcode\\skills\\sjzc\\SKILL.md",
+      "kind": "global_skill",
+      "lines": 140
+    },
+    {
+      "path": "C:\\Users\\Administrator\\.zcode\\skills\\wechat-chat-records\\SKILL.md",
+      "kind": "global_skill",
+      "lines": 90
+    },
+    {
+      "path": "F:\\python\\数据资产\\开发起步包\\55_系统未完成事项统一执行计划.md",
+      "kind": "55_top",
+      "lines": 80
+    }
+  ],
+  "findings": [
+    {
+      "source": "F:\\python\\数据资产\\.agents\\skills\\query-governance-intake\\SKILL.md",
+      "lineno": 60,
+      "rule": "R2_active_vs_approval",
+      "desc": "平台自动 active 与人工执行批准不得混用",
+      "risk": "high",
+      "line": "- 不伪造或直接修改人工审批、认证和发布终态。用户已授权提交后，查询版本可由平台既有自动门禁决定 active/candidate/blocked；关系、值域确认及其他明确要求人工治理的终态仍由人工处理"
+    }
+  ],
+  "by_rule": {
+    "R2_active_vs_approval": 1
+  },
+  "note": "只报告可能冲突，不自动修改指令；高危项须人工裁决，本工具不裁终态。"
+}

@@ -71,7 +71,8 @@
 |---:|---|---|---|
 | P0 | `55_系统未完成事项统一执行计划.md` | 进行中 | 唯一未完成事项总入口；多 AI 精准取数专项由 144 承接，应用收口由 130 承接，目录—血缘—质量协同完善由 138 补充 |
 | P1 | `183_AI协作指令收敛与重复流程自动化开发计划.md` | **执行入口已移交 185（2026-09-06 v1.1），禁止按 183 正文开工** | 已完成 AGENTS/查询技能/多 AI 技能的首轮指令收敛；后续开发跨会话接手 Skill、目录检查器、测试环境预检、多 AI 证据包装、指令漂移回归和同名全局 Skill 收敛。仅本地开发计划，不含生产、业务写入、cron 或 Git push 授权 |
-| P0 | `185_AI协作收敛剩余任务一次性执行计划.md` | **v1.1 定稿待执行（2026-09-06，外部审核 16 条全采纳）** | 184 复盘后的剩余项一次性执行入口：183 S1-S6 未执行批（check_doc_index/check_test_environment/project-task-resume skill/multi_ai_evidence/指令漂移检查/S6 降级调研）+ 184 修复项（ops-runbook 静态校验、register_doc 零孤儿基线）+ 夜跑/docare 首夜只读核对；提示词在其 §5 |
+| P0 | `185_AI协作收敛剩余任务一次性执行计划.md` | **执行完成（2026-09-06 下午 R0→R7 单会话；零 push）**；报告见下行 | 183 S1-S6 未执行批+184 修复项+夜跑/docare 首夜只读核对的一次性执行入口（已收口，详见 185_执行报告.md） |
+| P0 | `185_执行报告.md` + 同号 `185_执行报告_结果.json` | **执行完成（2026-09-06）** | C1-C7 全落地（四检查器+project-task-resume Skill+ops-runbook 复核零修复+目录基线首档 error1/warn22/info15 零误报）；N1①②过③SKIP 待 09-07；N1b 异常呈报（ORA-12541，待点名）；N2 OPER_STATUS=0 确认；S4 调用链未接如实标注；门禁全绿（新工具 36P+db_guard/alembic 15P/1S+前端 278/278+build 三预算）；dev_env.sh tunnel_up ugrep bug 最小修复（W1）；他人域 13 文件零触碰 |
 | P0 | `184_AI协作复盘_高频流程沉淀与中断分析报告.md` | **已完成（2026-09-06）** | 基于 35 会话档案的 AI 协作复盘：高频样板沉淀为 ops-runbook Skill+3 工具（dev_env/register_doc/export）；指令查重零冲突（CLAUDE=转发入口）；中断点八类清单+预防映射；规则裁决表（保留 7 条/废除 heredoc 中文）；回归矩阵全绿（44P 纯逻辑+21P DB+278P 前端+build 三绿，含一次并行互踩活证据） |
 | P0 | `178_177收口后可执行改进一次性执行计划.md` + 同号 `_执行报告.md`/`_结果.json` | **执行完成（2026-09-04 晚 R0→R7；生产未发布）**：R1 夜跑 **FAIL 呈报**（RUN-b3324c242e78 仍熔断但维度=max_change_ratio，F-1 放行 update 后例行 resync 比例维度仍炸，根治=G3 发布 F-2）；C6 GraphToolbar 单向数据流（vue/no-mutating-props 归零）、C7 alembic 自建 schema（隔离库 no-op 实证）、L1 台账↔探查互链①②③全部落地（零新增后端）；后端专项 17/0、前端 278/278+build 三绿；R5 未选表现 SKIP、两问未答记仍开、等待域 G1–G17 全量（output_r178/） | 177 收口后仍可单会话落地的改进执行入口；提示词在其 §6 |
 | P0 | `179_G13分域提交与G1G3生产发布runbook.md` | **runbook v1.0（2026-09-05，待点名授权）** | G13 十组分域提交方案（含 conftest/probe-findings 混合 hunk 拆分、他人域 13 文件禁入清单）+ G1/G3 后端发布步骤（镜像 r178-20260905、FFREE3 持久化核验、MAX_NEW 130→50 两步回落）+ 前端 r178 原子切换 + 回滚链 + 发布后夜跑验证预期；A/B/C 三段可独立授权。**执行版已升级为 180 号**（不拆 hunk 路线） |
@@ -239,6 +240,7 @@
 
 ## 目录更新记录
 
+| 2026-09-06 | 185 执行完成（R0→R7 单会话） | C1-C7 全落地：新增 tools/check_doc_index.py（唯一目录检查器，register_doc --check 并入同一解析）、check_test_environment.py（包装 database_guard 三态）、multi_ai_evidence.py（薄包装，S4 调用链未接如实标注）、check_instruction_drift.py（四语义规则，首跑仅 1 条真灰区信号）+ tools/tests/ 36 测试；新增 skill project-task-resume（含 147/177/180 三案例回放）+ AGENTS 路由 1 行 + gitignore 白名单；ops-runbook 复核零修复；目录基线首档（error1=181 未登记[他人域]/warn22/info15，零误报）。R5 只读：N1①failed=max_change_ratio ②success/update110 对账过、③SKIP 待 09-07；N1b docare 清单 0 字节+ORA-12541 呈报待点名；N2 OPER_STATUS=0 确认。W1=dev_env.sh tunnel_up ugrep bug 最小修复（/dev/tcp）。零 push、零生产写入、他人域 13 文件零触碰。 |
 | 2026-09-06 | 185 升 v1.1（外部 AI 审核修订）+ 184 产物双 bug 修复 | 审核 16 条全核实采纳：平台库改零写入、他人域扩展+R0 冻结清单、N1 重写三行对账（F-2 首夜预期被 round-9 flush 推翻：02:00 夜跑 failed=max_change_ratio、08:44 排水 success、观察点 09-07）、C1 唯一检查器、C2 包装 database_guard、C3 补路由+案例归档路径、R7 门禁收窄+白名单提交、产物路径统一；先行修复 dev_env.sh fi;; 重复与 ops-runbook password=pwd（实测通过）；183 状态改移交。 |
 | 2026-09-06 | 新增 184/185 号：AI 协作复盘收口与剩余任务执行计划 | 两子代理分析 35 会话档案（11,531 条消息）：高频样板 Top7 全部沉淀（ops-runbook Skill + dev_env.sh/register_doc.py/export 工具）；AGENTS/CLAUDE/长期记忆查重零冲突，AGENTS 补 ops-runbook 路由行；中断点八类+规则裁决（保留 7/废除 1）；回归矩阵全绿（纯逻辑 44P/DB 21P/前端 278+build，期间复现一次并行 pytest 互踩即证据）。185 移交 183 S1-S6 未执行项+修复项给执行 AI。修复 181 号文件名双前缀。 |
 | 2026-09-06 | 新增 183：AI 协作指令收敛与重复流程自动化计划 | 修订自主性、澄清、批准、局部停止和测试隔离规则；收敛查询与多 AI 技能误触发。S1–S6 脚本/Skill 开发待后续执行，明确不扩展生产和业务写入权限。 |

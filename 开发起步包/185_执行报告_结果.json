@@ -1,0 +1,47 @@
+{
+  "plan": "开发起步包/185_AI协作收敛剩余任务一次性执行计划.md（v1.1）",
+  "executed_at": "2026-09-06 16:45–18:5x",
+  "baseline_head": "ddd6d6b",
+  "verdict": "R0→R7 执行完成；N1③ SKIP 待 09-07；N1b 异常呈报待点名；零 push、业务源库/平台库零写入",
+  "batches": {
+    "R0": "done: 切片阅读+13 文件域基线+47 行 git status 冻结+快照+他人 pytest=0",
+    "R1_C1": "done: tools/check_doc_index.py 唯一检查器（register_doc --check 并入）；实仓 error1/warn22/info15 零误报；--check 幂等",
+    "R1_C2": "done: tools/check_test_environment.py 包装 database_guard 三态；五类用例过；实测 migration_ready",
+    "R2_C3": "done: project-task-resume Skill 86 行 + references 三案例（147 归档路径/177/180）+ AGENTS 路由 1 行 + gitignore 白名单",
+    "R3_C4": "done: multi_ai_evidence.py 单缺席收口/全缺席未完成报告用例过；S4 调用链未接（multi-review/verify 未引用，如实标注）",
+    "R3_C5": "done: check_instruction_drift.py 四语义规则；drift_report.json 首档仅 1 条 R2 真灰区信号",
+    "R4_C6": "done: ops-runbook 复核全过零修复（skill_check.md）",
+    "R4_C7": "done: doc_index_baseline.json 首档",
+    "R5_N1": "①RUN-69e87f7f27dd=failed/max_change_ratio 对账过；②RUN-2df6cd6db381=success/update candidates=110 对账过；③09-07 行缺失 SKIP 待 09-07（F-2 未宣称验证完成）",
+    "R5_N1b": "异常呈报：list_20260906.md 0 字节 + cron.log ORA-12541（his_visits 源库无监听）；修复待用户点名",
+    "R5_N2": "确认 OPER_STATUS=0 仍在（c0632940/V3/OPER1，2026-08-31 排班未执行）；处置建议仅入报告；列名证据=80 号快照（无 STATUS 列，状态列=OPER_STATUS）",
+    "R6_S6": "done: ZCode 无 skill-creator 同名冲突无需迁移；迁移建议三条；全局技能零触碰"
+  },
+  "gates": {
+    "tools_tests": "36 passed / 0 failed",
+    "db_guard_alembic_env": "15 passed / 1 skipped / 0 failed",
+    "frontend_typecheck": "pass（tsc+vue-tsc 0 错）",
+    "frontend_test": "278/278 passed（含他人域 captureMode 测试，通过无需 WARN）",
+    "frontend_build": "PASS（657.2/700 + 404.5/430 + 103.5/110 KB gzip 三预算）",
+    "backend_full": "1426 passed / 1 skipped / 0 failed in 1922.35s（PYTEST_EXIT=0）；0 新增 failed",
+    "reseed_import170": "import170 重灌成功：systems=26/sources=28/tables=12702/relations=1329/columns=178547/value_domains=77/audit=192/quality_rules=422/sequences_reset=107（RESEED_EXIT=0）"
+  },
+  "warns": [
+    "W1 dev_env.sh tunnel_up ugrep 失效→/dev/tcp 最小修复（184 产物 bug，185 §0.6 授权内）",
+    "W2 C1 真发现：181 未登记（他人域）+output_r170/181 目录未登记+19 缺类别+125 同号双题（只报告）",
+    "W3 N1b docare 每日任务 ORA-12541 失败呈报待点名",
+    "W4 S4 调用链未接（全局技能未引用包装器）",
+    "W5 离线值域包超 7 天提示重导；OPER_STATUS=0 含义【值域待确认】"
+  ],
+  "stop_triggered": 0,
+  "git": {
+    "push": 0,
+    "commits": [
+      "feat(tools): doc-index / test-env / multi-ai / drift checkers + tests + register_doc --check merge",
+      "feat(skill): project-task-resume + AGENTS routing + gitignore whitelist",
+      "docs(185): report + output_r185 artifacts"
+    ],
+    "others_domain_touched": 0
+  },
+  "artifacts_dir": "开发起步包/output_r185/"
+}

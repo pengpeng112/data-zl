@@ -1,0 +1,245 @@
+{
+  "package": "F:\\python\\数据资产\\开发起步包",
+  "stats": {
+    "body_numbers": 109,
+    "companion_numbers": 53,
+    "outdirs": 14,
+    "archived_numbers": 71,
+    "readme_covered_numbers": 138,
+    "findings": {
+      "error": 1,
+      "warn": 22,
+      "info": 15
+    }
+  },
+  "findings": [
+    {
+      "severity": "error",
+      "code": "orphan_doc",
+      "num": 181,
+      "detail": "主目录文件未在 README 登记：['181_003531签名模式报错根因排查与双向修复记录.md']"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 1,
+      "detail": "01_平台执行方案.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 2,
+      "detail": "02_开发环境与资产总索引.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 6,
+      "detail": "06_前置机与数据中心分析报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 7,
+      "detail": "07_业务系统与探查开放问题.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 9,
+      "detail": "09_数据资产_表结构与关联关系.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 10,
+      "detail": "10_关系验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 11,
+      "detail": "11_视图关系解析与HIS分类报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 12,
+      "detail": "12_候选关系验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 13,
+      "detail": "13_手麻人员映射验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 14,
+      "detail": "14_PACS_LIS_YDHL关系验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 15,
+      "detail": "15_关系补验与资产回写报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 16,
+      "detail": "16_hisuser业务库探查报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 17,
+      "detail": "17_内网部署环境与服务器信息.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 18,
+      "detail": "18_基础设施部署方案.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 19,
+      "detail": "19_药房药库关系验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 44,
+      "detail": "44_开源工具集成评估与数据库审核系统技术方案.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 55,
+      "detail": "55_系统未完成事项统一执行计划.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 115,
+      "detail": "115_112号双同步专项整改完成记录.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "multi_body_unverified",
+      "num": 125,
+      "detail": "同号多正文待人工核对（无同号标记、未逐文件登记）：['125_H7夜间观察记录.md', '125_HIS签名同步时区故障与150像素整改交接说明.md']"
+    },
+    {
+      "severity": "warn",
+      "code": "missing_category",
+      "num": 133,
+      "detail": "133_关系复核续批验证报告.md 首行缺 `> 类别：`（体例第 3 步）"
+    },
+    {
+      "severity": "warn",
+      "code": "orphan_outdir",
+      "num": 170,
+      "detail": "输出目录 output_r170/ 对应编号未在 README 登记"
+    },
+    {
+      "severity": "warn",
+      "code": "orphan_outdir",
+      "num": 181,
+      "detail": "输出目录 output_r181/ 对应编号未在 README 登记"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 149,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['149_字段值域知识库与AI自动注入执行计划.md', '149_曼陀罗EMR与HIS值域分析报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "ghost_whitelisted",
+      "num": 150,
+      "detail": "150 登记无文件（白名单：已删仍登记：用户确认课题结束（2026-09-05），README 行保留作历史说明）"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 153,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['153_平台一次性完善与bug修复_执行报告.md', '153_平台一次性完善与bug修复执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 161,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['161_平台升级核查缺陷修复_执行报告.md', '161_平台升级核查缺陷修复一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 164,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['164_163合并升级_执行报告.md', '164_163合并升级_测试任务与值域界面与跨系统数据质控专项计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 165,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['165_数据问题AI探查与入库_执行报告.md', '165_数据问题AI探查与入库执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 166,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['166_值域与探查问题展示导出_执行报告.md', '166_值域与探查问题展示导出功能开发计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 167,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['167_AI巡查演示界面与AI写SQL工作台_执行报告.md', '167_AI巡查演示界面与AI写SQL工作台开发计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 169,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['169_关系图谱叠加与首屏不可用修复执行计划.md', '169_图谱叠加与首屏不可用修复_执行报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 171,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['171_系统前后端全面修复与测试_执行报告.md', '171_系统前后端全面修复与测试一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 173,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['173_全栈一次性模拟测试问题发现计划.md', '173_全栈模拟测试_问题清单.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 174,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['174_CDMS无纸化赋权未成功_交付说明.md', '174_数据质量主动治理台账_执行报告.md', '174_数据质量主动治理台账方案.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 177,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['177_全仓真实未完成项_执行报告.md', '177_全仓真实未完成项一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 178,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['178_177收口后可执行改进_执行报告.md', '178_177收口后可执行改进一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 180,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['180_G13分域提交与G1G3生产发布一次性执行计划.md', '180_G13提交与G1G3发布_执行报告.md']"
+    }
+  ]
+}
