@@ -3,6 +3,7 @@
 > 执行：2026-09-06 17:21–17:35（避开 01:45–02:30 夜跑窗口）；全程只读
 > （平台库 SELECT、容器内文件读取、Docare 限量键限定 SELECT），零写入。
 > 原始输出：`raw_r5_platform_output.json` + `raw_r5_full_output.txt`；脚本 `r5_readonly_check.py`。
+> **09-07 晨检补记见文末「09-07 晨检」节**（N1③ 出数 + docare 第二晚观察 + 09-07 清单补跑）。
 
 ## N1 夜跑三行对账（口径：禁用"最新一行"判定，逐 run_id 定点核对）
 
@@ -72,3 +73,10 @@ WHERE PATIENT_ID=:pid AND VISIT_ID=:vid AND OPER_ID=:oid) WHERE ROWNUM<=10
   修正；建议**人工在手麻系统「手术登记」中将该排班作废/取消**（与
   OPER_STATUS=-80 作废口径对齐），避免其继续作为孤儿排班参与每日错配比对。
   实际作废须手术室/用户在手麻系统操作，AI 不代点。
+
+## 09-07 晨检（N1③ 出数 + docare 第二晚观察 + 09-07 清单补跑）
+
+- **N1③ ✅ 通过**：09-07 02:00 cron `RUN-464a660b0cb3` = **success，零熔断**（circuit_breaker_triggered=False）；四个子任务全 success——main_account_sync candidates=**0**（排水前死锁水位 110 已清空，无待处理变更）、jhemr_signature_sync 水位正常推进至 2026-09-06T14:54:00Z（1886 例全 skipped_existing=例行 resync，未触发 max_update——F-2 语义按设计工作）、user_dept_sync/education_title 无变更。**排水后首个完整夜窗通过，F-2 验证观察点就此完成（185 N1③ 收口）**。原始输出 `raw_morning_0907_platform.json`。
+- **docare 00:10 cron 未自愈 ❌**：syslog 证实 00:10:01 正常触发，但 list_20260907.md 再次 0 字节，cron.log 新增 traceback 与首晚相同（`his_visits` 连 ODS 8.216:1521 **ORA-12541 无监听**）。连续两晚同时段失败、白天连接正常（06:1x 补跑成功即证明）→ **定性：ODS 监听每晚 00:10 前后不可用（疑夜间维护/备份窗口）**。cron/告警/脚本均未动（生产变更需点名）。
+- **09-07 清单已按昨日同类授权模式白天补跑**（--dry-run，06:1x）：753 字节、2 组（00705241/c0460474）全部"FBINCU 已与 HIS 一致+本地号≠HIS 号→人工裁决"、**零自动修订候选**（连续两天该窗口形态一致：无纸化视图值已正确，仅需人工裁决留档）。副本 `docare_list_20260907_dryrun.md`。
+- **待用户决策（docare 根治三选）**：① cron 时间后挪（需先确认 ODS 监听恢复时刻，如 00:40/01:00 试探）；② 脚本加重试/退避（改服务器脚本需点名）；③ 失败告警（cron 邮件或平台通知）。不改则维持"白天人工补跑"模式亦可运行，但每晚都会产生 0 字节清单+traceback 噪音。

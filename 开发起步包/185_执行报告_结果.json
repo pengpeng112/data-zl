@@ -50,5 +50,11 @@
     "s4_wiring": "~/.zcode/skills/multi-review|multi-verify SKILL.md 各加预检指针+证据留痕节；grep 复核均命中 multi_ai_evidence；S4 调用链未接状态解除",
     "dir_hygiene": "19 文档补类别行；output_r170 登记（检查器新增反引号 output_rNN/ 识别+测试）；125 同号双文件登记；补 project-task-resume 技能行；复跑 check_doc_index error1/warn1/info17（剩余=181 家族，归并行会话）",
     "gates": "tools/tests 37 passed/0 failed"
+  },
+  "followup_20260907_morning": {
+    "N1_3": "RUN-464a660b0cb3（09-07 02:00）success/零熔断；candidates 110→0；签名水位→2026-09-06T14:54Z；F-2 验证观察点完成",
+    "docare_night2": "00:10 cron 再次 ORA-12541（ODS 8.216 监听 00:10 时段不可用，定性成立）；09-07 清单白天 dry-run 补跑（753B，2 组全人工裁决，零自动修订候选）",
+    "docare_pending_decision": "根治三选：cron 后挪 / 脚本重试 / 失败告警（均需点名；现维持白天人工补跑模式）",
+    "push": "2026-09-07 晨用户授权后执行 git push origin master"
   }
 }

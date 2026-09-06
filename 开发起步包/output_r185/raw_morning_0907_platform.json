@@ -1,0 +1,64 @@
+
+===R185_MORNING_BEGIN===
+{
+  "N3_runs": [
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "status": "success",
+      "circuit_breaker_triggered": "False",
+      "circuit_breaker_dimension": null,
+      "candidates_total": "0",
+      "success_count": "0",
+      "failed_count": "0",
+      "skipped_count": "3999",
+      "started_at": "2026-09-07T02:00:03.560584+08:00",
+      "finished_at": "2026-09-07T02:00:53.183915+08:00"
+    }
+  ],
+  "N3_subtasks": [
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "subtask_code": "jhemr_education_title_sync",
+      "status": "success",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "failed_count": "0",
+      "skipped_count": "2112",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-464a660b0cb3', 'source': {'dictionary_rows': 60, 'dictionary_codes': 60}, 'status': 'success', 'updated': 0, 'error_classes': {}, 'planned_count': 0, 'skipped_equal': 2066, 'skipped_no_user': 46, 'failed_fingerprints': [], 'reconciled_pending_audit': 0, 'target_committed_pending_audit': 0}"
+    },
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "subtask_code": "jhemr_signature_sync",
+      "status": "success",
+      "planned_count": "1886",
+      "succeeded_count": "0",
+      "failed_count": "0",
+      "skipped_count": "1886",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-464a660b0cb3', 'status': 'success', 'inserted': 0, 'watermark': {'status': 'committed', 'candidate': '2026-09-06T14:54:00+00:00', 'watermark_key': 'jhemr_signature_sync'}, 'error_classes': {}, 'planned_count': 1886, 'processed_count': 1886, 'skipped_no_user': 34, 'skipped_existing': 1852, 'source_signatures': 1886, 'failed_fingerprints': []}"
+    },
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "subtask_code": "jhemr_user_dept_sync",
+      "status": "success",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "failed_count": "0",
+      "skipped_count": "220",
+      "report_summary": "{'plan': {'dept_adds': 0, 'primary_changes': 0}, 'failed': 0, 'reason': 'no_changes', 'run_id': 'RUN-464a660b0cb3', 'source': {'managed_persons': 220}, 'status': 'success', 'target': {'target_users': 3958, 'target_dept_rows': 13314}, 'error_classes': {}, 'planned_count': 0, 'skipped_equal': 219, 'dept_rows_added': 0, 'primary_updated': 0, 'skipped_no_user': 1, 'failed_fingerprints': [], 'reconciled_pending_audit': 0, 'target_committed_pending_audit': 0}"
+    },
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "subtask_code": "main_account_sync",
+      "status": "success",
+      "planned_count": "0",
+      "succeeded_count": "0",
+      "failed_count": "0",
+      "skipped_count": "1",
+      "report_summary": "{'failed': 0, 'run_id': 'RUN-464a660b0cb3', 'status': 'success', 'skipped': 1, 'success': 0, 'candidates': 0, 'deactivate': 1, 'failed_count': 0, 'skipped_count': 1, 'success_count': 0}"
+    }
+  ],
+  "docare_list_0907": {
+    "exists": false
+  }
+}
+===R185_MORNING_END===
