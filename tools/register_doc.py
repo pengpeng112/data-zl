@@ -5,10 +5,11 @@
 用法：
   python tools/register_doc.py                      # 查询当前最大编号与下一个可用编号
   python tools/register_doc.py 开发起步包/184_标题.md # 给定新文档名，生成四步登记模板
-  python tools/register_doc.py --check              # 目录自检：README 与实际文件的孤儿/幽灵差异
+  python tools/register_doc.py --check              # 目录自检：转发到唯一检查器 check_doc_index.py
 
 四步（AGENTS 强制）：①编号续用最大+1 ②README 对应分组追加行 ③文档首行类别 ④目录更新记录一行。
 本工具只产出模板文本，由 AI/人核对后贴入，避免自动改写 README 出错。
+--check 自 185 号 C1 起复用 check_doc_index 的同一套解析函数（唯一规则源，防双检查器漂移）。
 """
 import argparse
 import re
@@ -42,21 +43,14 @@ def main():
 
     nums = known_numbers()
     top = nums[-1][0] if nums else 0
-    listed = set()
-    for line in README.read_text(encoding="utf-8").splitlines():
-        for m in re.finditer(r"`(\d{1,3})_[^`]+`", line):
-            listed.add(int(m.group(1)))
-    actual = {n for n, _ in nums}
 
     if args.check:
-        orphan = sorted(f"{n}_{name}" for n, name in nums if n not in listed)
-        ghost = sorted(l for l in listed if l not in actual and l != 150)  # 150 已删仍登记属已知
-        print(f"实际最大编号：{top}")
-        print(f"孤儿文件（实际有、README 未登记）：{len(orphan)}")
-        for x in orphan:
-            print("  -", x)
-        print(f"幽灵条目（README 有、文件不存在）：{len(ghost)} {ghost}")
-        return 0
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import check_doc_index
+
+        report = check_doc_index.run_checks(PKG)
+        check_doc_index.print_report(report)
+        return 1 if report["stats"]["findings"]["error"] else 0
 
     if not args.docname:
         top_name = nums[-1][1] if nums else "无"

@@ -27,7 +27,10 @@ OTHER_DOMAIN_FILES=(
 )
 
 tunnel_up() {
-  netstat -ano 2>/dev/null | grep -q "127.0.0.1:15432.*LISTENING"
+  # 185 WARN 最小修复：本机 Git Bash 的 grep 为 ugrep，netstat 输出（CRLF+GBK 头）
+  # 使 `grep -q "127.0.0.1:15432.*LISTENING"` 恒不命中 → 误判隧道不在、重复建转发失败。
+  # 改用 bash 内建 /dev/tcp 探测（无外部命令依赖，实测 2026-09-06）。
+  (exec 3<>/dev/tcp/127.0.0.1/15432) 2>/dev/null
 }
 
 ensure_tunnel() {
