@@ -32,6 +32,8 @@ dev.err
 !.agents/skills/sql-relation-intake/**
 !.agents/skills/query-governance-intake/
 !.agents/skills/query-governance-intake/**
+!.agents/skills/project-task-resume/
+!.agents/skills/project-task-resume/**
 .agents/skills/**/__pycache__/
 .agents/skills/**/*.pyc
 .ssh/

@@ -14,6 +14,7 @@
 - 普通取数 SQL 在完成查询资产检索后，再按物理来源使用 `.agents/skills/` 下的 `ods-readonly-sql`、`hisuser-readonly-sql`、`mobile-nursing-readonly-sql` 或 `docare-anesthesia-readonly-sql`。
 - 用户要求**处理 HIS/医院系统日常运维问题**（报错排查、故障处理、操作指导），或提到 `HIS日常问题处理知识库`、运维问题台账时，先读 `F:\python\Wx_ltjl\docs\知识库\HIS日常问题处理知识库.md`（84条运维台账知识库：现象/涉及表/排查SQL/风险分级，🔴写操作带护栏；映射 `开发起步包/HIS问题表映射.csv`；活库核验配合 sjzc 技能只读执行）。
 - 用户要求**发布/升级生产服务器、查夜跑/晨检核验、在 8.83 容器内连库探查、或对工号/患者做受控数据修复**时，先读仓库技能 `.agents/skills/ops-runbook/SKILL.md`（生产运维四件套标准件：容器连库探查/业务库写修复五步/镜像发布链/夜跑核验，含 pg_dump 方言、LOB 序列化、heredoc 编码等已踩坑；184 号复盘沉淀）。发布与写库仍须用户点名授权，技能只提供标准流程。
+- 用户要求**接手/续跑/恢复中断任务**，或提到跨会话接手、断点续跑、恢复某编号计划的执行时，先使用仓库技能 `.agents/skills/project-task-resume/SKILL.md`（跨会话接手四步：切片阅读→工具自检 check_doc_index/check_test_environment→域归属与进度判定→七项接手产出；含 147/177/180 三案例回放；不创建平行状态总表，不把历史授权当当前授权）。
 - 后续 AI 不得依赖聊天记忆获取表关系；优先读取平台 AI 上下文/关系配方/查询资产接口，平台不可用时读取技能引用的仓库机器可读资产。
 
 ### 技能分工与优先级
