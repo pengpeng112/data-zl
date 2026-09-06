@@ -199,7 +199,7 @@
 | `129_图谱修复权限整改布局美化交接.md` | 本地开发完成，待纳入 130 发布 | 业务系统→库/Owner→表→字段四级图谱、字段级局部图和表间关系显示；生产尚未升级 |
 | `127_数据质量与资产治理功能复核整改执行计划.md` | 代码/测试库门禁完成，待 130 收口 | 质量、责任人、术语、关系审核和 AI 助手整改；生产代码大部已存在，但数据 apply、状态闭环和统一镜像仍待验收 |
 | `126_AI查询SQL与统计指标闭环治理建设计划.md`（128 交接已归档 2026-08-27） | 最小闭环已生产，待扩充资产 | 查询/指标/产品/看板/MCP/多源已上线；当前生产 27 查询、48 指标，剩余 SQL 与阻断指标按治理门禁补齐 |
-| `122_每日人员同步任务状态审计与签名失败整改执行计划.md` / `124_HIS职称同步JHEMR执行与复用说明.md` / 两份 `125_*` | 主链上线；H7=2/3 | 每日无人值守任务、职称/签名补跑和水位已落地；还需完成第三个夜窗并修正观察脚本运行路径 |
+| `122_每日人员同步任务状态审计与签名失败整改执行计划.md` / `124_HIS职称同步JHEMR执行与复用说明.md` / 同号双份 `125_HIS签名同步时区故障与150像素整改交接说明.md`、`125_H7夜间观察记录.md` | 主链上线；H7=2/3 | 每日无人值守任务、职称/签名补跑和水位已落地；还需完成第三个夜窗并修正观察脚本运行路径 |
 | `112_诊断手术人工维护自动同步与HIS人员双目标同步整改执行计划.md` / `115_112号双同步专项整改完成记录.md` | 代码完成，写侧保持关闭 | 受控写回代码和安全门禁已完成；业务目标库写入、Phase D 与自动下发未经授权，不纳入本轮自动执行 |
 | `96_临床诊断字典同步海量与HIS分析与开发步骤.md` | P0/P1 已回写，闭环待验收 | 诊断/手术字典同步设计；仅做平台内状态、审计和只读验证收口，不自动开启业务库写入 |
 | `106_JHEMR密码SM4加密算法逆向完成与自动化交接说明.md` | 当前安全证据 | JHEMR 密码算法和自动化门禁证据；固定字符串、时区、PKCS7 等仍需在任何写侧启用前独立复核 |
@@ -223,6 +223,8 @@
 | `../.agents/skills/query-governance-intake/SKILL.md` | 当前 | 日常取数、SQL/指标版本、queryctl 和查询资产摄取的强制入口；只允许确定性门禁通过的只读 SQL 形成 active 版本 |
 | 全局 `~/.zcode/skills/sjzc/SKILL.md`（2026-08-24 由仓库级迁出） | 当前（全局） | 数据资产统一连库与表结构技能：/sjzc 无参列全部系统由 AI 判断、带系统名直连；表结构走平台元数据（20 系统/4 库型，DATA_CENTER 865 表/26,894 字段与 08 快照口径一致），live 通道经 8.83 容器受控连接器限量只读 SELECT（target_host+受控凭据，四库型实测打通）；仓库外目录会话同样可用 |
 | `../.agents/skills/sql-relation-intake/SKILL.md` | 当前 | 历史/报表/视图 SQL 的关系摄取入口；从平台或仓库获取最新资产，解析 JOIN、查重和分级，只生成可审核候选，不直接污染正式关系 |
+| `../.agents/skills/project-task-resume/SKILL.md` | 当前（185 号新增） | 跨会话接手/续跑/恢复中断任务技能：切片阅读→check_doc_index/check_test_environment 工具自检→域归属与进度判定→七项接手产出；references/ 含 147（归档）/177/180 三案例回放 |
+| `output_r170/`（import170.py 重灌工装；170 号无编号正文文档） | 工装 | 隔离库全量重灌标准件（12702 表/1329 关系/178547 字段/107 序列重置）；全量 pytest 后按 AGENTS 惯例重灌 |
 
 ## 归档区
 
@@ -240,6 +242,7 @@
 
 ## 目录更新记录
 
+| 2026-09-06 晚 | 185 收口后四项决策落地（用户拍板） | ①N1b：docare 每日清单 --dry-run 补跑重生（0→1251B，4 组全人工裁决、零自动修订候选；ORA-12541=ODS 00:10 时段性，09-07 晨检并入 N1③；cron/告警未动）；②N2 孤儿排班交手术室人工作废（平台侧零改动）；③S4 接线：multi-review/multi-verify 全局技能引用 tools/multi_ai_evidence.py（仓库外文件不进 Git）；④目录卫生：19 份老文档补 `> 类别：` 首行、`output_r170/` 工装行登记（check_doc_index 新增反引号 output_rNN/ 形态识别+测试）、125 改同号双文件登记、补 project-task-resume 技能行——check_doc_index 复跑 error1/warn1/info17（剩余 181 文档+output_r181 归并行身份线会话）。tools/tests 37P。详见 185_执行报告.md §10。 |
 | 2026-09-06 | 185 执行完成（R0→R7 单会话） | C1-C7 全落地：新增 tools/check_doc_index.py（唯一目录检查器，register_doc --check 并入同一解析）、check_test_environment.py（包装 database_guard 三态）、multi_ai_evidence.py（薄包装，S4 调用链未接如实标注）、check_instruction_drift.py（四语义规则，首跑仅 1 条真灰区信号）+ tools/tests/ 36 测试；新增 skill project-task-resume（含 147/177/180 三案例回放）+ AGENTS 路由 1 行 + gitignore 白名单；ops-runbook 复核零修复；目录基线首档（error1=181 未登记[他人域]/warn22/info15，零误报）。R5 只读：N1①failed=max_change_ratio ②success/update110 对账过、③SKIP 待 09-07；N1b docare 清单 0 字节+ORA-12541 呈报待点名；N2 OPER_STATUS=0 确认。W1=dev_env.sh tunnel_up ugrep bug 最小修复（/dev/tcp）。零 push、零生产写入、他人域 13 文件零触碰。 |
 | 2026-09-06 | 185 升 v1.1（外部 AI 审核修订）+ 184 产物双 bug 修复 | 审核 16 条全核实采纳：平台库改零写入、他人域扩展+R0 冻结清单、N1 重写三行对账（F-2 首夜预期被 round-9 flush 推翻：02:00 夜跑 failed=max_change_ratio、08:44 排水 success、观察点 09-07）、C1 唯一检查器、C2 包装 database_guard、C3 补路由+案例归档路径、R7 门禁收窄+白名单提交、产物路径统一；先行修复 dev_env.sh fi;; 重复与 ops-runbook password=pwd（实测通过）；183 状态改移交。 |
 | 2026-09-06 | 新增 184/185 号：AI 协作复盘收口与剩余任务执行计划 | 两子代理分析 35 会话档案（11,531 条消息）：高频样板 Top7 全部沉淀（ops-runbook Skill + dev_env.sh/register_doc.py/export 工具）；AGENTS/CLAUDE/长期记忆查重零冲突，AGENTS 补 ops-runbook 路由行；中断点八类+规则裁决（保留 7/废除 1）；回归矩阵全绿（纯逻辑 44P/DB 21P/前端 278+build，期间复现一次并行 pytest 互踩即证据）。185 移交 183 S1-S6 未执行项+修复项给执行 AI。修复 181 号文件名双前缀。 |
