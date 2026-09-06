@@ -80,7 +80,6 @@ case "${1:-}" in
       diff <(grep -v '^#' "$BASE") <(echo "$NOW") || true
       exit 1
     fi;;
-    fi;;
   "")
     ensure_tunnel && derive_url
     echo "[remind] 隔离库脚本一律显式 \$APP_TEST_DB_URL；跑全量 pytest 前终止非本会话 pytest；"

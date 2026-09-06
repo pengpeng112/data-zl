@@ -29,7 +29,7 @@ from app.services.db_connectors import OracleConnector
 
 def src_conn(cred, host, service):  # 凭据文件名见 /etc/data-asset/credentials/
     u, p = Path(f"/etc/data-asset/credentials/{cred}").read_text(encoding="utf-8").strip().split(":", 1)
-    return OracleConnector(host=host, port=1521, database=service, user=u, password=pwd,
+    return OracleConnector(host=host, port=1521, database=service, user=u, password=p,
                            connection_mode="direct", oracle_client_lib_dir="/opt/oracle", timeout_ms=120000)
 ```
 
