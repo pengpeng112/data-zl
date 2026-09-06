@@ -43,5 +43,12 @@
     ],
     "others_domain_touched": 0
   },
-  "artifacts_dir": "开发起步包/output_r185/"
+  "artifacts_dir": "开发起步包/output_r185/",
+  "followup_20260906_evening": {
+    "user_decisions": "②N1b 按建议补跑；③N2 交手术室人工（平台侧零改动）；④S4 接线；⑤目录卫生全做（181 归原会话）；①待 09-07 晨检；⑥push 未授权",
+    "n1b_rerun": "docare_mismatch_daily.py --dry-run 重生 list_20260906.md（0→1251 字节）；4 组全人工裁决、零自动修订候选（错过夜跑无遗漏修复）；ORA-12541=ODS 00:10 时段性；cron/告警未动",
+    "s4_wiring": "~/.zcode/skills/multi-review|multi-verify SKILL.md 各加预检指针+证据留痕节；grep 复核均命中 multi_ai_evidence；S4 调用链未接状态解除",
+    "dir_hygiene": "19 文档补类别行；output_r170 登记（检查器新增反引号 output_rNN/ 识别+测试）；125 同号双文件登记；补 project-task-resume 技能行；复跑 check_doc_index error1/warn1/info17（剩余=181 家族，归并行会话）",
+    "gates": "tools/tests 37 passed/0 failed"
+  }
 }
