@@ -18,6 +18,8 @@ dev.err
 .agents/*
 !.agents/skills/
 .agents/skills/*
+!.agents/skills/ops-runbook/
+!.agents/skills/ops-runbook/**
 !.agents/skills/ods-readonly-sql/
 !.agents/skills/ods-readonly-sql/**
 !.agents/skills/hisuser-readonly-sql/
