@@ -38,6 +38,7 @@ GHOST_WHITELIST = {
 BACKTICK_FILE = re.compile(r"`(\d{1,3})_[^`]+`")
 BACKTICK_RANGE = re.compile(r"`(\d{1,3})`\s*[–—-]\s*`(\d{1,3})`")
 BACKTICK_BARE = re.compile(r"`(\d{1,3})`")
+BACKTICK_OUTDIR = re.compile(r"`output_r(\d{1,3})/?`")
 NUM_PREFIX = re.compile(r"^(\d{1,3})_(.+)$")
 CATEGORY_LINE = re.compile(r"^>\s*类别[：:]")
 OUTDIR_NAME = re.compile(r"^output_r(\d{1,3})$")
@@ -103,8 +104,9 @@ def readme_coverage(readme_text: str) -> dict[int, str]:
     """提取主 README 的登记覆盖（编号 -> 依据）。
 
     只认反引号形态：`` `NN_...` `` 文件名、`` `a`–`b` `` 区间、`` `N` `` 裸编号
-    （完成度总览与证据链分组行中的裸编号同样是登记主张）。目录更新记录中的
-    纯文本历史提及不算登记（历史记录提及合法 ≠ 当前清单登记）。
+    （完成度总览与证据链分组行中的裸编号同样是登记主张）、`` `output_rNN/` ``
+    同号输出目录显式登记。目录更新记录中的纯文本历史提及不算登记（历史记录
+    提及合法 ≠ 当前清单登记）。
     """
     covered: dict[int, str] = {}
     for m in BACKTICK_FILE.finditer(readme_text):
@@ -115,6 +117,8 @@ def readme_coverage(readme_text: str) -> dict[int, str]:
         )
     for m in BACKTICK_BARE.finditer(readme_text):
         covered.setdefault(int(m.group(1)), "bare")
+    for m in BACKTICK_OUTDIR.finditer(readme_text):
+        covered.setdefault(int(m.group(1)), "outdir")
     return covered
 
 

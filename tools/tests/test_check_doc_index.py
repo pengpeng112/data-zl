@@ -120,6 +120,18 @@ def test_missing_category(pkg: Path):
     assert any(f["code"] == "missing_category" for f in report["findings"])
 
 
+def test_outdir_backtick_registration_form(pkg: Path):
+    """`output_rNN/` 反引号显式登记 = 同号输出目录的合法登记形态（185 收口补则）。"""
+    (pkg / "output_r07").mkdir()
+    readme = pkg / "README.md"
+    readme.write_text(
+        readme.read_text(encoding="utf-8") + "\n| 工装 | `output_r07/`（重灌脚本） | 工装 | 隔离库重灌 |\n",
+        encoding="utf-8",
+    )
+    report = cdi.run_checks(pkg)
+    assert not any(f["code"] == "orphan_outdir" and f["num"] == 7 for f in report["findings"])
+
+
 def test_outdir_covered_and_orphan(pkg: Path):
     (pkg / "output_r01").mkdir()   # 1：`01_已登记文档.md` 反引号登记 → 覆盖
     (pkg / "output_r05").mkdir()   # 5：无任何登记 → 孤儿输出目录
