@@ -40,8 +40,11 @@ _SENSITIVE_WORDS = re.compile(
 def normalize_status(value: Any, *, default: str = "failed") -> str:
     status = str(value or "").strip().lower()
     # Legacy statuses are normalized at the boundary and never exposed by the
-    # new status API.
-    aliases = {"circuit_open": "failed", "threshold_exceeded": "failed", "lock_held": "skipped"}
+    # new status API.  "partial" is the orchestrator's P0-6/§13.5 soft state
+    # (source incomplete / truncated / target_missing / blocked): it means the
+    # main task did its work, so it must not fall through to the "failed"
+    # default and fail-close every downstream subtask (189 修复）.
+    aliases = {"circuit_open": "failed", "threshold_exceeded": "failed", "lock_held": "skipped", "partial": "partial_success"}
     status = aliases.get(status, status)
     return status if status in SYNC_STATUSES else default
 
@@ -65,6 +68,9 @@ def aggregate_overall_status(
     title = normalize_status(title_status)
     dept = normalize_status(dept_status)
     login_sign = normalize_status(login_sign_status)
+    # 189 修复：主任务 partial（软状态）与 success 同为"已完成主干"；
+    # 子任务照常参与汇总，整体最多记 partial_success，不再落 failed。
+    main_soft = main in {"success", "partial_success"}
     if lock_reason == "lock_held" or main == "skipped":
         return "skipped"
     if main in {"failed", "misconfigured", "overdue"}:
@@ -72,18 +78,20 @@ def aggregate_overall_status(
     if main == "running" or signature == "running" or title == "running" or dept == "running" or login_sign == "running":
         return "running"
     if signature_required and signature in {"failed", "misconfigured", "overdue"}:
-        return "partial_success" if main == "success" else signature
+        return "partial_success" if main_soft else signature
     if title_required and title in {"failed", "misconfigured", "overdue"}:
-        return "partial_success" if main == "success" else title
+        return "partial_success" if main_soft else title
     if dept_required and dept in {"failed", "misconfigured", "overdue"}:
-        return "partial_success" if main == "success" else dept
+        return "partial_success" if main_soft else dept
     if login_sign_required and login_sign in {"failed", "misconfigured", "overdue"}:
-        return "partial_success" if main == "success" else login_sign
+        return "partial_success" if main_soft else login_sign
     if main == "success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}) and (not dept_required or dept in {"success", "skipped"}) and (not login_sign_required or login_sign in {"success", "skipped"}):
         return "success"
+    if main == "partial_success" and (not signature_required or signature in {"success", "skipped"}) and (not title_required or title in {"success", "skipped"}) and (not dept_required or dept in {"success", "skipped"}) and (not login_sign_required or login_sign in {"success", "skipped"}):
+        return "partial_success"
     if main == "skipped" and signature in {"skipped", "success"}:
         return "skipped"
-    return "partial_success" if main == "success" else "failed"
+    return "partial_success" if main_soft else "failed"
 
 
 def runner_exit_code(status: Any) -> int:

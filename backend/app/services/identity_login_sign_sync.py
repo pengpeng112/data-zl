@@ -7,11 +7,14 @@ client refuse login. This subtask is full-scope over the managed clinical
 population, like the dept subtask, and is additive-only:
 
 * missing ``users_control_mode`` is inserted with template ``0,2,4``;
-* users with **any** existing login/sign way rows are left untouched
-  (2026-09-05 003531 incident guard: template-filling partial gaps broke
-  manually configured users like ``2/4/8`` by inserting ``sign_way=0``
-  with ``default_flag=1``); only accounts with no way rows at all receive
-  the full ``0/2/4`` template;
+* empty accounts receive the full ``0/2/4`` template (same as working
+  account 003534);
+* users with existing login/sign rows are **not** template-filled
+  (2026-09-05 003531 incident: inserting ``sign_way=0`` with
+  ``default_flag=1`` onto a manual ``2/4/8`` config broke EMR);
+* if a login_way exists without the matching sign_way, insert that
+  sign_way with ``default_flag=0`` (003531 leftover: login had ``0``,
+  sign did not);
 * ``default_flag=1`` is set on ``sign_way=0`` only when the user currently
   has no default;
 * extra existing ways and existing defaults are never deleted or replaced.
@@ -68,11 +71,19 @@ def _conflict_flag_set(value: Any) -> bool:
 
 def _read_expected_platform(db) -> set[str]:
     from sqlalchemy import select
+    from ..core.config import settings
     from ..models.identity import IdentityPerson
     from ..models.identity_sync import IdentityProtectedAccount
-    from .identity_sync_orchestrator import ELIGIBLE_CLASSIFICATIONS, _get_person_depts
+    from .identity_sync_orchestrator import (
+        ELIGIBLE_CLASSIFICATIONS,
+        _get_person_depts,
+        _latest_decisions_by_person,
+        _protected_target_accounts,
+        _person_is_protected,
+    )
 
-    protected = {r for r in db.scalars(select(IdentityProtectedAccount.account_id)).all() if r}
+    protected_pairs = _protected_target_accounts(db)
+    dual_decisions = _latest_decisions_by_person(db) if settings.identity_dual_source_enforce else {}
     persons = db.scalars(
         select(IdentityPerson).where(
             IdentityPerson.employment_status == "active",
@@ -82,7 +93,22 @@ def _read_expected_platform(db) -> set[str]:
     expected: set[str] = set()
     for person in persons:
         emp = _text(person.person_code)
-        if not emp or emp in protected or _conflict_flag_set(person.conflict_flag):
+        if not emp or _conflict_flag_set(person.conflict_flag):
+            continue
+        protected_now, _hits = _person_is_protected(protected_pairs, emp)
+        if protected_now:
+            continue
+        # 186 I3：双来源判停用的在职人员不再补登录/签名方式（账号已停用，
+        # 填充无意义且可能被误读为“已恢复”）。本子任务本就不改账号状态。
+        # P0-5：enforce=true 时决策缺失或来源不完整的人员同样排除——
+        # 不得在无当前规则决策时按旧规则放行任何隐式账号操作。
+        decision = dual_decisions.get(emp)
+        if decision is not None:
+            if decision.desired_state == "disabled":
+                continue
+            if not decision.source_complete:
+                continue
+        elif dual_decisions:
             continue
         primary, _additionals = _get_person_depts(db, emp, person.classification)
         if not primary:
@@ -159,24 +185,29 @@ def _read_target(adapter: JhemrIdentityAdapter) -> dict[str, Any]:
         "has_column_privilege(current_user, 'jhemr.users_subsign', 'default_flag', 'UPDATE') AS can_update_default",
         (),
     ) or {}
+    # 189：default_flag 列级 UPDATE 缺失不再整体判 misconfigured——模板 INSERT
+    # 自带 default_flag，不依赖该权限；仅极少量的存量"way 0 无默认"修复
+    # （fix_default）需要它，降级跳过并在元数据里如实上报。
     if not all(bool(privilege.get(key)) for key in (
         "can_select_control", "can_insert_control",
         "can_select_sublogin", "can_insert_sublogin",
         "can_select_subsign", "can_insert_subsign",
-        "can_update_default",
     )):
         raise LoginSignSyncError("target_privilege_missing")
+    default_update_allowed = bool(privilege.get("can_update_default"))
     return {
         "users": target_users,
         "control": control_users,
         "logins": logins,
         "signs": signs,
         "defaults": defaults,
+        "default_update_allowed": default_update_allowed,
         "metadata": {
             "target_users": user_count,
             "control_rows": len(control_rows),
             "sublogin_rows": len(login_rows),
             "subsign_rows": len(sign_rows),
+            "default_update_priv": default_update_allowed,
         },
     }
 
@@ -188,12 +219,16 @@ def build_login_sign_plan(
     logins: dict[str, set[str]],
     signs: dict[str, set[str]],
     defaults: dict[str, int],
+    *,
+    allow_default_repair: bool = True,
 ) -> dict[str, Any]:
-    """Pure comparison: full template only for accounts with no way rows.
+    """Pure comparison: full 0/2/4 template only for accounts with no way rows.
 
-    2026-09-05（003531 事故治本）：已有任意登录/签名方式行的用户视为已配置，
-    不再按 0/2/4 模板补缺（防止给人工 2/4/8 配置后插 sign_way=0 产生双默认）。
-    仍会修 ``fix_default``（已有 0 行且完全无默认时补默认标记）。
+    Configured users are not template-filled (003531 dual-default incident).
+    Login ways that have no matching sign_way are still filled with
+    ``default_flag=0`` so nightly stays consistent with a working 003534 pair.
+    ``allow_default_repair=False``（目标账号缺 default_flag 列级 UPDATE 权限）
+    时跳过存量默认方式修复；模板 INSERT 自带默认值，不受影响。
     """
     repairs: list[dict[str, Any]] = []
     skipped_equal = 0
@@ -211,17 +246,20 @@ def build_login_sign_plan(
         existing_login_set = logins.get(emp, set())
         existing_signs = signs.get(emp, set())
         if existing_login_set or existing_signs:
-            # 已配置守卫：任何方式行存在即跳过模板补缺
             missing_logins: list[str] = []
-            missing_sign_ways: list[str] = []
-            skipped_configured += 1
+            missing_sign_ways = sorted(
+                existing_login_set - existing_signs,
+                key=lambda item: int(item) if str(item).isdigit() else 99,
+            )
+            if not missing_sign_ways:
+                skipped_configured += 1
         else:
             missing_logins = sorted(expected_logins)
             missing_sign_ways = list(EXPECTED_SIGN_WAYS)
         has_default = int(defaults.get(emp, 0)) >= 1
         sign_way_items = []
         for way in missing_sign_ways:
-            template = dict(sign_defaults[way])
+            template = dict(sign_defaults.get(way) or {"sign_way": way, "picmode": "2", "default_flag": "0"})
             if way == "0":
                 template["default_flag"] = "0" if has_default else "1"
                 if template["default_flag"] == "1":
@@ -233,7 +271,7 @@ def build_login_sign_plan(
                 "picmode": template.get("picmode", "2"),
                 "default_flag": template["default_flag"],
             })
-        fix_default = not has_default and "0" in existing_signs
+        fix_default = allow_default_repair and not has_default and "0" in existing_signs
         if not insert_control and not missing_logins and not sign_way_items and not fix_default:
             skipped_equal += 1
             continue
@@ -317,9 +355,18 @@ def sync_jhemr_login_sign_daily(
         "failed": 0, "target_committed_pending_audit": 0,
         "error_classes": {}, "failed_fingerprints": [],
     }
+    # 186 v1.10 P0-19：observe/disable_only 下登录/签名同步零目标写。
+    # （放在审计上下文检查之后：缺审计配置仍是 misconfigured，先于模式门禁）
     if db is None or not run_id:
         increment_error(result["error_classes"], "audit_config", "MissingAuditContext")
         result["status"] = "misconfigured"
+        return result
+    from .identity_sync_action_gate import gate_legacy_identity_write
+
+    mode_gate = gate_legacy_identity_write(db, "login_sign_sync")
+    if not mode_gate.allowed:
+        result["status"] = "skipped"
+        result["reason"] = mode_gate.reason
         return result
     try:
         expected = _read_expected_platform(db)
@@ -339,6 +386,7 @@ def sync_jhemr_login_sign_daily(
         adapter.connect()
         target = _read_target(adapter)
         result["target"] = target["metadata"]
+        result["default_update_allowed"] = bool(target.get("default_update_allowed"))
         reconciliation = reconcile_pending_login_sign_actions(
             db, expected, target["users"], target["control"],
             target["logins"], target["signs"], target["defaults"],
@@ -349,6 +397,7 @@ def sync_jhemr_login_sign_daily(
         plan = build_login_sign_plan(
             expected, target["users"], target["control"],
             target["logins"], target["signs"], target["defaults"],
+            allow_default_repair=bool(target.get("default_update_allowed")),
         )
         repairs = plan["repairs"]
         result["planned_count"] = len(repairs)

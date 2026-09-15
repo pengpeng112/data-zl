@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     his_source_jump_user: str = "root"
     his_source_jump_key: str = ""
     his_identity_sync_max_rows: int = 20000
+    # 186 v1.10 P0-6：关键来源 keyset 分页最大页数（每页 max_rows）。
+    identity_collect_max_pages: int = 5
 
     rbac_require_bound_token: bool = False
     env: str = "dev"
@@ -106,6 +108,51 @@ class Settings(BaseSettings):
     identity_cb_max_watermark_gap_hours: int = 48
     identity_cb_max_failure_rate: float = 0.2
     identity_cb_consecutive_failure_limit: int = 3
+
+    # 186 I2/I3：HIS 双来源（SYS_EMPLOYEE + SYS_USER）账号启停判定。
+    # enforce=true 时：任一来源明确停用 → 双目标停用；仅两者明确启用才
+    # 允许新建/恢复启用；期望 unknown 的未纳管人员不新建账号。
+    identity_dual_source_enforce: bool = True
+    # 分批状态对账的人员批量上限（§4.6.3：不扩大为全源表无界扫描；
+    # 2026-09-09 实测 SYS_USER 2001 行，默认上限 2000/批）。
+    identity_account_state_batch_limit: int = 2000
+    # 186 v1.10 P0-3：run 内分页续跑的总量上限（超过才 truncated=True）。
+    # 判定人口≈2530 且会增长，单批 2000 固定截断会让尾部人员永不评估。
+    identity_account_state_total_cap: int = 5000
+    # 186 v1.10 P0-9：旧归因容差仅保留作时间健康告警/旧证据展示，
+    # 不再参与解锁放行（§13.3：时间一致不是锁所有权证明）。
+    identity_enable_attribution_tolerance_s: int = 300
+
+    # 186 v1.10 P0-19：单一运行模式。observe=全身份目标零写（采集/决策照常）；
+    # disable_only=仅两个 disable 执行器动作且逐对象属批准范围；
+    # full=全部动作按其余门禁判定（仅隔离测试；生产不开放）。
+    identity_run_mode: str = "observe"
+
+    # 189：disable_only 下按白名单放行**属性对账类**旧写入口，逗号分隔，
+    # 仅认 login_sign_sync / jhemr_signature_sync / education_title_sync /
+    # jhemr_dept_sync（补已存在账号的方式/签名图片/职称/科室，不建号不启用）；
+    # 建号/锁定/改密类（jhemr_apply/cdms_apply/jhemr_lock/jhemr_password_reset）
+    # 永不放行；observe 模式不受此开关影响；空=维持 186 P0-19 全阻断。
+    identity_disable_only_allowed_legacy_kinds: str = ""
+
+    # 186 v1.10 §13.5：每调度窗口持久预算（唯一人员数，两目标计 2 动作算 1 人）。
+    identity_window_max_persons: int = 20
+    identity_window_hours: int = 20
+    # P0-20/T57：同代已 executed 停用的限量只读漂移回读（生产 observe 后
+    # 开启；隔离测试用 monkeypatch 注入读函数）。默认关——避免测试环境
+    # 真实连库。
+    identity_drift_readback_enabled: bool = False
+    identity_drift_readback_limit: int = 25
+    # §13.5 反饥饿：每窗 target_missing 池的只读探测上限（目标重现→回队列）。
+    identity_missing_probe_limit: int = 10
+
+    # 186 v1.10 §13.2：目标时钟只读采样工程默认值（不是对现有停用/变更阈值的调整）。
+    identity_clock_samples: int = 3
+    identity_clock_sample_timeout_s: float = 5.0
+    identity_clock_max_rtt_s: float = 2.0
+    identity_clock_health_ttl_s: float = 300.0
+    # 夜跑是否执行只读时钟采样（生产 observe 期开启；隔离测试默认关闭）。
+    identity_clock_sampling_enabled: bool = False
 
     # HMAC account fingerprint key (from secret provider, never in code/git)
     identity_hmac_key_ref: str = "file:///etc/data-asset/credentials/identity_hmac.key"
