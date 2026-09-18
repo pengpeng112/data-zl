@@ -283,6 +283,91 @@ class TestRbacAndScope:
         assert r.status_code == 200
         assert any(i["title"] == "全院可见" for i in r.json()["items"])
 
+    def test_read_all_cannot_write_out_of_scope(self, client, db_session):
+        """DEF-03（194 J08）：read_all 只放大读；跨科室写（transition/assign）必须 403。"""
+        db = db_session
+        issue = qgs.create_manual_issue(
+            db, title="read_all越权写目标", responsible_dept_code="D-SECRET", actor="t"
+        )
+        db.commit()
+        viewer_all = _role_client(
+            client,
+            role_code="qg_all_rw",
+            resources=[
+                "quality.issue.read",
+                "quality.issue.read_all",
+                "quality.issue.handle",
+                "quality.issue.assign",
+            ],
+            token="tok-qg-all-rw",
+            user="qg-allrw-1",  # 无 IdentityPerson → dept_codes 为空，不 touch D-SECRET
+        )
+        r = viewer_all.post(
+            f"/api/v1/quality-issues/{issue.id}/transition",
+            json={
+                "to_status": "acknowledged",
+                "expected_lock_version": issue.lock_version,
+                "reason": "越权接单",
+            },
+        )
+        assert r.status_code == 403, r.text
+        r2 = viewer_all.post(
+            f"/api/v1/quality-issues/{issue.id}/assign",
+            json={"expected_lock_version": issue.lock_version, "reason": "越权分派"},
+        )
+        assert r2.status_code == 403
+        # 详情读保持 200：read_all 的读语义不受本次收紧影响
+        r3 = viewer_all.get(f"/api/v1/quality-issues/{issue.id}")
+        assert r3.status_code == 200
+        assert "acknowledge" not in r3.json().get("allowed_actions", [])
+
+    def test_verify_allows_read_all_cross_department(self, client, db_session):
+        """验证职责（verify）保留 read_all 跨科室：他科 waiting_verify 可被质管员验证。"""
+        db = db_session
+        issue = qgs.create_manual_issue(
+            db, title="跨科验证目标", responsible_dept_code="D-SECRET", actor="t"
+        )
+        db.commit()
+        lv = issue.lock_version
+        # 默认 client（管理员）推进到 waiting_verify
+        for to_status, reason in (
+            ("acknowledged", "接单"),
+            ("in_progress", "开工"),
+        ):
+            r = client.post(
+                f"/api/v1/quality-issues/{issue.id}/transition",
+                json={"to_status": to_status, "expected_lock_version": lv, "reason": reason},
+            )
+            assert r.status_code == 200, r.text
+            lv = r.json()["lock_version"]
+        r = client.post(
+            f"/api/v1/quality-issues/{issue.id}/request-verification",
+            json={"expected_lock_version": lv, "reason": "请复测", "action_plan": "已整改"},
+        )
+        assert r.status_code == 200, r.text
+        lv = r.json()["lock_version"]
+        verifier = _role_client(
+            client,
+            role_code="qg_verifier_all",
+            resources=[
+                "quality.issue.read",
+                "quality.issue.read_all",
+                "quality.issue.verify",
+            ],
+            token="tok-qg-verifier",
+            user="qg-verifier-1",
+        )
+        rv = verifier.post(
+            f"/api/v1/quality-issues/{issue.id}/verify",
+            json={
+                "expected_lock_version": lv,
+                "passed": True,
+                "reason": "跨科验证通过",
+                "resolution_summary": "复测通过",
+            },
+        )
+        assert rv.status_code == 200, rv.text
+
 
 class TestFullLifecycleViaApi:
     def test_fail_to_resolve_and_recurrence(self, client, db_session, active_control):
@@ -377,6 +462,16 @@ class TestFullLifecycleViaApi:
         assert new_detail["recurrence_no"] == 1
 
     def test_verify_same_requester_forbidden(self, client, db_session, active_control):
+        db = db_session
+        # DEF-03（194）后写路径按本人/本科室：补经办人科室身份（问题科室=D-API），
+        # 使其真实 touch；read_all 不再豁免写。
+        if not db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "qg-handler-1")):
+            db.add(
+                IdentityPerson(
+                    person_code="qg-handler-1", person_name_cn="处理甲", dept_code="D-API"
+                )
+            )
+            db.commit()
         r = _ingest_fail(client, active_control["id"], "api-verify-r1", scope="api-verify")
         issue_id = r.json()["issue_id"]
         handler = _role_client(

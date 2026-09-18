@@ -43,7 +43,10 @@ def run() -> None:
                     AssetRolePermission(
                         role_code=role_code,
                         resource=code,
-                        action="allow",
+                        # DEF-05（194）：运行时仅认 action∈{None,"","access","*"} 为裸资源权限；
+                        # 原 "allow" 会被归一化为 "code:allow" 导致整类角色 fail-closed。
+                        # 测试套件与 permissions API 均写 "access"，此处对齐。
+                        action="access",
                     )
                 )
 

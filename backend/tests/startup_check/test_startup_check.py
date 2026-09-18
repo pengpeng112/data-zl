@@ -43,6 +43,7 @@ class _S(BaseSettings):
     identity_hmac_key_ref: str = ""
     identity_jhemr_default_password_ref: str = ""
     identity_cdms_default_password_ref: str = ""
+    auth_cookie_secure: bool = False
     build_id: str = "dev-local"
     git_sha: str = ""
 
@@ -60,6 +61,8 @@ def good(**o):
         identity_jhemr_password_write_enabled=False,
         build_id="b-2026-1234",
         git_sha="f8a9b0c1d2e3",
+        # QA ST-015：production 必须 Secure refresh cookie（DEF-11/194：测试样本与校验同步）
+        auth_cookie_secure=True,
     )
     base.update(o)
     return validate_production_config(_S(**base))
@@ -88,6 +91,9 @@ errs = good(build_id="dev-local")
 assert errs and any("build_id" in e for e in errs), errs
 errs = good(git_sha="")
 assert errs and any("git_sha" in e for e in errs), errs
+# DEF-11（194）：production 缺 APP_AUTH_COOKIE_SECURE 必须拒绝（QA ST-015）
+errs = good(auth_cookie_secure=False)
+assert errs and any("COOKIE_SECURE" in e for e in errs), errs
 
 print("STARTUP_CHECK_OK")
 """

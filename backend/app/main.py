@@ -489,6 +489,26 @@ async def auth_and_logging_middleware(request: Request, call_next):
                 # 可信用户的实时角色是唯一授权来源。即使数据库返回空列表，
                 # 也必须覆盖 JWT 缓存，确保撤权立即生效；查询异常由外层失败关闭。
                 if request.state.user_identifier:
+                    # DEF-04（194 I12）：无状态 JWT 不感知账号禁用/删除；
+                    # 每次请求实时复核账号存在且启用，禁用立即失效（401）。
+                    from .models.auth import AuthUser
+
+                    auth_user = db.scalar(
+                        select(AuthUser).where(
+                            AuthUser.user_identifier == request.state.user_identifier
+                        )
+                    )
+                    if auth_user is None or not auth_user.enabled:
+                        db.close()
+                        return JSONResponse(
+                            status_code=401,
+                            content={
+                                "code": 401,
+                                "message": "账号已禁用或不存在，请重新登录",
+                                "data": None,
+                                "request_id": request.state.request_id,
+                            },
+                        )
                     token_roles = _resolve_jwt_roles(db, jwt_payload)
                 request.state.roles = token_roles
             else:

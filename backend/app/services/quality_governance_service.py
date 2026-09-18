@@ -1107,7 +1107,9 @@ def compute_allowed_actions(
           "accept_risk":…, "export":…, "manage":…, "is_admin":…}
     """
     actions: list[str] = []
-    in_scope = has.get("read_all") or user_can_touch_issue(issue, scope)
+    # DEF-03（194）：写动作默认按本人/本科室（管理员豁免）；read_all 不再放大写按钮，
+    # 仅 verify（验证职责）保留跨科室可见性。
+    in_scope = has.get("is_admin") or user_can_touch_issue(issue, scope)
     is_admin = has.get("is_admin", False)
 
     if has.get("handle") and in_scope and issue.status not in ISSUE_TERMINAL_STATUSES:
@@ -1140,7 +1142,6 @@ def compute_allowed_actions(
         requester = last_verification_requester(db, issue.id)
         if requester != user_identifier or is_admin:
             actions.append("verify")
-
     if has.get("accept_risk") and in_scope and issue.status == "acknowledged":
         actions.append("accept_risk")
 

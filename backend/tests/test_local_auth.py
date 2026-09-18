@@ -427,3 +427,55 @@ def test_jwt_and_api_key_dual_credential(client: TestClient):
     assert bare.get("/api/v1/summary", headers={"Authorization": f"Bearer {jwt_token}"}).status_code == 200
     # fixture client uses API key
     assert client.get("/api/v1/summary").status_code == 200
+
+
+def test_disabled_account_old_jwt_rejected(client: TestClient):
+    """DEF-04（194 I12）：账号禁用后，已签发的 access JWT 必须立即失效（中间件实时复核）。"""
+    password = _make_password()
+    username = f"dis_{secrets.token_hex(4)}"
+    db = SessionLocal()
+    try:
+        auth_service.create_local_user(
+            db,
+            username=username,
+            password=password,
+            user_identifier=username,
+            must_change_password=False,
+        )
+        db.add(AssetUserRole(user_identifier=username, role_code="platform_admin"))
+        db.commit()
+    finally:
+        db.close()
+
+    bare = TestClient(app)
+    login = bare.post(
+        "/api/v1/auth/login",
+        json={"username": username, "password": password},
+        headers=_csrf_headers(),
+    )
+    assert login.status_code == 200
+    jwt_token = login.json()["data"]["accessToken"]
+    assert (
+        bare.get("/api/v1/summary", headers={"Authorization": f"Bearer {jwt_token}"}).status_code
+        == 200
+    )
+
+    db = SessionLocal()
+    try:
+        user = db.scalar(select(AuthUser).where(AuthUser.username == username))
+        assert user is not None
+        user.enabled = False
+        db.commit()
+    finally:
+        db.close()
+
+    r = bare.get("/api/v1/summary", headers={"Authorization": f"Bearer {jwt_token}"})
+    assert r.status_code == 401, r.text
+    assert "禁用" in r.json()["message"]
+    # 登录入口同样拒绝（既有行为，保持）
+    r2 = bare.post(
+        "/api/v1/auth/login",
+        json={"username": username, "password": password},
+        headers=_csrf_headers(),
+    )
+    assert r2.status_code == 401

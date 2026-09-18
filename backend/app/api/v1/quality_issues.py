@@ -332,8 +332,11 @@ def _ensure_write_access(
     perm: dict[str, bool],
     *,
     detail: str,
+    allow_read_all: bool = False,
 ) -> None:
-    if perm["read_all"]:
+    # DEF-03（194）：read_all 只放大读；写默认按本人/本科室范围（管理员豁免）。
+    # verify 保留 read_all 跨科室（验证职责，service 层另有"提请人不得自证"防线）。
+    if perm["is_admin"] or (allow_read_all and perm["read_all"]):
         return
     scope = qgs.resolve_user_scope(db, user_identifier)
     if not qgs.user_can_touch_issue(issue, scope):
@@ -904,7 +907,10 @@ def verify_issue(
 ):
     issue = _get_issue_or_404(db, issue_id)
     perm = _user_permission_map(db, user)
-    _ensure_write_access(db, issue, user, perm, detail="无权验证该问题（超出本人/本科室范围）")
+    _ensure_write_access(
+        db, issue, user, perm,
+        detail="无权验证该问题（超出本人/本科室范围）", allow_read_all=True,
+    )
     requester = qgs.last_verification_requester(db, issue.id)
     if requester == user and not perm["is_admin"]:
         raise HTTPException(
