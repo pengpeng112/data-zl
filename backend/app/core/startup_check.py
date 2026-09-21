@@ -14,6 +14,7 @@ APP_ENV=production 时强制校验以下配置，任何一项不满足直接拒�
 """
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
@@ -135,10 +136,23 @@ def _validate_credential_dir(settings) -> list[str]:
 
 
 def _validate_cookie_secure(settings) -> list[str]:
-    """QA ST-015：production 必须 Secure refresh cookie（防明文链路截获 8h 凭据）。"""
-    if not getattr(settings, "auth_cookie_secure", False):
-        return ["production 必须 APP_AUTH_COOKIE_SECURE=true（refresh cookie Secure 标志）"]
-    return []
+    """QA ST-015：production 必须 Secure refresh cookie（防明文链路截获 8h 凭据）。
+
+    r197 发布实证修订：当前内网部署为纯 HTTP（nginx 80，无 TLS），Secure=true
+    会使浏览器拒发 cookie。APP_AUTH_COOKIE_SECURE_ACK_HTTP=true 为显式确认的
+    HTTP 部署豁免（仅放行启动校验，不改变 cookie 标志）；上 TLS 后移除豁免。
+    """
+    if getattr(settings, "auth_cookie_secure", False):
+        return []
+    if getattr(settings, "auth_cookie_secure_ack_http", False):
+        logging.getLogger(__name__).warning(
+            "APP_AUTH_COOKIE_SECURE=false 且已显式确认 HTTP 部署"
+            "（APP_AUTH_COOKIE_SECURE_ACK_HTTP=true）：refresh cookie 无 Secure 标志，"
+            "明文链路存在截获风险，上线 TLS 后应移除该确认"
+        )
+        return []
+    return ["production 必须 APP_AUTH_COOKIE_SECURE=true（refresh cookie Secure 标志）；"
+            "确属 HTTP 内网部署时需显式 APP_AUTH_COOKIE_SECURE_ACK_HTTP=true 确认"]
 
 
 def _validate_identity(settings) -> list[str]:

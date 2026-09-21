@@ -44,6 +44,7 @@ class _S(BaseSettings):
     identity_jhemr_default_password_ref: str = ""
     identity_cdms_default_password_ref: str = ""
     auth_cookie_secure: bool = False
+    auth_cookie_secure_ack_http: bool = False
     build_id: str = "dev-local"
     git_sha: str = ""
 
@@ -94,6 +95,9 @@ assert errs and any("git_sha" in e for e in errs), errs
 # DEF-11（194）：production 缺 APP_AUTH_COOKIE_SECURE 必须拒绝（QA ST-015）
 errs = good(auth_cookie_secure=False)
 assert errs and any("COOKIE_SECURE" in e for e in errs), errs
+# r197 修订：HTTP 内网部署显式确认豁免（APP_AUTH_COOKIE_SECURE_ACK_HTTP）
+errs = good(auth_cookie_secure=False, auth_cookie_secure_ack_http=True)
+assert not any("COOKIE_SECURE" in e for e in errs), errs
 
 print("STARTUP_CHECK_OK")
 """

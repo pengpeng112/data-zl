@@ -184,6 +184,11 @@ class Settings(BaseSettings):
     auth_cookie_path: str = "/api/v1/auth"
     auth_cookie_samesite: str = "lax"
     auth_cookie_secure: bool = False
+    # QA ST-015 修订（r197 发布实证）：当前内网部署为纯 HTTP（nginx 80，无 TLS），
+    # Secure=true 会使浏览器拒发 refresh cookie 直接断登录。显式确认开关允许已
+    # 评估的 HTTP 部署通过启动校验（不改变 cookie Secure 标志本身）；上 TLS 后
+    # 移除该确认并恢复强制 Secure。
+    auth_cookie_secure_ack_http: bool = False
     auth_password_min_length: int = 8
     auth_password_max_length: int = 18
     auth_login_rate_limit: str = "5/minute"
