@@ -1,0 +1,67 @@
+{
+ "release": "r197-20260921b（集中升级发布）",
+ "date": "2026-09-21",
+ "authorization": "用户 2026-09-21 会话点名（'请你将能做的继续做完并升级服务器'）",
+ "release_point": {
+  "branch": "master",
+  "commit": "a16439f",
+  "commits": [
+   "fd10329 backend 蓄积(193 dataset 域+186/188 identity+QA ST-021/022+DEF-09)",
+   "058aa25 frontend 蓄积",
+   "6be9db2 chore 技能/AGENTS/QA 轮产物",
+   "d55bf2c chore 移除误入 db",
+   "68f3730 docs(193-197)",
+   "3f3c922 chore 互通地图/取数入口",
+   "a16439f fix(ST-015) HTTP 部署豁免"
+  ]
+ },
+ "image": {
+  "tag": "data-asset:r197-20260921b",
+  "id": "fb52fa46bcf3",
+  "base": "data-asset:r196-20260921"
+ },
+ "incident_and_fix": {
+  "incident": "首发 r197-20260921(8b24839d456c) 启动失败重启循环：蓄积代码 QA ST-015 强制 APP_AUTH_COOKIE_SECURE=true，与纯 HTTP 部署(nginx 80 无 TLS)冲突；服务中断约 4 分钟",
+  "rollback": "回滚 DATA_ASSET_IMAGE=data-asset:r196-20260921 立即恢复(health 200)",
+  "fix": "a16439f：启动校验增加 APP_AUTH_COOKIE_SECURE_ACK_HTTP 显式 HTTP 部署豁免(不改 cookie 标志，上 TLS 后移除)；backend.env 追加 ACK=true；重建 r197-20260921b"
+ },
+ "db": {
+  "backup_pre": "/opt/data-asset/backup/data_asset_pre_r197rel_20260921.dump (f505930b…)",
+  "migration": "e8f9a0b1c2d3 -> a7b8c9d0e1f2（plan193 B03 dataset 9 表，纯加表）",
+  "alembic_head_after": "a7b8c9d0e1f2",
+  "asset_ds_tables": 9
+ },
+ "readback": {
+  "container": "healthy",
+  "health": 200,
+  "env": "APP_AUTH_COOKIE_SECURE=false(未动)+ACK_HTTP=true(新增)；其余 env 未动",
+  "endpoints_401": [
+   "/api/v1/systems",
+   "/api/v1/relations",
+   "/api/v1/datasets(新)"
+  ],
+  "image_markers": "QA ST-021/193 B05/asset_ds_classifications/ST-022/sync_infectious×6/account_state/StateMachineError×11 全 ≥1"
+ },
+ "frontend": {
+  "build_id": "r197-20260921",
+  "entry": "index-ClMUEGTu.js",
+  "sha256_16_local": "e95b98651b925dbf",
+  "sha256_16_server_current": "e95b98651b925dbf",
+  "previous_symlink": "releases/r169-20260831-storage-fix",
+  "e2e": "nginx 80: 前端 200(index-ClMUEGTu.js 引用)+API health 200"
+ },
+ "gates": {
+  "backend_pytest": "1705P/1F(顺序竞态 ST-022 守护线程×TRUNCATE RESTART IDENTITY；单测与整文件均过)/1S 41min",
+  "frontend": "typecheck(tsc+vue-tsc)过；build 三预算过(main 660.2/700KB, graph 404.5/430, css 107.3/110)",
+  "post_fix": "startup_check+auth 30P"
+ },
+ "rollback": {
+  "api": "DATA_ASSET_IMAGE=data-asset:r196-20260921 bash /etc/data-asset/scripts/run_data_asset_api.sh",
+  "db": "恢复 data_asset_pre_r197rel_20260921.dump（迁移仅加表，alembic downgrade 亦可）",
+  "frontend": "current -> previous(r169-20260831-storage-fix)"
+ },
+ "not_done": [
+  "Git push（未点名，本地 7 提交待推）",
+  "cron/env 其他项未动（仅 backend.env 追加 ACK 一行）"
+ ]
+}
