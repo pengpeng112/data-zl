@@ -5,9 +5,9 @@
 ## 硬规则
 
 1. 平台是唯一事实源；本目录是缓存与交接，不是权威库。
-2. SQL 必须保存；结果默认不保存（`result_storage: none`），仅按需保存小型汇总。
+2. 用户要求日常取数、复用、修订或保存时，SQL 必须进入查询资产流程（检索、编写和本地校验，不必然提交平台）；按用户目标和已有授权决定是否保存、提交或执行。仅编写/审阅/解释 SQL 且未要求保存或执行时不提交平台。结果默认不保存（`result_storage: none`），仅按需保存小型汇总。
 3. 只允许单条 `SELECT` / 只读 CTE；禁止 DML/DDL/存储过程/锁表/无界大表扫描。
-4. 自动门禁通过后直接成为现行版本，不设管理员确认；门禁失败进入 `blocked/candidate`。
+4. 用户已授权提交后，平台自动门禁通过的查询版本成为现行版本，不另设管理员确认；门禁失败进入 `blocked/candidate`。这不取消草稿执行、关系/值域确认、指标/产品发布等现有人工审批。
 5. 参数（月份、科室等）只产生 run，不产生新 version；SQL/口径变化必须新 version。
 6. 不把凭据、姓名、身份证、电话、地址、患者明细写入外网 AI、SQL 注释、日志或 Git。
 7. JOIN 证据优先正式关系 / active 配方；历史 SQL JOIN 走 `sql-relation-intake`，不得直接写正式关系。
@@ -23,6 +23,8 @@
 | `_query_quarantine/` | 风险/错误包 |
 | `_query_context/` | 脱敏上下文缓存 |
 | `_query_templates/` | 模板 |
+| `exports/` | L2 任务交付（`序号、中文名`；模板 `exports/_templates/`；改名须登记开发起步包 README 目录更新记录） |
+| `_legacy/` | L3 遗留隔离（DDL/患者列 SQL 只登记不搬入；移入须 inventory 有无引用证据） |
 | `48项目核心制度/` | 现有试点 SQL（保留，不自动移动） |
 
 ## 命令
@@ -57,4 +59,3 @@ python tools/queryctl.py submit 取数/_query_working/QRY_DEMO
 python tools/import_core_48_metrics.py
 python tools/import_core_48_metrics.py --apply --only 3 4 5
 ```
-
