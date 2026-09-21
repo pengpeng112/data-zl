@@ -173,3 +173,6 @@ backend/_r175_work/
 
 # 197: 历史SQL关系核验——解包成员含患者条件值原文，禁止入库（结构化产物不受限）
 /开发起步包/output_r197/**/_archive_members/
+
+# 测试遗留 SQLite 不入库
+/backend/unused_test_guard*.db
