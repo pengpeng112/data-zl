@@ -9,7 +9,7 @@ vi.mock("@/router/index", () => ({ router: {} }));
 
 import { filterNoPermissionTree } from "@/router/utils";
 import { userKey } from "@/utils/auth";
-import assetRoute from "@/router/modules/asset";
+import homeRoute from "@/router/modules/home";
 
 const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -48,7 +48,7 @@ describe("plan171 R3 system-map menu visibility (filterNoPermissionTree)", () =>
       roles: ["asset_viewer"],
       permissions
     });
-    return filterNoPermissionTree([assetRoute as any]).find((r: any) => r.path === "/asset");
+    return filterNoPermissionTree([homeRoute as any]).find((r: any) => r.path === "/");
   };
 
   it("platform-style wildcard permission sees the menu entry", () => {

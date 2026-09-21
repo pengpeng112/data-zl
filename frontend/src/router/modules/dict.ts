@@ -1,5 +1,6 @@
 const Layout = () => import("@/layout/index.vue");
 
+// 186 N1：旧父级 /dict 保留为隐藏兼容路由；叶子已移至「标准与关系」分区。
 export default {
   path: "/dict",
   name: "Dict",
@@ -7,49 +8,9 @@ export default {
   redirect: "/dict/medical",
   meta: {
     icon: "ep/collection",
-    title: "字典中心",
-    rank: 13
+    title: "字典中心（兼容入口）",
+    rank: 91,
+    showLink: false
   },
-  children: [
-    {
-      path: "/dict/medical",
-      name: "DictMedical",
-      component: () => import("@/views/dict/medical/index.vue"),
-      meta: {
-        title: "诊断手术维护",
-        showLink: true,
-        auths: ["dict.medical.view"]
-      }
-    },
-    {
-      path: "/dict/mappings",
-      name: "DictMappings",
-      component: () => import("@/views/dict/mappings/index.vue"),
-      meta: {
-        title: "编码关系明细",
-        showLink: true,
-        auths: ["dict.mapping.view"]
-      }
-    },
-    {
-      path: "/dict/general",
-      name: "DictGeneral",
-      component: () => import("@/views/dict/general/index.vue"),
-      meta: {
-        title: "通用字典",
-        showLink: true,
-        auths: ["dict.general.view"]
-      }
-    },
-    {
-      path: "/dict/sync-diffs",
-      name: "DictSyncDiffs",
-      component: () => import("@/views/dict/sync-diffs/index.vue"),
-      meta: {
-        title: "同步差异",
-        showLink: true,
-        auths: ["dict.sync_diff.view"]
-      }
-    }
-  ]
+  children: []
 } satisfies RouteConfigsTable;

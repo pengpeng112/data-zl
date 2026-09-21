@@ -1,5 +1,6 @@
 const Layout = () => import("@/layout/index.vue");
 
+// 186 N1：旧父级 /governance 保留为隐藏兼容路由；值域页已移至「标准与关系」分区。
 export default {
   path: "/governance",
   name: "Governance",
@@ -7,20 +8,9 @@ export default {
   redirect: "/value-domains",
   meta: {
     icon: "ep/setting",
-    title: "数据治理",
-    rank: 15
+    title: "数据治理（兼容入口）",
+    rank: 93,
+    showLink: false
   },
-  children: [
-    {
-      // 166 F2：值域管理页（149 §8 方案 B 全量活化）
-      path: "/value-domains",
-      name: "ValueDomains",
-      component: () => import("@/views/asset/value-domains/index.vue"),
-      meta: {
-        title: "值域知识库",
-        showLink: true,
-        auths: ["value_domain.read"]
-      }
-    }
-  ]
+  children: []
 } satisfies RouteConfigsTable;

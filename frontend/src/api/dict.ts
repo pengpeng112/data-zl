@@ -1,6 +1,7 @@
 import { http } from "@/utils/http";
+import type { InfectDiagOption } from "@/utils/infectDiagDict";
 
-
+export type { InfectDiagOption };
 export type { ApiResponse, PageData } from "./types";
 import type { ApiResponse, PageData } from "./types";
 
@@ -52,6 +53,27 @@ export interface MedicalPushPlan {
   [key: string]: unknown;
 }
 
+export interface MedicalPushPlanSummary {
+  id: number;
+  plan_code: string;
+  status: string;
+  category_code: string;
+  target_systems: string[];
+  item_count: number;
+  content_hash?: string;
+  is_expired: boolean;
+  created_by: string;
+  approved_by?: string | null;
+  actions_by_system?: Record<string, Record<string, number>>;
+  actions?: Array<{
+    item_code: string;
+    item_name_cn: string;
+    action_type: string;
+    target_system: string;
+    infectious_disease_name?: string | null;
+  }>;
+}
+
 export interface MedicalMappingRowItem {
   local_code?: string;
   local_name?: string | null;
@@ -71,6 +93,7 @@ export interface MedicalMappingRowItem {
   low_risk_category_code?: string | null;
   low_risk_disease_name?: string | null;
   infectious_disease_name?: string | null;
+  infectious_disease_code?: string | null;
   source_file?: string | null;
   source_sheet?: string | null;
   status?: string | null;
@@ -97,8 +120,16 @@ export function getMedicalMappings(params?: Record<string, unknown>) {
 export function getMedicalMappingRows(params?: Record<string, unknown>) {
   return http.request<ApiResponse<PageData<MedicalMappingRowItem>>>("get", "/api/v1/dict-medical/mapping-rows", { params });
 }
+
 export function getMedicalMappingOptions(categoryCode: string) {
-  return http.request<ApiResponse<Record<string, string[]>>>("get", "/api/v1/dict-medical/mapping-options", {
+  return http.request<
+    ApiResponse<
+      Record<string, string[]> & {
+        infectious_diagnoses?: InfectDiagOption[];
+        infectious_source?: string;
+      }
+    >
+  >("get", "/api/v1/dict-medical/mapping-options", {
     params: { category_code: categoryCode }
   });
 }
@@ -331,11 +362,19 @@ export function getMedicalImportRuns(params?: Record<string, unknown>) {
   return http.request<ApiResponse<PageData<ImportRunInfo>>>("get", "/api/v1/dict-medical/import-runs", { params });
 }
 
-export function createMedicalPushPlan(data: { category_code: string; target_systems: string[] }) {
-  return http.request<ApiResponse<Record<string, unknown>>>("post", "/api/v1/dict-medical/push/plans", { data });
+export function createMedicalPushPlan(data: {
+  category_code: string;
+  target_systems: string[];
+  action_type?: "insert" | "stop" | "sync_infectious";
+  item_codes?: string[];
+}) {
+  return http.request<ApiResponse<MedicalPushPlanSummary>>("post", "/api/v1/dict-medical/push/plans", { data });
+}
+export function getMedicalPushPlan(planId: number) {
+  return http.request<ApiResponse<MedicalPushPlanSummary>>("get", `/api/v1/dict-medical/push/plans/${planId}`);
 }
 export function approveMedicalPushPlan(planId: number, note?: string) {
-  return http.request<ApiResponse<Record<string, unknown>>>("post", `/api/v1/dict-medical/push/plans/${planId}/approve`, { data: { note } });
+  return http.request<ApiResponse<MedicalPushPlanSummary>>("post", `/api/v1/dict-medical/push/plans/${planId}/approve`, { data: { note } });
 }
 export function executeMedicalPushPlan(planId: number) {
   return http.request<ApiResponse<Record<string, unknown>>>("post", `/api/v1/dict-medical/push/plans/${planId}/execute`);

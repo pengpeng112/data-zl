@@ -1,15 +1,16 @@
 const Layout = () => import("@/layout/index.vue");
 
+// 186 N1：质量治理分区（哪些问题需要处理、证据是什么）。
+// 台账为主入口；检测规则/观测/探查发现/AI分析为上下游。
 export default {
   path: "/quality-hub",
   name: "QualityHub",
   component: Layout,
-  // 174 S7：质量管理默认入口从探查发现切到质量台账；旧 /probe-findings 保留
   redirect: "/quality/issues",
   meta: {
     icon: "ep/aim",
-    title: "质量管理",
-    rank: 16
+    title: "质量治理",
+    rank: 30
   },
   children: [
     {
@@ -24,24 +25,25 @@ export default {
       }
     },
     {
-      // 174：我的任务（同组件，默认 mine 范围）
+      // 186 N1：侧栏不再重复三项；URL 保留，工作台与台账页内可直达
       path: "/quality/issues/mine",
       name: "QualityIssuesMine",
       component: () => import("@/views/quality/issues/index.vue"),
       meta: {
-        title: "我的任务",
-        showLink: true,
+        title: "我的质量任务",
+        showLink: false,
+        activePath: "/quality/issues",
         auths: ["quality.issue.read"]
       }
     },
     {
-      // 174：科室任务（同组件，默认 department 范围）
       path: "/quality/issues/department",
       name: "QualityIssuesDepartment",
       component: () => import("@/views/quality/issues/index.vue"),
       meta: {
-        title: "科室任务",
-        showLink: true,
+        title: "科室质量任务",
+        showLink: false,
+        activePath: "/quality/issues",
         auths: ["quality.issue.read"]
       }
     },
@@ -58,7 +60,6 @@ export default {
       }
     },
     {
-      // 174：质控清单
       path: "/quality/controls",
       name: "QualityControls",
       component: () => import("@/views/quality/controls/index.vue"),
@@ -69,7 +70,6 @@ export default {
       }
     },
     {
-      // 174：观测记录（不可变观测流水）
       path: "/quality/observations",
       name: "QualityObservations",
       component: () => import("@/views/quality/observations/index.vue"),
@@ -80,7 +80,7 @@ export default {
       }
     },
     {
-      // 166 F4：探查发现页（165 E4 契约消费面）；174 起不再作为默认入口
+      // 166 F4：探查发现页（165 E4 契约消费面）
       path: "/probe-findings",
       name: "ProbeFindings",
       component: () => import("@/views/asset/probe-findings/index.vue"),
@@ -88,6 +88,27 @@ export default {
         title: "探查发现",
         showLink: true,
         auths: ["probe.finding.read"]
+      }
+    },
+    {
+      // 174：元数据质控（显示名与质量台账区分，语义不变）
+      path: "/asset/quality",
+      name: "AssetQuality",
+      component: () => import("@/views/asset/quality/index.vue"),
+      meta: {
+        title: "元数据质控",
+        showLink: true,
+        auths: ["asset.quality.view"]
+      }
+    },
+    {
+      path: "/asset/ai-quality",
+      name: "AssetAiQuality",
+      component: () => import("@/views/asset/ai-quality/index.vue"),
+      meta: {
+        title: "AI质量分析",
+        showLink: true,
+        auths: ["asset.quality.ai.view"]
       }
     }
   ]

@@ -972,8 +972,28 @@ export const getViewDependencies = (params: {
   );
 };
 
+// 138 typed 血缘影响分析结果（object_key 6 段：system|source|namespace|schema|object|type）
+export interface LineageImpactEdge {
+  from: string;
+  to: string;
+  edge_type: string;
+  from_type: string;
+  to_type: string;
+  hops: number;
+}
+
+export interface LineageImpactResult {
+  object_key: string;
+  direction: string;
+  downstream_nodes: string[];
+  upstream_nodes: string[];
+  downstream_edges: LineageImpactEdge[];
+  upstream_edges: LineageImpactEdge[];
+  total_edges: number;
+}
+
 export const getImpactAnalysis = (table: string) => {
-  return http.get<ApiResponse<ImpactResult>, object>("/api/v1/lineage/impact", {
+  return http.get<ApiResponse<LineageImpactResult>, object>("/api/v1/lineage/impact", {
     params: { table }
   });
 };

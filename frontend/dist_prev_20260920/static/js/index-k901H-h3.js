@@ -1,0 +1,1 @@
+import{v as t,k as s,i as o,c as n,o as a,_ as c}from"./index-Dexuk14T.js";const r={class:"redirect-hint"},_=t({__name:"index",setup(i){const e=s();return o(()=>{e.replace({path:"/asset/systems",query:{tab:"connections"}})}),(p,d)=>(a(),n("div",r,"正在跳转到「业务系统与数据资源」…"))}}),m=c(_,[["__scopeId","data-v-71feb888"]]);export{m as default};

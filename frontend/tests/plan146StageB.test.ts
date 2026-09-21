@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import assetRoute from "@/router/modules/asset";
+import queryRoute from "@/router/modules/query";
 import {
   buildSystemTypeOptions,
   filterAndPaginateConnections,
@@ -61,7 +61,7 @@ describe("146 stage B contracts", () => {
   });
 
   it("B4 keeps canonical routes and one typed API layer with dot permissions", () => {
-    const children = assetRoute.children || [];
+    const children = queryRoute.children || [];
     const main = children.find(route => route.path === "/asset/queries");
     const accuracy = children.find(route => route.path === "/asset/queries/accuracy");
     expect(main?.meta?.auths).toEqual(["query.view"]);

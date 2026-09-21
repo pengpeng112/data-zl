@@ -34,6 +34,7 @@
           clearable
           placeholder="搜索系统、连接、Owner、表或字段"
           class="tree-search"
+          @keyup.enter="onTreeSearchEnter"
         />
         <el-tree
           ref="treeRef"
@@ -180,7 +181,7 @@ import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import type { ElTree } from "element-plus";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   getAssetTree,
   getAssetTreeTables,
@@ -190,6 +191,7 @@ import {
   listSystems,
   searchAssetTree,
   type AssetTreeNode,
+  type AssetSystemItem,
   type AssetTreeTable,
   type ColumnInfo,
   type GraphOptionItem,
@@ -234,6 +236,7 @@ interface TreeItem {
 }
 
 const router = useRouter();
+const route = useRoute();
 const treeRef = ref<InstanceType<typeof ElTree>>();
 const treeKeyword = ref("");
 const treeLoading = ref(false);
@@ -321,12 +324,23 @@ const {
 });
 
 const treeProps = { label: "label", children: "children" };
+// DEF-10（194）：系统筛选选项读取平台系统接口，不再硬编码系统清单
+const platformSystems = ref<AssetSystemItem[]>([]);
 const systemFilterOptions = computed(() =>
-  (CANONICAL_SYSTEM_CODES as readonly string[]).map(code => ({
-    code,
-    label: systemNameMap.value[code] || code
-  }))
+  platformSystems.value
+    .filter(sys => sys.system_code)
+    .map(sys => ({ code: sys.system_code, label: sys.system_name_cn || sys.system_code }))
 );
+
+async function loadPlatformSystems() {
+  try {
+    const res = await listSystems();
+    platformSystems.value = res.data || [];
+  } catch {
+    // 接口失败时仅保留“全部业务系统”，不回退硬编码清单
+    platformSystems.value = [];
+  }
+}
 
 function tableNodeKey(sourceCode: string, schemaName: string, tableName: string) {
   return `${sourceCode}::${schemaName}::${tableName}`;
@@ -536,16 +550,27 @@ const treeData = computed<TreeItem[]>(() => {
       (order.get(a.system_code || "") ?? 999) - (order.get(b.system_code || "") ?? 999)
   );
 
-  if (searchHits.value.length && treeKeyword.value.trim()) {
+  // DEF-07（194）：有搜索词时树只呈现搜索分区，骨架树不再被本地滤空；
+  // 服务端无命中时给出明确占位，避免“整树消失”。
+  const kw = treeKeyword.value.trim();
+  if (kw) {
+    if (searchHits.value.length) {
+      return [
+        {
+          id: "search-hits",
+          label: `搜索结果（${searchHits.value.length}）`,
+          kind: "category",
+          count: searchHits.value.length,
+          children: searchHits.value
+        }
+      ];
+    }
     return [
       {
-        id: "search-hits",
-        label: `搜索结果（${searchHits.value.length}）`,
-        kind: "category",
-        count: searchHits.value.length,
-        children: searchHits.value
-      },
-      ...base
+        id: "search-empty",
+        label: "无匹配表或字段（可清空关键词恢复目录）",
+        kind: "category"
+      }
     ];
   }
   return base;
@@ -574,16 +599,35 @@ const selectedTableName = computed(() =>
 
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 watch(treeKeyword, value => {
-  treeRef.value?.filter(value);
   if (searchTimer) clearTimeout(searchTimer);
   const kw = (value || "").trim();
   if (!kw) {
+    // DEF-07（194）：清空关键词恢复目录树与主列表全量
     searchHits.value = [];
+    params.keyword = "";
+    loadData(1);
     return;
   }
-  // 服务端表名搜索（骨架树不含表节点时本地 filter 不够）
-  searchTimer = setTimeout(() => runTreeSearch(kw), 300);
+  // DEF-07（194）：表名搜索联动主列表（与右侧关键词同参数），服务端搜索驱动树分区
+  params.keyword = kw;
+  searchTimer = setTimeout(() => {
+    runTreeSearch(kw);
+    loadData(1);
+  }, 300);
 });
+
+// 回车立即搜索，不等防抖
+function onTreeSearchEnter() {
+  if (searchTimer) clearTimeout(searchTimer);
+  const kw = treeKeyword.value.trim();
+  params.keyword = kw;
+  if (kw) {
+    runTreeSearch(kw);
+  } else {
+    searchHits.value = [];
+  }
+  loadData(1);
+}
 
 function filterTreeNode(value: string, data: TreeItem): boolean {
   if (!value) return true;
@@ -785,7 +829,7 @@ function applyTreeScope(node: TreeItem) {
 }
 
 async function handleTreeClick(node: TreeItem) {
-  if (node.id === "search-hits") return;
+  if (node.id === "search-hits" || node.id === "search-empty") return;
 
   // 146 E5（R5）：“加载更多”增量节点只追加下一页，不改变右侧筛选范围
   if (node.id.startsWith("loadmore:")) {
@@ -891,15 +935,38 @@ function reloadAll() {
 
 function goDetail(row: TableBrief) {
   // 146 E5：带物理来源隔离同名表；back_query 保留列表筛选/分页状态
+  // 186 P1-2（补录发现）：筛选状态只存在组件内，hash 路由下 location.search 恒空，
+  // 改从组件实际状态构造 back_query；挂载时按 route.query 恢复。
   const query: Record<string, string> = {};
   if (row.source_code) query.source_code = row.source_code;
-  const back = window.location.search.startsWith("?") ? window.location.search.slice(1) : "";
-  if (back) query.back_query = back;
+  const back = new URLSearchParams();
+  if (params.keyword) back.set("keyword", params.keyword);
+  if (params.domain) back.set("domain", params.domain);
+  if (scope.system_code) back.set("system_code", scope.system_code);
+  if (scope.source_code) back.set("source_code", scope.source_code);
+  if (scope.schema_name) back.set("schema_name", scope.schema_name);
+  if (page.value > 1) back.set("page", String(page.value));
+  const backStr = back.toString();
+  if (backStr) query.back_query = backStr;
   router.push({ path: `/asset/tables/${row.schema_name}/${row.table_name}`, query });
 }
 
 onMounted(async () => {
   void loadDomainCandidates();
+  // DEF-10（194）：系统筛选选项来自平台系统接口
+  void loadPlatformSystems();
+  // 186 P1-2：从 URL query 恢复列表状态（返回/分享链接保留筛选与分页）
+  const rq = route.query;
+  if (typeof rq.keyword === "string" && rq.keyword) params.keyword = rq.keyword;
+  if (typeof rq.domain === "string" && rq.domain) params.domain = rq.domain;
+  if (typeof rq.system_code === "string" && rq.system_code) {
+    scope.system_code = rq.system_code;
+    systemFilter.value = rq.system_code;
+  }
+  if (typeof rq.source_code === "string" && rq.source_code) scope.source_code = rq.source_code;
+  if (typeof rq.schema_name === "string" && rq.schema_name) scope.schema_name = rq.schema_name;
+  const restoredPage = Number.parseInt(String(rq.page || ""), 10);
+  if (Number.isFinite(restoredPage) && restoredPage > 1) page.value = restoredPage;
   await loadTree();
   await nextTick();
   loadData();

@@ -402,7 +402,8 @@ function getTopMenu(tag = false): menuType {
   const first =
     menus[0]?.children?.[0] ||
     menus[0] ||
-    ({ path: "/welcome", name: "Welcome", meta: { title: "首页" } } as menuType);
+    // 186 N1：兜底从 /welcome 改为工作台（新首页）；welcome 大屏仍保留独立入口
+    ({ path: "/workbench", name: "Workbench", meta: { title: "工作台" } } as menuType);
   const topMenu = handleTopMenu(first) || first;
   if (tag && topMenu?.path) {
     useMultiTagsStoreHook().handleTags("push", topMenu);

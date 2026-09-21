@@ -21,7 +21,7 @@ describe("plan174 quality governance ledger", () => {
   });
 
   it("routes: /asset/quality 路径不变、显示名改为元数据质控", () => {
-    const assetRouter = source("src/router/modules/asset.ts");
+    const assetRouter = source("src/router/modules/quality.ts");
     expect(assetRouter).toContain('path: "/asset/quality"');
     expect(assetRouter).toContain('title: "元数据质控"');
     expect(assetRouter).not.toContain('title: "数据质量"');

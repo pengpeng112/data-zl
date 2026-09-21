@@ -1,7 +1,9 @@
 ﻿.login-page {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr);
+  /* DEF-06（194）：卡片列改为有界宽度，任何视口下不再被挤出屏幕 */
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+  gap: clamp(24px, 4vw, 64px);
   min-height: 100vh;
   padding: 48px clamp(28px, 5vw, 72px);
   overflow: hidden;
@@ -10,6 +12,12 @@
     radial-gradient(circle at 76% 18%, rgb(14 165 233 / 18%), transparent 34%),
     radial-gradient(circle at 18% 72%, rgb(13 148 136 / 18%), transparent 32%),
     var(--gradient-hero);
+}
+
+/* DEF-06（194）：网格子项允许收缩，防止内容撑破轨道 */
+.brand-panel,
+.login-card-wrap {
+  min-width: 0;
 }
 
 .login-bg-grid {
@@ -277,5 +285,21 @@
 
   .login-card {
     padding: 24px;
+  }
+}
+
+/* DEF-08（194）：减少动态效果——登录页全部过渡/位移禁用 */
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-page *::before,
+  .login-page *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .login-button:hover,
+  .login-button:focus {
+    transform: none;
   }
 }

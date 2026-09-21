@@ -2,38 +2,87 @@
   <div class="quality-page">
     <el-tabs v-model="activeTab" class="quality-tabs" @tab-change="onTabChange">
       <template #extra>
-        <el-button v-perms="'asset.quality.ai.view'" type="primary" plain size="small" @click="router.push('/asset/ai-quality')">AI 质控分析</el-button>
+        <el-button
+          v-perms="'asset.quality.ai.view'"
+          type="primary"
+          plain
+          size="small"
+          @click="router.push('/asset/ai-quality')"
+          >AI 质控分析</el-button
+        >
       </template>
       <!-- ============================================================ -->
       <!-- Tab 1: 质量总览 -->
       <!-- ============================================================ -->
       <el-tab-pane label="质量总览" name="overview" lazy>
+        <p class="stat-group-title">问题概览</p>
         <section class="quality-stat-grid mb20">
-          <ReStatCard label="总问题数" :value="summary.total_findings" tone="primary">
+          <ReStatCard
+            label="总问题数"
+            :value="fmtNum(summary.total_findings)"
+            tone="primary"
+          >
             <template #icon><IssueIcon /></template>
           </ReStatCard>
-          <ReStatCard label="待处理" :value="summary.open_count" tone="danger">
+          <ReStatCard
+            label="待处理"
+            :value="fmtNum(summary.open_count)"
+            tone="danger"
+          >
             <template #icon><AlertIcon /></template>
           </ReStatCard>
-          <ReStatCard label="已解决" :value="summary.resolved_count" tone="accent">
+          <ReStatCard
+            label="已解决"
+            :value="fmtNum(summary.resolved_count)"
+            tone="accent"
+          >
             <template #icon><CheckIcon /></template>
           </ReStatCard>
-          <ReStatCard label="严重" :value="summary.critical_count" tone="danger">
+          <ReStatCard
+            label="严重"
+            :value="fmtNum(summary.critical_count)"
+            tone="danger"
+          >
             <template #icon><ErrorIcon /></template>
           </ReStatCard>
-          <ReStatCard label="重要" :value="summary.major_count" tone="warning">
+          <ReStatCard
+            label="重要"
+            :value="fmtNum(summary.major_count)"
+            tone="warning"
+          >
             <template #icon><WarningIcon /></template>
           </ReStatCard>
-          <ReStatCard label="一般" :value="summary.minor_count" tone="info">
+          <ReStatCard
+            label="一般"
+            :value="fmtNum(summary.minor_count)"
+            tone="info"
+          >
             <template #icon><InfoIcon /></template>
           </ReStatCard>
         </section>
 
+        <p class="stat-group-title">规则与整改</p>
         <section class="quality-metric-grid mb20">
-          <ReStatCard label="规则总数" :value="metrics.total_rules" tone="primary" />
-          <ReStatCard label="启用规则" :value="metrics.enabled_rules" tone="accent" />
-          <ReStatCard label="SQL 建议规则（未启用）" :value="metrics.suggested_rules" tone="info" />
-          <ReStatCard label="整改率" :value="formatPercent(metrics.pass_rate)" tone="warning" />
+          <ReStatCard
+            label="规则总数"
+            :value="fmtNum(metrics.total_rules)"
+            tone="primary"
+          />
+          <ReStatCard
+            label="启用规则"
+            :value="fmtNum(metrics.enabled_rules)"
+            tone="accent"
+          />
+          <ReStatCard
+            label="SQL 建议规则（未启用）"
+            :value="fmtNum(metrics.suggested_rules)"
+            tone="info"
+          />
+          <ReStatCard
+            label="整改率"
+            :value="formatPercent(metrics.pass_rate)"
+            :tone="passRateTone(metrics.pass_rate)"
+          />
         </section>
 
         <el-card class="mb20 system-overview-card">
@@ -49,36 +98,51 @@
               :key="row.system_code"
               type="button"
               class="system-card"
+              :class="`tone-${systemCardTone(row)}`"
               @click="filterBySystem(row)"
             >
-              <div class="system-card-title">
-                <strong>{{ systemDisplayName(row) }}</strong>
-                <el-tag v-if="row.system_code !== 'UNASSIGNED'" size="small" effect="plain">
+              <div class="system-card-head">
+                <strong class="system-card-name">{{
+                  systemDisplayName(row)
+                }}</strong>
+                <el-tag
+                  v-if="row.system_code !== 'UNASSIGNED'"
+                  size="small"
+                  effect="plain"
+                  class="system-card-tag"
+                  :title="row.system_code"
+                >
                   {{ systemShortCode(row.system_code) }}
                 </el-tag>
               </div>
               <dl class="system-card-metrics">
-                <div>
+                <div class="metric-cell">
                   <dt>问题</dt>
-                  <dd>{{ row.total_findings }}</dd>
+                  <dd>{{ fmtNum(row.total_findings) }}</dd>
                 </div>
-                <div>
+                <div class="metric-cell">
                   <dt>待处理</dt>
-                  <dd class="metric-danger">{{ row.open_count }}</dd>
+                  <dd :class="{ 'metric-danger': row.open_count > 0 }">
+                    {{ fmtNum(row.open_count) }}
+                  </dd>
                 </div>
-                <div>
+                <div class="metric-cell">
                   <dt>已解决</dt>
-                  <dd>{{ row.resolved_count }}</dd>
+                  <dd>{{ fmtNum(row.resolved_count) }}</dd>
                 </div>
-                <div>
+                <div class="metric-cell">
                   <dt>严重</dt>
-                  <dd :class="{ 'metric-danger': row.critical_count > 0 }">{{ row.critical_count }}</dd>
+                  <dd :class="{ 'metric-danger': row.critical_count > 0 }">
+                    {{ fmtNum(row.critical_count) }}
+                  </dd>
                 </div>
               </dl>
             </button>
           </div>
           <p v-if="systemsWithoutFindings.length" class="quiet-systems">
-            暂无问题：{{ systemsWithoutFindings.map(systemDisplayName).join("、") }}
+            暂无问题：{{
+              systemsWithoutFindings.map(systemDisplayName).join("、")
+            }}
           </p>
         </el-card>
       </el-tab-pane>
@@ -92,11 +156,25 @@
             <div class="rule-header">
               <div>
                 <span>质量规则</span>
-                <small class="rule-header-hint">先看已启用的平台规则；SQL 建议默认停用，启用前需复核。</small>
+                <small class="rule-header-hint"
+                  >先看已启用的平台规则；SQL 建议默认停用，启用前需复核。</small
+                >
               </div>
               <div class="rule-header-actions">
-                <el-button v-perms="'asset.quality.rule.create'" type="primary" size="small" @click="openRuleDialog()">新增规则</el-button>
-                <el-button v-perms="'asset.quality.rule.create'" size="small" :loading="autoGenerating" @click="autoGenerateRules">按主键/关系/缺失生成建议</el-button>
+                <el-button
+                  v-perms="'asset.quality.rule.create'"
+                  type="primary"
+                  size="small"
+                  @click="openRuleDialog()"
+                  >新增规则</el-button
+                >
+                <el-button
+                  v-perms="'asset.quality.rule.create'"
+                  size="small"
+                  :loading="autoGenerating"
+                  @click="autoGenerateRules"
+                  >按主键/关系/缺失生成建议</el-button
+                >
               </div>
             </div>
           </template>
@@ -115,7 +193,9 @@
               :key="chip.value || 'all'"
               type="button"
               class="rule-chip"
-              :class="{ 'is-active': (ruleFilters.rule_category || '') === chip.value }"
+              :class="{
+                'is-active': (ruleFilters.rule_category || '') === chip.value
+              }"
               @click="filterRuleCategory(chip.value)"
             >
               {{ chip.label }} {{ chip.count }}
@@ -131,7 +211,12 @@
                 class="filter-md"
                 @change="loadRules(1)"
               >
-                <el-option v-for="opt in ruleCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+                <el-option
+                  v-for="opt in ruleCategoryOptions"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="检查范围">
@@ -188,14 +273,26 @@
             </el-form-item>
           </el-form>
 
-          <el-table v-loading="rulesLoading" :data="rules" stripe size="small" class="rule-table">
+          <el-table
+            v-loading="rulesLoading"
+            :data="rules"
+            stripe
+            size="small"
+            class="rule-table"
+          >
             <el-table-column label="规则" min-width="240">
               <template #default="{ row }">
-                <div class="rule-name">{{ row.rule_name || row.rule_code }}</div>
+                <div class="rule-name">
+                  {{ row.rule_name || row.rule_code }}
+                </div>
                 <small class="rule-code">{{ row.rule_code }}</small>
               </template>
             </el-table-column>
-            <el-table-column label="检查对象" min-width="180" show-overflow-tooltip>
+            <el-table-column
+              label="检查对象"
+              min-width="180"
+              show-overflow-tooltip
+            >
               <template #default="{ row }">{{ ruleTargetText(row) }}</template>
             </el-table-column>
             <el-table-column prop="rule_category" label="分类" width="88">
@@ -212,7 +309,10 @@
             </el-table-column>
             <el-table-column prop="constraint_level" label="约束" width="78">
               <template #default="{ row }">
-                <el-tag size="small" :type="row.constraint_level === 'HARD' ? 'danger' : 'info'">
+                <el-tag
+                  size="small"
+                  :type="row.constraint_level === 'HARD' ? 'danger' : 'info'"
+                >
                   {{ constraintLevelLabel(row.constraint_level) }}
                 </el-tag>
               </template>
@@ -225,14 +325,21 @@
             <el-table-column label="状态" width="70">
               <template #default="{ row }">
                 <el-tag :type="row.enabled ? 'success' : 'info'" size="small">
-                  {{ row.enabled ? '启用' : '停用' }}
+                  {{ row.enabled ? "启用" : "停用" }}
                 </el-tag>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="168" fixed="right">
               <template #default="{ row }">
                 <div class="rule-ops">
-                  <el-button v-perms="'asset.quality.rule.create'" size="small" text type="primary" @click="openRuleDialog(row)">编辑</el-button>
+                  <el-button
+                    v-perms="'asset.quality.rule.create'"
+                    size="small"
+                    text
+                    type="primary"
+                    @click="openRuleDialog(row)"
+                    >编辑</el-button
+                  >
                   <el-button
                     v-perms="'asset.quality.rule.create'"
                     size="small"
@@ -240,14 +347,23 @@
                     :type="row.enabled ? 'warning' : 'success'"
                     @click="toggleRuleEnabled(row)"
                   >
-                    {{ row.enabled ? '停用' : '启用' }}
+                    {{ row.enabled ? "停用" : "启用" }}
                   </el-button>
                   <el-dropdown trigger="click">
                     <el-button size="small" text>更多</el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item v-if="row.check_sql" @click="validateRuleSql(row)">校验 SQL</el-dropdown-item>
-                        <el-dropdown-item v-perms="'asset.quality.rule.create'" divided @click="deleteRule(row)">删除</el-dropdown-item>
+                        <el-dropdown-item
+                          v-if="row.check_sql"
+                          @click="validateRuleSql(row)"
+                          >校验 SQL</el-dropdown-item
+                        >
+                        <el-dropdown-item
+                          v-perms="'asset.quality.rule.create'"
+                          divided
+                          @click="deleteRule(row)"
+                          >删除</el-dropdown-item
+                        >
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -274,14 +390,25 @@
         >
           <el-form ref="ruleFormRef" :model="ruleForm" label-width="100px">
             <el-form-item label="规则编码">
-              <el-input v-model="ruleForm.rule_code" placeholder="如 RULE_UNIQUE_001" />
+              <el-input
+                v-model="ruleForm.rule_code"
+                placeholder="如 RULE_UNIQUE_001"
+              />
             </el-form-item>
             <el-form-item label="规则名称">
-              <el-input v-model="ruleForm.rule_name" placeholder="规则中文名称" />
+              <el-input
+                v-model="ruleForm.rule_name"
+                placeholder="规则中文名称"
+              />
             </el-form-item>
             <el-form-item label="规则分类">
               <el-select v-model="ruleForm.rule_category" class="full-width">
-                <el-option v-for="opt in ruleCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+                <el-option
+                  v-for="opt in ruleCategoryOptions"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="检查范围">
@@ -301,7 +428,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="业务域">
-              <el-input v-model="ruleForm.business_domain" placeholder="如 住院、门诊" />
+              <el-input
+                v-model="ruleForm.business_domain"
+                placeholder="如 住院、门诊"
+              />
             </el-form-item>
             <el-form-item label="执行模式">
               <el-select v-model="ruleForm.execution_mode" class="full-width">
@@ -311,16 +441,31 @@
               </el-select>
             </el-form-item>
             <el-form-item label="目标表名">
-              <el-input v-model="ruleForm.target_table" placeholder="如 HIS.PAT_MASTER_INDEX" />
+              <el-input
+                v-model="ruleForm.target_table"
+                placeholder="如 HIS.PAT_MASTER_INDEX"
+              />
             </el-form-item>
             <el-form-item label="目标字段">
-              <el-input v-model="ruleForm.target_field" placeholder="单个或逗号分隔" />
+              <el-input
+                v-model="ruleForm.target_field"
+                placeholder="单个或逗号分隔"
+              />
             </el-form-item>
             <el-form-item label="检查SQL">
-              <el-input v-model="ruleForm.check_sql" type="textarea" :rows="3" placeholder="SELECT ..." />
+              <el-input
+                v-model="ruleForm.check_sql"
+                type="textarea"
+                :rows="3"
+                placeholder="SELECT ..."
+              />
             </el-form-item>
             <el-form-item label="说明">
-              <el-input v-model="ruleForm.description" type="textarea" :rows="2" />
+              <el-input
+                v-model="ruleForm.description"
+                type="textarea"
+                :rows="2"
+              />
             </el-form-item>
             <el-form-item label="启用">
               <el-switch v-model="ruleForm.enabled" />
@@ -328,20 +473,38 @@
           </el-form>
           <template #footer>
             <el-button @click="ruleDialogVisible = false">取消</el-button>
-            <el-button v-perms="'asset.quality.rule.create'" type="primary" @click="saveRule">保存</el-button>
+            <el-button
+              v-perms="'asset.quality.rule.create'"
+              type="primary"
+              :loading="savingRule"
+              @click="saveRule"
+              >保存</el-button
+            >
           </template>
         </el-dialog>
 
         <!-- 校验SQL结果弹窗 -->
-        <el-dialog v-model="sqlValidateVisible" title="SQL 校验结果" width="500px">
+        <el-dialog
+          v-model="sqlValidateVisible"
+          title="SQL 校验结果"
+          width="500px"
+        >
           <div v-if="sqlValidateResult">
             <el-descriptions :column="1" border size="small">
-              <el-descriptions-item label="是否有效">{{ sqlValidateResult.valid ? '是' : '否' }}</el-descriptions-item>
-              <el-descriptions-item v-if="sqlValidateResult.errors?.length" label="错误">
-                {{ sqlValidateResult.errors.join('；') }}
+              <el-descriptions-item label="是否有效">{{
+                sqlValidateResult.valid ? "是" : "否"
+              }}</el-descriptions-item>
+              <el-descriptions-item
+                v-if="sqlValidateResult.errors?.length"
+                label="错误"
+              >
+                {{ sqlValidateResult.errors.join("；") }}
               </el-descriptions-item>
-              <el-descriptions-item v-if="sqlValidateResult.warnings?.length" label="提醒">
-                {{ sqlValidateResult.warnings.join('；') }}
+              <el-descriptions-item
+                v-if="sqlValidateResult.warnings?.length"
+                label="提醒"
+              >
+                {{ sqlValidateResult.warnings.join("；") }}
               </el-descriptions-item>
             </el-descriptions>
           </div>
@@ -359,7 +522,8 @@
           <template #header>
             <span>执行质控检查</span>
           </template>
-          <el-button v-perms="'asset.quality.rule.execute'"
+          <el-button
+            v-perms="'asset.quality.rule.execute'"
             type="primary"
             :loading="checking"
             @click="runCheck"
@@ -368,9 +532,15 @@
           </el-button>
           <div v-if="checkResult" class="mt15">
             <el-descriptions :column="4" border size="small">
-              <el-descriptions-item label="执行规则数">{{ checkResult.total_rules }}</el-descriptions-item>
-              <el-descriptions-item label="发现问题数">{{ checkResult.total_findings }}</el-descriptions-item>
-              <el-descriptions-item label="扫描记录数">{{ checkResult.total_records }}</el-descriptions-item>
+              <el-descriptions-item label="执行规则数">{{
+                checkResult.total_rules
+              }}</el-descriptions-item>
+              <el-descriptions-item label="发现问题数">{{
+                checkResult.total_findings
+              }}</el-descriptions-item>
+              <el-descriptions-item label="扫描记录数">{{
+                checkResult.total_records
+              }}</el-descriptions-item>
               <el-descriptions-item label="通过率">
                 <span :class="passRateClass(checkResult.pass_rate)">
                   {{ formatPercent(checkResult.pass_rate) }}
@@ -487,7 +657,9 @@
               />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="loadFindings(1)">查询</el-button>
+              <el-button type="primary" @click="loadFindings(1)"
+                >查询</el-button
+              >
             </el-form-item>
           </el-form>
 
@@ -504,16 +676,25 @@
                   <p v-if="row.rule_description">{{ row.rule_description }}</p>
                   <div class="finding-loc">
                     <span>库 {{ findingDbText(row) }}</span>
-                    <span>表 {{ findingTableTitle(row) }}<template v-if="findingTableCode(row)"> / {{ findingTableCode(row) }}</template></span>
+                    <span
+                      >表 {{ findingTableTitle(row)
+                      }}<template v-if="findingTableCode(row)">
+                        / {{ findingTableCode(row) }}</template
+                      ></span
+                    >
                     <span>字段 {{ findingColumnText(row) }}</span>
                   </div>
-                  <pre v-if="row.sample_data" class="sample-json">{{ formatSampleData(row.sample_data) }}</pre>
+                  <pre v-if="row.sample_data" class="sample-json">{{
+                    formatSampleData(row.sample_data)
+                  }}</pre>
                   <span v-else class="rule-code">没有可展示的样本</span>
                 </div>
               </template>
             </el-table-column>
             <el-table-column label="问题" min-width="240" show-overflow-tooltip>
-              <template #default="{ row }">{{ findingProblemText(row) }}</template>
+              <template #default="{ row }">{{
+                findingProblemText(row)
+              }}</template>
             </el-table-column>
             <el-table-column label="库" width="130" show-overflow-tooltip>
               <template #default="{ row }">{{ findingDbText(row) }}</template>
@@ -521,15 +702,23 @@
             <el-table-column label="表" min-width="160" show-overflow-tooltip>
               <template #default="{ row }">
                 <div>{{ findingTableTitle(row) }}</div>
-                <small v-if="findingTableCode(row)" class="tech-name">{{ findingTableCode(row) }}</small>
+                <small v-if="findingTableCode(row)" class="tech-name">{{
+                  findingTableCode(row)
+                }}</small>
               </template>
             </el-table-column>
             <el-table-column label="字段" min-width="140" show-overflow-tooltip>
-              <template #default="{ row }">{{ findingColumnText(row) }}</template>
+              <template #default="{ row }">{{
+                findingColumnText(row)
+              }}</template>
             </el-table-column>
             <el-table-column label="分类" width="88">
               <template #default="{ row }">
-                <el-tag v-if="row.rule_category" size="small" :type="ruleCategoryTag(row.rule_category)">
+                <el-tag
+                  v-if="row.rule_category"
+                  size="small"
+                  :type="ruleCategoryTag(row.rule_category)"
+                >
                   {{ ruleCategoryLabel(row.rule_category) }}
                 </el-tag>
                 <span v-else>-</span>
@@ -537,15 +726,24 @@
             </el-table-column>
             <el-table-column label="严重程度" width="90">
               <template #default="{ row }">
-                <el-tag :type="sevTag(row.severity)" size="small">{{ severityLabel(row.severity) }}</el-tag>
+                <el-tag :type="sevTag(row.severity)" size="small">{{
+                  severityLabel(row.severity)
+                }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="状态" width="90">
               <template #default="{ row }">
-                <el-tag :type="statusTag(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
+                <el-tag :type="statusTag(row.status)" size="small">{{
+                  statusLabel(row.status)
+                }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="error_cnt" label="异常数" width="80" align="center" />
+            <el-table-column
+              prop="error_cnt"
+              label="异常数"
+              width="80"
+              align="center"
+            />
             <el-table-column label="异常率" width="90" align="center">
               <template #default="{ row }">
                 {{ formatFindingRate(row.error_rate, row.metric_value) }}
@@ -555,16 +753,43 @@
             <el-table-column label="操作" width="168" fixed="right">
               <template #default="{ row }">
                 <div class="rule-ops">
-                  <el-button v-perms="'asset.quality.rule.execute'" size="small" text type="primary" @click="openAssignDialog(row)">分派</el-button>
-                  <el-dropdown trigger="click" @command="(cmd: string) => recheckFinding(row, cmd)">
-                    <el-button v-perms="'asset.quality.rule.execute'" size="small" text>更多</el-button>
+                  <el-button
+                    v-perms="'asset.quality.rule.execute'"
+                    size="small"
+                    text
+                    type="primary"
+                    @click="openAssignDialog(row)"
+                    >分派</el-button
+                  >
+                  <el-dropdown
+                    trigger="click"
+                    @command="(cmd: string) => recheckFinding(row, cmd)"
+                  >
+                    <el-button
+                      v-perms="'asset.quality.rule.execute'"
+                      size="small"
+                      text
+                      >更多</el-button
+                    >
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item command="confirmed">确认有效</el-dropdown-item>
-                        <el-dropdown-item command="fixed">已修复</el-dropdown-item>
-                        <el-dropdown-item command="ignored">忽略</el-dropdown-item>
-                        <el-dropdown-item command="rechecked">已复核</el-dropdown-item>
-                        <el-dropdown-item divided @click="openFindingStatusDialog(row)">编辑状态</el-dropdown-item>
+                        <el-dropdown-item command="confirmed"
+                          >确认有效</el-dropdown-item
+                        >
+                        <el-dropdown-item command="fixed"
+                          >已修复</el-dropdown-item
+                        >
+                        <el-dropdown-item command="ignored"
+                          >忽略</el-dropdown-item
+                        >
+                        <el-dropdown-item command="rechecked"
+                          >已复核</el-dropdown-item
+                        >
+                        <el-dropdown-item
+                          divided
+                          @click="openFindingStatusDialog(row)"
+                          >编辑状态</el-dropdown-item
+                        >
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -587,7 +812,10 @@
         <el-dialog v-model="assignDialogVisible" title="分派问题" width="400px">
           <el-form>
             <el-form-item label="分派人">
-              <el-input v-model="assignForm.assigned_to" placeholder="输入分派人姓名" />
+              <el-input
+                v-model="assignForm.assigned_to"
+                placeholder="输入分派人姓名"
+              />
             </el-form-item>
             <el-form-item label="备注">
               <el-input v-model="assignForm.note" type="textarea" :rows="2" />
@@ -595,12 +823,21 @@
           </el-form>
           <template #footer>
             <el-button @click="assignDialogVisible = false">取消</el-button>
-            <el-button v-perms="'asset.quality.rule.execute'" type="primary" @click="submitAssign">确定</el-button>
+            <el-button
+              v-perms="'asset.quality.rule.execute'"
+              type="primary"
+              @click="submitAssign"
+              >确定</el-button
+            >
           </template>
         </el-dialog>
 
         <!-- 编辑状态弹窗 -->
-        <el-dialog v-model="findingStatusDialogVisible" title="编辑问题状态" width="400px">
+        <el-dialog
+          v-model="findingStatusDialogVisible"
+          title="编辑问题状态"
+          width="400px"
+        >
           <el-form>
             <el-form-item label="状态">
               <el-select v-model="findingStatusForm.status" class="full-width">
@@ -612,12 +849,23 @@
               </el-select>
             </el-form-item>
             <el-form-item label="备注">
-              <el-input v-model="findingStatusForm.note" type="textarea" :rows="2" />
+              <el-input
+                v-model="findingStatusForm.note"
+                type="textarea"
+                :rows="2"
+              />
             </el-form-item>
           </el-form>
           <template #footer>
-            <el-button @click="findingStatusDialogVisible = false">取消</el-button>
-            <el-button v-perms="'asset.quality.rule.execute'" type="primary" @click="submitFindingStatus">保存</el-button>
+            <el-button @click="findingStatusDialogVisible = false"
+              >取消</el-button
+            >
+            <el-button
+              v-perms="'asset.quality.rule.execute'"
+              type="primary"
+              @click="submitFindingStatus"
+              >保存</el-button
+            >
           </template>
         </el-dialog>
       </el-tab-pane>
@@ -652,10 +900,26 @@
       <el-tab-pane label="质量看板" name="dashboard" lazy>
         <div v-if="dashboardReady">
           <section class="quality-metric-grid mb20">
-            <ReStatCard label="总规则数" :value="metrics.total_rules" tone="primary" />
-            <ReStatCard label="启用规则" :value="metrics.enabled_rules || 0" tone="accent" />
-            <ReStatCard label="未启用建议" :value="metrics.suggested_rules || 0" tone="info" />
-            <ReStatCard label="整改率" :value="formatPercent(metrics.pass_rate)" :tone="passRateTone(metrics.pass_rate)" />
+            <ReStatCard
+              label="总规则数"
+              :value="metrics.total_rules"
+              tone="primary"
+            />
+            <ReStatCard
+              label="启用规则"
+              :value="metrics.enabled_rules || 0"
+              tone="accent"
+            />
+            <ReStatCard
+              label="未启用建议"
+              :value="metrics.suggested_rules || 0"
+              tone="info"
+            />
+            <ReStatCard
+              label="整改率"
+              :value="formatPercent(metrics.pass_rate)"
+              :tone="passRateTone(metrics.pass_rate)"
+            />
           </section>
 
           <el-row :gutter="16" class="chart-row">
@@ -663,7 +927,12 @@
               <el-card>
                 <template #header>
                   <span>规则分类分布</span>
-                  <el-button size="small" class="float-right" @click="refreshDashboard">刷新</el-button>
+                  <el-button
+                    size="small"
+                    class="float-right"
+                    @click="refreshDashboard"
+                    >刷新</el-button
+                  >
                 </template>
                 <ReChart
                   height="360px"
@@ -856,7 +1125,10 @@ function loadMetrics() {
       // Normalize rule_categories: accept array or legacy dict
       let cats = raw.rule_categories;
       if (cats && !Array.isArray(cats) && typeof cats === "object") {
-        cats = Object.entries(cats).map(([category, count]) => ({ category, count: Number(count) || 0 }));
+        cats = Object.entries(cats).map(([category, count]) => ({
+          category,
+          count: Number(count) || 0
+        }));
       }
       metrics.value = {
         total_rules: raw.total_rules || 0,
@@ -883,7 +1155,9 @@ function filterBySystem(row: SystemSummaryItem) {
 
 function systemDisplayName(row: SystemSummaryItem) {
   if (row.system_code === "UNASSIGNED") return "待归类";
-  return row.system_name_cn || systemNameMap[row.system_code] || row.system_code;
+  return (
+    row.system_name_cn || systemNameMap[row.system_code] || row.system_code
+  );
 }
 
 function systemShortCode(code: string) {
@@ -900,11 +1174,25 @@ function systemShortCode(code: string) {
   return aliases[code] || code;
 }
 
+// 总览卡片：按问题严重度给左侧色条定调（有严重=红、有待处理=黄、干净=绿）
+function systemCardTone(row: SystemSummaryItem): "danger" | "warning" | "ok" {
+  if ((row.critical_count || 0) > 0) return "danger";
+  if ((row.open_count || 0) > 0) return "warning";
+  return "ok";
+}
+
+// 数字千分位（20,928），空值按 0 处理
+function fmtNum(value: number | null | undefined): string {
+  return Number(value || 0).toLocaleString();
+}
+
 const systemsWithFindings = computed(() =>
   systemSummary.value.filter(row => (row.total_findings || 0) > 0)
 );
 const systemsWithoutFindings = computed(() =>
-  systemSummary.value.filter(row => row.system_code !== "UNASSIGNED" && !(row.total_findings || 0))
+  systemSummary.value.filter(
+    row => row.system_code !== "UNASSIGNED" && !(row.total_findings || 0)
+  )
 );
 
 // ============================================================
@@ -925,7 +1213,12 @@ const ruleFilters = reactive({
 });
 const ruleCategoryOptions = RULE_CATEGORY_OPTIONS;
 const ruleCategoryChips = computed(() => {
-  const counts = new Map((metrics.value.rule_categories || []).map(item => [item.category, item.count]));
+  const counts = new Map(
+    (metrics.value.rule_categories || []).map(item => [
+      item.category,
+      item.count
+    ])
+  );
   const total = metrics.value.total_rules || 0;
   return [
     { value: "", label: "全部", count: total },
@@ -971,9 +1264,11 @@ function loadRules(page?: number) {
     page: rulesPage.value,
     page_size: rulesPageSize.value
   };
-  if (ruleFilters.rule_category) params.rule_category = ruleFilters.rule_category;
+  if (ruleFilters.rule_category)
+    params.rule_category = ruleFilters.rule_category;
   if (ruleFilters.check_scope) params.check_scope = ruleFilters.check_scope;
-  if (ruleFilters.constraint_level) params.constraint_level = ruleFilters.constraint_level;
+  if (ruleFilters.constraint_level)
+    params.constraint_level = ruleFilters.constraint_level;
   if (ruleFilters.enabled !== undefined) params.enabled = ruleFilters.enabled;
   if (ruleFilters.keyword) params.keyword = ruleFilters.keyword;
 
@@ -1004,7 +1299,9 @@ async function autoGenerateRules() {
   try {
     const res = await autoGenerateQualityRules({ limit: 200 });
     const data = res.data || {};
-    ElMessage.success(`已生成 ${data.created || 0} 条建议，跳过 ${data.skipped || 0} 条重复规则`);
+    ElMessage.success(
+      `已生成 ${data.created || 0} 条建议，跳过 ${data.skipped || 0} 条重复规则`
+    );
     loadMetrics();
     loadRules(1);
   } catch (error: any) {
@@ -1055,7 +1352,11 @@ function openRuleDialog(row?: RuleItem) {
   ruleDialogVisible.value = true;
 }
 
+// QA ST-003：保存防重锁——在途时禁止重复提交。
+const savingRule = ref(false);
 function saveRule() {
+  if (savingRule.value) return;
+  savingRule.value = true;
   const payload: any = { ...ruleForm };
   const request = editingRuleId.value
     ? updateQualityRule(editingRuleId.value, payload)
@@ -1068,6 +1369,9 @@ function saveRule() {
     })
     .catch(error => {
       ElMessage.error(extractErrorDetail(error, "规则保存失败"));
+    })
+    .finally(() => {
+      savingRule.value = false;
     });
 }
 
@@ -1075,7 +1379,7 @@ function toggleRuleEnabled(row: RuleItem) {
   const newEnabled = !row.enabled;
   toggleQualityRule(row.id, newEnabled)
     .then(() => {
-      ElMessage.success(`已${newEnabled ? '启用' : '停用'}`);
+      ElMessage.success(`已${newEnabled ? "启用" : "停用"}`);
       loadRules();
     })
     .catch(error => {
@@ -1298,11 +1602,13 @@ const recordsPage = ref(1);
 const recordsPageSize = ref(20);
 const recordsTotal = ref(0);
 
-
 function loadRecords(page?: number) {
   if (page) recordsPage.value = page;
   recordsLoading.value = true;
-  getQualityCheckRuns({ page: recordsPage.value, page_size: recordsPageSize.value })
+  getQualityCheckRuns({
+    page: recordsPage.value,
+    page_size: recordsPageSize.value
+  })
     .then(({ data }) => {
       records.value = (data.items || []) as any;
       recordsTotal.value = data.total || 0;
@@ -1324,11 +1630,17 @@ const dashboardReady = ref(false);
 
 const ruleCategoryChartOption = computed(() => {
   let categories: any[] = metrics.value.rule_categories || [];
-  if (!Array.isArray(categories) && categories && typeof categories === "object") {
-    categories = Object.entries(categories as Record<string, number>).map(([category, count]) => ({
-      category,
-      count
-    }));
+  if (
+    !Array.isArray(categories) &&
+    categories &&
+    typeof categories === "object"
+  ) {
+    categories = Object.entries(categories as Record<string, number>).map(
+      ([category, count]) => ({
+        category,
+        count
+      })
+    );
   }
   const data = (Array.isArray(categories) ? categories : []).map((c: any) => ({
     name: ruleCategoryLabel(c.category ?? c.name ?? "other"),
@@ -1428,204 +1740,358 @@ onMounted(() => {
   loadSystemSummary();
   loadMetrics();
 });
-
 </script>
 
 <style scoped>
 .quality-page {
   padding: 4px;
 }
-.quality-tabs { margin-top: 0; }
+
+.quality-tabs {
+  margin-top: 0;
+}
+
 .findings-head {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
   min-height: 22px;
 }
+
 .findings-head span {
-  color: var(--text-secondary, #64748b);
   font-size: 12px;
   font-weight: 400;
+  color: var(--text-secondary, #64748b);
 }
-.tech-name { color: var(--text-secondary, #64748b); font-size: 12px; }
+
+.tech-name {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+
 .finding-loc {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin: 6px 0 10px;
-  color: var(--text-secondary, #64748b);
   font-size: 12px;
+  color: var(--text-secondary, #64748b);
 }
+
 .rule-header {
   display: flex;
+  gap: 12px;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
 }
+
 .rule-header-hint {
   display: block;
   margin-top: 4px;
-  color: var(--text-secondary, #64748b);
   font-size: 12px;
   font-weight: 400;
+  color: var(--text-secondary, #64748b);
 }
+
 .rule-header-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.rule-hint { margin-bottom: 12px; }
+
+.rule-hint {
+  margin-bottom: 12px;
+}
+
 .rule-chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 12px;
 }
+
 .rule-chip {
-  border: 1px solid var(--el-border-color);
-  background: var(--el-bg-color);
-  border-radius: 999px;
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
+  border-radius: 999px;
 }
+
 .rule-chip.is-active {
-  border-color: var(--el-color-primary);
   color: var(--el-color-primary);
   background: var(--el-color-primary-light-9);
+  border-color: var(--el-color-primary);
 }
-.rule-filter-form { margin-bottom: 8px; }
-.rule-name { font-weight: 600; line-height: 1.3; }
-.rule-code { color: var(--text-secondary, #64748b); font-size: 12px; }
+
+.rule-filter-form {
+  margin-bottom: 8px;
+}
+
+.rule-name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.rule-code {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+
 .rule-ops {
   display: flex;
-  align-items: center;
   flex-wrap: nowrap;
-  white-space: nowrap;
   gap: 0;
+  align-items: center;
+  white-space: nowrap;
 }
+
 .rule-ops :deep(.el-button) {
-  margin: 0;
   padding: 0 6px;
+  margin: 0;
 }
-.system-code-inline { display: block; color: var(--text-secondary); font-size: 11px; }
+
+.system-code-inline {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.stat-group-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.stat-group-title:not(:first-child) {
+  margin-top: 4px;
+}
+
 .quality-stat-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
 }
+
 .quality-metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
+
 .system-overview-head {
   display: flex;
+  gap: 12px;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
 }
+
 .system-overview-head small {
-  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
+  color: var(--text-secondary);
 }
+
 .system-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 12px;
 }
+
 .system-card {
+  --sys-tone: var(--success);
+
+  position: relative;
   display: block;
   width: 100%;
-  padding: 14px 16px;
+  padding: 14px 16px 14px 20px;
+  overflow: hidden;
   text-align: left;
   cursor: pointer;
-  background: var(--bg-page, #f8fafc);
+  background: var(--bg-card);
   border: 1px solid var(--border-light, #e2e8f0);
-  border-radius: 12px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease);
 }
+
+.system-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  content: "";
+  background: var(--sys-tone);
+}
+
+.system-card.tone-danger {
+  --sys-tone: var(--danger);
+}
+
+.system-card.tone-warning {
+  --sys-tone: var(--warning);
+}
+
+.system-card.tone-ok {
+  --sys-tone: var(--success);
+}
+
 .system-card:hover {
-  border-color: #7dd3fc;
-  box-shadow: 0 6px 16px rgb(14 165 233 / 10%);
+  border-color: var(--primary-300, #7dd3fc);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
-.system-card-title {
+
+.system-card-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
   margin-bottom: 12px;
 }
-.system-card-title strong {
+
+.system-card-name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 15px;
+  line-height: 1.4;
   color: var(--text-primary, #0f172a);
+  overflow-wrap: anywhere;
 }
+
+.system-card-tag {
+  flex: 0 1 auto;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .system-card-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
 }
+
+.metric-cell {
+  padding: 6px 8px;
+  background: var(--bg-page, #f8fafc);
+  border-radius: var(--radius-xs);
+}
+
 .system-card-metrics dt {
   margin: 0;
-  color: var(--text-secondary, #64748b);
   font-size: 11px;
+  color: var(--text-secondary, #64748b);
 }
+
 .system-card-metrics dd {
   margin: 2px 0 0;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--text-primary, #0f172a);
 }
+
+.metric-cell dd.metric-danger {
+  color: var(--danger);
+}
+
 .quiet-systems {
   margin: 14px 0 0;
-  color: var(--text-secondary, #64748b);
   font-size: 12px;
   line-height: 1.5;
+  color: var(--text-secondary, #64748b);
 }
+
 .quality-page :deep(.el-card) {
   border-color: var(--border-light);
   border-radius: var(--radius-base);
   box-shadow: var(--shadow-sm);
 }
+
 .quality-page :deep(.el-table) {
   --el-table-header-bg-color: var(--bg-elevated);
   --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
   --el-table-border-color: var(--border-light);
+
   font-size: 13px;
 }
-@media (max-width: 1280px) {
-  .quality-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (width <= 1280px) {
+  .quality-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
-@media (max-width: 760px) {
+
+@media (width <= 760px) {
   .quality-stat-grid,
-  .quality-metric-grid { grid-template-columns: 1fr; }
+  .quality-metric-grid {
+    grid-template-columns: 1fr;
+  }
 }
+
 .metric-accent {
+  font-weight: 700;
   color: var(--accent-500);
-  font-weight: 700;
 }
+
 .metric-warning {
+  font-weight: 700;
   color: var(--warning);
-  font-weight: 700;
 }
+
 .metric-danger {
-  color: var(--danger);
   font-weight: 700;
+  color: var(--danger);
 }
+
 .sample-panel {
   padding: 8px 20px;
 }
-.clickable-row { cursor: pointer; }
-.ml12 { margin-left: 12px; }
-.ml4 { margin-left: 4px; }
-.float-right { float: right; }
-.filter-sm { width: 110px; }
-.filter-md { width: 130px; }
-.filter-lg { width: 160px; }
-.filter-xl { width: 200px; }
-.full-width { width: 100%; }
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.ml12 {
+  margin-left: 12px;
+}
+
+.ml4 {
+  margin-left: 4px;
+}
+
+.float-right {
+  float: right;
+}
+
+.filter-sm {
+  width: 110px;
+}
+
+.filter-md {
+  width: 130px;
+}
+
+.filter-lg {
+  width: 160px;
+}
+
+.filter-xl {
+  width: 200px;
+}
+
+.full-width {
+  width: 100%;
+}
+
 .sample-json {
   max-height: 300px;
   padding: 10px;

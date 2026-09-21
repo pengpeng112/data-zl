@@ -32,6 +32,7 @@ export interface ApiKeyBinding {
   id: number;
   key_name: string;
   token_masked: string;
+  has_legacy_token?: boolean;
   enabled: boolean;
   user_identifier?: string | null;
   created_at?: string | null;

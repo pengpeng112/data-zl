@@ -30,6 +30,8 @@ import LaySetting from "./components/lay-setting/index.vue";
 import NavVertical from "./components/lay-sidebar/NavVertical.vue";
 import NavHorizontal from "./components/lay-sidebar/NavHorizontal.vue";
 import BackTopIcon from "@/assets/svg/back_top.svg?component";
+import { useRoute } from "vue-router";
+import { isCompetitionCaptureQuery } from "./captureMode";
 
 const appWrapperRef = ref();
 const { isDark } = useDark();
@@ -37,6 +39,10 @@ const { layout } = useLayout();
 const isMobile = deviceDetection();
 const pureSetting = useSettingStoreHook();
 const { $storage } = useGlobal<GlobalPropertiesApi>();
+const route = useRoute();
+const captureMode = computed(() =>
+  isCompetitionCaptureQuery(route.query, window.location.search)
+);
 
 const set: setType = reactive({
   sidebar: computed(() => {
@@ -61,7 +67,7 @@ const set: setType = reactive({
   }),
 
   hideTabs: computed(() => {
-    return $storage?.configure.hideTabs;
+    return $storage?.configure?.hideTabs ?? false;
   })
 });
 
@@ -157,9 +163,17 @@ const LayHeader = defineComponent({
 </script>
 
 <template>
-  <div ref="appWrapperRef" :class="['app-wrapper', set.classes]">
+  <div
+    ref="appWrapperRef"
+    :class="[
+      'app-wrapper',
+      set.classes,
+      { 'competition-capture': captureMode }
+    ]"
+  >
     <div
       v-show="
+        !captureMode &&
         set.device === 'mobile' &&
         set.sidebar.opened &&
         layout.includes('vertical')
@@ -169,6 +183,7 @@ const LayHeader = defineComponent({
     />
     <NavVertical
       v-show="
+        !captureMode &&
         !pureSetting.hiddenSideBar &&
         (layout.includes('vertical') || layout.includes('mix'))
       "
@@ -176,13 +191,27 @@ const LayHeader = defineComponent({
     <div
       :class="[
         'main-container',
-        pureSetting.hiddenSideBar ? 'main-hidden' : ''
+        pureSetting.hiddenSideBar || captureMode ? 'main-hidden' : ''
       ]"
     >
+      <div v-if="captureMode" class="capture-bar">
+        <div>
+          <strong>医院全域数据资产治理平台</strong>
+          <span>脱敏演示视图</span>
+        </div>
+        <div class="capture-tags" aria-label="平台治理边界">
+          <span>源库只读</span>
+          <span>证据可追溯</span>
+          <span>全程审计</span>
+        </div>
+      </div>
       <div v-if="set.fixedHeader">
-        <LayHeader />
+        <LayHeader v-if="!captureMode" />
         <!-- 主体内容 -->
-        <LayContent :fixed-header="set.fixedHeader" />
+        <LayContent
+          :fixed-header="set.fixedHeader"
+          :capture-mode="captureMode"
+        />
       </div>
       <el-scrollbar v-else>
         <el-backtop
@@ -191,13 +220,16 @@ const LayHeader = defineComponent({
         >
           <BackTopIcon />
         </el-backtop>
-        <LayHeader />
+        <LayHeader v-if="!captureMode" />
         <!-- 主体内容 -->
-        <LayContent :fixed-header="set.fixedHeader" />
+        <LayContent
+          :fixed-header="set.fixedHeader"
+          :capture-mode="captureMode"
+        />
       </el-scrollbar>
     </div>
     <!-- 系统设置 -->
-    <LaySetting />
+    <LaySetting v-if="!captureMode" />
   </div>
 </template>
 
@@ -231,5 +263,57 @@ const LayHeader = defineComponent({
 
 .re-screen {
   margin-top: 12px;
+}
+
+.competition-capture {
+  background: #eef3f8;
+
+  :deep(.main-container) {
+    margin-left: 0 !important;
+  }
+}
+
+.capture-bar {
+  display: flex;
+  height: 54px;
+  padding: 0 28px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 82% 0, rgb(45 212 191 / 28%), transparent 34%),
+    linear-gradient(118deg, #0b3d73 0%, #115ab0 58%, #0e7490 100%);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+  align-items: center;
+  justify-content: space-between;
+
+  > div:first-child {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  strong {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  > div:first-child span {
+    font-size: 12px;
+    color: rgb(255 255 255 / 72%);
+  }
+}
+
+.capture-tags {
+  display: flex;
+  gap: 8px;
+
+  span {
+    padding: 5px 10px;
+    font-size: 12px;
+    color: rgb(255 255 255 / 88%);
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 999px;
+  }
 }
 </style>

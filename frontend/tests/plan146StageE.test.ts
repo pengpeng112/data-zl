@@ -9,14 +9,15 @@ function source(path: string) {
 
 describe("146 stage E1/E2 relation entries", () => {
   it("keeps /asset/relations as a hidden redirect into graph path mode with query passthrough", () => {
-    const routes = source("src/router/modules/asset.ts");
+    const routes = source("src/router/modules/catalog.ts");
     expect(routes).toContain('path: "/asset/relations"');
     expect(routes).toContain('path: "/asset/graph"');
     expect(routes).toContain("...to.query");
     expect(routes).toContain('view_mode: to.query.view_mode ?? "path"');
     expect(routes).not.toContain('component: () => import("@/views/asset/relations/index.vue")');
     expect(routes).toMatch(/title: "关系路径（兼容入口）"[\s\S]{0,80}showLink: false/);
-    expect(routes).toMatch(/title: "血缘与影响"[\s\S]{0,60}showLink: false/);
+    // 186 N1：血缘恢复可见（§3.2），权限仍为 asset.lineage.view
+    expect(routes).toMatch(/title: "血缘与影响"[\s\S]{0,80}auths: \["asset.lineage.view"\]/);
   });
 
   it("graph page implements the path submode against the existing endpoint", () => {
@@ -62,7 +63,8 @@ describe("146 stage E3 ai-quality", () => {
     expect(page).toContain("POLL_TIMEOUT_MS");
     expect(page).toContain("10 * 60 * 1000");
     expect(page).toContain("Math.min(interval * 2, 10000)");
-    expect(page).toContain("onUnmounted(() => stopWatch())");
+    // 186 D2：卸载同时停单分析与巡查两路轮询（语义加严，非放松）
+    expect(page).toMatch(/onUnmounted\(\(\) => \{[\s\S]{0,80}stopWatch\(\);[\s\S]{0,80}stopPatrolWatch\(\);[\s\S]{0,40}\}\)/);
   });
 });
 

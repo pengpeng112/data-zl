@@ -67,7 +67,7 @@
         />
         <el-table v-loading="loadingKeys" :data="apiKeys" stripe class="token-table">
           <el-table-column prop="key_name" label="Key 名称" min-width="140" show-overflow-tooltip />
-          <el-table-column prop="token_masked" label="Token" width="130" />
+          <el-table-column prop="token_masked" label="Token 状态" width="110" />
           <el-table-column prop="enabled" label="状态" width="90">
             <template #default="{ row }">
               <el-tag size="small" :type="row.enabled ? 'success' : 'danger'">{{ row.enabled ? '启用' : '禁用' }}</el-tag>
@@ -210,7 +210,11 @@ async function saveUserRoles() {
   }
 }
 
+// QA ST-026：行内保存防重锁（对齐同页 saveUserRoles 的 savingRoles 惯例）。
+const savingKeyBinding = ref(false);
 async function saveKeyBinding(row: ApiKeyBinding) {
+  if (savingKeyBinding.value) return;
+  savingKeyBinding.value = true;
   try {
     await bindPermissionApiKey(row.id, {
       key_id: row.id,
@@ -222,6 +226,8 @@ async function saveKeyBinding(row: ApiKeyBinding) {
     await loadAudit();
   } catch {
     ElMessage.error("保存 Token 绑定失败");
+  } finally {
+    savingKeyBinding.value = false;
   }
 }
 

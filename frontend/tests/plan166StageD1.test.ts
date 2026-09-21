@@ -8,7 +8,7 @@ import { storageLocal } from "@pureadmin/utils";
 // 被 SSR 变换放大成 TDZ；filterNoPermissionTree 不依赖 router 单例，mock 掉。
 vi.mock("@/router/index", () => ({ router: {} }));
 
-import governanceRoute from "@/router/modules/governance";
+import governanceRoute from "@/router/modules/standards";
 import qualityRoute from "@/router/modules/quality";
 import { filterNoPermissionTree } from "@/router/utils";
 import { userKey } from "@/utils/auth";
@@ -21,9 +21,10 @@ describe("plan166 D1 route skeleton", () => {
     localStorage.clear();
   });
 
-  it("registers /value-domains under 数据治理 group with dot-form value_domain.read", () => {
-    const src = source("src/router/modules/governance.ts");
-    expect(src).toContain('title: "数据治理"');
+  it("registers /value-domains under 标准与关系 group with dot-form value_domain.read", () => {
+    // 186 N1：值域页自 /governance 分区移入「标准与关系」（auths 不变）
+    const src = source("src/router/modules/standards.ts");
+    expect(src).toContain('title: "标准与关系"');
     expect(src).toContain('auths: ["value_domain.read"]');
     expect(src).not.toContain("value_domain:"); // B3：点号权限码
     const child = (governanceRoute as any).children.find((r: any) => r.path === "/value-domains");
@@ -31,9 +32,9 @@ describe("plan166 D1 route skeleton", () => {
     expect(child.meta.showLink).toBe(true);
   });
 
-  it("registers /probe-findings under 质量管理 group with dot-form probe.finding.read", () => {
+  it("registers /probe-findings under 质量治理 group with dot-form probe.finding.read", () => {
     const src = source("src/router/modules/quality.ts");
-    expect(src).toContain('title: "质量管理"');
+    expect(src).toContain('title: "质量治理"');
     expect(src).toContain('auths: ["probe.finding.read"]');
     expect(src).not.toContain("probe.finding:"); // B3：点号权限码
     const child = (qualityRoute as any).children.find((r: any) => r.path === "/probe-findings");
@@ -69,7 +70,7 @@ describe("plan166 D1 route skeleton", () => {
 
     seed(["value_domain.read"]);
     let tree = filterNoPermissionTree([governanceRoute, qualityRoute] as any);
-    expect(tree.map((r: any) => r.name)).toEqual(["Governance"]);
+    expect(tree.map((r: any) => r.name)).toEqual(["Standards"]);  // 186 N1：Governance 更名 Standards
 
     seed(["probe.finding.read"]);
     tree = filterNoPermissionTree([governanceRoute, qualityRoute] as any);
@@ -77,7 +78,7 @@ describe("plan166 D1 route skeleton", () => {
 
     seed(["*:*:*"]);
     tree = filterNoPermissionTree([governanceRoute, qualityRoute] as any);
-    expect(tree.map((r: any) => r.name).sort()).toEqual(["Governance", "QualityHub"]);
+    expect(tree.map((r: any) => r.name).sort()).toEqual(["QualityHub", "Standards"]);  // 186 N1：Governance 更名 Standards
 
     seed(["asset.table.view"]);
     tree = filterNoPermissionTree([governanceRoute, qualityRoute] as any);

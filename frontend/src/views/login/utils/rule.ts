@@ -20,7 +20,8 @@ const loginRules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: "blur"
+      // U-6（194）：补充 change 触发，输入后校验错误随输入清除
+      trigger: ["blur", "change"]
     }
   ]
 });

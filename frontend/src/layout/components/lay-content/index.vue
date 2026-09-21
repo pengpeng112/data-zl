@@ -8,7 +8,8 @@ import { h, computed, Transition, defineComponent } from "vue";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 
 const props = defineProps({
-  fixedHeader: Boolean
+  fixedHeader: Boolean,
+  captureMode: Boolean
 });
 
 const { showModel } = useTags();
@@ -25,7 +26,7 @@ const transitions = computed(() => {
 });
 
 const hideTabs = computed(() => {
-  return $storage?.configure.hideTabs;
+  return $storage?.configure?.hideTabs ?? false;
 });
 
 const hideFooter = computed(() => {
@@ -49,6 +50,9 @@ const getMainWidth = computed(() => {
 });
 
 const getSectionStyle = computed(() => {
+  if (props.captureMode) {
+    return ["padding-top: 0; min-height: calc(100vh - 54px);"];
+  }
   return [
     hideTabs.value && layout ? "padding-top: 48px;" : "",
     !hideTabs.value && layout
@@ -158,7 +162,7 @@ const transitionMain = defineComponent({
                   />
                 </transitionMain>
               </div>
-              <LayFooter v-if="!hideFooter" />
+              <LayFooter v-if="!hideFooter && !captureMode" />
             </el-scrollbar>
             <div v-else class="grow">
               <transitionMain :route="route">
@@ -188,7 +192,7 @@ const transitionMain = defineComponent({
     </router-view>
 
     <!-- 页脚 -->
-    <LayFooter v-if="!hideFooter && !fixedHeader" />
+    <LayFooter v-if="!hideFooter && !fixedHeader && !captureMode" />
   </section>
 </template>
 
@@ -209,5 +213,13 @@ const transitionMain = defineComponent({
 
 .main-content {
   margin: 24px;
+}
+
+:global(.competition-capture) .main-content {
+  margin: 16px 20px 20px;
+}
+
+:global(.competition-capture) .app-main {
+  height: calc(100vh - 54px);
 }
 </style>

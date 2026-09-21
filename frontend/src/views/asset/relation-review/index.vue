@@ -191,7 +191,11 @@ function openEdit(row: Relation) {
   dialogVisible.value = true;
 }
 
+// QA ST-025：保存防重锁。
+const savingRelation = ref(false);
 async function saveRelation() {
+  if (savingRelation.value) return;
+  savingRelation.value = true;
   try {
     if (isEdit.value) {
       await updateRelation(editId.value, form.value);
@@ -201,6 +205,8 @@ async function saveRelation() {
     loadRelations();
   } catch (e: any) {
     ElMessage.error(extractErrorDetail(e, "保存失败"));
+  } finally {
+    savingRelation.value = false;
   }
 }
 
@@ -365,7 +371,12 @@ onMounted(() => {
     <RePageHeader
       title="关系复核中心"
       subtitle="审的是“表和表怎么关联”。批准后进入正式关系图谱；视图解析出来、没有 JOIN 字段的只能当线索，不能直接当外键。"
-    />
+    >
+      <template #actions>
+        <!-- 186 N1/A3：验证统计隐藏页常驻入口（独立权限 relation.view） -->
+        <el-button v-perms="'asset.relation.view'" @click="$router.push('/asset/relation-rates')">验证统计</el-button>
+      </template>
+    </RePageHeader>
 
     <el-alert
       class="review-hint"
@@ -529,7 +540,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button v-perms="'asset.relation.review'" type="primary" @click="saveRelation">保存</el-button>
+        <el-button v-perms="'asset.relation.review'" type="primary" :loading="savingRelation" @click="saveRelation">保存</el-button>
       </template>
     </el-dialog>
 

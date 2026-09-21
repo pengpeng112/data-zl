@@ -175,6 +175,9 @@ describe("146 R5 E8 dict", () => {
     expect(page).toContain("optionsCache");
     expect(page).toContain(":height=\"tableHeight\"");
     expect(page).toContain("请先完善必填项");
+    expect(page).toContain("filterInfect");
+    expect(page).toContain("COMM.INFECT_DIAG_DICT");
+    expect(page).toContain("matchInfectDiagDict");
   });
 
   it("medical push wizard gains rules alert, dynamic targets, cancel handling and category", () => {

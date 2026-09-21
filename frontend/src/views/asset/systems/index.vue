@@ -276,7 +276,10 @@ function addConnectionToList() {
   ElMessage.success("已加入连接列表");
 }
 
+// QA ST-004：敏感写操作防重锁（新建系统向导/凭据轮换/补建连接）。
+const savingWizard = ref(false);
 async function saveWizard() {
+  if (savingWizard.value) return;
   if (!form.value.system_code || !form.value.system_name_cn) {
     ElMessage.warning("系统编码和名称为必填");
     return;
@@ -302,12 +305,15 @@ async function saveWizard() {
         password: c.password || undefined
       }))
     };
+    savingWizard.value = true;
     await createSystemWithConnections(payload);
     ElMessage.success("系统与连接已保存");
     drawerVisible.value = false;
     await Promise.all([loadSystems(), loadSources(), loadResourceTree()]);
   } catch (e: any) {
     ElMessage.error(extractErrorDetail(e, "保存失败"));
+  } finally {
+    savingWizard.value = false;
   }
 }
 
@@ -390,7 +396,9 @@ function openCredRotate(row: AssetSourceItem, purpose: "readonly" | "write" = "r
   credDialog.value = true;
 }
 
+const savingCred = ref(false);
 async function saveCredRotate() {
+  if (savingCred.value) return;
   if (!credTarget.value) return;
   if (!credRotate.value.username || !credRotate.value.password) {
     ElMessage.warning("用户名和密码必填");
@@ -410,6 +418,7 @@ async function saveCredRotate() {
     if (credRotate.value.purpose === "write") {
       payload.write_policy = credRotate.value.write_policy;
     }
+    savingCred.value = true;
     await updateSourceCredential(credTarget.value.source_code, payload);
     ElMessage.success(
       credRotate.value.purpose === "write"
@@ -420,6 +429,8 @@ async function saveCredRotate() {
     loadSources();
   } catch (e: any) {
     ElMessage.error(extractErrorDetail(e, "凭据写入失败"));
+  } finally {
+    savingCred.value = false;
   }
 }
 
@@ -506,7 +517,9 @@ function openEditConnection(row: AssetSourceItem) {
   addConnDialog.value = true;
 }
 
+const savingAddConn = ref(false);
 async function saveAddConnection() {
+  if (savingAddConn.value) return;
   const c = addConnForm.value;
   if (!c.source_code || !c.target_host) {
     ElMessage.warning("连接编码和目标地址必填");
@@ -542,6 +555,8 @@ async function saveAddConnection() {
     loadSystems();
   } catch (e: any) {
     ElMessage.error(extractErrorDetail(e, "添加失败"));
+  } finally {
+    savingAddConn.value = false;
   }
 }
 
@@ -880,7 +895,7 @@ onMounted(async () => {
       <template #footer>
         <el-button v-if="editorMode === 'create' && wizardStep > 0" @click="wizardStep--">上一步</el-button>
         <el-button v-if="editorMode === 'create' && wizardStep < 3" type="primary" @click="nextWizardStep">下一步</el-button>
-        <el-button v-if="editorMode === 'create' && wizardStep === 3" v-perms="'source.manage'" type="primary" @click="saveWizard">保存</el-button>
+        <el-button v-if="editorMode === 'create' && wizardStep === 3" v-perms="'source.manage'" type="primary" :loading="savingWizard" @click="saveWizard">保存</el-button>
         <el-button v-if="editorMode === 'edit'" v-perms="'source.manage'" type="primary" :loading="editorSaving" @click="saveSystemEdit">保存修改</el-button>
         <el-button @click="drawerVisible = false">取消</el-button>
       </template>
@@ -921,7 +936,7 @@ onMounted(async () => {
       </el-form>
       <template #footer>
         <el-button @click="credDialog = false">取消</el-button>
-        <el-button v-perms="'source.credential_manage'" type="primary" @click="saveCredRotate">写入</el-button>
+        <el-button v-perms="'source.credential_manage'" type="primary" :loading="savingCred" @click="saveCredRotate">写入</el-button>
       </template>
     </el-dialog>
 
@@ -948,7 +963,7 @@ onMounted(async () => {
       </el-form>
       <template #footer>
         <el-button @click="addConnDialog = false">取消</el-button>
-        <el-button v-perms="'source.manage'" type="primary" @click="saveAddConnection">保存</el-button>
+        <el-button v-perms="'source.manage'" type="primary" :loading="savingAddConn" @click="saveAddConnection">保存</el-button>
       </template>
     </el-dialog>
   </div>

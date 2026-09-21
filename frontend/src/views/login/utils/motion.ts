@@ -21,20 +21,20 @@ export default defineComponent({
         }
       ),
       [
-        [
-          motion,
-          {
-            initial: { opacity: 0, y: 100 },
-            enter: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                delay
+          [
+            motion,
+            {
+              // DEF-08（194）：仅做透明度淡入，不做 y 位移，避免入场后坐标漂移
+              initial: { opacity: 0 },
+              enter: {
+                opacity: 1,
+                transition: {
+                  delay
+                }
               }
             }
-          }
+          ]
         ]
-      ]
     );
   }
 });

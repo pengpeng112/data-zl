@@ -23,7 +23,7 @@ vi.mock("@/api/asset", () => ({
 }));
 vi.mock("@/api/ops", () => ({ getAuditLogsSummary: api.getAuditLogsSummary }));
 
-import assetRoute from "@/router/modules/asset";
+import homeRoute from "@/router/modules/home";
 import SystemMap from "@/views/asset/system-map/index.vue";
 
 const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -57,12 +57,13 @@ function mountPage() {
 }
 
 describe("system-map: 数据资产系统图（六步治理链路）", () => {
-  it("route registered under 数据资产 with asset.overview.view", () => {
-    const child = (assetRoute as any).children.find((r: any) => r.path === "/asset/system-map");
+  it("route registered under 工作台 with asset.overview.view", () => {
+    // 186 N1：系统图移入工作台分区，显示名改为「平台能力全景」（auths 不变）
+    const child = (homeRoute as any).children.find((r: any) => r.path === "/asset/system-map");
     expect(child).toBeTruthy();
     expect(child.meta.auths).toEqual(["asset.overview.view"]);
     expect(child.meta.showLink).toBe(true);
-    expect(child.meta.title).toBe("数据资产系统图");
+    expect(child.meta.title).toBe("平台能力全景");
   });
 
   it("renders six governance steps and real KPI numbers from APIs", async () => {

@@ -44,6 +44,14 @@
 
     <el-card shadow="never" class="mb-4">
       <template #header><span>提交准确性反馈</span></template>
+      <!-- 186 P1-1：结果 → 反馈上下文提示（URL 只带定位 ID；上下文以接口回读为准） -->
+      <el-alert
+        v-if="linkAlert"
+        :type="linkAlert.type"
+        :title="linkAlert.text"
+        :closable="false"
+        class="mb-2"
+      />
       <el-form :model="form" label-width="120px" size="small">
         <el-form-item label="问题摘要" required>
           <el-input v-model="form.question" placeholder="例：2026年7月住院次均费用" />
@@ -67,6 +75,62 @@
           </el-button>
         </el-form-item>
       </el-form>
+      <!-- 186 P1-1：提交成功显示反馈编号与「查看我的反馈」锚点链接 -->
+      <el-alert v-if="lastFeedback" type="success" :closable="false" class="mt-2">
+        <template #title>
+          反馈 #{{ lastFeedback.feedback_id }} 已提交（状态：{{ lastFeedback.status }}）
+          <el-link type="primary" :underline="false" class="ml-2" @click="goMyFeedback">查看我的反馈</el-link>
+        </template>
+      </el-alert>
+    </el-card>
+
+    <!-- 186 Q2：我的反馈 / 审核队列（§4.4 列表契约消费） -->
+    <el-card id="feedback-records" shadow="never" class="mb-4">
+      <template #header>
+        <div class="card-header">
+          <span>反馈记录</span>
+          <el-radio-group v-model="feedbackScope" size="small" @change="loadFeedback(1)">
+            <el-radio-button value="mine">我的反馈</el-radio-button>
+            <el-radio-button value="queue">审核队列</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-loading="feedbackLoading" :data="feedbackItems" size="small" stripe>
+        <el-table-column prop="feedback_id" label="ID" width="70" />
+        <el-table-column prop="rating" label="评价" width="130" />
+        <el-table-column prop="status" label="状态" width="140">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.status === 'resolved' ? 'success' : row.status === 'rejected' ? 'info' : 'warning'">
+              {{ row.status }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="对象" min-width="200">
+          <template #default="{ row }">
+            {{ row.query_code ? `${row.query_code}@v${row.query_version}` : row.metric_code ? `${row.metric_code}@v${row.metric_version}` : row.product_code || "-" }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="run_id" label="run" width="80">
+          <template #default="{ row }">{{ row.run_id ?? "-" }}</template>
+        </el-table-column>
+        <el-table-column label="错误类型" min-width="160">
+          <template #default="{ row }">{{ (row.error_types || []).join(", ") || "-" }}</template>
+        </el-table-column>
+        <el-table-column prop="submitted_at" label="提交时间" min-width="150">
+          <template #default="{ row }">{{ formatTime(row.submitted_at) }}</template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        v-if="feedbackTotal > feedbackPageSize"
+        layout="total, prev, pager, next"
+        :total="feedbackTotal"
+        :page-size="feedbackPageSize"
+        :current-page="feedbackPage"
+        size="small"
+        class="mt-3"
+        @current-change="loadFeedback"
+      />
+      <el-alert v-if="feedbackError" type="error" :title="feedbackError" :closable="false" class="mt-3" />
     </el-card>
 
     <el-card shadow="never">
@@ -101,18 +165,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import {
   fetchAccuracyDashboard,
+  fetchMetricDetail,
+  fetchQueryRunDetail,
+  listAiFeedback,
   registerAnswerEvent,
   runEvaluation,
   submitFeedback,
   type AccuracyDashboard,
-  type EvaluationRunSummary
+  type EvaluationRunSummary,
+  type QueryRun
 } from "@/api/query-center";
 
 defineOptions({ name: "QueryAccuracy" });
+
+const route = useRoute();
 
 const RATINGS = [
   { v: "correct", label: "正确" },
@@ -144,6 +215,46 @@ const ERROR_TYPES = [
 ];
 
 const dash = ref<AccuracyDashboard | null>(null);
+
+// 186 Q2：反馈记录（mine=本人历史；queue 需 feedback:review，403 时提示）
+const feedbackScope = ref<"mine" | "queue">("mine");
+const feedbackItems = ref<any[]>([]);
+const feedbackTotal = ref(0);
+const feedbackPage = ref(1);
+const feedbackPageSize = 20;
+const feedbackLoading = ref(false);
+const feedbackError = ref<string | null>(null);
+
+function formatTime(value?: string | null) {
+  return value ? new Date(value).toLocaleString("zh-CN", { hour12: false }) : "-";
+}
+
+async function loadFeedback(page = 1) {
+  feedbackLoading.value = true;
+  feedbackError.value = null;
+  try {
+    const { data } = await listAiFeedback({
+      scope: feedbackScope.value,
+      page,
+      page_size: feedbackPageSize
+    });
+    feedbackItems.value = data.items || [];
+    feedbackTotal.value = data.total ?? 0;
+    feedbackPage.value = page;
+  } catch (e: any) {
+    feedbackItems.value = [];
+    feedbackTotal.value = 0;
+    const status = e?.response?.status;
+    feedbackError.value =
+      status === 403
+        ? feedbackScope.value === "queue"
+          ? "审核队列需要 feedback:review 权限"
+          : "缺少反馈读取权限（feedback:create / feedback:review）"
+        : e?.response?.data?.detail || e?.message || "反馈列表加载失败";
+  } finally {
+    feedbackLoading.value = false;
+  }
+}
 const evalSummary = ref<EvaluationRunSummary | null>(null);
 const submitting = ref(false);
 const running = ref(false);
@@ -154,6 +265,89 @@ const form = reactive({
   errorTypes: [] as string[],
   comment: ""
 });
+
+// 186 P1-1：结果 → 反馈链上下文。URL 只带非敏感定位 ID（run_id/metric_code），
+// query_code/version/digest 等一律以运行/指标详情接口回读为准，不信任 URL 传值；
+// 回读失败（404/403 等）不伪造上下文，提示可提交通用意见。
+type LinkState = "none" | "loading" | "linked" | "missing";
+const linkState = ref<LinkState>("none");
+const linkMissingText = ref("未找到运行记录，可提交通用意见（不会伪造上下文）");
+const linkedRun = ref<Pick<QueryRun, "id" | "query_code" | "version" | "result_digest"> | null>(null);
+const linkedMetric = ref<{ metric_code: string; metric_version: number | null } | null>(null);
+
+const linkAlert = computed<{ type: "info" | "success" | "warning"; text: string } | null>(() => {
+  if (linkState.value === "loading") {
+    return { type: "info", text: "正在回读关联运行/指标记录…" };
+  }
+  if (linkState.value === "linked" && linkedRun.value) {
+    const run = linkedRun.value;
+    return {
+      type: "success",
+      text: `已关联运行记录：${run.query_code}@v${run.version ?? "?"} · run #${run.id}（上下文来自运行详情回读，问题摘要请自行填写）`
+    };
+  }
+  if (linkState.value === "linked" && linkedMetric.value) {
+    const metric = linkedMetric.value;
+    return {
+      type: "success",
+      text: `已关联指标记录：${metric.metric_code}${metric.metric_version != null ? `@v${metric.metric_version}` : ""}（上下文来自指标详情回读，问题摘要请自行填写）`
+    };
+  }
+  if (linkState.value === "missing") {
+    return { type: "warning", text: linkMissingText.value };
+  }
+  return null;
+});
+
+async function loadLinkedContext() {
+  const metricCode = route.query.metric_code;
+  const runIdRaw = route.query.run_id;
+  const wantMetric = typeof metricCode === "string" && metricCode.trim() !== "";
+  const wantRun = runIdRaw != null && String(runIdRaw).trim() !== "";
+  if (!wantMetric && !wantRun) return;
+  const missingText = wantMetric
+    ? "未找到指标记录，可提交通用意见（不会伪造上下文）"
+    : "未找到运行记录，可提交通用意见（不会伪造上下文）";
+  linkState.value = "loading";
+  try {
+    if (wantMetric) {
+      const res = await fetchMetricDetail(metricCode as string);
+      const data = res.data as {
+        definition?: { metric_code?: string };
+        active_version?: { version?: number | null };
+      } | null;
+      const code = data?.definition?.metric_code;
+      if (!code) {
+        linkMissingText.value = missingText;
+        linkState.value = "missing";
+        return;
+      }
+      linkedMetric.value = { metric_code: code, metric_version: data?.active_version?.version ?? null };
+      linkState.value = "linked";
+      return;
+    }
+    const runId = Number(runIdRaw);
+    if (!Number.isInteger(runId) || runId <= 0) {
+      linkMissingText.value = missingText;
+      linkState.value = "missing";
+      return;
+    }
+    const res = await fetchQueryRunDetail(runId);
+    const run = res.data;
+    if (!run?.id || !run?.query_code) {
+      linkMissingText.value = missingText;
+      linkState.value = "missing";
+      return;
+    }
+    linkedRun.value = run;
+    linkState.value = "linked";
+  } catch {
+    linkedRun.value = null;
+    linkedMetric.value = null;
+    linkMissingText.value = missingText;
+    linkState.value = "missing";
+  }
+}
 
 function ratingLabel(rating: string): string {
   return RATINGS.find((r) => r.v === rating)?.label ?? rating;
@@ -184,22 +378,54 @@ async function submit() {
   try {
     const answer = await registerAnswerEvent({
       question_summary: form.question,
-      caller_id: "web-console"
+      caller_id: "web-console",
+      // 186 P1-1：携带回读得到的运行/指标上下文；未关联时不带，不伪造
+      ...(linkedRun.value
+        ? {
+            query_code: linkedRun.value.query_code,
+            query_version: linkedRun.value.version ?? undefined,
+            run_id: linkedRun.value.id,
+            ...(linkedRun.value.result_digest
+              ? { result_digest: linkedRun.value.result_digest }
+              : {})
+          }
+        : {}),
+      ...(linkedMetric.value
+        ? {
+            metric_code: linkedMetric.value.metric_code,
+            ...(linkedMetric.value.metric_version != null
+              ? { metric_version: linkedMetric.value.metric_version }
+              : {})
+          }
+        : {})
     });
-    await submitFeedback({
+    const feedback = await submitFeedback({
       answer_event_id: answer.data.answer_event_id,
       rating: form.rating,
       error_types: form.errorTypes,
       comment: form.comment
     });
+    lastFeedback.value = {
+      feedback_id: feedback.data?.feedback_id,
+      status: feedback.data?.status || "pending"
+    };
     ElMessage.success("反馈已提交，等待审核（不自动发布任何资产）");
     form.comment = "";
-    await loadDashboard();
+    await Promise.all([loadDashboard(), loadFeedback(1)]);
   } catch {
     ElMessage.error("提交失败：请检查权限与输入");
   } finally {
     submitting.value = false;
   }
+}
+
+// 186 P1-1：反馈成功后「查看我的反馈」锚点（页内反馈记录卡）
+const lastFeedback = ref<{ feedback_id?: number; status: string } | null>(null);
+
+function goMyFeedback() {
+  feedbackScope.value = "mine";
+  loadFeedback(1);
+  document.getElementById("feedback-records")?.scrollIntoView?.({ behavior: "smooth" });
 }
 
 async function runEval() {
@@ -215,7 +441,12 @@ async function runEval() {
   }
 }
 
-onMounted(loadDashboard);
+onMounted(() => {
+  loadDashboard();
+  loadFeedback(1);
+  // 186 P1-1：检测 run_id/metric_code 参数并回读上下文
+  loadLinkedContext();
+});
 </script>
 
 <style scoped>

@@ -106,9 +106,16 @@ class PureHttp {
           "/refresh-token"
         ];
         const isWhite = whiteList.some(url => (config.url || "").includes(url));
+        // QA ST-030：DEV 专用注入通道——仅限本地调试；写入真实 token 会进 dev bundle
+        // 且易误提交，生产构建（import.meta.env.DEV=false）恒不生效。
         const devToken = import.meta.env.DEV
           ? import.meta.env.VITE_DEV_API_TOKEN
           : undefined;
+        if (devToken) {
+          console.warn(
+            "[http] VITE_DEV_API_TOKEN 已启用：请求将携带该 Bearer。请确认这是本地调试专用凭据，切勿写入仓库。"
+          );
+        }
         if (devToken && !config.headers.Authorization && !isWhite) {
           config.headers["Authorization"] = `Bearer ${devToken}`;
         }

@@ -110,6 +110,48 @@ export function getIdentitySyncRuns(params?: Record<string, unknown>) {
 export function getIdentitySyncRun(runId: string) {
   return http.request<ApiResponse<Record<string, unknown>>>("get", `/api/v1/identity-sync/runs/${runId}`);
 }
+export interface AccountStateItem {
+  person_code: string;
+  employment_status?: string | null;
+  employee_state: string;
+  user_state: string;
+  desired_state: string;
+  decision_reason?: string | null;
+  execution_allowed?: boolean;
+  blocked_reason?: string | null;
+  source_complete?: boolean;
+  captured_at?: string | null;
+  transition_seq?: number;
+  targets: Record<string, {
+    action?: string | null;
+    status: string;
+    after_state?: string | null;
+    reason_code?: string | null;
+    lock_attribution?: string | null;
+    transition_seq?: number | null;
+    executed_at?: string | null;
+  }>;
+}
+
+/** 186 I1/I3：双来源账号启停状态（只读，按 run/目标结果追踪） */
+export function getAccountStates(params?: {
+  desired_state?: string;
+  person_code?: string;
+  page?: number;
+  page_size?: number;
+}) {
+  return http.get<
+    ApiResponse<{
+      total: number;
+      page: number;
+      page_size: number;
+      items: AccountStateItem[];
+      desired_state_summary?: Record<string, number>;
+    }>,
+    any
+  >("/api/v1/identity/account-states", { params });
+}
+
 export function getSyncDiffs(params?: Record<string, unknown>) {
   return http.request<ApiResponse<PageData<IdentitySyncDiff>>>("get", "/api/v1/identity/sync-diffs", { params });
 }

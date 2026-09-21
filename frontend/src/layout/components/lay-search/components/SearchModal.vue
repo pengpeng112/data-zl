@@ -10,7 +10,13 @@ import type { optionsItem, dragItem } from "../types";
 import { ref, computed, shallowRef, watch } from "vue";
 import { useDebounceFn, onKeyStroke } from "@vueuse/core";
 import { usePermissionStoreHook } from "@/store/modules/permission";
-import { cloneDeep, isAllEmpty, storageLocal } from "@pureadmin/utils";
+import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
+import {
+  purgeLegacyKeys,
+  searchCollect,
+  searchHistory,
+  titleMatchesAlias
+} from "@/utils/menuPreferences";
 import SearchIcon from "~icons/ri/search-line";
 
 interface Props {
@@ -30,8 +36,9 @@ const router = useRouter();
 
 const HISTORY_TYPE = "history";
 const COLLECT_TYPE = "collect";
-const LOCALEHISTORYKEY = "menu-search-history";
-const LOCALECOLLECTKEY = "menu-search-collect";
+// 186 N2：历史/收藏改为按平台环境+用户+schema 隔离的键（utils/menuPreferences）
+const historyStore = searchHistory;
+const collectStore = searchCollect;
 
 const keyword = ref("");
 const resultRef = ref();
@@ -81,40 +88,45 @@ const showEmpty = computed(() => {
   );
 });
 
-function getStorageItem(key) {
-  return storageLocal().getItem<optionsItem[]>(key) || [];
+function getStorageItem(kind: "history" | "collect") {
+  const list = kind === "history" ? historyStore.read() : collectStore.read();
+  return Array.isArray(list) ? list : [];
 }
 
-function setStorageItem(key, value) {
-  storageLocal().setItem(key, value);
+function setStorageItem(kind: "history" | "collect", value) {
+  if (kind === "history") historyStore.write(value);
+  else collectStore.write(value);
 }
 
-/** 将菜单树形结构扁平化为一维数组，用于菜单查询 */
-function flatTree(arr) {
+/** 将菜单树形结构扁平化为一维数组，用于菜单查询；
+ * 186 N2：附带归属分区标题（parentTitle）供结果显示 */
+function flatTree(arr, parentTitle = "") {
   const res = [];
-  function deep(arr) {
+  function deep(arr, parentTitle) {
     arr.forEach(item => {
+      if (item.meta && item.meta.parentTitle === undefined) {
+        item.meta.parentTitle = parentTitle;
+      }
       res.push(item);
-      item.children && deep(item.children);
+      item.children && deep(item.children, item.meta?.title ?? parentTitle);
     });
   }
-  deep(arr);
+  deep(arr, parentTitle);
   return res;
 }
 
-/** 查询 */
+/** 查询（186 N2：标题/拼音之外，旧中文名别名也命中） */
 function search() {
   const flatMenusData = flatTree(menusData.value);
+  const kw = keyword.value.trim();
   resultOptions.value = flatMenusData.filter(menu =>
-    keyword.value
+    kw
       ? menu.meta?.title
           .toLocaleLowerCase()
-          .includes(keyword.value.toLocaleLowerCase().trim()) ||
+          .includes(kw.toLocaleLowerCase()) ||
+        titleMatchesAlias(menu.meta?.title ?? "", kw) ||
         !isAllEmpty(
-          match(
-            menu.meta?.title.toLocaleLowerCase(),
-            keyword.value.toLocaleLowerCase().trim()
-          )
+          match(menu.meta?.title.toLocaleLowerCase(), kw.toLocaleLowerCase())
         )
       : false
   );
@@ -191,7 +203,7 @@ function handleEnter() {
 
 /** 删除历史记录 */
 function handleDelete(item) {
-  const key = item.type === HISTORY_TYPE ? LOCALEHISTORYKEY : LOCALECOLLECTKEY;
+  const key = item.type === HISTORY_TYPE ? "history" : "collect";
   let list = getStorageItem(key);
   list = list.filter(listItem => listItem.path !== item.path);
   setStorageItem(key, list);
@@ -200,15 +212,15 @@ function handleDelete(item) {
 
 /** 收藏历史记录 */
 function handleCollect(item) {
-  let searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
-  let searchCollectList = getStorageItem(LOCALECOLLECTKEY);
+  let searchHistoryList = getStorageItem("history");
+  let searchCollectList = getStorageItem("collect");
   searchHistoryList = searchHistoryList.filter(
     historyItem => historyItem.path !== item.path
   );
-  setStorageItem(LOCALEHISTORYKEY, searchHistoryList);
+  setStorageItem("history", searchHistoryList);
   if (!searchCollectList.some(collectItem => collectItem.path === item.path)) {
     searchCollectList.unshift({ ...item, type: COLLECT_TYPE });
-    setStorageItem(LOCALECOLLECTKEY, searchCollectList);
+    setStorageItem("collect", searchCollectList);
   }
   getHistory();
 }
@@ -218,48 +230,64 @@ function saveHistory() {
   const { path, meta } = resultOptions.value.find(
     item => item.path === activePath.value
   );
-  const searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
-  const searchCollectList = getStorageItem(LOCALECOLLECTKEY);
+  const searchHistoryList = getStorageItem("history");
+  const searchCollectList = getStorageItem("collect");
   const isCollected = searchCollectList.some(item => item.path === path);
   const existingIndex = searchHistoryList.findIndex(item => item.path === path);
   if (!isCollected) {
     if (existingIndex !== -1) searchHistoryList.splice(existingIndex, 1);
     if (searchHistoryList.length >= historyNum) searchHistoryList.pop();
     searchHistoryList.unshift({ path, meta, type: HISTORY_TYPE });
-    storageLocal().setItem(LOCALEHISTORYKEY, searchHistoryList);
+    setStorageItem("history", searchHistoryList);
   }
 }
 
 /** 更新存储的搜索记录 */
 function updateHistory() {
-  let searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
+  let searchHistoryList = getStorageItem("history");
   const historyIndex = searchHistoryList.findIndex(
     item => item.path === historyPath.value
   );
   if (historyIndex !== -1) {
     const [historyItem] = searchHistoryList.splice(historyIndex, 1);
     searchHistoryList.unshift(historyItem);
-    setStorageItem(LOCALEHISTORYKEY, searchHistoryList);
+    setStorageItem("history", searchHistoryList);
   }
 }
 
-/** 获取本地历史记录 */
+/** 获取本地历史记录（186 N2：与当前可访问路由求交，标题从当前 meta
+ * 重建；权限撤回后失效项立即消失，不依赖重新登录） */
 function getHistory() {
-  const searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
-  const searchCollectList = getStorageItem(LOCALECOLLECTKEY);
+  purgeLegacyKeys();
+  const accessible = flatTree(menusData.value);
+  const byPath = new Map(accessible.map(item => [item.path, item]));
+  const revalidate = list =>
+    (Array.isArray(list) ? list : [])
+      .filter(item => item?.path && byPath.has(item.path))
+      .map(item => ({
+        ...item,
+        meta: {
+          ...(item.meta ?? {}),
+          ...byPath.get(item.path).meta
+        }
+      }));
+  const searchHistoryList = revalidate(getStorageItem("history"));
+  const searchCollectList = revalidate(getStorageItem("collect"));
+  setStorageItem("history", searchHistoryList);
+  setStorageItem("collect", searchCollectList);
   historyOptions.value = [...searchHistoryList, ...searchCollectList];
   historyPath.value = historyOptions.value[0]?.path;
 }
 
 /** 拖拽改变收藏顺序 */
 function handleDrag(item: dragItem) {
-  const searchCollectList = getStorageItem(LOCALECOLLECTKEY);
+  const searchCollectList = getStorageItem("collect");
   const [reorderedItem] = searchCollectList.splice(item.oldIndex, 1);
   searchCollectList.splice(item.newIndex, 0, reorderedItem);
-  storageLocal().setItem(LOCALECOLLECTKEY, searchCollectList);
+  setStorageItem("collect", searchCollectList);
   historyOptions.value = [
-    ...getStorageItem(LOCALEHISTORYKEY),
-    ...getStorageItem(LOCALECOLLECTKEY)
+    ...getStorageItem("history"),
+    ...getStorageItem("collect")
   ];
   historyPath.value = reorderedItem.path;
 }

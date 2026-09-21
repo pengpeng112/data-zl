@@ -17,7 +17,7 @@
         <p class="hint">模型只收到脱敏需求、表字段、正式 JOIN 三要素和相关已确认值域，不接触患者明细。</p>
       </el-card>
       <el-card class="result-panel" shadow="never">
-        <template #header><div class="title"><span>生成结果</span><div><el-tag v-if="result" :type="riskBlocked ? 'danger' : 'success'">{{ riskBlocked ? '风险拦截' : '只读检查通过' }}</el-tag><el-button v-if="result" size="small" @click="copySql">复制 SQL</el-button></div></div></template>
+        <template #header><div class="title"><span>生成结果</span><div><el-tag v-if="result" :type="riskBlocked ? 'danger' : 'success'">{{ riskBlocked ? '风险拦截' : '只读检查通过' }}</el-tag><el-button v-if="result" size="small" @click="copySql">复制 SQL</el-button><el-button v-if="result" size="small" type="primary" plain @click="handoffToQueryCenter">带入查询中心</el-button></div></div></template>
         <template v-if="result">
           <pre class="sql-code"><code>{{ result.sql }}</code></pre>
           <div class="digest"><span>表 {{ result.context_digest.tables }}</span><span>关系 {{ result.context_digest.relations }}</span><span>值域 {{ result.context_digest.value_domains }}</span><span>{{ result.context_digest.payload_bytes }} bytes</span></div>
@@ -43,6 +43,8 @@ import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { generateAiSql, getAiSqlHistory, getTables, type AiSqlGenerateResult, type AiSqlHistoryItem, type TableBrief } from "@/api/asset";
+import { useQueryDraftHandoffStore } from "@/store/modules/queryDraftHandoff";
+import { useRouter } from "vue-router";
 import { extractErrorDetail } from "@/utils/errorMessage";
 
 const question = ref("");
@@ -78,6 +80,22 @@ async function copySql() {
   if (!result.value) return;
   try { await navigator.clipboard.writeText(result.value.sql); ElMessage.success("SQL 已复制"); }
   catch { ElMessage.warning("剪贴板不可用，请手动复制"); }
+}
+
+// 186 Q3：把当前生成结果带入查询中心摄取表单（仅预填，不自动提交/执行）
+function handoffToQueryCenter() {
+  if (!result.value?.sql) return;
+  const store = useQueryDraftHandoffStore();
+  const router = useRouter();
+  const handoffId = store.stage({
+    systemCode: "DATA_CENTER",
+    sqlText: result.value.sql,
+    questionSummary: question.value.slice(0, 200),
+    selectedTables: selectedTables.value.slice(),
+    contextDigest: (result.value as any).context_digest ?? {},
+    risk: (result.value as any).risk ?? {}
+  });
+  router.push({ path: "/asset/queries", query: { tab: "list", handoff: handoffId } });
 }
 function formatTime(value?: string | null) { return value ? new Date(value).toLocaleString("zh-CN", { hour12: false }) : "-"; }
 onMounted(async () => { await Promise.all([searchTables(""), loadHistory()]); });

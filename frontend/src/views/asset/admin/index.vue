@@ -12,7 +12,12 @@
       title="本页用于平台治理底座，不承担业务统计指标或日常查询版本管理；相关能力请前往查询与指标中心。"
     />
 
-    <el-card class="mb20">
+    <!-- 186 O1：长页拆分页签（tokens/owners/terms/snapshots），首开仅加载当前页签；
+         非法 tab 参数回首个页签；两类快照能力分开展示（旧汇总 vs 字段级） -->
+    <el-tabs v-model="activeAdminTab" @tab-change="onAdminTabChange">
+
+    <el-tab-pane label="安全接入（API Token）" name="tokens">
+      <el-card class="mb20">
       <template #header>
         <span>安全接入 · API Token</span>
         <el-button size="small" class="ml8" @click="createKey"
@@ -51,9 +56,9 @@
         </el-table-column>
       </el-table>
     </el-card>
-
-    <el-card>
-      <template #header>
+    </el-tab-pane>
+    <el-tab-pane label="责任归属" name="owners">
+      <el-card>      <template #header>
         <span>表 Owner</span>
         <el-button
           type="primary"
@@ -108,8 +113,9 @@
         @current-change="loadOwners"
       />
     </el-card>
-
-    <el-card class="mt20">
+    </el-tab-pane>
+    <el-tab-pane label="业务术语" name="terms">
+      <el-card class="mt20">
       <template #header>
         <span>业务术语</span>
         <el-button
@@ -167,6 +173,7 @@
         @current-change="loadTerms"
       />
     </el-card>
+    </el-tab-pane>
 
     <el-dialog v-model="termDialogVisible" title="业务术语" width="450px">
       <!-- 146 E4（R5）：术语表单带必填校验，保存前 validate -->
@@ -190,9 +197,10 @@
       </template>
     </el-dialog>
 
+    <el-tab-pane label="资产汇总快照" name="snapshots">
     <el-card class="mt20">
       <template #header>
-        <span>元数据快照</span>
+        <span>资产汇总快照</span>
         <el-button
           type="primary"
           size="small"
@@ -220,6 +228,9 @@
         <el-table-column prop="snapshot_time" label="时间" width="170" />
       </el-table>
       <p class="snap-hint">勾选两个快照后点击“对比快照”生成差异（再次勾选第三条将清空重新选择）。</p>
+      <!-- 186 O1：两类快照能力分开展示——本页为资产汇总快照（表/关系数量对比）；
+           字段级快照（scope=column_level/source_code，可作同来源 diff-preview）在「资产目录 → 元数据变更」的快照管理页。两类不可混比。 -->
+      <el-alert type="info" :closable="false" title="本页为资产汇总快照（表/关系数量级对比）；字段级快照请在 资产目录 → 元数据变更 → 快照管理 查看，两类快照不可混比。" />
       <div v-if="compareIds.length === 2" class="mt15">
         <el-button type="warning" size="small" @click="runCompare">
           对比快照 #{{ compareIds[0] }} vs #{{ compareIds[1] }}
@@ -278,6 +289,8 @@
         </div>
       </div>
     </el-card>
+    </el-tab-pane>
+    </el-tabs>
 
     <el-dialog v-model="ownerDialogVisible" title="表 Owner" width="450px">
       <!-- 146 E4（R5）：Owner 表单带必填与表名格式校验，保存前 validate -->
@@ -335,7 +348,7 @@
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import { ref, onMounted, reactive } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   listAdminKeys,
@@ -354,6 +367,7 @@ import {
 import { extractErrorDetail } from "@/utils/errorMessage";
 
 const router = useRouter();
+const route = useRoute();
 
 interface KeyItem {
   id: number;
@@ -723,11 +737,36 @@ function goToMetadataChanges() {
   router.push("/metadata/snapshots");
 }
 
+// 186 O1：页签懒加载——未打开的页签零请求；tab 参数白名单，非法回默认
+const ADMIN_TAB_WHITELIST = ["tokens", "owners", "terms", "snapshots"] as const;
+const activeAdminTab = ref<string>("tokens");
+const adminTabLoaded = reactive<Record<string, boolean>>({
+  tokens: false, owners: false, terms: false, snapshots: false
+});
+
+function loadAdminTab(tab: string) {
+  if (adminTabLoaded[tab]) return;
+  adminTabLoaded[tab] = true;
+  if (tab === "tokens") loadKeys();
+  else if (tab === "owners") loadOwners();
+  else if (tab === "terms") loadTerms();
+  else if (tab === "snapshots") loadSnapshots();
+}
+
+function onAdminTabChange(tab: string | number) {
+  const name = String(tab);
+  if (ADMIN_TAB_WHITELIST.includes(name as any)) {
+    loadAdminTab(name);
+    router.replace({ query: { ...route.query, tab: name } });
+  }
+}
+
 onMounted(() => {
-  loadKeys();
-  loadOwners();
-  loadTerms();
-  loadSnapshots();
+  const fromUrl = String(route.query.tab || "");
+  activeAdminTab.value = (ADMIN_TAB_WHITELIST as readonly string[]).includes(fromUrl)
+    ? fromUrl
+    : "tokens";
+  loadAdminTab(activeAdminTab.value);
 });
 </script>
 

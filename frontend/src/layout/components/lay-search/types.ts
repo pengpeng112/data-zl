@@ -4,6 +4,8 @@ interface optionsItem {
   meta: {
     icon?: string;
     title?: string;
+    /** 186 N2：归属分区标题（结果显示用） */
+    parentTitle?: string;
   };
 }
 

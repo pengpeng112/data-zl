@@ -1,5 +1,7 @@
 const Layout = () => import("@/layout/index.vue");
 
+// 186 N1：人员与权限分区。平台账号与业务系统账号用文案区分；
+// roles/auths 原样保留（路径与名称未变）。
 export default {
   path: "/identity",
   name: "Identity",
@@ -7,20 +9,10 @@ export default {
   redirect: "/identity/persons",
   meta: {
     icon: "ep/user",
-    title: "人员与科室",
-    rank: 12
+    title: "人员与权限",
+    rank: 50
   },
   children: [
-    {
-      path: "/identity/departments",
-      name: "IdentityDepartments",
-      component: () => import("@/views/identity/departments/index.vue"),
-      meta: {
-        title: "科室基线",
-        showLink: true,
-        auths: ["identity.dept.view"]
-      }
-    },
     {
       path: "/identity/persons",
       name: "IdentityPersons",
@@ -32,11 +24,21 @@ export default {
       }
     },
     {
+      path: "/identity/departments",
+      name: "IdentityDepartments",
+      component: () => import("@/views/identity/departments/index.vue"),
+      meta: {
+        title: "科室基线",
+        showLink: true,
+        auths: ["identity.dept.view"]
+      }
+    },
+    {
       path: "/identity/accounts",
       name: "IdentityAccounts",
       component: () => import("@/views/identity/accounts/index.vue"),
       meta: {
-        title: "跨系统账号",
+        title: "业务系统账号",
         showLink: true,
         auths: ["identity.account.view"]
       }
@@ -46,7 +48,7 @@ export default {
       name: "IdentityLocalAccounts",
       component: () => import("@/views/identity/local-accounts/index.vue"),
       meta: {
-        title: "本地账号",
+        title: "平台本地账号",
         showLink: true,
         roles: ["identity_admin", "platform_admin"],
         auths: ["identity.local_account.manage", "identity.role.manage"]
@@ -57,7 +59,7 @@ export default {
       name: "IdentitySyncDiffs",
       component: () => import("@/views/identity/sync-diffs/index.vue"),
       meta: {
-        title: "同步差异",
+        title: "人员同步差异",
         showLink: true,
         auths: ["identity.sync_diff.view"]
       }
@@ -67,7 +69,7 @@ export default {
       name: "IdentitySyncLogs",
       component: () => import("@/views/identity/sync-logs/index.vue"),
       meta: {
-        title: "同步日志",
+        title: "人员同步日志",
         showLink: true,
         auths: ["identity.sync_diff.view"]
       }
@@ -77,7 +79,7 @@ export default {
       name: "IdentityRoles",
       component: () => import("@/views/identity/roles/index.vue"),
       meta: {
-        title: "角色权限",
+        title: "平台角色权限",
         showLink: true,
         roles: ["identity_admin", "platform_admin"],
         auths: ["identity.role.manage", "identity.role.grant"]
@@ -98,7 +100,11 @@ export default {
       path: "/identity/permission-requests",
       name: "IdentityPermissionRequests",
       component: () => import("@/views/identity/permission-requests/index.vue"),
-      meta: { title: "权限申请审批", showLink: true, auths: ["identity.permission_request.view"] }
+      meta: {
+        title: "权限申请与审批",
+        showLink: true,
+        auths: ["identity.permission_request.view"]
+      }
     }
   ]
 } satisfies RouteConfigsTable;

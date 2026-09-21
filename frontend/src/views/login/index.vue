@@ -244,9 +244,9 @@ loadPublicStats();
       </Motion>
     </section>
 
+    // DEF-08（194）：登录卡片不做位移动画，保证按钮坐标稳定、可点击
     <section class="login-card-wrap">
-      <Motion :delay="120">
-        <div class="login-card">
+      <div class="login-card">
           <div class="login-card-header">
             <span class="card-kicker">安全登录</span>
             <h2>进入数据资产平台</h2>
@@ -265,7 +265,7 @@ loadPublicStats();
                 {
                   required: true,
                   message: '请输入账号',
-                  trigger: 'blur'
+                  trigger: ['blur', 'change']
                 }
               ]"
               prop="username"
@@ -300,7 +300,6 @@ loadPublicStats();
             </el-button>
           </el-form>
         </div>
-      </Motion>
     </section>
 
     <el-dialog

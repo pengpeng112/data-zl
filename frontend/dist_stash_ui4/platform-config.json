@@ -1,0 +1,28 @@
+﻿{
+  "Version": "6.2.0",
+  "Title": "山东省第二人民医院",
+  "SubTitle": "数据资产平台",
+  "FixedHeader": true,
+  "HiddenSideBar": false,
+  "MultiTagsCache": false,
+  "KeepAlive": true,
+  "Layout": "vertical",
+  "Theme": "light",
+  "DarkMode": false,
+  "OverallStyle": "light",
+  "Grey": false,
+  "Weak": false,
+  "HideTabs": false,
+  "HideFooter": false,
+  "Stretch": false,
+  "SidebarStatus": true,
+  "EpThemeColor": "#0EA5E9",
+  "ShowLogo": true,
+  "ShowModel": "smart",
+  "MenuArrowIconNoTransition": false,
+  "CachingAsyncRoutes": false,
+  "TooltipEffect": "light",
+  "ResponsiveStorageNameSpace": "responsive-",
+  "MenuSearchHistory": 6
+}
+

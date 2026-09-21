@@ -69,22 +69,74 @@
 
       <div v-else-if="impactResult" class="impact-result">
         <section class="impact-stats">
-          <ReStatCard label="引用视图数" :value="impactResult.total_views" tone="primary" />
-          <ReStatCard label="关联关系数" :value="impactResult.total_relations" tone="accent" />
-          <ReStatCard label="分析表" :value="impactResult.table" tone="info" />
+          <ReStatCard label="下游受影响对象" :value="impactResult.downstream_nodes?.length || 0" tone="primary" />
+          <ReStatCard label="上游来源对象" :value="impactResult.upstream_nodes?.length || 0" tone="accent" />
+          <ReStatCard label="血缘边总数" :value="impactResult.total_edges || 0" tone="info" />
         </section>
 
-        <div v-if="impactResult.referencing_views.length > 0" class="result-section">
-          <h3>被以下 ODS 视图引用</h3>
-          <el-tag v-for="viewName in impactResult.referencing_views" :key="viewName" class="tag-item" type="info">{{ viewName }}</el-tag>
+        <p class="impact-target">
+          分析对象：<code>{{ impactTargetLabel }}</code>
+        </p>
+
+        <div class="impact-columns">
+          <section class="impact-column">
+            <h3>
+              下游影响范围
+              <span class="col-sub">改这张表，谁会受影响</span>
+            </h3>
+            <template v-if="downstreamGroups.length">
+              <div v-for="group in downstreamGroups" :key="group.hop" class="hop-group">
+                <p class="hop-title">{{ hopLabel(group.hop) }}</p>
+                <div class="hop-nodes">
+                  <el-tag
+                    v-for="node in group.nodes"
+                    :key="node.key"
+                    :type="nodeTagType(node.type)"
+                    class="node-tag"
+                    effect="plain"
+                    @click="expandNodeInGraph(node)"
+                  >
+                    <span class="node-type">{{ nodeTypeLabel(node.type) }}</span>
+                    {{ node.name }}
+                  </el-tag>
+                </div>
+              </div>
+            </template>
+            <p v-else class="hop-empty">未发现下游依赖对象。</p>
+          </section>
+
+          <section class="impact-column">
+            <h3>
+              上游数据来源
+              <span class="col-sub">这张表的数据从哪来</span>
+            </h3>
+            <template v-if="upstreamGroups.length">
+              <div v-for="group in upstreamGroups" :key="group.hop" class="hop-group">
+                <p class="hop-title">{{ hopLabel(group.hop) }}</p>
+                <div class="hop-nodes">
+                  <el-tag
+                    v-for="node in group.nodes"
+                    :key="node.key"
+                    :type="nodeTagType(node.type)"
+                    class="node-tag"
+                    effect="plain"
+                    @click="expandNodeInGraph(node)"
+                  >
+                    <span class="node-type">{{ nodeTypeLabel(node.type) }}</span>
+                    {{ node.name }}
+                  </el-tag>
+                </div>
+              </div>
+            </template>
+            <p v-else class="hop-empty">未发现上游来源对象。</p>
+          </section>
         </div>
 
-        <div v-if="impactResult.dependent_relations.length > 0" class="result-section">
-          <h3>关联的正式关系</h3>
-          <div v-for="relation in impactResult.dependent_relations" :key="relation" class="relation-line">{{ relation }}</div>
-        </div>
-
-        <ReEmptyState v-if="impactResult.total_views === 0 && impactResult.total_relations === 0" title="未发现影响" description="未找到该表相关的视图或关系。" />
+        <ReEmptyState
+          v-if="!impactResult.downstream_nodes?.length && !impactResult.upstream_nodes?.length"
+          title="未发现血缘依赖"
+          description="该表暂无登记的血缘边，可先在血缘同步或关系审核中补充。"
+        />
       </div>
     </el-card>
 
@@ -92,6 +144,16 @@
       <ReToolbar :title="`ODS 视图依赖（${depsTotal}）`">
         <div class="deps-filter">
           <el-input v-model="depView" placeholder="视图名" clearable @clear="loadDeps" @keyup.enter="loadDeps" />
+          <el-select
+            v-model="depSchema"
+            class="dep-schema-select"
+            placeholder="被引用 Schema"
+            clearable
+            filterable
+            @change="onDepSchemaChange"
+          >
+            <el-option v-for="item in depSchemaOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
           <el-select
             v-model="depTable"
             class="dep-table-select"
@@ -117,6 +179,8 @@
         <template #actions><el-button type="primary" :icon="SearchIcon" @click="loadDeps">查询</el-button></template>
       </ReToolbar>
 
+      <p class="deps-hint">同一视图引用的多张表已合并展示；点击"被引用表"查看表详情，或在行内直接发起影响分析。</p>
+
       <!-- 146 E10（R5）：依赖表加载失败显式错误态 + 重试（不再静默） -->
       <ReEmptyState
         v-if="depsError"
@@ -126,11 +190,41 @@
         retryable
         @retry="loadDeps"
       />
-      <el-table v-else v-loading="depsLoading" :data="depsItems" stripe class="medical-data-table">
-        <el-table-column prop="view_name" label="ODS 视图" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="referenced_schema" label="被引用 Schema" width="140" />
-        <el-table-column prop="referenced_table" label="被引用表" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="alias" label="别名" width="100" />
+      <el-table
+        v-else
+        v-loading="depsLoading"
+        :data="depsItems"
+        stripe
+        class="medical-data-table"
+        :span-method="depSpanMethod"
+      >
+        <el-table-column label="ODS 视图" min-width="240">
+          <template #default="{ row }">
+            <div class="view-cell">
+              <span class="view-name">{{ row.view_name }}</span>
+              <span v-if="row.referenced_schema" class="view-schema">{{ row.referenced_schema }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="被引用表" min-width="240">
+          <template #default="{ row }">
+            <el-link type="primary" :underline="false" class="table-link" @click="openTableDetail(row)">
+              {{ row.referenced_table }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="别名" width="110">
+          <template #default="{ row }">
+            <el-tag v-if="row.alias" type="info" effect="plain" size="small">{{ row.alias }}</el-tag>
+            <span v-else class="cell-muted">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="170" align="center">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="runImpactForRow(row)">分析影响</el-button>
+            <el-button link type="primary" size="small" @click="expandRowInGraph(row)">图谱</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <el-pagination v-model:current-page="depPage" class="pager" :page-size="depPageSize" :total="depsTotal" layout="total, prev, pager, next" @current-change="loadDeps" />
     </el-card>
@@ -142,7 +236,7 @@ import ReEmptyState from "@/components/ReEmptyState/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   getGraphFilterOptions,
@@ -152,7 +246,8 @@ import {
   getViewDependencies,
   searchGraphTables,
   type GraphOptionItem,
-  type ImpactResult,
+  type LineageImpactEdge,
+  type LineageImpactResult,
   type ViewDependencyItem
 } from "@/api/asset";
 import {
@@ -172,7 +267,7 @@ const systemCode = ref("");
 const schemaName = ref("");
 const impactTable = ref("");
 const impactLoading = ref(false);
-const impactResult = ref<ImpactResult | null>(null);
+const impactResult = ref<LineageImpactResult | null>(null);
 // 146 E10（R5）：影响分析/视图依赖的真实错误态（失败原因 + 重试）
 const impactError = ref("");
 const depsError = ref("");
@@ -189,9 +284,101 @@ const depsTotal = ref(0);
 const depPage = ref(1);
 const depPageSize = ref(50);
 const depView = ref("");
+const depSchema = ref("");
 const depTable = ref("");
 const depTableSearching = ref(false);
 const depTableOptions = ref<ImpactTableOption[]>([]);
+// 依赖卡 schema 筛选复用图谱 schema 选项全集（后端 /lineage/views 已支持 schema 参数）
+const depSchemaOptions = computed(() => allSchemaOptions.value);
+
+// --- 血缘影响结果：typed object_key 解析与按跳分层 ---
+
+interface ImpactNodeDisplay {
+  key: string;
+  name: string;
+  type: string;
+}
+
+interface ImpactHopGroup {
+  hop: number;
+  nodes: ImpactNodeDisplay[];
+}
+
+const OBJECT_TYPE_LABELS: Record<string, string> = {
+  table: "表",
+  view: "视图",
+  query: "查询",
+  metric: "指标",
+  product: "产品"
+};
+
+const NODE_TAG_TYPES: Record<string, "primary" | "success" | "warning" | "danger" | "info"> = {
+  table: "primary",
+  view: "warning",
+  query: "success",
+  metric: "danger",
+  product: "info"
+};
+
+function parseObjectKeyName(key: string): { name: string; type: string } {
+  const parts = key.split("|");
+  if (parts.length === 6) return { name: `${parts[3]}.${parts[4]}`, type: parts[5] };
+  return { name: key, type: "table" };
+}
+
+function buildHopGroups(nodes: string[], edges: LineageImpactEdge[], side: "down" | "up"): ImpactHopGroup[] {
+  const info = new Map<string, { hop: number; type: string }>();
+  for (const edge of edges || []) {
+    const isDown = side === "down";
+    const node = isDown ? edge.to : edge.from;
+    const type = isDown ? edge.to_type : edge.from_type;
+    const prev = info.get(node);
+    if (!prev || edge.hops < prev.hop) info.set(node, { hop: edge.hops, type });
+  }
+  // nodes 列表兜底（无边记录的节点按 1 跳处理）
+  for (const key of nodes || []) {
+    if (!info.has(key)) info.set(key, { hop: 1, type: parseObjectKeyName(key).type });
+  }
+  const grouped = new Map<number, ImpactNodeDisplay[]>();
+  for (const [key, meta] of info) {
+    const parsed = parseObjectKeyName(key);
+    const list = grouped.get(meta.hop) || [];
+    list.push({ key, name: parsed.name, type: meta.type });
+    grouped.set(meta.hop, list);
+  }
+  return [...grouped.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([hop, items]) => ({ hop, nodes: items.sort((a, b) => a.name.localeCompare(b.name)) }));
+}
+
+const downstreamGroups = computed<ImpactHopGroup[]>(() => {
+  if (!impactResult.value) return [];
+  return buildHopGroups(impactResult.value.downstream_nodes || [], impactResult.value.downstream_edges || [], "down");
+});
+
+const upstreamGroups = computed<ImpactHopGroup[]>(() => {
+  if (!impactResult.value) return [];
+  return buildHopGroups(impactResult.value.upstream_nodes || [], impactResult.value.upstream_edges || [], "up");
+});
+
+const impactTargetLabel = computed(() => {
+  const key = impactResult.value?.object_key || "";
+  return key ? parseObjectKeyName(key).name : impactTable.value;
+});
+
+function hopLabel(hop: number): string {
+  return hop <= 1 ? "直接依赖（1 跳）" : `间接依赖（${hop} 跳）`;
+}
+
+function nodeTypeLabel(type: string): string {
+  return OBJECT_TYPE_LABELS[type] || type;
+}
+
+function nodeTagType(type: string): "primary" | "success" | "warning" | "danger" | "info" {
+  return NODE_TAG_TYPES[type] || "info";
+}
+
+// --- 影响分析 ---
 
 function runImpact() {
   if (!impactTable.value.trim()) { ElMessage.warning("请选择或搜索要分析的表"); return; }
@@ -206,6 +393,19 @@ function runImpact() {
     .finally(() => { impactLoading.value = false; });
 }
 
+function scrollToImpact() {
+  document.querySelector(".impact-query")?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function runImpactForRow(row: ViewDependencyItem) {
+  const schema = String(row.referenced_schema || "").trim();
+  const table = String(row.referenced_table || "").trim();
+  if (!table) { ElMessage.warning("该行缺少被引用表名"); return; }
+  impactTable.value = schema ? `${schema}.${table}` : table;
+  runImpact();
+  scrollToImpact();
+}
+
 function expandInGraph() {
   const selected = tableOptions.value.find(item => item.value === impactTable.value);
   const physicalKey = selected?.value || impactTable.value.trim();
@@ -213,10 +413,26 @@ function expandInGraph() {
   router.push({ path: "/asset/graph", query: { center: physicalKey } });
 }
 
+function expandNodeInGraph(node: ImpactNodeDisplay) {
+  if (node.type !== "table" && node.type !== "view") {
+    ElMessage.info("该对象类型暂不支持图谱定位，可在血缘同步中查看详情");
+    return;
+  }
+  router.push({ path: "/asset/graph", query: { center: node.name } });
+}
+
+// --- 视图依赖列表 ---
+
 function loadDeps() {
   depsLoading.value = true;
   depsError.value = "";
-  getViewDependencies({ page: depPage.value, page_size: depPageSize.value, view: depView.value || undefined, referenced_table: depTable.value || undefined })
+  getViewDependencies({
+    page: depPage.value,
+    page_size: depPageSize.value,
+    view: depView.value || undefined,
+    referenced_table: depTable.value || undefined,
+    schema: depSchema.value || undefined
+  })
     .then(({ data }) => { depsItems.value = data.items; depsTotal.value = data.total; })
     .catch(error => {
       depsItems.value = [];
@@ -225,6 +441,45 @@ function loadDeps() {
     })
     .finally(() => { depsLoading.value = false; });
 }
+
+function onDepSchemaChange() {
+  depPage.value = 1;
+  loadDeps();
+}
+
+// 同一视图引用多张表：合并"视图"列单元格，去重复观感
+type DepSpanMethod = (params: { row: ViewDependencyItem; rowIndex: number; columnIndex: number }) => [number, number];
+const depSpanMethod = computed<DepSpanMethod>(() => {
+  const items = depsItems.value;
+  const spans = new Array<number>(items.length).fill(0);
+  let i = 0;
+  while (i < items.length) {
+    let j = i;
+    while (j + 1 < items.length && items[j + 1].view_name === items[i].view_name) j += 1;
+    spans[i] = j - i + 1;
+    i = j + 1;
+  }
+  return ({ rowIndex, columnIndex }) => {
+    if (columnIndex !== 0) return [1, 1];
+    return [spans[rowIndex] || 1, 1];
+  };
+});
+
+function openTableDetail(row: ViewDependencyItem) {
+  const schema = String(row.referenced_schema || "").trim();
+  const table = String(row.referenced_table || "").trim();
+  if (!schema || !table) { ElMessage.warning("缺少 SCHEMA.TABLE 信息，无法打开表详情"); return; }
+  router.push(`/asset/tables/${encodeURIComponent(schema)}/${encodeURIComponent(table)}`);
+}
+
+function expandRowInGraph(row: ViewDependencyItem) {
+  const schema = String(row.referenced_schema || "").trim();
+  const table = String(row.referenced_table || "").trim();
+  if (!schema || !table) { ElMessage.warning("缺少 SCHEMA.TABLE 信息，无法在图谱展开"); return; }
+  router.push({ path: "/asset/graph", query: { center: `${schema}.${table}` } });
+}
+
+// --- 筛选选项加载（沿用原逻辑） ---
 
 async function loadCatalogOptions() {
   optionsLoading.value = true;
@@ -358,15 +613,34 @@ loadDeps();
 .schema-select { width: 180px; }
 .table-select { width: min(420px, 100%); }
 .dep-table-select { width: 280px; }
-.impact-hint { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.dep-schema-select { width: 180px; }
+.impact-hint, .deps-hint { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .deps-filter :deep(.el-input) { width: 240px; }
 .impact-result { display: grid; gap: 14px; margin-top: 14px; }
 .impact-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.result-section { padding: 14px; background: var(--bg-page); border: 1px solid var(--border-light); border-radius: var(--radius-base); }
-.result-section h3 { margin: 0 0 10px; font-size: 15px; color: var(--text-primary); }
-.tag-item { margin: 0 6px 6px 0; }
-.relation-line { padding: 5px 0; font-family: "Courier New", monospace; font-size: 13px; color: var(--text-regular); }
+.impact-target { margin: 0; font-size: 13px; color: var(--text-regular); }
+.impact-target code { padding: 2px 8px; background: var(--bg-page); border: 1px solid var(--border-light); border-radius: 4px; font-family: "Courier New", monospace; }
+.impact-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.impact-column { padding: 14px; background: var(--bg-page); border: 1px solid var(--border-light); border-radius: var(--radius-base); }
+.impact-column h3 { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 15px; color: var(--text-primary); }
+.col-sub { font-size: 12px; font-weight: normal; color: var(--text-secondary); }
+.hop-group { margin-bottom: 10px; }
+.hop-title { margin: 0 0 6px; font-size: 12px; color: var(--text-secondary); }
+.hop-nodes { display: flex; flex-wrap: wrap; gap: 6px; }
+.node-tag { cursor: pointer; }
+.node-tag:hover { border-color: var(--el-color-primary); }
+.node-type { margin-right: 4px; opacity: 0.75; }
+.hop-empty { margin: 0; font-size: 13px; color: var(--text-secondary); }
+.view-cell { display: flex; flex-direction: column; gap: 2px; }
+.view-name { font-family: "Courier New", monospace; font-size: 13px; color: var(--text-primary); }
+.view-schema { font-size: 12px; color: var(--text-secondary); }
+.table-link { font-family: "Courier New", monospace; font-size: 13px; }
+.cell-muted { color: var(--text-secondary); }
 .medical-data-table { --el-table-header-bg-color: var(--bg-elevated); --el-table-row-hover-bg-color: rgb(14 165 233 / 6%); --el-table-border-color: var(--border-light); margin-top: 12px; font-size: 13px; }
 .pager { justify-content: flex-end; margin-top: 14px; }
-@media (max-width: 760px) { .impact-stats { grid-template-columns: 1fr; } .impact-query :deep(.el-input), .deps-filter :deep(.el-input) { width: 100%; } }
+@media (max-width: 760px) {
+  .impact-stats { grid-template-columns: 1fr; }
+  .impact-columns { grid-template-columns: 1fr; }
+  .impact-query :deep(.el-input), .deps-filter :deep(.el-input) { width: 100%; }
+}
 </style>

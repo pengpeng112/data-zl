@@ -57,14 +57,14 @@ const markValue = ref($storage.configure?.showModel ?? "smart");
 const logoVal = ref($storage.configure?.showLogo ?? true);
 
 const settings = reactive({
-  greyVal: $storage.configure.grey,
-  weakVal: $storage.configure.weak,
-  tabsVal: $storage.configure.hideTabs,
-  showLogo: $storage.configure.showLogo,
-  showModel: $storage.configure.showModel,
-  hideFooter: $storage.configure.hideFooter,
-  multiTagsCache: $storage.configure.multiTagsCache,
-  stretch: $storage.configure.stretch
+  greyVal: $storage.configure?.grey ?? false,
+  weakVal: $storage.configure?.weak ?? false,
+  tabsVal: $storage.configure?.hideTabs ?? false,
+  showLogo: $storage.configure?.showLogo ?? true,
+  showModel: $storage.configure?.showModel ?? "smart",
+  hideFooter: $storage.configure?.hideFooter ?? true,
+  multiTagsCache: $storage.configure?.multiTagsCache ?? false,
+  stretch: $storage.configure?.stretch ?? false
 });
 
 const getThemeColorStyle = computed(() => {

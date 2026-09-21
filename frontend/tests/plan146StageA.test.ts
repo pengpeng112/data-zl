@@ -5,6 +5,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import ElementPlus from "element-plus";
 
 import assetRoute from "@/router/modules/asset";
+import catalogRoute from "@/router/modules/catalog";
 import RelationGraph from "@/views/asset/components/RelationGraph.vue";
 import { parseParameterObject } from "@/views/ops/sql-workbench/contracts";
 import OverviewPanel from "@/views/dict/medical/components/OverviewPanel.vue";
@@ -31,7 +32,7 @@ describe("plan146 stage A", () => {
     expect(apiSource).not.toContain("promoteCandidate");
     expect(apiSource).not.toContain("rejectCandidate");
 
-    const candidateRoute = (assetRoute as any).children.find((route: any) => route.name === "AssetCandidates");
+    const candidateRoute = (catalogRoute as any).children.find((route: any) => route.name === "AssetCandidates");
     const redirect = candidateRoute.redirect({ query: { from: "A", to: "B" } });
     expect(candidateRoute.meta.showLink).toBe(false);
     expect(redirect).toEqual({

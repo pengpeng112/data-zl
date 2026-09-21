@@ -18,7 +18,7 @@
           <div class="toolbar">
             <el-input v-model="keyword" clearable placeholder="编码/标题/用途" style="width: 240px" @keyup.enter="doSearch" />
             <el-button type="primary" @click="doSearch">查询</el-button>
-            <el-button v-perms="'query.create'" @click="openIngest">提交 SQL</el-button>
+            <el-button v-perms="'query.create'" ref="ingestTriggerRef" @click="openIngest">提交 SQL</el-button>
           </div>
           <el-table v-loading="loading" :data="items" stripe size="small" @row-click="openDetail">
             <el-table-column prop="query_code" label="编码" width="200" />
@@ -276,8 +276,57 @@
           <el-input v-model="form.sql_text" type="textarea" :rows="10" placeholder="仅 SELECT / WITH；bind 参数用 :name" />
           <el-button link type="primary" @click="insertSqlExample">填入安全示例</el-button>
         </el-form-item>
+        <!-- 186 Q3：语义契约字段（粒度/时间口径/限制/配方引用/参数表） -->
+        <el-form-item label="行粒度">
+          <el-input v-model="form.grain" placeholder="例如：一次住院（PATIENT_ID+VISIT_ID）" />
+        </el-form-item>
+        <el-form-item label="时间口径字段">
+          <el-input v-model="form.period_field" placeholder="例如：DISCHARGE_DATE_TIME" />
+        </el-form-item>
+        <el-form-item label="使用限制">
+          <el-input v-model="form.limitations_text" type="textarea" :rows="2" placeholder="每行一条，如：不含门诊" />
+        </el-form-item>
+        <el-form-item label="配方引用">
+          <el-input v-model="form.recipe_refs_text" placeholder="逗号或换行分隔的 recipe code" />
+        </el-form-item>
+        <el-form-item label="参数契约">
+          <el-table :data="form.parameter_rows" size="small" border>
+            <el-table-column label="参数名" min-width="120">
+              <template #default="{ row }"><el-input v-model="row.name" placeholder=":name" /></template>
+            </el-table-column>
+            <el-table-column label="类型" width="120">
+              <template #default="{ row }">
+                <el-select v-model="row.type">
+                  <el-option value="string" /><el-option value="number" /><el-option value="date" />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="必填" width="70">
+              <template #default="{ row }"><el-checkbox v-model="row.required" /></template>
+            </el-table-column>
+            <el-table-column label="默认值" min-width="110">
+              <template #default="{ row }">
+                <el-input v-model="row.default_value" placeholder="留空=无默认" :disabled="row.required" />
+              </template>
+            </el-table-column>
+            <el-table-column width="70">
+              <template #default="{ $index }">
+                <el-button link type="danger" @click="form.parameter_rows.splice($index, 1)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-button
+            link
+            type="primary"
+            @click="form.parameter_rows.push({ name: '', type: 'string', required: true, default_value: '' })"
+          >
+            添加参数
+          </el-button>
+          <div class="el-form-item__msg">SQL 中的 :name 参数请逐个登记；AI 生成不代表已具备可信参数契约。</div>
+        </el-form-item>
       </el-form>
       <template #footer>
+        <el-button @click="closeIngest">取消</el-button>
         <el-button @click="previewGate">门禁试算</el-button>
         <el-button v-perms="'query.create'" type="primary" :loading="saving" @click="submitIngest">提交（自动门禁）</el-button>
       </template>
@@ -358,6 +407,10 @@
         </el-button>
       </template>
       <RunProvenancePanel v-if="runOutcome" :run="runOutcome" class="mt12" />
+      <!-- 186 P1-1：执行结果 → 准确性反馈入口（只带非敏感定位 ID） -->
+      <div v-if="canFeedback && runOutcome" class="mt12">
+        <el-button size="small" type="primary" plain @click="feedbackRun(runOutcome)">反馈此结果</el-button>
+      </div>
       <el-table v-if="runSampleRows.length" :data="runSampleRows" size="small" border class="mt12" max-height="320">
         <el-table-column v-for="column in runSampleColumns" :key="column" :prop="column" :label="column" min-width="120" show-overflow-tooltip />
       </el-table>
@@ -365,6 +418,18 @@
 
     <el-dialog v-model="runDetailVisible" title="运行溯源" width="720px">
       <RunProvenancePanel :run="runDetail" />
+      <template #footer>
+        <!-- 186 P1-1：运行详情 → 准确性反馈入口（上下文由 accuracy 页按 run_id 回读，不信任 URL） -->
+        <el-button
+          v-if="canFeedback && runDetail"
+          size="small"
+          type="primary"
+          plain
+          @click="feedbackRun(runDetail)"
+        >
+          反馈此结果
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="metricIngestVisible" title="登记统计指标" width="720px">
@@ -417,6 +482,17 @@
           状态={{ calcResult.status }} 值={{ calcResult.metric_value ?? "-" }}
           批次={{ calcResult.run_batch }} 批次幂等={{ calcResult.idempotent }}
         </el-alert>
+        <!-- 186 P1-1：指标计算结果 → 准确性反馈入口（metric_code/version 来自已加载详情） -->
+        <el-button
+          v-if="canFeedback && calcResult"
+          class="mt12"
+          size="small"
+          type="primary"
+          plain
+          @click="feedbackMetricResult"
+        >
+          反馈此结果
+        </el-button>
       </template>
     </el-drawer>
 
@@ -439,8 +515,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
-import { ElMessage } from "element-plus";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter, type LocationQueryRaw } from "vue-router";
+import { useQueryDraftHandoffStore } from "@/store/modules/queryDraftHandoff";
+import { hasUserPermissions } from "@/utils/permission";
+import { userKey, type DataInfo } from "@/utils/auth";
+import { storageLocal } from "@pureadmin/utils";
+
+const route = useRoute();
+const router = useRouter();
+
+function currentUserProfile(): DataInfo<number> | null {
+  try {
+    return storageLocal().getItem<DataInfo<number>>(userKey) ?? null;
+  } catch {
+    return null;
+  }
+}
+import { ElMessage, ElMessageBox } from "element-plus";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import RePageHeader from "@/components/RePageHeader/index.vue";
 import RunProvenancePanel from "./components/RunProvenancePanel.vue";
@@ -473,7 +565,9 @@ import {
   type QueryVersion
 } from "@/api/query-center";
 
-const tab = ref("list");
+// 186 Q1：tab 与 URL 双向同步（tab=metrics/runs 直达可恢复；刷新保持；非法回 list）
+const QUERY_TAB_WHITELIST = ["list", "metrics", "products", "runs", "board", "ops"] as const;
+const tab = ref<string>("list");
 const loading = ref(false);
 const items = ref<any[]>([]);
 const total = ref(0);
@@ -492,6 +586,21 @@ const runDetail = ref<QueryRun | null>(null);
 const ingestVisible = ref(false);
 const saving = ref(false);
 const gateResult = ref<any>(null);
+// 186 P2-5：摄取弹窗关闭（取消/X/Esc）后焦点回到触发按钮（键盘主路径不丢焦点）。
+// 延迟到宏任务：Element Plus 焦点陷阱释放时会把焦点还原为打开前元素，需在其后回归。
+const ingestTriggerRef = ref<{ $el?: HTMLElement } | null>(null);
+function restoreIngestFocus() {
+  setTimeout(() => {
+    (ingestTriggerRef.value?.$el as HTMLElement | undefined)?.focus?.();
+  }, 0);
+}
+watch(ingestVisible, open => {
+  if (!open) restoreIngestFocus();
+});
+function closeIngest() {
+  ingestVisible.value = false;
+  restoreIngestFocus();
+}
 const form = reactive({
   query_code: "",
   title: "",
@@ -499,7 +608,13 @@ const form = reactive({
   source_code: "ods_8_216",
   dialect: "oracle",
   purpose: "",
-  sql_text: ""
+  sql_text: "",
+  // 186 Q3：语义门禁所需契约字段（Pydantic 可选≠门禁放行缺失值）
+  grain: "",
+  period_field: "",
+  limitations_text: "",
+  recipe_refs_text: "",
+  parameter_rows: [] as Array<{ name: string; type: string; required: boolean; default_value: string }>
 });
 
 const detailVisible = ref(false);
@@ -594,6 +709,11 @@ function certTone(status?: string): "success" | "warning" | "info" {
 }
 
 function onTab(name: string | number) {
+  const next = String(name);
+  if ((QUERY_TAB_WHITELIST as readonly string[]).includes(next)) {
+    // 同步到 URL（replace 不产生历史记录堆叠）
+    routeTabSync(next);
+  }
   if (name === "metrics") loadMetrics();
   if (name === "runs") loadRuns();
   if (name === "products") loadProducts();
@@ -604,16 +724,21 @@ function onTab(name: string | number) {
   }
 }
 
+// QA ST-029：列表请求序号守卫（与 detailSeq 同口径），防慢响应晚到覆盖新页。
+let listSeq = 0;
 async function loadList() {
+  const seq = ++listSeq;
   loading.value = true;
   try {
     const res = await fetchQueries({ page: page.value, page_size: pageSize, keyword: keyword.value || undefined });
+    if (seq !== listSeq) return;
     items.value = res.data?.items || [];
     total.value = res.data?.total || 0;
   } catch (e: any) {
+    if (seq !== listSeq) return;
     ElMessage.error(extractErrorDetail(e, "加载查询列表失败"));
   } finally {
-    loading.value = false;
+    if (seq === listSeq) loading.value = false;
   }
 }
 
@@ -623,16 +748,20 @@ function doSearch() {
   loadList();
 }
 
+let runsSeq = 0;
 async function loadRuns() {
+  const seq = ++runsSeq;
   runsLoading.value = true;
   try {
     const res = await fetchQueryRuns({ page: runsPage.value, page_size: runsPageSize.value });
+    if (seq !== runsSeq) return;
     runs.value = res.data?.items || [];
     runsTotal.value = res.data?.total || 0;
   } catch (e: any) {
+    if (seq !== runsSeq) return;
     ElMessage.error(extractErrorDetail(e, "加载运行记录失败"));
   } finally {
-    runsLoading.value = false;
+    if (seq === runsSeq) runsLoading.value = false;
   }
 }
 
@@ -644,6 +773,38 @@ async function openRunDetail(row: QueryRun) {
   } catch (e: any) {
     ElMessage.error(extractErrorDetail(e, "运行详情失败"));
   }
+}
+
+// 186 P1-1：结果 → 准确性反馈入口。只携带非敏感定位 ID（run_id/query_code/
+// query_version，取自已加载的运行详情数据），不带 SQL/提示词/digest；
+// accuracy 页按 run_id 回读真实上下文，不信任 URL 传值。
+const canFeedback = computed(() =>
+  hasUserPermissions(["feedback.create"], currentUserProfile())
+);
+
+function feedbackRun(run?: QueryRun | null) {
+  if (!run || !run.id || !run.query_code) return;
+  router.push({
+    path: "/asset/queries/accuracy",
+    query: {
+      run_id: String(run.id),
+      query_code: run.query_code,
+      query_version: run.version == null ? "" : String(run.version)
+    }
+  });
+}
+
+function feedbackMetricResult() {
+  const definition = metricDetail.value?.definition;
+  const version = metricDetail.value?.active_version?.version;
+  if (!definition?.metric_code) return;
+  router.push({
+    path: "/asset/queries/accuracy",
+    query: {
+      metric_code: definition.metric_code,
+      ...(version != null ? { metric_version: String(version) } : {})
+    }
+  });
 }
 
 function openIngest() {
@@ -663,6 +824,11 @@ function resetQueryForm() {
     source_code: "ods_8_216",
     dialect: "oracle",
     purpose: "",
+    grain: "",
+    period_field: "",
+    limitations_text: "",
+    recipe_refs_text: "",
+    parameter_rows: [],
     sql_text: ""
   });
   gateResult.value = null;
@@ -684,7 +850,37 @@ async function previewGate() {
 async function submitIngest() {
   saving.value = true;
   try {
-    const res = await ingestQuery({ ...form });
+    // 186 Q3：契约字段组装；空值不传（避免空字符串污染 schema）
+    const payload: Record<string, unknown> = {
+      query_code: form.query_code,
+      title: form.title,
+      system_code: form.system_code,
+      source_code: form.source_code || undefined,
+      dialect: form.dialect,
+      purpose: form.purpose,
+      sql_text: form.sql_text,
+      grain: form.grain || undefined,
+      period_field: form.period_field || undefined,
+      limitations: form.limitations_text
+        ? form.limitations_text.split("\n").map(s => s.trim()).filter(Boolean)
+        : undefined,
+      recipe_refs: form.recipe_refs_text
+        ? form.recipe_refs_text.split(/[,，\n]/).map(s => s.trim()).filter(Boolean)
+        : undefined,
+    };
+    const paramRows = form.parameter_rows.filter(row => row.name.trim());
+    if (paramRows.length) {
+      const schema: Record<string, unknown> = {};
+      for (const row of paramRows) {
+        schema[row.name.trim()] = {
+          type: row.type || "string",
+          required: Boolean(row.required),
+          ...(row.default_value ? { default: row.default_value } : {}),
+        };
+      }
+      payload.parameter_schema = schema;
+    }
+    const res = await ingestQuery(payload);
     const d = res.data;
     ElMessage.success(
       d.idempotent
@@ -767,7 +963,9 @@ async function submitRun() {
   }
 }
 
+let metricsSeq = 0;
 async function loadMetrics() {
+  const seq = ++metricsSeq;
   metricLoading.value = true;
   try {
     const res = await fetchMetrics({
@@ -775,12 +973,14 @@ async function loadMetrics() {
       page_size: metricPageSize,
       keyword: metricKeyword.value || undefined
     });
+    if (seq !== metricsSeq) return;
     metricItems.value = res.data?.items || [];
     metricTotal.value = res.data?.total || 0;
   } catch (e: any) {
+    if (seq !== metricsSeq) return;
     ElMessage.error(extractErrorDetail(e, "加载指标失败"));
   } finally {
-    metricLoading.value = false;
+    if (seq === metricsSeq) metricLoading.value = false;
   }
 }
 
@@ -838,7 +1038,9 @@ async function runCalculate(metricDetailData: any) {
   }
 }
 
+let productsSeq = 0;
 async function loadProducts() {
+  const seq = ++productsSeq;
   productLoading.value = true;
   try {
     const res = await fetchDataProducts({
@@ -847,12 +1049,14 @@ async function loadProducts() {
       keyword: productKeyword.value || undefined,
       enabled: true
     });
+    if (seq !== productsSeq) return;
     productItems.value = res.data?.items || [];
     productTotal.value = res.data?.total || 0;
   } catch (e: any) {
+    if (seq !== productsSeq) return;
     ElMessage.error(extractErrorDetail(e, "加载数据产品失败"));
   } finally {
-    productLoading.value = false;
+    if (seq === productsSeq) productLoading.value = false;
   }
 }
 
@@ -1014,7 +1218,76 @@ async function loadSources() {
   }
 }
 
+function routeTabSync(next: string) {
+  tab.value = next;
+  if (route.query.tab !== next) {
+    router.replace({ query: { ...route.query, tab: next } }).catch(() => undefined);
+  }
+}
+
+// 186 P2-6：handoff 参数一次性消费后立即从 URL 清除（保留 tab 等其他参数），
+// 避免刷新/分享时误报"临时草稿已失效"。
+function clearHandoffQuery() {
+  if (!route.query.handoff) return;
+  const query: LocationQueryRaw = { ...route.query };
+  delete query.handoff;
+  router.replace({ query }).catch(() => undefined);
+}
+
+function restoreTabFromUrl() {
+  const fromUrl = String(route.query.tab || "");
+  tab.value = (QUERY_TAB_WHITELIST as readonly string[]).includes(fromUrl) ? fromUrl : "list";
+  onTab(tab.value);
+}
+
+// 186 Q3：消费 AI SQL 交接草稿（一次取用；无权限不可带入；URL 只带 id）
+function consumeDraftHandoff() {
+  const handoffId = route.query.handoff;
+  if (!handoffId || typeof handoffId !== "string") return;
+  const store = useQueryDraftHandoffStore();
+  const draft = store.consume(handoffId);
+  if (!draft) {
+    ElMessage.info("临时草稿已失效，可返回重新生成或粘贴 SQL");
+    return;
+  }
+  // P2-6：一次性消费成功（含权限不足被丢弃的情况），URL 不再保留 handoff
+  clearHandoffQuery();
+  if (!hasUserPermissions(["query.create"], currentUserProfile())) {
+    ElMessage.warning("缺少 query.create 权限，草稿未带入");
+    return;
+  }
+  const dirty =
+    form.sql_text.trim() ||
+    form.query_code.trim() ||
+    form.title.trim() ||
+    form.purpose.trim();
+  const apply = () => {
+    form.sql_text = draft.sqlText;
+    form.system_code = draft.systemCode;
+    // §4.5：sourceCode 无证据时清空默认值，要求有效来源选择，不沿用默认冒充已确认
+    form.source_code = draft.sourceCode || "";
+    if (draft.questionSummary) {
+      form.title = form.title || draft.questionSummary.slice(0, 60);
+      form.purpose = form.purpose || draft.questionSummary.slice(0, 200);
+    }
+    ingestVisible.value = true;
+  };
+  if (dirty) {
+    ElMessageBox.confirm(
+      "表单已有未保存内容。保留当前输入，还是替换为新草稿？",
+      "草稿冲突",
+      { confirmButtonText: "替换为新草稿", cancelButtonText: "保留当前", type: "warning" }
+    )
+      .then(apply)
+      .catch(() => ElMessage.info("已保留当前表单内容"));
+  } else {
+    apply();
+  }
+}
+
 onMounted(() => {
+  restoreTabFromUrl();
+  consumeDraftHandoff();
   loadList();
   loadRuns();
 });

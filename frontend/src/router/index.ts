@@ -1,5 +1,6 @@
 // import "@/utils/sso";
 import Cookies from "js-cookie";
+import { recordRecentVisit } from "@/utils/menuPreferences";
 import { getConfig } from "@/config";
 import NProgress from "@/utils/progress";
 import { buildHierarchyTree } from "@/utils/tree";
@@ -204,6 +205,12 @@ router.beforeEach((to: ToRouteType, _from, next) => {
           }
           // 确保动态路由完全加入路由列表并且不影响静态路由（注意：动态路由刷新时router.beforeEach可能会触发两次，第一次触发动态路由还未完全添加，第二次动态路由才完全添加到路由列表，如果需要在router.beforeEach做一些判断可以在to.name存在的条件下去判断，这样就只会触发一次）
           if (isAllEmpty(to.name)) router.push(to.fullPath);
+        }).catch((err: unknown) => {
+          // QA ST-002：后端停机时 initRouter reject 会成为 unhandled rejection，
+          // next() 永不调用 → app 永不挂载（白屏+启动转圈）。降级到可操作的登录页。
+          console.error("[router] 初始化路由失败：", err);
+          NProgress.done();
+          next({ path: "/login" });
         });
       }
       toCorrectRoute();
@@ -224,6 +231,16 @@ router.beforeEach((to: ToRouteType, _from, next) => {
 
 router.afterEach(to => {
   loadedPaths.add(to.path);
+  // 186 N2：记录最近访问（用户隔离、白名单 query、20 条上限）
+  try {
+    recordRecentVisit({
+      path: to.path,
+      name: to.name,
+      query: to.query as Record<string, any>
+    });
+  } catch {
+    // 偏好记录失败不阻断导航（存储禁用/配额满时回退内存）
+  }
   NProgress.done();
 });
 

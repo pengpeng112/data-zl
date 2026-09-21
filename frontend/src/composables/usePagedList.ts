@@ -46,6 +46,14 @@ export function usePagedList<T, P extends { page: number; page_size: number }>(
       if (current !== seq) return;
       items.value = res.items || [];
       total.value = res.total || 0;
+      // QA ST-028：末页数据被删空后自动回退上一页，避免停留空页。
+      if (items.value.length === 0 && page.value > 1 && total.value > 0) {
+        const lastPage = Math.max(1, Math.ceil(total.value / pageSize.value));
+        if (page.value > lastPage) {
+          loadData(lastPage);
+          return;
+        }
+      }
     } catch (error) {
       if (current !== seq) return;
       const handled = options.onError?.(error);

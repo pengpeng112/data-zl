@@ -229,7 +229,10 @@ function statusTag(status: string): TagType {
 
 <style scoped>
 .import-wizard { padding: 16px 0; }
+
 .wizard-steps { margin-bottom: 24px; }
+
 .step-content { min-height: 300px; }
-.toolbar { display: flex; align-items: center; gap: 12px; }
+
+.toolbar { display: flex; gap: 12px; align-items: center; }
 </style>

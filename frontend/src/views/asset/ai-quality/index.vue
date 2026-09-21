@@ -315,6 +315,44 @@ async function refreshPatrolJobs() {
     catch { return item; }
   }));
 }
+// 186 D2：巡查轮询（此前 start 后仅刷新一次）。仅查状态，不重复提交模型任务；
+// 全部终态/超时/卸载/离开巡查页签即停。
+let patrolTimer: number | undefined;
+const PATROL_POLL_MS = 3000;
+const PATROL_POLL_TIMEOUT_MS = 10 * 60 * 1000;
+let patrolPollStartedAt = 0;
+
+function stopPatrolWatch() {
+  if (patrolTimer) {
+    window.clearTimeout(patrolTimer);
+    patrolTimer = undefined;
+  }
+}
+
+function patrolAllTerminal() {
+  return (
+    patrolJobs.value.length > 0 &&
+    patrolJobs.value.every(item =>
+      ["succeeded", "failed", "blocked", "unknown"].includes(item.status)
+    )
+  );
+}
+
+async function patrolTick() {
+  if (Date.now() - patrolPollStartedAt > PATROL_POLL_TIMEOUT_MS) {
+    stopPatrolWatch();
+    ElMessage.warning("巡查进度轮询已达 10 分钟上限，已停止；可手动刷新查看结果");
+    return;
+  }
+  await refreshPatrolJobs();
+  if (patrolAllTerminal()) {
+    stopPatrolWatch();
+    await loadPatrol();
+    return;
+  }
+  patrolTimer = window.setTimeout(patrolTick, PATROL_POLL_MS);
+}
+
 async function startPatrol() {
   patrolRunning.value = true;
   offlineReplay.value = false;
@@ -323,6 +361,12 @@ async function startPatrol() {
     patrolJobs.value = data.jobs.map(item => ({ id: item.job_id, job_id: item.job_id, table: item.table, task_type: "finding_batch", status: "queued" } as AiQualityJob & { table: string }));
     await refreshPatrolJobs();
     await loadPatrol();
+    // 186 D2：进入轮询直至全部终态（不再次提交模型任务）
+    stopPatrolWatch();
+    if (!patrolAllTerminal()) {
+      patrolPollStartedAt = Date.now();
+      patrolTimer = window.setTimeout(patrolTick, PATROL_POLL_MS);
+    }
     ElMessage.success(data.errors.length ? "巡查已提交，个别目标失败" : "巡查已提交");
   } catch {
     offlineReplay.value = Boolean(patrolRuns.value.length);
@@ -396,16 +440,67 @@ async function watchJob(jobId: number | string) {
   };
   await tick();
 }
+// 186 D2：统一完整报告文本——摘要、根因、噪声判断、建议、人工复核状态、
+// 证据摘要与生成时间；Markdown 形式，不完整报告标注「生成中」。
+function buildFullReportText(result: any): string {
+  if (!result) return "";
+  const structured = result.structured_result || result;
+  const lines: string[] = [];
+  const push = (label: string, value: unknown) => {
+    if (value === null || value === undefined || value === "") return;
+    if (Array.isArray(value)) {
+      if (!value.length) return;
+      lines.push(`## ${label}`);
+      for (const item of value) {
+        const text =
+          typeof item === "string"
+            ? item
+            : [item?.category, item?.reason ?? item?.description, item?.suggestion ?? item?.next_step]
+                .filter(Boolean)
+                .join("：");
+        if (text) lines.push(`- ${text}`);
+      }
+      return;
+    }
+    if (typeof value === "object") {
+      lines.push(`## ${label}`);
+      lines.push(
+        Object.entries(value as Record<string, unknown>)
+          .map(([k, v]) => `- ${k}: ${typeof v === "object" ? JSON.stringify(v) : String(v)}`)
+          .join("\n")
+      );
+      return;
+    }
+    lines.push(`## ${label}`);
+    lines.push(String(value));
+  };
+  push("摘要", structured.summary ?? result.summary);
+  push("根因分析", structured.root_causes ?? structured.root_cause);
+  push("噪声判断", structured.noise_assessment ?? structured.noise);
+  push("建议", structured.suggestions ?? structured.recommendations);
+  push("人工复核状态", structured.review_status ?? structured.attach_status);
+  push("证据摘要", structured.evidence);
+  lines.push(`## 生成时间`);
+  lines.push(new Date().toLocaleString("zh-CN", { hour12: false }));
+  const body = lines.join("\n\n").trim();
+  if (!body) return "";
+  const complete = structured.complete !== false && result.partial !== true;
+  return complete ? body : `${body}\n\n> 报告生成中：以上为当前可用部分`;
+}
+
 async function copyReport() {
   const result = selectedResult.value as any;
-  const text = result?.structured_result?.summary || result?.summary || liveText.value || "";
+  const text =
+    buildFullReportText(result) ||
+    (analyzing.value ? "" : liveText.value) ||
+    "";
   if (!text) {
-    ElMessage.warning("暂无可复制的报告内容");
+    ElMessage.warning(analyzing.value ? "报告仍在生成中" : "暂无可复制的报告内容");
     return;
   }
   try {
     await navigator.clipboard.writeText(text);
-    ElMessage.success("报告已复制");
+    ElMessage.success("完整报告已复制");
   } catch {
     ElMessage.warning("剪贴板不可用，请手动选择复制");
   }
@@ -491,7 +586,10 @@ onMounted(async () => {
   await loadStatus();
   await Promise.all([loadFindings(), loadJobs(), loadPatrol()]);
 });
-onUnmounted(() => stopWatch());
+onUnmounted(() => {
+  stopWatch();
+  stopPatrolWatch();
+});
 </script>
 
 <style scoped>

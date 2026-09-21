@@ -270,7 +270,11 @@ onMounted(load);
 <template>
   <div class="p-4">
     <RePageHeader title="关系配方库" subtitle="检索、版本化维护、复制和只读 SQL 预览；不执行目标库 DDL。">
-      <template #actions><el-button v-perms="'recipe.create'" type="primary" @click="openCreate">新建草稿</el-button></template>
+      <template #actions>
+        <!-- 186 N1/A3：AI 上下文预览隐藏页常驻入口（独立权限 ai_context.view） -->
+        <el-button v-perms="'asset.ai_context.view'" @click="$router.push('/asset/ai-context')">AI上下文预览</el-button>
+        <el-button v-perms="'recipe.create'" type="primary" @click="openCreate">新建草稿</el-button>
+      </template>
     </RePageHeader>
 
     <el-card class="mt-4">

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const page = readFileSync(resolve(process.cwd(), "src/views/asset/ai-sql/index.vue"), "utf8");
-const routes = readFileSync(resolve(process.cwd(), "src/router/modules/asset.ts"), "utf8");
+const routes = readFileSync(resolve(process.cwd(), "src/router/modules/query.ts"), "utf8");
 const api = readFileSync(resolve(process.cwd(), "src/api/asset.ts"), "utf8");
 
 describe("plan167 AI SQL workbench", () => {

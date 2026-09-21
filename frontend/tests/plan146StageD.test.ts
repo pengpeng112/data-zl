@@ -134,9 +134,19 @@ describe("146 stage D5 frontend permission closures", () => {
 
   it("keeps route meta.auths codes inside the backend resource catalog", () => {
     const catalog = source("../backend/app/api/v1/permissions.py");
-    const assetRoutes = source("src/router/modules/asset.ts");
-    const identityRoutes = source("src/router/modules/identity.ts");
-    const codes = [...`${assetRoutes}${identityRoutes}`.matchAll(/auths: \["([^"]+)"\]/g)].map(m => m[1]);
+    // 186 N1：叶子迁移到七分区模块后，扫描全部业务分区模块
+    const partitionSources = [
+      "src/router/modules/home.ts",
+      "src/router/modules/catalog.ts",
+      "src/router/modules/standards.ts",
+      "src/router/modules/quality.ts",
+      "src/router/modules/query.ts",
+      "src/router/modules/identity.ts",
+      "src/router/modules/ops.ts"
+    ]
+      .map(file => source(file))
+      .join("");
+    const codes = [...partitionSources.matchAll(/auths: \["([^"]+)"\]/g)].map(m => m[1]);
     expect(codes.length).toBeGreaterThan(10);
     for (const code of codes) {
       expect(catalog).toContain(`"code": "${code}"`);

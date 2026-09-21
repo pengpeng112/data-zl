@@ -1,6 +1,12 @@
 <template>
   <div class="metadata-changes">
-    <RePageHeader title="元数据变更事件" subtitle="跟踪源端表、字段和结构变更，支持分配、确认和闭环处理。" />
+    <RePageHeader title="元数据变更事件" subtitle="跟踪源端表、字段和结构变更，支持分配、确认和闭环处理。">
+      <!-- 186 N1/A3：隐藏页常驻入口（独立权限，不依赖宿主页权限） -->
+      <template #actions>
+        <el-button v-perms="'metadata.snapshot.view'" @click="$router.push('/metadata/snapshots')">快照管理</el-button>
+        <el-button v-perms="'metadata.diff.view'" @click="$router.push('/metadata/diff')">快照对比</el-button>
+      </template>
+    </RePageHeader>
 
     <section class="change-stat-grid">
       <ReStatCard label="全部变更" :value="summary.total ?? 0" tone="primary" />

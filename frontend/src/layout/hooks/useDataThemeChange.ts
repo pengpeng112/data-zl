@@ -63,10 +63,10 @@ export function useDataThemeChange() {
     };
 
     if (theme === "default" || theme === "light") {
-      setEpThemeColor(getConfig().EpThemeColor);
+      setEpThemeColor(getConfig().EpThemeColor || "#409EFF");
     } else {
       const colors = themeColors.value.find(v => v.themeColor === theme);
-      setEpThemeColor(colors.color);
+      setEpThemeColor(colors?.color || "#409EFF");
     }
   }
 
@@ -78,7 +78,7 @@ export function useDataThemeChange() {
   }
 
   /** 设置 `element-plus` 主题色 */
-  const setEpThemeColor = (color: string) => {
+  const setEpThemeColor = (color = "#409EFF") => {
     useEpThemeStoreHook().setEpThemeColor(color);
     document.documentElement.style.setProperty("--el-color-primary", color);
     for (let i = 1; i <= 2; i++) {

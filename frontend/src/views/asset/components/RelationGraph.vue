@@ -234,8 +234,10 @@ function nodeMeta(node: any) {
 function edgeLabelText(edge: any): string {
   if (typeof edge?.label === "string") return edge.label;
   if (edge?.label && typeof edge.label === "object") {
-    const fmt = (edge.label as Record<string, unknown>).formatter;
-    if (typeof fmt === "string") return fmt;
+    const labelObj = edge.label as Record<string, unknown>;
+    // QA K-001 补齐：G6 样式对象也可能用 .text 承载文本（实拍仍 [object Object] 的缺口）。
+    if (typeof labelObj.text === "string") return labelObj.text;
+    if (typeof labelObj.formatter === "string") return labelObj.formatter;
   }
   return typeof edge?.from_columns === "string" ? edge.from_columns : "";
 }

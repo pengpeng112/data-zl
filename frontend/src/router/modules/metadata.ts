@@ -1,5 +1,6 @@
 const Layout = () => import("@/layout/index.vue");
 
+// 186 N1：旧父级 /metadata 保留为隐藏兼容路由；叶子已移至「资产目录」分区。
 export default {
   path: "/metadata",
   name: "Metadata",
@@ -7,39 +8,9 @@ export default {
   redirect: "/metadata/changes",
   meta: {
     icon: "ep/monitor",
-    title: "变更检测",
-    rank: 14
+    title: "变更检测（兼容入口）",
+    rank: 92,
+    showLink: false
   },
-  children: [
-    {
-      path: "/metadata/changes",
-      name: "MetadataChanges",
-      component: () => import("@/views/metadata-changes/changes/index.vue"),
-      meta: {
-        title: "变更事件",
-        showLink: true,
-        auths: ["metadata.change.view"]
-      }
-    },
-    {
-      path: "/metadata/snapshots",
-      name: "MetadataSnapshots",
-      component: () => import("@/views/metadata-changes/snapshots/index.vue"),
-      meta: {
-        title: "快照管理",
-        showLink: true,
-        auths: ["metadata.snapshot.view"]
-      }
-    },
-    {
-      path: "/metadata/diff",
-      name: "MetadataDiff",
-      component: () => import("@/views/metadata-changes/diff/index.vue"),
-      meta: {
-        title: "快照对比",
-        showLink: true,
-        auths: ["metadata.diff.view"]
-      }
-    }
-  ]
+  children: []
 } satisfies RouteConfigsTable;

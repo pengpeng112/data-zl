@@ -24,6 +24,72 @@
       </article>
     </div>
 
+    <!-- 186 I1/I3：HIS 双来源（人员有效×账号启停）判定与双目标结果 -->
+    <el-card shadow="never" class="account-state-card">
+      <template #header>
+        <div class="list-head">
+          <strong>账号启停状态（{{ accountStateTotal }}）</strong>
+          <div class="list-filters">
+            <el-select v-model="accountStateFilter" class="status-filter" @change="loadAccountStates(1)">
+              <el-option label="期望停用" value="disabled" />
+              <el-option label="期望启用" value="enabled" />
+              <el-option label="证据不足" value="unknown" />
+            </el-select>
+            <el-button size="small" @click="loadAccountStates(accountStatePage)">刷新</el-button>
+          </div>
+        </div>
+      </template>
+      <el-table v-loading="accountStateLoading" :data="accountStates" size="small" stripe>
+        <el-table-column prop="person_code" label="工号" width="90" />
+        <el-table-column label="在职状态" width="90">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.employment_status === 'active' ? 'success' : 'info'">
+              {{ row.employment_status || "-" }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="employee_state" label="HIS人员" width="90" />
+        <el-table-column prop="user_state" label="HIS账号" width="90" />
+        <el-table-column label="期望状态" width="90">
+          <template #default="{ row }">
+            <el-tag size="small" :type="accountStateTone(row.desired_state)">{{ row.desired_state }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="decision_reason" label="判定原因" min-width="150" />
+        <el-table-column label="嘉和结果" width="120">
+          <template #default="{ row }">
+            <span>{{ targetText(row.targets?.JHEMR) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="无纸化结果" width="120">
+          <template #default="{ row }">
+            <span>{{ targetText(row.targets?.CDMS) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="观察时间" min-width="150">
+          <template #default="{ row }">
+            <span>{{ formatDateTime(row.captured_at) }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        v-if="accountStateTotal > accountStatePageSize"
+        layout="total, prev, pager, next"
+        :total="accountStateTotal"
+        :page-size="accountStatePageSize"
+        :current-page="accountStatePage"
+        @current-change="loadAccountStates"
+        class="mt12"
+      />
+      <el-alert
+        v-if="accountStateError"
+        type="error"
+        :closable="false"
+        :title="accountStateError"
+        class="mt12"
+      />
+    </el-card>
+
     <el-card shadow="never">
       <template #header>
         <div class="list-head">
@@ -150,7 +216,7 @@ import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import ReStatCard from "@/components/ReStatCard/index.vue";
-import { getIdentitySyncRun, getIdentitySyncRuns } from "@/api/identity";
+import { getAccountStates, getIdentitySyncRun, getIdentitySyncRuns } from "@/api/identity";
 import { formatDateTime, formatDuration, syncStatusTag } from "@/views/identity/sync-logs/syncLogLabels";
 
 interface SubtaskItem {
@@ -176,6 +242,45 @@ interface RunItem {
   success_count: number;
   failed_count: number;
   subtasks: SubtaskItem[];
+}
+
+const accountStateLoading = ref(false);
+const accountStates = ref<any[]>([]);
+const accountStateTotal = ref(0);
+const accountStatePage = ref(1);
+const accountStatePageSize = 20;
+const accountStateFilter = ref("disabled");
+const accountStateError = ref<string | null>(null);
+
+function accountStateTone(state: string) {
+  return state === "disabled" ? "danger" : state === "enabled" ? "success" : "info";
+}
+
+function targetText(target?: { action?: string | null; status: string; reason_code?: string | null }) {
+  if (!target || target.status === "no_attempt") return "未执行";
+  const label = target.action === "enable" ? "恢复" : target.action === "disable" ? "停用" : "-";
+  return `${label}:${target.status}${target.reason_code ? `(${target.reason_code})` : ""}`;
+}
+
+async function loadAccountStates(page = 1) {
+  accountStateLoading.value = true;
+  accountStateError.value = null;
+  try {
+    const { data } = await getAccountStates({
+      desired_state: accountStateFilter.value || undefined,
+      page,
+      page_size: accountStatePageSize
+    });
+    accountStates.value = data.items || [];
+    accountStateTotal.value = data.total ?? 0;
+    accountStatePage.value = page;
+  } catch (e: any) {
+    accountStates.value = [];
+    accountStateTotal.value = 0;
+    accountStateError.value = extractErrorDetail(e, "账号状态加载失败");
+  } finally {
+    accountStateLoading.value = false;
+  }
 }
 
 const loading = ref(false);
@@ -241,6 +346,7 @@ async function openRun(row: RunItem) {
 
 onMounted(() => {
   loadRuns(1);
+  loadAccountStates(1);
 });
 </script>
 

@@ -53,14 +53,40 @@ import "tippy.js/themes/light.css";
 import VueTippy from "vue-tippy";
 app.use(VueTippy);
 
-getPlatformConfig(app).then(async config => {
-  setupStore(app);
-  app.use(router);
-  await router.isReady();
-  injectResponsiveStorage(app, config);
-  app.use(MotionPlugin).use(useElementPlus).use(Table);
-  // .use(PureDescriptions)
-  // .use(useEcharts);
-  app.mount("#app");
-});
+getPlatformConfig(app)
+  .then(async config => {
+    setupStore(app);
+    app.use(router);
+    await router.isReady();
+    injectResponsiveStorage(app, config);
+    app.use(MotionPlugin).use(useElementPlus).use(Table);
+    // .use(PureDescriptions)
+    // .use(useEcharts);
+    app.mount("#app");
+  })
+  .catch((err: unknown) => {
+    // QA ST-002：启动链（配置/路由就绪）失败时渲染可读错误，替代永久启动转圈。
+    console.error("[main] 应用启动失败：", err);
+    const el = document.getElementById("app");
+    if (el) {
+      el.innerHTML = "";
+      const box = document.createElement("div");
+      box.setAttribute(
+        "style",
+        "min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#606266;"
+      );
+      const msg = document.createElement("span");
+      msg.textContent = "应用启动失败：平台服务暂不可用，请检查后端服务后刷新重试。";
+      const btn = document.createElement("button");
+      btn.textContent = "刷新重试";
+      btn.setAttribute(
+        "style",
+        "margin-left:12px;padding:6px 16px;border:1px solid #dcdfe6;border-radius:4px;background:#409eff;color:#fff;cursor:pointer;"
+      );
+      btn.onclick = () => window.location.reload();
+      box.appendChild(msg);
+      box.appendChild(btn);
+      el.appendChild(box);
+    }
+  });
 

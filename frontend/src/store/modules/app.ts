@@ -46,9 +46,11 @@ export const useAppStore = defineStore("pure-app", {
   },
   actions: {
     TOGGLE_SIDEBAR(opened?: boolean, resize?: string) {
-      const layout = storageLocal().getItem<StorageConfigs>(
-        `${responsiveStorageNameSpace()}layout`
-      );
+      // 旧版本或被清理一半的 localStorage 可能留下 null；侧栏切换必须可自愈。
+      const layout =
+        storageLocal().getItem<StorageConfigs>(
+          `${responsiveStorageNameSpace()}layout`
+        ) ?? ({ sidebarStatus: this.sidebar.opened } as StorageConfigs);
       if (opened && resize) {
         this.sidebar.withoutAnimation = true;
         this.sidebar.opened = true;

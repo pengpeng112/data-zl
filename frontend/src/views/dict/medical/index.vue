@@ -5,246 +5,494 @@
         <OverviewPanel />
       </el-tab-pane>
       <el-tab-pane label="映射维护" name="mapping">
-    <el-card shadow="never">
-      <template #header>
-        <RePageHeader title="诊断与手术编码体系" subtitle="维护院内编码、国家临床版、医保版及后续同步基础数据。">
-          <template #actions>
-            <el-radio-group v-model="categoryCode" @change="onCategoryChange">
-              <el-radio-button value="diagnosis">诊断</el-radio-button>
-              <el-radio-button value="operation">手术</el-radio-button>
-            </el-radio-group>
+        <el-card shadow="never">
+          <template #header>
+            <RePageHeader
+              title="诊断与手术编码体系"
+              subtitle="维护院内编码、国家临床版、医保版及后续同步基础数据。"
+            >
+              <template #actions>
+                <el-radio-group
+                  v-model="categoryCode"
+                  @change="onCategoryChange"
+                >
+                  <el-radio-button value="diagnosis">诊断</el-radio-button>
+                  <el-radio-button value="operation">手术</el-radio-button>
+                </el-radio-group>
+              </template>
+            </RePageHeader>
           </template>
-        </RePageHeader>
-      </template>
 
-      <div class="toolbar">
-        <el-button v-perms="'dict.medical.edit'" type="primary" @click="openCodeSetDialog()">新增编码体系</el-button>
-        <el-alert
-          v-if="authHint"
-          :title="authHint"
-          type="warning"
-          show-icon
-          :closable="false"
-          class="auth-alert"
-        />
-      </div>
+          <div class="toolbar">
+            <el-button
+              v-perms="'dict.medical.edit'"
+              type="primary"
+              @click="openCodeSetDialog()"
+              >新增编码体系</el-button
+            >
+            <el-alert
+              v-if="authHint"
+              :title="authHint"
+              type="warning"
+              show-icon
+              :closable="false"
+              class="auth-alert"
+            />
+          </div>
 
-      <el-table
-        ref="codeSetTableRef"
-        v-loading="loading"
-        :data="codeSets"
-        stripe
-        class="items-table"
-        row-key="code_set_code"
-        empty-text="暂无编码体系：请先在「导入审核」完成诊断/手术维护表导入，或调整类别后重试"
-      >
-        <el-table-column type="expand">
-          <template #default="{ row }">
-            <div class="sub-table-wrap">
-              <div class="toolbar sub-toolbar">
-                <el-button v-perms="'dict.medical.edit'" type="primary" size="small" @click="openItemDialog(row.code_set_code)">新增编码项</el-button>
-                <el-button size="small" @click="loadItems(row)">刷新编码项</el-button>
-                <span class="sub-count">共 {{ row._itemsTotal || 0 }} 项</span>
-              </div>
-              <el-table
-                v-loading="row._itemsLoading"
-                :data="row._items || []"
-                stripe
-                size="small"
-                empty-text="展开后点击刷新或等待加载编码项"
-              >
-                <el-table-column prop="item_code" label="编码" width="180" show-overflow-tooltip />
-                <el-table-column prop="item_name_cn" label="名称" min-width="220" show-overflow-tooltip />
-                <el-table-column prop="item_name_alias" label="别名" min-width="180" show-overflow-tooltip />
-                <el-table-column label="状态" width="90" align="center">
-                  <template #default="{ row: it }">
-                    <el-tag :type="it.status === 'active' ? 'success' : 'info'" size="small">
-                      {{ it.status === 'active' ? '启用' : '停用' }}
-                    </el-tag>
-                  </template>
-                </el-table-column>
-                <el-table-column label="操作" width="100" align="center" fixed="right">
-                  <template #default="{ row: it }">
-                    <el-button v-perms="'dict.medical.edit'" link type="primary" size="small" @click="openItemDialog(it.code_set_code, it)">编辑</el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-pagination
-                v-if="row._itemsTotal > (row._itemsPageSize || 20)"
-                v-model:current-page="row._itemsPage"
-                v-model:page-size="row._itemsPageSize"
-                :total="row._itemsTotal"
-                layout="total, prev, pager, next"
-                size="small"
-                class="pager"
-                @change="loadItems(row)"
+          <el-table
+            ref="codeSetTableRef"
+            v-loading="loading"
+            :data="codeSets"
+            stripe
+            class="items-table"
+            row-key="code_set_code"
+            empty-text="暂无编码体系：请先在「导入审核」完成诊断/手术维护表导入，或调整类别后重试"
+          >
+            <el-table-column type="expand">
+              <template #default="{ row }">
+                <div class="sub-table-wrap">
+                  <div class="toolbar sub-toolbar">
+                    <el-button
+                      v-perms="'dict.medical.edit'"
+                      type="primary"
+                      size="small"
+                      @click="openItemDialog(row.code_set_code)"
+                      >新增编码项</el-button
+                    >
+                    <el-button size="small" @click="loadItems(row)"
+                      >刷新编码项</el-button
+                    >
+                    <span class="sub-count"
+                      >共 {{ row._itemsTotal || 0 }} 项</span
+                    >
+                  </div>
+                  <el-table
+                    v-loading="row._itemsLoading"
+                    :data="row._items || []"
+                    stripe
+                    size="small"
+                    empty-text="展开后点击刷新或等待加载编码项"
+                  >
+                    <el-table-column
+                      prop="item_code"
+                      label="编码"
+                      width="180"
+                      show-overflow-tooltip
+                    />
+                    <el-table-column
+                      prop="item_name_cn"
+                      label="名称"
+                      min-width="220"
+                      show-overflow-tooltip
+                    />
+                    <el-table-column
+                      prop="item_name_alias"
+                      label="别名"
+                      min-width="180"
+                      show-overflow-tooltip
+                    />
+                    <el-table-column label="状态" width="90" align="center">
+                      <template #default="{ row: it }">
+                        <el-tag
+                          :type="it.status === 'active' ? 'success' : 'info'"
+                          size="small"
+                        >
+                          {{ it.status === "active" ? "启用" : "停用" }}
+                        </el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column
+                      label="操作"
+                      width="100"
+                      align="center"
+                      fixed="right"
+                    >
+                      <template #default="{ row: it }">
+                        <el-button
+                          v-perms="'dict.medical.edit'"
+                          link
+                          type="primary"
+                          size="small"
+                          @click="openItemDialog(it.code_set_code, it)"
+                          >编辑</el-button
+                        >
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <el-pagination
+                    v-if="row._itemsTotal > (row._itemsPageSize || 20)"
+                    v-model:current-page="row._itemsPage"
+                    v-model:page-size="row._itemsPageSize"
+                    :total="row._itemsTotal"
+                    layout="total, prev, pager, next"
+                    size="small"
+                    class="pager"
+                    @change="loadItems(row)"
+                  />
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="code_set_code"
+              label="编码体系"
+              min-width="220"
+              show-overflow-tooltip
+            >
+              <template #default="{ row }">
+                <span class="mono-cell">{{ row.code_set_code }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="code_set_name_cn"
+              label="名称"
+              min-width="220"
+              show-overflow-tooltip
+            />
+            <el-table-column label="类别" width="90" align="center">
+              <template #default="{ row }">
+                <el-tag
+                  :type="
+                    row.category_code === 'diagnosis' ? 'primary' : 'success'
+                  "
+                  effect="light"
+                  size="small"
+                >
+                  {{ row.category_code === "diagnosis" ? "诊断" : "手术" }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="类型" width="100" align="center">
+              <template #default="{ row }">
+                <el-tag
+                  :type="codeSetTypeTag(row.code_set_type)"
+                  effect="plain"
+                  size="small"
+                  >{{ codeSetTypeText(row.code_set_type) }}</el-tag
+                >
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="standard_system"
+              label="标准体系"
+              min-width="150"
+              show-overflow-tooltip
+            />
+            <el-table-column label="状态" width="90" align="center">
+              <template #default="{ row }">
+                <span
+                  class="status-cell"
+                  :class="{ off: row.enabled === false }"
+                >
+                  <i class="status-dot-sm" />
+                  {{ row.enabled === false ? "停用" : "启用" }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作"
+              width="120"
+              align="center"
+              fixed="right"
+            >
+              <template #default="{ row }">
+                <!-- 146 E8（R5）：查看编码自动展开行，不再只加载不展开 -->
+                <el-button
+                  link
+                  type="primary"
+                  size="small"
+                  @click="openCodeSetItems(row)"
+                  >查看编码</el-button
+                >
+                <el-button
+                  v-perms="'dict.medical.edit'"
+                  link
+                  type="primary"
+                  size="small"
+                  @click="openCodeSetDialog(row)"
+                  >编辑</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+
+        <el-dialog
+          v-model="codeSetDialog.visible"
+          :title="codeSetDialog.isEdit ? '编辑编码体系' : '新增编码体系'"
+          width="520px"
+          destroy-on-close
+        >
+          <el-form
+            ref="codeSetFormRef"
+            :model="codeSetDialog.form"
+            label-width="110px"
+          >
+            <el-form-item label="编码体系" prop="code_set_code">
+              <el-input
+                v-model="codeSetDialog.form.code_set_code"
+                :disabled="codeSetDialog.isEdit"
               />
-            </div>
+            </el-form-item>
+            <el-form-item label="名称" prop="code_set_name_cn">
+              <el-input v-model="codeSetDialog.form.code_set_name_cn" />
+            </el-form-item>
+            <el-form-item label="类型" prop="code_set_type">
+              <el-select
+                v-model="codeSetDialog.form.code_set_type"
+                class="full-width"
+              >
+                <el-option label="院内" value="clinical" />
+                <el-option label="国标" value="national" />
+                <el-option label="医保" value="insurance" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="分类" prop="category_code">
+              <el-select
+                v-model="codeSetDialog.form.category_code"
+                class="full-width"
+              >
+                <el-option label="诊断" value="diagnosis" />
+                <el-option label="手术" value="operation" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="标准体系" prop="standard_system">
+              <el-input v-model="codeSetDialog.form.standard_system" />
+            </el-form-item>
+            <el-form-item label="版本" prop="version_no">
+              <el-input v-model="codeSetDialog.form.version_no" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="codeSetDialog.visible = false">取消</el-button>
+            <el-button
+              v-perms="'dict.medical.edit'"
+              type="primary"
+              :loading="codeSetDialog.submitting"
+              @click="saveCodeSet"
+              >保存</el-button
+            >
           </template>
-        </el-table-column>
-        <el-table-column prop="code_set_code" label="编码体系" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="code_set_name_cn" label="名称" min-width="220" show-overflow-tooltip />
-        <el-table-column label="类别" width="90" align="center">
-          <template #default="{ row }">{{ row.category_code === "diagnosis" ? "诊断" : "手术" }}</template>
-        </el-table-column>
-        <el-table-column label="类型" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="codeSetTypeTag(row.code_set_type)" size="small">{{ codeSetTypeText(row.code_set_type) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="standard_system" label="标准体系" min-width="150" show-overflow-tooltip />
-        <el-table-column label="状态" width="90" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.enabled === false ? 'info' : 'success'" size="small">
-              {{ row.enabled === false ? "停用" : "启用" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="120" align="center" fixed="right">
-          <template #default="{ row }">
-            <!-- 146 E8（R5）：查看编码自动展开行，不再只加载不展开 -->
-            <el-button link type="primary" size="small" @click="openCodeSetItems(row)">查看编码</el-button>
-            <el-button v-perms="'dict.medical.edit'" link type="primary" size="small" @click="openCodeSetDialog(row)">编辑</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+        </el-dialog>
 
-    <el-dialog v-model="codeSetDialog.visible" :title="codeSetDialog.isEdit ? '编辑编码体系' : '新增编码体系'" width="520px" destroy-on-close>
-      <el-form ref="codeSetFormRef" :model="codeSetDialog.form" label-width="110px">
-        <el-form-item label="编码体系" prop="code_set_code">
-          <el-input v-model="codeSetDialog.form.code_set_code" :disabled="codeSetDialog.isEdit" />
-        </el-form-item>
-        <el-form-item label="名称" prop="code_set_name_cn">
-          <el-input v-model="codeSetDialog.form.code_set_name_cn" />
-        </el-form-item>
-        <el-form-item label="类型" prop="code_set_type">
-          <el-select v-model="codeSetDialog.form.code_set_type" class="full-width">
-            <el-option label="院内" value="clinical" />
-            <el-option label="国标" value="national" />
-            <el-option label="医保" value="insurance" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="分类" prop="category_code">
-          <el-select v-model="codeSetDialog.form.category_code" class="full-width">
-            <el-option label="诊断" value="diagnosis" />
-            <el-option label="手术" value="operation" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="标准体系" prop="standard_system">
-          <el-input v-model="codeSetDialog.form.standard_system" />
-        </el-form-item>
-        <el-form-item label="版本" prop="version_no">
-          <el-input v-model="codeSetDialog.form.version_no" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="codeSetDialog.visible = false">取消</el-button>
-        <el-button v-perms="'dict.medical.edit'" type="primary" :loading="codeSetDialog.submitting" @click="saveCodeSet">保存</el-button>
-      </template>
-    </el-dialog>
-
-    <el-dialog v-model="itemDialog.visible" :title="itemDialog.isEdit ? '编辑编码项' : '新增编码项'" width="520px" destroy-on-close>
-      <el-form ref="itemFormRef" :model="itemDialog.form" label-width="100px">
-        <el-form-item label="编码" prop="item_code">
-          <el-input v-model="itemDialog.form.item_code" :disabled="itemDialog.isEdit" />
-        </el-form-item>
-        <el-form-item label="名称" prop="item_name_cn">
-          <el-input v-model="itemDialog.form.item_name_cn" />
-        </el-form-item>
-        <el-form-item label="别名" prop="item_name_alias">
-          <el-input v-model="itemDialog.form.item_name_alias" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="itemDialog.form.status" class="full-width">
-            <el-option label="启用" value="active" />
-            <el-option label="停用" value="inactive" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="itemDialog.visible = false">取消</el-button>
-        <el-button v-perms="'dict.medical.edit'" type="primary" :loading="itemDialog.submitting" @click="saveItem">保存</el-button>
-      </template>
-    </el-dialog>
-
-    <el-card shadow="never" class="push-card">
-      <template #header>
-        <RePageHeader
-          title="下发 HIS / 海量（只增 + 单条停用）"
-          subtitle="禁止改已有业务字段；禁止批量 UPDATE；医保灰码写 ybhm=灰码 且不写对照表。默认 dry_run，apply 需服务端开关。"
-        />
-      </template>
-      <el-alert
-        :title="pushConfig.push_enabled ? '写通道已开启（仍须 confirmation_token）' : '写通道关闭：仅可 plan / dry_run'"
-        :type="pushConfig.push_enabled ? 'success' : 'info'"
-        show-icon
-        :closable="false"
-        class="push-alert"
-      />
-      <el-alert
-        type="warning"
-        :closable="false"
-        show-icon
-        class="push-alert"
-        title="写账号在「业务系统与数据资源 → 数据连接」配置：对 HIS/海量连接点「写凭据」，策略选 medical_dict_push。只读凭据与写凭据分离。"
-      />
-      <el-form :inline="true" class="push-form" label-width="100px">
-        <el-form-item label="目标">
-          <el-checkbox-group v-model="pushForm.targets">
-            <el-checkbox label="HIS_SOURCE">HIS</el-checkbox>
-            <el-checkbox label="JHEMR_VASTBASE">海量</el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-        <el-form-item label="编码(可选)">
-          <el-input v-model="pushForm.itemCodesText" placeholder="逗号分隔，空=按上限取平台启用项" style="width: 280px" />
-        </el-form-item>
-        <el-form-item label="上限">
-          <el-input-number v-model="pushForm.max_items" :min="1" :max="200" />
-        </el-form-item>
-        <el-form-item label="hospital_no">
-          <el-input v-model="pushForm.hospital_no" style="width: 140px" />
-        </el-form-item>
-        <el-form-item>
-          <el-button v-perms="'dict.medical.plan.create'" type="primary" :loading="pushLoading" @click="runPushPlan">生成计划</el-button>
-          <el-button v-perms="'dict.medical.plan.create'" :loading="pushLoading" @click="runPushExport">导出预览</el-button>
-        </el-form-item>
-      </el-form>
-      <div v-if="pushSummary" class="push-summary">
-        计划 {{ pushSummary.action_count }} 条：planned={{ pushSummary.summary?.planned }} blocked={{ pushSummary.summary?.blocked }}
-        grey/无对照跳过={{ pushSummary.summary?.skipped_grey_or_empty_contrast }}
-      </div>
-      <el-table v-loading="pushLoading" :data="pushActions" stripe size="small" max-height="420" empty-text="先生成下发计划">
-        <el-table-column prop="action_type" label="动作" width="70" />
-        <el-table-column prop="target_system" label="系统" width="130" show-overflow-tooltip />
-        <el-table-column prop="target_table" label="表" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="item_code" label="编码" width="140" show-overflow-tooltip />
-        <el-table-column prop="item_name" label="名称" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="plan_status" label="状态" width="100" />
-        <el-table-column label="灰码" width="70" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.meta?.is_grey_insurance || row.params?.ybhm === '灰码'" type="warning" size="small">灰码</el-tag>
+        <el-dialog
+          v-model="itemDialog.visible"
+          :title="itemDialog.isEdit ? '编辑编码项' : '新增编码项'"
+          width="520px"
+          destroy-on-close
+        >
+          <el-form
+            ref="itemFormRef"
+            :model="itemDialog.form"
+            label-width="100px"
+          >
+            <el-form-item label="编码" prop="item_code">
+              <el-input
+                v-model="itemDialog.form.item_code"
+                :disabled="itemDialog.isEdit"
+              />
+            </el-form-item>
+            <el-form-item label="名称" prop="item_name_cn">
+              <el-input v-model="itemDialog.form.item_name_cn" />
+            </el-form-item>
+            <el-form-item label="别名" prop="item_name_alias">
+              <el-input v-model="itemDialog.form.item_name_alias" />
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+              <el-select v-model="itemDialog.form.status" class="full-width">
+                <el-option label="启用" value="active" />
+                <el-option label="停用" value="inactive" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="itemDialog.visible = false">取消</el-button>
+            <el-button
+              v-perms="'dict.medical.edit'"
+              type="primary"
+              :loading="itemDialog.submitting"
+              @click="saveItem"
+              >保存</el-button
+            >
           </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button v-perms="'dict.medical.execute'" link type="primary" size="small" @click="dryRunOne(row)">dry-run</el-button>
-            <el-button v-perms="'dict.medical.execute'" link type="danger" size="small" :disabled="!pushConfig.push_enabled" @click="applyOne(row)">apply</el-button>
+        </el-dialog>
+
+        <el-card shadow="never" class="push-card">
+          <template #header>
+            <RePageHeader
+              title="下发 HIS / 海量（只增 + 单条停用）"
+              subtitle="禁止改已有业务字段；禁止批量 UPDATE；医保灰码写 ybhm=灰码 且不写对照表。默认 dry_run，apply 需服务端开关。"
+            />
           </template>
-        </el-table-column>
-      </el-table>
-      <div class="stop-box">
-        <span class="stop-label">单条停用：</span>
-        <el-select v-model="stopForm.target_system" style="width: 160px">
-          <el-option label="HIS_SOURCE" value="HIS_SOURCE" />
-          <el-option label="JHEMR_VASTBASE" value="JHEMR_VASTBASE" />
-        </el-select>
-        <el-input v-model="stopForm.item_code" placeholder="业务编码" style="width: 180px" />
-        <el-button v-perms="'dict.medical.execute'" :loading="pushLoading" @click="stopOne('dry_run')">停用 dry-run</el-button>
-        <el-button v-perms="'dict.medical.execute'" type="danger" :loading="pushLoading" :disabled="!pushConfig.push_enabled" @click="stopOne('apply')">停用 apply</el-button>
-      </div>
-      <el-input v-model="lastResultJson" type="textarea" :rows="6" readonly class="result-box" placeholder="最近一次执行结果 JSON" />
-    </el-card>
+          <div class="push-status" :class="{ on: pushConfig.push_enabled }">
+            <span class="status-dot" :class="{ on: pushConfig.push_enabled }" />
+            <span class="push-status-text">
+              {{
+                pushConfig.push_enabled
+                  ? "写通道已开启（仍须 confirmation_token）"
+                  : "写通道关闭：仅可 plan / dry_run"
+              }}
+            </span>
+            <span class="push-status-hint"
+              >写账号在「业务系统与数据资源 → 数据连接」配置：对
+              HIS/海量连接点「写凭据」，策略选
+              medical_dict_push，只读凭据与写凭据分离。</span
+            >
+          </div>
+          <el-form :inline="true" class="push-form" label-width="100px">
+            <el-form-item label="目标">
+              <el-checkbox-group v-model="pushForm.targets">
+                <el-checkbox label="HIS_SOURCE">HIS</el-checkbox>
+                <el-checkbox label="JHEMR_VASTBASE">海量</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item label="编码(可选)">
+              <el-input
+                v-model="pushForm.itemCodesText"
+                placeholder="逗号分隔，空=按上限取平台启用项"
+                style="width: 280px"
+              />
+            </el-form-item>
+            <el-form-item label="上限">
+              <el-input-number
+                v-model="pushForm.max_items"
+                :min="1"
+                :max="200"
+              />
+            </el-form-item>
+            <el-form-item label="hospital_no">
+              <el-input v-model="pushForm.hospital_no" style="width: 140px" />
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                v-perms="'dict.medical.plan.create'"
+                type="primary"
+                :loading="pushLoading"
+                @click="runPushPlan"
+                >生成计划</el-button
+              >
+              <el-button
+                v-perms="'dict.medical.plan.create'"
+                :loading="pushLoading"
+                @click="runPushExport"
+                >导出预览</el-button
+              >
+            </el-form-item>
+          </el-form>
+          <div v-if="pushSummary" class="push-summary">
+            计划 {{ pushSummary.action_count }} 条：planned={{
+              pushSummary.summary?.planned
+            }}
+            blocked={{ pushSummary.summary?.blocked }} grey/无对照跳过={{
+              pushSummary.summary?.skipped_grey_or_empty_contrast
+            }}
+          </div>
+          <el-table
+            v-loading="pushLoading"
+            :data="pushActions"
+            stripe
+            size="small"
+            max-height="420"
+            empty-text="先生成下发计划"
+          >
+            <el-table-column prop="action_type" label="动作" width="70" />
+            <el-table-column
+              prop="target_system"
+              label="系统"
+              width="130"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              prop="target_table"
+              label="表"
+              min-width="180"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              prop="item_code"
+              label="编码"
+              width="140"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              prop="item_name"
+              label="名称"
+              min-width="160"
+              show-overflow-tooltip
+            />
+            <el-table-column prop="plan_status" label="状态" width="100" />
+            <el-table-column label="灰码" width="70" align="center">
+              <template #default="{ row }">
+                <el-tag
+                  v-if="
+                    row.meta?.is_grey_insurance || row.params?.ybhm === '灰码'
+                  "
+                  type="warning"
+                  size="small"
+                  >灰码</el-tag
+                >
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template #default="{ row }">
+                <el-button
+                  v-perms="'dict.medical.execute'"
+                  link
+                  type="primary"
+                  size="small"
+                  @click="dryRunOne(row)"
+                  >dry-run</el-button
+                >
+                <el-button
+                  v-perms="'dict.medical.execute'"
+                  link
+                  type="danger"
+                  size="small"
+                  :disabled="!pushConfig.push_enabled"
+                  @click="applyOne(row)"
+                  >apply</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="stop-box">
+            <span class="stop-label">单条停用</span>
+            <el-select v-model="stopForm.target_system" style="width: 160px">
+              <el-option label="HIS_SOURCE" value="HIS_SOURCE" />
+              <el-option label="JHEMR_VASTBASE" value="JHEMR_VASTBASE" />
+            </el-select>
+            <el-input
+              v-model="stopForm.item_code"
+              placeholder="业务编码"
+              style="width: 180px"
+            />
+            <el-button
+              v-perms="'dict.medical.execute'"
+              :loading="pushLoading"
+              @click="stopOne('dry_run')"
+              >停用 dry-run</el-button
+            >
+            <el-button
+              v-perms="'dict.medical.execute'"
+              type="danger"
+              :loading="pushLoading"
+              :disabled="!pushConfig.push_enabled"
+              @click="stopOne('apply')"
+              >停用 apply</el-button
+            >
+          </div>
+          <div class="result-section">
+            <p class="result-title">最近一次执行结果</p>
+            <el-input
+              v-model="lastResultJson"
+              type="textarea"
+              :rows="6"
+              readonly
+              class="result-box"
+              placeholder="最近一次执行结果 JSON"
+            />
+          </div>
+        </el-card>
       </el-tab-pane>
       <el-tab-pane label="导入审核" name="import">
         <ImportWizard />
@@ -258,9 +506,9 @@
 
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
-import ImportWizard from './components/ImportWizard.vue';
-import OverviewPanel from './components/OverviewPanel.vue';
-import PushWizard from './components/PushWizard.vue';
+import ImportWizard from "./components/ImportWizard.vue";
+import OverviewPanel from "./components/OverviewPanel.vue";
+import PushWizard from "./components/PushWizard.vue";
 import { ref, reactive, onBeforeUnmount, onMounted } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
 import { extractErrorDetail } from "@/utils/errorMessage";
@@ -278,7 +526,7 @@ import {
   stopMedicalPushOne
 } from "@/api/dict";
 
-const activeTab = ref('overview');
+const activeTab = ref("overview");
 const categoryCode = ref("diagnosis");
 const codeSets = ref<any[]>([]);
 const loading = ref(false);
@@ -313,7 +561,10 @@ async function loadCodeSets() {
 async function loadItems(row: any) {
   row._itemsLoading = true;
   try {
-    const res = await getMedicalItems(row.code_set_code, { page: row._itemsPage, page_size: row._itemsPageSize });
+    const res = await getMedicalItems(row.code_set_code, {
+      page: row._itemsPage,
+      page_size: row._itemsPageSize
+    });
     row._items = res.data.items || [];
     row._itemsTotal = res.data.total || 0;
   } catch (error) {
@@ -335,11 +586,19 @@ function onCategoryChange() {
 }
 
 function codeSetTypeText(type: string) {
-  return type === "clinical" ? "院内" : type === "national" ? "国标" : type === "insurance" ? "医保" : type || "-";
+  return type === "clinical"
+    ? "院内"
+    : type === "national"
+      ? "国标"
+      : type === "insurance"
+        ? "医保"
+        : type || "-";
 }
 
 function codeSetTypeTag(type: string): any {
-  return { clinical: "", national: "success", insurance: "warning" }[type] || "info";
+  return (
+    { clinical: "", national: "success", insurance: "warning" }[type] || "info"
+  );
 }
 
 const codeSetFormRef = ref<FormInstance>();
@@ -437,7 +696,9 @@ async function saveItem() {
     await upsertMedicalItem(itemDialog.form);
     ElMessage.success(itemDialog.isEdit ? "编辑成功" : "新增成功");
     itemDialog.visible = false;
-    const row = codeSets.value.find(item => item.code_set_code === itemDialog.form.code_set_code);
+    const row = codeSets.value.find(
+      item => item.code_set_code === itemDialog.form.code_set_code
+    );
     if (row) loadItems(row);
   } catch (error) {
     ElMessage.error(extractErrorDetail(error, "编码项保存失败"));
@@ -446,7 +707,10 @@ async function saveItem() {
   }
 }
 
-const pushConfig = reactive<{ push_enabled: boolean; default_hospital_no?: string }>({
+const pushConfig = reactive<{
+  push_enabled: boolean;
+  default_hospital_no?: string;
+}>({
   push_enabled: false
 });
 const pushLoading = ref(false);
@@ -475,7 +739,8 @@ async function loadPushSourceCodes() {
     for (const source of res.data || []) {
       const systemCode = String(source.system_code || "").toUpperCase();
       if (systemCode === "HIS_SOURCE" || systemCode === "JHEMR_VASTBASE") {
-        if (source.source_code) pushSourceCodes[systemCode] = source.source_code;
+        if (source.source_code)
+          pushSourceCodes[systemCode] = source.source_code;
       }
     }
   } catch {
@@ -497,9 +762,13 @@ function parseItemCodes() {
 async function loadPushConfig() {
   try {
     const res = await getMedicalPushConfig();
-    const data = (res.data || {}) as { push_enabled?: boolean; default_hospital_no?: string };
+    const data = (res.data || {}) as {
+      push_enabled?: boolean;
+      default_hospital_no?: string;
+    };
     pushConfig.push_enabled = !!data.push_enabled;
-    if (data.default_hospital_no) pushForm.hospital_no = data.default_hospital_no;
+    if (data.default_hospital_no)
+      pushForm.hospital_no = data.default_hospital_no;
   } catch {
     pushConfig.push_enabled = false;
   }
@@ -572,11 +841,15 @@ async function applyOne(row: any) {
   } catch {
     return;
   }
-  const { value: token } = await ElMessageBox.prompt("请输入 confirmation_token", "写通道确认", {
-    inputType: "password",
-    confirmButtonText: "执行",
-    cancelButtonText: "取消"
-  }).catch(() => ({ value: "" }));
+  const { value: token } = await ElMessageBox.prompt(
+    "请输入 confirmation_token",
+    "写通道确认",
+    {
+      inputType: "password",
+      confirmButtonText: "执行",
+      cancelButtonText: "取消"
+    }
+  ).catch(() => ({ value: "" }));
   if (!token) return;
   pushLoading.value = true;
   try {
@@ -603,9 +876,13 @@ async function stopOne(mode: "dry_run" | "apply") {
   }
   let token = "";
   if (mode === "apply") {
-    const prompt = await ElMessageBox.prompt("请输入 confirmation_token", "停用确认", {
-      inputType: "password"
-    }).catch(() => null);
+    const prompt = await ElMessageBox.prompt(
+      "请输入 confirmation_token",
+      "停用确认",
+      {
+        inputType: "password"
+      }
+    ).catch(() => null);
     if (!prompt?.value) return;
     token = prompt.value;
   }
@@ -618,11 +895,17 @@ async function stopOne(mode: "dry_run" | "apply") {
       hospital_no: pushForm.hospital_no,
       mode,
       confirmation_token: token || null,
-      his_source_code: resolvePushSourceCode(stopForm.target_system === "JHEMR_VASTBASE" ? "JHEMR_VASTBASE" : "HIS_SOURCE"),
+      his_source_code: resolvePushSourceCode(
+        stopForm.target_system === "JHEMR_VASTBASE"
+          ? "JHEMR_VASTBASE"
+          : "HIS_SOURCE"
+      ),
       jhemr_source_code: resolvePushSourceCode("JHEMR_VASTBASE")
     });
     lastResultJson.value = JSON.stringify(res.data, null, 2);
-    ElMessage.success(mode === "dry_run" ? "停用 dry-run 完成" : "停用 apply 已提交");
+    ElMessage.success(
+      mode === "dry_run" ? "停用 dry-run 完成" : "停用 apply 已提交"
+    );
   } catch (error) {
     ElMessage.error(extractErrorDetail(error, "停用操作失败"));
   } finally {
@@ -637,23 +920,212 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.dict-medical { padding: 4px; }
-.dict-medical :deep(.el-card) { border-color: var(--border-light); border-radius: var(--radius-base); box-shadow: var(--shadow-sm); }
-.toolbar { display: flex; align-items: center; gap: 8px; }
-.auth-alert { flex: 1; }
-.sub-table-wrap { padding: 8px 40px 12px; }
-.sub-toolbar { margin-bottom: 8px; }
-.sub-count { color: var(--el-text-color-secondary); font-size: 12px; }
+<style scoped lang="scss">
+@media (width <= 760px) {
+  .sub-table-wrap {
+    padding: 12px 10px;
+  }
+}
 
-.items-table { margin-top: 12px; }
-.pager { justify-content: flex-end; margin-top: 8px; }
-.full-width { width: 100%; }
-.push-card { margin-top: 16px; }
-.push-alert { margin-bottom: 12px; }
-.push-form { margin-bottom: 8px; }
-.push-summary { margin: 8px 0; font-size: 13px; color: var(--el-text-color-secondary); }
-.stop-box { display: flex; align-items: center; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
-.stop-label { font-size: 13px; }
-.result-box { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 12px; }
+.dict-medical {
+  padding: 4px;
+}
+
+.dict-medical :deep(.el-card) {
+  border-color: var(--border-light);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.dict-medical :deep(.el-card__header) {
+  padding-bottom: 12px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.auth-alert {
+  flex: 1;
+}
+
+/* 编码体系表：统一表格观感 + 编码等宽 */
+.items-table {
+  --el-table-header-bg-color: var(--bg-elevated);
+  --el-table-row-hover-bg-color: rgb(14 165 233 / 6%);
+  --el-table-border-color: var(--border-light);
+
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.mono-cell {
+  font-family: "Courier New", monospace;
+  font-size: 12.5px;
+  color: var(--text-regular);
+}
+
+.status-cell {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+.status-cell.off {
+  color: var(--text-secondary);
+}
+
+.status-dot-sm {
+  width: 7px;
+  height: 7px;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 15%, transparent);
+}
+
+.status-cell.off .status-dot-sm {
+  background: var(--text-muted);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-muted) 15%, transparent);
+}
+
+/* 展开子表：浅色渐变容器，与主表拉开层级 */
+.sub-table-wrap {
+  padding: 14px 24px 16px 48px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary-500) 4%, transparent),
+    transparent 70%
+  );
+}
+
+.sub-toolbar {
+  margin-bottom: 10px;
+}
+
+.sub-count {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.sub-table-wrap :deep(.el-table) {
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+}
+
+.pager {
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* 下发卡片 */
+.push-card {
+  margin-top: 16px;
+}
+
+.push-alert {
+  margin-bottom: 12px;
+}
+
+.push-form {
+  margin-bottom: 8px;
+}
+
+.push-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  background: color-mix(in srgb, var(--info-500) 6%, var(--bg-card));
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--text-muted);
+  border-radius: var(--radius-base);
+}
+
+.push-status.on {
+  background: color-mix(in srgb, var(--success) 6%, var(--bg-card));
+  border-left-color: var(--success);
+}
+
+.push-status-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.push-status-hint {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--text-muted);
+  border-radius: 50%;
+}
+
+.status-dot.on {
+  background: var(--success);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 18%, transparent);
+}
+
+.push-summary {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+.stop-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding-top: 14px;
+  margin: 14px 0 0;
+  border-top: 1px dashed var(--border-light);
+}
+
+.stop-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stop-label::after {
+  content: "：";
+}
+
+.result-section {
+  margin-top: 14px;
+}
+
+.result-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.result-box {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
+.result-box :deep(.el-textarea__inner) {
+  background: var(--bg-page);
+}
 </style>

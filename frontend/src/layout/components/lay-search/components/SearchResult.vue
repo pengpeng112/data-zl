@@ -82,6 +82,14 @@ defineExpose({ handleScroll });
       <component :is="useRenderIcon(item.meta?.icon)" />
       <span class="result-item-title">
         {{ item.meta?.title }}
+        <!-- 186 N2：显示归属分区，帮助区分同名功能（如人员/字典同步） -->
+        <span
+          v-if="item.meta?.parentTitle"
+          class="result-item-parent"
+          :class="{ 'text-white': item.path === active }"
+        >
+          {{ item.meta.parentTitle }}
+        </span>
       </span>
       <EnterOutlined />
     </div>
@@ -106,8 +114,19 @@ defineExpose({ handleScroll });
     &-title {
       display: flex;
       flex: 1;
+      align-items: center;
       margin-left: 5px;
     }
+  }
+
+  .result-item-parent {
+    margin-left: 8px;
+    padding: 0 6px;
+    font-size: 12px;
+    color: #909399;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    opacity: 0.8;
   }
 }
 </style>

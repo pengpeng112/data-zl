@@ -397,6 +397,22 @@ export function previewQueryGate(data: {
   return http.request<ApiResponse<QueryGateResult>>("post", "/api/v1/queries/gate", { data });
 }
 
+/** 186 Q2：反馈分页列表（mine=本人历史 / queue=审核队列） */
+export function listAiFeedback(params?: {
+  scope?: "mine" | "queue";
+  status?: string;
+  query_code?: string;
+  page?: number;
+  page_size?: number;
+}) {
+  return http.request<ApiResponse<{
+    total: number;
+    page: number;
+    page_size: number;
+    items: Array<Record<string, unknown>>;
+  }>>("get", "/api/v1/ai/feedback", { params });
+}
+
 export function ingestQuery(data: Record<string, unknown>) {
   return http.request<ApiResponse<{ idempotent?: boolean; version?: QueryVersion }>>(
     "post",
