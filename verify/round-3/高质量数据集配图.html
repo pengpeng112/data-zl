@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>高质量专题数据集 · 持续治理支撑 — 数据资产平台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; background: #eef1f6; }
+  .slide { width: 1920px; height: 1080px; position: relative; overflow: hidden; background: linear-gradient(135deg, #eef2f8 0%, #f7f9fc 60%, #eaf0fa 100%); }
+
+  /* 顶栏（平台同款：白底导航 + 医院 logo 色） */
+  .topbar { height: 64px; background: #ffffff; border-bottom: 1px solid #e6ebf3; display: flex; align-items: center; padding: 0 36px; gap: 14px; }
+  .logo-mark { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #f59e0b, #f97316); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 18px; }
+  .topbar .sys { font-size: 18px; font-weight: 700; color: #0f172a; }
+  .topbar .sys small { color: #64748b; font-weight: 400; margin-left: 10px; font-size: 13px; }
+  .topbar .right { margin-left: auto; display: flex; gap: 18px; color: #475569; font-size: 13px; }
+  .topbar .pill { background: #f1f5f9; border-radius: 999px; padding: 5px 14px; }
+
+  /* Hero：蓝色渐变主标题带（呼应大赛主题） */
+  .hero { margin: 26px 48px 0; border-radius: 16px; padding: 30px 44px; background: linear-gradient(120deg, #0b3b8f 0%, #1d5fd4 55%, #2f7ff0 100%); color: #fff; position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; right: -60px; top: -70px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.18), transparent 65%); }
+  .hero h1 { font-size: 40px; letter-spacing: 2px; }
+  .hero .sub { margin-top: 10px; font-size: 19px; opacity: .92; letter-spacing: 6px; }
+  .hero .tag { position: absolute; right: 44px; top: 30px; text-align: right; font-size: 14px; opacity: .9; line-height: 1.9; }
+  .hero .tag b { display: block; font-size: 20px; letter-spacing: 3px; }
+
+  /* KPI：真实系统数字 */
+  .kpis { display: flex; gap: 20px; margin: 22px 48px 0; }
+  .kpi { flex: 1; background: #fff; border: 1px solid #e3eaf5; border-radius: 14px; padding: 18px 22px; box-shadow: 0 6px 18px rgba(15,23,42,.05); }
+  .kpi .num { font-size: 38px; font-weight: 800; color: #1d4ed8; font-family: "DIN Alternate", "Segoe UI", sans-serif; }
+  .kpi .num small { font-size: 16px; font-weight: 600; color: #64748b; margin-left: 2px; }
+  .kpi .lab { margin-top: 4px; color: #475569; font-size: 15px; }
+  .kpi .foot { margin-top: 6px; color: #94a3b8; font-size: 12px; }
+
+  /* 六步治理链路 */
+  .chain-title { margin: 26px 48px 12px; display: flex; align-items: baseline; gap: 16px; }
+  .chain-title h2 { font-size: 24px; color: #0f172a; }
+  .chain-title span { color: #64748b; font-size: 14px; }
+  .chain { display: flex; gap: 16px; margin: 0 48px; }
+  .step { flex: 1; background: linear-gradient(180deg, #ffffff, #f6f9ff); border: 1px solid #dfe8f8; border-radius: 14px; padding: 20px 18px 18px; position: relative; }
+  .step .no { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+  .step h3 { text-align: center; margin-top: 12px; font-size: 19px; color: #0f172a; letter-spacing: 1px; }
+  .step p { margin-top: 8px; font-size: 13.5px; line-height: 1.65; color: #475569; text-align: center; min-height: 66px; }
+  .step .mod { margin-top: 8px; text-align: center; font-size: 12px; color: #2563eb; background: #eaf1ff; border-radius: 999px; padding: 4px 10px; display: inline-block; left: 50%; transform: translateX(50%); position: relative; white-space: nowrap; }
+  .arrow { align-self: center; color: #93b4f5; font-size: 26px; font-weight: 700; }
+
+  /* 底部双横幅（呼应 PPT 原版式） */
+  .banner { margin: 24px 48px 0; border-radius: 14px; padding: 20px 34px; color: #fff; display: flex; align-items: center; gap: 20px; }
+  .banner.main { background: linear-gradient(120deg, #0b3b8f, #1d5fd4); }
+  .banner.main b { font-size: 26px; letter-spacing: 6px; }
+  .banner.main span { margin-left: auto; font-size: 15px; opacity: .92; }
+  .banner.sub2 { background: #123c8c; margin-top: 14px; justify-content: center; font-size: 21px; letter-spacing: 2px; }
+  .icon-dot { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,.65); display: flex; align-items: center; justify-content: center; font-size: 18px; flex: none; }
+
+  .foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: #94a3b8; font-size: 12px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="topbar">
+    <div class="logo-mark">医</div>
+    <div class="sys">山东省第二人民医院 · 数据资产平台<small>医院数据资产指挥中心</small></div>
+    <div class="right"><span class="pill"> governance 全链路留痕</span><span class="pill">RBAC 最小授权</span><span class="pill">源库只读</span></div>
+  </div>
+
+  <div class="hero">
+    <h1>以持续治理支撑高质量数据集建设</h1>
+    <div class="sub">可信 · 可解释 · 可追溯 · 可复用</div>
+    <div class="tag"><b>2026 年山东省数智健康大赛</b>数据资产平台 · 治理能力实景</div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="num">20<small>+</small></div><div class="lab">接入业务系统</div><div class="foot">HIS / LIS / PACS / EMR / 手麻 / 移动护理 …</div></div>
+    <div class="kpi"><div class="num">12,702</div><div class="lab">治理资产表</div><div class="foot">全景视图 · 资产可知</div></div>
+    <div class="kpi"><div class="num">1,329</div><div class="lab">数据关系</div><div class="foot">跨系统关联 · 置信度分级</div></div>
+    <div class="kpi"><div class="num">957</div><div class="lab">治理关系（可信口径）</div><div class="foot">复核确认 · 责任到人</div></div>
+    <div class="kpi"><div class="num">100<small>%</small></div><div class="lab">治理动作留痕</div><div class="foot">审计日志 · 过程可溯</div></div>
+  </div>
+
+  <div class="chain-title"><h2>六步持续治理链路</h2><span>每一步均由平台真实模块支撑，非一次性导数</span></div>
+  <div class="chain">
+    <div class="step"><div class="no">1</div><h3>资产可知</h3><p>梳理全域数据全景视图一览无余，系统/表/字段三级目录</p><div class="mod">表资产 · 业务系统</div></div>
+    <div class="arrow">➤</div>
+    <div class="step"><div class="no">2</div><h3>关系可信</h3><p>构建跨系统关联关系，置信度分级锁定责任到人</p><div class="mod">关系图谱 · 关系复核</div></div>
+    <div class="arrow">➤</div>
+    <div class="step"><div class="no">3</div><h3>标准统一</h3><p>制定数据标准与口径，值域知识库语义统一</p><div class="mod">值域知识库 · 字典中心</div></div>
+    <div class="arrow">➤</div>
+    <div class="step"><div class="no">4</div><h3>质控可检</h3><p>规则统一 + AI 自动化质控，及时发现问题并入库跟踪</p><div class="mod">数据质量 · AI 探查</div></div>
+    <div class="arrow">➤</div>
+    <div class="step"><div class="no">5</div><h3>过程可溯</h3><p>全链路日志留痕，质量轨迹可追溯可审计</p><div class="mod">审计日志 · 权限留痕</div></div>
+    <div class="arrow">➤</div>
+    <div class="step"><div class="no">6</div><h3>结果可复用</h3><p>基于确认数据，多场景业务可复用</p><div class="mod">查询与指标中心 · 数据产品</div></div>
+  </div>
+
+  <div class="banner main">
+    <div class="icon-dot">◎</div>
+    <b>可信 · 可解释 · 可追溯 · 可复用</b>
+    <span>全链路治理闭环驱动：规范标准 · 应用友好化 · 口径稳定 · 生成可靠 · 场景赋能 · 互信共赢</span>
+  </div>
+  <div class="banner sub2">
+    <div class="icon-dot">▤</div>
+    从临时导一份数据，逐步走向由持续治理能力支撑的高质量专题数据集。
+  </div>
+
+  <div class="foot">山东省第二人民医院 数据资产平台 · 治理数据实景（表 12,702 / 关系 1,329 / 系统 20+）</div>
+</div>
+</body>
+</html>

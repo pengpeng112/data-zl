@@ -50,7 +50,7 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" data-asset-83
 
 7. 回写 Excel 前先备份。SQL 写入指定分子/分母列，统计值按年份写入末尾年度列；保存后重新打开文件核对单元格。
 
-8. 连接失败时停止并报告 SSH 错误类型。不得改用聊天中的明文密码、自动接受未知主机、猜测账号或扫描网络。
+8. 连接失败时仅暂停依赖该连接的步骤，报告 SSH 错误类型，继续离线核对和其他独立工作。不得改用聊天中的明文密码、自动接受未知主机、猜测账号或扫描网络。
 
 ## B. Windows 仓库本机：旧 SSH 跳板方式
 
@@ -90,6 +90,8 @@ python ..\.agents\skills\hisuser-readonly-sql\scripts\run_his_readonly.py --test
 
 ## D. 平台 API
 
+用户明确要求连接、查询或验证，已构成该目标和范围内的操作请求，无需重复询问是否开始；仍须满足所选通道的访问权限、草稿审批和时间窗口。仅对实际缺失的具体批准提问，普通请求不自动豁免白天 live 限制或授权批量探查。静态校验不新增人工审批，也不替代现有审批。
+
 推荐顺序：
 
 1. `POST /api/v1/ai/sessions`；
@@ -97,7 +99,7 @@ python ..\.agents\skills\hisuser-readonly-sql\scripts\run_his_readonly.py --test
 3. `POST /api/v1/ai/export-context`；
 4. `POST /api/v1/ai/sql-risk-scan`；
 5. `POST /api/v1/ai/propose-sql`；
-6. 人工批准后调用 `POST /api/v1/ai/drafts/{draft_id}/execute`，使用 `source_code=his_source_10_10_10_15`；当前平台 API 契约上限为 `max_rows<=5000`。需要10000行查询或50000行导出时使用服务器内网 direct 执行器。
+6. 草稿经现有人工批准后调用 `POST /api/v1/ai/drafts/{draft_id}/execute`，使用 `source_code=his_source_10_10_10_15`；当前平台 API 契约上限为 `max_rows<=5000`。需要10000行查询或50000行导出且用户已明确要求相应查询/导出时，可使用服务器内网 direct 执行器；direct 只解决行数和运行位置，不得用于绕过草稿审批、数据访问授权或审计。判断既有授权已满足时核对：目标源、对象或 SQL、参数范围、执行时段、适用通道；同一任务已有等价批准不重复索取。仅缺白天执行批准时，呈报已备好的限量 SQL、范围与超时，只询问该时段批准；仅缺草稿审批时，提供具体 draft_id 与审批状态，不重复询问是否开始。
 
 Token 由客户端安全认证配置注入，不写命令、Skill 或报告。
 

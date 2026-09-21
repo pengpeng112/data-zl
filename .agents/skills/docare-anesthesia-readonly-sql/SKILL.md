@@ -1,6 +1,6 @@
 ---
 name: docare-anesthesia-readonly-sql
-description: 为山东省第二人民医院 Docare 手术麻醉独立源端（平台系统编码 DOCARE，Oracle 11g，MEDSURGERY/MEDCOMM/MEDICU 多 Owner）检索表结构、分析手术麻醉关系、编写只读 SQL，并在用户明确要求时受控执行限量 SELECT。用户提到 Docare、手麻、手术麻醉、麻醉计划、麻醉总结、麻醉事件、术中监护、手术排班、镇痛、交接、MED_OPERATION_MASTER、MEDSURGERY、MEDCOMM 或 MEDICU 时使用。禁止 DML/DDL、创建视图、锁表、存储过程、全表扫描和输出未脱敏患者信息；凭据仅可来自环境变量或服务器受控凭据文件。
+description: 为山东省第二人民医院 Docare 手术麻醉独立源端（平台系统编码 DOCARE，Oracle 11g，MEDSURGERY/MEDCOMM/MEDICU 多 Owner）检索表结构、分析手术麻醉关系、编写只读 SQL，并在用户明确要求时受控执行限量 SELECT。用户提到 Docare、手麻、手术麻醉、麻醉计划、麻醉总结、麻醉事件、术中监护、手术排班、镇痛、手术护理交接、MED_OPERATION_MASTER、MEDSURGERY、MEDCOMM 或 MEDICU 时使用。禁止 DML/DDL、创建视图、锁表、存储过程、全表扫描和输出未脱敏患者信息；凭据仅可来自环境变量或服务器受控凭据文件。
 ---
 
 # Docare 手术麻醉只读查询
@@ -14,20 +14,24 @@ description: 为山东省第二人民医院 Docare 手术麻醉独立源端（�
 1. `AGENTS.md`、`开发起步包/README.md` 和 `55_系统未完成事项统一执行计划.md`。
 2. 本技能 [Docare 查询指南](references/docare-guide.md)。
 3. 需要连接或执行时读取 [连接指南](references/connection-guide.md)。
-4. 字段以 `开发起步包/80_手麻Docare系统Oracle元数据快照.json` 为准。
+4. 字段优先取 DOCARE 平台当前元数据；缺失或不可用时回退 `开发起步包/80_手麻Docare系统Oracle元数据快照.json` 并标注日期。
 5. 关系以 `80_手麻Docare系统活库探查与关系分析报告.md` 和 `80_手麻Docare系统关系验证结果.json` 为准。
+
+## 请求与执行批准
+
+用户明确要求连接、查询或验证，已构成该目标和范围内的操作请求，无需重复询问是否开始；仍须满足所选通道的访问权限、草稿审批和时间窗口。仅对实际缺失的具体批准提问，普通请求不自动豁免白天 live 限制或授权批量探查。静态校验不新增人工审批，也不替代现有审批。
 
 ## 字段值域硬规则（149 值域知识库，强制）
 
 - 涉及编码/状态/类型/阈值/字典类字段（如 手术/麻醉状态码、急诊标志、离院方式等（含跨系统镜像 `SM.MED_OPERATION_MASTER.OPER_STATUS` 口径））写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
 - 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=DOCARE` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
-- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据按 149 提交平台 pending（AI 仅可提交，确认/裁决须人工）。
+- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据时先纳入本次候选材料；用户明确要求摄取、登记，或当前任务已授权相应候选提交时，才提交平台 pending（AI 仅可提交，确认/裁决须人工）；否则报告建议，不因未提交阻塞原任务。
 - 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
 
 ## 标准流程
 
 1. 明确业务目的、每行粒度、手术范围、时间范围、字段、汇总口径和是否导出。
-2. 在 80 号快照中确认 Owner、对象、字段和类型；不得依赖默认 Schema 或同义词。
+2. 在 DOCARE 平台当前元数据中确认 Owner、对象、字段和类型，缺失或不可用时回退 80 号快照并标注日期；不得依赖默认 Schema 或同义词。
 3. 优先选择已验证关系，保留孤儿率和历史数据限制。
 4. 使用全限定对象名和完整复合键：
    - 患者：`PATIENT_ID`
@@ -48,7 +52,7 @@ python .agents/skills/docare-anesthesia-readonly-sql/scripts/validate_docare_sql
 ## 查询和导出
 
 - 普通查询：`--max-rows` 最大 10000。
-- 文件导出：`--export-max-rows` 最大 50000，仅允许服务器内网 `direct` 模式及 Git 仓库外路径。
+- 文件导出：`--export-max-rows` 最大 50000，仅允许服务器内网 `direct` 模式及 Git 仓库外执行器路径（不得降低执行器路径门禁）。允许交付的脱敏结果最终按根 AGENTS.md 取数导出目录规则归集至 `取数/exports/<序号、任务名>/`，交付前核验 Git 忽略状态；原始患者明细不因此获得带出权限。
 - 上限不构成全表扫描授权；业务键和时间边界始终优先。
 
 ```powershell
@@ -59,11 +63,13 @@ python ..\.agents\skills\docare-anesthesia-readonly-sql\scripts\run_docare_reado
   --max-rows 10000
 ```
 
-## 必须停止
+## 阻塞范围与停止条件
+
+以下情况只停止依赖该条件的连接、SQL 生成或执行步骤；继续完成已授权的本地资产核对、候选说明、静态检查和其他独立工作。不得猜测字段、改用写连接或降低校验来绕过。
 
 - 用户要求写入、创建视图、修改结构、调用过程或锁表。
 - 认证信息未通过批准的环境变量或凭据文件提供。
-- 表、字段或复合 JOIN 键未在活库证据中确认。
+- 表、字段或复合 JOIN 键经平台当前元数据、80 号快照和允许的只读结构通道核对后仍未确认。
 - 大表查询缺少手术键、患者键或时间边界。
 - 查询会把未脱敏患者信息发送给 AI、日志或报告。
 - 跨 Docare 与数据中心 SM/HIS 查询，却没有已验证同步对象、DBLINK 或分步对账方案。

@@ -1,0 +1,62 @@
+{
+  "round": 10,
+  "created_at": "2026-09-11 08:58:30",
+  "tool": "tools/multi_ai_evidence.py",
+  "ais": {
+    "kimi": {
+      "status": "present",
+      "files": [
+        {
+          "file": "审查_kimi.raw",
+          "normalized_to": "审查_kimi",
+          "sha256_raw": "d265e063cd06ed3bb6c707af5d237ffc222bb3440dcbca680b58df17244883ed",
+          "bytes": 7911
+        },
+        {
+          "file": "审查_kimi_r2.raw",
+          "normalized_to": "审查_kimi_r2",
+          "sha256_raw": "a666703d5b7a4d06122bcd1cdd338e389758638eff871d4ba033682dd362a20e",
+          "bytes": 9031
+        }
+      ],
+      "reason": ""
+    },
+    "grok": {
+      "status": "present",
+      "files": [
+        {
+          "file": "审查_grok.raw",
+          "normalized_to": "审查_grok",
+          "sha256_raw": "2bd1a83a42b2024847e4eae0223918a74afb3c28b4b71e5079f585996c7b7cde",
+          "bytes": 13768
+        },
+        {
+          "file": "审查_grok_r2.raw",
+          "normalized_to": "审查_grok_r2",
+          "sha256_raw": "d22cb462e20b6809597b07f39ec6c2a33511590428f4c6064706531ee162dc43",
+          "bytes": 16424
+        }
+      ],
+      "reason": ""
+    },
+    "codex": {
+      "status": "present",
+      "files": [
+        {
+          "file": "检查_codex.md",
+          "normalized_to": "检查_codex_normalized.md",
+          "sha256_raw": "d9c505961108569b61cbd48d78c6000ad3f244c7f068a5b1af07f064007b62a1",
+          "bytes": 16465
+        },
+        {
+          "file": "检查_codex_r2.md",
+          "normalized_to": "检查_codex_r2_normalized.md",
+          "sha256_raw": "3928ec380eb73ad199eb08e31ca37f5148db84efffecdae0bd36212a630a3608",
+          "bytes": 19880
+        }
+      ],
+      "reason": ""
+    }
+  },
+  "note": "本 manifest 只登记文件级证据（哈希/在席/缺席），不载结论；终审归人工。"
+}

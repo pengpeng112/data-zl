@@ -1,0 +1,81 @@
+• 我先读 bug 报告，再按引用逐一核查源文件。
+
+• 现在并行读取报告引用的所有源文件。
+
+• 我需要的是 overview 端点本体（1524-1731 行），刚才误读了文件头部。
+
+• 我需要的是 overview 端点实现体（1289–1731 行），此前三次都误传了相同的默认偏移。现在显式指定 line_offset 读取。
+
+• 核查完成。六个假设逐一给出独立结论，证据均来自当前源码与 `node_modules` 实际依赖。
+
+  ## 审查结论
+
+  ### P1 首屏错误面板 —— 确认有问题（机制链成立），但报告截图证据与当前代码不符，严重度：高
+
+  机制链每一环都在代码中坐实：
+
+  - 前端 HTTP 超时阈值确为 10s：`frontend/src/utils/http/index.ts:34` `timeout: 10000`。
+  - overview 分支失败后无任何重试/降级：`index.vue:626-647` 的 `getGraphOverview` 失败直接走 catch（681-685 行）→ `classifyGraphError` → `api_error` → `index.vue:197-209` 的 `el-result` 错误面板。且「重置条件」会回到 overview 默认模式（874-877 行）再次超时——死循环。
+  - 后端慢的结构根因存在，但报告措辞不精确：慢的不是"12702 表逐级聚合"（system 层本身是 SQL `GROUP BY`，很快），而是聚合边计算循环——`graph.py` 约 1683-1709 行对**全量** `AssetRelation` 无 limit 扫描，且 `_resolve_relation_endpoint(db, rel, ...)` **未传 resolver**，物理字段缺失的行每次触发 `resolve_endpoint`/`_resolve_endpoint_lenient` 全表查询（N+1）。对照：object 层分支在约 1592 行用了 `_EndpointResolver.load(db)` 预载索引——同一文件两种待遇，聚合分支恰恰是漏掉优化的那个。1329 关系 × 潜在 2 次查询打到 12702 行的表上，23.5s 量级可信。
+
+  疑点：报告截图的文案「图谱加载失败 / 接口超时或服务异常，请稍后重试」、按钮「重新加载」、关联编号格式 `graph-load-<时间戳>-<随机>` 在当前代码库**完全不存在**（`grep -rn "图谱加载失败\|graph-load-\|接口超时" frontend/src frontend/mock` 零命中）。当前代码渲染的标题是「图谱接口请求失败」、按钮是「重试」、关联编号是 16 位随机 hex（`graphErrors.ts:79-87, 34-38`）。截图不是由当前 src 渲染的（可能是旧 dist 产物或转写失真），P1 的"实拍证据"无法由代码佐证；但"超时→错误面板"的结论仍成立。
+
+  验证命令：`curl -o /dev/null -w '%{http_code} %{time_total}s\n' -H "Authorization: Bearer <token>" "http://127.0.0.1:8000/api/v1/graph/overview?level=system"`
+
+  ### R2 force alpha 过低 —— 根因机制被证伪（伪根因），但参数确有问题，严重度：高
+
+  这是本次核查最重要的发现：**G6 v5 的 `type: "force"` 根本不是 d3-force**。`node_modules/@antv/g6/lib/registry/build-in.js:70` 把 `force` 映射到 `@antv/layout` 的自定义 `ForceLayout`；该布局的选项类型（`@antv/layout/src/algorithm/force/types.ts`）与默认参数（`index.ts:23-40`）**完全没有 `alpha`/`alphaDecay`/`alphaMin`/`forceSimulation` 概念**——这四个选项只存在于 `d3-force`（`d3-force/types.ts:214-232`）。`AdvancedRelationGraph.vue:234-237` 的四个参数是被静默忽略的死配置（`new Graph({...} as any)` 还绕过了类型检查，所以编译不报错）。
+
+  推论：报告"alpha 0.35 导致力导过弱"的因果链不成立，其修复建议"alpha 提到 0.8~1、alphaDecay 降到 0.028"**将毫无效果**。
+
+  但"力导参数失衡"本身属实，只是病灶在别处：该自定义布局默认 `edgeStrength: 50, nodeStrength: 1000, gravity: 10`（`index.ts:23-40`），代码覆盖为 `edgeStrength: 0.45`（引力削弱约 99%）、`nodeStrength: -280`（斥力量级仅约默认 1/4），而 `gravity` 保持默认 10 持续拉向中心——向心 ≫ 斥力/引力，中心坍缩风险真实存在。正确的修复方向是调 `gravity`/`nodeStrength`/`edgeStrength`、或改用 `d3-force`（才真正吃 alpha）、或按报告备选方案改预计算布局。
+
+  ### R4 标签配置矛盾 —— 配置矛盾属实，但因果权重低，严重度：低
+
+  - 矛盾属实：G6 base-node 默认 `labelWordWrap: false`（`base-node.js:235-237`），`label*` 前缀经 `subStyleProps` 传给 Label shape；`wordWrap=false` 时 `wordWrapWidth`/`maxLines`/`textOverflow` 不进换行管线，故 `AdvancedRelationGraph.vue:345-348` 的 `labelMaxWidth:168 + labelMaxLines:5 + labelTextOverflow:"clip"` 基本失效。
+  - 但无功能后果：标签文本已由 `formatGraphNodeLabel` 预换行（`graphTransform.ts:148-188`，显式 `\n`、≤5 行、每行 ≤7 字），多行展示不依赖 G6 的 wordWrap。
+  - 标签互叠是节点堆叠的次生现象（`labelPlacement:"bottom"` + 节点圆重叠则标签必叠），不是独立缺陷。
+  - "漂浮中文标签 = preset 与 force 坐标混用"的猜测**不成立**：force 模式下 `graphData()` 不写 `x/y`（`AdvancedRelationGraph.vue:332` 仅 preset 分支写坐标），单次渲染内不存在混用。漂浮标签更可能是被压进墨团的节点的标签外露。
+  - 验证：`grep -n "labelWordWrap\|labelMaxWidth" frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js`
+
+  ### R5 SVG 降级 fallback —— 确认有问题，严重度：中
+
+  - 降级逻辑属实：`graphLoadPolicy.ts:19-20`（阈值 220 节点/320 边，报告引的 22 行其实是 `isAggregationViewMode`，行号略偏）、30 行 `shouldUseSvg` 强制切 SVG。
+  - 语义错位属实：`RelationGraph.vue:445-451`，force/layered 一律落到 `buildLayered` 网格，explore（force 语义）切 SVG 后变成按分组排网格。
+  - 重叠风险算术上成立：`buildLayered` 列距 260、行距 92（329-332 行）；标签渲染在圆心下方 `width/2 + 14 + lineIndex*15`（模板 79 行），标签最多约 6 行（5 行名 + tech 行）× 15px ≈ 90px，起点距圆心已达半径+14 ≈ 35-47px → 标签底缘可达圆心下约 120px **> 行距 92px**，密集分组时上一行标签必然压到下一行圆点。列距 260 vs 标签宽 ~168 横向尚可，纵向是硬伤。
+  - 补充：`applyGraphLoadPolicy` 只在 loadData 非 overview 分支（`index.vue:670`）和 `loadChain`（745 行）调用；overview 分支不触发降级。
+
+  ### R7 el-segmented 不可达 —— 无独立问题（P1 的次生现象），严重度：低；附带的错误态死循环为中
+
+  - `GraphToolbar.vue:4` 的 `<el-segmented>` 无 `v-if`，无条件渲染；element-plus 2.11.5（`package.json:69`）正常输出 `.el-segmented` DOM。
+  - 真正原因在 `index.vue:9`：GraphToolbar 整体被 `<template v-if="!isErrorState && state !== 'loading'">` 包裹——首屏 loading 期间和 P1 错误面板期间工具栏**不存在**，`querySelector('.el-segmented')` 必然为 null。复现脚本是在错误面板状态下量的，null 是 P1 的后果，不是 Element Plus 版本或条件渲染缺陷。健康会话中真实用户点得到。
+  - 衍生真问题：错误面板把工具栏整个隐藏，用户只剩「重试/重置条件」，两者都回 overview 再超时，无法切到 explore 等轻量模式自救（见 P1 死循环）。
+  - 验证：接口正常时浏览器 console 跑 `document.querySelector('.el-segmented')` 应非 null。
+
+  ### R8 meta 口径错位 —— 确认有问题，严重度：低
+
+  `graph.py` overview 非 object 分支（约 1711-1720 行）：
+
+  ```python
+  meta = _graph_meta(matched_assets, matched_assets, len(edges), matched_assets > len(nodes), ...)
+  ```
+
+  - `total_relations`/`matched_relations` 实际填入的是 **AssetTable 表计数**（12702），`returned_relations` 填入的是聚合边数（1），`truncated` 实际是「表数 > 聚合节点数」——与全局图端点（`graph.py:977-999`，`total_relations` = `AssetRelation` 计数）语义不一致。
+  - 与报告 ov_probe 实测值 `12702/12702/1/truncated=true` 完全吻合，反向坐实。
+  - 影响：`GraphToolbar.vue:91-95` 会把 overview 显示成「总数 12702 / 命中 12702 / 返回 1 / 已截断」，对用户构成误导（"返回 1 还截断"看起来很荒谬），加剧"图谱坏了"的观感；纯展示口径，不影响数据正确性。
+
+  ## 汇总
+
+  | 假设 | 结论 | 严重度 | 关键证据 |
+  |---|---|---|---|
+  | P1 错误面板 | 确认（但截图文案与当前代码不符，证据链有疑点） | 高 | `http/index.ts:34`；`index.vue:626-647, 197-209`；`graph.py:1683-1709` N+1；`graphErrors.ts:79-87` 文案不符 |
+  | R2 alpha 过低 | 伪根因（force ≠ d3-force，alpha 系死配置）；真病灶是 gravity 10 vs 被削弱的 edgeStrength/nodeStrength | 高 | `build-in.js:70`；`@antv/layout/src/algorithm/force/types.ts`、`index.ts:23-40`；`AdvancedRelationGraph.vue:226-238` |
+  | R4 标签矛盾 | 矛盾属实但无功能后果（文本已预换行）；漂浮标签归因坐标混用不成立 | 低 | `base-node.js:235-237`；`graphTransform.ts:148-188`；`AdvancedRelationGraph.vue:332` |
+  | R5 SVG fallback | 确认：行距 92 < 标签栈高约 120px，跨行压叠必然；force 落 layered 语义错位属实 | 中 | `RelationGraph.vue:445-451, 329-332, 79`；`graphLoadPolicy.ts:19-20, 30` |
+  | R7 el-segmented | 无独立问题，系 P1 错误态下工具栏未渲染的次生现象 | 低（UX 死循环中） | `index.vue:9`；`GraphToolbar.vue:4`；`package.json:69` |
+  | R8 meta 口径 | 确认：total/matched 填表计数、returned 填聚合边数，与全局端点语义不一致 | 低 | `graph.py:1711-1720` vs `977-999`；`GraphToolbar.vue:91-95` |
+
+  两点审查者备注：其一，报告最小修复思路第 2 条「force alpha 提到 0.8~1」按 R2 的核查结果**不会生效**，实施前必须改为调 gravity/力强度或切 `d3-force`/预设布局；其二，P1 截图文案与当前源码不匹配，建议先确认复现环境跑的是 vite dev（src）还是旧 dist 包，再决定证据是否可采信。
+
+  本次为纯只读审查，未修改任何文件；未读取 `verify/` 下其他文件，也未读 `审查_zcode.md`（仅用 Grep 文件名列表确认过 `复现v4.py` 等存在，未看内容）。
+

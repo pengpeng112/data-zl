@@ -1,0 +1,74 @@
+{
+  "steps": [
+    {
+      "step": "V4_D0_overview_settled",
+      "measure": {
+        "canvas": 0,
+        "svg": 37,
+        "svgCircles": 0,
+        "graphWrapExists": false,
+        "g6Containers": [
+          "asset-graph-page main-content",
+          "graph-error-panel",
+          "graph-error-correlation"
+        ],
+        "neighborCalls": 0,
+        "graphCalls": 4
+      },
+      "console": [
+        "error:Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "step": "toolbar_struct",
+      "struct": {
+        "hasSegmented": false,
+        "segItems": [],
+        "radios": [
+          "通知",
+          "消息(3)",
+          "待办(4)"
+        ],
+        "toolbarText": ""
+      }
+    },
+    {
+      "step": "V4_E1_fail",
+      "measure": {
+        "canvas": 0,
+        "svg": 37,
+        "svgCircles": 0,
+        "graphWrapExists": false,
+        "g6Containers": [
+          "asset-graph-page main-content",
+          "graph-error-panel",
+          "graph-error-correlation"
+        ],
+        "neighborCalls": 0,
+        "graphCalls": 4
+      },
+      "console": [
+        "V4E1-fail:Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for get_by_text(\"关系探索\", exact=True).first\n"
+      ]
+    },
+    {
+      "step": "V4_E2_dblclick_expand",
+      "measure": {
+        "canvas": 0,
+        "svg": 37,
+        "svgCircles": 0,
+        "graphWrapExists": false,
+        "g6Containers": [
+          "asset-graph-page main-content",
+          "graph-error-panel",
+          "graph-error-correlation"
+        ],
+        "neighborCalls": 0,
+        "graphCalls": 4
+      },
+      "console": [
+        "no-canvas-for-E2"
+      ]
+    }
+  ]
+}

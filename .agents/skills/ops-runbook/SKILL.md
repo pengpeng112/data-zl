@@ -8,9 +8,9 @@ description: 数据资产平台生产运维四件套标准件——8.83 容器�
 ## 0. 总边界
 
 - 本机 Windows 不直连业务库；一切经 `ssh -o BatchMode=yes -i C:\Users\Administrator\.ssh\id_ed25519_ai root@10.10.8.83`。
-- 业务源库（HIS/ODS/Docare/CDMS/JHEMR…）写入必须用户逐例授权；平台库操作按 AGENTS 门禁。
+- 业务源库（HIS/ODS/Docare/CDMS/JHEMR…）写入必须用户逐例授权，并通过 `asset_action_executors` 白名单和审批通道；本技能不授权临时直连写脚本。平台库操作按 AGENTS 门禁。
 - 生产发布、cron、env 修改须用户点名；口令零落盘（凭据只从 `/etc/data-asset/credentials/` 受控文件注入）。
-- 他人域文件零触碰（`bash tools/dev_env.sh --domain-baseline/--domain-check` 管基线）。
+- 不修改、覆盖、回退或暂存与本任务无关的他人改动，允许只读检查。准备编辑时使用任务独立基线路径执行 `dev_env.sh --domain-baseline/--domain-check`，不覆盖其他会话基线。
 
 ## 1. 容器内连库探查（最高频样板，29+ 会话验证）
 
@@ -34,7 +34,7 @@ def src_conn(cred, host, service):  # 凭据文件名见 /etc/data-asset/credent
 ```
 
 - 平台库：`from app.core.db import SessionLocal`（容器内即生产/开发库）。
-- 直连写事务（仅获授权后）：`oracledb.init_oracle_client(lib_dir="/opt/oracle")` + `oracledb.connect(user, password, dsn="host:1521/service")`，`autocommit=False`。
+- 写事务仅由已批准的 `asset_action_executors` 白名单执行器承载；不存在适用执行器时只准备修复方案、差异及验证材料，不用直连脚本替代。
 - Oracle 需厚模式；JHEMR 直连须 `-e APP_IDENTITY_SYNC_DIRECT_CONNECTION=true`。
 
 **输出序列化标准件 norm()**（RAW/BLOB/LOB/date 均处理，4+ 会话踩坑后固化）：
@@ -55,7 +55,7 @@ def norm(v):
 
 ## 2. 业务库受控写修复（17 会话成型，181/182 实证）
 
-五步，缺一不可，全部留痕：
+以下是白名单执行器应满足的五步验收要求，缺一不可，全部留痕；不是独立的直连写入授权：
 
 1. **侦察**：数据字典定位受影响表集（如 `all_tab_columns` 三键拥有表逐表 count>0），**主键成分列（如 VISIT_ID）的修订必须全链同改，否则断链**；
 2. **预检**：目标键冲突必须全 0、源行数与预期一致；
@@ -63,7 +63,7 @@ def norm(v):
 4. **执行**：单事务，逐表 UPDATE 后 `rowcount` 与备份数对账，**不符立即 rollback 整例**；每例独立事务，单例失败不连坐；
 5. **回读+审计**：复核查询验证目标形态；平台 `GovernAuditLog` 写一行（module/entity_ref/action/operator=标识串/before/after）。
 
-- 回滚 = 按备份 JSON 逆向 UPDATE。
+- 回滚由同一受控通道按已批准回滚方案恢复备份；不得另起直连 UPDATE 绕过审批或审计。
 - **pg_dump 备份坑（两次会话踩）**：`APP_DB_URL` 是 `postgresql+psycopg://` 方言，pg_dump 不认——先 `sed s/postgresql+psycopg/postgresql/`；宿主机 pg_dump 在 `/usr/local/pgsql/bin/`。备份文件命名 `data_asset_pre_<tag>_<ts>.dump`。
 
 ## 3. 生产镜像发布（153/166/169/171/174/180/181 验证；详细版见 179/180 号文档）
@@ -105,7 +105,7 @@ FROM asset.asset_identity_sync_subtasks WHERE run_id=:latest;
 | pg_dump `role "root" does not exist` / 方言 URL | scheme 转换 §2；显式传 URL |
 | bytes/LOB JSON 序列化失败 | 统一 norm() §1 |
 | heredoc 中文经 stdin 编码损坏 | 本地文件 + `<` 重定向，禁 heredoc 长脚本 |
-| 并行会话互踩测试库/僵尸 pytest | 全量前 `tasklist` 清点非本会话 pytest；跑完重灌 import170.py |
+| 并行会话互踩测试库/僵尸 pytest | 全量前 `tasklist` 清点非本会话 pytest；跑后按隔离库约定恢复要求处理（不默认 import170） |
 | 镜像/发布窗口竞态（他方先发布） | 发布前 git log+docker ps 双快照；改动尽早提交占位 |
 | README/大文件超 25k tokens | Read 带 offset 分段；工具大输出转 stdout 日志文件再读 |
-| 用户选项卡未答 | 按"未答=不越权"处理记 SKIP，不空转等待 |
+| 用户选项卡未答 | 必需信息/批准缺失记待输入/待批准，继续独立工作；可选偏好合理等待后用已说明的默认值；仅明确排除或不适用记 SKIP |

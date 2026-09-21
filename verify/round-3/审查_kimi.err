@@ -1,0 +1,1570 @@
+• Let me read the bug report first, then the referenced source files.
+
+• Note the user asks me to verify: P1 (error panel / R1+R6 combined?), R2 force alpha, R4 label config contradiction, R5 SVG fallback, R7 el-segmented unreachable, R8 meta 口径错位 (that's R7 in the report). The user maps: P1 首屏错误面板 / R2 / R4 / R5 / R7 el-segmented 不可达 / R8 meta 口径错位. So "R8" in user wording = report's R7 (meta 口径错位). Fine.
+
+  Now read the source files. Let me read all referenced files in parallel.
+
+• Now read RelationGraph.vue, graph/index.vue, GraphToolbar.vue (referenced for R7/P3), and backend graph.py overview endpoint. graph/index.vue is likely large. Let me read RelationGraph.vue fully and graph.py, and GraphToolbar.vue; for graph/index.vue read fully too (may be ~600 lines).I need to read the overview endpoint in graph.py. Let me grep for "overview" to find it, and also read graph/index.vue.Oops — the Grep hit verify/round-3 files too, but I only saw filenames, not content. The user said don't read other files under verify/. A file listing match isn't reading content; but I should be careful not to open them. Fine.
+
+  Find overview endpoint in graph.py:I need lines 1524-1731 (the overview endpoint). Read that range.I re-read the same range accidentally (I passed no line_offset so it read from line 1 again). I need lines 1524-1731 for the overview endpoint. Use line_offset.
+
+• I keep passing the same call — I need to explicitly set line_offset=1289 to get _field_overview and the overview endpoint body (lines 1289–1731).
+
+• The Read tool kept returning lines 1-1000 because I didn't pass line_offset. I need to pass line_offset explicitly. Let me use Grep with -A to get the overview endpoint body, or Bash sed. Actually simplest: Grep for the overview function with context. Or Read with line_offset=1289, n_lines=443. My previous calls omitted line_offset apparently (the tool output shows line 1). I did include line_offset=1289 in my parameter intent but the calls seem to have dropped it. Let me call Read with line_offset explicitly and carefully.The Read tool seems to ignore my line_offset parameter in this environment (or the host replayed an identical call). I'll use Bash sed to extract lines 1289–1735 of graph.py, and also use sed for graph/index.vue relevant ranges. That's a read-only shell command — fine.def _parse_parent_path(value: str | None) -> tuple[str | None, str | None, str | None, str | None, str | None]:
+    if not value:
+        return None, None, None, None, None
+    parts = value.split("|")
+    if len(parts) != 5:
+        raise HTTPException(status_code=422, detail="parent_physical_key 格式应为 system|source|namespace|schema|table")
+    return tuple(parts)  # type: ignore[return-value]
+
+
+def _object_type_name(table: AssetTable) -> str:
+    return _object_type(table)
+
+
+def _apply_asset_filters(stmt, *, system_code: str | None, source_code: str | None, schema_name: str | None, domain: str | None, object_type: str | None):
+    if system_code:
+        codes = system_code_filter_values(system_code)
+        stmt = stmt.where(AssetTable.system_code.in_(codes or [system_code]))
+    if source_code:
+        stmt = stmt.where(AssetTable.source_code == source_code)
+    if schema_name:
+        ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+        stmt = stmt.where(ns_key == schema_name)
+    if domain:
+        stmt = stmt.where(AssetTable.domain == domain)
+    if object_type == "view":
+        stmt = stmt.where(or_(AssetTable.table_role.ilike("%view%"), AssetTable.table_role.ilike("%视图%"), AssetTable.table_name.ilike("V\\_%", escape="\\")))
+    elif object_type == "table":
+        stmt = stmt.where(~or_(AssetTable.table_role.ilike("%view%"), AssetTable.table_role.ilike("%视图%"), AssetTable.table_name.ilike("V\\_%", escape="\\")))
+    return stmt
+
+
+def _overview_id(level: str, values: tuple[str | None, ...]) -> str:
+    return "overview|" + level + "|" + "|".join(value or "" for value in values)
+
+
+def _overview_node(
+    level: str,
+    values: tuple[str | None, ...],
+    label: str,
+    count: int,
+    *,
+    path: str | None = None,
+) -> GraphNode:
+    system_code = values[0] if values else None
+    source_code = values[1] if len(values) > 1 else None
+    schema_name = values[2] if len(values) > 2 else None
+    return GraphNode(
+        id=_overview_id(level, values),
+        physical_key=_overview_id(level, values),
+        display_id=label,
+        label=label,
+        system_code=system_code,
+def _field_overview(
+    db: Session,
+    *,
+    table_physical_key: str,
+    system_code: str,
+    source_code: str,
+    namespace_name: str | None,
+    schema_name: str,
+    table_name: str,
+    limit: int,
+    started: float,
+) -> ApiResponse[GraphOverviewData]:
+    """按完整物理键返回一张表及其字段节点，不跨来源拼接同名字段。"""
+    endpoint = (system_code, source_code, namespace_name, schema_name, table_name)
+    table = _table_map_by_physical_key(db, {endpoint}).get(table_physical_key)
+    if table is None:
+        raise HTTPException(status_code=404, detail="字段概览的中心表不存在或物理键不唯一")
+
+    column_base = select(AssetColumn).where(
+        AssetColumn.system_code == system_code,
+        AssetColumn.source_code == source_code,
+        AssetColumn.schema_name == schema_name,
+        AssetColumn.table_name == table_name,
+    )
+    if namespace_name:
+        exact_stmt = column_base.where(AssetColumn.namespace_name == namespace_name)
+        exact_count = db.scalar(select(func.count()).select_from(exact_stmt.order_by(None).subquery())) or 0
+        if exact_count:
+            column_base = exact_stmt
+        else:
+            column_base = column_base.where(or_(
+                AssetColumn.namespace_name.is_(None),
+                AssetColumn.namespace_name == "",
+                AssetColumn.namespace_name == schema_name,
+            ))
+    else:
+        column_base = column_base.where(or_(
+            AssetColumn.namespace_name.is_(None),
+            AssetColumn.namespace_name == "",
+            AssetColumn.namespace_name == schema_name,
+        ))
+
+    matched_columns = db.scalar(
+        select(func.count()).select_from(column_base.order_by(None).subquery())
+    ) or 0
+    columns = db.scalars(
+        column_base.order_by(AssetColumn.column_id, AssetColumn.column_name).limit(limit)
+    ).all()
+
+    relation_columns: set[str] = set()
+    from_match = (
+        (AssetRelation.from_system_code == system_code)
+        & (AssetRelation.from_source_code == source_code)
+        & (AssetRelation.from_schema_name == schema_name)
+        & (AssetRelation.from_table_name == table_name)
+    )
+    to_match = (
+        (AssetRelation.to_system_code == system_code)
+        & (AssetRelation.to_source_code == source_code)
+        & (AssetRelation.to_schema_name == schema_name)
+        & (AssetRelation.to_table_name == table_name)
+    )
+    for relation in db.scalars(select(AssetRelation).where(or_(from_match, to_match))).all():
+        if (
+            relation.from_system_code == system_code
+            and relation.from_source_code == source_code
+            and relation.from_schema_name == schema_name
+            and relation.from_table_name == table_name
+        ):
+            relation_columns.update(item.upper() for item in _split_relation_columns(relation.from_columns))
+        if (
+            relation.to_system_code == system_code
+            and relation.to_source_code == source_code
+@router.get("/overview", response_model=ApiResponse[GraphOverviewData], summary="服务端完整资产概览")
+def overview(
+    level: str = Query("system", pattern="^(system|source|schema|object|field)$"),
+    parent_physical_key: str | None = Query(None),
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    schema: str | None = Query(None),
+    domain: str | None = Query(None),
+    object_type: str | None = Query(None, pattern="^(table|view)$"),
+    limit: int = Query(80, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[GraphOverviewData]:
+    started = perf_counter()
+    p_sys, p_src, p_ns, p_schema, p_table = _parse_parent_path(parent_physical_key)
+    system_code, source_code, schema = system_code or p_sys, source_code or p_src, schema or p_schema
+    if level == "source" and not system_code:
+        raise HTTPException(status_code=422, detail="source 概览必须提供 system_code 或 parent_physical_key")
+    if level == "schema" and not system_code:
+        raise HTTPException(status_code=422, detail="schema 概览必须提供 system_code 或 parent_physical_key")
+    if level == "object" and (not system_code or not schema):
+        raise HTTPException(status_code=422, detail="object 概览必须提供 system_code 和 schema")
+    if level == "field":
+        if not parent_physical_key or not p_sys or not p_src or not p_schema or not p_table:
+            raise HTTPException(status_code=422, detail="field 概览必须提供完整表物理键 parent_physical_key")
+        return _field_overview(
+            db,
+            table_physical_key=parent_physical_key,
+            system_code=p_sys,
+            source_code=p_src,
+            namespace_name=p_ns,
+            schema_name=p_schema,
+            table_name=p_table,
+            limit=limit,
+            started=started,
+        )
+    base = _apply_asset_filters(select(AssetTable), system_code=system_code, source_code=source_code, schema_name=schema, domain=domain, object_type=object_type)
+    matched_assets = db.scalar(select(func.count()).select_from(base.order_by(None).subquery())) or 0
+    nodes: list[GraphNode] = []
+    edges: list[GraphEdge] = []
+    if level == "object":
+        rows = db.scalars(base.order_by(AssetTable.schema_name, AssetTable.table_name).limit(limit)).all()
+        object_candidates: dict[tuple[str, str, str, str], list[str]] = defaultdict(list)
+        for table in rows:
+            key = _physical_key(table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name)
+            if not key:
+                continue
+            node = _graph_node_for(key, _display_id(table.schema_name, table.table_name), table.system_code, table.source_code, table.namespace_name, table.schema_name, table.table_name, table)
+            node.asset_count, node.child_count, node.object_type, node.technical_name = 1, 1, _object_type_name(table), _table_full(table.schema_name, table.table_name)
+            node.category = node.object_type
+            nodes.append(node)
+            if table.system_code and table.source_code and table.schema_name and table.table_name:
+                object_candidates[(table.system_code, table.source_code, table.schema_name, table.table_name)].append(key)
+
+        object_ids = {
+            logical_key: candidates[0]
+            for logical_key, candidates in object_candidates.items()
+            if len(candidates) == 1
+        }
+
+        # 对象层展示真实表间关系，上一层 Schema 节点不继续占据画布。
+        # 历史关系 namespace 可能为空，因此先按唯一逻辑四元组定位到当前展示节点，
+        # 再把边端点替换为资产表的完整物理键，避免同名跨来源串边。
+        endpoint_resolver = _EndpointResolver.load(db)
+        seen_edge_ids: set[str] = set()
+        for relation in db.scalars(select(AssetRelation)).all():
+            from_ep = _resolve_relation_endpoint(db, relation, "from", resolver=endpoint_resolver)
+            to_ep = _resolve_relation_endpoint(db, relation, "to", resolver=endpoint_resolver)
+            f_sys, f_src, _f_ns, f_schema, f_table, f_display = from_ep
+            t_sys, t_src, _t_ns, t_schema, t_table, t_display = to_ep
+            if not all((f_sys, f_src, f_schema, f_table, t_sys, t_src, t_schema, t_table)):
+                continue
+            from_key = object_ids.get((f_sys, f_src, f_schema, f_table))
+            to_key = object_ids.get((t_sys, t_src, t_schema, t_table))
+            if not from_key or not to_key or from_key == to_key:
+                continue
+            edge = _build_edge(relation, from_key, to_key, f_display, t_display, from_ep, to_ep)
+            if edge.id in seen_edge_ids:
+                continue
+            seen_edge_ids.add(edge.id)
+            edges.append(edge)
+    else:
+        system_names = load_system_name_map(db)
+        source_names = {
+            row[0]: row[1]
+            for row in db.execute(select(AssetDataSource.source_code, AssetDataSource.source_name_cn)).all()
+            if row[0]
+        }
+        schema_names = {
+            (row[0], row[1]): row[2]
+            for row in db.execute(
+                select(AssetSourceSchema.source_code, AssetSourceSchema.schema_name, AssetSourceSchema.schema_name_cn)
+            ).all()
+            if row[0] and row[1] and row[2]
+        }
+        ns_key = func.coalesce(AssetTable.schema_name, AssetTable.namespace_name, "")
+        if level == "system":
+            raw_rows = db.execute(
+                base.with_only_columns(AssetTable.system_code, func.count(AssetTable.id)).group_by(AssetTable.system_code)
+            ).all()
+            merged: dict[str, int] = {}
+            for raw_code, cnt in raw_rows:
+                canon = normalize_system_code(raw_code) or (raw_code or "UNKNOWN")
+                merged[canon] = merged.get(canon, 0) + int(cnt or 0)
+            for canon, cnt in sorted(merged.items(), key=lambda item: (-item[1], item[0])):
+                label = system_names.get(canon, canon)
+                nodes.append(_overview_node("system", (canon,), label, cnt, path=canon))
+        elif level == "source":
+            stmt = (
+                base.with_only_columns(AssetTable.system_code, AssetTable.source_code, func.count(AssetTable.id).label("asset_count"))
+                .group_by(AssetTable.system_code, AssetTable.source_code)
+                .order_by(func.count(AssetTable.id).desc())
+                .limit(limit)
+            )
+            for row in db.execute(stmt).all():
+                values = (row[0], row[1])
+                label = source_names.get(row[1], str(row[1] or "未命名连接"))
+                nodes.append(_overview_node("source", values, label, int(row[2] or 0), path="|".join(v or "" for v in values)))
+        else:
+            schema_stmt = (
+                base.with_only_columns(ns_key.label("schema_key"), func.count(AssetTable.id))
+                .group_by(ns_key)
+                .order_by(func.count(AssetTable.id).desc())
+                .limit(limit)
+            )
+            for row in db.execute(schema_stmt).all():
+                schema_name = row[0] or "未命名"
+                canon = normalize_system_code(system_code) or system_code
+                label = schema_name
+                for (_src, sch), cn in schema_names.items():
+                    if sch == schema_name and cn:
+                        label = cn
+                        break
+                display = f"{label}（{schema_name}）" if label != schema_name else schema_name
+                nodes.append(
+                    _overview_node(
+                        "schema",
+                        (canon, "", schema_name),
+                        display,
+                        int(row[1] or 0),
+                        path=f"{canon}|{schema_name}",
+                    )
+                )
+        if nodes:
+            node_ids = {node.id for node in nodes}
+
+            def _level_key(sys_c: str | None, src_c: str | None, sch: str | None) -> str | None:
+                canon = normalize_system_code(sys_c) or sys_c
+                if level == "system":
+                    return _overview_id("system", (canon,)) if canon else None
+                if level == "source":
+                    return _overview_id("source", (canon, src_c)) if canon and src_c else None
+                if not canon or not sch:
+                    return None
+                return _overview_id("schema", (canon, "", sch))
+
+            rel_stmt = select(AssetRelation)
+            if domain:
+                rel_stmt = rel_stmt.where(AssetRelation.domain == domain)
+            pair_counts: dict[tuple[str, str], int] = {}
+            for rel in db.scalars(rel_stmt).all():
+                f_sys, f_src, _f_ns, f_sch, _f_tbl, _f_disp = _resolve_relation_endpoint(db, rel, "from")
+                t_sys, t_src, _t_ns, t_sch, _t_tbl, _t_disp = _resolve_relation_endpoint(db, rel, "to")
+                f_id = _level_key(f_sys, f_src, f_sch)
+                t_id = _level_key(t_sys, t_src, t_sch)
+                if not f_id or not t_id or f_id == t_id:
+                    continue
+                if f_id not in node_ids or t_id not in node_ids:
+                    continue
+                pair_counts[(f_id, t_id)] = pair_counts.get((f_id, t_id), 0) + 1
+            for (f_id, t_id), edge_count in sorted(pair_counts.items()):
+                edges.append(GraphEdge(
+                    id=f"overview-rel:{f_id}->{t_id}",
+                    source=f_id,
+                    target=t_id,
+                    label=f"{edge_count} 条关系",
+                    relation_type="formal",
+                    relation_layer="aggregated",
+                ))
+    filters = {"level": level, "system_code": system_code, "source_code": source_code, "schema": schema, "domain": domain, "object_type": object_type, "limit": limit}
+    if level == "object":
+        meta = _graph_meta(
+            db.scalar(select(func.count()).select_from(AssetRelation)) or 0,
+            len(edges),
+            len(edges),
+            matched_assets > len(nodes),
+            0,
+            filters,
+            query_ms=round((perf_counter() - started) * 1000, 2),
+            warnings=[] if edges else ["当前表层暂无已治理的表间关系；仍可选择表查看字段图谱"],
+        )
+    else:
+        meta = _graph_meta(
+            matched_assets,
+            matched_assets,
+            len(edges),
+            matched_assets > len(nodes),
+            0,
+            filters,
+            query_ms=round((perf_counter() - started) * 1000, 2),
+            warnings=["结果已按层级聚合；继续下钻可查看真实表间关系和字段"],
+        )
+    meta.returned_nodes = len(nodes)
+    meta.estimated_total = matched_assets
+    next_level = {"system": "schema", "source": "schema", "schema": "object", "object": "field"}[level]
+    return ApiResponse(data=GraphOverviewData(level=level, next_level=next_level, selected_path={k: v for k, v in (("system", system_code), ("source", source_code), ("schema", schema)) if v}, data=GraphData(nodes=nodes, edges=edges, meta=meta)))
+
+
+@router.get("/filter-options", response_model=ApiResponse[GraphFilterOptionsData], summary="级联图谱筛选项")
+def filter_options(
+    system_code: str | None = Query(None),
+    source_code: str | None = Query(None),
+    schema: str | None = Query(None),
+Now I have the overview endpoint. Key observations for R1 and R7(meta 口径):
+
+  Overview level=system (default): queries AssetTable grouped by system_code (fast SQL aggregate), then loads all AssetRelation rows (`db.scalars(select(AssetRelation)).all()` — wait, that's in the `else` branch for non-object levels: `rel_stmt = select(AssetRelation)` with only optional domain filter, then iterates all relations in Python calling `_resolve_relation_endpoint(db, rel, "from")` WITHOUT a resolver → each unresolved endpoint triggers DB queries via `resolve_endpoint` / `_resolve_endpoint_lenient`. That's the N+1 → 23.5s. Confirmed: full table scan of AssetRelation (~1329 rows or 12702?) plus per-row endpoint resolution queries. Actually report says 12702 tables / 1329 relations. Wait — report says "12702 表 / 1329 关系" in env line 6. But meta shows total_relations=12702, matched_relations=12702. Hmm, interesting: R7 claims total_relations=12702 = 表总数 (table count), relations semantic mismatch. Let me check: in the non-object branch, meta = _graph_meta(matched_assets, matched_assets, len(edges), ...). matched_assets = count of AssetTable = 12702 tables. So total_relations=matched_assets=12702 (actually table count!), matched_relations=12702 (also table count), returned_relations=len(edges)=1... wait report says returned_relations=1. In the system level with 17 nodes, edges should be pair_counts of aggregated system-to-system relations. Report said inner nodes=17 and returned_relations=1, truncated=true. Hmm, truncated = matched_assets > len(nodes) → 12702 > 17 = true. And returned_relations=1? That means pair_counts produced only 1 edge — because for system level, f_id/t_id must be in node_ids (17 system nodes), and most relations resolve within same system (f_id==t_id skipped) or fail to resolve. Possibly most relations have same system → only 1 cross-system edge. Plausible.
+
+  So R7 (meta 口径错位): CONFIRMED. In overview non-object branch, `_graph_meta` receives `matched_assets` (table count) as total_relations and matched_relations, and `len(edges)` (aggregated edge count) as returned_relations. Field names claim relations semantics but values are asset counts for total/matched and aggregated edge count for returned. Also truncated = matched_assets > len(nodes) compares table count to node count — semantically odd but intentionally "there are more assets than shown nodes". The frontend GraphToolbar shows "总数/命中/返回" from these meta fields — misleading. Confirmed 口径错位, severity low (display only).
+
+  R1 (overview slow, 23.5s): The non-object branch does `db.scalars(rel_stmt).all()` over ALL AssetRelation rows and calls `_resolve_relation_endpoint(db, rel, side)` without resolver for each — for rows whose physical fields are missing, this triggers `resolve_endpoint` + `_resolve_endpoint_lenient` DB queries per row (N+1). Plus `load_system_name_map`, source_names, schema_names queries. With production-like data this can be slow; whether exactly 23.5s I can't verify without running, but the structure supports the hypothesis: no caching, per-row endpoint resolution with DB queries. Also note there's a `_EndpointResolver` used in object branch but NOT in the aggregate branch — inconsistent, and the aggregate branch is the slow one. So R1: structurally confirmed (N+1 risk + full relation scan), severity high. I cannot verify the actual 23.5s timing without running the server; but the code path clearly lacks pre-aggregation/caching.
+
+  Wait — how many relations? Report env says 1329 relations, but also says meta.total_relations=12702... that 12702 is matched_assets (tables). 1329 relations × up to 2 extra queries each ≈ manageable in ms... Hmm, 1329 rows with per-row `resolve_endpoint` DB queries (each doing `.all()` over AssetTable scans without index?) — `_resolve_endpoint_lenient` does a full-table query per relation row: `select(...).where(schema==X, table==Y)` on 12702-row table — 1329×2 such queries ≈ 2658 queries × ~8ms ≈ 21s. That matches 23.5s! And `resolve_endpoint` (shared service) likely also queries. So yes, N+1 over 12702-row asset_tables without the preloaded resolver explains ~23s. Strong confirmation. Actually also note: `_resolve_relation_endpoint` only does the resolver/DB lookup when sys/src missing; if relations have backfilled physical fields, no queries. Production data apparently has many rows with missing from_system_code etc. So the timing depends on data. But report says "已回填行天然零查询" — the aggregate branch doesn't use resolver at all, so any relation with missing physical fields → 1-2 queries. Given 23.5s measured thrice in the bug report's environment, plausible.
+
+  I can even verify quickly? Running the backend would need DB. The verification command: `cd backend && ./.venv/Scripts/python.exe -c` timing... too heavy. I'll give the code evidence and suggest verification via curl timing (already in report) or a pytest. I could check if backend dev server is running on 8000 and curl the overview endpoint to measure. That'd be a read-only GET. Let me try: curl http://127.0.0.1:8000/api/v1/graph/overview — requires auth (require_permission), will 401. Could still check timing of 401 (fast). Not useful. Skip.
+
+  Now frontend graph/index.vue — I need lines around 486-497 (timeout/10s) and the load logic, view-mode handling, engine switching (SVG vs G6), and how el-segmented is used / whether v-if hides it. Let me read graph/index.vue. It's probably big; grep for relevant parts first.1147 frontend/src/views/asset/graph/index.vue
+10:      <div v-if="filters.view_mode === 'overview'" class="graph-breadcrumb" aria-label="图谱下钻路径">
+11:        <el-button text :disabled="overviewLevel === 'system'" @click="goOverviewLevel('system')">业务系统</el-button>
+12:        <template v-if="['schema', 'object', 'field'].includes(overviewLevel)">
+14:          <el-button text :disabled="overviewLevel === 'schema'" @click="goOverviewLevel('schema')">
+18:        <template v-if="['object', 'field'].includes(overviewLevel)">
+20:          <el-button text :disabled="overviewLevel === 'object'" @click="goOverviewLevel('object')">
+24:        <span v-if="overviewLevel === 'field'">› 字段</span>
+34:        :graph-engine="graphEngine"
+125:        class="graph-load-alert"
+131:      <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
+140:        <template v-if="graphData.nodes.length && (graphData.edges.length || filters.view_mode === 'overview')">
+142:            :is="graphEngine === 'g6' ? AdvancedRelationGraph : RelationGraph"
+165:            <el-tag size="small" :type="graphEngine === 'g6' ? 'success' : 'info'" disable-transitions>
+166:              当前引擎：{{ graphEngine === "g6" ? "G6 高级图" : "内置 SVG" }}
+168:            <span v-if="graphEngine === 'svg' && graphLoadNotice" class="engine-reason">降级原因：{{ graphLoadNotice }}</span>
+212:    <div v-else class="graph-loading-page">
+230:import { decideGraphLoadPolicy } from "@/views/asset/graph/graphLoadPolicy";
+253:const overviewLevel = ref<"system" | "source" | "schema" | "object" | "field">("system");
+255:const graphEngine = ref<GraphEngine>("g6");
+303:const viewModeOptions = computed(() => options.view_modes.filter(item => !item.deprecated && ["overview", "path", "explore", "review"].includes(item.code)).map(item => ({ label: item.label, value: item.code })));
+305:const graphLoadingText = computed(() => filters.view_mode === "overview" ? "正在加载资产概览" : filters.view_mode === "explore" ? "正在加载关系探索" : filters.view_mode === "path" ? "正在查询关联路径" : "正在加载证据视图");
+346:  if (mode.code === "overview") {
+460:  graphEngine.value = value;
+486:  const policy = decideGraphLoadPolicy({
+490:    graphEngine: graphEngine.value,
+495:  if (policy.shouldUseSvg) graphEngine.value = "svg";
+522:  return selected?.deprecated ? options.view_modes.find(item => item.code === "overview") : selected;
+533:    const mode = routeViewMode() || options.view_modes.find(item => item.code === "overview") || currentViewMode.value || options.view_modes.find(item => item.code === "table") || options.view_modes[0];
+587:  if (filters.view_mode !== "overview" || overviewLevel.value === "field") return;
+593:      next_level: overviewLevel.value
+595:    if (overviewLevel.value === "system") options.system_options = res.data.items;
+596:    if (overviewLevel.value === "source") options.source_options = res.data.items;
+597:    if (overviewLevel.value === "schema") options.schema_options = res.data.items;
+598:    if (overviewLevel.value === "object") options.domain_options = res.data.business_domains;
+626:    if (filters.view_mode === "overview") {
+628:      const overview = await getGraphOverview({
+629:        level: overviewLevel.value,
+630:        parent_physical_key: overviewLevel.value === "field" ? fieldParentKey.value : undefined,
+635:        limit: overviewLevel.value === "system" ? 40 : 120
+638:      const data = overview.data.data;
+641:      if (overviewLevel.value === "field") {
+855:  const overviewMode = options.view_modes.find(item => item.code === "overview");
+856:  if (overviewMode) {
+857:    filters.view_mode = overviewMode.code;
+858:    overviewLevel.value = "system";
+859:    applyModeDefaults(overviewMode);
+874:  const overviewMode = options.view_modes.find(item => item.code === "overview") || options.view_modes.find(item => item.code === "table");
+875:  filters.view_mode = overviewMode?.code || "overview";
+876:  overviewLevel.value = "system";
+877:  if (overviewMode) applyModeDefaults(overviewMode);
+882:  filters.validation_status = overviewMode?.validation_status || "";
+883:  filters.confidence = overviewMode?.confidence || "";
+928:    overviewLevel.value = "field";
+940:  overviewLevel.value = level === "source" ? "schema" : level;
+952:    overviewLevel.value = "schema";
+962:  if (filters.view_mode === "overview") {
+967:      overviewLevel.value = "schema";
+976:      overviewLevel.value = "schema";
+984:      overviewLevel.value = "object";
+1007:  if (graphEngine.value !== "g6") return;
+    pathState.value = "error";
+    pathError.value = extractErrorDetail(error, "关联路径查询失败");
+  } finally {
+    pathLoading.value = false;
+  }
+}
+
+function pickLocateCandidate(row: GraphTableSearchItem) {
+  locate.physical_key = row.physical_key;
+  locate.table = row.table_name || row.physical_key;
+  locate.search_results = [];
+  void loadChain();
+}
+
+function changeViewMode(value: string) {
+  filters.view_mode = value;
+  applyViewMode();
+}
+
+function changeEngine(value: GraphEngine) {
+  graphEngine.value = value;
+  refreshGraphOnly();
+}
+
+function applyViewMode() {
+  selectedNodeId.value = "";
+  const mode = currentViewMode.value;
+  if (!mode) return;
+  applyModeDefaults(mode);
+  if (mode.code === "explore" || mode.requires_table) {
+    if (locate.physical_key || locate.table.trim()) {
+      loadChain();
+    } else {
+      refreshGraphOnly();
+      ElMessage.warning("请输入中心表后查看上下游链路");
+    }
+    return;
+  }
+  loadData();
+}
+
+function refreshGraphOnly() {
+  renderKey.value += 1;
+}
+
+function applyGraphLoadPolicy(data: GraphData) {
+  const policy = decideGraphLoadPolicy({
+    nodeCount: data.nodes.length,
+    edgeCount: data.edges.length,
+    viewMode: filters.view_mode,
+    graphEngine: graphEngine.value,
+    aggregateGroups: filters.aggregate_groups
+  });
+  graphLoadNotice.value = policy.notice;
+  if (policy.shouldAggregate) filters.aggregate_groups = true;
+  if (policy.shouldUseSvg) graphEngine.value = "svg";
+  if (policy.shouldAggregate || policy.shouldUseSvg) ElMessage.warning(policy.notice);
+}
+
+function routeQueryText(value: unknown) {
+  return Array.isArray(value) ? String(value[0] || "") : String(value || "");
+}
+
+function applyRouteQueryFilters() {
+  const keyword = routeQueryText(route.query.keyword).trim();
+  const validationStatus = routeQueryText(route.query.validation_status).trim();
+  const confidence = routeQueryText(route.query.confidence).trim();
+  const groupBy = routeQueryText(route.query.group_by).trim();
+  const showReviewLayer = routeQueryText(route.query.show_review_layer).trim().toLowerCase();
+  if (keyword) filters.keyword = keyword;
+  if (validationStatus && options.validation_statuses.includes(validationStatus)) {
+    filters.validation_status = validationStatus;
+  }
+  if (confidence) filters.confidence = confidence;
+  if (["system", "source", "schema", "domain"].includes(groupBy)) filters.group_by = groupBy as typeof filters.group_by;
+  if (["1", "true", "yes"].includes(showReviewLayer) && currentViewMode.value?.show_review_layer) filters.show_review_layer = true;
+}
+
+function routeViewMode() {
+  // /asset/relations 兼容 redirect 使用 view_mode=path；外部链接也可能带 mode=path。
+  const code = (routeQueryText(route.query.view_mode) || routeQueryText(route.query.mode)).trim();
+  const selected = options.view_modes.find(item => item.code === code);
+  return selected?.deprecated ? options.view_modes.find(item => item.code === "overview") : selected;
+}
+
+// 108号 P0-01：筛选默认值只来自后端 options.view_modes，前端不猜测状态
+async function loadOptions() {
+  optionsReady.value = false;
+  try {
+    const res = await getGraphOptions();
+    Object.assign(options, res.data);
+    allSourceOptions.value = [...(options.source_options || options.sources.map(value => ({ value, label: value })) )];
+    optionsReady.value = true;
+    const mode = routeViewMode() || options.view_modes.find(item => item.code === "overview") || currentViewMode.value || options.view_modes.find(item => item.code === "table") || options.view_modes[0];
+    if (mode) {
+      filters.view_mode = mode.code;
+      applyModeDefaults(mode);
+      applyRouteQueryFilters();
+    }
+    return true;
+  } catch (err) {
+    const info = classifyGraphError(err);
+    state.value = info.state === "api_error" ? "api_error" : info.state;
+    errorInfo.value = {
+      ...info,
+      title: "图谱配置加载失败",
+      description: "无法获取图谱筛选选项，请确认后端服务正常。",
+    };
+    return false;
+  }
+}
+
+// E7：请求序号守卫——并发触发时仅最后一次请求的结果生效（防旧响应覆盖新状态）。
+let loadDataSeq = 0;
+let sourceOptionsSeq = 0;
+let chainSeq = 0;
+
+async function handleSystemChange() {
+  // system_code and source_code are distinct dimensions.  A system change
+  // resets the child connection and narrows it to the selected system.
+  filters.source_code = "";
+  filters.source_code = "";
+  const seq = ++sourceOptionsSeq;
+  try {
+    const res = await listSources(filters.system_code ? { system_code: filters.system_code } : undefined);
+    if (seq !== sourceOptionsSeq) return;
+    options.source_options = (res.data || []).map(source => ({
+      value: source.source_code,
+      label: source.source_name_cn || source.source_code
+    }));
+  } catch {
+    if (seq !== sourceOptionsSeq) return;
+    options.source_options = [...allSourceOptions.value];
+  }
+  await loadData();
+}
+
+async function loadDiagnostics() {
+  try {
+    const res = await getGraphDiagnostics();
+    diagnosticWarnings.value = res.data?.warnings || [];
+  } catch {
+    // diagnostics 失败与主图隔离，不阻断页面（108号 §五.4）
+    diagnosticWarnings.value = ["图谱诊断接口暂时不可用，不影响图谱展示"];
+  }
+}
+
+async function loadCascadeOptions() {
+  if (filters.view_mode !== "overview" || overviewLevel.value === "field") return;
+  try {
+    const res = await getGraphFilterOptions({
+      system_code: filters.system_code || undefined,
+      source_code: filters.source_code || undefined,
+      schema: filters.schema || undefined,
+      next_level: overviewLevel.value
+    });
+    if (overviewLevel.value === "system") options.system_options = res.data.items;
+    if (overviewLevel.value === "source") options.source_options = res.data.items;
+    if (overviewLevel.value === "schema") options.schema_options = res.data.items;
+    if (overviewLevel.value === "object") options.domain_options = res.data.business_domains;
+  } catch {
+    // 主概览请求仍会返回可见错误，级联选项失败不覆盖主状态。
+  }
+}
+
+function emptyState() {
+  const hasFilters = Boolean(
+    filters.system_code || filters.source_code || filters.schema || filters.domain
+    || filters.validation_status || filters.keyword || filters.confidence
+  );
+  state.value = hasFilters ? "filter_empty" : "empty";
+}
+
+async function loadData() {
+  if (filters.view_mode === "path") {
+    // 路径模式不加载全量图，等待用户在路径面板发起查询。
+    if (pathState.value !== "found") {
+      state.value = "empty";
+    }
+    return;
+  }
+  const seq = ++loadDataSeq;
+  loading.value = true;
+  state.value = "loading";
+  centerTable.value = "";
+  selectedNodeId.value = "";
+  try {
+    if (filters.view_mode === "overview") {
+      await loadCascadeOptions();
+      const overview = await getGraphOverview({
+        level: overviewLevel.value,
+        parent_physical_key: overviewLevel.value === "field" ? fieldParentKey.value : undefined,
+        system_code: filters.system_code || undefined,
+        source_code: filters.source_code || undefined,
+        schema: filters.schema || undefined,
+        domain: filters.domain || undefined,
+        limit: overviewLevel.value === "system" ? 40 : 120
+      });
+      if (seq !== loadDataSeq) return;
+      const data = overview.data.data;
+      graphData.value = data;
+      graphMeta.value = data.meta || null;
+      if (overviewLevel.value === "field") {
+        centerTable.value = fieldParentKey.value;
+        selectedNodeId.value = fieldParentKey.value;
+        filters.layout_mode = "radial";
+      }
+      state.value = data.nodes.length ? "success" : "empty";
+      return;
+    }
+    const res = await getGraph({
+      system_code: filters.system_code || undefined,
+      source_code: filters.source_code || undefined,
+      schema: filters.schema || undefined,
+      domain: filters.domain || undefined,
+      validation_status: filters.validation_status || undefined,
+      confidence: filters.confidence || undefined,
+      keyword: filters.keyword || undefined,
+      limit: filters.limit,
+      include_candidates: filters.include_candidates,
+      include_dependencies: filters.include_dependencies
+    });
+    if (seq !== loadDataSeq) return;
+    const data = res.data;
+    if (!validateGraphData(data)) {
+      state.value = "contract_error";
+      errorInfo.value = contractErrorInfo(new Error("graph data structure invalid"));
+      return;
+    }
+    graphData.value = data;
+    graphMeta.value = data.meta || null;
+    applyGraphLoadPolicy(data);
+    if (data.nodes.length && data.edges.length) {
+      state.value = "success";
+    } else {
+      emptyState();
+    }
+  } catch (err) {
+    if (seq !== loadDataSeq) return;
+    graphData.value = { nodes: [], edges: [] };
+    graphMeta.value = null;
+    const info = classifyGraphError(err);
+    state.value = info.state;
+    errorInfo.value = info;
+  } finally {
+    if (seq === loadDataSeq) {
+      loading.value = false;
+    }
+  }
+}
+
+async function loadChain() {
+  const exploreMode = options.view_modes.find(item => item.code === "explore");
+  if (exploreMode) {
+    filters.view_mode = exploreMode.code;
+    applyModeDefaults(exploreMode);
+  }
+  const seq = ++chainSeq;
+  let physicalKey = locate.physical_key.trim();
+  if (!physicalKey && locate.table.trim()) {
+    try {
+      const search = await searchGraphTables({
+Now I need: (1) where the "图谱加载失败" error panel is rendered (P1), and the http timeout (10s) — find in http utils; (2) applyModeDefaults around line 346; (3) el-segmented rendering — check Element Plus version in package.json; (4) check how AdvancedRelationGraph vs RelationGraph engine chosen for explore; (5) check whether `getGraphOverview` error → state api_error → error panel. Let me look at error panel markup and classifyGraphError, and applyModeDefaults.198:      <el-result
+207:      </el-result>
+232:  classifyGraphError,
+306:const isErrorState = computed(() => ["auth_error", "permission_error", "api_error", "contract_error"].includes(state.value));
+541:    const info = classifyGraphError(err);
+542:    state.value = info.state === "api_error" ? "api_error" : info.state;
+680:    const info = classifyGraphError(err);
+717:      const info = classifyGraphError(err);
+759:    const info = classifyGraphError(err);
+817:    const info = classifyGraphError(error);
+  focusKeyword: filters.keyword,
+  centerTable: centerTable.value,
+  selectedNodeId: selectedNodeId.value,
+  showReviewLayer: filters.show_review_layer && Boolean(currentViewMode.value?.show_review_layer),
+  systemNames: systemNameMap.value,
+  sourceNames: sourceNameMap.value
+  }));
+
+function applyModeDefaults(mode: GraphViewMode) {
+  filters.group_by = mode.group_by;
+  filters.confidence = mode.confidence || "";
+  filters.validation_status = mode.validation_status || "";
+  filters.include_candidates = mode.include_candidates;
+  filters.include_dependencies = mode.include_dependencies;
+  filters.show_review_layer = Boolean(mode.show_review_layer);
+  filters.layout_mode = mode.layout_mode;
+  if (mode.code === "overview") {
+    filters.group_by = "system";
+    filters.confidence = "";
+    filters.validation_status = "";
+    // 概览默认 Neo4j 式力导向：系统分散，有关系则连线
+    filters.layout_mode = "force";
+  }
+}
+
+// 146 E1：路径查询子模式（调用既有 /relations/path，双端远程选择 + 方向/跳数 + 三态）
+const pathForm = reactive({
+  from: "",
+  to: "",
+  direction: "both" as "both" | "out" | "in",
+  max_hops: 4
+34:  timeout: 10000,
+35:    "element-plus",
+69:    "element-plus": "^2.11.5",
+Key facts gathered:
+
+  - HTTP timeout = 10000ms (frontend/src/utils/http/index.ts:34). Confirms R6: frontend 10s timeout vs backend 23.5s.
+  - element-plus ^2.11.5 — el-segmented exists since 2.7ish, renders `.el-segmented` class. So DOM should contain `.el-segmented`. Why did the repro get null? Because on the error panel state, the toolbar might not render? Check index.vue template around line 198 el-result — is GraphToolbar inside a v-if that only shows when not error? Let me check the template structure around lines 1-230.
+
+  Also need to check P1 error panel: the el-result with title 图谱加载失败. Let me view lines 100-215 of template.
+
+  And check applyGraphLoadPolicy is only applied in non-overview branch (loadData non-overview). For overview mode, no policy applied; also overview default layout_mode=force with G6 engine (graphEngine default "g6"). The overview error comes from getGraphOverview throwing (timeout abort at 10s) → catch → classifyGraphError → state api_error → el-result error panel. Confirmed P1 chain.
+
+  For R7 (user numbering) el-segmented: GraphToolbar.vue line 4 uses el-segmented with :model-value and options. Element Plus 2.11.5 renders `<div class="el-segmented">`. So `document.querySelector('.el-segmented')` should find it IF toolbar is rendered. But when state is api_error, is toolbar hidden? Check template: line ~30 GraphToolbar usage with :graph-engine etc. Need to see if it's wrapped in v-if. Let me read template 1-230.﻿<template>
+  <div class="asset-graph-page">
+    <RePageHeader
+      title="关系图谱"
+      subtitle="知识图谱：业务系统 → Schema/库 → 表 → 字段。单击节点下钻，拖拽查看关系。"
+    />
+
+    <!-- 加载/成功：工具栏 + 图表 -->
+    <template v-if="!isErrorState && state !== 'loading'">
+      <div v-if="filters.view_mode === 'overview'" class="graph-breadcrumb" aria-label="图谱下钻路径">
+        <el-button text :disabled="overviewLevel === 'system'" @click="goOverviewLevel('system')">业务系统</el-button>
+        <template v-if="['schema', 'object', 'field'].includes(overviewLevel)">
+          <span>›</span>
+          <el-button text :disabled="overviewLevel === 'schema'" @click="goOverviewLevel('schema')">
+            {{ filters.system_code ? (systemNameMap[filters.system_code] || filters.system_code) : "Schema / 库" }}
+          </el-button>
+        </template>
+        <template v-if="['object', 'field'].includes(overviewLevel)">
+          <span>›</span>
+          <el-button text :disabled="overviewLevel === 'object'" @click="goOverviewLevel('object')">
+            {{ filters.schema || "表" }}
+          </el-button>
+        </template>
+        <span v-if="overviewLevel === 'field'">› 字段</span>
+        <span class="graph-breadcrumb-hint">单击节点进入下一层 · 拖拽/滚轮缩放</span>
+      </div>
+      <GraphToolbar
+        :filters="filters"
+        :locate="locate"
+        :options="options"
+        :normalized="normalized"
+        :current-view-mode="currentViewMode"
+        :view-mode-options="viewModeOptions"
+        :graph-engine="graphEngine"
+        :loading="loading"
+        :selected-node-id="selectedNodeId"
+        :meta="graphMeta"
+        @view-mode-change="changeViewMode"
+        @engine-change="changeEngine"
+        @load-chain="loadChain"
+        @global-search="globalSearch"
+        @back-global="backToGlobal"
+        @load-data="loadData"
+        @refresh="refreshGraphOnly"
+        @sample-pass="showSamplePass"
+        @reset="resetFilters"
+      />
+
+      <el-card v-if="filters.view_mode === 'path'" shadow="never" class="path-panel">
+        <div class="path-form">
+          <el-select
+            v-model="pathForm.from"
+            filterable
+            remote
+            clearable
+            placeholder="起点表（如 HIS.PAT_VISIT）"
+            :remote-method="searchPathOptions"
+            :loading="pathSearching"
+            class="path-select"
+          >
+            <el-option
+              v-for="item in pathOptions"
+              :key="item.physical_key"
+              :label="`${item.technical_name || item.physical_key}${item.display_name && item.display_name !== item.technical_name ? '（' + item.display_name + '）' : ''}`"
+              :value="item.physical_key"
+            />
+          </el-select>
+          <span class="path-arrow">→</span>
+          <el-select
+            v-model="pathForm.to"
+            filterable
+            remote
+            clearable
+            placeholder="终点表"
+            :remote-method="searchPathOptions"
+            :loading="pathSearching"
+            class="path-select"
+          >
+            <el-option
+              v-for="item in pathOptions"
+              :key="item.physical_key"
+              :label="`${item.technical_name || item.physical_key}${item.display_name && item.display_name !== item.technical_name ? '（' + item.display_name + '）' : ''}`"
+              :value="item.physical_key"
+            />
+          </el-select>
+          <el-select v-model="pathForm.direction" class="path-direction" placeholder="方向">
+            <el-option label="双向" value="both" />
+            <el-option label="正向" value="out" />
+            <el-option label="反向" value="in" />
+          </el-select>
+          <el-input-number v-model="pathForm.max_hops" :min="1" :max="8" controls-position="right" />
+          <el-button type="primary" :loading="pathLoading" :disabled="!pathForm.from || !pathForm.to" @click="doPathQuery">查询路径</el-button>
+        </div>
+        <el-alert v-if="pathError" type="error" :closable="false" :title="pathError" show-icon class="path-status">
+          <template #default><el-button size="small" @click="doPathQuery">重试</el-button></template>
+        </el-alert>
+        <el-table v-if="pathResult?.path?.length" :data="pathResult.hops" size="small" class="path-status" border>
+          <el-table-column label="#" type="index" width="50" align="center" />
+          <el-table-column prop="from" label="从" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="to" label="到" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="join_condition" label="关联条件" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="confidence" label="置信度" width="80" align="center" />
+          <el-table-column prop="validation_status" label="验证状态" width="110" align="center" />
+        </el-table>
+        <ReEmptyState
+          v-else-if="pathState === 'none'"
+          title="未找到关联路径"
+          :description="`在方向与 ${pathForm.max_hops} 跳上限内，未发现这两张表之间的可达路径。`"
+          class="path-status"
+        />
+      </el-card>
+
+      <el-card v-if="locate.search_results.length" shadow="never" class="path-panel">
+        <template #header>同名资产候选（{{ locate.search_results.length }}）— 点击选择中心表</template>
+        <el-table :data="locate.search_results" size="small" max-height="220" @row-click="pickLocateCandidate">
+          <el-table-column prop="physical_key" label="物理键" min-width="220" show-overflow-tooltip />
+          <el-table-column prop="display_name" label="中文名" min-width="140" show-overflow-tooltip />
+          <el-table-column prop="system_code" label="系统" width="110" align="center" />
+          <el-table-column prop="schema_name" label="Schema" width="110" />
+        </el-table>
+      </el-card>
+
+      <el-alert
+        v-if="graphLoadNotice"
+        class="graph-load-alert"
+        type="warning"
+        show-icon
+        :closable="false"
+        :title="graphLoadNotice"
+      />
+      <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
+      <GraphLegendFilters
+        v-model:relation-types="legendRelationTypes"
+        v-model:confidences="legendConfidences"
+        v-model:show-review-layer="filters.show_review_layer"
+        class="graph-legend-filter"
+      />
+      <div class="graph-workspace">
+      <div v-loading="loading" :element-loading-text="graphLoadingText" class="graph-wrap">
+        <template v-if="graphData.nodes.length && (graphData.edges.length || filters.view_mode === 'overview')">
+          <component
+            :is="graphEngine === 'g6' ? AdvancedRelationGraph : RelationGraph"
+            ref="graphRef"
+            :key="renderKey"
+            :nodes="visibleGraphData.nodes"
+            :edges="visibleGraphData.edges"
+            :focus-keyword="filters.keyword"
+            :group-by="filters.group_by"
+            :center-table="centerTable"
+            :selected-node-id="selectedNodeId"
+            :show-review-layer="filters.show_review_layer && Boolean(currentViewMode?.show_review_layer)"
+            :layout-mode="filters.layout_mode"
+            :aggregate-groups="filters.aggregate_groups"
+            :aggregation-threshold="8"
+            :view-mode="filters.view_mode"
+            :system-names="systemNameMap"
+            :source-names="sourceNameMap"
+            height="calc(100vh - 280px)"
+            @node-click="selectNode"
+            @node-activate="toggleNodeExpansion"
+            @edge-click="showEdge"
+            @render-error="handleRenderError"
+          />
+          <div class="engine-status">
+            <el-tag size="small" :type="graphEngine === 'g6' ? 'success' : 'info'" disable-transitions>
+              当前引擎：{{ graphEngine === "g6" ? "G6 高级图" : "内置 SVG" }}
+            </el-tag>
+            <span v-if="graphEngine === 'svg' && graphLoadNotice" class="engine-reason">降级原因：{{ graphLoadNotice }}</span>
+          </div>
+        </template>
+        <ReEmptyState
+          v-else-if="hasAnyData"
+          title="暂无可展示关系"
+          description="请调整系统、Schema、关系等级或中心表条件后重新加载。"
+        />
+        <ReEmptyState
+          v-else
+          title="筛选结果为空"
+          description="当前条件未命中任何关系，可清空条件或调整筛选后重试。"
+        >
+          <template #action>
+            <el-button type="primary" @click="resetFilters">清空条件</el-button>
+          </template>
+        </ReEmptyState>
+      </div>
+      <GraphInspector
+        :open="inspectorOpen"
+        :node="selectedNode"
+        :edge="selectedEdge"
+        @close="inspectorOpen = false"
+        @open-table="openTable"
+      />
+      </div>
+    </template>
+
+    <!-- 错误面板：auth/permission/api/contract 统一展示，可重试 -->
+    <div v-else-if="errorInfo" class="graph-error-panel">
+      <el-result
+        :icon="errorIcon"
+        :title="errorInfo.title"
+        :sub-title="errorDescription"
+      >
+        <template #extra>
+          <el-button v-if="errorInfo.canRetry" type="primary" @click="retryPage">重试</el-button>
+          <el-button @click="resetFilters">重置条件</el-button>
+        </template>
+      </el-result>
+      <p class="graph-error-correlation">关联编号：{{ errorInfo.correlationId }}</p>
+    </div>
+
+    <!-- 初始 loading -->
+    <div v-else class="graph-loading-page">
+      <el-skeleton :rows="6" animated />
+    </div>
+
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import ReEmptyState from "@/components/ReEmptyState/index.vue";
+import AdvancedRelationGraph from "@/views/asset/components/AdvancedRelationGraph.vue";
+import GraphInspector from "@/views/asset/components/GraphInspector.vue";
+import GraphLegendFilters from "@/views/asset/components/GraphLegendFilters.vue";
+import GraphToolbar, { type GraphEngine } from "@/views/asset/components/GraphToolbar.vue";
+import RelationGraph from "@/views/asset/components/RelationGraph.vue";
+import { normalizeGraphData } from "@/views/asset/graph/graphNormalize";
+import { decideGraphLoadPolicy } from "@/views/asset/graph/graphLoadPolicy";
+Important finding for R7 (el-segmented unreachable): GraphToolbar is inside `<template v-if="!isErrorState && state !== 'loading'">` (index.vue:9). So when the page is in error state (which is the default first-screen state due to P1 timeout), the toolbar — including el-segmented — is NOT rendered. Hence `document.querySelector('.el-segmented')` returns null in the repro. So the "unreachable" is a consequence of the error state, not a bug in el-segmented itself. But ALSO: during loading state it's not rendered either. In a healthy session, el-segmented would render. So R7 = 无问题 as an independent bug; it's explained by P1. The "模式切换控件自动化不可达" is a symptom of the error panel, not a separate defect. However — the repro v3 was mode switching... they may have been in error state. Given error panel blocks toolbar, the automation failure is explained. So verdict: 无独立问题（由 P1 错误态导致）；但有个二阶问题——错误面板把工具栏整个隐藏，用户连切换模式的机会都没有，只能"重试/重置"，reset goes back to overview which times out again → dead loop. That's actually a real UX problem worth noting (medium).
+
+  Now R2 (force alpha too low): AdvancedRelationGraph.vue:226-238 — force layout with alpha:0.35, alphaDecay:0.022, alphaMin:0.008. G6 v5 force layout defaults: alpha=1? In G6 v5 (antv), force layout extends d3-force. d3 default alpha=1, alphaDecay≈0.0228, alphaMin=0.001. Setting alpha:0.35 means the simulation starts with only 35% energy → nodes move less, may not spread enough. With preventOverlap + nodeSize 88 + nodeSpacing 36, collide forces exist, but low alpha means less displacement overall. The claim "v5 默认 1" — I believe G6 v5 force layout default alpha... Actually G6 v5's force layout: options include alpha? In @antv/g6 v5 force layout extends BaseLayout with d3-force simulation; default alpha not exposed? Hmm. The claim is plausible but I can't verify G6 default without node_modules. Let me check node_modules/@antv/g6 force layout defaults quickly. Actually G6 v5 force layout: `alpha` isn't a documented option... Let me check. In G6 v5.0, the `force` layout options: type, linkDistance, nodeStrength, edgeStrength, collideStrength, nodeSize, preventOverlap, nodeSpacing, alpha, alphaDecay, alphaMin, forceSimulation... G6 v5 force passes these to d3-force simulation: simulation.alpha(alpha).alphaDecay(alphaDecay).alphaMin(alphaMin). Defaults from d3: alpha=1. So alpha:0.35 indeed reduces initial energy to 35%. With alphaDecay 0.022, number of iterations to cool ≈ log(alphaMin/alpha)/log(1-alphaDecay) = log(0.008/0.35)/log(0.978) ≈ (-3.78)/(-0.0222) ≈ 170 ticks. d3 runs 300 ticks by default per alpha decay... Actually ticks run until alpha < alphaMin. ~170 ticks. That's fine number of iterations but each tick displacement is scaled by alpha which is lower. Hmm — the real question: does low alpha cause center-blob? Lower alpha → less total movement → nodes started at random positions near center (d3 initializes in a phyllotaxis pattern actually, centered). With insufficient energy and strong edgeStrength 0.45 pulling connected nodes together, nodes may not spread. Also animation:false and the component calls fitView right after render — force layout in G6 v5 without animation executes synchronously? With animation:false, G6 v5 runs the simulation to completion synchronously. So the final positions reflect cooled simulation. Whether blob forms depends on parameters.
+
+  More relevant: check whether G6 v5 accepts `alpha` in force layout options. Let me check node_modules/@antv/g6/dist or the types. Quick grep.
+
+  Also R4: label config — labelWordWrap:false + labelMaxWidth:168 + labelMaxLines:5 + labelTextOverflow:"clip". In G6 v5, labelWordWrap false means no wrapping; labelMaxWidth only applies when wordWrap true? Actually in G6 v5, `labelMaxWidth` — max width of label, percent or number, effective when labelWordWrap is true (wrapping) or for ellipsis with labelTextOverflow. Hmm. In G6 v5 docs: labelWordWrap (whether to wrap), labelMaxWidth (max width, effective only when wordWrap enabled?), labelMaxLines (effective when wordWrap enabled), labelTextOverflow: 'clip'/'ellipsis'. If wordWrap=false, maxLines is ineffective → but labels here contain explicit "\n" from formatGraphNodeLabel (multi-line text). Explicit newlines still render multiline regardless of wordWrap. So the "contradiction" claim: wordWrap false + maxLines 5 is indeed contradictory/dead config but the label text is pre-wrapped with \n by formatGraphNodeLabel, so multi-line display still works. labelMaxWidth 168 with overflow clip: in G6 v5, does labelMaxWidth clip single-line width even when wordWrap false? Docs: "labelMaxWidth: 文字最大宽度，超出部分根据 labelTextOverflow 处理" — I think maxWidth applies regardless? Need to check G6 v5 source. The severity here is low-medium; the real overlap problem is from layout not label config.
+
+  Also check "floating labels" claim (R4's second part: preset coords vs force displacement mixing). In graphData(), preset positions only for hierarchy/layered; for force mode no preset. But: when switching layoutMode from hierarchy/layered → force, performRender destroys and recreates instance when wantsLayout changes (graphCreatedAt logic). But if nodes previously had x/y in style... setData replaces data. New graphData() for force has no x/y. Fine. But there's a subtle bug: when switching between force→grouped (both engine-layout), the instance is reused and setOptions({layout}) is called. OK.
+
+  Floating unconnected labels ("住院主记录","在院记录" floating): those are table_name_cn labels; nodes are circles with labelPlacement bottom; if two nodes overlap exactly, labels overlap. Or: label belongs to a node rendered tiny/invisible? Not diagnosable from code alone.
+
+  Let me verify G6 v5 force layout accepts alpha/alphaDecay and its defaults, from node_modules. Quick grep in frontend/node_modules/@antv/g6 (or @antv/layout). Force layout in G6 v5 lives in @antv/g6/src/layouts or @antv/layout? In G6 v5.0.x, layouts are in @antv/layout package (ForceLayout). Options alpha? @antv/layout ForceLayout extends d3-force? Actually @antv/layout v1 force is a custom implementation with options like alpha? Hmm. G6 v5 uses @antv/layout's `force` (ForceLayout class) which implements its own force simulation (from @antv/layout types: centripetalOptions, linkDistance, nodeStrength, edgeStrength, collideStrength, nodeSize, preventOverlap, nodeSpacing, alpha, alphaDecay, alphaMin, forceSimulation...). Let me grep node_modules to confirm defaults.algorithm
+component
+event-emitter
+expr
+g
+g-canvas
+g-lite
+g-math
+g-plugin-dragndrop
+g6
+graphlib
+hierarchy
+layout
+scale
+util
+vendor
+59:    "@antv/g6": "^5.1.1",
+---
+LICENSE
+README.md
+dist
+lib
+node_modules
+package.json
+src
+frontend/node_modules/@antv/layout/lib:
+_virtual
+algorithm
+index.d.ts
+index.js
+index.js.map
+model
+node_modules
+registry.d.ts
+registry.js
+registry.js.map
+runtime
+types
+util
+worker.js
+worker.js.map
+
+frontend/node_modules/@antv/layout/src:
+algorithm
+index.ts
+model
+registry.ts
+runtime
+types
+util
+worker.ts
+frontend/node_modules/@antv/layout/src/algorithm/:
+antv-dagre
+base-layout.ts
+base-simulation.ts
+circular
+combo-combined
+concentric
+d3-force
+d3-force-3d
+dagre
+force
+force-atlas2
+fruchterman
+grid
+index.ts
+mds
+radial
+random
+types.ts
+
+frontend/node_modules/@antv/layout/src/types/:
+common.ts
+data.ts
+edge-label.ts
+force.ts
+id.ts
+index.ts
+point.ts
+position.ts
+size.ts
+frontend/node_modules/@antv/layout/src/algorithm/d3-force/index.ts
+frontend/node_modules/@antv/layout/src/algorithm/d3-force/types.ts
+frontend/node_modules/@antv/layout/src/algorithm/d3-force-3d/index.ts
+frontend/node_modules/@antv/layout/src/algorithm/d3-force-3d/typing.d.ts
+G6 v5 `type: "force"` maps to which layout? In G6 v5 registry, "force" → ForceLayout from @antv/layout/algorithm/force (the custom one, not d3-force). Let me check the force layout's options — does it support alpha/alphaDecay? Check src/algorithm/force and types/force.ts.===
+attractive.ts
+centripetal.ts
+collide.ts
+gravity.ts
+index.ts
+repulsive.ts
+simulation.ts
+types.ts
+typing.d.ts
+101:  linkDistance?:
+111:  nodeStrength?: number | Expr | ((node: NodeData) => number);
+120:   * <zh/> 是否防止重叠，必须配合下面属性 nodeSize 或节点数据中的 data.size 属性，只有在数据中设置了 data.size 或在该布局中配置了与当前图节点大小相同的 nodeSize 值，才能够进行节点重叠的碰撞检测
+122:   * <en/> Whether to prevent overlap, must be used with the following properties nodeSize or data.size in the node data, and only when the data.size is set in the data or the nodeSize value is configured with the same value as the current graph node size in the layout configuration, can the node overlap collision detection be performed
+125:  preventOverlap?: boolean;
+215:  collideStrength?: number;
+255:    | 'nodeStrength'
+257:    | 'linkDistance'
+272:  nodeSize: NodeSizeFn;
+274:  nodeStrength: NodeStrengthFn;
+276:  linkDistance: LinkDistanceFn;
+===SIM===
+Interesting — @antv/layout's `force` types.ts has NO alpha/alphaDecay/alphaMin options. Let me check the simulation.ts and how G6 v5 maps "force" layout type. Also check G6's layout registry: does `type: "force"` map to @antv/layout force (ForceLayout, custom simulation without alpha) or d3-force?
+
+  G6 v5 layout registry: in @antv/g6 src/registry/layout or lib. Let me grep g6 for "d3-force" and "force".build-in.d.ts
+build-in.js
+build-in.js.map
+extension
+get.d.ts
+get.js
+get.js.map
+register.d.ts
+register.js
+register.js.map
+store.d.ts
+store.js
+store.js.map
+types.d.ts
+types.js
+types.js.map
+35:        'drag-element-force': behaviors_1.DragElementForce,
+60:        'antv-dagre': layouts_1.AntVDagreLayout,
+61:        'combo-combined': layouts_1.ComboCombinedLayout,
+63:        'd3-force': layouts_1.D3ForceLayout,
+64:        'force-atlas2': layouts_1.ForceAtlas2Layout,
+65:        circular: layouts_1.CircularLayout,
+66:        concentric: layouts_1.ConcentricLayout,
+67:        dagre: layouts_1.DagreLayout,
+69:        fishbone: layouts_1.FishboneLayout,
+70:        force: layouts_1.ForceLayout,
+71:        fruchterman: layouts_1.FruchtermanLayout,
+72:        grid: layouts_1.GridLayout,
+74:        mds: layouts_1.MDSLayout,
+76:        radial: layouts_1.RadialLayout,
+77:        random: layouts_1.RandomLayout,
+78:        snake: layouts_1.SnakeLayout,
+===
+214:  alpha?: number;
+220:  alphaMin?: number;
+226:  alphaDecay?: number;
+232:  alphaTarget?: number;
+Confirmed: G6 v5 maps `type: "force"` → `layouts_1.ForceLayout` = @antv/layout's custom `force` algorithm (NOT d3-force). And the custom force types.ts has NO alpha/alphaDecay/alphaMin options — those options only exist in `d3-force` (lines 214-232 of d3-force/types.ts). 
+
+  So the bug report's R2 assumption ("G6 v5 force 布局 alpha:0.35 导致力导过弱") is based on a wrong premise: the `alpha`, `alphaDecay`, `alphaMin`, `forceSimulation` options passed in AdvancedRelationGraph.vue:226-238 are silently ignored by the ForceLayout (custom @antv/layout force). Wait — but do they get ignored? The ForceLayout options interface doesn't include them; extra options are typically ignored. Let me check force/index.ts to see what options it consumes, and what its defaults/behavior are — e.g., how many iterations it runs. Also check `force/types.ts` full options list to see what matters (gravity, centripetal, factor, interval, clustering?).
+
+  Also need to check how the simulation runs — the custom force layout might run a fixed number of iterations. Let me look at force/index.ts briefly.import type {
+  CommonForceLayoutOptions,
+  EdgeData,
+  Expr,
+  NodeData,
+  Point,
+} from '../../types';
+
+export type AccMap = { [id: string]: { x: number; y: number; z: number } };
+
+/**
+ * <zh/> 向心力配置，包括叶子节点、离散点、其他节点的向心中心及向心力大小
+ *
+ * <en/> Centripetal configuration, including the center of the leaf node, the center of the scattered point, and the center of the other nodes
+ */
+export interface CentripetalOptions {
+  /**
+   * <zh/> 叶子节点（即度数为 1 的节点）受到的向心力大小
+   * - number: 固定向心力大小
+   * - ((node: NodeData, nodes: NodeData[], edges: EdgeData[]) => number): 可根据节点、边的情况返回不同的值
+   * <en/> The centripetal force of the leaf node (i.e., the node with degree 1)
+   * - number: fixed centripetal force size
+   * - ((node: NodeData, nodes: NodeData[], edges: EdgeData[]) => number): return different values according to the node, edge, and situation
+   * @defaultValue 2
+   */
+  leaf?:
+    | number
+    | Expr
+    | ((node: NodeData, nodes: NodeData[], edges: EdgeData[]) => number);
+  /**
+   * <zh/> 离散节点（即度数为 0 的节点）受到的向心力大小
+   * - number: 固定向心力大小
+   * - ((node: NodeData, nodes: NodeData[], edges: EdgeData[]) => number): 可根据节点情况返回不同的值
+   * <en/> The centripetal force of the scattered node (i.e., the node with degree 0)
+   * - number: fixed centripetal force size
+   * - ((node: NodeData) => number): return different values according to the node situation
+   * @defaultValue 2
+   */
+  single?: number | Expr | ((node: NodeData) => number);
+  /**
+   * <zh/> 除离散节点、叶子节点以外的其他节点（即度数 > 1 的节点）受到的向心力大小
+   * - number: 固定向心力大小
+   * - ((node: NodeData) => number): 可根据节点的情况返回不同的值
+   * <en/> The centripetal force of the other nodes (i.e., the node with degree > 1)
+   * - number: fixed centripetal force size
+   * - ((node: NodeData) => number): return different values according to the node situation
+   * @defaultValue 1
+   */
+  others?: number | Expr | ((node: NodeData) => number);
+  /**
+   * <zh/> 向心力发出的位置，可根据节点、边的情况返回不同的值、默认为图的中心
+   *
+   * <en/> The position where the centripetal force is emitted, which can return different values according to the node, edge, and situation. The default is the center of the graph
+   */
+  center?:
+    | Expr
+    | ((
+        node: NodeData,
+        nodes: NodeData[],
+        edges: EdgeData[],
+        width: number,
+        height: number,
+      ) => {
+        x: number;
+        y: number;
+        z?: number;
+        centerStrength?: number;
+      });
+}
+
+interface FormatCentripetalOptions extends CentripetalOptions {
+  leaf: (node: NodeData, nodes: NodeData[], edges: EdgeData[]) => number;
+  /** Force strength for single nodes. */
+  single: (node: NodeData) => number;
+  /** Force strength for other nodes. */
+  others: (node: NodeData) => number;
+  center: (
+    node: NodeData,
+    nodes: NodeData[],
+    edges: EdgeData[],
+    width: number,
+    height: number,
+  ) => {
+    x: number;
+    y: number;
+    z?: number;
+    centerStrength?: number;
+  };
+}
+
+export interface ForceLayoutOptions extends CommonForceLayoutOptions {
+  /**
+   * <zh/> 边的长度
+   * - number: 固定长度
+   * - ((edge: EdgeData, source: NodeData, target: NodeData) => number): 根据边的信息返回长度
+   * <en/> The length of the edge
+   * - number: fixed length
+   * - ((edge: EdgeData, source: NodeData, target: NodeData) => number): return length according to the edge information
+   * @defaultValue 200
+   */
+  linkDistance?:
+    | number
+    | Expr
+    | ((edge: EdgeData, source: NodeData, target: NodeData) => number);
+  /**
+   * <zh/> 节点作用力，正数代表节点之间的引力作用，负数代表节点之间的斥力作用
+   *
+   * <en/> The force of the node, positive numbers represent the attraction force between nodes, and negative numbers represent the repulsion force between nodes
+   * @defaultValue 1000
+   */
+  nodeStrength?: number | Expr | ((node: NodeData) => number);
+  /**
+   * <zh/> 边的作用力（引力）大小
+   *
+   * <en/> The size of the force of the edge (attraction)
+   * @defaultValue 50
+   */
+  edgeStrength?: number | Expr | ((edge: EdgeData) => number);
+  /**
+   * <zh/> 是否防止重叠，必须配合下面属性 nodeSize 或节点数据中的 data.size 属性，只有在数据中设置了 data.size 或在该布局中配置了与当前图节点大小相同的 nodeSize 值，才能够进行节点重叠的碰撞检测
+So ForceLayout (custom) options: linkDistance, nodeStrength, edgeStrength, preventOverlap, collideStrength, nodeSize, nodeSpacing, centripetalOptions, gravity?, clustering?, etc. No alpha. Let me confirm there's no alpha anywhere in force simulation:===
+21:   * <en/> The centripetal force of the leaf node (i.e., the node with degree 1)
+22:   * - number: fixed centripetal force size
+34:   * <en/> The centripetal force of the scattered node (i.e., the node with degree 0)
+35:   * - number: fixed centripetal force size
+44:   * <en/> The centripetal force of the other nodes (i.e., the node with degree > 1)
+45:   * - number: fixed centripetal force size
+53:   * <en/> The position where the centripetal force is emitted, which can return different values according to the node, edge, and situation. The default is the center of the graph
+153:  gravity?: number;
+160:  factor?: number;
+167:  interval?: number;
+171:   * <en/> Centripetal configuration, including the centripetal center of leaf nodes, discrete points, and the centripetal center of other nodes
+173:  centripetalOptions?: CentripetalOptions;
+179:   * <zh/> 若为 true，则 centripetalOptions.single 将为 100；centripetalOptions.leaf 将使用 getClusterNodeStrength 返回值；getClusterNodeStrength.center 将为叶子节点返回当前所有叶子节点的平均中心
+181:   * <en/> If it is true, centripetalOptions.single will be 100; centripetalOptions.leaf will use the return value of getClusterNodeStrength; getClusterNodeStrength.center will be the average center of all leaf nodes
+190:   * <zh/> 若为 true，将使用 nodeClusterBy 配置的节点数据中的字段作为聚类依据。 centripetalOptions.single、centripetalOptions.leaf、centripetalOptions.others 将使用 getClusterNodeStrength 返回值；leaf、centripetalOptions.center 将使用当前节点所属聚类中所有节点的平均中心
+192:   * <en/> If it is true, the node data configured by nodeClusterBy will be used as the clustering basis. centripetalOptions.single, centripetalOptions.leaf, centripetalOptions.others will use the return value of getClusterNodeStrength; leaf、centripetalOptions.center will use the average center of all nodes in the current cluster
+197:   * <zh/> 指定节点数据中的字段名称作为节点聚类的依据，clustering 为 true 时生效，自动生成 centripetalOptions，可配合 clusterNodeStrength 使用
+205:   * <en/> Use it with clustering and nodeClusterBy to specify the size of the centripetal force of the cluster
+250:    | 'centripetalOptions'
+263:  maxIteration: number;
+===COMMON===
+Confirmed: @antv/layout `force` (the one G6 v5 `type:"force"` uses) has NO alpha/alphaDecay/alphaMin options at all — those four options in AdvancedRelationGraph.vue:234-237 (`alpha: 0.35, alphaDecay: 0.022, alphaMin: 0.008, forceSimulation: undefined`) are silently ignored dead config. So R2's causal claim ("alpha 0.35 导致力导过弱") is factually wrong about mechanism — alpha is a no-op here. The real tunables are nodeStrength (-280 set), edgeStrength (0.45 — but note default is 50! Setting edgeStrength:0.45 makes edge attraction nearly zero vs default 50), linkDistance 180 (default 200), collideStrength 1, preventOverlap true with nodeSize 88, nodeSpacing 36.
+
+  Actually wait — this cuts the other way: edgeStrength default is 50; the code sets 0.45, making springs ~100× weaker than default. And nodeStrength -280 vs default 1000 repulsion... hmm, negative = repulsion, default nodeStrength 1000 is positive?? "@defaultValue 1000" with positive = attraction per doc. Weird default but whatever. With edgeStrength 0.45, edges barely attract; repulsion -280 pushes apart. That shouldn't cause center blob... unless centripetal force (default leaf 2, others 1, single 2) pulls to center and repulsion is too weak relative to mass... Also maxIteration is in the runtime config. Let me check force/index.ts to see defaults used and whether layout runs to completion.
+
+  Also important: G6's layout pipeline — with `animation: false` in graph options, does force layout run synchronously to maxIteration? In G6 v5, layout runs and returns positions; the graph then renders. Force layout executes a fixed number of iterations in a loop before returning.
+
+  Rather than going deeper into the simulation internals, the key review conclusions for R2:
+
+  1. R2's stated mechanism (alpha 0.35 too low) is WRONG — `force` layout type ignores alpha/alphaDecay/alphaMin entirely (those belong to `d3-force`). The lines 234-237 are dead config.
+  2. However the underlying complaint (nodes not spreading / overlap) could still be real, driven by other params: edgeStrength 0.45 (≈1% of default 50) — springs too weak; preventOverlap depends on nodeSize=88 matching actual rendered node size (circle diameter is nodeCircleSize 42..66+degree*2, plus label below) — mismatch possible; centripetal default pulls toward center.
+  3. Also `nodeSize: 88` vs actual node sizes (up to 66 diameter for center, 42-54 typical) — collision radius uses 88/2=44 + spacing 36 — should be enough.
+
+  So verdict for R2: 存疑/部分错误 — the hypothesis's causal mechanism is disproven (alpha is dead config for this layout type); overlap risk exists but attribution to alpha is wrong; fix should target edgeStrength/centripetal or switch to `d3-force` (which honors alpha) or preset layouts. Severity of the mis-attribution: high for the fix direction (the proposed fix "alpha 提到 0.8~1" would do nothing).
+
+  Wait — I should double check whether G6's ForceLayout wrapper might pass through unknown options or map alpha. Check @antv/layout force/index.ts constructor — does it merge options and use them? Extra options ignored. Also verify G6 v5's layout options for 'force' type typing — g6's types may declare alpha in ForceLayoutOptions re-exported from @antv/layout. Since @antv/layout ForceLayoutOptions lacks alpha, TS would flag it... but they passed `as any` (`new Graph({...} as any)`), so typechecking wouldn't catch it. And in performRender: `instance.setOptions({ layout } as any)`. Yes — dead config confirmed by types.
+
+  Let me quickly double-check force simulation uses maxIteration and runs to completion, plus check defaults in index.ts for what's used. Actually enough evidence. One more check: does @antv/layout force index.ts pick specific options (i.e., silently ignore alpha)? Let me peek at force/index.ts options handling quickly.23:const DEFAULTS_LAYOUT_OPTIONS: Partial<ForceLayoutOptions> = {
+26:  maxIteration: 500,
+59:    return DEFAULTS_LAYOUT_OPTIONS;
+63:    const options = this.parseOptions(this.options);
+369:      options.centripetalOptions = Object.assign({}, basicCentripetal, {
+431:      options.centripetalOptions = Object.assign(basicCentripetal, {
+
+export type { ForceLayoutOptions };
+
+const DEFAULTS_LAYOUT_OPTIONS: Partial<ForceLayoutOptions> = {
+  nodeSize: 30,
+  dimensions: 2,
+  maxIteration: 500,
+  gravity: 10,
+  factor: 1,
+  edgeStrength: 50,
+  nodeStrength: 1000,
+  coulombDisScale: 0.005,
+  damping: 0.9,
+  maxSpeed: 200,
+  minMovement: 0.4,
+  interval: 0.02,
+  linkDistance: 200,
+  clusterNodeStrength: 20,
+  collideStrength: 1,
+  preventOverlap: true,
+  distanceThresholdMode: 'mean',
+};
+
+/**
+ * <zh/> 力导向布局 (Force)
+ *
+ * <en/> Force-directed layout (Force)
+ *
+ * @remarks
+ * <zh/> 基于自定义物理模拟的力导向布局，使用库伦定律计算斥力，胡克定律计算引力
+ *
+ * <en/> Force-directed layout based on custom physics simulation, using Coulomb's law for repulsion and Hooke's law for attraction
+ */
+export class ForceLayout extends BaseLayoutWithIterations<ForceLayoutOptions> {
+  public id = 'force';
+
+  public simulation: ForceSimulation | null = null;
+
+  protected getDefaultOptions(): Partial<ForceLayoutOptions> {
+    return DEFAULTS_LAYOUT_OPTIONS;
+  }
+Confirmed conclusively: the custom ForceLayout (G6 v5 `type:"force"`) uses custom physics sim with defaults: nodeStrength 1000, edgeStrength 50, gravity 10, maxIteration 500, etc. There is NO alpha handling. The app overrides: nodeStrength -280 (repulsion, much weaker than default magnitude 1000), edgeStrength 0.45 (vs default 50 — attraction ~110× weaker), collideStrength 1, linkDistance 180, nodeSize 88, nodeSpacing 36. So relative to defaults, the app's config drastically weakens both repulsion and attraction while keeping gravity:10 (centripetal-ish pull to center, not overridden). Gravity 10 pulls everything to center; repulsion -280 with coulombDisScale 0.005 → repulsive force tiny at distance. This plausibly causes center-clumping — but NOT because of alpha. R2's mechanism is wrong; the real knobs are gravity (left at default 10) vs weakened nodeStrength/edgeStrength.
+
+  Also `forceSimulation: undefined` — dead.
+
+  Now R4 (label config contradiction): G6 v5 node style label options. Check G6 v5 label behavior: labelWordWrap, labelMaxWidth, labelMaxLines, labelTextOverflow. In G6 v5, these map to @antv/g text styles: wordWrap, wordWrapWidth (labelMaxWidth → wordWrapWidth?), maxLines, textOverflow. In @antv/g, wordWrap only takes effect when wordWrap=true; maxLines applies with wordWrap. textOverflow 'clip'... Let me verify quickly in g6 lib how labelWordWrap etc are mapped.frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js:235:    labelMaxWidth: '200%',
+frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js:237:    labelWordWrap: false,
+    droppable: true,
+    draggable: true,
+    port: true,
+    ports: [],
+    portZIndex: 2,
+    portLinkToCenter: false,
+    badge: true,
+    badges: [],
+    badgeZIndex: 3,
+    halo: false,
+    haloDroppable: false,
+    haloLineDash: 0,
+    haloLineWidth: 12,
+    haloStrokeOpacity: 0.25,
+    haloPointerEvents: 'none',
+    haloZIndex: -1,
+    icon: true,
+    iconZIndex: 1,
+    label: true,
+    labelIsBillboard: true,
+    labelMaxWidth: '200%',
+    labelPlacement: 'bottom',
+    labelWordWrap: false,
+    labelZIndex: 0,
+};
+/**
+ * <zh/> 在离屏画布中获取图形包围盒
+ *
+ * <en/> Get the bounding box of the shape in the off-screen canvas
+ * @param context - <zh/> 运行时上下文 <en/> Runtime context
+ * @param shape - <zh/> 图形实例 <en/> Graphic instance
+ * @returns <zh/> 图形包围盒 <en/> Graphic bounding box
+ */
+function getBoundsInOffscreen(context, shape) {
+    if (!context)
+        return shape.getLocalBounds();
+    // 将主图形靠背至全局空间，避免受到父级 transform 的影响
+    // 合理的操作应该是拷贝至离屏画布，但目前 G 有点问题
+    // Move the main shape to the global space to avoid being affected by the parent transform
+    // The reasonable operation should be moved to the off-screen canvas, but there is a problem with G at present
+    const canvas = context.canvas.getLayer();
+    const substitute = shape.cloneNode();
+    (0, visibility_1.setVisibility)(substitute, 'hidden');
+    canvas.appendChild(substitute);
+    const bounds = substitute.getLocalBounds();
+    substitute.destroy();
+47:        const { wordWrap, wordWrapWidth, padding } = style;
+60:                width: wordWrap ? Math.min(totalWidth, wordWrapWidth + left + right) : totalWidth,
+87:    wordWrap: true,
+88:    maxLines: 1,
+89:    wordWrapWidth: 128,
+90:    textOverflow: '...',
+Now check how G6 maps labelWordWrap/labelMaxWidth/labelMaxLines/labelTextOverflow to the Label shape style (wordWrap, wordWrapWidth, maxLines, textOverflow). Search in g6 lib for labelMaxWidth usage in elements/nodes or utils/label.frontend/node_modules/@antv/g6/lib/elements/edges/base-edge.js:252:    labelMaxWidth: '80%',
+frontend/node_modules/@antv/g6/lib/elements/edges/base-edge.js:257:    labelWordWrap: false,
+frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js:235:    labelMaxWidth: '200%',
+frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js:237:    labelWordWrap: false,
+frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js:59:        return Object.assign((0, element_1.getTextStyleByPlacement)(keyBounds, placement, offsetX, offsetY), { wordWrapWidth: (0, text_1.getWordWrapWidthByBox)(keyBounds, maxWidth) }, labelStyle);
+frontend/node_modules/@antv/g6/lib/elements/edges/base-edge.js:132:        const wordWrapWidth = (0, text_1.getWordWrapWidthByEnds)([bbox.min, bbox.max], maxWidth);
+frontend/node_modules/@antv/g6/lib/elements/edges/base-edge.js:133:        return Object.assign({ wordWrapWidth }, labelPositionStyle, restStyle);
+===
+52:        return Object.assign((0, prefix_1.omitStyleProps)(style, ['label', 'halo', 'icon', 'badge', 'port']));
+57:        const _a = (0, prefix_1.subStyleProps)(this.getGraphicStyle(attributes), 'label'), { placement, maxWidth, offsetX, offsetY } = _a, labelStyle = __rest(_a, ["placement", "maxWidth", "offsetX", "offsetY"]);
+177:        this.upsert('label', shapes_1.Label, style, container);
+So G6 node label style: `labelWordWrap`, `labelMaxWidth`, `labelMaxLines`, `labelTextOverflow` are passed through subStyleProps 'label' prefix → Label shape gets `wordWrap` (from labelWordWrap), `wordWrapWidth` computed from maxWidth (labelMaxWidth; can be number 168), `maxLines` (labelMaxLines), `textOverflow` (labelTextOverflow 'clip'... wait, Label's default textOverflow is '...'). 
+
+  In @antv/g Text shape: wordWrap only applies when wordWrap=true; if wordWrap=false, wordWrapWidth/maxLines/textOverflow are ignored (no wrapping, no ellipsization — text renders full width). Actually in @antv/g, when wordWrap=false, textOverflow is NOT applied — text overflows freely. Let me verify: @antv/g-lite text rendering. The Label shape defaults wordWrap:true maxLines:1 wordWrapWidth:128 textOverflow:'...'. G6 base-node defaults labelWordWrap:false. The app sets labelWordWrap:false, labelMaxWidth:168, labelMaxLines:5, labelTextOverflow:'clip'. With wordWrap=false, maxLines and textOverflow are dead in @antv/g's wordWrap pipeline... but wait, does G's Text apply maxLines even without wordWrap for text containing \n? Explicit \n splits into lines regardless; maxLines truncates lines? In @antv/g, line wrapping: if wordWrap false, it still splits on \n. maxLines... I believe maxLines applies only in wordWrap mode. Not 100% sure, but likely.
+
+  So R4's claim "labelWordWrap:false + labelMaxWidth:168 + labelMaxLines:5 组合矛盾（不换行则 maxLines 无效）" is essentially CORRECT as a config-contradiction observation: with wordWrap=false, labelMaxWidth/labelMaxLines/labelTextOverflow are inert. Since label text is pre-wrapped by formatGraphNodeLabel (explicit \n, ≤5 lines, ≤7 chars/line for names), rendering works anyway — the inert config isn't the cause of overlap. The overlap is layout-driven. But labelPlacement bottom + overlapping nodes → overlapping labels, consistent with report. The "漂浮未连接中文标签" — those are likely labels of overlapping/hidden nodes (node circles overlap into a blob, labels render below each circle at labelOffsetY 8, so labels of inner circles appear detached/floating amid the blob). That interpretation is consistent.
+
+  So R4: 配置矛盾属实（dead config），但对"标签互叠"因果贡献低；严重度低。漂浮标签更可能是节点堆叠的次生现象。
+
+  Now R5 (SVG fallback): RelationGraph.vue:445-450 — layout computed: grouped/radial/hierarchy have builders; fallback = buildLayered for "force"/"layered" modes. graphLoadPolicy.ts:19-22,30: shouldUseSvg when nodeCount>=220 or edgeCount>=320 and engine g6. Note: applyGraphLoadPolicy is only called in loadData's non-overview branch (line ~669: only after getGraph, not for overview or chain?). Let me check loadChain — does it apply policy? Earlier we saw loadData calls applyGraphLoadPolicy only in non-overview path. Check loadChain for applyGraphLoadPolicy. Also check table-detail usage. The claim R5: "SVG 降级引擎（>220 节点强制切换，graphLoadPolicy.ts:22）layout fallback=buildLayered 网格（列距260/行距92），但 label 最宽168+节点42~68px，密集邻域仍叠；且 explore/force 模式名落到 layered 语义错位". 
+
+  Verify: RelationGraph layout computed (line 445-451): grouped → buildGrouped; radial → buildRadial; hierarchy → buildHierarchy; else → buildLayered (covers force & layered). buildLayered: columns by nodeGroup, x spacing 260, rows y spacing 92. Node diameter 42-54ish (max 66 center) + label below (multi-line, each line 15px). Row pitch 92 vs node height: diameter ~42-54 + label 14+ lines*15 (up to 5 lines ≈ 89px below) → total ~150px > 92 → vertical overlap of labels with next row's node circles. Confirmed: row pitch 92 insufficient when labels are multi-line (up to 5+tech lines ≈ 6 lines × 15px = 90px + circle radius). So dense SVG fallback does overlap vertically. Column pitch 260 vs label maxWidth ~168 → horizontal OK-ish. So R5 is plausible/confirmed as a real overlap risk in SVG layered fallback: 92px row pitch < node + label stack height. Severity 中.
+
+  The "explore/force → layered 语义错位" claim: explore uses force in G6; if engine switches to SVG, force mode falls into buildLayered grid — yes that's the fallback at line 450. Semantic mismatch true but cosmetic-ish.
+
+  Now R6: index.vue 486-497 is applyGraphLoadPolicy; report says "前端 10s 超时阈值（http 工具层）与 overview 实际 23.5s 不匹配；无重试/降级到轻量层". Confirmed: http timeout 10000 at frontend/src/utils/http/index.ts:34; loadData overview branch has no retry/fallback; error → errorInfo → el-result panel ("图谱加载失败"? let me check errorInfo titles — classifyGraphError). The error panel title in repro: "图谱加载失败", subtitle "接口超时或服务异常，请稍后重试". Check graphError classification file. Quick grep.===
+485:function applyGraphLoadPolicy(data: GraphData) {
+670:    applyGraphLoadPolicy(data);
+745:    applyGraphLoadPolicy(res.data);
+===
+      const search = await searchGraphTables({
+        q: locate.table.trim(),
+        system_code: filters.system_code || undefined,
+        source_code: filters.source_code || undefined,
+        schema: filters.schema || undefined,
+        limit: 30
+      });
+      if (seq !== chainSeq) return;
+      locate.search_results = search.data.items;
+      if (search.data.items.length !== 1) {
+        ElMessage.warning(search.data.items.length ? "找到多个同名资产，请补充业务系统、数据连接或 Owner 后再展开" : "未找到唯一中心资产");
+        return;
+      }
+      physicalKey = search.data.items[0].physical_key;
+      locate.physical_key = physicalKey;
+    } catch (err) {
+      if (seq !== chainSeq) return;
+      const info = classifyGraphError(err);
+      state.value = info.state;
+      errorInfo.value = info;
+      return;
+    }
+  }
+  if (!physicalKey) {
+    ElMessage.warning("请输入要定位的表名");
+    return;
+  }
+  loading.value = true;
+  state.value = "loading";
+  try {
+    const res = await getGraphNeighbors({
+      center_physical_key: physicalKey,
+      depth: locate.depth,
+      direction: locate.direction,
+      limit: filters.limit
+    });
+    if (seq !== chainSeq) return;
+    if (!validateGraphData(res.data)) {
+      state.value = "contract_error";
+      errorInfo.value = contractErrorInfo(new Error("neighbors data structure invalid"));
+      return;
+    }
+    graphData.value = res.data;
+    exploreState = createExploreState(res.data);
+    graphMeta.value = res.data.meta || null;
+    applyGraphLoadPolicy(res.data);
+    centerTable.value = physicalKey;
+    selectedNodeId.value = res.data.nodes[0]?.id || physicalKey;
+    filters.keyword = physicalKey;
+    filters.layout_mode = "force";
+    if (res.data.nodes.length && res.data.edges.length) {
+      state.value = "success";
+    } else {
+      emptyState();
+    }
+  } catch (err) {
+    if (seq !== chainSeq) return;
+    graphData.value = { nodes: [], edges: [] };
+    graphMeta.value = null;
+    const info = classifyGraphError(err);
+    state.value = info.state;
+    errorInfo.value = info;
+    ElMessage.warning(info.description);
+  } finally {
+    if (seq === chainSeq) {
+      loading.value = false;
+    }
+  }
+}
+
+async function globalSearch() {
+  const query = locate.table.trim();
+  if (!query) return ElMessage.warning("请输入表名、中文名、Schema 或五段物理键");
+  try {
+  let physicalKey = query.split("|").length === 5 ? query : "";
+  if (!physicalKey) {
+    const response = await searchGraphTables({
+      q: query,
+      system_code: filters.system_code || undefined,
+      source_code: filters.source_code || undefined,
+      schema: filters.schema || undefined,
+Confirmed:
+  - loadChain sets `filters.layout_mode = "force"` explicitly (line ~748) — explore/搜索聚焦 uses force mode → G6 force layout with the ineffective alpha and weakened strengths. So explore DOES go through force, consistent with R3's claim.
+  - applyGraphLoadPolicy called in loadChain (745) and loadData non-overview (670), NOT for overview. So overview (system level, ~17 nodes) wouldn't trigger anyway.
+  - The error text "图谱加载失败"/"接口超时或服务异常" wasn't found by my grep in graph/*.ts or utils — maybe in graphError helper file elsewhere. Let me find classifyGraphError definition.frontend/src/views/asset/graph/graphErrors.ts
+Interesting — graphErrors.ts title is "图谱接口请求失败", but the report's screenshot showed "图谱加载失败" with subtitle "接口超时或服务异常，请稍后重试" and buttons "重新加载/重置条件" and correlation id `graph-load-20260830163111123-5257`. That doesn't match this error panel: here title "图谱接口请求失败", description "请稍后重试；若持续失败请联系管理员并提供下方关联编号。", buttons "重试/重置条件", correlation ID is random hex (8 bytes → 16 hex chars), not `graph-load-<timestamp>-<rand>` format. So the screenshot's error panel is NOT from this code path! There must be another error panel elsewhere — maybe in a different page (asset graph page older version?) or the report was against a different build. Let me search the whole frontend src for "图谱加载失败" and "graph-load-".frontend/src/views/asset/graph/index.vue:125:        class="graph-load-alert"
+frontend/src/views/asset/graph/index.vue:131:      <el-alert v-if="diagnosticWarnings.length" class="graph-load-alert" type="warning" show-icon :closable="false" :title="diagnosticWarnings.join('；')" />
+frontend/src/views/asset/graph/index.vue:1071:.graph-load-alert {
+Confirmed: the strings "图谱加载失败" / "接口超时或服务异常" / "graph-load-<timestamp>" / "重新加载" do NOT exist anywhere in frontend/src or frontend/mock. The current error panel (index.vue:197-209 + graphErrors.ts) shows "图谱接口请求失败" + "请稍后重试；若持续失败请联系管理员并提供下方关联编号。" + buttons "重试/重置条件" + random-hex correlation ID.
+
+  So the bug report's P1 screenshot evidence describes an error panel that doesn't match the current source. Possible explanations: (a) the repro ran against an older built bundle (frontend/dist) rather than current source dev server; (b) the report fabricated/misattributed; (c) backend mock. The report says env was "本机 dev 栈（uvicorn 8000 + vite 8848）" — vite dev server serves from src, so current code should show "图谱接口请求失败". The mismatch is significant: P1's *mechanism* (timeout → error panel) is structurally confirmed (10s http timeout, no retry/fallback for overview, catch → api_error → el-result), but the quoted screenshot text doesn't exist in the codebase → 疑问. Severity: the underlying timeout problem is high (structurally confirmed); the specific screenshot text is unverifiable/mismatched.
+
+  Let me also double check the correlation id format claim: report says `graph-load-20260830163111123-5257`. Current code: newCorrelationId() = 16 hex chars, no "graph-load-" prefix. Confirmed mismatch.
+
+  Now R1 verification detail — the 23.5s: I can't run the prod-like DB. But code evidence: overview non-object branch (graph.py ~1683-1709): `rel_stmt = select(AssetRelation)` — full scan of ALL relations (no limit), then per-relation `_resolve_relation_endpoint(db, rel, "from")` called WITHOUT resolver → if physical endpoint fields missing, `resolve_endpoint(db,...)` + `_resolve_endpoint_lenient(db,...)` each run full DB queries per relation row → N+1. Meanwhile the `object` level branch DOES use `_EndpointResolver.load(db)` (line ~1592) — so the aggregate/system branch is inconsistent and does per-row queries. With 1329 relations and 12702-table asset_tables, worst case ~2658 unindexed queries — 23.5s plausible. Also no cache. So R1: 确认有问题（结构层面），严重度高. Note the interesting nuance: it's not "12702 表逐级聚合" in Python — the system-level aggregation itself is a SQL GROUP BY (fast); the slow part is the relation edge-aggregation loop with per-row endpoint resolution. So the report's wording ("全库 12702 表逐级聚合无缓存") is imprecise but the conclusion (overview too slow, N+1, no cache) is confirmed.
+
+  Also, matched_assets for system level: count of all AssetTable = 12702 → matches meta.total_relations=12702 in report. Confirms R7/R8(meta口径): total_relations=matched_assets(table count), matched_relations=matched_assets, returned_relations=len(edges) (aggregated edges), truncated=matched_assets>len(nodes). So the meta field names (relations semantics from global graph endpoint) are misused in overview: total/matched are table counts, returned is edge count, truncated compares table count vs node count. Confirmed 口径错位. Severity: low (only feeds the stats tags in GraphToolbar; but note — in overview mode, toolbar displays "总数 12702 / 命中 12702 / 返回 1" which is nonsense/misleading to users; also "已截断(limit=80)" shows since truncated=true with filters.limit=80... actually filters in meta include limit. GraphToolbar shows 已截断 tag with limit from filters.limit (frontend filters.limit, default 120?) — whatever. Display-level confusion, low-medium.
+
+  Wait — also the report says returned_relations=1 with 17 system nodes. With level=system and 17 systems, pair_counts of cross-system relations → 1 edge only? That means the overview system layer shows 17 nodes with 1 connecting edge — plus frontend's linkAdjacentOverviewNodes adds cycle structure edges so the ring connects. OK.
+
+  R8 in user's numbering = "meta 口径错位" = report's R7. Confirmed above.
+
+  User's "R7 el-segmented 不可达" = report's P3/R-... In the report table, R7 row is meta 口径; the user's list has both "R7 el-segmented 不可达" and "R8 meta 口径错位", so user renumbered: P1, R2, R4, R5, R7(el-segmented, = report P3), R8(meta, = report R7). Fine.
+
+  R7 el-segmented: GraphToolbar.vue:4 uses `<el-segmented>` unconditionally (no v-if), and lines 24-25 use el-segmented inside `v-if="filters.view_mode === 'explore'"`. Element Plus 2.11.5 does render `.el-segmented` class. BUT: GraphToolbar itself is only rendered when `!isErrorState && state !== 'loading'` (index.vue:9). During initial loading (state='loading') and during the P1 error panel, the toolbar doesn't exist → querySelector('.el-segmented') === null. The repro measured on a page stuck in error panel (P1) → null. So el-segmented unreachability is fully explained by the error state, not by Element Plus rendering differences or a v-if on the component itself. For real users in a healthy session, the segmented control renders. So: 无独立问题（由 P1 错误态解释的次生现象），但错误面板隐藏整个工具栏 → 用户无法切换到其他模式自救，只能重试/重置回到 overview 再超时——死循环 UX。严重度：低-中。
+
+  Hmm wait — one more check on R7: "重新加载/重置条件" buttons in the report's screenshot vs current "重试/重置条件". Another mismatch reinforcing that the screenshot text isn't from current code.
+
+  Also for P1: is there any retry/fallback for overview failure? No — loadData overview catch → error panel only. And reset (重置条件) → resetFilters → back to overview mode default → reload overview → timeout again. Confirmed dead loop. Check resetFilters quickly? Line ~874: sets view_mode to overview, overviewLevel system, then presumably loadData. Yes lines 874-877 area. Confirmed.
+
+  R5 verification details — graphLoadPolicy.ts:22: SVG_NODE_THRESHOLD = 220 at line 19 (report said "graphLoadPolicy.ts:22" which is isAggregationViewMode; threshold constant is line 19; minor line-number inaccuracy). shouldUseSvg = veryLarge && engine g6 (line 30). RelationGraph fallback: layout computed line 445-451 — buildLayered for force/layered. buildLayered: x spacing 260 (col * 260, line 329), row pitch 92 (line 332). Node label: multi-line text below circle at y = width/2 + 14 + lineIndex*15, up to 5-6 lines → up to ~90-105px below center. Row pitch 92 → labels of row N overlap circle of row N+1 (circle center at +92, radius ~21-27; label extends ~33+14... label starts at y=width/2+14 ≈ 35-47 below center, extends to ~35+6*15=125px below center → crosses into next row's circle (92+27=119). Yes overlap confirmed by arithmetic. Also edge labels showLabel when selectedNodeId or radial. And nodeClass is-muted opacity 0.24 etc.
+
+  But hold on — does the SVG engine actually get used for explore neighbor graphs? Neighbor graphs: nodes usually < 220, so shouldUseSvg rarely triggers for explore. R5 matters for review/global mode with big data (limit up to 500 → nodes could exceed 220). OK.
+
+  One more thing for R4's "漂浮中文标签疑 label 与节点错位（preset 坐标与 force 位移混用）": In graphData(), for force mode hierarchyPos=null, so no preset x/y — all nodes start from layout. No mixing within a single render. But across mode switches without instance destroy (force→grouped both "engine-layout"), setData replaces data; positions recomputed by new layout. G6 might retain old positions? setOptions({layout}) then render() recomputes. Not a clear bug. The floating labels more plausibly = labels of nodes hidden inside the blob. So that sub-claim: 存疑/大概率误归因.
+
+  Now P2 (node blob) — user asked only about P1, R2, R4, R5, R7, R8. P2 wasn't in the user's list. Skip or mention briefly.
+
+  Also R3 wasn't in the user's list either. OK — user listed: P1 首屏错误面板 / R2 force alpha 过低 / R4 标签配置矛盾 / R5 SVG 降级 fallback / R7 el-segmented 不可达 / R8 meta 口径错位. Six items.
+
+  Summary of verdicts:
+
+  **P1 首屏错误面板**: 部分确认 + 证据疑点.
+  - 机制链结构确认：http 超时 10000ms（frontend/src/utils/http/index.ts:34）；loadData overview 分支无重试/降级（index.vue:626-647, 681-685 catch → classifyGraphError → api_error → el-result 错误面板 index.vue:197-209）。后端 overview 聚合分支存在 N+1（graph.py ~1683-1709 全量 AssetRelation 扫描 + `_resolve_relation_endpoint` 未传 resolver → 每行潜在 1-2 次全表查询；对照 object 分支 1592 行用了 `_EndpointResolver.load(db)`），23.5s 在 12702 表/1329 关系数据量下可信。严重度：高。
+  - 疑点：报告截图的文案「图谱加载失败 / 接口超时或服务异常，请稍后重试 / 重新加载」与关联编号格式 `graph-load-<时间戳>-<随机>` 在当前代码中完全不存在（grep frontend/src + frontend/mock 零命中）；当前代码标题应为「图谱接口请求失败」、按钮「重试/重置条件」、关联编号为 16 位随机 hex（graphErrors.ts:79-87, 34-38）。说明截图证据不是由当前 src 渲染（可能是旧 dist 包或描述转写），P1 的"现象截图"无法由代码佐证；结论性判断（超时→错误面板）仍成立。验证命令：`curl -o /dev/null -w '%{time_total}' http://127.0.0.1:8000/api/v1/graph/overview?level=system`（需带 token）。
+
+  **R2 force alpha 过低**: 机制被证伪（伪根因），但配置确有问题.
+  - G6 v5 注册表把 `type:"force"` 映射到 @antv/layout 的自定义 ForceLayout（node_modules/@antv/g6/lib/registry/build-in.js:70），该布局的 ForceLayoutOptions（@antv/layout/src/algorithm/force/types.ts）与默认参数（index.ts:23-40）**完全没有 alpha/alphaDecay/alphaMin/forceSimulation 概念**——这些选项仅存在于 `d3-force`（d3-force/types.ts:214-232）。AdvancedRelationGraph.vue:234-237 的四个参数是死配置，被静默忽略（且 `new Graph({...} as any)` 绕过了类型检查）。所以"alpha 0.35 导致力导过弱"的因果链不成立，报告修复建议"alpha 提到 0.8~1"将毫无效果。
+  - 但力导参数确有失衡：默认 edgeStrength=50/nodeStrength=1000/gravity=10，代码覆盖为 edgeStrength 0.45（削弱约 99%）、nodeStrength -280（斥力量级约为默认 1/4），gravity 保持默认 10 拉向中心 → 向心>斥力的中心坍缩风险真实存在。严重度：高（作为"节点堆叠"的候选根因方向，但正确修法是调 gravity/nodeStrength/edgeStrength 或换 d3-force/预设布局，而非调 alpha）。
+  - 验证：node_modules 静态证据即可；或浏览器里 `graph.getLayout()` 无。
+
+  **R4 标签配置矛盾**: 配置矛盾属实但因果权重低.
+  - G6 base-node 默认 labelWordWrap:false、labelMaxWidth:'200%'（base-node.js:235-237）；label* 前缀经 subStyleProps 传给 Label shape → @antv/g Text；wordWrap=false 时 wordWrapWidth/maxLines/textOverflow 不参与换行管线 → labelMaxWidth:168、labelMaxLines:5、labelTextOverflow:'clip' 基本失效（AdvancedRelationGraph.vue:345-348）。矛盾属实。但标签文本已由 formatGraphNodeLabel 预换行（graphTransform.ts:148-188，显式 \n、≤5 行、每行 ≤7 字），所以多行展示不依赖 G6 wordWrap，"不换行导致 maxLines 无效"不造成功能性后果。标签互叠是节点堆叠的次生现象（labelPlacement bottom + offsetY 8，节点重叠则标签必叠）。"漂浮中文标签"更可能是被压在墨团里的节点的标签外露，而非 preset/force 坐标混用——force 模式 graphData() 不写 x/y（AdvancedRelationGraph.vue:332 仅在 preset 时写），同一次渲染内不存在坐标混用。严重度：低。验证：`grep -n "labelWordWrap" frontend/node_modules/@antv/g6/lib/elements/nodes/base-node.js`。
+
+  **R5 SVG 降级 fallback**: 确认有问题.
+  - graphLoadPolicy.ts:19-20 阈值 220 节点/320 边，30 行强制切 svg（报告引 graphLoadPolicy.ts:22 行号略偏，22 行是 isAggregationViewMode）。RelationGraph.vue:445-451：layout computed 对 force/layered 一律落到 buildLayered（450 行），explore（force）切 SVG 后语义确实错位成网格。buildLayered 列距 260/行距 92（329-332 行）；节点标签渲染在圆心下方 width/2+14+lineIndex*15（模板 79 行），formatGraphNodeLabel 最多 5 行名+2 行 tech+计数 ≈ 最多 ~6 行 × 15px ≈ 90px，加上半径 21-33px → 标签底缘可达圆心下 ~120px > 行距 92px → 跨行压叠算术上必然发生（密集分组时）。严重度：中。另注意 applyGraphLoadPolicy 只在 loadData 非 overview 分支（index.vue:670）和 loadChain（745 行）调用，overview 分支不触发降级。
+
+  **R7 el-segmented 不可达**: 无独立问题（P1 的次生现象）+ 一个次生 UX 问题.
+  - GraphToolbar.vue:4 的 el-segmented 无 v-if，无条件渲染；element-plus 2.11.5（package.json:69）正常渲染 .el-segmented DOM。但 GraphToolbar 整体被包在 index.vue:9 `<template v-if="!isErrorState && state !== 'loading'">` 里——首屏 loading 期间和 P1 错误面板期间工具栏不存在，querySelector 必然 null。复现脚本在错误面板状态下测量 → null，是 P1 的后果而非 Element Plus 版本/条件渲染缺陷。真实用户在健康会话中能点到。衍生问题：错误面板隐藏整个工具栏，用户只剩「重试/重置条件」，两者都回到 overview 再次超时 → 死循环，无法切到 explore 自救。严重度：低（控件本身）/中（错误态死循环 UX）。验证：健康状态下 `document.querySelector('.el-segmented')` 应非 null。
+
+  **R8 meta 口径错位**: 确认有问题.
+  - overview 非 object 分支 meta = _graph_meta(matched_assets, matched_assets, len(edges), matched_assets > len(nodes), ...)（graph.py 1711-1720 区间）：total_relations/matched_relations 实为 AssetTable 计数（12702），returned_relations 实为聚合边数（1），truncated 实为「表数 > 聚合节点数」。与全局图端点（graph.py:977-999，total_relations=AssetRelation 计数）语义不一致，前端 GraphToolbar.vue:91-95 会把这些显示为「总数 12702 / 命中 12702 / 返回 1 / 已截断」——误导。与报告 ov_probe 实测值（12702/12702/1/truncated=true）完全吻合，反向坐实。严重度：低（纯展示口径，不影响数据正确性，但加剧用户对"图谱坏了"的观感）。
+
+  Verification commands I can suggest. Should I actually try running anything? The backend dev server might be running; curl to overview would need auth token — skip; code evidence suffices.
+
+  Write the final review in Chinese, structured per item with verdict + reason + severity + evidence/verification.
+
+To resume this session: kimi -r session_13122694-a402-46f8-86c0-a9978c6aea70

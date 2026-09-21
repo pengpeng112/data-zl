@@ -1,0 +1,517 @@
+• Let me read the plan file and the referenced files to review.
+
+• I need to review this plan against the user's requirements and check facts. Let me check key reference files and verify claims in the plan:
+
+  1. Root directory contents — check _tmp_* count, tar.gz files, subdirectories
+  2. 取数/exports — check the 4 unnumbered directories, numbering
+  3. 开发起步包/README.md — numbering, output_r* dirs
+  4. tools/ — capture scripts count
+  5. check_doc_index.py — does it exist, what does it check
+  6. dev_env.sh — domain-baseline mechanism
+  7. frontend root scattered files
+  8. AGENTS.md rules — e.g., "禁止新建平行状态总表" — does repo_manifest.json violate that? README says "禁止再新建平行状态总表" for 文档管理. The manifest is machine-readable index, might conflict.
+  9. 取数 export rule: "发现未编号或不符的任务目录，按本规则补编号/整理后在 README 目录更新记录登记" — the plan complies.
+  10. 184 复盘报告 — check claims.
+
+  Also check the user's original ask: "搜索下github没有什么方式能够更好地规范" — typo probably "有没有什么方式". The plan did research. Also "结合这个项目的历史聊天记录" — plan references 184号复盘 which analyzed 35 sessions — reasonable proxy, but did the plan author actually use chat records? The plan claims to rely on 184 report. Also user asked "待审方案" review only — I'm reviewing, not executing.
+
+  Note: the user requirement original quote in the plan (§0) differs from what was given to me — the plan's quote includes "其中调用 codex 请使用 5.6 sol low模式进行分析即可" which is not in the requirement given to me. The version I received doesn't include that codex phrase. Minor discrepancy — actually the version given to me says "搜索下github没有什么方式" without the codex line. The plan's embedded quote has extra text about codex. This could be faithful to a different original. I should note it.
+
+  Let me verify facts in the repo. I'll run several checks in parallel.
+
+AGENTS.md
+CLAUDE.md
+GIT_SETUP.md
+_offline_build_123
+_tmp_certcheck.py
+_tmp_certcheck2.py
+_tmp_certcheck3.py
+_tmp_certcheck4.py
+_tmp_drg_ssh.py
+_tmp_j10_contract.py
+_tmp_j7_apply.py
+_tmp_j7_fix_layer.py
+_tmp_j7_fix_metrics.py
+_tmp_j7_inspect.sh
+_tmp_j7_query.py
+_tmp_j7_smoke.py
+_tmp_j7_smoke2.py
+_tmp_j7_unused.py
+_tmp_j7_unused2.py
+_tmp_j7_unused3.py
+_tmp_j7_verify.py
+_tmp_j7_verify_release.sh
+_tmp_j8_demo_analysis.py
+_tmp_j9_ai_perm.py
+_tmp_j9_ai_perm2.py
+_tmp_j9_grant_ai.py
+backend
+deploy
+drivers
+frontend
+qa-report-20260909
+r178_dist.tar.gz
+r181_dist.tar.gz
+review
+start_backend.bat
+start_frontend.bat
+tools
+verify
+三仓库互通地图.md
+三仓库检查处理提示词-数据资产.md
+三仓库问题清单与评审提示词.md
+取数
+开发起步包
+===
+22
+10、规培基地数据提取
+11、三规范数据提取
+12、职称晋升工作量统计
+13、心衰PLOS研究数据提取
+1、医保
+20260730市场监督管理费用明细
+20260730质量控制部药占比
+3、移动护理
+4、其他指标提取
+5、财务
+6、抗菌办
+7、设备科
+9、药学部
+PCCM统计
+===
+48项目核心制度
+START_HERE.md
+_query_context
+_query_inbox
+_query_outbox
+_query_quarantine
+_query_results
+_query_synced
+_query_templates
+_query_working
+exports
+工作量日报
+/f/python/数据资产/开发起步包/output_r163
+/f/python/数据资产/开发起步包/output_r165
+/f/python/数据资产/开发起步包/output_r166
+/f/python/数据资产/开发起步包/output_r167
+/f/python/数据资产/开发起步包/output_r169
+/f/python/数据资产/开发起步包/output_r170
+/f/python/数据资产/开发起步包/output_r171
+/f/python/数据资产/开发起步包/output_r173
+/f/python/数据资产/开发起步包/output_r174
+/f/python/数据资产/开发起步包/output_r177
+/f/python/数据资产/开发起步包/output_r178
+/f/python/数据资产/开发起步包/output_r180
+/f/python/数据资产/开发起步包/output_r181
+/f/python/数据资产/开发起步包/output_r185
+/f/python/数据资产/开发起步包/output_r186
+===
+15
+/f/python/数据资产/tools/analyze_newsrc7_view_relations.py
+/f/python/数据资产/tools/capture_186_screens.py
+/f/python/数据资产/tools/capture_ai_patrol_gif.py
+/f/python/数据资产/tools/capture_competition_ai_demos.py
+/f/python/数据资产/tools/capture_competition_screens.py
+/f/python/数据资产/tools/capture_four_governance_screens.py
+/f/python/数据资产/tools/capture_governance_gifs.py
+/f/python/数据资产/tools/check_186_production_readiness.py
+/f/python/数据资产/tools/check_doc_index.py
+/f/python/数据资产/tools/check_instruction_drift.py
+/f/python/数据资产/tools/check_test_environment.py
+/f/python/数据资产/tools/collect_186_readonly_baseline.py
+/f/python/数据资产/tools/export_value_domains_json.py
+/f/python/数据资产/tools/export_zcode_conversations.py
+/f/python/数据资产/tools/fancyhis_attr_extract.py
+/f/python/数据资产/tools/fancyhis_dnfile_scan.py
+/f/python/数据资产/tools/fancyhis_sql_extract.py
+/f/python/数据资产/tools/glm_flash.py
+/f/python/数据资产/tools/import_core_48_metrics.py
+/f/python/数据资产/tools/intake_query_dir_relations.py
+/f/python/数据资产/tools/multi_ai_evidence.py
+/f/python/数据资产/tools/queryctl.py
+/f/python/数据资产/tools/register_doc.py
+/f/python/数据资产/tools/s9_e2e_r174.py
+===
+27
+• Facts so far:
+  - Root: _tmp_* count = 22 (plan says "17+个" — 22 fits "17+"). But also root has files the plan's §1 doesn't mention: `start_backend.bat`, `start_frontend.bat`, `三仓库互通地图.md`, `三仓库检查处理提示词-数据资产.md`, `三仓库问题清单与评审提示词.md`, `GIT_SETUP.md`, `review/`, `verify/`, `取数/`, `开发起步包/`. The plan §3.1 target structure lists "根/AGENTS.md CLAUDE.md GIT_SETUP.md ← 入口（不动）" and core dirs, but omits `三仓库互通地图.md`（AGENTS.md explicitly references it as L2 单一权威源 at root）and the two `三仓库*` prompt files and `start_*.bat`. Where do they go in the plan? §3.1 tree doesn't include them. The 验收总清单 says "根目录仅 3 入口文件 + 10 核心目录 + 2 新归拢目录" — but actual root has at least 6 files (3 entry + 三仓库互通地图.md + 2 more 三仓库 md) + start_*.bat. So §5's acceptance criterion contradicts reality unless those files are moved too — plan doesn't address them. That's a real gap/inconsistency.
+
+  Also `三仓库互通地图.md` must stay at root per AGENTS.md ("本仓库根目录"). Plan's §3.1 omits it — significant.
+
+  - 取数/exports: 15 dirs listed: numbered 1,3,4,5,6,7,9,10,11,12,13 (11 numbered), unnumbered: 20260730市场监督管理费用明细, 20260730质量控制部药占比, PCCM统计 (3). Plan says "任务目录 14 个（4 个无编号...及编号 2 缺位）" — counts "4 个无编号" but lists 3 names + "编号 2 缺位" as the 4th? That's muddled: number 2 missing isn't an "unnumbered directory". Also actual count is 15 dirs, plan says 14. And plan §3.2 proposes numbering 14,15,16 continuing "exports 现最大号" = 13, ok. But §5 says "exports 17 个任务目录全部编号合规" — where does 17 come from? Current 15 dirs. Inconsistent with §1's 14 and actual 15. Also note missing numbers 2 and 8 — plan mentions 2 but not 8.
+
+  - output_r* dirs: 15 actual (plan says 15 ✓). Plan §3.3 says keep "最近 3 轮（r180/r181/r185/r186）" — that's 4 rounds listed, labeled "最近 3 轮" — internal inconsistency.
+
+  - 数据资产_* packages: 15 actual, plan says 17. Discrepancy. Wait, my count: `ls -d 开发起步包/数据资产_* | wc -l` = 15. Plan says 17. Let me double check — the tree shows 数据资产_关系图谱, 七系统, 四系统, 新HIS逆向, 资产包, HIS_READY二次优化包, HIS_READY复核包, HIS_READY治理导入包, HIS_READY专项核查包 + "... and 223 more". 223 more?? 开发起步包 has 130 top-level MD + dirs. Hmm 223 more entries in 开发起步包. My ls -d counted only 数据资产_* = 15. Plan says 17. Minor factual error.
+
+  - tools: actual 27 .py files (plan says 48 个文件 — maybe includes tests/ and __pycache__; tools/ has 27 py + tests/ dir + __pycache__). Plan says "48 个文件" total which could include tests. capture_* scripts: actual 6 ✓ (capture_186_screens, capture_ai_patrol_gif, capture_competition_ai_demos, capture_competition_screens, capture_four_governance_screens, capture_governance_gifs). Plan says 6 ✓.
+
+  - frontend root files: need to check build.log etc.
+
+  - backend counts: app 383 / scripts 190 / tests 380 — plausible, check quickly.
+
+  - check_doc_index.py exists ✓, register_doc.py ✓, dev_env.sh — where? Plan references dev_env.sh `--domain-baseline`. Need to check it exists.
+
+  - 184号复盘 report — check existence and claims about "中断点八类" and 并行互踩.
+
+  - 取数/START_HERE.md — check the numbering rule and whether plan §3.2 complies. Rule says 序号 = exports 下现有最大序号 +1 — plan complies (14,15,16).
+
+  - The plan's embedded user quote includes "其中调用 codex 请使用 5.6 sol low模式进行分析即可" which is NOT in the requirement text given to me. The version I received ends "我回让别的ai按照这个计划进行整理处理". So either the plan author quoted a different/fuller original, or added it. Given the task says "首节内嵌该需求原文", discrepancy worth flagging — but possibly the requirement I received was abridged. I'll flag as a discrepancy to verify, not assert fabrication.
+
+  - "搜索下github" research: plan §8 lists sources — agents.md, ADR, Diátaxis, dbt, docs-as-code. Reasonable coverage. Can't verify they actually fetched but plausible.
+
+  - AGENTS.md conflicts: 
+    - "禁止再新建平行状态总表" — repo_manifest.json: is it a parallel status table? README is the sole authoritative catalog for 开发起步包 docs. The manifest duplicates README catalog info in machine-readable form. Risk: dual-source drift, which plan acknowledges for sub-AGENTS but not for manifest vs README. Actually AGENTS.md says 禁止新建平行状态总表 for 文档管理. A generated manifest (build artifact, regenerated) is arguably a derived view not a parallel authoritative table — but plan says "建议入库" (commit it), which makes it a checked-in snapshot that can drift. Flag this tension; suggest generation-on-demand or CI check.
+    - "任何 AI 每次会话开始时先做只读目录自检" — manifest helps.
+    - 文档新增规则 requires README registration — plan P5 includes README 更新记录 ✓.
+    - Moving `output_r*` to `_archive/`: AGENTS.md says 无用文档迁移 "只迁不删" to `_archive/` with records — complies. But grep references requirement ✓.
+    - `_scratch/` and `artifacts/` gitignored: check whether r178_dist.tar.gz etc. are currently git-tracked. Plan §6.4 handles: "若已被 git 跟踪则保持跟踪并仅移动位置" — but then putting them under a gitignored artifacts/ dir is contradictory: git mv a tracked file into a gitignored directory keeps it tracked (gitignore doesn't affect tracked files), fine actually. But new files added there won't be tracked. OK.
+    - drivers/ jar: moving drivers/ into artifacts/ — is drivers/ referenced anywhere (deploy scripts)? Need grep.
+    - qa-report-20260909 moving to artifacts/ — check references.
+    - `.release_r169_20260830/`, `.video_agent/`, `.zcode/`, `.agents/`, `.ssh/` — plan keeps .agents/.ssh/.zcode in core dirs (§3.1 lists them) ✓ but `.video_agent/` is listed in §1 as problematic yet §3.1 tree doesn't mention where it goes — not in core dirs list, not in artifacts list. Gap. Also `.pytest_cache/` deletion fine.
+    - frontend build logs moved to root artifacts/? Plan says artifacts/ at root gets frontend logs — cross-directory move, fine but odd; better frontend/artifacts or logs dir. Minor.
+
+  - backend/_oa_work, _plan139_work etc gitignored — plan mentions _oa_work only.
+
+  - "改动尽早占位提交" — from 184; but AGENTS.md says no git commit without explicit ask. Plan §3.5.3 proposes adding a rule encouraging early commits — conflicts with the "DO NOT run git commit unless explicitly asked" boundary? Adding a rule to AGENTS.md that says agents should commit early could conflict with authorization gates. Actually the boundary rules say git push/tag needs approval; commits also per system prompt need explicit request. Flag.
+
+  - P0 "基线文件落 review/ 外的工作记录" — vague.
+
+  - 验收 "check_doc_index 三目录联检 error=0（既有 181 他人域除外）" — need check what check_doc_index does; does it currently pass?
+
+  - The requirement mentions "历史聊天记录 对话" — plan relies on 184号复盘 (35 sessions analysis). Reasonable, but should verify 184 exists and says that.
+
+  - Requirement emphasis "特别是查询 和md文件" — plan covers 取数 SQL (§3.2) and 开发起步包 MD (§3.3) ✓.
+
+  - "便于不同agent ai快速获取" — manifest + 守护表 + 子AGENTS ✓.
+
+  - Missing from plan: 取数/ has other dirs: 48项目核心制度, 工作量日报, _query_* — plan doesn't address 散 SQL location precisely. §1 says "SQL/TXT 共 212 个" across 取数; §3.2.2 addresses "取数/ 顶层历史散 SQL/TXT（exports 外）". Top-level of 取数 has only dirs + START_HERE.md per listing... Actually `ls 取数/` shows no loose SQL at top level. The 212 SQL/TXT must be inside exports and other dirs. Plan §3.2.2 says "顶层历史散 SQL/TXT" — may be factually wrong about location. Need to check where loose SQLs are.
+
+  Also `工作量日报` and `48项目核心制度` dirs — not exports task dirs; plan doesn't mention them. Minor gap.
+
+  Let me verify: frontend root files, backend counts, dev_env.sh existence, 184 report, loose SQL in 取数, git status of tar.gz, references to drivers/qa-report.
+
+Dockerfile
+LICENSE
+README.en-US.md
+README.md
+build.log
+build2.log
+commitlint.config.js
+dev.err
+dev.log
+eslint.config.js
+index.html
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+postcss.config.js
+stylelint.config.js
+tests
+tsconfig.json
+typecheck.log
+types
+vite.config.ts
+vitest.log
+审查_grok.err
+审查_grok.raw
+drivers/Vastbase-G100-2.15_pg-2026033109.jar
+===tracked-count
+1773
+===status
+ M .agents/skills/docare-anesthesia-readonly-sql/SKILL.md
+ M .agents/skills/hisuser-readonly-sql/SKILL.md
+ M .agents/skills/hisuser-readonly-sql/references/connection-guide.md
+ M .agents/skills/mobile-nursing-readonly-sql/SKILL.md
+ M .agents/skills/ods-readonly-sql/SKILL.md
+/f/python/数据资产/取数/START_HERE.md
+===
+/f/python/数据资产/取数/48项目核心制度/48项核心制度_电子病历指标_总SQL.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/06_纯电子病历指标月度统计.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/07_手术与电子病历指标月度统计.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/08_三级二级医师查房频次.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/09_非计划再次手术疑难讨论候选统计.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/10_非计划再入院疑难讨论候选统计.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/11_电子病历指标最终SQL总入口.sql
+/f/python/数据资产/取数/48项目核心制度/历史参考与过程文件/过程与废弃SQL汇总.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标01_患者入院48小时内转科率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标02_患者入院8小时内查房率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标03_三级医师查房频次达标率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标04_二级医师查房频次达标率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标05_术者术前24小时查房完成率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标06_术者术后24小时查房完成率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标07_术前知情同意书签署完成率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标08_知情同意书签署时间规范率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标09_知情同意书签署顺序规范率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标10_诊疗方案决策权审核率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标13_二三级护理出院率.sql
+/f/python/数据资产/取数/48项目核心制度/指标SQL/指标16_非计划再次手术疑难讨论率.sql
+===count
+212
+180_G13分域提交与G1G3生产发布一次性执行计划.md
+180_G13提交与G1G3发布_执行报告.md
+180_G13提交与G1G3发布_结果.json
+181_003531签名模式报错根因排查与双向修复记录.md
+182_手麻急诊登记住院次错配致无纸化漏采分析与修正方案.md
+183_AI协作指令收敛与重复流程自动化开发计划.md
+184_AI协作复盘_高频流程沉淀与中断分析报告.md
+185_AI协作收敛剩余任务一次性执行计划.md
+185_执行报告.md
+185_执行报告_结果.json
+186_系统功能与菜单体验重构_执行报告.md
+186_系统功能与菜单体验重构_结果.json
+186_系统功能与菜单体验重构一次性执行计划.md
+187_多任务取数会话纪要与挂起事项.md
+===
+/f/python/数据资产/tools/dev_env.sh
+• Findings:
+  - frontend root: plan §1 says "根散文件 36 个" — actual non-dir files: Dockerfile, LICENSE, README.en-US.md, README.md, build.log, build2.log, commitlint.config.js, dev.err, dev.log, eslint.config.js, index.html, package.json, pnpm-lock.yaml, pnpm-workspace.yaml, postcss.config.js, stylelint.config.js, tsconfig.json, typecheck.log, vitest.log, 审查_grok.err, 审查_grok.raw = 21 files + dirs (tests, types). "36 个" likely counts all entries. The logs/审查 files listed ✓ correct. OK.
+  - git: tar.gz files NOT tracked (only drivers jar matched). So r178/r181 tar.gz are untracked; git mv won't work on them — plan P1 says "git mv 24+ 项" but untracked files need plain mv. §6.4 partially acknowledges. Minor technical inconsistency: `git mv` fails on untracked files.
+  - drivers jar IS git-tracked. Moving drivers/ → artifacts/ (gitignored) — tracked file in ignored dir stays tracked, works with git mv. OK but then .gitignore of artifacts/ with tracked files inside is confusing; acceptable.
+  - 取数: no loose SQL at top level (only START_HERE.md). Loose SQLs live in 48项目核心制度/ and 工作量日报/ etc. Plan §3.2.2 says "取数/顶层历史散 SQL/TXT（exports 外）" — mischaracterizes location; actual work is judging SQLs inside non-exports dirs (48项目核心制度, 工作量日报). Also SQL/TXT total 212 matches plan's 212 ✓ but they're mostly inside exports? My count was across all of 取数 including exports. Let me not over-derive; the count matches.
+  - dev_env.sh exists at tools/dev_env.sh ✓ (exit code 1 from grep no match in backend/scripts, fine).
+  - 184 report exists ✓. Should read relevant part to verify "中断点八类" and "并行互踩" claims.
+
+  Check 184 report and README 取数 rule + check_doc_index current state. Also verify "output_r 保留最近 3 轮（r180/r181/r185/r186）" — 4 items mislabeled. And 数据资产_* count = 15 not 17. Let me recount carefully — maybe some are files not dirs./f/python/数据资产/开发起步包/数据资产_HIS_READY专项核查包
+/f/python/数据资产/开发起步包/数据资产_HIS_READY二次优化包
+/f/python/数据资产/开发起步包/数据资产_HIS_READY复核包
+/f/python/数据资产/开发起步包/数据资产_HIS_READY治理导入包
+/f/python/数据资产/开发起步包/数据资产_HIS源端资产包
+/f/python/数据资产/开发起步包/数据资产_HRP源端资产包
+/f/python/数据资产/开发起步包/数据资产_JHEMR_Vastbase资产包
+/f/python/数据资产/开发起步包/数据资产_OA源端资产包
+/f/python/数据资产/开发起步包/数据资产_ODS_HIS归一优化包
+/f/python/数据资产/开发起步包/数据资产_ODS核心表治理导入包
+/f/python/数据资产/开发起步包/数据资产_七系统源端资产包
+/f/python/数据资产/开发起步包/数据资产_关系图谱
+/f/python/数据资产/开发起步包/数据资产_四系统源端资产包
+/f/python/数据资产/开发起步包/数据资产_新HIS逆向资产包
+/f/python/数据资产/开发起步包/数据资产_资产包
+===
+53:## 5. 任务 4：中断点清单（Agent 卡点与预防，均已映射处置）
+60:| 并行互踩 | 测试库 schema 被清/僵尸 pytest（006/019 等 6 会话）；他人域 hunk（031/017）；发布窗口竞态（180 先于守卫提交） | --domain 基线；全量前清点 pytest；改动尽早提交占位 |
+===
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""check_doc_index.py — 开发起步包目录唯一检查器（185 号 C1；183-S2）。
+
+识别五种登记形态：编号正文 `NN_*.md` / 同号配套（`NN_*_结果.json`、
+`NN_*_执行报告.md` 等）/ 同号输出目录 `output_rNN/` / README 组合登记
+（反引号区间与列表，如 `` `61`–`67`、`71`、`87`–`89` ``）/ `_archive/`
+归档条目（归档记录表按编号覆盖，文件名可省编号前缀、允许 28b/29/29c 变体）。
+
+检查：孤儿（实际有、README 未登记）、幽灵（README 登记、任何位置无文件）、
+同号多正文（README 同号标记或逐文件登记=已识别形态；否则待人工核对）、
+缺类别（首行非 `> 类别：`）、归档孤儿/归档幽灵、主目录与归档同名残留。
+
+`tools/register_doc.py --check` 复用本模块解析函数（唯一规则源，防双检查器漂移）。
+
+默认只读报告；`--fix` 默认 dry-run，写 README 必须显式 `--files`（只补登记
+模板行，绝不自动归档、移动或删除）。
+
+已知良性（白名单，勿报）：
+- 150 号：用户已确认结束（2026-09-05），正文已删、README 登记行保留作历史说明。
+- 根级 CLAUDE.md：AGENTS.md 的纯转发入口，不属于本目录编号体系（扫描范围
+  仅为 开发起步包/，不会产生该发现，此处留档防止后续误纳）。
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+# 幽灵白名单：编号 -> 良性原因
+GHOST_WHITELIST = {
+    150: "已删仍登记：用户确认课题结束（2026-09-05），README 行保留作历史说明",
+}
+
+BACKTICK_FILE = re.compile(r"`(\d{1,3})_[^`]+`")
+BACKTICK_RANGE = re.compile(r"`(\d{1,3})`\s*[–—-]\s*`(\d{1,3})`")
+BACKTICK_BARE = re.compile(r"`(\d{1,3})`")
+Confirmed:
+  - 数据资产_* dirs = 15, plan says 17. Factual error (or counts something else).
+  - 184 report does contain 并行互踩 row with "改动尽早提交占位" ✓ (in table). "中断点八类" — §5 heading "中断点清单"; need not verify exact count of 8.
+  - check_doc_index exists and scope is only 开发起步包/. Plan P4 extends to 取数/artifacts 联检 — plausible extension.
+  - START_HERE.md grep for exports/编号 returned nothing before "===" — wait, output shows "===" first then check_doc_index content. The grep printed nothing! So 取数/START_HERE.md has no mention of exports or 编号? Odd. The numbering rule is in AGENTS.md ("取数导出目录规则"). Let me check START_HERE.md content quickly.
+
+  Also plan §3.2 says template "并入 取数/START_HERE.md" — need to see if START_HERE exists and is the right place. It exists. Fine.
+
+  Let me quickly check START_HERE.md head and check whether exports dirs contain README already, and check 187 doc (多任务取数会话纪要) maybe relevant. Also verify git tracked status of _tmp files — none tracked (git ls-files grep showed only drivers jar). So all _tmp_*, tar.gz, _offline_build_123, .release_r169, qa-report are untracked → "git mv" won't work; need plain mv. Plan P1 says git mv 24+ items — technically wrong for untracked. Also "git status 可见纯 rename" won't hold for untracked→ignored moves (they'd just disappear from untracked list). Acceptance criterion flawed.
+
+  Check exports README presence.# 取数工作区（126 查询资产闭环）
+
+> 所有 AI 开始日常取数、保存 SQL、复用指标或修订口径前，必须先读本文件与根目录 `AGENTS.md`、`开发起步包/126_AI查询SQL与统计指标闭环治理建设计划.md`。
+
+## 硬规则
+
+1. 平台是唯一事实源；本目录是缓存与交接，不是权威库。
+2. 用户要求日常取数、复用、修订或保存时，SQL 必须进入查询资产流程（检索、编写和本地校验，不必然提交平台）；按用户目标和已有授权决定是否保存、提交或执行。仅编写/审阅/解释 SQL 且未要求保存或执行时不提交平台。结果默认不保存（`result_storage: none`），仅按需保存小型汇总。
+3. 只允许单条 `SELECT` / 只读 CTE；禁止 DML/DDL/存储过程/锁表/无界大表扫描。
+4. 用户已授权提交后，平台自动门禁通过的查询版本成为现行版本，不另设管理员确认；门禁失败进入 `blocked/candidate`。这不取消草稿执行、关系/值域确认、指标/产品发布等现有人工审批。
+5. 参数（月份、科室等）只产生 run，不产生新 version；SQL/口径变化必须新 version。
+6. 不把凭据、姓名、身份证、电话、地址、患者明细写入外网 AI、SQL 注释、日志或 Git。
+7. JOIN 证据优先正式关系 / active 配方；历史 SQL JOIN 走 `sql-relation-intake`，不得直接写正式关系。
+
+## 推荐目录
+
+| 目录 | 用途 |
+|---|---|
+| `_query_working/` | 正在编写 |
+| `_query_inbox/` | AI/人工新提交 |
+| `_query_outbox/` | 已校验待同步 |
+| `_query_synced/` | 已同步到平台 |
+| `_query_quarantine/` | 风险/错误包 |
+| `_query_context/` | 脱敏上下文缓存 |
+| `_query_templates/` | 模板 |
+| `48项目核心制度/` | 现有试点 SQL（保留，不自动移动） |
+
+## 命令
+
+```powershell
+===READMEs
+HIS医保稽查数据sql.txt
+化验结果.txt
+医保飞检数据提取———病理.txt
+影像检查.txt
+飞检-创建表及导库(1).sql
+-- 10、规培基地数据提取:
+1.sql
+2.sql
+3.sql
+4.sql
+5.sql
+6.sql
+-- 13、心衰PLOS研究数据提取:
+26263WEX4-选题立项书-调整-9.9.pdf
+README.md
+_build_external_template.py
+hf_extract
+外院数据提取模板（外部验证中心）.xlsx
+外院数据提取要求（外部验证中心）.md
+-- 20260730市场监督管理费用明细:
+01_门诊诊疗项目费用明细_只读.sql
+02_住院诊疗项目费用明细_只读.sql
+住院_诊疗项目费用明细_202401.xlsx
+住院_诊疗项目费用明细_202402.xlsx
+住院_诊疗项目费用明细_202403.xlsx
+住院_诊疗项目费用明细_202404.xlsx
+-- PCCM统计:
+PCCM新冠患者_2026上半年.csv
+PCCM结核患者_2026上半年.csv
+Key finding: START_HERE.md's 推荐目录 table explicitly says `48项目核心制度/` = "现有试点 SQL（保留，不自动移动）". Plan §3.2.2's 散 SQL 收编 could conflict with this "保留，不自动移动" rule if applied to 48项目核心制度. The plan targets "顶层历史散 SQL/TXT" which don't exist at top level; the actual SQL/TXT outside exports are inside 48项目核心制度/ and 工作量日报/ — and 48项目核心制度 is explicitly protected. So plan §3.2.2's premise ("顶层历史散 SQL") is factually wrong about location; and its收编 scope risks clashing with START_HERE's explicit rule unless scoped carefully. Significant.
+
+  Also most exports task dirs lack README (1、医保 has no README; 10、规培 has none visible; 13、心衰 has README). Plan's README-header requirement is apt.
+
+  Numbered dirs: 1,3,4,5,6,7,9,10,11,12,13 — missing 2 and 8. Plan mentions 编号 2 缺位 but not 8. §5 says "exports 17 个任务目录" — actual 15 dirs; even after renumbering 3 unnumbered → 14,15,16, the count stays 15 dirs. "17 个" unexplained. And plan §1 says "任务目录 14 个" — actual 15. Recount: 10,11,12,13,1,3,4,5,6,7,9 = 11 numbered + 3 unnumbered = 14? Wait my ls listed: 10、规培基地数据提取, 11、三规范数据提取, 12、职称晋升工作量统计, 13、心衰PLOS研究数据提取, 1、医保, 20260730市场监督管理费用明细, 20260730质量控制部药占比, 3、移动护理, 4、其他指标提取, 5、财务, 6、抗菌办, 7、设备科, 9、药学部, PCCM统计 = 14 dirs! Let me count: 10,11,12,13 (4), 1 (5), 20260730市场 (6), 20260730质控 (7), 3 (8), 4 (9), 5 (10), 6 (11), 7 (12), 9 (13), PCCM (14). Yes 14 dirs. I miscounted earlier. So plan §1 "任务目录 14 个" ✓ correct. "4 个无编号" listing 3 names + 编号2缺位 — still muddled wording: only 3 unnumbered dirs; 编号2缺位 is a gap not an unnumbered dir. Also missing 8 not mentioned.
+
+  Then §5 "exports 17 个任务目录" — after补编号 there'd be 14 dirs numbered up to 16 (skipping 2,8). "17 个" is wrong; should be 14. Unless they plan to also收编 48项目核心制度 etc.? No. So §5 has an arithmetic error.
+
+  Now AGENTS.md 取数 rule: "序号 = exports 下现有最大序号 +1" — max is 13, so new dirs get 14,15,16 ✓ plan complies.
+
+  output_r count = 15 ✓ plan says 15. §3.3 "保留最近 3 轮（r180/r181/r185/r186）" — lists 4. Mislabel. Also plan §1 says "output_r* 证据目录 15 个" ✓.
+
+  数据资产_* = 15, plan §1 says 17 ✗.
+
+  Root: plan §1 "散文件 34 个" — actual files: AGENTS.md, CLAUDE.md, GIT_SETUP.md, 22 _tmp_*, r178, r181, start_backend.bat, start_frontend.bat, 三仓库互通地图.md, 三仓库检查处理提示词, 三仓库问题清单与评审提示词 = 3+22+2+2+3 = 32 files. Plus maybe others. "34" close. _tmp count "17+" — actual 22 ✓ (says 17+).
+
+  §3.1 tree core dirs: "backend/ frontend/ deploy/ tools/ review/ verify/ 取数/ 开发起步包/ .agents/ .ssh/ .zcode/" = 11 dirs. But omits .video_agent/ (mentioned in §1 as issue, then nowhere assigned), .git (fine), and root files start_backend.bat/start_frontend.bat/三仓库互通地图.md/三仓库检查处理提示词/三仓库问题清单与评审提示词 unassigned. §5 acceptance "根目录仅 3 入口文件 + 10 核心目录 + 2 新归拢目录" — but tree lists 11 core dirs (backend frontend deploy tools review verify 取数 开发起步包 .agents .ssh .zcode = 11), and at least 三仓库互通地图.md must stay at root per AGENTS.md (L2 单一权威源, root). So acceptance list is internally inconsistent (10 vs 11) and misses required root files. Executing AI would be confused.
+
+  Also .zcode/ — is it a core dir? It's tool config (.zcode = zcode AI). Keeping it is fine.
+
+  Coverage check vs requirement:
+  ①现状乱 — covered §1.
+  ②多AI — covered §3.5, 184.
+  ③结合历史聊天记录与文件实况 — plan uses 184号复盘 (35会话/11311消息分析) as the chat-record evidence, plus 当日实测. Reasonable. But note: the requirement said "结合这个项目的历史聊天记录 对话及文件情况" — plan did not itself re-read chat records; relies on 184. Acceptable proxy, but should be stated as limitation? Plan §7 does cite 184. OK-ish; flag as moderate.
+  ④GitHub 调研 — §2/§8, reasonable set. Note "搜索下github没有什么方式" — typo in original; plan interpreted as 调研GitHub通行做法 ✓.
+  ⑤查询+MD 重点 — §3.2/§3.3 ✓.
+  ⑥后期管理+快速获取 — manifest §3.4, 守护表 ✓.
+  ⑦详细方案+计划交另一 AI 执行 — §4 ✓ with batches/验收/回滚.
+
+  Added scope (私自加戏?): 
+  - backend/frontend 子 AGENTS.md — beyond user's ask? User asked about 规范文件, esp 查询和md, for multi-AI. Sub-AGENTS.md arguably in scope (多agent快速获取). Not 加戏.
+  - tools/capture grouping — minor, in scope (脚本规整).
+  - check_doc_index 扩展 — supporting.
+  - "改动尽早占位提交" rule addition — this imports a git-commit behavior rule; conflicts with the repo's "git mutations need explicit user confirmation each time" boundary and system rules. Adding a standing rule to AGENTS.md encouraging early commits could erode the authorization gate. Flag as risk; also user didn't ask to change collaboration rules. Borderline 加戏 + safety concern.
+
+  Other issues:
+  - §3.4 manifest "建议入库" (commit) vs AGENTS.md "禁止再新建平行状态总表". A checked-in generated JSON duplicating README catalog = parallel status table risk; better generated on demand + CI drift check. Plan doesn't address this tension. Flag.
+  - P1 "git mv 24+ 项" — most target items (_tmp_*, tar.gz, _offline_build_123, .release_r169, qa-report, frontend logs) are untracked (git ls-files shows only drivers jar tracked among them). git mv fails on untracked files; and §5 "git status 可见纯 rename" impossible for untracked→ignored moves. Technical error in plan. Also moving untracked files into gitignored dirs makes them invisible to git — fine but "保留历史" claim (§4 执行边界 "全程 git mv 保留历史") is wrong for untracked files — no history exists.
+  - drivers jar is tracked; moving to gitignored artifacts/ keeps it tracked — but then .gitignore ignoring a dir containing tracked files is confusing; also is drivers/ referenced by deploy docs? Should grep. Let me check references quickly for drivers and qa-report.
+  - frontend logs → root artifacts/: moving files across projects into root artifacts mixes frontend junk into root; simpler to keep frontend/logs/ or delete (logs are regenerable). Plan chose mv — fine, but placement arguable. Minor.
+  - qa-report-20260909 contains 问题记录.md/修复记录.md — is it referenced? It looks like an active QA record (2026-09-09, two days ago). Moving to artifacts/ may break references and it may still be in use. Plan lists it as "一次性验收目录" — but dated 2 days ago, could be ongoing. Risk.
+  - .release_r169_20260830 hidden dir into artifacts ✓ fine.
+  - _scratch gitignored but files untracked already — moving _tmp_* into _scratch means they stay on disk; fine. But "可能被翻查" ok.
+  - P2 acceptance "check 工具通过" — check_doc_index currently only scans 开发起步包; 取数 checking doesn't exist until P4. So P2 acceptance references a tool capability delivered in P4 — ordering inconsistency. Actually P2 says "check 工具通过" maybe refers to future ext; still sequencing issue.
+  - §3.2.1 renaming "14、市场监督管理费用明细" etc. — complies with AGENTS rule ✓, and moving date prefix into README 口径字段 — reasonable. But rule also requires "在 README 目录更新记录登记" — plan P5 includes README 更新记录 ✓ (though that's 开发起步包 README; the 取数 rule says "在 README 目录更新记录登记" meaning 开发起步包 README per AGENTS context — plan should be explicit; minor).
+  - §3.3 output_r 保留 "最近 3 轮（r180/r181/r185/r186）" — 4 rounds; also r181 listed both in §1 as 他人域 (181 家族 WIP, "他人域文件零触碰…181 家族") in §4 执行边界! Contradiction: §3.3 wants to archive/move output_r* except recent, while §4 says 181 家族 is 他人域 zero-touch. output_r181 would presumably be kept (recent) so no move — but if any 181-family files were in move set it'd conflict. Since keep list includes r181, OK, but the boundary mention "181 家族" vs P3 moving output_r163–r178 — need grep references. Plan does require grep before move ✓.
+  - "最近 3 轮" should probably be "最近 4 轮" or keep r180+ — editorial error.
+  - Manifest query_code 列表 requires parsing README of task dirs — depends on P2 README 补全; ordering fine (P4 after P2) ✓.
+  - §5 "check_doc_index 三目录联检 error=0（既有 181 他人域除外）" — check_doc_index currently passes? Unknown; extending to 取数/artifacts is new dev. OK.
+  - Plan didn't address `取数/工作量日报/` and `48项目核心制度/` placement relative to exports numbering rule — these are non-exports dirs; fine to leave, but §3.2.2's "散 SQL" scope ambiguity noted.
+  - 前端 审查_grok.raw/.err — external AI review artifacts; moving fine.
+  - GIT_SETUP.md kept as entry ✓.
+  - CLAUDE.md kept ✓ (check_doc_index whitelist mentions it).
+  - Plan §2 ADR row: "编号文档增加被替代→归档注明惯例" — aligns with AGENTS §4 无用文档迁移 ✓.
+  - Missing: 55 plan / README updates — P5 covers README 更新记录 ✓.
+  - The user requirement quote in §0 includes "其中调用 codex 请使用 5.6 sol low模式进行分析即可" — not present in the requirement text I was given. Either the plan author had the fuller original (likely, since they're the one who received it) or added. Given my prompt says 方案.md 首节内嵌该需求原文 and my received text lacks the codex clause, flag as a discrepancy to confirm, low severity. Also "我回让别的ai" typo preserved ✓ faithful.
+
+  Also check: does anything reference qa-report-20260909 or drivers? Quick grep. And check git check-ignore for _tmp? Also confirm tar.gz untracked — yes, git ls-files grep only showed drivers jar.
+
+  Let me do one final grep round for references to the move targets.
+
+开发起步包/README.md:79:| P0 | `178_177收口后可执行改进一次性执行计划.md` + 同号 `_执行报告.md`/`_结果.json` | **执行完成（2026-09-04 晚 R0→R7；生产未发布）**：R1 夜跑 **FAIL 呈报**（RUN-b3324c242e78 仍熔断但维度=max_change_ratio，F-1 放行 update 后例行 resync 比例维度仍炸，根治=G3 发布 F-2）；C6 GraphToolbar 单向数据流（vue/no-mutating-props 归零）、C7 alembic 自建 schema（隔离库 no-op 实证）、L1 台账↔探查互链①②③全部落地（零新增后端）；后端专项 17/0、前端 278/278+build 三绿；R5 未选表现 SKIP、两问未答记仍开、等待域 G1–G17 全量（output_r178/） | 177 收口后仍可单会话落地的改进执行入口；提示词在其 §6 |
+开发起步包/README.md:92:| P0 | `173_全栈一次性模拟测试问题发现计划.md` + 同号 `_问题清单.md`/`_结果.json` | **已执行完成（2026-09-01 一次性单会话 T0→T6 全批；只测不修）**：四线+三补充全跑——C 契约比对 99.0% 覆盖路径/方法漂移 0、A 规则扫 10 条、S 全路由探针 1328 次/395 路由 5xx=0 旁路=0、写成功路径 38 用例 37 过、RBAC 68 检查 0 违规、健康 12/12、typecheck/build 过、V 薄弱页 18/18；问题 **P1×1（import170 重灌未重置序列→隔离库写审计端点全 500，根因-修复-复验闭环）+P2×2（新建系统列表不可见 CANONICAL 过滤；6 写按钮 v-perms 不一致）+P3×8+不确定项×3**，待主 AI 裁决修复；证据 `output_r173/`（exceptions W1-W5；他人域 16 文件哈希终检一致） | 全栈模拟测试问题发现：期望码表+副作用黑名单（63 端点）先行，纯平台库写端点成功路径断言 |
+开发起步包/README.md:116:| `172_CDMS无纸化用户权限模型与下乡名单核对.md` | 证据链 | **源端用户权限模型（后续 AI 速查）**：CDMS 用户-权限三层模型（T_MSS_EMP_DICT 用户 / T_MSS_AUTHMAPPING 权限映射 / KESHID 科室字典），三大陷阱（FUSER=操作人恒 admin 被授权人在 FID、FUSERSTATE 恒 0 无停用语义、EMP_DEPT/USERTOCATEGORY 空壳表）+ 每用户 5 行权限模板（FTYPE 0/2/3/5/10）；关系已落平台复核草稿 id 99-101（C 级 draft，转正式需复核）；附 2026-08 下乡 33 人核对结论与补权限幂等 SQL（output_r171/cdms_grant_missing.sql） |
+开发起步包/README.md:230:| `output_r170/`（import170.py 重灌工装；170 号无编号正文文档） | 工装 | 隔离库全量重灌标准件（12702 表/1329 关系/178547 字段/107 序列重置）；全量 pytest 后按 AGENTS 惯例重灌 |
+开发起步包/README.md:270:| 2026-09-06 晚 | 185 收口后四项决策落地（用户拍板） | ①N1b：docare 每日清单 --dry-run 补跑重生（0→1251B，4 组全人工裁决、零自动修订候选；ORA-12541=ODS 00:10 时段性，09-07 晨检并入 N1③；cron/告警未动）；②N2 孤儿排班交手术室人工作废（平台侧零改动）；③S4 接线：multi-review/multi-verify 全局技能引用 tools/multi_ai_evidence.py（仓库外文件不进 Git）；④目录卫生：19 份老文档补 `> 类别：` 首行、`output_r170/` 工装行登记（check_doc_index 新增反引号 output_rNN/ 形态识别+测试）、125 改同号双文件登记、补 project-task-resume 技能行——check_doc_index 复跑 error1/warn1/info17（剩余 181 文档+output_r181 归并行身份线会话）。tools/tests 37P。详见 185_执行报告.md §10。 |
+开发起步包/README.md:291:| 2026-09-04 晚 | 178 号一次性执行完成（R0→R7） | 按提示词执行：R1 夜跑 FAIL 呈报（RUN-b3324c242e78 维度 max_change_ratio 仍熔断，未调阈值，归 G3）；C6 GraphToolbar 单向数据流（13 处受控+changeDisplay emit 化+父组件 Object.assign，no-mutating-props 归零）；C7 alembic env.py 自建 schema（tests/alembic_env 4 用例+隔离库 no-op）；L1 台账↔探查互链①②③（sourceRef.ts 纯函数+两页 scoped-slot+finding_id 消费+listQualityObservations 反查按钮，零新增后端）；门禁后端专项 17/0+全量见报告、前端 typecheck+278/278+build 三绿；R5 未选表现 SKIP、开工两问未答记仍开；等待域 G1–G17 全量呈报。新增同号 `_执行报告.md`+`_结果.json`+output_r178/ 五件套。 |
+开发起步包/README.md:294:| 2026-09-03 晚 | 177 号代码批一次性执行完成（R0→R7） | 按提示词执行：R2 修 173/171 五缺陷（import170 序列重置端到端复验 ingest 500→200；系统 readback 根因修正=非 CANONICAL 分区返回 upper() 编码，改回库内原值；6 按钮 v-perms；图谱边标签 edgeLabelText 兜底链；配方 create 非法表 422；C6 GraphToolbar 白名单冲突 WARN 跳过）；R3 身份线 I1 FFREE3/I2 登录签名子任务复核通过，**176 F-2 实现**（托管圈例行 resync 单列不计 max_update，存在性检查失败回退旧口径，9 测试含 110 人双向锁定）；门禁后端全量 1415P/1S/0F、身份专项 126P/0F、前端 typecheck+267/267+build 三绿；隔离库重灌+107 序列对齐；他人域 13 文件哈希零触碰。R1 夜跑未到时点延后、R5 CDMS 表现未选 SKIP；零 Git 写/零发布/零业务源写。新增同号 `_执行报告.md`+`_结果.json`+output_r177/ 四件套。 |
+开发起步包/README.md:299:| 2026-09-02 | 174 号 S0–S10 一次性执行完成（开发与隔离验收） | 五表+状态机+归并+RBAC/数据范围+三前缀 API+导出+种子+前端四页全落地；迁移 d5e6f7a8b9c0 往返对称、种子二次 apply 零新增、后端 1397P/0F、前端 262P+三件套、S9 十三场景 13/13；生产迁移/种子/部署待授权（W1/W2）；四条未核验规则 detector 保持 blocked（W3）。新增同号 `_执行报告.md`+`_结果.json`，工件 output_r174/ |
+开发起步包/README.md:305:| 2026-09-02 | 172 号补执行：下乡人员无纸化权限补齐 27/27 | 用户授权按每日同步任务处理；根因=legacy_unmanaged 存量分类被夜间管线排除；生产容器内同 env 定向 reconcile（24 align+3 建户），run RUN-f2513dc373c1，独立复核 ALL_27_OK；赵慧工号存疑留人工；工装归档 output_r171/ |
+开发起步包/README.md:325:| 2026-09-01 | 用户授权：生产↔本地最新表双向同步完成 | 经隧道只读核对生产现状（26 系统/12767 表/1329 关系/178547 列/77 值域/422 质量规则）：①隔离库 data_asset_test 补齐生产新增 65 张 dbo|dbo|* ECG 元数据表（保留生产 id、id 冲突 0），补后六指标与生产完全一致，反向（本地→生产）多余项 0=无回推项；②机器可读资产包 数据资产_资产包/ 三 CSV 全量刷新到生产现状（tables 865→12767 行、columns 26894→178547 行、relationships 103→1329 行），旧包 865 条治理注记（domain/grain/pk/confidence/note/source=curated|metadata）按 schema+table 全部保留、新行 source=platform，旧文件备份 .bak.20260901，manifest.json 重写（行数/字节/sha256+同步来源注记）；catalog.json（策展摘要）与 value_domains.json（08-29 已最新）不动。生产零写入；脚本与证据 output_r171/sync_tables_20260901*.py/json。 |
+===
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.*
+node_modules/
+dist/
+.DS_Store
+*.log
+.idea/
+.vscode/
+.pytest_cache/
+dev.log
+dev.err
+.eslintcache
+# AI 本地状态默认忽略，仅跟踪经审核的仓库级技能。
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/ops-runbook/
+!.agents/skills/ops-runbook/**
+!.agents/skills/ods-readonly-sql/
+!.agents/skills/ods-readonly-sql/**
+!.agents/skills/hisuser-readonly-sql/
+!.agents/skills/hisuser-readonly-sql/**
+!.agents/skills/mobile-nursing-readonly-sql/
+!.agents/skills/mobile-nursing-readonly-sql/**
+!.agents/skills/docare-anesthesia-readonly-sql/
+!.agents/skills/docare-anesthesia-readonly-sql/**
+• Important: README references output_r170, output_r171, output_r173, output_r174, output_r177, output_r178 extensively — plan §3.3 says grep before move and keep referenced ones; so most old output_r dirs are referenced in README and skills → they'd stay in place, meaning §3.3's archiving goal largely self-defeats. The plan anticipates this ("被引用者留原位") — but then the actual reduction is small. Worth noting the expected outcome may be near-zero moves, making P3 low value. Also check_doc_index recognizes output_rNN as registered companions tied to README registration — moving them to _archive requires README re-registration; plan covers (P3 README 登记更新).
+
+  Also .gitignore already ignores *.log, dev.log, dev.err, .pytest_cache — so frontend build.log etc are already ignored (untracked). And _tmp files untracked. So P1 "git mv" largely inapplicable; plain mv needed. Confirmed technical flaw.
+
+  The background grep is still running; its result will arrive. It's checking references to qa-report-20260909, drivers/Vastbase, _offline_build_123, release_r169. I should wait for it before finalizing? It will notify. I can't do much else meanwhile — I have enough for the review; but the reference check on qa-report/drivers matters for risk assessment of P1 moves. I'll wait for the notification... Actually the instruction says don't poll; continue current work. I can draft, but final answer should include that result. Since I have nothing else pending, and the notification arrives as a new message, I could just end my turn with partial... Better: the notification will come; but if I reply now, the review would be incomplete. Hmm. The grep over 开发起步包 (large) may take a while. I could do a faster targeted grep on key files instead. Let me just do quick targeted greps that finish fast: AGENTS.md, deploy/, tools/ for drivers and qa-report.
+
+• Only one reference: 171 结果.json references one of the move targets (probably release_r169 or _offline_build_123). Minor — a JSON evidence file reference. So reference surface for P1 moves is small but non-zero; plan's grep-before-move covers it.
+
+  Now I have enough. Write the review conclusion in Chinese, structured: overall verdict, coverage check, then issue list with severity, each citing plan sections and evidence.
+
+To resume this session: kimi -r session_56c9c38d-5a50-4f74-a3a5-9eaa0dbc81e1

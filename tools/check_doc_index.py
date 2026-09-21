@@ -147,7 +147,179 @@ def archive_registry_numbers(archive_readme_text: str) -> set[int]:
     return nums
 
 
-def run_checks(pkg: Path) -> dict:
+def scan_archive_outdirs(pkg: Path) -> list[str]:
+    """round-10 扩展：_archive/ 下 output_r*/ 等子目录（归档证据目录形态，目录级登记即可）。"""
+    archive_dir = pkg / "_archive"
+    if not archive_dir.is_dir():
+        return []
+    return sorted([d.name for d in archive_dir.iterdir() if d.is_dir()])
+
+
+EXPORTS_TASK = re.compile(r"^(\d+)、")
+EXPORTS_WHITELIST = {"_templates"}
+
+
+def check_exports_numbering(repo: Path) -> tuple[list[dict], str]:
+    """round-10 扩展（仅本机有效）：取数/exports 任务目录编号合规。
+
+    规则（AGENTS 2026-09-08）：任务目录须 `序号、中文名`；`_templates` 为白名单；
+    编号缺位合法（历史空号）仅提示。取数/ 属 gitignored 区，克隆后本项无效。
+    """
+    exp = repo / "取数" / "exports"
+    if not exp.is_dir():
+        return [], "取数/exports 不存在（非本仓布局，跳过）"
+    findings: list[dict] = []
+    nums: set[int] = set()
+    for d in sorted(exp.iterdir()):
+        if not d.is_dir():
+            continue
+        m = EXPORTS_TASK.match(d.name)
+        if m:
+            nums.add(int(m.group(1)))
+        elif d.name not in EXPORTS_WHITELIST:
+            findings.append({"severity": "error", "code": "exports_unnumbered", "num": 0,
+                             "detail": f"exports 任务目录无编号：{d.name}/（规则：序号、中文名；白名单 {sorted(EXPORTS_WHITELIST)}）"})
+    for n in sorted(nums):
+        if n > 1 and (n - 1) not in nums and n not in (1,):
+            findings.append({"severity": "info", "code": "exports_gap", "num": n,
+                             "detail": f"exports 编号 {n} 前存在空号 {n-1}（历史空号合法，仅提示）"})
+    note = "exports 联检仅本机工作区有效（取数/ 为 gitignored）"
+    return findings, note
+
+
+INDEX_ARROW_LINK = re.compile(r"→\s*`([^`]+)`")
+INDEX_BACKTICK = re.compile(r"`([^`]+)`")
+INDEX_CMD = re.compile(r"^(python|pnpm|npm|npx|git|bash|cd|pip|poetry)\b", re.I)
+INDEX_CACHE_PREFIXES = ("tools/.cache/",)
+INDEX_ROOT_FILES = {
+    "AGENTS.md", "INDEX.md", "CLAUDE.md", "GIT_SETUP.md", ".gitignore",
+}
+INDEX_ROOT_DIRS = {
+    "review", "verify", "artifacts", "_scratch", "backend", "frontend",
+    "tools", "取数", "deploy", "drivers",
+}
+
+# 兼容旧名：历史测试/调用若引用 INDEX_LINK，等同箭头形式
+INDEX_LINK = INDEX_ARROW_LINK
+
+
+def _index_is_command(s: str) -> bool:
+    s = s.strip()
+    if INDEX_CMD.match(s):
+        return True
+    parts = s.split()
+    return bool(parts) and bool(INDEX_CMD.match(parts[0]))
+
+
+def _index_looks_like_path(s: str) -> bool:
+    raw = s.strip()
+    if not raw or raw.startswith("http") or _index_is_command(raw):
+        return False
+    if any(ch in raw for ch in "*?"):
+        return False
+    core = raw.rstrip("/")
+    if "/" in raw or raw.endswith((".md", ".py", ".json", ".ts", ".vue", ".sh", ".bat", ".txt")):
+        return True
+    if core in INDEX_ROOT_FILES or core in INDEX_ROOT_DIRS:
+        return True
+    return False
+
+
+def extract_index_link_targets(text: str) -> list[str]:
+    """抽出 INDEX 应校验的路径：想做X表第二列反引号 + 全文箭头形式路径。"""
+    seen: list[str] = []
+
+    def add(raw: str) -> None:
+        t = raw.split("#")[0].strip().split("（")[0].strip()
+        if t and t not in seen and not _index_is_command(t):
+            seen.append(t)
+
+    for raw in INDEX_ARROW_LINK.findall(text):
+        add(raw)
+
+    in_route = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            in_route = "想做" in line
+            continue
+        if not in_route or not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        if "想做什么" in cells[0] or cells[0].startswith("---"):
+            continue
+        for raw in INDEX_BACKTICK.findall(cells[1]):
+            add(raw)
+    return seen
+
+
+def check_index_links(repo: Path) -> list[dict]:
+    """round-10 扩展：INDEX「想做X读Y」表第二列路径 + 箭头形式路径存在性（断链=warn）。
+
+    环境相关 `~/...`、gitignored 本地缓存缺失记 info，不升 warn。
+    """
+    idx = repo / "INDEX.md"
+    if not idx.is_file():
+        return []
+    findings: list[dict] = []
+    for t in extract_index_link_targets(idx.read_text(encoding="utf-8")):
+        if not _index_looks_like_path(t):
+            continue
+        posix = t.replace("\\", "/")
+        if t.startswith("~"):
+            if Path(t).expanduser().exists():
+                continue
+            findings.append({
+                "severity": "info", "code": "index_env_link", "num": 0,
+                "detail": f"INDEX.md 环境相关路径本机不存在（不记断链）：{t}",
+            })
+            continue
+        if (repo / t).exists():
+            continue
+        if posix.startswith(INDEX_CACHE_PREFIXES):
+            findings.append({
+                "severity": "info", "code": "index_cache_missing", "num": 0,
+                "detail": f"INDEX.md 指向本地缓存未生成（可运行 build_repo_manifest.py）：{t}",
+            })
+            continue
+        findings.append({
+            "severity": "warn", "code": "index_broken_link", "num": 0,
+            "detail": f"INDEX.md 指向不存在：{t}",
+        })
+    return findings
+
+
+H1_TITLE = re.compile(r"^#\s+(.*)$")
+
+
+def check_number_title(pkg: Path, state: dict) -> list[dict]:
+    """round-10 扩展：编号-标题一致性（文件名 NN_标题 vs 正文一级标题前导编号，错配=warn 提示）。
+
+    实证样例：187 号文件正文一级标题仍为"150、…"（187 号纪要 §0 已登记）。
+    规则：一级标题存在前导数字且 ≠ 文件编号 → warn；无前导数字不判（标题自由）。
+    """
+    findings: list[dict] = []
+    h1_num = re.compile(r"^(\d+)")
+    for num, names in sorted(state["body"].items()):
+        for name in names:
+            try:
+                text = (pkg / name).read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            h1 = next((H1_TITLE.match(ln).group(1).strip() for ln in text.splitlines() if H1_TITLE.match(ln)), "")
+            if not h1:
+                continue
+            m2 = h1_num.match(h1)
+            if m2 and len(m2.group(1)) >= 4:
+                continue  # 4 位以上前导数字视为年份（如 2026…），非编号
+            if m2 and int(m2.group(1)) != num:
+                findings.append({"severity": "warn", "code": "number_title_mismatch", "num": num,
+                                 "detail": f"{name} 正文一级标题前导编号「{m2.group(1)}」≠ 文件编号 {num}（疑似沿用旧标题）"})
+    return findings
+
+
+def run_checks(pkg: Path, repo: Path | None = None) -> dict:
     """执行全部检查，返回机器可读报告。发现项 severity：error/warn/info。"""
     readme = pkg / "README.md"
     readme_text = readme.read_text(encoding="utf-8")
@@ -250,9 +422,22 @@ def run_checks(pkg: Path) -> dict:
                  "detail": f"同名文件同时存在于主目录与 _archive（迁移不完整）：{dup}"}
             )
 
+    # 7) round-10 扩展：_archive 子目录（归档证据目录，info 登记）
+    for dname in scan_archive_outdirs(pkg):
+        findings.append({"severity": "info", "code": "archive_subdir", "num": 0,
+                         "detail": f"_archive/ 含子目录 {dname}/（归档证据目录，目录级登记）"})
+
+    # 8) round-10 扩展：exports 编号联检（仅本机）+ INDEX 断链 + 编号-标题一致性
+    ext_note = ""
+    if repo is not None:
+        exp_findings, ext_note = check_exports_numbering(repo)
+        findings.extend(exp_findings)
+        findings.extend(check_index_links(repo))
+    findings.extend(check_number_title(pkg, state))
+
     sev_rank = {"error": 0, "warn": 1, "info": 2}
     findings.sort(key=lambda f: (sev_rank[f["severity"]], f.get("num", 0), f["code"]))
-    return {
+    report = {
         "package": str(pkg),
         "stats": {
             "body_numbers": len(body),
@@ -267,6 +452,9 @@ def run_checks(pkg: Path) -> dict:
         },
         "findings": findings,
     }
+    if ext_note:
+        report["extensions_note"] = ext_note
+    return report
 
 
 def print_report(report: dict) -> None:
@@ -367,7 +555,7 @@ def main(argv: list[str] | None = None) -> int:
             print("--fix 缺少 --files：默认 dry-run，不写任何文件（写 README 须显式文件列表）")
         return apply_fix(pkg, files, dry_run=not files)
 
-    report = run_checks(pkg)
+    report = run_checks(pkg, repo=root)
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:

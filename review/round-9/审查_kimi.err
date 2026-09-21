@@ -1,0 +1,278 @@
+• The user wants a read-only review of review/round-9/方案.md and deadlock_crosscheck.md. Let me read those files.
+
+• Now I need to verify the plan against the source. Key checks:
+
+  1. Coverage/fidelity of 方案.md vs deadlock_crosscheck.md and user requirement.
+  2. My own independent issues.
+
+  Things to verify in the repo:
+  - Does the nightly script exist: `/app/scripts/run_identity_modified_nightly.py` — check backend/scripts locally.
+  - The docker exec env vars match `/etc/cron.d/data-asset-identity-nightly` — the plan says "逐项一致", but the plan R3 command lacks `-i` and uses plain `docker exec` without `-t`. Also crosscheck §4 uses `-i` for stdin python; R3 runs a script file so no -i needed.
+  - Potential discrepancy: plan §1 says "ratio=110/99=1.111>0.3" matches crosscheck. Good.
+  - Plan §1 says "窗内 129 名真实变更者...过滤后 110 候选" — crosscheck §3 says 129 rows MODIFIEDTIME > window, candidates 110. OK.
+  - Plan §1 "阈值实测：candidates 114<200" — crosscheck says candidates 114<200 too (§2 #6: candidates 114<200, update 110<150, deactivate 4<20). Note: CANDIDATES=110 in §3 but check shows 114 (110+4). OK.
+  - Plan target ② says watermark advance to ≥2026-08-27 18:57, expected ≈2026-09-05 08:47:41. Crosscheck says ≥08-27 18:57. But wait — the max MODIFIEDTIME in window = 2026-09-05 08:47:41 per plan §1. Crosscheck §3 says HIS MODIFIEDTIME>=09-05 → 1 人. Consistent.
+
+  Potential issues I should hunt:
+
+  1. **The R3 command's env var set may not actually match the crontab** — need to check if the repo contains a copy of `/etc/cron.d/data-asset-identity-nightly`. Search deploy/ for that.
+
+  2. **Missing `-e` vars**: Does the cron file include database connection env vars? The docker exec without them inherits container env (docker exec inherits the container's environment), so cron file might include extra vars. Check.
+
+  3. **Watermark advance mechanism**: the plan claims one success pushes watermark to max candidate MODIFIEDTIME (2026-09-05). Need to verify `advance_watermark` uses candidate max. Check code identity_watermark.py / orchestrator.
+
+  4. **deactivate=4 with JHEMR password write enabled** — the plan enables `APP_IDENTITY_JHEMR_PASSWORD_WRITE_ENABLED=true` which is a write to JHEMR business system. Hard boundary 4 says "业务源库（HIS/JHEMR/CDMS）零直连；一切经平台容器既有通道" — but the sync itself writes to JHEMR (deactivate locks accounts in JHEMR). That's the platform's own channel, fine. But it contradicts a naive reading. Also the nightly normally does this, so OK.
+
+  5. **Timing contradiction**: Plan §4 R3 says "白天执行", R5 says "09-07 02:25 当夜自然验证" — but today is 09-06. If R3 runs 09-06 daytime, then "当夜" would be 09-07 02:00 cron. Consistent. But §1 says nightly at 02:00 — R5 at 02:25 might be too early if run takes 1-5 min... fine.
+
+  Wait — actually current date per environment is 2026-09-05T22:58 UTC, which is 2026-09-06 06:58 Beijing. Plan dated 09-06. OK.
+
+  6. **R5 scheduling**: "可排程定时任务" — the executing AI would need a cron/reminder; fine.
+
+  7. **The plan's §0 quotes user requirement** — user requirement says "我让别的ai进行执行" and requirement points at deadlock_crosscheck.md. The plan covers it. Check for "私自加戏": R2 pg_dump backup — crosscheck §5 includes it as 前置, so not added. R6 says products to `output_r180/flush/`. Not in crosscheck explicitly but reasonable; also "不改 55/README" consistent with crosscheck footer.
+
+  8. **Potential technical issue: `APP_IDENTITY_CB_MAX_CHANGE_RATIO=2.0`** — need to verify the env var name exists in code. Grep backend for `CB_MAX_CHANGE_RATIO`.
+
+  9. **Threshold margin**: ratio threshold override 2.0 vs actual 1.111 — margin fine. But R1 guard says "若 update>140 → STOP" — 150 threshold. OK. But what if by execution time MODIFIEDTIME changes? HIS recent counts low (§3: 09-06 → 0 人）. OK.
+
+  10. **Deactivate risk**: plan §7.2 says 4 deactivates = design. But JHEMR lock is a business-system write — user requirement's crosscheck explicitly includes it (§2 #5, §5 预期效果）. Covered.
+
+  11. **A subtle issue**: plan §1 states "五维阈值实测：candidates 114<200" — but the run would recompute; if 110 update + 4 deactivate = 114 candidates; threshold max_candidates=200. OK.
+
+  12. **Possible gap**: The plan doesn't verify whether the nightly script `run_identity_modified_nightly.py` supports being run manually in daytime and whether `APP_IDENTITY_NIGHTLY_ENABLED=false` + provider=host_cron combination actually allows a manual run (maybe the script checks enabled flag and exits?). Need to check script code. This is a real potential failure: setting NIGHTLY_ENABLED=false might cause the script to skip! Let me check.
+
+  13. Also check whether `check_thresholds` reads env var at import time vs runtime — if the threshold is bound at module import via settings, `-e` env works since settings read env at process start. Fine, docker exec starts new process.
+
+  14. Crosscheck §5 says "B 会话给出的完整命令可用" — plan reproduces the command. Verify it includes all 8 env vars listed: PROVIDER, NIGHTLY_ENABLED, PYTHONPATH, SYNC_ENABLED, JHEMR_PASSWORD_WRITE, CDMS_FID, PHASE_D, DIRECT_CONNECTION + added ratio. Plan R3 has all 8. ✓.
+
+  15. One mismatch: crosscheck says W10 precedent "112 候选一次性放行成功" vs plan §1 same. OK.
+
+  16. Plan R0 requires image `data-asset:r181-20260905`. Crosscheck mentions r181 guard grep=2 but plan R1.2 requires grep -c ≥1 while crosscheck says grep=2 — minor loosening; crosscheck §4 row 4 says grep=2. Plan says ≥1. Minor inconsistency, low risk but worth noting (a grep count of 1 vs 2 could mean partial deploy of guard; crosscheck evidence says 2).
+
+  17. Potential missing: plan never mentions verifying no parallel session writes (§9 mentions 182 线 "执行时避开同窗写平台库" — open item noted, good).
+
+  18. Security: pg_dump via container env parsing, "口令仅入变量" — fine. But R2 dumps to /opt/data-asset/... on the server — contains personal data? Backup is standard practice （惯例）. OK.
+
+  19. Does plan address "治本随下次发布"? Yes §8 mirrors crosscheck §6, including G2 书面追认 and F-3. Crosscheck §6 items: ratio 分子， 分母， P3-2/P3-3, bare except WARN, G2 追认. Plan §8 adds F-3 降级评估 (from crosscheck §7 开放项）. Fine.
+
+  Now verify code facts. Let me grep the backend.
+
+• Env var name: config.py field `identity_cb_max_change_ratio` → pydantic BaseSettings env name likely `APP_IDENTITY_CB_MAX_CHANGE_RATIO` if env_prefix="APP_". Verify config prefix. Also check whether settings is cached and read at process start — docker exec new process, fine.
+
+  Check the script: does it check APP_IDENTITY_NIGHTLY_ENABLED or provider flags? The script itself doesn't reference them; but `run_nightly_pipeline` might check sync enabled / provider. Need to check orchestrator for gating on settings like identity_sync_enabled, scheduler provider, nightly enabled. If `APP_IDENTITY_NIGHTLY_ENABLED=false` causes pipeline to skip/misconfigured, R3 command would fail. But presumably this is the same env as the actual cron file — and cron runs nightly successfully (well, it runs and trips breaker, meaning it runs). Since cron job uses NIGHTLY_ENABLED=false + PROVIDER=host_cron and the nightly actually executes (fails on breaker, not on "disabled"), the flags are consistent. Still, let me verify quickly how these flags gate.
+
+  Also check watermark advance logic: on success, watermark advances to what? Check identity_watermark.advance_watermark and orchestrator call.Confirmed: `advance_watermark` only commits on success — root cause matches. Env prefix `APP_` confirmed → `APP_IDENTITY_CB_MAX_CHANGE_RATIO` is the right env var. Watermark advances to `max_watermark` of candidates — plan's expectation ≈ max MODIFIEDTIME (2026-09-05 08:47:41) plausible; need to see what items feed max_watermark at orchestrator:714. Let me read orchestrator around lines 500-730 to check the threshold logic, scope denominator, and what candidate set feeds advance_watermark. Also lines 542-575 for gating.
+
+  Also check around line 600-640 for the deactivate override at 632, and check_thresholds at 516.Key findings from code:
+
+  1. `check_thresholds` ratio numerator = new + update + deactivate = 0+110+4=114, scope=99 → ratio=114/99=1.152, not 110/99=1.111! Wait — crosscheck says ratio=1.111 computed as update/scope=110/99. But code line 515: `change_ratio = (stats.get("new",0) + stats.get("update",0) + stats.get("deactivate",0)) / scope`. With stats["deactivate"] overwritten to 4 (line 631), ratio = (0+110+4)/99 = 114/99 = 1.1515. The crosscheck and plan both claim ratio=1.111 (110/99). That's a factual discrepancy!
+
+  Let me double check. Line 515: `change_ratio = (stats.get("new", 0) + stats.get("update", 0) + stats.get("deactivate", 0)) / scope`. Yes. new=0, update=110, deactivate=4 → 114/99 = 1.1515. The claimed "1.111" and "唯一失败维度 ratio=110/99" is wrong arithmetic per code. Both are >0.3 and both <2.0, so the conclusion (override 2.0 suffices) still holds. But plan §1 states "ratio=110/99=1.111>0.3" — inaccurate per code; actual 1.152. Also crosscheck §2 #2 says "B 正确且已精确实测：scope=99、update=110、ratio=1.111" — claims "实测" via §4 reproduction script which runs real `check_thresholds`... but §4 script prints `check_thresholds(c + d, s)` — the returned value would show value=1.152. Hmm, unless the reproduction actually returned 1.111, meaning scope isn't 99 or numerator differs. Wait — maybe in actual data new=0, update=110, deactivate=4, scope=99 → 1.1515. If the printed value were 1.111, then numerator=110, meaning stats["deactivate"] wasn't included... but code includes it. Unless scope computed differently. Hmm, but the check_thresholds uses `scope = max(int(stats.get("scope", total)), 1)`. stats["scope"] from _compute_change_stats = count of persons with source_create_date>=MANAGED_SINCE, active, eligible classes = 99.
+
+  So actual ratio should be 1.152. The docs claim 1.111 = 110/99, which equals update/scope without deactivate. So the crosscheck's "精确实测" claim appears inconsistent with the code path. This is a real finding: either the §4 reproduction output was misrecorded, or... Let me verify: does `check_thresholds` maybe not include deactivate? Line 515 clearly includes it. Also note max_deactivate check at line 512 happens BEFORE ratio check; deactivate=4<20 passes.
+
+  Impact: conclusion unchanged (both 1.111 and 1.152 exceed 0.3 and are below 2.0 override; margin remains). But plan's "五维阈值实测 ratio 1.111" is arithmetically wrong vs code; also plan R1's STOP condition "update>140" — fine. And override 2.0 margin: if more changes accumulate by execution time, ratio = (110+x+4)/99; 2.0 allows up to ~198 numerator — still capped by max_update=150 and max_candidates=200. OK.
+
+  Also B session's "ratio≈1.15" was actually right per code, and the "裁决" said B's ratio claim correct but "精确实测 1.111" — B said 1.15! Table row 2: B 主张 "ratio≈1.15、scope=99<候选110，分子可大于分母". 裁决： "B 正确且已精确实测：scope=99、update=110、ratio=1.111". So B's 1.15 matched code arithmetic (114/99=1.1515), and the "精确" 1.111 is actually the less accurate number. Interesting — the adjudication praised 1.111 as precise but 1.15 was the code-consistent value. Good catch to report.
+
+  2. `run_nightly_pipeline` with refresh_source=True runs `sync_his_identity` — a fresh HIS collection. That means during R3, the collection refreshes person_sources from HIS, so MODIFIEDTIME values as of execution time. Fine.
+
+  3. Watermark advance (line 705-722): candidate_wm = max over candidates' modified_time. Advances to max MODIFIEDTIME in window (2026-09-05 08:47:41 expected). But note: advance happens only `if failed_count == 0 and watermark_rows`. If even 1 candidate fails, watermark does NOT advance and run status="failed". Plan R3 hard boundary 3 says if failed → no retry, STOP. Good.
+
+  But subtlety: after a successful run advancing watermark to 09-05 08:47, the next nightly window = watermark−24h = 09-04 08:47. Any MODIFIEDTIME in (09-04 08:47, ...] re-selected. HIS counts: MODIFIEDTIME>=09-04 → 2 人， >=09-05 → 1 人. So next nightly candidates ≈ small (1-2). Matches "候选个位数". OK.
+
+  However — wait, there's a subtlety about whether watermark advancing only on `failed_count==0` creates risk: R4.2 says "若仍=08-28 02:57 → 异常呈报". Fine.
+
+  4. Gating: `APP_IDENTITY_NIGHTLY_ENABLED=false` — line 544: if nightly_enabled, providers add "apscheduler". With provider=host_cron and nightly_enabled=false, providers={host_cron}, single → OK, no misconfigured. Good — matches plan. If both were set, it'd be misconfigured. So R3 env set is coherent with code.
+
+  Also there are "gates" at line 1542-1543 in some other function (probably preflight/gate check) requiring identity_sync_enabled=true and nightly_enabled=false. R3 includes SYNC_ENABLED=true and NIGHTLY_ENABLED=false. Consistent.
+
+  5. `_fetch_jhemr_existing_emp_nos` returns None on failure → fail-closed: all candidates treated as... line 436: `if jhemr_existing is not None and not c.get("modified_time"): resync else update`. With None, all managed → update; non-managed → new (line 440-443: align requires jhemr_existing not None). So if JHEMR check fails during R3, new count could jump → max_new=50 breaker could trip → run fails. That's fail-closed, fine. But note the plan relies on existence check working (crosscheck §2 #4 verified probe OK).
+
+  6. Threshold check happens AFTER refresh_source collection — good, reflects current data.
+
+  7. Another important check: `check_thresholds(candidates + deactivate_candidates, stats)` — total = 110+4=114 < 200 ✓.
+
+  8. Ratio override 2.0: is `identity_cb_max_change_ratio` read from env at process start? config.py BaseSettings with env_prefix APP_ → yes, `APP_IDENTITY_CB_MAX_CHANGE_RATIO=2.0` works. Confirmed name matches.
+
+  9. Plan R1.2: grep -c skip_configured ≥1 vs crosscheck says grep=2. Minor.
+
+  10. Plan R0: image must be `data-asset:r181-20260905`. Can't verify locally. OK.
+
+  11. Now check the cron env list — is there a copy in repo to verify "逐项一致"? Search for data-asset-identity-nightly in repo.
+
+  Also check: R3 command lacks `-e APP_IDENTITY_SYNC_DIRECT_CONNECTION=true`? No wait, it has it (line 55). It has all 8 listed in crosscheck §5. Good.
+
+  One more potential issue: plan §3 boundary 1 says "唯一允许的生产写操作=R4 的一次性 docker exec" — but the docker exec is R3, not R4! §3.1 says "R4 的一次性 docker exec" while §4 defines the write at R3. R4 is 后置核验 (read-only). That's an internal inconsistency/typo — section numbering error in the hard boundary. Executing AI might get confused. Good catch.
+
+  Also R2 backup is a write to server filesystem (/opt dump) — boundary says "唯一允许的生产写操作" = docker exec, but R2 pg_dump writes a dump file. Technically a write to the server, though not to the DB. Minor inconsistency in wording. Actually pg_dump also reads the production DB (fine). The dump file write is a filesystem write — boundary 1 says "其余一切生产访问只读" — dump file creation arguably violates literal reading. Worth flagging as wording issue.
+
+  12. Plan §2 目标②: "水位推进至 ≥2026-08-27 18:57（实测预期≈2026-09-05 08:47:41）". Watermark = max candidate modified_time = 09-05 08:47:41 per §1. Consistent with code.
+
+  But wait — one more nuance: the watermark advance uses candidates' `modified_time` from `_modified_employee_times`, which reflects refreshed HIS data. If between now and execution new HIS modifications occur (e.g., daytime updates), watermark advances to those too — fine, window slides.
+
+  13. Timezone: MODIFIEDTIME naive parsed via fromisoformat, watermark stored tz-aware +08:00. max_watermark handles naive→utc replace. Fine.
+
+  14. The R5 expectation "resync_unchanged 首次出现": after watermark advances to 09-05 08:47, next window = 09-04 08:47. Candidates = persons with MODIFIEDTIME > 09-04 08:47 → ~1-2 with modified_time... wait, then those are updates, not resync_unchanged. resync_unchanged requires managed candidate WITHOUT modified_time. But in incremental mode, `select_nightly_candidates`: `if modified_by_code: if emp_no not in modified_by_code: continue` — when modified_by_code is non-empty, only modified persons are candidates, all have modified_time → all update, resync_unchanged=0! resync_unchanged only appears when modified_by_code is EMPTY (elif branch: full managed circle since MANAGED_SINCE, no modified_time → resync_unchanged). Hmm wait — if modified_by_code is empty dict (no one modified in window), then `if modified_by_code:` is False → elif branch selects ALL active eligible persons with create_date>=MANAGED_SINCE (~99 people), all without modified_time → resync_unchanged=99. That's the "空增量夜的全托管圈约 110 人" comment at line 413. So R5 expectation "候选个位数 + resync_unchanged 首现" — contradictory? If window after 09-05 08:47 contains 1-2 modified persons, modified_by_code non-empty → candidates = those 1-2, all update, resync_unchanged=0. If zero modified → candidates = whole managed circle (~99) as resync_unchanged, candidates≈99 not 个位数.
+
+  Hmm wait, look again at crosscheck §3: HIS MODIFIEDTIME>=09-04 → 2 人， >=09-05 → 1. After flush, watermark≈09-05 08:47:41, window start = 09-04 08:47:41. The person(s) with MODIFIEDTIME in (09-04 08:47, 09-05 08:47] — the one at 09-05 08:47:41 itself: `_is_after_modified_watermark` uses create_date > start → 09-05 08:47:41 > 09-04 08:47:41 → True → reselected! So next night, that 1 person is re-selected as update=1, ratio=1/scope... scope≈99 → 0.01 < 0.3 ✓. So "候选个位数" ✓ but resync_unchanged would NOT appear (update=1). Unless no one in window → then full circle ~99 resync_unchanged, candidates≈99 (not 个位数）.
+
+  Hmm wait, but candidates≈99 < 200 fine, resync_unchanged=99 first appears. So R5's dual expectation "候选个位数 AND resync_unchanged 首现" is mutually exclusive given the code: either window non-empty (few candidates, updates, no resync) or window empty (~99 resync candidates). Actually wait — the person at exactly 09-05 08:47:41 equals the new watermark create_date; window start = watermark − 24h = 09-04 08:47:41, and 09-05 08:47:41 > start so reselected. Yes. So next night likely candidates=1 (update), resync_unchanged=0. R5 expects "report_summary 首现 resync_unchanged 计数" — with update=1, resync_unchanged key still appears in report? finalize_run... Actually the run report_summary at line 694 doesn't include resync at all; that's P3-2's complaint. Hmm, "resync_unchanged 首次出现" — where? Maybe in stats. The crosscheck says the same expectation (§5 后置核验： resync_unchanged 首次出现）. This comes from F-2's design: on empty-increment nights the whole managed circle is resynced. But the night right after the flush will have ≥1 modified person in window (the 09-05 08:47 one) → incremental mode → no resync. So the expectation is likely wrong for 09-07 specifically, though not harmful (R5 says 若仍熔断→呈报）. Actually would 09-07's run succeed? candidates=1, update=1, ratio≈0.01 ✓ success. So the run recovers either way; only the "resync_unchanged 首现" sub-expectation is mispredicted. Worth flagging as a prediction error that could cause executing AI to misjudge R5 as anomaly. R5 says "预期 status=success、候选个位数、report_summary 首现 resync_unchanged 计数" — if resync_unchanged absent, does the AI treat as failure? The instruction "若仍熔断→原样留痕呈报" only covers 熔断. Ambiguity risk. Good finding.
+
+  Let me double check the empty-window path: `_modified_employee_times` returns {} when no modified rows. Then in select_nightly_candidates, `if modified_by_code:` empty dict is falsy → elif: `not person.source_create_date or < MANAGED_SINCE: continue` → all active eligible with create_date>=07-20 selected WITHOUT modified_time. ~99 candidates. Then stats: managed & no modified_time & jhemr_existing not None → resync_unchanged. Then check_thresholds: candidates=99<200 ✓, update=0, new=0, ratio=(0+0+deact)/99 small ✓. And then the run would actually PROCESS all 99 candidates (reconcile_existing=True) — a full-circle resync night, ~99 actual sync actions. That's the designed F-2 behavior. OK.
+
+  So R5 outcome branches: (a) ≥1 modified in window → few updates, success; (b) none → ~99 resync_unchanged, success. Both success. The plan's joint expectation is impossible but harmless-ish. Flag it.
+
+  15. Check ratio override margin more carefully: if by execution time the window has grown (more days failing)... watermark still 08-28, window = 08-27 02:57 → now. Candidates currently 110. HIS recent activity low. max_update=150 still guards. Override 2.0 with scope=99 → numerator up to 198 allowed, but max_update=150 and max_candidates=200 and max_deactivate=20 guard. Plan §7.4 says exactly this. OK.
+
+  16. R1 guard: "若 update>140...→ STOP". 140 vs threshold 150 — margin 10. Reasonable.
+
+  17. Deactivate: `_process_deactivate_candidate` executes `execute_jhemr_lock(emp_no)` — a real JHEMR write. Plan discloses in §7.2. It's a business-system write through platform channel — user authorization? The crosscheck §5 says "待用户一句话授权". The plan is 待审； user said another AI will execute. The executing AI needs explicit user authorization for production writes. Plan §3 frames boundaries but the plan itself doesn't state "需用户授权后执行" gate prominently? §5 crosscheck says 待用户一句话授权. 方案.md doesn't mention waiting for user authorization — it says "白天执行". Since user will hand it to another AI, presumably with authorization. Minor: could add explicit authorization precondition. Worth a small note.
+
+  18. Missing from plan vs crosscheck: crosscheck §4 reproduction command includes `-i` and ssh key path; plan R1 references "crosscheck §4 命令原样" — fine, dependency on crosscheck file present at 开发起步包/output_r180/. The plan says R0 reads `output_r180/deadlock_crosscheck.md` — relative path ambiguity （开发起步包/output_r180/). Minor.
+
+  19. Plan §1 says "夜跑自 09-01 起每晚熔断...09-06 02:00 RUN-69e87f7f27dd" — consistent with crosscheck? Crosscheck says 自 09-01 起. OK.
+
+  20. Plan R3 note: "预期 stdout 首字段 status success；耗时约 1-5 分钟（111 候选）" — 111 vs 110+4=114? Minor numeric sloppiness: "111 候选" — where does 111 come from? Maybe 110+1? Crosscheck says 110 update + 4 deactivate = 114 total processed. "111 候选" looks like a typo. Also §2 目标① "110 名真实变更对齐、4 名 inactive". So R3's "111 候选" is inconsistent (should be ~114 processing units / 110+4). Flag minor.
+
+  Also processing 114 candidates × 2 targets + subtasks (signature/title/dept/login_sign full-scope compares) in 1-5 min? The subtasks are full-scope daily syncs (dept sync full compare, login_sign daily). Nightly normally runs within its window; estimate unverifiable locally. Note ssh without timeout; fine.
+
+  21. One more check: the plan claims "window=水位−24h" — confirmed via window_start default settings.identity_sync_lookback_hours. Check config value = 24? Let me grep. Also `identity_sync_lookback_hours` default.
+
+  22. Security: R3 passes no credentials on command line ✓. pg_dump 口令仅入变量 ✓.
+
+  23. Plan §6 回滚： compensation + audit; extreme → restore R2 dump. Restoring a pg_dump over the platform DB would be a big production operation — but it's labeled 极端情况. OK.
+
+  24. Docker exec while container running: env override only affects the exec'd process ✓. Note: the exec'd python process writes to the same platform DB the running API container uses — concurrent access normal.
+
+  25. Parallel session 182 writing platform DB during the flush — §9 open item says avoid same-window writes. The flush itself takes distributed lock `identity_nightly_sync`; if 182's work triggers another nightly run concurrently, lock skips. OK.
+
+  26. Check `identity_sync_lookback_hours` default and `identity_cb_max_update` etc. defaults to verify numbers 150/50/20/200. Quick grep config.
+
+• Important findings from config:
+
+  - `identity_cb_max_update: int = 100` — code default is **100**, not 150! The plan and crosscheck repeatedly cite "update 110<150 ✓" and "max_update=150 硬闸仍在", and R1 STOP condition "若 update>140（150 阈值余量不足）". If the production env file overrides it to 150, fine — but I can't verify. Actually crosscheck mentions "D2（MAX_UPDATE 150→100）" as a deferred item in plan 非目标 — meaning current production value is 150 (via env), and D2 would change to 100. Code default is 100. So production env must set APP_IDENTITY_CB_MAX_UPDATE=150. The R3 docker exec env list does NOT include APP_IDENTITY_CB_MAX_UPDATE — but docker exec inherits the container's environment, so whatever the container has applies. Hmm wait — does docker exec inherit container env? Yes, docker exec uses the container's environment (from image ENV + docker run -e). So if the container was started with MAX_UPDATE=150 via env file, the exec'd process inherits it. OK — but the plan's R3 command's `-e` set "与 crontab 逐项一致" — the cron file presumably contains more vars? Actually crosscheck §5 lists exactly 8 vars as the full set. And container env provides the rest. Fine.
+
+  BUT: there's a subtle risk — if the cron file's env set differs from the container env (e.g., cron sets MAX_UPDATE=150 explicitly but container env has default 100), then... can't verify locally. The plan R3 command doesn't include MAX_UPDATE; relies on inheritance. Since both cron and exec would inherit container env identically, behavior matches the nightly. OK.
+
+  - `identity_cb_max_watermark_gap_hours: 48` — check_thresholds line 519-521: watermark_gap_hours check! watermark_gap = now − wm.last_run_at where wm = the watermark row with latest last_run_at. last_run_at updated on every advance... but failed runs don't advance → last_run_at stays at last success = 08-30? Wait, advance_watermark sets row.last_run_at = now. Only on success. The wm row queried is `IdentitySyncWatermark order by last_run_at desc` — could be a different watermark_key (signature stream?) that advances on other runs. crosscheck §3 WM_RAW shows last_create_date=08-28 but last_run_at=08-30 (W10). If last successful advance was 08-30 (W10 align path? but that "未推 main 水位"... yet last_run_at=08-30 on main row? crosscheck #1 says 08-30 is last_run_at "W10 手动跑的 align 路径未推 main 水位" — hmm, if it didn't advance, why is last_run_at 08-30? Maybe W10 run did advance some watermark or touched last_run_at. Whatever.)
+
+  Critical: at execution time 09-06 daytime, watermark_gap_hours = now − last successful watermark advance. If last_run_at=08-30, gap ≈ 6.5 days = ~160h > 48h limit → **watermark_continuity dimension would ALSO trigger**! But the plan/crosscheck claim "唯一失败维度=max_change_ratio". check_thresholds checks ratio BEFORE watermark_continuity (line 516 before 519), and returns first triggered → ratio triggers first, masking continuity. The crosscheck §4 reproduction runs check_thresholds which returns only the first dimension. So after overriding ratio to 2.0, the **watermark_continuity check (gap>48h) would trigger next** and still fail the run!
+
+  Wait — is that right? stats["watermark_gap_hours"] computed in _compute_change_stats lines 471-477: wm = row with max last_run_at across ALL watermark rows. If other watermark streams (e.g., signature sync watermark?) advance more recently... The comment says "hours since the last successful HIS collection". Which watermark rows exist? main_account_sync and maybe others. If signature subtask advances its own watermark nightly... but signature sync is gated on main success (script: signature skipped if main not success). Since 09-01 all mains failed → no subtask ran → no watermark advanced since... hmm, but wait: did anything succeed after 08-30? The nightly failed each night 09-01..09-06. W10 was 08-30 manual. What about 08-31? crosscheck says 夜跑自 09-01 起熔断 — maybe 08-31 succeeded? "连续 6 晚" 09-01..09-06. If 08-31 02:00 succeeded, last_run_at=08-31, gap at 09-06 ≈ 140h > 48h.
+
+  Hmm but wait — how did the crosscheck's "五维阈值实测" conclude "唯一失败维度=max_change_ratio"? Because check_thresholds returns the FIRST triggered dimension. Their §4 script prints check_thresholds result = max_change_ratio. They never saw watermark_continuity because ratio trips first. With ratio overridden to 2.0, next check: watermark_gap. If gap > 48h, the R3 run FAILS with dimension=watermark_continuity!
+
+  Unless... the config comment at line 103-106 says: "W10 二次修复（2026-08-30 用户授权选项1）：水位连续性阈值原写死 48h，连续失败后形成'失败→水位不推进→更失败'死锁；改为可配置以便恢复性运行临时放宽（方案 A 同款临时阈值先例）". So there IS precedent: the recovery run also needs to override `APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS`! W10's recovery used "同款临时阈值" override. And the current R3 command does NOT include it!
+
+  Hold on — but does the gap actually exceed 48? gap = now − max(last_run_at over all watermark rows). The R3 run itself... wait, does sync_his_identity (refresh_source) update any watermark? It collects into person_sources; watermark advance only in run_nightly_pipeline. What about other watermark_keys — get_watermark used for main_account_sync; is there a signature watermark? "Independent composite watermarks for account and signature streams" per identity_watermark docstring. If signature stream's watermark advanced recently... but signature sync only runs when main succeeds (script lines 44-49). Main last succeeded when? If nightly failed since 09-01, last main success was 08-31 02:00 or earlier. So max last_run_at ≈ 08-31 → gap at 09-06 ≈ 6 days = 144h >> 48h.
+
+  BUT the W10 precedent on 08-30: gap then was ~2 days? 08-28 02:57 → 08-30 = ~50h > 48h → that's why they needed the override ("恢复性运行临时放宽（方案 A 同款临时阈值先例）"). So W10's exec command included APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS override. And now gap is much bigger (~144h). The R3 command missing this override means the flush run will trip watermark_continuity and FAIL — this is a **critical flaw** in the plan!
+
+  Wait, but let me double-check: does check_thresholds receive stats with watermark_gap_hours > 48 in the crosscheck §4 reproduction? Their repro printed check_thresholds → returned max_change_ratio (first trigger). They never saw the second. And plan R1 "确认仍为「唯一失败维度=max_change_ratio」" — reproduces only first dimension. So the plan would pass R1, run R3, and R3 would fail on watermark_continuity (or ratio passes, continuity trips). Then per hard boundary 3: no retry, STOP. The flush fails.
+
+  Hmm wait — actually, let me recheck: is `watermark_gap_hours` maybe computed differently... line 472-477: `wm = db.scalar(select(IdentitySyncWatermark).order_by(IdentitySyncWatermark.last_run_at.desc()))`. If ANY watermark row has recent last_run_at (e.g., the signature stream or employee_key stream), gap is small. Do other processes advance watermarks? E.g., daytime HIS sync creating half-accounts — does it call advance_watermark on some key? Unknown. The crosscheck §3 WM_RAW shows main_account_sync: last_run_at=08-30. Can't verify other rows locally. But the strong signal: the config comment explicitly documents this exact deadlock ("失败→水位不推进→更失败") and says recovery requires temporarily relaxing this threshold — "方案 A 同款临时阈值先例". The crosscheck and plan both missed this second breaker. This is the single most important finding.
+
+  Actually wait — let me reconsider. Maybe watermark_gap was already >48 during the past nights and ratio just masks it. On 09-01, gap since 08-30 ≈ 50h >48. So even without the ratio issue, every night since 09-01 would ALSO have tripped watermark_continuity had ratio not tripped first. The repro confirming "唯一失败维度" is wrong — it's the "first" failing dimension, not the only one. The plan's core premise "ratio=2.0 一处覆盖即可放行" is likely false; R3 as written will fail on watermark_continuity.
+
+  Unless the threshold env in production sets APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS high... can't verify. But default 48 and the code comment's precedent strongly suggest override needed. This is a must-flag critical issue: R3 command should also carry `-e APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS=<足够大>` (precedent-approved pattern), and R1 should enumerate ALL triggered dimensions, not just the first (e.g., evaluate each dimension independently).
+
+  Let me double check the check_thresholds order: max_candidates → max_new → max_update → max_align → max_deactivate → max_change_ratio → watermark_continuity → source_row_conservation. source_row_delta_pct=0 → fine. watermark_gap: stats computed always. So yes.
+
+  Second check on deactivate=4 in ratio numerator: ratio = (0+110+4)/99 = 1.1515 ≈ 1.152, not 1.111. Confirmed discrepancy.
+
+  Third: R5 prediction issue (resync_unchanged vs few-update mutually exclusive), as analyzed.
+
+  Fourth: §3.1 references "R4 的一次性 docker exec" but the write is at R3 — numbering bug in hard boundary.
+
+  Fifth: "111 候选" in R3 vs 110/114 elsewhere.
+
+  Sixth: R1.2 grep ≥1 vs crosscheck grep=2.
+
+  Seventh: R2 pg_dump writes to server disk — boundary 1 "其余一切生产访问只读" wording conflict (minor).
+
+  Eighth: watermark advance requires failed_count==0 (line 706). With 110 updates + 4 deactivates + retries, any single failure → no advance + run failed → deadlock persists. Plan's R4.2 covers detection. Also failure_rate>0.2 flag. Fine, disclosed implicitly? Not explicitly: plan doesn't mention that a single candidate failure prevents watermark advance (atomicity). R4.2 does say "若仍=08-28 → 异常呈报". Could add explicit note. Minor.
+
+  Ninth: `identity_cb_max_update` default 100 vs plan's 150 — relies on env override; if R3's env set "与 crontab 逐项一致" and crontab doesn't include it but container env does, fine. But the plan's R1 STOP threshold uses 150; should verify actual effective value in container (R1 could print settings). Suggest adding to R1: print effective thresholds from the container env. Actually crosscheck §4 repro used real check_thresholds which uses live settings → 110<150 passed, so env has 150. OK fine.
+
+  Tenth: coverage check of user requirement. User: analyze problem, detailed solution for another AI to execute, two layers (immediate release + root fix next release). Plan covers: root cause §1, execution card §4, root-fix §8. Coverage good. Deviations: none major; "私自加戏": R2 backup (from crosscheck, OK), R6 deliverables (reasonable), §9 open items (from crosscheck). The plan's §0 quotes the requirement. Fidelity good.
+
+  Eleventh: R5 "可排程定时任务" — the executing AI scheduling a cron on its own session is fine.
+
+  Twelfth: One more code check — `sync_his_identity` (refresh_source=True) writes to platform DB (person_sources) — that's part of normal pipeline, fine, and it's via the container. Boundary 4 "业务源库零直连" — the pipeline itself reads HIS via platform's configured connection (direct connection flag true). That's the platform's own channel. OK.
+
+  Thirteenth: potential issue — R3 command omits `-i`/`-t`; runs a script, fine. Also `ssh root@10.10.8.83` without `-i key` — plan omits key path (crosscheck §4 includes `-i C:/Users/...`). AGENTS.md says pubkey auth works by default config; fine.
+
+  Also should verify: does check order mean that when ratio override 2.0 applied, update=110 also needs max_update≥110 — env 150 confirmed by repro. And max_candidates 114<200 ✓.
+
+  One more: the watermark candidate uses `datetime.fromisoformat(c["modified_time"])` — candidates' modified_time isoformat strings; naive vs aware mixing in max_watermark handled. OK.
+
+  Also: after successful flush, watermark=09-05 08:47:41 (naive? from raw_data MODIFIEDTIME "2026-09-05T08:47:41" naive → max_watermark replaces tz with UTC!). Look: max_watermark line 62: `value = create_date if create_date.tzinfo else create_date.replace(tzinfo=timezone.utc)`. MODIFIEDTIME from HIS is Beijing local naive → stamped as UTC → stored as 2026-09-05 08:47:41+00:00 = displayed +08:00 would be 16:47? Hmm, but existing watermark shows `2026-08-28 02:57:45+08:00`. get_watermark returns row value with tz. Mixing could shift window by 8h. But this is pre-existing behavior, same as every prior run; not the plan's problem. Skip or minor note. Actually wait — `_modified_employee_times` compares parsed naive MODIFIEDTIME via `_is_after_modified_watermark(parsed, modified_since, ...)` — identity_time.as_aware probably normalizes. Pre-existing; not plan's scope. Skip.
+
+  Also R4.2 expectation "水位 ≈2026-09-05T08:47:41" — with tz stamping, stored value may read 08:47:41+00:00. Executing AI comparing strings might see tz mismatch and misjudge. Very minor; the plan says "允许=候选集 max". OK.
+
+  Let me also confirm watermark_gap uses `last_run_at` of any row — if the R3 run partially... no, only success advances.
+
+  Now — one more important check: does the plan address the deactivate=4 locks needing JHEMR write enabled — env includes APP_IDENTITY_JHEMR_PASSWORD_WRITE_ENABLED=true. Deactivate lock uses execute_jhemr_lock — probably needs jhemr credential, present in container env. Fine.
+
+  I think I should also verify identity_time.as_aware quickly? Not necessary.
+
+  Also verify the claim "F-2 豁免在增量模式下是死代码" — code line 245: `if modified_by_code:` non-empty → only modified candidates → all have modified_time → line 436 `not c.get("modified_time")` False → never resync_unchanged. Confirmed: resync_unchanged unreachable in incremental mode. ✓ (And my R5 analysis stands.)
+
+  Wait, actually reconsider R5: after flush, next night window = (09-04 08:47, ...]. The person with MODIFIEDTIME=09-05 08:47:41: is 09-05 08:47:41 > start(09-04 08:47:41)? Yes → reselected. So candidates≥1 with modified_time → update=1, resync=0. So "候选个位数" ✓, "resync_unchanged 首现" ✗. Unless HIS data changes. Confirmed plan prediction internally inconsistent. Also plan §2 目标③ same claim.
+
+  Hmm, one more consideration on the critical finding: maybe I'm wrong that gap>48. `_compute_change_stats` gap uses max last_run_at across watermark rows. crosscheck §3 only shows main row. Are there other rows (e.g., "signature_sync" watermark) with recent last_run_at? Signature sync ran... the script only runs subtasks when main success. Main last success ≤08-31. Actually wait — did main succeed 08-31? 熔断自 09-01 起 → 08-31 02:00 succeeded → watermarks last_run_at ≈ 08-31 02:xx → at 09-06 daytime gap ≈ 124h > 48. Unless W10's 08-30... whatever, definitely >48 since last success ≥6 days ago.
+
+  Actually hold on — crosscheck #1 says last_run_at=08-30 for main. If main succeeded 08-31, last_run_at would be 08-31. It shows 08-30 — so last success was 08-30 (W10 manual), and 08-31's cron... maybe also failed, or熔断从 08-31? crosscheck says 自 09-01 起每晩熔断. If 08-31 succeeded, main last_run_at should be 08-31. It says 08-30. Contradiction? "08-30 是 last_run_at（W10 手动跑的 align 路径未推 main 水位）" — wait, if W10 didn't advance main watermark, why is main's last_run_at 08-30? advance_watermark sets last_run_at only when advancing. If W10 align path didn't advance main watermark, last_run_at wouldn't be 08-30... unless W10 did advance it (to 08-28 02:57? no...). Hmm — actually maybe W10 ran 08-30 and advanced main watermark to 08-28 02:57:45 (the max candidate modified_time at that time), setting last_run_at=08-30. Then "未推 main 水位" in crosscheck refers to B's confusion... The 裁决 says "08-30 是 last_run_at（W10 手动跑的 align 路径未推 main 水位）" — contradictory-ish, but either way last_run_at=08-30 → gap at 09-06 ≈ 150h > 48h. Confirmed critical.
+
+  And the config comment PROVES the team knows: watermark_continuity must be temporarily relaxed for recovery runs ("方案 A 同款临时阈值先例" — W10 did it). The plan's R3 missing `APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS` override is very likely a fatal omission → R3 will fail with dimension=watermark_continuity after ratio passes.
+
+  Also — the R1 repro per crosscheck §4 calls check_thresholds which returns first dimension only; the plan's claim "唯一失败维度" is unproven for downstream dimensions. Recommend R1 compute all dimensions independently.
+
+  Let me also double-check `identity_cb_max_watermark_gap_hours` env name: APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS. ✓
+
+  I have enough. One more coverage item: user requirement mentions "用途：交多 AI 交叉核查" — the plan includes §3 boundaries for executing AI. Fine.
+
+  Also plan R0 says read `output_r180/nightly_d.md` — exists? Check quickly via Glob. And R6 output dir. Minor; quick glob for nightly_d.md.
+
+• Files exist. Now compose the review. Structure:
+
+  一、覆盖度与忠实度（①）
+  二、自发发现的问题（②），按严重度排序，附代码依据。
+
+  Critical finding: watermark_continuity second breaker. Let me be careful and precise:
+
+  - config.py:106 `identity_cb_max_watermark_gap_hours: int = 48`
+  - orchestrator.py:519-521 check after ratio
+  - gap computed at orchestrator.py:471-477 from max last_run_at; last success ≈08-30 → gap ~150h > 48
+  - config.py:103-105 comment explicitly documents this deadlock and the precedent of temporary relaxation for recovery runs ("方案 A 同款临时阈值先例")
+  - Plan R3 command lacks APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS override → predicted failure mode: run trips watermark_continuity, status=failed, watermark not advanced, deadlock persists; per boundary 3 no retry → mission fails.
+  - Also R1's "唯一失败维度" verification method (first-trigger only) cannot detect this — check_thresholds returns first triggered dimension (orchestrator.py:497-525 early returns).
+
+  Second: ratio arithmetic 114/99=1.152 vs claimed 1.111 (orchestrator.py:515 includes deactivate in numerator). Conclusion unaffected (both >0.3, <2.0), but "实测" claim wrong; also ironically B会话's 1.15 was right and裁决 labeled 1.111 "精确".
+
+  Third: R5 expectation contradiction (resync_unchanged vs 个位数 mutually exclusive) — code orchestrator.py:245-252, 436-439.
+
+  Fourth: §3.1 boundary references "R4 的一次性 docker exec" but write is R3.
+
+  Fifth: "111 候选" (R3) vs 110/114.
+
+  Sixth: grep -c ≥1 vs crosscheck grep=2 (R1.2 weaker than evidence).
+
+  Seventh: R2 pg_dump writes dump file to prod server — boundary 1 "其余一切生产访问只读" literal conflict (minor wording).
+
+  Eighth: single candidate failure → failed_count>0 → watermark not advanced (orchestrator.py:706) and run failed; plan doesn't explicitly warn this atomicity (R4.2 catches after the fact). Also failure_rate breaker (688-690). With 114 write operations incl. JHEMR deactivates, non-trivial. Suggest R1 include a dry pre-check? Not available. Just note.
+
+  Ninth: missing explicit user-authorization precondition; crosscheck §5 says 待用户一句话授权， plan omits it. Executing AI given the plan might proceed without confirming authorization. Also the flush writes to JHEMR (business system) — 4 account locks + 110 account syncs; under repo rules this is production write needing explicit approval.
+
+  Tenth: coverage assessment — requirement covered; no major 加戏； R2/R6 reasonable; §8 matches crosscheck §6+§7.
+
+  Also positive verifications to report: env var name correct (config prefix APP_ ✓), script exists ✓, NIGHTLY_ENABLED=false+PROVIDER=host_cron doesn't trip multiple_provider guard (orchestrator.py:542-563) ✓, advance-on-success-only confirmed (watermark.py:69-71, orchestrator.py:706) root cause accurate ✓, F-2 dead code claim confirmed ✓, scope denominator bug confirmed (orchestrator.py:445-451 vs numerator includes incremental members) ✓, ratio numerator>denominator possible ✓.
+
+  Also note: ratio override 2.0 — with deactivate included, (110+4)/99=1.152 < 2.0 ✓ margin fine.
+
+  Also plan §1 "增量窗=水位−24h" ✓ (config 73).
+
+  Write final answer in Chinese, structured, with severity ratings.
+
+To resume this session: kimi -r session_c64f7369-b56d-4b80-944f-448efbac04fd

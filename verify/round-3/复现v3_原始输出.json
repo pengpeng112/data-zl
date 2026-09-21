@@ -1,0 +1,62 @@
+{
+  "steps": [
+    {
+      "step": "E1_explore_focus_1hop",
+      "measure": {
+        "canvas": 0,
+        "svgCircles": 0,
+        "svgTexts": 0,
+        "graphApiCount": 4,
+        "neighborCalls": 0,
+        "slowApis": [
+          {
+            "api": "/graph/overview",
+            "ms": 10012
+          }
+        ]
+      },
+      "console": [
+        "error:Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "E1-fail:Locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\".el-segmented__item\").filter(has_text=\"关系探索\").first\n"
+      ]
+    },
+    {
+      "step": "E2_explore_2hop",
+      "measure": {
+        "canvas": 0,
+        "svgCircles": 0,
+        "svgTexts": 0,
+        "graphApiCount": 4,
+        "neighborCalls": 0,
+        "slowApis": [
+          {
+            "api": "/graph/overview",
+            "ms": 10012
+          }
+        ]
+      },
+      "console": [
+        "segments=[]"
+      ]
+    },
+    {
+      "step": "E3_explore_dblclick_expand",
+      "measure": {
+        "canvas": 0,
+        "svgCircles": 0,
+        "svgTexts": 0,
+        "graphApiCount": 4,
+        "neighborCalls": 0,
+        "slowApis": [
+          {
+            "api": "/graph/overview",
+            "ms": 10012
+          }
+        ]
+      },
+      "console": [
+        "E3-fail:Locator.bounding_box: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"canvas\").first\n"
+      ]
+    }
+  ]
+}

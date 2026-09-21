@@ -1,0 +1,5 @@
+- 高：`overview` 聚合层全量加载所有关系，并逐条调用未复用 `_EndpointResolver` 的端点解析，存在明显 N+1 查询，足以解释 23 秒超时；[graph.py](F:/python/数据资产/backend/app/api/v1/graph.py:1683)
+- 高：对象层即使只展示最多 200 张表，仍无条件读取全库关系再过滤，数据增长后每次下钻都会产生高延迟和内存压力；[graph.py](F:/python/数据资产/backend/app/api/v1/graph.py:1588)
+- 高：force 布局把初始 `alpha` 固定为 0.35，可能在节点充分排斥前即收敛，直接加剧报告复现的中心堆叠；[AdvancedRelationGraph.vue](F:/python/数据资产/frontend/src/views/asset/components/AdvancedRelationGraph.vue:234)
+- 中：节点标签关闭换行却同时配置五行上限，长表名只能裁切且相邻标签更易叠压；[AdvancedRelationGraph.vue](F:/python/数据资产/frontend/src/views/asset/components/AdvancedRelationGraph.vue:345)
+- 中：报告把 `meta.total_relations=12702` 当作关系数量支撑结论，但后端聚合层实际将 `matched_assets` 填入该字段，因此该指标是表数且存在契约语义错误；[graph.py](F:/python/数据资产/backend/app/api/v1/graph.py:1709)

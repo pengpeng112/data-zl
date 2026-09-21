@@ -63,7 +63,7 @@ python ..\.agents\skills\ods-readonly-sql\scripts\run_ods_readonly.py --test-con
 3. `POST /api/v1/ai/export-context` 核对字段和关系；
 4. `POST /api/v1/ai/sql-risk-scan`；
 5. `POST /api/v1/ai/propose-sql` 保存草稿；
-6. 人工批准后调用 `POST /api/v1/ai/drafts/{draft_id}/execute`，请求中使用 `source_code=ods_8_216`；当前平台 API 契约上限为 `max_rows<=5000`。需要10000行查询或50000行文件导出时，改用服务器内网 direct 执行器，不擅自绕过 API 契约。
+6. 草稿经现有人工批准后调用 `POST /api/v1/ai/drafts/{draft_id}/execute`，请求中使用 `source_code=ods_8_216`；当前平台 API 契约上限为 `max_rows<=5000`。需要10000行查询或50000行文件导出且用户已明确要求相应查询/导出时，可使用服务器内网 direct 执行器；direct 只解决行数和运行位置，不得用于绕过草稿审批、数据访问授权或审计。
 
 接口需要合法 Token 和权限。Token 不写入 Skill 或命令历史，使用调用工具的安全认证配置。
 

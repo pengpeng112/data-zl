@@ -1,0 +1,86 @@
+{
+  "steps": [
+    {
+      "step": "S1_overview_default",
+      "measure": {
+        "svgCircles": 0,
+        "nodeOverlap": 0,
+        "labelTotal": 0,
+        "labelOverlap": 0,
+        "samplePairs": [],
+        "hasCanvas": 0,
+        "engineText": ""
+      },
+      "slow_graph_apis": [
+        {
+          "api": "/graph/overview",
+          "ms": 10008
+        }
+      ],
+      "console_errors": [
+        "error:Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "step": "S2_explore_center",
+      "measure": {
+        "svgCircles": 0,
+        "nodeOverlap": 0,
+        "labelTotal": 0,
+        "labelOverlap": 0,
+        "samplePairs": [],
+        "hasCanvas": 0,
+        "engineText": ""
+      },
+      "slow_graph_apis": [
+        {
+          "api": "/graph/overview",
+          "ms": 10008
+        }
+      ],
+      "console_errors": [
+        "S2-interact-fail:Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for get_by_text(\"关系探索\").first\n"
+      ]
+    },
+    {
+      "step": "S3_explore_expand_multi",
+      "measure": {
+        "svgCircles": 0,
+        "nodeOverlap": 0,
+        "labelTotal": 0,
+        "labelOverlap": 0,
+        "samplePairs": [],
+        "hasCanvas": 0,
+        "engineText": ""
+      },
+      "slow_graph_apis": [
+        {
+          "api": "/graph/overview",
+          "ms": 10008
+        }
+      ],
+      "console_errors": []
+    },
+    {
+      "step": "S4_search_focus",
+      "measure": {
+        "svgCircles": 0,
+        "nodeOverlap": 0,
+        "labelTotal": 0,
+        "labelOverlap": 0,
+        "samplePairs": [],
+        "hasCanvas": 0,
+        "engineText": ""
+      },
+      "slow_graph_apis": [
+        {
+          "api": "/graph/overview",
+          "ms": 10008
+        }
+      ],
+      "console_errors": [
+        "S4-fail:Locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"input[placeholder*='搜索']\").first\n"
+      ]
+    }
+  ]
+}

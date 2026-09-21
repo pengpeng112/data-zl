@@ -1,0 +1,918 @@
+• The user wants an independent review of review/round-10/方案_v2.md against the initial review findings （分歧表.md, 审查_kimi, 审查_grok, 检查_codex.md). Read-only. Let me first read the materials.
+
+  Let me list review/round-10 and read files.
+
+total 836
+drwxr-xr-x 1 Administrator 197121      0 Sep 11 09:11 .
+drwxr-xr-x 1 Administrator 197121      0 Sep 11 08:58 ..
+-rw-r--r-- 1 Administrator 197121    872 Sep 11 09:07 manifest.json
+-rw-r--r-- 1 Administrator 197121   7573 Sep 11 09:10 分歧表.md
+-rw-r--r-- 1 Administrator 197121     98 Sep 11 08:59 哈希.md
+-rw-r--r-- 1 Administrator 197121  13933 Sep 11 09:07 审查_grok
+-rw-r--r-- 1 Administrator 197121      0 Sep 11 08:59 审查_grok.err
+-rw-r--r-- 1 Administrator 197121  13768 Sep 11 09:06 审查_grok.raw
+-rw-r--r-- 1 Administrator 197121      0 Sep 11 09:11 审查_grok_r2.err
+-rw-r--r-- 1 Administrator 197121    173 Sep 11 09:12 审查_grok_r2.raw
+-rw-r--r-- 1 Administrator 197121   7967 Sep 11 09:07 审查_kimi
+-rw-r--r-- 1 Administrator 197121  48137 Sep 11 09:07 审查_kimi.err
+-rw-r--r-- 1 Administrator 197121   7911 Sep 11 09:07 审查_kimi.raw
+-rw-r--r-- 1 Administrator 197121    262 Sep 11 09:12 审查_kimi_r2.err
+-rw-r--r-- 1 Administrator 197121     65 Sep 11 09:12 审查_kimi_r2.raw
+-rw-r--r-- 1 Administrator 197121   2218 Sep 11 08:59 审查_zcode.md
+-rw-r--r-- 1 Administrator 197121  12217 Sep 11 08:59 方案.md
+-rw-r--r-- 1 Administrator 197121  19710 Sep 11 09:11 方案_v2.md
+-rw-r--r-- 1 Administrator 197121 668767 Sep 11 09:04 检查_codex.err
+-rw-r--r-- 1 Administrator 197121  16465 Sep 11 09:04 检查_codex.md
+-rw-r--r-- 1 Administrator 197121   1280 Sep 11 09:12 检查_codex_r2.err
+-rw-r--r-- 1 Administrator 197121      0 Sep 11 09:11 检查_codex_r2.md
+• Now read the three reviews （审查_kimi, 审查_grok, 检查_codex.md) and maybe 审查_zcode.md and v1 方案.md for comparison.
+
+• Now I have all the materials. I need to do an independent review of 方案_v2.md:
+
+  ① Does v2 faithfully implement the initial review findings (spot-check item by item)?
+  ② Does it introduce new problems?
+  ③ Final coverage of user needs?
+
+  Let me map the 分歧表's 30 items against v2 content, and also check whether the original findings from 审查_kimi, 审查_grok, 检查_codex.md are covered by 分歧表 (some findings may have been dropped from the 分歧表 silently — e.g., Codex items 7, 8, 12, 16, 20... let me check).
+
+  Let me first systematically map Codex's 26 items and Grok's and Kimi's findings against the 分歧表 30 items, then verify v2 against 分歧表， then verify v2's factual claims against the repo.
+
+  Key verification points I should check myself in the repo (read-only):
+
+  1. Root dir _tmp_* count = 22? Let me count.
+  2. exports count = 14, numbered [1,3,4,5,6,7,9,10,11,12,13], missing 2/8, 3 unnumbered.
+  3. 数据资产_* count = 15.
+  4. .gitignore contains /取数/*, _tmp_*, *.log etc.
+  5. drivers jar tracked.
+  6. dev_env.sh OTHER_DOMAIN contains 5 capture scripts; capture scripts use parents[1].
+  7. 取数 START_HERE says 48项目核心制度 保留不自动移动； platform is single source of truth.
+  8. README size ~206KB/601 lines? v2 says 206KB/601行； grok said 212KB/553行. Check.
+  9. 184 报告 says 11,531 messages.
+  10. 187 号 doc exists.
+  11. AGENTS.md size ~22KB.
+  12. check_doc_index.py scan_package skips subdirectories (Codex #15).
+  13. capture scripts in dev_env.sh.
+  14. qa-report-20260909 exists.
+  15. Git status ~170 changes, 186 observation window.
+  16. output_r* count = 15.
+  17. 工作量日报 top-level orphan.
+  18. frontend 审查_grok.raw/.err exist.
+  19. v2 references: §3.1 claims "新增 INDEX.md"; AGENTS.md 22KB.
+  20. v2's claim "frontend 六个日志" — build*.log, dev.err/dev.log, typecheck.log, vitest.log = 6? build*.log might be multiple. Check.
+
+  Also check items that 分歧表 may have dropped:
+  - Codex #7 (grep 不足证明无断链） — v2 §4 执行边界 mentions "正文含旧路径+parents[1] 类动态拼接+Markdown 相对链接三检，含 ignored 文件的定向搜索例外" — covered in P4 "移动项零断链（正文相对链接+脚本动态路径双检）". But 分歧表 doesn't list this as an item... Let me check 分歧表： items 1-30. Codex #7 （只搜旧路径不足） — not obviously in 分歧表. Hmm, but v2 does address it in §4 执行边界. Let me check.
+  - Codex #8 （回滚设计不足） — v2 P2 回滚 = "按清单反向 mv", 迁移清单含 SHA-256. Partially. 分歧表 doesn't have an item for rollback insufficiency. Codex #8 said: 每批应有旧路径→新路径映射、跟踪状态、文件数量/大小/哈希、碰撞处理、恢复顺序和停止条件. v2 has 迁移清单 （旧→新+数量+SHA-256) but no 碰撞处理/恢复顺序/停止条件. This may be a gap — 分歧表 dropped Codex #7 and #8? Let me re-scan 分歧表 items: 1 exports数字， 2 git mv不可行， 3 根目录保留清单， 4 数据资产包15, 5 3轮/4轮， 6 capture迁移， 7 顶层散SQL前提， 8 manifest平行总表， 9 占位提交， 10 qa-report, 11 drivers jar, 12 脏工作区， 13 README超限， 14 manifest键， 15 check不扫archive子目录， 16 P2依赖P4时序， 17 归属率100%, 18 codex句， 19 grok断言codex空， 20 11311, 21 187号， 22 GitHub实例， 23 query_code追溯， 24 类比过强， 25 新产物散落， 26 frontend日志直删vs mv, 27 审查产物去向， 28 根AGENTS膨胀， 29 _tmp计数， 30 tools 48口径.
+
+  Missing from 分歧表 (findings in reviews but not listed):
+  - Codex #7 (grep 断链验证不足） — not in 分歧表！ But v2 §4 执行边界 does address it partially. Need to check whether v2 picked it up anyway.
+  - Codex #8 （回滚不覆盖中途失败/碰撞） — not in 分歧表. v2 partially addresses （清单+SHA-256+反向mv) but lacks collision/stop conditions.
+  - Codex #12 （导出数据长期管理/受控存储/访问控制） — not in 分歧表. v2? §1.5 提到本机面不承诺 Git 回滚；风险5"取数为本机面：跨机器交接不依赖 Git（现状即如此，本计划不改变，仅清单+哈希留证）". So v2 explicitly defers. Hmm.
+  - Codex #16 (manifest 检索验证方法） — 分歧表 #8 mentions 校验方法？ #8 says "Codex: 漂移契约+校验方法". v2 §3.4.3 manifest 5任务演练 — covers Codex #16. OK.
+  - Codex #17 （索引敏感字段边界） — v2 §3.4.2 字段白名单+排除敏感路径. Covered though not explicitly in 分歧表 (folded into #8).
+  - Codex #20 （守护表不足，需认领机制/编号串行化/共享测试资源） — 分歧表 #9 covers 认领+单一整合者+编号串行化. Codex also mentioned worktree评估、共享测试资源占用 — v2 doesn't. Minor.
+  - Codex #26 （新产物散落） = 分歧表 #25. Covered.
+  - Grok: "不同 AI/agent 成效" （产出物溯源） — Grok ①需求覆盖表②行： "未回应不同AI成效——没有产出物溯源". Is this in 分歧表？ Not explicitly. v2? Task README 头含最小交付追溯 (run_id, 执行时间） — that's per-task delivery traceability, not "which AI wrote it". Hmm, v2 doesn't clearly add agent-attribution. But query.yaml already has AI来源 field (Codex #9 mentioned query.yaml contains AI来源）. v2 says query_code 清单引用不复制 — so AI attribution lives in platform. Partially addressed.
+  - Grok: "P4 覆盖§3.4四类 vs 五类" — v1 internal issue; v2 restructured §3.4 to 4 items (1 INDEX, 2 manifest, 3 演练， 4 AGENTS指针）. Resolved by restructuring.
+  - Grok: "P0 基线落点未指定" — v2 P0 产物 = `review/round-10-exec/盘点.json`. Specified. Good.
+  - Grok §四.1: AGENTS.md 22.7KB/146行， 32KiB truncation — v2 §2 row 1 mentions "22KB，Codex 32KiB 截断窗内但已近半". Covered.
+  - Kimi 次要观察： "取数补编号需在 README 目录更新记录登记" — v2? P3 产物 doesn't explicitly mention README 登记义务... Actually AGENTS rule is about exports 目录登记 in README 目录更新记录. Wait — the rule says "发现未编号或不符的任务目录，按本规则补编号/整理后在 README 目录更新记录登记". v2 P3 doesn't mention this登记. Hmm, check: v2 §3.2 L2 item 1-3, P3 row. Not mentioned. That's a miss of Kimi's secondary observation. But it's minor; though exports README... Actually which README? "README 目录更新记录" — the AGENTS rule refers to 开发起步包/README.md's 目录更新记录？ The rule context is 取数导出目录规则； it says "在 README 目录更新记录登记" — presumably 取数 exports related registration. v2 omits. Minor gap.
+  - Kimi: manifest 双源漂移 — covered by 分歧表 #8.
+  - Grok: 审查_zcode 自审未抓住 — fine.
+
+  Also 分歧表 #19: Grok claimed 检查_codex.md empty; evidence shows 16,465 bytes. True — I see 检查_codex.md is 16465 bytes. And there are _r2 files: 检查_codex_r2.md is 0 bytes (r2 round). Fine.
+
+  Now check v2 for NEW problems:
+
+  1. v2 §1 says "开发起步包 顶层 MD 130 个（编号 1–187 中 111 号在册，76 跳号来自归档）；README 206KB/601 行". Need verify. Grok said 212KB/553行 on same day. Discrepancy — v2 claims "实测复核版". Let me check README size.
+
+  2. v2 §3.1 允许保留清单 includes "GIT_SETUP.md" — verify it exists. Also `三仓库检查处理提示词-数据资产.md`、`三仓库问题清单与评审提示词.md` — verify existence.
+
+  3. v2 §3.1: "frontend 六个日志" — verify: build*.log, dev.err, dev.log, typecheck.log, vitest.log. build*.log could be several files. And 审查_grok.raw/.err → review/adhoc. Verify frontend root files.
+
+  4. v2 §3.2: 改名 14、15、16 — "续现最大号 13" — verify max is 13.
+
+  5. v2 §3.2 危险 SQL: `1、医保/飞检-创建表及导库(1).sql` — verify exists and contains CREATE TABLE.
+
+  6. v2 §3.3: output_r* 15 个 — verify. dev_env.sh references output_r170/import170.py — verify.
+
+  7. v2 §3.5.5: "约 170 条未提交改动" — verify roughly via git status count.
+
+  8. v2 §2 claims AGENTS.md 22KB — verify.
+
+  9. v2 §3.4.1: INDEX.md ≤40行 new file; AGENTS only +1 line. But AGENTS.md has a mandatory documentation rule: new docs must be numbered NN_中文名.md and registered... Actually INDEX.md at root — AGENTS doc rules apply to 开发起步包 mainly ("文档管理" section about 开发起步包 README). INDEX.md in root is a new entry file — hmm, AGENTS says 新文档编号前缀 — that applies to 开发起步包 docs. Root INDEX.md similar to 三仓库互通地图.md precedent (root, unnumbered). Fine.
+
+  10. Potential new issue: v2 §3.1 says `.pytest_cache/` 直接删除——唯一删除项. But also frontend logs go to artifacts. And v2 says artifacts/ gitignored receives `.release_r169_20260830/` — a dot-directory; fine.
+
+  11. v2 §3.1 新增 `_scratch/` 和 `artifacts/` gitignored — but wait, .gitignore already ignores `/_tmp_*`; moving to _scratch requires adding to .gitignore — v2 P2 says ".gitignore 先改". OK.
+
+  12. v2 §4 P3 验收 "exports 目录=编号合规且各含 README 头" — 14 个任务 README 头补全. But §3.2 says template at 取数/exports/_templates/task_readme_template.md — new dir inside exports; fine.
+
+  13. v2 §3.2 L3: 工作量日报 "中已无引用的散 SQL" — verify 工作量日报 exists at 取数/工作量日报.
+
+  14. v2 §1 取数： "总文件约 859" matches grok's 859. OK.
+
+  15. v2 §1 backend: "app 383 / scripts 190 / tests 380 / _oa_work 29" — plausible, can't easily verify all but can spot check.
+
+  16. v2 §3.3.1 output_r: "近 5 轮默认保留 r178/r180/r181/r185/r186" — earlier v1 said "最近3轮" with 4 listed; v2 fixed to "近轮提示（r178/r180/r181/r185/r186 近 5 轮默认保留）". Wait now it's 5 rounds listed as "近 5 轮" — consistent now. But candidates for archiving "r163/r165/r166/r167/r169/r173/r174" — 15 total output_r dirs: which are they? Verify list.
+
+  17. v2 §5: "check_doc_index 三目录联检（与 P0 基线差异=0，181 既有项除外并以基线差异口径报告而非口头豁免）" — addresses Codex #25 second half. Good.
+
+  18. New problem check: v2 §3.4.1 INDEX.md "新增，入库" while AGENTS prohibits "平行状态总表" — INDEX is a short map not state table; consistent with 分歧表 #8 resolution. But note AGENTS.md "文档管理与目录维护" says 禁止新建平行状态总表； INDEX.md as navigation map is arguably fine, and v2 says README 保持权威. OK.
+
+  19. v2 §3.4.2 repo_manifest "本地按需生成，不入库" — but tools/build_repo_manifest.py itself would be tracked (tool). Fine.
+
+  20. Check: v2 §1.5 says .gitignore 含 `/取数/*` — verify exact pattern. Grok said `/取数/*`. If .gitignore has `/取数/*` then 取数/START_HERE.md is also ignored? START_HERE.md is a file inside 取数 — `/取数/*` ignores all direct children including START_HERE.md. Hmm, but is START_HERE tracked? If tracked before ignore, still tracked. Whatever — v2's claim "取数/ 全部（含 exports）" ignored: if START_HERE.md is tracked, claim slightly overstated. Check git ls-files 取数.
+
+  21. v2 §0 note: "实测 gpt-5.6 在 ChatGPT 账号不可用，已用 gpt-6-astra+low 替代" — process note; fine.
+
+  22. v2 §3.5.3: register_doc.py exists? Verify tools/register_doc.py exists.
+
+  23. v2 §4 P5: "check_doc_index 三目录联检+_archive 子目录扫描+exports 编号校验" — covers Codex #15. Good.
+
+  24. v2 §3.3.4 README 瘦身 — addresses Grok #5/Codex #13/分歧表 #13. Good. But "不物理拆文件" — Grok suggested 按分组拆页或强制分段读； v2 chose 分段读取约定+INDEX. Reasonable trade-off, documented.
+
+  25. v2 §6.5: "取数为本机面：跨机器交接不依赖 Git（现状即如此）" — addresses Codex #12 partially by explicit deferral. Codex #12 asked for 受控存储位置/可检索摘要/保留清理条件 — v2 defers. Note as residual gap (deferred, not implemented).
+
+  Now also check whether v2 dropped anything from v1 that was good, or introduced contradictions:
+
+  - v2 §3.1 允许保留目录 list: "backend/ frontend/ deploy/ tools/ review/ verify/ 取数/ 开发起步包/ .agents/ .ssh/ .zcode/ drivers/" — that's 12 dirs. Plus .video_agent/. Root also has .git/, .pytest_cache/ (delete), _offline_build_123/ (→artifacts), .release_r169_20260830/ (→artifacts), qa-report-20260909/ （待确认）. What about `.agents/`? included. Anything else in root? From tree: also `_tmp_*` files, tar.gz files. And possibly other files like `GIT_SETUP.md`, `CLAUDE.md`. Also `开发起步包` has "... and 223 more". Root listing shows "... and 22 more entries" — so there may be more root files not in the tree! The tree was truncated. v2 claims "散文件 34 个". Need to verify actual root files to see if 允许保留清单 covers everything. Let me list root.
+
+  - Potential issue: v2 §3.1 保留文件 includes `GIT_SETUP.md` — check exists.
+
+  - v2 P2 验收： "根目录实际清单 == §3.1 允许保留清单" — but .git/, .pytest_cache (deleted), _scratch/, artifacts/, qa-report （待确认）... the允许保留清单 doesn't list `.git/` (obvious), `_scratch/`, `artifacts/` (listed as 新增 separately). OK.
+
+  - v2 §3.6: "以上写入 INDEX.md 附录与各子 AGENTS（≤30 行内）" — consistent.
+
+  Now, item-by-item faithfulness check （抽查）. I'll pick representative items across types:
+
+  分歧表 #1: v2 §1 取数 column: "exports/ 交付目录 14 个（编号 [1,3,4,5,6,7,9,10,11,12,13]，缺位 2/8，无编号 3 个：...）" ✓ matches resolution. §3.2 L2.1: 改名 14/15/16 不回填 2/8 ✓. §5: "exports 14 个目录全部编号合规（缺位 2/8 保持空号）" ✓.
+
+  #2: v2 §1.5 两层治理声明 ✓.
+
+  #3: §3.1 允许保留清单逐文件 ✓ includes bat, 三仓库 MDs, gitignore, gitattributes... wait — does §3.1 list `.gitignore`、`.gitattributes`? Yes: "`.gitignore`、`.gitattributes`" — yes listed. 三仓库互通地图.md ✓, 三仓库检查处理提示词 ✓, 三仓库问题清单与评审提示词 ✓. .video_agent 保留并明示 ✓.
+
+  #4: §1 开发起步包 "数据资产_* 包 15 个" ✓.
+
+  #5: §3.3.1 引用保留为主+近轮提示 ✓.
+
+  #6: §3.1 不迁移 tools/capture_* ✓.
+
+  #7: §3.2 三层 ✓; 48项目核心制度保留 ✓.
+
+  #8: §3.4 INDEX 短地图+manifest 降级本地派生 ✓; README 瘦身 §3.3.4 ✓.
+
+  #9: §3.5.4 占位提交剥离 ✓.
+
+  #10: §3.1 待确认 qa-report ✓.
+
+  #11: §1.5 drivers 保留原地 ✓.
+
+  #12: §3.5.5 开工门禁 ✓.
+
+  #13: §3.3.4 README 瘦身 ✓.
+
+  #14: §3.4.2 键=相对路径 ✓.
+
+  #15: P5 "_archive 子目录扫描" ✓.
+
+  #16: §4 重排 P1 规则先行，P2 验收不再依赖 P4 工具？ P2 验收： "根目录实际清单==§3.1 允许保留清单；清单哈希全对" — no check tool dependency ✓. P5 验收有"工具测试绿" ✓.
+
+  #17: §3.2 指标口径拆分三分数 ✓; §5 ✓.
+
+  #18: §0 注 ✓.
+
+  #19: 分歧表 handled; v2 doesn't need change. §0 note mentions gpt-6-astra 替代留档 ✓.
+
+  #20: §1 "11,531 条消息" ✓.
+
+  #21: §1 历史证据 + §7 声明 ✓.
+
+  #22: §2 表格补实例 ✓.
+
+  #23: §3.2 L2.2 README 头含最小交付追溯字段 ✓.
+
+  #24: §2 "借鉴理念/实际引入"+"差异"列 ✓.
+
+  #25: §3.6 ✓.
+
+  #26: §3.1 frontend 日志 → artifacts (mv 默认） ✓. Actually 分歧表 #26 说 "定 mv 默认（只迁不删红线），删除选项留用户" — v2 §3.1 says frontend 六个日志 → artifacts. And .pytest_cache 直接删除 "唯一删除项，可再生". Hmm — #26 said 只迁不删红线 for logs; .pytest_cache deletion is a different object, v2 justifies as 可再生. Is deleting .pytest_cache a violation of "只迁不删"? It's a cache directory, regenerable; risk minimal. But the repo's doc rule "无用文档迁移（只迁不删）" applies to 开发起步包 docs, not caches. Acceptable but flag as a judgment call — deletion is irreversible in the strictest sense but cache is regenerable. Fine, minor.
+
+  #27: §3.1 审查产物 → review/adhoc/ ✓.
+
+  #28: §3.4.4 AGENTS 仅加 1 行指针，守护表进 INDEX ✓.
+
+  #29: §1 "_tmp_* 22 个" ✓ (verify actual count).
+
+  #30: §1 tools "48 项（含 __pycache__；根下脚本 25）" — wait, 分歧表 #30 says v2 注明口径"不含 __pycache__"... v2 says "48 项（含 __pycache__；根下脚本 25）" — it clarifies composition. ✓ (resolution said 注明口径； v2 states 含 pycache, 根下 25). Fine.
+
+  Now items in reviews NOT in 分歧表 — check if v2 addressed anyway:
+
+  - Codex #7 （断链验证三检）: v2 §4 执行边界 "移动前必 grep（正文含旧路径+parents[1] 类动态拼接+Markdown 相对链接三检，含 ignored 文件的定向搜索例外）" ✓ addressed despite not in 分歧表.
+  - Codex #8 （回滚碰撞/停止条件）: v2 回滚列 "按清单反向 mv" — 迁移清单含 SHA-256+数量， but no collision handling/stop conditions. Partially. §1.5 "回滚=按清单反向 mv". Gap remains (weakened). Note it.
+  - Codex #12 （导出数据长期管理/访问控制）: v2 §6.5 explicitly defers. Residual gap, disclosed.
+  - Codex #20 共享测试资源/worktree: not addressed. Minor; 分歧表 #9 covered main parts.
+  - Kimi 次要： exports 改名须在 README 目录更新记录登记 — v2 P3 doesn't mention登记义务. Check v2... §3.2/P3 — not mentioned. Minor miss. Actually wait — is that rule about 开发起步包 README? "发现未编号或不符的任务目录，按本规则补编号/整理后在 README 目录更新记录登记" — README here likely means 开发起步包/README.md 目录更新记录. v2 omits. Flag as minor.
+  - Grok 需求② "不同AI成效/产出物溯源": v2 部分覆盖 (task README 追溯字段含 run_id；但无 agent 归属）. query.yaml has AI来源 per Codex #9. v2 says 引用不复制 — so attribution accessible via platform. Acceptable-ish; note.
+
+  Now new problems in v2 — verify factual claims:
+
+  Let me run verification commands:
+  1. ls root files count, _tmp_* count.
+  2. ls 取数/exports.
+  3. ls -d 开发起步包/数据资产_*
+  4. ls -d 开发起步包/output_r*
+  5. wc -c/-l 开发起步包/README.md
+  6. wc -c AGENTS.md
+  7. .gitignore content
+  8. git ls-files | grep -E "取数|drivers|_tmp"
+  9. git status --short | wc -l
+  10. grep parents in capture scripts; dev_env.sh OTHER_DOMAIN
+  11. 取数 top-level ls; START_HERE content re 48项
+  12. ls frontend root *.log etc.
+  13. ls tools | wc; register_doc.py exists
+  14. 184 报告 message count; 187 exists
+  15. 工作量日报 exists
+  16. 飞检 SQL exists + CREATE TABLE
+  17. check_doc_index.py scan_package
+  18. root files: GIT_SETUP.md etc.
+
+  Let me batch these.
+
+32
+22
+AGENTS.md
+CLAUDE.md
+GIT_SETUP.md
+_tmp_certcheck.py
+_tmp_certcheck2.py
+_tmp_certcheck3.py
+_tmp_certcheck4.py
+_tmp_drg_ssh.py
+_tmp_j10_contract.py
+_tmp_j7_apply.py
+_tmp_j7_fix_layer.py
+_tmp_j7_fix_metrics.py
+_tmp_j7_inspect.sh
+_tmp_j7_query.py
+_tmp_j7_smoke.py
+_tmp_j7_smoke2.py
+_tmp_j7_unused.py
+_tmp_j7_unused2.py
+_tmp_j7_unused3.py
+_tmp_j7_verify.py
+_tmp_j7_verify_release.sh
+_tmp_j8_demo_analysis.py
+_tmp_j9_ai_perm.py
+_tmp_j9_ai_perm2.py
+_tmp_j9_grant_ai.py
+r178_dist.tar.gz
+r181_dist.tar.gz
+start_backend.bat
+start_frontend.bat
+三仓库互通地图.md
+三仓库检查处理提示词-数据资产.md
+三仓库问题清单与评审提示词.md
+10、规培基地数据提取
+11、三规范数据提取
+12、职称晋升工作量统计
+13、心衰PLOS研究数据提取
+1、医保
+20260730市场监督管理费用明细
+20260730质量控制部药占比
+3、移动护理
+4、其他指标提取
+5、财务
+6、抗菌办
+7、设备科
+9、药学部
+PCCM统计
+---
+48项目核心制度
+START_HERE.md
+_query_context
+_query_inbox
+_query_outbox
+_query_quarantine
+_query_results
+_query_synced
+_query_templates
+_query_working
+exports
+工作量日报
+---
+15
+开发起步包/output_r163/
+开发起步包/output_r165/
+开发起步包/output_r166/
+开发起步包/output_r167/
+开发起步包/output_r169/
+开发起步包/output_r170/
+开发起步包/output_r171/
+开发起步包/output_r173/
+开发起步包/output_r174/
+开发起步包/output_r177/
+开发起步包/output_r178/
+开发起步包/output_r180/
+开发起步包/output_r181/
+开发起步包/output_r185/
+开发起步包/output_r186/
+ 22751 AGENTS.md
+212265 开发起步包/README.md
+235016 total
+   195 AGENTS.md
+   600 开发起步包/README.md
+   795 total
+• Findings so far:
+
+  - Root files: 32 total, of which _tmp_* = 22. v2 says "散文件 34 个，其中 _tmp_* 22 个". Actual non-dir files = 32, not 34. Hmm — ls -p | grep -v / counts files only: 32. v2 claims 34. Discrepancy of 2. Wait — maybe hidden files? ls without -a doesn't show dotfiles. .gitignore, .gitattributes are dotfiles! So 32 + 2 dotfiles = 34. ✓ v2's 34 includes .gitignore/.gitattributes. Good — and _tmp count 22 ✓.
+
+  - exports: 14 dirs, numbered [1,3,4,5,6,7,9,10,11,12,13], missing 2/8, unnumbered 3 ✓ matches v2 exactly.
+
+  - 数据资产_* = 15 ✓. output_r* = 15 ✓, and the actual list includes r163/165/166/167/169/170/171/173/174/177/178/180/181/185/186. v2's archive candidates: r163/r165/r166/r167/r169/r173/r174 — all exist ✓. Keep set r178/r180/r181/r185/r186 + referenced r170/r171/r177. Consistent.
+
+  - README: 212,265 bytes / 600 lines. v2 says "README 206KB/601 行". Actual = 207.3 KiB (212265/1024=207.3KB) or 206.3 KB decimal... 212265 bytes = 206.3 KB (decimal) = 207.3 KiB. "206KB" ≈ decimal KB ✓ close enough. Lines: 600 vs v2's 601 — wc -l counts newlines; if file ends without trailing newline, last line not counted, so actual lines could be 601. Acceptable. Grok said 553 lines — v2's 601 closer. AGENTS.md 22751 bytes = 22.2 KiB ✓ "22KB", 195 lines (v2 doesn't cite line count for AGENTS; §2 says "100–150 行为宜" community — AGENTS is 195 lines, slightly over, but v2 only commits to +1 line, fine).
+
+  Next batch: .gitignore, git ls-files, git status count, dev_env.sh, START_HERE, frontend logs, tools, 184/187.__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.*
+node_modules/
+dist/
+.DS_Store
+*.log
+.idea/
+.vscode/
+.pytest_cache/
+dev.log
+dev.err
+.eslintcache
+# AI 本地状态默认忽略，仅跟踪经审核的仓库级技能。
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/ops-runbook/
+!.agents/skills/ops-runbook/**
+!.agents/skills/ods-readonly-sql/
+!.agents/skills/ods-readonly-sql/**
+!.agents/skills/hisuser-readonly-sql/
+!.agents/skills/hisuser-readonly-sql/**
+!.agents/skills/mobile-nursing-readonly-sql/
+!.agents/skills/mobile-nursing-readonly-sql/**
+!.agents/skills/docare-anesthesia-readonly-sql/
+!.agents/skills/docare-anesthesia-readonly-sql/**
+!.agents/skills/sql-relation-intake/
+!.agents/skills/sql-relation-intake/**
+!.agents/skills/query-governance-intake/
+!.agents/skills/query-governance-intake/**
+!.agents/skills/project-task-resume/
+!.agents/skills/project-task-resume/**
+.agents/skills/**/__pycache__/
+.agents/skills/**/*.pyc
+.ssh/
+.zcode/
+
+# 本地临时探查/运维脚本（常含环境注入默认值，禁止进发布基线）
+backend/scripts/_ro_*.py
+backend/scripts/_apply_*.py
+backend/scripts/_hrp_*.py
+backend/scripts/_readonly_*.py
+backend/scripts/_tmp_*.py
+backend/scripts/_m1m2*
+backend/scripts/*_result.json
+backend/scripts/*_pytest*.txt
+backend/scripts/_chk.py
+backend/scripts/_v.py
+backend/scripts/_ufe.py
+backend/scripts/_seed_remote.py
+backend/scripts/_sync_two.py
+backend/scripts/_post_sync_verify.py
+backend/scripts/_deploy_*.py
+backend/scripts/_rerun_*.py
+backend/scripts/_hotfix_*.py
+backend/scripts/_finish_*.py
+backend/scripts/_fix_*.py
+backend/scripts/_probe_*.py
+backend/scripts/_ready_*.py
+backend/scripts/_reclone_*.py
+backend/scripts/_smoke_*.py
+backend/scripts/_ensure_*.py
+backend/scripts/_upload_*.py
+backend/scripts/_verify_*.py
+backend/scripts/_browser_*.py
+backend/scripts/_debug_*.py
+backend/scripts/_hot_*.py
+backend/scripts/_continue_*.py
+# 111 号 S9：一次性指标 / 推送 / 服务端冒烟验证临时脚本，禁止混入发布提交
+backend/scripts/_metrics_snapshot.py
+backend/scripts/_run_push_tests.py
+backend/scripts/_server_test_medical_push.py
+# 其余单下划线脚本均为本地一次性探查/复现辅助；双下划线包文件不匹配。
+backend/scripts/_[!_]*.py
+
+# 大体积本地缓存/导出 / 离线构建产物（不进 Git，仅随发布包传输）
+*.dump
+wheelhouse/
+**/wheels*/
+**/*wheels*/
+frontend/dist/
+deploy/offline/*.tar.gz
+deploy/offline/*.zip
+deploy/offline/SHA256SUMS
+
+# 126：取数工作区 — 运行缓存不进 Git；模板与入口可进 Git
+/取数/*
+!/取数/START_HERE.md
+!/取数/_query_templates/
+!/取数/_query_templates/**
+# 保留历史项目目录由用户自管；默认忽略其下可能含结果的内容
+/取数/48项目核心制度/
+/取数/exports/
+/取数/_query_inbox/
+/取数/_query_working/
+/取数/_query_outbox/
+/取数/_query_synced/
+/取数/_query_quarantine/
+/取数/_query_results/
+/取数/_query_context/
+/取数/.query_state/
+/2026高次次-病历首页数据表样*.xlsx
+/临床诊断字典与国标版本映射关系*.xlsx
+/**/*病历*.xlsx
+
+# 123 offline artifacts (never commit)
+_offline_build_123/
+offline/wheels/
+offline/pnpm-store/
+
+
+backend/identity_unit_test.db
+backend/identity_test.db
+
+# 本地备份副本和用户另行保存的上报材料不属于代码发布基线
+*.bak.*
+/材料上报/
+/开发起步包/_archive/临时命令输出_*
+
+# GitHub 100MB limit: keep HRP bulk columns out of git
+开发起步包/数据资产_HRP源端资产包/hrp_source_columns.csv
+backend/var/*.py
+backend/var/*.txt
+backend/var/*.sh
+backend/var/.*
+
+# 截图/网络抓包/临时二进制
+开发起步包/截图/
+*.har
+
+# 会话临时脚本/发布包（可能含凭据，永不入库）
+/_tmp_*
+/*.tar
+
+# plan139: 四业务源库表结构/元数据大块仅保留本地与服务器证据目录，不进 Git（2026-08-22 用户指令）
+backend/_plan139_work/*_snapshot.json
+backend/_plan139_work/platform_assets_export.json
+开发起步包/数据资产_四系统源端资产包/
+backend/_oa_work/
+开发起步包/数据资产_OA源端资产包/
+
+# 150: 七系统源库表结构/元数据大块仅保留本地与服务器证据目录，不进 Git
+开发起步包/数据资产_七系统源端资产包/
+
+# 171 R1④ 仓库卫生（round-7 D5 裁决：本地保留+gitignore；*.log 已有全局规则覆盖，此处补目录/锁文件）
+开发起步包/docs/
+~$*
+.release_*/
+backend/_r163_work/
+
+# 173: 一次性全栈模拟测试工装目录（只测不修，产物在 开发起步包/output_r173/）
+backend/_r173_work/
+
+# 172/175 一次性工作目录（同 _r163_work 口径）
+backend/_r172_work/
+backend/_r175_work/
+backend/var/126complete-20260811220155-backend.tar.gz
+backend/var/126complete-20260811220155-csv.tar.gz
+backend/var/126complete-20260811220449-backend.tar.gz
+backend/var/126complete-20260811220449-csv.tar.gz
+backend/var/126complete-20260811220449-frontend.tar.gz
+backend/var/126p5-20260811223311-backend.tar.gz
+backend/var/126p5-20260811223311-frontend.tar.gz
+backend/var/core48-sql.tar.gz
+backend/var/release-126p12-20260811213058-backend.tar.gz
+backend/var/release-126p12-20260811213058-frontend.tar.gz
+backend/var/release-126p3-20260811215229-backend.tar.gz
+drivers/Vastbase-G100-2.15_pg-2026033109.jar
+---
+170
+?? qa-report-20260909/
+13:OTHER_DOMAIN_FILES=(
+14-  "frontend/src/layout/index.vue"
+15-  "frontend/src/layout/components/lay-content/index.vue"
+16-  "frontend/src/layout/components/lay-setting/index.vue"
+17-  "frontend/src/layout/hooks/useDataThemeChange.ts"
+18-  "frontend/src/layout/hooks/useTag.ts"
+19-  "frontend/src/store/modules/app.ts"
+20-  "frontend/src/layout/captureMode.ts"
+21-  "frontend/tests/competitionCaptureMode.test.ts"
+22-  "tools/capture_ai_patrol_gif.py"
+23-  "tools/capture_competition_ai_demos.py"
+24-  "tools/capture_competition_screens.py"
+25-  "tools/capture_four_governance_screens.py"
+26-  "tools/capture_governance_gifs.py"
+27-)
+28-
+29-tunnel_up() {
+30-  # 185 WARN 最小修复：本机 Git Bash 的 grep 为 ugrep，netstat 输出（CRLF+GBK 头）
+31-  # 使 `grep -q "127.0.0.1:15432.*LISTENING"` 恒不命中 → 误判隧道不在、重复建转发失败。
+32-  # 改用 bash 内建 /dev/tcp 探测（无外部命令依赖，实测 2026-09-06）。
+33-  (exec 3<>/dev/tcp/127.0.0.1/15432) 2>/dev/null
+--
+63:  for f in "${OTHER_DOMAIN_FILES[@]}"; do
+64-    [[ -f "$ROOT/$f" ]] && echo "$f"
+65-  done
+66-}
+67-
+68-case "${1:-}" in
+69-  --domain-baseline)
+70-    OUT="${2:-$ROOT/开发起步包/output_domain_baseline.txt}"
+71-    { echo "# other-domain hash baseline $(date '+%F %T') HEAD=$(git -C "$ROOT" rev-parse --short HEAD)"
+72-      cd "$ROOT" && git hash-object $(domain_files_existing)
+73-    } > "$OUT"
+74-    echo "[baseline] $(grep -c . "$OUT") 行 -> $OUT";;
+75-  --domain-check)
+76-    BASE="${2:-$ROOT/开发起步包/output_domain_baseline.txt}"
+77-    [[ -f "$BASE" ]] || { echo "[check] 基线不存在: $BASE（先 --domain-baseline）"; exit 2; }
+78-    NOW="$(cd "$ROOT" && git hash-object $(domain_files_existing))"
+79-    if diff <(grep -v '^#' "$BASE") <(echo "$NOW") >/dev/null; then
+80-      echo "[check] 他人域 $(domain_files_existing | wc -l) 文件与基线一致 ✔"
+===
+tools/capture_186_screens.py:19:ROOT = Path(__file__).resolve().parents[1]
+tools/capture_ai_patrol_gif.py:13:ROOT = Path(__file__).resolve().parents[1]
+tools/capture_competition_ai_demos.py:17:ROOT = Path(__file__).resolve().parents[1]
+tools/capture_competition_screens.py:19:ROOT = Path(__file__).resolve().parents[1]
+tools/capture_four_governance_screens.py:8:ROOT = Path(__file__).resolve().parents[1]
+tools/capture_governance_gifs.py:8:ROOT=Path(__file__).resolve().parents[1]
+===
+89:    echo "[remind] pytest 后按惯例重灌: PYTHONPATH=backend backend/.venv/Scripts/python.exe 开发起步包/output_r170/import170.py";;
+Key findings:
+
+  1. .gitignore: v2 §1.5 says "本机 gitignored 面：取数/ 全部（含 exports——.gitignore 含 /取数/*）". Reality: `/取数/*` is ignored BUT with exceptions: `!/取数/START_HERE.md`, `!/取数/_query_templates/` are un-ignored. So "取数/ 全部" is slightly overstated — START_HERE.md and _query_templates CAN be in Git. Check if they're actually tracked: git ls-files grep 取数 returned nothing for 取数！ The git ls-files output showed only backend/var tar.gz files and drivers jar. So 取数/START_HERE.md is NOT tracked despite the negation. So v2's practical claim （取数 不在 Git 里） holds true in fact, though the .gitignore does allow START_HERE/templates. v2's statement ".gitignore 含 /取数/*" is accurate. Minor nuance: v2 says "取数/ 全部" gitignored — technically START_HERE/_query_templates are not ignored by .gitignore but are untracked. v2's L1 says "_query_* 工作流目录与 query.yaml/query_code 机制整体不动" — fine. Not a real problem, but a small imprecision worth noting: v2's §1.5 "取数/ 全部（含 exports——.gitignore 含 /取数/*）" omits the negation exceptions. Low severity.
+
+  2. tar.gz: .gitignore has `/*.tar` (root tar files) — r178_dist.tar.gz ends with .tar.gz... does `/*.tar` match `r178_dist.tar.gz`? No! `*.tar` doesn't match `*.tar.gz`. Hmm. But git status shows only `?? qa-report-20260909/` as untracked among our targets — wait, git status --short | grep showed only qa-report line. But _tmp_*, tar.gz didn't appear in git status output? git status --short | wc -l = 170. Let me check: the grep for "qa-report|drivers" showed only qa-report. drivers is tracked & unmodified. But are r178_dist.tar.gz tracked? git ls-files didn't show them. Are they ignored? `/*.tar` doesn't match `.tar.gz`. Also `**/*wheels*/`? No. Hmm — is there another rule? `deploy/offline/*.tar.gz` — no, root tar.gz not covered... Wait, git status didn't show r178_dist.tar.gz as untracked?? Let me verify. The grep only filtered qa-report|drivers. tar.gz lines wouldn't match that grep. Need to check git status for tar.gz and check_ignore.
+
+  Actually v2 §1.5 says tar.gz are in "本机 gitignored 面" — need to verify. Let me run git check-ignore.
+
+  3. dev_env.sh OTHER_DOMAIN: contains 5 capture_* scripts (capture_ai_patrol_gif, capture_competition_ai_demos, capture_competition_screens, capture_four_governance_screens, capture_governance_gifs) — NOT capture_186_screens. tools has 6 capture_* (incl. capture_186_screens). v2 says "capture_* 6 个中 5 个在 dev_env.sh 他人域基线内" ✓ accurate. All 6 use parents[1] ✓ (v2 says "且用 parents[1] 定位仓库根（移动即断）" — stated about the capture_* group; accurate).
+
+  4. dev_env.sh line 89 references output_r170/import170.py ✓ (v2 §3.3.1 claim).
+
+  5. git status 170 条 ✓ matches v2 §3.5.5 "约 170 条未提交改动".
+
+  6. qa-report-20260909 untracked (`??`) — v2 says 归属待确认，疑为并行 QA 会话活跃台账. Fine.
+
+  Next: check tar.gz ignore status, START_HERE 48项 language, frontend root files, tools count, register_doc.py, check_doc_index scan_package, 184 message count, 187 existence, 工作量日报， 飞检 SQL, exports numbering, GIT_SETUP.md exists (yes saw in root listing ✓), 三仓库 MDs ✓ (in root listing)..gitignore:136:/_tmp_*	_tmp_j7_query.py
+.gitignore:97:/取数/exports/	"\345\217\226\346\225\260/exports"
+.gitignore:152:.release_*/	.release_r169_20260830
+.gitignore:111:_offline_build_123/	_offline_build_123
+---
+?? r178_dist.tar.gz
+?? r181_dist.tar.gz
+26:| `48项目核心制度/` | 现有试点 SQL（保留，不自动移动） |
+===
+7:1. 平台是唯一事实源；本目录是缓存与交接，不是权威库。
+26:| `48项目核心制度/` | 现有试点 SQL（保留，不自动移动） |
+Dockerfile
+LICENSE
+README.en-US.md
+README.md
+build.log
+build2.log
+commitlint.config.js
+dev.err
+dev.log
+eslint.config.js
+index.html
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+postcss.config.js
+stylelint.config.js
+tsconfig.json
+typecheck.log
+vite.config.ts
+vitest.log
+审查_grok.err
+审查_grok.raw
+---
+27
+24
+tools/check_doc_index.py
+tools/register_doc.py
+Critical findings:
+
+  1. **r178_dist.tar.gz / r181_dist.tar.gz are NOT gitignored** — git check-ignore returned nothing for them, and git status shows them as `??` untracked. v2 §1.5 claims: "本机 gitignored 面：…根 `_tmp_*`、`*.log`、tar.gz、`_offline_build_*`、`.release_*`…这些不在 Git 里". tar.gz files are untracked but NOT ignored. Implication: after moving them into `artifacts/`, P2 says ".gitignore 先改" to add artifacts/ — if artifacts/ is gitignored, then moving tar.gz there is fine. But v2's §1.5 statement that tar.gz are currently in the "gitignored 面" is factually wrong — they're just untracked. Practical impact is small (they're not in Git either way), but the两层治理声明's premise "不适用 git status 纯 rename 验收" still holds. However there's a subtlety: untracked-but-not-ignored files show up in git status as ?? — if artifacts/ is added to .gitignore first, fine. Minor factual imprecision. Also note: qa-report-20260909 is also untracked-not-ignored (consistent with kimi's "未忽略").
+
+  Wait — actually check-ignore output: only 4 lines returned, for _tmp_j7_query.py, 取数/exports, .release_r169_20260830, _offline_build_123. r178/r181 tar.gz, 取数/START_HERE.md, qa-report got no output = not ignored. START_HERE not ignored (matches the negation rule) ✓. So v2's "tar.gz gitignored" claim is wrong. `/*.tar` doesn't match `.tar.gz`. Good catch — a new minor factual error in v2.
+
+  Hmm, but does it matter for the plan? v2 P2: "artifacts/ 建立（.gitignore 先改）；mv … tar×2…". Since artifacts/ will be gitignored, end state same. But §1.5's characterization "不适用 git status 纯 rename 验收" — for untracked files that remains true. And "也不承诺 Git 级回滚" — true. So impact: low, but it is an inaccuracy in the "实测复核版" section. Also worth noting: since tar.gz are NOT ignored, they currently pollute `git status` as ?? — moving them to gitignored artifacts/ actually cleans git status. Fine.
+
+  2. frontend logs: build.log, build2.log, dev.err, dev.log, typecheck.log, vitest.log = 6 日志 ✓ (v2 "frontend 六个日志" ✓; "build*.log" = 2 files). 审查_grok.raw/.err ✓ exist. Total non-dir files = 22, not 36! v2 §1 says "frontend 根 36 文件中垃圾为…". Wait — Grok said "36 个根文件". My ls -p frontend | grep -v / shows 22 files. Hmm, maybe ls -p didn't show hidden files (.eslintrc? .npmrc etc.). Let me count with ls -A. Grok counted 36 probably including dotfiles. v2 just repeated "36". Let me verify.
+
+  3. tools: ls tools/ | wc -l = 27?? v2 says "tools 48 项（含 __pycache__；根下脚本 25）". I got 27 items total, 24 .py files. Grok said "48=含 __pycache__+tests; 根下 25". Hmm — 27 vs 48? Maybe subdirectories contain more (tools/tests/). ls tools/ counts top-level entries = 27. Where does 48 come from? Maybe `ls tools/` at Grok's time included more, or counted recursively? The working tree shows tools/ has __pycache__, tests, and ~25 scripts. 27 top-level entries (25 scripts + __pycache__ + tests?). Actually 24 *.py + maybe capture shell scripts etc. v2's "48 项" — where from? v1 apparently said 48 （分歧表 #30: "tools 48 含 pycache 口径" — v1 said 48, grok said 48=含字节码， 根下25). Hmm, grok said tools 文件 48 = 含 __pycache__+tests. But my count of top-level entries is 27. Unless __pycache__ contains ~20 .pyc files and tests/ contains files... "48 项" might be a recursive count? Let me count recursively. Actually the initial tree listing showed tools/ with __pycache__/, tests/, and scripts "... and 17 more" → total around 27 entries. So "48 项" might count including contents of __pycache__ and tests. Let me verify with find.
+
+  4. START_HERE: 48项目核心制度 "保留，不自动移动" ✓; "平台是唯一事实源" ✓ — v2's claims accurate.
+
+  5. register_doc.py ✓ exists; check_doc_index.py ✓.
+
+  Next verify: frontend dotfiles count, tools recursive count, check_doc_index scan_package skip subdirs, 184 message count 11,531, 187 doc exists, 工作量日报 contents, 飞检 SQL, exports README status (only 13 has README?), GIT_SETUP.md exists ✓ (saw in root). Also check 取数 total files ~859, backend counts maybe skip (v2 says 实测复核）. Also check "186 观察窗" in README — grep. And check_doc_index.py scan_package.48
+36
+---
+28
+48
+18
+            m = NUM_PREFIX.match(f.name)
+            if m:
+                archived[int(m.group(1))].append(f.name)
+
+    missing_cat: list[str] = []
+    for num, names in sorted(body.items()):
+        for name in names:
+            first = next(
+                (ln for ln in (pkg / name).read_text(encoding="utf-8").splitlines() if ln.strip()),
+                "",
+            )
+            if not CATEGORY_LINE.match(first):
+                missing_cat.append(name)
+
+    return {
+        "body": dict(body),
+        "companion": dict(companion),
+        "outdirs": dict(outdirs),
+        "archived": dict(archived),
+        "missing_cat": missing_cat,
+    }
+
+
+def readme_coverage(readme_text: str) -> dict[int, str]:
+    """提取主 README 的登记覆盖（编号 -> 依据）。
+
+    只认反引号形态：`` `NN_...` `` 文件名、`` `a`–`b` `` 区间、`` `N` `` 裸编号
+    （完成度总览与证据链分组行中的裸编号同样是登记主张）、`` `output_rNN/` ``
+    同号输出目录显式登记。目录更新记录中的纯文本历史提及不算登记（历史记录
+    提及合法 ≠ 当前清单登记）。
+    """
+5:> 数据基础：35 个会话档案（tools/export_zcode_conversations.py 导出，11,531 条消息）+ 两轮只读子代理模式分析 + 项目 exceptions 台账
+41:| `tools/export_zcode_conversations.py` | 会话库导出（本次复盘的数据源） | 35 会话/11,531 条/11MB ✔ |
+开发起步包/187_多任务取数会话纪要与挂起事项.md
+---
+1. frontend root: `ls -A | grep -v /` = 48?? That grep -v / on ls -A output — ls -A doesn't append /, so directories are included in the count. 48 = all entries including dirs. With -p (slash-append), files = 36. So "frontend 根 36 文件" = 36 files (including dotfiles like .eslintrc etc.) ✓ consistent with v2's "根 36 文件". My earlier non-hidden count was 22. OK v2 fine.
+
+  2. tools: find maxdepth 1 = 28 entries (27 + tools itself). find type f = 48 files total (recursive, incl. tests/ and __pycache__ .pyc=18). So "48 项（含 __pycache__）" — 48 recursive files incl 18 pyc; "根下脚本 25"... find tools -maxdepth 1 -type f: 28 entries - tools - __pycache__ - tests = 25 files at root. ✓ v2 accurate. Grok's "根下 25" also. Good.
+
+  3. 184 says 11,531 ✓ v2 correct. 187 exists ✓.
+
+  4. README "观察窗" grep returned nothing! v2 §3.5.5 says "186 处观察窗" and §1 says 186 S5 观察窗 (Grok's claim was "README 显示 186 仍在 S5 观察窗（2026-09-10 起）"). My grep for 观察窗 in README found nothing. Let me grep more broadly — maybe "观察窗" is in 186 doc or phrased differently ("S5", "观察"). Check.
+
+  5. check_doc_index.py: the snippet shows archived scanning via NUM_PREFIX on f.name — need to see if it iterates subdirectories. The visible part: `archived[int(m.group(1))].append(f.name)` — need context above line 80 to see if it's (pkg/"_archive").glob("*") files only. Let me read more of the file to confirm scan_package skips subdirectories (Codex #15 claim).      missing_cat   主目录编号 .md 中首行非 `> 类别：` 的文件名列表
+    """
+    body: dict[int, list[str]] = defaultdict(list)
+    companion: dict[int, list[str]] = defaultdict(list)
+    for f in sorted(pkg.glob("*")):
+        if not f.is_file():
+            continue
+        m = NUM_PREFIX.match(f.name)
+        if not m:
+            continue  # README.md、HIS问题表映射.csv、~$ 锁文件等非编号文件
+        num = int(m.group(1))
+        (body if f.suffix == ".md" else companion)[num].append(f.name)
+
+    outdirs: dict[int, str] = {}
+    for d in sorted(pkg.glob("output_r*")):
+        m = OUTDIR_NAME.match(d.name)
+        if m:
+            outdirs[int(m.group(1))] = d.name
+
+    archived: dict[int, list[str]] = defaultdict(list)
+    archive_dir = pkg / "_archive"
+    if archive_dir.is_dir():
+        for f in sorted(archive_dir.glob("*")):
+            if not f.is_file():
+                continue
+            m = NUM_PREFIX.match(f.name)
+            if m:
+                archived[int(m.group(1))].append(f.name)
+72:| P0 | `186_系统功能与菜单体验重构_执行报告.md` + 同号 `_结果.json` + `output_r186/` | **v1.10 已执行至 S5（2026-09-10）：observe 夜1 通过、230 基线冻结、试点+本窗 19 人执行（17 人双/单目标停用）；211 人按 20h/窗≤20 推进，cron=disable_only；enable 保持关闭** | P0-1～P0-20、P1-1/4~12、T47～T60落地；生产镜像r186-20260909c+迁移e8f9a0b1c2d3+唯一observe cron+前端切换；两disable执行器+用途绑定+试点范围(003740/001554)已登记；两enable保持disabled；校时待内网NTP源。证据：报告v1.10节+结果JSON review_fixes+output_r186/production_pack |
+73:| P0/P1 | `186_系统功能与菜单体验重构一次性执行计划.md` | **v1.10 已执行至 S4（部署+登记完成）；S5/S6 跨夜观察与试点按窗口待验证；disable-only批准保留** | §13新增P0-16～P0-20、P1-12及T47～T60（合计60场景）：CDMS大小写/恢复竞态、源注册按用途兼容字典、observe全身份零写、批准名单/跨夜预算、目标漂移回读、反馈排序；8.83可安全校时，两目标以只读时钟采样与类型/时区合同取证，不改目标时间，不以时间容差证明锁所有权。S0–S6分阶段门禁，003740/001554双人试点，230基线每窗max20，缺失blocked/retry；enable/建号/人工回填/提阈值仍关闭；§9为当前接续提示词 |
+247:- 2026-09-10：186 S5 当日执行（应用户要求）——晨检通过+2 修复（cron 直连开关/时钟采样缺参→镜像 e）；冻结 230 基线（scope 2）；试点 003740 双目标停用回读一致、001554 JHEMR 停用+CDMS target_missing；本窗批次 17 人实际停用；当日反饥饿+熔断口径修复→镜像 g；cron 切 disable_only；211 人约 11 窗逐窗推进待验证。员工侧停用 60 人未入批准范围单列。
+248:- 2026-09-09（晚，v1.10执行）：P0-1～P0-20/P1-1~12适用项/T47～T60全部修复并隔离验收（身份专项290+用例、后端全量干净重跑、前端typecheck+vitest 320+build预算、迁移e8f9a0b1c2d3往返）；生产S3完成（备份pg_dump→旧cron归档停用→镜像r186-20260909c→迁移→唯一host_cron(observe)→前端r186-20260909c原子切换→readiness ready=true）；S4受控登记（用途绑定×2、JHEMR/CDMS两disable执行器启用、试点范围003740/001554，GovernAuditLog留痕）；chrony公网pool不可达校时受阻待内网源；观察夜自2026-09-10 02:00起，试点最早2026-09-12窗，230基线逐窗≤20人推进，全部待验证未伪报。新增tools/check_186_production_readiness.py、tools/collect_186_readonly_baseline.py及output_r186/production_pack/证据。
+===
+72:| P0 | `186_系统功能与菜单体验重构_执行报告.md` + 同号 `_结果.json` + `output_r186/` | **v1.10 已执行至 S5（2026-09-10）：observe 夜1 通过、230 基线冻结、试点+本窗 19 人执行（17 人双/单目标停用）；211 人按 20h/窗≤20 推进，cron=disable_only；enable 保持关闭** | P0-1～P0-20、P1-1/4~12、T47～T60落地；生产镜像r186-20260909c+迁移e8f9a0b1c2d3+唯一observe cron+前端切换；两disable执行器+用途绑定+试点范围(003740/001554)已登记；两enable保持disabled；校时待内网NTP源。证据：报告v1.10节+结果JSON review_fixes+output_r186/production_pack |
+73:| P0/P1 | `186_系统功能与菜单体验重构一次性执行计划.md` | **v1.10 已执行至 S4（部署+登记完成）；S5/S6 跨夜观察与试点按窗口待验证；disable-only批准保留** | §13新增P0-16～P0-20、P1-12及T47～T60（合计60场景）：CDMS大小写/恢复竞态、源注册按用途兼容字典、observe全身份零写、批准名单/跨夜预算、目标漂移回读、反馈排序；8.83可安全校时，两目标以只读时钟采样与类型/时区合同取证，不改目标时间，不以时间容差证明锁所有权。S0–S6分阶段门禁，003740/001554双人试点，230基线每窗max20，缺失blocked/retry；enable/建号/人工回填/提阈值仍关闭；§9为当前接续提示词 |
+247:- 2026-09-10：186 S5 当日执行（应用户要求）——晨检通过+2 修复（cron 直连开关/时钟采样缺参→镜像 e）；冻结 230 基线（scope 2）；试点 003740 双目标停用回读一致、001554 JHEMR 停用+CDMS target_missing；本窗批次 17 人实际停用；当日反饥饿+熔断口径修复→镜像 g；cron 切 disable_only；211 人约 11 窗逐窗推进待验证。员工侧停用 60 人未入批准范围单列。
+248:- 2026-09-09（晚，v1.10执行）：P0-1～P0-20/P1-1~12适用项/T47～T60全部修复并隔离验收（身份专项290+用例、后端全量干净重跑、前端typecheck+vitest 320+build预算、迁移e8f9a0b1c2d3往返）；生产S3完成（备份pg_dump→旧cron归档停用→镜像r186-20260909c→迁移→唯一host_cron(observe)→前端r186-20260909c原子切换→readiness ready=true）；S4受控登记（用途绑定×2、JHEMR/CDMS两disable执行器启用、试点范围003740/001554，GovernAuditLog留痕）；chrony公网pool不可达校时受阻待内网源；观察夜自2026-09-10 02:00起，试点最早2026-09-12窗，230基线逐窗≤20人推进，全部待验证未伪报。新增tools/check_186_production_readiness.py、tools/collect_186_readonly_baseline.py及output_r186/production_pack/证据。
+250:- 2026-09-09（v1.10复核）：直接修订186计划§9/§12并新增§13，核对当前编排/适配器/写策略/反馈实现，追加P0-16～P0-20、P1-12及T47～T60；将8.83校时与两目标只读偏差采样分离，恢复仍要求锁所有权和独立批准；消除四人试点、旧授权提示词、固定迁移head、部署前后证据循环及230候选与20执行预算混淆。README/55同步，历史报告保留；仅文档与同号基线变更，未开发、连生产、校时或执行停用。181家族目录差异不在本轮修改范围。
+252:- 2026-09-09：186号一次性执行完成（单会话 R0→I2/I3后端→N1-N3→W1/A/Q/D/I/O/U→V1/V2）。新增同号执行报告+结果JSON+output_r186（路由清单/SYS_USER源端证据/10张fixture截图/静态模式请求实证/测试日志）。重大事实更新：**sjzc live 数据字典实证 FXHIS.SYS_USER 实存**（平台元数据漏收；EMPL_CODE↔EMPLCODE 关联 2000/2001 严格一人一账号；STATUS 仅{0,1}；230人「人员有效但账号停用」存量）。生产发布/目标库写入/真实夜跑待批准，未执行。他人域文件零回退。
+254:- 2026-09-09（晚）：186升v1.2——执行后复核追加§12：4个P0代码缺陷（enforce假关/enable桥接TypeError/分批2000<人口2530截断/恢复归因未采目标侧时间戳）+部署顺序硬依赖与渐进发布规范+P1/P2收尾项+用户决策清单（发布批准/230积压三选/试点名单/写开关链/时钟确认），交下一执行AI一次性完成；P0未修复不得申请生产发布。
+256:- 2026-09-09（复核续）：186升v1.3——独立代码复核确认四个P0，并补入 P0-5～P0-10（缺决策旁路、源端截断识别、保护映射、target_missing幂等、时间/时区容差、账号映射歧义）及 P1 最新状态 API/双采集入口/执行器门禁/报告统计；仍未执行生产发布、迁移 apply、目标库写入或真实夜跑。
+Confirmed:
+
+  - check_doc_index.py scan_package: `archive_dir.glob("*")` + `if not f.is_file(): continue` — skips subdirectories ✓ (Codex #15 verified true; v2 P5 addresses it ✓).
+  - 186 观察窗： README confirms 186 S5 "跨夜观察" ongoing （观察夜自2026-09-10 02:00起， 211人 11窗逐窗推进） — v2's "186 处观察窗" claim substantiated ✓. The word "观察窗" itself doesn't appear but the substance （跨夜观察， 试点窗口） is there.
+  - qa-report-20260909: dated 2026-09-09, same period as 186 S3 production work — plausible it's related to 186-era QA. v2's "待确认" handling appropriate.
+
+  Remaining verifications:
+  1. 飞检 SQL exists & contains CREATE TABLE/PII.
+  2. exports README status (v2 P3 says "14 个任务 README 头补全" — check current state; grok said only 13 has README).
+  3. 取数 total files ~859.
+  4. 工作量日报 exists (saw in ls ✓).
+  5. GIT_SETUP.md exists ✓ (in root listing).
+  6. 三仓库 MDs exist ✓.
+  7. .video_agent exists ✓ (tree).
+  8. Check 开发起步包 top-level MD count = 130? v2 says "顶层 MD 130 个（编号 1–187 中 111 号在册，76 跳号来自归档）". Quick check.
+  9. 取数 START_HERE — v2 says "_query_* 10 个目录" — my ls showed: _query_context, _query_inbox, _query_outbox, _query_quarantine, _query_results, _query_synced, _query_templates, _query_working = 8, plus .query_state = 9? v2 §1 says "10 个 _query_* 目录". Count: _query_context, _query_inbox, _query_outbox, _query_quarantine, _query_results, _query_synced, _query_templates, _query_working = 8 `_query_*`. Plus .query_state (dotdir, not _query_). And exports, 48项目核心制度， 工作量日报. 取数子目录实测： Grok said 12 (10 _query_* + 48项 + 工作量日报）. My ls shows 8 _query_* dirs + .query_state + exports + 48 + 工作量日报 = 12 total entries (incl START_HERE.md file). Hmm. Let me count: ls 取数/ showed: 48项目核心制度， START_HERE.md, _query_context, _query_inbox, _query_outbox, _query_quarantine, _query_results, _query_synced, _query_templates, _query_working, exports, 工作量日报. That's 8 _query_* dirs visible. But .query_state is hidden (tree shows .query_state/). So 8 _query_* + .query_state = 9. v2 says "10 个 _query_* 目录". Hmm — maybe there are hidden ones? ls without -A missed .query_state. Is .query_state counted as "_query_*"? It's ".query_state" — different prefix. v2 says "10 个 `_query_*` 目录" — actual = 8 (or 9 counting .query_state). Possible minor count error. Let me verify with ls -A.
+
+  Also exports README check and 飞检 SQL..query_state
+48项目核心制度
+START_HERE.md
+_query_context
+_query_inbox
+_query_outbox
+_query_quarantine
+_query_results
+_query_synced
+_query_templates
+_query_working
+exports
+工作量日报
+---
+HIS医保稽查数据sql.txt
+化验结果.txt
+医保飞检数据提取———病理.txt
+影像检查.txt
+飞检-创建表及导库(1).sql
+---
+HAS README: 取数/exports/13、心衰PLOS研究数据提取/
+---
+862
+---
+130
+1. 取数 dir: 8 `_query_*` directories + `.query_state` + `exports` + `48项目核心制度` + `工作量日报` + `START_HERE.md`. v2 §1 says "10 个 `_query_*` 目录" — actual `_query_*` count = 8. Even counting `.query_state`, it's 9, and `.query_state` doesn't match `_query_*` pattern. So v2's "10 个" is a factual error (should be 8, or 9 incl .query_state). Note: 分歧表 #7's evidence said "取数子目录实测 12 个（10 个 _query_* + 48项 + 工作量日报）" — that evidence itself is wrong (12 total entries = 8 _query_ + exports + 48 + 工作量日报 + START_HERE file; with .query_state = 12 dirs). Actually counting directories only: .query_state, 48, _query_×8, exports, 工作量日报 = 12 directories. So "12 个子目录" is right if including .query_state, but "10 个 _query_*" is wrong — it's 8. This error propagated from 分歧表 into v2 §1. Minor factual error in v2 (and in 分歧表's "evidence" column). Impact: low (doesn't drive any action; L1 says don't touch anyway). But it's in the "实测复核版" section which claims re-verified accuracy.
+
+  2. 飞检-创建表及导库（1).sql exists in exports/1、医保/ ✓. My grep -l CREATE TABLE failed with exit 1 — possibly due to Chinese path/encoding in Git Bash or grep found nothing. Let me retry with proper quoting. Actually the error was on the first command block (grep -l returned nothing → exit 1? No, grep -l exit 1 = no match). Hmm — "Command failed with exit code: 1" for the whole block because last command grep found no match? That would mean the SQL does NOT contain "CREATE TABLE" uppercase — maybe lowercase "create table". Let me check with -i. Also check for PII columns （姓名/身份证）.
+
+  3. exports README: only 13 has README ✓ (matches grok; v2 P3 "14 个任务 README 头补全" is appropriate).
+
+  4. 取数 total files = 862 now (v2 says "约 859（时点漂移）" — hedged with 时点漂移 ✓ fine).
+
+  5. 开发起步包 top-level MD = 130 ✓ matches v2.
+
+  Now check the 飞检 SQL content with case-insensitive grep.10
+0
+a14ba12 docs(185): stage dual-arm ODS/Docare window probe scripts (server-side, read-only)
+63
+---
+99
+77
+The 飞检 SQL has 10 "create table" matches (case-insensitive), 0 姓名/身份证 matches. v2 §1 claims the file "含 CREATE TABLE 与姓名/身份证字段". CREATE TABLE ✓ (10 matches). 姓名/身份证 — 0 matches for those exact terms. Maybe it uses column names like PATIENT_NAME, ID_CARD, or 身份证号码？ Let me check for English PII columns or other Chinese terms like 身份证号. Also possible encoding (GBK?) — grep for Chinese may fail if file is GBK-encoded. Let me check the file encoding and search for PATIENT_NAME/ID_CARD.
+
+  Also git status: 170 total, 63 untracked. Fine.
+
+  Let me check the file.取数/exports/1、医保/飞检-创建表及导库(1).sql: ISO-8859 text, with CRLF line terminators
+0
+--�շ���Ŀ��۱�
+create table  INSUR_EXPORT.�շ���Ŀ��۱� as(
+select
+pl.item_code ҽԺ�շѱ���,
+pl.item_name ҽԺ�շ�����,
+pl.MATERIAL_CODE ��۱���,
+pl.item_name �����Ŀ����,
+pl.units ������λ,
+pl.price ִ�е���,
+' ' ��Ŀ�ں�,
+' ' ��������,
+case when pl.stop_date is null then '��' else '��' end �Ƿ�ͣ��,
+pl.stop_date ͣ��ʱ��,
+pl.item_spec ˵��
+from price_list pl);
+--���������ϸ�嵥
+create table INSUR_EXPORT.���������ϸ�嵥
+as(  select nvl( cc.clinic_no, (select to_char(visit_date,'yyyymmdd')||visit_no from outp_orders_costs where rcpt_no=bb.rcpt_no and rownum=1))  as Ψһ�����ʶ,
+         bb.patient_id as �����,
+         bb.name as ����,
+         (select pmi.sex from pat_master_index pmi where bb.PATIENT_ID=pmi.patient_id) as �Ա�,
+         (select pmi.id_no from pat_master_index pmi where bb.PATIENT_ID=pmi.patient_id) as ����֤����,
+         FLOOR(MONTHS_BETWEEN(trunc(aa.VISIT_DATE),
+         (select pmi.DATE_OF_BIRTH from pat_master_index pmi where bb.PATIENT_ID=pmi.patient_id))/12) as ��ҽ����,
+         aa.VISIT_DATE as ��������,
+         (select d.dept_name from dept_dict d where d.dept_code = cc.ordered_by_dept) as ��Ժ����,
+         aa.appoint_no as ���ݺ�,
+         ' ' as ��۱���,
+         aa.ITEM_CODE as ҽԺ��Ŀ����,
+         aa.ITEM_NAME as ҽԺ��Ŀ����,
+         aa.ITEM_SPEC as ���,
+         aa.item_price as ����,
+         aa.UNITS as ������λ,
+         aa.AMOUNT as ����,
+         aa.COSTS as ���,
+         bb.visit_date as ���÷���ʱ��,
+         (select d.dept_name from dept_dict d where d.dept_code = cc.ordered_by_dept)��������,
+         (SELECT dept_name FROM dept_dict WHERE dept_code = aa.performed_by) as �Ʒѿ���,
+         (case when aa.item_class in('A','B') then 'ҩƷ' when aa.item_class in('I' ) then '������ʩ' else '������Ŀ'
+         end ) as ���ô���,
+The file is GBK-encoded (shows as ISO-8859 mojibake). The content: `bb.name as 姓名`, `pmi.id_no as 身份证号码` — so it does select patient name and ID number. v2's claim "含 CREATE TABLE 与姓名/身份证字段" is ✓ accurate (grep for UTF-8 姓名 failed due to GBK encoding, but the mojibake shows 姓名/身份证号码 present). Good — v2 accurate here.
+
+  Now I have enough verification. Let me also quickly check a couple of remaining v2 claims:
+
+  1. v2 §1 "qa-report-20260909（归属待确认）" — contents 问题记录.md/修复记录.md ✓ (from tree).
+  2. v2 §3.2 "exports/_templates/task_readme_template.md" — new, fine.
+  3. v2 §1 "编号 1–187 中 111 号在册，76 跳号来自归档" — hard to verify quickly; _archive has 77 md files. 111+76=187 ✓ arithmetic consistent. 130 top-level MDs, 111 numbered docs + README + others (non-numbered like 三仓库？ no those are root). 130 MDs total, numbered 111 → 19 non-numbered MDs at top level? Plausible （提示词 etc.). Not critical.
+  4. backend counts (app 383 / scripts 190 / tests 380) — skip; labeled 实测复核版， not load-bearing for plan correctness.
+  5. v2 §4 P0 mentions "review/round-10-exec/盘点.json" — addresses Grok's "P0 基线落点未指定" ✓.
+
+  Now check items I flagged as possibly dropped from 分歧表：
+
+  - Codex #7 （断链 grep 不足）: v2 §4 执行边界 "移动前必 grep（正文含旧路径+parents[1] 类动态拼接+Markdown 相对链接三检，含 ignored 文件的定向搜索例外）" ✓ addressed even though not in 分歧表. Good.
+  - Codex #8 （回滚碰撞/停止条件）: v2 partially — 迁移清单（旧→新+数量+SHA-256）+反向mv. No collision handling （目标已存在）, no stop conditions. §1.5 "回滚=按清单反向 mv". Partially addressed; residual weakness. Not in 分歧表 — dropped finding (medium-low).
+  - Codex #12 （导出数据长期管理/访问控制/跨机器交接）: v2 §6.5 explicitly defers ("本计划不改变，仅清单+哈希留证"). Deferred with rationale, not implemented. Not in 分歧表. It's a design scope decision — defensible but should be noted as a consciously uncovered Codex point.
+  - Codex #20 partial: 共享测试资源占用规则、worktree 评估 — not in v2. 分歧表 #9 covered认领/单一整合者/编号串行化. The worktree/测试资源 parts dropped silently. Minor.
+  - Kimi 次要： exports 改名须在 README 目录更新记录登记 — v2 未提. Let me double check v2 P3... "3 目录改名（不回填 2/8）" — no mention of README 登记. The AGENTS rule （取数导出目录规则） says "按本规则补编号/整理后在 README 目录更新记录登记". So v2 P3 misses this mandatory registration step. Minor but it's a hard rule in AGENTS ("所有 AI 同样遵守本规则"). Flag it.
+
+  Also check: v2 §3.2 L2.1 "续现最大号 13" — actual max is 13 ✓ (verified exports list).
+
+  New problems introduced by v2:
+
+  N1. §1 "10 个 _query_* 目录" — actual 8 (+.query_state=9). Factual error propagated from 分歧表 #7 "evidence". Low impact (L1 not touched anyway), but undermines "实测复核版" claim.
+
+  N2. §1.5 "tar.gz 属 gitignored 面" — actual: r178_dist.tar.gz/r181_dist.tar.gz are untracked but NOT ignored (git status shows ??). The plan's P2 sequence (".gitignore 先改") mitigates, but the §1.5 characterization is wrong; also §1.5 omits .gitignore 的取数例外（START_HERE.md/_query_templates 未被忽略，虽然实际未跟踪）。低严重度。
+
+  N3. .pytest_cache 删除：v2 §3.1 说 ".pytest_cache/ 直接删除——唯一删除项，可再生"。根目录有 .pytest_cache/ 且 backend/.pytest_cache 也存在。删除可再生缓存基本无风险，但与"只迁不删"的仓库文档规则精神（该规则针对文档）不冲突。可接受，但注意 frontend 也提到了吗？frontend 没有 .pytest_cache。OK，低。
+
+  N4. v2 §5 验收 "exports 14 个目录全部编号合规（缺位 2/8 保持空号）且各含 README 头" — 但 §3.2 还说 _templates 目录会建在 exports/ 下，那么 exports/ 下将有 14 个任务目录 + _templates。验收口径 "exports 目录=编号合规" 需要排除 _templates。v2 P3 验收写 "exports 目录=编号合规且各含 README 头" — 若执行 AI 严格按字面，_templates 无编号会被判不合规。小的口径漏洞。另外 check_doc_index 扩展 "exports 编号校验" 也需排除 _templates。值得一提（低-中）。
+
+  N5. v2 §3.1 允许保留清单未含 `.git/`、`artifacts/`、`_scratch/`（后两者以"新增"列出）、`.pytest_cache/`（删除）— 以及 `qa-report` 待确认。但还漏了：根目录是否还有其他东西？我实测根文件 32+2 dotfiles=34 ✓ v2 的 34 对。目录：从 tree 看根目录有 _offline_build_123, .agents, .git, .pytest_cache, .release_r169_20260830, .ssh, .video_agent, .zcode, 开发起步包， 取数， backend, deploy, drivers, frontend, qa-report-20260909, review, tools, verify = 18 ✓ v2 "18 个" 对。允许保留目录清单列了 12 + .video_agent = 13，加新增 _scratch/artifacts = 15，加待确认 qa-report，加迁移走 2（_offline_build/.release）= 18 ✓ 闭合。好。
+
+  N6. INDEX.md 入库与 AGENTS "禁止新建平行状态总表"：v2 把 INDEX 限定 ≤40 行导航地图、状态仍以 README 为权威 — 合理，非状态总表。OK。
+
+  N7. v2 §3.4.3 演练验收 "读取文件数 ≤ 直读 README 的 50%" — 可测量性存疑但可接受。
+
+  N8. v2 §4 P2 验收 "清单哈希全对" — gitignored 面 mv 后 SHA-256 校验，OK。
+
+  N9. v2 §3.2 L2.2 README 头模板放 exports/_templates/ — 而 .gitignore 忽略整个 /取数/exports/，模板不会入库 — 与 126 机制一致（取数本机面）。OK，但注意 _query_templates 是特意 negation 可入库的，exports/_templates 则不会。一致于"本机面"定位。无问题。
+
+  N10. v2 §3.5.5 开工门禁 "P0 仅盘点不搬迁；P2 起批前置条件=域基线锁定+与并行会话协调窗口" ✓ 回应 Grok #4/Codex脏工作区。
+
+  N11. 需求覆盖：Grok 指出"不同 AI 成效/产出物溯源"未回应 — v2 通过 task README 追溯字段（版本/参数/run_id/时间）部分覆盖交付溯源，但"哪个 AI/会话产出"仍只靠 query.yaml 的 AI 来源字段（v2 选择引用不复制）。可算基本覆盖但偏弱。
+
+  N12. v2 §2 表格 "AGENTS.md 开放标准…根 AGENTS.md 单一权威（22KB，Codex 32KiB 截断窗内但已近半）" — 实测 22.7KB ✓。
+
+  N13. v2 §1 backend "_oa_work（gitignored）29" — .gitignore 含 backend/_oa_work/ ✓。
+
+  N14. v2 §1 tools "capture_* 6 个中 5 个在 dev_env.sh 他人域基线" ✓ verified.
+
+  N15. v2 §3.1 "frontend 六个日志" ✓ (build.log, build2.log, dev.err, dev.log, typecheck.log, vitest.log = 6).
+
+  One more check: v2 §3.3.1 says "近 5 轮默认保留 r178/r180/r181/r185/r186" — output_r dirs present: r163,165,166,167,169,170,171,173,174,177,178,180,181,185,186 (15). 保留 5 + referenced (r170 via dev_env.sh; r171, r177 via README per kimi) → candidates r163/165/166/167/169/173/174 (7 个） ✓ consistent with v2's候选 list. Good.
+
+  Also should I check that 分歧表 #19 claim （检查_codex.md 16,465 字节） — yes file is 16465 bytes ✓. And v2 didn't need changes there.
+
+  Check coverage of 需求 ④ "调研 GitHub 通行做法" — v2 §2 now has repo-level instances (agentsmd/agents.md, jaffle-shop) + llms.txt + CODEOWNERS ✓ addresses Codex #22/Grok.
+
+  需求 ⑦ 详细方案+计划交另一 AI 执行 — v2 §4 table with 批/产物/验收/回滚 ✓ much improved.
+
+  Now also confirm the 分歧表 claim in #1 that GLM v1 wrote "17" — whatever, historical.
+
+  One more possible new issue: v2 §3.1 says "`三仓库互通地图.md`（AGENTS 指定 L2 权威，绝不可动）" ✓ matches AGENTS. Good.
+
+  v2 §1.5: "回滚=按清单反向 mv" — fine.
+
+  v2 §3.4.2: manifest 字段白名单 "路径/类别行/状态/标题/docstring 首行" — 状态从哪读？Codex #15（防漂移契约）要求"规定状态从 README、55 还是正文读取"— v2 says "类别行/状态" but does it specify the source of 状态？ "字段白名单（路径/类别行/状态/标题/docstring 首行）" — doesn't specify where 状态 comes from (README 登记行？ 正文首行？). Partially — 漂移契约 lists 生成命令+时戳+schema 版本+禁止手改+过期重生成+不得替代权威入口. The "状态来源未规定" nuance from Codex #15 （出处 §3.4) is partially addressed. Minor.
+
+  I think I have enough. Let me also quickly double-check the "取数 exports README 登记义务" AGENTS rule quote: "发现未编号或不符的任务目录，按本规则补编号/整理后在 README 目录更新记录登记" — yes from AGENTS.md 取数导出目录规则 section. v2 P3 doesn't include this registration step. Also the rule "文件头注明数据源系统与统计口径" — v2's README 头模板 covers 数据源+口径 ✓.
+
+  Also verify 分歧表 #26 resolution "定 mv 默认（只迁不删红线），删除选项留用户" vs v2: frontend 日志 → artifacts (mv) ✓; but .pytest_cache 直删 — .pytest_cache wasn't part of #26 (that was frontend logs). v2 marks it "唯一删除项，可再生" — a small deviation from pure "只迁不删" but justified and low-risk. Note as observation.
+
+  Also v2 §1 取数 says "总文件约 859（时点漂移）" — I measured 862. Hedged ✓.
+
+  Also 111 号在册+76 跳号： can't verify cheaply; arithmetic 111+76=187 consistent; skip with note? I could do a quick check: numbered MDs at top level. ls 开发起步包/*.md | wc -l = 130. Count distinct numeric prefixes: could do quickly.
+
+  Let me do that quick check to be thorough on §1's claim.
+
+111
+71
+• 顶层编号 MD 去重 = 111 号在册 ✓。_archive 去重编号 = 71（v2 说 76 跳号来自归档；71 归档编号 + 可能有些跳号无归档文件，如 2/8 exports 不算… 编号 1–187 共 187，111 在册 → 76 跳号；_archive 有 71 个不同编号，剩 5 个跳号可能无对应归档文件或归档为非 md）。v2 说"76 跳号来自归档" — 71 个有归档 md，剩余 5 个跳号未必"来自归档"。轻微不精确（76 vs 71+5），极低严重度。不深究，可在报告中提一句。
+
+  好，现在写独立结论。结构：
+
+  1. 总体结论
+  2. ① 逐项抽查忠实度（分歧表 30 项 → 抽重点项验证落实，附 v2 节号）
+  3. 初审材料中未入分歧表的发现，v2 是否仍覆盖（Codex #7/#8/#12/#20 部分、Kimi 登记义务、Grok agent 溯源）
+  4. ② 新引入问题清单（_query_* 计数 10→8、tar.gz 非 gitignored、_templates 与编号校验口径、README 登记义务遗漏、76 vs 71 跳号、.pytest_cache 删除）
+  5. ③ 需求覆盖度终评（七要素逐项）
+  6. 结论：是否可交付执行 + 建议修补点
+
+  写中文，引用节号与证据。保持只读——我没有修改任何文件。
+
+To resume this session: kimi -r session_c3af8cc1-0355-41bf-9e67-138d8ef81e61

@@ -1,0 +1,19 @@
+{
+  ".agents/skills/docare-anesthesia-readonly-sql/SKILL.md": "b2444b5f6a3831d5",
+  ".agents/skills/hisuser-readonly-sql/SKILL.md": "e1e31b863f49bed8",
+  ".agents/skills/hisuser-readonly-sql/references/connection-guide.md": "124022d630244248",
+  ".agents/skills/mobile-nursing-readonly-sql/SKILL.md": "24858878ebf8cd53",
+  ".agents/skills/ods-readonly-sql/SKILL.md": "d0309ae247eefa70",
+  ".agents/skills/ods-readonly-sql/references/connection-guide.md": "7dcaa9a0e0840f19",
+  ".agents/skills/ops-runbook/SKILL.md": "2099e10ca23c081d",
+  ".agents/skills/project-task-resume/SKILL.md": "b8e0f67cc7869167",
+  ".agents/skills/query-governance-intake/SKILL.md": "09ce4f6539f5488a",
+  ".agents/skills/sql-relation-intake/SKILL.md": "03bfaaf9e4d15c8a",
+  "backend/app/services/cdms_identity_adapter.py": "b0bd9c9443abd813",
+  "backend/app/services/identity_login_sign_sync.py": "4745f2ba392e4179",
+  "backend/app/services/jhemr_identity_adapter.py": "9461064b08625360",
+  "backend/tests/identity_login_sign_sync/test_login_sign_sync.py": "29feede34e5e5588",
+  "backend/tests/test_identity_sync.py": "4c7eb0d31e23432a",
+  "开发起步包/181_003531签名模式报错根因排查与双向修复记录.md": "434f5fdb2f055726",
+  "开发起步包/output_domain_baseline.txt": "1bb1795d89eec022"
+}

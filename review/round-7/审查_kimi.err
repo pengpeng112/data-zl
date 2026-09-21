@@ -1,0 +1,50 @@
+• Read the file and review it.I'm a read-only reviewer. Review the 方案.md point by point with 【同意/反对/疑问+理由+风险】 per item, citing section numbers or quotes. I should only read 方案.md — I must not read other files in review/. I can rely on my own knowledge of the repo's AGENTS.md constraints (already in context).
+
+  Let me structure the review by sections/items:
+
+  §1 现状诊断：
+  - 1.1 表
+  - 1.2 S1–S7
+
+  §2 修复项 F1–F5
+  §3 测试计划 T0–T5
+  §4 执行顺序
+  §5 边界与风险
+
+  Per-item judgments:
+
+  S1 — 同意 (already fixed, evidence vitest).
+  S2 — 同意 with note: mixing uncommitted changes is real risk.
+  S3 — 同意/疑问: claim "生产 data-asset:r166" — can't verify but plausible.
+  S4 — 同意.
+  S5 — 同意 （登记非缺陷， F5 只核对）.
+  S6 — 疑问： `.gitignore` 追加 `*.log 已有` — fine; "docs/ 副本改移动出库或登记" — user confirmed keeping copies, but moving 200 md files 出库 is file mutation; as reviewer I just assess risk: moving files out of repo may break references. Also `~$*.docx` ignore fine. Risk: `.release_*/` ignore might hide future release artifacts — acceptable.
+  S7 — 同意.
+
+  F1 — 同意.
+  F2 — 疑问/部分反对： "按域分批提交" mixes others' in-progress work （登录签名为他人半成品） — committing half-finished work from parallel sessions is risky; better to commit only completed domains (169/167) and leave 半成品. Also "随后生产发布" — S3 says production r166 broken; hotpatch r170 reasonable but T5 requires authorization — fine. Risk: committing another session's unfinished feature just because tests pass doesn't mean semantically complete.
+  F3 — 同意 with risks (moving docs out).
+  F4 — 同意.
+  F5 — 同意.
+
+  T0 — 疑问： expects 12702, "或先跑 import170.py 重灌" — but §5 says pytest fixtures clear DB, T2 must re-seed before T3. T0 baseline check ok.
+  T1 — 同意； expected test counts may drift (245 vs "39 files") — minor: counts hardcoded will cause false failures; suggest matching on 0 failed rather than exact counts.
+  T2 — 同意； the targeted pytest line lists paths `tests/identity_login_sign_sync` — likely a directory; fine.
+  T3 — 同意 but 疑问： "隔离库+真实数据" — after T2 clears DB, must re-import (mentioned in §5, but T3 section itself doesn't include the re-import step; execution order §4 says T2→T3 without re-seed step — actually §5 says "T2 之后必须重灌再 T3" but §4 flow omits explicit 重灌 step between T2 and T3. Risk: T3 fails with empty DB. Should add explicit step.
+  T4 — 同意.
+  T5 — 同意.
+  通过标准 — 同意.
+
+  §4 — 疑问： order T1 before F2 commit, T2 after commit — fine; but F3 （仓库卫生， .gitignore edit) happens before commit, good. Missing 重灌 step. Also "全程单执行者" good.
+
+  §5 — 同意 mostly; "以其测试通过为准" for 半成品 — risky as noted in F2.
+
+  Also global observation: 方案 scope says "只读分析+计划产出" but F1 was already executed during drafting (modified code) — slight contradiction with "修复执行在方案定稿后进行"; minor.
+
+  Also T1 expects "39 files / 245 tests" while §1.1 says 245 tests after systemMap; earlier line 14 says 238+... consistent-ish.
+
+  Also note AGENTS.md constraints: frontend must use pnpm — plan uses pnpm, good. Git writes need authorization — plan respects.
+
+  Write the review in Chinese, point by point.
+
+To resume this session: kimi -r session_40ec9b22-1131-4a39-b303-ceda92a1efe7

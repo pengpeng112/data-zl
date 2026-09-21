@@ -1,0 +1,180 @@
+{
+  "package": "F:\\python\\数据资产\\开发起步包",
+  "stats": {
+    "body_numbers": 111,
+    "companion_numbers": 55,
+    "outdirs": 15,
+    "archived_numbers": 71,
+    "readme_covered_numbers": 141,
+    "findings": {
+      "error": 1,
+      "warn": 4,
+      "info": 22
+    }
+  },
+  "findings": [
+    {
+      "severity": "error",
+      "code": "orphan_doc",
+      "num": 181,
+      "detail": "主目录文件未在 README 登记：['181_003531签名模式报错根因排查与双向修复记录.md']"
+    },
+    {
+      "severity": "warn",
+      "code": "number_title_mismatch",
+      "num": 164,
+      "detail": "164_163合并升级_执行报告.md 正文一级标题前导编号「163」≠ 文件编号 164（疑似沿用旧标题）"
+    },
+    {
+      "severity": "warn",
+      "code": "number_title_mismatch",
+      "num": 164,
+      "detail": "164_163合并升级_测试任务与值域界面与跨系统数据质控专项计划.md 正文一级标题前导编号「163」≠ 文件编号 164（疑似沿用旧标题）"
+    },
+    {
+      "severity": "warn",
+      "code": "orphan_outdir",
+      "num": 181,
+      "detail": "输出目录 output_r181/ 对应编号未在 README 登记"
+    },
+    {
+      "severity": "warn",
+      "code": "number_title_mismatch",
+      "num": 187,
+      "detail": "187_多任务取数会话纪要与挂起事项.md 正文一级标题前导编号「150」≠ 文件编号 187（疑似沿用旧标题）"
+    },
+    {
+      "severity": "info",
+      "code": "archive_subdir",
+      "num": 0,
+      "detail": "_archive/ 含子目录 _decompile_tmp/（归档证据目录，目录级登记）"
+    },
+    {
+      "severity": "info",
+      "code": "archive_subdir",
+      "num": 0,
+      "detail": "_archive/ 含子目录 completed_plan_snapshots_20260704/（归档证据目录，目录级登记）"
+    },
+    {
+      "severity": "info",
+      "code": "exports_gap",
+      "num": 3,
+      "detail": "exports 编号 3 前存在空号 2（历史空号合法，仅提示）"
+    },
+    {
+      "severity": "info",
+      "code": "exports_gap",
+      "num": 9,
+      "detail": "exports 编号 9 前存在空号 8（历史空号合法，仅提示）"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 125,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['125_H7夜间观察记录.md', '125_HIS签名同步时区故障与150像素整改交接说明.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 149,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['149_字段值域知识库与AI自动注入执行计划.md', '149_曼陀罗EMR与HIS值域分析报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "ghost_whitelisted",
+      "num": 150,
+      "detail": "150 登记无文件（白名单：已删仍登记：用户确认课题结束（2026-09-05），README 行保留作历史说明）"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 153,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['153_平台一次性完善与bug修复_执行报告.md', '153_平台一次性完善与bug修复执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 161,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['161_平台升级核查缺陷修复_执行报告.md', '161_平台升级核查缺陷修复一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 164,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['164_163合并升级_执行报告.md', '164_163合并升级_测试任务与值域界面与跨系统数据质控专项计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 165,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['165_数据问题AI探查与入库_执行报告.md', '165_数据问题AI探查与入库执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 166,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['166_值域与探查问题展示导出_执行报告.md', '166_值域与探查问题展示导出功能开发计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 167,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['167_AI巡查演示界面与AI写SQL工作台_执行报告.md', '167_AI巡查演示界面与AI写SQL工作台开发计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 169,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['169_关系图谱叠加与首屏不可用修复执行计划.md', '169_图谱叠加与首屏不可用修复_执行报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 171,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['171_系统前后端全面修复与测试_执行报告.md', '171_系统前后端全面修复与测试一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 173,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['173_全栈一次性模拟测试问题发现计划.md', '173_全栈模拟测试_问题清单.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 174,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['174_CDMS无纸化赋权未成功_交付说明.md', '174_数据质量主动治理台账_执行报告.md', '174_数据质量主动治理台账方案.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 177,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['177_全仓真实未完成项_执行报告.md', '177_全仓真实未完成项一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 178,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['178_177收口后可执行改进_执行报告.md', '178_177收口后可执行改进一次性执行计划.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 180,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['180_G13分域提交与G1G3生产发布一次性执行计划.md', '180_G13提交与G1G3发布_执行报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 185,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['185_AI协作收敛剩余任务一次性执行计划.md', '185_执行报告.md']"
+    },
+    {
+      "severity": "info",
+      "code": "multi_form_registered",
+      "num": 186,
+      "detail": "同号多正文（README 同号标记或逐文件登记，已识别形态）：['186_系统功能与菜单体验重构_执行报告.md', '186_系统功能与菜单体验重构一次性执行计划.md']"
+    }
+  ],
+  "extensions_note": "exports 联检仅本机工作区有效（取数/ 为 gitignored）"
+}

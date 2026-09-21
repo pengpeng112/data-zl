@@ -1,0 +1,432 @@
+• I need to read the review/round-9 files: 方案_r2.md, 分歧表.md, and probably the original 方案.md and my previous review comments. Let me look at the directory first.
+
+total 154
+drwxr-xr-x 1 Administrator 197121     0 Sep  6 07:11 .
+drwxr-xr-x 1 Administrator 197121     0 Sep  6 06:56 ..
+-rw-r--r-- 1 Administrator 197121  4492 Sep  6 07:10 分歧表.md
+-rw-r--r-- 1 Administrator 197121    82 Sep  6 06:57 哈希.md
+-rw-r--r-- 1 Administrator 197121     0 Sep  6 07:11 复审_grok.err
+-rw-r--r-- 1 Administrator 197121     0 Sep  6 07:11 复审_grok.md
+-rw-r--r-- 1 Administrator 197121   179 Sep  6 07:11 复审_kimi.err
+-rw-r--r-- 1 Administrator 197121    52 Sep  6 07:11 复审_kimi.md
+-rw-r--r-- 1 Administrator 197121     0 Sep  6 06:58 审查_grok.err
+-rw-r--r-- 1 Administrator 197121    12 Sep  6 07:08 审查_grok.exit
+-rw-r--r-- 1 Administrator 197121 18674 Sep  6 07:08 审查_grok.md
+-rw-r--r-- 1 Administrator 197121 18408 Sep  6 07:08 审查_grok.raw
+-rw-r--r-- 1 Administrator 197121 45557 Sep  6 07:08 审查_kimi.err
+-rw-r--r-- 1 Administrator 197121    12 Sep  6 07:08 审查_kimi.exit
+-rw-r--r-- 1 Administrator 197121  7636 Sep  6 07:08 审查_kimi.md
+-rw-r--r-- 1 Administrator 197121  7570 Sep  6 07:08 审查_kimi.raw
+-rw-r--r-- 1 Administrator 197121  2391 Sep  6 06:57 审查_zcode.md
+-rw-r--r-- 1 Administrator 197121  7824 Sep  6 06:57 方案.md
+-rw-r--r-- 1 Administrator 197121 10060 Sep  6 07:11 方案_r2.md
+-rw-r--r-- 1 Administrator 197121  1429 Sep  6 06:58 检查_codex.err
+-rw-r--r-- 1 Administrator 197121    13 Sep  6 06:58 检查_codex.exit
+-rw-r--r-- 1 Administrator 197121     0 Sep  6 06:58 检查_codex.md
+• Now I need my previous review comments （审查_kimi.md, problems 1-7).Now I need to check r2 against my 7 issues one by one. Also check for new blocking problems. Since my review cited code facts, I should verify the key technical claims in r2 remain consistent with the actual code — particularly:
+
+  - Issue 1: watermark continuity coverage. R3 command now includes `APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS=240` with note to replace with R1 GAP. R1 changed to per-dimension evaluation. ✓
+  - Issue 2: ratio 1.152. §1 line 12: "ratio (0+110+4)/99=1.152>0.3 ✗". ✓
+  - Issue 3: R5 two-branch description. Line 74: "预期二分支…a) 候选个位、全 update、success；b) 窗口空 → 全托管圈 ~99 人 resync_unchanged 单列、success". ✓
+  - Issue 4: §3.1 numbering. r2 line 25: "1. 唯一生产写操作=R3 的一次性 docker exec（进程级 env 覆盖）；R2 备份文件除外，其余生产访问一律只读。" ✓ (both numbering fix and the R2-backup wording fix from issue 5)
+  - Issue 5:
+    - "111 候选" — check r2. Line 58/61... R3 says "耗时…" hmm r1 had "111 候选 + 子任务" in line 59. In r2 line 61: "真跑前会先 sync_his_identity 刷新采集，候选集可能小幅漂移". Search r2 for "111" — not present in what I read. ✓
+    - Guard grep: r2 line 44: `grep -c skip_configured /app/app/services/jhemr_identity_adapter.py` 必须=2 （注意文件是 adapter，不是 login_sign_sync). ✓ — matches B5 verdict (adapter=2, login_sign_sync=0).
+    - Wording conflict: line 25 fixed. ✓
+  - Issue 6: authorization gate. Line 24: 铁律 0 授权门禁； R0 step 1. ✓
+  - Issue 7: single failure → watermark not advanced, explicit in §7 risk ③ (line 86) and 铁律 3 (line 27). ✓
+
+  Now check for new issues / deviations:
+
+  1. R3 command: uses single line, includes both overrides. Also line 55: `GAP = max(240, ceil(R1 实测 gap)+24)`. Gap is ~145-150h, so 240 default fine. OK.
+
+  2. R1 hard gate: "max(c+d 的 modified_time) − 24h > 2026-08-27 18:57". Wait — the logic: after success, watermark advances to max(candidates modified_time). New window_start = max − 24h. For the cluster (08-27 18:49/18:57) to slide out, need max − 24h > 08-27 18:57. That's consistent with B3 verdict. ✓
+
+  3. R4.2: `window_start(新 last_create_date) > 2026-08-27 18:57`. Hmm, window_start = new last_create_date − 24h. So new last_create_date > 08-28 18:57. And the check "若仍=08-28 02:57（原地踏步）→ 即使 success 也判死锁未解除". Consistent with B3. ✓
+
+  4. A1/login_sign: §1 line 15 explains audit default. R4.3: 不要求 login_sign. ✓. But wait — R4.4 003531 守卫： "审计中「已有登录/签名方式者新增 sign_way=0 INSERT」=0". If login_sign subtask doesn't execute, then there will be no login_sign actions at all, so this check is trivially 0 — it verifies nothing. Is this a problem? It's a guard check; trivially passing is not harmful but is a vacuous check. Minor, not blocking. Actually — is it misleading? The 003531 守卫 (skip_configured) is in jhemr_identity_adapter.py — hmm, if the guard is in the adapter, it may apply to... Actually per B5, skip_configured is in jhemr_identity_adapter.py (=2). If login_sign isn't executed, the INSERT path isn't exercised. R4.4's =0 would trivially hold. But r181 guard exists in production regardless. This is a soft point, not a blocker.
+
+  5. Potential new issue: §1 line 12 says "candidates 114<200 ✓" — consistent with 110+4=114. R4.1 says "candidates_total≈110" — hmm, r1 said "candidates_total≈110" too. If candidates = 114 (110+4), then R4.1's ≈110 is slightly off but ≈ covers it. Actually does candidates_total count include deactivate? In r1 §1, "过滤后 110 候选+4 deactivate"; check_thresholds has separate candidates dim 114<200. So candidates_total in run row might be 114. "≈110" is loose but acceptable. Not blocking.
+
+  6. R0 step 3 image check: `data-asset:r181-20260905`. Wait — earlier crosscheck said nightly image? r1 R0 also said r181-20260905. §7 ④ says "r181 已有治本守卫". Consistent.
+
+  7. R3 command env set: compare with crontab — can't verify the crontab content locally (it's on the server), but r2 says "与 /etc/cron.d/data-asset-identity-nightly 逐项一致". One thing: r1 command had the same env list; r2 adds two. Fine.
+
+  8. Possible new issue: R1 requires running "crosscheck §4 复现" via docker exec with stdin script — read-only. OK.
+
+  9. Line 44: guard check via `grep -c` — that's fine.
+
+  10. R2 backup command: parses APP_DB_URL from container env, gets password from /etc/data-asset/backend.env. Reasonable. One subtle thing: `re.match(r"[a-z+]+://([^:]+):[^@]+@[^/]+/([^?]+)"` — group(1)=user, group(2)=db. Then `U=${UD% *}; D=${UD#* }` — splits on space. OK. pg_dump path /usr/local/pgsql/bin/pg_dump on host. Plausible; can't verify server-side. Not a new blocking issue.
+
+  11. Line 41 hard gate: "max − 24h > 2026-08-27 18:57" — need max > 08-28 18:57. Note current watermark is 08-28 02:57:45. Interesting: the gate requires candidate max beyond 08-28 18:57. B3 noted 4 people in 129 snapshot have modified > 08-28 watermark (02:57), but the gate needs > 18:57 — stricter. That's per B3's decided gate. Fine.
+
+  12. Check: does r2 preserve issue-1's advice "R1 复现改为逐维独立评估（而非只取 check_thresholds 首个返回值）"? R1 heading: "**逐维独立评估，禁止只看 check_thresholds 首个返回**". ✓ And prints watermark_gap_hours etc. ✓
+
+  13. Anything new blocking? Line 12: "source_row_conservation（R1 一并打印）" — R1 prints stats["source_row_delta_pct"]. OK.
+
+  14. One potential new issue: §1 says "window = 水位−24h" — fine. Line 14: "收敛条件…仅当该值使 `该值−24h > 08-27 18:57`" — wait, "该值" = max(c+d modified). Hmm, actually after the run, new watermark = max modified. New window start = that − 24h. For cluster (max cluster time 08-27 18:57) to be out of window: window_start > 08-27 18:57. Correct.
+
+  Hmm wait, actually there's subtlety: is the comparison `>` strict on window membership? If window is `modified_time >= window_start`, then to exclude 18:57 entries need window_start > 18:57. Fine.
+
+  15. R3: "候选集可能小幅漂移——R1 STOP 线已覆盖". R1 STOP line: "update>140; new 或 deactivate 较 09-06 晨快照激增". OK.
+
+  16. One check on A1 implementation: r2 says R4.3 "不要求 login_sign". But DoD §5 says "R4 六项全过". Fine.
+
+  17. Possible new issue: r2 line 12 "熔断共七维" — lists: candidates, new, update, align, deactivate, ratio, watermark_continuity, source_row_conservation — that's actually 8 items listed (candidates/new/update/align/deactivate/ratio/continuity/conservation). "共七维" vs 8 listed. Minor numeric slip. Let me count from the text: "candidates 114<200 ✓、new 0<50 ✓、update 110<150 ✓、align 0<150 ✓、deactivate 4<20 ✓、ratio ...✗、watermark_continuity ...✗、source_row_conservation（R1 一并打印）" — that's 8 dimensions named. So "七维" is off by one. Hmm, but I should verify how many dimensions check_thresholds actually has. My original review referenced orchestrator.py:497-525. Let me check the actual code to be accurate. If the code has 7 dims (maybe source_row_conservation is separate from check_thresholds), then "熔断共七维（check_thresholds orchestrator.py:497-525…）" with 8 items listed could be a minor inconsistency — the parenthetical says source_row_conservation is printed in R1, possibly indicating it's not in check_thresholds. Let me verify the code.
+
+  Also verify gap value claim and other code references in r2: config.py:103-105, orchestrator lines. Let me check the actual code files quickly.    }
+
+
+# ---------------------------------------------------------------------------
+# Threshold / fuse checks (plan 107 section 3)
+# ---------------------------------------------------------------------------
+
+def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str, Any]:
+    """Check circuit breaker thresholds. Returns triggered dimension or None."""
+    total = len(candidates)
+    if total > settings.identity_cb_max_candidates:
+        return {"triggered": True, "dimension": "max_candidates", "value": total, "limit": settings.identity_cb_max_candidates}
+    if stats.get("new", 0) > settings.identity_cb_max_new:
+        return {"triggered": True, "dimension": "max_new", "value": stats["new"], "limit": settings.identity_cb_max_new}
+    # 176 F-2：update 只含真实变更（HIS 增量命中）或存在性检查失败的保守回退；
+    # 托管在册例行 resync 在 stats["resync_unchanged"] 单列，不计入本维度与
+    # 下方 change_ratio（比照 align_existing 的豁免方式），仍受 max_candidates 约束。
+    if stats.get("update", 0) > settings.identity_cb_max_update:
+        return {"triggered": True, "dimension": "max_update", "value": stats["update"], "limit": settings.identity_cb_max_update}
+    # W10 方案 C：现存用户对齐单独设上限（防群体性误对齐），不计入 max_new/ratio
+    if stats.get("align_existing", 0) > settings.identity_cb_max_align:
+        return {"triggered": True, "dimension": "max_align", "value": stats["align_existing"], "limit": settings.identity_cb_max_align}
+    if stats.get("deactivate", 0) > settings.identity_cb_max_deactivate:
+        return {"triggered": True, "dimension": "max_deactivate", "value": stats["deactivate"], "limit": settings.identity_cb_max_deactivate}
+    scope = max(int(stats.get("scope", total)), 1)
+    change_ratio = (stats.get("new", 0) + stats.get("update", 0) + stats.get("deactivate", 0)) / scope
+    if change_ratio > settings.identity_cb_max_change_ratio:
+        return {"triggered": True, "dimension": "max_change_ratio", "value": round(change_ratio, 3), "limit": settings.identity_cb_max_change_ratio}
+    # Watermark continuity check (plan 107 section 3)
+    wm_limit = settings.identity_cb_max_watermark_gap_hours
+    if stats.get("watermark_gap_hours", 0) > wm_limit:
+        return {"triggered": True, "dimension": "watermark_continuity", "value": stats["watermark_gap_hours"], "limit": wm_limit}
+    # Source row count conservation (plan 107 section 3)
+    if stats.get("source_row_delta_pct", 0) > 20:
+        return {"triggered": True, "dimension": "source_row_conservation", "value": stats["source_row_delta_pct"], "limit": 20}
+    return {"triggered": False}
+
+
+# ---------------------------------------------------------------------------
+# Full pipeline: plan -> apply -> readback -> reconcile -> report
+# ---------------------------------------------------------------------------
+
+def run_nightly_pipeline(db: Session, *, triggered_by: str = "nightly_cron", refresh_source: bool = False) -> dict[str, Any]:
+    """Execute the full nightly pipeline. Auto-advances without human approval.
+
+    Pipeline: collect -> preflight -> plan -> apply -> readback -> reconcile -> report.
+    identity_cb_max_new: int = 50
+    identity_cb_max_update: int = 100
+    identity_cb_max_deactivate: int = 20
+    identity_cb_max_change_ratio: float = 0.3
+    # W10 方案 C（2026-08-29 用户授权）：JHEMR 现存用户首次纳管对齐不计入
+    # max_new / max_change_ratio，单设上限防群体性误对齐（55 📌 熔断裁决项）。
+    # 默认 150：须低于 max_candidates(200)，否则该维度不可达；当前批次 112 可过。
+    identity_cb_max_align: int = 150
+    # W10 二次修复（2026-08-30 用户授权选项1）：水位连续性阈值原写死 48h，
+    # 连续失败后形成"失败→水位不推进→更失败"死锁；改为可配置以便恢复性
+    # 运行临时放宽（方案 A 同款临时阈值先例），默认值保持 48 不变。
+    identity_cb_max_watermark_gap_hours: int = 48
+    identity_cb_max_failure_rate: float = 0.2
+    identity_cb_consecutive_failure_limit: int = 3
+
+    # HMAC account fingerprint key (from secret provider, never in code/git)
+    identity_hmac_key_ref: str = "file:///etc/data-asset/credentials/identity_hmac.key"
+
+    # JHEMR default password (from secret provider only, never in code/git)
+    identity_jhemr_default_password_ref: str = "file:///etc/data-asset/credentials/jhemr_default_password"
+    # 107 §5.2：SM4 算法经第二个受控账号交叉验证前，密码写入（及依赖密码的建号）保持关闭
+94:    identity_cb_max_candidates: int = 200
+95:    identity_cb_max_new: int = 50
+96:    identity_cb_max_update: int = 100
+97:    identity_cb_max_deactivate: int = 20
+98:    identity_cb_max_change_ratio: float = 0.3
+102:    identity_cb_max_align: int = 150
+106:    identity_cb_max_watermark_gap_hours: int = 48
+107:    identity_cb_max_failure_rate: float = 0.2
+Interesting findings:
+
+  1. `check_thresholds` actually has 8 dimensions: max_candidates, max_new, max_update, max_align, max_deactivate, max_change_ratio, watermark_continuity, source_row_conservation. r2 says "熔断共七维" but lists 8 items. Minor numeric slip — the parenthetical "（R1 一并打印）" might suggest they treat source_row_conservation as informational, but it IS a blocking dimension in check_thresholds (line ~525-526: `if stats.get("source_row_delta_pct", 0) > 20: return triggered`). So "七维" is wrong — it's 8 dimensions, all capable of triggering. Also note: source_row_conservation is in check_thresholds and short-circuits after watermark_continuity — meaning even with ratio+gap covered, source_row_conservation could still trigger. r2 does say "source_row_conservation（R1 一并打印）" and R1 prints stats["source_row_delta_pct"], but does R1's STOP line cover it? STOP 线： "update>140；new 或 deactivate 较 09-06 晨快照激增；候选 max 不满足硬闸；CB 表 is_open；守卫≠2。" — source_row_delta_pct > 20 is NOT in the STOP line. Hmm. If delta_pct > 20, R3 would fail on the third hidden dimension. This is potentially the same class of error as problem 1 — a third short-circuit-hidden dimension not covered by either an env override or a STOP gate. Is source_row_conservation overridable by env? Looking at code: `if stats.get("source_row_delta_pct", 0) > 20` — hardcoded 20, NOT configurable. So if delta_pct happens to be >20, R3 fails with no recourse except STOP. R1 does print it, so the executing AI would see it, but the STOP line doesn't list it as a stop condition. This is a residual risk worth flagging — is it blocking? The value would presumably be small (source rows stable). But strictly, the plan's completeness claim "熔断共七维…同时覆盖 ratio 与 gap 两个 env" implies only two can fail; source_row_conservation could be a third failure. The R1 print mitigates (human/AI sees it), but the STOP 线 omission is a real gap. I'd rate it medium, worth flagging as a defect in落实 of problem 1's spirit ("逐维独立评估" — it is printed, but no explicit gate). Actually wait — R1 says "逐维独立评估" and prints source_row_delta_pct. The STOP line doesn't include it though. Given the plan's own logic (hidden dimensions behind short-circuit), leaving a dimension printed-but-ungated is an inconsistency. I'll flag as minor-to-medium, non-blocking but should be fixed.
+
+  2. **Bigger find**: config.py shows `identity_cb_max_update: int = 100` — the default is **100**, not 150! r1 §1 said "update 110<150 ✓" and r2 §1 line 12 repeats "update 110<150 ✓". Wait — 110 > 100, so with default 100, max_update would ALSO trigger! Hmm wait, but r1's §1 said thresholds实测 "update 110<150 ✓". Where did 150 come from? Maybe the production env overrides APP_IDENTITY_CB_MAX_UPDATE=150. In W10 context, 112 candidates passed, so production likely has max_update=150. Also r2 §7 ⑤ says "max_update=150、max_new=50 硬闸仍在" and R1 STOP 线 says "update>140（150 阈值余量不足）" — wait r2 R1 STOP line says "update>140". So the plan assumes production env max_update=150. In my original review problem list I didn't dispute 150 (I cited orchestrator code lines but the value comes from env). The code default is 100 but production env presumably sets 150 — this was in crosscheck evidence presumably. I can't verify server env from here. Since both r1 and crosscheck used 150, and W10's 112 candidates passed, 150 in production is plausible. Not a new issue introduced by r2; it's inherited. But note: r2 §1 line 12 lists "update 110<150 ✓" as a passing dimension — consistent with prior evidence. OK, leave it.
+
+  Actually wait — but this matters for check order: update dim (110<150 pass) comes before ratio. Fine.
+
+  3. config.py:103-105 comment cited by r2 line 13 "W10 先例本就如此，config.py:103-105 注释自证" — the actual comment is at config.py:103-105 ("W10 二次修复（2026-08-30 用户授权选项1）：水位连续性阈值原写死 48h…改为可配置以便恢复性运行临时放宽（方案 A 同款临时阈值先例）"). ✓ Accurate.
+
+  4. Verify line refs in r2: "check_thresholds orchestrator.py:497-525". Let me check actual line numbers. The sed showed function starting around line 497. Let me get exact line numbers.
+
+  Also verify "orchestrator.py:706 failed_count==0 才推进", "identity_sync_audit.py:173", "orchestrator.py:471-477" (gap from max last_run_at), "orchestrator.py:515" ratio formula, "orchestrator.py:631" deactivate override, and adapter grep skip_configured=2.
+
+417:    - watermark_gap_hours: hours since the last successful HIS collection
+471:    watermark_gap_hours = 0.0
+473:        select(IdentitySyncWatermark).order_by(IdentitySyncWatermark.last_run_at.desc())
+475:    if wm is not None and wm.last_run_at is not None:
+476:        last_run = _as_aware(wm.last_run_at)
+477:        watermark_gap_hours = max(0.0, (_now() - last_run).total_seconds() / 3600.0)
+486:        "watermark_gap_hours": round(watermark_gap_hours, 2),
+489:        "source_row_delta_pct": 0,
+497:def check_thresholds(candidates: list[dict], stats: dict[str, int]) -> dict[str, Any]:
+515:    change_ratio = (stats.get("new", 0) + stats.get("update", 0) + stats.get("deactivate", 0)) / scope
+519:    wm_limit = settings.identity_cb_max_watermark_gap_hours
+520:    if stats.get("watermark_gap_hours", 0) > wm_limit:
+521:        return {"triggered": True, "dimension": "watermark_continuity", "value": stats["watermark_gap_hours"], "limit": wm_limit}
+523:    if stats.get("source_row_delta_pct", 0) > 20:
+524:        return {"triggered": True, "dimension": "source_row_conservation", "value": stats["source_row_delta_pct"], "limit": 20}
+640:                "stats": {k: v for k, v in stats.items() if k != "watermark_gap_hours"},
+692:        run_record.status = "success" if failed_count == 0 else "failed"
+706:        if failed_count == 0 and watermark_rows:
+725:        if failed_count == 0:
+    signature_result: dict[str, Any],
+    title_result: dict[str, Any] | None = None,
+    dept_result: dict[str, Any] | None = None,
+    login_sign_result: dict[str, Any] | None = None,
+) -> str:
+    """Write the combined fact and return the only supported overall status."""
+    title_result = title_result or {"status": "success"}
+    dept_result = dept_result or {"status": "success"}
+    login_sign_result = login_sign_result or {"status": "success"}
+    overall = aggregate_overall_status(
+        main_result.get("status"),
+        signature_result.get("status"),
+        signature_required=True,
+        lock_reason=main_result.get("reason"),
+        title_status=title_result.get("status"),
+        title_required=True,
+2
+0
+login_sign_sync: file missing or 0
+• Verify remaining: deactivate override at 631 (r2 doesn't cite 631; fine). The ratio formula at 515 ✓. gap from max last_run_at at 471-477 ✓. failed_count==0 advance at 706 ✓. audit default at line 173 ✓ (login_sign_result = ... or {"status":"success"} — that's line 173? The sed shows lines 165-180; the login_sign line appears at the 9th line shown → 165+8=173. ✓). adapter grep=2 ✓, login_sign_sync=0 ✓.
+
+  Now check the deactivate count claim "deactivate=len(d) 覆盖" — orchestrator.py:631 per my earlier review. Fine.
+
+  Also check "orchestrator.py:497-525" — check_thresholds spans 497 to ~526 (return at 525/526). ✓ close enough.
+
+  Now the "七维" issue: check_thresholds has 8 dimensions: max_candidates, max_new, max_update, max_align, max_deactivate, max_change_ratio, watermark_continuity, source_row_conservation. r2 §1 line 12 says "熔断共七维" then lists 8 entries including source_row_conservation. That's an internal inconsistency — a new minor factual error introduced in r2 (r1 said 五维 then listed 6... r1 line 15: "五维阈值实测：candidates…、new…、update…、align…、deactivate…、ratio" — also listed 6 while saying 五维. So r1 also had this off-by-one style issue, and r2 changed to 七维 but lists 8). It's a low-severity numeric slip but in a section whose whole point is dimensional completeness. Worth flagging.
+
+  More important: source_row_conservation. It IS a hard triggering dimension in check_thresholds (line 523-524), hardcoded limit 20, NOT env-configurable. r2 treats it as "R1 一并打印" only, and the R1 STOP 线 does not include source_row_delta_pct>20. Since it's the third short-circuit-hidden dimension (after ratio and gap), the same logic that made problem 1 fatal applies: if source_row_delta_pct>20 at execution time, R3 fails with no override possible and no explicit STOP gate instructing the executor to halt beforehand. Mitigating: R1 prints it, and an executor evaluating "逐维独立评估" might catch it; also stats["source_row_delta_pct"] default is 0 (line 489) — is it ever set non-zero? Let me check where source_row_delta_pct gets computed. If it's always 0 in current code, then it's dead and non-issue. Let me grep.
+
+188:    source_rows = db.scalars(select(IdentityPersonSource).where(
+192:    for source in source_rows:
+489:        "source_row_delta_pct": 0,
+523:    if stats.get("source_row_delta_pct", 0) > 20:
+524:        return {"triggered": True, "dimension": "source_row_conservation", "value": stats["source_row_delta_pct"], "limit": 20}
+backend/app/services/jhemr_identity_adapter.py:919:                actions.append({"action": "skip_configured", "table": "users_sublogin", "rows": len(existing_sl)})
+backend/app/services/jhemr_identity_adapter.py:935:                actions.append({"action": "skip_configured", "table": "users_subsign", "rows": len(existing_ss)})
+backend/scripts/run_identity_modified_nightly.py:11:from app.services.identity_login_sign_sync import sync_jhemr_login_sign_daily
+backend/scripts/run_identity_modified_nightly.py:76:            login_sign_result = {"status": "skipped", "reason": main_result.get("reason", "lock_held"), "failed": 0, "error_classes": {}}
+backend/scripts/run_identity_modified_nightly.py:78:            login_sign_result = {"status": "skipped", "reason": "main_account_sync_not_successful", "failed": 0, "error_classes": {}}
+backend/scripts/run_identity_modified_nightly.py:80:            login_sign_result = sync_jhemr_login_sign_daily(run_id=run_id, db=db)
+backend/scripts/run_identity_modified_nightly.py:125:                subtask_code="jhemr_login_sign_sync",
+backend/scripts/run_identity_modified_nightly.py:127:                status=normalize_status(login_sign_result.get("status")),
+backend/scripts/run_identity_modified_nightly.py:128:                planned_count=int(login_sign_result.get("planned_count") or 0),
+backend/scripts/run_identity_modified_nightly.py:130:                    int(login_sign_result.get("control_inserted") or 0)
+backend/scripts/run_identity_modified_nightly.py:131:                    + int(login_sign_result.get("sublogin_inserted") or 0)
+backend/scripts/run_identity_modified_nightly.py:132:                    + int(login_sign_result.get("subsign_inserted") or 0)
+• Important new finding! `backend/scripts/run_identity_modified_nightly.py` — the script R3 runs — **DOES import and call `sync_jhemr_login_sign_daily`** (line 11, line 80). That contradicts A1's verdict / r2 §1 claim that "r175 旧 runner 未调用该子任务"?
+
+  Wait — need to be careful. A1 said "r175 旧 runner 未调用该子任务" and the evidence终审 confirmed audit default at identity_sync_audit.py:173. But here, run_identity_modified_nightly.py line 80 calls sync_jhemr_login_sign_daily when main is successful. Hmm — but maybe the production container runs a different/older version of the script (r175 image vs current backend code at r181?). The nightly image in production is r181-20260905. Which runner does the crontab invoke? The claim was "r175 旧 runner". Is the local code the same as what's in the container? Local repo may be ahead.
+
+  Hold on. Let me think about what A1 actually adjudicated: the nightly summary showed login_sign:success but actions=0; Grok said old runner doesn't call it, and the audit default at line 173 writes success. The evidence终审 confirmed the default logic exists — but that alone doesn't prove the runner doesn't call it; the default only applies if login_sign_result is None. If the runner calls sync_jhemr_login_sign_daily, login_sign_result would be a real dict, not None... unless finalize is called without login_sign_result in some path.
+
+  Wait, but the runner here passes login_sign_result to... let me look more carefully at run_identity_modified_nightly.py to understand. There may be two runners: run_identity_nightly.py (old, r175) and run_identity_modified_nightly.py (newer). The crontab may invoke the old one. My grep of run_identity_nightly.py returned nothing (file may not exist locally). Let me check which scripts exist and what the crontab reference is. The production crontab is on the server — can't read locally. But there may be evidence in crosscheck or docs.
+
+  Actually r2 §1 says "r175 旧 runner 未调用该子任务" — meaning production cron uses the r175-era runner script which lacks the login_sign call. R3 runs `/app/scripts/run_identity_modified_nightly.py` — same as r1's R3. If the container image is r181 and contains the modified runner WITH login_sign call... then R3's one-off run WOULD execute login_sign! That would contradict r2's "login_sign 不执行" claim and R4.3's "不要求 login_sign".
+
+  Hmm wait — but which script does the crontab run? If crontab runs run_identity_modified_nightly.py too (the name suggests it's THE nightly script), then A1's verdict "old runner doesn't call login_sign" might be about an older version of this same script inside the image. The image is r181-20260905. Local backend code — is it at r181 or ahead? The presence of sync call in local code doesn't tell what's in the image.
+
+  Let me check git log for run_identity_modified_nightly.py to see when the login_sign call was added, and whether the r181 image (20260905) includes it. Also check the audit call in the runner — does it pass login_sign_result to finalize?
+
+  Actually, also relevant: r2 R4.3 says "不要求 login_sign（r175 runner 无此调用，summary 中该行=审计默认值）". And §1: "r175 旧 runner 未调用该子任务， identity_sync_audit.py:173 对未传参写默认". The A1 verdict's evidence only confirmed the default at :173 — it did NOT confirm the runner in production lacks the call. The local code shows the runner DOES call it (line 80). If local code ≈ r181 image, then A1's adjudication might be wrong, and r2 inherited a wrong premise.
+
+  But wait — G2 is described as "login_sign 子任务上线需用户书面追认/随镜像换 runner". If the current image's runner already calls login_sign, G2 would already be live. The A1 verdict says G2 未上线. The evidence: nightly summaries show login_sign:success with actions=0. Hmm, but if the runner calls it and it runs with zero actions (nothing to do), status would be success with 0 actions — also consistent! So actions=0 isn't decisive either.
+
+  Let me look at the full runner script and git history to determine when the login_sign invocation was added, and check whether production crontab uses run_identity_modified_nightly.py. The crosscheck doc (output_r180/deadlock_crosscheck.md) may state which script cron runs. Let me read relevant parts.f691abb feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+36b8743 feat: 144/146/149/153/156 平台升级并修复 153 复核缺陷
+e60c586 feat: complete platform governance and catalog naming
+04453e8 feat(identity): add signature sync audit, timezone fix, and 150px JPEG
+f691abb feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+36b8743 feat: 144/146/149/153/156 平台升级并修复 153 复核缺陷
+e60c586 feat: complete platform governance and catalog naming
+04453e8 feat(identity): add signature sync audit, timezone fix, and 150px JPEG
+The local repo's `run_identity_modified_nightly.py` DOES call login_sign. The question is whether the production container image `data-asset:r181-20260905` contains this version. The commit f691abb added the login/sign subtask. When was that commit? And what code does the r181 image carry?
+
+  Actually, the crontab on the server — which script does it invoke? The A1 verdict says "r175 旧 runner 未调用该子任务". Perhaps production cron invokes a *different* script (an r175-era one) than run_identity_modified_nightly.py. But R3's command runs `/app/scripts/run_identity_modified_nightly.py` — if that script in the r181 image includes the login_sign call (as local code does), then R3 WILL execute login_sign, contradicting r2's premise "login_sign 不执行" and R4.3 "不要求 login_sign".
+
+  Hmm, wait. Let me reconsider. Maybe the local working tree is ahead of r181. Check git status/log dates. The r181 image is dated 20260905 (yesterday). f691abb commit — check its date.
+
+  Also, does the crontab run run_identity_modified_nightly.py? If cron runs this same script and it has login_sign... then nightly summary's login_sign:success would be real, not default. But A1 verdict (with actions=0 as corroboration) said it's default. Hmm, but actions=0 could also result from a real run with nothing to do... but Grok's argument was the runner doesn't call it. The 证据终审 only verified the default at audit:173 — it did NOT verify which runner/version is in production.
+
+  Key check: what does the crontab invoke? There might be a copy in deploy/ or docs. Also check whether there's another runner script like run_identity_nightly.py that lacks login_sign. Let me search deploy/ and the repo for crontab content.
+
+f691abb 2026-09-05 10:19:10 +0800 feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+_apply_his_identity_and_hrp.py
+_apply_his_identity_result.json
+_apply_identity_retry_and_hrp_cred.py
+ro_identity_nightly_observe.py
+run_identity_modified_nightly.py
+• Key facts:
+
+  - The login_sign subtask was added to `run_identity_modified_nightly.py` in commit f691abb dated **2026-09-05 10:19** — the same day as image `r181-20260905`. So the r181 image may or may not include this commit depending on build time. Image tag says 20260905; commit is 10:19 AM on 09-05. Plausibly included in r181... but the A1 verdict said the production runner is the "r175 旧 runner" — implying production cron invokes an older runner, or the image's script predates this.
+
+  - There's only ONE runner script locally: run_identity_modified_nightly.py. No run_identity_nightly.py. So "r175 旧 runner" must refer to an older *version* of the same script inside the running container.
+
+  Critical question for r2's R3: `docker exec ... python /app/scripts/run_identity_modified_nightly.py` — this runs the script **inside the r181 container**. Whether login_sign executes depends on whether the r181 image contains commit f691abb. The 分歧表 A1 verdict established (via nightly summary actions=0 + audit default) that current nightly cron does NOT execute login_sign. But R3 runs the script from the container, not cron's possibly-different invocation... Actually cron likely runs the same docker exec of the same script. If the container script lacked login_sign, then cron's runs show default success — consistent.
+
+  So the decisive question: does the r181-20260905 image contain f691abb? The image was built 09-05; f691abb committed 09-05 10:19. Can't verify locally with certainty — but wait, this is exactly what the R0/R1 guard could check: r2 R1 has guard "grep -c skip_configured jhemr_identity_adapter.py 必须=2" — the adapter exists in container. A direct check would be `grep -c sync_jhemr_login_sign_daily /app/scripts/run_identity_modified_nightly.py` in the container.
+
+  Hmm, but actually, is this a problem with r2? r2's premise (from A1 verdict): login_sign 未上线， G2 不激活， R4.3 不验收 login_sign, R3 不 docker cp runner. If the r181 image's runner ALREADY includes the login_sign call (committed 09-05 10:19, image dated 09-05), then R3's one-off run WILL execute login_sign for real (writing JHEMR sublogin/subsign rows for ~half-accounts) — without the plan acknowledging it, without R4.3 acceptance, and with R4.4's 003531 guard check being the only safety net. That would be a significant deviation: the plan says "login_sign 不执行（G2 待授权）" but the executed command would actually run it.
+
+  But hold on — is there contradictory evidence? The nightly summaries showed login_sign:success with actions=0, and A1 concluded it's the audit default because the runner doesn't call it. If the r181 image DID include f691abb's runner, then since 09-05 the nightly runs would execute login_sign for real... The nights in question (09-01 through 09-06) — image r181 deployed 09-05. Nightly runs on 09-06 02:00 (RUN-69e87f7f27dd) used r181. Did that run's summary show login_sign:success? The main task failed (circuit breaker) every night, so login_sign_result would be {"status":"skipped", reason:"main_account_sync_not_successful"} — NOT default success! Wait: with the new runner, when main fails, login_sign is "skipped", and finalize_run receives login_sign_result={"status":"skipped"...} — not None, so no default. Summary would show login_sign:skipped. If instead summaries showed login_sign:success during failed nights, that proves the old runner (no login_sign param → default success). A1's evidence cited exactly that: nightly summary login_sign:success alongside failed main → old runner. OK so the evidence does support that the container runner lacks the login_sign call... IF the summaries during r181-era failed nights showed success for login_sign.
+
+  Hmm, but also: audit default applies when login_sign_result is None. In the old runner, finalize_run is called without login_sign param → default success. That's consistent.
+
+  But wait — what about the image? If r181 includes f691abb, the container script has the call. The R3 command explicitly runs /app/scripts/run_identity_modified_nightly.py from the container. The cron also presumably runs the same script in the same container. So if container script = old version (no login_sign), both cron and R3 skip it — consistent with r2's premise. If container script = new version, cron's failed-night summaries would show skipped not success.
+
+  The A1 证据终审 verified only the audit default exists locally, NOT the container script version. The verdict "Grok 正确" rests on nightly summary showing success during failed nights (from crosscheck evidence, which I haven't read). Let me check the crosscheck doc for what the nightly summary actually showed and what runner cron invokes.
+
+  Also there's another wrinkle: the adapter skip_configured guard (=2) is in jhemr_identity_adapter.py, which is used by login_sign sync. r2 says "r181 已有治本守卫" — the guard being in the container image suggests r181 includes recent code. If r181 includes the adapter guard (which came with the login_sign feature in f691abb? or earlier?), it likely includes the runner change too. Let me check when skip_configured was added to the adapter and when the runner got login_sign — both in f691abb? grep git log for jhemr_identity_adapter.py.f071c85 2026-09-05 fix(identity): skip template fill for configured sign ways (181)
+f691abb 2026-09-05 feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+36b8743 2026-08-27 feat: 144/146/149/153/156 平台升级并修复 153 复核缺陷
+c3a5d18 2026-08-21 chore: snapshot working tree before plan139 execution (backup)
+e60c586 2026-08-11 feat: complete platform governance and catalog naming
+f071c85 2026-09-05 10:49:09 +0800 fix(identity): skip template fill for configured sign ways (181)
+f691abb 2026-09-05 10:19:10 +0800 feat(identity): CDMS FFREE3, JHEMR login/sign subtask, F-2 resync_unchanged circuit breaker semantics (conftest.py also registers alembic_env dir for the following commit)
+60:- **命令**：与 `/etc/cron.d/data-asset-identity-nightly` 逐项同款的 docker exec（PROVIDER/NIGHTLY_ENABLED/PYTHONPATH/SYNC_ENABLED/JHEMR_PASSWORD_WRITE/CDMS_FID/PHASE_D/DIRECT_CONNECTION 全套），仅追加 `-e APP_IDENTITY_CB_MAX_CHANGE_RATIO=2.0`（进程级，不改 env 文件/不重启/不切镜像；1.111<2.0 且留余量）。B 会话给出的完整命令可用。
+63:- **预期效果**：110 update 对齐成功 + 4 deactivate（设计内锁定）+ 签名/职称/科室子任务积压补齐 + login_sign（带守卫）；水位推进至 ≥08-27 18:57（或刷新后更新值）。
+73:5. （关联）G2 追认：login_sign 接线在 orchestrator 层已随 r178/r181 上线（A 会话 W-02 更正），r181 带治本守卫，建议用户书面追认。
+Very important:
+
+  - f071c85 (2026-09-05 10:49) is the r181 fix "skip template fill for configured sign ways (181)" — the skip_configured guard. So r181 image includes f071c85 which came AFTER f691abb (login_sign runner wiring). Therefore the r181 image's runner **does** contain the login_sign call.
+
+  Wait, but the image tag r181-20260905 — built 09-05, presumably after commit f071c85 10:49. So the container's run_identity_modified_nightly.py includes sync_jhemr_login_sign_daily call.
+
+  But then the A1 verdict ("r175 旧 runner 未调用该子任务") would be wrong about the *current* container? Hmm, "r175 旧 runner" — maybe the crontab doesn't call run_identity_modified_nightly.py but something else? Or maybe cron calls the script with an older overlay? Or... let me think about what nightly summary evidence showed.
+
+  Actually wait — maybe the crontab runs a DIFFERENT entrypoint. Let me check what /etc/cron.d/data-asset-identity-nightly invokes. crosscheck §5 mentions "与 /etc/cron.d/data-asset-identity-nightly 逐项同款的 docker exec". The script name in the cron — crosscheck line 60 says the command is "同款 docker exec ... data-asset-api python /app/scripts/run_identity_modified_nightly.py"? r1's R3 used run_identity_modified_nightly.py and said it must match crontab item by item. So cron runs run_identity_modified_nightly.py in the container.
+
+  If the r181 container's script includes login_sign wiring, then on failed nights (main failed), login_sign_result = {"status":"skipped", ...}, and finalize would record login_sign:skipped — not success. If nightly summaries during 09-05/09-06 (r181 era) showed login_sign:success, that contradicts. If they showed skipped, then A1's "audit default success" narrative was based on r175-era summaries.
+
+  Hmm, but actually — wait. Which runner did cron invoke before? "r175 旧 runner" per 分歧表. Maybe the image in production was r175 until recently, and r181 was deployed 09-05. The 09-06 02:00 run (RUN-69e87f7f27dd) would have used r181. What did its summary show for login_sign? The A1 verdict cited nightly_d §五B claiming summary showed jhemr_login_sign_sync:success ⇒ GLM claimed executed. Grok said default. If the 09-06 run under r181 showed login_sign:success while main failed, then the container runner must be the old one (no login_sign param) — because the new runner would write skipped.
+
+  Unless... the image r181-20260905 was built BEFORE f071c85 was committed (10:49)? Unlikely — tag says r181 and commit says "(181)".
+
+  I cannot resolve this from local evidence alone definitively. But here's the thing: the A1 verdict's decisive local evidence was only the audit default at :173. The claim "r175 旧 runner 未调用" is a production-state claim that was NOT verified locally — and local git evidence shows the login_sign wiring (f691abb) PRECEDES the r181 guard fix (f071c85) that r2 itself relies on ("r181 已有治本守卫", R1 guard grep=2 on the container's adapter). If the container has the adapter with skip_configured (=2, verified in production per crosscheck §2#4), then the container image includes f071c85, which includes f691abb, which wires login_sign into the runner. That's a direct logical contradiction with "r175 旧 runner 未调用该子任务": the container can't both have the r181 adapter guard and the r175 runner — unless the image deliberately kept an old script, which git history contradicts (same file evolved: f691abb added the call to this very script).
+
+  Wait, actually let me double check: did f691abb ADD the login_sign call to run_identity_modified_nightly.py? The -S search on the script returned... hmm, the third command in the first Bash call returned nothing? The output shows only two lines from the second command (f071c85 and f691abb from adapter -S search), then nothing for the script -S search? Actually the output block shows:
+
+  ```
+  f071c85 2026-09-05 fix...(181)      <- adapter log
+  f691abb 2026-09-05 feat...           <- adapter log
+  36b8743 ...                          <- adapter log
+  c3a5d18 ...
+  e60c586 ...
+  f071c85 2026-09-05 10:49:09 +0800 fix...   <- adapter -S skip_configured
+  f691abb 2026-09-05 10:19:10 +0800 feat...  <- script -S sync_jhemr_login_sign_daily
+  ```
+
+  The last line with 10:19:10 timestamp is the script -S result: f691abb added sync_jhemr_login_sign_daily to run_identity_modified_nightly.py. Confirmed.
+
+  So: f691abb (09-05 10:19) wired login_sign into the runner; f071c85 (09-05 10:49) added skip_configured guard to adapter, tagged as the r181 fix. r181 image includes both (guard verified in production =2 per B5's evidence终审 which ran `grep -c` ... wait, was that run locally or in the container? B5 says "`grep -c` 实测 adapter=2 / login_sign_sync=0" — probably local. Hmm. And r2's R1 guard step 5 runs the grep in the container expecting =2.)
+
+  The implication: when R3 executes `/app/scripts/run_identity_modified_nightly.py` inside the r181 container, and the main task succeeds (that's the whole point of the release), the script will reach line 80 and **actually execute sync_jhemr_login_sign_daily** — a real JHEMR write subtask. r2's premise "login_sign 不执行（G2 待授权，r175 runner 无此调用）" would then be false for the R3 run: R4.3 says "不要求 login_sign", R4.4 checks the 003531 guard in audit, and §7④ says login_sign 不执行.
+
+  BUT — crucial counterevidence: nightly summaries. If the r181 container runner had login_sign wiring, then on the failed night 09-06 02:00 (RUN-69e87f7f27dd, image r181), the runner would have set login_sign_result="skipped" and the summary would show login_sign:skipped. A1's whole dispute was about summary showing login_sign:success. Grok's winning argument: default success at audit:173. For the default to fire, the runner must have called finalize WITHOUT login_sign_result — i.e., old runner. If the 09-06 run used r181 with the new runner, the summary would show skipped, and GLM's "summary shows success" claim would be about... hmm.
+
+  Actually wait — was the 09-06 02:00 run under r181? Image r181-20260905 deployed 09-05. The nightly at 09-06 02:00 → yes r181. If that run's summary showed login_sign:success, then the container runner = old. If skipped, then new runner present and A1 verdict wrong.
+
+  The nightly_d.md §五B (A会话） claimed "summary 出现 jhemr_login_sign_sync:success ⇒ orchestrator 层执行了它" — this is about some nightly run. Which run? Probably 09-06's or recent ones. If it showed success while main failed (every night since 09-01 failed), new runner would show skipped. Unless the summary GLM looked at predates r181... but the whole deadlock started 09-01, and r181 deployed 09-05. Runs 09-01~09-05 02:00 were under pre-r181 images (old runner → default success ✓). The 09-06 run under r181 might have shown skipped — or success if...
+
+  Hmm wait, actually there's another possibility: maybe the r181 image build happened but the container wasn't recreated? R0 checks `docker ps` image = data-asset:r181-20260905, so the container runs r181.
+
+  I genuinely can't settle which version the container holds from local evidence alone — BUT the git timeline strongly suggests r181 (built after f071c85 10:49 on 09-05, tagged with the very fix number of that commit) contains the wired runner. And r2's own guard (adapter skip_configured=2 in container) presupposes f071c85 is in the image. f691abb is an ancestor of f071c85 (10:19 < 10:49, same day, sequential commits). Let me verify ancestry: is f691abb an ancestor of f071c85?
+
+f691abb IS ancestor of f071c85
+f071c85 2026-09-05 10:49:09 +0800 fix(identity): skip template fill for configured sign ways (181)
+809f0b2 2026-09-05 10:20:22 +0800 docs(173-180): full-stack test findings, CDMS/174/175/176/177/178 reports, 179/180 release plans, output evidence dirs (150 draft files removed as-is per G9 pending)
+63:- **预期效果**：110 update 对齐成功 + 4 deactivate（设计内锁定）+ 签名/职称/科室子任务积压补齐 + login_sign（带守卫）；水位推进至 ≥08-27 18:57（或刷新后更新值）。
+73:5. （关联）G2 追认：login_sign 接线在 orchestrator 层已随 r178/r181 上线（A 会话 W-02 更正），r181 带治本守卫，建议用户书面追认。
+• I have enough evidence. Let me finalize the analysis. This is a focused review task; no need for TodoList.
+
+  Key chain for the potential new blocking issue:
+
+  1. f691abb (2026-09-05 10:19) added `sync_jhemr_login_sign_daily` call to `run_identity_modified_nightly.py` (lines 11, 75-80).
+  2. f071c85 (2026-09-05 10:49, message literally tagged "(181)") added skip_configured guard to jhemr_identity_adapter.py.
+  3. f691abb IS an ancestor of f071c85.
+  4. r2 relies on the r181 image containing the adapter guard (R1 guard: container grep must=2; §7④ "r181 已有治本守卫"). If the container has f071c85, it necessarily has f691abb, i.e., the runner wired with login_sign.
+  5. Therefore when R3 runs `/app/scripts/run_identity_modified_nightly.py` in the container and main succeeds, line 80 executes login_sign for real (real JHEMR writes: control/sublogin/subsign inserts).
+  6. r2's premise (§1 last bullet, R4.3, §7④): "login_sign 不执行（r175 旧 runner 无此调用）" — inherited from A1 verdict.
+
+  Contradiction? Not so fast — the counter-evidence: nightly summaries on failed nights showed login_sign:success (per nightly_d §五B, the subject of A1). Under r181 image with new runner, failed main → login_sign:skipped, not success. The 09-06 02:00 run was under r181. If its summary showed login_sign:success → container runner is old → image does NOT contain f691abb → contradiction with guard presence... unless the guard grep=2 was verified locally only, and the container's adapter might differ!
+
+  Hmm wait — actually B5's evidence "grep -c 实测 adapter=2 / login_sign_sync=0" was run locally (the 分歧表 says "实测" — ambiguous, but likely local since it's in the 证据终审 column done by GLM locally). The container content is verified only at R1 execution time.
+
+  So two coherent scenarios:
+  - Scenario A: r181 image contains f071c85 (hence f691abb) → container runner HAS login_sign wiring → A1 verdict wrong for r181 era → r2's "login_sign 不执行" premise false → R3 will actually execute login_sign writes without acceptance criteria → real issue (potentially blocking, since it means an unplanned business write to JHEMR: inserting sublogin/subsign rows for half-accounts).
+  - Scenario B: r181 image predates f691abb somehow (e.g., image built from a different tree, or runner in image is older) → but then adapter guard presence in container is also unverified → r2's own R1 guard expectation =2 might fail → STOP.
+
+  Either way, there's an unresolved production-state question. But which is more likely? The image tag "r181-20260905" and commit f071c85's message "(181)" strongly suggest the image was built at/after f071c85. Also R0 requires the image be exactly r181-20260905. And §7④ "r181 已有治本守卫" asserts the guard is in production.
+
+  Hmm, but wait — actually there's a subtlety. If the container runner HAS login_sign wiring, then the nightly summaries on 09-06 (r181, failed main) would show login_sign:skipped. Was the A1 dispute about the 09-06 run or earlier runs? nightly_d §五B "summary 出现 jhemr_login_sign_sync:success" — if that observation was from runs 09-01~09-05 02:00 (pre-r181 images), it's fully consistent with old runner + default. And it says nothing about the r181 container. In that case Grok's "假成功" verdict is correct *for those nights*, but r2's extrapolation "r175 旧 runner" (i.e., the CURRENT container still runs the old runner) is unverified and likely wrong — the current container is r181, and r181 includes the wiring.
+
+  Actually wait, is there any chance the crontab invokes a *different script* than run_identity_modified_nightly.py? crosscheck §5 line 60 says the release command must be "与 /etc/cron.d/data-asset-identity-nightly 逐项同款的 docker exec" and r1/r2's R3 uses run_identity_modified_nightly.py — implying cron runs that script. There's no other identity nightly runner in backend/scripts (only ro_identity_nightly_observe.py which is read-only observe). So cron runs run_identity_modified_nightly.py.
+
+  So the decisive question "does the r181 image's copy of run_identity_modified_nightly.py contain the login_sign call" cannot be settled locally with 100% certainty, but the git ancestry + tag evidence makes "yes" the strongly indicated answer. This is exactly the kind of thing R1 could check with one grep (`grep -c sync_jhemr_login_sign_daily /app/scripts/run_identity_modified_nightly.py`), and r2 lacks it.
+
+  Impact if true: R3's one-off run will, after main success, execute sync_jhemr_login_sign_daily — real JHEMR writes (insert control/sublogin/subsign for half-accounts). The plan says this won't happen ("G2 待授权"、R4.3 不验收、§2 非目标"不激活 G2"). Executing an unauthorized G2 activation is precisely what 非目标 forbids. And R4.4's 003531 guard check would actually become meaningful (good), but R4.3 explicitly waives login_sign acceptance. So if the wiring is live, the plan mis-instructs the executor: it would report "success" while having performed an unplanned G2 activation, or worse, misread the evidence.
+
+  Hmm, but hold on — should I double-check the A1 premise once more? Grok's evidence: "当晚 actions=0 是旁证" and audit:173 default. If the runner in the container at the time of those nights was old (pre-r181 deployed 09-05), all consistent. The r2 extrapolation is "r175 旧 runner 未调用" — describing the CURRENT production runner as r175's. But R0/§1 also say current image is r181-20260905. So r2 simultaneously claims: image=r181 (contains guard, per its own guard check) AND runner=r175 (no login_sign). Given f691abb ⋖ f071c85, these two claims are mutually inconsistent unless the image build deliberately mixed versions — no evidence of that.
+
+  Actually — one more possibility to be fair: the image could have been built from a tree where scripts/ was at an older version but services/ at newer (e.g., partial docker cp of services only during the r181 hotfix). The r181 fix might have been deployed via docker cp of just jhemr_identity_adapter.py rather than a full rebuild! "r181-20260905" image tag suggests rebuild, but hotfixes via docker cp happened before ("不 docker cp runner" in r2 非目标 implies docker cp is a known deployment mechanism!). If the r181 guard was hot-patched into the container via docker cp of the adapter file only, then: adapter has guard (=2 ✓), runner still old (no login_sign ✓) — fully consistent with A1 AND with r2! And the image tag could still show r181-20260905 from the base.
+
+  Ugh. So the container state is genuinely undecidable from local evidence. Both scenarios are coherent. Therefore the correct review finding is: r2 inherited A1's unverified production-state premise ("runner 无此调用") whose only adjudicated evidence was the audit default (which proves nothing about the runner), and local git evidence (f691abb ancestor of the r181 guard commit) makes the premise doubtful. Since the consequence of the premise being wrong is an unplanned G2 activation (real JHEMR writes) with waived acceptance, R1 should add a one-line container probe: `grep -c sync_jhemr_login_sign_daily /app/scripts/run_identity_modified_nightly.py` → if ≥1, STOP 呈报（or explicitly cover login_sign acceptance + user authorization). Given 铁律 "与方案不符的事实=STOP", actually if the runner has the call and login_sign executes, would the executor even notice? R4.3 says 不要求 login_sign — the executor wouldn't check. The run would perform G2 writes silently. That's why I'd rate this a substantive new finding — arguably blocking-level for a plan whose 非目标 explicitly excludes G2 activation, because there's a realistic, evidence-backed scenario where executing the plan as written violates its own 非目标 without detection.
+
+  Is it "blocking"? The user's question asks: ②有无新增阻断级问题. I'd classify it as 阻断级（新）or at least 必须修复： add the R1 probe. Given uncertainty, I'll present it as "新增高严重度问题（建议视为阻断，因修复成本极低：R1 加一条 grep）".
+
+  Now the per-issue verification:
+
+  问题1（致命，watermark_continuity 漏覆盖）→ 落实：§1 line 12-13 （七维列举含 gap 维度+双 env 要求）, R1 标题"逐维独立评估"+打印 watermark_gap_hours, R3 命令含 APP_IDENTITY_CB_MAX_WATERMARK_GAP_HOURS=240 且 GAP=max(240, ceil（实测）+24) (§4 R3 line 55, 58, 61). ✓ 落实正确。代码核实：orchestrator.py:519-521 ✓, config.py:106 默认48 ✓, config.py:103-105 注释 ✓.
+    - 偏差1a（小）: §1 "熔断共七维"但列出 8 维（含 source_row_conservation)；代码 check_thresholds 实为 8 个触发维度（497-525)。且 source_row_conservation 在代码里 hardcode >20 不可 env 覆盖（orchestrator.py:523-524），是第三个可能被短路隐藏的维度；r2 仅在 R1"一并打印"，STOP 线（§4 R1 末）未列入 source_row_delta_pct>20。虽然 stats 默认 0（orchestrator.py:489）且当前未见非零来源，风险低，但与问题1同一逻辑类别，STOP 线应补一条。——这算"落实偏差/新引入的小问题"，不算阻断。
+
+  问题2（ratio 1.152）→ §1 line 12: "(0+110+4)/99=1.152" ✓；§8 分母行 "单测锁定 114/99 不再出现" ✓ (114/99=1.152)。正确。
+
+  问题3（R5 二分支）→ R5 line 74: 二分支描述 ✓ 正确落实。
+
+  问题4（§3 编号）→ r2 §3.1: "唯一生产写操作=R3" ✓；同时吸收了"R2 备份文件除外"措辞 ✓。
+
+  问题5（小瑕疵）→ "111" 已消失（R3 无候选数注）✓；守卫改 adapter 且 =2 ✓（与 B5 裁决一致；我本地复核 adapter=2/login_sign_sync=0 ✓）；§3.1 措辞冲突已修 ✓。
+
+  问题6（授权门禁）→ §3 铁律 0 + R0 第 1 步 ✓。
+
+  问题7（单点失败不推水位）→ §7 ③ "1 人失败=整 run failed 且水位不动（orchestrator:706）" ✓（代码 706 行确认）；铁律 3 禁重试 ✓。
+
+  Other r2 changes to sanity check:
+  - B3 落实： §1 line 14 收敛条件、R1 硬闸（max−24h > 08-27 18:57 否则 STOP)、R4.2 改判 window_start。✓ 与 B3 裁决一致。R4.2 措辞 "window_start（新 last_create_date) > 2026-08-27 18:57" — window_start = new watermark − 24h. Consistent with R1 gate. ✓
+  - A1 落实： 见上面的新发现 — 前提未证且与 git 证据张力大。
+  - B8 单行命令 ✓ (line 58 单行， 含 BatchMode+key ✓)。
+  - B9 R2 备份命令写死 ✓ — 检查该命令正确性： 容器 env 解析 user/db, 口令从 /etc/data-asset/backend.env grep。一个细节： 命令里 `grep -oP "(?<=://)[^:]+:\K[^@]+(?=@)"` 取第一个含密码的 URL — 若 backend.env 有多个 URL，head -1 可能取错（比如第一个是只读 HIS 连接而非平台库）。轻微风险，但"180 B2 同款"有先例，且失败→STOP。提示级。
+  - R4.1 "candidates_total≈110" vs §1 "candidates 114" — 110+4=114; candidates_total 口径若含 deactivate 则≈114。"≈"容差可接受，但与 §1 的 114 略有口径摇摆。提示级。
+  - R4.4 003531 守卫检查：若 login_sign 真未执行，该检查恒为 0（空集），属空验；若执行了（新发现场景），它又变成唯一防线但 R4.3 已豁免。与新发现联动。
+
+  结论结构：
+  - 逐条 1-7: 全部落实，其中问题1有一个小的同类残留（source_row_conservation 未入 STOP 线 + "七维"实为八维）。
+  - 新增阻断级候选： runner/login_sign 前提未证（git 证据： f691abb 是 r181 守卫提交 f071c85 的祖先， 容器若含守卫则 runner 大概率已接线） → 建议 R1 增加一条容器内 grep 探针；若为 1+ 则 STOP 呈报（因为那意味着 R3 会真实执行 login_sign， 违反自身非目标）。
+
+  Severity judgment: The user asks "有无新增阻断级问题". I'll call the runner issue 阻断级（条件性）: not a guaranteed failure, but a realistic scenario where the plan as written produces an undetected violation of its own non-goal, and the fix is trivial. Also note the limitation: container content can't be verified locally — which is exactly why the probe belongs in R1.
+
+  Also double-check "七维" claim once more: r2 line 12 lists: candidates, new, update, align, deactivate, ratio, watermark_continuity, source_row_conservation = 8 items. Code: 8 early-return dimensions. So "七维" wrong both ways. Minor.
+
+  One more check — r2 §1 line 12 "candidates 114<200" ✓ consistent. "update 110<150" — production env presumably 150 (code default 100!). Wait, code default identity_cb_max_update=100. If production env does NOT override it, update dim = 110>100 would trigger BEFORE ratio! But r1/crosscheck实测 said update 110<150 ✓ — meaning production env sets 150. W10 with 112 candidates passed update dim, consistent with 150. This is inherited from r1, not new. But worth a footnote? The R3 env set doesn't include APP_IDENTITY_CB_MAX_UPDATE — relying on env file having 150. Since crosscheck实测 confirmed 150 in production, fine. Not a new issue.
+
+  Also R3 timeout "20-30 分钟" vs r1 "1-5 分钟" — fine.
+
+  DoD §5: "当日=R1 留痕…+R2 备份+R3 run_id+success+R4 六项全过" ✓ R5 分离 ✓ (B7).
+
+  Now write the final review. Language: Chinese. Structure: per-issue verdict with r2 section citations, then new findings with severity. Cite code evidence lines.
+
+To resume this session: kimi -r session_a7e4c9bf-7c96-4ecb-82c9-ab542b7accfc

@@ -1,0 +1,81 @@
+{
+  "规则": "引用保留为主；tracked_refs>0 一律保留",
+  "结论": "15/15 全部有 tracked 引用 → 零归档（如实报告，预期量小）",
+  "detail": [
+    {
+      "dir": "output_r163",
+      "tracked_refs": 14,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r165",
+      "tracked_refs": 15,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r166",
+      "tracked_refs": 6,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r167",
+      "tracked_refs": 6,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r169",
+      "tracked_refs": 10,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r170",
+      "tracked_refs": 24,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r171",
+      "tracked_refs": 20,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r173",
+      "tracked_refs": 12,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r174",
+      "tracked_refs": 9,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r177",
+      "tracked_refs": 13,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r178",
+      "tracked_refs": 8,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r180",
+      "tracked_refs": 10,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r181",
+      "tracked_refs": 7,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r185",
+      "tracked_refs": 4,
+      "decision": "保留（引用保留规则）"
+    },
+    {
+      "dir": "output_r186",
+      "tracked_refs": 1,
+      "decision": "保留（引用保留规则）"
+    }
+  ]
+}

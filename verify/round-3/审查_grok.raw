@@ -1,0 +1,112 @@
+我先只读读取 bug 报告和它点名的源文件，再按每条假设独立核对，不改任何文件。报告已读到；接下来对照你点名的六个假设，直接核对对应源码实现。超时、错误面板、标签函数和工具栏 DOM 还要对上，我继续把这些路径读完。独立只读核对完成。以下按你列的 6 条假设给出结论（未改任何文件，未读 `verify/` 下其他文件，也未读 `审查_zcode.md`）。本轮未打 live 接口，耗时/截图类数字只作为报告陈述，不以实测复述。
+
+---
+
+### P1 首屏错误面板 — **确认有问题** · 严重度 **高**
+
+首屏默认走 `overview` → `getGraphOverview`，走全局 Axios `timeout: 10000`，超时进 `api_error` 错误面板，工具栏一并被卸掉。后端 system/schema 层还会把**全量** `AssetRelation` 拉进 Python 循环，且**不传** `_EndpointResolver`，物理字段缺失时会退回逐条 SQL 反查。这与「接口慢于 10s → 首屏必失败」同构。
+
+证据：
+- `frontend/src/utils/http/index.ts:34`：`timeout: 10000`
+- `frontend/src/api/asset.ts:891-901`：`getGraphOverview` 无单独加长 timeout
+- `frontend/src/views/asset/graph/index.vue:9`、`197-208`、`306`、`626-647`、`676-682`：overview 失败 → `el-result`；`v-if="!isErrorState && state !== 'loading'"` 把 `GraphToolbar` 藏掉
+- `backend/app/api/v1/graph.py:1666-1692`：`rel_stmt = select(AssetRelation)` 后 `for rel in db.scalars(...).all()`，`_resolve_relation_endpoint(db, rel, ...)` **无 resolver**
+- 对比同文件 `1586-1590`：object 层才 `EndpointResolver.load`
+
+文案不完全等于报告：源码标题是「图谱接口请求失败」，按钮是「重试/重置条件」，关联编号是 `newCorrelationId()` 的 16 位 hex（`graphErrors.ts:34-37,79-87`），不是报告里的「图谱加载失败 / 接口超时或服务异常 / graph-load-时间戳」。机制成立，文案是转述。
+
+**验证：** 浏览器 Network 看 `GET /api/v1/graph/overview` 是否 `(failed) timeout`≈10s；后端日志 `query_ms`。本轮未复测 23.5s。
+
+---
+
+### R2 force alpha 过低 — **疑问**（假设机制不成立；同段 force 配置仍有高风险缺陷） · 严重度 **高**（叠堆现象）/ **低**（alpha 本身）
+
+`layoutOptions()` 确实写了 `alpha: 0.35`、`alphaDecay: 0.022`，且 explore/搜索聚焦强制 `layout_mode = "force"`。但 G6 v5 的 `type: "force"` 绑定的是 **AntV ForceLayout**，不是 d3-force。AntV force **没有** `alpha`/`alphaDecay`/`forceSimulation`；这些是 `type: "d3-force"` 的选项，对当前引擎会被忽略。注释自己也承认 force 会挤到中心。
+
+更可疑的是同段 `nodeStrength: -280`：AntV 默认 `nodeStrength: 1000` 是库伦斥力权重；实现里 `weight = factor/coulomb² * nodeStrength`。负数会把斥力打成吸引，叠上默认 `gravity: 10`，比「alpha 过低」更像墨团根因。
+
+证据：
+- `AdvancedRelationGraph.vue:186-188,203-238`：`usesPresetPositions()` 只管 hierarchy/layered；force 走 `type: "force"` + `alpha: 0.35`
+- `graph/index.vue:749`：`filters.layout_mode = "force"`
+- `@antv/g6/src/registry/build-in.ts`：`force: ForceLayout`，`d3-force` 才是 D3
+- `@antv/layout/lib/algorithm/force/index.js:15-32`、`repulsive.js:30-41`：默认 gravity 10、nodeStrength 1000；weight 含 nodeStrength
+
+**验证：** 对比 `type: "force"` vs `"d3-force"` 的 options 类型；临时只改 `nodeStrength` 为正（如 1000）看是否散开，不要只拧 alpha。
+
+---
+
+### R4 标签配置矛盾 — **确认有问题** · 严重度 **中**
+
+三层标签策略互相打架，叠节点时会看起来像「漂浮中文」：
+
+1. `formatGraphNodeLabel` 已按中文名/英文名拆行并 `\n` 拼接（中文最多 5 行 + 英文最多 2 行 + 计数）。
+2. G6 节点又设 `labelWordWrap: false` + `labelMaxWidth: 168` + `labelMaxLines: 5`。G6 默认 `labelWordWrap: false`，`maxLines` 只在 wordWrap 时有意义，这组是死配置/矛盾配置。
+3. `labelPlacement: "bottom"`：节点一旦挤在一起，底标必然互压。中文名与 `HIS.xxx` 被拆成两段后，中文行更容易看起来「没连在圆上」。
+
+证据：
+- `graphTransform.ts:163-187`
+- `AdvancedRelationGraph.vue:135-144,339-351`
+- `@antv/g6/src/elements/nodes/base-node.ts:221-223`、`shapes/label.ts:40-46`（Label 默认 `wordWrap: true, maxLines: 1`，节点默认关掉 wrap）
+
+这是叠加放大器，不是把圆套圆的第一因（第一因在布局）。
+
+**验证：** 单节点时看 label 是否已是多行 `\n`；把 `labelWordWrap` 打开后是否二次折叠。
+
+---
+
+### R5 SVG 降级 fallback — **确认有问题** · 严重度 **中**
+
+`>220` 节点或 `>320` 边会把引擎从 G6 切到 SVG。SVG 的 `layout` 对 `force` **没有实现**，直接落到 `buildLayered`（列距 260、行距 92）。explore 名义是 force，实际是按 schema 分组的网格。
+
+行距 92 对多行标签不够：圆半径约 21–33，标签从 `r+14` 起每行 15px，`formatGraphNodeLabel` 可达 5+2 行，竖直方向会压到下一行节点。水平 260 对「168+节点直径」一般够，报告把叠压主因写成列宽偏了，**竖向才是缺口**。
+
+证据：
+- `graphLoadPolicy.ts:19-30`
+- `graph/index.vue:142,485-496,745`：explore 会 `applyGraphLoadPolicy`；**overview 成功路径不调用**（626-647 提前 return）
+- `RelationGraph.vue:320-336,445-450,74-80`
+
+**验证：** 邻域 `nodes.length>=220` 时看「当前引擎：内置 SVG」；量相邻节点 `y` 差是否恒为 92。
+
+---
+
+### R7 el-segmented 不可达 — **疑问**（首屏失败时确认不可达；控件自身并非渲染不出） · 严重度 **高**（挂在 P1 上）/ **低**（独立 DOM 问题）
+
+`GraphToolbar.vue:4` 确有 `<el-segmented>`。Element Plus 2.11 根节点 class 就是 `el-segmented`（`useNamespace("segmented")` + `options.length` 才挂载）。
+
+自动化 `querySelector('.el-segmented') === null` 的直接原因是 **P1 错误态把整块工具栏 `v-if` 掉了**（`index.vue:9`），不是 EP 换了 class。options 为空时 segmented 也不渲染（`segmented2.mjs:126`），但那是 options 失败，不是版本差异。
+
+成功加载后，用户能点到「关系探索」。首屏若一直停在错误面板，则真实用户同样切不了模式——这是 P1 的连带，不是独立「控件坏了」。
+
+**验证：** 成功态执行 `document.querySelectorAll('.el-segmented')`；错误态再查一次，对照 `v-if`。
+
+---
+
+### R8 meta 口径错位 — **确认有问题** · 严重度 **低**
+
+system/source/schema 的 overview 把 **表数量** `matched_assets` 填进名为 `total_relations` / `matched_relations` 的字段；`returned_relations` 才是聚合边数；`truncated = matched_assets > len(nodes)` 在系统层几乎恒 true（12702 表 vs 十几个系统节点），并不表示关系被截断。工具栏文案是「总数/命中/返回/已截断」，会把表规模读成关系规模。
+
+证据：
+- `graph.py:1559-1560,1714-1726`：非 object 层 `_graph_meta(matched_assets, matched_assets, len(edges), matched_assets > len(nodes), ...)`
+- 对照 `graph.py:977,1075-1078`：主图谱接口 `total_relations = count(AssetRelation)`
+- 对照 `graph.py:1703-1712`：object 层 `total_relations` 才是关系总数，但 `truncated` 仍按表数 vs 节点数
+- `GraphToolbar.vue:90-94`：`总数 {{ meta.total_relations }}` + `已截断（limit={{ filters.limit }}）`
+- `schemas/graph.py:110-116` 字段名语义是关系
+
+这能解释报告里 `total_relations=12702, returned_relations=1, truncated=true`（环境描述是 12702 **表** / 1329 **关系**），但不解释墨团。
+
+**验证：** `GET /api/v1/graph/overview?level=system` 的 `meta` 与 `GET /api/v1/graph/diagnostics` 的 `table_count`/`relation_count` 对照。
+
+---
+
+### 对照小结
+
+| ID | 结论 | 严重度 | 一句话 |
+|---|---|---|---|
+| P1 | 确认有问题 | 高 | 10s 超时 vs overview 全量关系循环，首屏进错误面板 |
+| R2 | 疑问 | 高/低 | alpha 对 `type:"force"` 基本无效；同段负 `nodeStrength` + 默认 gravity 更像墨团 |
+| R4 | 确认有问题 | 中 | wrap 函数与 G6 禁 wrap/maxLines 矛盾，底标在堆叠时互压 |
+| R5 | 确认有问题 | 中 | 大图切 SVG 后 force 名实变成 92px 网格，多行标签竖向会叠 |
+| R7 | 疑问 | 高（连带） | 控件能渲染；首屏错误时工具栏被卸掉所以点不到 |
+| R8 | 确认有问题 | 低 | overview 把表数塞进 `total_relations`，截断口径也是表不是边 |
+
+与用户主诉「进去内容叠加、不直观」最对齐的是：**P1（进不去/先报错）+ 邻域 force 布局（R2 机制需改判，现象仍在）+ R4 底标**。R5 只在策略触发 SVG 后上场。R7 是 P1 的 UI 后果。R8 是统计口径，不是叠加。
