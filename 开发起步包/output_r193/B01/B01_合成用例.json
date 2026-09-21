@@ -1,0 +1,376 @@
+{
+  "meta": {
+    "case_set": "193-B01-synthetic-cases",
+    "version": "1.0",
+    "synthetic": true,
+    "generated_by": "B01 批次（2026-09-16）",
+    "usage": "B03+ 批次 fixture 输入；修改须升 version 并在 193 §12 记录；禁止填入真实患者信息",
+    "contract_ref": "output_r193/B01/B01_试点契约.md（条款号 C-§n）",
+    "cohort": {
+      "cohort_code": "SYN-PILOT-2020",
+      "window_start": "2020-01-01T00:00:00",
+      "window_end": "随数据集版本冻结时刻（本用例集假设 2026-06-30）",
+      "annual_attribution": "按出院年归属【待确认 BC-05】",
+      "freeze_assumption_for_case_003": "2020-01-15"
+    }
+  },
+  "patients": [
+    { "internal_id": "SYN-P-001", "name": "合成示例一", "sex": "1", "birthdate": "1955-03-10", "id_card_ref": "SYN-IDC-001" },
+    { "internal_id": "SYN-P-002", "name": "合成示例二", "sex": "2", "birthdate": "1948-11-02", "id_card_ref": "SYN-IDC-002" },
+    { "internal_id": "SYN-P-003", "name": "合成示例三", "sex": "1", "birthdate": "1962-06-18", "id_card_ref": "SYN-IDC-003" },
+    { "internal_id": "SYN-P-004", "name": "合成示例四", "sex": "2", "birthdate": "1970-01-25", "id_card_ref": "SYN-IDC-004" },
+    { "internal_id": "SYN-P-005", "name": "合成示例五", "sex": "1", "birthdate": "1958-09-30", "id_card_ref": "SYN-IDC-005" },
+    { "internal_id": "SYN-P-006A", "name": "合成示例同", "sex": "1", "birthdate": "1980-07-07", "id_card_ref": "SYN-IDC-006A" },
+    { "internal_id": "SYN-P-006B", "name": "合成示例同", "sex": "1", "birthdate": "1980-07-07", "id_card_ref": "SYN-IDC-006B" },
+    { "internal_id": "SYN-P-007", "name": "合成示例七", "sex": "2", "birthdate": "1990-02-14", "id_card_ref": "SYN-IDC-007" },
+    { "internal_id": "SYN-P-008", "name": "合成示例八", "sex": "1", "birthdate": "1966-04-21", "id_card_ref": "SYN-IDC-008" },
+    { "internal_id": "SYN-P-009", "name": "合成示例九", "sex": "2", "birthdate": "1975-12-08", "id_card_ref": "SYN-IDC-009" },
+    { "internal_id": "SYN-P-010", "name": "合成示例十", "sex": "1", "birthdate": "1983-05-19", "id_card_ref": "SYN-IDC-010" },
+    { "internal_id": "SYN-P-011", "name": "合成示例十一", "sex": "2", "birthdate": "1959-10-03", "id_card_ref": "SYN-IDC-011" }
+  ],
+  "cases": [
+    {
+      "case_id": "SYN-CASE-001",
+      "title": "跨年住院：窗口前入院、窗口内出院",
+      "boundary": ["跨年住院"],
+      "contract_refs": ["C-§1.2", "C-§7.1"],
+      "acceptance_batches": ["B06", "B09", "B12"],
+      "patients": ["SYN-P-001"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-001", "visit_id": "1" },
+          "business_time": { "admit": "2019-12-20T10:00:00", "discharge": "2020-01-05T09:30:00" },
+          "available_time": "2020-01-05T09:30:00",
+          "fields": { "discharge_disposition": "1", "dept": "SYN-科室A" }
+        }
+      ],
+      "expectations": [
+        "就诊区间与窗口相交 → 纳入 SYN-PILOT-2020",
+        "S1/S2/S4 年度统计归属 2020（按出院年，BC-05）；2019 年不产生统计行",
+        "对账：该患者候选=1、纳入=1、排除=0、隔离=0"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-002",
+      "title": "跨年住院：窗口前完全结束",
+      "boundary": ["跨年住院"],
+      "contract_refs": ["C-§1.2"],
+      "acceptance_batches": ["B09"],
+      "patients": ["SYN-P-002"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-002", "visit_id": "1" },
+          "business_time": { "admit": "2019-08-01T09:00:00", "discharge": "2019-09-30T14:00:00" },
+          "available_time": "2019-09-30T14:00:00",
+          "fields": { "discharge_disposition": "1", "dept": "SYN-科室A" }
+        }
+      ],
+      "expectations": [
+        "就诊区间与窗口无交集 → 不纳入本次窗口统计",
+        "排除态记录原因码 window_outside；患者保留在患者主档（覆盖矩阵窗口外标注）",
+        "对账：候选=1、纳入=0、排除=1（原因 window_outside）、隔离=0"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-003",
+      "title": "跨年住院：冻结时刻仍在院",
+      "boundary": ["跨年住院"],
+      "contract_refs": ["C-§1.2", "C-§4.3"],
+      "acceptance_batches": ["B09", "B12"],
+      "patients": ["SYN-P-003"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-003", "visit_id": "1" },
+          "business_time": { "admit": "2019-12-28T15:00:00", "discharge": null },
+          "available_time": "2019-12-28T15:00:00",
+          "fields": { "dept": "SYN-科室A", "status_at_freeze": "in_hospital" }
+        }
+      ],
+      "expectations": [
+        "区间相交 → 纳入队列（患者可见）",
+        "无出院 → 不计入 S1 出院人次分母；发布版本披露在院未出院人次",
+        "discharge 为 null 显式缺失，不得用冻结时刻顶替出院时间"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-004",
+      "title": "旧系统切换：新旧 LIS 2023 双写重叠",
+      "boundary": ["旧系统切换"],
+      "contract_refs": ["C-§5.2", "C-§5.3"],
+      "acceptance_batches": ["B07", "B08", "B09"],
+      "patients": ["SYN-P-004"],
+      "events": [
+        {
+          "domain": "lab_order",
+          "source_code": "LIS_CACHE_OLD",
+          "keys": { "test_no": "T-SYN-20221228" },
+          "business_time": "2022-12-28T08:00:00",
+          "available_time": "2022-12-28T16:00:00",
+          "fields": { "source_patient_id": "HP-004" }
+        },
+        {
+          "domain": "lab_order",
+          "source_code": "LIS_CACHE_OLD",
+          "keys": { "test_no": "T-SYN-20230105" },
+          "business_time": "2023-01-05T08:00:00",
+          "available_time": "2023-01-05T15:00:00",
+          "fields": { "source_patient_id": "HP-004", "overlap_marker": "dual_write" }
+        },
+        {
+          "domain": "lab_order",
+          "source_code": "LIS_NEW",
+          "keys": { "test_no": "T-SYN-20230105" },
+          "business_time": "2023-01-05T08:05:00",
+          "available_time": "2023-01-05T15:10:00",
+          "fields": { "source_patient_id": "HP-004", "overlap_marker": "dual_write" }
+        }
+      ],
+      "expectations": [
+        "T-SYN-20230105 双写重叠区去重为 1 个检验申请事件（优先新库为准，BC-07），老库副本作验证引用保留",
+        "T-SYN-20221228 老库独有事件正常保留计数",
+        "对账披露：重叠区事件数、去重数、双库不一致数（本例 0）",
+        "检验项目结果（G5）按同 TEST_NO 同步去重"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-005",
+      "title": "旧系统切换：文书 MTL→JHEMR 断崖与衔接",
+      "boundary": ["旧系统切换"],
+      "contract_refs": ["C-§5.2", "C-§5.3"],
+      "acceptance_batches": ["B06", "B11", "B09"],
+      "patients": ["SYN-P-005"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-005", "visit_id": "1" },
+          "business_time": { "admit": "2025-04-15T09:00:00", "discharge": "2025-05-20T10:00:00" },
+          "available_time": "2025-05-20T10:00:00",
+          "fields": { "dept": "SYN-科室A" }
+        },
+        {
+          "domain": "clinical_document",
+          "source_code": "MTL",
+          "keys": { "doc_id": "DOC-MTL-0001" },
+          "business_time": "2025-04-20T11:00:00",
+          "available_time": "2025-04-20T11:00:00",
+          "fields": { "visit_ref": "HP-005|1", "doc_type": "SYN-入院记录" }
+        },
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-005", "visit_id": "2" },
+          "business_time": { "admit": "2025-06-05T09:00:00", "discharge": "2025-06-15T10:00:00" },
+          "available_time": "2025-06-15T10:00:00",
+          "fields": { "dept": "SYN-科室A" }
+        },
+        {
+          "domain": "clinical_document",
+          "source_code": "JHEMR",
+          "keys": { "doc_id": "DOC-JHE-0002" },
+          "business_time": "2025-06-10T15:00:00",
+          "available_time": "2025-06-10T15:00:00",
+          "fields": { "visit_ref": "HP-005|2", "doc_type": "SYN-病程记录" }
+        }
+      ],
+      "expectations": [
+        "两次就诊与两份文书挂同一内部患者 SYN-P-005，患者维度贯通切换期",
+        "时间线完整呈现两段文书；2025-05-20 至 2025-06-05 的文书空档标'来源覆盖外'，不得显示'无文书记录'",
+        "覆盖矩阵：MTL 行覆盖终点与 JHEMR 行覆盖起点分别记录，断崖期进对账披露"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-006",
+      "title": "身份边界：同名同出生日期、身份证不同",
+      "boundary": ["缺失与身份边界"],
+      "contract_refs": ["C-§1.3", "C-§2 G14"],
+      "acceptance_batches": ["B06", "B09"],
+      "patients": ["SYN-P-006A", "SYN-P-006B"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-006A", "visit_id": "1" },
+          "business_time": { "admit": "2021-05-10T09:00:00", "discharge": "2021-05-15T10:00:00" },
+          "available_time": "2021-05-15T10:00:00",
+          "fields": { "id_card_ref": "SYN-IDC-006A" }
+        },
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-006B", "visit_id": "1" },
+          "business_time": { "admit": "2021-05-10T10:00:00", "discharge": "2021-05-18T10:00:00" },
+          "available_time": "2021-05-18T10:00:00",
+          "fields": { "id_card_ref": "SYN-IDC-006B" }
+        }
+      ],
+      "expectations": [
+        "确定性规则不合并：不同 id_card_ref → 两个内部患者，永不自动归并",
+        "系统不得输出'同一人两次住院'的时间线；各自独立成线",
+        "如任何候选规则提出合并，只能进隔离态+人工复核通道，不得自动生效（黄金样例错误合并=0 硬门禁）"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-007",
+      "title": "身份边界：同号不同源不得串人",
+      "boundary": ["缺失与身份边界"],
+      "contract_refs": ["C-§2 G14", "C-§8"],
+      "acceptance_batches": ["B06"],
+      "patients": ["SYN-P-001", "SYN-P-007"],
+      "events": [
+        {
+          "domain": "outpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "outpatient_num": "8877" },
+          "business_time": "2020-06-01T09:00:00",
+          "available_time": "2020-06-01T09:00:00",
+          "fields": { "source_patient_id": "HP-001" }
+        },
+        {
+          "domain": "anesthesia_event",
+          "source_code": "DOCARE",
+          "keys": { "docare_patient_id": "8877", "oper_no": "E-0001" },
+          "business_time": "2021-11-11T14:00:00",
+          "available_time": "2021-11-11T18:00:00",
+          "fields": { "emergency_indicator": "2" }
+        }
+      ],
+      "expectations": [
+        "来源身份映射键为 (source_code, 来源身份值) 二元组，不使用裸值匹配 → HP-001 与 Docare 8877 是两条独立来源身份",
+        "SYN-P-007（Docare 8877 的映射归属）不得继承 SYN-P-001 的门诊与住院史",
+        "跨源事件关联必须经事件键+时间窗证据，不得仅凭号码相同"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-008",
+      "title": "截止语义：结果可用时间晚于预测时点",
+      "boundary": ["截止语义"],
+      "contract_refs": ["C-§4.1", "C-§4.2", "C-§3.3"],
+      "acceptance_batches": ["B09", "B13"],
+      "patients": ["SYN-P-008"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-008", "visit_id": "1" },
+          "business_time": { "admit": "2020-01-02T10:00:00", "discharge": "2020-01-05T12:00:00" },
+          "available_time": "2020-01-05T12:00:00",
+          "fields": { "discharge_disposition": "1" }
+        },
+        {
+          "domain": "lab_order",
+          "source_code": "LIS_NEW",
+          "keys": { "test_no": "T-SYN-20200103" },
+          "business_time": "2020-01-03T08:00:00",
+          "available_time": "2020-01-06T14:00:00",
+          "platform_time": "2020-01-07T02:00:00",
+          "fields": { "source_patient_id": "HP-008", "item_result_numeric": 3.9, "item_unit": "mmol/L" }
+        }
+      ],
+      "expectations": [
+        "训练样本（预测时点=2020-01-05T12:00 出院时刻）不得使用该检验结果值（available_time > 预测时点）；最多保留'存在未回执申请'形态",
+        "统计 as-of（按 business_time 归属 2020-01）与训练 as-of 对同一事件结论不同，两者都必须可复现",
+        "时效指标可计算：available→platform 延迟=12h；business→available 延迟=78h"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-009",
+      "title": "缺失边界：LIS 报告 VISIT_ID 缺失（孤儿）",
+      "boundary": ["缺失边界"],
+      "contract_refs": ["C-§7.3", "C-§6.1"],
+      "acceptance_batches": ["B08", "B09"],
+      "patients": ["SYN-P-009"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-009", "visit_id": "3" },
+          "business_time": { "admit": "2022-03-01T09:00:00", "discharge": "2022-03-08T10:00:00" },
+          "available_time": "2022-03-08T10:00:00",
+          "fields": {}
+        },
+        {
+          "domain": "lab_order",
+          "source_code": "LIS_NEW",
+          "keys": { "test_no": "T-SYN-20220305", "visit_id": null },
+          "business_time": "2022-03-05T08:00:00",
+          "available_time": "2022-03-05T17:00:00",
+          "fields": { "source_patient_id": "HP-009" }
+        }
+      ],
+      "expectations": [
+        "事件不丢弃：以 (source_patient_id) 单键建立低置信候选关联并挂质量标记 visit_id_missing，或进孤儿分母——两种路径之一，禁止直接猜 VISIT_ID",
+        "B09 孤儿率分母计入该报告；对账公式含'关联低置信'一档",
+        "时间线展示该检验时带质量提示，不得静默归入某次就诊"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-010",
+      "title": "缺失边界：Docare 急诊 VISIT_ID=1 默认值",
+      "boundary": ["缺失边界", "旧系统切换"],
+      "contract_refs": ["C-§5.2 DOCARE 行", "C-§7.3"],
+      "acceptance_batches": ["B06", "B09"],
+      "patients": ["SYN-P-010"],
+      "events": [
+        {
+          "domain": "outpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "outpatient_num": "OP-SYN-1010" },
+          "business_time": "2021-11-11T13:30:00",
+          "available_time": "2021-11-11T13:30:00",
+          "fields": { "source_patient_id": "HP-010" }
+        },
+        {
+          "domain": "anesthesia_event",
+          "source_code": "DOCARE",
+          "keys": { "docare_patient_id": "DC-1010", "visit_id": "1", "oper_no": "E-0002" },
+          "business_time": "2021-11-11T14:00:00",
+          "available_time": "2021-11-11T18:00:00",
+          "fields": { "emergency_indicator": "2", "oper_status": "40" }
+        }
+      ],
+      "expectations": [
+        "VISIT_ID=1 按默认值规则处理：不解读为'第一次住院'，不与不存在的住院就诊自动关联（175 号证据规则）",
+        "急诊麻醉事件经 (患者映射+同日+急诊标志) 证据挂到同日门诊就诊，置信度标记为规则推断而非强键",
+        "该事件计入'默认值例外'对账档，B09 可统计默认值占比"
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-011",
+      "title": "外院边界：本院无记录区间不得推断无就诊",
+      "boundary": ["外院边界"],
+      "contract_refs": ["C-§7.4", "C-§3.1", "C-§3.2 S4"],
+      "acceptance_batches": ["B11", "B13"],
+      "patients": ["SYN-P-011"],
+      "events": [
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-011", "visit_id": "1" },
+          "business_time": { "admit": "2020-01-28T09:00:00", "discharge": "2020-02-10T10:00:00" },
+          "available_time": "2020-02-10T10:00:00",
+          "fields": { "discharge_disposition": "1" }
+        },
+        {
+          "domain": "inpatient_visit",
+          "source_code": "HIS_SOURCE",
+          "keys": { "source_patient_id": "HP-011", "visit_id": "2" },
+          "business_time": { "admit": "2021-03-01T09:00:00", "discharge": "2021-03-12T10:00:00" },
+          "available_time": "2021-03-12T10:00:00",
+          "fields": { "discharge_disposition": "1" }
+        }
+      ],
+      "expectations": [
+        "时间线在 2020-02-11 至 2021-02-28 显示'本院无记录区间'，禁止生成'无就诊/无患病/存活'类推断字段",
+        "S4 再入院率：第二次入院距上次出院 >31 天 → 不计再入院分子",
+        "数据卡/产品披露：本院可观测区间为两条住院之间，院外就诊不可见（含院外死亡）"
+      ]
+    }
+  ]
+}

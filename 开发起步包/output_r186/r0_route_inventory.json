@@ -1,0 +1,673 @@
+{
+  "generated_at": "2026-09-20T08:36:38.598Z",
+  "visible_leaf_count": 41,
+  "total_leaf_count": 52,
+  "visible_by_parent": {
+    "/": 4,
+    "/catalog": 6,
+    "/standards": 7,
+    "/quality-hub": 6,
+    "/query": 3,
+    "/identity": 9,
+    "/ops": 6
+  },
+  "remaining_routes": [
+    {
+      "path": "/login",
+      "name": "Login",
+      "title": "登录"
+    },
+    {
+      "path": "/access-denied",
+      "name": "AccessDenied",
+      "title": "403"
+    },
+    {
+      "path": "/server-error",
+      "name": "ServerError",
+      "title": "500"
+    },
+    {
+      "path": "/redirect",
+      "name": "",
+      "title": "加载中..."
+    }
+  ],
+  "routes": [
+    {
+      "parent": "/",
+      "parentTitle": "工作台",
+      "path": "/workbench",
+      "name": "Workbench",
+      "title": "日常工作台",
+      "showLink": true,
+      "hasComponent": true
+    },
+    {
+      "parent": "/",
+      "parentTitle": "工作台",
+      "path": "/welcome",
+      "name": "Welcome",
+      "title": "运行总览",
+      "showLink": true,
+      "hasComponent": true
+    },
+    {
+      "parent": "/",
+      "parentTitle": "工作台",
+      "path": "/asset/overview",
+      "name": "AssetOverview",
+      "title": "资产统计",
+      "showLink": true,
+      "auths": [
+        "asset.overview.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/",
+      "parentTitle": "工作台",
+      "path": "/asset/system-map",
+      "name": "AssetSystemMap",
+      "title": "平台能力全景",
+      "showLink": true,
+      "auths": [
+        "asset.overview.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/systems",
+      "name": "AssetSystems",
+      "title": "系统与数据资源",
+      "showLink": true,
+      "auths": [
+        "asset.system.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/datasets",
+      "name": "DatasetCatalog",
+      "title": "数据集目录",
+      "showLink": true,
+      "auths": [
+        "query.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/tables",
+      "name": "AssetTables",
+      "title": "表与字段",
+      "showLink": true,
+      "auths": [
+        "asset.table.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/graph",
+      "name": "AssetGraph",
+      "title": "关系图谱",
+      "showLink": true,
+      "auths": [
+        "asset.graph.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/lineage",
+      "name": "AssetLineage",
+      "title": "血缘与影响",
+      "showLink": true,
+      "auths": [
+        "asset.lineage.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/metadata/changes",
+      "name": "MetadataChanges",
+      "title": "元数据变更",
+      "showLink": true,
+      "auths": [
+        "metadata.change.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/tables/:schema/:table",
+      "name": "AssetTableDetail",
+      "title": "表详情",
+      "showLink": false,
+      "auths": [
+        "asset.table.view"
+      ],
+      "activePath": "/asset/tables",
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/sources",
+      "name": "AssetSources",
+      "title": "数据连接（兼容入口）",
+      "showLink": false,
+      "redirect": "/asset/systems?tab=connections",
+      "hasComponent": false
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/relations",
+      "name": "AssetRelations",
+      "title": "关系路径（兼容入口）",
+      "showLink": false,
+      "redirect": "(dynamic)",
+      "hasComponent": false
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/asset/candidates",
+      "name": "AssetCandidates",
+      "title": "候选关系（兼容入口）",
+      "showLink": false,
+      "redirect": "(dynamic)",
+      "hasComponent": false
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/metadata/snapshots",
+      "name": "MetadataSnapshots",
+      "title": "快照管理",
+      "showLink": false,
+      "auths": [
+        "metadata.snapshot.view"
+      ],
+      "activePath": "/metadata/changes",
+      "hasComponent": true
+    },
+    {
+      "parent": "/catalog",
+      "parentTitle": "资产目录",
+      "path": "/metadata/diff",
+      "name": "MetadataDiff",
+      "title": "快照对比",
+      "showLink": false,
+      "auths": [
+        "metadata.diff.view"
+      ],
+      "activePath": "/metadata/changes",
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/value-domains",
+      "name": "ValueDomains",
+      "title": "值域知识库",
+      "showLink": true,
+      "auths": [
+        "value_domain.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/dict/medical",
+      "name": "DictMedical",
+      "title": "诊断手术字典",
+      "showLink": true,
+      "auths": [
+        "dict.medical.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/dict/general",
+      "name": "DictGeneral",
+      "title": "通用字典",
+      "showLink": true,
+      "auths": [
+        "dict.general.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/dict/mappings",
+      "name": "DictMappings",
+      "title": "编码映射",
+      "showLink": true,
+      "auths": [
+        "dict.mapping.view",
+        "dict.medical.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/dict/sync-diffs",
+      "name": "DictSyncDiffs",
+      "title": "字典同步差异",
+      "showLink": true,
+      "auths": [
+        "dict.sync_diff.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/asset/relation-review",
+      "name": "AssetRelationReview",
+      "title": "关系复核",
+      "showLink": true,
+      "auths": [
+        "asset.relation.review"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/asset/relation-recipes",
+      "name": "AssetRelationRecipes",
+      "title": "关系配方",
+      "showLink": true,
+      "auths": [
+        "asset.recipe.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/asset/relation-rates",
+      "name": "AssetRelationRates",
+      "title": "关系验证统计",
+      "showLink": false,
+      "auths": [
+        "asset.relation.view"
+      ],
+      "activePath": "/asset/relation-review",
+      "hasComponent": true
+    },
+    {
+      "parent": "/standards",
+      "parentTitle": "标准与关系",
+      "path": "/asset/ai-context",
+      "name": "AssetAiContext",
+      "title": "AI上下文预览",
+      "showLink": false,
+      "auths": [
+        "asset.ai_context.view"
+      ],
+      "activePath": "/asset/relation-recipes",
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/issues",
+      "name": "QualityIssues",
+      "title": "质量台账",
+      "showLink": true,
+      "auths": [
+        "quality.issue.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/issues/mine",
+      "name": "QualityIssuesMine",
+      "title": "我的质量任务",
+      "showLink": false,
+      "auths": [
+        "quality.issue.read"
+      ],
+      "activePath": "/quality/issues",
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/issues/department",
+      "name": "QualityIssuesDepartment",
+      "title": "科室质量任务",
+      "showLink": false,
+      "auths": [
+        "quality.issue.read"
+      ],
+      "activePath": "/quality/issues",
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/issues/:id",
+      "name": "QualityIssueDetail",
+      "title": "问题详情",
+      "showLink": false,
+      "auths": [
+        "quality.issue.read"
+      ],
+      "activePath": "/quality/issues",
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/controls",
+      "name": "QualityControls",
+      "title": "质控清单",
+      "showLink": true,
+      "auths": [
+        "quality.control.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/quality/observations",
+      "name": "QualityObservations",
+      "title": "观测记录",
+      "showLink": true,
+      "auths": [
+        "quality.observation.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/probe-findings",
+      "name": "ProbeFindings",
+      "title": "探查发现",
+      "showLink": true,
+      "auths": [
+        "probe.finding.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/asset/quality",
+      "name": "AssetQuality",
+      "title": "元数据质控",
+      "showLink": true,
+      "auths": [
+        "asset.quality.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/quality-hub",
+      "parentTitle": "质量治理",
+      "path": "/asset/ai-quality",
+      "name": "AssetAiQuality",
+      "title": "AI质量分析",
+      "showLink": true,
+      "auths": [
+        "asset.quality.ai.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/query",
+      "parentTitle": "查询与指标",
+      "path": "/asset/ai-sql",
+      "name": "AssetAiSql",
+      "title": "AI辅助编写",
+      "showLink": true,
+      "auths": [
+        "ai.context.read"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/query",
+      "parentTitle": "查询与指标",
+      "path": "/asset/queries",
+      "name": "AssetQueries",
+      "title": "查询、指标与产品",
+      "showLink": true,
+      "auths": [
+        "query.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/query",
+      "parentTitle": "查询与指标",
+      "path": "/asset/queries/accuracy",
+      "name": "AssetQueryAccuracy",
+      "title": "准确性与反馈",
+      "showLink": true,
+      "auths": [
+        "query.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/persons",
+      "name": "IdentityPersons",
+      "title": "人员管理",
+      "showLink": true,
+      "auths": [
+        "identity.person.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/departments",
+      "name": "IdentityDepartments",
+      "title": "科室基线",
+      "showLink": true,
+      "auths": [
+        "identity.dept.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/accounts",
+      "name": "IdentityAccounts",
+      "title": "业务系统账号",
+      "showLink": true,
+      "auths": [
+        "identity.account.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/local-accounts",
+      "name": "IdentityLocalAccounts",
+      "title": "平台本地账号",
+      "showLink": true,
+      "roles": [
+        "identity_admin",
+        "platform_admin"
+      ],
+      "auths": [
+        "identity.local_account.manage",
+        "identity.role.manage"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/sync-diffs",
+      "name": "IdentitySyncDiffs",
+      "title": "人员同步差异",
+      "showLink": true,
+      "auths": [
+        "identity.sync_diff.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/sync-logs",
+      "name": "IdentitySyncLogs",
+      "title": "人员同步日志",
+      "showLink": true,
+      "auths": [
+        "identity.sync_diff.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/roles",
+      "name": "IdentityRoles",
+      "title": "平台角色权限",
+      "showLink": true,
+      "roles": [
+        "identity_admin",
+        "platform_admin"
+      ],
+      "auths": [
+        "identity.role.manage",
+        "identity.role.grant"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/authorizations",
+      "name": "IdentityAuthorizations",
+      "title": "人员授权",
+      "showLink": true,
+      "roles": [
+        "identity_admin",
+        "platform_admin"
+      ],
+      "auths": [
+        "identity.role.grant"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/identity",
+      "parentTitle": "人员与权限",
+      "path": "/identity/permission-requests",
+      "name": "IdentityPermissionRequests",
+      "title": "权限申请与审批",
+      "showLink": true,
+      "auths": [
+        "identity.permission_request.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/ops/runs",
+      "name": "OpsRuns",
+      "title": "运维任务",
+      "showLink": true,
+      "auths": [
+        "ops.run.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/ops/sql-workbench",
+      "name": "OpsSqlWorkbench",
+      "title": "受控SQL运维",
+      "showLink": true,
+      "auths": [
+        "ops.sql.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/ops/tools",
+      "name": "OpsTools",
+      "title": "运维工具模板",
+      "showLink": true,
+      "auths": [
+        "ops.tool.manage"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/ops/audit",
+      "name": "OpsAudit",
+      "title": "操作审计",
+      "showLink": true,
+      "auths": [
+        "ops.audit.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/asset/admin",
+      "name": "AssetAdmin",
+      "title": "治理基础配置",
+      "showLink": true,
+      "auths": [
+        "asset.admin.view"
+      ],
+      "hasComponent": true
+    },
+    {
+      "parent": "/ops",
+      "parentTitle": "平台运维",
+      "path": "/asset/ai-tools",
+      "name": "AssetAiTools",
+      "title": "AI接入与协作",
+      "showLink": true,
+      "auths": [
+        "asset.ai_draft.view"
+      ],
+      "hasComponent": true
+    }
+  ]
+}

@@ -1,0 +1,711 @@
+[
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-4264E2FC1C",
+  "statements": 10
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-42E060720B",
+  "statements": 30
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S4F-F25E68DF83",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-E9080EA37B",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_DETAIL\", [\"PRESC_DATE\", \"PRESC_NO\"]], [\"DRUG_PRESC_MASTER\", [\"PRESC_DATE\", \"PRESC_NO\"]], \"inner\"]",
+  "match": "existing_pairset",
+  "attach_to": "S2F-A4F3F1FA73",
+  "statements": 22
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\"]], [\"DRUG_PRESC_MASTER\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_ITEMS\", [\"EXAM_NO\"]], [\"EXAM_MASTER\", [\"EXAM_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-EE88384570",
+  "statements": 15
+ },
+ {
+  "stage_key": "[[\"LAB_RESULT\", [\"TEST_NO\", \"ITEM_NO\"]], [\"LAB_TEST_ITEMS\", [\"TEST_NO\", \"ITEM_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-67F8789EE2",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-0C86751F48",
+  "statements": 10
+ },
+ {
+  "stage_key": "[[\"LAB_RESULT\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-BE6DDA7EB6",
+  "statements": 18
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\", \"病人ID\", \"住院次数\"]], [\"ORDERS\", [\"ORDERING_DEPT\", \"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DOCT_DRUG_PRESC_MASTER\", [\"PRESC_NO\", \"PATIENT_ID\"]], [\"ORDERS\", [\"CURRENT_PRESC_NO\", \"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-0E7BE7E086",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CLINIC_VS_CHARGE\", [\"CLINIC_ITEM_CODE\"]], [\"ORDERS\", [\"ORDER_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_IMPORT_DETAIL\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_IMPORT_DETAIL\", [\"DOCUMENT_NO\"]], [\"DRUG_IMPORT_MASTER\", [\"DOCUMENT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 7
+ },
+ {
+  "stage_key": "[[\"DRUG_IMPORT_MASTER\", [\"STORAGE\"]], [\"DRUG_STORAGE_DEPT\", [\"STORAGE_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"DOCUMENT_NO\"]], [\"DRUG_EXPORT_MASTER\", [\"DOCUMENT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 11
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_MASTER\", [\"STORAGE\"]], [\"DRUG_STORAGE_DEPT\", [\"STORAGE_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CONSULTATION_DOCTOR_DETAIL\", [\"CONSULTATION_ID\"]], [\"CONSULTATION_DOCTOR_MASTER\", [\"CONSULTATION_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-4A1529052D",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], [\"DRUG_STOCK_LOG_NEW\", [\"DRUG_CODE\", \"PACKAGE_SPEC\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"DRUG_IMPORT_DETAIL\", [\"DRUG_CODE\", \"PACKAGE_SPEC\", \"FIRM_ID\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 7
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_DETAIL_TEMP\", [\"PRESC_DATE\", \"PRESC_NO\"]], [\"DRUG_PRESC_MASTER_TEMP\", [\"PRESC_DATE\", \"PRESC_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 8
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL_LOG_NEW\", [\"DOCUMENT_NO\"]], [\"DRUG_EXPORT_MASTER_LOG_NEW\", [\"DOCUMENT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"BATCH_NO\", \"FIRM_ID\", \"PACKAGE_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"BATCH_NO\", \"FIRM_ID\", \"PACKAGE_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_PRE\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\"]], [\"EXAM_MASTER\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-F16FF49E4E",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\"]], [\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"SUBJ_CODE\"]], [\"TALLY_SUBJECT_DICT\", [\"SUBJ_CODE\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-678B3B21E2",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\", \"VISIT_NO\", \"VISIT_DATE\"]], [\"OUTP_ORDER_DESC\", [\"RCPT_NO\", \"VISIT_NO\", \"VISIT_DATE\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-2A80F74804",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OUTP_ORDER_DESC\", [\"ORDERED_BY_DEPT\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-F135E41CC5",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"DRUG_EXPORT_MASTER\", [\"STORAGE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\", \"PACKAGE_SPEC\", \"PACKAGE_UNITS\", \"FIRM_ID\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"UNITS\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"UNITS\"]], [\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"EXAM_NO\"]], [\"INP_BILL_DETAIL\", [\"OPER_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-942AF56C2B",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_DISPENSE_REC\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_DETAIL\", [\"PRESC_NO\"]], [\"DRUG_PRESC_MASTER\", [\"PRESC_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"MCS_ORDER_SCHEDULE\", [\"WARD_CODE\"]], [\"WARDS\", [\"WARD_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_STOCK\", [\"STORAGE\"]], [\"DRUG_STORAGE_DEPT\", [\"STORAGE_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"UNITS\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DBA_OBJECTS\", [\"OBJECT_ID\"]], [\"V$LOCKED_OBJECT\", [\"OBJECT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"V$LOCKED_OBJECT\", [\"SESSION_ID\"]], [\"V$SESSION\", [\"SID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S4F-25378B31C7",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"BL_RYJL\", [\"ZYLSH\"]], [\"ZY_ZYYZXXMX\", [\"ZYJZLSH\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"MCS_DOC_FORM\", [\"ID\"]], [\"MCS_DOC_FORM_RECORDS\", [\"FORM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 10
+ },
+ {
+  "stage_key": "[[\"INPATIENTS\", [\"PAT_INDEX_NO\"]], [\"MCS_DOC_FORM\", [\"PATIENT_UID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 10
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-11FB0C398E",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\", \"EXAM_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"APP_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"EXAM_NO\"]], [\"EXAM_REPORT\", [\"EXAM_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-85177FB98A",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"DIAGNOSIS_TYPE\"]], [\"DIAGNOSIS_TYPE_DICT\", [\"DIAGNOSIS_TYPE_CODE\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S4F-FEB658BACB",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"TREAT_RESULT\"]], [\"TREATING_RESULT_DICT\", [\"TREATING_RESULT_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], [\"OUTP_MR\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-A1E797568B",
+  "statements": 8
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"TEST_NO\"]], [\"OUTP_TREAT_REC\", [\"APPOINT_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-5CB74852EF",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"OUTP_PRESC\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"EXAM_NO\"]], [\"OUTP_TREAT_REC\", [\"APPOINT_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-90361056DF",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\", \"VISIT_DATE\", \"VISIT_NO\"]], [\"OUTP_MR\", [\"PATIENT_ID\", \"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-D89F991E47",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_NAME_DICT\", [\"DRUG_CODE\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_DETAIL\", [\"DRUG_CODE\", \"PACKAGE_SPEC\", \"FIRM_ID\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-CB3BA33251",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_PRESC_DETAIL\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-C90B6003D8",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\"]], [\"OUTP_RCPT_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-B460DFC719",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_RCPT_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-24528FCEF4",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_PRICE_LIST\", [\"EXP_CODE\", \"FIRM_ID\"]], [\"OUTP_BILL_ITEMS\", [\"ITEM_CODE\", \"ITEM_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_PRICE_LIST\", [\"EXP_CODE\", \"FIRM_ID\"]], [\"INP_BILL_DETAIL\", [\"ITEM_CODE\", \"ITEM_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PRESC_DETAIL\", [\"PRESC_NO\", \"PRESC_DATE\"]], [\"DRUG_PRESC_MASTER\", [\"PRESC_NO\", \"PRESC_DATE\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-A4F3F1FA73",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DOSE_UNITS\"]], [\"ORDERS\", [\"DOSAGE_UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-F1148F94BD",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"VISIT_ID\"]], [\"PATS_IN_HOSPITAL\", [\"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"BED_REC\", [\"WARD_CODE\", \"BED_NO\"]], [\"PATS_IN_HOSPITAL\", [\"WARD_CODE\", \"BED_NO\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-86227FC71B",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"ORDER_SUB_NO\", \"ORDER_NO\", \"VISIT_ID\", \"PATIENT_ID\"]], [\"ORDERS_COSTS\", [\"ORDER_SUB_NO\", \"ORDER_NO\", \"VISIT_ID\", \"PATIENT_ID\"]], \"outer\"]",
+  "match": "existing_variant_join",
+  "attach_to": "S3F-C4039F391C",
+  "statements": 1,
+  "join_type": "outer"
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"ORDER_SUB_NO\", \"ORDER_NO\", \"VISIT_ID\", \"PATIENT_ID\"]], [\"ORDERS_COSTS\", [\"ORDER_SUB_NO\", \"ORDER_NO\", \"VISIT_ID\", \"PATIENT_ID\"]], \"outer\"]",
+  "match": "existing_variant",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_VS_WARD\", [\"DEPT_CODE\"]], [\"DRUG_DISPENSE_PRE\", [\"ORDERED_BY\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_PRE\", [\"OPER_BATCH_NO\"]], [\"DRUG_DISPENSE_REQ\", [\"OPER_BATCH_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_PROVIDE_APPLICATION\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PROVIDE_APPLICATION\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-1A98B5707E",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"DISPENSARY\", \"DRUG_CODE\"]], [\"DRUG_DISPENS_PROPERTY\", [\"DISPENSARY\", \"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DOCT_DRUG_PRESC_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-7C3491FAB2",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"QUANTITY\", \"DRUG_SPEC\", \"DRUG_CODE\"]], [\"DRUG_PROVIDE_APPLICATION\", [\"QUANTITY\", \"DRUG_SPEC\", \"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"DRUG_SPEC\", \"DRUG_CODE\"]], [\"DRUG_PROVIDE_APPLICATION\", [\"DRUG_SPEC\", \"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_EXPORT_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\", \"QUANTITY\"]], [\"DRUG_PROVIDE_APPLICATION\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\", \"QUANTITY\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-F62272933D",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"PATIENT_ID\"]], [\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"outer\"]",
+  "match": "existing_variant_join",
+  "attach_to": "S2F-F62272933D",
+  "statements": 1,
+  "join_type": "outer"
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"outer\"]",
+  "match": "existing_variant",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_BATCH_MASTER\", [\"TEST_NO\"]], [\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_IMPORT_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], [\"ORDERS_EXECUTE_DETAILS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_SPEC\", \"DRUG_CODE\"]], [\"DRUG_PRICE_LIST\", [\"DRUG_SPEC\", \"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"MIN_SPEC\", \"FIRM_ID\", \"DRUG_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\", \"PACKAGE_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_PRE\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_LOCAL_ID\"]], [\"EXAM_PAT_MI\", [\"PATIENT_LOCAL_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_LOCAL_ID\", \"LOCAL_ID_CLASS\"]], [\"EXAM_PAT_MI\", [\"PATIENT_LOCAL_ID\", \"LOCAL_ID_CLASS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"LAB_TEST_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"outer\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"DRUG_SPEC\", \"FIRM_ID\"]], [\"DRUG_STOCK\", [\"DRUG_CODE\", \"PACKAGE_SPEC\", \"FIRM_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"DRUG_NAME_DICT\", [\"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_NAME_DICT\", [\"EXP_CODE\"]], [\"EXP_PRICE_LIST\", [\"EXP_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DBA_HIST_ACTIVE_SESS_HISTORY\", [\"USER_ID\"]], [\"DBA_USERS\", [\"USER_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"V$SESSION\", [\"SQL_ADDRESS\"]], [\"V$SQL\", [\"ADDRESS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_IMPORT_DETAIL\", [\"EXP_CODE\"]], [\"EXP_NAME_DICT\", [\"EXP_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_DICT\", [\"EXP_CODE\"]], [\"EXP_NAME_DICT\", [\"EXP_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_DICT\", [\"EXP_CODE\", \"EXP_SPEC\"]], [\"EXP_PRICE_LIST\", [\"EXP_CODE\", \"EXP_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_PRESC_DETAIL_TEMP\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DOCT_DRUG_PRESC_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_EXPORT_DETAIL\", [\"DOCUMENT_NO\"]], [\"EXP_EXPORT_MASTER\", [\"DOCUMENT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_DICT\", [\"EXP_CODE\", \"EXP_SPEC\"]], [\"EXP_STOCK\", [\"EXP_CODE\", \"EXP_SPEC\"]], \"outer\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXP_PRICE_LIST\", [\"EXP_CODE\", \"EXP_SPEC\", \"FIRM_ID\"]], [\"EXP_STOCK\", [\"EXP_CODE\", \"PACKAGE_SPEC\", \"FIRM_ID\"]], \"outer\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_ITEMS\", [\"EXAM_NO\"]], [\"EXAM_REPORT\", [\"EXAM_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"LAB_RESULT\", [\"TEST_NO\"]], [\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_STOCK\", [\"PACKAGE_UNITS\"]], [\"OUTP_BILL_ITEMS\", [\"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], [\"ORDERS_ANTI_DRUG\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "existing_exact",
+  "attach_to": "S2F-79A7F03D1D",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"ORDERS_EXECUTE_DETAILS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\"]], [\"PRE_DISCHGED_PATS\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], [\"DRUG_PRESC_DETAIL\", [\"DRUG_CODE\", \"DRUG_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PATS_IN_HOSPITAL\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_DISPENSE_REC\", [\"FIRM_ID\", \"DRUG_SPEC\", \"DRUG_CODE\"]], [\"DRUG_PRICE_LIST\", [\"FIRM_ID\", \"DRUG_SPEC\", \"DRUG_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ }
+]

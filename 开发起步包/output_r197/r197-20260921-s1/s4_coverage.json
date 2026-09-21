@@ -1,0 +1,19 @@
+{
+ "stage": "S4",
+ "queue_rows": 345,
+ "unique_stmts": 330,
+ "dup_rows": 15,
+ "dup_explained_by_file_duplicate_map": 15,
+ "dup_explained_archive_member_map": 0,
+ "dup_unexplained": [],
+ "stmts_with_family_evidence": 144,
+ "stmts_in_metrics_ledger": 186,
+ "closure": true,
+ "templates_total": 214,
+ "templates_with_edges": 134,
+ "templates_new_family": 30,
+ "templates_supplement_family": 120,
+ "templates_stats_only": 80,
+ "new_relation_families": 11,
+ "supplemented_existing_relations": 18
+}

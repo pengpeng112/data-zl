@@ -1,0 +1,48 @@
+{
+ "schema_version": "r188-checkpoint-run/1.0",
+ "run_id": "r188-20260913",
+ "updated_at": "2026-09-13T21:00:00+08:00",
+ "phase": "step1_night1_done",
+ "stages": {
+  "S0_scope": "DONE",
+  "S1_collectors": "DONE (harvester+driver+import adapter, 12 unit tests + selftest)",
+  "S2_pilot": "DONE (clinic 14stmt/4.6s, 单条最大1.57s, 预算精确停止)",
+  "S3_metadata_B13": "PARTIAL 3/13 (night1: EMERGENCY_CLINIC DONE 219对象/1893字段; MEDICAL_RECORD_MGMT DONE 1384对象/23620字段; TRANSFUSION_NEW PARTIAL=XH_BIS_4.0可及0表4视图, XH_BIS/HyAppFrame BLOCKED_PRIVILEGE需熙恒DBA) | v2.1: 剩余10源一次性队列就绪",
+  "S4_offline_relations": "PARTIAL (152 candidates from 159; A-class classification 12767 tables done)",
+  "S5_capacity": "PARTIAL 3源 (Oracle USER_SEGMENTS降级=登录schema only, CLINIC 877.9MiB / YCYL 88GiB; 其余owner unknown)",
+  "S6_value_domains": "PARTIAL (859 offline candidates; confirmed 26 reused by reference)",
+  "S7_package": "PARTIAL (day artifacts done; snapshots await night)",
+  "S8_import_adaptation": "DONE (build_r188_package_and_import.py; FK->candidate only; selftest pass)",
+  "S9_report": "PARTIAL (day-phase report; final report after night windows)"
+ },
+ "next_action": "v2.1一次性队列: bash /opt/data-asset/evidence/r188-exploration-20260913/scripts/run_night.sh remaining (10源, 提示词=188 §16)",
+ "server_state": {
+  "evidence_dir": "/opt/data-asset/evidence/r188-exploration-20260913/",
+  "scripts_uploaded": [
+   "harvest_r188_lowload.py",
+   "run_r188_night.py",
+   "run_night.sh"
+  ],
+  "configs": 14,
+  "queue": "queue_night1.json"
+ },
+ "night1_evidence": {
+  "server_dir": "/opt/data-asset/evidence/r188-exploration-20260913/",
+  "snapshots": [
+   "emergency_clinic_10_10_10_120.r2.snapshot.json",
+   "mr_mgmt_10_10_10_55.r2.snapshot.json",
+   "bloodnew_sqlserver_10_10_8_7.xh40.snapshot.json"
+  ],
+  "budget_summary": {
+   "emergency": "74stmt/1.0sDB",
+   "mr_mgmt": "238stmt/6.8sDB",
+   "bloodnew_xh40": "9stmt/0.3sDB"
+  },
+  "source_writes": 0,
+  "incidents": [
+   "ORA-00942 ALL_SEGMENTS×2 → USER_SEGMENTS降级修复（结构数据零损失）",
+   "11g兼容×2 (CON_NAME/oracle_maintained) → 试点期修复",
+   "bloodnew Xiheng_user 仅XH_BIS_4.0可及(HAS_DBACCESS实测) → XH_BIS/HyAppFrame BLOCKED_PRIVILEGE"
+  ]
+ }
+}

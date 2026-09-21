@@ -1,0 +1,54 @@
+{
+  "run_id": "r195-20260919-084932",
+  "updated_at": "2026-09-20 10:10",
+  "phase2": {
+    "approval": "用户 2026-09-20 批准三项（S7 生产入库 / S5 探针当天执行（周末低负载豁免夜窗）/ S8 一次性只读 ApiKey）",
+    "S7": {
+      "status": "DONE",
+      "backup": "/opt/data-asset/backup/data_asset_pre_r195_20260919.dump (SHA 0974f2bd8744…)",
+      "inserted": 114,
+      "id_range": "561-674",
+      "total_reviews": "560→674",
+      "audit_id": 275,
+      "idempotent_replay": "114×INSERT 0 0（BEGIN…ROLLBACK 验证，零持久化）",
+      "rollback": "DELETE FROM asset.asset_relation_reviews WHERE relation_scope='r195_intake'（批次级，未动他人行）",
+      "approved_untouched": "3→3"
+    },
+    "S5": {
+      "status": "DONE(11 OK + 1 BLOCKED)",
+      "results_file": "validation_results.jsonl",
+      "probes_ok": ["P-B1-01","P-B1-02","P-B1-03(空窗实证)+P-B1-03r(2024窗)","P-B1-04","P-B1-12","P-B2-05","P-B3-06","P-B4-07","P-B5-08","P-B5-09(+b)","P-B5-11"],
+      "blocked": [{"probe": "P-B5-10", "tag": "BLOCKED_ACCESS", "cause": "血透源登记指向接口库 dialysis(仅 T_ITF_XT)，业务表在 dialysis0111/dialysis0108，PG 无法跨库"}],
+      "key_findings": [
+        "MTL 断崖实证：2025-06 窗 EPR_INPATIENT_DOCINDEX=0 行；2024-06 窗 200 行且 P_INPATIENT_TIMES≈VISIT_ID（198/199 一致）",
+        "CDA.CDA_DICTIONARY 存在 51 组 (字典名称,院标编码) 重复映射 → 所有 V_EMR_* 字典 JOIN 有放大风险（值域治理线索）",
+        "CDA.T_JBJL 为 ODS 实例视图（平台元数据未收视图）→ jhemr 草稿引用有效，元数据缺口",
+        "SM.MED_OPERATION_MASTER.OPER_ID 有值（与 HIS.OPERATION.OPER_ID 全 NULL 对照）；同日多台=2 组实证",
+        "JHEMR schema 在 ODS 实例实存，JHMR_FILE_INDEX 2025-06=73,016 行 → jhemr 草稿部署前提成立",
+        "9 项 HISUSER 裸名悬案全解：8 个 PUBLIC 同义词 + D07_EXAM_ITEM_MAP 为 HISUSER 直有表，均无 DBLink",
+        "Pitaya Status=512 占 89.4%（192,674/215,409）→ 支持 512=已完成语义（值域候选证据）"
+      ]
+    },
+    "S8": {
+      "status": "DONE(8/8 用例 200)",
+      "result_file": "readback.json",
+      "one_time_keys": "创建即删（key_id 3/4/5/7 + inspect；残留复核 0）",
+      "audit_ids": "276-283",
+      "positive": ["P1 组合键 26 rels 含 PATIENT_ID|VISIT_ID", "P2 TEST_NO 链 7 rels", "P3 手术三键 5 rels", "P4 值域 24 条含离院陷阱", "P5 FILE_UNIQUE_ID 3 rels"],
+      "negative": ["N1 同名表精确隔离", "N2 r195 草稿不混入正式导出", "N3 P_INPATIENT_TIMES 在正式关系中作键（MTL 时代合法，切换期语义需人工注意）"],
+      "platform_gaps": [
+        "/api/v1/ai 粗前缀只放行 platform_admin/quality_admin，ai.context.read 细粒度码对 ai_user 形同虚设（两门禁交集唯一=platform_admin）",
+        "system-context 无排序取前 N 表，关系段对大系统几乎恒空，需 export-context 定向检索",
+        "血透源元数据范围≠live 通道范围（183 表 vs 1 表）"
+      ]
+    }
+  },
+  "pending_after_phase2": [
+    "人工治理：114 条 r195_intake 草稿 approve/reject/补证（平台界面）",
+    "血透源登记修复（database 指向 dialysis0111 或另建源）——平台配置变更，需另行批准",
+    "CDA 字典 51 组重复映射清理 + T_JBJL 等视图元数据补采——值域/元数据治理后续",
+    "配方候选 57 份（recipe_candidates.json）人工补齐后走配方草稿流程",
+    "值域候选（Pitaya Status 等）未提交——不在本次批准范围"
+  ],
+  "idempotency": "重跑规则不变：manifest 哈希一致→跳过解析；S7 重放新增恒 0（NOT EXISTS）；探针结果按 probe_id 追加不去重（历史保留）"
+}

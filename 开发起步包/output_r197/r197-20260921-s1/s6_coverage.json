@@ -1,0 +1,25 @@
+{
+ "stage": "S6",
+ "probes_planned": 37,
+ "probe_sql_records": 42,
+ "executed": 39,
+ "channel_failed_then_resolved": [
+  "Q14->Q14b",
+  "Q17/Q17b->D4(证伪)",
+  "Q27/Q27b->Q27c",
+  "Q28/Q28b->Q28c"
+ ],
+ "still_failed": [
+  "Q17b (ID_NO 列不存在——即探针结论，非通道问题)"
+ ],
+ "insufficient": [
+  "Q32 批次表零样本",
+  "Q33 DISPENSE_REC 零命中（子指标）"
+ ],
+ "authorization": "用户接续指令 2026-09-21 本会话授予；通道=sjzc live 受控连接器；聚合返回；业务源库写入=0",
+ "sources_touched": [
+  "his_source_10_10_10_15",
+  "ods_8_216",
+  "mobile_nursing_oracle_10_10_125"
+ ]
+}

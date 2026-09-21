@@ -1,0 +1,360 @@
+{
+ "run_id": "r197-20260921-s1",
+ "stage": "S7_exec_done_awaiting_human_governance",
+ "date": "2026-09-21",
+ "input_baseline": {
+  "files_json": 611,
+  "hash_same": 611,
+  "disk_new": 0,
+  "archive_members_listed": 130,
+  "archive_sql_members_extracted": 83
+ },
+ "coverage": {
+  "readable_units": 506,
+  "parsed_units": 483,
+  "no_sql_units": 23,
+  "dispositions": {
+   "parsed": 483,
+   "no_sql_statements": 23,
+   "support_result_material": 31,
+   "support_doc_binary": 1,
+   "support_manual": 4,
+   "link_ignored": 1,
+   "statement_archive_extracted": 6,
+   "program_not_run": 15,
+   "pb_library_static_export_only": 15,
+   "pb_project": 14,
+   "pb_binary_blocked": 15,
+   "log_support": 5,
+   "image": 68,
+   "local_db_support": 5,
+   "config_support": 3,
+   "vcs_metadata_non_sql": 3,
+   "data_archive_listed": 2
+  }
+ },
+ "statements": {
+  "rows_with_branches": 6575,
+  "statement_units": 6286,
+  "unique_templates": 3256,
+  "types": {
+   "select": 6444,
+   "fragment": 6,
+   "ddl_other": 24,
+   "set_txn": 62,
+   "update": 11,
+   "insert": 15,
+   "grant": 9,
+   "delete": 4
+  }
+ },
+ "objects": {
+  "distinct": 461,
+  "mapped": 322,
+  "genuine_unknown": 125
+ },
+ "platform_baseline": {
+  "tables_pulled": 18539,
+  "relations_formal": 1329,
+  "relation_reviews": 666,
+  "recipes": 65,
+  "value_domains_confirmed": 26,
+  "targeted_relations_touching_matched": 119,
+  "targeted_reviews": 0
+ },
+ "queues": {
+  "S2": 2039,
+  "S5": 1998,
+  "S4": 345,
+  "S3": 1904
+ },
+ "blocked": [
+  {
+   "id": "PBL/PBD",
+   "reason": "PowerBuilder 库无静态导出工具，SQL 无法不暴露数据地提取",
+   "count": 30
+  },
+  {
+   "id": "DOC(1)/结果表 XLS/XLSX(31)",
+   "reason": "按计划仅作支持材料，未读患者数据行",
+   "count": 32
+  },
+  {
+   "id": "糖尿病数据 rar ×2",
+   "reason": "患者结果数据包，仅列成员未解压",
+   "count": 2
+  },
+  {
+   "id": "genuine_unknown_objects",
+   "reason": "125 个对象未定位（本段新增涉及 CURRENT_PRICE_LIST/EINV_COMM_DATA/YB_MAPPING/OPERATION_NAME 等 22 个 D 类族）",
+   "count": 125
+  },
+  {
+   "id": "dynamic_sql_s34",
+   "reason": "S3 20 + S4 46 条旗标语句待用户语境确认（ISS-S3-DYN/ISS-S4-DYN）",
+   "count": 66
+  }
+ ],
+ "next": "人工治理终态：①167 条 r197_intake 草稿 approve/reject（平台界面，逐条或批量）；②13 条配方草稿人工审核/activate；③34 条值域 pending 人工 confirm；④人工发布后按 §11.3 八类用例 AI 回读（①住院组合键②门诊复合键③收费防放大④手术台次/术式区别⑤TEST_NO 大表约束⑥护理表单限定⑦药品有效期⑧跨源待核与负例不可作正式依据）。撤销通道与备份见 readback.json。受阻账不变：PBL/PBD 30、动态 SQL 220、D 类 42、未定位 125、出库表停更 2025-07-05",
+ "workload_reestimate": {
+  "S2_stmts": 2039,
+  "S2_templates": 1096,
+  "S3_stmts": 1904,
+  "S3_templates": 881,
+  "S4_stmts": 345,
+  "S4_templates": 214,
+  "S5_stmts": 1998,
+  "S5_templates": 1065
+ },
+ "date_s2": "2026-09-21",
+ "s2": {
+  "queue_rows": 2039,
+  "distinct_stmts": 1993,
+  "duplicate_rows_explained": 46,
+  "templates": 1096,
+  "templates_with_edges": 577,
+  "stats_only_templates": 519,
+  "relation_families": 223,
+  "intake_states": {
+   "existing_supplement": 127,
+   "candidate": 59,
+   "partial": 16,
+   "candidate_d_crosssource": 13,
+   "candidate_blocked_source": 8
+  },
+  "public_families": [
+   "RF-INPATIENT-VISIT(18)",
+   "RF-PATIENT-MASTER(27)",
+   "RF-OUTPATIENT-CLINIC(10)",
+   "RF-DEPT-DICT(36)",
+   "RF-STAFF-DICT(22)"
+  ],
+  "issues": 21,
+  "probes_designed": 15,
+  "validation_state": "all not_run",
+  "governance_state": "all local",
+  "blocked": [
+   "platform_refresh_ssh_reset",
+   "value_domain_snapshot_aged_20260829",
+   "dynamic_sql_122_stmts_pending",
+   "unresolved_eq_39_templates",
+   "PBL_PBD_30_inherited_S1"
+  ]
+ },
+ "date_s34": "2026-09-21",
+ "relations_total": 405,
+ "s34": {
+  "s3": {
+   "queue_rows": 1904,
+   "unique_stmts": 1878,
+   "dup_rows_explained": 26,
+   "templates": 881,
+   "templates_with_edges": 179,
+   "stats_only_templates": 702,
+   "new_families": 74,
+   "judgment_families": 9,
+   "supplemented_s2_relations": 43,
+   "supplement_statements": 176,
+   "intake_states": {
+    "existing_supplement": 9,
+    "candidate": 28,
+    "partial": 15,
+    "candidate_d_crosssource": 18,
+    "rejected_negative": 2,
+    "candidate_blocked_source": 2
+   },
+   "rejected_negative_ids": [
+    "S3F-00D14B17CE",
+    "S3F-9522A5F378"
+   ],
+   "recipes": 8,
+   "issues": 15,
+   "probes": [
+    "S3-P001..P008"
+   ],
+   "stmts_with_family_evidence": 185,
+   "stmts_stats_only": 1693
+  },
+  "s4": {
+   "queue_rows": 345,
+   "unique_stmts": 330,
+   "dup_rows_explained": 15,
+   "templates": 214,
+   "templates_with_edges": 134,
+   "stats_only_templates": 80,
+   "new_families": 11,
+   "supplemented_relations": 18,
+   "supplement_statements": 233,
+   "intake_states": {
+    "partial": 2,
+    "existing_supplement": 3,
+    "candidate_d_crosssource": 4,
+    "candidate_blocked_source": 2
+   },
+   "metrics_ledger_templates": 214,
+   "issues": 6,
+   "probes": [
+    "S4-P001..P006"
+   ],
+   "stmts_with_family_evidence": 144,
+   "stmts_in_ledger": 186
+  },
+  "platform_refresh_20260921": {
+   "ssh": "restored",
+   "value_domains_confirmed": 26,
+   "formal_relations_total": 1329,
+   "formal_extra_for_missing_tables": 28,
+   "review_drafts_touching_s34_tables": 44,
+   "recipes_total_all_draft": 65
+  },
+  "mask_rescan": {
+   "canonical_three_patterns": "0 hits / 19 artifacts",
+   "strict_scan": "24 adjudicated business-literal FPs + 1 true positive fixed (S2-era citation in issues.jsonl & S2 report masked)"
+  },
+  "issues_total": 43,
+  "probes_total": 29
+ },
+ "s5": {
+  "queue_rows": 1998,
+  "unique_stmts": 1971,
+  "dup_rows_explained": 27,
+  "dup_unexplained": 0,
+  "templates": 1065,
+  "templates_with_edges": 165,
+  "templates_stats_only": 900,
+  "new_families": 97,
+  "supplements_to_existing": 35,
+  "intake_states": {
+   "candidate": 59,
+   "existing_supplement": 10,
+   "candidate_d_crosssource": 7,
+   "partial": 18,
+   "candidate_blocked_source": 1,
+   "rejected_negative": 2
+  },
+  "rejected_negative_ids": [
+   "S5F-4220821021",
+   "S5F-DB4677BC1A"
+  ],
+  "recipes": 5,
+  "issues": 10,
+  "probes": [
+   "S5-P001..P008"
+  ],
+  "stmts_with_family_evidence": 186,
+  "stmts_stats_only": 1785,
+  "dedup_upgrade": "pairset order-insensitive layer added (exact 34/pairset 1/variant 2/variant_join 2/new 95); legacy 8 order-variant pairs found in S2-S4 -> ISS-S5-ORDERVAR, merge at S7 import",
+  "platform_refresh_20260921": {
+   "formal_relations_s5_tables": "115 effective (case-sensitive), all within S1∪S34 baseline — no drift",
+   "jhemr_case_collision_filtered": 148,
+   "reviews_touching_s5_tables": 93
+  },
+  "mask_rescan": {
+   "canonical_three_patterns": "0 hits / 8 artifacts",
+   "strict_scan": "55 adjudicated business-literal FPs + 2 true positives fixed at pipeline level (KEZHUREN/PRESCRIBED_BY name filters masked, masker word lists widened, path real-name masked); full run-dir residual scan 0"
+  }
+ },
+ "s2_s5_reconciliation": {
+  "families_total": 405,
+  "by_stage": {
+   "S2": 223,
+   "S3": 74,
+   "S4": 11,
+   "S5": 97
+  },
+  "intake_states": {
+   "existing_supplement": 149,
+   "candidate": 146,
+   "partial": 51,
+   "candidate_d_crosssource": 42,
+   "candidate_blocked_source": 13,
+   "rejected_negative": 4
+  },
+  "supplement_events": 95,
+  "recipes_total": 13,
+  "issues_total": 53,
+  "probes_total": 37,
+  "queues_closed": {
+   "S2": "1993/1993",
+   "S3": "1878/1878",
+   "S4": "330/330",
+   "S5": "1971/1971"
+  }
+ },
+ "s6": {
+  "probe_sql_records": 42,
+  "executed": 39,
+  "channel_failures_resolved": [
+   "Q14->Q14b",
+   "Q17->D4 列不存在(即结论)",
+   "Q27/Q28->覆盖窗重试"
+  ],
+  "authorization": "用户接续指令 2026-09-21 本会话授予（窗口/通道按探针包所列）；通道=sjzc live；写入 0；聚合返回",
+  "relations_validation_updated": 59,
+  "validation_states": {
+   "passed_in_scope": 41,
+   "failed": 16,
+   "insufficient": 2,
+   "not_run": 346
+  },
+  "key_findings": [
+   "VISIT_ID 单列最大 1833 患者/组；RCPT_NO 单列 33.7-58.3% 重复；三列收据键 0 重复",
+   "住院费用守恒 196/197；门诊三口径 58/58；预交金两键 0 重复",
+   "INP_SETTLE_MASTER_YB 无 ID_NO 列（任何 owner）——S3F-007BA0B97D 证伪",
+   "手术直连放大实证 73/114 visit 多手术条；名称 JOIN 负例 31 组+同名 1110 人",
+   "药价 61.6% 多价并存（max 11）；库存两列键 max 125 行；批次表零样本",
+   "药品出库表停更 2025-07-05；OPERATION_SCALE 带空格变体；HIS vs ODS 的 OPER_ID 语义不同",
+   "护理患者链 200/200 命中；重复评估 22.5%"
+  ],
+  "artifacts": [
+   "probe_package.json",
+   "validation_results.jsonl",
+   "validation_matrix.json",
+   "s6_coverage.json",
+   "S6_执行报告.md"
+  ]
+ },
+ "s7": {
+  "platform_baseline_no_drift": {
+   "formal": 1329,
+   "reviews": 674,
+   "draft": 666,
+   "recipes": 65,
+   "vd_confirmed": 26
+  },
+  "code_facts_verified": "relation_reviews.py 无普通创建 POST（仅 approve/reject/batch）；未使用旧导入脚本",
+  "import_payload": {
+   "rows": 167,
+   "sha256_16": "690a0a7b10e68224",
+   "composition": {
+    "candidate": 132,
+    "partial": 35
+   },
+   "by_stage": {
+    "S2": 61,
+    "S3": 37,
+    "S5": 69
+   },
+   "not_imported_with_reasons": 238
+  },
+  "recipe_payload": {
+   "rows": 13,
+   "sha256_16": "763f565a17ba3642"
+  },
+  "value_domain_candidates": 5,
+  "rehearsal": "PASS（167 插入/重放 0/反向 1/回滚干净/清理零残留/他人不变，rehearsal_result.json）",
+  "approval_package": "approval_package.md——A1 关系草稿+167 / A2 配方 draft×13 / A3 值域 pending×5",
+  "production_write_executed": true,
+  "post_import_steps_after_approval_and_human_publish": [
+   "草稿隔离验证",
+   "八类 AI 回读用例（①住院组合键…⑧负例）"
+  ],
+  "execution_evidence": {
+   "backup": "data_asset_pre_r197_20260921.dump (f12a47cce3021230…)",
+   "A1": "167 inserted, total 674→841, ID 675–841, all draft, audit 286",
+   "A2": "13 recipes draft, 65→78, ID 67–79, audit 287",
+   "A3": "34 VD pending, 128→162, confirmed 26 untouched",
+   "isolation": "AI-visible recipes=0; formal relations 1329 untouched"
+  }
+ }
+}

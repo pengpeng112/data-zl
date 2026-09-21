@@ -1,0 +1,50 @@
+{
+  "batch": "180",
+  "plan": "开发起步包/180_G13分域提交与G1G3生产发布一次性执行计划.md（v1.0）",
+  "executed_at": "2026-09-05",
+  "authorization": "用户点名按 180 执行；push/D2/G2 未授权未做",
+  "one_line": "九组分域提交入库 + 生产镜像 r178-20260905 发布（G1 FFREE3 持久化 / G3 F-2 上产 / MAX_NEW→50）+ 前端 r178 原子切换；D1 夜跑验证已排程 09-06 02:25；零 push/零 cron 改/零业务源连接。",
+  "segment_A": {
+    "commits": [
+      "5487ebf chore(hygiene): ignore one-shot work dirs",
+      "9a1616b feat(174): quality governance ledger backend",
+      "a9925dd feat(175): lis/us/docare governance + ecg review import scripts",
+      "5664365 fix(177): catalog readback/recipe 422/edge label/v-perms",
+      "f691abb feat(identity): FFREE3 + login/sign subtask module + F-2",
+      "ce8e9a8 fix(alembic): ensure asset schema exists",
+      "ab18625 fix(178): GraphToolbar one-way data flow",
+      "013b6a4 feat(quality): 174 ledger frontend + 178 cross links",
+      "809f0b2 docs(173-180): reports/plans/output evidence"
+    ],
+    "pushed": false,
+    "other_domain_files_committed": 0,
+    "smoke": "backend alembic_env 4 passed; frontend 16 passed"
+  },
+  "segment_B": {
+    "base_image": "data-asset:r175-20260903",
+    "new_image": "data-asset:r178-20260905 (e42bfaf55360)",
+    "container": "25970c9185b6 healthy",
+    "image_smoke": { "FFREE3": 11, "resync_unchanged": 5, "schema_ddl": 2, "login_sign_adapter": 1 },
+    "readback": { "health": 200, "three_api": "401", "alembic_current": "d5e6f7a8b9c0 (head)", "settings": "150/50" },
+    "db_backup": "data_asset_pre_r178_20260905.dump 139M",
+    "env_backup": "backend.env.bak-maxnew-20260905",
+    "runner_decision": "保留 r175 旧版 runner（login_sign=0），G2 不因本批激活"
+  },
+  "segment_C": {
+    "frontend_release": "r178-20260905",
+    "entry_hash_local_equals_prod": "index-vXKROi89.js",
+    "budgets": "657.2/700, 404.5/430, 103.5/110 KB gzip PASS",
+    "nginx": "test pass + reload; home 200; api via nginx 401"
+  },
+  "segment_D": {
+    "d1_automation": "automation-2f3ff9ec @ 2026-09-06 02:25 (read-only, writes output_r180/nightly_d.md)",
+    "d2_executed": false,
+    "result": "待出（不得在 nightly_d.md 产出前宣称 F-2 已验证）"
+  },
+  "red_lines": {
+    "push": 0, "checkout_stash_reset": 0, "cron_changes": 0, "dockerfile_changes": 0,
+    "business_source_connections": 0, "credentials_on_disk": 0, "other_domain_commits": 0
+  },
+  "evidence": "开发起步包/output_r180/",
+  "dod_180_s9": "§9.1-3/5 全过；§9.4 D1 排程待出；§9.6 未宣称项如实"
+}

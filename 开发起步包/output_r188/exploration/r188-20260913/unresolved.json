@@ -1,0 +1,72 @@
+{
+ "schema_version": "r188-unresolved/1.0",
+ "generated_at": "2026-09-13",
+ "items": [
+  {
+   "id": "U1",
+   "scope": "B13 all",
+   "stage": "S2/S3/S5 live",
+   "blocking": "time window",
+   "evidence": "夜窗22:00-00:00未到(白天禁止批量源端探索)",
+   "impact": "13源元数据/容量采集",
+   "independent_work_done": "采集器/驱动/配置/执行包全部就绪并上传8.83",
+   "needed_from": "到达已批准夜窗时段",
+   "resume_action": "run_night.sh night1"
+  },
+  {
+   "id": "U2",
+   "scope": "11个B源",
+   "stage": "平台纳入(S10)",
+   "blocking": "平台credential_ref为NULL",
+   "evidence": "S0基线：186/187批注册未回填credential_ref(凭据文件本身存在)",
+   "impact": "sjzc live通道对11源无法解析凭据；不影响本轮采集(容器直读模式)",
+   "independent_work_done": "S0清单记录；采集走159先例直读凭据文件",
+   "needed_from": "步骤二批准后随元数据导入一并回填credential_ref(平台库写)",
+   "resume_action": "S10导入含source更新"
+  },
+  {
+   "id": "U3",
+   "scope": "BRONCHOSCOPY/HEMODIALYSIS",
+   "stage": "S3",
+   "blocking": "早期空登记未复核",
+   "evidence": "187 §2：未复核(早期登记)",
+   "impact": "连通性未知",
+   "independent_work_done": "凭据文件在；驱动队列排最后",
+   "needed_from": "窗口内单次验证结果",
+   "resume_action": "若BLOCKED_NETWORK/AUTH只记录原因不重试"
+  },
+  {
+   "id": "U4",
+   "scope": "HEARING_TEST",
+   "stage": "S3",
+   "blocking": "HuaChainSQL兼容性未实证",
+   "evidence": "188计划§1.2: 国产PG兼容库元数据函数可能差异",
+   "impact": "PG采集路径可能部分失败",
+   "independent_work_done": "PGEngine逐查询guard+error记录",
+   "needed_from": "试点结果",
+   "resume_action": "函数级失败记error继续，整源失败记BLOCKED_DIALECT"
+  },
+  {
+   "id": "U5",
+   "scope": "隔离验收",
+   "stage": "S9",
+   "blocking": "需夜窗采集产物",
+   "evidence": "导入dry-run需实际快照",
+   "impact": "隔离库导入演练延后",
+   "independent_work_done": "导入适配器+selftest通过",
+   "needed_from": "night1快照+APP_TEST_DB_URL核实",
+   "resume_action": "隔离库执行build_r188_package_and_import.py dry-run"
+  },
+  {
+   "id": "U6",
+   "scope": "bloodnew例程解析",
+   "stage": "S4",
+   "blocking": "332/447例程T-SQL未解析",
+   "evidence": "159 §3A：游标/动态SQL/临时表超出sqlglot覆盖",
+   "impact": "输血关系候选不全(已知子集)",
+   "independent_work_done": "37候选+23unresolved保留",
+   "needed_from": "人工或专用T-SQL解析(后续立项)",
+   "resume_action": "标注coverage已知子集，不宣称全量"
+  }
+ ]
+}

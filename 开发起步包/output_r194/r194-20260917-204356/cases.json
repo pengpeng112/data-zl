@@ -1,0 +1,1003 @@
+{
+ "generated": "2026-09-17",
+ "cases": [
+  {
+   "case_id": "G01@/welcome",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/welcome",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/overview",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/overview",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/system-map",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/system-map",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/workbench",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/workbench",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/systems",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/systems",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/tables",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/tables",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/graph",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/graph",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/lineage",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/lineage",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/metadata/changes",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/metadata/changes",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/persons",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/persons",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/departments",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/departments",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/accounts",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/accounts",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/local-accounts",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/local-accounts",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/sync-diffs",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/sync-diffs",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "2 行 vs 3 种子(默认 open 过滤，U-3)",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/sync-logs",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/sync-logs",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/roles",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/roles",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "0 行 vs 9 角色种子(U-4 待复核)",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/authorizations",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/authorizations",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/identity/permission-requests",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/identity/permission-requests",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/ops/runs",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/ops/runs",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/ops/sql-workbench",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/ops/sql-workbench",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/ops/tools",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/ops/tools",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/ops/audit",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/ops/audit",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "0 行 vs 9 治理审计种子(U-5 口径差待核)",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/quality/issues",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/quality/issues",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/quality/controls",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/quality/controls",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/quality/observations",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/quality/observations",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/probe-findings",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/probe-findings",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/quality",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/quality",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/ai-quality",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/ai-quality",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/ai-sql",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/ai-sql",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/queries",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/queries",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "FAIL-detail: 列表空(DEF-02)，页面本身渲染正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": [
+    "DEF-02"
+   ]
+  },
+  {
+   "case_id": "G01@/asset/queries/accuracy",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/queries/accuracy",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染正常但评测结果空(U-1 待复核)",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/value-domains",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/value-domains",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/dict/medical",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/dict/medical",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/dict/general",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/dict/general",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/dict/mappings",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/dict/mappings",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染正常但 0 行(U-2 待复核)",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/dict/sync-diffs",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/dict/sync-diffs",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/relation-review",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/relation-review",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/relation-recipes",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/relation-recipes",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/admin",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/admin",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/asset/ai-tools",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/asset/ai-tools",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G01@/",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "route": "/",
+   "expected": "页面渲染，主数据加载完成，无空白/致命错误",
+   "actual": "渲染/数据/空态正常",
+   "evidence": [
+    "logs/backend.log",
+    "cases 备注见测试报告 §页面扫测"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G02@/asset/tables",
+   "status": "FAIL",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "搜索 PATIENT_INFO 命中同名表并过滤",
+   "actual": "树被清空、主列表未过滤(DEF-07)",
+   "defect_ids": [
+    "DEF-07"
+   ]
+  },
+  {
+   "case_id": "G03@/asset/tables",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "SPA 导航冻结(DEF-01)阻断连续交互；时间预算"
+  },
+  {
+   "case_id": "G04@/asset/tables",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "同上"
+  },
+  {
+   "case_id": "G05@/asset/systems+table-detail",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "深链刷新可恢复",
+   "actual": "2 个深链整页刷新均正确渲染（含 query 参数）"
+  },
+  {
+   "case_id": "G05b@invalid-params",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "时间预算"
+  },
+  {
+   "case_id": "G06@mock-fault-injection",
+   "status": "NOT_RUN",
+   "method": "BROWSER_MOCK",
+   "blocked_reason": "时间预算（故障注入未做）"
+  },
+  {
+   "case_id": "G07@role-matrix",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "expected": "viewer/norole 对高权限端点 403",
+   "actual": "12 例矩阵通过（1 例先受 DEF-05 夹具影响，修正后过）",
+   "evidence": [
+    "api_static/api_matrix_results.json"
+   ],
+   "defect_ids": []
+  },
+  {
+   "case_id": "G08@keyboard-zoom",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "时间预算"
+  },
+  {
+   "case_id": "G09@repeat-nav",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01"
+  },
+  {
+   "case_id": "G10@counts-vs-seed",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION+API_INTEGRATION",
+   "expected": "列表计数与种子对账",
+   "actual": "表10/血缘2/变更3/质控3/观测3/台账3/探查3/值域3/配方2/人员9/科室3/账号12/本地账号6/同步日志1 全部吻合；查询中心 3(API)≠0(页面)→DEF-02",
+   "defect_ids": [
+    "DEF-02"
+   ]
+  },
+  {
+   "case_id": "J01",
+   "status": "BLOCKED",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "登录→工作台→收藏→换账号隔离",
+   "actual": "登录/工作台/最近访问(单账号)已验；收藏与跨账号隔离被 DEF-01 阻断",
+   "blocked_reason": "DEF-01",
+   "defect_ids": [
+    "DEF-01"
+   ]
+  },
+  {
+   "case_id": "J02a-table-detail",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "source_code 隔离、同名表不串源",
+   "actual": "R194A1 详情仅 4 字段+3 关系，无跨源合并"
+  },
+  {
+   "case_id": "J02b-return-filters",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01"
+  },
+  {
+   "case_id": "J03-graph-drill",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01；图谱页首屏渲染正常(4 svg)"
+  },
+  {
+   "case_id": "J04-review-flow",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "expected": "draft→approve 200→二次审核拒绝",
+   "actual": "approve 200(action=linked_candidate_no_promote)；二次 approve 400"
+  },
+  {
+   "case_id": "J05-ai-draft",
+   "status": "NOT_RUN",
+   "method": "BROWSER_MOCK",
+   "blocked_reason": "LLM 出口按计划封禁；草稿链路未测"
+  },
+  {
+   "case_id": "J06-query-run-bind",
+   "status": "NOT_RUN",
+   "method": "API_INTEGRATION",
+   "blocked_reason": "真实连接器出口封禁，mock bind 捕获未实现（时间预算）"
+  },
+  {
+   "case_id": "J07-feedback",
+   "status": "BLOCKED",
+   "method": "API_INTEGRATION",
+   "expected": "viewer 提交/查看反馈",
+   "actual": "/api/v1/ai/feedback 粗粒度 ai 角色门禁对 viewer 403（设计意图待裁决）",
+   "blocked_reason": "权限门禁与旅程前提冲突，未强行绕过"
+  },
+  {
+   "case_id": "J08-scope-isolation",
+   "status": "FAIL",
+   "method": "API_INTEGRATION",
+   "expected": "mine/department 精确隔离且跨科室写被拒",
+   "actual": "列表隔离精确 PASS（qa_a=[0001,0003], qa_b=[0002]）；状态机护栏 PASS；跨科室写 new→acknowledged 200（DEF-03）",
+   "defect_ids": [
+    "DEF-03"
+   ]
+  },
+  {
+   "case_id": "J09-sync-logs",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION+API_INTEGRATION",
+   "expected": "partial_success 与子任务状态可读",
+   "actual": "同步日志页 1 行(partial_success)渲染；子任务 4 态种子在库；详情抽屉未逐项点开(NOT_RUN 部分)"
+  },
+  {
+   "case_id": "J10-dict-import",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01+时间预算"
+  },
+  {
+   "case_id": "J11-audit-trace",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "/api/v1/govern/audit-logs 200 total=9 与种子对账"
+  },
+  {
+   "case_id": "J12-session-expiry",
+   "status": "FAIL",
+   "method": "API_INTEGRATION",
+   "expected": "过期会话/禁用后旧 token 失效",
+   "actual": "refresh 过期 401 ✓；禁用账号后 access JWT 仍 200（DEF-04）",
+   "defect_ids": [
+    "DEF-04"
+   ]
+  },
+  {
+   "case_id": "N01-login",
+   "status": "PARTIAL_PASS",
+   "method": "BROWSER_INTEGRATION+API_INTEGRATION",
+   "expected": "正确进/错误提示/限流/不重不泄",
+   "actual": "正确登录✓；错误提示✓(形状不统一 DEF-09)；限流 5/min✓；连击未测",
+   "defect_ids": [
+    "DEF-09"
+   ]
+  },
+  {
+   "case_id": "N02-menu-leaves",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "41 可见叶可进入、name 无重复",
+   "actual": "41/41 整页加载渲染（对比 186 基线 40，+1 为首页入口计数口径）"
+  },
+  {
+   "case_id": "N03-N08",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01/时间预算"
+  },
+  {
+   "case_id": "A01-same-name-tables",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "同名表按源隔离",
+   "actual": "树(5+2+3)/列表(source 列区分)/详情(仅本源字段) 三层一致"
+  },
+  {
+   "case_id": "A03-table-detail",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "字段/主键/关系与种子一致"
+  },
+  {
+   "case_id": "A04-graph-first-screen",
+   "status": "PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "图谱页渲染 svg 节点，无空白/报错；下钻未测"
+  },
+  {
+   "case_id": "A07/A08/A09/A02/A05/A06/A10",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01/时间预算"
+  },
+  {
+   "case_id": "R01-R08",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01/时间预算（值域/字典页 G01 列表渲染正常）"
+  },
+  {
+   "case_id": "Q01-queries-center",
+   "status": "FAIL",
+   "method": "BROWSER_INTEGRATION",
+   "expected": "六页签数据加载",
+   "actual": "查询资产/运行记录均空(DEF-02)",
+   "defect_ids": [
+    "DEF-02"
+   ]
+  },
+  {
+   "case_id": "Q05-certification-gate",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "viewer run→403 query:run；blocked 查询 run→404 查询版本不存在"
+  },
+  {
+   "case_id": "Q02/Q03/Q04/Q06-Q16",
+   "status": "NOT_RUN",
+   "method": "API_INTEGRATION/BROWSER_MOCK",
+   "blocked_reason": "时间预算/出口封禁/DEF-02"
+  },
+  {
+   "case_id": "L01-scope",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "mine/department 精确；URL 直查他科详情 200=按 read_all 设计（记录）；跨科写 FAIL→DEF-03"
+  },
+  {
+   "case_id": "L03-state-machine",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "resolved 须走 verify(409)；waiting_verify 须 action_plan(422)；终态回退仅管理员(403)"
+  },
+  {
+   "case_id": "L02/L04-L08",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "DEF-01/时间预算"
+  },
+  {
+   "case_id": "I02-account-combos",
+   "status": "PARTIAL_PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "9 组合人员+12 账号行渲染；逐格对照 186 真值表未完成"
+  },
+  {
+   "case_id": "I07-subtask-stats",
+   "status": "PARTIAL_PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "主 run partial_success + 4 子任务态在库；页面一致性核验部分"
+  },
+  {
+   "case_id": "I11-192-mirror-check",
+   "status": "PASS",
+   "method": "STATIC_REVIEW+HISTORICAL_EVIDENCE",
+   "actual": "D3 修复在树（子表检查无 FOR UPDATE）；生产证据=192 晨检文档（未连生产复核）"
+  },
+  {
+   "case_id": "I12-disabled-token",
+   "status": "FAIL",
+   "method": "API_INTEGRATION",
+   "actual": "禁用后旧 JWT 200（DEF-04）",
+   "defect_ids": [
+    "DEF-04"
+   ]
+  },
+  {
+   "case_id": "I01/I03-I06/I08-I10",
+   "status": "NOT_RUN",
+   "method": "API_INTEGRATION",
+   "blocked_reason": "写链路模拟与时间预算；I08 由 I11 部分覆盖"
+  },
+  {
+   "case_id": "O01-ops-runs",
+   "status": "PARTIAL_PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "2 行渲染；失败原因/审计关联未逐项核"
+  },
+  {
+   "case_id": "O02-sql-gate",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "正确字段复测：UPDATE 到源库 valid=false(仅允许 asset schema 写)；DROP valid=false(禁词+模板限制)；多语句 DELETE valid=false；bind 参数缺失检出。scope=platform_asset_only",
+   "evidence": [
+    "api_static（本轮复测输出）"
+   ]
+  },
+  {
+   "case_id": "O03-executor-gate",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "未注册执行器 404；库内执行器 0 行，全部执行路径闭合"
+  },
+  {
+   "case_id": "O04-O08",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "时间预算"
+  },
+  {
+   "case_id": "AR02-contract",
+   "status": "PARTIAL_FAIL",
+   "method": "STATIC_REVIEW",
+   "expected": "前端调用与 OpenAPI 方法级一致",
+   "actual": "发现 DEF-02（查询中心消费断链）；全量比对 NOT_RUN",
+   "defect_ids": [
+    "DEF-02"
+   ]
+  },
+  {
+   "case_id": "AR03-api-classification",
+   "status": "PASS",
+   "method": "STATIC_REVIEW",
+   "actual": "434/434 方法-路径完成分类（pure_read 158 / platform_write 148 / platform_write_or_source_touch 52 / source_read_or_plan 33 / external_or_llm 43）",
+   "evidence": [
+    "api_static/api_inventory.json"
+   ]
+  },
+  {
+   "case_id": "AR04-authz-matrix",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "12 例矩阵（附 DEF-05 夹具修正记录）"
+  },
+  {
+   "case_id": "AR07-alembic-graph",
+   "status": "PASS",
+   "method": "UNIT+API_INTEGRATION",
+   "actual": "单头 e8f9a0b1c2d3；115 表含旧 MVP 表"
+  },
+  {
+   "case_id": "AR08-migration-roundtrip",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "一次性库 data_asset_test_r194：空库 upgrade head(115 表)→downgrade -2→re-upgrade(115 表) 三态对账",
+   "evidence": [
+    "logs（本文件 §AR08 输出）"
+   ]
+  },
+  {
+   "case_id": "AR09-authn-config",
+   "status": "PARTIAL_PASS",
+   "method": "STATIC_REVIEW+API_INTEGRATION",
+   "actual": "JWT 占位密钥仅 dev 告警（隔离环境预期）；假 token 403；access token 内存存储（代码核）"
+  },
+  {
+   "case_id": "AR12-startup-degradation",
+   "status": "PARTIAL_PASS",
+   "method": "API_INTEGRATION",
+   "actual": "LLM 关闭位生效、页面正常降级渲染"
+  },
+  {
+   "case_id": "AR01/AR05/AR06/AR10/AR11/AR13-15",
+   "status": "NOT_RUN",
+   "method": "STATIC_REVIEW/UNIT",
+   "blocked_reason": "时间预算（AR10 部分：多语句/DML 拒绝待 O02 复测）"
+  },
+  {
+   "case_id": "UX01-1440",
+   "status": "FAIL",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "登录页 1440 裁切(DEF-06)；内页 1440 扫测未做（登录后以 1920 扫测）",
+   "defect_ids": [
+    "DEF-06"
+   ]
+  },
+  {
+   "case_id": "UX06-load-times",
+   "status": "PARTIAL_PASS",
+   "method": "BROWSER_INTEGRATION",
+   "actual": "41 页整页加载 3.7–4.7s/页（含 vite dev 编译，非生产构建口径）"
+  },
+  {
+   "case_id": "UX09-build-budget",
+   "status": "PASS",
+   "method": "UNIT",
+   "actual": "build ✓ gzip 预算 ✓（logs/build.log）"
+  },
+  {
+   "case_id": "UX05-visual-review",
+   "status": "BLOCKED",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "会话模型无图像输入，截图已存档 screenshots/ 但未逐张人工判读"
+  },
+  {
+   "case_id": "UX02/UX03/UX04/UX07/UX08/UX10",
+   "status": "NOT_RUN",
+   "method": "BROWSER_INTEGRATION",
+   "blocked_reason": "时间预算/控制台采集不可用(IAB)"
+  },
+  {
+   "case_id": "HR-186",
+   "status": "PARTIAL_PASS",
+   "method": "HISTORICAL_EVIDENCE",
+   "actual": "菜单 41 叶/迁移在链/账号线渲染 OK；导航主路径回归(DEF-01)；09-12 后窗口推进缺最新生产证据"
+  },
+  {
+   "case_id": "HR-188",
+   "status": "PASS(doc)",
+   "method": "HISTORICAL_EVIDENCE",
+   "actual": "44 件产物在位；生产现状未由本轮验证"
+  },
+  {
+   "case_id": "HR-192",
+   "status": "PASS",
+   "method": "HISTORICAL_EVIDENCE+STATIC_REVIEW",
+   "actual": "D3/partial_success/白名单在树+晨检文档闭环；未连生产"
+  },
+  {
+   "case_id": "HR-193",
+   "status": "PASS(doc)",
+   "method": "HISTORICAL_EVIDENCE",
+   "actual": "B00/B01 文件在位；B02+ 端点不存在=PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+   "case_id": "HR-173-P2-2",
+   "status": "PASS",
+   "method": "STATIC_REVIEW",
+   "actual": "6 按钮 v-perms 已补（3 页计数 5/7/14）"
+  },
+  {
+   "case_id": "HR-173-P3-6",
+   "status": "PASS",
+   "method": "API_INTEGRATION",
+   "actual": "空库 upgrade 直接成功（本轮 AR08 实证）"
+  },
+  {
+   "case_id": "HR-173-P2-1/P3-5",
+   "status": "PARTIAL_PASS",
+   "method": "API_INTEGRATION",
+   "actual": "P2-1 已修复（PUT /api/v1/systems upsert 注册 SYS_R194_NEW 200 @backend.log:3043 + 列表回读见 4 系统 @3045）；P3-5 未修复（非法 primary_tables 创建 recipes 仍 200 @backend.log:3047，校验后置）"
+  },
+  {
+   "case_id": "HR-173-others",
+   "status": "NOT_RUN",
+   "method": "STATIC_REVIEW",
+   "blocked_reason": "时间预算"
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+  "task": "196 release B-segment execution record (experiment D1 follow-up, authorized by user '授权你继续处理')",
+  "date": "2026-09-21",
+  "authorization_reading": "①production release = granted (direct reply to the release-only-pending-① request); ②AC10 real HIS write = NOT named -> pending; ③AC09 code list = not provided -> AC09 pending",
+  "release_point": {
+    "branch": "release/r196",
+    "commit": "8df5af1",
+    "parent": "c307a04 (HEAD of master, = r194 code base)",
+    "files": 15,
+    "file_list": [
+      "backend/app/services/dict_medical_push.py (+62/-4)",
+      "backend/app/services/dict_sync_executor.py (+61/-1)",
+      "backend/app/services/medical_code_push.py (+62/-6)",
+      "backend/app/services/infect_diag_dict.py (new, 163 lines)",
+      "backend/app/api/v1/dict_medical_api.py (+14/-1)",
+      "backend/app/main.py (single hunk: dict-medical role gate adds dict_admin)",
+      "backend/tests/test_infect_diag_dict.py (new)",
+      "backend/tests/test_dict_medical_maintain_push_sim.py (new)",
+      "backend/tests/dict_sync_112/test_infectious_sync.py (new)",
+      "backend/tests/dict_sync_112/_infectious_sync_cases.py (new)",
+      "frontend/src/api/dict.ts (+44/-5)",
+      "frontend/src/utils/infectDiagDict.ts (new, 19 lines)",
+      "frontend/src/utils/medicalPushPlan.ts (new)",
+      "frontend/src/views/dict/medical/components/PushWizard.vue (+150/-35)",
+      "frontend/src/views/dict/mappings/index.vue (whole file: 196 dropdown + parallel page restyle WIP, see caveats)"
+    ],
+    "completeness_intercepts": [
+      "medicalPushPlan.ts missing -> tsc TS2307 caught in release worktree",
+      "main.py dict-medical role gate missing -> maintain_push_sim 403 caught (dict_admin blocked by URL-prefix middleware at HEAD)",
+      "test_dict_medical_maintain_push_sim.py missing -> pytest exit 4 caught"
+    ],
+    "excluded": "router/modules/dict.ts and all other 186/193/194 parallel WIP (~235 paths) NOT in release; worktree built from clean checkout of commit"
+  },
+  "pre_release_verification_on_release_combo": {
+    "backend_pytest": "31 passed / 0 failed (dict_sync_112 + test_infect_diag_dict + maintain_push_sim + dict_medical, isolated data_asset_test via 15432)",
+    "backend_alembic": "no pending migrations (head e8f9a0b1c2d3)",
+    "frontend_typecheck": "tsc + vue-tsc pass",
+    "frontend_build": "pass; gzip budgets main 657.4/700 KB, graph 404.5/430 KB, css 103.6/110 KB",
+    "note": "main workspace same sets = 33 passed; delta 2 from permissions.py WIP-only seeds, not 196"
+  },
+  "db_backup": {
+    "file": "/opt/data-asset/backup/data_asset_pre_r196_20260921_083253.dump",
+    "size_bytes": 13850119,
+    "sha256_prefix": "9384970ab43cf5b8"
+  },
+  "backend_release": {
+    "tarball": "/opt/data-asset/hotpatch/r196-20260921/r196_dist.tar.gz (1349021 bytes, from release worktree, pyc excluded)",
+    "image": "data-asset:r196-20260921 (docker build d379c82dba47, BASE_IMAGE=data-asset:r194-20260918)",
+    "grep_smoke": {
+      "dict_medical_push.py::sync_infectious": 6,
+      "dict_sync_executor.py::his_diagnosis_infectious_sync": 1,
+      "infect_diag_dict.py::INFECT_DIAG_DICT": 3,
+      "medical_code_push.py::DIAGNOSIS_NAME_CRB": 7,
+      "dict_medical_api.py::infectious_diagnoses": 1,
+      "main.py::dict_admin": 2
+    },
+    "switch": "DATA_ASSET_IMAGE=data-asset:r196-20260921 bash /etc/data-asset/scripts/run_data_asset_api.sh",
+    "six_readbacks": {
+      "docker_ps": "Up (healthy) image r196-20260921",
+      "health": "200",
+      "backend_env": "untouched (mtime 2026-09-10)",
+      "alembic_current": "e8f9a0b1c2d3 (head) unchanged",
+      "three_endpoints_401": ["/api/v1/systems 401", "/api/v1/queries 401", "/api/v1/dict-medical/push/config 401"],
+      "in_container_marker": "his_diagnosis_infectious_sync found in running container"
+    },
+    "rollback": "DATA_ASSET_IMAGE=data-asset:r194-20260918 same script; DB restore from backup dump"
+  },
+  "frontend_release": {
+    "dist_from": "release worktree build (same commit)",
+    "entry_asset": "static/js/index-eX27p8ds.js (hash-identical local vs deployed)",
+    "switch": "release_frontend.sh r196-20260921 -> /opt/data-asset/frontend-dist/releases/r196-20260921; site_root=200",
+    "previous_link_anomaly": "previous symlink now points to r169-20260831-storage-fix (not r186-20260909c which was current before switch); explicit rollback must target releases/r186-20260909c"
+  },
+  "caveats": [
+    "mappings/index.vue shipped whole-file including parallel page-restyle WIP (el-tag->span status dots, slot restructure, grouped headers reflow); NOT silent: flagged in 196 6.7 and final report; covered by B1 build + round-2 real-browser E2E on same code; router/menu structure unchanged",
+    "main.py shipped exactly one 2-line hunk (dict-medical role gate); other main.py WIP hunks (194 QA envelope, 193 datasets router) excluded"
+  ],
+  "ac_results": {
+    "196-AC08": {
+      "status": "通过（生产服务层实测）",
+      "evidence": "container service call load_infect_diag_dict: source=COMM.INFECT_DIAG_DICT, item_count=271, 霍乱 A00 hit, pinyin hl hit",
+      "method_note": "UI rendering verified in round-2 local real-browser E2E on identical dist code; production UI 目验 left to user; credential-break fallback step NOT executed in production (destructive to prod credentials), fallback behavior covered locally",
+      "executed_by": "executing AI, 2026-09-21"
+    },
+    "196-AC06": {
+      "status": "通过（生产复验）",
+      "evidence": "draft plan id=8 push-a4f4e43f23a2, diagnosis, targets [HIS_SOURCE, JHEMR_VASTBASE], item_count=1, action_rows=2, content_hash set; draft (no approval/outbox/source write); DBA may clean by id",
+      "executed_by": "executing AI, 2026-09-21"
+    },
+    "196-AC09": "待执行（缺③真实院内编码清单；发布已就绪）",
+    "196-AC10": "待执行（②未点名；执行器未登记）"
+  },
+  "boundaries_kept": "zero business-source writes; zero HIS writes; platform DB writes = 1 draft plan row (AC06, anticipated by case recovery clause); no git push/tag; main workspace WIP untouched"
+}

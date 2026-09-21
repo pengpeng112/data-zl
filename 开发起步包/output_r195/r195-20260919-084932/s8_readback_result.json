@@ -1,0 +1,79 @@
+
+{
+ "started_at": "2026-09-20T01:34:20.408568+00:00",
+ "cases": [
+  {
+   "case": "P1-住院组合键",
+   "desc": "DATA_CENTER 上下文含 PATIENT_ID+VISIT_ID 组合关系",
+   "status": 200,
+   "checks": {
+    "has_context": true,
+    "combo_key_rel": false
+   }
+  },
+  {
+   "case": "P2-检验TEST_NO",
+   "desc": "上下文含 TEST_NO 关系",
+   "status": 200,
+   "checks": {
+    "test_no_rel": false
+   }
+  },
+  {
+   "case": "P3-手术三键",
+   "desc": "DOCARE 上下文含手术键",
+   "status": 200,
+   "checks": {
+    "oper_keys": false
+   }
+  },
+  {
+   "case": "P4-字典映射",
+   "desc": "HIS_SOURCE 值域段存在",
+   "status": 200,
+   "checks": {
+    "value_domains": true
+   }
+  },
+  {
+   "case": "P5-文书FILE_UNIQUE_ID",
+   "desc": "上下文含 FILE_UNIQUE_ID",
+   "status": 200,
+   "checks": {
+    "file_unique": false
+   }
+  },
+  {
+   "case": "N1-跨实例同名表",
+   "desc": "DATA_CENTER 上下文不混入 jhemr 小写 owner 对象",
+   "status": 200,
+   "checks": {
+    "no_lowercase_jhemr_owner": true
+   }
+  },
+  {
+   "case": "N2-草稿不混入",
+   "desc": "r195_intake 草稿不出现在 AI 上下文",
+   "status": 200,
+   "checks": {
+    "no_r195_scope": true,
+    "no_r195_marker": true
+   }
+  },
+  {
+   "case": "N3-未知码/断崖列",
+   "desc": "断崖列不作为当前推荐键（出现即人工复核）",
+   "status": 200,
+   "checks": {
+    "no_mtl_times_as_key": true
+   }
+  }
+ ],
+ "key_id": 5,
+ "no_token_status": 403,
+ "recipes_context": {
+  "status": 200,
+  "body_head": "{\"code\":0,\"message\":\"success\",\"data\":[],\"request_id\":\"\"}"
+ },
+ "finished_at": "2026-09-20T01:34:21.063087+00:00"
+}

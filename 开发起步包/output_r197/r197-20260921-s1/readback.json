@@ -1,0 +1,61 @@
+{
+ "run_id": "r197-20260921-s1",
+ "stage": "S7-approved-execution",
+ "executed_at": "2026-09-21 21:12–21:20 (UTC+8)",
+ "approval": "用户 2026-09-21 会话内批准（'批准你继续执行'，覆盖批准包 A1/A2/A3）",
+ "backup": {
+  "path": "/opt/data-asset/backup/data_asset_pre_r197_20260921.dump",
+  "sha256": "f12a47cce30212309d33339f9aa59be8f94f6e62cc6048c9f1c23885857f1276",
+  "bytes": 13850418
+ },
+ "A1_reviews": {
+  "sql": "r197_insert.sql（单事务 psql -1 -v ON_ERROR_STOP=1，PSQL_EXIT=0，守卫 DO 通过）",
+  "inserted": 167,
+  "scope": "r197_intake",
+  "readback": {
+   "total_reviews": "674→841",
+   "scope_rows": 167,
+   "all_draft": 167,
+   "id_range": "675–841 连续 167",
+   "approved_untouched": 3,
+   "chinese_fields": "167 行 desc/confidence=C/business_logic 非空；抽检 ID 675/700/841 中文完整"
+  },
+  "audit_log_id": 286,
+  "replay_guard": "NOT EXISTS 幂等（隔离预演重放 0 已证）"
+ },
+ "A2_recipes": {
+  "sql": "r197_insert_a2a3.sql（同款单事务，PSQL_EXIT=0，守卫：recipes=78/r197=13 通过）",
+  "inserted": 13,
+  "readback": {
+   "recipes_total": "65→78",
+   "r197_draft_is_active_false": 13,
+   "id_range": "67–79 连续",
+   "version": 1,
+   "chinese_names": "抽检 RCP-S3-01..04 名称完整"
+  },
+  "audit_log_id": 287,
+  "governance": "draft；approve/activate 留人工"
+ },
+ "A3_value_domains": {
+  "inserted_pending": 34,
+  "composition": "OPERATION_SCALE 4 enum + 1 trap（'一 ' 尾随空格）；STOP_FLAG 2 enum；EXAM_CLASS 17 enum；ITEM_CLASS 9 enum；OPER_CODE 1 trap（多义键分流）",
+  "readback": {
+   "vd_pending": "128→162",
+   "vd_confirmed_untouched": 26,
+   "id_range": "283–315 区间（note 过滤 '197 S6%' 命中 32=34−2，两条 trap note 前缀不同属预期）"
+  },
+  "governance": "pending；确认/裁决人工（AI 不 confirm）"
+ },
+ "draft_isolation_verification": {
+  "recipes_ai_context_visible": "0（status=active AND is_active AND ai_readable）——13 条 draft 不进 AI 配方上下文，隔离成立",
+  "formal_relations_untouched": 1329,
+  "value_domain_confirmed_untouched": 26,
+  "conclusion": "草稿可追溯（scope/imported_from=r197_intake、审计 286/287、备份可回滚）且不混入正式 AI 上下文"
+ },
+ "rollback": "批次级撤销=DELETE WHERE relation_scope='r197_intake' / imported_from='r197_intake' / note-like r197 VD 行；或恢复备份 dump",
+ "not_executed": [
+  "Git push/tag（未申请）",
+  "approve/activate/confirmed（人工治理终态）",
+  "八类 AI 回读用例（待人工发布后）"
+ ]
+}

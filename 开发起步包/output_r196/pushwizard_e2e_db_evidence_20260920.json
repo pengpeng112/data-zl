@@ -1,0 +1,51 @@
+{
+  "collected_at": "2026-09-20T10:49:31.225934+00:00",
+  "db": "data_asset_test",
+  "plan": {
+    "id": 1,
+    "plan_code": "push-eaa198bdd686",
+    "status": "approved",
+    "category_code": "diagnosis",
+    "target_systems": [
+      "HIS_SOURCE"
+    ],
+    "item_count": 2,
+    "content_hash": "ead3001ea8d45727f7fc2e624de97cb9",
+    "created_by": "admin",
+    "approved_by": "approver196",
+    "expires_at": "2026-09-21T18:45:16.345636+08:00"
+  },
+  "actions": [
+    {
+      "item_code": "A00.1xx001",
+      "action_type": "sync_infectious",
+      "target_system": "HIS_SOURCE",
+      "status": "planned",
+      "diff_type": "changed",
+      "infectious_disease_name": "霍乱",
+      "hash_version": 2
+    },
+    {
+      "item_code": "A01.0xx001",
+      "action_type": "sync_infectious",
+      "target_system": "HIS_SOURCE",
+      "status": "planned",
+      "diff_type": "changed",
+      "infectious_disease_name": "",
+      "hash_version": 2
+    }
+  ],
+  "outbox": [
+    {
+      "id": 1,
+      "event_type": "plan_approve",
+      "status": "pending",
+      "business_key": "plan:1:HIS_SOURCE",
+      "category": "dict_push",
+      "target_system": "HIS_SOURCE",
+      "plan_id": 1,
+      "attempt": 0,
+      "max_attempts": 3
+    }
+  ]
+}

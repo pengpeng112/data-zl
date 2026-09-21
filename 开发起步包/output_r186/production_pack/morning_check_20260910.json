@@ -1,0 +1,42 @@
+{
+  "check_at": "2026-09-10T08:25+08:00",
+  "nightly_run": {
+    "run_id": "RUN-0be96c4ce005",
+    "started": "2026-09-10 02:00:03+08:00",
+    "finished": "2026-09-10 02:01:02+08:00",
+    "status": "success",
+    "run_mode": "observe",
+    "zero_target_write": {
+      "attempts_total": 0,
+      "window_budgets": 0,
+      "reservations": 0
+    },
+    "decisions_captured_at_0200": {
+      "total": 2531,
+      "source_complete": 2531,
+      "by_state": {
+        "disabled": 290,
+        "enabled": 1715,
+        "unknown": 526
+      }
+    },
+    "subtasks": "main success(planned=1,skip=1)；signature/dept/title/login_sign 全部 skipped（observe 零写预期）",
+    "his_watermark": "main_account_sync committed @02:01:02（来源完整，按设计推进）"
+  },
+  "historical_failed_run": "RUN-69e87f7f27dd failed 是 2026-09-06 02:00 旧 r181 链遗留；2026-09-09 以来 0 次 failed",
+  "gate_state_unchanged": {
+    "disables_enabled": 2,
+    "enables_disabled": 2,
+    "pilot_scope": "003740/001554 active"
+  },
+  "morning_fixes": [
+    "cron 补 APP_IDENTITY_SYNC_DIRECT_CONNECTION=true（仅连通性开关；否则适配器在容器内找 ssh 建隧道失败，disable_only 试点会被全量阻断）",
+    "镜像 e（r186-20260909e）：修 identity_clock_health JHEMR 构建器 _fetch_one 缺 params 的 TypeError（此前 JHEMR 恒无样本）"
+  ],
+  "clock_health_after_fix": {
+    "JHEMR": "偏差 +19.94..+19.95s（真实、稳定、3 样本）；clock_timestamp 合同建立",
+    "CDMS": "raw 墙钟与平台 CST 一致（偏差≈0）；+28793.8s 稳定区间为 naive 值被贴 UTC 的解释性伪偏差，组件按 §13.2 告警不采信；SYSDATE/SYSTIMESTAMP/DBTIMEZONE=+00:00/SESSIONTIMEZONE=+08:00 合同已建",
+    "healthy": true,
+    "enable": "仍关闭（AUTOMATIC_ENABLE_SUPPORTED=False，结构性）"
+  }
+}

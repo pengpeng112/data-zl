@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-09-09T12:17:04.886853+00:00",
+  "plan": "186 v1.10 (S2 发布包)",
+  "base_revision": "c6d7e8f9a0b1",
+  "target_revision": "e8f9a0b1c2d3",
+  "migration_roundtrip_isolated": "PASS base->target->base->target (data_asset_test)",
+  "approval": {
+    "phase_d_approval_ref": "186-20260909-disable-only",
+    "executors_to_enable": [
+      "JHEMR_ACCOUNT_DISABLE",
+      "CDMS_ACCOUNT_DISABLE"
+    ],
+    "executors_stay_disabled": [
+      "JHEMR_ACCOUNT_ENABLE",
+      "CDMS_ACCOUNT_ENABLE"
+    ],
+    "purpose": "identity_account_sync (source purpose binding; 不覆盖 medical_dict_push)",
+    "write_credential_refs": "沿用服务器已登记 jhemr_identity_sync.write / cdms_identity_sync.write"
+  },
+  "env_changes_production": {
+    "APP_IDENTITY_RUN_MODE": "observe (S3 初始) -> disable_only (S4 后)",
+    "APP_IDENTITY_CLOCK_SAMPLING_ENABLED": "true (observe 期开启只读采样)",
+    "APP_IDENTITY_SYNC_ENABLED": "true",
+    "APP_IDENTITY_PHASE_D_APPROVAL_VERSION": "186-20260909-disable-only",
+    "APP_IDENTITY_DRIFT_READBACK_ENABLED": "true (disable_only 期)",
+    "APP_IDENTITY_SCHEDULER_PROVIDER": "host_cron (唯一入口；替换旧 cron，不再命令行注入旧 Phase D)"
+  },
+  "backend_source_sha256_16": {
+    "backend/app/services/identity_sync_orchestrator.py": "d67ce29e1e74ad1f",
+    "backend/app/services/identity_sync_executor_bridge.py": "f7967de241a4f5e5",
+    "backend/app/services/identity_sync_action_gate.py": "f9209c40be705f1c",
+    "backend/app/services/identity_clock_health.py": "8d10b1b641c79faa",
+    "backend/app/services/his_identity_sync.py": "7c8c53d4a637c614",
+    "backend/app/services/identity_source_collector.py": "b23fa89a3b933bca",
+    "backend/app/services/identity_login_sign_sync.py": "4745f2ba392e4179",
+    "backend/app/services/identity_title_sync.py": "4f7e3b0963e89304",
+    "backend/app/services/identity_account_state.py": "ae240f428402f4f7",
+    "backend/app/services/jhemr_identity_adapter.py": "9461064b08625360",
+    "backend/app/services/cdms_identity_adapter.py": "648803ab1cc582b0",
+    "backend/app/services/ai_feedback_service.py": "43dda9fa83fb228e",
+    "backend/app/models/identity_sync.py": "3aeda7bcc29676ea",
+    "backend/app/models/asset_system.py": "13322c7a32b3d553",
+    "backend/app/models/governance_base.py": "49265771ca9e7bd4",
+    "backend/app/core/config.py": "d8a9b94373c243b7",
+    "backend/app/api/v1/identity.py": "4f178ceb5fafab96",
+    "backend/app/api/v1/identity_sync.py": "1a317df3fd662f8c",
+    "backend/app/api/v1/systems.py": "f1dc175a9508a9ae",
+    "backend/app/api/v1/governance_ops.py": "fe15519bbdd3bcce",
+    "backend/app/api/v1/permissions.py": "6d92162e6043170c",
+    "backend/alembic/versions/e8f9a0b1c2d3_identity_action_governance.py": "ba9e316181c58b45"
+  },
+  "frontend": {
+    "entry_js": "index-_mee8Zzo.js",
+    "budget": "main entry js gz=659.5KB <= 700KB PASS; graph 404.5<=430 PASS; css 104.1<=110 PASS",
+    "typecheck": "tsc+vue-tsc 双过",
+    "vitest": "320/320 passed"
+  },
+  "rollback": {
+    "backend": "回滚容器镜像至 r181-20260905；不自动 downgrade 生产库（新表向后兼容，旧代码不读）；已登记执行器/绑定保留供审计，可将 enabled 置 false",
+    "frontend": "回退 dist 至上一构建目录",
+    "note": "回滚应用版本不反写目标账号状态（§8.3-6）；pending 队列由新版本消费"
+  }
+}

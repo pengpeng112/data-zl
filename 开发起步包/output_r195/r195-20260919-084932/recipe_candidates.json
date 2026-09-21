@@ -1,0 +1,2431 @@
+{
+ "generated_at": "2026-09-19T09:29:50.898674",
+ "recipes": [
+  {
+   "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+   "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "bf41748bff84b0ea92a50b6d8ffb19bad294179ab48842735cd90fb6094c39eb",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "2",
+     "raw": "d2.diagnosis_type = '2'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "1",
+     "raw": "d1.diagnosis_type = '1'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dd.diagnosis_type = '3'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                           '-'\n                       )\n                   ),\n         "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                           '-'\n                       )\n                   ),\n         "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "ttt.patient_id",
+     "rhs": "sw.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "ttt.visit_id",
+     "rhs": "sw.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR",
+   "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "e2501a93aedd17ffc22c1339360a738b9c47c059daf4241348b37de267132689",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "2",
+     "raw": "d2.diagnosis_type = '2'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "1",
+     "raw": "d1.diagnosis_type = '1'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dd.diagnosis_type = '3'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                           '-'\n                       )\n                   ),\n         "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                           '-'\n                       )\n                   ),\n         "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "ttt.patient_id",
+     "rhs": "sw.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "ttt.visit_id",
+     "rhs": "sw.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OPERA_RECORD",
+   "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "7558d9bd04ce5b59580088981dd3230f5c881a05edebb66f391697b12257e17a",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1), (select cast(sd.name as varchar2(50))\n                                   from his.staff"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1 )),              '-')     as SURGEON_NAME, \n\n               substr(\n                   nv"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(t3.qxhsxm as varchar2(50))\n                       e"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(mom.first_supply_nurse as varchar2(50))\n           "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(t3.xthsxm as varchar2(50))\n                       e"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pv.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pv.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "df.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "df.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+   "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "b3d0a4d9a5d5919b61580611f2eebc6717a42a230c9eea4daba44fa7b7ff7202",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1), (select cast(sd.name as varchar2(50))\n                                   from his.staff"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1 )),              '-')     as SURGEON_NAME, \n\n               substr(\n                   nv"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(CAST(NULL AS VARCHAR2(4000)) as varchar2(50))\n     "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(mom.first_supply_nurse as varchar2(50))\n           "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else cast(CAST(NULL AS VARCHAR2(4000)) as varchar2(50))\n     "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pv.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pv.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "df.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "df.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING",
+   "file": "三甲完成视图\\一般护理记录_v_EMR_GENERAL_NURSING.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "4d328461d537ba6d6926c4699a966283083a2b7fa35eb8c37cc78f5bf3479831",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dg.diagnosis_type = '3'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "a.node_code  in（ '00172','00112','00115','00114','00116','K01005')\n               AND a.FORM_ID = f."
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00148",
+     "raw": "a.node_code = '00148'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n               '无'\n           ),\n           1,\n           1000\n       ) AS CATHETER_NUR"
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00093",
+     "raw": "a.node_code = '00093'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n               '-'\n           ),\n           1,\n           2000\n       ) AS BRIEF_ILLNES"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_DOC_ORDER_DRUG",
+   "file": "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "0eedbdcfc6705fa12b758d46ff2560085075008bb1c9e0b878b386e85b80a7e3",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               '01'\n           ),\n           1,\n           20\n       ) as ODER_ITEM_COD"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               '药品类医嘱'\n           ),\n           1,\n           20\n       ) as ODER_ITEM_"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum=1)  , t.order_code ), 1, 100) as ODR_CODE, \n    substr(nvl(  (select F007_CHAN_PIN_MING_CHENG"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum=1)  , t.order_text ), 1, 100)  as DRUG_COMMON_NAME, \n\n          substr(nvl(  (select F007_CHA"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum=1)  , t.order_text ), 1, 100)   as ODR_NAME, \n\n\n       nvl((select VALUE_DOMAIN_CODE from   C"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "m.PHY_CLASS =p.dict_code) and rownum=1),'99')     as DRUG_CLASS_CODE,  \n\n      nvl( (select VALUE_DO"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "t.order_code",
+     "rhs": "t1.drug_code",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ICH",
+   "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "9e058c69965d0ee477148d3a220033faa18f08e4540d9a9e19b0c2d721049115",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "in_subset",
+     "raw": "occ_dict.院标编码 =\n          case\n              when regexp_replace(trim(to_char(a.occupation)), '[[:space:]]+', '') in\n                   ('11','13','17','21','24','27','31','37','51','54','70','80','90"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "main_diag.patient_id",
+     "rhs": "a.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "main_diag.visit_id",
+     "rhs": "a.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "main_diag_code_cd.院标编码",
+     "rhs": "main_diag.diagnosis_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "main_diag_name_cd.院标名称",
+     "rhs": "main_diag.diagnosis_desc",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "director_sd.emp_no",
+     "rhs": "a.director",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "chief_sd.emp_no",
+     "rhs": "a.chief_doctor",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "attending_sd.emp_no",
+     "rhs": "a.attending_doctor",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "resident_sd.emp_no",
+     "rhs": "a.doctor_in_charge",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ICH_CHARGE",
+   "file": "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "025b6408a1dfa7e1affa7960e1df0d67f3411b7575a5a6fe85f306c458d32e31",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "r.mr_bill_class is not null\n               ) x\n         where x.charge_type_code in\n               ('1','2','3','4','5','6','7','8','9','901',\n       "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "r.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "JOIN"
+    },
+    {
+     "lhs": "r.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ICH_OPERATION",
+   "file": "三甲完成视图\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3a3c853849e3dd98568437583a3727e47a73be5d7777ecc5e0d6cdb2042e4443",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ICH_DIAGNOSIS",
+   "file": "三甲完成视图\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "73ff49043241e653d0c769570bad7d4d79254a8ebd0e2ef7a12682f622b730c6",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "trim(to_char(d.diagnosis_desc)) is not null\n                               )\n                       )\n                   end,\n                   '-'\n "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ICH_ALLERGIES",
+   "file": "三甲完成视图\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3c86dce2325b31b7d709de8fcbf2c5b2208f123e98abeed322af45acebf2aa32",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "a.alergy_drugs is not null"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "trim(to_char(a.alergy_drugs)) is not null"
+    },
+    {
+     "kind": "in_subset",
+     "raw": "regexp_replace(trim(to_char(a.alergy_drugs)), '[[:space:]]+', '') not in\n                       ('无', '否', '无过敏', '无药物过敏', '无药物过敏史',\n                        '未发现', '未见', '不详', '未知', '-', '"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_IN_FEE_INFO_MAIN",
+   "file": "三甲完成视图\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "41f688e6a011d123e4eb050707264c3d387ba6c5bcbca9b38de5abeba5879a92",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "TRANSACT_TYPE",
+     "value": "正常",
+     "raw": "s.transact_type = '正常'"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+   "file": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "163c84463dbcd4c1f46ea1548244edeb80f831dc553ba44a8827e559c2278ae0",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "SETTLE_TYPE",
+     "value": "结算",
+     "raw": "c.settle_type = '结算'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "CATEGORY_CODE",
+     "value": "DM04-001",
+     "raw": "CATEGORY_CODE='DM04-001'"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pl.item_class",
+     "rhs": "a.item_class",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pl.item_code",
+     "rhs": "a.item_code",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT",
+   "file": "三甲完成视图\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "ea615c3a1ce7c32297ea38d30c1a539d371637e9bc3f507a0c5d22736b222fa8",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "ASSESS_CODE",
+     "value": "Z01028",
+     "raw": "a.assess_code = 'Z01028'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           1,\n           20\n       ) AS ADMISSION_TYPE,  \n\n       diag_dict.std_code  A"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS WEIGHT,  \n\n       NVL(\n           (SELECT ROUND(TO_NUMBER(REGE"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS BREATHING_RATE,  \n\n       NVL(\n           (SELECT ROUND(TO_NUM"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS PULSE_RATE,  \n\n       NVL(\n           (SELECT ROUND(TO_NUMBER("
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS PRESSURE_H,  \n\n       NVL(\n           (SELECT ROUND(TO_NUMBER("
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ADMISSION_DIAGNOSIS",
+   "file": "三甲完成视图\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "ce46dc1ce88a68bf851494e059d4ce50afdc7f9ab342eac995bb74388392ad56",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                   ),\n                   ''\n               ),\n               '-'\n       "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                   ),\n                   ''\n               ),\n               '-'\n       "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                   ),\n                   ''\n               ),\n               nvl(nullif("
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                   ),\n                   ''\n               ),\n               nvl(\n      "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                   ),\n                   ''\n               ),\n               '-'\n       "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_OTHERS",
+   "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "e0c610bdf89dfb810b7744a4c4b8c2c0dc3b8ec3c145cdb2f9844e6a3f51d0e5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DOC_TYPE_NAME",
+     "value": "其他知情同意书",
+     "raw": "t1.doc_type_name = '其他知情同意书'"
+    },
+    {
+     "kind": "in_subset",
+     "raw": "t1.doc_title in (\n                               '医患协议书-新标',\n                               '拒绝检查治疗告知书-新标',\n                               '激素使用知情同意书',\n                               '消化内镜知情同意书-新标',"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "(\n                           diag_cd.院标编码 = dd.diagnosis_code\n                        or (\n                               diag_cd.院标编码 is null\n       "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "t3.paragraph_id",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.uhid",
+     "rhs": "t1.uhid",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.paragraph_id",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+   "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "41685eb861cfea1dc65ed1f4eebf29ef697f84d966b24c05ad1ade306a77fce5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "in_subset",
+     "raw": "t1.TOPIC in (\n                               '医患协议书-新标',\n                               '拒绝检查治疗告知书-新标',\n                               '激素使用知情同意书',\n                               '消化内镜知情同意书-新标',"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "(\n                           diag_cd.院标编码 = dd.diagnosis_code\n                        or (\n                               diag_cd.院标编码 is null\n       "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "t3.paragraph_id",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.FILE_UNIQUE_ID",
+     "rhs": "t1.FILE_UNIQUE_ID",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.paragraph_id",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_DISCHARGE_RECORD",
+   "file": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3a85e83aab446583decfaf22694aa25e631633edc1b01f34316c0b022989637d",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "t2.diagnosis_type = '3'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(20)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(100)\n                       )\n                   "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_DISCHARGE_RECORD_JHEMR",
+   "file": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "1bcf25da40f78317f0787ea6104c3403b959f6bbf8ae2b57daafcca6ccdda08e",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "t2.diagnosis_type = '3'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(20)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(50)\n                       )\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(100)\n                       )\n                   "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS",
+   "file": "三甲完成视图\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "011f01855877a5cd15161681edc578473acaf7a9c6dccab41d7ea4cb7dcd8a24",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           as varchar2(100)\n                       )\n                   "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT",
+   "file": "三甲完成视图\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "55b1a780a038993c18ced32c1e7a753ada1d9af2f2c4373be2b48f66a29d45f3",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dg.diagnosis_type = '3'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00021",
+     "raw": "a.node_code = '00021'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           '1'\n       ) AS DIET_CODE,  \n\n       NVL(\n           (SELECT SUBSTRB(\n      "
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00021",
+     "raw": "a.node_code = '00021'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           '良好'\n       ) AS DIET_NAME,  \n\n       NVL(\n           (SELECT CASE\n         "
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00020",
+     "raw": "a.node_code = '00020'"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "HRPSEY656.EMR_HOS_PRACTITIONER",
+   "file": "三甲完成视图\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+   "deploy_system": "HRP",
+   "sha256": "96f8cc3ef91451a2383f48c99614448539bb47c54ae7312cf14f6d5396925932",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": true
+   },
+   "qualifiers": [],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "V_EMR_EXAM_IMAGE_REP",
+   "file": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+   "deploy_system": "HIS",
+   "sha256": "8166873af281a030858b54065432bb19b894b2f7b2b7b386aff2dddfeede0d56",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "I",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'I'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.DISCHARGE_DATE_TIME >= DATE '2021-01-01'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.DISCHARGE_DATE_TIME <  DATE '2026-01-01'"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "em.HOS_EXAM_TYPE_CODE",
+     "rhs": "i.EXAM_ITEM_CODE",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "cim.HIS_ITEM_CODE",
+     "rhs": "i.EXAM_ITEM_CODE",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OPERATION_NURSING",
+   "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "069cb6f20bd6ed364493c233e04b447bda68a6dfc5b55884a2a9a1a88b495a17",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "a.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "nurse.patient_id",
+     "rhs": "a.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "nurse.visit_id",
+     "rhs": "a.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "nurse.oper_id",
+     "rhs": "a.oper_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_OPERATION",
+   "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "31d5e9d32005687542ee0c5d4258ed9b0244a050e8d313fd12f03dfa70ac603d",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(cast(t.p_dept_code as varchar2(50)), '-')\n                  "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '8'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '其他'\n                   ),\n                   1,\n               "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '-'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else nvl(\n                                   (select cast(sd."
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "mom.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "mom.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_OPERATION_JHEMR",
+   "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "129f2b7301ba83e235e3171657bce1c0f781feaefe7a6fac51b5e126b6139f84",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(cast(t.DEPT_CODE as varchar2(50)), '-')\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '8'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '其他'\n                   ),\n                   1,\n               "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '-'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n                           else nvl(\n                                   (select cast(sd."
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "mom.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "mom.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "V_EMR_EXAM_IMAGE_PATH",
+   "file": "三甲完成视图\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+   "deploy_system": "HIS",
+   "sha256": "2724cf12cb87a708dd9c1510e5c7ac8de48e1cad23e2fa3dfc75d1e12c2dd2c8",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "r.USE_IMAGE IS NOT NULL\n        ) x\n        WHERE x.IMAGE_SAVE_PATH IS NOT NULL\n          AND LENGTH(TRIM(x.IMAGE_SAVE_PATH)) > 0"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INSPECTION_ALLERGY_TEST",
+   "file": "三甲完成视图\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "1dfb76462a0d542d12751b63df404d2efa51c8a7db2de76890884081c3e13259",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "RESULT_STATUS",
+     "value": "4",
+     "raw": "ltm.RESULT_STATUS = '4'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "NULLIF(TRIM(lr.REPORT_ITEM_NAME), '') IS NOT NULL"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "NULLIF(TRIM(lr.RESULT), '') IS NOT NULL"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INSPECTION_TEST",
+   "file": "三甲完成视图\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "69089fd38d10dcb354d57fc765e8a36b9e1f7a2f1e647f9edcdfef576e62b1f0",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "I",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'I'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O_RCPT",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O_RCPT'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O_NORCPT",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O_NORCPT'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "I",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'I'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.DISCHARGE_DATE_TIME <  DATE '2024-01-01'"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INSPECTION_ITEM_TEST",
+   "file": "三甲完成视图\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "9d377e4405a704e4b271edf06b614a4686c40259b1f6646da3593a79eab6605a",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "I",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'I'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O_RCPT",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O_RCPT'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "SRC_TYPE_FOR_JOIN",
+     "value": "O_NORCPT",
+     "raw": "m.SRC_TYPE_FOR_JOIN = 'O_NORCPT'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.DISCHARGE_DATE_TIME >= DATE '2021-01-01'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.DISCHARGE_DATE_TIME <  DATE '2024-01-01'"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_DEATH_RECORD",
+   "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "49eceae1ba64cb31c398e64439d86bcfb0ce8c31d5b1d85b080fd1e4c194b73c",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "dmain.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dmain.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_DEATH_RECORD_JHEMR",
+   "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "380efe98c7dae9fb1e5133bf601b484b29f057db7ce61e380fa966b2a04ec262",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "dmain.patient_id",
+     "rhs": "pv.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dmain.visit_id",
+     "rhs": "pv.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT",
+   "file": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3ea33d0d5c4050387af4442f70e76e0f9239413075add0e154caf3f7fe43e579",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "in_subset",
+     "raw": "t1.doc_title in (\n                       '消化内镜知情同意书-新标',\n                       '电子纤维支气管镜检查知情同意书-新标',\n                       '术中冰冻切片检查知情同意书-新标',\n                       '骨髓穿刺/活检术知情同意书-新标',"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(cast(t.p_dept_code as varchar2(50)), '-')\n                  "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '8'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '其他'\n                   ),\n                   1,\n               "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pv.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR",
+   "file": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "8f69a6381eb5c8d71d2b4698570c2005d4db78efeb0f76331c2c88bf77859c46",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "in_subset",
+     "raw": "t1.TOPIC in (\n                       '消化内镜知情同意书-新标',\n                       '电子纤维支气管镜检查知情同意书-新标',\n                       '术中冰冻切片检查知情同意书-新标',\n                       '骨髓穿刺/活检术知情同意书-新标',"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(cast(t.DEPT_CODE as varchar2(50)), '-')\n                   )"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '8'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '其他'\n                   ),\n                   1,\n               "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pv.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN",
+   "file": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "6881ea53cf5c9fefa722d1ce96e913522352cf8b2510e5a28670dca656debfc1",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "aa.plan_time IS NOT NULL"
+    },
+    {
+     "kind": "in_subset",
+     "raw": "aa.vitalsign_type IN (\n                   '1001',  \n                   '1002',  \n                   '1003',  \n                   '1004',  \n                   '1005',  \n                   '3009',"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "wsfl.patient_uid",
+     "rhs": "p.pat_index_no",
+     "kw": "JOIN"
+    },
+    {
+     "lhs": "wsfl.created_by",
+     "rhs": "us.user_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "op.patient_uid",
+     "rhs": "wsfl.patient_uid",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_MEDICAL_RECORD_INFO",
+   "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "28ec5a0981ed7f0df9b0c984c4543180dfa9c15c3a4acd4728835b2d2f9888e8",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "t4.uhid",
+     "rhs": "t.uhid",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.段落编号",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR",
+   "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "b3df28c85b4e10426165bac2ee50fefd5ecc9fb7698aa164e3857bb46bf8b5dd",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "t4.FILE_UNIQUE_ID",
+     "rhs": "t.FILE_UNIQUE_ID",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.FILE_UNIQUE_ID",
+     "rhs": "t1.id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+   "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "ba4414f5ccffe299eddadcf8bec8afe514b03a7b7b7dae34447768f1664491db",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dd.diagnosis_type = '3'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "ks.qmpt_name is not null"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "t2.uhid",
+     "rhs": "t1.uhid",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.段落编号",
+     "rhs": "t2.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t3.uhid",
+     "rhs": "t1.uhid",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t5.段落编号",
+     "rhs": "t3.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "diag_code_cd.院标编码",
+     "rhs": "dd.diagnosis_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "diag_name_cd.院标名称",
+     "rhs": "dd.diagnosis_desc",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "rel_cd.院标编码",
+     "rhs": "pmi.relationship",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+   "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "bf6ef3092dd3ed56104cfc15c30a2679837f9cba48090f7910e89a9f8f7b3b54",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dd.diagnosis_type = '3'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "ks.qmpt_name is not null"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "t2.FILE_UNIQUE_ID",
+     "rhs": "t1.FILE_UNIQUE_ID",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t4.FILE_UNIQUE_ID",
+     "rhs": "t2.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t3.FILE_UNIQUE_ID",
+     "rhs": "t1.FILE_UNIQUE_ID",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "t5.FILE_UNIQUE_ID",
+     "rhs": "t3.id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "diag_code_cd.院标编码",
+     "rhs": "dd.diagnosis_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "diag_name_cd.院标名称",
+     "rhs": "dd.diagnosis_desc",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "rel_cd.院标编码",
+     "rhs": "pmi.relationship",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT",
+   "file": "三甲完成视图\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "7be1352a3d461480a85056b06fd3203b6ffaac210952f46e5a22f9f8dd58a805",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dg.diagnosis_type = '3'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "VITALSIGN_TYPE",
+     "value": "1014",
+     "raw": "A.vitalsign_type = '1014'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "A.vitalsign_nval1 IS NOT NULL"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS WEIGHT,  \n\n       SUBSTRB(\n           NVL(\n               TO_C"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS",
+   "file": "三甲完成视图\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "17ed057dae92e05bd093ac9fddf64794f9998b310f13c1521b092915dca8023e",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dg.diagnosis_type = '3'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00009",
+     "raw": "a.node_code = '00009'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "TRIM(a.STRING_VALUE) IS NOT NULL"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n                       NVL(TO_CHAR(p.diagnosis_name), '-')\n                   )\n       "
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": true
+   },
+   "qualifiers": [],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": true
+   },
+   "qualifiers": [],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": true
+   },
+   "qualifiers": [],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+   "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "90ad5cdc75184f5b2071e5705dcde8b4a40f55e6b39bf9f0c05bc71da7bfafd2",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [],
+   "subquery_joins": [
+    {
+     "lhs": "tr.sqlsh",
+     "rhs": "s2.xyhzsqdh",
+     "kw": "INNER JOIN"
+    },
+    {
+     "lhs": "s2.pk_no",
+     "rhs": "r.pk_no",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "cd.院标名称",
+     "rhs": "s2.xymc",
+     "kw": "WHERE"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT",
+   "file": "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "ca912e31dce8bfe4d93db06c020a95d378a1a01b34c2be818f0b267df477e635",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "in_subset",
+     "raw": "a.template_code IN ('564', '616', '619', '782', '854', '722', '598')"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "score.form_id",
+     "rhs": "f.ID",
+     "kw": "JOIN"
+    },
+    {
+     "lhs": "score.template_code",
+     "rhs": "f.template_code",
+     "kw": "JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_RECORD",
+   "file": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "441c1e933e70422e9577abd99d84f3e24f8e64a0d6c972885c855b08be66b47a",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "x.returned_date is null"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1\n                )\n           then '2'\n           else '1'\n       end as FALG_FIRST_VISIT,"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "x.returned_date is null"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1\n                )\n           then '复诊'\n           else '初诊'\n       end as FALG_FIRST_VISI"
+    },
+    {
+     "kind": "in_subset",
+     "raw": "t.rqlb = 'A'\n               then '11'\n\n               when t.insur_jg in ('370100', '379902', '379903')"
+    },
+    {
+     "kind": "in_subset",
+     "raw": "t.rqlb = 'A'\n               then '本市职工基本医疗保险'\n\n               when t.insur_jg in ('370100', '379902', '379903')"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "pmi.patient_id",
+     "rhs": "a.patient_id",
+     "kw": "INNER JOIN"
+    },
+    {
+     "lhs": "dg.visit_date",
+     "rhs": "a.visit_date",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dict.院标编码",
+     "rhs": "d.diag_code",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_DIAG",
+   "file": "三甲完成视图\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3b48c2409cccf410770e530eb240fe37fdf0f237e951c08b63fc2a1f0a441e75",
+   "logic_flags": {
+    "union_branches": 2,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "date_window",
+     "raw": "a.visit_date >= DATE '2021-01-01'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.visit_date <  DATE '2026-01-01'\n                       ) q\n\n                  LEFT JOIN (\n                        SELECT TO_CHAR(cd.院标编码) AS match_value,\n                               MAX(TO_CHAR(c"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "cd.院标编码 IS NOT NULL"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.visit_date >= DATE '2021-01-01'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "a.visit_date <  DATE '2026-01-01'\n                       ) q\n\n                  LEFT JOIN (\n                        SELECT TO_CHAR(cd.院标名称) AS match_value,\n                               MAX(TO_CHAR(c"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "cd.院标名称 IS NOT NULL"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_RECIPE",
+   "file": "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "37ddd4f107243cf23fa45327cae866b0742a942d87c02857330161f5d783557c",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               case when pmi.id_no is not null then '01' else '99' end\n           ),\n  "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               case when pmi.id_no is not null then '居民身份证' else '其他法定有效证件' end\n       "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               d.visit_dept\n           ),\n           1,\n           20\n       ) as DEP_C"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               nvl(\n                   (select ks.dept_name\n                      from "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               d.visit_dept\n           ),\n           1,\n           50\n       ) as HOS_D"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n               a.prescribed_by\n           ),\n           1,\n           32\n       ) as DO"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "td.presc_no",
+     "rhs": "a.presc_no",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "td.presc_date",
+     "rhs": "a.presc_date",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+   "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "e29183ca406efc412531ff4a685187e74cbdd34acd32047a60cac88259be0933",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "CATEGORY_CODE",
+     "value": "CC99.00203",
+     "raw": "v.category_code = 'CC99.00203'"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "(\n                              pl.stop_date IS NULL\n                              OR pl.stop_date >= a.presc_date\n                          )\n       "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "dd.drug_code",
+     "rhs": "t.drug_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "dd.drug_spec",
+     "rhs": "t.drug_spec",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "std.his_drug_code",
+     "rhs": "t.drug_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "route_map.local_code",
+     "rhs": "t.administration",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "form_map.hospital_code",
+     "rhs": "m.dose_model_code",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pharm_map.dict_code",
+     "rhs": "m.phy_class",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "insur_map.item_code",
+     "rhs": "t.drug_code",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+   "file": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "bb8ddf0e7fa32294d0c4f59b6c9a4d149096251b8cdb7ceabc41fcd9665e72b5",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "pl.mr_bill_class is not null"
+    },
+    {
+     "kind": "null_filter",
+     "raw": "(\n                                          pl.stop_date is null\n                                       or obi.visit_date < pl.stop_date\n             "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "b.rcpt_no",
+     "rhs": "c.rcpt_no",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "b.rcpt_no",
+     "rhs": "d.rcpt_no",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "b.rcpt_no",
+     "rhs": "pay.rcpt_no",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+   "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "dcc7253b8a427f994f1eeb83305534372276a6bbd52a37b51ecb840a32c5175e",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "CATEGORY_CODE",
+     "value": "DM04-001",
+     "raw": "CATEGORY_CODE='DM04-001'"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "c.rcpt_no",
+     "rhs": "a.rcpt_no",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "otc.order_id",
+     "rhs": "b.order_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "otc.order_item_id",
+     "rhs": "b.order_item_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "opt.order_id",
+     "rhs": "b.order_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "opt.order_item_id",
+     "rhs": "b.order_item_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pl.item_class",
+     "rhs": "b.item_class",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "pl.item_code",
+     "rhs": "b.item_code",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH",
+   "file": "三甲完成视图\\阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+   "deploy_system": "MOBILE_NURSING",
+   "sha256": "5aca9bcd96db8203c66bc1655ce0d8ac2f1660c43e54abb4673c3cbf2deabce9",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": false,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "status_literal",
+     "col": "DIAGNOSIS_TYPE",
+     "value": "3",
+     "raw": "dg.diagnosis_type = '3'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "TEMPLATE_CODE",
+     "value": "742",
+     "raw": "a.template_code = '742'"
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00005",
+     "raw": "a.node_code = '00005'"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS BIRTH_TIMES,  \n\n       NVL(\n           (SELECT TO_NUMBER(REGEX"
+    },
+    {
+     "kind": "status_literal",
+     "col": "NODE_CODE",
+     "value": "00004",
+     "raw": "a.node_code = '00004'"
+    },
+    {
+     "kind": "date_window",
+     "raw": "ROWNUM = 1),\n           0\n       ) AS PREGNANT_TIMES,  \n\n        to_date('1900-01-01','yyyy-mm-dd') AS LAST_MENSTRUATION_DATE,  \n\n       to_date('1900-01-01','yyyy-mm-dd')   AS EXPECTED_DATE,"
+    }
+   ],
+   "subquery_joins": [],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ANESTHESIA_RECORD",
+   "file": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "147ba7c3bf502c870ccaec8f6bca513cca7c8548ea4866471479d447273da213",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           v.dept_admission_to\n         ),\n         1,\n         20\n       ) as DEPT_COD"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           (select hd.dept_name\n              from his.dept_dict hd\n             where "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n         ),\n         1,\n         50\n       ) as DEPT_NAME, \n\n       substr(\n         nvl"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           v.discharge_ward_code\n         ),\n         1,\n         50\n       ) as WARD_N"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)  ,(select cd.国标编码\n                from cda.cda_dictionary cd\n               where cd.字典名"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n\n           ),\n         1,\n         50\n       ) as OPERA_CODE, \n\n       substr(\n        "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "o.patient_id",
+     "rhs": "b.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "o.visit_id",
+     "rhs": "b.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "b.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "b.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+   "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "3fcae3104bf9f31028fdaed91dad374fddb6399984a232013d52ab7cc1f15cb6",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           (select hd.qmpt_name\n              from his.dept_dict hd\n             where "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1)\n         ),\n         1,\n         50\n       ) as DEPT_NAME, \n\n       substr(\n         nvl"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           p.dept_admission_to\n         ),\n         1,\n         20\n       ) as DEPT_COD"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           p.discharge_ward_code\n         ),\n         1,\n         50\n       ) as WARD_N"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           '不详'\n         ),\n         1,\n         50\n       ) as ABO_NAME, \n\n       nvl("
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n           '未查'\n         ),\n         1,\n         50\n       ) as RH_NAME, \n\n           n"
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "a.patient_id",
+     "rhs": "f2.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "f2.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "p.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "cd.院标名称",
+     "rhs": "o.anaesthesia_method",
+     "kw": "WHERE"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+   "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "206b3734efb5e22dcee2f1abcc1f8d6bcd9ff9c2960841368ec868024f5bbd78",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": true,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "cd.院标名称 = dd.diagnosis_desc)\n       ),        dd.diagnosis_desc)\n\n      as AFTER_DISEASE, \n\n      substr(\n  nvl(\n    nullif(\n      (case when postv.t "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "a.patient_id",
+     "rhs": "o.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "o.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "a.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "postv.patient_id",
+     "rhs": "a.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "postv.visit_id",
+     "rhs": "a.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "postv.oper_id",
+     "rhs": "a.oper_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  },
+  {
+   "view": "ODS.V_EMR_INFOR_ANESTHESIA",
+   "file": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+   "deploy_system": "DATA_CENTER",
+   "sha256": "f05912e06051dc05eb2d5aed721a9a1fbba3b1e8125d610c7cacc09b116cd615",
+   "logic_flags": {
+    "union_branches": 1,
+    "row_number": true,
+    "group_by": false,
+    "distinct": false
+   },
+   "qualifiers": [
+    {
+     "kind": "null_filter",
+     "raw": "(\n              to_char(o.operation_no) = to_char(mom.oper_id)\n\n           or (\n                  o.operating_date is not null\n              and nvl(m"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(cast(pv.dept_discharge_from as varchar2(50)), '-')\n         "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       nvl(\n                           (select cast(ks.dept_name as var"
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '-'\n                   ),\n                   1,\n                "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '其他麻醉方法'\n                   ),\n                   1,\n           "
+    },
+    {
+     "kind": "rownum_limit",
+     "raw": "rownum = 1),\n                       '8'\n                   ),\n                   1,\n                "
+    }
+   ],
+   "subquery_joins": [
+    {
+     "lhs": "o.patient_id",
+     "rhs": "mom.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "o.visit_id",
+     "rhs": "mom.visit_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "mom.patient_id",
+     "rhs": "dd.patient_id",
+     "kw": "LEFT JOIN"
+    },
+    {
+     "lhs": "mom.visit_id",
+     "rhs": "dd.visit_id",
+     "kw": "LEFT JOIN"
+    }
+   ],
+   "note": "配方草稿素材：完整键/条件/状态码/粒度需人工补齐后才可发布"
+  }
+ ],
+ "count": 57
+}

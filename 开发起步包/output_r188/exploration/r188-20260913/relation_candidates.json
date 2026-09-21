@@ -1,0 +1,4043 @@
+{
+ "schema_version": "r188-relations/1.0",
+ "run_id": "r188-20260913",
+ "generated_at": "2026-09-13",
+ "rule": "全部为候选(review_required=true)；声明FK=结构证据；视图/例程JOIN=静态C级；不自动升正式",
+ "entries": [
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "POLICYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.SECDATA",
+   "to_columns": [
+    "POLICYID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "f6b1a682d9c7795e",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "MODIFIEDBYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "020fc798c7aa513d",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "CREATEDBYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "88ede5a2b983f92d",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.REPORTSCHEDULE",
+   "from_columns": [
+    "REPORTID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CATALOG",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ab8960812c0b0345",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SCHEDULE",
+   "from_columns": [
+    "SCHEDULEID"
+   ],
+   "to_object": "REPORTSERVER.DBO.REPORTSCHEDULE",
+   "to_columns": [
+    "SCHEDULEID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "fa9b5919262a3da3",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SCHEDULE",
+   "from_columns": [
+    "CREATEDBYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "cd6e3e2afdecbe59",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SECDATA",
+   "from_columns": [
+    "AUTHTYPE"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "AUTHTYPE"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "e0eba94a0cb1365f",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CHUNKSEGMENTMAPPING",
+   "from_columns": [
+    "SEGMENTID"
+   ],
+   "to_object": "REPORTSERVER.DBO.SEGMENT",
+   "to_columns": [
+    "SEGMENTID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "d54393286113bc1b",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.MODELDRILL",
+   "from_columns": [
+    "REPORTID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CATALOG",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "61bcfeeb0e83f526",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "REPORT_OID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CATALOG",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "38882ca10451f1b2",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "OWNERID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "76cc98fb8aa4db9b",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "MODIFIEDBYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "04427324b03992f4",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "ITEMID"
+   ],
+   "to_object": "REPORTSERVER.DBO.DATASETS",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "b7096f6032b3f429",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "ITEMID"
+   ],
+   "to_object": "REPORTSERVER.DBO.DATASOURCE",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4bdbcc564ad452d5",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "ITEMID"
+   ],
+   "to_object": "REPORTSERVER.DBO.DATASOURCE",
+   "to_columns": [
+    "LINK"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "925af204d1388bea",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CATALOG",
+   "from_columns": [
+    "ITEMID"
+   ],
+   "to_object": "REPORTSERVER.DBO.MODELPERSPECTIVE",
+   "to_columns": [
+    "MODELID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "71fd6f92e1ec76f3",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.CHUNKDATA",
+   "from_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "to_object": "REPORTSERVER.DBO.HISTORY",
+   "to_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "65eae9cae6e995e2",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.HISTORY",
+   "from_columns": [
+    "REPORTID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CATALOG",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ab010995f06abf43",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.HISTORY",
+   "from_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "to_object": "REPORTSERVER.DBO.SNAPSHOTDATA",
+   "to_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "1f5df0066f983f25",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.MODELDRILL",
+   "from_columns": [
+    "MODELID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CATALOG",
+   "to_columns": [
+    "ITEMID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "d1bc860f5ad7f7d4",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.POLICIES",
+   "from_columns": [
+    "POLICYID"
+   ],
+   "to_object": "REPORTSERVER.DBO.SECDATA",
+   "to_columns": [
+    "POLICYID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "fc953694c972fe01",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.RUNNINGJOBS",
+   "from_columns": [
+    "USERID"
+   ],
+   "to_object": "REPORTSERVER.DBO.USERS",
+   "to_columns": [
+    "USERID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "91c2dc8797b2918f",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SEGMENTEDCHUNK",
+   "from_columns": [
+    "CHUNKID"
+   ],
+   "to_object": "REPORTSERVER.DBO.CHUNKSEGMENTMAPPING",
+   "to_columns": [
+    "CHUNKID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "0888f5c4358b48ab",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SEGMENTEDCHUNK",
+   "from_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "to_object": "REPORTSERVER.DBO.HISTORY",
+   "to_columns": [
+    "SNAPSHOTDATAID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "29e511a5219fd6f0",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "to_object": "REPORTSERVER.DBO.ACTIVESUBSCRIPTIONS",
+   "to_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "1de619939ebc352f",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "to_object": "REPORTSERVER.DBO.DATASOURCE",
+   "to_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "5cf984135c4a457e",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVER.DBO.SUBSCRIPTIONS",
+   "from_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "to_object": "REPORTSERVER.DBO.REPORTSCHEDULE",
+   "to_columns": [
+    "SUBSCRIPTIONID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "cc3efbb6aa299d20",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "REPORTSERVERTEMPDB.DBO.CHUNKSEGMENTMAPPING",
+   "from_columns": [
+    "SEGMENTID"
+   ],
+   "to_object": "REPORTSERVERTEMPDB.DBO.SEGMENT",
+   "to_columns": [
+    "SEGMENTID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "3170291bdbe8f15a",
+   "object_scope": "system_component",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向；ReportServer系统组件边"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.BLOODBAG",
+   "from_columns": [
+    "BLOODAMOUNT"
+   ],
+   "to_object": "XH_BIS.DBO.DICT_BLOODBREEDDETAILS",
+   "to_columns": [
+    "AMOUNT"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "9bac8532c4635d51",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.BLOODBAG",
+   "from_columns": [
+    "COMPONENTCODE"
+   ],
+   "to_object": "XH_BIS.DBO.DICT_BLOODBREEDDETAILS",
+   "to_columns": [
+    "CODE"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "0491c3abdc6f70aa",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.NUR_BLOODTAKESHEET",
+   "from_columns": [
+    "APPSERIALNO"
+   ],
+   "to_object": "XH_BIS.DBO.DOC_APPLYSHEET",
+   "to_columns": [
+    "SERIALNO"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "417435c5a2da6923",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODBAG",
+   "from_columns": [
+    "BLOODBREEDID"
+   ],
+   "to_object": "XH_BIS.DBO.DICT_BLOODBREED",
+   "to_columns": [
+    "ID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "e72e0627026b5f4e",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODBAG",
+   "from_columns": [
+    "BLOODBREEDDETAILSID"
+   ],
+   "to_object": "XH_BIS.DBO.DICT_BLOODBREEDDETAILS",
+   "to_columns": [
+    "ID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "8feb9598492b2add",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODBAG",
+   "from_columns": [
+    "SERIALNO"
+   ],
+   "to_object": "XH_BIS.DBO.LIS_CROSSCONFIG",
+   "to_columns": [
+    "BLOODBAGID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "a5842d7e92630440",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODBAG",
+   "from_columns": [
+    "SENDORDERID"
+   ],
+   "to_object": "XH_BIS.DBO.XK_BLOODSENDRECORD",
+   "to_columns": [
+    "SERIALNO"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "5d020defbe15e164",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODBAGRECOVERY",
+   "from_columns": [
+    "BLOODPOCKETID"
+   ],
+   "to_object": "XH_BIS.DBO.XK_BLOODSENDRECORD",
+   "to_columns": [
+    "BLOODBAGID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "d768ac0d3feb35bb",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS.DBO.XK_BLOODSENDRECORD",
+   "from_columns": [
+    "TAKESHEETID"
+   ],
+   "to_object": "XH_BIS.DBO.NUR_BLOODTAKESHEET",
+   "to_columns": [
+    "SERIALNO"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "routine_view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "92d884bb71205da1",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SBJGBH_CORRES_ECP",
+   "from_columns": [
+    "NEWSBJGBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "SBJGBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "72f2cbb6dc52d2dd",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_CORRES_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "dd4810077f382df9",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_MZ_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "e7fdf141f2141fe5",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_T",
+   "from_columns": [
+    "YLXMBM"
+   ],
+   "to_object": "MHS5.SI_MEDI_ITEM_T",
+   "to_columns": [
+    "YLXMBM"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "7e367c37aa65fbac",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_MEDI_ITEM_T",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "dcfcc59e4075f35d",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "0d038cc9e8902df0",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "DWLESB.APPIDONGATECONFIG",
+   "from_columns": [
+    "GATEID"
+   ],
+   "to_object": "DWLESB.GATEIDCONFIG",
+   "to_columns": [
+    "GATEID"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f8f57e80dfa55e7c",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SETTLE_INFO_FOR_FINA",
+   "from_columns": [
+    "ZYLSH"
+   ],
+   "to_object": "MHS5.PATIENT_INFO",
+   "to_columns": [
+    "ZYLSH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "b891b59175a7b29e",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SETTLE_INFO_FOR_FINA",
+   "from_columns": [
+    "YYBM"
+   ],
+   "to_object": "MHS5.PATIENT_INFO",
+   "to_columns": [
+    "YYBM"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "90bcd3a6ead2302c",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_DOCTOR_RELA_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "6eb97642c70d902e",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_ALIAS_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f3fce80a2fb718cc",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_MZ_T",
+   "from_columns": [
+    "YLXMBM"
+   ],
+   "to_object": "MHS5.SI_MEDI_ITEM_T",
+   "to_columns": [
+    "YLXMBM"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "27aff3ce98d97a68",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIRST_PAY_MZ_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_MEDI_ITEM_T",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "276026df01eeaad1",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_FIXPHAC_HILIST_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "20022fb0f1d2c075",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_LIMIT_PRICE_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "71c04f649720576b",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_MAXPRICE_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "be98e0f7dd224dfd",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_ITEM_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "70161e6e3211209a",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_MEDI_SETTLE_ITEM_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "2ee65b1a056b7acd",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SI_SICK_TYPE_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "c7e5d28b8291d830",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SJTB_HOSP_AVG_FEE_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "206dd686646c2222",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SJTB_HOSP_SICK_LIMIT_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "83e70c42951cd6a9",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MHS5.SJTB_ITEM_CMPL_T",
+   "from_columns": [
+    "ZCBH"
+   ],
+   "to_object": "MHS5.SI_POLICY_RELA",
+   "to_columns": [
+    "ZCBH"
+   ],
+   "join_type": "inner_equi",
+   "qualifiers": [],
+   "evidence_kind": "view_join_offline",
+   "evidence_ref": "159/relation_candidates.json + snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f6b12b70f824811a",
+   "object_scope": "business",
+   "intake_status": "candidate",
+   "confidence": "C",
+   "directional": false,
+   "review_required": true,
+   "note": "等值JOIN不能证明父子方向"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_authorization",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_auth_authId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "cc4a859709be940c",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_role",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_auth_roleId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "3394db8c1e082bca",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_processdefinition",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_core_processdefinition_task_core_processdefinition",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "b95d8b55b2199438",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_process",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_core_task_approvers_core_process",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "d4133bc360585b57",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_process",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_core_task_core_process",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "d4133bc360585b57",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_menu",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_menu_menuId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "169fc5dd3753b46a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_role",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_menu_roleId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "3394db8c1e082bca",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_role",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_sqls_roleId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "3394db8c1e082bca",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_sqls",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_sqls_sqlId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "bed228e659bab400",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_role",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_user_roleId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "3394db8c1e082bca",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "HyAppFrame.dbo.core_user",
+   "from_columns": [
+    "ID_"
+   ],
+   "to_object": "HyAppFrame.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_user_userId",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "2f96810af523441c",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Subscriptions",
+   "from_columns": [
+    "SubscriptionID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ActiveSubscriptions_Subscriptions",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "0eeee3c83da6834b",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_CachePolicyReportID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Catalog_CreatedByID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Catalog_LinkSourceID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Catalog_ModifiedByID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Catalog_ParentID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Policies",
+   "from_columns": [
+    "PolicyID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Catalog_Policy",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ae8b76ab3111c37a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DataSetItemID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DataSetLinkID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DataSourceItemID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ModelDrillModel",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ModelDrillReport",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ModelPerspectiveModel",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Subscriptions",
+   "from_columns": [
+    "SubscriptionID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Notifications_Subscriptions",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "0eeee3c83da6834b",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Policies",
+   "from_columns": [
+    "PolicyID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_PoliciesPolicyID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ae8b76ab3111c37a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Policies",
+   "from_columns": [
+    "PolicyID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_PolicyUserRole_Policy",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ae8b76ab3111c37a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Roles",
+   "from_columns": [
+    "RoleID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_PolicyUserRole_Role",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "5a264fad0b6263f7",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_PolicyUserRole_User",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ReportSchedule_Report",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Schedule",
+   "from_columns": [
+    "ScheduleID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ReportSchedule_Schedule",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "856b1758a1b8131f",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Subscriptions",
+   "from_columns": [
+    "SubscriptionID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_ReportSchedule_Subscriptions",
+    "is_disabled": true,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "0eeee3c83da6834b",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Schedule_Users",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Policies",
+   "from_columns": [
+    "PolicyID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_SecDataPolicyID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "ae8b76ab3111c37a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Catalog",
+   "from_columns": [
+    "ItemID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Subscriptions_Catalog",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "60b6a8067f07f459",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Subscriptions_ModifiedBy",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServer.dbo.Users",
+   "from_columns": [
+    "UserID"
+   ],
+   "to_object": "ReportServer.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_Subscriptions_Owner",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "4deacc0d6ff41319",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServerTempDB.dbo.TempCatalog",
+   "from_columns": [
+    "TempCatalogID"
+   ],
+   "to_object": "ReportServerTempDB.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DataSetItemID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "755ccc85b4513e7a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "ReportServerTempDB.dbo.TempCatalog",
+   "from_columns": [
+    "TempCatalogID"
+   ],
+   "to_object": "ReportServerTempDB.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DataSourceItemID",
+    "is_disabled": false,
+    "is_not_trusted": true,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "755ccc85b4513e7a",
+   "object_scope": "system_component",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "namespace": "10.10.8.7:1433",
+   "from_object": "XH_BIS_4.0.dbo.Xk_BloodInventory",
+   "from_columns": [
+    "InventoryId"
+   ],
+   "to_object": "XH_BIS_4.0.None.None",
+   "to_columns": [
+    null
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_InventoryDetail_Inventory",
+    "is_disabled": false,
+    "is_not_trusted": false,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:9bf9924fc10156bb",
+   "sql_fingerprint": "8718741b7f3c66e4",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.CSW_DOMAININFO$",
+   "from_columns": [
+    "RECORDTYPEID"
+   ],
+   "to_object": "MDSYS.CSW_RECORD_TYPES$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005699",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "ac3ee61eb1288b9f",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.OGIS_GEOMETRY_COLUMNS",
+   "from_columns": [
+    "SRID"
+   ],
+   "to_object": "MDSYS.OGIS_SPATIAL_REFERENCE_SYSTEMS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_SRID",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "0c78b18671fd8a18",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.OLS_DIR_BUSINESSES",
+   "from_columns": [
+    "CHAIN_ID"
+   ],
+   "to_object": "MDSYS.OLS_DIR_BUSINESS_CHAINS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "OLSFK3",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "b70276586b84267b",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.OLS_DIR_CATEGORIES",
+   "from_columns": [
+    "PARENT_ID",
+    "CATEGORY_TYPE_ID"
+   ],
+   "to_object": "MDSYS.OLS_DIR_CATEGORIES",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "OLSFK1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "98663a194b86d320",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.OLS_DIR_CATEGORIES",
+   "from_columns": [
+    "CATEGORY_TYPE_ID"
+   ],
+   "to_object": "MDSYS.OLS_DIR_CATEGORY_TYPES",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "OLSFK2",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "bb405a669a453b2b",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.OLS_DIR_CATEGORIZATIONS",
+   "from_columns": [
+    "CATEGORY_ID",
+    "CATEGORY_TYPE_ID"
+   ],
+   "to_object": "MDSYS.OLS_DIR_CATEGORIES",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "OLSFK5",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "bb464b2e03ea9c92",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.ROWTOKENMAP_T$",
+   "from_columns": [
+    "TOKENID"
+   ],
+   "to_object": "MDSYS.TOKENSESSIONMAP_T$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005694",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f271d2c26637c098",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_AXES",
+   "from_columns": [
+    "COORD_AXIS_NAME_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_AXIS_NAMES",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_AXIS_FOREIGN_AXIS",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "c9cbea8e64a583c3",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_AXES",
+   "from_columns": [
+    "COORD_SYS_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_AXIS_FOREIGN_CS",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "838d2932da2ca649",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_AXES",
+   "from_columns": [
+    "UOM_ID"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_AXIS_FOREIGN_UOM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "bc1d763d880f3cd6",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OPS",
+   "from_columns": [
+    "LEGACY_CODE"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OPS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OPERATION_FOREIGN_LEGACY",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "c35c1283cd4aa7ee",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OPS",
+   "from_columns": [
+    "COORD_OP_METHOD_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OP_METHODS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OPERATION_FOREIGN_METHOD",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "733e09a94a6717bd",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OPS",
+   "from_columns": [
+    "SOURCE_SRID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OPERATION_FOREIGN_SOURCE",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "bbdb88e254783869",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OPS",
+   "from_columns": [
+    "TARGET_SRID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OPERATION_FOREIGN_TARGET",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "239558fc274f5810",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_USE",
+   "from_columns": [
+    "COORD_OP_METHOD_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OP_METHODS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_USE_FOREIGN_METH",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "717b60622b732d77",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_USE",
+   "from_columns": [
+    "PARAMETER_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OP_PARAMS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_USE_FOREIGN_PARA",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "fd781edd66bb3d98",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_VALS",
+   "from_columns": [
+    "COORD_OP_METHOD_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OP_METHODS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_VAL_FOREIGN_METH",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "7e30ac888bca4bd1",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_VALS",
+   "from_columns": [
+    "COORD_OP_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OPS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_VAL_FOREIGN_OP",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "6b867044435faff9",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_VALS",
+   "from_columns": [
+    "PARAMETER_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OP_PARAMS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_VAL_FOREIGN_PARA",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "4a679312d147877d",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PARAM_VALS",
+   "from_columns": [
+    "UOM_ID"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PARA_VAL_FOREIGN_UOM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "6932a18195cafee3",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PATHS",
+   "from_columns": [
+    "SINGLE_OP_SOURCE_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PATH_FOREIGN_SOURCE",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "b8864fc70691d95b",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_OP_PATHS",
+   "from_columns": [
+    "SINGLE_OP_TARGET_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_OP_PATH_FOREIGN_TARGET",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "083d6501a6af75e8",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "COORD_SYS_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_CS",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "333ea59db655006d",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "DATUM_ID"
+   ],
+   "to_object": "MDSYS.SDO_DATUMS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_DATUM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f711dab6896429c8",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "SOURCE_GEOG_SRID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_GEOG",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "af50311c2b6be122",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "CMPD_HORIZ_SRID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_HORIZ",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "05eadaf1a06535f2",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "LEGACY_CODE"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_LEGACY",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "ec6b345f8d202c5a",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "PROJECTION_CONV_ID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_OPS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_PROJ",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "13606fdf941102b7",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_COORD_REF_SYS",
+   "from_columns": [
+    "CMPD_VERT_SRID"
+   ],
+   "to_object": "MDSYS.SDO_COORD_REF_SYS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "COORD_REF_SYS_FOREIGN_VERT",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "977823c3bf0d68c7",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_DATUMS",
+   "from_columns": [
+    "ELLIPSOID_ID"
+   ],
+   "to_object": "MDSYS.SDO_ELLIPSOIDS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "DATUM_FOREIGN_ELLIPSOID",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "ccdfb821294f14d9",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_DATUMS",
+   "from_columns": [
+    "LEGACY_CODE"
+   ],
+   "to_object": "MDSYS.SDO_DATUMS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "DATUM_FOREIGN_LEGACY",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f3cd0224718c74c8",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_DATUMS",
+   "from_columns": [
+    "PRIME_MERIDIAN_ID"
+   ],
+   "to_object": "MDSYS.SDO_PRIME_MERIDIANS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "DATUM_FOREIGN_MERIDIAN",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "795c6d945dfcaaa5",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_ELLIPSOIDS",
+   "from_columns": [
+    "UOM_ID"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "ELLIPSOID_FOREIGN_UOM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "e65a7b93a1eecf04",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_PRIME_MERIDIANS",
+   "from_columns": [
+    "UOM_ID"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "PRIME_MERIDIAN_FOREIGN_UOM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "c0d56af294b0a8f4",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "from_columns": [
+    "LEGACY_CODE"
+   ],
+   "to_object": "MDSYS.SDO_ELLIPSOIDS",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "ELLIPSOID_FOREIGN_LEGACY",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "7be83a61a51871f6",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "from_columns": [
+    "LEGACY_CODE"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "UNIT_OF_MEASURE_FOREIGN_LEGACY",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "f23720e1735f91cb",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "from_columns": [
+    "TARGET_UOM_ID"
+   ],
+   "to_object": "MDSYS.SDO_UNITS_OF_MEASURE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "UNIT_OF_MEASURE_FOREIGN_UOM",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "e80a929f7b904ac0",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.SDO_WS_CONFERENCE_PARTICIPANTS",
+   "from_columns": [
+    "CONFERENCE_ID"
+   ],
+   "to_object": "MDSYS.SDO_WS_CONFERENCE",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SDO_WS_CONF_PART_FK",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "6b3aeb804c89afa5",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATUREINSTANCEMETADATA$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005683",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "1f620aa2023f248d",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATURETYPEATTRS$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005684",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "49ad6db321a48886",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATURETYPENESTEDSDOS$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005688",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "329612769006ee6a",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATURETYPESIMPLETAGATTRS$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005685",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "2eace54a33058abf",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATURETYPETAGS$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005682",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "fa775e09754552e0",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "MDSYS.WFS_FEATURETYPEXMLCOLINFO$",
+   "from_columns": [
+    "FEATURETYPEID"
+   ],
+   "to_object": "MDSYS.WFS_FEATURETYPE$",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "SYS_C005687",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "d9f8533cce0b7424",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "namespace": "10.10.10.151-152:orcl(RAC)",
+   "from_object": "SCOTT.EMP",
+   "from_columns": [
+    "DEPTNO"
+   ],
+   "to_object": "SCOTT.DEPT",
+   "to_columns": null,
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "FK_DEPTNO",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": false
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:25cc5343a29daf3c",
+   "sql_fingerprint": "33d5ced96524b934",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_dictionary_data",
+   "from_columns": [
+    "dict_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_dictionary",
+   "to_columns": [
+    "dict_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_dictionary_data_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "a30768eb334f4ffd",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_email_record",
+   "from_columns": [
+    "create_user_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_user",
+   "to_columns": [
+    "user_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_email_record_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "353d66a52e80afa4",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_file_record",
+   "from_columns": [
+    "create_user_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_user",
+   "to_columns": [
+    "user_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_file_record_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "af26af7ec84a63c8",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_operation_record",
+   "from_columns": [
+    "user_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_user",
+   "to_columns": [
+    "user_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_operation_record_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "b2e5f0aec3f391c4",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_role_menu",
+   "from_columns": [
+    "role_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_role",
+   "to_columns": [
+    "role_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_role_menu_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "1571c70778545f42",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_role_menu",
+   "from_columns": [
+    "menu_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_menu",
+   "to_columns": [
+    "menu_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_role_menu_ibfk_2",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "1e43fde2e349226c",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_user_role",
+   "from_columns": [
+    "user_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_user",
+   "to_columns": [
+    "user_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_user_role_ibfk_1",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "5e33d4e034ed798d",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "namespace": "10.10.8.163:3306",
+   "from_object": "sdsr_queue_java.sys_user_role",
+   "from_columns": [
+    "role_id"
+   ],
+   "to_object": "sdsr_queue_java.sys_role",
+   "to_columns": [
+    "role_id"
+   ],
+   "join_type": "declared_fk",
+   "qualifiers": {
+    "constraint_name": "sys_user_role_ibfk_2",
+    "is_disabled": null,
+    "is_not_trusted": null,
+    "r_column_resolved": null
+   },
+   "evidence_kind": "declared_fk_structure",
+   "evidence_ref": "159 snapshot sha256:f3f8ae127a980363",
+   "sql_fingerprint": "30e89415df6f4f0f",
+   "object_scope": "business",
+   "intake_status": "structural_evidence",
+   "confidence": "B",
+   "directional": true,
+   "review_required": true,
+   "note": "声明FK保留方向；数据覆盖率未知(未验证)；禁用/不可信FK已标注"
+  }
+ ],
+ "summary": {
+  "QUEUE|declared_fk_structure|business": 8,
+  "SDDW_PROD|declared_fk_structure|business": 45,
+  "SDDW_PROD|view_join_offline|business": 22,
+  "TRANSFUSION_NEW|declared_fk_structure|business": 1,
+  "TRANSFUSION_NEW|declared_fk_structure|system_component": 39,
+  "TRANSFUSION_NEW|routine_view_join_offline|business": 9,
+  "TRANSFUSION_NEW|routine_view_join_offline|system_component": 28
+ },
+ "dedup_note": "B类13源当前平台零关系(基线2026-09-13)，无existing_relation_id可冲突；bloodold 6边属未注册系统不入本包"
+}

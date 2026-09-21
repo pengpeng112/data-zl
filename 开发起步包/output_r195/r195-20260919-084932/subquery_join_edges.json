@@ -1,0 +1,1262 @@
+[
+ {
+  "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+  "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "ttt.patient_id",
+  "rhs": "sw.patient_id",
+  "raw": "ttt.patient_id = sw.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+  "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "ttt.visit_id",
+  "rhs": "sw.visit_id",
+  "raw": "ttt.visit_id = sw.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+  "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "ttt.patient_id",
+  "rhs": "sw.patient_id",
+  "raw": "ttt.patient_id = sw.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+  "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "ttt.visit_id",
+  "rhs": "sw.visit_id",
+  "raw": "ttt.visit_id = sw.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "pv.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "pv.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dd.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dd.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "df.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "df.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "df.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "df.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "pv.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "pv.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dd.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dd.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "df.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "df.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+  "view": "ODS.V_EMR_OPERA_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "df.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "df.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+  "view": "ODS.V_EMR_DOC_ORDER_DRUG",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t.order_code",
+  "rhs": "t1.drug_code",
+  "raw": "t.order_code = t1.drug_code"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "main_diag.patient_id",
+  "rhs": "a.patient_id",
+  "raw": "main_diag.patient_id = a.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "main_diag.visit_id",
+  "rhs": "a.visit_id",
+  "raw": "main_diag.visit_id = a.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "main_diag_code_cd.院标编码",
+  "rhs": "main_diag.diagnosis_code",
+  "raw": "main_diag_code_cd.院标编码 = main_diag.diagnosis_code"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "main_diag_name_cd.院标名称",
+  "rhs": "main_diag.diagnosis_desc",
+  "raw": "main_diag_name_cd.院标名称 = main_diag.diagnosis_desc"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "director_sd.emp_no",
+  "rhs": "a.director",
+  "raw": "director_sd.emp_no = a.director"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "chief_sd.emp_no",
+  "rhs": "a.chief_doctor",
+  "raw": "chief_sd.emp_no = a.chief_doctor"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "attending_sd.emp_no",
+  "rhs": "a.attending_doctor",
+  "raw": "attending_sd.emp_no = a.attending_doctor"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "resident_sd.emp_no",
+  "rhs": "a.doctor_in_charge",
+  "raw": "resident_sd.emp_no = a.doctor_in_charge"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "nurse_sd.emp_no",
+  "rhs": "a.duty_nurse",
+  "raw": "nurse_sd.emp_no = a.duty_nurse"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "refresher_sd.emp_no",
+  "rhs": "a.advanced_studies_doctor",
+  "raw": "refresher_sd.emp_no = a.advanced_studies_doctor"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "intern_sd.emp_no",
+  "rhs": "a.practice_doctor",
+  "raw": "intern_sd.emp_no = a.practice_doctor"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "coder_sd.emp_no",
+  "rhs": "a.cataloger",
+  "raw": "coder_sd.emp_no = a.cataloger"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "qcn_sd.emp_no",
+  "rhs": "a.nurse_of_control_quality",
+  "raw": "qcn_sd.emp_no = a.nurse_of_control_quality"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+  "view": "ODS.V_EMR_ICH",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "cdoctor_leader_sd.emp_no",
+  "rhs": "a.cdoctor_leader",
+  "raw": "cdoctor_leader_sd.emp_no = a.cdoctor_leader"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+  "view": "ODS.V_EMR_ICH_CHARGE",
+  "block": 0,
+  "join_kw": "JOIN",
+  "lhs": "r.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "r.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+  "view": "ODS.V_EMR_ICH_CHARGE",
+  "block": 0,
+  "join_kw": "JOIN",
+  "lhs": "r.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "r.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pl.item_class",
+  "rhs": "a.item_class",
+  "raw": "pl.item_class = a.item_class"
+ },
+ {
+  "file": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pl.item_code",
+  "rhs": "a.item_code",
+  "raw": "pl.item_code  = a.item_code"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t3.paragraph_id",
+  "rhs": "t1.id",
+  "raw": "t3.paragraph_id = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.uhid",
+  "rhs": "t1.uhid",
+  "raw": "t4.uhid = t1.uhid"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.paragraph_id",
+  "rhs": "t1.id",
+  "raw": "t4.paragraph_id = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dd.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dd.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t3.paragraph_id",
+  "rhs": "t1.id",
+  "raw": "t3.paragraph_id = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.FILE_UNIQUE_ID",
+  "rhs": "t1.FILE_UNIQUE_ID",
+  "raw": "t4.FILE_UNIQUE_ID = t1.FILE_UNIQUE_ID"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.paragraph_id",
+  "rhs": "t1.id",
+  "raw": "t4.paragraph_id = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dd.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OTHERS_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dd.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+  "view": "V_EMR_EXAM_IMAGE_REP",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "em.HOS_EXAM_TYPE_CODE",
+  "rhs": "i.EXAM_ITEM_CODE",
+  "raw": "em.HOS_EXAM_TYPE_CODE = i.EXAM_ITEM_CODE"
+ },
+ {
+  "file": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+  "view": "V_EMR_EXAM_IMAGE_REP",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "cim.HIS_ITEM_CODE",
+  "rhs": "i.EXAM_ITEM_CODE",
+  "raw": "cim.HIS_ITEM_CODE = i.EXAM_ITEM_CODE"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "a.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "a.visit_id   = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "a.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "a.visit_id   = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "nurse.patient_id",
+  "rhs": "a.patient_id",
+  "raw": "nurse.patient_id = a.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "nurse.visit_id",
+  "rhs": "a.visit_id",
+  "raw": "nurse.visit_id   = a.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+  "view": "ODS.V_EMR_OPERATION_NURSING",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "nurse.oper_id",
+  "rhs": "a.oper_id",
+  "raw": "nurse.oper_id    = a.oper_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "mom.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "mom.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "p.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "p.visit_id = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "mom.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "mom.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "p.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_OPERATION_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "p.visit_id = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+  "view": "ODS.V_EMR_DEATH_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dmain.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dmain.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+  "view": "ODS.V_EMR_DEATH_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dmain.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dmain.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+  "view": "ODS.V_EMR_DEATH_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dmain.patient_id",
+  "rhs": "pv.patient_id",
+  "raw": "dmain.patient_id = pv.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+  "view": "ODS.V_EMR_DEATH_RECORD_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dmain.visit_id",
+  "rhs": "pv.visit_id",
+  "raw": "dmain.visit_id = pv.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+  "view": "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "pv.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pv.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "pv.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+  "view": "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN",
+  "block": 0,
+  "join_kw": "JOIN",
+  "lhs": "wsfl.patient_uid",
+  "rhs": "p.pat_index_no",
+  "raw": "wsfl.patient_uid = p.pat_index_no"
+ },
+ {
+  "file": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+  "view": "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "wsfl.created_by",
+  "rhs": "us.user_code",
+  "raw": "wsfl.created_by = us.user_code"
+ },
+ {
+  "file": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+  "view": "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "op.patient_uid",
+  "rhs": "wsfl.patient_uid",
+  "raw": "op.patient_uid = wsfl.patient_uid"
+ },
+ {
+  "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+  "view": "ODS.V_EMR_MEDICAL_RECORD_INFO",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.uhid",
+  "rhs": "t.uhid",
+  "raw": "t4.uhid = t.uhid"
+ },
+ {
+  "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+  "view": "ODS.V_EMR_MEDICAL_RECORD_INFO",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.段落编号",
+  "rhs": "t1.id",
+  "raw": "t4.段落编号 = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+  "view": "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.FILE_UNIQUE_ID",
+  "rhs": "t.FILE_UNIQUE_ID",
+  "raw": "t4.FILE_UNIQUE_ID = t.FILE_UNIQUE_ID"
+ },
+ {
+  "file": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+  "view": "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.FILE_UNIQUE_ID",
+  "rhs": "t1.id",
+  "raw": "t4.FILE_UNIQUE_ID = t1.id"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t2.uhid",
+  "rhs": "t1.uhid",
+  "raw": "t2.uhid = t1.uhid"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.段落编号",
+  "rhs": "t2.id",
+  "raw": "t4.段落编号 = t2.id"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t3.uhid",
+  "rhs": "t1.uhid",
+  "raw": "t3.uhid = t1.uhid"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t5.段落编号",
+  "rhs": "t3.id",
+  "raw": "t5.段落编号 = t3.id"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "diag_code_cd.院标编码",
+  "rhs": "dd.diagnosis_code",
+  "raw": "diag_code_cd.院标编码 = dd.diagnosis_code"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "diag_name_cd.院标名称",
+  "rhs": "dd.diagnosis_desc",
+  "raw": "diag_name_cd.院标名称 = dd.diagnosis_desc"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "rel_cd.院标编码",
+  "rhs": "pmi.relationship",
+  "raw": "rel_cd.院标编码 = pmi.relationship"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t2.FILE_UNIQUE_ID",
+  "rhs": "t1.FILE_UNIQUE_ID",
+  "raw": "t2.FILE_UNIQUE_ID = t1.FILE_UNIQUE_ID"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t4.FILE_UNIQUE_ID",
+  "rhs": "t2.id",
+  "raw": "t4.FILE_UNIQUE_ID = t2.id"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t3.FILE_UNIQUE_ID",
+  "rhs": "t1.FILE_UNIQUE_ID",
+  "raw": "t3.FILE_UNIQUE_ID = t1.FILE_UNIQUE_ID"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "t5.FILE_UNIQUE_ID",
+  "rhs": "t3.id",
+  "raw": "t5.FILE_UNIQUE_ID = t3.id"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "diag_code_cd.院标编码",
+  "rhs": "dd.diagnosis_code",
+  "raw": "diag_code_cd.院标编码 = dd.diagnosis_code"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "diag_name_cd.院标名称",
+  "rhs": "dd.diagnosis_desc",
+  "raw": "diag_name_cd.院标名称 = dd.diagnosis_desc"
+ },
+ {
+  "file": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+  "view": "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "rel_cd.院标编码",
+  "rhs": "pmi.relationship",
+  "raw": "rel_cd.院标编码 = pmi.relationship"
+ },
+ {
+  "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+  "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+  "block": 0,
+  "join_kw": "INNER JOIN",
+  "lhs": "tr.sqlsh",
+  "rhs": "s2.xyhzsqdh",
+  "raw": "tr.sqlsh = s2.xyhzsqdh"
+ },
+ {
+  "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+  "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "s2.pk_no",
+  "rhs": "r.pk_no",
+  "raw": "s2.pk_no = r.pk_no"
+ },
+ {
+  "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+  "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "p.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+  "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "p.visit_id = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+  "view": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+  "block": 0,
+  "join_kw": "WHERE",
+  "lhs": "cd.院标名称",
+  "rhs": "s2.xymc",
+  "raw": "cd.院标名称 = s2.xymc"
+ },
+ {
+  "file": "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql",
+  "view": "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT",
+  "block": 0,
+  "join_kw": "JOIN",
+  "lhs": "score.form_id",
+  "rhs": "f.ID",
+  "raw": "score.form_id = f.ID"
+ },
+ {
+  "file": "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql",
+  "view": "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT",
+  "block": 0,
+  "join_kw": "JOIN",
+  "lhs": "score.template_code",
+  "rhs": "f.template_code",
+  "raw": "score.template_code = f.template_code"
+ },
+ {
+  "file": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECORD",
+  "block": 0,
+  "join_kw": "INNER JOIN",
+  "lhs": "pmi.patient_id",
+  "rhs": "a.patient_id",
+  "raw": "pmi.patient_id = a.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dg.visit_date",
+  "rhs": "a.visit_date",
+  "raw": "dg.visit_date = a.visit_date"
+ },
+ {
+  "file": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dict.院标编码",
+  "rhs": "d.diag_code",
+  "raw": "dict.院标编码 = d.diag_code"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "td.presc_no",
+  "rhs": "a.presc_no",
+  "raw": "td.presc_no = a.presc_no"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "td.presc_date",
+  "rhs": "a.presc_date",
+  "raw": "td.presc_date = a.presc_date"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.drug_code",
+  "rhs": "t.drug_code",
+  "raw": "dd.drug_code = t.drug_code"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "dd.drug_spec",
+  "rhs": "t.drug_spec",
+  "raw": "dd.drug_spec = t.drug_spec"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "std.his_drug_code",
+  "rhs": "t.drug_code",
+  "raw": "std.his_drug_code = t.drug_code"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "route_map.local_code",
+  "rhs": "t.administration",
+  "raw": "route_map.local_code = t.administration"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "form_map.hospital_code",
+  "rhs": "m.dose_model_code",
+  "raw": "form_map.hospital_code = m.dose_model_code"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pharm_map.dict_code",
+  "rhs": "m.phy_class",
+  "raw": "pharm_map.dict_code = m.phy_class"
+ },
+ {
+  "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+  "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "insur_map.item_code",
+  "rhs": "t.drug_code",
+  "raw": "insur_map.item_code = t.drug_code"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "b.rcpt_no",
+  "rhs": "c.rcpt_no",
+  "raw": "b.rcpt_no = c.rcpt_no"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "b.rcpt_no",
+  "rhs": "d.rcpt_no",
+  "raw": "b.rcpt_no = d.rcpt_no"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "b.rcpt_no",
+  "rhs": "pay.rcpt_no",
+  "raw": "b.rcpt_no = pay.rcpt_no"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "c.rcpt_no",
+  "rhs": "a.rcpt_no",
+  "raw": "c.rcpt_no = a.rcpt_no"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "otc.order_id",
+  "rhs": "b.order_id",
+  "raw": "otc.order_id = b.order_id"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "otc.order_item_id",
+  "rhs": "b.order_item_id",
+  "raw": "otc.order_item_id = b.order_item_id"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "opt.order_id",
+  "rhs": "b.order_id",
+  "raw": "opt.order_id = b.order_id"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "opt.order_item_id",
+  "rhs": "b.order_item_id",
+  "raw": "opt.order_item_id = b.order_item_id"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pl.item_class",
+  "rhs": "b.item_class",
+  "raw": "pl.item_class = b.item_class"
+ },
+ {
+  "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+  "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "pl.item_code",
+  "rhs": "b.item_code",
+  "raw": "pl.item_code  = b.item_code"
+ },
+ {
+  "file": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+  "view": "ODS.V_EMR_ANESTHESIA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "o.patient_id",
+  "rhs": "b.patient_id",
+  "raw": "o.patient_id = b.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+  "view": "ODS.V_EMR_ANESTHESIA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "o.visit_id",
+  "rhs": "b.visit_id",
+  "raw": "o.visit_id   = b.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+  "view": "ODS.V_EMR_ANESTHESIA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "b.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "b.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+  "view": "ODS.V_EMR_ANESTHESIA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "b.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "b.visit_id   = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "f2.patient_id",
+  "raw": "a.patient_id = f2.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "f2.visit_id",
+  "raw": "a.visit_id   = f2.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "a.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "a.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "p.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "p.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "p.visit_id   = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+  "view": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+  "block": 0,
+  "join_kw": "WHERE",
+  "lhs": "cd.院标名称",
+  "rhs": "o.anaesthesia_method",
+  "raw": "cd.院标名称 = o.anaesthesia_method"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "o.patient_id",
+  "raw": "a.patient_id = o.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "o.visit_id",
+  "raw": "a.visit_id = o.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "a.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "a.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "a.visit_id   = dd.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "postv.patient_id",
+  "rhs": "a.patient_id",
+  "raw": "postv.patient_id = a.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "postv.visit_id",
+  "rhs": "a.visit_id",
+  "raw": "postv.visit_id   = a.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+  "view": "ODS.V_EMR_ANES_AFTER_RECORD",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "postv.oper_id",
+  "rhs": "a.oper_id",
+  "raw": "postv.oper_id    = a.oper_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+  "view": "ODS.V_EMR_INFOR_ANESTHESIA",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "o.patient_id",
+  "rhs": "mom.patient_id",
+  "raw": "o.patient_id = mom.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+  "view": "ODS.V_EMR_INFOR_ANESTHESIA",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "o.visit_id",
+  "rhs": "mom.visit_id",
+  "raw": "o.visit_id = mom.visit_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+  "view": "ODS.V_EMR_INFOR_ANESTHESIA",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.patient_id",
+  "rhs": "dd.patient_id",
+  "raw": "mom.patient_id = dd.patient_id"
+ },
+ {
+  "file": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+  "view": "ODS.V_EMR_INFOR_ANESTHESIA",
+  "block": 0,
+  "join_kw": "LEFT JOIN",
+  "lhs": "mom.visit_id",
+  "rhs": "dd.visit_id",
+  "raw": "mom.visit_id = dd.visit_id"
+ }
+]

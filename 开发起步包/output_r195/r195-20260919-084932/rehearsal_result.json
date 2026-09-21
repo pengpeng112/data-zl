@@ -1,0 +1,23 @@
+{
+ "started_at": "2026-09-19T01:31:30.776343+00:00",
+ "target_db_expected": "data_asset_test",
+ "database": "data_asset_test",
+ "baseline": {
+  "total_reviews": 0,
+  "r195_rows": 0,
+  "approved": 0
+ },
+ "first_pass_inserted": 114,
+ "rows_after_first_pass": 114,
+ "replay_inserted": 0,
+ "reverse_probe_inserted": 1,
+ "cleanup_deleted": 115,
+ "after_cleanup": {
+  "total_reviews": 0,
+  "r195_rows": 0,
+  "approved": 0
+ },
+ "others_untouched": true,
+ "finished_at": "2026-09-19T01:31:31.639454+00:00",
+ "verdict": "PASS"
+}

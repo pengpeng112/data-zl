@@ -1,0 +1,117 @@
+
+{
+ "started_at": "2026-09-20T01:36:16.150573+00:00",
+ "cases": [
+  {
+   "case": "P1-住院组合键",
+   "desc": "PAT_VISIT/PAT_MASTER_INDEX 组合键关系",
+   "status": 200,
+   "n_tables": 2,
+   "n_relations": 26,
+   "checks": {
+    "has_combo": true,
+    "rel_samples": [
+     "HIS.PAT_VISIT->HIS.DOC_REGISTER_EMP_MATCH[DOCTOR_IN_CHARGE]",
+     "HIS.PAT_VISIT->HIS.EXAM_MASTER[PATIENT_ID|VISIT_ID]",
+     "HIS.PAT_VISIT->HIS.EXAM_MASTER[PATIENT_ID|VISIT_ID]"
+    ]
+   }
+  },
+  {
+   "case": "P2-检验TEST_NO",
+   "desc": "LAB_TEST_MASTER/LAB_RESULT 关系",
+   "status": 200,
+   "n_tables": 2,
+   "n_relations": 7,
+   "checks": {
+    "has_test_no": true,
+    "rel_samples": [
+     "HIS.PAT_VISIT->HIS.LAB_TEST_MASTER",
+     "HIS.LAB_TEST_MASTER->HIS.OUTP_RCPT_MASTER",
+     "HIS.OUTP_BILL_ITEMS->HIS.LAB_RESULT"
+    ]
+   }
+  },
+  {
+   "case": "P3-手术三键",
+   "desc": "MED_OPERATION_MASTER 关系",
+   "status": 200,
+   "n_tables": 1,
+   "n_relations": 5,
+   "checks": {
+    "has_3key": true,
+    "rel_samples": [
+     "DOCARE.MED_OPERATION_MASTER[]->SM.MED_OPERATION_MASTER",
+     "SM.MED_OPERATION_MASTER[PATIENT_ID]->HIS.PAT_MASTER_INDEX",
+     "HIS.PAT_VISIT[PATIENT_ID|VISIT_ID]->SM.MED_OPERATION_MASTER"
+    ]
+   }
+  },
+  {
+   "case": "P4-字典映射值域",
+   "desc": "HIS_SOURCE confirmed 值域注入",
+   "status": 200,
+   "n_tables": 0,
+   "n_relations": 0,
+   "checks": {
+    "vd_count": 24,
+    "has_disposition_trap": true
+   }
+  },
+  {
+   "case": "P5-文书FILE_UNIQUE_ID",
+   "desc": "JHMR 文书索引-内容关系",
+   "status": 200,
+   "n_tables": 2,
+   "n_relations": 3,
+   "checks": {
+    "has_fuid": true,
+    "rel_samples": [
+     "JHEMR.JHMR_FILE_INDEX->HIS.DEPT_DICT",
+     "JHEMR.JHMR_FILE_INDEX->HIS.PAT_VISIT",
+     "JHEMR.JHMR_FILE_INDEX->JHEMR.JHMR_FILE_CONTENT_TEXT"
+    ]
+   }
+  },
+  {
+   "case": "N1-跨实例同名表",
+   "desc": "DEPT_DICT 按请求精确返回",
+   "status": 200,
+   "n_tables": 1,
+   "n_relations": 5,
+   "checks": {
+    "returned_tables": [
+     "HIS.DEPT_DICT"
+    ],
+    "no_jhemr_mixed": true
+   }
+  },
+  {
+   "case": "N2-草稿不混入",
+   "desc": "r195 草稿不进正式关系导出",
+   "status": 200,
+   "n_tables": 1,
+   "n_relations": 23,
+   "checks": {
+    "no_r195_marker": true
+   }
+  },
+  {
+   "case": "N3-断崖列不为键",
+   "desc": "P_INPATIENT_TIMES 不作正式键",
+   "status": 200,
+   "n_tables": 1,
+   "n_relations": 5,
+   "checks": {
+    "not_used_as_key": false
+   }
+  }
+ ],
+ "notes": [],
+ "key_id": 7,
+ "residual_check": {
+  "verify_r195_keys": 0,
+  "readback_roles": 0
+ },
+ "finished_at": "2026-09-20T01:36:16.548229+00:00"
+}

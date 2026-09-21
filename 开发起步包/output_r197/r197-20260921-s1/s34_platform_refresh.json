@@ -1,0 +1,1405 @@
+{
+ "refreshed_at": "2026-09-21",
+ "value_domains": [
+  [
+   "1",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "1",
+   "enum"
+  ],
+  [
+   "2",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "2",
+   "enum"
+  ],
+  [
+   "3",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "4",
+   "enum"
+  ],
+  [
+   "4",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "5",
+   "enum"
+  ],
+  [
+   "5",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "9",
+   "enum"
+  ],
+  [
+   "6",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DISCHARGE_DISPOSITION",
+   "COMM.DISCHARGE_DISPOSITION_DICT",
+   "trap"
+  ],
+  [
+   "7",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "PAT_VISIT",
+   "DEATH_DATE_TIME",
+   "NOT_FILLED",
+   "trap"
+  ],
+  [
+   "8",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "OPERATION",
+   "OPERATION_EMER_INDICATOR",
+   "1",
+   "enum"
+  ],
+  [
+   "9",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "OPERATION",
+   "OPERATION_EMER_INDICATOR",
+   "2",
+   "enum"
+  ],
+  [
+   "10",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "OPERATION",
+   "OPERATION_EMER_INDICATOR",
+   "3",
+   "enum"
+  ],
+  [
+   "11",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE",
+   "1",
+   "enum"
+  ],
+  [
+   "12",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE",
+   "2",
+   "enum"
+  ],
+  [
+   "13",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE",
+   "3",
+   "enum"
+  ],
+  [
+   "14",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE",
+   "7",
+   "enum"
+  ],
+  [
+   "15",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE",
+   "8",
+   "enum"
+  ],
+  [
+   "16",
+   "DATA_CENTER",
+   "ods_8_216",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "OPER_STATUS",
+   ">=35",
+   "threshold"
+  ],
+  [
+   "17",
+   "DATA_CENTER",
+   "ods_8_216",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "OPER_STATUS",
+   "-80",
+   "threshold"
+  ],
+  [
+   "18",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "ITEM_NAME",
+   "免疫组织化学染色诊断",
+   "literal"
+  ],
+  [
+   "19",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "ITEM_NAME",
+   "免疫组织化学染色诊断（液盖膜涡流混匀法加收）",
+   "trap"
+  ],
+  [
+   "20",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "OUTPADM",
+   "CLINIC_MASTER",
+   "VISIT_TYPE",
+   "急诊",
+   "literal"
+  ],
+  [
+   "21",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "OUTPADM",
+   "CLINIC_MASTER",
+   "REGISTTYPE",
+   "6",
+   "enum"
+  ],
+  [
+   "22",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "TREAT_RESULT",
+   "1",
+   "enum"
+  ],
+  [
+   "74",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "TREAT_RESULT",
+   "2",
+   "enum"
+  ],
+  [
+   "75",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "TREAT_RESULT",
+   "3",
+   "enum"
+  ],
+  [
+   "76",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "TREAT_RESULT",
+   "4",
+   "enum"
+  ],
+  [
+   "77",
+   "HIS_SOURCE",
+   "his_source_10_10_10_15",
+   "MEDREC",
+   "DIAGNOSIS",
+   "TREAT_RESULT",
+   "9",
+   "enum"
+  ]
+ ],
+ "recipes": [
+  [
+   "HIS_VIEW_COMM_INPUT_DRUG_LISTS00_5b0f78a59557",
+   "COMM.INPUT_DRUG_LISTS00 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.DRUG_DICT\", \"COMM.DRUG_NAME_DICT\", \"COMM.DRUG_PRICE_LIST\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_JMPZ_DRUG_DIC_V_4ae68fb1adfe",
+   "COMM.JMPZ_DRUG_DIC_V 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.DRUG_DICT\", \"COMM.DRUG_PRICE_LIST\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_SPECIAL_DRUG_LIST_3c84072e8909",
+   "COMM.SPECIAL_DRUG_LIST 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.DRUG_DICT\", \"COMM.DRUG_PRICE_LIST\", \"COMM.PRICE_ITEM_NAME_DICT\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_ANES_NAME_DICT_d3de69637662",
+   "COMM.V_ANES_NAME_DICT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.PRICE_ITEM_NAME_DICT\", \"COMM.PRICE_LIST\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_CLINIC_NAME_DICT_cfee38c89013",
+   "COMM.V_CLINIC_NAME_DICT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.CLINIC_ITEM_DICT\", \"COMM.CLINIC_ITEM_NAME_DICT\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_EXP_NAME_f32c63384e44",
+   "COMM.V_EXP_NAME 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.EXP_DICT\", \"COMM.EXP_NAME_DICT\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_OPER_NAME_DICT_4de7f89d9ef6",
+   "COMM.V_OPER_NAME_DICT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.PRICE_ITEM_NAME_DICT\", \"COMM.PRICE_LIST\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_STAFF_DICT_DEPT_6d42d7e211f4",
+   "COMM.V_STAFF_DICT_DEPT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.DEPT_DICT\", \"COMM.STAFF_DICT\"]"
+  ],
+  [
+   "HIS_VIEW_COMM_V_STAFF_ON_JOB_DICT_a49730226a6e",
+   "COMM.V_STAFF_ON_JOB_DICT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.DEPT_DICT\", \"COMM.STAFF_DICT\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_CLI_INP_TRACE_DRUG_SEND_VIEW_e5960bbe733a",
+   "DRUG_USER.CLI_INP_TRACE_DRUG_SEND_VIEW 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.PHA_CLI_REQUEST_DRUG\", \"DRUG_USER.PHA_DICT_MEDINFO\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_CLI_TRACE_DRUG_RETURN_VIEW_298cc50dd1ba",
+   "DRUG_USER.CLI_TRACE_DRUG_RETURN_VIEW 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.MED_DICT_PRICE\", \"DRUG_USER.PHA_CLI_REQUEST_DRUG\", \"DRUG_USER.PHA_DICT_MEDINFO\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_CLI_TRACE_DRUG_SEND_VIEW_30be5201b4db",
+   "DRUG_USER.CLI_TRACE_DRUG_SEND_VIEW 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.MED_DICT_PRICE\", \"DRUG_USER.PHA_CLI_REQUEST_DRUG\", \"DRUG_USER.PHA_DICT_MEDINFO\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_INP_TRACE_DRUG_SEND_VIEW_e5960bbe733a",
+   "DRUG_USER.INP_TRACE_DRUG_SEND_VIEW 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.PHA_CLI_REQUEST_DRUG\", \"DRUG_USER.PHA_DICT_MEDINFO\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_PHA_INP_TRACE_DRUG_SEND_VIEW_cccea24c6b6c",
+   "DRUG_USER.PHA_INP_TRACE_DRUG_SEND_VIEW 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.PHA_DICT_MEDINFO\", \"DRUG_USER.PHA_INP_DISPMASTER\", \"DRUG_USER.PHA_INP_REQUEST_DRUG\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_V_DRUG_EXPORT_SDSE_e773ceac072a",
+   "DRUG_USER.V_DRUG_EXPORT_SDSE 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.MED_DICT_BASEINFO\", \"DRUG_USER.MED_DICT_PRICE\", \"DRUG_USER.MED_OUT_DETAIL\", \"DRUG_USER.MED_OUT_MASTER\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_V_DRUG_IMPORT_SDSE_e396fdae133d",
+   "DRUG_USER.V_DRUG_IMPORT_SDSE 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.MED_DICT_BASEINFO\", \"DRUG_USER.MED_DICT_PRICE\", \"DRUG_USER.MED_IN_DETAIL\", \"DRUG_USER.MED_IN_MASTER\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_V_DRUG_REAL_SDSE_163babc21f03",
+   "DRUG_USER.V_DRUG_REAL_SDSE 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"DRUG_USER.MED_DICT_BASEINFO\", \"DRUG_USER.MED_DICT_PRICE\", \"DRUG_USER.PHA_CLI_REQUEST_DRUG\", \"DRUG_USER.PHA_INP_REQUEST_DRUG\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_V_INP_ANTI_EXECNUM_b4f97aa9253d",
+   "DRUG_USER.V_INP_ANTI_EXECNUM 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"ORDADM.ORDERS\", \"PHARMACY.DRUG_DISPENSE_REC\"]"
+  ],
+  [
+   "HIS_VIEW_DRUG_USER_V_INP_ANTI_ITEMS_a7a98fb8d1cb",
+   "DRUG_USER.V_INP_ANTI_ITEMS 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"COMM.CLINIC_ITEM_DICT\", \"EXAM.EXAM_ITEMS\", \"EXAM.EXAM_MASTER\", \"LAB.LAB_TEST_ITEMS\", \"LAB.LAB_TEST_MASTER\", \"ORDADM.ORDERS\"]"
+  ],
+  [
+   "HIS_VIEW_INPADM_JMPZ_PATIENT_IN_DIAGNOSIS_V_5acfdb91d015",
+   "INPADM.JMPZ_PATIENT_IN_DIAGNOSIS_V 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"INPADM.PATS_IN_HOSPITAL\", \"MEDREC.DIAGNOSIS\"]"
+  ],
+  [
+   "HIS_VIEW_INPADM_JMPZ_PATIENT_IN_V_1f51d05b0b16",
+   "INPADM.JMPZ_PATIENT_IN_V 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"INPADM.BED_REC\", \"INPADM.PATS_IN_HOSPITAL\", \"MEDREC.PAT_MASTER_INDEX\"]"
+  ],
+  [
+   "HIS_VIEW_LAB_HIS_IN_LAB_RESULT_V_831e250681bd",
+   "LAB.HIS_IN_LAB_RESULT_V 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"INPADM.PATS_IN_HOSPITAL\", \"LAB.LAB_TEST_MASTER\"]"
+  ],
+  [
+   "HIS_VIEW_LAB_V_PATIENTLISRESULT_ea9cf4b86571",
+   "LAB.V_PATIENTLISRESULT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"LAB.LAB_RESULT\", \"LAB.LAB_TEST_ITEMS\"]"
+  ],
+  [
+   "HIS_VIEW_PHARMACY_OUT_DRUG_EXPORT_ff7db51d774f",
+   "PHARMACY.OUT_DRUG_EXPORT 视图关系草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PHARMACY.DRUG_EXPORT_DETAIL\", \"PHARMACY.DRUG_EXPORT_MASTER\", \"PHARMACY.DRUG_STORAGE_DEPT\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_BL_JZLGBL_1710e7fb8013",
+   "CORE2DB.BL_JZLGBL 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OBSERVERECORD\", \"CORE2DB.CLINIC_API_OUTPATIENTDISEASECOURSERECORD\", \"CORE2DB.DATA_API_MEDICALRESOURCES\", \"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.DATA_API_PRACTITIONER\", \"CORE2DB.DATA_API_TRANSSUBJECT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_BL_MJZBL_314cab4150ff",
+   "CORE2DB.BL_MJZBL 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.DATA_API_HOSPITAL\", \"CORE2DB.DATA_API_MEDICALRESOURCES\", \"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.DATA_API_PRACTITIONER\", \"CORE2DB.DATA_API_TRANSSUBJECT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CLINI_DATA_NEST_1c43446102f8",
+   "CORE2DB.CLINI_DATA_NEST 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.DATA_API_MEDICALRESOURCES\", \"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_CHINA_FIRST_OUT_RECORD_VIEW_2e2fea975599",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_CHINA_FIRST_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_CHINAFIRSTOUTRECORD\", \"CORE2DB.CLINIC_API_CHINAFIRSTOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_CHINA_REPEATED_OUT_RECORD_VIEW_5ed2010a578d",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_CHINA_REPEATED_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_CHINAREPEATEDOUTRECORD\", \"CORE2DB.CLINIC_API_CHINAREPEATEDOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_CLINIC_API_VISUAL_RECORD_VIEW_af7b4c6407ec",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_CLINIC_API_VISUAL_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_VISUALRECORD\", \"CORE2DB.CLINIC_API_VISUALRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_EMERGENCY_FIRST_OUT_RECORD_VIEW_b0da4b639c1e",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_EMERGENCY_FIRST_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_EMERGENCYFIRSTOUTRECORD\", \"CORE2DB.CLINIC_API_EMERGENCYFIRSTOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_EMERGENCY_REPEATED_OUT_RECORD_VIEW_e169ed1efc69",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_EMERGENCY_REPEATED_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_EMERGENCYREPEATEDOUTRECORD\", \"CORE2DB.CLINIC_API_EMERGENCYREPEATEDOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_FIRST_OUT_RECORD_VIEW_768fc8032259",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_FIRST_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_FIRSTOUTRECORD\", \"CORE2DB.CLINIC_API_FIRSTOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_MULTIDISCIPLINARY_RECORD_VIEW_b481d520593b",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_MULTIDISCIPLINARY_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_MULTIDISCIPLINARYRECORD\", \"CORE2DB.CLINIC_API_MULTIDISCIPLINARYRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_OBSERVE_RECORD_VIEW_5ea7b0645f12",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_OBSERVE_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OBSERVERECORD\", \"CORE2DB.CLINIC_API_OBSERVERECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_OUTPATIENT_DISEASE_COURSE_RECORD_VIEW_e68aa7d692aa",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_OUTPATIENT_DISEASE_COURSE_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OUTPATIENTDISEASECOURSERECORD\", \"CORE2DB.CLINIC_API_OUTPATIENTDISEASECOURSERECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_OUT_VIEW_RECORD_VIEW_51c60c556740",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_OUT_VIEW_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OUTVIEWRECORD\", \"CORE2DB.CLINIC_API_OUTVIEWRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_REPEATED_OUT_RECORD_VIEW_7ad9c5a55121",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_REPEATED_OUT_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_REPEATEDOUTRECORD\", \"CORE2DB.CLINIC_API_REPEATEDOUTRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_SALVAGE_RECORD_VIEW_09a911b12b53",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_SALVAGE_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OUTPATIENTSALVAGERECORD\", \"CORE2DB.CLINIC_API_OUTPATIENTSALVAGERECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_CURRENT_MEDICAL_RECORD_WARD_ROUND_RECORD_VIEW_a48ef0aef999",
+   "CORE2DB.CURRENT_MEDICAL_RECORD_WARD_ROUND_RECORD_VIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_OUTPATIENTWARDROUNDRECORD\", \"CORE2DB.CLINIC_API_OUTPATIENTWARDROUNDRECORDCONTROL\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_DATA_260420_2381f1b9d475",
+   "CORE2DB.DATA_260420 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_FIRSTOUTRECORD\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_FXJCPT_CDR_EMR_DOCUMENT_c913cf34397d",
+   "CORE2DB.FXJCPT_CDR_EMR_DOCUMENT 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_FIRSTOUTRECORD\", \"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_FXJCPT_CDR_NEST_YBEMR_14fd80294fcf",
+   "CORE2DB.FXJCPT_CDR_NEST_YBEMR 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_VW_PATI_OUT_EMRFILE_d1db4e8d2bfa",
+   "CORE2DB.VW_PATI_OUT_EMRFILE 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.CLINIC_API_FIRSTOUTRECORD\", \"CORE2DB.CLINIC_API_REPEATEDOUTRECORD\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\"]"
+  ],
+  [
+   "PLAN139_VIEW_CORE2DB_V_HIS_INFECTION_EMR_MEDICAL_INFO_5f92e6456cc4",
+   "CORE2DB.V_HIS_INFECTION_EMR_MEDICAL_INFO 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"CORE2DB.DATA_API_MEDICALRESOURCES\", \"CORE2DB.DATA_API_PATIENT\", \"CORE2DB.MEDICAL_API_MEDICALRECORDS\", \"CORE2DB.V_HIS_INFECTION_CLINICAL_CONTENT\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_EMR_PHYSICAL_EXAM_d81b6bfbc3f0",
+   "JZCIS.DBO.EMR_PHYSICAL_EXAM 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.HYB\", \"JZCIS.DBO.JCMXX\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.SFXM\", \"JZCIS.DBO.V_KSJL\", \"JZCIS.DBO.YBDM\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_EMR_PHYSICAL_EXAM_ITEM_d8c1deb3fb40",
+   "JZCIS.DBO.EMR_PHYSICAL_EXAM_ITEM 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.HYB\", \"JZCIS.DBO.JCMXX\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.V_KSJL\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_JCXXBIRTHDAYVIEW_f8e101c3c4d2",
+   "JZCIS.DBO.JCXXBIRTHDAYVIEW 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.DWMC\", \"JZCIS.DBO.JCXX\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_TJ_GNJCZB_af986136e02d",
+   "JZCIS.DBO.TJ_GNJCZB 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.JCSFXM\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.SFXM\", \"JZCIS.DBO.V_KSJL\", \"JZCIS.DBO.YHXX\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_TJ_TJMXB_e674255e9912",
+   "JZCIS.DBO.TJ_TJMXB 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.HYB\", \"JZCIS.DBO.JCMXX\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.V_KSJL\", \"JZCIS.DBO.YHXX\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_V_EMR_PHYSICAL_EXAM_79d8e82b4917",
+   "JZCIS.DBO.V_EMR_PHYSICAL_EXAM 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.EMR_PHYSICAL_EXAM_TYPE_MAP\", \"JZCIS.DBO.HYB\", \"JZCIS.DBO.JCMXX\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.SFXM\", \"JZCIS.DBO.V_KSJL\", \"JZCIS.DBO.YBDM\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_V_EMR_PHYSICAL_EXAM_ITEM_fa571e698b8e",
+   "JZCIS.DBO.V_EMR_PHYSICAL_EXAM_ITEM 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.EMR_PHYSICAL_EXAM_TYPE_MAP\", \"JZCIS.DBO.JCMXX\", \"JZCIS.DBO.JCSFXMTOSFXM\", \"JZCIS.DBO.KSBM\", \"JZCIS.DBO.V_KSJL\"]"
+  ],
+  [
+   "PLAN139_VIEW_JZCIS_DBO_V_EMR_PHYSICAL_REPORT_43769045df35",
+   "JZCIS.DBO.V_EMR_PHYSICAL_REPORT 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"JZCIS.DBO.DWMC\", \"JZCIS.DBO.JCXX\", \"JZCIS.DBO.V_KSJL\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_BS25015_fa2357f9a5d1",
+   "PITAYA.DBO.BS25015 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_FROZENREPORT\", \"PITAYA.DBO.USERS\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_PATHOLOGICAL_EXAM_RECORD_6af5779e8f91",
+   "PITAYA.DBO.PATHOLOGICAL_EXAM_RECORD 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADVICE\", \"PITAYA.DBO.PITAYA_DBTYPE\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_T_ITF_BL_b7e85997e1cf",
+   "PITAYA.DBO.T_ITF_BL 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_IMAGES\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_VIEW_BLREPORT____cbd0283b5f09",
+   "PITAYA.DBO.VIEW_BLREPORT未使用 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_FROZENREPORT\", \"PITAYA.DBO.PITAYA_IMAGES\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_VWREPORTS____074b8506a69a",
+   "PITAYA.DBO.VWREPORTS未使用 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_FROZENREPORT\", \"PITAYA.DBO.PITAYA_IMAGES\", \"PITAYA.DBO.USERS\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_V_BLZLST_cff00ac3b30a",
+   "PITAYA.DBO.V_BLZLST 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_SLICE\", \"PITAYA.DBO.USERS\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_V_PIMS_f13163480686",
+   "PITAYA.DBO.V_PIMS 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_FROZENREPORT\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_V_PIS_IMAGE_9970b749da19",
+   "PITAYA.DBO.V_PIS_IMAGE 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_IMAGES\"]"
+  ],
+  [
+   "PLAN139_VIEW_PITAYA_DBO_YJ_BLJCBG_7fc87242ef84",
+   "PITAYA.DBO.YJ_BLJCBG 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"PITAYA.DBO.PITAYA\", \"PITAYA.DBO.PITAYA_ADDITIONALREPORT\", \"PITAYA.DBO.PITAYA_FROZENREPORT\", \"PITAYA.DBO.USERS\"]"
+  ],
+  [
+   "PLAN139_VIEW_QPIS_DBO_V_PIMS_70be40b6e773",
+   "QPIS.DBO.V_PIMS 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"QPIS.DBO.CMIPSMAIN\", \"QPIS.DBO.CMIPSMAIN_BCBG\", \"QPIS.DBO.CMIPSMAIN_BDBG\"]"
+  ],
+  [
+   "PLAN139_VIEW_ZONEKINGNET_DBO_V_PACS_INTERFACE_XX_1c1874751fdf",
+   "ZONEKINGNET.DBO.V_PACS_INTERFACE_XX 视图复杂逻辑草稿",
+   "draft",
+   "false",
+   "",
+   "[\"EIS.DBO.PATIENT\", \"EIS.DBO.PATIENTEXAMITEM\", \"EIS.DBO.REQUESTEXAMITEM\", \"JZCIS.DBO.SFXM\", \"ZONEKINGNET.DBO.EXAMBODYPART\", \"ZONEKINGNET.DBO.EXAMITEMTOBODYPART\"]"
+  ],
+  [
+   "V_INP_EXAM_REPORTS_EXAM_OUTPATIENT_INPATIENT",
+   "V_INP_EXAM_REPORTS",
+   "approved",
+   "false",
+   "exam_imaging_report",
+   "[{\"role\": \"exam_master\", \"alias\": \"em\", \"table\": \"EXAM.EXAM_MASTER\"}, {\"role\": \"exam_report\", \"alias\": \"er\", \"table\": \"EXAM.EXAM_REPORT\"}, {\"role\": \"inpatient_visit\", \"alias\": \"pv\", \"table\": \"MEDREC.PAT_VISIT\"}, {\"role\": \"patient_master\", \"alias\": \"pmi\", \"table\": \"MEDREC.PAT_MASTER_INDEX\"}, {\"role\": \"outpatient_treat_charge_detail\", \"alias\": \"a\", \"table\": \"OUTP_TREAT_REC\"}, {\"role\": \"outpatient_visit_master\", \"alias\": \"b\", \"table\": \"CLINIC_MASTER\"}, {\"role\": \"request_department\", \"alias\": \"req_dept\", \"table\": \"COMM.DEPT_DICT\"}, {\"role\": \"execute_department\", \"alias\": \"exec_dept\", \"table\": \"COMM.DEPT_DICT\"}]"
+  ]
+ ],
+ "review_cols": [
+  "id",
+  "relation_scope",
+  "source_relation_table",
+  "source_relation_id",
+  "from_system_code",
+  "from_source_code",
+  "from_table",
+  "from_columns",
+  "to_system_code",
+  "to_source_code",
+  "to_table",
+  "to_columns",
+  "join_condition",
+  "relation_desc_cn",
+  "business_logic_cn",
+  "confidence",
+  "validation_status",
+  "review_status",
+  "reviewer",
+  "reviewed_at",
+  "review_note",
+  "source_evidence",
+  "created_at",
+  "updated_at"
+ ],
+ "reviews_touching_s34_tables": [
+  [
+   "1",
+   "approved",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.PAT_VISIT",
+   "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID"
+  ],
+  [
+   "7",
+   "draft",
+   "OUTPBILL.OUTP_ORDER_DESC",
+   "OUTPBILL.OUTP_RCPT_MASTER",
+   "OUTPBILL.OUTP_ORDER_DESC.RCPT_NO = OUTPBILL.OUTP_RCPT_MASTER.RCPT_NO"
+  ],
+  [
+   "8",
+   "draft",
+   "INPBILL.INP_SETTLE_MASTER_YB",
+   "INPBILL.INP_SETTLE_MASTER",
+   "INPBILL.INP_SETTLE_MASTER_YB.PATIENT_ID = INPBILL.INP_SETTLE_MASTER.PATIENT_ID AND INPBILL.INP_SETTLE_MASTER_YB.VISIT_ID = INPBILL.INP_SETTLE_MASTER.VISIT_ID"
+  ],
+  [
+   "9",
+   "draft",
+   "OUTPBILL.OUTP_BILL_ITEMS",
+   "COMM.STAFF_DICT",
+   "OUTPBILL.OUTP_BILL_ITEMS.ORDERED_BY_DOCTOR = COMM.STAFF_DICT.EMP_NO"
+  ],
+  [
+   "10",
+   "draft",
+   "INPBILL.INP_BILL_DETAIL",
+   "FXHIS.SYS_DEPARTMENT",
+   "INPBILL.INP_BILL_DETAIL.ORDERED_BY = FXHIS.SYS_DEPARTMENT.DEPTCODE"
+  ],
+  [
+   "12",
+   "draft",
+   "MEDREC.OPERATION",
+   "COMM.OPERATION_DICT",
+   "MEDREC.OPERATION.OPERATION_CODE = COMM.OPERATION_DICT.OPERATION_CODE"
+  ],
+  [
+   "29",
+   "draft",
+   "INPBILL.INP_SETTLE_MASTER",
+   "INPBILL.INP_PAYMENTS_MONEY",
+   "A.RCPT_NO = B.RCPT_NO"
+  ],
+  [
+   "30",
+   "draft",
+   "INPBILL.INP_SETTLE_MASTER",
+   "INPBILL.INP_SETTLE_MASTER_YB",
+   "A.brjsh = C.brjsh"
+  ],
+  [
+   "107",
+   "draft",
+   "SDSR_QUEUE_JAVA.SYS_OPERATION_RECORD",
+   "SDSR_QUEUE_JAVA.SYS_USER",
+   "user_id=user_id"
+  ],
+  [
+   "204",
+   "draft",
+   "IS_INFA.PO_REPOSITORYOPERATIONALI",
+   "IS_INFA.PR_RESOURCE",
+   "PSR_CONTAINER=PRR_ID"
+  ],
+  [
+   "564",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "HIS.PAT_VISIT",
+   "ttt.patient_id = d2.patient_id AND ttt.visit_id = d2.visit_id"
+  ],
+  [
+   "569",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = pv.patient_id AND mom.visit_id = pv.visit_id"
+  ],
+  [
+   "570",
+   "draft",
+   "SM.MED_DIAGNOSIS_DICT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.diag_before_operation = c.diagnosis_name AND mom.diag_before_operation = c.diagnosis_name"
+  ],
+  [
+   "587",
+   "draft",
+   "HIS.OPERATION",
+   "HIS.PAT_VISIT",
+   "pv.patient_id = o.patient_id AND pv.visit_id = o.visit_id"
+  ],
+  [
+   "588",
+   "draft",
+   "HIS.OPERATION",
+   "HIS.PAT_MASTER_INDEX",
+   "pmi.patient_id = o.patient_id"
+  ],
+  [
+   "589",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "HIS.PAT_MASTER_INDEX",
+   "pmi.patient_id = a.patient_id AND t.patient_id = t2.patient_id"
+  ],
+  [
+   "590",
+   "draft",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id AND b.PATIENT_ID = p.PATIENT_ID"
+  ],
+  [
+   "591",
+   "draft",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.INP_SETTLE_MASTER_YB",
+   "c.patient_id = a.patient_id AND c.visit_id = a.visit_id"
+  ],
+  [
+   "594",
+   "draft",
+   "LUNA_MCS_SDSEY.DIAGNOSIS_BASY",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "dg.VISIT_ID = YDZD.SERIES"
+  ],
+  [
+   "597",
+   "draft",
+   "C##NIS5.OPERATION_SOURCE",
+   "C##NIS5.OVERALL",
+   "os.caseid = o.caseid"
+  ],
+  [
+   "604",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_OPERATION_SCHEDULE",
+   "a.patient_id = a1.patient_id AND a.visit_id   = a1.visit_id"
+  ],
+  [
+   "605",
+   "draft",
+   "SM.MED_ANESTHESIA_PLAN",
+   "SM.MED_OPERATION_MASTER",
+   "a.patient_id = e3.patient_id AND a.visit_id   = e3.visit_id"
+  ],
+  [
+   "607",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = p.patient_id AND mom.patient_id = p.patient_id"
+  ],
+  [
+   "608",
+   "draft",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "609",
+   "draft",
+   "JHEMR.JHMR_FILE_INDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.visit_id = t.VISIT_ID"
+  ],
+  [
+   "613",
+   "draft",
+   "HIS.OPERATION",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "o.patient_id = t.p_clinic_id AND o.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "614",
+   "draft",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = t.p_clinic_id AND mom.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "616",
+   "draft",
+   "HIS.OPERATION",
+   "JHEMR.JHMR_FILE_INDEX",
+   "o.patient_id = t.PATIENT_ID AND o.visit_id = t.VISIT_ID"
+  ],
+  [
+   "617",
+   "draft",
+   "JHEMR.JHMR_FILE_INDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = t.PATIENT_ID AND mom.visit_id = t.VISIT_ID"
+  ],
+  [
+   "622",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "t.P_INPATIENT_TIMES = ddd.visit_id AND t.P_INPATIENT_TIMES = dddd.visit_id"
+  ],
+  [
+   "623",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "JHEMR.JHMR_FILE_INDEX",
+   "t.VISIT_ID = ddd.visit_id AND t.VISIT_ID = dddd.visit_id"
+  ],
+  [
+   "658",
+   "draft",
+   "HIS.DRUG_PRESC_DETAIL",
+   "HIS.DRUG_PRICE_LIST",
+   "pl.drug_code = t.drug_code AND pl.firm_id = t.firm_id"
+  ],
+  [
+   "660",
+   "draft",
+   "HIS.OUTP_RCPT_MASTER",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id"
+  ],
+  [
+   "661",
+   "draft",
+   "HIS.OUTP_BILL_ITEMS",
+   "HIS.PRICE_LIST",
+   "pl.item_class = obi.item_class AND pl.item_code  = obi.item_code"
+  ],
+  [
+   "662",
+   "draft",
+   "HIS.OUTP_RCPT_MASTER",
+   "ODS.CDA_VALUE_DOMAIN_MAP",
+   "e.patient_id = a.patient_id"
+  ],
+  [
+   "664",
+   "draft",
+   "HIS.DEPT_DICT",
+   "HIS.INP_BILL_DETAIL",
+   "b.DEPT_CODE = d.DEPT_CODE"
+  ],
+  [
+   "665",
+   "draft",
+   "SM.MED_ANESTHESIA_EVENT",
+   "SM.MED_OPERATION_MASTER",
+   "mae.patient_id = b.patient_id AND mae.visit_id   = b.visit_id"
+  ],
+  [
+   "667",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = b.operation_name AND cd.院标名称 = b.operation_name"
+  ],
+  [
+   "668",
+   "draft",
+   "SM.MED_CUSTOM_DATA",
+   "SM.MED_OPERATION_MASTER",
+   "sq.visit_id   = b.visit_id AND sq.oper_id    = b.oper_id"
+  ],
+  [
+   "669",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id AND a.patient_id = b.patient_id"
+  ],
+  [
+   "671",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = a.operation_name"
+  ],
+  [
+   "672",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_OPERATION_SCHEDULE",
+   "mos.patient_id = mom.patient_id AND mos.visit_id = mom.visit_id"
+  ],
+  [
+   "673",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = mom.anesthesia_method"
+  ],
+  [
+   "674",
+   "draft",
+   "SM.MED_CUSTOM_DATA",
+   "SM.MED_OPERATION_MASTER",
+   "mcd.patient_id = mom.patient_id AND mcd.visit_id = mom.visit_id"
+  ]
+ ],
+ "formal_relations_s34_missing_tables": [
+  [
+   "12",
+   "DATA_CENTER",
+   "HIS.PAT_VISIT",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_MASTER",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "13",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_MASTER",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_NAME",
+   "PATIENT_ID+VISIT_ID+OPER_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "31",
+   "DATA_CENTER",
+   "SM.MED_ANESTHESIA_PLAN",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_MASTER",
+   "PATIENT_ID+VISIT_ID+OPER_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "35",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_MASTER",
+   "DATA_CENTER",
+   "HIS.PAT_MASTER_INDEX",
+   "MED_OPERATION_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "290",
+   "JHEMR_VASTBASE",
+   "jhemr.emr_first_page_item_dict",
+   "JHEMR_VASTBASE",
+   "jhemr.v_operation_dict",
+   "",
+   "B",
+   "candidate"
+  ],
+  [
+   "291",
+   "JHEMR_VASTBASE",
+   "jhemr.operation_contrast_dict",
+   "JHEMR_VASTBASE",
+   "jhemr.v_operation_dict",
+   "",
+   "B",
+   "candidate"
+  ],
+  [
+   "292",
+   "JHEMR_VASTBASE",
+   "jhemr.operation_dict",
+   "JHEMR_VASTBASE",
+   "jhemr.v_operation_dict",
+   "",
+   "B",
+   "candidate"
+  ],
+  [
+   "299",
+   "JHEMR_VASTBASE",
+   "jhemr.jhinpat_mr_on_line",
+   "JHEMR_VASTBASE",
+   "jhemr.v_patcardlist",
+   "",
+   "B",
+   "candidate"
+  ],
+  [
+   "373",
+   "DOCARE",
+   "MEDSURGERY.MED_SCHEDULED_OPERATION_NAME",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_SCHEDULE",
+   "MEDSURGERY.MED_SCHEDULED_OPERATION_NAME(PATIENT_ID,VISIT_ID,SCHEDULE_ID) = MEDSURGERY.MED_OPERATION_SCHEDULE(PATIENT_ID,VISIT_ID,SCHEDULE_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "374",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "DOCARE",
+   "MEDCOMM.MED_PAT_VISIT",
+   "MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID) = MEDCOMM.MED_PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "375",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_NAME",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_OPERATION_NAME(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "376",
+   "DOCARE",
+   "MEDSURGERY.MED_ANESTHESIA_PLAN",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_PLAN(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "377",
+   "DOCARE",
+   "MEDSURGERY.MED_ANESTHESIA_SUMMARY",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_SUMMARY(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "378",
+   "DOCARE",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "379",
+   "DOCARE",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT_BACK",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT_BACK(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "380",
+   "DOCARE",
+   "MEDSURGERY.MED_ANESTHESIA_INPUT_DATA",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_INPUT_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "381",
+   "DOCARE",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "382",
+   "DOCARE",
+   "MEDSURGERY.MED_PATIENT_MONITOR_DATA",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PATIENT_MONITOR_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "383",
+   "DOCARE",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA_HISTORY",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA_HISTORY(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "384",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_ANALGESIC",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_OPERATION_ANALGESIC(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "385",
+   "DOCARE",
+   "MEDSURGERY.MED_ANES_OPERHANDOVER",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANES_OPERHANDOVER(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "386",
+   "DOCARE",
+   "MEDSURGERY.MED_ANES_DOC_CHECK",
+   "DOCARE",
+   "MEDSURGERY.MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANES_DOC_CHECK(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "523",
+   "DOCARE",
+   "DOCARE.MED_DIAGNOSIS_DICT",
+   "DATA_CENTER",
+   "SM.MED_DIAGNOSIS_DICT",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "527",
+   "DOCARE",
+   "DOCARE.MED_OPERATION_DICT",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_DICT",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "528",
+   "DOCARE",
+   "DOCARE.MED_OPERATION_MASTER",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_MASTER",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "529",
+   "DOCARE",
+   "DOCARE.MED_OPERATION_NAME",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_NAME",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "530",
+   "DOCARE",
+   "DOCARE.MED_OPERATION_NAME_CANCELED",
+   "DATA_CENTER",
+   "SM.MED_OPERATION_NAME_CANCELED",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "535",
+   "DOCARE",
+   "DOCARE.MED_SCHEDULED_OPERATION_NAME",
+   "DATA_CENTER",
+   "SM.MED_SCHEDULED_OPERATION_NAME",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ]
+ ]
+}

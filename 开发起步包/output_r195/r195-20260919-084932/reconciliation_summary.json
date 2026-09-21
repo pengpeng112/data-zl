@@ -1,0 +1,29 @@
+{
+ "generated_at": "2026-09-19T08:57:07.072400",
+ "counts": {
+  "package_total_files": 922,
+  "sql_files_total": 294,
+  "bare_view_objects": 123,
+  "root_main_files": 67,
+  "root_jhemr_files": 17,
+  "backup_files": 67,
+  "history_files": 52,
+  "objects_74_table": 74,
+  "74_missing_in_root": [
+   "V_EMR_ADVERSE_EVENT_FINAL",
+   "V_EMR_BLOOD_APPLY_REPORT",
+   "V_EMR_BLOOD_APPLY_REPORT_ITEM",
+   "V_EMR_PHYSICAL_EXAM",
+   "V_EMR_PHYSICAL_EXAM_ITEM",
+   "V_EMR_PHYSICAL_REPORT",
+   "V_EMR_TRANSFUSION_RECORD"
+  ],
+  "root_extra_not_in_74": [],
+  "root_vs_backup": {
+   "same": 18,
+   "differs": 49
+  },
+  "excel_rows": 78,
+  "excel_distinct_views": 77
+ }
+}

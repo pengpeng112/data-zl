@@ -1,0 +1,1139 @@
+{
+ "schema_version": "r188-capacity/1.0",
+ "run_id": "r188-20260913",
+ "generated_at": "auto",
+ "databases": [
+  {
+   "system_code": "ADVERSE_EVENT",
+   "source_code": "adverse_event_10_10_10_50",
+   "engine": "mysql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T12:08:48.423668+00:00",
+   "budget_used": {
+    "statements": 68,
+    "db_seconds": 5.2,
+    "wall_seconds": 201.4
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "mas",
+     "tables": 61,
+     "views": 4,
+     "columns": 940,
+     "estimated_rows_known_sum": 725109,
+     "rows_known_table_count": 61,
+     "stats_at": null,
+     "allocated_bytes": 809091072,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "mas_activiti",
+     "tables": 25,
+     "views": 0,
+     "columns": 265,
+     "estimated_rows_known_sum": 2801419,
+     "rows_known_table_count": 25,
+     "stats_at": null,
+     "allocated_bytes": 1788592128,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "mds",
+     "tables": 312,
+     "views": 0,
+     "columns": 3594,
+     "estimated_rows_known_sum": 17872,
+     "rows_known_table_count": 312,
+     "stats_at": null,
+     "allocated_bytes": 10895360,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "pitaya_bi",
+     "tables": 26,
+     "views": 0,
+     "columns": 416,
+     "estimated_rows_known_sum": 3860,
+     "rows_known_table_count": 26,
+     "stats_at": null,
+     "allocated_bytes": 1769472,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "pitaya_cmi",
+     "tables": 33,
+     "views": 0,
+     "columns": 450,
+     "estimated_rows_known_sum": 12433,
+     "rows_known_table_count": 33,
+     "stats_at": null,
+     "allocated_bytes": 6668288,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "pitaya_gtt",
+     "tables": 10,
+     "views": 0,
+     "columns": 138,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 10,
+     "stats_at": null,
+     "allocated_bytes": 294912,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "pitaya_identity",
+     "tables": 23,
+     "views": 0,
+     "columns": 329,
+     "estimated_rows_known_sum": 195800,
+     "rows_known_table_count": 23,
+     "stats_at": null,
+     "allocated_bytes": 37568512,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "pitaya_rule",
+     "tables": 1,
+     "views": 0,
+     "columns": 34,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 1,
+     "stats_at": null,
+     "allocated_bytes": 16384,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    },
+    {
+     "schema": "qds",
+     "tables": 1,
+     "views": 127,
+     "columns": 8,
+     "estimated_rows_known_sum": 10670,
+     "rows_known_table_count": 1,
+     "stats_at": null,
+     "allocated_bytes": 1589248,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    }
+   ],
+   "summary_counts": {
+    "tables": 492,
+    "views": 131,
+    "columns": 6174,
+    "constraints": 103700,
+    "indexes": 656,
+    "view_definitions": 131
+   }
+  },
+  {
+   "system_code": "TRANSFUSION_NEW",
+   "source_code": "bloodnew_sqlserver_10_10_8_7",
+   "engine": "sqlserver",
+   "status": "PARTIAL: XH_BIS_4.0 only (0 tables/4 views live); XH_BIS + HyAppFrame BLOCKED_PRIVILEGE (Xiheng_user no db access; vendor DBA needed)",
+   "collected_at": "2026-09-13T12:24:05.347285+00:00",
+   "budget_used": {
+    "statements": 9,
+    "db_seconds": 0.3,
+    "wall_seconds": 18.4
+   },
+   "source_writes": 0,
+   "schemas": [],
+   "blocked_note": "no table payload"
+  },
+  {
+   "system_code": "BRONCHOSCOPY",
+   "source_code": "bronchoscopy_postgresql_10_10_8_240",
+   "engine": "postgresql",
+   "status": "PARTIAL(OperationalError:connection failed: connection to server at \"10.10.8.240\", port )",
+   "collected_at": "2026-09-14T12:00:40.199807+00:00",
+   "budget_used": null,
+   "source_writes": 0,
+   "schemas": [],
+   "blocked_note": "OperationalError:connection failed: connection to server at \"10.10.8.240\", port 5432 failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or "
+  },
+  {
+   "system_code": "HEMODIALYSIS",
+   "source_code": "dialysis_postgresql_10_10_10_88",
+   "engine": "postgresql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T12:59:44.687722+00:00",
+   "budget_used": {
+    "statements": 198,
+    "db_seconds": 0.3,
+    "wall_seconds": 576.6
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "public",
+     "tables": 177,
+     "views": 6,
+     "columns": 2047,
+     "estimated_rows_known_sum": 73342322,
+     "rows_known_table_count": 96,
+     "stats_at": null,
+     "allocated_bytes": 3735552,
+     "capacity_coverage": "pg_total_relation_size per object; partition children not double-counted"
+    }
+   ],
+   "summary_counts": {
+    "tables": 177,
+    "views": 6,
+    "columns": 2047,
+    "constraints": 218,
+    "indexes": 280,
+    "view_definitions": 6,
+    "huachain_note": [
+     {
+      "version": "PostgreSQL 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit",
+      "db": "dialysis",
+      "current_user": "wzhhpt"
+     }
+    ]
+   }
+  },
+  {
+   "system_code": "EMERGENCY_CLINIC",
+   "source_code": "emergency_clinic_10_10_10_120",
+   "engine": "oracle",
+   "status": "DONE",
+   "collected_at": "2026-09-13T12:10:07.512250+00:00",
+   "budget_used": {
+    "statements": 74,
+    "db_seconds": 1.0,
+    "wall_seconds": 209.2
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "CLINIC",
+     "tables": 169,
+     "views": 29,
+     "columns": 1707,
+     "estimated_rows_known_sum": 4581580,
+     "rows_known_table_count": 169,
+     "stats_at": "2026-08-31",
+     "allocated_bytes": 920584192,
+     "capacity_coverage": "login-schema-only"
+    },
+    {
+     "schema": "DIP",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "INFOR",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "JZUSER",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "MEDCOMM",
+     "tables": 17,
+     "views": 0,
+     "columns": 168,
+     "estimated_rows_known_sum": 3507,
+     "rows_known_table_count": 17,
+     "stats_at": "2024-07-26",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SCOTT",
+     "tables": 4,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 23,
+     "rows_known_table_count": 4,
+     "stats_at": "2019-12-13",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "YIBANG",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    }
+   ],
+   "capacity_note": "ALL_SEGMENTS not visible to app account; USER_SEGMENTS covers login schema only; other owners unknown",
+   "summary_counts": {
+    "tables": 190,
+    "views": 29,
+    "columns": 1893,
+    "constraint_columns": 219,
+    "index_columns": 222,
+    "view_definitions": "29/29",
+    "owner_struct_errors": []
+   }
+  },
+  {
+   "system_code": "HEARING_TEST",
+   "source_code": "hearing_test_postgresql_10_10_9_187",
+   "engine": "postgresql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T13:09:31.482905+00:00",
+   "budget_used": {
+    "statements": 171,
+    "db_seconds": 0.3,
+    "wall_seconds": 522.6
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "public",
+     "tables": 28,
+     "views": 0,
+     "columns": 308,
+     "estimated_rows_known_sum": 102790,
+     "rows_known_table_count": 27,
+     "stats_at": null,
+     "allocated_bytes": 34152448,
+     "capacity_coverage": "pg_total_relation_size per object; partition children not double-counted"
+    },
+    {
+     "schema": "report",
+     "tables": 123,
+     "views": 4,
+     "columns": 1716,
+     "estimated_rows_known_sum": 13820739,
+     "rows_known_table_count": 99,
+     "stats_at": null,
+     "allocated_bytes": 3593142272,
+     "capacity_coverage": "pg_total_relation_size per object; partition children not double-counted"
+    }
+   ],
+   "summary_counts": {
+    "tables": 151,
+    "views": 4,
+    "columns": 2024,
+    "constraints": 123,
+    "indexes": 131,
+    "view_definitions": 4,
+    "huachain_note": [
+     {
+      "version": "PostgreSQL 15.2 (HuaChainSQL 1.0) on x86_64-pc-linux-gnu, compiled by gcc (GCC) 7.2.0, 64-bit",
+      "db": "report",
+      "current_user": "report_4_paperless"
+     }
+    ]
+   }
+  },
+  {
+   "system_code": "INFECTION_SURVEILLANCE",
+   "source_code": "infection_10_10_9_45",
+   "engine": "oracle",
+   "status": "PARTIAL(owner struct error: C##NIS5,C##NIS6 — ORA-03156 call timeout on batched catalog query; per plan §3.3 smaller-batch re-run needs DBA/ops confirmation)",
+   "collected_at": "2026-09-14T11:44:57.459265+00:00",
+   "budget_used": {
+    "statements": 38,
+    "db_seconds": 47.0,
+    "wall_seconds": 123.3
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "C##FXPT",
+     "tables": 0,
+     "views": 1,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "C##HLGL",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "C##NIS5",
+     "tables": 450,
+     "views": 6,
+     "columns": 0,
+     "estimated_rows_known_sum": 17428610,
+     "rows_known_table_count": 275,
+     "stats_at": "2026-04-03",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "C##NIS6",
+     "tables": 288,
+     "views": 3,
+     "columns": 0,
+     "estimated_rows_known_sum": 14808291,
+     "rows_known_table_count": 257,
+     "stats_at": "2024-07-11",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "C##XLYY",
+     "tables": 2,
+     "views": 0,
+     "columns": 53,
+     "estimated_rows_known_sum": 81414,
+     "rows_known_table_count": 1,
+     "stats_at": "2026-06-23",
+     "allocated_bytes": 10682368,
+     "capacity_coverage": "login-schema-only"
+    },
+    {
+     "schema": "C##YL_GRXXJL",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    }
+   ],
+   "capacity_note": "ALL_SEGMENTS not visible to app account; USER_SEGMENTS covers login schema only; other owners unknown",
+   "summary_counts": {
+    "tables": 740,
+    "views": 10,
+    "columns": 53,
+    "constraint_columns": 0,
+    "index_columns": 0,
+    "view_definitions": "10/10",
+    "owner_struct_errors": [
+     {
+      "owner": "C##NIS5",
+      "error": "DPY-4024: call timeout of 15000 ms exceeded\nDPI-1067: call timeout of 15000 ms exceeded with ORA-03156\nORA-03156: Messag"
+     },
+     {
+      "owner": "C##NIS6",
+      "error": "DPY-4024: call timeout of 15000 ms exceeded\nDPI-1067: call timeout of 15000 ms exceeded with ORA-03156\nORA-03156: Messag"
+     }
+    ]
+   }
+  },
+  {
+   "system_code": "INTERCONNECT_PROV",
+   "source_code": "interconnect_10_10_10_5",
+   "engine": "oracle",
+   "status": "DONE",
+   "collected_at": "2026-09-14T12:12:36.173272+00:00",
+   "budget_used": {
+    "statements": 395,
+    "db_seconds": 8.0,
+    "wall_seconds": 1218.4
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "BI",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DC_DATA1",
+     "tables": 111,
+     "views": 0,
+     "columns": 722,
+     "estimated_rows_known_sum": 316121,
+     "rows_known_table_count": 110,
+     "stats_at": "2019-07-15",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DIP",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "HEALTH_EXCHANGE",
+     "tables": 98,
+     "views": 0,
+     "columns": 2691,
+     "estimated_rows_known_sum": 21609834,
+     "rows_known_table_count": 98,
+     "stats_at": "2024-01-10",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "HOS_ODS",
+     "tables": 171,
+     "views": 4,
+     "columns": 4597,
+     "estimated_rows_known_sum": 427417517,
+     "rows_known_table_count": 171,
+     "stats_at": "2026-09-13",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "HOS_STG",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "HR",
+     "tables": 7,
+     "views": 1,
+     "columns": 35,
+     "estimated_rows_known_sum": 215,
+     "rows_known_table_count": 7,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "IS_INFA",
+     "tables": 479,
+     "views": 186,
+     "columns": 4812,
+     "estimated_rows_known_sum": 1065445,
+     "rows_known_table_count": 479,
+     "stats_at": "2025-06-14",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "IX",
+     "tables": 17,
+     "views": 8,
+     "columns": 171,
+     "estimated_rows_known_sum": 9,
+     "rows_known_table_count": 17,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "ODS",
+     "tables": 41,
+     "views": 0,
+     "columns": 1190,
+     "estimated_rows_known_sum": 416306,
+     "rows_known_table_count": 41,
+     "stats_at": "2023-03-16",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "OE",
+     "tables": 10,
+     "views": 13,
+     "columns": 53,
+     "estimated_rows_known_sum": 11449,
+     "rows_known_table_count": 10,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "PM",
+     "tables": 2,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 13,
+     "rows_known_table_count": 2,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "RS_INFA",
+     "tables": 342,
+     "views": 170,
+     "columns": 3491,
+     "estimated_rows_known_sum": 8907,
+     "rows_known_table_count": 342,
+     "stats_at": "2019-03-15",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SCOTT",
+     "tables": 4,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 23,
+     "rows_known_table_count": 4,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SH",
+     "tables": 17,
+     "views": 1,
+     "columns": 171,
+     "estimated_rows_known_sum": 1074698,
+     "rows_known_table_count": 13,
+     "stats_at": "2018-12-12",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SPT_EXCHANGE",
+     "tables": 81,
+     "views": 0,
+     "columns": 2873,
+     "estimated_rows_known_sum": 284254250,
+     "rows_known_table_count": 81,
+     "stats_at": "2026-08-31",
+     "allocated_bytes": 71486996480,
+     "capacity_coverage": "login-schema-only"
+    },
+    {
+     "schema": "SPT_HEALTH",
+     "tables": 75,
+     "views": 0,
+     "columns": 2773,
+     "estimated_rows_known_sum": 6493083,
+     "rows_known_table_count": 75,
+     "stats_at": "2019-07-26",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SPT_RTD",
+     "tables": 27,
+     "views": 0,
+     "columns": 407,
+     "estimated_rows_known_sum": 151236050,
+     "rows_known_table_count": 27,
+     "stats_at": "2026-09-01",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SPT_YPGYBZ",
+     "tables": 11,
+     "views": 0,
+     "columns": 200,
+     "estimated_rows_known_sum": 6317105,
+     "rows_known_table_count": 11,
+     "stats_at": "2026-09-13",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "WINDMILL",
+     "tables": 96,
+     "views": 0,
+     "columns": 563,
+     "estimated_rows_known_sum": 26971,
+     "rows_known_table_count": 96,
+     "stats_at": "2024-01-10",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "ZK_DT",
+     "tables": 40,
+     "views": 0,
+     "columns": 553,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 40,
+     "stats_at": "2022-08-09",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    }
+   ],
+   "capacity_note": "ALL_SEGMENTS not visible to app account; USER_SEGMENTS covers login schema only; other owners unknown",
+   "summary_counts": {
+    "tables": 1629,
+    "views": 383,
+    "columns": 25338,
+    "constraint_columns": 1029,
+    "index_columns": 2258,
+    "view_definitions": "200/383",
+    "owner_struct_errors": []
+   }
+  },
+  {
+   "system_code": "MEDICAL_RECORD_MGMT",
+   "source_code": "mr_mgmt_10_10_10_55",
+   "engine": "oracle",
+   "status": "DONE",
+   "collected_at": "2026-09-13T12:13:43.081099+00:00",
+   "budget_used": {
+    "statements": 238,
+    "db_seconds": 6.8,
+    "wall_seconds": 723.1
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "BI",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DBZ",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DIP",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "HR",
+     "tables": 7,
+     "views": 1,
+     "columns": 35,
+     "estimated_rows_known_sum": 215,
+     "rows_known_table_count": 7,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "IX",
+     "tables": 17,
+     "views": 8,
+     "columns": 171,
+     "estimated_rows_known_sum": 9,
+     "rows_known_table_count": 17,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "JC",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "MEDICALRECORD",
+     "tables": 111,
+     "views": 5,
+     "columns": 1639,
+     "estimated_rows_known_sum": 5053,
+     "rows_known_table_count": 111,
+     "stats_at": "2024-07-24",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "MEDREC",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "OE",
+     "tables": 10,
+     "views": 13,
+     "columns": 53,
+     "estimated_rows_known_sum": 11449,
+     "rows_known_table_count": 10,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "PM",
+     "tables": 2,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 13,
+     "rows_known_table_count": 2,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SCOTT",
+     "tables": 4,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 23,
+     "rows_known_table_count": 4,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SH",
+     "tables": 17,
+     "views": 1,
+     "columns": 171,
+     "estimated_rows_known_sum": 1074698,
+     "rows_known_table_count": 13,
+     "stats_at": "2018-07-05",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "VIEWUSER",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "YCYL",
+     "tables": 1122,
+     "views": 66,
+     "columns": 21515,
+     "estimated_rows_known_sum": 94494362,
+     "rows_known_table_count": 1122,
+     "stats_at": "2026-08-25",
+     "allocated_bytes": 92333932544,
+     "capacity_coverage": "login-schema-only"
+    }
+   ],
+   "capacity_note": "ALL_SEGMENTS not visible to app account; USER_SEGMENTS covers login schema only; other owners unknown",
+   "summary_counts": {
+    "tables": 1290,
+    "views": 94,
+    "columns": 23620,
+    "constraint_columns": 1484,
+    "index_columns": 1580,
+    "view_definitions": "94/94",
+    "owner_struct_errors": []
+   }
+  },
+  {
+   "system_code": "OUTPATIENT_APPT",
+   "source_code": "outpatient_mysql_10_10_8_161",
+   "engine": "mysql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T11:48:08.016326+00:00",
+   "budget_used": {
+    "statements": 10,
+    "db_seconds": 1.1,
+    "wall_seconds": 21.2
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "sdsr_mzyy_java",
+     "tables": 85,
+     "views": 9,
+     "columns": 1829,
+     "estimated_rows_known_sum": 12532929,
+     "rows_known_table_count": 85,
+     "stats_at": null,
+     "allocated_bytes": 3058162924,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    }
+   ],
+   "summary_counts": {
+    "tables": 85,
+    "views": 9,
+    "columns": 1829,
+    "constraints": 6561,
+    "indexes": 144,
+    "view_definitions": 9
+   }
+  },
+  {
+   "system_code": "QUEUE",
+   "source_code": "queue_mysql_10_10_8_163",
+   "engine": "mysql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T11:48:39.467393+00:00",
+   "budget_used": {
+    "statements": 10,
+    "db_seconds": 0.2,
+    "wall_seconds": 20.3
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "sdsr_queue_java",
+     "tables": 62,
+     "views": 0,
+     "columns": 750,
+     "estimated_rows_known_sum": 141624,
+     "rows_known_table_count": 62,
+     "stats_at": null,
+     "allocated_bytes": 27541504,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    }
+   ],
+   "summary_counts": {
+    "tables": 62,
+    "views": 0,
+    "columns": 750,
+    "constraints": 3153,
+    "indexes": 109,
+    "view_definitions": 0
+   }
+  },
+  {
+   "system_code": "RESEARCH_MYSQL",
+   "source_code": "research_mysql_10_10_8_200",
+   "engine": "mysql",
+   "status": "DONE",
+   "collected_at": "2026-09-14T11:47:10.979160+00:00",
+   "budget_used": {
+    "statements": 22,
+    "db_seconds": 1.5,
+    "wall_seconds": 45.7
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "labsop",
+     "tables": 276,
+     "views": 0,
+     "columns": 5687,
+     "estimated_rows_known_sum": 151264,
+     "rows_known_table_count": 276,
+     "stats_at": null,
+     "allocated_bytes": 53952512,
+     "capacity_coverage": "information_schema DATA+INDEX length (DATA_FREE excluded)"
+    }
+   ],
+   "summary_counts": {
+    "tables": 276,
+    "views": 0,
+    "columns": 5687,
+    "constraints": 68119,
+    "indexes": 280,
+    "view_definitions": 0
+   }
+  },
+  {
+   "system_code": "SDDW_PROD",
+   "source_code": "sddw_oracle_10_10_10_152",
+   "engine": "oracle",
+   "status": "DONE",
+   "collected_at": "2026-09-14T11:39:10.122880+00:00",
+   "budget_used": {
+    "statements": 102,
+    "db_seconds": 12.8,
+    "wall_seconds": 337.1
+   },
+   "source_writes": 0,
+   "schemas": [
+    {
+     "schema": "AR",
+     "tables": 7,
+     "views": 0,
+     "columns": 86,
+     "estimated_rows_known_sum": 3812,
+     "rows_known_table_count": 7,
+     "stats_at": "2023-10-31",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DA_READONLY",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DIP",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "DWLESB",
+     "tables": 31,
+     "views": 1,
+     "columns": 166,
+     "estimated_rows_known_sum": 128141,
+     "rows_known_table_count": 31,
+     "stats_at": "2024-12-18",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "ECP",
+     "tables": 0,
+     "views": 0,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "MHS5",
+     "tables": 236,
+     "views": 18,
+     "columns": 4491,
+     "estimated_rows_known_sum": 561655989,
+     "rows_known_table_count": 236,
+     "stats_at": "2026-09-13",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "PWE",
+     "tables": 6,
+     "views": 0,
+     "columns": 52,
+     "estimated_rows_known_sum": 28858,
+     "rows_known_table_count": 6,
+     "stats_at": "2026-09-13",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SCOTT",
+     "tables": 4,
+     "views": 0,
+     "columns": 18,
+     "estimated_rows_known_sum": 23,
+     "rows_known_table_count": 4,
+     "stats_at": "2020-08-04",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SEP",
+     "tables": 24,
+     "views": 4,
+     "columns": 144,
+     "estimated_rows_known_sum": 3820734,
+     "rows_known_table_count": 24,
+     "stats_at": "2026-08-27",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SHENHE",
+     "tables": 0,
+     "views": 7,
+     "columns": 0,
+     "estimated_rows_known_sum": 0,
+     "rows_known_table_count": 0,
+     "stats_at": null,
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    },
+    {
+     "schema": "SI0001",
+     "tables": 6,
+     "views": 0,
+     "columns": 187,
+     "estimated_rows_known_sum": 138,
+     "rows_known_table_count": 6,
+     "stats_at": "2025-01-16",
+     "allocated_bytes": null,
+     "capacity_coverage": "unknown"
+    }
+   ],
+   "capacity_note": "ALL_SEGMENTS not visible to app account; USER_SEGMENTS covers login schema only; other owners unknown",
+   "summary_counts": {
+    "tables": 314,
+    "views": 30,
+    "columns": 5144,
+    "constraint_columns": 360,
+    "index_columns": 599,
+    "view_definitions": "30/30",
+    "owner_struct_errors": []
+   }
+  }
+ ],
+ "notes": [
+  "行数一律 estimated（现成统计：Oracle NUM_ROWS、SQLServer sys.partitions index_id 0/1、MySQL TABLE_ROWS、PG reltuples）",
+  "未知=null 不写0；RAC/分区/非聚集索引不双算；视图不加行数",
+  "Oracle 应用账号容量=登录schema(USER_SEGMENTS降级)时按 capacity_coverage 标注",
+  "外部影像/对象存储未计入"
+ ]
+}

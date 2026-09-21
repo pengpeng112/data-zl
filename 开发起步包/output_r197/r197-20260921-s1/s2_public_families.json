@@ -1,0 +1,727 @@
+{
+ "RF-INPATIENT-VISIT": {
+  "desc": "住院事实表经 PATIENT_ID+VISIT_ID 关联 PAT_VISIT（住院万能键）",
+  "relations": [
+   {
+    "relation_id": "S2F-4264E2FC1C",
+    "edge": "DIAGNOSIS.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 82
+   },
+   {
+    "relation_id": "S2F-CB3BA33251",
+    "edge": "OPERATION.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 74
+   },
+   {
+    "relation_id": "S2F-60FDE4D634",
+    "edge": "INP_BILL_DETAIL.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 51
+   },
+   {
+    "relation_id": "S2F-D6E536D1CB",
+    "edge": "OPERATION_MASTER.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 19
+   },
+   {
+    "relation_id": "S2F-E9080EA37B",
+    "edge": "ORDERS.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 18
+   },
+   {
+    "relation_id": "S2F-89188944F3",
+    "edge": "INP_SETTLE_MASTER.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 17
+   },
+   {
+    "relation_id": "S2F-0D77903D00",
+    "edge": "PAT_VISIT.PATIENT_ID+VISIT_ID=PAT_VISIT_NEW.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 8
+   },
+   {
+    "relation_id": "S2F-8949408577",
+    "edge": "PATS_IN_HOSPITAL.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-E83977F6B8",
+    "edge": "ADT_LOG.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 6
+   },
+   {
+    "relation_id": "S2F-5178A77822",
+    "edge": "INP_SETTLE_MASTER_YB.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 6
+   },
+   {
+    "relation_id": "S2F-8D8BE3D683",
+    "edge": "MR_ON_LINE.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-4591948786",
+    "edge": "CONSULTATION_DOCTOR_MASTER.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-EB8C099F77",
+    "edge": "PAT_VISIT.PATIENT_ID+VISIT_ID=TRANSFER.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-C84A01F90E",
+    "edge": "MEDICAL_RECORD_REVIEW_TABLE.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-E9F9B6B9F0",
+    "edge": "PAT_VISIT.PATIENT_ID+VISIT_ID=SETTLE_ZY_REC.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-2FAFC5BB63",
+    "edge": "ORDERS_ANTI_DRUG.PATIENT_ID+VISIT_ID=PAT_VISIT.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-6419CDF435",
+    "edge": "PAT_VISIT.PATIENT_ID+VISIT_ID=病理病人清单.HISID号+住院次数",
+    "intake_state": "candidate_blocked_source",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-106C981A96",
+    "edge": "PAT_VISIT.PATIENT_ID+VISIT_ID=PAT_VISIT_BIS.PATIENT_ID+VISIT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   }
+  ],
+  "relation_count": 18,
+  "statement_total": 303
+ },
+ "RF-PATIENT-MASTER": {
+  "desc": "患者级事实 PATIENT_ID 关联 PAT_MASTER_INDEX",
+  "relations": [
+   {
+    "relation_id": "S2F-79A7F03D1D",
+    "edge": "PAT_MASTER_INDEX.PATIENT_ID=PAT_VISIT.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 112
+   },
+   {
+    "relation_id": "S2F-C90B6003D8",
+    "edge": "INP_BILL_DETAIL.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "partial",
+    "statements": 64
+   },
+   {
+    "relation_id": "S2F-4574484543",
+    "edge": "DIAGNOSIS.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 17
+   },
+   {
+    "relation_id": "S2F-E30E4C998C",
+    "edge": "CLINIC_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 16
+   },
+   {
+    "relation_id": "S2F-A2AC280BB4",
+    "edge": "OPERATION_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 12
+   },
+   {
+    "relation_id": "S2F-0E7BE7E086",
+    "edge": "ORDERS.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 11
+   },
+   {
+    "relation_id": "S2F-0C86751F48",
+    "edge": "LAB_TEST_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 9
+   },
+   {
+    "relation_id": "S2F-2CBE5A43AE",
+    "edge": "OUTP_ORDER_DESC.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 9
+   },
+   {
+    "relation_id": "S2F-B77EBB79A0",
+    "edge": "OPERATION.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-942AF56C2B",
+    "edge": "EXAM_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-2DFE1F503B",
+    "edge": "OUTP_ORDERS.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-A3E55A8818",
+    "edge": "OPERATION_NAME.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "candidate_d_crosssource",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-E3F678FEEB",
+    "edge": "MR_ON_LINE.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-196E3BAA1A",
+    "edge": "CONSULTATION_DOCTOR_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-F1148F94BD",
+    "edge": "PATS_IN_HOSPITAL.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-C36B580C32",
+    "edge": "OUTP_MR.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-4CB6A6C7F3",
+    "edge": "INP_SETTLE_MASTER_YB.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-413940AE48",
+    "edge": "PAT_MASTER_INDEX.PATIENT_ID=PREPAYMENT_RCPT.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-24528FCEF4",
+    "edge": "OUTP_RCPT_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-629BB5669F",
+    "edge": "PAT_MASTER_INDEX.PATIENT_ID=V_LAB_TEST_BATCH_MASTER.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-D84E81F2B1",
+    "edge": "MEDICAL_CARD_MEMO.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-F62272933D",
+    "edge": "LAB_TEST_BATCH_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-31768536A4",
+    "edge": "PAT_MASTER_INDEX.PATIENT_ID=病理病人清单.唯一就诊标识",
+    "intake_state": "candidate_blocked_source",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-F78A23F649",
+    "edge": "PATS_IN_TRANSFERRING.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-E54644CEB6",
+    "edge": "MEDICAL_CARD_VS_IDNO.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-8812CEEEFC",
+    "edge": "PAT_MASTER_INDEX.PATIENT_ID=PAT_VISIT_TEMP.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-EB27457693",
+    "edge": "INP_SETTLE_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   }
+  ],
+  "relation_count": 27,
+  "statement_total": 294
+ },
+ "RF-OUTPATIENT-CLINIC": {
+  "desc": "门诊表经 VISIT_DATE+VISIT_NO（可加 RCPT_NO/CLINIC_NO）关联 CLINIC_MASTER",
+  "relations": [
+   {
+    "relation_id": "S2F-190AFAC505",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO=OUTP_TREAT_REC.VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate",
+    "statements": 27
+   },
+   {
+    "relation_id": "S2F-50040F7BC3",
+    "edge": "CLINIC_MASTER.PATIENT_ID+VISIT_DATE+VISIT_NO=OUTP_MR_DIAG_DESC.PATIENT_ID+VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-6B88D353D7",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO+CLINIC_LABEL+VISIT_TIME_DESC=CLINIC_RETURNED_ACCT.VISIT_DATE+VISIT_NO+CLINIC_LABEL+TIME_DESC",
+    "intake_state": "candidate",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-B5154A7469",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO=OUTP_MR.VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-AA768A72B9",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO=OUTP_PRESC.VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate_d_crosssource",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-D89F991E47",
+    "edge": "CLINIC_MASTER.PATIENT_ID+VISIT_DATE+VISIT_NO=OUTP_MR.PATIENT_ID+VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-0943448C9F",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO+PATIENT_ID=OUTP_MR.VISIT_DATE+VISIT_NO+PATIENT_ID",
+    "intake_state": "candidate",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-3E2BBE8708",
+    "edge": "CLINIC_MASTER.VISIT_NO=OUTP_MR_DIAG_DESC.VISIT_NO",
+    "intake_state": "partial",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-11CEA3F43C",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO=CLINIC_PAYMENTS_MONEY.VISIT_DATE+VISIT_NO",
+    "intake_state": "candidate",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-B198689143",
+    "edge": "CLINIC_MASTER.VISIT_DATE+VISIT_NO+PATIENT_ID=OUTP_MR_DIAG_DESC.VISIT_DATE+VISIT_NO+PATIENT_ID",
+    "intake_state": "candidate",
+    "statements": 1
+   }
+  ],
+  "relation_count": 10,
+  "statement_total": 44
+ },
+ "RF-DEPT-DICT": {
+  "desc": "科室代码字段关联 DEPT_DICT（出入院/开单/执行/病区/手术科室等，不可互换）",
+  "relations": [
+   {
+    "relation_id": "S2F-B7763F2E63",
+    "edge": "DEPT_DICT.DEPT_CODE=STAFF_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 39
+   },
+   {
+    "relation_id": "S2F-6EA01F27EA",
+    "edge": "DEPT_DICT.DEPT_CODE=INP_BILL_DETAIL.PERFORMED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 24
+   },
+   {
+    "relation_id": "S2F-61A57AEFD3",
+    "edge": "DEPT_DICT.DEPT_CODE=PAT_VISIT.DEPT_DISCHARGE_FROM",
+    "intake_state": "existing_supplement",
+    "statements": 20
+   },
+   {
+    "relation_id": "S2F-D9B174AAE2",
+    "edge": "DEPT_DICT.DEPT_CODE=INP_BILL_DETAIL.ORDERED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 18
+   },
+   {
+    "relation_id": "S2F-E9F9A0C5FB",
+    "edge": "DEPT_DICT.DEPT_CODE=OUTP_BILL_ITEMS.PERFORMED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 16
+   },
+   {
+    "relation_id": "S2F-FFFC5B8A88",
+    "edge": "DEPT_DICT.DEPT_CODE=INP_BILL_DETAIL.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 10
+   },
+   {
+    "relation_id": "S2F-141CC29EA0",
+    "edge": "DEPT_DICT.DEPT_CODE=OUTP_BILL_ITEMS.ORDERED_BY_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 9
+   },
+   {
+    "relation_id": "S2F-46B28879ED",
+    "edge": "CLINIC_MASTER.VISIT_DEPT=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 8
+   },
+   {
+    "relation_id": "S2F-AFE509521C",
+    "edge": "DEPT_DICT.DEPT_CODE=OPERATION_MASTER.OPERATING_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-E0FB01F26F",
+    "edge": "DEPT_DICT.DEPT_CODE=STAFF_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-F135E41CC5",
+    "edge": "DEPT_DICT.DEPT_CODE=OUTP_ORDER_DESC.ORDERED_BY_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 6
+   },
+   {
+    "relation_id": "S2F-06B1878538",
+    "edge": "DEPT_DICT.DEPT_CODE=PAT_VISIT_NEW.OPERATOR_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 6
+   },
+   {
+    "relation_id": "S2F-EAC7E864FF",
+    "edge": "DEPT_DICT.DEPT_CODE=PAT_VISIT_NEW.OUT_OPERATOR_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 6
+   },
+   {
+    "relation_id": "S2F-4C29B97CA6",
+    "edge": "DEPT_DICT.DEPT_CODE=PATS_IN_HOSPITAL.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-EEF02B44FE",
+    "edge": "DEPT_DICT.DEPT_CODE=INP_BILL_DETAIL.WARDCODE",
+    "intake_state": "existing_supplement",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-6F84D2F67F",
+    "edge": "DEPT_DICT.DEPT_CODE=LAB_TEST_MASTER.ORDERING_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-769FF44047",
+    "edge": "DEPT_DICT.DEPT_CODE=LAB_TEST_MASTER.PERFORMED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-1F666ABDE9",
+    "edge": "APP_CONFIGER_PARAMETER.DEPT_CODE=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-12DC40C9EC",
+    "edge": "DEPT_DICT.DEPT_CODE=DEPT_VS_WARD.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-78EA534A94",
+    "edge": "DEPT_DICT.DEPT_CODE=DEPT_VS_WARD.WARD_CODE",
+    "intake_state": "partial",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-5BCE765C5B",
+    "edge": "ADT_LOG.WARD_CODE=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-AE5A0D60B8",
+    "edge": "DEPT_DICT.DEPT_CODE=TRANSFER.DEPT_TRANSFERED_TO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-58D89620A9",
+    "edge": "DEPT_DICT.DEPT_CODE=PAT_VISIT.DEPT_ADMISSION_TO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-F1D8F20B7A",
+    "edge": "CONSULTATION_DOCTOR_DETAIL.CONSULTATION_DEPT=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-04DFA7C646",
+    "edge": "DEPT_DICT.DEPT_CODE=OPERATION_MASTER.OPERATING_ROOM",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-F20C1529B5",
+    "edge": "BED_TRANS_LOG.WARD_CODE=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-F66254FEAA",
+    "edge": "DEPT_DICT.DEPT_CODE=EXAM_MASTER.REQ_DEPT",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-7427C0DF14",
+    "edge": "DEPT_DICT.DEPT_CODE=EXAM_MASTER.PERFORMED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-B040DC9E3E",
+    "edge": "DEPT_DICT.DEPT_CODE=OPERATION_MASTER.DEPT_STAYED",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-DF5F8AF878",
+    "edge": "DEPT_DICT.DEPT_CODE=STAFF_VS_GROUP.GROUP_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-1D56B2E12F",
+    "edge": "DEPT_DICT.DEPT_CODE=DOCT_DRUG_PRESC_MASTER.ORDERED_BY",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-28CA624C33",
+    "edge": "DEPT_ADT_DAY.DEPT_CODE=DEPT_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-5B40330D0C",
+    "edge": "DEPT_DICT.DEPT_CODE=DEPT_VS_WARD.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-A3A2C2111D",
+    "edge": "DEPT_DICT.DEPT_CODE=PATS_IN_TRANSFERRING.DEPT_TRANSFERED_TO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-5316AF26B6",
+    "edge": "DEPT_DICT.DEPT_CODE=PATS_IN_HOSPITAL.WARD_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-7A63966E87",
+    "edge": "DEPT_DICT.DEPT_CODE=OUTP_ORDERS_COSTS.ORDERED_BY_DEPT",
+    "intake_state": "candidate_d_crosssource",
+    "statements": 1
+   }
+  ],
+  "relation_count": 36,
+  "statement_total": 206
+ },
+ "RF-STAFF-DICT": {
+  "desc": "员工工号字段关联 STAFF_DICT（EMP_NO；姓名/USER_NAME 仅高风险证据）",
+  "relations": [
+   {
+    "relation_id": "S2F-B7763F2E63",
+    "edge": "DEPT_DICT.DEPT_CODE=STAFF_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 39
+   },
+   {
+    "relation_id": "S2F-9F870E5A7E",
+    "edge": "CLINIC_MASTER.DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 12
+   },
+   {
+    "relation_id": "S2F-333D618107",
+    "edge": "OPERATION_MASTER.SURGEON=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 10
+   },
+   {
+    "relation_id": "S2F-64887A96B7",
+    "edge": "OUTP_BILL_ITEMS.ORDERED_BY_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 10
+   },
+   {
+    "relation_id": "S2F-525A3839F9",
+    "edge": "STAFF_DICT.EMP_NO=WAIT_BED_PATS_NEW.CONSULTING_DOCTOR",
+    "intake_state": "existing_supplement",
+    "statements": 8
+   },
+   {
+    "relation_id": "S2F-22FEDABB84",
+    "edge": "PAT_VISIT_NEW.IN_OPERATOR_NO=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-EF5AE47BD1",
+    "edge": "PAT_VISIT_NEW.OUT_OPERATOR_NO=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-E0FB01F26F",
+    "edge": "DEPT_DICT.DEPT_CODE=STAFF_DICT.DEPT_CODE",
+    "intake_state": "existing_supplement",
+    "statements": 7
+   },
+   {
+    "relation_id": "S2F-447C413169",
+    "edge": "INP_BILL_DETAIL.OPERATOR_NO=STAFF_DICT.ID",
+    "intake_state": "candidate",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-05D6848137",
+    "edge": "OPERATION.ANESTHESIA_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 4
+   },
+   {
+    "relation_id": "S2F-64444D5F7F",
+    "edge": "OPERATION.OPERATOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 3
+   },
+   {
+    "relation_id": "S2F-02718439BB",
+    "edge": "STAFF_DICT.EMP_NO=STAFF_VS_GROUP.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-D3EDFB4370",
+    "edge": "OUTP_RCPT_MASTER.OPERATOR_NO=STAFF_DICT.ID",
+    "intake_state": "candidate",
+    "statements": 2
+   },
+   {
+    "relation_id": "S2F-ED042DDB13",
+    "edge": "OUTP_DOCTOR_SCHEDULE.DOCTOR_NO=STAFF_DICT.EMP_NO",
+    "intake_state": "candidate_d_crosssource",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-1962CC8415",
+    "edge": "CONSULTATION_DOCTOR_MASTER.CONSULTATION_APPLY_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-C84BB2598E",
+    "edge": "CONSULTATION_DOCTOR_DETAIL.CONSULTATION_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-FF689C8E0E",
+    "edge": "PREPAYMENT_RCPT.OPERATOR_NO=STAFF_DICT.ID",
+    "intake_state": "candidate",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-7E158DBE85",
+    "edge": "CLINIC_MASTER.OPERATOR=STAFF_DICT.ID",
+    "intake_state": "candidate",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-BCB9A63C52",
+    "edge": "CLINIC_MASTER.DOCTOR=STAFF_DICT.USER_NAME",
+    "intake_state": "partial",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-B2553962A7",
+    "edge": "PAT_VISIT.ATTENDING_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-0846498312",
+    "edge": "OUTP_ORDER_DESC.ORDERED_BY_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-35D425985E",
+    "edge": "DOCTOR_GROUP.DOCTOR_USER=STAFF_DICT.USER_NAME",
+    "intake_state": "partial",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-BE0A807D4A",
+    "edge": "DRUG_PRESC_MASTER.PRESCRIBED_BY=STAFF_DICT.EMP_NO",
+    "intake_state": "existing_supplement",
+    "statements": 1
+   },
+   {
+    "relation_id": "S2F-0C8092BAFC",
+    "edge": "OUTP_ORDERS_COSTS.ORDERED_BY_DOCTOR=STAFF_DICT.EMP_NO",
+    "intake_state": "candidate_d_crosssource",
+    "statements": 1
+   }
+  ],
+  "relation_count": 24,
+  "statement_total": 126
+ }
+}

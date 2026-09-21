@@ -1,0 +1,592 @@
+[
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-60FDE4D634",
+  "statements": 13
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"VISIT_DATE\"]], [\"OUTP_BILL_ITEMS\", [\"VISIT_DATE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"INP_BILL_DETAIL\", [\"ORDERED_BY\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-D9B174AAE2",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DRUG_DICT\", [\"DRUG_CODE\"]], [\"INP_BILL_DETAIL\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-4264E2FC1C",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-CB3BA33251",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DISCHARGE_DISPOSITION_DICT\", [\"DISCHARGE_DISPOSITION_CODE\"]], [\"PAT_VISIT\", [\"DISCHARGE_DISPOSITION\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-89188944F3",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-79A7F03D1D",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER_YB\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-5178A77822",
+  "statements": 9
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"EXAM_NO\"]], [\"OUTP_BILL_ITEMS\", [\"APPOINT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-942AF56C2B",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"EXAM_NO\", \"PATIENT_ID\", \"VISIT_ID\"]], [\"INP_BILL_DETAIL\", [\"OPER_CODE\", \"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-C90B6003D8",
+  "statements": 7
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"CLASS_ON_INP_RCPT\"]], [\"INP_RCPT_FEE_DICT\", [\"FEE_CLASS_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\", \"VISIT_DATE\", \"VISIT_NO\"]], [\"OUTP_ORDER_DESC\", [\"RCPT_NO\", \"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\", \"CLINIC_NO\"]], [\"OUTP_ORDER_DESC\", [\"PATIENT_ID\", \"CLINIC_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-E256C47346",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\"]], [\"OUTP_ORDER_DESC\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-040B518C68",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDER_DESC\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-2CBE5A43AE",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_RCPT_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-24528FCEF4",
+  "statements": 7
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OUTP_ORDER_DESC\", [\"ORDERED_BY_DEPT\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-F135E41CC5",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"BILL_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], [\"OUTP_BILL_ITEMS\", [\"ITEM_CLASS\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-7D4F63EBE3",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\"]], [\"OUTP_RCPT_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-B460DFC719",
+  "statements": 36
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDER_DESC\", [\"RCPT_NO\"]], [\"OUTP_RCPT_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"VISIT_NO\", \"VISIT_DATE\"]], [\"OUTP_ORDER_DESC\", [\"VISIT_NO\", \"VISIT_DATE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CLINIC_VS_CHARGE\", [\"CHARGE_ITEM_CODE\", \"CHARGE_ITEM_CLASS\"]], [\"CURRENT_PRICE_LIST\", [\"ITEM_CODE\", \"ITEM_CLASS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"ITEM_CODE\"]], [\"INSUR_VSH_CENTER_ITEM_NEW\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-797C110153",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"FIRM_ID\", \"UNITS\"]], [\"INP_BILL_DETAIL\", [\"ITEM_CODE\", \"ITEM_SPEC\", \"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INSUR_VSH_CENTER_ITEM_NEW\", [\"ITEM_CODE\"]], [\"OUTP_BILL_ITEMS\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DRUG_PRICE_LIST\", [\"DRUG_CODE\", \"FIRM_ID\", \"UNITS\"]], [\"OUTP_BILL_ITEMS\", [\"ITEM_CODE\", \"ITEM_SPEC\", \"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OUTP_BILL_ITEMS\", [\"PERFORMED_BY\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-E9F9A0C5FB",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"OUTP_RCPT_MASTER\", [\"OPERATOR_NO\"]], [\"STAFF_DICT\", [\"ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-D3EDFB4370",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"VISIT_DATE\", \"VISIT_NO\", \"RCPT_NO\"]], [\"OUTP_ORDER_DESC\", [\"VISIT_DATE\", \"VISIT_NO\", \"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-0BF98D1B1C",
+  "statements": 9
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-42E060720B",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"DOCTOR_USER\"]], [\"STAFF_DICT\", [\"EMP_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_PAYMENTS_MONEY\", [\"RCPT_NO\"]], [\"OUTP_RCPT_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 39
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"VISIT_DATE\", \"VISIT_NO\"]], [\"CLINIC_PAYMENTS_MONEY\", [\"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-11CEA3F43C",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_VS_CHARGE\", [\"CHARGE_ITEM_CODE\"]], [\"PRICE_LIST\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_DICT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], [\"CLINIC_VS_CHARGE\", [\"CLINIC_ITEM_CLASS\", \"CLINIC_ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_NAME_DICT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], [\"CLINIC_VS_CHARGE\", [\"CLINIC_ITEM_CLASS\", \"CLINIC_ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-33FFE8A421",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"VISIT_ID\"]], [\"PAT_VISIT\", [\"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-1008D796C9",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDERS\", [\"CLINIC_NO\"]], [\"OUTP_ORDER_DESC\", [\"CLINIC_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"ORDER_ID\"]], [\"OUTP_ORDERS\", [\"ORDER_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"SUBJ_CODE\"]], [\"TALLY_SUBJECT_DICT\", [\"SUBJ_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"MR_BILL_CLASS\"]], [\"MR_BILL_CLASS_DICT\", [\"MR_BILL_CLASS_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PRICE_LIST\", [\"SUBJ_CODE\"]], [\"TALLY_SUBJECT_DICT\", [\"SUBJ_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"MR_BILL_CLASS_DICT\", [\"MR_BILL_CLASS_CODE\"]], [\"PRICE_LIST\", [\"MR_BILL_CLASS\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-D16F6274AC",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"INP_BILL_DETAIL\", [\"WARDCODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-EEF02B44FE",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\", \"ITEM_CODE\"]], [\"INSUR_BILL_DETIAL\", [\"PATIENT_ID\", \"VISIT_ID\", \"YYXMBM\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-4574484543",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], [\"OUTP_BILL_ITEMS\", [\"APPOINT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_DICT\", [\"ITEM_CODE\"]], [\"CLINIC_VS_CHARGE\", [\"CLINIC_ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CLINIC_VS_CHARGE\", [\"CHARGE_ITEM_CODE\"]], [\"CURRENT_PRICE_LIST\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-EB27457693",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], [\"CLINIC_ITEM_DICT\", [\"ITEM_CLASS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INSUR_VSH_CENTER_ITEM_NEW\", [\"ITEM_CODE\"]], [\"PRICE_LIST\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"BILL_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], [\"PRICE_LIST\", [\"CLASS_ON_RECKONING\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPER_CODE\", \"ORDER_NO\"]], [\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"APP_NO\", \"ORDER_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"ITEM_CODE\"]], [\"ORDERS\", [\"ORDER_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"病理病人清单\", [\"HISID号\", \"住院次数\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"INP_SETTLE_MASTER_YB\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\"]], [\"病理病人清单\", [\"唯一就诊标识\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"LAB_RESULT\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-BE6DDA7EB6",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-11FB0C398E",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], [\"ORDERS_COSTS\", [\"PATIENT_ID\", \"VISIT_ID\", \"ORDER_NO\", \"ORDER_SUB_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"ITEM_CODE\"]], [\"ORDERS_COSTS\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"ORDERS\", [\"ORDER_CLASS\"]], [\"ORDER_CLASS_DICT\", [\"ORDER_CLASS_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], [\"ORDERS_COSTS\", [\"ITEM_CLASS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"ORDERED_BY_DOCTOR\"]], [\"STAFF_DICT\", [\"EMP_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-64887A96B7",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"STAFF_DICT\", [\"DEPT_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-B7763F2E63",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"CLASS_ON_RECKONING\"]], [\"RECK_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-82947C72C9",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"RCPT_NO\", \"VISIT_NO\", \"VISIT_DATE\"]], [\"OUTP_ORDER_DESC\", [\"RCPT_NO\", \"VISIT_NO\", \"VISIT_DATE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-2A80F74804",
+  "statements": 7
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_DICT\", [\"ITEM_CODE\"]], [\"EXAM_RPT_PATTERN\", [\"DESCRIPTION_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"CLASS_ON_RECKONING\"]], [\"RECK_ITEM_CLASS_DICT\", [\"CLASS_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-3EC0DE462A",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER_YB\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"SETTLE_ZY_REC\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-F9B9C57BF3",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"CLINIC_NO\"]], [\"OUTP_ORDER_DESC\", [\"CLINIC_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-BDCE2A3160",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"RCPT_NO\"]], [\"INP_SETTLE_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-836F2A5926",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_PAYMENTS_MONEY\", [\"RCPT_NO\"]], [\"INP_SETTLE_MASTER\", [\"RCPT_NO\"]], \"outer\"]",
+  "match": "s2_variant_join",
+  "attach_to": "S2F-54DDF3090C",
+  "statements": 1,
+  "join_type": "outer"
+ },
+ {
+  "stage_key": "[[\"INP_PAYMENTS_MONEY\", [\"RCPT_NO\"]], [\"INP_SETTLE_MASTER\", [\"RCPT_NO\"]], \"outer\"]",
+  "match": "s2_variant",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_VS_CHARGE\", [\"UNITS\"]], [\"PRICE_LIST\", [\"UNITS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OUTP_BILL_ITEMS\", [\"ORDERED_BY_DEPT\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-141CC29EA0",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], [\"PREPAYMENT_RCPT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-413940AE48",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"VISIT_DATE\", \"VISIT_NO\"]], [\"OUTP_ORDERS_COSTS\", [\"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDERS_COSTS\", [\"ITEM_CODE\", \"ITEM_SPEC\"]], [\"PRICE_LIST\", [\"ITEM_CODE\", \"ITEM_SPEC\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_RCPT_MASTER\", [\"PATIENT_ID\", \"RCPT_NO\"]], [\"PREPAYMENT_RCPT_ADD\", [\"PATIENT_ID\", \"RCPT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_RCPT_MASTER\", [\"RCPT_NO\"]], [\"OUTP_RCPT_MASTER_YB\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"INP_PAYMENTS_MONEY\", [\"RCPT_NO\"]], [\"INP_SETTLE_MASTER\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-54DDF3090C",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PREPAYMENT_RCPT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"ITEM_CODE\"]], [\"PRICE_LIST\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PREPAYMENT_RCPT\", [\"RCPT_NO\"]], [\"PREPAYMENT_RCPT_ADD\", [\"RCPT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"VISIT_NO\", \"VISIT_DATE\", \"RCPT_NO\"]], [\"OUTP_ORDER_DESC\", [\"VISIT_NO\", \"VISIT_DATE\", \"RCPT_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-B204F9C884",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CLINIC_MASTER\", [\"PATIENT_ID\"]], [\"PREPAYMENT_RCPT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"ITEM_CODE\", \"ITEM_CLASS\"]], [\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CODE\", \"ITEM_CLASS\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"ITEM_CODE\", \"ITEM_CLASS\", \"ITEM_NAME\"]], [\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CODE\", \"ITEM_CLASS\", \"ITEM_NAME\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CODE\"]], [\"PRICE_LIST\", [\"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"ITEM_CODE\", \"ITEM_CLASS\", \"ITEM_NAME\"]], [\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CODE\", \"ITEM_CLASS\", \"ITEM_NAME\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], [\"PRICE_LIST\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"CURRENT_PRICE_LIST\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], [\"PERFORM_DEPT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"CLINIC_ITEM_DICT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], [\"PRICE_ITEM_NAME_DICT\", [\"ITEM_CLASS\", \"ITEM_CODE\"]], \"outer\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OFFICIAL_DRUG_CATALOG\", [\"CONSTRAINED_LEVEL\"]], [\"OFFICIAL_DRUG_CATALOG_CLASS\", [\"CLASS_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDERS_COSTS\", [\"VISIT_DATE\", \"VISIT_NO\"]], [\"OUTP_ORDER_DESC\", [\"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"SUBJ_CODE\"]], [\"TALLY_SUBJECT_DICT\", [\"SUBJ_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-891B95F49D",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"PREPAYMENT_RCPT\", [\"RCPT_NO\", \"PATIENT_ID\", \"VISIT_ID\"]], [\"PREPAYMENT_RCPT_ADD\", [\"RCPT_NO\", \"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"PREPAY_ACCT\", [\"ACCT_NO\"]], [\"PREPAY_ACCT_MONEY\", [\"ACCT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"PREPAY_ACCT\", [\"OPERATOR_NO\"]], [\"STAFF_DICT\", [\"ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"STAFF_DICT\", [\"ID\"]], [\"V_SETTLE_DETAIL_FOR_REPORT_02\", [\"OPERATOR_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_ORDERS\", [\"VISIT_DATE\", \"VISIT_NO\"]], [\"OUTP_TREAT_REC_T\", [\"VISIT_DATE\", \"VISIT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OUTP_BILL_ITEMS\", [\"APPOINT_NO\"]], [\"OUTP_TREAT_REC_T\", [\"APPOINT_NO\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ }
+]

@@ -1,0 +1,2536 @@
+{
+ "run_id": "r197-20260921-s1",
+ "stage": "S6",
+ "date": "2026-09-21",
+ "probe_records": 42,
+ "executed": 39,
+ "failed_channel": 3,
+ "verdicts": {
+  "Q01": "evidence",
+  "Q02": "pass",
+  "Q03": "pass",
+  "Q04": "pass",
+  "Q05": "evidence",
+  "Q06": "pass",
+  "Q07": "pass",
+  "Q08": "existence",
+  "Q09": "evidence",
+  "Q10": "evidence",
+  "Q11": "evidence",
+  "Q12": "pass",
+  "Q13": "pass",
+  "Q14": "timeout",
+  "Q14b": "pass",
+  "Q15": "evidence",
+  "Q16": "evidence",
+  "Q17": "failed_col",
+  "Q17b": "failed_col",
+  "Q18": "evidence",
+  "Q19": "evidence",
+  "Q20": "evidence",
+  "Q21": "evidence",
+  "Q22": "pass",
+  "Q23": "pass",
+  "Q24": "pass",
+  "Q25": "pass",
+  "Q26": "evidence",
+  "Q27": "insufficient",
+  "Q27b": "insufficient",
+  "Q27c": "pass",
+  "Q28": "insufficient",
+  "Q28b": "insufficient",
+  "Q28c": "pass",
+  "Q29": "evidence",
+  "Q30": "evidence",
+  "Q31": "pass",
+  "Q32": "insufficient",
+  "Q33": "pass",
+  "Q34": "pass",
+  "Q35": "evidence",
+  "D1": "evidence",
+  "D4": "failed_col"
+ },
+ "verdict_summaries": {
+  "Q01": "VISIT_ID 单列：47 个组覆盖 3277 行，最大 1833 患者/组、38/47 组重复——单列 VISIT_ID 连接跨患者串号实证",
+  "Q02": "住院万能键 (PATIENT_ID,VISIT_ID) 近窗 0 重复；56/3216 患者多次住院（max 3）——组合键成立，PATIENT_ID 单列缺 VISIT_ID 有 1.7% 患者放大",
+  "Q03": "CLINIC_MASTER：CLINIC_NO 与 (VISIT_DATE,VISIT_NO) 近窗均唯一（13572 行 0 重复）",
+  "Q04": "PATS_IN_HOSPITAL 当前在院表 PATIENT_ID 唯一（1150 患者无重复）",
+  "Q05": "RCPT_NO 单列：BILL_ITEMS 58.3% 组重复、ORDER_DESC 33.7% 组重复；三列 (RCPT_NO,VISIT_NO,VISIT_DATE) 0 重复——三列键是唯一键",
+  "Q06": "DEPT_DICT 816 码唯一；STOP_FLAG 3 个取值（值域证据）",
+  "Q07": "STAFF_DICT 4286 EMP_NO 唯一；姓名 3177 个中 1 个名字 1110 人（占位名）——姓名 JOIN 高危实证",
+  "Q08": "PAT_VISIT_NEW(224408)/TEMP(5279)/BIS(5378) 活库均存在（MEDREC）",
+  "Q09": "MEDREC.OPERATION 近窗 257 行 OPER_ID 非空 0——AGENTS 历史'OPER_ID 全 NULL'活库复核成立",
+  "Q10": "OUTP_MR_DIAG_DESC VISIT_NO 单列 38.4% 组重复（ODS）——单列连接放大实证",
+  "Q11": "OUTP_TREAT_REC SERIAL_NO 单列 216/35916 组重复（0.6%，跨就诊复用少量存在）",
+  "Q12": "住院费用守恒：200 visit 中 196 金额精确匹配（99.5%）；50/197 visit 多张结算单——INP_SETTLE_MASTER 粒度=visit×结算序号实证",
+  "Q13": "门诊三口径金额对账 58/58 收据全匹配（明细SUM=收据总额=支付净额）",
+  "Q14": "预交金全表聚合 62s 超时（失败证据保留）",
+  "Q14b": "预交金重试（20000 样本）：RCPT_NO 0 重复、ADD 三列键 10917 组 0 重复",
+  "Q15": "OPER_CODE 按 ITEM_CLASS 分流：各类 OPER_CODE 非空率≈99%+；LEN≥8 仅 D 类 17 行；ITEM_CLASS 身份值域仍待确认（证据收集）",
+  "Q16": "结算↔YB：visit 覆盖 183/197；2 列键 SETTLE 侧 50 组重复（多次结算）、YB 侧 1 组——2 列键不唯一，需结算序号",
+  "Q17": "ID_NO 探针 ORA 错误（2s 即败）——后续 D4 证实列不存在",
+  "Q17b": "重试仍败——INPBILL.INP_SETTLE_MASTER_YB 无 ID_NO 列（D1/D4 证据）",
+  "Q18": "OPERATION 侧：114/200 visit 有手术记录，73 组多手术、max 10 条/visit——术式条粒度实证",
+  "Q19": "ODS OPERATION_MASTER：75/200 visit、78 行、3 组多台次 max 2；ODS 侧 OPER_ID 全非空、同日多台次 0——台次粒度实证；HIS.OPERATION 与 ODS.OPERATION_MASTER 的 OPER_ID 语义不同（前者全 NULL）",
+  "Q20": "OPERATION_DICT：31/16418 名称重复（max 3 人/名）；OPERATION_CODE 重复 2 组——名称 JOIN 负例实证+码侧微瑕",
+  "Q21": "OPERATION_SCALE 值域：'一'/'一 '(尾随空格!)/'二'/'三'/'四'/None × STOP_FLAG 0/1——证据收集，确认走值域治理",
+  "Q22": "DIAGNOSIS_TYPE 实测 1/2/3/7/8，全落 confirmed 域；NO1 覆盖 200/206 主诊断",
+  "Q23": "术式码孤儿率 1/257（99.6% 命中），OPERATION_CODE 非空 100%",
+  "Q24": "LAB_RESULT 大表 TEST_NO 限定执行 1.9s；182/200 申请有结果；本窗项目行≈1/申请，单列 TEST_NO 连接未放大（Panel 场景仍建议两列键）",
+  "Q25": "检查链：ITEMS 200/200 命中、REPORT 148/200（74%，未检/待报）、EXAM_PAT_MI 两列键 181/200",
+  "Q26": "EXAM_CLASS 17 个中文值实测（心电图/B超/CT/磁共振…）——AGENTS 硬约束 5 活库复核",
+  "Q27": "DRUG_USER owner 近窗 0 行",
+  "Q27b": "PHARMACY owner 近窗仍 0 行——表停更于 2025-07-05",
+  "Q27c": "数据覆盖窗（2025-06-01..07-05）：1863 单 0 重复、0 跨库房、max 1 库房——DOCUMENT_NO 单键在库房内全局唯一",
+  "Q28": "近窗 0 行（同 Q27）",
+  "Q28b": "同上",
+  "Q28c": "覆盖窗 200/200 主从命中、1177 明细行、max 151 明细/单",
+  "Q29": "DRUG_STOCK 样本：191/193 药码+规格多行、max 125 行、max 8 库房、max 120 批号——两列键放大 125 倍实证（PK 元数据含 STORAGE/BATCH_NO/FIRM_ID/PACKAGE_SPEC 一致）",
+  "Q30": "DRUG_PRICE_LIST 三列键 61.6% 多价（2383/3867，max 11 价）、258 组部分停用——多价并存实证，选价必须生效窗",
+  "Q31": "近窗 2000 处方号 0 跨日复用、0 重复——PRESC_NO 本窗唯一（单列在本窗无放大；跨日理论风险未观测到）",
+  "Q32": "LAB_TEST_BATCH_MASTER 近窗 200 申请 0 命中——批次表近窗无数据（零样本）",
+  "Q33": "ORDERS 四列键：EXECUTE_DETAILS 736 行/159 键（一嘱多执行 avg 4.6 实证）；ANTI_DRUG 7 行命中；DISPENSE_REC 0 命中（本窗医嘱非摆药类，零样本）",
+  "Q34": "护理患者链：200/200 患者 pat_index_no↔patient_uid 命中、4891 表单、max 268 表单/患者——平台正式 45/46 一致复核",
+  "Q35": "表单-记录 500/500 命中（form_id 均有 records）；同患者同模板重复评估 622/2768 组（22.5%）、max 29 次——重复评估粒度实证",
+  "D1": "INPBILL.INP_SETTLE_MASTER_YB 列清单无 ID_NO（有 GBJSHID/RYID 等）",
+  "D4": "全库任何 owner 的 INP_SETTLE_MASTER_YB 均无 ID_NO 列——S3F-007BA0B97D 端点列不存在（活库证伪）"
+ },
+ "relation_validation_counts": {
+  "not_run": 346,
+  "passed_in_scope": 41,
+  "failed": 16,
+  "insufficient": 2
+ },
+ "relation_states": [
+  {
+   "relation_id": "S2F-79A7F03D1D",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-3EC0DE462A",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4264E2FC1C",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-CB3BA33251",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C90B6003D8",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-60FDE4D634",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-B7763F2E63",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-82947C72C9",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-190AFAC505",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-4EB1EB7136",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-A754A04130",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6EA01F27EA",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-2A80F74804",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-42E060720B",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-61A57AEFD3",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-D6E536D1CB",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-E9080EA37B",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-D9B174AAE2",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-BE6DDA7EB6",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-89188944F3",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-4574484543",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E30E4C998C",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E9F9A0C5FB",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-3F4050B114",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-D24A708DF5",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-9F870E5A7E",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-A2AC280BB4",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E1F69F4E85",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A0A41D9E5A",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0E7BE7E086",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-891B95F49D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-333D618107",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-FFFC5B8A88",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-64887A96B7",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2DF926CEB5",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-0C86751F48",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B460DFC719",
+   "intake_state": "existing_supplement",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-678B3B21E2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-141CC29EA0",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2CBE5A43AE",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-46B28879ED",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0D77903D00",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-525A3839F9",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-22FEDABB84",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EF5AE47BD1",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-AFE509521C",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0BF98D1B1C",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-8949408577",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-11FB0C398E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C77ABA45F2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E0FB01F26F",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E83977F6B8",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-5178A77822",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F135E41CC5",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-06B1878538",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EAC7E864FF",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-BDCE2A3160",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-A1E797568B",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4A1529052D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C0E9E1112A",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B77EBB79A0",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-447C413169",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-942AF56C2B",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-DB7BD1C6F6",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-2F6090BE06",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2DFE1F503B",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-564A1EE688",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C4A72131D6",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-05D6848137",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-DCC5B4B8B2",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-00E1F5934D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-65296D207D",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A3E55A8818",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E3F678FEEB",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-8D8BE3D683",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-5B7458DD64",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-64444D5F7F",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4C29B97CA6",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-196E3BAA1A",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4591948786",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EE88384570",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-50040F7BC3",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-5CB74852EF",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E256C47346",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-1008D796C9",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-86D477D1F0",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6B88D353D7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-065F70AB35",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EEF02B44FE",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-89304A7856",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2C9FE1D3B6",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-86227FC71B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-FB7AC774E3",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-AF65517FED",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-CC3A22B4C8",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6C2E7DDA34",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1692CC85EE",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C2E64B1573",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F1148F94BD",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-67F8789EE2",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-C36B580C32",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7034281A87",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-CAC61346F1",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6F84D2F67F",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-769FF44047",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F9B9C57BF3",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4CB6A6C7F3",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-02718439BB",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B5154A7469",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-320B0458DF",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-AA768A72B9",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-D3EDFB4370",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-FD2673AB7B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-D89F991E47",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-413940AE48",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-24528FCEF4",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-10C9EADF7A",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A5790F6F3E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7F2DBC5ADB",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-802768F217",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7D4F63EBE3",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-16574BB093",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-040B518C68",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-1A98B5707E",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-629BB5669F",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-D84E81F2B1",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-ABB077BBC9",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F909187A90",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EB8C099F77",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1F666ABDE9",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F62272933D",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0943448C9F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C84A01F90E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-12DC40C9EC",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-78EA534A94",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-ED042DDB13",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A70D3EBC14",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1962CC8415",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C84BB2598E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-5BCE765C5B",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-55ACB4FC9A",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-3E2BBE8708",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-49E28C0D3F",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-F8EC0A1539",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-9CAD506D24",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-29B5BD5DD7",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-AE5A0D60B8",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1036A56300",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-902589A969",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-F2EB10CC12",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E9F9B6B9F0",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-54DDF3090C",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-836F2A5926",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-33FFE8A421",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-58D89620A9",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-11CEA3F43C",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2FAFC5BB63",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1CD1EE807A",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F1D8F20B7A",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2C722937BF",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-04DFA7C646",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F20C1529B5",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-80190A1266",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-BB4AF449D7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-D16F6274AC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-FF689C8E0E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7E158DBE85",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F16FF49E4E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B6C23A8ACC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-17BB014443",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6419CDF435",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-797C110153",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B198689143",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-BCB9A63C52",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-90361056DF",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-85177FB98A",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-F66254FEAA",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7427C0DF14",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-31768536A4",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-2FCB132BFF",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-3B503C4EFC",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E7CB647358",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-C1F7CEF65A",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-9E31D12931",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-8572FD8F83",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A4FCF1023F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-041E567A15",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B040DC9E3E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4F303AD7E2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-95DD780285",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B2553962A7",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-3B0F594FB5",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-DF5F8AF878",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1D56B2E12F",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7C3491FAB2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-28CA624C33",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-5B40330D0C",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-F78A23F649",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A3A2C2111D",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-6078311B11",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4AB467630E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-106C981A96",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-FA29D8E7F7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-E54644CEB6",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0846498312",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4F2611A60A",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-68463732FB",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-BBC3503264",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-8812CEEEFC",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-35D425985E",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-EB27457693",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-1C9DF9CFDD",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-917C47B1AB",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-A4F3F1FA73",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S2F-BE0A807D4A",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-915DEA9EFE",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7E1C8D9306",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-4A747E122E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-5316AF26B6",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-B204F9C884",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-7A63966E87",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-0C8092BAFC",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S2F-02408E08CE",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-FBDD22E3B6",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-03501B12F4",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-355B5DFB83",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-BE42E3FFB8",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-7EEAFF05AE",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-98E525FBE7",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-62E947277B",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C4039F391C",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-69A35ED45C",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C141BD0D7F",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-9C28994D16",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-E7DE652B19",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-0841AC6F4F",
+   "intake_state": "existing_supplement",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-5581025AFA",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-E65D6CED98",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-0F3B49513D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-00D14B17CE",
+   "intake_state": "rejected_negative",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-2296EA2297",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-8ECB821803",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C21F072F9B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-00F35490BC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-654ED25BB1",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-B8DD5D167D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-9522A5F378",
+   "intake_state": "rejected_negative",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-6971C4D4A3",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-8CF8B4B39E",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-4E0A7CB9FE",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-170685FC38",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-21C1208636",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-FF1623FE72",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-38CC8E4235",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C4FDA97470",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-73E9BAF540",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D344927D56",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D6D49C5D99",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-7D08A9E399",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C38E45F362",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-F5C0C8EDAE",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-9193379481",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-7FDFCCAC38",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-3F30DA6B47",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D8F12989E0",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-C548CAAE32",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-295B16CA54",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-1B570DFBF5",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-5020B1B11D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D09BA261AA",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-E307DA535C",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D4525A54BD",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-EEECA20C13",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-832C4D19C5",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-A7C9381FA2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-5FF4CF0E1A",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-715855B0A8",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-3904B0E814",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C8B128DDC1",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-9702FDD8A7",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-24FCB0CB0D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-CE3037882E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-F080FBDD9A",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-F2E3960562",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-6E9E76D915",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-8AAD1D2E5E",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-EB459B5BAF",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-AE50AE31B8",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-C752F8DA70",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-57AB79EC21",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-007BA0B97D",
+   "intake_state": "candidate",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S3F-5D3D14EBA1",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-946D1FA610",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-BABF066FF6",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-D3F9CA5789",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-5F33CABCD5",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S3F-3862E450B1",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-C9C945D425",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S4F-01DD31DEAC",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S4F-F25E68DF83",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-FEB658BACB",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S4F-25378B31C7",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-F637211D5D",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-3F2F386848",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-32B9889A40",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-CFAAA0B750",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-D3BE8D1AD5",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S4F-4D4AB047C4",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-57E6B624A0",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-2A342EA32E",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-26095F1933",
+   "intake_state": "existing_supplement",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-4B05EDDFDE",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-567E60F5C7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C438A80C4D",
+   "intake_state": "candidate",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-2EC1F5346C",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-6D51708E12",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-55C917604B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-58FB18210F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-F8FAA6C79C",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-6460E6631D",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-09818A1214",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-FFEF7998D3",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-EFFC080BB2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-8B66C16DFC",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-5429C07ADC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-39A21CC6DC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-1F64D8E654",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-0BF471B7F7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-B20ED6ACFC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9750A16A8F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-82AAEAEC9E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-F8D397A256",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C6D9B09D1D",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D01C5207CF",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-653F9C1A82",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C3192AFD7A",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-A2C52B1B9D",
+   "intake_state": "partial",
+   "validation_state": "insufficient",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-FC41ABDDDA",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-83CEF7EB9E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-579A0CB0A2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D83C05E9A9",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D6CA335877",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-3A3249FB5B",
+   "intake_state": "candidate_blocked_source",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-37CFA5B5D7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-4B81FD6A45",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-BC645BBC63",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-E84B2B06DC",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9757449C01",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-FEBB0999F9",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D6CC6E5FC6",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-155FD309A4",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-04DD382FAE",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-3E64FB7320",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9CA85187E2",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-39743C3B56",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-DC6165C54E",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-6F156FC2B7",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-8D31D65915",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-91FCC96E1F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C048B5E8F8",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9328386622",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-4220821021",
+   "intake_state": "rejected_negative",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-AC0D6652C7",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-F0EC7628AA",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-ABF2F6C279",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-710F585ED1",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-22DADEED18",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-B1AC8D3067",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-A84F244F96",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D569E00977",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-AA125F5559",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-5AE8B0A597",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D4F66B37E7",
+   "intake_state": "candidate",
+   "validation_state": "insufficient",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-FA2842AB56",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-41797A4A4E",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-BF863C6D6B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-7A9A5FB37B",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-654F6FE714",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D8F81B64AE",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-635760EBAB",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-5E5767D1DB",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-83EA9907EA",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-8B65E05346",
+   "intake_state": "partial",
+   "validation_state": "failed",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-2F56B5102B",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-B99E6BD99E",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-F7E9633251",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-B10642FE49",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C1A8966D0C",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9F3095B783",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-79264C1422",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-67F4C2968F",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-8958129949",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-C9E906EFA4",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-1577F3CF38",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-B275CAE715",
+   "intake_state": "candidate_d_crosssource",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-11ECDE6ADC",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-F004BB9BB0",
+   "intake_state": "partial",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-CA2C220F46",
+   "intake_state": "existing_supplement",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-DB4677BC1A",
+   "intake_state": "rejected_negative",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-AB4C2AA3D7",
+   "intake_state": "candidate",
+   "validation_state": "passed_in_scope",
+   "probed": true
+  },
+  {
+   "relation_id": "S5F-6D34594CB9",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-9EF4214B31",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-D2BC6F1F4D",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-6EB49E7BE9",
+   "intake_state": "partial",
+   "validation_state": "not_run",
+   "probed": false
+  },
+  {
+   "relation_id": "S5F-2FBB4EFCCD",
+   "intake_state": "candidate",
+   "validation_state": "not_run",
+   "probed": false
+  }
+ ]
+}

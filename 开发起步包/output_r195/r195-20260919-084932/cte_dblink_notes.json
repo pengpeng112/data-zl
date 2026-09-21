@@ -1,0 +1,30 @@
+{
+ "cte_names": [
+  "AFS",
+  "BASE",
+  "BC",
+  "BS",
+  "COMP",
+  "DPARAM",
+  "H",
+  "IDCARD",
+  "MAT",
+  "PP",
+  "SIGNS",
+  "VA"
+ ],
+ "dblink_refs": {
+  "dept_dict@HIS": [
+   "MOBILE_NURSING"
+  ],
+  "pat_visit@HIS": [
+   "MOBILE_NURSING"
+  ],
+  "DIAGNOSIS@HIS": [
+   "MOBILE_NURSING"
+  ],
+  "cda_dictionary@SJZX": [
+   "MOBILE_NURSING"
+  ]
+ }
+}

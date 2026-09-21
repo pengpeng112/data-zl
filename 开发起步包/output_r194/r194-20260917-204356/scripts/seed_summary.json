@@ -1,0 +1,57 @@
+{
+ "seeded_at": "2026-09-18T23:51:02.454130+00:00",
+ "sections": {
+  "users": {
+   "ok": true,
+   "count": 6
+  },
+  "systems_sources": {
+   "ok": true,
+   "count": 9
+  },
+  "tables_columns": {
+   "ok": true,
+   "count": 10
+  },
+  "relations": {
+   "ok": true,
+   "count": 13
+  },
+  "recipes": {
+   "ok": true,
+   "count": 2
+  },
+  "value_domains": {
+   "ok": true,
+   "count": 3
+  },
+  "dicts": {
+   "ok": true,
+   "count": 18
+  },
+  "queries_metrics_products": {
+   "ok": true,
+   "count": 17
+  },
+  "quality": {
+   "ok": true,
+   "count": 12
+  },
+  "identity": {
+   "ok": true,
+   "count": 33
+  },
+  "ai_feedback": {
+   "ok": true,
+   "count": 6
+  },
+  "wrapup_u_items": {
+   "ok": true,
+   "count": 11
+  },
+  "audit_metadata_probe_ops": {
+   "ok": true,
+   "count": 35
+  }
+ }
+}

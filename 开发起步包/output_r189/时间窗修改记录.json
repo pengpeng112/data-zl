@@ -1,0 +1,733 @@
+{
+  "selected": 74,
+  "records": [
+    {
+      "name": "入院记录(D08 标）",
+      "view": "v_EMR_ADMISSION_RECORD",
+      "file": "入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <to_date('2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql",
+      "sha_orig": "004ceabafd3c518e"
+    },
+    {
+      "name": "入院诊断表",
+      "view": "v_EMR_ADMISSION_DIAGNOSIS",
+      "file": "入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql",
+      "sha_orig": "ce5972f10f81a1f6"
+    },
+    {
+      "name": "出院记录(D12 标）",
+      "view": "v_EMR_DISCHARGE_RECORD",
+      "file": "出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql",
+      "sha_orig": "4c02d99d902a7296"
+    },
+    {
+      "name": "出院记录-诊断(辅 D12 标）",
+      "view": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+      "file": "出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+      "sha_orig": "1dabc844b9184a4a"
+    },
+    {
+      "name": "住院医嘱信息-药品类医嘱",
+      "view": "v_emr_doc_order_drug",
+      "file": "住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql",
+      "sha_orig": "c31320289ef089ca"
+    },
+    {
+      "name": "住院医嘱信息-非药品类医嘱",
+      "view": "v_EMR_doc_order_check",
+      "file": "住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql",
+      "sha_orig": "144bf7fbcd47fd38"
+    },
+    {
+      "name": "门诊处方(D03/D04 标）",
+      "view": "v_EMR_OUTPATIENT_RECIPE",
+      "file": "门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql",
+      "sha_orig": "db29acd35ce9d8cb"
+    },
+    {
+      "name": "门诊处方明细(辅 D03/D04 标）",
+      "view": "v_EMR_OUTPATIENT_RECIPE_ITEM",
+      "file": "门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+      "action": "已改上界",
+      "reason": "上界 <  DATE '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+      "sha_orig": "5be1b2d2e45dd53b"
+    },
+    {
+      "name": "门诊挂号(D01 标）",
+      "view": "v_EMR_OUTPATIENT_REGISTER",
+      "file": "门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql",
+      "sha_orig": "0010f054a063c52c"
+    },
+    {
+      "name": "门诊/急诊就诊记录(D02 标）",
+      "view": "v_EMR_OUTPATIENT_RECORD",
+      "file": "门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01；上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql",
+      "sha_orig": "4e7be9c96743d7af"
+    },
+    {
+      "name": "门（急）诊费用明细表",
+      "view": "v_EMR_OUT_FEE_INFO_CHILD",
+      "file": "门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+      "action": "已改上界",
+      "reason": "上界 < date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql",
+      "sha_orig": "ce92aec022f827f5"
+    },
+    {
+      "name": "门诊/急诊就诊诊断表",
+      "view": "v_EMR_OUTPATIENT_DIAG",
+      "file": "门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+      "action": "已改上界",
+      "reason": "上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql",
+      "sha_orig": "3a30b88715ec4e0b"
+    },
+    {
+      "name": "门（急）诊费用信息主表",
+      "view": "v_EMR_out_fee_info_main",
+      "file": "门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01；上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql",
+      "sha_orig": "cfcc9c9845f31174"
+    },
+    {
+      "name": "住院结算费用信息主表",
+      "view": "v_EMR_IN_fee_info_main",
+      "file": "住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql",
+      "sha_orig": "e559d7bc72c0acef"
+    },
+    {
+      "name": "住院费用明细表",
+      "view": "v_EMR_IN_FEE_INFO_CHILD",
+      "file": "住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql",
+      "sha_orig": "0b4bcc3b1d104538"
+    },
+    {
+      "name": "检验报告单(D18)",
+      "view": "V_EMR_INSPECTION_TEST",
+      "file": "检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "瑞美 10.10.10.73",
+      "from": "live:ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql",
+      "sha_orig": "69089fd38d10dcb3"
+    },
+    {
+      "name": "检验报告-图片子表",
+      "view": "V_EMR_INSPECTION_IMAGE_TEST",
+      "file": "检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "瑞美 10.10.10.73",
+      "from": "live:ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql",
+      "sha_orig": "40f5b3bc6f642389"
+    },
+    {
+      "name": "检验报告-药敏子表",
+      "view": "V_EMR_INSPECTION_ALLERGY_TEST",
+      "file": "检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "瑞美 10.10.10.73",
+      "from": "live:ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql",
+      "sha_orig": "1dfb76462a0d542d"
+    },
+    {
+      "name": "检验报告单-项目(辅 D06 标）",
+      "view": "V_EMR_INSPECTION_ITEM_TEST",
+      "file": "检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "瑞美 10.10.10.73",
+      "from": "live:ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql",
+      "sha_orig": "9d377e4405a704e4"
+    },
+    {
+      "name": "影像诊断报告( D07 标）",
+      "view": "V_EMR_EXAM_IMAGE_REP",
+      "file": "影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+      "action": "已改上界",
+      "reason": "上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01",
+      "src": "HIS系统 10.10.10.15/his",
+      "from": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql",
+      "sha_orig": "e99045d5e2aea221"
+    },
+    {
+      "name": "检查影像诊断报告子表(辅 D07 标）",
+      "view": "V_EMR_EXAM_IMAGE_PATH",
+      "file": "检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "HIS系统 10.10.10.15/his",
+      "from": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql",
+      "sha_orig": "2724cf12cb87a708"
+    },
+    {
+      "name": "住院病案首页(电子病历) (D09/D10 标）",
+      "view": "v_emr_ich",
+      "file": "住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ICH.sql",
+      "sha_orig": "d18ada73def511dd"
+    },
+    {
+      "name": "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+      "view": "v_emr_ich_operation",
+      "file": "住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ICH_OPERATION.sql",
+      "sha_orig": "cdf38c1b21db4aff"
+    },
+    {
+      "name": "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+      "view": "v_emr_ich_allergies",
+      "file": "住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql",
+      "sha_orig": "f5d15bcbdeacfad8"
+    },
+    {
+      "name": "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+      "view": "V_EMR_ICH_CHARGE",
+      "file": "住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ICH_CHARGE.sql",
+      "sha_orig": "d3558c09c730d1de"
+    },
+    {
+      "name": "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+      "view": "V_EMR_ICH_DIAGNOSIS",
+      "file": "住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+      "action": "已改上界",
+      "reason": "上界 <  date '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql",
+      "sha_orig": "55e4afd1f866610a"
+    },
+    {
+      "name": "体检报告单(D69）",
+      "view": "v_EMR_PHYSICAL_REPORT",
+      "file": "体检报告单(D69）_v_EMR_PHYSICAL_REPORT.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "体检系统"
+    },
+    {
+      "name": "体检项目表",
+      "view": "v_EMR_PHYSICAL_EXAM",
+      "file": "体检项目表_v_EMR_PHYSICAL_EXAM.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "体检系统"
+    },
+    {
+      "name": "体检项目明细表",
+      "view": "v_EMR_PHYSICAL_EXAM_ITEM",
+      "file": "体检项目明细表_v_EMR_PHYSICAL_EXAM_ITEM.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "体检系统"
+    },
+    {
+      "name": "输血申请单",
+      "view": "v_EMR_BLOOD_APPLY_REPORT",
+      "file": "输血申请单_v_EMR_BLOOD_APPLY_REPORT.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "输血系统"
+    },
+    {
+      "name": "输血申请单明细",
+      "view": "v_EMR_BLOOD_APPLY_REPORT_ITEM",
+      "file": "输血申请单明细_v_EMR_BLOOD_APPLY_REPORT_ITEM.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "输血系统"
+    },
+    {
+      "name": "输血记录",
+      "view": "v_EMR_TRANSFUSION_RECORD",
+      "file": "输血记录_v_EMR_TRANSFUSION_RECORD.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "输血系统"
+    },
+    {
+      "name": "电子病历汇总",
+      "view": "V_EMR_MEDICAL_RECORD_INFO",
+      "file": "电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql",
+      "sha_orig": "28ec5a0981ed7f0d"
+    },
+    {
+      "name": "术后首次病程记录",
+      "view": "v_EMR_HOS_POSTOPER_RECORD",
+      "file": "术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql",
+      "sha_orig": "7a94dbe113954b00"
+    },
+    {
+      "name": "术前讨论与小结",
+      "view": "v_EMR_HOS_PREOP_DISCUSS",
+      "file": "术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql",
+      "sha_orig": "b2ee310890116c86"
+    },
+    {
+      "name": "死亡病历讨论记录",
+      "view": "v_EMR_HOS_DND_RECORD",
+      "file": "死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql",
+      "sha_orig": "9293080a6809c907"
+    },
+    {
+      "name": "疑难病例讨论记录",
+      "view": "v_EMR_HOS_DIFFIC_CASE_DISCUSS",
+      "file": "疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+      "sha_orig": "3c76f86429823580"
+    },
+    {
+      "name": "转科记录",
+      "view": "v_EMR_HOS_CHANGE_MAJOR_RECORD",
+      "file": "转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+      "sha_orig": "1d0dc180a0c87934"
+    },
+    {
+      "name": "转诊/院纪录（转出记录）",
+      "view": "v_EMR_REFERRAL_HOS_RECORD",
+      "file": "转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql",
+      "sha_orig": "ad6dac97037f5348"
+    },
+    {
+      "name": "会诊记录",
+      "view": "v_EMR_HOS_CONSUL_RECORD",
+      "file": "会诊记录_v_EMR_HOS_CONSUL_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql",
+      "sha_orig": "fa1b9dbf30b1f741"
+    },
+    {
+      "name": "住院医师交接班记录",
+      "view": "v_EMR_HOS_SUCCESSION_RECORD",
+      "file": "住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql",
+      "sha_orig": "b679a300fdb45cfe"
+    },
+    {
+      "name": "抢救记录",
+      "view": "v_EMR_HOS_SAVE_RECORD",
+      "file": "抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql",
+      "sha_orig": "20dfaa6c8e22d35f"
+    },
+    {
+      "name": "24小时内入院死亡记录",
+      "view": "v_emr_admission_dead_record_tf",
+      "file": "24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql",
+      "sha_orig": "71f14bc076437745"
+    },
+    {
+      "name": "一般手术记录",
+      "view": "v_emr_opera_record",
+      "file": "一般手术记录_v_emr_opera_record.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OPERA_RECORD.sql",
+      "sha_orig": "5ccc17f47b763606"
+    },
+    {
+      "name": "麻醉术前访视记录",
+      "view": "v_EMR_BOFORE_OPERA_RECORD",
+      "file": "麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql",
+      "sha_orig": "25610ebf0611a6e7"
+    },
+    {
+      "name": "麻醉手术记录",
+      "view": "v_EMR_ANESTHESIA_RECORD",
+      "file": "麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql",
+      "sha_orig": "8aaf79913df582f4"
+    },
+    {
+      "name": "麻醉手术中用血记录",
+      "view": "v_EMR_ANES_RECORD_BLOOD",
+      "file": "麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql",
+      "sha_orig": "9de20d9a7fbf4691"
+    },
+    {
+      "name": "麻醉手术中用药记录",
+      "view": "v_EMR_ANES_RECORD_MED",
+      "file": "麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql",
+      "sha_orig": "441ff3a4a06d5a21"
+    },
+    {
+      "name": "麻醉术后访视记录",
+      "view": "v_EMR_ANES_AFTER_RECORD",
+      "file": "麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql",
+      "sha_orig": "20ab3ae8c929d9e8"
+    },
+    {
+      "name": "入院评估记录",
+      "view": "V_EMR_ADMISSION_ASSESSMENT",
+      "file": "入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql",
+      "sha_orig": "ed6ab6a74beaf5e4"
+    },
+    {
+      "name": "出院评估与指导",
+      "view": "v_EMR_DISCHARGE_ASSESSMENT",
+      "file": "出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql",
+      "sha_orig": "e6aad6d0f15656c6"
+    },
+    {
+      "name": "阴道分娩记录",
+      "view": "v_EMR_CHILDBIRTH",
+      "file": "阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql",
+      "sha_orig": "c69b5008d6611681"
+    },
+    {
+      "name": "一般护理记录",
+      "view": "v_EMR_GENERAL_NURSING",
+      "file": "一般护理记录_v_EMR_GENERAL_NURSING.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql",
+      "sha_orig": "95141f70ee84bb28"
+    },
+    {
+      "name": "病危（重）护理记录",
+      "view": "v_EMR_CRITICALLY_ILL_NURS",
+      "file": "病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql",
+      "sha_orig": "9bee086c5b2b412e"
+    },
+    {
+      "name": "病危（重）护理记录-出入量记录",
+      "view": "v_EMR_IN_OUT_AMOUNT",
+      "file": "病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql",
+      "sha_orig": "e00d9482140d5b98"
+    },
+    {
+      "name": "生命体征测量记录",
+      "view": "v_EMR_VITAL_SIGN",
+      "file": "生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+      "action": "已改上界",
+      "reason": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql",
+      "sha_orig": "0c957615bdcd3d01"
+    },
+    {
+      "name": "手术护理记录",
+      "view": "v_emr_operation_nursing",
+      "file": "手术护理记录_v_emr_operation_nursing.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql",
+      "sha_orig": "4571a7192e574977"
+    },
+    {
+      "name": "高值耗材使用记录",
+      "view": "V_EMR_CONSUMABLES",
+      "file": "高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+      "action": "已改上界",
+      "reason": "上界 < DATE '2025-01-01' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_CONSUMABLES.sql",
+      "sha_orig": "a76bc9b3c93818f8"
+    },
+    {
+      "name": "手术知情同意书",
+      "view": "v_emr_infor_operation",
+      "file": "手术知情同意书_v_emr_infor_operation.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql",
+      "sha_orig": "8f66c9aaaf351227"
+    },
+    {
+      "name": "麻醉知情同意书",
+      "view": "v_emr_infor_anesthesia",
+      "file": "麻醉知情同意书_v_emr_infor_anesthesia.sql",
+      "action": "已改上界",
+      "reason": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql",
+      "sha_orig": "42d09709874c911c"
+    },
+    {
+      "name": "输血治疗同意书",
+      "view": "v_EMR_INFOR_TRANS_BLOOD",
+      "file": "输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql",
+      "sha_orig": "90ad5cdc75184f5b"
+    },
+    {
+      "name": "特殊检查及特殊治疗同意书",
+      "view": "v_emr_infor_spec_exam_treat",
+      "file": "特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql",
+      "sha_orig": "3ea33d0d5c405038"
+    },
+    {
+      "name": "病危(重)通知书",
+      "view": "v_emr_infor_critically_ill",
+      "file": "病危(重)通知书_v_emr_infor_critically_ill.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql",
+      "sha_orig": "ba4414f5ccffe299"
+    },
+    {
+      "name": "其它知情同意书",
+      "view": "v_EMR_INFOR_OTHERS",
+      "file": "其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql",
+      "sha_orig": "e0c610bdf89dfb81"
+    },
+    {
+      "name": "血透治疗记录",
+      "view": "v_EMR_BLOOD_DIALY_RECORD",
+      "file": "血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "血液透析",
+      "from": "history:血透系统.txt",
+      "sha_orig": "8981108ec10f0d0b"
+    },
+    {
+      "name": "血透治疗过程记录",
+      "view": "v_EMR_BLOOD_DIALY_DETAIL",
+      "file": "血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "血液透析",
+      "from": "history:血透系统.txt",
+      "sha_orig": "8981108ec10f0d0b"
+    },
+    {
+      "name": "血透治疗医嘱明细",
+      "view": "v_EMR_BLOOD_DIALY_ORDER",
+      "file": "血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "血液透析",
+      "from": "history:血透系统.txt",
+      "sha_orig": "8981108ec10f0d0b"
+    },
+    {
+      "name": "死亡记录表",
+      "view": "V_EMR_DEATH_RECORD",
+      "file": "死亡记录表_V_EMR_DEATH_RECORD.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "数据中心 10.10.8.216:1521/orcl",
+      "from": "live:ods_8_216__ODS.V_EMR_DEATH_RECORD.sql",
+      "sha_orig": "49eceae1ba64cb31"
+    },
+    {
+      "name": "量表评估",
+      "view": "v_emr_nursing_assessment",
+      "file": "量表评估_v_emr_nursing_assessment.sql",
+      "action": "已改上界",
+      "reason": "上界 <  TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+      "src": "数据中心 移动护理",
+      "from": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql",
+      "sha_orig": "5cce35ff5b4e1a49"
+    },
+    {
+      "name": "病理报告",
+      "view": "EMR_PATHOLOGY_REPORT",
+      "file": "病理报告_EMR_PATHOLOGY_REPORT.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "病理系统",
+      "from": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql",
+      "sha_orig": "5d858b68c277cea0"
+    },
+    {
+      "name": "分子病理报告",
+      "view": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+      "file": "分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "病理系统",
+      "from": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+      "sha_orig": "36369e6572b1f8b3"
+    },
+    {
+      "name": "医院感染信息登记表",
+      "view": "EMR_INFECTION_INFORMATION_REGISTER",
+      "file": "医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "院感",
+      "from": "history:院感.txt",
+      "sha_orig": "8fb034881fd538ac"
+    },
+    {
+      "name": "医院执业人员信息表",
+      "view": "EMR_HOS_PRACTITIONER",
+      "file": "医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+      "action": "未改",
+      "reason": "未见2021-2024时间上界",
+      "src": "HRP 10.10.10.23:1521/hrpdb",
+      "from": "live:hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+      "sha_orig": "96f8cc3ef91451a2"
+    },
+    {
+      "name": "不良事件表",
+      "view": "v_EMR_ADVERSE_EVENT_FINAL",
+      "file": "不良事件表_v_EMR_ADVERSE_EVENT_FINAL.sql",
+      "action": "未改",
+      "reason": "无活库DDL且无桌面历史稿",
+      "src": "不良事件系统"
+    }
+  ],
+  "changed": 49,
+  "unchanged": 25
+}

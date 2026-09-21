@@ -1,0 +1,83 @@
+a14ba1258217f3512fdffa0e3f5be22573939743
+--- git status ---
+ M .agents/skills/docare-anesthesia-readonly-sql/SKILL.md
+ M .agents/skills/hisuser-readonly-sql/SKILL.md
+ M .agents/skills/hisuser-readonly-sql/references/connection-guide.md
+ M .agents/skills/mobile-nursing-readonly-sql/SKILL.md
+ M .agents/skills/ods-readonly-sql/SKILL.md
+ M .agents/skills/ods-readonly-sql/references/connection-guide.md
+ M .agents/skills/ops-runbook/SKILL.md
+ M .agents/skills/project-task-resume/SKILL.md
+ M .agents/skills/query-governance-intake/SKILL.md
+ M .agents/skills/sql-relation-intake/SKILL.md
+ M AGENTS.md
+ M backend/app/services/cdms_identity_adapter.py
+ M backend/app/services/identity_login_sign_sync.py
+ M backend/app/services/jhemr_identity_adapter.py
+ M backend/tests/identity_login_sign_sync/test_login_sign_sync.py
+ M backend/tests/test_identity_sync.py
+ M frontend/src/layout/components/lay-content/index.vue
+ M frontend/src/layout/components/lay-setting/index.vue
+ M frontend/src/layout/hooks/useDataThemeChange.ts
+ M frontend/src/layout/hooks/useTag.ts
+ M frontend/src/layout/index.vue
+ M frontend/src/store/modules/app.ts
+ M "\344\270\211\344\273\223\345\272\223\344\272\222\351\200\232\345\234\260\345\233\276.md"
+ M "\345\217\226\346\225\260/START_HERE.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/55_\347\263\273\347\273\237\346\234\252\345\256\214\346\210\220\344\272\213\351\241\271\347\273\237\344\270\200\346\211\247\350\241\214\350\256\241\345\210\222.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/README.md"
+ M "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r185/nightly_read.md"
+?? frontend/src/layout/captureMode.ts
+?? frontend/tests/competitionCaptureMode.test.ts
+?? "frontend/\345\256\241\346\237\245_grok.err"
+?? "frontend/\345\256\241\346\237\245_grok.raw"
+?? r178_dist.tar.gz
+?? r181_dist.tar.gz
+?? review/round-7/
+?? review/round-8/
+?? review/round-9/
+?? tools/capture_ai_patrol_gif.py
+?? tools/capture_competition_ai_demos.py
+?? tools/capture_competition_screens.py
+?? tools/capture_four_governance_screens.py
+?? tools/capture_governance_gifs.py
+?? tools/s9_e2e_r174.py
+?? verify/round-3/
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/180_G13\346\217\220\344\272\244\344\270\216G1G3\345\217\221\345\270\203_\346\211\247\350\241\214\346\212\245\345\221\212.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/180_G13\346\217\220\344\272\244\344\270\216G1G3\345\217\221\345\270\203_\347\273\223\346\236\234.json"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/183_AI\345\215\217\344\275\234\346\214\207\344\273\244\346\224\266\346\225\233\344\270\216\351\207\215\345\244\215\346\265\201\347\250\213\350\207\252\345\212\250\345\214\226\345\274\200\345\217\221\350\256\241\345\210\222.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/186_\347\263\273\347\273\237\345\212\237\350\203\275\344\270\216\350\217\234\345\215\225\344\275\223\351\252\214\351\207\215\346\236\204\344\270\200\346\254\241\346\200\247\346\211\247\350\241\214\350\256\241\345\210\222.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/deadlock_crosscheck.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/exceptions.json"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/flush/"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/nightly_d.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/progress.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r180/release_evidence.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r181/"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r185/ods_window_probe_conclusion.md"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r185/ods_window_probe_result.txt"
+?? "\345\274\200\345\217\221\350\265\267\346\255\245\345\214\205/output_r186/"
+--- baseline hashes (task-relevant files) ---
+c01e8396bac35eec09fb6af68b12956318058a97
+be5d9def9b5d4bf9f2cfd34c4bce0a318d5454ec
+497c0e63a97595d140f17cf6a0f1f458ab65f0bd
+3495f5f59658b00755dd5cb7845239c0204abec5
+c9771bcb5044a178a913158b507be97b83368189
+1edb65e7cbb906ac46e8ad556b8c804b4ee992c3
+8d3d21159de029d31bc5c020369e140609bba0e9
+821996607579f4455251cb3da4e69aaed789a00a
+46ad4f48c120de13cbd9c7a263e7c74f264ebb25
+e0024b4d79e100dedaf491ef2a8f3a39fb8f732a
+290d14ea08faa233ff66540447f410fc5108517e
+5babdbaf70368ea9739b8f0a7acc0a6ac04a4f01
+b5e3b5dee3f9024f15bf6428fcbc8533506b5032
+35727fa38bbd59845a13a82fa4fffee97deaaf2e
+42b833832f1cb379a367d376a59b419c7d1c16ef
+7c29c45df137ec4a4b69e28cf5c6589818e07735
+47f6f7a98361687bc39960fc18490e77d42cbd1c
+449839408c2aa6bf63c7330a595fb4a4b1fec1b8
+6caa3056a8b948c316991778270befec1471dec8
+2747925041808a54ca57774afa172c37f78497f6
+4fd530b6da58130a324d74d5d660d1d396204f01
+9b4a4063e22c4fc291265a95aa8175e5b52d52f8
+be10d7bd078ef03b1bc1a7d23dbe11df9acf6421

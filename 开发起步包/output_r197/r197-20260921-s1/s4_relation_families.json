@@ -1,0 +1,5053 @@
+{
+ "stage": "S4",
+ "new_families": [
+  {
+   "key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 16,
+   "statements": 19,
+   "units": 8,
+   "stmt_ids_sample": [
+    "5a79af84026c093aaa2c",
+    "a69a284d9c5ffe394758",
+    "ccc20d74deefb9b952a7",
+    "ccc20d74deefb9b952a7",
+    "2762a13be00e1ac3aa7c",
+    "cb0c4c16cdf24915e924",
+    "cef599d8ec52528d24e7",
+    "cef599d8ec52528d24e7",
+    "252d7d5d6d0bb9ee236b",
+    "097693c7ed58f0b27459",
+    "73c08cdc988586bd9db3",
+    "dbd6b2a7aacc13d25abc",
+    "1fd22a169339eb0aec33",
+    "a2769b8541c3a4d79978",
+    "f1ce4487894e6c28856b",
+    "5603add59bdf02faa32e",
+    "6fa12df104f3fc317818",
+    "ecea996b176e391b4cdf",
+    "0a9778a0757e295dc393"
+   ],
+   "member_templates": [
+    "14ac95b622b0fa81",
+    "14ed1a62bb1b6222",
+    "21b250a484fe78ca",
+    "3c314cee9de39897",
+    "603bc0798b3d089e",
+    "6355e7539bd12f24",
+    "6ff5fc62a58de93d",
+    "773dd8c0ccd82c49",
+    "8726e6ee6fd5e945",
+    "adc2d5fda5c1ef2e",
+    "bcb2f0ed62cc7c7e",
+    "bfb0b9b97a356e51",
+    "d5a3e7a06e1ea476",
+    "da7e1c3fa4738802",
+    "e7c0e798358c413e",
+    "e8f9c35afb33c42a"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      171,
+      180
+     ],
+     "raw": [
+      "OPERATION.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION.VISIT_ID = OPERATION_MASTER.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0132",
+     "file": "小卢sql\\医疗质控.sql",
+     "lines": [
+      238,
+      275
+     ],
+     "raw": [
+      "a.patient_id = d.patient_id",
+      "a.visit_id  = d.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0302",
+     "file": "小王sql记录\\三级手术.txt",
+     "lines": [
+      1,
+      16
+     ],
+     "raw": [
+      "A.PATIENT_ID = B.PATIENT_ID",
+      "A.VISIT_ID = B.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      78,
+      112
+     ],
+     "raw": [
+      "A.PATIENT_ID = B.PATIENT_ID",
+      "A.VISIT_ID = B.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      113,
+      152
+     ],
+     "raw": [
+      "A.PATIENT_ID = B.PATIENT_ID",
+      "A.VISIT_ID = B.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      153,
+      192
+     ],
+     "raw": [
+      "A.PATIENT_ID = B.PATIENT_ID",
+      "A.VISIT_ID = B.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"OPERATION\", [\"OPERATION_DESC\"]], [\"OPERATION_DICT\", [\"OPERATION_NAME\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION",
+    [
+     "OPERATION_DESC"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_DICT",
+    [
+     "OPERATION_NAME"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 9,
+   "statements": 9,
+   "units": 2,
+   "stmt_ids_sample": [
+    "5a79af84026c093aaa2c",
+    "a69a284d9c5ffe394758",
+    "252d7d5d6d0bb9ee236b",
+    "dbd6b2a7aacc13d25abc",
+    "1fd22a169339eb0aec33",
+    "f1ce4487894e6c28856b",
+    "6fa12df104f3fc317818",
+    "ecea996b176e391b4cdf",
+    "0a9778a0757e295dc393"
+   ],
+   "member_templates": [
+    "14ac95b622b0fa81",
+    "14ed1a62bb1b6222",
+    "6355e7539bd12f24",
+    "8726e6ee6fd5e945",
+    "adc2d5fda5c1ef2e",
+    "bfb0b9b97a356e51",
+    "da7e1c3fa4738802",
+    "e7c0e798358c413e",
+    "e8f9c35afb33c42a"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0302",
+     "file": "小王sql记录\\三级手术.txt",
+     "lines": [
+      1,
+      16
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      78,
+      112
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      113,
+      152
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      153,
+      192
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      193,
+      232
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0321",
+     "file": "小王sql记录\\耳鼻喉手术门诊住院工作量.sql.txt",
+     "lines": [
+      233,
+      272
+     ],
+     "raw": [
+      "B.OPERATION_DESC = D.OPERATION_NAME"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "LAB_TEST_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 5,
+   "statements": 5,
+   "units": 2,
+   "stmt_ids_sample": [
+    "3a4c18e4256d7c6988e6",
+    "50e3537f6109c1e2f333",
+    "aa0091192a291a5b4a8f",
+    "c6fb967e22a0205f26a3",
+    "ef91820c15ef3431c013"
+   ],
+   "member_templates": [
+    "04e475409b4cb13f",
+    "0aa180f173598a68",
+    "a9222b02cb379adc",
+    "c4c571340f49eb77",
+    "ef61669825d7f972"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      18,
+      32
+     ],
+     "raw": [
+      "l.patient_id = v.patient_id",
+      "l.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      32,
+      46
+     ],
+     "raw": [
+      "l.patient_id = v.patient_id",
+      "l.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      63,
+      80
+     ],
+     "raw": [
+      "l.patient_id = v.patient_id",
+      "l.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      80,
+      94
+     ],
+     "raw": [
+      "l.patient_id = v.patient_id",
+      "l.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0585",
+     "file": "质控办：耳鼻喉相关指标.txt",
+     "lines": [
+      115,
+      138
+     ],
+     "raw": [
+      "ltm.patient_id = v.patient_id",
+      "ltm.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "correlated": 1
+     }
+    }
+   ],
+   "platform_matches": [
+    {
+     "plat_id": "553",
+     "tables": [
+      "EXAM_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=EXAM_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=EXAM_MASTER.VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "555",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=LAB_TEST_MASTER.VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "LAB_TEST_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "LAB_TEST_MASTER",
+       "VISIT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "556",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "OUTP_RCPT_MASTER"
+     ],
+     "expr": "LAB_TEST_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(LAB_TEST_MASTER.VISIT_ID,0)=0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "LAB_TEST_MASTER",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "562",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PATIENT_ID+VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "LAB_TEST_MASTER",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "537",
+     "tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "expr": "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID",
+     "grade": "B",
+     "status": "sample_pass",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "2",
+     "tables": [
+      "DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=DIAGNOSIS.PATIENT_ID AND PAT_VISIT.VISIT_ID=DIAGNOSIS.VISIT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "16",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND (VISIT_ID 相同 OR 0/NULL 按门诊)",
+     "grade": "A",
+     "status": "needs_split",
+     "shared_pairs": [
+      [
+       "LAB_TEST_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "1",
+     "tables": [
+      "PAT_MASTER_INDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "39",
+     "tables": [
+      "FIRST_PAGE_COSTS",
+      "PAT_VISIT"
+     ],
+     "expr": "FIRST_PAGE_COSTS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(FIRST_PAGE_COSTS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "37",
+     "tables": [
+      "JHMR_FILE_CONTENT_DG",
+      "PAT_VISIT"
+     ],
+     "expr": "JHMR_FILE_CONTENT_DG.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_CONTENT_DG.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "36",
+     "tables": [
+      "JHMR_FILE_INDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "JHMR_FILE_INDEX.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_INDEX.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "38",
+     "tables": [
+      "PAT_DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_DIAGNOSIS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(PAT_DIAGNOSIS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "29",
+     "tables": [
+      "EPR_INPATIENT_DOCINDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "EPR_INPATIENT_DOCINDEX.P_CLINIC_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(P_INPATIENT_TIMES)=TO_CHAR(VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "44",
+     "tables": [
+      "INPATIENTS",
+      "PAT_VISIT"
+     ],
+     "expr": "INPATIENTS.MRN=PAT_MASTER_INDEX.INP_NO AND INPATIENTS.SERIES=PAT_VISIT.VISIT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    }
+   ],
+   "review_draft_matches": [
+    {
+     "review_id": "1",
+     "expr": "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID",
+     "status": "approved"
+    }
+   ]
+  },
+  {
+   "key": "[[\"DIAGNOSIS\", [\"DIAGNOSIS_TYPE\"]], [\"DIAGNOSIS_TYPE_DICT\", [\"DIAGNOSIS_TYPE_CODE\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS",
+    [
+     "DIAGNOSIS_TYPE"
+    ]
+   ],
+   "end_b": [
+    "DIAGNOSIS_TYPE_DICT",
+    [
+     "DIAGNOSIS_TYPE_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 2,
+   "stmt_ids_sample": [
+    "1c764011bec639c4f1ff",
+    "9c5332eeea66410992c3"
+   ],
+   "member_templates": [
+    "47441d0bf9872c2e",
+    "f7a6ec19e6e04bd0"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0090",
+     "file": "创建表及导库.sql",
+     "lines": [
+      104,
+      121
+     ],
+     "raw": [
+      "d.DIAGNOSIS_TYPE_CODE=a.diagnosis_type"
+     ],
+     "flags": {
+      "dynamic_sql": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0419",
+     "file": "病理医保飞检数据提取.txt",
+     "lines": [
+      260,
+      274
+     ],
+     "raw": [
+      "d.DIAGNOSIS_TYPE_CODE=t.diagnosis_type"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "platform_matches": [
+    {
+     "plat_id": "567",
+     "tables": [
+      "DIAGNOSIS",
+      "DIAGNOSIS_TYPE_DICT"
+     ],
+     "expr": "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "DIAGNOSIS",
+       "DIAGNOSIS_TYPE"
+      ],
+      [
+       "DIAGNOSIS_TYPE_DICT",
+       "DIAGNOSIS_TYPE_CODE"
+      ]
+     ]
+    },
+    {
+     "plat_id": "21",
+     "tables": [
+      "DIAGNOSIS",
+      "DIAGNOSIS_TYPE_DICT"
+     ],
+     "expr": "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "DIAGNOSIS",
+       "DIAGNOSIS_TYPE"
+      ],
+      [
+       "DIAGNOSIS_TYPE_DICT",
+       "DIAGNOSIS_TYPE_CODE"
+      ]
+     ]
+    }
+   ],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "EXAM_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "c63f8c4897012a9b6991",
+    "a598a7da045b5ee2b05d"
+   ],
+   "member_templates": [
+    "418d479f7073d5ea",
+    "b771fd5ffdc18232"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0585",
+     "file": "质控办：耳鼻喉相关指标.txt",
+     "lines": [
+      90,
+      115
+     ],
+     "raw": [
+      "em.patient_id = v.patient_id",
+      "em.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0585",
+     "file": "质控办：耳鼻喉相关指标.txt",
+     "lines": [
+      334,
+      381
+     ],
+     "raw": [
+      "em.patient_id = v.patient_id",
+      "em.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "platform_matches": [
+    {
+     "plat_id": "553",
+     "tables": [
+      "EXAM_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=EXAM_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=EXAM_MASTER.VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "EXAM_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "EXAM_MASTER",
+       "VISIT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "554",
+     "tables": [
+      "EXAM_MASTER",
+      "OUTP_RCPT_MASTER"
+     ],
+     "expr": "EXAM_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(EXAM_MASTER.VISIT_ID,0)=0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "EXAM_MASTER",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "555",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=LAB_TEST_MASTER.VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "560",
+     "tables": [
+      "EXAM_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PATIENT_ID+VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+     "grade": "A",
+     "status": "sample_verified",
+     "shared_pairs": [
+      [
+       "EXAM_MASTER",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "537",
+     "tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "expr": "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID",
+     "grade": "B",
+     "status": "sample_pass",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "2",
+     "tables": [
+      "DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=DIAGNOSIS.PATIENT_ID AND PAT_VISIT.VISIT_ID=DIAGNOSIS.VISIT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "16",
+     "tables": [
+      "LAB_TEST_MASTER",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND (VISIT_ID 相同 OR 0/NULL 按门诊)",
+     "grade": "A",
+     "status": "needs_split",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "1",
+     "tables": [
+      "PAT_MASTER_INDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "39",
+     "tables": [
+      "FIRST_PAGE_COSTS",
+      "PAT_VISIT"
+     ],
+     "expr": "FIRST_PAGE_COSTS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(FIRST_PAGE_COSTS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "37",
+     "tables": [
+      "JHMR_FILE_CONTENT_DG",
+      "PAT_VISIT"
+     ],
+     "expr": "JHMR_FILE_CONTENT_DG.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_CONTENT_DG.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "36",
+     "tables": [
+      "JHMR_FILE_INDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "JHMR_FILE_INDEX.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_INDEX.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "38",
+     "tables": [
+      "PAT_DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_DIAGNOSIS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(PAT_DIAGNOSIS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "29",
+     "tables": [
+      "EPR_INPATIENT_DOCINDEX",
+      "PAT_VISIT"
+     ],
+     "expr": "EPR_INPATIENT_DOCINDEX.P_CLINIC_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(P_INPATIENT_TIMES)=TO_CHAR(VISIT_ID)",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "PATIENT_ID"
+      ]
+     ]
+    },
+    {
+     "plat_id": "44",
+     "tables": [
+      "INPATIENTS",
+      "PAT_VISIT"
+     ],
+     "expr": "INPATIENTS.MRN=PAT_MASTER_INDEX.INP_NO AND INPATIENTS.SERIES=PAT_VISIT.VISIT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "PAT_VISIT",
+       "VISIT_ID"
+      ]
+     ]
+    }
+   ],
+   "review_draft_matches": [
+    {
+     "review_id": "1",
+     "expr": "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID",
+     "status": "approved"
+    }
+   ]
+  },
+  {
+   "key": "[[\"DIAGNOSIS_DICT\", [\"YB_CODE\"]], [\"YB_MAPPING\", [\"YB_CODE\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS_DICT",
+    [
+     "YB_CODE"
+    ]
+   ],
+   "end_b": [
+    "YB_MAPPING",
+    [
+     "YB_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "d520d412413da6e0c0ee",
+    "0f5129a12f046ad6fa3b"
+   ],
+   "member_templates": [
+    "808040c8d833c06d",
+    "bd7cfc8b2f9915c2"
+   ],
+   "rep_examples": [
+    {
+     "unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+     "file": "A_F0138::SQL\\2022年08月 22-28.sql",
+     "lines": [
+      95,
+      100
+     ],
+     "raw": [
+      "YB_MAPPING.YB_CODE = DIAGNOSIS_DICT.YB_CODE"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+     "file": "A_F0138::SQL\\2022年08月 22-28.sql",
+     "lines": [
+      101,
+      108
+     ],
+     "raw": [
+      "YB_MAPPING.YB_CODE = DIAGNOSIS_DICT.YB_CODE"
+     ],
+     "flags": {
+      "correlated": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"病理病人清单\", [\"HISID号\", \"住院次数\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "病理病人清单",
+    [
+     "HISID号",
+     "住院次数"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "1c764011bec639c4f1ff"
+   ],
+   "member_templates": [
+    "47441d0bf9872c2e"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0419",
+     "file": "病理医保飞检数据提取.txt",
+     "lines": [
+      260,
+      274
+     ],
+     "raw": [
+      "t.patient_id = brqd.hisid号",
+      "t.visit_id = brqd.住院次数"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "platform_matches": [
+    {
+     "plat_id": "2",
+     "tables": [
+      "DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "expr": "PAT_VISIT.PATIENT_ID=DIAGNOSIS.PATIENT_ID AND PAT_VISIT.VISIT_ID=DIAGNOSIS.VISIT_ID",
+     "grade": "A",
+     "status": "verified",
+     "shared_pairs": [
+      [
+       "DIAGNOSIS",
+       "PATIENT_ID"
+      ],
+      [
+       "DIAGNOSIS",
+       "VISIT_ID"
+      ]
+     ]
+    }
+   ],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"病理病人清单\", [\"HISID号\", \"住院次数\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "病理病人清单",
+    [
+     "HISID号",
+     "住院次数"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "097693c7ed58f0b27459"
+   ],
+   "member_templates": [
+    "6ff5fc62a58de93d"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0419",
+     "file": "病理医保飞检数据提取.txt",
+     "lines": [
+      275,
+      298
+     ],
+     "raw": [
+      "a.patient_id = brqd.hisid号",
+      "a.visit_id = brqd.住院次数"
+     ],
+     "flags": {}
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"OPERATION_DICT\", [\"YB_CODE\"]], [\"YB_MAPPING\", [\"YB_CODE\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_DICT",
+    [
+     "YB_CODE"
+    ]
+   ],
+   "end_b": [
+    "YB_MAPPING",
+    [
+     "YB_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "fedb0f0838c6653b247e"
+   ],
+   "member_templates": [
+    "5745ae2bc6101b8d"
+   ],
+   "rep_examples": [
+    {
+     "unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+     "file": "A_F0138::SQL\\2022年06月 13-19.sql",
+     "lines": [
+      16,
+      21
+     ],
+     "raw": [
+      "YB_MAPPING.YB_CODE = OPERATION_DICT.YB_CODE"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": []
+  },
+  {
+   "key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPERATION_CODE\"]], [\"OPERATION_NAME\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPERATION_CODE\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION",
+    [
+     "PATIENT_ID",
+     "VISIT_ID",
+     "OPERATION_CODE"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_NAME",
+    [
+     "PATIENT_ID",
+     "VISIT_ID",
+     "OPERATION_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "fe2026b967a9be7c79c5"
+   ],
+   "member_templates": [
+    "34f811758ff8c81d"
+   ],
+   "rep_examples": [
+    {
+     "unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+     "file": "A_F0138::SQL\\2022年06月 13-19.sql",
+     "lines": [
+      294,
+      314
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = A.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = A.VISIT_ID",
+      "OPERATION_NAME.OPERATION_CODE = A.OPERATION_CODE"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": [
+    {
+     "review_id": "12",
+     "expr": "MEDREC.OPERATION.OPERATION_CODE = COMM.OPERATION_DICT.OPERATION_CODE",
+     "status": "draft"
+    }
+   ]
+  },
+  {
+   "key": "[[\"OPERATION_DICT\", [\"OPERATION_CODE\"]], [\"OPERATION_NAME\", [\"OPERATION_CODE\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_DICT",
+    [
+     "OPERATION_CODE"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_NAME",
+    [
+     "OPERATION_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "cd7ea211e02b952bc73d"
+   ],
+   "member_templates": [
+    "1bd22c1b1caceb16"
+   ],
+   "rep_examples": [
+    {
+     "unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+     "file": "A_F0138::SQL\\2022年08月 01-07.sql",
+     "lines": [
+      523,
+      627
+     ],
+     "raw": [
+      "OPERATION_DICT.OPERATION_CODE = OPERATION_NAME.OPERATION_CODE"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "platform_matches": [],
+   "review_draft_matches": [
+    {
+     "review_id": "12",
+     "expr": "MEDREC.OPERATION.OPERATION_CODE = COMM.OPERATION_DICT.OPERATION_CODE",
+     "status": "draft"
+    }
+   ]
+  }
+ ],
+ "supplements_to_s2": [
+  {
+   "key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "OPERATION",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 3,
+   "statements": 3,
+   "units": 2,
+   "stmt_ids_sample": [
+    "d897e6133d9fd6476347",
+    "2a2dc50fb40d4d09b023",
+    "a2f511c23b105ecc77fe"
+   ],
+   "member_templates": [
+    "235840e116b42e93",
+    "46d7bd1e483c776b",
+    "cb923f5e58737e06"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      1,
+      18
+     ],
+     "raw": [
+      "o.patient_id = di.patient_id",
+      "o.visit_id = di.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      18,
+      38
+     ],
+     "raw": [
+      "o.patient_id = di.patient_id",
+      "o.visit_id = di.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年08月 15-21.sql",
+     "file": "A_F0138::SQL\\2022年08月 15-21.sql",
+     "lines": [
+      496,
+      510
+     ],
+     "raw": [
+      "DIAGNOSIS.PATIENT_ID = OPERATION.PATIENT_ID",
+      "DIAGNOSIS.VISIT_ID = OPERATION.VISIT_ID"
+     ],
+     "flags": {
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-AF65517FED"
+  },
+  {
+   "key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 44,
+   "statements": 46,
+   "units": 15,
+   "stmt_ids_sample": [
+    "3a4c18e4256d7c6988e6",
+    "50e3537f6109c1e2f333",
+    "9926e0ac731735f4d8e7",
+    "d897e6133d9fd6476347",
+    "04c8a2840198a46c2b23",
+    "c56aafb57ccdd378b554",
+    "902655ce9257cf4809de",
+    "1eebc9d9cc881c354ed0",
+    "fa56e7c6d886eee8b426",
+    "7a1f061f177e12d50a5c",
+    "c63f8c4897012a9b6991",
+    "14f7cd72793260639fec",
+    "2a2dc50fb40d4d09b023",
+    "fd23f2bb5d196eb5e2fd",
+    "c42dd04ae74125304d6e",
+    "be70d7844e1ab34ce877",
+    "7a55a7bf5e851885db29",
+    "98629293e852c10fe851",
+    "fb49ec5a69c12438e3e3",
+    "7baef2dda6b1e082b835",
+    "2eaa266f4bc7936bf43e",
+    "0f51d791a14af2ad5064",
+    "6f3b0ef45f7649e45dc7",
+    "113d41725fa35a443c64",
+    "c4623f8b1b70933d14d0",
+    "a6f149909a38178b1963",
+    "c2ad9d4b8b54ed08c5aa",
+    "43b7cffb33f7c50c5081",
+    "661a7347fdfda610b6da",
+    "aa0091192a291a5b4a8f",
+    "4b1f23492ac4d41a1c5e",
+    "a598a7da045b5ee2b05d",
+    "ffd13647e07f2d35fae0",
+    "5ec3f866df998eb61a64",
+    "c6fb967e22a0205f26a3",
+    "a2f511c23b105ecc77fe",
+    "da7dfe6e18fceb1f49e4",
+    "1354ea2e9fd862224ebe",
+    "9b49e8c56f177b9978ef",
+    "f70e759719c2bf49f645"
+   ],
+   "member_templates": [
+    "04e475409b4cb13f",
+    "0aa180f173598a68",
+    "1797c0462ae598d6",
+    "235840e116b42e93",
+    "23cf4c9ef4ad934a",
+    "2d48edf196d0f323",
+    "2d9115be5ff33ed1",
+    "3313504ac8c046d1",
+    "34aa6f42055e084e",
+    "3fe16351428ed05f",
+    "418d479f7073d5ea",
+    "422372260ebc4d5d",
+    "46d7bd1e483c776b",
+    "4d05f4500f7029cf",
+    "543018c9eb00871a",
+    "59d008db428f9c82",
+    "5d180d4ae81f68cb",
+    "5f7ee3a7f27d08f5",
+    "64085d5eeaf455fe",
+    "6b4029130413d7b1",
+    "6c432a8ef08d8ca9",
+    "6e46bb451be879db",
+    "721514b14f633f1a",
+    "73d4cdef4ca09dd9",
+    "7bc8d65394d4c69d",
+    "91acca465899a8b0",
+    "993ad6f58e6cbbf0",
+    "9d7e1b404633c354",
+    "a9222b02cb379adc",
+    "af02e06662553bfa",
+    "b771fd5ffdc18232",
+    "b960bde97941c59b",
+    "ba34d536e374472b",
+    "c4c571340f49eb77",
+    "cb923f5e58737e06",
+    "d6ae3418424b2797",
+    "e0751d3d85bb811c",
+    "e421e787b072751b",
+    "e5721725eb3b095b",
+    "e5b921d1db499098",
+    "ef016259ab024b9c",
+    "ef61669825d7f972",
+    "f657d72a8bd50c00",
+    "fbdc5cbc9580a6da"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      1,
+      18
+     ],
+     "raw": [
+      "di.patient_id = v.patient_id",
+      "di.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      18,
+      38
+     ],
+     "raw": [
+      "di.patient_id = v.patient_id",
+      "di.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0010",
+     "file": "2022-2024年非计划重返手术室再手术率、非计划重返再住院及并发症发生率.txt",
+     "lines": [
+      45,
+      88
+     ],
+     "raw": [
+      "d.patient_id=v.patient_id",
+      "d.visit_id=v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0019",
+     "file": "2024年6月-2025年1月泌尿微创科工作量统计.txt",
+     "lines": [
+      83,
+      94
+     ],
+     "raw": [
+      "d.patient_id = v.patient_id",
+      "d.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0044",
+     "file": "三级医院指标数据提取\\医疗部数据sql.txt",
+     "lines": [
+      15,
+      34
+     ],
+     "raw": [
+      "d.patient_id = b.patient_id",
+      "d.visit_id = b.visit_id"
+     ],
+     "flags": {
+      "pb_params": 1
+     }
+    },
+    {
+     "unit": "F0098",
+     "file": "医疗部三甲评审指标.txt",
+     "lines": [
+      49,
+      60
+     ],
+     "raw": [
+      "d.patient_id = b.patient_id",
+      "d.visit_id = b.visit_id"
+     ],
+     "flags": {
+      "dynamic_sql": 1,
+      "pb_params": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-4264E2FC1C"
+  },
+  {
+   "key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+   "end_a": [
+    "DIAGNOSIS",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_MASTER_INDEX",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 5,
+   "statements": 5,
+   "units": 4,
+   "stmt_ids_sample": [
+    "d897e6133d9fd6476347",
+    "2a2dc50fb40d4d09b023",
+    "1c764011bec639c4f1ff",
+    "a2f511c23b105ecc77fe",
+    "9c5332eeea66410992c3"
+   ],
+   "member_templates": [
+    "235840e116b42e93",
+    "46d7bd1e483c776b",
+    "47441d0bf9872c2e",
+    "cb923f5e58737e06",
+    "f7a6ec19e6e04bd0"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      1,
+      18
+     ],
+     "raw": [
+      "di.patient_id = p.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0002",
+     "file": "15岁以下鼻窦炎.txt",
+     "lines": [
+      18,
+      38
+     ],
+     "raw": [
+      "di.patient_id = p.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0090",
+     "file": "创建表及导库.sql",
+     "lines": [
+      104,
+      121
+     ],
+     "raw": [
+      "a.PATIENT_ID=pmi.patient_id"
+     ],
+     "flags": {
+      "dynamic_sql": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0419",
+     "file": "病理医保飞检数据提取.txt",
+     "lines": [
+      260,
+      274
+     ],
+     "raw": [
+      "t.patient_id = b.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年08月 15-21.sql",
+     "file": "A_F0138::SQL\\2022年08月 15-21.sql",
+     "lines": [
+      496,
+      510
+     ],
+     "raw": [
+      "DIAGNOSIS.PATIENT_ID = PAT_MASTER_INDEX.PATIENT_ID"
+     ],
+     "flags": {
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-4574484543"
+  },
+  {
+   "key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 65,
+   "statements": 71,
+   "units": 23,
+   "stmt_ids_sample": [
+    "d7365cbe59d5483adb2d",
+    "ba1b9bac88c2546f811b",
+    "3a4c18e4256d7c6988e6",
+    "c1b9877e86ed63f4ec0c",
+    "50e3537f6109c1e2f333",
+    "19de6e9f9fe0a2f5e560",
+    "708d990047da1a099c06",
+    "228c388d7890eafdad5e",
+    "812b2fa4b384a924344b",
+    "d604babaee4c7409cdf2",
+    "fb6181bcdfbd254348a8",
+    "c09428a38ab674f6a880",
+    "fb68cae344891d44ef4c",
+    "7e1e93912c98dc47599f",
+    "c5e3ec84c16090b19f8f",
+    "02a1eb86eb74388b7479",
+    "bfb091d6219118fc0e49",
+    "c56aafb57ccdd378b554",
+    "902655ce9257cf4809de",
+    "ab7099edce52caf4600f",
+    "6a701971ee1dbff88469",
+    "d516f7a3154d8c1e371b",
+    "fa56e7c6d886eee8b426",
+    "951084914baea71c84f1",
+    "c63f8c4897012a9b6991",
+    "14f7cd72793260639fec",
+    "b3169648d4ae300309b1",
+    "23706ab6e6351397b5eb",
+    "367cda2f6e5cdc5162b3",
+    "c42dd04ae74125304d6e",
+    "8ed6fc4711654cee2b42",
+    "47408ed3fbd8a4108075",
+    "f8d80e2cc762183eb388",
+    "9d159eda71042eddeb95",
+    "51d2c9de9b19739494bf",
+    "1acbe28eae5aff9e5b99",
+    "316f739dcf4c2d4bbecc",
+    "9b66ff56f9349e9152af",
+    "0f51d791a14af2ad5064",
+    "113d41725fa35a443c64"
+   ],
+   "member_templates": [
+    "01ff166f88a111ec",
+    "04e475409b4cb13f",
+    "08c0d8bd30f140b8",
+    "0aa180f173598a68",
+    "11800e07988e9816",
+    "11e94c52f9904a6e",
+    "1362662b795f77b9",
+    "171ed13afd6297f6",
+    "1966652dadecd398",
+    "1c76399ba4e8c75e",
+    "256b44adf4134c03",
+    "274f27dd10d4cbbd",
+    "2b3c5756e3fd59ee",
+    "2d48edf196d0f323",
+    "2d9115be5ff33ed1",
+    "3047936e351d866e",
+    "3109a0bef24114cb",
+    "314b3e93f4ec1657",
+    "34aa6f42055e084e",
+    "34b3c11b241c3043",
+    "418d479f7073d5ea",
+    "422372260ebc4d5d",
+    "506a6c0b68465bd2",
+    "50ea47a575797945",
+    "515c07aa20b881cb",
+    "543018c9eb00871a",
+    "54e951b96c86ba64",
+    "565614f12724dd78",
+    "5981a0f46240eb2f",
+    "5d6fe07f446bc433",
+    "6103c4b5861945db",
+    "62e1af7c97f4c67c",
+    "6761729c4a81e364",
+    "6c432a8ef08d8ca9",
+    "721514b14f633f1a",
+    "73d4cdef4ca09dd9",
+    "7caaab13560b01b8",
+    "7cea2bc9a88622cd",
+    "9aa6670da37d9843",
+    "a10cb3449934ce83",
+    "a3d6ee7773a37b96",
+    "a9222b02cb379adc",
+    "a9494fd634c8eaa0",
+    "a951c10786796c90",
+    "a99459f954793402",
+    "a9ba87dd79d1b8f3",
+    "ad322045789a8791",
+    "af02e06662553bfa",
+    "af986af231a9bdfc",
+    "b73fe4ec546741c1",
+    "b771fd5ffdc18232",
+    "b960bde97941c59b",
+    "ba34d536e374472b",
+    "be636b62cb1aac82",
+    "c08b5cfb6c1c190a",
+    "c3f8b61eece8308e",
+    "c496fb5963afd0c6",
+    "c4c571340f49eb77",
+    "d181e12ea9b31582",
+    "d25c8f5a8f18bccb",
+    "d45c76ecf07eef48",
+    "e525c47515f20363",
+    "ef61669825d7f972",
+    "f657d72a8bd50c00",
+    "fbdc5cbc9580a6da"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0004",
+     "file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+     "lines": [
+      21,
+      30
+     ],
+     "raw": [
+      "o.patient_id = v.patient_id",
+      "o.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0004",
+     "file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+     "lines": [
+      33,
+      48
+     ],
+     "raw": [
+      "o.patient_id = v.patient_id",
+      "o.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0010",
+     "file": "2022-2024年非计划重返手术室再手术率、非计划重返再住院及并发症发生率.txt",
+     "lines": [
+      45,
+      88
+     ],
+     "raw": [
+      "oo.patient_id = v.patient_id",
+      "oo.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0014",
+     "file": "2023人事科职称数据提取sql(2).sql",
+     "lines": [
+      38,
+      44
+     ],
+     "raw": [
+      "a.patient_id=b.patient_id",
+      "a.visit_id=b.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0019",
+     "file": "2024年6月-2025年1月泌尿微创科工作量统计.txt",
+     "lines": [
+      35,
+      47
+     ],
+     "raw": [
+      "o.patient_id = v.patient_id",
+      "o.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0019",
+     "file": "2024年6月-2025年1月泌尿微创科工作量统计.txt",
+     "lines": [
+      47,
+      60
+     ],
+     "raw": [
+      "o.patient_id = v.patient_id",
+      "o.visit_id = v.visit_id"
+     ],
+     "flags": {}
+    }
+   ],
+   "supplements_s2": "S2F-CB3BA33251"
+  },
+  {
+   "key": "[[\"OPERATION\", [\"OPERATION_CODE\"]], [\"OPERATION_DICT\", [\"OPERATION_CODE\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION",
+    [
+     "OPERATION_CODE"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_DICT",
+    [
+     "OPERATION_CODE"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 42,
+   "statements": 49,
+   "units": 14,
+   "stmt_ids_sample": [
+    "d7365cbe59d5483adb2d",
+    "ba1b9bac88c2546f811b",
+    "c1b9877e86ed63f4ec0c",
+    "65f12f2d3ac8e8d70dde",
+    "4ed8207a016256cf2f4e",
+    "19de6e9f9fe0a2f5e560",
+    "708d990047da1a099c06",
+    "228c388d7890eafdad5e",
+    "812b2fa4b384a924344b",
+    "d604babaee4c7409cdf2",
+    "fb6181bcdfbd254348a8",
+    "fb68cae344891d44ef4c",
+    "7e1e93912c98dc47599f",
+    "c5e3ec84c16090b19f8f",
+    "02a1eb86eb74388b7479",
+    "bfb091d6219118fc0e49",
+    "ab7099edce52caf4600f",
+    "6a701971ee1dbff88469",
+    "951084914baea71c84f1",
+    "b3169648d4ae300309b1",
+    "23706ab6e6351397b5eb",
+    "8ed6fc4711654cee2b42",
+    "47408ed3fbd8a4108075",
+    "f8d80e2cc762183eb388",
+    "9d159eda71042eddeb95",
+    "1acbe28eae5aff9e5b99",
+    "316f739dcf4c2d4bbecc",
+    "9b66ff56f9349e9152af",
+    "49cbc8d157690ec17eff",
+    "e57a44e4580f408359e8",
+    "d6f42de2869ae4b0d270",
+    "5a69f640e8df082b9ddc",
+    "f9b9c1de3caa321a829e",
+    "1a90cf1fcf29d442950f",
+    "1a0c67f6455491af6d51",
+    "04eef14b67329b59fd0d",
+    "3f39f4bb4937680c22b6",
+    "2edf933ba8b0491c6836",
+    "8ddc6343122c9e2cdabc",
+    "4a46f897adad3d30902e"
+   ],
+   "member_templates": [
+    "01ff166f88a111ec",
+    "08c0d8bd30f140b8",
+    "0e5347787c0ace53",
+    "11800e07988e9816",
+    "11e94c52f9904a6e",
+    "1362662b795f77b9",
+    "171ed13afd6297f6",
+    "1c76399ba4e8c75e",
+    "256b44adf4134c03",
+    "274f27dd10d4cbbd",
+    "2b3c5756e3fd59ee",
+    "3047936e351d866e",
+    "3109a0bef24114cb",
+    "34b3c11b241c3043",
+    "506a6c0b68465bd2",
+    "50ea47a575797945",
+    "54e951b96c86ba64",
+    "565614f12724dd78",
+    "5981a0f46240eb2f",
+    "5d6fe07f446bc433",
+    "62e1af7c97f4c67c",
+    "6761729c4a81e364",
+    "7caaab13560b01b8",
+    "7cea2bc9a88622cd",
+    "8038a078d6537d4c",
+    "9aa6670da37d9843",
+    "a10cb3449934ce83",
+    "a3d6ee7773a37b96",
+    "a881ad1b56ba5275",
+    "a951c10786796c90",
+    "a9ba87dd79d1b8f3",
+    "ad322045789a8791",
+    "af986af231a9bdfc",
+    "b73fe4ec546741c1",
+    "bb2ea2ad518b6ccc",
+    "be636b62cb1aac82",
+    "d181e12ea9b31582",
+    "d25c8f5a8f18bccb",
+    "d45c76ecf07eef48",
+    "d5a3e7a06e1ea476",
+    "e525c47515f20363",
+    "f9dca4d3f5f251d8"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0004",
+     "file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+     "lines": [
+      21,
+      30
+     ],
+     "raw": [
+      "od.operation_code = o.operation_code"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0004",
+     "file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+     "lines": [
+      33,
+      48
+     ],
+     "raw": [
+      "od.operation_code = o.operation_code"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0004",
+     "file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+     "lines": [
+      48,
+      58
+     ],
+     "raw": [
+      "od.operation_code = o.operation_code"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0019",
+     "file": "2024年6月-2025年1月泌尿微创科工作量统计.txt",
+     "lines": [
+      35,
+      47
+     ],
+     "raw": [
+      "od.operation_code = o.operation_code"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0019",
+     "file": "2024年6月-2025年1月泌尿微创科工作量统计.txt",
+     "lines": [
+      47,
+      60
+     ],
+     "raw": [
+      "od.operation_code = o.operation_code"
+     ],
+     "flags": {}
+    },
+    {
+     "unit": "F0046",
+     "file": "三级医院指标数据提取\\手术数据sql.txt",
+     "lines": [
+      1,
+      15
+     ],
+     "raw": [
+      "o.operation_code = od.operation_code"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "pb_params": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-4EB1EB7136"
+  },
+  {
+   "key": "[[\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+   "end_a": [
+    "PAT_MASTER_INDEX",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 4,
+   "statements": 4,
+   "units": 2,
+   "stmt_ids_sample": [
+    "c56aafb57ccdd378b554",
+    "902655ce9257cf4809de",
+    "ffd13647e07f2d35fae0",
+    "fc87c1b85a280f78773f"
+   ],
+   "member_templates": [
+    "2d48edf196d0f323",
+    "2d9115be5ff33ed1",
+    "b960bde97941c59b",
+    "f657d72a8bd50c00"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0010",
+     "file": "2022-2024年非计划重返手术室再手术率、非计划重返再住院及并发症发生率.txt",
+     "lines": [
+      45,
+      88
+     ],
+     "raw": [
+      "p.patient_id = v.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      2,
+      28
+     ],
+     "raw": [
+      "v.patient_id = p.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      28,
+      55
+     ],
+     "raw": [
+      "v.patient_id = p.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      55,
+      78
+     ],
+     "raw": [
+      "v.patient_id = p.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-79A7F03D1D"
+  },
+  {
+   "key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OPERATION_MASTER\", [\"OPERATING_DEPT\"]], \"inner\"]",
+   "end_a": [
+    "DEPT_DICT",
+    [
+     "DEPT_CODE"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_MASTER",
+    [
+     "OPERATING_DEPT"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 2,
+   "stmt_ids_sample": [
+    "c3d5a325f948526b5eb6",
+    "6fa12df104f3fc317818"
+   ],
+   "member_templates": [
+    "9c21dbfa1263650f",
+    "da7e1c3fa4738802"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0116",
+     "file": "取手术量.txt",
+     "lines": [
+      84,
+      135
+     ],
+     "raw": [
+      "a.operating_dept = b.dept_code"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0302",
+     "file": "小王sql记录\\三级手术.txt",
+     "lines": [
+      1,
+      16
+     ],
+     "raw": [
+      "aa.dept_code = a.operating_dept"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-AFE509521C"
+  },
+  {
+   "key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_MASTER",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_MASTER_INDEX",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 2,
+   "stmt_ids_sample": [
+    "097693c7ed58f0b27459",
+    "c3d5a325f948526b5eb6"
+   ],
+   "member_templates": [
+    "6ff5fc62a58de93d",
+    "9c21dbfa1263650f"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0116",
+     "file": "取手术量.txt",
+     "lines": [
+      84,
+      135
+     ],
+     "raw": [
+      "a.patient_id = c.patient_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0419",
+     "file": "病理医保飞检数据提取.txt",
+     "lines": [
+      275,
+      298
+     ],
+     "raw": [
+      "a.patient_id=c.patient_id"
+     ],
+     "flags": {}
+    }
+   ],
+   "supplements_s2": "S2F-A2AC280BB4"
+  },
+  {
+   "key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPER_ID\"]], [\"OPERATION_NAME\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPER_ID\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID",
+     "OPER_ID"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_NAME",
+    [
+     "PATIENT_ID",
+     "VISIT_ID",
+     "OPER_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 16,
+   "statements": 28,
+   "units": 4,
+   "stmt_ids_sample": [
+    "cd7ea211e02b952bc73d",
+    "d57ee36b7b07ee2b696b",
+    "d57ee36b7b07ee2b696b",
+    "03a8812ad1f8ba9de0b5",
+    "03a8812ad1f8ba9de0b5",
+    "f00363f71cceb82a941e",
+    "f00363f71cceb82a941e",
+    "fe2026b967a9be7c79c5",
+    "12243c96c429133e7b6b",
+    "05c9c10b13ea13734d66",
+    "05c9c10b13ea13734d66",
+    "138551d6e6bae00dd980",
+    "138551d6e6bae00dd980",
+    "dd156a847a38e8de831c",
+    "dd156a847a38e8de831c",
+    "d1ca0b592a8587b51e08",
+    "d1ca0b592a8587b51e08",
+    "bf0ea7e434ceba300d07",
+    "bf0ea7e434ceba300d07",
+    "29be3875278a70a64371",
+    "29be3875278a70a64371",
+    "8db39f2e0cea315444a5",
+    "1e5ab924dbaf40be464f",
+    "1e5ab924dbaf40be464f",
+    "6a966dbc0c7b73e5c552",
+    "6a966dbc0c7b73e5c552",
+    "44d7997ed4944c7f5d43",
+    "44d7997ed4944c7f5d43"
+   ],
+   "member_templates": [
+    "1bd22c1b1caceb16",
+    "1bdcd131f86cd3ba",
+    "2daacc2c39dfbaa1",
+    "34f095190f77eb66",
+    "34f811758ff8c81d",
+    "3af09e9ad351f6b6",
+    "4467596e64a7f37b",
+    "5f2185a4fd036559",
+    "6fd9423959b2e3a9",
+    "701b3547f4eaf0e0",
+    "79e0df8868af3268",
+    "910a49cce2e9d87a",
+    "9cdcaafda3492c1b",
+    "b6b6483b1c556c1e",
+    "c622e8aa53db7013",
+    "d1db42938fdfbfc0"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      317,
+      329
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      344,
+      358
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      365,
+      378
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      385,
+      400
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      407,
+      419
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4
+     }
+    },
+    {
+     "unit": "F0131",
+     "file": "小卢sql\\HIS取数SQL.sql",
+     "lines": [
+      428,
+      441
+     ],
+     "raw": [
+      "OPERATION_NAME.PATIENT_ID = OPERATION_MASTER.PATIENT_ID",
+      "OPERATION_NAME.VISIT_ID = OPERATION_MASTER.VISIT_ID",
+      "OPERATION_NAME.OPER_ID = OPERATION_MASTER.OPER_ID"
+     ],
+     "flags": {
+      "comma_join": 4,
+      "dynamic_sql": 4
+     }
+    }
+   ],
+   "supplements_s2": "S2F-D24A708DF5"
+  },
+  {
+   "key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+   "end_a": [
+    "INP_BILL_DETAIL",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "2eaa266f4bc7936bf43e",
+    "c5394b97ffbc815dfd96"
+   ],
+   "member_templates": [
+    "6b4029130413d7b1",
+    "c3f8b61eece8308e"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      22,
+      38
+     ],
+     "raw": [
+      "INP_BILL_DETAIL.PATIENT_ID = PAT_VISIT.PATIENT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      43,
+      60
+     ],
+     "raw": [
+      "INP_BILL_DETAIL.PATIENT_ID = PAT_VISIT.PATIENT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-33FFE8A421"
+  },
+  {
+   "key": "[[\"INP_BILL_DETAIL\", [\"VISIT_ID\"]], [\"PAT_VISIT\", [\"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "INP_BILL_DETAIL",
+    [
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "2eaa266f4bc7936bf43e",
+    "c5394b97ffbc815dfd96"
+   ],
+   "member_templates": [
+    "6b4029130413d7b1",
+    "c3f8b61eece8308e"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      22,
+      38
+     ],
+     "raw": [
+      "PAT_VISIT.VISIT_ID = INP_BILL_DETAIL.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      43,
+      60
+     ],
+     "raw": [
+      "PAT_VISIT.VISIT_ID = INP_BILL_DETAIL.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-1008D796C9"
+  },
+  {
+   "key": "[[\"MEDICAL_RECORD_REVIEW_TABLE\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "MEDICAL_RECORD_REVIEW_TABLE",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 6,
+   "statements": 6,
+   "units": 3,
+   "stmt_ids_sample": [
+    "367cda2f6e5cdc5162b3",
+    "be70d7844e1ab34ce877",
+    "1cafff7219fd59f62780",
+    "2eaa266f4bc7936bf43e",
+    "564f7f3b050c2526fbf9",
+    "c5394b97ffbc815dfd96"
+   ],
+   "member_templates": [
+    "515c07aa20b881cb",
+    "59d008db428f9c82",
+    "5c8129f3f3a152e2",
+    "6b4029130413d7b1",
+    "85d295246379a057",
+    "c3f8b61eece8308e"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      22,
+      38
+     ],
+     "raw": [
+      "PAT_VISIT.PATIENT_ID = MEDICAL_RECORD_REVIEW_TABLE.PATIENT_ID",
+      "PAT_VISIT.VISIT_ID = MEDICAL_RECORD_REVIEW_TABLE.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0319",
+     "file": "小王sql记录\\病案上报数据提取--2023-1009.txt",
+     "lines": [
+      43,
+      60
+     ],
+     "raw": [
+      "PAT_VISIT.PATIENT_ID = MEDICAL_RECORD_REVIEW_TABLE.PATIENT_ID",
+      "PAT_VISIT.VISIT_ID = MEDICAL_RECORD_REVIEW_TABLE.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年08月 08-14.sql",
+     "file": "A_F0138::SQL\\2022年08月 08-14.sql",
+     "lines": [
+      392,
+      404
+     ],
+     "raw": [
+      "F.PATIENT_ID = PAT_VISIT.PATIENT_ID",
+      "F.VISIT_ID = PAT_VISIT.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年08月 08-14.sql",
+     "file": "A_F0138::SQL\\2022年08月 08-14.sql",
+     "lines": [
+      410,
+      423
+     ],
+     "raw": [
+      "F.PATIENT_ID = PAT_VISIT.PATIENT_ID",
+      "F.VISIT_ID = PAT_VISIT.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年10月 03-16.sql",
+     "file": "A_F0138::SQL\\2022年10月 03-16.sql",
+     "lines": [
+      392,
+      401
+     ],
+     "raw": [
+      "MEDICAL_RECORD_REVIEW_TABLE.PATIENT_ID = PAT_VISIT.PATIENT_ID",
+      "MEDICAL_RECORD_REVIEW_TABLE.VISIT_ID = PAT_VISIT.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "A_F0138::SQL\\2022年10月 03-16.sql",
+     "file": "A_F0138::SQL\\2022年10月 03-16.sql",
+     "lines": [
+      402,
+      410
+     ],
+     "raw": [
+      "MEDICAL_RECORD_REVIEW_TABLE.PATIENT_ID = PAT_VISIT.PATIENT_ID",
+      "MEDICAL_RECORD_REVIEW_TABLE.VISIT_ID = PAT_VISIT.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-C84A01F90E"
+  },
+  {
+   "key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "INP_SETTLE_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "c09428a38ab674f6a880",
+    "e776125aa9d7a4cf3494"
+   ],
+   "member_templates": [
+    "1966652dadecd398",
+    "c496fb5963afd0c6"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0379",
+     "file": "按手术取总人数  平均住院日  平均总费用   按月 和 季度.txt",
+     "lines": [
+      27,
+      59
+     ],
+     "raw": [
+      "v.patient_id = s.patient_id",
+      "v.visit_id = s.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0379",
+     "file": "按手术取总人数  平均住院日  平均总费用   按月 和 季度.txt",
+     "lines": [
+      59,
+      89
+     ],
+     "raw": [
+      "v.patient_id = s.patient_id",
+      "v.visit_id = s.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-89188944F3"
+  },
+  {
+   "key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OPERATION_MASTER\", [\"DEPT_STAYED\"]], \"inner\"]",
+   "end_a": [
+    "DEPT_DICT",
+    [
+     "DEPT_CODE"
+    ]
+   ],
+   "end_b": [
+    "OPERATION_MASTER",
+    [
+     "DEPT_STAYED"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 3,
+   "units": 2,
+   "stmt_ids_sample": [
+    "cef599d8ec52528d24e7",
+    "cef599d8ec52528d24e7",
+    "73c08cdc988586bd9db3"
+   ],
+   "member_templates": [
+    "603bc0798b3d089e",
+    "773dd8c0ccd82c49"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0581",
+     "file": "质控办取分级手术量 (2).txt",
+     "lines": [
+      1,
+      21
+     ],
+     "raw": [
+      "mom.dept_stayed = dd.dept_code"
+     ],
+     "flags": {
+      "comma_join": 4,
+      "correlated": 4
+     }
+    },
+    {
+     "unit": "F0583",
+     "file": "质控办取微创手术量明细.txt",
+     "lines": [
+      3,
+      38
+     ],
+     "raw": [
+      "mom.dept_stayed = dd.dept_code"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-B040DC9E3E"
+  },
+  {
+   "key": "[[\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+   "end_a": [
+    "LAB_TEST_ITEMS",
+    [
+     "TEST_NO"
+    ]
+   ],
+   "end_b": [
+    "LAB_TEST_MASTER",
+    [
+     "TEST_NO"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "50e3537f6109c1e2f333",
+    "aa0091192a291a5b4a8f"
+   ],
+   "member_templates": [
+    "0aa180f173598a68",
+    "a9222b02cb379adc"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      63,
+      80
+     ],
+     "raw": [
+      "l.test_no = lti.test_no"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    },
+    {
+     "unit": "F0584",
+     "file": "质控办指标提取.txt",
+     "lines": [
+      80,
+      94
+     ],
+     "raw": [
+      "l.test_no = lti.test_no"
+     ],
+     "flags": {
+      "comma_join": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-42E060720B"
+  },
+  {
+   "key": "[[\"EXAM_ITEMS\", [\"EXAM_NO\"]], [\"EXAM_MASTER\", [\"EXAM_NO\"]], \"inner\"]",
+   "end_a": [
+    "EXAM_ITEMS",
+    [
+     "EXAM_NO"
+    ]
+   ],
+   "end_b": [
+    "EXAM_MASTER",
+    [
+     "EXAM_NO"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 2,
+   "statements": 2,
+   "units": 1,
+   "stmt_ids_sample": [
+    "c63f8c4897012a9b6991",
+    "a598a7da045b5ee2b05d"
+   ],
+   "member_templates": [
+    "418d479f7073d5ea",
+    "b771fd5ffdc18232"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0585",
+     "file": "质控办：耳鼻喉相关指标.txt",
+     "lines": [
+      90,
+      115
+     ],
+     "raw": [
+      "em.exam_no = ei.exam_no"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    },
+    {
+     "unit": "F0585",
+     "file": "质控办：耳鼻喉相关指标.txt",
+     "lines": [
+      334,
+      381
+     ],
+     "raw": [
+      "em.exam_no = ei.exam_no"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-EE88384570"
+  },
+  {
+   "key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "INP_BILL_DETAIL",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 3,
+   "statements": 3,
+   "units": 1,
+   "stmt_ids_sample": [
+    "902655ce9257cf4809de",
+    "ffd13647e07f2d35fae0",
+    "fc87c1b85a280f78773f"
+   ],
+   "member_templates": [
+    "2d9115be5ff33ed1",
+    "b960bde97941c59b",
+    "f657d72a8bd50c00"
+   ],
+   "rep_examples": [
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      2,
+      28
+     ],
+     "raw": [
+      "ibd.patient_id = v.patient_id",
+      "ibd.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      28,
+      55
+     ],
+     "raw": [
+      "ibd.patient_id = v.patient_id",
+      "ibd.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    },
+    {
+     "unit": "F0592",
+     "file": "重点手术病人信息.txt",
+     "lines": [
+      55,
+      78
+     ],
+     "raw": [
+      "ibd.patient_id = v.patient_id",
+      "ibd.visit_id = v.visit_id"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "dynamic_sql": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-60FDE4D634"
+  },
+  {
+   "key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+   "end_a": [
+    "OPERATION_MASTER",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "end_b": [
+    "PAT_VISIT",
+    [
+     "PATIENT_ID",
+     "VISIT_ID"
+    ]
+   ],
+   "join_type": "inner",
+   "templates": 1,
+   "statements": 1,
+   "units": 1,
+   "stmt_ids_sample": [
+    "cd7ea211e02b952bc73d"
+   ],
+   "member_templates": [
+    "1bd22c1b1caceb16"
+   ],
+   "rep_examples": [
+    {
+     "unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+     "file": "A_F0138::SQL\\2022年08月 01-07.sql",
+     "lines": [
+      523,
+      627
+     ],
+     "raw": [
+      "OPERATION_MASTER.PATIENT_ID = PAT_VISIT.PATIENT_ID",
+      "OPERATION_MASTER.VISIT_ID = PAT_VISIT.VISIT_ID"
+     ],
+     "flags": {
+      "comma_join": 1,
+      "correlated": 1
+     }
+    }
+   ],
+   "supplements_s2": "S2F-D6E536D1CB"
+  }
+ ],
+ "stats_only_templates": [
+  {
+   "template_hash": "13667c40517cd5fe",
+   "rep_unit": "F0001",
+   "rep_file": "111111111.sql",
+   "rep_lines": [
+    41,
+    44
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "a281b1a269092247",
+   "rep_unit": "F0001",
+   "rep_file": "111111111.sql",
+   "rep_lines": [
+    45,
+    47
+   ],
+   "tables": [
+    "OPERATION_SCHEDULE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "3418e2b721b88dda",
+   "rep_unit": "F0001",
+   "rep_file": "111111111.sql",
+   "rep_lines": [
+    47,
+    52
+   ],
+   "tables": [
+    "OPERATION_MASTER",
+    "DEPT_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {
+    "comma_join": 1
+   },
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "a81eb41aa2adaa05",
+   "rep_unit": "F0004",
+   "rep_file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+   "rep_lines": [
+    12,
+    21
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [
+    "group_by",
+    "count",
+    "correlated_hint"
+   ],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "321079f532a05e6a",
+   "rep_unit": "F0004",
+   "rep_file": "2017年-2023年 手术台次、三四级手术操作量.txt",
+   "rep_lines": [
+    96,
+    104
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [
+    "group_by",
+    "count",
+    "correlated_hint"
+   ],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "0dc1253f7f30c6f3",
+   "rep_unit": "F0081",
+   "rep_file": "修改住院次数可能涉及的表.txt",
+   "rep_lines": [
+    5,
+    6
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "2ac662fefc10343d",
+   "rep_unit": "F0081",
+   "rep_file": "修改住院次数可能涉及的表.txt",
+   "rep_lines": [
+    8,
+    9
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "3d45e07451104c69",
+   "rep_unit": "F0081",
+   "rep_file": "修改住院次数可能涉及的表.txt",
+   "rep_lines": [
+    9,
+    10
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "04c1c2b66c55a210",
+   "rep_unit": "F0081",
+   "rep_file": "修改住院次数可能涉及的表.txt",
+   "rep_lines": [
+    20,
+    22
+   ],
+   "tables": [
+    "MR_ON_LINE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "0e555b748e3407d8",
+   "rep_unit": "F0081",
+   "rep_file": "修改住院次数可能涉及的表.txt",
+   "rep_lines": [
+    22,
+    24
+   ],
+   "tables": [
+    "MR_INDEX"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "6ea69570bd19726e",
+   "rep_unit": "F0101",
+   "rep_file": "医疗部提取门诊量、门诊收入，收住院量，住院收入，手术量，手术收入，收治病种数及种类，四级收入及微创手术数.txt",
+   "rep_lines": [
+    155,
+    157
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 3
+  },
+  {
+   "template_hash": "951171b2ad2a055e",
+   "rep_unit": "F0124",
+   "rep_file": "国家临床重点专科数据调取：眩晕疾病科.txt",
+   "rep_lines": [
+    34,
+    40
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [
+    "count",
+    "correlated_hint"
+   ],
+   "filters": [
+    {
+     "col": "DEPT_STAYED",
+     "op": "=",
+     "val": "'?\r\nand om.start_date_time >= to_date('"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "075165c5e69bb20f",
+   "rep_unit": "F0125",
+   "rep_file": "国家医保局数据筛查.txt",
+   "rep_lines": [
+    89,
+    310
+   ],
+   "tables": [
+    "DIAGNOSIS",
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [
+    "distinct"
+   ],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "3"
+    },
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "3"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "3"
+    },
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "2"
+    }
+   ],
+   "flags": {
+    "comma_join": 1,
+    "dynamic_sql": 1,
+    "correlated": 1
+   },
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "8085ddface7cb12e",
+   "rep_unit": "F0295",
+   "rep_file": "小孙遗产\\日常问题.sql",
+   "rep_lines": [
+    66,
+    71
+   ],
+   "tables": [
+    "MR_ON_LINE"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "VISIT_ID",
+     "op": "=",
+     "val": "1"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "6d053809f2101838",
+   "rep_unit": "F0301",
+   "rep_file": "小王sql记录\\三级医院评审指标统计(医疗部).txt",
+   "rep_lines": [
+    79,
+    83
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_NAME",
+     "op": "LIKE",
+     "val": "'%化学治疗%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "ed07dc07ac30ec05",
+   "rep_unit": "F0301",
+   "rep_file": "小王sql记录\\三级医院评审指标统计(医疗部).txt",
+   "rep_lines": [
+    172,
+    176
+   ],
+   "tables": [
+    "DIAGNOSIS_TYPE_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "a04dc91e2e76738f",
+   "rep_unit": "F0301",
+   "rep_file": "小王sql记录\\三级医院评审指标统计(医疗部).txt",
+   "rep_lines": [
+    179,
+    188
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "VISIT_ID",
+     "op": "=",
+     "val": "4"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "7e79ccf27b157db6",
+   "rep_unit": "F0361",
+   "rep_file": "手麻系统排班找不到.txt",
+   "rep_lines": [
+    2,
+    4
+   ],
+   "tables": [
+    "OPERATION_SCHEDULE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "1fb35f105ec760c3",
+   "rep_unit": "F0559",
+   "rep_file": "耳整形科2023年全年的相关数据.txt",
+   "rep_lines": [
+    21,
+    26
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [
+    "correlated_hint"
+   ],
+   "filters": [
+    {
+     "col": "DEPT_STAYED",
+     "op": "=",
+     "val": "'?\r\nand om.start_date_time  >= to_Date('"
+    },
+    {
+     "col": "ANESTHESIA_METHOD",
+     "op": "LIKE",
+     "val": "'%全%麻%'"
+    },
+    {
+     "col": "ANESTHESIA_METHOD",
+     "op": "LIKE",
+     "val": "'%复合%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "4e007fdf31b27728",
+   "rep_unit": "F0605",
+   "rep_file": "麻醉总例次数、麻醉患者总数、全身麻醉总例次数、神经外科（神外一二三）手术总量和死亡患者总量.txt",
+   "rep_lines": [
+    27,
+    33
+   ],
+   "tables": [
+    "OPERATION_MASTER",
+    "DEPT_DICT"
+   ],
+   "grain": [
+    "count"
+   ],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "0a5b701ef09a0733",
+   "rep_unit": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_lines": [
+    255,
+    258
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 34
+  },
+  {
+   "template_hash": "117e8de065b38f59",
+   "rep_unit": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_lines": [
+    310,
+    315
+   ],
+   "tables": [
+    "OPERATION_SCHEDULE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 5
+  },
+  {
+   "template_hash": "b45aaee7c8e121e1",
+   "rep_unit": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_lines": [
+    763,
+    765
+   ],
+   "tables": [
+    "MR_ON_LINE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 49
+  },
+  {
+   "template_hash": "f987bf4761c84c77",
+   "rep_unit": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 14-27.sql",
+   "rep_lines": [
+    826,
+    829
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "VISIT_ID",
+     "op": "=",
+     "val": "4"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 8
+  },
+  {
+   "template_hash": "7ea679c0e6536b1d",
+   "rep_unit": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_lines": [
+    8,
+    12
+   ],
+   "tables": [
+    "MR_COMM_VS_HIS_COMM"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "CLASS_CODE",
+     "op": "=",
+     "val": "'MARITAL_STATUS_DICT'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "7b9cff6953ac9b8c",
+   "rep_unit": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_lines": [
+    170,
+    172
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "2688798f6e720c9b",
+   "rep_unit": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_lines": [
+    238,
+    242
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'B37.200x005+H62.'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 3
+  },
+  {
+   "template_hash": "4478fb377e40a80c",
+   "rep_unit": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年02月 8-13.sql",
+   "rep_lines": [
+    430,
+    433
+   ],
+   "tables": [
+    "MR_ON_LINE"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "ef78b7b64aef1212",
+   "rep_unit": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_lines": [
+    5,
+    19
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "=",
+     "val": "'?\r\n  AND VISIT_ID = '"
+    },
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "'3'"
+    },
+    {
+     "col": "DIAGNOSIS_NO",
+     "op": "=",
+     "val": "'1'"
+    },
+    {
+     "col": "DIAGNOSIS_DESC",
+     "op": "=",
+     "val": "'糖尿病性周围神经病'"
+    },
+    {
+     "col": "TREAT_RESULT",
+     "op": "=",
+     "val": "'2'"
+    },
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'E14.400x023+G63.2'"
+    },
+    {
+     "col": "ADMISSION_CONDITION",
+     "op": "=",
+     "val": "'1'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "a377a8500abc1e97",
+   "rep_unit": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_lines": [
+    314,
+    317
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "=",
+     "val": "'?\r\nAND DIAGNOSIS_TYPE = '"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "29999ba737ecf52a",
+   "rep_unit": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 07-13.sql",
+   "rep_lines": [
+    318,
+    322
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "=",
+     "val": "'?\r\nAND DIAGNOSIS_TYPE = '"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "9907762b706ad1a7",
+   "rep_unit": "A_F0138::SQL\\2022年03月 14-20.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 14-20.sql",
+   "rep_lines": [
+    315,
+    318
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "=",
+     "val": "'?\r\nAND VISIT_ID = '"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "0142561c57a3e703",
+   "rep_unit": "A_F0138::SQL\\2022年03月 21-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 21-27.sql",
+   "rep_lines": [
+    696,
+    698
+   ],
+   "tables": [
+    "DIAGNOSIS",
+    "PAT_MASTER_INDEX"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {
+    "correlated": 3
+   },
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 3
+  },
+  {
+   "template_hash": "a2adac21d033b432",
+   "rep_unit": "A_F0138::SQL\\2022年03月 21-27.sql",
+   "rep_file": "A_F0138::SQL\\2022年03月 21-27.sql",
+   "rep_lines": [
+    707,
+    711
+   ],
+   "tables": [
+    "MR_INDEX"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "VISIT_ID",
+     "op": "=",
+     "val": "6"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "c52e5afa98e5f315",
+   "rep_unit": "A_F0138::SQL\\2022年04月 04-10.sql",
+   "rep_file": "A_F0138::SQL\\2022年04月 04-10.sql",
+   "rep_lines": [
+    381,
+    384
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "LIKE",
+     "val": "'c0412814%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "6da7ac172193d508",
+   "rep_unit": "A_F0138::SQL\\2022年04月 11-17.sql",
+   "rep_file": "A_F0138::SQL\\2022年04月 11-17.sql",
+   "rep_lines": [
+    706,
+    710
+   ],
+   "tables": [
+    "MR_ON_LINE"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "PATIENT_ID",
+     "op": "=",
+     "val": "'?\r\nOR PATIENT_ID = '"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "9e5ede5423d7c824",
+   "rep_unit": "A_F0138::SQL\\2022年04月 25-01.sql",
+   "rep_file": "A_F0138::SQL\\2022年04月 25-01.sql",
+   "rep_lines": [
+    326,
+    331
+   ],
+   "tables": [
+    "MEDREC.DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "99ec9063da629f79",
+   "rep_unit": "A_F0138::SQL\\2022年05月 16-22.sql",
+   "rep_file": "A_F0138::SQL\\2022年05月 16-22.sql",
+   "rep_lines": [
+    96,
+    98
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "440d031fbcec4327",
+   "rep_unit": "A_F0138::SQL\\2022年05月 23-29.sql",
+   "rep_file": "A_F0138::SQL\\2022年05月 23-29.sql",
+   "rep_lines": [
+    64,
+    67
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "fe32ab39af5e27c6",
+   "rep_unit": "A_F0138::SQL\\2022年05月 23-29.sql",
+   "rep_file": "A_F0138::SQL\\2022年05月 23-29.sql",
+   "rep_lines": [
+    215,
+    218
+   ],
+   "tables": [
+    "MR_INDEX"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "d65017aea37da0e2",
+   "rep_unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_file": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_lines": [
+    31,
+    32
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "af41350f559ea136",
+   "rep_unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_file": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_lines": [
+    41,
+    44
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 4
+  },
+  {
+   "template_hash": "124a1b6038d5ebcf",
+   "rep_unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_file": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_lines": [
+    54,
+    58
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "2a72007ea0eee167",
+   "rep_unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_file": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_lines": [
+    319,
+    323
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "OPERATION_CODE",
+     "op": "=",
+     "val": "'25.01001'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "164eb377229e25a6",
+   "rep_unit": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_file": "A_F0138::SQL\\2022年06月 13-19.sql",
+   "rep_lines": [
+    324,
+    327
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'XH'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "4f86da2e0fd39c6e",
+   "rep_unit": "A_F0138::SQL\\2022年07月 25-31.sql",
+   "rep_file": "A_F0138::SQL\\2022年07月 25-31.sql",
+   "rep_lines": [
+    368,
+    372
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'A04.700x0011'"
+    },
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'A04.700x001'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "072d046a2ff18d80",
+   "rep_unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_lines": [
+    14,
+    17
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "7d4476bf4cef33e6",
+   "rep_unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_lines": [
+    18,
+    21
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "2a98a31aac10f1b3",
+   "rep_unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_lines": [
+    40,
+    44
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [
+    "group_by",
+    "count"
+   ],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "b32de284a56c081b",
+   "rep_unit": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 01-07.sql",
+   "rep_lines": [
+    669,
+    673
+   ],
+   "tables": [
+    "COMM.OPERATION_DICT",
+    "HISUSER.SFG_DATA"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {
+    "comma_join": 1,
+    "dynamic_sql": 1
+   },
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "48f7c4c28da06187",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    2,
+    6
+   ],
+   "tables": [
+    "YB_MAPPING",
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "TYPE",
+     "op": "=",
+     "val": "'1'"
+    },
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "c2ea15fe14f21ce7",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    7,
+    11
+   ],
+   "tables": [
+    "YB_MAPPING",
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "TYPE",
+     "op": "=",
+     "val": "'1'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "51ad80f5fcfa50c9",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    12,
+    14
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "75bbb7fa2dc22bcf",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    22,
+    23
+   ],
+   "tables": [
+    "COMM.DIAGNOSIS_DICT_BK_20220822"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "a16492a2423c9324",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    25,
+    28
+   ],
+   "tables": [
+    "YB_MAPPING",
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "TYPE",
+     "op": "=",
+     "val": "'2'"
+    },
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "8992989c7ba4a0cc",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    29,
+    33
+   ],
+   "tables": [
+    "YB_MAPPING",
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "TYPE",
+     "op": "=",
+     "val": "'2'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "0e6644982841184b",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    34,
+    36
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "6458bec4ef0d7353",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    37,
+    40
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "cdb1b067c1c397c4",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    64,
+    65
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [
+    "max"
+   ],
+   "filters": [
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    }
+   ],
+   "flags": {
+    "dynamic_sql": 1,
+    "correlated": 1
+   },
+   "unresolved_eq": 0,
+   "type": "set_txn",
+   "statements": 1
+  },
+  {
+   "template_hash": "2fa7199d7f699b61",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    66,
+    70
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [
+    "distinct"
+   ],
+   "filters": [
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "STD_INDICATOR",
+     "op": "=",
+     "val": "0"
+    }
+   ],
+   "flags": {
+    "dynamic_sql": 1
+   },
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "7139a9250277b7c3",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    71,
+    74
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "14f203c2c61f0afa",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    109,
+    113
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "=",
+     "val": "'E85.413+L99.0*'"
+    },
+    {
+     "col": "YB_CODE",
+     "op": "=",
+     "val": "'E85.413+L99.0*'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "1d6b9c6f7991107f",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    116,
+    118
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "STOP_FLAG",
+     "op": "=",
+     "val": "0"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "489616cecaf0d862",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    220,
+    223
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "STOP_FLAG",
+     "op": "=",
+     "val": "1"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "75fd1b88852da160",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    471,
+    474
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 2
+  },
+  {
+   "template_hash": "8075a67dcad3dae8",
+   "rep_unit": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_file": "A_F0138::SQL\\2022年08月 22-28.sql",
+   "rep_lines": [
+    816,
+    819
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "39cf56844f465f7a",
+   "rep_unit": "A_F0138::SQL\\2022年09月 13-18.sql",
+   "rep_file": "A_F0138::SQL\\2022年09月 13-18.sql",
+   "rep_lines": [
+    250,
+    252
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "LIKE",
+     "val": "'E14.400x023%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "c5d775ff197d0dff",
+   "rep_unit": "A_F0138::SQL\\2022年09月 26-02.sql",
+   "rep_file": "A_F0138::SQL\\2022年09月 26-02.sql",
+   "rep_lines": [
+    53,
+    56
+   ],
+   "tables": [
+    "MR_COMP_CLASS_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "76c58bca3161b274",
+   "rep_unit": "A_F0138::SQL\\2022年09月 26-02.sql",
+   "rep_file": "A_F0138::SQL\\2022年09月 26-02.sql",
+   "rep_lines": [
+    57,
+    59
+   ],
+   "tables": [],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "insert",
+   "statements": 1
+  },
+  {
+   "template_hash": "115d581204667b46",
+   "rep_unit": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_lines": [
+    726,
+    730
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [
+    "count"
+   ],
+   "filters": [
+    {
+     "col": "OPERATION_STATUS",
+     "op": "=",
+     "val": "1"
+    },
+    {
+     "col": "OPERATION_CODE",
+     "op": "=",
+     "val": "''"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "4ed1ad903fdd2b11",
+   "rep_unit": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_lines": [
+    731,
+    734
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "OPERATION_SCALE",
+     "op": "=",
+     "val": "'四'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "943acb48e33728ad",
+   "rep_unit": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 03-16.sql",
+   "rep_lines": [
+    878,
+    881
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "388442b9122137b2",
+   "rep_unit": "A_F0138::SQL\\2022年10月 24-30.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 24-30.sql",
+   "rep_lines": [
+    235,
+    238
+   ],
+   "tables": [
+    "DIAGNOSIS"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_TYPE",
+     "op": "=",
+     "val": "'3'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "d12fa936294ada28",
+   "rep_unit": "A_F0138::SQL\\2022年10月 24-30.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 24-30.sql",
+   "rep_lines": [
+    1164,
+    1166
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "DIAGNOSIS_CODE",
+     "op": "LIKE",
+     "val": "'B59.x00x0021%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "d763a7c4c2935806",
+   "rep_unit": "A_F0138::SQL\\2022年10月 31-06.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 31-06.sql",
+   "rep_lines": [
+    247,
+    249
+   ],
+   "tables": [
+    "MR_BASE_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "SUPER_CODE",
+     "op": "=",
+     "val": "'N99'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "b44e65d1d437230a",
+   "rep_unit": "A_F0138::SQL\\2022年10月 31-06.sql",
+   "rep_file": "A_F0138::SQL\\2022年10月 31-06.sql",
+   "rep_lines": [
+    520,
+    522
+   ],
+   "tables": [
+    "MR_TRACE_LOG"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "303ca5d568df33b0",
+   "rep_unit": "A_F0138::SQL\\2022年12月 26-31.sql",
+   "rep_file": "A_F0138::SQL\\2022年12月 26-31.sql",
+   "rep_lines": [
+    30,
+    33
+   ],
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "grain": [],
+   "filters": [
+    {
+     "col": "OPERATION_CODE",
+     "op": "LIKE",
+     "val": "'40.3x00%'"
+    }
+   ],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "e1396376fb672233",
+   "rep_unit": "A_F0138::SQL\\2023年01月 02-08.sql",
+   "rep_file": "A_F0138::SQL\\2023年01月 02-08.sql",
+   "rep_lines": [
+    367,
+    370
+   ],
+   "tables": [
+    "DIAGNOSIS_DICT_INSUR"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "6a7ae2aa574d0ba5",
+   "rep_unit": "A_F0138::SQL\\2023年01月 09-15.sql",
+   "rep_file": "A_F0138::SQL\\2023年01月 09-15.sql",
+   "rep_lines": [
+    203,
+    205
+   ],
+   "tables": [
+    "OPERATION_MASTER"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  },
+  {
+   "template_hash": "61121737aa87948d",
+   "rep_unit": "A_F0138::SQL\\2023年01月 09-15.sql",
+   "rep_file": "A_F0138::SQL\\2023年01月 09-15.sql",
+   "rep_lines": [
+    206,
+    209
+   ],
+   "tables": [
+    "OPERATION"
+   ],
+   "grain": [],
+   "filters": [],
+   "flags": {},
+   "unresolved_eq": 0,
+   "type": "select",
+   "statements": 1
+  }
+ ]
+}

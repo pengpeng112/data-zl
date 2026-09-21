@@ -1,0 +1,53 @@
+{
+ "generated_at": "2026-09-21",
+ "families_total": 405,
+ "import_rows": 167,
+ "import_by_intake": {
+  "candidate": 132,
+  "partial": 35
+ },
+ "import_by_stage": {
+  "S2": 61,
+  "S3": 37,
+  "S5": 69
+ },
+ "import_by_validation": {
+  "not_run": 148,
+  "passed_in_scope": 19
+ },
+ "excluded": {
+  "platform_formal_covers_evidence_only": 144,
+  "platform_draft_same_edge": 1,
+  "d_crosssource_unlocated": 41,
+  "validation_failed_not_positive_edge": 14,
+  "order_variant_merged_into_senior": 8,
+  "endpoint_unresolved": 5,
+  "blocked_source": 13,
+  "rejected_negative": 4,
+  "ops_dictionary_view": 4,
+  "validation_insufficient": 2
+ },
+ "ordervar_merged_juniors": [
+  "S2F-0BF98D1B1C",
+  "S2F-320B0458DF",
+  "S2F-0943448C9F",
+  "S2F-2C722937BF",
+  "S2F-B198689143",
+  "S2F-8572FD8F83",
+  "S2F-B204F9C884",
+  "S3F-69A35ED45C"
+ ],
+ "internal_pair_duplicates": [
+  [
+   "S2F-C77ABA45F2",
+   "S2F-9E31D12931"
+  ],
+  [
+   "S2F-54DDF3090C",
+   "S3F-D09BA261AA"
+  ]
+ ],
+ "not_imported_are_not_lost": "全部 405 族保留于 relations.jsonl（本地证据完整），排除项均有类别与理由",
+ "recipes": "13 条配方候选（RCP-S3-01..08 + RCP-S5-01..05）→ recipe_payload.json，平台 draft 经 /api/v1/recipes，随批准包一并呈报",
+ "value_domain_candidates": "S6 值域证据（OPERATION_SCALE 尾随空格变体/STOP_FLAG/EXAM_CLASS 17 值/ITEM_CLASS）→ value_domain_candidates.json 待审入口"
+}

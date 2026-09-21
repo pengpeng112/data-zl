@@ -1,0 +1,3590 @@
+{
+ "object_mapping": {
+  "A": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "ODS",
+    "table_role": ""
+   },
+   {
+    "system": "ULTRASOUND_ENDOSCOPY",
+    "source": "ultrasound_endoscopy_sqlserver_10_10_10_161",
+    "schema": "MedcareES.dbo",
+    "table_role": "view"
+   }
+  ],
+  "ADMINISTRATION_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "ADT_LOG": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "ANAESTHESIA_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "APPLICATIONS_PARA": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "APP_CONFIGER_BASEINFO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "APP_CONFIGER_PARAMETER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "APP_GRANTS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "AREA_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "AUTO_SETTING_ID": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "BANK_TRANS_LISTS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "BED_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "dimension"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "BED_TRANS_LOG": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "BILL_ITEM_CLASS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "BL_RYJL": [
+   {
+    "system": "MANDALA_EMR",
+    "source": "mandala_emr_oracle_10_10_10_177",
+    "schema": "EMR",
+    "table_role": "candidate"
+   }
+  ],
+  "CASHER_NO_REC": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "CHARGE_TYPE_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLIENT_INSTALLATION": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_INDEX": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "CLINIC_ITEM_CLASS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_ITEM_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_ITEM_MAPPING": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "ODS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "core_fact"
+   }
+  ],
+  "CLINIC_PAYMENTS_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "CLINIC_RETURNED_ACCT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "CLINIC_TYPE_SETTING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CLINIC_VS_CHARGE": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.APP_CONFIGER_PARAMETER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.CLINIC_ITEM_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.CLINIC_ITEM_MAPPING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.CLINIC_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DATASOURCE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DEPT_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DEPT_VS_WARD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DOCTOR_GROUP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DRUG_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.DRUG_PRICE_LIST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.INPUT_SETTING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.OPERATION_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.PRICE_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.PRICE_LIST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.SECURITY_RIGHT_DESCRIPTION": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.STAFF_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM.STAFF_VS_GROUP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "CONSULTATION_DOCTOR_DETAIL": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "dimension"
+   }
+  ],
+  "CONSULTATION_DOCTOR_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "dimension"
+   }
+  ],
+  "COUNTRY_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DEPT_ADT_DAY": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "DEPT_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_emr",
+    "schema": "JHEMR",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   },
+   {
+    "system": "INFECTION_SURVEILLANCE",
+    "source": "infection_10_10_9_45",
+    "schema": "C##XLYY",
+    "table_role": "table"
+   },
+   {
+    "system": "INTERCONNECT_PROV",
+    "source": "interconnect_10_10_10_5",
+    "schema": "HEALTH_EXCHANGE",
+    "table_role": "table"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "DEPT_OI_ATTR_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DEPT_VS_WARD": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DIAGNOSIS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "INFECTION_SURVEILLANCE",
+    "source": "infection_10_10_9_45",
+    "schema": "C##NIS5",
+    "table_role": "table"
+   },
+   {
+    "system": "INFECTION_SURVEILLANCE",
+    "source": "infection_10_10_9_45",
+    "schema": "C##NIS6",
+    "table_role": "table"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "DIAGNOSIS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DRG",
+    "source": "drg_postgresql_10_10_10_107",
+    "schema": "ods",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "DIAGNOSIS_TYPE_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "DISCHARGE_DISPOSITION_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DOCTOR_GROUP": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DOCTOR_TITLE_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DOCT_DRUG_PRESC_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DOCT_DRUG_PRESC_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_CLASS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_DISPENSE_PRE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_DISPENSE_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "core_fact"
+   }
+  ],
+  "DRUG_DISPENSE_REC_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_DISPENSE_REQ": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_DISPENS_PROPERTY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_EXPORT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_EXPORT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_IMPORT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_IMPORT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_PRESC_ATTR_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_PRESC_DETAIL": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "core_fact"
+   }
+  ],
+  "DRUG_PRESC_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "core_fact"
+   }
+  ],
+  "DRUG_PRICE_LIST": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_PROVIDE_APPLICATION": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_PROVIDE_NOTICE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_STOCK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_STORAGE_DEPT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "DRUG_TOXI_PROPERTY_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_USER.MED_DICT_BASEINFO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   }
+  ],
+  "EINV_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "EMR.HIS_COST_INPRC_INPMAIN": [
+   {
+    "system": "MANDALA_EMR",
+    "source": "mandala_emr_oracle_10_10_10_177",
+    "schema": "EMR",
+    "table_role": "candidate"
+   }
+  ],
+  "EXAM_APPOINTS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "candidate"
+   }
+  ],
+  "EXAM_BILL_ITEMS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "core_fact"
+   }
+  ],
+  "EXAM_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXAM_ITEMS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "core_fact"
+   }
+  ],
+  "EXAM_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "core_fact"
+   }
+  ],
+  "EXAM_PAT_MI": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "candidate"
+   }
+  ],
+  "EXAM_REPORT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "KZL",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "core_fact"
+   }
+  ],
+  "EXAM_RESULT_STATUS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXAM_RPT_PATTERN": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXAM_SHARINGCENTER_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "table_role": "candidate"
+   }
+  ],
+  "EXAM_SUBCLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXP_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXP_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXP_PRICE_LIST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "EXP_PROPERTY_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "HISUSER.MUNICIPAL_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "ODS",
+    "table_role": ""
+   }
+  ],
+  "INPADM.BED_REC": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "dimension"
+   }
+  ],
+  "INPADM.PATS_IN_HOSPITAL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "core_fact"
+   }
+  ],
+  "INPATIENTS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_ydhl",
+    "schema": "YDHL",
+    "table_role": ""
+   },
+   {
+    "system": "MOBILE_NURSING",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "schema": "LUNA_MCS_SDSEY",
+    "table_role": "table"
+   }
+  ],
+  "INPBILL.INP_BILL_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "INPBILL.PREPAYMENT_RCPT_ADD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INPUT_DRUG_LISTS_FOR_PRE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "candidate"
+   }
+  ],
+  "INPUT_SETTING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "INP_ACCT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_ACCT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_ACCT_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_BILL_DETAIL": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "INP_BILL_DETAIL_B": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_BILL_DETAIL_HRP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_BILL_DETAIL_JZ": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_PAYMENTS_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_RCPT_FEE_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "INP_SETTLE_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_SETTLE_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "INP_SETTLE_MASTER_YB": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INP_SETTLE_MASTER_YD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "INSURANCE.INSUR_VSH_CENTER_ITEM_NEW": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "INSURANCE.SETTLE_ZY_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "INSURANCE.YYXMBM": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "INSUR_VSH_CENTER_ITEM_NEW": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "LAB.LAB_RESULT_ITEM": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "LAB.LAB_TEST_BATCH_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "LAB_RESULT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_lis",
+    "schema": "LIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "LIS_SOURCE",
+    "source": "lis_sqlserver_10_10_10_73",
+    "schema": "dbo",
+    "table_role": "table"
+   }
+  ],
+  "LAB_SHARINGCENTER_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "LAB_TEST_BATCH_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "LAB_TEST_ITEMS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "core_fact"
+   }
+  ],
+  "LAB_TEST_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "core_fact"
+   }
+  ],
+  "MARITAL_STATUS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "MCS_DOC_FORM": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_ydhl",
+    "schema": "YDHL",
+    "table_role": ""
+   },
+   {
+    "system": "MOBILE_NURSING",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "schema": "LUNA_MCS_SDSEY",
+    "table_role": "table"
+   }
+  ],
+  "MCS_DOC_FORM_RECORDS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_ydhl",
+    "schema": "YDHL",
+    "table_role": ""
+   },
+   {
+    "system": "MOBILE_NURSING",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "schema": "LUNA_MCS_SDSEY",
+    "table_role": "table"
+   }
+  ],
+  "MCS_ORDER_SCHEDULE": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_ydhl",
+    "schema": "YDHL",
+    "table_role": ""
+   },
+   {
+    "system": "MOBILE_NURSING",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "schema": "LUNA_MCS_SDSEY",
+    "table_role": "table"
+   }
+  ],
+  "MEDICAL_CARD_MEMO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDICAL_CARD_TYPE_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "MEDICAL_CARD_VS_IDNO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDICAL_QC_MSG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDICAL_RECORD_REVIEW_TABLE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC.DIAGNOSIS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "MEDREC.MEDICAL_CARD_MEMO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC.MEDICAL_CARD_TYPE_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "MEDREC.MEDICAL_CARD_VS_IDNO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC.MEDICAL_RECORD_REVIEW_TABLE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC.MED_ICU_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "MEDREC.PAT_ICU_RECORD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC.PAT_MASTER_INDEX": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "MEDREC.PAT_VISIT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "MED_DEPT_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_sm",
+    "schema": "SM",
+    "table_role": ""
+   },
+   {
+    "system": "DOCARE",
+    "source": "docare_oracle_10_10_10_68",
+    "schema": "MEDCOMM",
+    "table_role": "table"
+   }
+  ],
+  "MED_ICU_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "MED_OPERATION_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_sm",
+    "schema": "SM",
+    "table_role": ""
+   },
+   {
+    "system": "DOCARE",
+    "source": "docare_oracle_10_10_10_68",
+    "schema": "MEDSURGERY",
+    "table_role": "table"
+   }
+  ],
+  "MED_OPERATION_SCHEDULE": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_sm",
+    "schema": "SM",
+    "table_role": ""
+   },
+   {
+    "system": "DOCARE",
+    "source": "docare_oracle_10_10_10_68",
+    "schema": "MEDSURGERY",
+    "table_role": "table"
+   }
+  ],
+  "MED_PAT_MASTER_INDEX": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_sm",
+    "schema": "SM",
+    "table_role": ""
+   },
+   {
+    "system": "DOCARE",
+    "source": "docare_oracle_10_10_10_68",
+    "schema": "MEDCOMM",
+    "table_role": "table"
+   }
+  ],
+  "MR_BASE_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "MR_BILL_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "MR_COMM_VS_HIS_COMM": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MR_COMP_CLASS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "MR_FEE_CLASS_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "MR_INDEX": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MR_ON_LINE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "MR_TRACE_LOG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "excluded"
+   }
+  ],
+  "NATION_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "NEWBORN_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "OCCUPATION_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "OFFICIAL_DRUG_CATALOG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "excluded"
+   }
+  ],
+  "OFFICIAL_DRUG_CATALOG_CLASS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "excluded"
+   }
+  ],
+  "OPERATION": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "INFECTION_SURVEILLANCE",
+    "source": "infection_10_10_9_45",
+    "schema": "C##NIS5",
+    "table_role": "table"
+   },
+   {
+    "system": "INFECTION_SURVEILLANCE",
+    "source": "infection_10_10_9_45",
+    "schema": "C##NIS6",
+    "table_role": "table"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "OPERATION_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DRG",
+    "source": "drg_postgresql_10_10_10_107",
+    "schema": "ods",
+    "table_role": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "OPERATION_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "ORDADM.CONSULTATION_DOCTOR_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "dimension"
+   }
+  ],
+  "ORDADM.CONSULTATION_DOCTOR_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "dimension"
+   }
+  ],
+  "ORDADM.ORDERS_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "excluded"
+   }
+  ],
+  "ORDADM.ORDERS_SPECIAL_ANTI_REQUEST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "candidate"
+   }
+  ],
+  "ORDERS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "core_fact"
+   }
+  ],
+  "ORDERS_ANTI_DRUG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "candidate"
+   }
+  ],
+  "ORDERS_COSTS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "core_fact"
+   }
+  ],
+  "ORDERS_EXECUTE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "candidate"
+   }
+  ],
+  "ORDERS_EXECUTE_DETAILS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "execution_fact"
+   }
+  ],
+  "ORDERS_GROUP_REC": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "ORDERS_SHEET_IMAGE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "candidate"
+   }
+  ],
+  "ORDER_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "ORDER_STATUS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "OUTPBILL.EINV_COMM_DATA": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTPBILL.EINV_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTPBILL.OUTP_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "OUTP_ACCT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_ACCT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_ACCT_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_BILL_ITEMS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "OUTP_BILL_ITEMS_HRP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_CARD_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_MR": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "OUTP_MR_DIAG_DESC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "OUTP_ORDERS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "OUTP_ORDER_DESC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_PAYMENTS_MONEY": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_PRESC_T": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "OUTP_RCPT_FEE_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "OUTP_RCPT_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "OUTP_RCPT_MASTER_YD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTP_TREAT_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "PATIENT_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DOCARE",
+    "source": "docare_oracle_10_10_10_68",
+    "schema": "MEDSURGERY",
+    "table_role": "table"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PATIENT_STATUS_CHG_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PATS_IN_HOSPITAL": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "PATS_IN_TRANSFERRING": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "PAT_ICU_RECORD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "PAT_MASTER_INDEX": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "PAT_VISIT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   },
+   {
+    "system": "JHEMR_VASTBASE",
+    "source": "jhemr_vastbase_10_10_8_177",
+    "schema": "jhemr",
+    "table_role": "table"
+   }
+  ],
+  "PAT_VISIT_BIS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "PAT_VISIT_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "PAY_WAY_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PERFORM_DEFAULT_SCHEDULE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PERFORM_DEPT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PERFORM_FREQ_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PHARMACY.DOCT_DRUG_PRESC_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY.DRUG_DISPENSE_PRE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY.DRUG_IMPORT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY.DRUG_IMPORT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY.DRUG_PROVIDE_NOTICE_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PREPAYMENT_RCPT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "payment_fact"
+   }
+  ],
+  "PREPAYMENT_RCPT_ADD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "PREPAY_ACCT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "PREPAY_ACCT_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "PRE_DISCHGED_PATS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "PRICE_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "PRICE_LIST": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "RECK_ITEM_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "REGIST_ACCT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "REGIST_ACCT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "REGIST_ACCT_MONEY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "table_role": "candidate"
+   }
+  ],
+  "RELATIONSHIP_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "CRBSB",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "SECURITY_GROUPINGS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "SECURITY_INFO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "SERIES": [
+   {
+    "system": "PHYSICAL_EXAM",
+    "source": "physical_exam_sqlserver_10_10_10_96",
+    "schema": "ZONEKINGNET.DBO",
+    "table_role": "table"
+   }
+  ],
+  "SETTLE_ZY_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "STAFF_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "STAFF_GROUP_CLASS_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "STAFF_VS_GROUP": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "STAT_VS_CHARGE_TYPE_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "TALLY_SUBJECT_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "TITLE_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "ODS",
+    "table_role": ""
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "TRANSFER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "TREATING_RESULT_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "WAIT_BED_PATS_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "dimension"
+   }
+  ],
+  "WARDBED_TRANS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "dimension"
+   }
+  ],
+  "WARDS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_ydhl",
+    "schema": "YDHL",
+    "table_role": ""
+   },
+   {
+    "system": "MOBILE_NURSING",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "schema": "LUNA_MCS_SDSEY",
+    "table_role": "table"
+   }
+  ],
+  "COMM..APP_CONFIGER_PARAMETER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..CLINIC_ITEM_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..CLINIC_ITEM_MAPPING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..CLINIC_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..DATASOURCE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..DEPT_VS_WARD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..DRUG_PRICE_LIST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..INPUT_SETTING": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..OPERATION_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..PRICE_ITEM_NAME_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..PRICE_LIST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..SECURITY_RIGHT_DESCRIPTION": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..STAFF_DICT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "COMM..STAFF_VS_GROUP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "table_role": "dimension"
+   }
+  ],
+  "DRUG_USER..MED_DICT_BASEINFO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "DRUG_USER",
+    "table_role": "candidate"
+   }
+  ],
+  "EMR..HIS_COST_INPRC_INPMAIN": [
+   {
+    "system": "MANDALA_EMR",
+    "source": "mandala_emr_oracle_10_10_10_177",
+    "schema": "EMR",
+    "table_role": "candidate"
+   }
+  ],
+  "HISUSER..MUNICIPAL_DICT": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "ODS",
+    "table_role": ""
+   }
+  ],
+  "INPADM..PATS_IN_HOSPITAL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "table_role": "core_fact"
+   }
+  ],
+  "INPBILL..INP_BILL_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "INSURANCE..INSUR_VSH_CENTER_ITEM_NEW": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "INSURANCE..SETTLE_ZY_REC": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "INSURANCE..YYXMBM": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "table_role": ""
+   }
+  ],
+  "LAB..LAB_RESULT_ITEM": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "LAB..LAB_TEST_BATCH_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "LAB",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC..DIAGNOSIS": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "MEDREC..MEDICAL_CARD_MEMO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC..MEDICAL_CARD_VS_IDNO": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC..MEDICAL_RECORD_REVIEW_TABLE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC..PAT_ICU_RECORD": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "candidate"
+   }
+  ],
+  "MEDREC..PAT_MASTER_INDEX": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "MEDREC..PAT_VISIT": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "table_role": "core_fact"
+   }
+  ],
+  "ORDADM..CONSULTATION_DOCTOR_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "dimension"
+   }
+  ],
+  "ORDADM..ORDERS_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "excluded"
+   }
+  ],
+  "ORDADM..ORDERS_SPECIAL_ANTI_REQUEST": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "ORDADM",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTPBILL..EINV_COMM_DATA": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTPBILL..EINV_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "candidate"
+   }
+  ],
+  "OUTPBILL..OUTP_RCPT_MASTER": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "table_role": "core_fact"
+   }
+  ],
+  "PHARMACY..DRUG_DISPENSE_PRE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY..DRUG_IMPORT_DETAIL": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "PHARMACY..DRUG_PROVIDE_NOTICE_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "table_role": "candidate"
+   }
+  ],
+  "EXAM..EXAM_ITEMS": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "include_status": "candidate"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "include_status": "included"
+   }
+  ],
+  "EXAM..EXAM_MASTER": [
+   {
+    "system": "DATA_CENTER",
+    "source": "ods_8_216",
+    "schema": "HIS",
+    "include_status": "core"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "EXAM",
+    "include_status": "included"
+   }
+  ],
+  "COMM..DIAGNOSIS_DICT_BK_20220822": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "COMM.DIAGNOSIS_DICT_BK_20220822": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "DRUG_SUPPLIER_CATALOG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "COMM..SECURITY_TEMPLATE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "COMM.SECURITY_TEMPLATE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "SECURITY_TEMPLATE": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "UPDATE_LOG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "COMM",
+    "include_status": "excluded"
+   }
+  ],
+  "LEND_BED_LOG": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "include_status": "excluded"
+   }
+  ],
+  "INPADM..PATS_IN_HOSPITAL_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "include_status": "excluded"
+   }
+  ],
+  "INPADM.PATS_IN_HOSPITAL_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPADM",
+    "include_status": "excluded"
+   }
+  ],
+  "INPBILL..INP_BILL_DETAIL_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "include_status": "excluded"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "INPBILL.INP_BILL_DETAIL_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "include_status": "excluded"
+   },
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "INPBILL..PREPAYMENT_RCPT_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "INPBILL.PREPAYMENT_RCPT_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "INPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "DEPT_EXAM_DAY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDADM",
+    "include_status": "excluded"
+   }
+  ],
+  "MEDADM..DEPT_EXAM_DAY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDADM",
+    "include_status": "excluded"
+   }
+  ],
+  "MEDADM.DEPT_EXAM_DAY": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDADM",
+    "include_status": "excluded"
+   }
+  ],
+  "MEDICAL_CARD_VS_IDNO_DEL_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "include_status": "excluded"
+   }
+  ],
+  "PAT_VISIT_TEMP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "MEDREC",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTPADM..CLINIC_MASTER_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTPADM.CLINIC_MASTER_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPADM",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTP_BILL_ITEMS_TEMP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTP_ORDER_DESC_TEMP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTPBILL..OUTP_PAYMENTS_MONEY_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "OUTPBILL.OUTP_PAYMENTS_MONEY_BK": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "OUTPBILL",
+    "include_status": "excluded"
+   }
+  ],
+  "PHARMACY.DRUG_EXPORT_DETAIL_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "PHARMACY..DRUG_EXPORT_MASTER_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "PHARMACY.DRUG_EXPORT_MASTER_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "DRUG_PRESC_DETAIL_TEMP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "DRUG_PRESC_MASTER_TEMP": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "DRUG_STOCK_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "PHARMACY..DRUG_STOCK_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ],
+  "PHARMACY.DRUG_STOCK_LOG_NEW": [
+   {
+    "system": "HIS",
+    "source": "his_source_10_10_10_15",
+    "schema": "PHARMACY",
+    "include_status": "excluded"
+   }
+  ]
+ },
+ "unmatched": [
+  "ATF_YPXX_DETAIL",
+  "CURRENT_PRICE_LIST",
+  "DEPT_DICT_NEW",
+  "DEPT_DICT_SLX",
+  "DIAGNOSIS_DICT_INSUR",
+  "DICTIONARYSET",
+  "DRG_COMM_DICT",
+  "DRG_PERSON_INFO",
+  "DRG_UPLOAD_LOG",
+  "DRUG_P",
+  "EMR",
+  "EMR..HIS_DIAGNOSIS_DICT",
+  "EMR.HIS_DIAGNOSIS_DICT",
+  "EXAM_BL..BL_EXAM_MASTER",
+  "EXAM_BL.BL_EXAM_MASTER",
+  "EXP_CLASS_DICT",
+  "EXP_EXPORT_DETAIL",
+  "EXP_EXPORT_MASTER",
+  "EXP_FORM_DICT",
+  "EXP_IMPORT_DETAIL",
+  "EXP_IMPORT_MASTER",
+  "EXP_INVENTORY_CHECK",
+  "EXP_STOCK",
+  "EXP_STORAGE_DEPT",
+  "EXP_SUB_STORAGE_DICT",
+  "GGWS..HIS_PATINFO",
+  "GGWS.HIS_PATINFO",
+  "GMZJ_NEW",
+  "GMZJ_NEW_GC",
+  "HISUSER..PROVINCIAL_DICT",
+  "HISUSER..SFG_DATA",
+  "HISUSER..TTTT",
+  "HISUSER.PROVINCIAL_DICT",
+  "HISUSER.SFG_DATA",
+  "HISUSER.TTTT",
+  "HS20200714",
+  "INPUT_DRUG_LISTS",
+  "INPUT_DRUG_LISTS_DM",
+  "INPUT_NODRUG_LIST",
+  "INPUT_NODRUG_LIST_TEST",
+  "INSURANCE..DRG_COMM_DICT",
+  "INSURANCE..INSUR_BILL_DETIAL",
+  "INSURANCE..INSUR_OUT_OF_DIRECTORY_DICT",
+  "INSURANCE..OUTP_RCPT_MASTER_YB",
+  "INSURANCE..VW_PATI_IN_DX",
+  "INSURANCE.DRG_COMM_DICT",
+  "INSURANCE.INSUR_BILL_DETIAL",
+  "INSURANCE.INSUR_OUT_OF_DIRECTORY_DICT",
+  "INSURANCE.INSUR_P",
+  "INSURANCE.VW_PATI_IN_DX",
+  "INSURANCE_ACCOUNTS",
+  "INSUR_EXPORT",
+  "INSUR_EXPORT..信息表",
+  "INSUR_EXPORT..病理病人清单",
+  "INSUR_EXPORT.信息表",
+  "INSUR_EXPORT.病理病人清单",
+  "INSUR_HIS_VS_CENTER",
+  "INSUR_OUT_OF_DIRECTORY_DICT",
+  "INSUR_PREPAYMENT_RCPT",
+  "INSUR_VSH_CENTER_ITEM",
+  "INSUR_VSH_TEZ_PAT",
+  "INSUR_VS_CENTER",
+  "INVOICE_MANAGE_REC",
+  "JOB_DEFINITION",
+  "KEY_DICT_NEW",
+  "LAB..SQ_HSJC_TUBE_BARCODE",
+  "LAB..VIEW_LAB_RESULT",
+  "LAB.SQ_HSJC_TUBE_BARCODE",
+  "LAB.VIEW_LAB_RESULT",
+  "LCLJ..HIS_OPERATION_VIEW",
+  "LCLJ..LCLJ_HIS_BASY_LJHZXX",
+  "LCLJ.HIS_OPERATION_VIEW",
+  "LCLJ.LCLJ_HIS_BASY_LJHZXX",
+  "LIST_ST_QUERY",
+  "MEDICAL_RECORD_HANDOVER",
+  "MONURSING..MONURSING_LOG",
+  "MONURSING.MONURSING_LOG",
+  "ODERS",
+  "OPERATION_NAME",
+  "OPERATION_SCHEDULE",
+  "OUTPDOCT..OUTP_ORDERS_COSTS",
+  "OUTPDOCT.OUTP_ORDERS_COSTS",
+  "OUTP_DOCTOR_SCHEDULE",
+  "OUTP_ORDERS_COSTS",
+  "OUTP_ORDERS_T",
+  "OUTP_PRESC",
+  "OUTP_RCPT_MASTER_YB",
+  "OUTP_TREAT_REC_T",
+  "OUTP_WAIT_QUEUE",
+  "PAT_DRGS",
+  "PRESC_T",
+  "PUB_PATIENTINFO_INSURE",
+  "SCHEDULED_OPERATION_NAME",
+  "SFG_DATA",
+  "SQLSPT",
+  "SUM",
+  "SURGERY.OPERATION_SCHEDULE",
+  "SYSTEM..DICTIONARYSET",
+  "SYSTEM.DICTIONARYSET",
+  "TABLE_NAME",
+  "TABLE_NAME_4J",
+  "TABLE_NAME_BFZ",
+  "TABLE_NAME_WC",
+  "TJJKHLYY..DC_DRUG_PRESC_MASTER",
+  "TJJKHLYY..DC_INP_BILL_DETAIL",
+  "TJJKHLYY.DC_DRUG_PRESC_MASTER",
+  "TJJKHLYY.DC_INP_BILL_DETAIL",
+  "WEBSERVICE_LOG",
+  "WHERE",
+  "YB_MAPPING",
+  "YJTBIS..BIS_BILL_LOG",
+  "YJTBIS.BIS_BILL_LOG",
+  "YJYY..VI_MA_EXAMITEM",
+  "YJYY..VI_MA_MZBILLINFO",
+  "YJYY..VI_MA_PATIENTINFO",
+  "YJYY..VI_MA_ZYBILLINFO",
+  "YJYY.VI_MA_EXAMITEM",
+  "YJYY.VI_MA_MZBILLINFO",
+  "YJYY.VI_MA_PATIENTINFO",
+  "YJYY.VI_MA_ZYBILLINFO",
+  "ZY_ZYYZXXMX",
+  "加工号改序列",
+  "手麻系统中对应信息修改一致后",
+  "改医嘱SELECT",
+  "科室护理单元对照"
+ ],
+ "platform_table_count": 18539,
+ "counts": {
+  "asset_relations": "1329",
+  "asset_candidate_relations": "0",
+  "asset_relation_reviews": "674",
+  "asset_relation_recipes": "65",
+  "asset_column_value_domains_confirmed": "26"
+ },
+ "review_status": "draft|666\nrejected|5\napproved|3",
+ "unmatched_categories": {
+  "oracle_system_dict": [
+   "ALL_TAB_COMMENTS",
+   "COUNT",
+   "DBA_HIST_ACTIVE_SESS_HISTORY",
+   "DBA_HIST_SQLSTAT",
+   "DBA_HIST_SQLTEXT",
+   "DBA_OBJECTS",
+   "DBA_USERS",
+   "V$LOCKED_OBJECT",
+   "V$SESSION",
+   "V$SQL",
+   "V$TRANSACTION"
+  ],
+  "genuine_unknown": [
+   "ATF_YPXX_DETAIL",
+   "CURRENT_PRICE_LIST",
+   "DEPT_DICT_NEW",
+   "DEPT_DICT_SLX",
+   "DIAGNOSIS_DICT_INSUR",
+   "DICTIONARYSET",
+   "DRG_COMM_DICT",
+   "DRG_PERSON_INFO",
+   "DRG_UPLOAD_LOG",
+   "DRUG_P",
+   "EMR",
+   "EMR..HIS_DIAGNOSIS_DICT",
+   "EMR.HIS_DIAGNOSIS_DICT",
+   "EXAM_BL..BL_EXAM_MASTER",
+   "EXAM_BL.BL_EXAM_MASTER",
+   "EXP_CLASS_DICT",
+   "EXP_EXPORT_DETAIL",
+   "EXP_EXPORT_MASTER",
+   "EXP_FORM_DICT",
+   "EXP_IMPORT_DETAIL",
+   "EXP_IMPORT_MASTER",
+   "EXP_INVENTORY_CHECK",
+   "EXP_STOCK",
+   "EXP_STORAGE_DEPT",
+   "EXP_SUB_STORAGE_DICT",
+   "GGWS..HIS_PATINFO",
+   "GGWS.HIS_PATINFO",
+   "GMZJ_NEW",
+   "GMZJ_NEW_GC",
+   "HISUSER..PROVINCIAL_DICT",
+   "HISUSER..SFG_DATA",
+   "HISUSER..TTTT",
+   "HISUSER.PROVINCIAL_DICT",
+   "HISUSER.SFG_DATA",
+   "HISUSER.TTTT",
+   "HS20200714",
+   "INPUT_DRUG_LISTS",
+   "INPUT_DRUG_LISTS_DM",
+   "INPUT_NODRUG_LIST",
+   "INPUT_NODRUG_LIST_TEST",
+   "INSURANCE..DRG_COMM_DICT",
+   "INSURANCE..INSUR_BILL_DETIAL",
+   "INSURANCE..INSUR_OUT_OF_DIRECTORY_DICT",
+   "INSURANCE..OUTP_RCPT_MASTER_YB",
+   "INSURANCE..VW_PATI_IN_DX",
+   "INSURANCE.DRG_COMM_DICT",
+   "INSURANCE.INSUR_BILL_DETIAL",
+   "INSURANCE.INSUR_OUT_OF_DIRECTORY_DICT",
+   "INSURANCE.INSUR_P",
+   "INSURANCE.VW_PATI_IN_DX",
+   "INSURANCE_ACCOUNTS",
+   "INSUR_EXPORT",
+   "INSUR_EXPORT..信息表",
+   "INSUR_EXPORT..病理病人清单",
+   "INSUR_EXPORT.信息表",
+   "INSUR_EXPORT.病理病人清单",
+   "INSUR_HIS_VS_CENTER",
+   "INSUR_OUT_OF_DIRECTORY_DICT",
+   "INSUR_PREPAYMENT_RCPT",
+   "INSUR_VSH_CENTER_ITEM",
+   "INSUR_VSH_TEZ_PAT",
+   "INSUR_VS_CENTER",
+   "INVOICE_MANAGE_REC",
+   "JOB_DEFINITION",
+   "KEY_DICT_NEW",
+   "LAB..SQ_HSJC_TUBE_BARCODE",
+   "LAB..VIEW_LAB_RESULT",
+   "LAB.SQ_HSJC_TUBE_BARCODE",
+   "LAB.VIEW_LAB_RESULT",
+   "LCLJ..HIS_OPERATION_VIEW",
+   "LCLJ..LCLJ_HIS_BASY_LJHZXX",
+   "LCLJ.HIS_OPERATION_VIEW",
+   "LCLJ.LCLJ_HIS_BASY_LJHZXX",
+   "LIST_ST_QUERY",
+   "MEDICAL_RECORD_HANDOVER",
+   "MONURSING..MONURSING_LOG",
+   "MONURSING.MONURSING_LOG",
+   "ODERS",
+   "OPERATION_NAME",
+   "OPERATION_SCHEDULE",
+   "OUTPDOCT..OUTP_ORDERS_COSTS",
+   "OUTPDOCT.OUTP_ORDERS_COSTS",
+   "OUTP_DOCTOR_SCHEDULE",
+   "OUTP_ORDERS_COSTS",
+   "OUTP_ORDERS_T",
+   "OUTP_PRESC",
+   "OUTP_RCPT_MASTER_YB",
+   "OUTP_TREAT_REC_T",
+   "OUTP_WAIT_QUEUE",
+   "PAT_DRGS",
+   "PRESC_T",
+   "PUB_PATIENTINFO_INSURE",
+   "SCHEDULED_OPERATION_NAME",
+   "SFG_DATA",
+   "SQLSPT",
+   "SUM",
+   "SURGERY.OPERATION_SCHEDULE",
+   "SYSTEM..DICTIONARYSET",
+   "SYSTEM.DICTIONARYSET",
+   "TABLE_NAME",
+   "TABLE_NAME_4J",
+   "TABLE_NAME_BFZ",
+   "TABLE_NAME_WC",
+   "TJJKHLYY..DC_DRUG_PRESC_MASTER",
+   "TJJKHLYY..DC_INP_BILL_DETAIL",
+   "TJJKHLYY.DC_DRUG_PRESC_MASTER",
+   "TJJKHLYY.DC_INP_BILL_DETAIL",
+   "WEBSERVICE_LOG",
+   "WHERE",
+   "YB_MAPPING",
+   "YJTBIS..BIS_BILL_LOG",
+   "YJTBIS.BIS_BILL_LOG",
+   "YJYY..VI_MA_EXAMITEM",
+   "YJYY..VI_MA_MZBILLINFO",
+   "YJYY..VI_MA_PATIENTINFO",
+   "YJYY..VI_MA_ZYBILLINFO",
+   "YJYY.VI_MA_EXAMITEM",
+   "YJYY.VI_MA_MZBILLINFO",
+   "YJYY.VI_MA_PATIENTINFO",
+   "YJYY.VI_MA_ZYBILLINFO",
+   "ZY_ZYYZXXMX",
+   "加工号改序列",
+   "手麻系统中对应信息修改一致后",
+   "改医嘱SELECT",
+   "科室护理单元对照"
+  ],
+  "dated_backup_temp": [
+   "CLINIC_MASTER2023",
+   "CLINIC_RETURNED_ACCT_20200810",
+   "OPERATION_DOCARE_TEMP"
+  ]
+ },
+ "dedup_note": "double-dot artifacts normalized; supplement query includes excluded rows"
+}

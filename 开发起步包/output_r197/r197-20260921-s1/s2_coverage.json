@@ -1,0 +1,11 @@
+{
+ "queue_rows_S2": 2039,
+ "distinct_stmt_ids": 1993,
+ "duplicate_file_rows": 46,
+ "dup_explanation": "44 组由 S1 file_duplicate_map/archive_member_duplicate_of_original 精确解释；1 组为 A_F0526::介入工作量sql(2).txt 与 F0305/F0508 的语句级同哈希变体（文件级非全同），证据挂代表 F0305",
+ "families": 223,
+ "stmts_attached_to_families_distinct": 631,
+ "stats_only_templates": 519,
+ "stats_only_stmts_distinct": 1362,
+ "closure": "631 + 1362 = 1993 distinct = 2039 queue rows - 46 duplicate rows；模板侧 577+519=1096 闭合"
+}

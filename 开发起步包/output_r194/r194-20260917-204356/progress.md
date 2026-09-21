@@ -1,0 +1,28 @@
+# r194 执行进度
+
+- 20:43 S0a 目录自检/切片阅读完成；既有差异与 194 §2.3-3 一致（181 孤儿、55/164/187 体例告警，仅记录）
+- 20:45 S0b HEAD=d7536d0 + 193 未提交条目指纹落盘；run 目录建立
+- 20:47 S0c check_test_environment=pure_logic_ready → dev_env.sh 隧道 → data_asset_test 身份/独占核实（其他连接 0，空库 115 表）
+- 20:55 S0d API 盘点 434 方法-路径（含权限码/风险分类）；前端路由 73 条（41 可见叶）
+- 20:56–20:59 S1a 合成种子 12/12 段成功（修字段名/约束若干轮，seed_summary.json）
+- 21:01 S1b 隔离后端 8000 启动（出口封禁 env），健康 OK；调度/执行器/LLM/Dify 零注册（日志核实）
+- 21:02 vite 8848 启动
+- 21:03–21:15 登录按钮攻坚：定位三现象（1440 裁切 DEF-06、浮动动画 DEF-08、IAB 点击超时但动作生效）；21:15 登录成功
+- 21:16 工作台快照；发现站内导航冻结（DEF-01，P0）
+- 21:18–21:28 S2 全页 G01 扫测（41/41，deep-link+reload 路径）
+- 21:28 查询中心空列表确认（DEF-02）
+- 21:29 后台启动 typecheck/纯逻辑 pytest；21:31 typecheck 双过；21:33 纯逻辑 15P/1S
+- 21:33–21:41 S3 API 矩阵：AR04 12 例；发现权限种子 action 漂移（DEF-05）→ 夹具修正后全绿；J04 状态机过；J08 隔离精确认证 + 跨科室写越权（DEF-03）
+- 21:43 J02 表详情 PASS（按源隔离）；J12/I12 会话过期+禁用 token（DEF-04）
+- 21:44 后台 vitest+build；21:45 vitest 320/320；build+gzip 预算过
+- 21:46 AR07/AR08 一次性库迁移往返 PASS
+- 21:48 S6 历史复核阅读（173 清单/186 末节/192 晨检/193 B00B01）+ 代码核对（192 D3 在树）
+- 21:50 后台全量 pytest 启动（隔离库将被清空——浏览器证据已收完）
+- 21:52 历史任务复核.md / 问题清单.md 落盘
+- 待办：pytest 结果 → O02 补测（正确字段）→ 173 P2-1/P3-5 补测 → cases/coverage/测试报告 → README/55 登记 → 进程清理
+- 22:28（约）全量 pytest 完成：1617 passed / 1 failed / 1 skipped（36:38；唯一 F=test_production_weak_config_fails_closed → DEF-11）
+- 22:29–22:31 pytest 后补测（backend.log:3029–3057）：重登录 → O02 正确字段复测 6/6 PASS（UPDATE 写源库/DROP/多语句 DELETE 均 valid=false，bind 缺失检出）→ 173 P2-1（PUT /api/v1/systems 200 @3043 + 列表回读 @3045）与 P3-5（POST /api/v1/recipes 200 @3047）→ J11 补测（/govern/audit-logs 200 total=9 @3049）→ 过期 refresh 401 断言
+- 22:31–22:33（约）S7 终稿：cases.json/coverage.json 手工更新补测终态（J11/O02/HR-173 由 NOT_RUN 改判 + 质量门禁 backend_full/o02_retest），测试报告/问题清单定稿
+- 22:33（约）S8：README/55 登记、进程清理（uvicorn 8000 / vite 8848 已停，端口 0 监听）、终检（他人域 13 文件一致、8 个 JSON 有效、git 增量=output_r194+README+55）
+- 23:00 交付中文总结
+- 2026-09-18 复核修订（另一 AI 审阅 5 项发现全部确认 + 本仓复核新增 3 项后执行）：①历史任务复核.md 173 表回写补测终态（原停留 pytest 前快照，与 cases.json 矛盾）；②coverage.json/测试报告 §2 旅程口径对齐 cases.json（执行 6+阻断 2+未做 4；J11 曾误列 NOT_RUN，"8 条执行"系把 BLOCKED 计入）；③问题清单：DEF-11 归 P2（P2 4 条/P3 2 条）、DEF-03 行号 335→337、DEF-01 证据引用的 logs/browser_nav_freeze 不存在改为时间线+backend.log 请求空窗佐证、DEF-05 备注"记录于 environment.json"失实更正、U-1~U-6 标注未复核保持开放；④cases.json HR-173 措辞更正（PUT upsert 注册）+清理 3 处 NOT_RUN→改判残留的 blocked_reason:null；⑤生成脚本 gen_cases_coverage.py 全量同步终态（原脚本 4 处 pytest 前快照，重跑会把 J11/O02/HR-173 打回 NOT_RUN、backend_full 打回 RUNNING——已实测重跑与产物逐字节一致，回退风险消除）；⑥README/55 口径对齐并登记。状态分布（66/9/6/1/3/21/2=108）与全部 PASS/FAIL 结论零变化。

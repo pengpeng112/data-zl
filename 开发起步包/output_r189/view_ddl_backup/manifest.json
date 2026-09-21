@@ -1,0 +1,794 @@
+[
+  {
+    "file": "ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ADMISSION_DEAD_RECORD_TF",
+    "bytes": 26170,
+    "sha256": "b09360e0b97b1b941e9e9d379760bcf0f005f616fe9540e011d0c88ca2d2f531",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ADMISSION_DIAGNOSIS",
+    "bytes": 8275,
+    "sha256": "c0ba26b1394236c9e6f961afe545f4d9e6c118182ac8a559435b40a23f02cbe9",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ADMISSION_RECORD",
+    "bytes": 47206,
+    "sha256": "e7e51ab2adc0a9b6836f4e6cc1961a06b89ea9ddd7a4a4a0393f3f7729dae3b6",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ADMISSION_RECORD_EXAM.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ADMISSION_RECORD_EXAM",
+    "bytes": 6135,
+    "sha256": "ab78a70dd0bd831fc08ab9236bcacd5f12ce5ee0404babbca790549cdbdee4c2",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ANESTHESIA_RECORD",
+    "bytes": 27733,
+    "sha256": "df8cee13d56dda94b19c7d7bd09c9e98d9fd6c680e38ce105def4c45e4f41e7a",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ANES_AFTER_RECORD",
+    "bytes": 33443,
+    "sha256": "a106963ae8d4a5c03a53294600b64a0aa18766a69d2799042f9e1de08ea66f20",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ANES_RECORD_BLOOD",
+    "bytes": 4365,
+    "sha256": "590a76a705885bf651b147c6a031f41d7e1ef7bd0747d542e982b945ce6514af",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ANES_RECORD_MED",
+    "bytes": 8976,
+    "sha256": "9f85148774517295636958dd4c793e03f0d7c7ac228cbb2235b8f32a49139e25",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_BOFORE_OPERA_RECORD",
+    "bytes": 40299,
+    "sha256": "9eb7d02144df3723e2d525544e57eca52d72f2e8b693c9b2feb5cc771fa7feb7",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_CONSUMABLES.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_CONSUMABLES",
+    "bytes": 3686,
+    "sha256": "238d6a74038d8dfa654190f39a308e68e1b63d37a6bac2c51be933c44fd0d28c",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_DEATH_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_DEATH_RECORD",
+    "bytes": 12852,
+    "sha256": "6dccb31de4c5528e7c1e0db44ca68c2af60af638c416efc726d4297d124170b7",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_DISCHARGE_RECORD",
+    "bytes": 24855,
+    "sha256": "35be4bc6acd2f98debc32c621329c03f2552274710600ff21834f21fcc2718f9",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_DOC_ORDER_CHECK",
+    "bytes": 12545,
+    "sha256": "084cf81c8c666b4ce26a2029d4a890720508aa33456228f4495d651a01702444",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_DOC_ORDER_DRUG",
+    "bytes": 40099,
+    "sha256": "0aa6636ebcfc3788e1feb3179632b0969fe3e3c254ab96b8a50dbfe139bbad2b",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+    "bytes": 14149,
+    "sha256": "221c289c1e82a6b961840b264d1c88e185fb305d2148d70b3b0e257e665c64d3",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_CONSUL_RECORD",
+    "bytes": 6487,
+    "sha256": "1511ce1934f2b16f037813476335bdfc043a668f584d44a059ccb832bc726065",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "bytes": 13556,
+    "sha256": "18b820ca4f80674cc96fbb548c3e708277450645b46b91870fc13ffd805ae4ce",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_DND_RECORD",
+    "bytes": 10353,
+    "sha256": "c95b64f79e0d6d87d43c4b92cbd79b80520da6ff55b44a2ca5f4c19ee3955930",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_POSTOPER_RECORD",
+    "bytes": 2718,
+    "sha256": "e6366328e7c6c0b8e172be395ca9597ef594eb96947f654c3b47533f97199658",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_PREOP_DISCUSS",
+    "bytes": 16234,
+    "sha256": "6256f63aa8a5be2fb3a1a2ae71e918ece08becff15b9a83b302b8c2821d8dcac",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_SAVE_RECORD",
+    "bytes": 25880,
+    "sha256": "cd9d9880959c833c4c44388b163df6c158137cafeb4444b44473aa9c73a58c5c",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_HOS_SUCCESSION_RECORD",
+    "bytes": 9966,
+    "sha256": "e7a1b8bb0051b3a5308073df682868c6b482f44a5e5a5714a48692dec335a333",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ICH.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ICH",
+    "bytes": 56064,
+    "sha256": "c1b92c5431071c9e5935f13eb59fb2f826d226b86585efe95042d5ae6e578107",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ICH_ALLERGIES",
+    "bytes": 5217,
+    "sha256": "a6d5f2dee326fdf62bb658cb3073ac57312b172ad620cef435e6b9cf9b0a9823",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ICH_CHARGE.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ICH_CHARGE",
+    "bytes": 7024,
+    "sha256": "9d54a2114b508e36780d73ad2fb58884393408231844ca216e79f27dabc6cf2c",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ICH_DIAGNOSIS",
+    "bytes": 15755,
+    "sha256": "4553748fbe77b7a29fe061c5eab99b17a610a7285153c0c11366895c500fad52",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_ICH_OPERATION.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_ICH_OPERATION",
+    "bytes": 17408,
+    "sha256": "d5ae8b5d372a8f0f68ca52025cce54125b975ebe5c628c0db0859f1144606966",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_ANESTHESIA",
+    "bytes": 23246,
+    "sha256": "a2120bdaaac5998ed67cc262c86d4a6a349980746af84188e894c1d4bb6dd218",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_CRITICALLY_ILL",
+    "bytes": 20918,
+    "sha256": "105f4e352166f4f0f92692d55dfa3cebba27b80f1bb20ba82a815e516cd3cb43",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_OPERATION",
+    "bytes": 26596,
+    "sha256": "016487ef36e552eb96fd592fb0f290063b4ee2bb78a877ac5a390e02ed662d5c",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_OTHERS",
+    "bytes": 22863,
+    "sha256": "cccc60811045bd44bf4264bcaec8bdd8738a5a44eeba1007b9910de56dbb8bcb",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_SPEC_EXAM_TREAT",
+    "bytes": 17379,
+    "sha256": "7b077df40b1b8324ca5380372fb3c0d46cdecd20cd184b07422f593850e69943",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INFOR_TRANS_BLOOD",
+    "bytes": 18782,
+    "sha256": "7f59973ea0a18a0b104a4faef3865411e549de15560d1b55e2532f1ddc1b8a69",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INSPECTION_ALLERGY_TEST",
+    "bytes": 10165,
+    "sha256": "fdc9f120afa15d74554c7e8a1b2c7eb81acc7d2be871254e235e200b8140efac",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INSPECTION_IMAGE_TEST",
+    "bytes": 1763,
+    "sha256": "29210146509434db133fd369aafdfb23b7cb7c9d5523341e82221e2abf53748f",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INSPECTION_ITEM_TEST",
+    "bytes": 20054,
+    "sha256": "bb459146eb5674ff7d5dc4f6ed7e9662b80cc21059eaf65e47f0a52d4ebb79a5",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_INSPECTION_TEST",
+    "bytes": 33877,
+    "sha256": "aaca6fc672af7a30d27b553b3585dafacf4697d70a26cfc6087e1cba8b43eddd",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_IN_FEE_INFO_CHILD",
+    "bytes": 10417,
+    "sha256": "1c3597c4d8a0e673c57ea3ad8706d46b7aa1944dfc1ff98a4c4c2b79ddb5a55d",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_IN_FEE_INFO_MAIN",
+    "bytes": 3727,
+    "sha256": "6aa97b18711e51089d686a9414ffb41a692a51e7c8021fca833d24f497795fbf",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_MEDICAL_RECORD_INFO",
+    "bytes": 10463,
+    "sha256": "ebb956c732de852683965f51f1f391a9968e514e5128ca7e100a3e836dba801d",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_NURSING_ASSESSMENT.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_NURSING_ASSESSMENT",
+    "bytes": 39777,
+    "sha256": "f7eda4967b959adbd18186060264cbda18d82748e07fd586047d800fb669df28",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OPERATION_NURSING",
+    "bytes": 31340,
+    "sha256": "ea9c837d13150a189c8e809330c640c337e044edb4a4a5f2eea0e8bf7c207310",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OPERA_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OPERA_RECORD",
+    "bytes": 38392,
+    "sha256": "8e5328c4b419eba9a17f194453e5185a6d6eb0a7000797d4a518c7d950bc259a",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_DIAG",
+    "bytes": 21480,
+    "sha256": "9141525520ded78336c57a72fc7c47fcc353e66b98821514835528186efecd5e",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG_BAK.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_DIAG_BAK",
+    "bytes": 19371,
+    "sha256": "1e627d2a5acc214f0a5a2abba1f66115e55c2fffef2e4d2d7d0de39d30ec2653",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_RECIPE",
+    "bytes": 13840,
+    "sha256": "32bba411253f8e9d3f91d77ca7b05f99096052338fece526b2672c77877af2a3",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_BAK.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_RECIPE_BAK",
+    "bytes": 40619,
+    "sha256": "32bf12313535d94ac4cf8a6d4eb2ae1f3d2cd7d7e3973ddd71cf0aff464baf34",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_RECIPE_ITEM",
+    "bytes": 40839,
+    "sha256": "600c63f6bf1ed04948200b08cd4739c41dbf0386533525d6b653979e01036323",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_RECORD",
+    "bytes": 27770,
+    "sha256": "93c3eea344f4bdf0f001e05e7c1e5986ee0f143d847ec8f51dc03593849b0325",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUTPATIENT_REGISTER",
+    "bytes": 18078,
+    "sha256": "2df376ea8170a96a206571f79c457c67a573c782abd39e948bedff5a195f8070",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUT_FEE_INFO_CHILD",
+    "bytes": 12994,
+    "sha256": "3aadc78a2bb350743e5be42c0f225f20f30edd3313b5028eb3feccb9b179d0f7",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_OUT_FEE_INFO_MAIN",
+    "bytes": 27941,
+    "sha256": "ab335cfe80fd75e60f77856edf7e8fb12409eab1941ab2d5c984fcec83885bf2",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "V_EMR_REFERRAL_HOS_RECORD",
+    "bytes": 7722,
+    "sha256": "8c7f56ce277ca1faf809f147512fbb18c76e03c0b1b1955639d3d3d4352a2b10",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+    "bytes": 6080,
+    "sha256": "3be6fbdcb015afce70b958d7f38f8760681a718325e9dcc2bd66aea2ac7d124f",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "ods_8_216__ODS.EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+    "source": "ods_8_216",
+    "owner": "ODS",
+    "name": "EMR_HOS_CHANGE_MAJOR_RECORD",
+    "bytes": 14147,
+    "sha256": "df2efcd27468615daadf1cbb1d4706c294fca4334ad829939917acab73b79672",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql",
+    "source": "his_source_10_10_10_15",
+    "owner": "HISUSER",
+    "name": "V_EMR_EXAM_IMAGE_REP",
+    "bytes": 27981,
+    "sha256": "6b06231cee3bbac45566ce8e2d8f502960ebc1c2aa9c0ffcbc3752010033db4e",
+    "method": "ALL_VIEWS.TEXT",
+    "ok": true
+  },
+  {
+    "file": "his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql",
+    "source": "his_source_10_10_10_15",
+    "owner": "HISUSER",
+    "name": "V_EMR_EXAM_IMAGE_PATH",
+    "bytes": 3927,
+    "sha256": "49875ae6739f9371c942544412446b388a5dbcc5bfd751113e49a818bb8f2131",
+    "method": "ALL_VIEWS.TEXT",
+    "ok": true
+  },
+  {
+    "file": "his_source_10_10_10_15__HISUSER.V_EMR_CONSUMABLES.sql",
+    "source": "his_source_10_10_10_15",
+    "owner": "HISUSER",
+    "name": "V_EMR_CONSUMABLES",
+    "bytes": 6276,
+    "sha256": "fbb148399c8b1db51967ae63bdd98dcc52c39041194d85b262dcad79c1e092ee",
+    "method": "ALL_VIEWS.TEXT",
+    "ok": true
+  },
+  {
+    "file": "lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION.sql",
+    "source": "lis_sqlserver_10_10_10_73",
+    "owner": "dbo",
+    "name": "v_EMR_INSPECTION",
+    "bytes": 28107,
+    "sha256": "d8ded606a6e686742ce78f0780550ed979f829001e2354823eaf03d4429a4838",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "lis_sqlserver_10_10_10_73__dbo.V_EMR_INSPECTION_IMAGE.sql",
+    "source": "lis_sqlserver_10_10_10_73",
+    "owner": "dbo",
+    "name": "V_EMR_INSPECTION_IMAGE",
+    "bytes": 4107,
+    "sha256": "fbff052c3cc9a118bb7756b44a6b255dd57d570571eb29d30cc42a828adad47d",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ALLERGY.sql",
+    "source": "lis_sqlserver_10_10_10_73",
+    "owner": "dbo",
+    "name": "v_EMR_INSPECTION_ALLERGY",
+    "bytes": 7649,
+    "sha256": "0fc956ba97a7048963c1e10842d052822259c759afaba34ea710a0fee2ff98eb",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ITEM.sql",
+    "source": "lis_sqlserver_10_10_10_73",
+    "owner": "dbo",
+    "name": "v_EMR_INSPECTION_ITEM",
+    "bytes": 15009,
+    "sha256": "0a1d7140237a5959fdc74d88bb6ff27f841de1031f7304279fb222eb7da45b56",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_NURSING_ASSESSMENT",
+    "bytes": 10485,
+    "sha256": "0c5e71aabadbab5a5a0bb640737cd412a9c82a89054b149d4e15ded863f530ab",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_ADMISSION_ASSESSMENT",
+    "bytes": 23951,
+    "sha256": "701d2b9f457abdf07512b18ef431f3adcf4dea57f92f4f052165c0909230b755",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_GENERAL_NURSING",
+    "bytes": 15500,
+    "sha256": "5431602008ebc316321dd0780dbca2dd14c536f0506782ac70c236cb3220b68d",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_DISCHARGE_ASSESSMENT",
+    "bytes": 17329,
+    "sha256": "c39974a35bcc3de8ecdbe5de81af171bc64666d3abade8fdd4fecb6fd5434923",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_CHILDBIRTH",
+    "bytes": 44903,
+    "sha256": "b6516ef64a37598711e5811f3287e4d9206bbde805dcd282a2240072f8cf0e6b",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_CRITICALLY_ILL_NURS",
+    "bytes": 14236,
+    "sha256": "af355a9a321e74f3dced8cf15644710e0c5d4ce5a97e317890455d86c322ea19",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_IN_OUT_AMOUNT",
+    "bytes": 10972,
+    "sha256": "d588ed80ec33f8ac77f4c7dde68eeabba65bf36b1a7d0de1ce58484b23259244",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql",
+    "source": "mobile_nursing_oracle_10_10_10_125",
+    "owner": "LUNA_MCS_SDSEY",
+    "name": "V_EMR_VITAL_SIGN",
+    "bytes": 15139,
+    "sha256": "406a38cd46a58df38f80b833f7509435cdf5eeec750080c88760b8151d2b673d",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+    "source": "hrp_10_10_10_23",
+    "owner": "HRPSEY656",
+    "name": "EMR_HOS_PRACTITIONER",
+    "bytes": 13696,
+    "sha256": "0a836a9313976db4eb92cb3f068410785d1daea5187b3bd3958e6c9814a61442",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "hrp_10_10_10_23__HRPSEY656.EMR_HOS_INFORMATION.sql",
+    "source": "hrp_10_10_10_23",
+    "owner": "HRPSEY656",
+    "name": "EMR_HOS_INFORMATION",
+    "bytes": 6078,
+    "sha256": "e3ad76a13bfd9b450249b06e9f4c7df999cb3a0117c8b77e316a0f2f32ba7c63",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": "hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+    "source": "hrp_10_10_10_23",
+    "owner": "HRPSEY656",
+    "name": "EMR_HOS_PRACTITIONER",
+    "bytes": 13696,
+    "sha256": "0a836a9313976db4eb92cb3f068410785d1daea5187b3bd3958e6c9814a61442",
+    "method": "GET_DDL",
+    "ok": true
+  },
+  {
+    "file": null,
+    "source": "physical_exam_sqlserver_10_10_10_96",
+    "owner": "-",
+    "name": "-",
+    "ok": false,
+    "error": "RuntimeError: sqlserver connector unavailable: install ODBC Driver + pyodbc or pymssql. pyodbc=ImportError; pymssql=OperationalError"
+  },
+  {
+    "file": null,
+    "source": "dialysis_postgresql_10_10_10_88",
+    "owner": "-",
+    "name": "-",
+    "ok": false,
+    "error": "ProgrammingError: only '%s', '%b', '%t' are allowed as placeholders, got '%E'"
+  },
+  {
+    "file": "pathology_sqlserver_10_10_9_41__dbo.molecular_pathology_exam_record.sql",
+    "source": "pathology_sqlserver_10_10_9_41",
+    "owner": "dbo",
+    "name": "molecular_pathology_exam_record",
+    "bytes": 2993,
+    "sha256": "254db99db2de496309ac6ec353a0b22a79a0ae887462bf82ae2e7fd63ba486be",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql",
+    "source": "pathology_sqlserver_10_10_9_41",
+    "owner": "dbo",
+    "name": "EMR_PATHOLOGY_REPORT",
+    "bytes": 47293,
+    "sha256": "382378a978e76a17e50214e215dbffefc074b8d0b3087e062586dee40e5f5b78",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": "pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+    "source": "pathology_sqlserver_10_10_9_41",
+    "owner": "dbo",
+    "name": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "bytes": 23371,
+    "sha256": "2777ac8467d0a32f08c55d2a3f8797c4acceafd3b4f90332897dc4a3106a88f4",
+    "method": "sys.sql_modules",
+    "ok": true
+  },
+  {
+    "file": null,
+    "source": "infection_10_10_9_45",
+    "owner": "*",
+    "name": "*",
+    "ok": false,
+    "error": "   impl.connect(params_impl, pool_impl)\n  File \"src/oracledb/impl/thick/connection.pyx\", line 527, in oracledb.thick_impl.ThickConnImpl.connect\n  File \"src/oracledb/impl/thick/utils.pyx\", line 476, in oracledb.thick_impl._raise_from_info\noracledb.exceptions.DatabaseError: ORA-01017: 用户名/口令无效; 登录被拒绝\n"
+  },
+  {
+    "file": null,
+    "source": "adverse_event_10_10_10_50",
+    "owner": "-",
+    "name": "-",
+    "ok": false,
+    "error": "OperationalError: (1045, \"Access denied for user 'root'@'10.10.8.83' (using password: NO)\")"
+  }
+]

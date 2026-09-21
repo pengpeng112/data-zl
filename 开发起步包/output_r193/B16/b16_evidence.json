@@ -1,0 +1,47 @@
+{
+ "passed": 8,
+ "failed": 0,
+ "results": [
+  {
+   "case": "login",
+   "ok": true,
+   "detail": "http://127.0.0.1:8848/#/workbench"
+  },
+  {
+   "case": "B16-page-renders",
+   "ok": true,
+   "detail": "404=False; 含标题=True"
+  },
+  {
+   "case": "B16-dataset-row",
+   "ok": true,
+   "detail": "DS_B16 行可见=True"
+  },
+  {
+   "case": "B16-status-published",
+   "ok": true,
+   "detail": "published 状态可见=True"
+  },
+  {
+   "case": "B16-readable-tag",
+   "ok": true,
+   "detail": "已授权标签=True"
+  },
+  {
+   "case": "B16-batch-query",
+   "ok": true,
+   "detail": "批次 JSON 含计数=True; 片段='{\\n  \"run_id\": \"RUN-B16\",\\n  \"status\": \"checkpointed\",\\n  \"counters\": {\\n    \"skipped\": 0,\\n   '"
+  },
+  {
+   "case": "regression-tables-route",
+   "ok": true,
+   "detail": "表目录页可达"
+  },
+  {
+   "case": "console-errors",
+   "ok": true,
+   "detail": "错误数=0 样例=[]"
+  }
+ ],
+ "mode": "real-api"
+}

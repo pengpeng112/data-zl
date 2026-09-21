@@ -1,0 +1,268 @@
+{
+ "ran_at": "2026-09-17 21:34:45",
+ "results": [
+  {
+   "case": "AR04-anon-systems",
+   "status": 401,
+   "expected": 401,
+   "pass": true,
+   "note": "{\"code\": 401, \"message\": \"缺少 Authorization: Bearer <token>\", \"data\": null}"
+  },
+  {
+   "case": "AR04-norole-systems",
+   "status": 200,
+   "expected": 200,
+   "pass": true,
+   "note": "{\"code\": 0, \"message\": \"success\", \"data\": [{\"id\": 19, \"system_code\": \"SYS_R194A\", \"system_name_cn\": \"194测试系统甲\", \"system_"
+  },
+  {
+   "case": "AR04-norole-admin-keys",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"2bbe57564dce453bb94488a69a25d5c1\"}"
+  },
+  {
+   "case": "AR04-norole-identity-write",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"51eaab3a57d14718af607c30c302de01\"}"
+  },
+  {
+   "case": "AR04-viewer-admin",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"84ee20db8ae64cc3940d6e5d7521e91b\"}"
+  },
+  {
+   "case": "AR04-viewer-issues",
+   "status": 403,
+   "expected": 200,
+   "pass": false,
+   "note": "{\"detail\": \"缺少权限: quality.issue.read\"}"
+  },
+  {
+   "case": "AR04-viewer-issue-create",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"detail\": \"缺少权限: quality.issue.create\"}"
+  },
+  {
+   "case": "AR04-norole-ops-tools",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"8eda375c24124a039a27ed37ab62e9dc\"}"
+  },
+  {
+   "case": "AR04-viewer-ops-tools",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"8a52071db66e429aaabfac8be42bd1c6\"}"
+  },
+  {
+   "case": "AR04-admin-ops-tools",
+   "status": 200,
+   "expected": 200,
+   "pass": true,
+   "note": "{\"code\": 0, \"message\": \"success\", \"data\": {\"total\": 1, \"page\": 1, \"page_size\": 50, \"items\": [{\"id\": 1, \"tool_code\": \"TOO"
+  },
+  {
+   "case": "AR04-viewer-executors",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"权限不足\", \"data\": null, \"request_id\": \"7a6086dbe30a4deba61d30c25ff8bf25\"}"
+  },
+  {
+   "case": "AR04-bogus-token",
+   "status": 403,
+   "expected": 403,
+   "pass": true,
+   "note": "{\"code\": 403, \"message\": \"无效或已禁用的 API Token\", \"data\": null}"
+  },
+  {
+   "case": "J08-qaA-mine-200",
+   "status": 403,
+   "expected": 200,
+   "pass": false,
+   "note": ""
+  },
+  {
+   "case": "J08-qaA-sees-only-NK",
+   "status": 0,
+   "expected": 200,
+   "pass": false,
+   "note": "qa_a mine=[]"
+  },
+  {
+   "case": "J08-qaB-sees-only-WK",
+   "status": 0,
+   "expected": 200,
+   "pass": false,
+   "note": "qa_b mine=[]"
+  },
+  {
+   "case": "J12-expiring-me-ok",
+   "status": 200,
+   "expected": 200,
+   "pass": true,
+   "note": ""
+  },
+  {
+   "case": "J12-bad-token-me",
+   "status": 403,
+   "expected": [
+    401,
+    403
+   ],
+   "pass": true,
+   "note": ""
+  },
+  {
+   "case": "O02-select-limit",
+   "status": 422,
+   "expected": [
+    200,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"22a15b58e"
+  },
+  {
+   "case": "O02-update",
+   "status": 422,
+   "expected": [
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"b0934977d"
+  },
+  {
+   "case": "O02-delete",
+   "status": 422,
+   "expected": [
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"2940e279a"
+  },
+  {
+   "case": "O02-drop",
+   "status": 422,
+   "expected": [
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"755b26e9b"
+  },
+  {
+   "case": "O02-multi",
+   "status": 422,
+   "expected": [
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"9a5f1d01d"
+  },
+  {
+   "case": "O02-noscan",
+   "status": 422,
+   "expected": [
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "{\"code\": 422, \"message\": \"参数校验失败\", \"data\": [\"body -> sql: Field required\"], \"request_id\": \"f0e0ccdcd"
+  },
+  {
+   "case": "O03-unregistered-executor",
+   "status": 404,
+   "expected": [
+    400,
+    403,
+    404,
+    422
+   ],
+   "pass": true,
+   "note": "{\"detail\": \"Not Found\"}"
+  },
+  {
+   "case": "J04-draft-list",
+   "status": 200,
+   "expected": 200,
+   "pass": true,
+   "note": "items=1"
+  },
+  {
+   "case": "J04-approve-draft",
+   "status": 404,
+   "expected": [
+    200,
+    201
+   ],
+   "pass": false,
+   "note": "{\"detail\": \"Not Found\"}"
+  },
+  {
+   "case": "J04-second-review-rejected",
+   "status": 404,
+   "expected": [
+    400,
+    404,
+    409,
+    422
+   ],
+   "pass": true,
+   "note": "second review should not silently re-review"
+  },
+  {
+   "case": "Q05-legacy-unverified-run-by-viewer",
+   "status": 403,
+   "expected": [
+    200,
+    403,
+    422
+   ],
+   "pass": true,
+   "note": "status=403; {\"detail\": \"缺少权限: query:run\"}"
+  },
+  {
+   "case": "Q05-blocked-query-run",
+   "status": 404,
+   "expected": [
+    200,
+    403,
+    422,
+    404
+   ],
+   "pass": true,
+   "note": "blocked status query run -> 404; {\"detail\": \"查询版本不存在\"}"
+  },
+  {
+   "case": "I02-accounts-P19401",
+   "status": 200,
+   "expected": 200,
+   "pass": true,
+   "note": "{\"code\": 0, \"message\": \"success\", \"data\": {\"total\": 12, \"page\": 1, \"page_size\": 50, \"items\": [{\"id\": 14, \"person_code\": \"P19401\", \"system_co"
+  },
+  {
+   "case": "J11-audit-list",
+   "status": 404,
+   "expected": [
+    200,
+    404
+   ],
+   "pass": true,
+   "note": "{\"detail\": \"Not Found\"}"
+  }
+ ]
+}

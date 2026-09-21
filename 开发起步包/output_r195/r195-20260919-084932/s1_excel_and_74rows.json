@@ -1,0 +1,2025 @@
+{
+ "excel_rows": [
+  {
+   "sheet": "工作表1",
+   "row": 1,
+   "cells": [
+    "v_EMR_doc_order_drug",
+    "一级目录",
+    "二级目录",
+    "视图名",
+    "完整路径",
+    "视图名",
+    "完成情况",
+    "责任人",
+    "数据来源",
+    "需要值域对照",
+    "进度",
+    "备注",
+    "数据库信息"
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 2,
+   "cells": [
+    "1",
+    "住院部分",
+    "入院记录",
+    "入院记录(D08 标）",
+    "住院部分 > 入院记录 > 入院记录(D08 标）",
+    "v_EMR_ADMISSION_RECORD",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 3,
+   "cells": [
+    "2",
+    "",
+    "",
+    "入院记录-辅助检查(辅 D08 标）",
+    "住院部分 > 入院记录 > 入院记录-辅助检查(辅 D08 标）",
+    "EMR_ADMISSION_RECORD_EXAM",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "待抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 4,
+   "cells": [
+    "3",
+    "",
+    "",
+    "入院诊断表",
+    "住院部分 > 入院记录 > 入院诊断表",
+    "v_EMR_ADMISSION_DIAGNOSIS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "入院诊断医院不填写数据量很少",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 5,
+   "cells": [
+    "4",
+    "",
+    "出院记录",
+    "出院记录(D12 标）",
+    "住院部分 > 出院记录 > 出院记录(D12 标）",
+    "v_EMR_DISCHARGE_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 6,
+   "cells": [
+    "5",
+    "",
+    "",
+    "出院记录-诊断(辅 D12 标）",
+    "住院部分 > 出院记录 > 出院记录-诊断(辅 D12 标）",
+    "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 7,
+   "cells": [
+    "6",
+    "",
+    "住院医嘱信息",
+    "住院医嘱信息-药品类医嘱",
+    "住院部分 > 住院医嘱信息 > 住院医嘱信息-药品类医嘱",
+    "v_emr_doc_order_drug",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "部分药品编码为空已经屏蔽无法上传",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 8,
+   "cells": [
+    "7",
+    "",
+    "",
+    "住院医嘱信息-非药品类医嘱",
+    "住院部分 > 住院医嘱信息 > 住院医嘱信息-非药品类医嘱",
+    "v_EMR_doc_order_check",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 9,
+   "cells": [
+    "8",
+    "门诊部分",
+    "门诊处方",
+    "门诊处方(D03/D04 标）",
+    "门诊部分 > 门诊处方 > 门诊处方(D03/D04 标）",
+    "v_EMR_OUTPATIENT_RECIPE",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 10,
+   "cells": [
+    "9",
+    "",
+    "",
+    "门诊处方明细(辅 D03/D04 标）",
+    "门诊部分 > 门诊处方 > 门诊处方明细(辅 D03/D04 标）",
+    "v_EMR_OUTPATIENT_RECIPE_ITEM",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 11,
+   "cells": [
+    "10",
+    "",
+    "门诊挂号",
+    "门诊挂号(D01 标）",
+    "门诊部分 > 门诊挂号 > 门诊挂号(D01 标）",
+    "v_EMR_OUTPATIENT_REGISTER",
+    "完成",
+    "董甲皓",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "药品与收费项目对照崔忠丽",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 12,
+   "cells": [
+    "11",
+    "",
+    "",
+    "门诊/急诊就诊记录(D02 标）",
+    "门诊部分 > 门诊挂号 > 门诊/急诊就诊记录(D02 标）",
+    "v_EMR_OUTPATIENT_RECORD",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 13,
+   "cells": [
+    "12",
+    "",
+    "",
+    "门（急）诊费用明细表",
+    "门诊部分 > 门诊挂号 > 门（急）诊费用明细表",
+    "v_EMR_OUT_FEE_INFO_CHILD",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 14,
+   "cells": [
+    "13",
+    "",
+    "",
+    "门诊/急诊就诊诊断表",
+    "门诊部分 > 门诊挂号 > 门诊/急诊就诊诊断表",
+    "v_EMR_OUTPATIENT_DIAG",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 15,
+   "cells": [
+    "14",
+    "费用信息",
+    "门诊结算费用信息",
+    "门（急）诊费用信息主表",
+    "费用信息 > 门诊结算费用信息 > 门（急）诊费用信息主表",
+    "v_EMR_out_fee_info_main",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 16,
+   "cells": [
+    "15",
+    "",
+    "住院费用信息",
+    "住院结算费用信息主表",
+    "费用信息 > 住院费用信息 > 住院结算费用信息主表",
+    "v_EMR_IN_fee_info_main",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 17,
+   "cells": [
+    "16",
+    "",
+    "",
+    "住院费用明细表",
+    "费用信息 > 住院费用信息 > 住院费用明细表",
+    "v_EMR_IN_FEE_INFO_CHILD",
+    "完成",
+    "董甲皓",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 18,
+   "cells": [
+    "17",
+    "实验室检验报告单",
+    "检验报告单(D18)",
+    "检验报告单(D18)",
+    "实验室检验报告单 > 检验报告单(D18)",
+    "瑞美：rmcloudilis7.dbo.v_EMR_INSPECTION\n数据中心：V_EMR_INSPECTION_TEST",
+    "完成",
+    "郭婧",
+    "瑞美\n10.10.10.73",
+    "",
+    "",
+    "23年10月份新上线的瑞美，23年之前取的HIS中的检验报告",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 19,
+   "cells": [
+    "18",
+    "",
+    "检验报告-图片子表",
+    "检验报告-图片子表",
+    "实验室检验报告单 > 检验报告-图片子表",
+    "瑞美：V_EMR_INSPECTION_IMAGE\n数据中心：V_EMR_INSPECTION_IMAGE_TEST",
+    "完成",
+    "郭婧",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 20,
+   "cells": [
+    "19",
+    "",
+    "检验报告-药敏子表",
+    "检验报告-药敏子表",
+    "实验室检验报告单 > 检验报告-药敏子表",
+    "瑞美：v_EMR_INSPECTION_ALLERGY\n数据中心：V_EMR_INSPECTION_ALLERGY_TEST",
+    "完成",
+    "郭婧",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 21,
+   "cells": [
+    "20",
+    "",
+    "检验报告单-项目(辅 D06 标）",
+    "检验报告单-项目(辅 D06 标）",
+    "实验室检验报告单 > 检验报告单-项目(辅 D06 标）",
+    "瑞美：v_EMR_INSPECTION_ITEM\n数据中心：V_EMR_INSPECTION_ITEM_TEST",
+    "完成",
+    "郭婧",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 22,
+   "cells": [
+    "21",
+    "影像检查报告",
+    "影像诊断报告( D07 标）",
+    "影像诊断报告( D07 标）",
+    "影像检查报告 > 影像诊断报告( D07 标）",
+    "V_EMR_EXAM_IMAGE_REP",
+    "完成",
+    "董鑫田",
+    "HIS系统\n10.10.10.15/his",
+    "",
+    "",
+    "pacs2021年7月份使用，超声2022年下半年启用，之前均无数据",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 23,
+   "cells": [
+    "22",
+    "",
+    "检查影像诊断报告子表(辅 D07 标）",
+    "检查影像诊断报告子表(辅 D07 标）",
+    "影像检查报告 > 检查影像诊断报告子表(辅 D07 标）",
+    "V_EMR_EXAM_IMAGE_PATH",
+    "完成",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 24,
+   "cells": [
+    "23",
+    "病案首页",
+    "住院病案首页(电子病历) (D09/D10 标）",
+    "住院病案首页(电子病历) (D09/D10 标）",
+    "病案首页 > 住院病案首页(电子病历) (D09/D10 标）",
+    "v_emr_ich",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 25,
+   "cells": [
+    "24",
+    "",
+    "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+    "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+    "病案首页 > 住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+    "v_emr_ich_operation",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 26,
+   "cells": [
+    "25",
+    "",
+    "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+    "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+    "病案首页 > 住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+    "v_emr_ich_allergies",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 27,
+   "cells": [
+    "26",
+    "",
+    "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+    "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+    "病案首页 > 住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+    "V_EMR_ICH_CHARGE",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 28,
+   "cells": [
+    "27",
+    "",
+    "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+    "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+    "病案首页 > 住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+    "V_EMR_ICH_DIAGNOSIS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 29,
+   "cells": [
+    "28",
+    "健康体检部分",
+    "体检报告单(D69）",
+    "体检报告单(D69）",
+    "健康体检部分 > 体检报告单(D69）",
+    "v_EMR_PHYSICAL_REPORT",
+    "完成",
+    "彭赫",
+    "体检系统",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 30,
+   "cells": [
+    "29",
+    "",
+    "体检项目表",
+    "体检项目表",
+    "健康体检部分 > 体检项目表",
+    "v_EMR_PHYSICAL_EXAM",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 31,
+   "cells": [
+    "30",
+    "",
+    "体检项目明细表",
+    "体检项目明细表",
+    "健康体检部分 > 体检项目明细表",
+    "v_EMR_PHYSICAL_EXAM_ITEM",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 32,
+   "cells": [
+    "31",
+    "输血管理",
+    "输血申请单",
+    "输血申请单",
+    "输血管理 > 输血申请单",
+    "v_EMR_BLOOD_APPLY_REPORT",
+    "完成",
+    "彭赫",
+    "输血系统",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 33,
+   "cells": [
+    "32",
+    "",
+    "输血申请单明细",
+    "输血申请单明细",
+    "输血管理 > 输血申请单明细",
+    "v_EMR_BLOOD_APPLY_REPORT_ITEM",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 34,
+   "cells": [
+    "33",
+    "",
+    "输血记录",
+    "输血记录",
+    "输血管理 > 输血记录",
+    "v_EMR_TRANSFUSION_RECORD",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 35,
+   "cells": [
+    "34",
+    "",
+    "血袋回收记录表",
+    "血袋回收记录表",
+    "输血管理 > 血袋回收记录表",
+    "无法提供",
+    "无法提供",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 36,
+   "cells": [
+    "35",
+    "电子病历管理",
+    "电子病历汇总",
+    "电子病历汇总",
+    "电子病历管理 > 电子病历汇总",
+    "V_EMR_MEDICAL_RECORD_INFO",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 37,
+   "cells": [
+    "36",
+    "病程记录",
+    "术后首次病程记录",
+    "术后首次病程记录",
+    "病程记录 > 术后首次病程记录",
+    "v_EMR_HOS_POSTOPER_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 38,
+   "cells": [
+    "37",
+    "",
+    "术前讨论与小结",
+    "术前讨论与小结",
+    "病程记录 > 术前讨论与小结",
+    "v_EMR_HOS_PREOP_DISCUSS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 39,
+   "cells": [
+    "38",
+    "",
+    "死亡病历讨论记录",
+    "死亡病历讨论记录",
+    "病程记录 > 死亡病历讨论记录",
+    "v_EMR_HOS_DND_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 40,
+   "cells": [
+    "39",
+    "",
+    "疑难病例讨论记录",
+    "疑难病例讨论记录",
+    "病程记录 > 疑难病例讨论记录",
+    "v_EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 41,
+   "cells": [
+    "40",
+    "",
+    "转科记录",
+    "转科记录",
+    "病程记录 > 转科记录",
+    "v_EMR_HOS_CHANGE_MAJOR_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 42,
+   "cells": [
+    "41",
+    "",
+    "转诊/院纪录（转出记录）",
+    "转诊/院纪录（转出记录）",
+    "病程记录 > 转诊/院纪录（转出记录）",
+    "v_EMR_REFERRAL_HOS_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 43,
+   "cells": [
+    "42",
+    "",
+    "会诊记录",
+    "会诊记录",
+    "病程记录 > 会诊记录",
+    "v_EMR_HOS_CONSUL_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 44,
+   "cells": [
+    "43",
+    "",
+    "住院医师交接班记录",
+    "住院医师交接班记录",
+    "病程记录 > 住院医师交接班记录",
+    "v_EMR_HOS_SUCCESSION_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "只有21条数据无其他数据",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 45,
+   "cells": [
+    "44",
+    "",
+    "抢救记录",
+    "抢救记录",
+    "病程记录 > 抢救记录",
+    "v_EMR_HOS_SAVE_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 46,
+   "cells": [
+    "45",
+    "",
+    "24小时内入院死亡记录",
+    "24小时内入院死亡记录",
+    "病程记录 > 24小时内入院死亡记录",
+    "v_emr_admission_dead_record_tf",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 47,
+   "cells": [
+    "46",
+    "",
+    "一般手术记录",
+    "一般手术记录",
+    "病程记录 > 一般手术记录",
+    "v_emr_opera_record",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 48,
+   "cells": [
+    "47",
+    "",
+    "麻醉术前访视记录",
+    "麻醉术前访视记录",
+    "病程记录 > 麻醉术前访视记录",
+    "v_EMR_BOFORE_OPERA_RECORD",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 49,
+   "cells": [
+    "48",
+    "",
+    "麻醉记录",
+    "麻醉手术记录",
+    "病程记录 > 麻醉记录 > 麻醉手术记录",
+    "v_EMR_ANESTHESIA_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 50,
+   "cells": [
+    "49",
+    "",
+    "",
+    "麻醉手术中用血记录",
+    "病程记录 > 麻醉记录 > 麻醉手术中用血记录",
+    "v_EMR_ANES_RECORD_BLOOD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 51,
+   "cells": [
+    "50",
+    "",
+    "",
+    "麻醉手术中用药记录",
+    "病程记录 > 麻醉记录 > 麻醉手术中用药记录",
+    "v_EMR_ANES_RECORD_MED",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 52,
+   "cells": [
+    "51",
+    "",
+    "麻醉术后访视记录",
+    "麻醉术后访视记录",
+    "病程记录 > 麻醉术后访视记录",
+    "v_EMR_ANES_AFTER_RECORD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 53,
+   "cells": [
+    "52",
+    "护理记录",
+    "入院评估记录",
+    "入院评估记录",
+    "护理记录 > 入院评估记录",
+    "V_EMR_ADMISSION_ASSESSMENT",
+    "带抽取",
+    "董鑫田",
+    "移动护理",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 54,
+   "cells": [
+    "53",
+    "",
+    "出院评估与指导",
+    "出院评估与指导",
+    "护理记录 > 出院评估与指导",
+    "v_EMR_DISCHARGE_ASSESSMENT",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 55,
+   "cells": [
+    "54",
+    "",
+    "阴道分娩记录",
+    "阴道分娩记录",
+    "护理记录 > 阴道分娩记录",
+    "v_EMR_CHILDBIRTH",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 56,
+   "cells": [
+    "55",
+    "",
+    "一般护理记录",
+    "一般护理记录",
+    "护理记录 > 一般护理记录",
+    "v_EMR_GENERAL_NURSING",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 57,
+   "cells": [
+    "56",
+    "",
+    "病危（重）护理记录",
+    "病危（重）护理记录",
+    "护理记录 > 病危（重）护理记录",
+    "v_EMR_CRITICALLY_ILL_NURS",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 58,
+   "cells": [
+    "57",
+    "",
+    "病危（重）护理记录-出入量记录",
+    "病危（重）护理记录-出入量记录",
+    "护理记录 > 病危（重）护理记录-出入量记录",
+    "v_EMR_IN_OUT_AMOUNT",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 59,
+   "cells": [
+    "58",
+    "",
+    "生命体征测量记录",
+    "生命体征测量记录",
+    "护理记录 > 生命体征测量记录",
+    "v_EMR_VITAL_SIGN",
+    "带抽取",
+    "董鑫田",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 60,
+   "cells": [
+    "59",
+    "",
+    "手术护理记录",
+    "手术护理记录",
+    "护理记录 > 手术护理记录",
+    "v_emr_operation_nursing",
+    "带抽取",
+    "董鑫田",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 61,
+   "cells": [
+    "60",
+    "",
+    "高值耗材使用记录",
+    "高值耗材使用记录",
+    "护理记录 > 高值耗材使用记录",
+    "V_EMR_CONSUMABLES",
+    "待抽取",
+    "彭赫",
+    "",
+    "",
+    "需要具体到患者由HIS提供",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 62,
+   "cells": [
+    "61",
+    "",
+    "护理计划记录",
+    "护理计划记录",
+    "护理记录 > 护理计划记录",
+    "未使用无法提供",
+    "未使用无法提供",
+    "董鑫田",
+    "",
+    "",
+    "未使用无法提供",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 63,
+   "cells": [
+    "62",
+    "知情同意书",
+    "手术知情同意书",
+    "手术知情同意书",
+    "知情同意书 > 手术知情同意书",
+    "v_emr_infor_operation",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 64,
+   "cells": [
+    "63",
+    "",
+    "麻醉知情同意书",
+    "麻醉知情同意书",
+    "知情同意书 > 麻醉知情同意书",
+    "v_emr_infor_anesthesia",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 65,
+   "cells": [
+    "64",
+    "",
+    "输血治疗同意书",
+    "输血治疗同意书",
+    "知情同意书 > 输血治疗同意书",
+    "v_EMR_INFOR_TRANS_BLOOD",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 66,
+   "cells": [
+    "65",
+    "",
+    "特殊检查及特殊治疗同意书",
+    "特殊检查及特殊治疗同意书",
+    "知情同意书 > 特殊检查及特殊治疗同意书",
+    "v_emr_infor_spec_exam_treat",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 67,
+   "cells": [
+    "66",
+    "",
+    "病危(重)通知书",
+    "病危(重)通知书",
+    "知情同意书 > 病危(重)通知书",
+    "v_emr_infor_critically_ill",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 68,
+   "cells": [
+    "67",
+    "",
+    "其它知情同意书",
+    "其它知情同意书",
+    "知情同意书 > 其它知情同意书",
+    "v_EMR_INFOR_OTHERS",
+    "完成",
+    "张景华",
+    "",
+    "",
+    "完成抽取",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 69,
+   "cells": [
+    "68",
+    "血液透析",
+    "血透治疗记录",
+    "血透治疗记录",
+    "血液透析 > 血透治疗记录",
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "完成",
+    "彭赫",
+    "血液透析",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 70,
+   "cells": [
+    "69",
+    "",
+    "血透治疗过程记录",
+    "血透治疗过程记录",
+    "血液透析 > 血透治疗过程记录",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 71,
+   "cells": [
+    "70",
+    "",
+    "血透治疗医嘱明细",
+    "血透治疗医嘱明细",
+    "血液透析 > 血透治疗医嘱明细",
+    "v_EMR_BLOOD_DIALY_ORDER",
+    "完成",
+    "彭赫",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 72,
+   "cells": [
+    "71",
+    "死亡记录表",
+    "",
+    "死亡记录表",
+    "死亡记录表",
+    "V_EMR_DEATH_RECORD",
+    "完成",
+    "张景华",
+    "数据中心\n10.10.8.216:1521/orcl",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 73,
+   "cells": [
+    "72",
+    "量表评估",
+    "",
+    "量表评估",
+    "量表评估",
+    "ods：v_emr_nursing_assessment\n移动护理：v_EMR_NURSING_ASSESSMENT",
+    "",
+    "彭赫",
+    "数据中心\n移动护理",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 74,
+   "cells": [
+    "73",
+    "病理报告",
+    "病理报告",
+    "病理报告",
+    "病理报告 > 病理报告",
+    "EMR_PATHOLOGY_REPORT",
+    "完成",
+    "崔忠丽",
+    "病理系统",
+    "需要值域对照",
+    "待核查",
+    "",
+    "sqlserver  \nip:10.10.9.41\n端口:1433\n数据库  Pitaya\n账号： qp\n密码：SDs2y@6877"
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 75,
+   "cells": [
+    "74",
+    "",
+    "分子病理报告",
+    "分子病理报告",
+    "病理报告 > 分子病理报告",
+    "EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "完成",
+    "崔忠丽",
+    "",
+    "需要值域对照",
+    "待核查",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 76,
+   "cells": [
+    "75",
+    "医院感染信息登记表",
+    "",
+    "医院感染信息登记表",
+    "医院感染信息登记表",
+    "c##fxpt.EMR_INFECTION_INFORMATION_REGISTER",
+    "完成",
+    "崔忠丽",
+    "院感",
+    "",
+    "",
+    "",
+    "10.10.9.45:1521/orcl\nc##fxpt\nfxpt"
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 77,
+   "cells": [
+    "76",
+    "医院执业人员信息表",
+    "",
+    "医院执业人员信息表",
+    "医院执业人员信息表",
+    "EMR_HOS_PRACTITIONER",
+    "完成",
+    "郭婧",
+    "HRP\n10.10.10.23:1521/hrpdb",
+    "",
+    "",
+    "",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 78,
+   "cells": [
+    "77",
+    "不良事件表",
+    "",
+    "不良事件表",
+    "不良事件表",
+    "v_EMR_ADVERSE_EVENT_FINAL",
+    "完成",
+    "彭赫",
+    "不良事件系统",
+    "",
+    "",
+    "无住院次和患者ID，需要再前置机进行更新",
+    ""
+   ]
+  },
+  {
+   "sheet": "工作表1",
+   "row": 79,
+   "cells": [
+    "数据核查、汇总、出抽取",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "彭赫、张景华",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ]
+  }
+ ],
+ "rows_74": [
+  {
+   "cn_name": "入院记录(D08 标）",
+   "view": "v_EMR_ADMISSION_RECORD",
+   "action": "已改上界",
+   "note": "上界 <to_date('2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql"
+  },
+  {
+   "cn_name": "入院诊断表",
+   "view": "v_EMR_ADMISSION_DIAGNOSIS",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql"
+  },
+  {
+   "cn_name": "出院记录(D12 标）",
+   "view": "v_EMR_DISCHARGE_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql"
+  },
+  {
+   "cn_name": "出院记录-诊断(辅 D12 标）",
+   "view": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql"
+  },
+  {
+   "cn_name": "住院医嘱信息-药品类医嘱",
+   "view": "v_emr_doc_order_drug",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql"
+  },
+  {
+   "cn_name": "住院医嘱信息-非药品类医嘱",
+   "view": "v_EMR_doc_order_check",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql"
+  },
+  {
+   "cn_name": "门诊处方(D03/D04 标）",
+   "view": "v_EMR_OUTPATIENT_RECIPE",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql"
+  },
+  {
+   "cn_name": "门诊处方明细(辅 D03/D04 标）",
+   "view": "v_EMR_OUTPATIENT_RECIPE_ITEM",
+   "action": "已改上界",
+   "note": "上界 <  DATE '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql"
+  },
+  {
+   "cn_name": "门诊挂号(D01 标）",
+   "view": "v_EMR_OUTPATIENT_REGISTER",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql"
+  },
+  {
+   "cn_name": "门诊/急诊就诊记录(D02 标）",
+   "view": "v_EMR_OUTPATIENT_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01；上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql"
+  },
+  {
+   "cn_name": "门（急）诊费用明细表",
+   "view": "v_EMR_OUT_FEE_INFO_CHILD",
+   "action": "已改上界",
+   "note": "上界 < date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql"
+  },
+  {
+   "cn_name": "门诊/急诊就诊诊断表",
+   "view": "v_EMR_OUTPATIENT_DIAG",
+   "action": "已改上界",
+   "note": "上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql"
+  },
+  {
+   "cn_name": "门（急）诊费用信息主表",
+   "view": "v_EMR_out_fee_info_main",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01；上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql"
+  },
+  {
+   "cn_name": "住院结算费用信息主表",
+   "view": "v_EMR_IN_fee_info_main",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql"
+  },
+  {
+   "cn_name": "住院费用明细表",
+   "view": "v_EMR_IN_FEE_INFO_CHILD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql"
+  },
+  {
+   "cn_name": "检验报告单(D18)",
+   "view": "V_EMR_INSPECTION_TEST",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql"
+  },
+  {
+   "cn_name": "检验报告-图片子表",
+   "view": "V_EMR_INSPECTION_IMAGE_TEST",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql"
+  },
+  {
+   "cn_name": "检验报告-药敏子表",
+   "view": "V_EMR_INSPECTION_ALLERGY_TEST",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql"
+  },
+  {
+   "cn_name": "检验报告单-项目(辅 D06 标）",
+   "view": "V_EMR_INSPECTION_ITEM_TEST",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql"
+  },
+  {
+   "cn_name": "影像诊断报告( D07 标）",
+   "view": "V_EMR_EXAM_IMAGE_REP",
+   "action": "已改上界",
+   "note": "上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01；上界 <  DATE '2025-01-01' → 2026-01-01",
+   "origin": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql"
+  },
+  {
+   "cn_name": "检查影像诊断报告子表(辅 D07 标）",
+   "view": "V_EMR_EXAM_IMAGE_PATH",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql"
+  },
+  {
+   "cn_name": "住院病案首页(电子病历) (D09/D10 标）",
+   "view": "v_emr_ich",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ICH.sql"
+  },
+  {
+   "cn_name": "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+   "view": "v_emr_ich_operation",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ICH_OPERATION.sql"
+  },
+  {
+   "cn_name": "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+   "view": "v_emr_ich_allergies",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql"
+  },
+  {
+   "cn_name": "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+   "view": "V_EMR_ICH_CHARGE",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ICH_CHARGE.sql"
+  },
+  {
+   "cn_name": "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+   "view": "V_EMR_ICH_DIAGNOSIS",
+   "action": "已改上界",
+   "note": "上界 <  date '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql"
+  },
+  {
+   "cn_name": "体检报告单(D69）",
+   "view": "v_EMR_PHYSICAL_REPORT",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "体检项目表",
+   "view": "v_EMR_PHYSICAL_EXAM",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "体检项目明细表",
+   "view": "v_EMR_PHYSICAL_EXAM_ITEM",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "输血申请单",
+   "view": "v_EMR_BLOOD_APPLY_REPORT",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "输血申请单明细",
+   "view": "v_EMR_BLOOD_APPLY_REPORT_ITEM",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "输血记录",
+   "view": "v_EMR_TRANSFUSION_RECORD",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  },
+  {
+   "cn_name": "电子病历汇总",
+   "view": "V_EMR_MEDICAL_RECORD_INFO",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql"
+  },
+  {
+   "cn_name": "术后首次病程记录",
+   "view": "v_EMR_HOS_POSTOPER_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql"
+  },
+  {
+   "cn_name": "术前讨论与小结",
+   "view": "v_EMR_HOS_PREOP_DISCUSS",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql"
+  },
+  {
+   "cn_name": "死亡病历讨论记录",
+   "view": "v_EMR_HOS_DND_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql"
+  },
+  {
+   "cn_name": "疑难病例讨论记录",
+   "view": "v_EMR_HOS_DIFFIC_CASE_DISCUSS",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql"
+  },
+  {
+   "cn_name": "转科记录",
+   "view": "v_EMR_HOS_CHANGE_MAJOR_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql"
+  },
+  {
+   "cn_name": "转诊/院纪录（转出记录）",
+   "view": "v_EMR_REFERRAL_HOS_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql"
+  },
+  {
+   "cn_name": "会诊记录",
+   "view": "v_EMR_HOS_CONSUL_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql"
+  },
+  {
+   "cn_name": "住院医师交接班记录",
+   "view": "v_EMR_HOS_SUCCESSION_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql"
+  },
+  {
+   "cn_name": "抢救记录",
+   "view": "v_EMR_HOS_SAVE_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql"
+  },
+  {
+   "cn_name": "24小时内入院死亡记录",
+   "view": "v_emr_admission_dead_record_tf",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql"
+  },
+  {
+   "cn_name": "一般手术记录",
+   "view": "v_emr_opera_record",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OPERA_RECORD.sql"
+  },
+  {
+   "cn_name": "麻醉术前访视记录",
+   "view": "v_EMR_BOFORE_OPERA_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql"
+  },
+  {
+   "cn_name": "麻醉手术记录",
+   "view": "v_EMR_ANESTHESIA_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql"
+  },
+  {
+   "cn_name": "麻醉手术中用血记录",
+   "view": "v_EMR_ANES_RECORD_BLOOD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql"
+  },
+  {
+   "cn_name": "麻醉手术中用药记录",
+   "view": "v_EMR_ANES_RECORD_MED",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql"
+  },
+  {
+   "cn_name": "麻醉术后访视记录",
+   "view": "v_EMR_ANES_AFTER_RECORD",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql"
+  },
+  {
+   "cn_name": "入院评估记录",
+   "view": "V_EMR_ADMISSION_ASSESSMENT",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql"
+  },
+  {
+   "cn_name": "出院评估与指导",
+   "view": "v_EMR_DISCHARGE_ASSESSMENT",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql"
+  },
+  {
+   "cn_name": "阴道分娩记录",
+   "view": "v_EMR_CHILDBIRTH",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql"
+  },
+  {
+   "cn_name": "一般护理记录",
+   "view": "v_EMR_GENERAL_NURSING",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql"
+  },
+  {
+   "cn_name": "病危（重）护理记录",
+   "view": "v_EMR_CRITICALLY_ILL_NURS",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql"
+  },
+  {
+   "cn_name": "病危（重）护理记录-出入量记录",
+   "view": "v_EMR_IN_OUT_AMOUNT",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql"
+  },
+  {
+   "cn_name": "生命体征测量记录",
+   "view": "v_EMR_VITAL_SIGN",
+   "action": "已改上界",
+   "note": "上界 < TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql"
+  },
+  {
+   "cn_name": "手术护理记录",
+   "view": "v_emr_operation_nursing",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql"
+  },
+  {
+   "cn_name": "高值耗材使用记录",
+   "view": "V_EMR_CONSUMABLES",
+   "action": "已改上界",
+   "note": "上界 < DATE '2025-01-01' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_CONSUMABLES.sql"
+  },
+  {
+   "cn_name": "手术知情同意书",
+   "view": "v_emr_infor_operation",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql"
+  },
+  {
+   "cn_name": "麻醉知情同意书",
+   "view": "v_emr_infor_anesthesia",
+   "action": "已改上界",
+   "note": "上界 <  to_date('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql"
+  },
+  {
+   "cn_name": "输血治疗同意书",
+   "view": "v_EMR_INFOR_TRANS_BLOOD",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql"
+  },
+  {
+   "cn_name": "特殊检查及特殊治疗同意书",
+   "view": "v_emr_infor_spec_exam_treat",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql"
+  },
+  {
+   "cn_name": "病危(重)通知书",
+   "view": "v_emr_infor_critically_ill",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql"
+  },
+  {
+   "cn_name": "其它知情同意书",
+   "view": "v_EMR_INFOR_OTHERS",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql"
+  },
+  {
+   "cn_name": "血透治疗记录",
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "history:血透系统.txt"
+  },
+  {
+   "cn_name": "血透治疗过程记录",
+   "view": "v_EMR_BLOOD_DIALY_DETAIL",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "history:血透系统.txt"
+  },
+  {
+   "cn_name": "血透治疗医嘱明细",
+   "view": "v_EMR_BLOOD_DIALY_ORDER",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "history:血透系统.txt"
+  },
+  {
+   "cn_name": "死亡记录表",
+   "view": "V_EMR_DEATH_RECORD",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:ods_8_216__ODS.V_EMR_DEATH_RECORD.sql"
+  },
+  {
+   "cn_name": "量表评估",
+   "view": "v_emr_nursing_assessment",
+   "action": "已改上界",
+   "note": "上界 <  TO_DATE('2025-01-01 00:00:00' → 2026-01-01",
+   "origin": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql"
+  },
+  {
+   "cn_name": "病理报告",
+   "view": "EMR_PATHOLOGY_REPORT",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql"
+  },
+  {
+   "cn_name": "分子病理报告",
+   "view": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql"
+  },
+  {
+   "cn_name": "医院感染信息登记表",
+   "view": "EMR_INFECTION_INFORMATION_REGISTER",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "history:院感.txt"
+  },
+  {
+   "cn_name": "医院执业人员信息表",
+   "view": "EMR_HOS_PRACTITIONER",
+   "action": "未改",
+   "note": "未见2021-2024时间上界",
+   "origin": "live:hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql"
+  },
+  {
+   "cn_name": "不良事件表",
+   "view": "v_EMR_ADVERSE_EVENT_FINAL",
+   "action": "未改",
+   "note": "无活库DDL且无桌面历史稿",
+   "origin": ""
+  }
+ ]
+}

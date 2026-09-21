@@ -1,0 +1,96 @@
+
+{
+  "ready": true,
+  "phase": "after",
+  "target_revision": "e8f9a0b1c2d3",
+  "blocking_failures": [],
+  "checks": [
+    {
+      "check": "build_id_present",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "build_id": "r186-20260909c",
+        "git_sha": "96ed027-plus174-175"
+      }
+    },
+    {
+      "check": "identity_run_mode_configured",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "identity_run_mode": "observe"
+      }
+    },
+    {
+      "check": "single_scheduler_provider",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "declared_provider": "host_cron",
+        "nightly_enabled": false,
+        "effective_providers": [
+          "host_cron"
+        ]
+      }
+    },
+    {
+      "check": "alembic_head",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "actual": "e8f9a0b1c2d3",
+        "expected": "e8f9a0b1c2d3",
+        "phase": "after"
+      }
+    },
+    {
+      "check": "new_tables_exist",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "missing": []
+      }
+    },
+    {
+      "check": "executor_states",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "actual": {
+          "JHEMR_ACCOUNT_ENABLE": false,
+          "CDMS_ACCOUNT_ENABLE": false,
+          "JHEMR_ACCOUNT_DISABLE": true,
+          "CDMS_ACCOUNT_DISABLE": true
+        },
+        "expected": {
+          "JHEMR_ACCOUNT_DISABLE": true,
+          "CDMS_ACCOUNT_DISABLE": true,
+          "JHEMR_ACCOUNT_ENABLE": false,
+          "CDMS_ACCOUNT_ENABLE": false
+        }
+      }
+    },
+    {
+      "check": "single_cron_calls_new_entry",
+      "ok": true,
+      "blocking": true,
+      "detail": {
+        "/etc/cron.d/data-asset-identity-nightly": {
+          "exists": false,
+          "mentions_old_runner": false,
+          "active_lines": []
+        },
+        "scheduler_drift": false
+      }
+    },
+    {
+      "check": "chrony_synchronized",
+      "ok": false,
+      "blocking": false,
+      "detail": {
+        "error": "FileNotFoundError"
+      }
+    }
+  ]
+}

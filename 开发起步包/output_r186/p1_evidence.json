@@ -1,0 +1,40 @@
+{
+ "passed": 6,
+ "failed": 0,
+ "results": [
+  {
+   "case": "login-real-api",
+   "ok": true,
+   "detail": "url=http://127.0.0.1:8848/#/workbench"
+  },
+  {
+   "case": "P1-3-10-pages-render",
+   "ok": true,
+   "detail": "10/10 渲染无 404/未登录跳转"
+  },
+  {
+   "case": "P1-2-chain1",
+   "ok": true,
+   "detail": "筛选后总数=45 详情带back_query=True 详情关系图=True 边抽屉(非必需)=False 复核页=True 点返回按钮=False 恢复关键词='CDR' 恢复总数=45"
+  },
+  {
+   "case": "P1-2-chain2",
+   "ok": true,
+   "detail": "变更行数=3 事件影响/查询入口=True 快照对比页可达=True"
+  },
+  {
+   "case": "P1-2-zero-write",
+   "ok": true,
+   "detail": "非GET API 请求（除登录刷新）=无"
+  },
+  {
+   "case": "console-errors",
+   "ok": true,
+   "detail": "错误数=0 样例=[]"
+  }
+ ],
+ "mode": "real-api",
+ "frontend": "http://127.0.0.1:8848",
+ "backend": "http://127.0.0.1:8000",
+ "seed": "import170 production display data + r194 wrapup sections"
+}

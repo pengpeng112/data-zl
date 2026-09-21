@@ -1,0 +1,3783 @@
+{
+ "generated_at": "2026-09-19T09:08:52.569826",
+ "files": [
+  {
+   "relpath": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF"
+   ],
+   "sha256": "bf41748bff84b0ea92a50b6d8ffb19bad294179ab48842735cd90fb6094c39eb",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql",
+   "refs": [
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd36",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "v_emr_admission_record",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.orders",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR"
+   ],
+   "sha256": "e2501a93aedd17ffc22c1339360a738b9c47c059daf4241348b37de267132689",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "v_emr_admission_record",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.orders",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD"
+   ],
+   "sha256": "7558d9bd04ce5b59580088981dd3230f5c881a05edebb66f391697b12257e17a",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OPERA_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "DOC_REGISTER_EMP_MATCH",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd9",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_diagnosis_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD_JHEMR"
+   ],
+   "sha256": "b3d0a4d9a5d5919b61580611f2eebc6717a42a230c9eea4daba44fa7b7ff7202",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "DOC_REGISTER_EMP_MATCH",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_diagnosis_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\一般护理记录_v_EMR_GENERAL_NURSING.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING"
+   ],
+   "sha256": "4d328461d537ba6d6926c4699a966283083a2b7fa35eb8c37cc78f5bf3479831",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql",
+   "refs": [
+    {
+     "ref": "mcs_doc_form_records",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_doc_form",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\会诊记录_v_EMR_HOS_CONSUL_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_CONSUL_RECORD"
+   ],
+   "sha256": "edf98ee9ad728cbbdb42079e0d186aac8ac6ab3e2441487b8d76df3da96cdfba",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.consultation_doctor_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.consultation_doctor_detail",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_DRUG"
+   ],
+   "sha256": "0eedbdcfc6705fa12b758d46ff2560085075008bb1c9e0b878b386e85b80a7e3",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "DRUG_STANDARD_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA_VALUE_DOMAIN_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "PORTAL_USER.PORTAL_SYS_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.orders",
+     "dblink": ""
+    },
+    {
+     "ref": "his.drug_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.MED_DICT_BASEINFO",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_CHECK"
+   ],
+   "sha256": "f4682206fe426464611d580daf04eb7d21ad496bf5c1f23c3a12a8621a61c3f0",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.orders",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD"
+   ],
+   "sha256": "5b85454bb5a6648a17eb9a2a17bc9b6a4f077a4f8a4319156270d48742509d8c",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.t_jbjl",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD41",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD_JHEMR"
+   ],
+   "sha256": "863bc4c4321ff1f1ab17aa8b16418b319bf0713ddd62071f01b1993e2c70c891",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.t_jbjl",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ICH"
+   ],
+   "sha256": "9e058c69965d0ee477148d3a220033faa18f08e4540d9a9e19b0c2d721049115",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ICH.sql",
+   "refs": [
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ICH_CHARGE"
+   ],
+   "sha256": "025b6408a1dfa7e1affa7960e1df0d67f3411b7575a5a6fe85f306c458d32e31",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ICH_CHARGE.sql",
+   "refs": [
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.mr_bill_costs",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ICH_OPERATION"
+   ],
+   "sha256": "3a3c853849e3dd98568437583a3727e47a73be5d7777ecc5e0d6cdb2042e4443",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ICH_OPERATION.sql",
+   "refs": [
+    {
+     "ref": "his.operation_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ICH_DIAGNOSIS"
+   ],
+   "sha256": "73ff49043241e653d0c769570bad7d4d79254a8ebd0e2ef7a12682f622b730c6",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql",
+   "refs": [
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ICH_ALLERGIES"
+   ],
+   "sha256": "3c86dce2325b31b7d709de8fcbf2c5b2208f123e98abeed322af45acebf2aa32",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql",
+   "refs": [
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_MAIN"
+   ],
+   "sha256": "41f688e6a011d123e4eb050707264c3d387ba6c5bcbca9b38de5abeba5879a92",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql",
+   "refs": [
+    {
+     "ref": "his.inp_settle_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.inp_settle_master_yb",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_CHILD"
+   ],
+   "sha256": "163c84463dbcd4c1f46ea1548244edeb80f831dc553ba44a8827e559c2278ae0",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql",
+   "refs": [
+    {
+     "ref": "CDA_VALUE_DOMAIN_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.inp_bill_detail",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.inp_settle_master_yb",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.price_list",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD"
+   ],
+   "sha256": "9c0925a1489a4b21cc5348f95c8a0f2ba3088ea0417794e0e80d0fad5dcc86eb",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pats_in_hospital",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD34",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD_JHEMR"
+   ],
+   "sha256": "b9f50f66e519db112583a8b6d738916c0ead2f1a9272249717100bb3c6c4d2de",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pats_in_hospital",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT"
+   ],
+   "sha256": "ea615c3a1ce7c32297ea38d30c1a539d371637e9bc3f507a0c5d22736b222fa8",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql",
+   "refs": [
+    {
+     "ref": "mcs_assess_form_record",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_doc_form",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_assess_form",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS_BASY",
+     "dblink": ""
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DIAGNOSIS"
+   ],
+   "sha256": "ce46dc1ce88a68bf851494e059d4ce50afdc7f9ab342eac995bb74388392ad56",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql",
+   "refs": [
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS"
+   ],
+   "sha256": "e0c610bdf89dfb810b7744a4c4b8c2c0dc3b8ec3c145cdb2f9844e6a3f51d0e5",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql",
+   "refs": [
+    {
+     "ref": "MTL.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD31",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DIAGNOSIS",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.CDA_DICTIONARY",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS_JHEMR"
+   ],
+   "sha256": "41685eb861cfea1dc65ed1f4eebf29ef697f84d966b24c05ad1ade306a77fce5",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD31",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DIAGNOSIS",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.CDA_DICTIONARY",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD"
+   ],
+   "sha256": "3a85e83aab446583decfaf22694aa25e631633edc1b01f34316c0b022989637d",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pats_in_hospital",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD_JHEMR"
+   ],
+   "sha256": "1bcf25da40f78317f0787ea6104c3403b959f6bbf8ae2b57daafcca6ccdda08e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pats_in_hospital",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS"
+   ],
+   "sha256": "011f01855877a5cd15161681edc578473acaf7a9c6dccab41d7ea4cb7dcd8a24",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "refs": [
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT"
+   ],
+   "sha256": "55b1a780a038993c18ced32c1e7a753ada1d9af2f2c4373be2b48f66a29d45f3",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql",
+   "refs": [
+    {
+     "ref": "mcs_doc_form_records",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_doc_form",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+   "category": "root_main",
+   "view_names": [
+    "EMR_MOLECULAR_PATHOLOGY_REPORT"
+   ],
+   "sha256": "36369e6572b1f8b3bdb3f30ca53dd0516318f71ec938fd263de00dc3a2f5f27a",
+   "dialect": "sqlserver",
+   "deploy_system": "PATHOLOGY",
+   "origin_74": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+   "refs": [
+    {
+     "ref": "dbo.Pitaya",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql",
+   "category": "root_main",
+   "view_names": [
+    "c##fxpt.emr_infection_information_register"
+   ],
+   "sha256": "8fb034881fd538ac47595840b3710626afc1f89abf0904d146b0bdee4894c06c",
+   "dialect": "oracle",
+   "deploy_system": "INFECTION_SURVEILLANCE",
+   "origin_74": "history:院感.txt",
+   "refs": [
+    {
+     "ref": "c##nis5.operation_source",
+     "dblink": ""
+    },
+    {
+     "ref": "c##nis5.bacteria",
+     "dblink": ""
+    },
+    {
+     "ref": "c##nis5.antibiotics",
+     "dblink": ""
+    },
+    {
+     "ref": "c##nis5.overall",
+     "dblink": ""
+    },
+    {
+     "ref": "c##nis5.infection",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+   "category": "root_main",
+   "view_names": [
+    "HRPSEY656.EMR_HOS_PRACTITIONER"
+   ],
+   "sha256": "96f8cc3ef91451a2383f48c99614448539bb47c54ae7312cf14f6d5396925932",
+   "dialect": "oracle",
+   "deploy_system": "HRP",
+   "origin_74": "live:hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+   "refs": [
+    {
+     "ref": "bd_psndoc",
+     "dblink": ""
+    },
+    {
+     "ref": "hi_psnjob",
+     "dblink": ""
+    },
+    {
+     "ref": "bd_psncl",
+     "dblink": ""
+    },
+    {
+     "ref": "org_dept",
+     "dblink": ""
+    },
+    {
+     "ref": "MD_ENUMVALUE",
+     "dblink": ""
+    },
+    {
+     "ref": "bd_defdoc",
+     "dblink": ""
+    },
+    {
+     "ref": "hi_psndoc_edu",
+     "dblink": ""
+    },
+    {
+     "ref": "hi_psndoc_glbdef2",
+     "dblink": ""
+    },
+    {
+     "ref": "HRPSEY656.CDA_SECTION_MAP",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+   "category": "root_main",
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_REP"
+   ],
+   "sha256": "8166873af281a030858b54065432bb19b894b2f7b2b7b386aff2dddfeede0d56",
+   "dialect": "oracle",
+   "deploy_system": "HIS",
+   "origin_74": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql",
+   "refs": [
+    {
+     "ref": "EXAM.EXAM_MASTER",
+     "dblink": ""
+    },
+    {
+     "ref": "EXAM.EXAM_ITEMS",
+     "dblink": ""
+    },
+    {
+     "ref": "EXAM.EXAM_REPORT",
+     "dblink": ""
+    },
+    {
+     "ref": "EXAM.EXAM_APPOINTS",
+     "dblink": ""
+    },
+    {
+     "ref": "PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "DEPT_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "OUTP_TREAT_REC",
+     "dblink": ""
+    },
+    {
+     "ref": "CLINIC_MASTER",
+     "dblink": ""
+    },
+    {
+     "ref": "OUTP_ORDER_DESC",
+     "dblink": ""
+    },
+    {
+     "ref": "SYS_EMPLOYEE",
+     "dblink": ""
+    },
+    {
+     "ref": "D07_EXAM_ITEM_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "CLINIC_ITEM_MAPPING",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OPERATION_NURSING"
+   ],
+   "sha256": "069cb6f20bd6ed364493c233e04b447bda68a6dfc5b55884a2a9a1a88b495a17",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_schedule",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_plan",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_custom_data",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION"
+   ],
+   "sha256": "31d5e9d32005687542ee0c5d4258ed9b0244a050e8d313fd12f03dfa70ac603d",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd46",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION_JHEMR"
+   ],
+   "sha256": "129f2b7301ba83e235e3171657bce1c0f781feaefe7a6fac51b5e126b6139f84",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD"
+   ],
+   "sha256": "7d9ad41bf3b31340b0a4f58c1eeee2b2b65ad4ac5b9146b4e0223e61ec10a6e7",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD44",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD_JHEMR"
+   ],
+   "sha256": "3105cfd8390467001c558ad8a06df3a58de1f28c9df43b86d542de4787e368e5",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS"
+   ],
+   "sha256": "92e1b7ae3d3d737e20b800e89211ed367bf81cedc49e859bf8da867a27966af9",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD47",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD46",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS_JHEMR"
+   ],
+   "sha256": "f34e5fc9dedd60679d24e604a895be44d5a0c5abb14bd1645e5a023fd2adf3ff",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD"
+   ],
+   "sha256": "4ddcc2d0bae19b667c0da6884e39812c04bb9322b962d0dd9f7766bf56a4c84f",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD_JHEMR"
+   ],
+   "sha256": "1df6a584d856608ff7567013c2820826c60f482b8d22e5af7cdba13266eaaccf",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "root_main",
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "sha256": "2724cf12cb87a708dd9c1510e5c7ac8de48e1cad23e2fa3dfc75d1e12c2dd2c8",
+   "dialect": "oracle",
+   "deploy_system": "HIS",
+   "origin_74": "live:his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql",
+   "refs": [
+    {
+     "ref": "V_EMR_EXAM_IMAGE_REP",
+     "dblink": ""
+    },
+    {
+     "ref": "EXAM.EXAM_REPORT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_IMAGE_TEST"
+   ],
+   "sha256": "40f5b3bc6f6423892fbfb98058f903d3acfad72833e2e97dbce2365fd1bd1584",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql",
+   "refs": [
+    {
+     "ref": "V_EMR_INSPECTION_TEST",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ALLERGY_TEST"
+   ],
+   "sha256": "1dfb76462a0d542d12751b63df404d2efa51c8a7db2de76890884081c3e13259",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "refs": [
+    {
+     "ref": "HIS.LAB_RESULT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LAB_TEST_MASTER",
+     "dblink": ""
+    },
+    {
+     "ref": "V_EMR_INSPECTION_TEST",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LAB_TEST_ITEMS",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.CLINIC_ITEM_DICT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_TEST"
+   ],
+   "sha256": "69089fd38d10dcb354d57fc765e8a36b9e1f7a2f1e647f9edcdfef576e62b1f0",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql",
+   "refs": [
+    {
+     "ref": "HIS.LAB_TEST_MASTER",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.OUTP_ORDER_DESC",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.STAFF_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LAB_TEST_ITEMS",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.CLINIC_ITEM_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DIAGNOSIS",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ITEM_TEST"
+   ],
+   "sha256": "9d377e4405a704e4b271edf06b614a4686c40259b1f6646da3593a79eab6605a",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql",
+   "refs": [
+    {
+     "ref": "HIS.LAB_TEST_MASTER",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.OUTP_ORDER_DESC",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LAB_RESULT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LAB_TEST_ITEMS",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.LIS_EXAMINE_ITEM_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "CLINIC_ITEM_MAPPING_U",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD"
+   ],
+   "sha256": "e95ab553a404f3c350d766a548d64639a932a9bfea9406c482254fd2882d510b",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD51",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD_JHEMR"
+   ],
+   "sha256": "a3ba28e15a2ab904bdd4a520636c87c0fceb3e0b882d0d8c456f9f1ff58b881d",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD"
+   ],
+   "sha256": "49eceae1ba64cb31c398e64439d86bcfb0ce8c31d5b1d85b080fd1e4c194b73c",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_DEATH_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD_JHEMR"
+   ],
+   "sha256": "380efe98c7dae9fb1e5133bf601b484b29f057db7ce61e380fa966b2a04ec262",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT"
+   ],
+   "sha256": "3ea33d0d5c4050387af4442f70e76e0f9239413075add0e154caf3f7fe43e579",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR"
+   ],
+   "sha256": "8f69a6381eb5c8d71d2b4698570c2005d4db78efeb0f76331c2c88bf77859c46",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN"
+   ],
+   "sha256": "6881ea53cf5c9fefa722d1ce96e913522352cf8b2510e5a28670dca656debfc1",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql",
+   "refs": [
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_vital_info",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_sys_users",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_event_info",
+     "dblink": ""
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO"
+   ],
+   "sha256": "28ec5a0981ed7f0df9b0c984c4543180dfa9c15c3a4acd4728835b2d2f9888e8",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql",
+   "refs": [
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient_docindex",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.epr_inpatient",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.emrsd_content",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR"
+   ],
+   "sha256": "b3df28c85b4e10426165bac2ee50fefd5ecc9fb7698aa164e3857bb46bf8b5dd",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+   ],
+   "sha256": "e95358522d2be1c3f77be496b45de026b018611f207120e4464dd16f89ad4693",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD40",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS_JHEMR"
+   ],
+   "sha256": "f556b6ede4f2dc9e59e4cbc613bd1e08c872cf58e9a35a32c1408cb3b1370861",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL"
+   ],
+   "sha256": "ba4414f5ccffe299eddadcf8bec8afe514b03a7b7b7dae34447768f1664491db",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql",
+   "refs": [
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD49",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD37",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DIAGNOSIS",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.CDA_DICTIONARY",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR"
+   ],
+   "sha256": "bf6ef3092dd3ed56104cfc15c30a2679837f9cba48090f7910e89a9f8f7b3b54",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD49",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD37",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DIAGNOSIS",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.CDA_DICTIONARY",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT"
+   ],
+   "sha256": "7be1352a3d461480a85056b06fd3203b6ffaac210952f46e5a22f9f8dd58a805",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql",
+   "refs": [
+    {
+     "ref": "mcs_vital_info",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_order_schedule",
+     "dblink": ""
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS"
+   ],
+   "sha256": "17ed057dae92e05bd093ac9fddf64794f9998b310f13c1521b092915dca8023e",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql",
+   "refs": [
+    {
+     "ref": "mcs_doc_form_records",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_vital_info",
+     "dblink": ""
+    },
+    {
+     "ref": "mcs_doc_form",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\病理报告_EMR_PATHOLOGY_REPORT.sql",
+   "category": "root_main",
+   "view_names": [
+    "EMR_PATHOLOGY_REPORT"
+   ],
+   "sha256": "5d858b68c277cea05faf9da07bda25f20cc75476e1c7e09b813efc457759c81d",
+   "dialect": "sqlserver",
+   "deploy_system": "PATHOLOGY",
+   "origin_74": "live:pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql",
+   "refs": [
+    {
+     "ref": "dbo.Pitaya",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+   "category": "root_main",
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "dialect": "oracle",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "origin_74": "history:血透系统.txt",
+   "refs": [
+    {
+     "ref": "Treatment_Treatment",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_Hospitalization",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescription",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_AfterSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_VascularAccess",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_IDInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescriptionMaterial",
+     "dblink": ""
+    },
+    {
+     "ref": "Auxiliary_MaterialInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSymptom",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeCheck",
+     "dblink": ""
+    },
+    {
+     "ref": "AGE",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_PatientInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Organ_Employee",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringParam",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrderDeal",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrder",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "dialect": "oracle",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "origin_74": "history:血透系统.txt",
+   "refs": [
+    {
+     "ref": "Treatment_Treatment",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_Hospitalization",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescription",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_AfterSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_VascularAccess",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_IDInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescriptionMaterial",
+     "dblink": ""
+    },
+    {
+     "ref": "Auxiliary_MaterialInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSymptom",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeCheck",
+     "dblink": ""
+    },
+    {
+     "ref": "AGE",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_PatientInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Organ_Employee",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringParam",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrderDeal",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrder",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+   "category": "root_main",
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "dialect": "oracle",
+   "deploy_system": "HISTORY_UNRESOLVED",
+   "origin_74": "history:血透系统.txt",
+   "refs": [
+    {
+     "ref": "Treatment_Treatment",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_Hospitalization",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescription",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_AfterSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_VascularAccess",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_IDInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Plan_PatientPrescriptionMaterial",
+     "dblink": ""
+    },
+    {
+     "ref": "Auxiliary_MaterialInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSymptom",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_BeforeCheck",
+     "dblink": ""
+    },
+    {
+     "ref": "AGE",
+     "dblink": ""
+    },
+    {
+     "ref": "Register_PatientInfomation",
+     "dblink": ""
+    },
+    {
+     "ref": "Organ_Employee",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringSigns",
+     "dblink": ""
+    },
+    {
+     "ref": "Treatment_DuringParam",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrderDeal",
+     "dblink": ""
+    },
+    {
+     "ref": "Order_PatientDayOrder",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD"
+   ],
+   "sha256": "c08570b6ec2667c6d383f8a766e5c68d241271f121fda3959dab42377ebd7e1d",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.adt_log",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT_DOCINDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EPR_INPATIENT",
+     "dblink": ""
+    },
+    {
+     "ref": "mtl.EMRSD42",
+     "dblink": ""
+    },
+    {
+     "ref": "MTL.EMRSD_CONTENT",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD_JHEMR"
+   ],
+   "sha256": "895ec3061b058479c8bc5b2f5dd77721ad07d8943a5a2c4b804011bf9ff1168f",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.adt_log",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "jhemr.jhmr_file_content_text",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_REFERRAL_HOS_RECORD"
+   ],
+   "sha256": "935424aae2511adace5e09944b3ab3ccea22d9813185aca6b3da62cad88e378e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.adt_log",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_TRANS_BLOOD"
+   ],
+   "sha256": "90ad5cdc75184f5b2071e5705dcde8b4a40f55e6b39bf9f0c05bc71da7bfafd2",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sx.b_t_reqd",
+     "dblink": ""
+    },
+    {
+     "ref": "sx.b_t_xyxxb",
+     "dblink": ""
+    },
+    {
+     "ref": "sx.b_t_reactions",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT"
+   ],
+   "sha256": "ca912e31dce8bfe4d93db06c020a95d378a1a01b34c2be818f0b267df477e635",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql",
+   "refs": [
+    {
+     "ref": "mcs_doc_form",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "mcs_doc_form_records",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECORD"
+   ],
+   "sha256": "441c1e933e70422e9577abd99d84f3e24f8e64a0d6c972885c855b08be66b47a",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.clinic_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "doc_register_emp_match",
+     "dblink": ""
+    },
+    {
+     "ref": "title_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "municipal_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.outp_mr",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.outp_rcpt_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.outp_mr_diag_desc",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_DIAG"
+   ],
+   "sha256": "3b48c2409cccf410770e530eb240fe37fdf0f237e951c08b63fc2a1f0a441e75",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql",
+   "refs": [
+    {
+     "ref": "HIS.outp_mr_diag_desc",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.clinic_master",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_mr",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE"
+   ],
+   "sha256": "37ddd4f107243cf23fa45327cae866b0742a942d87c02857330161f5d783557c",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.drug_presc_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.drug_presc_detail",
+     "dblink": ""
+    },
+    {
+     "ref": "his.drug_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.clinic_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM"
+   ],
+   "sha256": "e29183ca406efc412531ff4a685187e74cbdd34acd32047a60cac88259be0933",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "refs": [
+    {
+     "ref": "HIS.drug_price_list",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.drug_presc_master",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.drug_presc_detail",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.clinic_master",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.med_dict_baseinfo",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.drug_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "DRUG_STANDARD_DICT",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "CDA_VALUE_DOMAIN_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "PORTAL_USER.portal_sys_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.insur_vsh_center_item_new",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_REGISTER"
+   ],
+   "sha256": "676d166ba567eb50695bf9316c71b87533f1f15d1c10bc0569a7880a3046644f",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql",
+   "refs": [
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "municipal_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "shunneng.appointinfoview",
+     "dblink": ""
+    },
+    {
+     "ref": "his.clinic_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_MAIN"
+   ],
+   "sha256": "bb8ddf0e7fa32294d0c4f59b6c9a4d149096251b8cdb7ceabc41fcd9665e72b5",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql",
+   "refs": [
+    {
+     "ref": "HIS.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_rcpt_master",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_order_desc",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.price_list",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_bill_items",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_payments_money",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_CHILD"
+   ],
+   "sha256": "dcc7253b8a427f994f1eeb83305534372276a6bbd52a37b51ecb840a32c5175e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql",
+   "refs": [
+    {
+     "ref": "CDA_VALUE_DOMAIN_MAP",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_rcpt_master",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_bill_items",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_order_desc",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_treat_rec",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.outp_presc_t",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.price_list",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+   "category": "root_main",
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH"
+   ],
+   "sha256": "5aca9bcd96db8203c66bc1655ce0d8ac2f1660c43e54abb4673c3cbf2deabce9",
+   "dialect": "oracle",
+   "deploy_system": "MOBILE_NURSING",
+   "origin_74": "live:mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql",
+   "refs": [
+    {
+     "ref": "mcs_doc_form_records",
+     "dblink": ""
+    },
+    {
+     "ref": "MCS_DOC_FORM",
+     "dblink": ""
+    },
+    {
+     "ref": "inpatients",
+     "dblink": ""
+    },
+    {
+     "ref": "dept_dict",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "pat_visit",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "DIAGNOSIS",
+     "dblink": "HIS"
+    },
+    {
+     "ref": "cda_dictionary",
+     "dblink": "SJZX"
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_CONSUMABLES"
+   ],
+   "sha256": "d78189afce05dc4e5ff6d9a06ea0f925dbc696de222dff18f148d3265f06f29e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_CONSUMABLES.sql",
+   "refs": [
+    {
+     "ref": "HIS.INP_BILL_DETAIL",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_MASTER_INDEX",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.PAT_VISIT",
+     "dblink": ""
+    },
+    {
+     "ref": "HIS.DEPT_DICT",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_MED"
+   ],
+   "sha256": "01cb6757c309a9d24f3d774abf41841d4fbd38d1a45de97eedffc17d1caa9a2e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql",
+   "refs": [
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_event",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_BLOOD"
+   ],
+   "sha256": "1525a641a7a950a04753c5a22270209b71ef282385c6ae5f930bbaa1e15ccb2e",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql",
+   "refs": [
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ANESTHESIA_RECORD"
+   ],
+   "sha256": "147ba7c3bf502c870ccaec8f6bca513cca7c8548ea4866471479d447273da213",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_event",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_custom_data",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_plan",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_BOFORE_OPERA_RECORD"
+   ],
+   "sha256": "3fcae3104bf9f31028fdaed91dad374fddb6399984a232013d52ab7cc1f15cb6",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_custom_data",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_schedule",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_plan",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_emr_archive_detial",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_ANES_AFTER_RECORD"
+   ],
+   "sha256": "206b3734efb5e22dcee2f1abcc1f8d6bcd9ff9c2960841368ec868024f5bbd78",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_schedule",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_plan",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_custom_data",
+     "dblink": ""
+    }
+   ]
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+   "category": "root_main",
+   "view_names": [
+    "ODS.V_EMR_INFOR_ANESTHESIA"
+   ],
+   "sha256": "f05912e06051dc05eb2d5aed721a9a1fbba3b1e8125d610c7cacc09b116cd615",
+   "dialect": "oracle",
+   "deploy_system": "DATA_CENTER",
+   "origin_74": "live:ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql",
+   "refs": [
+    {
+     "ref": "his.dept_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "cda.cda_dictionary",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_custom_data",
+     "dblink": ""
+    },
+    {
+     "ref": "his.staff_dict",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_master",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_visit",
+     "dblink": ""
+    },
+    {
+     "ref": "his.pat_master_index",
+     "dblink": ""
+    },
+    {
+     "ref": "his.operation",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_anesthesia_plan",
+     "dblink": ""
+    },
+    {
+     "ref": "sm.med_operation_schedule",
+     "dblink": ""
+    },
+    {
+     "ref": "his.diagnosis",
+     "dblink": ""
+    }
+   ]
+  }
+ ]
+}

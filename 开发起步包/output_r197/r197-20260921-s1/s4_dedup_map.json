@@ -1,0 +1,165 @@
+[
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-AF65517FED",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-4264E2FC1C",
+  "statements": 46
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-4574484543",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-CB3BA33251",
+  "statements": 71
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"OPERATION_CODE\"]], [\"OPERATION_DICT\", [\"OPERATION_CODE\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-4EB1EB7136",
+  "statements": 49
+ },
+ {
+  "stage_key": "[[\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-79A7F03D1D",
+  "statements": 4
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"DIAGNOSIS_TYPE\"]], [\"DIAGNOSIS_TYPE_DICT\", [\"DIAGNOSIS_TYPE_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OPERATION_MASTER\", [\"OPERATING_DEPT\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-AFE509521C",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\"]], [\"PAT_MASTER_INDEX\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-A2AC280BB4",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 19
+ },
+ {
+  "stage_key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPER_ID\"]], [\"OPERATION_NAME\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPER_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-D24A708DF5",
+  "statements": 28
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"OPERATION_DESC\"]], [\"OPERATION_DICT\", [\"OPERATION_NAME\"]], \"inner\"]",
+  "match": "new",
+  "statements": 9
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-33FFE8A421",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"VISIT_ID\"]], [\"PAT_VISIT\", [\"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-1008D796C9",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"MEDICAL_RECORD_REVIEW_TABLE\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-C84A01F90E",
+  "statements": 6
+ },
+ {
+  "stage_key": "[[\"INP_SETTLE_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-89188944F3",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"病理病人清单\", [\"HISID号\", \"住院次数\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"病理病人清单\", [\"HISID号\", \"住院次数\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DEPT_DICT\", [\"DEPT_CODE\"]], [\"OPERATION_MASTER\", [\"DEPT_STAYED\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-B040DC9E3E",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 5
+ },
+ {
+  "stage_key": "[[\"LAB_TEST_ITEMS\", [\"TEST_NO\"]], [\"LAB_TEST_MASTER\", [\"TEST_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-42E060720B",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"EXAM_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"EXAM_ITEMS\", [\"EXAM_NO\"]], [\"EXAM_MASTER\", [\"EXAM_NO\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-EE88384570",
+  "statements": 2
+ },
+ {
+  "stage_key": "[[\"INP_BILL_DETAIL\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-60FDE4D634",
+  "statements": 3
+ },
+ {
+  "stage_key": "[[\"OPERATION_DICT\", [\"YB_CODE\"]], [\"YB_MAPPING\", [\"YB_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OPERATION\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPERATION_CODE\"]], [\"OPERATION_NAME\", [\"PATIENT_ID\", \"VISIT_ID\", \"OPERATION_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OPERATION_DICT\", [\"OPERATION_CODE\"]], [\"OPERATION_NAME\", [\"OPERATION_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"OPERATION_MASTER\", [\"PATIENT_ID\", \"VISIT_ID\"]], [\"PAT_VISIT\", [\"PATIENT_ID\", \"VISIT_ID\"]], \"inner\"]",
+  "match": "s2_exact",
+  "attach_to": "S2F-D6E536D1CB",
+  "statements": 1
+ },
+ {
+  "stage_key": "[[\"DIAGNOSIS_DICT\", [\"YB_CODE\"]], [\"YB_MAPPING\", [\"YB_CODE\"]], \"inner\"]",
+  "match": "new",
+  "statements": 2
+ }
+]

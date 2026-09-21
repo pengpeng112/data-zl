@@ -1,0 +1,6 @@
+  F:\python\数据资产\backend\.venv\Lib\site-packages\pypinyin\phrases_dict.py:16: DeprecationWarning: codecs.open() is deprecated. Use open() instead.
+    with open(_json_path, encoding='utf8') as fp:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1695 passed, 1 skipped, 9 warnings in 3307.23s (0:55:07)
+PYTEST_EXIT=0

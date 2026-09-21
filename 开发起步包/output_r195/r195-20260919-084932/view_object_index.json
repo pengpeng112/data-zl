@@ -1,0 +1,1400 @@
+{
+ "reconciled_at": "2026-09-19T08:56:13.401660",
+ "objects": {
+  "V_EMR_OPERA_RECORD": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\revised_views\\46_V_EMR_OPERA_RECORD_源视图修正版.sql"
+   ]
+  },
+  "DBO.V_EMR_INSPECTION_D18": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\revised_views\\EMR_INSPECTION_D18_修正版.sql"
+   ]
+  },
+  "DBO.V_EMR_INSPECTION_ITEM_D06": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\revised_views\\EMR_INSPECTION_ITEM_D06_修正版.sql"
+   ]
+  },
+  "V_EMR_ICH": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\revised_views\\V_EMR_ICH_源视图修正版.sql"
+   ]
+  },
+  "SOURCE_10_10_10_15__HISUSER.V_EMR_CONSUMABLES": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_CONSUMABLES.sql"
+   ]
+  },
+  "SOURCE_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql"
+   ]
+  },
+  "SOURCE_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql"
+   ]
+  },
+  "HRPSEY656.EMR_HOS_INFORMATION": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\hrp_10_10_10_23__HRPSEY656.EMR_HOS_INFORMATION.sql"
+   ]
+  },
+  "HRPSEY656.EMR_HOS_PRACTITIONER": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+    "三甲完成视图\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql"
+   ]
+  },
+  "V_EMR_INSPECTION": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION.sql",
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_INSPECTION.sql",
+    "三甲完成视图\\history\\v_EMR_INSPECTION.sql"
+   ]
+  },
+  "V_EMR_INSPECTION_ALLERGY": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ALLERGY.sql"
+   ]
+  },
+  "V_EMR_INSPECTION_IMAGE": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.V_EMR_INSPECTION_IMAGE.sql"
+   ]
+  },
+  "V_EMR_INSPECTION_ITEM": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ITEM.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql",
+    "三甲完成视图\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql",
+    "三甲完成视图\\备份_20260914活库原样\\阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+    "三甲完成视图\\阴道分娩记录_v_EMR_CHILDBIRTH.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+    "三甲完成视图\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql",
+    "三甲完成视图\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql",
+    "三甲完成视图\\一般护理记录_v_EMR_GENERAL_NURSING.sql",
+    "三甲完成视图\\备份_20260914活库原样\\一般护理记录_v_EMR_GENERAL_NURSING.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+    "三甲完成视图\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\量表评估_v_emr_nursing_assessment.sql",
+    "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql"
+   ]
+  },
+  "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql",
+    "三甲完成视图\\备份_20260914活库原样\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+    "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql"
+   ]
+  },
+  "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+    "三甲完成视图\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql"
+   ]
+  },
+  "ODS.EMR_HOS_CHANGE_MAJOR_RECORD": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.EMR_HOS_CHANGE_MAJOR_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql",
+    "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+    "三甲完成视图\\备份_20260914活库原样\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_DIAGNOSIS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql",
+    "三甲完成视图\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql",
+    "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_RECORD_EXAM": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_RECORD_EXAM.sql"
+   ]
+  },
+  "ODS.V_EMR_ANES_AFTER_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+    "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_ANES_RECORD_BLOOD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql",
+    "三甲完成视图\\麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql"
+   ]
+  },
+  "ODS.V_EMR_ANES_RECORD_MED": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql",
+    "三甲完成视图\\麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql"
+   ]
+  },
+  "ODS.V_EMR_ANESTHESIA_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+    "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_BOFORE_OPERA_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+    "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_CONSUMABLES": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_CONSUMABLES.sql",
+    "三甲完成视图\\备份_20260914活库原样\\高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+    "三甲完成视图\\高值耗材使用记录_V_EMR_CONSUMABLES.sql"
+   ]
+  },
+  "ODS.V_EMR_DEATH_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DEATH_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+    "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_DISCHARGE_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql",
+    "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_DOC_ORDER_CHECK": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql",
+    "三甲完成视图\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql"
+   ]
+  },
+  "ODS.V_EMR_DOC_ORDER_DRUG": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql",
+    "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+    "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_CONSUL_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql",
+    "三甲完成视图\\会诊记录_v_EMR_HOS_CONSUL_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\会诊记录_v_EMR_HOS_CONSUL_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+    "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_DND_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+    "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_POSTOPER_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+    "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_PREOP_DISCUSS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+    "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_SAVE_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+    "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_SUCCESSION_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql",
+    "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_ICH": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH.sql",
+    "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql"
+   ]
+  },
+  "ODS.V_EMR_ICH_ALLERGIES": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql",
+    "三甲完成视图\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql"
+   ]
+  },
+  "ODS.V_EMR_ICH_CHARGE": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_CHARGE.sql",
+    "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql"
+   ]
+  },
+  "ODS.V_EMR_ICH_DIAGNOSIS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql",
+    "三甲完成视图\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql"
+   ]
+  },
+  "ODS.V_EMR_ICH_OPERATION": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_OPERATION.sql",
+    "三甲完成视图\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql"
+   ]
+  },
+  "ODS.V_EMR_IN_FEE_INFO_CHILD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql",
+    "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql"
+   ]
+  },
+  "ODS.V_EMR_IN_FEE_INFO_MAIN": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql",
+    "三甲完成视图\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+    "三甲完成视图\\备份_20260914活库原样\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_ANESTHESIA": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql",
+    "三甲完成视图\\备份_20260914活库原样\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+    "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_CRITICALLY_ILL": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql",
+    "三甲完成视图\\备份_20260914活库原样\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+    "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_OPERATION": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql",
+    "三甲完成视图\\备份_20260914活库原样\\手术知情同意书_v_emr_infor_operation.sql",
+    "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_OTHERS": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql",
+    "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+    "三甲完成视图\\备份_20260914活库原样\\其它知情同意书_v_EMR_INFOR_OTHERS.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+    "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_TRANS_BLOOD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+    "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql"
+   ]
+  },
+  "ODS.V_EMR_INSPECTION_ALLERGY_TEST": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql",
+    "三甲完成视图\\备份_20260914活库原样\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+    "三甲完成视图\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql"
+   ]
+  },
+  "ODS.V_EMR_INSPECTION_IMAGE_TEST": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql",
+    "三甲完成视图\\备份_20260914活库原样\\检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql",
+    "三甲完成视图\\检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql"
+   ]
+  },
+  "ODS.V_EMR_INSPECTION_ITEM_TEST": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql",
+    "三甲完成视图\\备份_20260914活库原样\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+    "三甲完成视图\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql"
+   ]
+  },
+  "ODS.V_EMR_INSPECTION_TEST": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql",
+    "三甲完成视图\\备份_20260914活库原样\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+    "三甲完成视图\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql"
+   ]
+  },
+  "ODS.V_EMR_MEDICAL_RECORD_INFO": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql",
+    "三甲完成视图\\备份_20260914活库原样\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+    "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql"
+   ]
+  },
+  "ODS.V_EMR_NURSING_ASSESSMENT": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_NURSING_ASSESSMENT.sql"
+   ]
+  },
+  "ODS.V_EMR_OPERA_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OPERA_RECORD.sql",
+    "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+    "三甲完成视图\\备份_20260914活库原样\\一般手术记录_v_emr_opera_record.sql"
+   ]
+  },
+  "ODS.V_EMR_OPERATION_NURSING": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql",
+    "三甲完成视图\\备份_20260914活库原样\\手术护理记录_v_emr_operation_nursing.sql",
+    "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql"
+   ]
+  },
+  "ODS.V_EMR_OUT_FEE_INFO_CHILD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+    "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql"
+   ]
+  },
+  "ODS.V_EMR_OUT_FEE_INFO_MAIN": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+    "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_DIAG": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+    "三甲完成视图\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_DIAG_BAK": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG_BAK.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_RECIPE": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+    "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_RECIPE_BAK": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_BAK.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+    "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+    "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql"
+   ]
+  },
+  "ODS.V_EMR_OUTPATIENT_REGISTER": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql",
+    "三甲完成视图\\门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql"
+   ]
+  },
+  "ODS.V_EMR_REFERRAL_HOS_RECORD": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql",
+    "三甲完成视图\\转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql"
+   ]
+  },
+  "EMR_MOLECULAR_PATHOLOGY_REPORT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+    "三甲完成视图\\分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql"
+   ]
+  },
+  "EMR_PATHOLOGY_REPORT": {
+   "cats": [
+    "governance",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql",
+    "三甲完成视图\\备份_20260914活库原样\\病理报告_EMR_PATHOLOGY_REPORT.sql",
+    "三甲完成视图\\病理报告_EMR_PATHOLOGY_REPORT.sql"
+   ]
+  },
+  "MOLECULAR_PATHOLOGY_EXAM_RECORD": {
+   "cats": [
+    "governance"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.molecular_pathology_exam_record.sql"
+   ]
+  },
+  "OUTPATIENT_REGISTER(2)": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\11、门诊挂号(D01 标）EMR_OUTPATIENT_REGISTER(2).sql",
+    "三甲完成视图\\history\\11、门诊挂号(D01 标）EMR_OUTPATIENT_REGISTER(2).sql"
+   ]
+  },
+  "OUT_FEE_INFO_CHILD": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\13、门（急）诊费用明细表EMR_OUT_FEE_INFO_CHILD.sql",
+    "三甲完成视图\\history\\13、门（急）诊费用明细表EMR_OUT_FEE_INFO_CHILD.sql"
+   ]
+  },
+  "OUT_FEE_INFO_MAIN": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\15、门（急）诊费用信息主表EMR_OUT_FEE_INFO_MAIN.sql",
+    "三甲完成视图\\history\\15、门（急）诊费用信息主表EMR_OUT_FEE_INFO_MAIN.sql"
+   ]
+  },
+  "IN_FEE_INFO_MAIN(1)": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\16、住院结算费用信息主表EMR_IN_fee_info_main(1).sql",
+    "三甲完成视图\\history\\16、住院结算费用信息主表EMR_IN_fee_info_main(1).sql"
+   ]
+  },
+  "IN_FEE_INFO_CHILD(1)": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\17、住院费用明细表EMR_IN_FEE_INFO_CHILD(1).sql",
+    "三甲完成视图\\history\\17、住院费用明细表EMR_IN_FEE_INFO_CHILD(1).sql"
+   ]
+  },
+  "V_EMR_CONSUMABLES": {
+   "cats": [
+    "governance",
+    "history"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_CONSUMABLES_初步版.sql",
+    "三甲完成视图\\history\\v_EMR_CONSUMABLES_初步版.sql"
+   ]
+  },
+  "V_EMR_EXAM_IMAGE_PATH": {
+   "cats": [
+    "governance",
+    "history",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_EXAM_IMAGE_PATH.sql",
+    "三甲完成视图\\history\\v_EMR_EXAM_IMAGE_PATH.sql",
+    "三甲完成视图\\备份_20260914活库原样\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+    "三甲完成视图\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql"
+   ]
+  },
+  "V_EMR_EXAM_IMAGE_REP": {
+   "cats": [
+    "governance",
+    "history",
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_EXAM_IMAGE_REP.sql",
+    "三甲完成视图\\history\\v_EMR_EXAM_IMAGE_REP.sql",
+    "三甲完成视图\\备份_20260914活库原样\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+    "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_OPERA_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_SUCCESSION_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_ADMISSION_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_OTHERS_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_DISCHARGE_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD_jhemr.sql"
+   ]
+  },
+  "C##FXPT.EMR_INFECTION_INFORMATION_REGISTER": {
+   "cats": [
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "三甲完成视图\\医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql"
+   ]
+  },
+  "V_EMR_BLOOD_DIALY_RECORD": {
+   "cats": [
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+    "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql"
+   ]
+  },
+  "V_EMR_BLOOD_DIALY_DETAIL": {
+   "cats": [
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+    "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql"
+   ]
+  },
+  "V_EMR_BLOOD_DIALY_ORDER": {
+   "cats": [
+    "live_backup_20260914",
+    "root_main"
+   ],
+   "files": [
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\备份_20260914活库原样\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+    "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+    "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+    "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_OPERATION_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_SAVE_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_PREOP_DISCUSS_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_POSTOPER_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_DND_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_DEATH_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql"
+   ]
+  },
+  "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD_JHEMR": {
+   "cats": [
+    "root_jhemr_draft"
+   ],
+   "files": [
+    "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD_jhemr.sql"
+   ]
+  },
+  "QUERY": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\scripts_旧版检查脚本\\view1_query.sql"
+   ]
+  },
+  "ADMISSION_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图1_EMR_ADMISSION_RECORD\\EMR_ADMISSION_RECORD_修正版.sql"
+   ]
+  },
+  "V_EMR_HOS_POSTOPER_RECORD": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图36_EMR_HOS_POSTOPER_RECORD\\EMR_HOS_POSTOPER_RECORD_修正版.sql"
+   ]
+  },
+  "V_EMR_HOS_PREOP_DISCUSS": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图37_EMR_HOS_PREOP_DISCUSS\\EMR_HOS_PREOP_DISCUSS_修正版.sql"
+   ]
+  },
+  "V_EMR_HOS_DND_RECORD": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图38_EMR_HOS_DND_RECORD\\EMR_HOS_DND_RECORD_修正版.sql"
+   ]
+  },
+  "V_EMR_HOS_DIFFIC_CASE_DISCUSS": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图39_EMR_HOS_DIFFIC_CASE_DISCUSS\\EMR_HOS_DIFFIC_CASE_DISCUSS_修正版.sql"
+   ]
+  },
+  "V_EMR_ADMISSION_DIAGNOSIS": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图3_EMR_ADMISSION_DIAGNOSIS\\EMR_ADMISSION_DIAGNOSIS_修正版.sql"
+   ]
+  },
+  "HOS_CHANGE_MAJOR_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图40_EMR_HOS_CHANGE_MAJOR_RECORD\\EMR_HOS_CHANGE_MAJOR_RECORD_修正版.sql"
+   ]
+  },
+  "V_EMR_REFERRAL_HOS_RECORD": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图41_EMR_REFERRAL_HOS_RECORD\\EMR_REFERRAL_HOS_RECORD_修正版.sql"
+   ]
+  },
+  "HOS_CONSUL_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图42_EMR_HOS_CONSUL_RECORD\\EMR_HOS_CONSUL_RECORD_修正版.sql"
+   ]
+  },
+  "V_EMR_HOS_SUCCESSION_RECORD": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图43_EMR_HOS_SUCCESSION_RECORD\\EMR_HOS_SUCCESSION_RECORD_修正版.sql"
+   ]
+  },
+  "HOS_SAVE_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图44_EMR_HOS_SAVE_RECORD\\EMR_HOS_SAVE_RECORD_修正版.sql"
+   ]
+  },
+  "ADMISSION_DEAD_RECORD_TF_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图45_EMR_ADMISSION_DEAD_RECORD_TF\\EMR_ADMISSION_DEAD_RECORD_TF_修正版.sql"
+   ]
+  },
+  "OPERA_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图46_EMR_OPERA_RECORD\\EMR_OPERA_RECORD_修正版.sql"
+   ]
+  },
+  "BOFORE_OPERA_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图47_EMR_BOFORE_OPERA_RECORD\\EMR_BOFORE_OPERA_RECORD_修正版.sql"
+   ]
+  },
+  "ANESTHESIA_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图48_EMR_ANESTHESIA_RECORD\\EMR_ANESTHESIA_RECORD_修正版.sql"
+   ]
+  },
+  "ANES_RECORD_BLOOD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图49_EMR_ANES_RECORD_BLOOD\\EMR_ANES_RECORD_BLOOD_修正版.sql"
+   ]
+  },
+  "V_EMR_DISCHARGE_RECORD": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图4_EMR_DISCHARGE_RECORD\\EMR_DISCHARGE_RECORD_修正版.sql"
+   ]
+  },
+  "ANES_RECORD_MED_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图50_EMR_ANES_RECORD_MED\\EMR_ANES_RECORD_MED_修正版.sql"
+   ]
+  },
+  "AFTER_OPERA_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图51_EMR_AFTER_OPERA_RECORD\\EMR_AFTER_OPERA_RECORD_修正版.sql"
+   ]
+  },
+  "DISCHARGE_RECORD_DIAGNOSIS_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\核查完成\\视图5_EMR_DISCHARGE_RECORD_DIAGNOSIS\\EMR_DISCHARGE_RECORD_DIAGNOSIS_修正版.sql"
+   ]
+  },
+  "OUTPATIENT_RECORD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图11_EMR_OUTPATIENT_RECORD\\EMR_OUTPATIENT_RECORD_修正版.sql"
+   ]
+  },
+  "OUT_FEE_INFO_CHILD_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图12_EMR_OUT_FEE_INFO_CHILD\\EMR_OUT_FEE_INFO_CHILD_修正版.sql"
+   ]
+  },
+  "OUTPATIENT_DIAG_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图13_EMR_OUTPATIENT_DIAG\\EMR_OUTPATIENT_DIAG_修正版.sql"
+   ]
+  },
+  "OUT_FEE_INFO_MAIN_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图14_EMR_OUT_FEE_INFO_MAIN\\EMR_OUT_FEE_INFO_MAIN_修正版.sql"
+   ]
+  },
+  "ADMISSION_RECORD_EXAM_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图2_EMR_ADMISSION_RECORD_EXAM\\EMR_ADMISSION_RECORD_EXAM_修正版.sql"
+   ]
+  },
+  "DOC_ORDER_DRUG_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图6_EMR_DOC_ORDER_DRUG\\EMR_DOC_ORDER_DRUG_修正版.sql"
+   ]
+  },
+  "DOC_ORDER_CHECK_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图7_EMR_DOC_ORDER_CHECK\\EMR_DOC_ORDER_CHECK_修正版.sql"
+   ]
+  },
+  "OUTPATIENT_RECIPE_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图8_EMR_OUTPATIENT_RECIPE\\EMR_OUTPATIENT_RECIPE_修正版.sql"
+   ]
+  },
+  "OUTPATIENT_RECIPE_ITEM_修正版": {
+   "cats": [
+    "archived_ignore"
+   ],
+   "files": [
+    "无用文件归档\\核查报告\\视图9_EMR_OUTPATIENT_RECIPE_ITEM\\EMR_OUTPATIENT_RECIPE_ITEM_修正版.sql"
+   ]
+  }
+ }
+}

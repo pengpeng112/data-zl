@@ -1,0 +1,4633 @@
+{
+ "generated_at": "2026-09-19T09:26:44.483666",
+ "v13_target_fields": [
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NATION_CODE",
+   "standard": "GBT3304-1991",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MARITAL_STATUS_CODE",
+   "standard": "GBT4766-1984",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OCCUPATION_CODE",
+   "standard": "GBT6565-1999",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "LINKMAN_RELATION_CODE",
+   "standard": "DMA-09",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ATTENDING_DOCTOR_CODE",
+   "standard": "医生身份证号",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CHIEF_DOCTOR_CODE",
+   "standard": "医生身份证号",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADMISSION_TYPE_CODE",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADMISSION_TYPE_NAME",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IS_BMIDO",
+   "standard": "1是，0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "INSU_TYPE_CODE",
+   "standard": "DMB‐47医保类型字典",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADM_WAY_CODE",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADM_WAY_NAME",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "EXAM_TYPE",
+   "standard": "CC99.00208",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "EXAM_TIME",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "EXAM_TIME_CODE",
+   "standard": "CS_EXAMINE_ITEM(检验)/ CV04.30.009检查项目",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构：",
+   "field": "PRI_DIA_MARK",
+   "standard": "1中医，2西医",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "IC10编码 或者中西诊断2021版",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构：",
+   "field": "DIAGNOSIS_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101-身份证件类别代码表",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISCHARGE_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "auto_leave_hos",
+   "standard": "1是，0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS24HRADM_DISCH",
+   "standard": "1是，0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DESTINATION_CODE",
+   "standard": "CV06.00.226-离院方式代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISCHARGE_STATUS",
+   "standard": "CV05.10.010-病情转归代码表",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIAGNOSIS_TYPE",
+   "standard": "1中医，2西医",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CONFIRMED_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADMISSION_ID",
+   "standard": "患者本次就医的精准标识号；",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "值域：0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODR_TYPE",
+   "standard": "1、长期，2、临时，3，出院带药9、其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODER_ITEM_CODE",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODER_ITEM_nAME",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DRUG_CLASS_CODE",
+   "standard": "CC99.00203",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "CATEGORY",
+   "standard": "1.西药 2.中成药 3.中药饮片4.其它",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DRUG_FORM_CODE",
+   "standard": "CV08.50.002",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "SINGLE_DOSE",
+   "standard": "计算使用",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "Unit_code",
+   "standard": "DMD-100",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "JL_UNIT",
+   "standard": "DMD-100",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DRUG_FREQUENCY_CODE",
+   "standard": "CC06.00.901",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "IS_ANTI",
+   "standard": "1是 0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ANTI_USE_GRADE_CODE",
+   "standard": "CV08.50.905",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DRUG_WAY_CD",
+   "standard": "CV06.00.102",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DRUG_WAY_NAME",
+   "standard": "CV06.00.102",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "IF_YF",
+   "standard": "抗菌药物必填",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "TCM_DECOCTION_METHOD",
+   "standard": "CV06.00.239-中药饮片煎煮法",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORDER_STATUS",
+   "standard": "1.有效 2.无效",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODR_TYPE",
+   "standard": "1、长期，2、临时，3，出院带药9、其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "DPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODRISU_DT",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORDER_CATEGORY_CODE",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORDER_STATUS",
+   "standard": "1.有效；2.无效",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RECIPE_CLINIC_CODE",
+   "standard": "CC99.00202",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RECIPE_CLASS_CODE",
+   "standard": "DMD-02",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PRESCRIBE_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_CLASS_CODE",
+   "standard": "CC99.00203",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DOSAGE_UNIT",
+   "standard": "DMD-100",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_FREQUENCY_CODE",
+   "standard": "CC06.00.901-执行频率",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_FORM_CODE",
+   "standard": "CV08.50.002",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_ESSENTIAL",
+   "standard": "T-F_1是0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ESSENTIL_GRADE",
+   "standard": "CV08.50.904",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_ANTI",
+   "standard": "T-F_1是0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANTI_USE_GRADE_CODE",
+   "standard": "CV08.50.905",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IF_YF",
+   "standard": "抗菌药物必填，非抗菌药物 - 选填",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_WAY_CD",
+   "standard": "CV06.00.102",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_WAY_NAME",
+   "standard": "CV06.00.102",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TCM_DECOCTION_METHOD",
+   "standard": "CV06.00.239-中药饮片煎煮法",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ODR_TYPE",
+   "standard": "1、长期，2、临时，9、其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ORDER_CATEGORY_CODE",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ORDER_STATUS",
+   "standard": "1. 有效 2. 无效",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DTCODE",
+   "standard": "通常由一系列数字、字母和 （或）符号组成，标识在药品包 装盒的显著位置",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NHSA_STANDARD_CODE",
+   "standard": "定点机构填写，通过医保组件 查询",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DOSAGE",
+   "standard": "依据国家卫生健康委发布的 WS /T 778—2021《药品采购使用 管理分类代码与标识码》标准, 药品采购使用管理分类代码 [简称国家药管平台药品编码 （YPID）]是国家药管平台药品 基本数据库中的药品产品唯一 标识。",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_ADMINISTRATION_ROUTE",
+   "standard": "CV06.00.102",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_EXTERNAL_PRES",
+   "standard": "1 是 0 否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "FLAG_LOCAL",
+   "standard": "1:是  0 否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "LINKMAN_RELATION",
+   "standard": "DMA-09",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CHARGE_TYPE_CODE",
+   "standard": "DMB‐47医保类型字典",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "REG_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "FLAG_VISIT",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "Flag_ref",
+   "standard": "1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OUTPATIENT_CODE",
+   "standard": "1急诊，2门诊，3 留观",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "REGISTER_TYPE",
+   "standard": "LC003.002",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OTHER_CARD_CODE",
+   "standard": "CV02.01.101",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CLINIC_EMERGENCY_MARK_CODE",
+   "standard": "1急诊，2门诊，3 留观",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "FALG_FIRST_VISIT",
+   "standard": "1初诊，2复诊，3留观",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TCM_WM_MARK_CODE",
+   "standard": "1中医，2西医",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADMIN_ILLNESS_CODE",
+   "standard": "中医GB/T 15657-2021 或者西医ICD10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OTHER_ILLNESS_CODE",
+   "standard": "GB/T 15657-2021 或者ICD10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TREATMENT_SECTION_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TREATMENT_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TREATMENT",
+   "standard": "填写处置类医嘱内容",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IS_BMIDO",
+   "standard": "1：是 0：否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MARRIAGE",
+   "standard": "GBT4766-1984-婚姻状况代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NATIONALITY",
+   "standard": "GBT3304-1991-民族代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PROFESSION",
+   "standard": "GBT6565-1999-职业代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "EDU_BACKGROUND",
+   "standard": "DMB‐28学历代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NATION_CODE",
+   "standard": "GBT2659-2000-国籍代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "EMERGENCY_LEVEL",
+   "standard": "CV05.01.050-急诊分级",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "INSU_TYPE_CODE",
+   "standard": "DMB‐47医保类型字典",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PHYSICIAN_TITLE",
+   "standard": "参照专业技术职务代码（GB/T 8561-2001）",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "CHARGE_TYPE",
+   "standard": "DM03-200",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODER_ITEM_NAME",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ODER_ITEM_CODE",
+   "standard": "GB_2.2.16 医嘱大类",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "PROJ_AMT",
+   "standard": "退费数量为负数",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORD_DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "RCD_DT",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "if_prn",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "SETTLEMENT_ID",
+   "standard": "20",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "REFERENCED_SETTLEMENT_ID",
+   "standard": "20",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "IS_REVERSED",
+   "standard": "1",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TCM_WM_MARK_CODE",
+   "standard": "1中医，2西医",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IF_MAIN",
+   "standard": "1：是 0：否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "INFECTIOUS_SIGNS",
+   "standard": "是否为传染病",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CHINA_MED_SYNDROME_CODE",
+   "standard": "中医症候代码2021版",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIAG_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "PAY_MODE",
+   "standard": "CV07.10.004",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "PAY_MODE",
+   "standard": "CV07.10.004",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "FEE_CAT_CODE",
+   "standard": "DM03-200",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "PROJ_AMT",
+   "standard": "退费数量为负数",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORD_DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "RCD_DT",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "if_prn",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "FEE_CAT_CODE",
+   "standard": "DM03-200",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "PROJ_AMT",
+   "standard": "退费数量为负数",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "ORD_DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "RCD_DT",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述：（18版新增表） / 表结构:",
+   "field": "if_prn",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "LONIC_CLASS_CODE",
+   "standard": "CC99.00004-",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "INSPECTION_TYPE",
+   "standard": "CC99.00004-检验类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "REPORT_ERROR_TYPE",
+   "standard": "CV06.00.238-报告错误类型",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SAMPLE_TYPE_CODE",
+   "standard": "CC99.00006-检验标本类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SPECIMEN_REJECT_CODE",
+   "standard": "CV06.02.009-标本拒绝原因",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "AUDIT_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SOURCE_CODE",
+   "standard": "1门诊，2急诊，3住院，4体检",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PRINT_TIME",
+   "standard": "yyyymmdd",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DRUG_ALLERGY_CODE",
+   "standard": "CC99.00093",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ITEM_CODE",
+   "standard": "CS_EXAMINE_ITEM",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ALARM_STATE",
+   "standard": "0未通知、1已通知",
+   "required": "否"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CALL_DATE",
+   "standard": "格式：YYYY-MM-DD HH24:MI:SS",
+   "required": "否"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MTU_REC_MARK",
+   "standard": "1是，0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "HOSPITEM_NAME",
+   "standard": "按照医院实际填写",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "HOSPITEM_CODE",
+   "standard": "按照医院实际填写",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ITEM_SIGN",
+   "standard": "1.正常 2.异常 3.不确定",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "PATIENT_TYPE_CODE",
+   "standard": "CC99.00005",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "IMAGE_TYPE_CODE",
+   "standard": "CC99.00003-影像类别",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101-",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "DEP_NUM",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "APPLY_DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "EXAM_POS_CODE",
+   "standard": "CV06.00.227",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "ANAE_METHOD_CODE",
+   "standard": "CV06.00.103",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "ANAE_EASTWEST_FLAG",
+   "standard": "1.西医麻醉2.中医麻醉",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "EXAM_DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "AUDIT_DATE",
+   "standard": "业务日期",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "SOURCE_CODE",
+   "standard": "1门诊，2急诊，3住院，4体检",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "PRINT_TIME",
+   "standard": "YYYYMMDD HH:MM:SS",
+   "required": ""
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "EXAM_TYPE_CODE",
+   "standard": "CV04.30.009检查项目",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "EXAM_TYPE_NAME",
+   "standard": "CV04.30.009检查项目",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "HOS_EXAM_TYPE_NAME",
+   "standard": "按照医院实际填写",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "HOS_EXAM_TYPE_CODE",
+   "standard": "按照医院实际填写",
+   "required": "是"
+  },
+  {
+   "dataset": "一次同类型检查多个部位的：三条记录区分；REPORT_NUM(单据号把持一致)； 建议： ID使用部位申请和报告ID 拼接区分 / 表结构:",
+   "field": "MTU_REC_MARK",
+   "standard": "1是，0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HOME_TYPE_CODE",
+   "standard": "1：西医 2：中医",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CHARGE_MODE_CODE",
+   "standard": "DMB‐47",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "MARITAL_STATUS_CODE",
+   "standard": "GBT4766-1984",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OCCUPATION_CODE",
+   "standard": "GBT6565-1999",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NATION_CODE",
+   "standard": "GBT3304-1991",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "COUNTRY_CODE",
+   "standard": "GBT2659-2000",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RBT_CONTACT_CODE",
+   "standard": "DMA-09",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_AUTOPSY",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BLOOD_ABO_CODE",
+   "standard": "CV04.50.005",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BLOOD_RH_CODE",
+   "standard": "CC99.00011-RH血型代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ADMISSION_TYPE_CODE",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_ALLERGY",
+   "standard": "T-F_1是0否代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISCHARGE_TYPE_CODE",
+   "standard": "CV06.00.226",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_READMISSION",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "QC_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TREATE_TYPE_CODE",
+   "standard": "CC04.50.901-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_USE_HERB",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_USE_EQUIP",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_USE_TECH",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_DIALECTIAL_NURSING",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_DEATH",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFUSION_REACTION_MARK",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BT_REACTION_MARK",
+   "standard": "T-F_1是0否 3.未输 代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERATION_COMPLICATIONS",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_INFECTION",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_INFECTION_REPORT",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_CRITICAL",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_EMERGENCY",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ROOT_DEATH_CODE",
+   "standard": "ICD编码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IN_CONDITION_CODE",
+   "standard": "CC5501.12-入院时情况",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TDEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ODEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SINGLE_DISEASE_MG_CODE",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATHWAY_COMPLETION",
+   "standard": "1完成，2退出",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "QUIT_REASON",
+   "standard": "LC003.008-退出原因代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "VARIATION_CASE",
+   "standard": "1有，2无",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "MEDICAL_PREPARATION_FLAG",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "MEDICAL_DEVICE_FLAG",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "MEDICAL_TECHNOLOGY_FLAG",
+   "standard": "T-F_1是0否代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIS_OUTCOME_CODE",
+   "standard": "CV05.10.010",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SFFJHZRY",
+   "standard": "1是，2否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SFRJBF",
+   "standard": "1是，2否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TNMZLFQ",
+   "standard": "1 0 期2 Ⅰ期3 Ⅱ期4 Ⅲ期5 Ⅳ期6 无法判定",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "YCHXJSY",
+   "standard": "按照小时为单位统计",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ZYZDJBBM",
+   "standard": "ICD-10",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ZYZDRYBQ",
+   "standard": "CV05.10.019",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_CODE",
+   "standard": "ICD",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPS_TYPE",
+   "standard": "1、手术；2、介入手术；3、治疗性操作；4、诊断性操作；5、内（窥）镜治疗；9、其他",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ANAESTHESIA_CODE",
+   "standard": "（CV06.00.103）",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "HEALING_GRADE_CODE",
+   "standard": "DMD-06切口愈合等级代码表",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_GRADE",
+   "standard": "CV05.10.024",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_BP_CODE",
+   "standard": "CV06.00.227",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "INCISION_CATEGORY",
+   "standard": "CV05.10.022",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_NATURE_CODE",
+   "standard": "LC003.006",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ELECTIVE_EMERGENCY",
+   "standard": "CV05.10.040-手术类型值",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SFWRJSS",
+   "standard": "0否，1是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SFWRJCZ",
+   "standard": "0否，1是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SFFJHZSS",
+   "standard": "0否，1是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CHARGE_TYPE_CODE",
+   "standard": "CC99.00092-住院病案首页-收费类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIAGNOSIS_TYPE",
+   "standard": "CC5502.20",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD编码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE",
+   "standard": "ICD 疾病名称",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIS_OUTCOME_CODE",
+   "standard": "CV05.10.010",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IS_CAWM_DIAGNOSIS",
+   "standard": "1中医，2西医",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ADMISSION_CONDITION",
+   "standard": "DMD-11",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "MARITAL_STATUS_CODE",
+   "standard": "GBT4766-1984",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OCCUPATION_CODE",
+   "standard": "GBT6565-1999",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SMOKE",
+   "standard": "1：是  0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRINK",
+   "standard": "1：是  0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NATION_CODE",
+   "standard": "（GBT3304-1991）",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HEIGHT",
+   "standard": "单位：CM",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "WEIGHT",
+   "standard": "单位：KG",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIA_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "START_DTIME",
+   "standard": "YYYYMMDD HH24MISS",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "EXAM_TYPE",
+   "standard": "DMD-106",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "EXAM_RESULT_CODE",
+   "standard": "1：合格 2：不合格 3：专业受限",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CHECK_TIME",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "EXAM_TYPE_CODE",
+   "standard": "DMD-54体检类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "EXAM_TYPE_CODE",
+   "standard": "DMD-54体检类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "ITEM_CODE",
+   "standard": "CC99.00008",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "RESULT_TYPE",
+   "standard": "值域：0 数值型 1文本型",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "RESULT_EXPLAIN",
+   "standard": "DMD-55 结果解释代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PAT_SEX",
+   "standard": "GBT2261-2003",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PAT_TYPE_CODE",
+   "standard": "1,门诊2，住院",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_ID",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "APPLY_STATUS",
+   "standard": "DMD-44",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "VERIFY_TIME",
+   "standard": "业务日期",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TRANSFUSION_HISTORY",
+   "standard": "1:有 0：无",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIAGNOSE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "FLAG_OPERATION",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BLOOD_KIND",
+   "standard": "CV04.05.021",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BLOOD_UNIT_CODE",
+   "standard": "DMD-45",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PAT_TYPE_CODE",
+   "standard": "1,门诊2，住院",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BAGS_NO",
+   "standard": "拼接 区分精准唯一s",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ABO_CODE",
+   "standard": "CV04.50.005-ABO",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RH_CODE",
+   "standard": "CC99.00011-RH",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TRANSFUSION_CODE",
+   "standard": "1.无 2.有 9.未说明",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TRANSFUSION_NATURE",
+   "standard": "1.备血 2.常规 3.紧急",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "APPLY_ABO_CODE",
+   "standard": "CV04.50.005-ABO",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "APPLY_RH_CODE",
+   "standard": "CC99.00011-RH",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TRANSFUSION_VAR",
+   "standard": "CV04.05.021",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BEFORE_HGB",
+   "standard": "填写检测数值，例：130",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BT_REACTION_MARK",
+   "standard": "1.是 0.否 3.未输",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BT_REACTION_TYPE_CODE",
+   "standard": "CV05.01.040",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BLOOD_KIND",
+   "standard": "CV04.05.021",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PATIENT_TYPE",
+   "standard": "1、门急诊2、住院",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MED_TYPE",
+   "standard": "10",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ARCHIVE_TIME",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RECORD_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SIGN_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISCUSS_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PROF_TECH_CATE_CODE",
+   "standard": "GBT 8561-2001-专业技术职务代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BEFOPER_DCODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIAGNOSIS_BASIS",
+   "standard": "LC002.019",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ALLERGY_HISTORY_MARK",
+   "standard": "1:是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PERFORM_OPERATION_CODE",
+   "standard": "ICD编码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PERFORM_OPERATION_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PERFORM_ANES_CODE",
+   "standard": "CV06.00.103",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SIGN_DATE",
+   "standard": "业务日期",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构 :",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构 :",
+   "field": "PROF_TECH_CATE_CODE",
+   "standard": "GBT 8561-2001-专业技术职务代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构 :",
+   "field": "DEATH_DIAG_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构 :",
+   "field": "FAMILY_AGREE_AUTO_SIGN",
+   "standard": "1：是 0：否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构 :",
+   "field": "SIGN_DATE",
+   "standard": "业务日期",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISCUSS_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "CURR_DIAG_CD_NAME",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "CURR_DIAG_CD_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "CURR_DIAG_CSYN_NAME",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "CURR_DIAG_CSYN_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "ROLL_OUT_DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003-性别代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "ICD10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIAG_DATE",
+   "standard": "yyyymmdd",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERATION_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SURGERY_START_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CURR_DIAG_WE_DIAG_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CURR_DIAG_CD_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CURR_DIAG_CD_NAME",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CURR_DIAG_CSYN_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CURR_DIAG_CSYN_NAME",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERATION_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PROF_TECH_CATE_CODE",
+   "standard": "GBT 8561-2001-专业技术职务代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "NATION_CODE",
+   "standard": "GBT3304-1991",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "MARITAL_STATUS_CODE",
+   "standard": "GBT4766-1984",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "JOB_CODE",
+   "standard": "GBT6565-1999",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "DAP_CONTACT_CODE",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "IN_HOS_WE_DIAG_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "IN_HOS_CH_DIAG_CD_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "IN_HOS_CH_DIAG_CSYN_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "OUT_HOS_WE_DIAG_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "OUT_HOS_CH_DIAG_CD_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "OUT_HOS_CH_DIAG_CSYN_NAME",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "OUT_HOS_CH_DIAG_CSYN_CODE",
+   "standard": "GB/T 15657-2021",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "BEF_OPE_DIAG",
+   "standard": "ICD-10/中医2021版",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "AFTER_OPE_DIAG",
+   "standard": "ICD-10/中医2021版",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "OPERA_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "OPERA_GRADE",
+   "standard": "CV05.10.024",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "OPERA_POSI",
+   "standard": "DMD-41-",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "OPERATION_HIS",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "DRAINAGE_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "BT_REACTION_MARK",
+   "standard": "1.是 0.否 3.未输",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "ANAESTHESIA_CODE",
+   "standard": "CV06.00.103",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "ANESTHESIA",
+   "standard": "1是 0 否",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "INCISION_HEALING_LEVEL_CODE",
+   "standard": "CV05.10.022-手术切口类别代码表",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "WOUNDHEAL_LEVEL_CODE",
+   "standard": "DMD-06切口愈合等级代码表",
+   "required": ""
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "LOCAL_PROCEDURE_CODE",
+   "standard": "ICD9",
+   "required": "是"
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "NHS_PROCEDURE_CODE",
+   "standard": "ICD9",
+   "required": "是"
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "IS_MAIN_PROCEDURE",
+   "standard": "1是 0 否",
+   "required": "是"
+  },
+  {
+   "dataset": "表结构: / 2.10.11一般手术记录",
+   "field": "OPERATE_TYPE",
+   "standard": "CV05.10.040-手术类型值",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "ABO_CODE",
+   "standard": "CV04.50.005",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "RH_CODE",
+   "standard": "CC99.00011-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "BEFORE_OPERA_DIAGNOSIS",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "OPERA_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "ANES_METHOD_CODE",
+   "standard": "CV06.00.103",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "MENTAL_STATE_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述: / 表结构:",
+   "field": "SIGNATURE_ASA",
+   "standard": "CV05.10.021",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERA_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERA_POSITION_CODE",
+   "standard": "DMD-41",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANES_METHOD_CODE",
+   "standard": "e",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BREATH_TYPE",
+   "standard": "1.自主呼吸 2.辅助呼吸3.控制呼吸",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANES_MERGE_CODE",
+   "standard": "1.否 2.是 3.不稳定",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATIENT_TO",
+   "standard": "DMD-42",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TRANSFUSION_TYPE_CODE",
+   "standard": "CV04.50.021",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BT_REACTION_MARK",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_TYPE",
+   "standard": "DMD-43",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANES_FLAG",
+   "standard": "1:是 0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_CONT",
+   "standard": "1:是 0否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_STARTIME",
+   "standard": "YYYYMMDD HHMISS",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_ENDTIME",
+   "standard": "YYYYMMDD HHMISS",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_FREQUENCY_CODE",
+   "standard": "CC06.00.901",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRUG_WAY_CODE",
+   "standard": "CV06.00.102",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "AFTER_OPERA_DIAGNOSIS",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ANES_METHOD_CODE",
+   "standard": "CV06.00.103",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERA_WINDPIPE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ADMISSION_DIAGNOSIS_CD",
+   "standard": "ICD10",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ADMISSION_TYPE_CODE",
+   "standard": "CV09.00.403",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIET_CODE",
+   "standard": "1.良好2.一般3.较差 9.",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEVELOPMENT_CODE",
+   "standard": "1.正力型2.无力型3.超力型",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SPIRIT_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PHYCHOLOGICAL_CD",
+   "standard": "CV05.10.002",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NUTRITION_CODE",
+   "standard": "1.良好2.中等3.差",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SELF_CARE_ABILITY",
+   "standard": "1.完全自理2.部分自理3.不能自理",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HEALTH_STATUS_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFECTION_FLAG",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SMOKE_STATUS",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SMOKE_STATUS_CODE",
+   "standard": "从不吸烟2.过去吸，已戒烟3.吸烟",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRINK_STATUS",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DRINK_FREQUENCY",
+   "standard": "CV03.00.104",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NOTICE_DOC_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261—2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD10",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIET_CODE",
+   "standard": "1.良好2.—般3.较差",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SELF_CARE_ABILITY",
+   "standard": "1.完全自理2.部分自理 3.不能自理",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISCHARGE_TYPE",
+   "standard": "CV06.00.226",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIET_GUIDE_CODE",
+   "standard": "CV06.00.224",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIAGNOSIS_TYPE",
+   "standard": "CC5502.20",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IN_DIAGNOSIS_CODE",
+   "standard": "西医ICD10中医2021版诊断",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IN_DIAGNOSIS",
+   "standard": "西医ICD10中医2021版诊断",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MEMBRANE_RUPTRRE_TYPE",
+   "standard": "自然、人工",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PRE_CHARACTER",
+   "standard": "清 、Ⅰ°、Ⅱ°、Ⅲ°",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "FETUS_POSITION_CODE",
+   "standard": "CV05.01.007",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MINDWIFEY_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "MEMBRANES_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CUT_MASK",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "LACERATE_DEGREE_CODE",
+   "standard": "CV05.01.010",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "HEMATOMA_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ANES_METHOD_CODE",
+   "standard": "CV06.00.103",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "VAGNIAL_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "HEAMATORA_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "LACERATION_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SAVE_BLOOD_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "BLADDER_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CHILD_SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "APGAR",
+   "standard": "1、1min2、5min3、10min",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DELIVERY_OUTCOME_CODE",
+   "standard": "1.活产 2.死胎 3.死产",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CHILD_ADNORMAL_CODE",
+   "standard": "CV05.10.020",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_LEVEL_CODE",
+   "standard": "CV06.00.220",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_TYPE_CODE",
+   "standard": "CV06.00.22",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "FOOT_DORSUM_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIET_CODE",
+   "standard": "1.良好 2.一般 3.较差",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "CATHETER_NURSE_CODE",
+   "standard": "1.翻身拍背 2.雾化吸人 3.吸痰",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIEF_GUIDE_CODE",
+   "standard": "CV06.00.224",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "PHYCHOLOGICAL_NURSE_CD",
+   "standard": "1.根据病人心理状况施行心理护理2.家属心理支持",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SECURITY_NURSE_CODE",
+   "standard": "1.勤巡视病房2.加床档3.约束四肢",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OUT_CHECK_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IN_CHECK_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OUT_ASSESSMENT_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "IN_ASSESSMENT_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ISOLATION_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ISOLATION_TYPE_CODE",
+   "standard": "CV06.00.222",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261—2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_LEVEL_CODE",
+   "standard": "CV06.00.220",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_TYPE_CODE",
+   "standard": "CV06.00.22",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIET_CODE",
+   "standard": "1.良好2.—般3.较差",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261—2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_LEVEL_CODE",
+   "standard": "CV06.00.220",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_TYPE_CODE",
+   "standard": "CV06.00.22",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "TCM_USAGE_CODE",
+   "standard": "CV06.00.101",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "VOMIT_CODE",
+   "standard": "1是 0否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "URESIES_DIFF_CODE",
+   "standard": "1是 0否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD_10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "BREATHING_MACHINE_CODE",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ABO_CODE",
+   "standard": "CV04.50.005",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "RH_CODE",
+   "standard": "CC99.00011",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DIAGNOSIS_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_CODE",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "ALLERGIES_CODE",
+   "standard": "1,是 0,否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "NURSE_LEVEL_CODE",
+   "standard": "CV06.00.220",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "OPERATION_DISEASE_CD",
+   "standard": "1.是 0.否",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "BEFORE_OPER_CD",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "BEFORE_CHECK_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "AFTER_CHECK_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构:",
+   "field": "DISTRICT_CODE",
+   "standard": "GBT 2260-2007行政区划代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IMPLANT_CODE",
+   "standard": "1.是 0.否",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "ICD10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NURSE_LEVEL_CODE",
+   "standard": "CV06.00.220",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "NURSE_TYPE_CODE",
+   "standard": "CV06.00.22",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CATHETER_NURSE_CODE",
+   "standard": "1.翻身拍背 2.雾化吸人 3.吸痰",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SECURITY_NURSE_CODE",
+   "standard": "1.勤巡视病房 2.加床档 3.约束四肢",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DIET_GUIDE_CODE",
+   "standard": "CV06.00.224",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PREOPERATIVE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERATION",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANAESTHESIA_CODE",
+   "standard": "CV06.00.103",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SAP_RELATIONSHIP_CODE",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PREOPERATIVE",
+   "standard": "ICD-10",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OPERATION",
+   "standard": "ICD-9",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANAESTHESIA_CODE",
+   "standard": "CV06.00.103",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SAP_RELATIONSHIP",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "DISEASE_CODE",
+   "standard": "ICD10",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "BT_HISTORY_CODE",
+   "standard": "1.无2.有9.未说明",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "VOB_CODE",
+   "standard": "CV04.50.021",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "SAP_RELATIONSHIP",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "PATIENT_SIGN_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "2.12.3输血治疗同意书 / 表结构：",
+   "field": "DOC_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "2.12.4特殊检查及特殊治疗同意书 / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.4特殊检查及特殊治疗同意书 / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "2.12.4特殊检查及特殊治疗同意书 / 表结构：",
+   "field": "SAP_RELATIONSHIP",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "2.12.4特殊检查及特殊治疗同意书 / 表结构：",
+   "field": "PATIENT_SIGN_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "2.12.4特殊检查及特殊治疗同意书 / 表结构：",
+   "field": "DOC_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "CRITICAL_NOTICE_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PAT_LEGAL_REPRE_CODE",
+   "standard": "GBT4761-2008",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "LEGAL_REPRE_SIGN_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DOC_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PAT_LEGAL_REPRE_CODE",
+   "standard": "GBT4761-2008",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATIENT_SIGN_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DOC_DATE",
+   "standard": "Yyyymmdd hh24miss",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATIENT_SEX",
+   "standard": "GBT2261-2003",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_TYPE",
+   "standard": "DMD-58",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_DBP",
+   "standard": "单位：mmHg",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_SBP",
+   "standard": "单位：mmHg",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_T",
+   "standard": "单位：℃",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_RATE",
+   "standard": "次/分钟",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_FLOW",
+   "standard": "单位：ml",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_VBP",
+   "standard": "单位：mmHg",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_TMP",
+   "standard": "单位：mmHg",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BD_UFV_LIMIT",
+   "standard": "单位：ml",
+   "required": "是"
+  },
+  {
+   "dataset": "死亡记录表概述: / 表结构:",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "死亡记录表概述: / 表结构:",
+   "field": "ID_TYPE",
+   "standard": "CV02.01.101",
+   "required": "是"
+  },
+  {
+   "dataset": "死亡记录表概述: / 表结构:",
+   "field": "DISEASE_CODE",
+   "standard": "ICD_10",
+   "required": "是"
+  },
+  {
+   "dataset": "死亡记录表概述: / 表结构:",
+   "field": "BASIC_CAUSE_CODE",
+   "standard": "ICD_10中含有死亡的",
+   "required": "是"
+  },
+  {
+   "dataset": "2.15 量表评估 / 量表评估表概述:",
+   "field": "PAT_SEX",
+   "standard": "GBT2261-2003",
+   "required": "是"
+  },
+  {
+   "dataset": "2.15 量表评估 / 量表评估表概述:",
+   "field": "PAT_TYPE_CODE",
+   "standard": "1,门诊2，住院",
+   "required": "是"
+  },
+  {
+   "dataset": "2.15 量表评估 / 量表评估表概述:",
+   "field": "DEPT_ID",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATIENT_TYPE_CODE",
+   "standard": "CC99.00005",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HAS_MOLECULAR_TEST",
+   "standard": "0 无，1 有",
+   "required": "否"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "PATIENT_TYPE_CODE",
+   "standard": "CC99.00005",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101-",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SEX_CODE",
+   "standard": "0未知，1男，2女，9不明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SPECIMEN_TYPE",
+   "standard": "石蜡组织/新鲜组织/外周血/骨髓/胸腹水/脑脊液/细胞涂片",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "TEST_PLATFORM",
+   "standard": "NGS/qPCR/dPCR/Sanger/FISH/IHC/基因芯片/NanoString/其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "VARIANT_TYPE",
+   "standard": "错义突变/无义突变/移码突变/缺失/插入/融合/扩增/剪接变异/拷贝数变异/其他",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "VARIANT_INTERPRETATION",
+   "standard": "致病性/可能致病/意义未明(VUS)/可能良性/良性",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "GENOTYPE",
+   "standard": "杂合/纯合/半合子/体细胞突变",
+   "required": ""
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RECORD_STATUS",
+   "standard": "草稿/待审核/已审核/已发布/已撤回",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_NEWBORN",
+   "standard": "0否 1 是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFECTED_DEPT_CODE",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFECTED_DEPT_NAME",
+   "standard": "CS_SECTION-科室名称",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFECTED_PART",
+   "standard": "CV10.00.001-感染部位",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INFECTION_DIAGNOSIS",
+   "standard": "ICD10编码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ISNOSOCOMIAL",
+   "standard": "院内；院外",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_ICU",
+   "standard": "0否 1 是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ICU_DEP_NAME",
+   "standard": "CS_SECTION-科室代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ICU_DEP_CODE",
+   "standard": "CS_SECTION-科室名称",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SURGERY_TYPE",
+   "standard": "1、手术；2、介入手术；3、治疗性操作；4、诊断性操作；5、内（窥）镜治疗；9、其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANAE_METHOD_NAME",
+   "standard": "CV06.00.103-麻醉方法代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "ANAE_METHOD_CODE",
+   "standard": "CV06.00.103-麻醉方法代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "INCISION_TYPE",
+   "standard": "CV05.10.022-手术切口类别",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HEALING_GRADE_CODE",
+   "standard": "DMD-06-切口愈合等级",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "HEALING_GRADE_NAME",
+   "standard": "DMD-06-切口愈合等级",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SURGERY_INFECTION_TYPE",
+   "standard": "1、手术；2、介入手术；3、治疗性操作；4、诊断性操作；5、内（窥）镜治疗；9、其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "IS_HOSPITAL_ACQUIRED",
+   "standard": "0否 1 是",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "RELATIONSHIP",
+   "standard": "1 有关；无关 0",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "BACTERIA",
+   "standard": "CV10.00.002-感染病原菌",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "OUTCOM",
+   "standard": "CV05.10.010-病情转归代码表",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "STYPE",
+   "standard": "CV10.00.003-疑似类型",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "DANGEROUS",
+   "standard": "CV10.00.004-危险因素说明",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "SPECIMEN",
+   "standard": "CV10.00.005-疑似诊断标本",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表结构：",
+   "field": "FOCUS",
+   "standard": "CV10.00.006-重点菌缩写",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "ETHNICITY",
+   "standard": "GBT3304-1991-民族代码",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "EMP_CATEGORY",
+   "standard": "医、技、护、行政后勤",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "PRACTICE_QUAL",
+   "standard": "01 执业医师       02 执业助理医师       03 执业护士       04 执业药师",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "EDUCATION",
+   "standard": "01 博士研究生       02 硕士研究生       03 省委党校研究生       04 中央党校研究生       05 本科       06 省委党校大学       07 中央党校大学       08 专科       09 中专       10 高中       11 职业高中       12 初中       13 小学",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "EMP_STATUS",
+   "standard": "01 在岗       02 返聘       03 退休       04 离(调)       05 辞退       06 其他",
+   "required": "是"
+  },
+  {
+   "dataset": "表概述： / 表概述：",
+   "field": "PROF_TITLE_LEVEL",
+   "standard": "0 未定职级专业技术人员       1 初级士        初级师      3 中级       4 副高级       5 正高级",
+   "required": "是"
+  }
+ ],
+ "registry_value_domain_fields": [
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "SEX_CODE",
+   "standard": "GBT2261-2003"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "OTHER_ID_TYPE",
+   "standard": "CV02.01.101"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "NATION_CODE",
+   "standard": "GBT3304-1991"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "MARITAL_STATUS_CODE",
+   "standard": "GBT4766-1984"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "OCCUPATION_CODE",
+   "standard": "GBT6565-1999"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "DEP_CODE",
+   "standard": "CS_SECTION"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "LINKMAN_RELATION_CODE",
+   "standard": "DMA-09"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "ADMISSION_TYPE_CODE",
+   "standard": "CV09.00.403"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "INSU_TYPE_CODE",
+   "standard": "DMB-47"
+  },
+  {
+   "view": "V_EMR_ADMISSION_RECORD",
+   "field": "ADM_WAY_CODE",
+   "standard": "CV09.00.403"
+  }
+ ],
+ "case_map_evidence_files": [
+  {
+   "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+   "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "01"
+    },
+    {
+     "when": "1",
+     "then": "01"
+    },
+    {
+     "when": "汉",
+     "then": "01"
+    },
+    {
+     "when": "汉族",
+     "then": "01"
+    },
+    {
+     "when": "01",
+     "then": "汉族"
+    },
+    {
+     "when": "1",
+     "then": "汉族"
+    },
+    {
+     "when": "汉",
+     "then": "汉族"
+    },
+    {
+     "when": "汉族",
+     "then": "汉族"
+    }
+   ],
+   "n_maps": 8
+  },
+  {
+   "view": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR",
+   "file": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "01"
+    },
+    {
+     "when": "1",
+     "then": "01"
+    },
+    {
+     "when": "汉",
+     "then": "01"
+    },
+    {
+     "when": "汉族",
+     "then": "01"
+    },
+    {
+     "when": "01",
+     "then": "汉族"
+    },
+    {
+     "when": "1",
+     "then": "汉族"
+    },
+    {
+     "when": "汉",
+     "then": "汉族"
+    },
+    {
+     "when": "汉族",
+     "then": "汉族"
+    }
+   ],
+   "n_maps": 8
+  },
+  {
+   "view": "ODS.V_EMR_DOC_ORDER_DRUG",
+   "file": "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+   "maps_sample": [
+    {
+     "when": "1",
+     "then": "1"
+    },
+    {
+     "when": "2",
+     "then": "3"
+    },
+    {
+     "when": "3",
+     "then": "3"
+    },
+    {
+     "when": "4",
+     "then": "4"
+    },
+    {
+     "when": "1",
+     "then": "医生签名"
+    },
+    {
+     "when": "2",
+     "then": "已执行"
+    },
+    {
+     "when": "3",
+     "then": "已执行"
+    },
+    {
+     "when": "4",
+     "then": "医生取消"
+    },
+    {
+     "when": "1",
+     "then": "1"
+    },
+    {
+     "when": "3",
+     "then": "2"
+    },
+    {
+     "when": "2",
+     "then": "3"
+    },
+    {
+     "when": "5",
+     "then": "4"
+    },
+    {
+     "when": "6",
+     "then": "4"
+    },
+    {
+     "when": "4",
+     "then": "2"
+    }
+   ],
+   "n_maps": 14
+  },
+  {
+   "view": "ODS.V_EMR_DOC_ORDER_CHECK",
+   "file": "三甲完成视图\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+   "maps_sample": [
+    {
+     "when": "1",
+     "then": "1"
+    },
+    {
+     "when": "2",
+     "then": "3"
+    },
+    {
+     "when": "3",
+     "then": "3"
+    },
+    {
+     "when": "4",
+     "then": "4"
+    },
+    {
+     "when": "1",
+     "then": "医生签名"
+    },
+    {
+     "when": "2",
+     "then": "已执行"
+    },
+    {
+     "when": "3",
+     "then": "已执行"
+    },
+    {
+     "when": "4",
+     "then": "医生取消"
+    },
+    {
+     "when": "4",
+     "then": "2"
+    }
+   ],
+   "n_maps": 9
+  },
+  {
+   "view": "ODS.V_EMR_ICH",
+   "file": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+   "maps_sample": [
+    {
+     "when": "职工医保",
+     "then": "10"
+    },
+    {
+     "when": "省直医保",
+     "then": "10"
+    },
+    {
+     "when": "省内职工",
+     "then": "11"
+    },
+    {
+     "when": "省外职工",
+     "then": "12"
+    },
+    {
+     "when": "居民医保",
+     "then": "20"
+    },
+    {
+     "when": "省内居民",
+     "then": "21"
+    },
+    {
+     "when": "学生医保",
+     "then": "21"
+    },
+    {
+     "when": "儿童医保",
+     "then": "21"
+    },
+    {
+     "when": "新农合",
+     "then": "21"
+    },
+    {
+     "when": "省外居民",
+     "then": "22"
+    },
+    {
+     "when": "异地医保",
+     "then": "22"
+    },
+    {
+     "when": "贫困救助",
+     "then": "40"
+    },
+    {
+     "when": "商业医疗保险",
+     "then": "50"
+    },
+    {
+     "when": "全公费",
+     "then": "60"
+    },
+    {
+     "when": "自费",
+     "then": "70"
+    }
+   ],
+   "n_maps": 422
+  },
+  {
+   "view": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+   "file": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "1"
+    },
+    {
+     "when": "02",
+     "then": "2"
+    },
+    {
+     "when": "03",
+     "then": "3"
+    },
+    {
+     "when": "04",
+     "then": "4"
+    },
+    {
+     "when": "05",
+     "then": "5"
+    },
+    {
+     "when": "06",
+     "then": "6"
+    },
+    {
+     "when": "07",
+     "then": "7"
+    },
+    {
+     "when": "08",
+     "then": "8"
+    },
+    {
+     "when": "09",
+     "then": "9"
+    },
+    {
+     "when": "0901",
+     "then": "901"
+    },
+    {
+     "when": "10",
+     "then": "10"
+    },
+    {
+     "when": "1001",
+     "then": "101"
+    },
+    {
+     "when": "1002",
+     "then": "102"
+    },
+    {
+     "when": "1003",
+     "then": "24"
+    },
+    {
+     "when": "11",
+     "then": "11"
+    }
+   ],
+   "n_maps": 31
+  },
+  {
+   "view": "ODS.V_EMR_ADMISSION_RECORD",
+   "file": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "01"
+    },
+    {
+     "when": "1",
+     "then": "01"
+    },
+    {
+     "when": "汉",
+     "then": "01"
+    },
+    {
+     "when": "汉族",
+     "then": "01"
+    },
+    {
+     "when": "汉族族",
+     "then": "01"
+    },
+    {
+     "when": "02",
+     "then": "02"
+    },
+    {
+     "when": "2",
+     "then": "02"
+    },
+    {
+     "when": "蒙古",
+     "then": "02"
+    },
+    {
+     "when": "蒙古族",
+     "then": "02"
+    },
+    {
+     "when": "03",
+     "then": "03"
+    },
+    {
+     "when": "3",
+     "then": "03"
+    },
+    {
+     "when": "回",
+     "then": "03"
+    },
+    {
+     "when": "回族",
+     "then": "03"
+    },
+    {
+     "when": "04",
+     "then": "04"
+    },
+    {
+     "when": "4",
+     "then": "04"
+    }
+   ],
+   "n_maps": 392
+  },
+  {
+   "view": "ODS.V_EMR_ADMISSION_RECORD_JHEMR",
+   "file": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD_jhemr.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "01"
+    },
+    {
+     "when": "1",
+     "then": "01"
+    },
+    {
+     "when": "汉",
+     "then": "01"
+    },
+    {
+     "when": "汉族",
+     "then": "01"
+    },
+    {
+     "when": "汉族族",
+     "then": "01"
+    },
+    {
+     "when": "02",
+     "then": "02"
+    },
+    {
+     "when": "2",
+     "then": "02"
+    },
+    {
+     "when": "蒙古",
+     "then": "02"
+    },
+    {
+     "when": "蒙古族",
+     "then": "02"
+    },
+    {
+     "when": "03",
+     "then": "03"
+    },
+    {
+     "when": "3",
+     "then": "03"
+    },
+    {
+     "when": "回",
+     "then": "03"
+    },
+    {
+     "when": "回族",
+     "then": "03"
+    },
+    {
+     "when": "04",
+     "then": "04"
+    },
+    {
+     "when": "4",
+     "then": "04"
+    }
+   ],
+   "n_maps": 392
+  },
+  {
+   "view": "V_EMR_EXAM_IMAGE_REP",
+   "file": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    }
+   ],
+   "n_maps": 3
+  },
+  {
+   "view": "ODS.V_EMR_INSPECTION_TEST",
+   "file": "三甲完成视图\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    },
+    {
+     "when": "不详",
+     "then": "9"
+    },
+    {
+     "when": "未说明",
+     "then": "9"
+    }
+   ],
+   "n_maps": 5
+  },
+  {
+   "view": "ODS.V_EMR_INSPECTION_ITEM_TEST",
+   "file": "三甲完成视图\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    },
+    {
+     "when": "不详",
+     "then": "9"
+    },
+    {
+     "when": "未说明",
+     "then": "9"
+    }
+   ],
+   "n_maps": 5
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+   "maps_sample": [
+    {
+     "when": "HD",
+     "then": "HD"
+    },
+    {
+     "when": "HDF",
+     "then": "HDF"
+    },
+    {
+     "when": "HFD",
+     "then": "HFD"
+    },
+    {
+     "when": "HP",
+     "then": "HP"
+    },
+    {
+     "when": "HF",
+     "then": "HF"
+    },
+    {
+     "when": "HD+HP",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HP+HD",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HFD+HP",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HP+HFD",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HD",
+     "then": "低通，普通血液透析"
+    },
+    {
+     "when": "HDF",
+     "then": "血滤，血液透析滤过"
+    },
+    {
+     "when": "HFD",
+     "then": "高通，高通量血液透析"
+    },
+    {
+     "when": "HP",
+     "then": "灌流，血液灌流"
+    },
+    {
+     "when": "HF",
+     "then": "血液滤过"
+    },
+    {
+     "when": "HD+HP",
+     "then": "低通+灌流"
+    }
+   ],
+   "n_maps": 18
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+   "maps_sample": [
+    {
+     "when": "HD",
+     "then": "HD"
+    },
+    {
+     "when": "HDF",
+     "then": "HDF"
+    },
+    {
+     "when": "HFD",
+     "then": "HFD"
+    },
+    {
+     "when": "HP",
+     "then": "HP"
+    },
+    {
+     "when": "HF",
+     "then": "HF"
+    },
+    {
+     "when": "HD+HP",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HP+HD",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HFD+HP",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HP+HFD",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HD",
+     "then": "低通，普通血液透析"
+    },
+    {
+     "when": "HDF",
+     "then": "血滤，血液透析滤过"
+    },
+    {
+     "when": "HFD",
+     "then": "高通，高通量血液透析"
+    },
+    {
+     "when": "HP",
+     "then": "灌流，血液灌流"
+    },
+    {
+     "when": "HF",
+     "then": "血液滤过"
+    },
+    {
+     "when": "HD+HP",
+     "then": "低通+灌流"
+    }
+   ],
+   "n_maps": 18
+  },
+  {
+   "view": "v_EMR_BLOOD_DIALY_RECORD",
+   "file": "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+   "maps_sample": [
+    {
+     "when": "HD",
+     "then": "HD"
+    },
+    {
+     "when": "HDF",
+     "then": "HDF"
+    },
+    {
+     "when": "HFD",
+     "then": "HFD"
+    },
+    {
+     "when": "HP",
+     "then": "HP"
+    },
+    {
+     "when": "HF",
+     "then": "HF"
+    },
+    {
+     "when": "HD+HP",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HP+HD",
+     "then": "HD+HP"
+    },
+    {
+     "when": "HFD+HP",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HP+HFD",
+     "then": "HFD+HP"
+    },
+    {
+     "when": "HD",
+     "then": "低通，普通血液透析"
+    },
+    {
+     "when": "HDF",
+     "then": "血滤，血液透析滤过"
+    },
+    {
+     "when": "HFD",
+     "then": "高通，高通量血液透析"
+    },
+    {
+     "when": "HP",
+     "then": "灌流，血液灌流"
+    },
+    {
+     "when": "HF",
+     "then": "血液滤过"
+    },
+    {
+     "when": "HD+HP",
+     "then": "低通+灌流"
+    }
+   ],
+   "n_maps": 18
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_RECORD",
+   "file": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+   "maps_sample": [
+    {
+     "when": "1",
+     "then": "10"
+    },
+    {
+     "when": "未婚",
+     "then": "10"
+    },
+    {
+     "when": "2",
+     "then": "20"
+    },
+    {
+     "when": "已婚",
+     "then": "20"
+    },
+    {
+     "when": "再婚",
+     "then": "20"
+    },
+    {
+     "when": "3",
+     "then": "30"
+    },
+    {
+     "when": "丧偶",
+     "then": "30"
+    },
+    {
+     "when": "4",
+     "then": "40"
+    },
+    {
+     "when": "离婚",
+     "then": "40"
+    },
+    {
+     "when": "离异",
+     "then": "40"
+    },
+    {
+     "when": "0",
+     "then": "90"
+    },
+    {
+     "when": "5",
+     "then": "90"
+    },
+    {
+     "when": "9",
+     "then": "90"
+    },
+    {
+     "when": "其他",
+     "then": "90"
+    },
+    {
+     "when": "",
+     "then": "90"
+    }
+   ],
+   "n_maps": 196
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_DIAG",
+   "file": "三甲完成视图\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    },
+    {
+     "when": "不详",
+     "then": "9"
+    },
+    {
+     "when": "未说明",
+     "then": "9"
+    },
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    },
+    {
+     "when": "不详",
+     "then": "9"
+    },
+    {
+     "when": "未说明",
+     "then": "9"
+    }
+   ],
+   "n_maps": 10
+  },
+  {
+   "view": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+   "file": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    },
+    {
+     "when": "未知",
+     "then": "0"
+    },
+    {
+     "when": "不详",
+     "then": "9"
+    },
+    {
+     "when": "未说明",
+     "then": "9"
+    }
+   ],
+   "n_maps": 5
+  },
+  {
+   "view": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+   "file": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+   "maps_sample": [
+    {
+     "when": "01",
+     "then": "1"
+    },
+    {
+     "when": "02",
+     "then": "2"
+    },
+    {
+     "when": "03",
+     "then": "3"
+    },
+    {
+     "when": "04",
+     "then": "4"
+    },
+    {
+     "when": "05",
+     "then": "5"
+    },
+    {
+     "when": "06",
+     "then": "6"
+    },
+    {
+     "when": "07",
+     "then": "7"
+    },
+    {
+     "when": "08",
+     "then": "8"
+    },
+    {
+     "when": "09",
+     "then": "9"
+    },
+    {
+     "when": "0901",
+     "then": "901"
+    },
+    {
+     "when": "10",
+     "then": "10"
+    },
+    {
+     "when": "1001",
+     "then": "101"
+    },
+    {
+     "when": "1002",
+     "then": "102"
+    },
+    {
+     "when": "1003",
+     "then": "24"
+    },
+    {
+     "when": "11",
+     "then": "11"
+    }
+   ],
+   "n_maps": 67
+  },
+  {
+   "view": "ODS.V_EMR_CONSUMABLES",
+   "file": "三甲完成视图\\高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+   "maps_sample": [
+    {
+     "when": "男",
+     "then": "1"
+    },
+    {
+     "when": "女",
+     "then": "2"
+    }
+   ],
+   "n_maps": 2
+  }
+ ],
+ "note": "目标标准码与源字段映射分开保存；确认前一律 pending；标准合法不代表源语义正确"
+}

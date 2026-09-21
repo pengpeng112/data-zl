@@ -1,0 +1,7 @@
+{
+  "date": "2026-09-06",
+  "inserted_count": 68,
+  "skipped": [{"login": "001252", "reason": "no_fdept"}],
+  "remaining_after": 1,
+  "note": "RoleManage/User reads T_MSS_HOSPITALFOFFN. Batch filled FOFFIN=EMP.FDEPT, FREE1 from TOFFIM I/O/T/H."
+}

@@ -1,0 +1,20 @@
+{
+ "stage": "S3",
+ "queue_rows": 1904,
+ "unique_stmts": 1878,
+ "dup_rows": 26,
+ "dup_explained_by_file_duplicate_map": 23,
+ "dup_unexplained": [],
+ "stmts_with_family_evidence": 185,
+ "stmts_stats_only_ledger": 1693,
+ "closure": true,
+ "templates_total": 881,
+ "templates_with_edges": 179,
+ "templates_stats_only": 702,
+ "new_relation_families": 74,
+ "supplemented_existing_relations": 43,
+ "judgment_families": 9,
+ "templates_new_family": 95,
+ "templates_supplement_family": 102,
+ "dup_explained_archive_member_map": 3
+}

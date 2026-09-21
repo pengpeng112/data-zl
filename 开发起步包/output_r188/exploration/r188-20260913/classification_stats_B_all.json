@@ -1,0 +1,236 @@
+{
+ "per_system": {
+  "ADVERSE_EVENT": {
+   "tables": 492,
+   "views": 131,
+   "columns": 6174,
+   "core": 11,
+   "non_core": 1,
+   "undecided": 611
+  },
+  "TRANSFUSION_NEW": {
+   "tables": 0,
+   "views": 0,
+   "columns": 0,
+   "core": 0,
+   "non_core": 0,
+   "undecided": 0
+  },
+  "BRONCHOSCOPY": {
+   "tables": 0,
+   "views": 0,
+   "columns": 0,
+   "core": 0,
+   "non_core": 0,
+   "undecided": 0
+  },
+  "HEMODIALYSIS": {
+   "tables": 177,
+   "views": 6,
+   "columns": 2047,
+   "core": 16,
+   "non_core": 3,
+   "undecided": 164
+  },
+  "EMERGENCY_CLINIC": {
+   "tables": 190,
+   "views": 29,
+   "columns": 1893,
+   "core": 14,
+   "non_core": 4,
+   "undecided": 201
+  },
+  "HEARING_TEST": {
+   "tables": 151,
+   "views": 4,
+   "columns": 2024,
+   "core": 11,
+   "non_core": 9,
+   "undecided": 135
+  },
+  "INFECTION_SURVEILLANCE": {
+   "tables": 740,
+   "views": 10,
+   "columns": 53,
+   "core": 2,
+   "non_core": 89,
+   "undecided": 659
+  },
+  "INTERCONNECT_PROV": {
+   "tables": 1629,
+   "views": 383,
+   "columns": 25338,
+   "core": 82,
+   "non_core": 76,
+   "undecided": 1854
+  },
+  "MEDICAL_RECORD_MGMT": {
+   "tables": 1290,
+   "views": 94,
+   "columns": 23620,
+   "core": 21,
+   "non_core": 29,
+   "undecided": 1334
+  },
+  "OUTPATIENT_APPT": {
+   "tables": 85,
+   "views": 9,
+   "columns": 1829,
+   "core": 25,
+   "non_core": 6,
+   "undecided": 63
+  },
+  "QUEUE": {
+   "tables": 62,
+   "views": 0,
+   "columns": 750,
+   "core": 4,
+   "non_core": 4,
+   "undecided": 54
+  },
+  "RESEARCH_MYSQL": {
+   "tables": 276,
+   "views": 0,
+   "columns": 5687,
+   "core": 0,
+   "non_core": 6,
+   "undecided": 270
+  },
+  "SDDW_PROD": {
+   "tables": 314,
+   "views": 30,
+   "columns": 5144,
+   "core": 50,
+   "non_core": 24,
+   "undecided": 270
+  }
+ },
+ "snapshot_status": {
+  "adverse_event_10_10_10_50": {
+   "file": "adverse_event_10_10_10_50.snapshot.json",
+   "engine": "mysql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 68,
+    "db_seconds": 5.2,
+    "wall_seconds": 201.4
+   }
+  },
+  "bloodnew_sqlserver_10_10_8_7": {
+   "file": "bloodnew_sqlserver_10_10_8_7.xh40.snapshot.json",
+   "engine": "sqlserver",
+   "status": "PARTIAL: XH_BIS_4.0 only (0 tables/4 views live); XH_BIS + HyAppFrame BLOCKED_PRIVILEGE (Xiheng_user no db access; vendor DBA needed)",
+   "budget_used": {
+    "statements": 9,
+    "db_seconds": 0.3,
+    "wall_seconds": 18.4
+   }
+  },
+  "bronchoscopy_postgresql_10_10_8_240": {
+   "file": "bronchoscopy_postgresql_10_10_8_240.snapshot.json",
+   "engine": "postgresql",
+   "status": "PARTIAL(OperationalError:connection failed: connection to server at \"10.10.8.240\", port )",
+   "budget_used": null
+  },
+  "dialysis_postgresql_10_10_10_88": {
+   "file": "dialysis_postgresql_10_10_10_88.snapshot.json",
+   "engine": "postgresql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 198,
+    "db_seconds": 0.3,
+    "wall_seconds": 576.6
+   }
+  },
+  "emergency_clinic_10_10_10_120": {
+   "file": "emergency_clinic_10_10_10_120.r2.snapshot.json",
+   "engine": "oracle",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 74,
+    "db_seconds": 1.0,
+    "wall_seconds": 209.2
+   }
+  },
+  "hearing_test_postgresql_10_10_9_187": {
+   "file": "hearing_test_postgresql_10_10_9_187.snapshot.json",
+   "engine": "postgresql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 171,
+    "db_seconds": 0.3,
+    "wall_seconds": 522.6
+   }
+  },
+  "infection_10_10_9_45": {
+   "file": "infection_10_10_9_45.snapshot.json",
+   "engine": "oracle",
+   "status": "PARTIAL(owner struct error: C##NIS5,C##NIS6 — ORA-03156 call timeout on batched catalog query; per plan §3.3 smaller-batch re-run needs DBA/ops confirmation)",
+   "budget_used": {
+    "statements": 38,
+    "db_seconds": 47.0,
+    "wall_seconds": 123.3
+   }
+  },
+  "interconnect_10_10_10_5": {
+   "file": "interconnect_10_10_10_5.snapshot.json",
+   "engine": "oracle",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 395,
+    "db_seconds": 8.0,
+    "wall_seconds": 1218.4
+   }
+  },
+  "mr_mgmt_10_10_10_55": {
+   "file": "mr_mgmt_10_10_10_55.r2.snapshot.json",
+   "engine": "oracle",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 238,
+    "db_seconds": 6.8,
+    "wall_seconds": 723.1
+   }
+  },
+  "outpatient_mysql_10_10_8_161": {
+   "file": "outpatient_mysql_10_10_8_161.snapshot.json",
+   "engine": "mysql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 10,
+    "db_seconds": 1.1,
+    "wall_seconds": 21.2
+   }
+  },
+  "queue_mysql_10_10_8_163": {
+   "file": "queue_mysql_10_10_8_163.snapshot.json",
+   "engine": "mysql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 10,
+    "db_seconds": 0.2,
+    "wall_seconds": 20.3
+   }
+  },
+  "research_mysql_10_10_8_200": {
+   "file": "research_mysql_10_10_8_200.snapshot.json",
+   "engine": "mysql",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 22,
+    "db_seconds": 1.5,
+    "wall_seconds": 45.7
+   }
+  },
+  "sddw_oracle_10_10_10_152": {
+   "file": "sddw_oracle_10_10_10_152.snapshot.json",
+   "engine": "oracle",
+   "status": "DONE",
+   "budget_used": {
+    "statements": 102,
+    "db_seconds": 12.8,
+    "wall_seconds": 337.1
+   }
+  }
+ }
+}

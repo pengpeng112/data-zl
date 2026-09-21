@@ -1,0 +1,40 @@
+﻿system_code,system_name_cn,class,canonical,source_code,db_type,endpoint,service_or_db,write_policy,enabled,platform_tables,platform_columns,credential_ref_set,last_collect_at,r188_coverage
+ADVERSE_EVENT,医疗安全不良事件(火龙果),B,,adverse_event_10_10_10_50,mysql,10.10.10.50:3306,,readonly,True,0,0,no,,day: offline evidence ready
+BRONCHOSCOPY,气管镜系统,B,,bronchoscopy_postgresql_10_10_8_240,postgresql,10.10.8.240:5432,clouddb,readonly,True,0,0,yes,,day: offline evidence ready
+CORE2DB,门诊病历,A,,core2db_mysql_10_10_8_135,mysql,10.10.8.135:3306,core2db,readonly,True,568,8066,yes,2026-08-22 09:57:47.140101+08,reuse platform
+DATA_CENTER,数据中心,A,,ods_8_216,oracle,10.10.8.216:1521,orcl,readonly,True,701,21140,no,,reuse platform
+DATA_CENTER,数据中心,A,,ods_emr,oracle,10.10.8.216:1521,orcl,readonly,True,79,2654,no,,reuse platform
+DATA_CENTER,数据中心,A,,ods_lis,oracle,10.10.8.216:1521,orcl,readonly,True,11,538,no,,reuse platform
+DATA_CENTER,数据中心,A,,ods_pacs,oracle,10.10.8.216:1521,orcl,readonly,True,18,891,no,,reuse platform
+DATA_CENTER,数据中心,A,,ods_sm,oracle,10.10.8.216:1521,orcl,readonly,True,25,969,no,,reuse platform
+DATA_CENTER,数据中心,A,,ods_ydhl,oracle,10.10.8.216:1521,orcl,readonly,True,31,702,no,,reuse platform
+DOCARE,Docare手术麻醉,A,,docare_oracle_10_10_10_68,oracle,10.10.10.68:1521,docare,readonly,True,646,4627,yes,2026-07-15 07:28:21.646151+08,reuse platform
+DRG,DRG系统,A,,drg_postgresql_10_10_10_107,postgresql,10.10.10.107:5836,drg_hosp,readonly,True,161,4341,no,,reuse platform
+ECG,心电系统,A,,cardionet_sqlserver_10_10_10_80,sqlserver,10.10.10.80:1433,cardioNet,readonly,True,4,188,yes,,reuse platform
+ECG,心电系统,A,,ecg_sqlserver_10_10_10_80,sqlserver,10.10.10.80:1433,EDSChinaDB,readonly,True,61,931,yes,,reuse platform
+EMERGENCY_CLINIC,急诊系统(麦迪斯顿),B,,emergency_clinic_10_10_10_120,oracle,10.10.10.120:1521,clinic,readonly,True,0,0,no,,day: offline evidence ready
+HEARING_TEST,电测听系统,B,,hearing_test_postgresql_10_10_9_187,postgresql,10.10.9.187:15432,report,readonly,True,0,0,yes,,day: offline evidence ready
+HEMODIALYSIS,血透系统,B,,dialysis_postgresql_10_10_10_88,postgresql,10.10.10.88:5432,dialysis,readonly,True,0,0,yes,,day: offline evidence ready
+HIS,HIS 业务系统,A,,hisbase_oracle_10_10_10_14,oracle,10.10.10.14:1521,hisserver,readonly,True,0,0,yes,,reuse platform
+HIS,HIS 业务系统,A,,his_source_10_10_10_15,oracle,10.10.10.15:1521,his,medical_dict_push,True,1241,14024,yes,,reuse platform
+HRP,HRP,A,,hrp_10_10_10_23,oracle,10.10.10.23:1521,hrpdb,readonly,True,67,748,yes,2026-07-14 18:38:50.745872+08,reuse platform
+INFECTION_SURVEILLANCE,医院感染实时监控(杏林),B,,infection_10_10_9_45,oracle,10.10.9.45:1521,orcl,readonly,True,0,0,no,,day: offline evidence ready
+INTERCONNECT_PROV,互联互通省平台,B,,interconnect_10_10_10_5,oracle,10.10.10.5:1521,orcl,readonly,True,0,0,no,,day: offline evidence ready
+JHEMR_VASTBASE,嘉和电子病历,A,,jhemr_vastbase_10_10_8_177,vastbase,10.10.8.177:5432,jhemr,medical_dict_push,True,1421,11928,yes,2026-07-14 19:21:58.671425+08,reuse platform
+LIS_SOURCE,LIS,A,,lis_sqlserver_10_10_10_73,sqlserver,10.10.10.73:1433,rmcloudlis7,readonly,True,1254,9031,yes,2026-07-15 07:28:21.646151+08,reuse platform
+MANDALA_EMR,曼陀罗电子病历,A,,mandala_emr_oracle_10_10_10_177,oracle,10.10.10.177:1521,orcl,readonly,True,1354,29269,no,,reuse platform
+MEDICAL_RECORD_MGMT,病案管理系统(华健),B,,mr_mgmt_10_10_10_55,oracle,10.10.10.55:1521,ycyl,readonly,True,0,0,no,,day: offline evidence ready
+MOBILE_NURSING,移动护理,A,,mobile_nursing_oracle_10_10_10_125,oracle,10.10.10.125:1521,ewell,readonly,True,567,7619,yes,2026-07-15 11:19:27.563242+08,reuse platform
+OA,OA办公系统,A,,oa_sqlserver_10_10_10_69,sqlserver,10.10.10.69:1433,oa,readonly,True,1685,29956,yes,2026-08-22 15:53:48.576337+08,reuse platform
+OCCUPATIONAL_DISEASE,职业病,A,,occupational_disease_sqlserver_10_10_8_96,sqlserver,10.10.8.96:1433,tjdatabase4,readonly,True,291,3205,yes,2026-08-22 09:57:47.140101+08,reuse platform
+OUTPATIENT_APPT,门诊预约系统,B,,outpatient_mysql_10_10_8_161,mysql,10.10.8.161:3306,,readonly,True,0,0,no,,day: offline evidence ready
+PACS_SOURCE,PACS,A,,pacs_mysql_10_10_10_191,mysql,10.10.10.191:3306,gecris,readonly,True,536,4027,yes,2026-07-15 07:28:21.646151+08,reuse platform
+PAPERLESS_CDMS,无纸化病案,A,,paperless_cdms_oracle_10_10_10_93,oracle,10.10.10.93:1521,orcl,readonly,True,349,3097,yes,2026-07-15 07:28:21.646151+08,reuse platform
+PATHOLOGY,病理,A,,pathology_sqlserver_10_10_9_41,sqlserver,10.10.9.41:1433,pitaya,readonly,True,294,5166,yes,2026-08-22 09:57:47.140101+08,reuse platform
+PHYSICAL_EXAM,体检,A,,physical_exam_sqlserver_10_10_10_96,sqlserver,10.10.10.96:1433,"EIS,JZCIS,ZONEKINGNET",readonly,True,578,7584,yes,2026-08-22 09:57:47.140101+08,reuse platform
+QUEUE,门诊叫号系统,B,,queue_mysql_10_10_8_163,mysql,10.10.8.163:3306,,readonly,True,0,0,no,,day: offline evidence ready
+RESEARCH_MYSQL,科研系统MySQL,B,,research_mysql_10_10_8_200,mysql,10.10.8.200:4306,,readonly,True,0,0,no,,day: offline evidence ready
+SDDW_PROD,医保结算系统正式(山大地纬),B,,sddw_oracle_10_10_10_151,oracle,10.10.10.151:1521,orcl,readonly,True,0,0,no,,day: offline evidence ready
+SDDW_PROD,医保结算系统正式(山大地纬),B,,sddw_oracle_10_10_10_152,oracle,10.10.10.152:1521,orcl,readonly,True,0,0,no,,day: offline evidence ready
+TRANSFUSION_NEW,新输血系统(熙恒),B,,bloodnew_sqlserver_10_10_8_7,mssql,10.10.8.7:1433,,readonly,True,0,0,no,,day: offline evidence ready
+ULTRASOUND_ENDOSCOPY,超声内镜,A,,ultrasound_endoscopy_sqlserver_10_10_10_161,sqlserver,10.10.10.161:1433,MedcareUS,readonly,True,825,7846,yes,2026-07-15 07:28:21.646151+08,reuse platform

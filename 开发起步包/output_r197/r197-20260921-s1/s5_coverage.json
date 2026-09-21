@@ -1,0 +1,54 @@
+{
+ "stage": "S5",
+ "queue_rows": 1998,
+ "unique_stmts": 1971,
+ "dup_rows": 27,
+ "dup_explained_by_file_duplicate_map": 21,
+ "dup_explained_archive_member_map": 6,
+ "dup_unexplained": [],
+ "stmts_with_family_evidence": 186,
+ "stmts_in_stats_ledger": 1785,
+ "closure": true,
+ "templates_total": 1065,
+ "templates_with_edges": 165,
+ "templates_new_family": 110,
+ "templates_supplement_family": 87,
+ "templates_stats_only": 900,
+ "new_relation_families": 97,
+ "supplemented_existing_relations": 34,
+ "dedup_layers": {
+  "existing_exact": 34,
+  "existing_pairset": 1,
+  "new": 95,
+  "existing_variant_join": 2,
+  "existing_variant": 2
+ },
+ "s2_s5_reconciliation": {
+  "families_total": 405,
+  "by_stage": {
+   "S2": 223,
+   "S3": 74,
+   "S4": 11,
+   "S5": 97
+  },
+  "intake_states": {
+   "existing_supplement": 149,
+   "candidate": 146,
+   "partial": 51,
+   "candidate_d_crosssource": 42,
+   "candidate_blocked_source": 13,
+   "rejected_negative": 4
+  },
+  "six_category_accounting": {
+   "新增（各段新族）": 405,
+   "其中驳回负例（不导入）": 4,
+   "其中部分成立（partial）": 51,
+   "其中 D 类跨源候选": 42,
+   "其中来源受阻候选": 13,
+   "已有补证据（supplements 次数）": 95
+  },
+  "recipes_total": 13,
+  "issues_total": 53,
+  "probes_total": 37
+ }
+}

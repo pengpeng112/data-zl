@@ -1,0 +1,931 @@
+{
+ "schema_version": "r188-scope-manifest/1.0",
+ "run_id": "r188-20260913",
+ "generated_at": "2026-09-13 (platform baseline 16:22:33+08)",
+ "plan_ref": "开发起步包/188_未探索业务数据库只读探索执行计划.md v2.0",
+ "evidence_inputs": {
+  "platform_baseline": "_scratch/r188_s0_platform_baseline.json (copy in sources/platform/)",
+  "credential_refs": "_scratch/r188_s0_credref.json",
+  "187_landscape": "开发起步包/187_平台各系统数据探索情况总说明.md",
+  "188_account_record": "开发起步包/188_平台专用只读数据库账号建设记录.md",
+  "159_report": "开发起步包/159_七系统只读探查与表结构资产采集报告.md",
+  "159_snapshot_dir": "开发起步包/数据资产_七系统源端资产包/ (gitignored)"
+ },
+ "platform_totals": {
+  "systems": 36,
+  "sources": 39,
+  "real_systems_A18_plus_B13": 31,
+  "merged_alias_systems": 5,
+  "note": "36=31实际系统+5merged别名(EMR/HIS_SOURCE/LIS/PACS/SM)；39源=A25+B14(SDDW_PROD双节点)；无未归类系统；187记载40源为旧口径",
+  "sddw_test": "CONFIRMED_ABSENT (系统/源均不在平台，按用户指示移除)"
+ },
+ "class_B_13": [
+  {
+   "order": 1,
+   "system_code": "EMERGENCY_CLINIC",
+   "class": "B",
+   "system_name_cn": "急诊系统(麦迪斯顿)",
+   "engine_hint": "oracle",
+   "endpoint_hint": "10.10.10.120:1521/clinic",
+   "credential_file": "emergency_clinic_oracle_10_10_10_120.readonly",
+   "credential_file_present": true,
+   "must_check": "clinic服务、实际业务owner；先做一小批元数据试点(S2候选)",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "emergency_clinic_10_10_10_120",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.10.120:1521",
+     "service_or_db": "clinic",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 2,
+   "system_code": "MEDICAL_RECORD_MGMT",
+   "class": "B",
+   "system_name_cn": "病案管理系统(华健)",
+   "engine_hint": "oracle",
+   "endpoint_hint": "10.10.10.55:1521/ycyl",
+   "credential_file": "mr_mgmt_oracle_10_10_10_55.readonly",
+   "credential_file_present": true,
+   "must_check": "YCYL服务；病案管理与无纸化病案不能混为同源",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "mr_mgmt_10_10_10_55",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.10.55:1521",
+     "service_or_db": "ycyl",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 3,
+   "system_code": "TRANSFUSION_NEW",
+   "class": "B",
+   "system_name_cn": "新输血系统(熙恒)",
+   "engine_hint": "mssql",
+   "endpoint_hint": "10.10.8.7:1433",
+   "credential_file": "bloodnew_sqlserver_10_10_8_7.readonly",
+   "credential_file_present": true,
+   "must_check": "先复用159快照(289表)；核实XH_BIS等业务库；ReportServer单列系统组件",
+   "old_snapshot": "bloodnew（289表/51视图/7227字段/40FK+R4候选37条）",
+   "sources": [
+    {
+     "source_code": "bloodnew_sqlserver_10_10_8_7",
+     "registered": true,
+     "db_type": "mssql",
+     "endpoint": "10.10.8.7:1433",
+     "service_or_db": null,
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 4,
+   "system_code": "SDDW_PROD",
+   "class": "B",
+   "system_name_cn": "医保结算系统正式(山大地纬)",
+   "engine_hint": "oracle-rac",
+   "endpoint_hint": "10.10.10.151/152:1521/orcl",
+   "credential_file": "sddw_oracle_10_10_10_152.readonly",
+   "credential_file_present": true,
+   "must_check": "复用159/R4快照(443表)；双节点只计一次；SYSTEM内业务对象按白名单",
+   "old_snapshot": "sddw_snapshot_r4（443表/14owner/无SYSTEM/索引859列）",
+   "sources": [
+    {
+     "source_code": "sddw_oracle_10_10_10_151",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.10.151:1521",
+     "service_or_db": "orcl",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": false,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    },
+    {
+     "source_code": "sddw_oracle_10_10_10_152",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.10.152:1521",
+     "service_or_db": "orcl",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 5,
+   "system_code": "INFECTION_SURVEILLANCE",
+   "class": "B",
+   "system_name_cn": "医院感染实时监控(杏林)",
+   "engine_hint": "oracle12c",
+   "endpoint_hint": "10.10.9.45:1521/orcl",
+   "credential_file": "infection_oracle_10_10_9_45.readonly",
+   "credential_file_present": true,
+   "must_check": "核实CDB/PDB身份；不自动ALTER SESSION切容器",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "infection_10_10_9_45",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.9.45:1521",
+     "service_or_db": "orcl",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 6,
+   "system_code": "RESEARCH_MYSQL",
+   "class": "B",
+   "system_name_cn": "科研系统MySQL",
+   "engine_hint": "mariadb",
+   "endpoint_hint": "10.10.8.200:4306",
+   "credential_file": "research_mysql_10_10_8_200.readonly",
+   "credential_file_present": true,
+   "must_check": "非标端口4306；da_readonly已切换(.bak-admin备份)",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "research_mysql_10_10_8_200",
+     "registered": true,
+     "db_type": "mysql",
+     "endpoint": "10.10.8.200:4306",
+     "service_or_db": null,
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 7,
+   "system_code": "OUTPATIENT_APPT",
+   "class": "B",
+   "system_name_cn": "门诊预约系统",
+   "engine_hint": "mysql8",
+   "endpoint_hint": "10.10.8.161:3306",
+   "credential_file": "outpatient_mysql_10_10_8_161.readonly",
+   "credential_file_present": true,
+   "must_check": "da_readonly已切换；预约与叫号分来源",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "outpatient_mysql_10_10_8_161",
+     "registered": true,
+     "db_type": "mysql",
+     "endpoint": "10.10.8.161:3306",
+     "service_or_db": null,
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 8,
+   "system_code": "QUEUE",
+   "class": "B",
+   "system_name_cn": "门诊叫号系统",
+   "engine_hint": "mysql8",
+   "endpoint_hint": "10.10.8.163:3306",
+   "credential_file": "queue_mysql_10_10_8_163.readonly",
+   "credential_file_present": true,
+   "must_check": "复用159快照(sdsr_queue_java 62表)；da_readonly已切换；不再用root兜底",
+   "old_snapshot": "queue（sdsr_queue_java 62表/750字段/65PK/8FK/109索引）",
+   "sources": [
+    {
+     "source_code": "queue_mysql_10_10_8_163",
+     "registered": true,
+     "db_type": "mysql",
+     "endpoint": "10.10.8.163:3306",
+     "service_or_db": null,
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 9,
+   "system_code": "ADVERSE_EVENT",
+   "class": "B",
+   "system_name_cn": "医疗安全不良事件(火龙果)",
+   "engine_hint": "mariadb",
+   "endpoint_hint": "10.10.10.50:3306",
+   "credential_file": "adverse_event_mysql_10_10_10_50.readonly",
+   "credential_file_present": true,
+   "must_check": "报告/流程/字典业务域识别；da_readonly已切换",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "adverse_event_10_10_10_50",
+     "registered": true,
+     "db_type": "mysql",
+     "endpoint": "10.10.10.50:3306",
+     "service_or_db": null,
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 10,
+   "system_code": "INTERCONNECT_PROV",
+   "class": "B",
+   "system_name_cn": "互联互通省平台",
+   "engine_hint": "oracle",
+   "endpoint_hint": "10.10.10.5:1521/orcl",
+   "credential_file": "interconnect_oracle_10_10_10_5.readonly",
+   "credential_file_present": true,
+   "must_check": "spt_exchange/ods/rs逐schema采；不与DATA_CENTER同名schema混淆",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "interconnect_10_10_10_5",
+     "registered": true,
+     "db_type": "oracle",
+     "endpoint": "10.10.10.5:1521",
+     "service_or_db": "orcl",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 11,
+   "system_code": "HEARING_TEST",
+   "class": "B",
+   "system_name_cn": "电测听系统",
+   "engine_hint": "pg-compatible-huachain",
+   "endpoint_hint": "10.10.9.187:15432/report",
+   "credential_file": "hearing_test_postgresql_10_10_9_187.readonly",
+   "credential_file_present": true,
+   "must_check": "HuaChainSQL元数据函数兼容性先试点；PG兼容≠全部统计接口可用",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "hearing_test_postgresql_10_10_9_187",
+     "registered": true,
+     "db_type": "postgresql",
+     "endpoint": "10.10.9.187:15432",
+     "service_or_db": "report",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": true,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 12,
+   "system_code": "BRONCHOSCOPY",
+   "class": "B",
+   "system_name_cn": "气管镜系统",
+   "engine_hint": "postgresql",
+   "endpoint_hint": "10.10.8.240:5432/clouddb",
+   "credential_file": "bronchoscopy_postgresql_10_10_8_240.readonly",
+   "credential_file_present": true,
+   "must_check": "早期空登记，窗口内单次验证；失败只记录原因",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "bronchoscopy_postgresql_10_10_8_240",
+     "registered": true,
+     "db_type": "postgresql",
+     "endpoint": "10.10.8.240:5432",
+     "service_or_db": "clouddb",
+     "write_policy": "readonly",
+     "enabled": true,
+     "platform_credential_ref_set": true,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  },
+  {
+   "order": 13,
+   "system_code": "HEMODIALYSIS",
+   "class": "B",
+   "system_name_cn": "血透系统",
+   "engine_hint": "postgresql",
+   "endpoint_hint": "10.10.10.88:5432/dialysis",
+   "credential_file": "dialysis_postgresql_10_10_8_88.readonly",
+   "credential_file_present": true,
+   "must_check": "已有血透成果先查重(157号DR图像对接)，不重复建系统",
+   "old_snapshot": null,
+   "sources": [
+    {
+     "source_code": "dialysis_postgresql_10_10_8_88",
+     "registered": false,
+     "db_type": null,
+     "endpoint": "None:None",
+     "service_or_db": null,
+     "write_policy": null,
+     "enabled": null,
+     "platform_credential_ref_set": false,
+     "credential_file_present": true,
+     "last_collect_at": null,
+     "platform_tables": 0,
+     "platform_columns": 0,
+     "schemas_registered": 0
+    }
+   ],
+   "capabilities_todo": {
+    "metadata": "PENDING_WINDOW",
+    "capacity": "PENDING_WINDOW",
+    "relations_offline": "PENDING_METADATA",
+    "classification": "PENDING_METADATA",
+    "value_domains": "PENDING_METADATA",
+    "import": "PENDING_APPROVAL"
+   }
+  }
+ ],
+ "class_A_18": [
+  {
+   "system_code": "HIS",
+   "class": "A",
+   "system_name_cn": "HIS 业务系统",
+   "sources": [
+    "hisbase_oracle_10_10_10_14",
+    "his_source_10_10_10_15"
+   ],
+   "platform_tables": 1241,
+   "platform_columns": 14024,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "DATA_CENTER",
+   "class": "A",
+   "system_name_cn": "数据中心",
+   "sources": [
+    "ods_8_216",
+    "ods_emr",
+    "ods_lis",
+    "ods_pacs",
+    "ods_sm",
+    "ods_ydhl"
+   ],
+   "platform_tables": 865,
+   "platform_columns": 26894,
+   "relations_in_platform": 56,
+   "value_domains_in_platform": 2,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "MANDALA_EMR",
+   "class": "A",
+   "system_name_cn": "曼陀罗电子病历",
+   "sources": [
+    "mandala_emr_oracle_10_10_10_177"
+   ],
+   "platform_tables": 1354,
+   "platform_columns": 29269,
+   "relations_in_platform": 16,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "JHEMR_VASTBASE",
+   "class": "A",
+   "system_name_cn": "嘉和电子病历",
+   "sources": [
+    "jhemr_vastbase_10_10_8_177"
+   ],
+   "platform_tables": 1421,
+   "platform_columns": 11928,
+   "relations_in_platform": 280,
+   "value_domains_in_platform": 51,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "LIS_SOURCE",
+   "class": "A",
+   "system_name_cn": "LIS",
+   "sources": [
+    "lis_sqlserver_10_10_10_73"
+   ],
+   "platform_tables": 1254,
+   "platform_columns": 9031,
+   "relations_in_platform": 20,
+   "value_domains_in_platform": 3,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "OA",
+   "class": "A",
+   "system_name_cn": "OA办公系统",
+   "sources": [
+    "oa_sqlserver_10_10_10_69"
+   ],
+   "platform_tables": 1685,
+   "platform_columns": 29956,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "DOCARE",
+   "class": "A",
+   "system_name_cn": "Docare手术麻醉",
+   "sources": [
+    "docare_oracle_10_10_10_68"
+   ],
+   "platform_tables": 646,
+   "platform_columns": 4627,
+   "relations_in_platform": 46,
+   "value_domains_in_platform": 10,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "CORE2DB",
+   "class": "A",
+   "system_name_cn": "门诊病历",
+   "sources": [
+    "core2db_mysql_10_10_8_135"
+   ],
+   "platform_tables": 568,
+   "platform_columns": 8066,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "ULTRASOUND_ENDOSCOPY",
+   "class": "A",
+   "system_name_cn": "超声内镜",
+   "sources": [
+    "ultrasound_endoscopy_sqlserver_10_10_10_161"
+   ],
+   "platform_tables": 825,
+   "platform_columns": 7846,
+   "relations_in_platform": 12,
+   "value_domains_in_platform": 5,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "MOBILE_NURSING",
+   "class": "A",
+   "system_name_cn": "移动护理",
+   "sources": [
+    "mobile_nursing_oracle_10_10_10_125"
+   ],
+   "platform_tables": 567,
+   "platform_columns": 7619,
+   "relations_in_platform": 12,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "PHYSICAL_EXAM",
+   "class": "A",
+   "system_name_cn": "体检",
+   "sources": [
+    "physical_exam_sqlserver_10_10_10_96"
+   ],
+   "platform_tables": 578,
+   "platform_columns": 7584,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "PACS_SOURCE",
+   "class": "A",
+   "system_name_cn": "PACS",
+   "sources": [
+    "pacs_mysql_10_10_10_191"
+   ],
+   "platform_tables": 536,
+   "platform_columns": 4027,
+   "relations_in_platform": 33,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "PAPERLESS_CDMS",
+   "class": "A",
+   "system_name_cn": "无纸化病案",
+   "sources": [
+    "paperless_cdms_oracle_10_10_10_93"
+   ],
+   "platform_tables": 349,
+   "platform_columns": 3097,
+   "relations_in_platform": 35,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "PATHOLOGY",
+   "class": "A",
+   "system_name_cn": "病理",
+   "sources": [
+    "pathology_sqlserver_10_10_9_41"
+   ],
+   "platform_tables": 294,
+   "platform_columns": 5166,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "OCCUPATIONAL_DISEASE",
+   "class": "A",
+   "system_name_cn": "职业病",
+   "sources": [
+    "occupational_disease_sqlserver_10_10_8_96"
+   ],
+   "platform_tables": 291,
+   "platform_columns": 3205,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "ECG",
+   "class": "A",
+   "system_name_cn": "心电系统",
+   "sources": [
+    "cardionet_sqlserver_10_10_10_80",
+    "ecg_sqlserver_10_10_10_80"
+   ],
+   "platform_tables": 65,
+   "platform_columns": 1119,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "DRG",
+   "class": "A",
+   "system_name_cn": "DRG系统",
+   "sources": [
+    "drg_postgresql_10_10_10_107"
+   ],
+   "platform_tables": 161,
+   "platform_columns": 4341,
+   "relations_in_platform": 12,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  },
+  {
+   "system_code": "HRP",
+   "class": "A",
+   "system_name_cn": "HRP",
+   "sources": [
+    "hrp_10_10_10_23"
+   ],
+   "platform_tables": 67,
+   "platform_columns": 748,
+   "relations_in_platform": 0,
+   "value_domains_in_platform": 0,
+   "capabilities_todo": {
+    "metadata": "DONE_REUSE",
+    "capacity": "PENDING_WINDOW_READONLY_STATS",
+    "relations_offline": "PARTIAL_REUSE",
+    "classification": "PENDING_OFFLINE",
+    "value_domains": "PARTIAL_REUSE",
+    "import": "NOT_NEEDED_EXISTING"
+   }
+  }
+ ],
+ "class_C_blocked_pool": {
+  "note": "沿187 §3清单只读引用，本轮不探测不补登记",
+  "groups": [
+   "Oracle服务名未知(2)",
+   "MySQL白名单2013(8)",
+   "MSSQL TDS协商失败(6)",
+   "PG拒绝(科研GP)",
+   "容器网络不通(5)",
+   "仅本机可连(1)",
+   "明示不支持(环控)"
+  ]
+ },
+ "credential_gap_finding": {
+  "summary": "B类13源凭据文件在8.83全部存在，但平台asset_data_sources.credential_ref有11个B源为NULL(186/187批注册未回填)",
+  "impact": "sjzc live通道对这些源无法解析凭据；S3采集走容器内直读凭据文件模式(159先例,ops-runbook §1)；credential_ref回填留步骤二平台纳入时处理",
+  "null_ref_B_sources": [
+   "adverse_event_10_10_10_50",
+   "bloodnew_sqlserver_10_10_8_7",
+   "emergency_clinic_10_10_10_120",
+   "infection_10_10_9_45",
+   "interconnect_10_10_10_5",
+   "mr_mgmt_10_10_10_55",
+   "outpatient_mysql_10_10_8_161",
+   "queue_mysql_10_10_8_163",
+   "research_mysql_10_10_8_200",
+   "sddw_oracle_10_10_10_151",
+   "sddw_oracle_10_10_10_152"
+  ]
+ },
+ "physical_identity_notes": [
+  "SDDW_PROD 151/152=RAC双节点同一DB(orcl)，采集只连152活节点，容量只计一次",
+  "DATA_CENTER 6源=同一物理库8.216的6个逻辑采集通道(共享)",
+  "HIS 2源=15(his服务)+14(hisserver镜像)不同实例",
+  "ECG 2源=同主机两数据库(EDSChinaDB/cardioNet)",
+  "体检=同实例3数据库(EIS,JZCIS,ZONEKINGNET)",
+  "INTERCONNECT_PROV多schema(spt_exchange/ods/rs)=同一库分层，不与DATA_CENTER混淆"
+ ],
+ "window_and_authorization": {
+  "night_window": "用户启动指令批准按188 v2.0执行(含已批准夜窗小批试点)；建议窗22:00-00:00避开docare 00:10与身份同步02:00夜跑；执行前无夜跑冲突再启动",
+  "daytime_allowed": "平台元数据只读、离线分析、采集器本地审查与测试",
+  "source_live_now": "PENDING_WINDOW (S2试点起在夜窗执行)"
+ }
+}

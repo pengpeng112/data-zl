@@ -1,0 +1,43 @@
+{
+  "collected_at": "2026-09-09",
+  "channel": "sjzc live 受控连接器 his_source_10_10_10_15（仅数据字典与聚合统计，零业务明细/零凭据采集）",
+  "physical_object": {
+    "found": true,
+    "owner": "FXHIS",
+    "table": "SYS_USER",
+    "note": "平台元数据未收录（tables SYS_USER 0 命中）；源库数据字典 all_tables 命中唯一对象"
+  },
+  "columns_for_sync": ["EMPL_CODE", "STATUS", "ISDELETED", "TYPE", "MODIFIEDTIME"],
+  "columns_rejected": ["PASSWORD", "NICKNAME", "AVATAR", "ROLEID", "CREATEDUSERNAME", "MODIFIEDUSERNAME"],
+  "join_key": {
+    "his_side": "TRIM(FXHIS.SYS_USER.EMPL_CODE) = TRIM(FXHIS.SYS_EMPLOYEE.EMPLCODE)",
+    "sys_user_rows": 2001,
+    "empl_code_nonnull": 2001,
+    "empl_code_distinct": 2001,
+    "cardinality": "严格一人一账号（EMPL_CODE 100% 非空且唯一）",
+    "matched_to_sys_employee": 2000,
+    "unmatched": 1,
+    "unmatched_note": "唯一未命中行为 TYPE=100/USERFLAG=P 平台账号（非员工登录账号），按范围外处理",
+    "employee_without_account": "SYS_EMPLOYEE 2529 distinct EMPLCODE，528 人无 SYS_USER 账号（缺失≠停用）"
+  },
+  "value_domains": {
+    "STATUS": {"0": 1717, "1": 284, "null": 0, "other": 0, "semantics": "用户口径：1=停用，0=启用"},
+    "ISDELETED": {"0": 2001, "1": 0, "null": 0},
+    "TYPE": {"1": 2000, "100": 1},
+    "USERFLAG": {"null": 2000, "P": 1},
+    "TENANTID": {"161223412138053": 2001}
+  },
+  "modifiedtime_reliability": {
+    "null_count": 325,
+    "null_pct": 16.2,
+    "max": "2026-09-08 15:16:59",
+    "conclusion": "16% 为 NULL，不可作为增量水位；变化发现采用受管集合分批状态对账（186 §4.6.3 默认方案）"
+  },
+  "cross_state_population": {
+    "user_disabled_employee_enabled": 230,
+    "user_enabled_employee_disabled": 1,
+    "note": "230 人即当前夜跑完全不可见的『人员有效但账号停用』人群（SYS_EMPLOYEE.MODIFIEDTIME 不变则永远不进候选）"
+  },
+  "aggregate_only": true,
+  "patient_or_secret_data": "无（全部为 COUNT 聚合与列名结构，未采集任何姓名/密码/患者数据）"
+}

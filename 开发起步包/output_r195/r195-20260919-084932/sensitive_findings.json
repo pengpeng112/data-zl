@@ -1,0 +1,48 @@
+{
+ "note": "账号名与文件清单；口令明文不复制进本产物",
+ "accounts": {
+  "ods": {
+   "files": [
+    ".tmp_check_dnd_after_alter.py",
+    ".tmp_check_dnd_length.py",
+    ".tmp_check_dnd_target_limits.py",
+    ".tmp_find_death_views.py",
+    ".tmp_find_dnd_view.py",
+    "governance\\reports\\前置机数据核查执行计划.md",
+    "governance\\reports\\开发环境与资产总索引.md",
+    "scripts\\audit_domains_local.py"
+   ],
+   "file_count": 59
+  },
+  "dboper": {
+   "files": [
+    ".tmp_check_dnd_after_alter.py",
+    ".tmp_check_dnd_length.py",
+    ".tmp_check_dnd_target_limits.py",
+    "governance\\reports\\前置机数据核查执行计划.md",
+    "governance\\reports\\开发环境与资产总索引.md",
+    "scripts\\batch_insert.py",
+    "scripts\\check_all_fk.py",
+    "scripts\\check_fk_fast.py"
+   ],
+   "file_count": 57
+  },
+  "ssh_user": {
+   "files": [
+    "scripts\\export_research_labsop_csv.py",
+    "scripts\\export_research_labsop_sql.py",
+    "scripts\\generate_research_business_content.py"
+   ],
+   "file_count": 3
+  },
+  "db_user": {
+   "files": [
+    "scripts\\export_research_labsop_csv.py",
+    "scripts\\export_research_labsop_sql.py",
+    "scripts\\generate_research_business_content.py"
+   ],
+   "file_count": 3
+  }
+ },
+ "file_count": 78
+}

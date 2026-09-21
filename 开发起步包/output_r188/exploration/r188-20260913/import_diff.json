@@ -1,0 +1,284 @@
+{
+ "schema_version": "r188-import-diff/1.0",
+ "run_id": "r188-20260913",
+ "basis": "dryrun_final.json（隔离库 data_asset_test 全量 dry-run，结束 rollback 零落库）",
+ "generated_at": "2026-09-16T10:49:57.971640+00:00",
+ "package_totals": {
+  "objects": 6102,
+  "columns": 74693,
+  "fk_candidates": 542,
+  "view_dependencies": 0
+ },
+ "import_summary": {
+  "mode": "dry_run",
+  "tables_inserts": 6102,
+  "tables_updates": 0,
+  "tables_writes": 6102,
+  "columns_writes": 74693,
+  "candidates_in": 542,
+  "prepared_reviews": 486,
+  "skipped_prepare": 28,
+  "eligible_reviews": 484,
+  "inserted_reviews": 0,
+  "skipped_metadata": 2,
+  "metadata_error_types": {
+   "missing_table": 2
+  },
+  "view_dependency_rows": 0,
+  "platform_before": {
+   "systems": 0,
+   "sources": 0,
+   "tables": 0,
+   "columns": 0,
+   "relations": 0,
+   "reviews": 0,
+   "recipes": 0
+  },
+  "platform_after": {
+   "systems": 18,
+   "sources": 18,
+   "tables": 6102,
+   "columns": 74693,
+   "relations": 0,
+   "reviews": 0,
+   "recipes": 0
+  },
+  "source_identity": {
+   "existing_sources": 0,
+   "conflicts": []
+  }
+ },
+ "per_system": {
+  "EMERGENCY_CLINIC": {
+   "system_name_cn": "急诊系统(麦迪斯顿)",
+   "package_objects": 219,
+   "platform_writes": {
+    "tables_inserts": 219,
+    "tables_updates": 0,
+    "columns_writes": 1893
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 1,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "MEDICAL_RECORD_MGMT": {
+   "system_name_cn": "病案管理系统(华健)",
+   "package_objects": 1384,
+   "platform_writes": {
+    "tables_inserts": 1384,
+    "tables_updates": 0,
+    "columns_writes": 23620
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 221,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "TRANSFUSION_NEW": {
+   "system_name_cn": "新输血系统(熙恒)",
+   "package_objects": 0,
+   "platform_writes": {
+    "tables_inserts": 0,
+    "tables_updates": 0,
+    "columns_writes": 134
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "PARTIAL: XH_BIS_4.0 only (0 tables/4 views live); XH_BIS + HyAppFrame BLOCKED_PRIVILEGE (Xiheng_user no db access; vendor DBA needed)",
+   "exclusion_note": "XH_BIS_4.0 仅 4 视图可见（134 列）；XH_BIS/HyAppFrame=BLOCKED_PRIVILEGE 待熙恒 DBA 授权，不用其他账号兜底"
+  },
+  "SDDW_PROD": {
+   "system_name_cn": "医保结算系统正式(山大地纬)",
+   "package_objects": 344,
+   "platform_writes": {
+    "tables_inserts": 344,
+    "tables_updates": 0,
+    "columns_writes": 5144
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 1,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "INFECTION_SURVEILLANCE": {
+   "system_name_cn": "医院感染实时监控(杏林)",
+   "package_objects": 750,
+   "platform_writes": {
+    "tables_inserts": 750,
+    "tables_updates": 0,
+    "columns_writes": 53
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "PARTIAL(owner struct error: C##NIS5,C##NIS6 — ORA-03156 call timeout on batched catalog query; per plan §3.3 smaller-batch re-run needs DBA/ops confirmation)",
+   "exclusion_note": "列/约束/索引缺口：C##NIS5/NIS6 列批查询 ORA-03156（表清单 750 已全，列仅 53）；补采需 DBA 确认后小批次另行授权"
+  },
+  "RESEARCH_MYSQL": {
+   "system_name_cn": "科研系统MySQL",
+   "package_objects": 276,
+   "platform_writes": {
+    "tables_inserts": 276,
+    "tables_updates": 0,
+    "columns_writes": 5687
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "OUTPATIENT_APPT": {
+   "system_name_cn": "门诊预约系统",
+   "package_objects": 94,
+   "platform_writes": {
+    "tables_inserts": 94,
+    "tables_updates": 0,
+    "columns_writes": 1829
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "QUEUE": {
+   "system_name_cn": "门诊叫号系统",
+   "package_objects": 62,
+   "platform_writes": {
+    "tables_inserts": 62,
+    "tables_updates": 0,
+    "columns_writes": 750
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 8,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "ADVERSE_EVENT": {
+   "system_name_cn": "医疗安全不良事件(火龙果)",
+   "package_objects": 623,
+   "platform_writes": {
+    "tables_inserts": 623,
+    "tables_updates": 0,
+    "columns_writes": 6174
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 116,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "INTERCONNECT_PROV": {
+   "system_name_cn": "互联互通省平台",
+   "package_objects": 2012,
+   "platform_writes": {
+    "tables_inserts": 2012,
+    "tables_updates": 0,
+    "columns_writes": 25338
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 164,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "HEARING_TEST": {
+   "system_name_cn": "电测听系统",
+   "package_objects": 155,
+   "platform_writes": {
+    "tables_inserts": 155,
+    "tables_updates": 0,
+    "columns_writes": 2024
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  },
+  "BRONCHOSCOPY": {
+   "system_name_cn": "气管镜系统",
+   "package_objects": 0,
+   "platform_writes": {
+    "tables_inserts": 0,
+    "tables_updates": 0,
+    "columns_writes": 0
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 0,
+   "snapshot_status": "PARTIAL(OperationalError:connection failed: connection to server at \"10.10.8.240\", port )",
+   "exclusion_note": "连接即被服务端断开（BLOCKED），零元数据；恢复需网络科/厂商确认访问策略"
+  },
+  "HEMODIALYSIS": {
+   "system_name_cn": "血透系统",
+   "package_objects": 183,
+   "platform_writes": {
+    "tables_inserts": 183,
+    "tables_updates": 0,
+    "columns_writes": 2047
+   },
+   "unchanged": 0,
+   "conflicts": 0,
+   "fk_candidates": 31,
+   "snapshot_status": "DONE",
+   "exclusion_note": null
+  }
+ },
+ "exclusions": {
+  "INFECTION_SURVEILLANCE": "列/约束/索引缺口：C##NIS5/NIS6 列批查询 ORA-03156（表清单 750 已全，列仅 53）；补采需 DBA 确认后小批次另行授权",
+  "BRONCHOSCOPY": "连接即被服务端断开（BLOCKED），零元数据；恢复需网络科/厂商确认访问策略",
+  "TRANSFUSION_NEW": "XH_BIS_4.0 仅 4 视图可见（134 列）；XH_BIS/HyAppFrame=BLOCKED_PRIVILEGE 待熙恒 DBA 授权，不用其他账号兜底"
+ },
+ "notes": [
+  "全量 dry-run 于隔离库 data_asset_test 执行，事务结束 rollback，生产零影响",
+  "FK 候选仅入 asset_relation_reviews 候选层（relation_scope=candidate），不升正式关系",
+  "院感 750 表清单层入库；列缺口如实保留，补采后增量包二次入库"
+ ],
+ "s10_execution": {
+  "approved": "2026-09-17 user approved S10 (S9_批准包清单.md §6 scope)",
+  "backup": "data_asset_pre_r188_s10_20260916_192753.dump (pg_dump -Fc 12MB, 1144 objects, sha256 87f61dc7...)",
+  "canary": {
+   "system": "QUEUE",
+   "result": "62 tables / 750 columns / 8 candidate reviews landed first, readback verified"
+  },
+  "full_apply_attempt1_rollback": "UniqueViolation: (MEDCOMM,*) already owned by DOCARE source — asset_tables unique key is platform-wide GLOBAL; transaction rolled back, zero residue verified",
+  "platform_ownership_exclusions": {
+   "rule_A": "EMERGENCY_CLINIC MEDCOMM 17 objects excluded (schema registered under DOCARE)",
+   "rule_B": "80 Oracle vendor sample-schema keys (SCOTT/HR/IX/OE/PM/SH) duplicated across r188 Oracle sources — excluded from ALL systems; zero business-schema impact",
+   "implementation": "built into build_r188_package_and_import.py (_apply_platform_exclusions) so every rebuild (dry-run or apply) produces the identical package; dry-run-filtered-upload approach abandoned because builder always regenerates --package-dir"
+  },
+  "final_package_v3": {
+   "objects": 5917,
+   "columns": 73557,
+   "fk_candidates": 478,
+   "excluded_vs_s9": "185 object rows / 1136 columns / 64 candidates (all non-business: 17 MEDCOMM platform-owned + sample schemas)"
+  },
+  "apply_result": {
+   "tables_inserts": 5855,
+   "tables_updates": 0,
+   "columns_writes": 72807,
+   "inserted_reviews": 450,
+   "skipped_existing_review": 8,
+   "skipped_metadata": 2,
+   "queue_idempotent": "QUEUE 62/750/8 already landed by canary; apply added zero duplicates"
+  },
+  "s11_readback": "logs/s11_readback.json: 13/13 systems tables+columns exact; review groups 172+114+133+31+8=458 (450 new + 8 canary) reconcile with apply counters; core-table/view/candidate spot checks pass; infection columns=53 reflects known PARTIAL",
+  "second_dry_run_idempotency": "logs/dryrun_v3second.json: same package re-run -> tables_writes=0, columns_writes=0, inserted_reviews=0, skipped_existing_review=458, platform counts unchanged (18684/252104/560)",
+  "evidence_files": [
+   "logs/apply_canary.json",
+   "logs/apply_v3.json",
+   "logs/dryrun_v3prod.json",
+   "logs/dryrun_v3second.json",
+   "logs/s11_readback.json",
+   "logs/v2_exclusion_report.json"
+  ]
+ }
+}

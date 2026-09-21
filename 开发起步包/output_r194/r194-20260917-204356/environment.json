@@ -1,0 +1,33 @@
+{
+  "run_id": "r194-20260917-204356",
+  "date": "2026-09-17",
+  "git_head": "d7536d05fbbb2951b10c4c5bc3db38d9bf53763a",
+  "git_head_subject": "docs(192): sign-way nightly fill recovery execution record + README/55 registration",
+  "workspace": "dirty: 193 modified/untracked entries at start (other tasks' work preserved; see logs/workspace_fingerprint_git_status.txt)",
+  "backend_venv": "backend/.venv (python 3.14 line, psycopg)",
+  "frontend": "pnpm + vite dev mode",
+  "isolated_db": {
+    "name": "data_asset_test",
+    "server": "PostgreSQL 14.10 via 127.0.0.1:15432 SSH tunnel (root@10.10.8.83, repo-standard test channel tools/dev_env.sh)",
+    "verified_exclusive": true,
+    "other_connections_at_start": 0,
+    "asset_tables": 115,
+    "baseline": "completely empty at start; seeded by scripts/seed_r194_data.py (12/12 sections ok)"
+  },
+  "exit_blocking": {
+    "scheduler": "asset_scheduler_jobs trigger_mode=scheduled count=0; APP_QUERY_SCHEDULE_ENABLED/APP_IDENTITY_NIGHTLY_ENABLED/APP_DICT_MEDICAL_PUSH_ENABLED default false -> _start_scheduler() registers nothing and does not start",
+    "llm": "APP_HOSPITAL_LLM_ENABLED=false override for local server",
+    "dify": "APP_DIFY_QUALITY_ENABLED default false",
+    "write_executors": "asset_action_executors = 0 rows",
+    "real_source_connectors": "no connector endpoints invoked against real systems; synthetic systems only (127.0.0.1 targets); assertion via backend log + audit scan at end"
+  },
+  "roles_seeded": {
+    "A_r194_admin": "platform_admin",
+    "B_r194_viewer": "asset_viewer",
+    "C_r194_qa_a": "quality_admin (dept NK)",
+    "D_r194_qa_b": "quality_admin (dept WK)",
+    "E_r194_norole": "no role",
+    "F_r194_expiring": "asset_viewer (session expiry journey)"
+  },
+  "notes": "passwords are synthetic seed values held in session only; not written to repo"
+}

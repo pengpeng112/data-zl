@@ -1,0 +1,124 @@
+{
+ "passed": 23,
+ "failed": 0,
+ "results": [
+  {
+   "case": "DEF-06-1440-card-inside",
+   "ok": true,
+   "detail": "card x=440 w=430 vw=1440 scrollW=1440"
+  },
+  {
+   "case": "DEF-06-1440-button-visible",
+   "ok": true,
+   "detail": "btn x=473 w=364 right=837"
+  },
+  {
+   "case": "DEF-08-button-y-stable",
+   "ok": true,
+   "detail": "y样本=[991.8, 991.8, 991.8, 991.8, 991.8, 991.8, 991.8, 991.8, 991.8, 991.8] 漂移=0.0px"
+  },
+  {
+   "case": "DEF-06-1280-card-inside",
+   "ok": true,
+   "detail": "card x=295 w=430 vw=1280"
+  },
+  {
+   "case": "DEF-06-1000-card-inside",
+   "ok": true,
+   "detail": "card x=50 w=430 vw=1000"
+  },
+  {
+   "case": "DEF-08-reduced-motion-stable",
+   "ok": true,
+   "detail": "y样本=[991.8, 991.8, 991.8, 991.8, 991.8, 991.8] 漂移=0.0px"
+  },
+  {
+   "case": "U6-errors-appear",
+   "ok": true,
+   "detail": "空提交后错误=['请输入账号', '请输入密码']"
+  },
+  {
+   "case": "U6-username-error-cleared",
+   "ok": true,
+   "detail": "输入账号后剩余错误=['请输入密码']"
+  },
+  {
+   "case": "U6-password-error-cleared",
+   "ok": true,
+   "detail": "输入密码后剩余错误=[]"
+  },
+  {
+   "case": "login-success",
+   "ok": true,
+   "detail": "url=http://127.0.0.1:8848/#/workbench"
+  },
+  {
+   "case": "DEF-01-nav-not-frozen",
+   "ok": true,
+   "detail": "6/6 直达正常"
+  },
+  {
+   "case": "DEF-02-query-list-renders",
+   "ok": true,
+   "detail": "查询列表渲染分页总量：是"
+  },
+  {
+   "case": "DEF-10-system-chips-from-api",
+   "ok": true,
+   "detail": "chips=['全部业务系统', '194测试系统甲', '194测试系统乙', '194空测试系统']"
+  },
+  {
+   "case": "DEF-07-tree-search-hits",
+   "ok": true,
+   "detail": "树搜索分区=有；树文本片段='资产目录\\n刷新\\n业务系统\\n搜索结果（3）\\n3\\n表\\n194测试系统甲 → 目录异常 → CLIN → PATIENT_INFO（患者主索引）\\n4\\n表\\n194测试系'"
+  },
+  {
+   "case": "DEF-07-main-list-filtered",
+   "ok": true,
+   "detail": "主列表含 PATIENT_INFO 过滤结果"
+  },
+  {
+   "case": "DEF-07-clear-restores",
+   "ok": true,
+   "detail": "清空后树恢复=是"
+  },
+  {
+   "case": "U1-accuracy-dashboard-renders",
+   "ok": true,
+   "detail": "看板渲染已审核/未评价统计"
+  },
+  {
+   "case": "U2-mapping-rows-visible",
+   "ok": true,
+   "detail": "宽表可见院内码=是"
+  },
+  {
+   "case": "U3-sync-diffs-default-open",
+   "ok": true,
+   "detail": "默认 open 过滤展示"
+  },
+  {
+   "case": "U4-roles-cards-render",
+   "ok": true,
+   "detail": "角色数据渲染（卡片布局）"
+  },
+  {
+   "case": "U5-default-tab-audit",
+   "ok": true,
+   "detail": "默认页签=治理审计（govern audit-logs 口径）"
+  },
+  {
+   "case": "U5-ops-events-visible",
+   "ok": true,
+   "detail": "执行日志页签展示运维事件流（asset_ops_event_logs）"
+  },
+  {
+   "case": "console-errors",
+   "ok": true,
+   "detail": "错误数=0 样例=[]"
+  }
+ ],
+ "frontend": "http://127.0.0.1:8848",
+ "backend": "http://127.0.0.1:8000",
+ "seed": "r194 synthetic (12+wrapup sections)"
+}

@@ -1,0 +1,42 @@
+{
+  "batch": "180",
+  "executed_at": "2026-09-05",
+  "authorization": "用户点名『按照 180 计划执行』→ 执行 A+B+C+D1(排程)+E；push/D2/G2 未授权未做",
+  "exceptions": [
+    {
+      "id": "W-01",
+      "severity": "INFO",
+      "item": "容器 /health 的 build_id 字段仍显示 r175-20260903",
+      "reason": "/etc/data-asset/backend.env 里 APP_BUILD_ID=旧值；镜像实际内容已由 B3 四项 grep 实证为 r178。按红线未擅改 env 之外的展示性变量。",
+      "disposition": "下次 env 变更窗口（如 D2 授权时）可顺带把 APP_BUILD_ID/APP_FRONTEND_BUILD_ID 更新为 r178-20260905"
+    },
+    {
+      "id": "W-02",
+      "severity": "WARN",
+      "item": "容器内夜跑 runner 保持 r175 旧版（md5 87ff0c8f ≠ 工作区 63daf260）",
+      "reason": "Dockerfile.hotpatch 只 COPY app/ alembic/ alembic.ini，不含 scripts/。**刻意不 docker cp 新 runner**：新 runner 已接线 jhemr_login_sign_sync 子任务，cp 会导致今晚 02:00 未授权激活 G2（JHEMR 写侧）。旧 runner + 新 app 层 = F-2/FFREE3 生效 + 既有三子任务 + login_sign 不出现，恰为当前授权边界。",
+      "disposition": "G2 接线随下次用户授权一并走（届时 runner 随镜像 scripts 层修复或显式 cp）"
+    },
+    {
+      "id": "W-03",
+      "severity": "INFO",
+      "item": "前端 previous 链接沿承 r169-20260831-storage-fix 而非 r175",
+      "reason": "release_frontend.sh 的 previous 继承逻辑自 r169 起未随 r171/r175 发布更新（历史遗留）。",
+      "disposition": "真回滚点 releases/r175-20260903 完好，需要时 ln -sfn 手动指回；建议后续批次修脚本 previous 取上一个 current"
+    },
+    {
+      "id": "W-04",
+      "severity": "INFO",
+      "item": "A9 提交时 output_r180 仅含开工快照；E 段产物（本文件等）为未跟踪残留",
+      "reason": "180 禁止 reset（不能把 output_r180 从 A9 暂存区剔除），且 E 段文件晚于提交产生。",
+      "disposition": "E 段文档留待下一次授权提交时随 docs 组入库"
+    },
+    {
+      "id": "W-05",
+      "severity": "WARN",
+      "item": "批内检出并行会话改动：4 个 identity 文件在我 A5 提交后被第三方修改（未提交）",
+      "reason": "10:23:53–10:25:09 之间 backend/app/services/identity_login_sign_sync.py、jhemr_identity_adapter.py、tests/identity_login_sign_sync/test_login_sign_sync.py、tests/test_identity_sync.py 被并行会话写入「2026-09-05 003531 事故」防护逻辑（login/sign 模板补缺改为仅对无任何方式行的账户，防双默认）。时间线：我 10:22 打包 → 对方 10:24 改 → 我 10:24 用 10:22 包构建镜像 → **r178 镜像不含对方改动**（生产=我提交时状态）；对方改动留在工作区未提交、未 push、未触我的任何产出文件；生产侧无风险叠加（容器 runner login_sign=0，该子任务本就不执行）。",
+      "disposition": "按铁律不代提交、不回退他人改动；请用户知悉该并行会话（疑似针对 003531 手动登录/签名同步事故的治本修复）并裁决其入库窗口；对方改动与我的 A5 提交（bf28df6 基线）不冲突，可正常 rebase/追加提交"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "batch": "r3-flush（方案_r3 R0-R6）",
+  "executed_at": "2026-09-06 08:44",
+  "authorization": "用户点名「按照给出的方案执行」→ 方案_r3 全卡（R2 备份+R3 一次性放行）；未含 D2/G2/治本/push",
+  "exceptions": [
+    {
+      "id": "W-01",
+      "severity": "INFO",
+      "item": "R3 先刷新采集使水位终值优于预检",
+      "reason": "预检 candmax=2026-09-05T08:47:41，实际推进到 16:47:41+08（sync_his_identity 刷新带入该人当日更新值）。",
+      "disposition": "更有利（window_start 更靠前），R4.2 硬闸以实际值判定通过"
+    },
+    {
+      "id": "W-02",
+      "severity": "INFO",
+      "item": "main_success=111 与 planned=110 的口径差",
+      "reason": "111+3(skipped)=114=110 update+4 deactivate，与 batches=114 守恒自洽；deactivate 计入 success 汇总。",
+      "disposition": "R4.5 守恒判定通过，无需处置"
+    },
+    {
+      "id": "W-03",
+      "severity": "WARN",
+      "item": "R5 次夜观察未能排程",
+      "reason": "本会话由 D1 定时任务派生，CronCreate 拒绝嵌套创建（平台限制）。",
+      "disposition": "留新会话/主 AI 于 09-07 02:25 后只读复查；判定口径=方案_r3 §4.R5 二分支（个位增量 success 或 resync_unchanged 首现均算恢复）"
+    },
+    {
+      "id": "W-04",
+      "severity": "INFO",
+      "item": "R1 探针两条 grep 的 ssh 回显曾丢失",
+      "reason": "$(…) 嵌套在多命令 ssh 字符串中被吞（操作现象，与 180 批 B0 相同）。",
+      "disposition": "单独重跑取到（guard=2/runner=0），不影响判定"
+    }
+  ]
+}

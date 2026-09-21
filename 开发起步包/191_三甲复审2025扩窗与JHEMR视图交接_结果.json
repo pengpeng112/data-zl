@@ -1,0 +1,11 @@
+{
+  "doc": "191_三甲复审2025扩窗与JHEMR视图交接.md",
+  "status": "handover_for_peer_verify",
+  "plan_authority": "189_v1.1",
+  "source_writes": 0,
+  "live_ddl_patched": false,
+  "local_time_window_patched": 49,
+  "local_unchanged": 25,
+  "jhemr_drafts": 17,
+  "desktop_dir": "D:\\Users\\Administrator\\Desktop\\三甲复审\\6、数管中心三甲数据上报\\数据接口规范+值域2.3\\三甲完成视图"
+}

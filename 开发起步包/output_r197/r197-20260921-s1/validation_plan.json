@@ -1,0 +1,574 @@
+{
+ "stage": "S2",
+ "run_id": "r197-20260921-s1",
+ "note": "S6 前的探针设计增量；执行须按 §10 取得具体批准（夜窗、只读、聚合返回）；S3 增量 2026-09-21：费用守恒+键唯一性+多义分流探针；S4 增量 2026-09-21：手术放大/名称JOIN负例/值域证据/主诊断口径探针；S5 增量 2026-09-21：检验大表约束/检查覆盖/药品单据与药价/护理 VTE/半键放大/批次 1:1/医嘱四列键覆盖探针",
+ "probes": [
+  {
+   "probe_id": "S2-P001",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-86D477D1F0",
+    "S2F-C90B6003D8"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P002",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-4264E2FC1C",
+    "S2F-2DF926CEB5"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P003",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-E256C47346",
+    "S2F-BDCE2A3160"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P004",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-60FDE4D634",
+    "S2F-1008D796C9",
+    "S2F-33FFE8A421"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P005",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-1A98B5707E",
+    "S2F-2C9FE1D3B6"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P006",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-2A80F74804",
+    "S2F-040B518C68"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P007",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-50040F7BC3",
+    "S2F-3E2BBE8708"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P008",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-DB7BD1C6F6",
+    "S2F-49E28C0D3F"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P009",
+   "purpose": "组合键完整性：单列连接相对组合键的父键重复率与子键孤儿率",
+   "relation_ids": [
+    "S2F-AF65517FED",
+    "S2F-902589A969"
+   ],
+   "method": "父端 GROUP BY 单列 HAVING COUNT>1 重复率；子端单列 JOIN 后行数放大倍数 vs 组合键 JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P010",
+   "purpose": "住院万能键覆盖率（代表族抽查即可，其余族引用同一证据）",
+   "relation_ids": [],
+   "method": "PAT_VISIT(PATIENT_ID,VISIT_ID) 重复率 + 各事实表命中/孤儿率聚合",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P011",
+   "purpose": "门诊复合键真实组合：VISIT_DATE+VISIT_NO 是否需加 RCPT_NO/CLINIC_NO",
+   "relation_ids": [
+    "S2F-190AFAC505",
+    "S2F-E30E4C998C",
+    "S2F-9F870E5A7E"
+   ],
+   "method": "CLINIC_MASTER(VISIT_DATE,VISIT_NO) 重复率；OUTP_ORDER_DESC/OUTP_BILL_ITEMS 三列组合唯一性",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P012",
+   "purpose": "科室字典停用/重用：DEPT_CODE 重复与 STOP_FLAG 分布",
+   "relation_ids": [
+    "S2F-B7763F2E63",
+    "S2F-6EA01F27EA",
+    "S2F-61A57AEFD3"
+   ],
+   "method": "DEPT_DICT GROUP BY DEPT_CODE HAVING COUNT>1；重复行的 STOP_FLAG/日期区间",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P013",
+   "purpose": "员工字典：EMP_NO 唯一性 + 停用重用（姓名 JOIN 负例验证）",
+   "relation_ids": [
+    "S2F-B7763F2E63",
+    "S2F-9F870E5A7E",
+    "S2F-333D618107"
+   ],
+   "method": "STAFF_DICT EMP_NO 重复率；USER_NAME 重复率（证明姓名 JOIN 放大）",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P014",
+   "purpose": "历史变体表/临时表存在性与来源（S1 未知对象探针合并）",
+   "relation_ids": [
+    "S2F-0D77903D00",
+    "S2F-22FEDABB84",
+    "S2F-EF5AE47BD1",
+    "S2F-06B1878538",
+    "S2F-EAC7E864FF",
+    "S2F-10C9EADF7A",
+    "S2F-F8EC0A1539",
+    "S2F-9CAD506D24",
+    "S2F-29B5BD5DD7",
+    "S2F-17BB014443",
+    "S2F-6419CDF435",
+    "S2F-31768536A4",
+    "S2F-3B503C4EFC",
+    "S2F-106C981A96",
+    "S2F-8812CEEEFC"
+   ],
+   "method": "仅元数据/行数聚合探针，不取患者明细",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S2-P015",
+   "purpose": "OPERATION_MASTER.OPER_ID 与 OPERATION.OPERATION_NO 对位（已知 HIS.OPER_ID 全 NULL 为反例）",
+   "relation_ids": [
+    "S2F-A754A04130",
+    "S2F-D6E536D1CB"
+   ],
+   "method": "组合键族抽查 OPER_ID 非空率，不假设与 DOCARE/SM 同源",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P001",
+   "purpose": "门诊开单↔收据 RCPT_NO 单列相对复合键的放大倍数",
+   "relation_ids": [
+    "S3F-03501B12F4",
+    "S2F-0BF98D1B1C"
+   ],
+   "method": "OUTP_ORDER_DESC 按 RCPT_NO 父键重复率；单列 vs (RCPT_NO+VISIT_NO+VISIT_DATE) JOIN 前后行数对比",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P002",
+   "purpose": "住院费用守恒：visit 级 SUM(INP_BILL_DETAIL.COSTS) 对 INP_SETTLE_MASTER 总额列",
+   "relation_ids": [
+    "S2F-60FDE4D634",
+    "S2F-89188944F3"
+   ],
+   "method": "抽样父键（≤200 visit）聚合两侧金额，差额=0 占比；总额列名以平台元数据为准（TOTAL_COSTS 类，执行前核对）",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P003",
+   "purpose": "门诊收据金额守恒：SUM(OUTP_BILL_ITEMS.CHARGES) 与支付-退费净额按 RCPT_NO 对账",
+   "relation_ids": [
+    "S3F-FBDD22E3B6",
+    "S2F-B460DFC719"
+   ],
+   "method": "按 RCPT_NO 聚合三口径（明细 SUM、收据总额列、SUM(PAYMENT_AMOUNT)-SUM(REFUNDED_AMOUNT)）对比；退费方向字段值域待确认",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P004",
+   "purpose": "预交金三键唯一性：RCPT_NO / RCPT_NO+PATIENT_ID+VISIT_ID / CHECK_NO+BANK_CODE",
+   "relation_ids": [
+    "S3F-5FF4CF0E1A"
+   ],
+   "method": "三种键父键重复率对比；支票对账场景用 CHECK_NO+BANK_CODE",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P005",
+   "purpose": "价表多价并存与生效时间窗字段存在性",
+   "relation_ids": [
+    "S3F-170685FC38"
+   ],
+   "method": "DRUG_PRICE_LIST/PRICE_LIST 同键行数分布（=1 占比、>1 多价率）；元数据核对生效起止列名",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P006",
+   "purpose": "OPER_CODE 多义分流验证（聚合）",
+   "relation_ids": [
+    "S3F-8CF8B4B39E",
+    "S3F-D8F12989E0"
+   ],
+   "method": "INP_BILL_DETAIL 按 ITEM_CLASS 分组的 OPER_CODE LENGTH 分布 + EXAM_NO/TEST_NO/OPER_ID 命中率聚合",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P007",
+   "purpose": "INP_SETTLE_MASTER↔_YB 组合键覆盖率与 brjsh 变体核对（草稿8 vs 草稿30）",
+   "relation_ids": [
+    "S3F-0841AC6F4F"
+   ],
+   "method": "两键各自重复率与互覆盖率聚合；brjsh 列存在性以元数据为准",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S3-P008",
+   "purpose": "ID_NO 连接覆盖率（PPI：仅聚合，零值回显）",
+   "relation_ids": [
+    "S3F-007BA0B97D"
+   ],
+   "method": "聚合：命中率/重复率/孤儿率；输出仅比率数值",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   },
+   "ppi_policy": "ID_NO 值不得出现在任何输出、日志、SQL 文本回显中"
+  },
+  {
+   "probe_id": "S4-P001",
+   "purpose": "OPERATION↔OPERATION_MASTER 住院键直连放大倍数",
+   "relation_ids": [
+    "S4F-C9C945D425"
+   ],
+   "method": "同 visit 手术条数分布（两表各自 GROUP BY visit 计数）；直连 JOIN 前后行数对比；多台手术 visit 占比",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   },
+   "known_precedent": "195 号 S5 已实证 2 组同日多次手术"
+  },
+  {
+   "probe_id": "S4-P002",
+   "purpose": "OPERATION_DICT.OPERATION_NAME 重复率（名称 JOIN 负例证据）",
+   "relation_ids": [
+    "S4F-01DD31DEAC",
+    "S2F-4EB1EB7136"
+   ],
+   "method": "OPERATION_DICT GROUP BY OPERATION_NAME HAVING COUNT>1 占比；名称 JOIN 后行数放大对比 OPERATION_CODE JOIN",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S4-P003",
+   "purpose": "OPERATION_SCALE/STOP_FLAG 值域分布（待确认域证据收集）",
+   "relation_ids": [
+    "S4F-C9C945D425"
+   ],
+   "method": "OPERATION_DICT 按 OPERATION_SCALE 聚合行数（'一'/'二'/'三'/'四'/空）；STOP_FLAG 分布；只回聚合",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S4-P004",
+   "purpose": "同日多次手术样本扩展（引用 195 号先例）",
+   "relation_ids": [
+    "S4F-C9C945D425"
+   ],
+   "method": "OPERATION_MASTER 同 visit 同 START_DATE_TIME 重复度聚合；与 195 号 2 组实证对账",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S4-P005",
+   "purpose": "主诊断口径覆盖率：DIAGNOSIS_NO=1 与 DIAGNOSIS_TYPE 分布",
+   "relation_ids": [
+    "S2F-4264E2FC1C",
+    "S4F-FEB658BACB"
+   ],
+   "method": "DIAGNOSIS 按 DIAGNOSIS_TYPE 聚合行数（对照 confirmed 1/2/3/7/8）；DIAGNOSIS_NO=1 每 visit 覆盖率",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S4-P006",
+   "purpose": "术式码孤儿率：OPERATION.OPERATION_CODE→OPERATION_DICT",
+   "relation_ids": [
+    "S2F-4EB1EB7136"
+   ],
+   "method": "OPERATION 左连字典聚合未命中率；STOP_FLAG=0 过滤前后差异",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P001",
+   "purpose": "LAB_RESULT 大表约束+项目级键（单列 TEST_NO vs TEST_NO+ITEM_NO 放大）",
+   "relation_ids": [
+    "S5F-F004BB9BB0",
+    "S2F-67F8789EE2",
+    "S2F-BE6DDA7EB6"
+   ],
+   "method": "受控选 ≤200 个 TEST_NO（近窗申请单），TEST_NO 子查询限定进 LAB_RESULT；分别按两键 JOIN 前后行数与放大倍数聚合对比；结果行/项目行比率分布",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   },
+   "big_table_guard": "HIS.LAB_RESULT 约 1 亿行：必须 TEST_NO IN (子查询) 限定，外层 ROWNUM 不是全扫保护"
+  },
+  {
+   "probe_id": "S5-P002",
+   "purpose": "检查链 EXAM_NO 覆盖（ITEMS/REPORT→MASTER 命中与孤儿；EXAM_PAT_MI 覆盖率）",
+   "relation_ids": [
+    "S2F-EE88384570",
+    "S2F-85177FB98A",
+    "S5F-FC41ABDDDA"
+   ],
+   "method": "近窗 EXAM_MASTER 左连 ITEMS/REPORT 聚合未命中率；EXAM_CLASS 中文值分布；EXAM_PAT_MI 两列键命中率",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P003",
+   "purpose": "药品单据 DOCUMENT_NO 唯一性（全库房 vs 分库房）+库存真实粒度",
+   "relation_ids": [
+    "S5F-57E6B624A0",
+    "S5F-8B65E05346"
+   ],
+   "method": "DOCUMENT_NO 重复率聚合（全表域 vs +STORAGE 分组）；DRUG_STOCK 按药码+规格行数分布（库房/批号维度存在性）",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P004",
+   "purpose": "药价三列键多价并存+生效期缺口",
+   "relation_ids": [
+    "S5F-C438A80C4D",
+    "RCP-S3-04"
+   ],
+   "method": "DRUG_PRICE_LIST 同三列键有效行数分布（多价并存率）；生效起止列空值率",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P005",
+   "purpose": "移动护理 VTE 键验证（pat_index_no 命中+form_id 唯一+重复评估分布）",
+   "relation_ids": [
+    "S5F-26095F1933",
+    "S5F-2A342EA32E"
+   ],
+   "method": "近窗 INPATIENTS 左连 MCS_DOC_FORM 命中率；form.id 在 records 中重复率；同 (patient_uid,template_code,住院次) 评估次数分布",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   },
+   "source_note": "移动护理 Oracle（或 ods_ydhl 镜像，按五要素通道执行；实例身份待核）"
+  },
+  {
+   "probe_id": "S5-P006",
+   "purpose": "处方半键放大（PRESC_NO 单列 vs +PRESC_DATE）",
+   "relation_ids": [
+    "S5F-DC6165C54E",
+    "S2F-A4F3F1FA73"
+   ],
+   "method": "近窗 PRESC_NO 值在 DRUG_PRESC_MASTER 出现次数分布（跨日复用率）；单列 JOIN 前后行数对比",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P007",
+   "purpose": "检验批次↔申请单 1:1 验证",
+   "relation_ids": [
+    "S5F-D4F66B37E7",
+    "S5F-A2C52B1B9D"
+   ],
+   "method": "近窗 LAB_TEST_MASTER 左连 BATCH_MASTER 命中率；TEST_NO 在 BATCH_MASTER 重复率；PATIENT_ID 单列放大倍数（半键实证）",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  },
+  {
+   "probe_id": "S5-P008",
+   "purpose": "ORDERS 四列键三表覆盖（EXECUTE_DETAILS/DISPENSE_REC/DISPENSE_PRE/ANTI_DRUG）",
+   "relation_ids": [
+    "S5F-F8FAA6C79C",
+    "S5F-AB4C2AA3D7"
+   ],
+   "method": "近窗 ORDERS（限定科室/时间窗）四列键在四张下游表的命中率、重复度与一嘱多执行分布",
+   "bounds": {
+    "parent_keys_max": 200,
+    "agg_rows_max": 50,
+    "timeout_s": 30,
+    "channel": "只读，夜窗执行（需按 §10 批准）"
+   }
+  }
+ ]
+}

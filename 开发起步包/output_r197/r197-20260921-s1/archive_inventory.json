@@ -1,0 +1,1504 @@
+{
+ "archives": [
+  {
+   "id": "F0138",
+   "file": "小孙SQL.rar",
+   "bytes": 204336,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "SQL\\2022年02月 14-27.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年02月 28-06.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年02月 8-13.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年03月 07-13.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年03月 14-20.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年03月 21-27.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年03月 28-03.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年04月 04-10.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年04月 11-17.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年04月 25-01.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年05月 09-15.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年05月 16-22.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年05月 23-29.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年05月 30-05.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年06月 06-12.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年06月 13-19.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年06月 20-26.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年06月 27-03.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年07月 05-10.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年07月 11-17.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年07月 18-24.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年07月 25-31.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年08月 01-07.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年08月 08-14.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年08月 15-21.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年08月 22-28.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年08月 29-04.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年09月 05-11.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年09月 13-18.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年09月 19-25.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年09月 26-02.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年10月 03-16.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年10月 17-23.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年10月 24-30.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年10月 31-06.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年11月 07-13.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年11月 14-20.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年11月 21-26.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年11月 28-04.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年12月 05-11.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年12月 19-25.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2022年12月 26-31.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2023年01月 02-08.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\2023年01月 09-15.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\优抚调账.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\医嘱摆药SQL.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\可用.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\处方.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\摆药.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\病案上报数据校对.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\结余留用-可用.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\结余留用.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\账不平.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL\\门诊诊间结算数据.sql",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "SQL",
+     "size": null,
+     "encrypted": false,
+     "action": "skipped_ext"
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0228",
+   "file": "小孙遗产\\3绩效系统\\images\\ljcomm.rar",
+   "bytes": 74993,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "ljcomm.pbl",
+     "size": null,
+     "encrypted": false,
+     "action": "skipped_ext"
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0345",
+   "file": "常用sql语句董鑫田.zip",
+   "bytes": 20351,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "按手术取总人数  平均住院日  平均总费用   按月 和 季度.txt",
+     "size": 3921,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "2周与一个月内再住院例数.txt",
+     "size": 1075,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "出院诊断为急性脑梗死、脑出血、颅内感染、癫痫、格林巴列综合征的出院病人，按月份给予相关信息：姓名、住院号、诊断、入院时间、住院天数、住院费.txt",
+     "size": 1321,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "住院患者信息，包括姓名、入院日期、出院日期、住院天数、住院费用、出院方式、出院诊断.txt",
+     "size": 1306,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "麻醉时间统计.txt",
+     "size": 705,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "手术时长统计.txt",
+     "size": 978,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "住院的有影像检查的，做过手术的病病理诊断.txt",
+     "size": 998,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "会诊数据.txt",
+     "size": 1181,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "特抗药专家.txt",
+     "size": 51,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "医保办提取drgs数据.sql",
+     "size": 23587,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "药房结余留用.txt",
+     "size": 4448,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "抗菌办查询医嘱开具（非处方）的抗菌药信息.txt",
+     "size": 940,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "泌尿科DRG7-9月数据.txt",
+     "size": 1914,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "修改住院次数可能涉及的表.txt",
+     "size": 1515,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "发热门诊挂号量和医生所在科室对照.txt",
+     "size": 396,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "鼻科2021年全年住院人数，入院科室为鼻科一，住院号，姓名，性别，年龄，病案首页出院诊断（诊断顺序按病案首页出院诊断为准），手术名称.txt",
+     "size": 1796,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "2021年度静脉血栓栓塞风险评估（VTE评估）.txt",
+     "size": 777,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "绩效办取便民门诊开单医生报表，具体到医生.txt",
+     "size": 3172,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "2022春节期间耳鼻喉开单手术费明细.txt",
+     "size": 664,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "造影数据.txt",
+     "size": 1264,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "节假日入院病人费用明细.txt",
+     "size": 4610,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "提取价表SQL.txt",
+     "size": 1337,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "账不平.txt",
+     "size": 395,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    },
+    {
+     "name": "财务上报数据.sql",
+     "size": 5847,
+     "encrypted": false,
+     "action": "error:FileNotFoundError"
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0442",
+   "file": "糖尿病数据提取\\提取语句\\提取语句-住院.rar",
+   "bytes": 5346,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "住院病人信息.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院登记.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院费用.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院化验报告.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院检查报告.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院医嘱.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "住院诊断.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0443",
+   "file": "糖尿病数据提取\\提取语句\\提取语句-门诊.rar",
+   "bytes": 4863,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "门诊病人信息.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊处方.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊化验报告.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊检查报告.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊诊断.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊登记.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "门诊费用.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0451",
+   "file": "糖尿病数据提取\\糖尿病住院数据.rar",
+   "bytes": 14294003,
+   "role": "data_list_only",
+   "members": [
+    {
+     "name": "住院病人信息.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院登记.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院费用.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院化验报告.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院检查报告.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院医嘱.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "住院诊断.xls",
+     "size": null,
+     "encrypted": false
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0452",
+   "file": "糖尿病数据提取\\糖尿病门诊数据.rar",
+   "bytes": 50627346,
+   "role": "data_list_only",
+   "members": [
+    {
+     "name": "门诊费用2018.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊处方.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊费用2023.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊费用2022.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊费用2021.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊费用2020.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊费用2019.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊登记.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊化验报告.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊检查报告.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊诊断.xls",
+     "size": null,
+     "encrypted": false
+    },
+    {
+     "name": "门诊病人信息.xls",
+     "size": null,
+     "encrypted": false
+    }
+   ],
+   "error": null
+  },
+  {
+   "id": "F0526",
+   "file": "绩效办提取语句\\提取语句\\其他数据提取\\提取语句.rar",
+   "bytes": 10287,
+   "role": "statement_archive",
+   "members": [
+    {
+     "name": "床旁出入院.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "放疗工作量sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "介入工作量sql(2).txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "介入手术项目收入明细.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "影像科工作量sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "不占药耗比\\住院.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "不占药耗比\\汇总取明细.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "不占药耗比\\门诊不占.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\产房护理工作量.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\介入科sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\内镜中心sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\急诊转费sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\病房护理单元sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\耳鼻喉保健病房工作量提取sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\门诊护理工作量sql.txt",
+     "size": null,
+     "encrypted": false,
+     "action": "extracted"
+    },
+    {
+     "name": "不占药耗比",
+     "size": null,
+     "encrypted": false,
+     "action": "skipped_ext"
+    },
+    {
+     "name": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）",
+     "size": null,
+     "encrypted": false,
+     "action": "skipped_ext"
+    }
+   ],
+   "error": null
+  }
+ ],
+ "extracted": [
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年02月 14-27.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年02月 14-27.sql",
+   "bytes": 19728,
+   "sha256": "86c79e2da3cbdd8450c798f5861ed07905182aa5f83e83d622a0b402272833f9",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年02月 28-06.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年02月 28-06.sql",
+   "bytes": 15100,
+   "sha256": "653dd021c751fe4088e411703c8f1e585d1c72a30030a38f1e934eee27fad617",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年02月 8-13.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年02月 8-13.sql",
+   "bytes": 19743,
+   "sha256": "13d85147ff3b8a2a2df627ba61357cf847fb2f4be24fbe02637fdb290a605427",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年03月 07-13.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年03月 07-13.sql",
+   "bytes": 12328,
+   "sha256": "6db7923a5bd41a32a5f46a7539f71982ea8ffbed3ed079f8c87ff8b7365e7cbf",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年03月 14-20.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年03月 14-20.sql",
+   "bytes": 11910,
+   "sha256": "e478915d000083c5dd9600ad7b295e72eb1722f06929d30d395d497d569aab81",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年03月 21-27.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年03月 21-27.sql",
+   "bytes": 14662,
+   "sha256": "68d42c041e37ae2ee6b073a23209936fd4a9e0d76415d2108a03835107374495",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年03月 28-03.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年03月 28-03.sql",
+   "bytes": 10755,
+   "sha256": "73e56c29e0d2ed1a4da729d0c5d27459d662b171652b1fb8f581d98c655b13a6",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年04月 04-10.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年04月 04-10.sql",
+   "bytes": 8846,
+   "sha256": "65200fa72e1a9f64bea82564bf29f1df8a7296429bc2ac843a47a88ee6b1a8b2",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年04月 11-17.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年04月 11-17.sql",
+   "bytes": 16812,
+   "sha256": "e29946f2125f1ef94208fb4217fd89a76cc4e000c2fa114d1b2b54966eae5c15",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年04月 25-01.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年04月 25-01.sql",
+   "bytes": 10545,
+   "sha256": "b1531064786e60b9525d7d49b85b55ccb795b27bc421e3438d56bd05172853f4",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年05月 09-15.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年05月 09-15.sql",
+   "bytes": 36957,
+   "sha256": "2e2cc2ddf3b6153b0897b07ed305d7cdc4dd3ea0532e886a97781d168ac940e7",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年05月 16-22.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年05月 16-22.sql",
+   "bytes": 14416,
+   "sha256": "ae50783ff91bd51b9a16d59cc3874f8a3297dae31b81454f4f6b654f3319b538",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年05月 23-29.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年05月 23-29.sql",
+   "bytes": 16114,
+   "sha256": "4cacdab1981e63245716ffb04c4580a69961b29bb2e463e8bbf9f8485e3fe597",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年05月 30-05.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年05月 30-05.sql",
+   "bytes": 11694,
+   "sha256": "f63661d02876447b7054a70495d58fe4eea28b1e115edb0639ec5a27216ef660",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年06月 06-12.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年06月 06-12.sql",
+   "bytes": 21421,
+   "sha256": "01d5d9dfa0c2caa72042e915aa2f0fc162bcb1f75227d06d0363d84b7d44af98",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年06月 13-19.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年06月 13-19.sql",
+   "bytes": 14557,
+   "sha256": "ac99ce28dd34bf430c630c7807ac8b1382007291f0d2b33199bc35bdc2aeac55",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年06月 20-26.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年06月 20-26.sql",
+   "bytes": 10489,
+   "sha256": "f0fb42b4c81d695d83173400fb547ed70a316991a0a3f662df8a01187e35a8a6",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年06月 27-03.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年06月 27-03.sql",
+   "bytes": 19134,
+   "sha256": "5a5c4acbabcb038d4bf49d0488cb24c4bc75847e91653fd5d40651e622e06cfb",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年07月 05-10.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年07月 05-10.sql",
+   "bytes": 10351,
+   "sha256": "5b88527868ca47fa129371d9996cdd9efff3a7624e2589da8df31deefabf0485",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年07月 11-17.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年07月 11-17.sql",
+   "bytes": 11414,
+   "sha256": "689a395c06a8241ce7af6275b52026be54621cf4256c0c12bc54482440e6a2ee",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年07月 18-24.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年07月 18-24.sql",
+   "bytes": 20814,
+   "sha256": "113f5f4f8962c2c8a4a622fcdbbde79d210375ee85e1ab48b9bb73b0397b01f0",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年07月 25-31.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年07月 25-31.sql",
+   "bytes": 13583,
+   "sha256": "f305dcd88bbb0188e5d48e0bb03f520e76b02821717472a321b0ed601d0ad5a9",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年08月 01-07.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年08月 01-07.sql",
+   "bytes": 44885,
+   "sha256": "106f0cbcc09edc0c999f024242669cb1c78501c35ba5e3d8c1d6197ec15cfa63",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年08月 08-14.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年08月 08-14.sql",
+   "bytes": 26096,
+   "sha256": "494d5d453d3bbe05435584935bf7db5aa25486688456e922bc7b51684a019787",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年08月 15-21.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年08月 15-21.sql",
+   "bytes": 15774,
+   "sha256": "703d1a5e7650a04709fb159e57e63c8b64918f14e5429a4364b94a956957ee26",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年08月 22-28.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年08月 22-28.sql",
+   "bytes": 37936,
+   "sha256": "b5dc3f293a469a8726f02382cc58b7303205ba3990b6756e1586eedeb82b4049",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年08月 29-04.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年08月 29-04.sql",
+   "bytes": 44938,
+   "sha256": "d442cae3b790cf355c5e2d8970075c4b100addc11011b8685e7c1ba92059e143",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年09月 05-11.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年09月 05-11.sql",
+   "bytes": 27375,
+   "sha256": "2fbdcd81099e8f1d1f3deeccf8c2fb613a74f757ac488f3159582e473fabc14e",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年09月 13-18.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年09月 13-18.sql",
+   "bytes": 10377,
+   "sha256": "3c1853fe3f676dfe14bb3b92314bb509c845025f5ac3c3215c88dc3ca76b0695",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年09月 19-25.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年09月 19-25.sql",
+   "bytes": 17916,
+   "sha256": "d9cd92b75d2c36e59e6559dce3a6a9e794b70b6b5e43c80212169b926bc7eabb",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年09月 26-02.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年09月 26-02.sql",
+   "bytes": 33631,
+   "sha256": "a2858937c59bd092973c69b737a1e7b0664cc7fc6ef71d3cce27425efdb33e88",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年10月 03-16.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年10月 03-16.sql",
+   "bytes": 44903,
+   "sha256": "b758ccce206bf4bb6403481a2afe6886557023b96608259f25928a19a38344d1",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年10月 17-23.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年10月 17-23.sql",
+   "bytes": 22996,
+   "sha256": "578ac169a8344d52af8f974f1ac6de48a9e1635a7a8eaf12cd1748b31f126288",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年10月 24-30.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年10月 24-30.sql",
+   "bytes": 46638,
+   "sha256": "f5a594d85b65b2905d885e464025a40f6deecc6df465fe8e7e9c1fa25eeaa33d",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年10月 31-06.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年10月 31-06.sql",
+   "bytes": 13431,
+   "sha256": "45867826ff6f9ae3a7a86a8e2ea10c70796de0c58885e13ab5f411b84fa71c0e",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年11月 07-13.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年11月 07-13.sql",
+   "bytes": 24015,
+   "sha256": "e0197de42219af395e17805292793cd7533c40f5ae409419d32efb08bfb5232c",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年11月 14-20.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年11月 14-20.sql",
+   "bytes": 17538,
+   "sha256": "62e0e84fd88ba81c75f03b3805f740b9c0776dcc978b9a8ebb2158d337a7e570",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年11月 21-26.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年11月 21-26.sql",
+   "bytes": 19055,
+   "sha256": "ece55fb8bdca3cf909190a332e9bf6415294e38d191c2385f2ceae4b07ba0ce8",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年11月 28-04.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年11月 28-04.sql",
+   "bytes": 28508,
+   "sha256": "badc8c2f451863ff719b04053c0669696ba3dc134760d59d92d5b68f4443db4f",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年12月 05-11.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年12月 05-11.sql",
+   "bytes": 33352,
+   "sha256": "9c8f47afaec316253c3bbde8536a560270750522776ff531b982d06d3986ac98",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年12月 19-25.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年12月 19-25.sql",
+   "bytes": 2088,
+   "sha256": "7697b16e9bdbd8ebaee67991e1c3e0abc12da765b2264ac032fda4286c6c7110",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2022年12月 26-31.sql",
+   "dest": "_archive_members\\F0138\\SQL_2022年12月 26-31.sql",
+   "bytes": 9088,
+   "sha256": "e3423e3400ee980b6d8dd463e879757532cf17b9a090592d8bf82af0d0ca0920",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2023年01月 02-08.sql",
+   "dest": "_archive_members\\F0138\\SQL_2023年01月 02-08.sql",
+   "bytes": 12657,
+   "sha256": "2f9f28af044c7cd495c369eb42bc98e8ac3abb22adf296f01ed3649fc87bff83",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\2023年01月 09-15.sql",
+   "dest": "_archive_members\\F0138\\SQL_2023年01月 09-15.sql",
+   "bytes": 11415,
+   "sha256": "66cc3ce54091430b962f210baad24e25fa788ac1bf4f308d49352dd913f18135",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\优抚调账.sql",
+   "dest": "_archive_members\\F0138\\SQL_优抚调账.sql",
+   "bytes": 1489,
+   "sha256": "883e722a46738f2e522e7679d0df994cef1d027979e16056f4bf3864bacb7514",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\医嘱摆药SQL.sql",
+   "dest": "_archive_members\\F0138\\SQL_医嘱摆药SQL.sql",
+   "bytes": 6875,
+   "sha256": "6dd1a564bd586d6b006edb82174602fdcc12b13f2fbac72fac04b66cf95a034d",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\可用.sql",
+   "dest": "_archive_members\\F0138\\SQL_可用.sql",
+   "bytes": 4611,
+   "sha256": "d4f88f61a9b04ac0fc963eaa23e8d2491333d63ded2bba2b5aabc753d0974ec6",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\处方.sql",
+   "dest": "_archive_members\\F0138\\SQL_处方.sql",
+   "bytes": 6970,
+   "sha256": "8dc99457bc3a8a0814776c0c56fcd050496fb583da6e8cff97c2fcfffc852886",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\摆药.sql",
+   "dest": "_archive_members\\F0138\\SQL_摆药.sql",
+   "bytes": 4497,
+   "sha256": "f65e59dcd3da7b2409c9ab0a1ba42541ba57fc65e4f5291a2caed6462ade6a4e",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\病案上报数据校对.sql",
+   "dest": "_archive_members\\F0138\\SQL_病案上报数据校对.sql",
+   "bytes": 1503,
+   "sha256": "2e62f4e3bd9ebe61077a6b38a619c360126639b562051e61b336b73d0485d66b",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\结余留用-可用.sql",
+   "dest": "_archive_members\\F0138\\SQL_结余留用-可用.sql",
+   "bytes": 4531,
+   "sha256": "7346ac2eade643fbad3dcbb6680a042f586ba1ba59b9c7b4410709ad3966af9e",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\结余留用.sql",
+   "dest": "_archive_members\\F0138\\SQL_结余留用.sql",
+   "bytes": 2290,
+   "sha256": "336d639bfea4a074fccbe101f8cbe2765b635398d3b85342761fb9d5656bfcbe",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\账不平.sql",
+   "dest": "_archive_members\\F0138\\SQL_账不平.sql",
+   "bytes": 603,
+   "sha256": "6ca238b34aa00d9d25fb8738c25f77d6a0cfb6e78e6d161d689d91784b088c70",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0138",
+   "member": "SQL\\门诊诊间结算数据.sql",
+   "dest": "_archive_members\\F0138\\SQL_门诊诊间结算数据.sql",
+   "bytes": 2003,
+   "sha256": "27829a949b93a3a90deed12f8bc1a932341f2f4d0532b7b9e7ea6f47f41f991d",
+   "ext": ".sql"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院病人信息.txt",
+   "dest": "_archive_members\\F0442\\住院病人信息.txt",
+   "bytes": 2550,
+   "sha256": "e15de2ab14a050688e88a6bcf144e36265b61553da629648451671aa49c3dcfa",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院登记.txt",
+   "dest": "_archive_members\\F0442\\住院登记.txt",
+   "bytes": 1659,
+   "sha256": "1512cd3a36fb56899efd0ef3a2667220e233ab9ab206dbef0831d6b2d10b12e7",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院费用.txt",
+   "dest": "_archive_members\\F0442\\住院费用.txt",
+   "bytes": 1798,
+   "sha256": "c8c2522c54eb0f6dca3e14d629ede129cb778cb0ae06bc7d1633b58297e4aa74",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院化验报告.txt",
+   "dest": "_archive_members\\F0442\\住院化验报告.txt",
+   "bytes": 1698,
+   "sha256": "d7341f06b6c62806b989291e32beae367ad1712462dd245d14eacc973a3275c4",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院检查报告.txt",
+   "dest": "_archive_members\\F0442\\住院检查报告.txt",
+   "bytes": 1844,
+   "sha256": "1dfaa591c84fd5b7e06e597b7637e2f40d6b6fc635f15201f4a6e071b59ee3c6",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院医嘱.txt",
+   "dest": "_archive_members\\F0442\\住院医嘱.txt",
+   "bytes": 2854,
+   "sha256": "364cddd29214606e0a88c9e0ec22a5f016ecc5570bd8d5ba54272b3955265647",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0442",
+   "member": "住院诊断.txt",
+   "dest": "_archive_members\\F0442\\住院诊断.txt",
+   "bytes": 1762,
+   "sha256": "aa02bfd57f4b7d2c09b2b21e5e4f297795b5f69001eafe6aae8ba5baedce71de",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊病人信息.txt",
+   "dest": "_archive_members\\F0443\\门诊病人信息.txt",
+   "bytes": 2277,
+   "sha256": "c2b191c6043d4d72fa00d86aa0047dbff0e0e80c7520e105d849be577dc2370b",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊处方.txt",
+   "dest": "_archive_members\\F0443\\门诊处方.txt",
+   "bytes": 1541,
+   "sha256": "a3ff259c80f68a5f88cba614750e7e98b63666252040b6f445f0a7cc4a6d1c25",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊化验报告.txt",
+   "dest": "_archive_members\\F0443\\门诊化验报告.txt",
+   "bytes": 1495,
+   "sha256": "59162647120a8e27e59980cebbfe3a92d779908835dafebaf324e1672939c1ef",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊检查报告.txt",
+   "dest": "_archive_members\\F0443\\门诊检查报告.txt",
+   "bytes": 1643,
+   "sha256": "99995b19c80195c3de82cc804311e243843edab78322fd4fce188e115d83385c",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊诊断.txt",
+   "dest": "_archive_members\\F0443\\门诊诊断.txt",
+   "bytes": 1212,
+   "sha256": "a26488e0091cb09dee497ced470aefac160ba403f3c15298107fe6a7262aea53",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊登记.txt",
+   "dest": "_archive_members\\F0443\\门诊登记.txt",
+   "bytes": 1411,
+   "sha256": "093f20b3f08d893be22abcb0793e927c4ac89a494beeb060082713b2a0b97d87",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0443",
+   "member": "门诊费用.txt",
+   "dest": "_archive_members\\F0443\\门诊费用.txt",
+   "bytes": 1744,
+   "sha256": "c081586a60368d50bc657170acca80996cdd3e91a8395598df3194dbffc5d94a",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "床旁出入院.txt",
+   "dest": "_archive_members\\F0526\\床旁出入院.txt",
+   "bytes": 1655,
+   "sha256": "af70d65d8b42573498b10364ff0711ed4df44c88144c79339a41bdca53868318",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "放疗工作量sql.txt",
+   "dest": "_archive_members\\F0526\\放疗工作量sql.txt",
+   "bytes": 2387,
+   "sha256": "0d034ea3276d56c93c32b7111b0f76e31a218ed7a2e8d91cfbee84e0f9259aed",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "介入工作量sql(2).txt",
+   "dest": "_archive_members\\F0526\\介入工作量sql(2).txt",
+   "bytes": 5694,
+   "sha256": "ab2162e1b9c59b4abf3f3e6d78e6d7f5c4108074b00ff8ceda71bf4d6bd4dab9",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "介入手术项目收入明细.txt",
+   "dest": "_archive_members\\F0526\\介入手术项目收入明细.txt",
+   "bytes": 1582,
+   "sha256": "983bfc295a32771776f4520ca272034a3563a7ebe0cd9151b9c29f6fa7c1a26a",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "影像科工作量sql.txt",
+   "dest": "_archive_members\\F0526\\影像科工作量sql.txt",
+   "bytes": 1719,
+   "sha256": "b067e6ce06dee87cdc2e37e39d339da5f86f0377444e2cbdeccccfba05adbe38",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "不占药耗比\\住院.txt",
+   "dest": "_archive_members\\F0526\\不占药耗比_住院.txt",
+   "bytes": 462,
+   "sha256": "059f08a0037606f848165b084b1741f9614fca9a298bf78fcd4360be615e61b1",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "不占药耗比\\汇总取明细.txt",
+   "dest": "_archive_members\\F0526\\不占药耗比_汇总取明细.txt",
+   "bytes": 3695,
+   "sha256": "0aff0ce395f889f1608b5ade4fee0255cdb9e482e58daf6b9c007e527fe2a228",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "不占药耗比\\门诊不占.txt",
+   "dest": "_archive_members\\F0526\\不占药耗比_门诊不占.txt",
+   "bytes": 533,
+   "sha256": "d682554cd16f2d420d80f2013fe69529b82d2be55ff65d16ae986d8eec8272bc",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\产房护理工作量.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_产房护理工作量.txt",
+   "bytes": 1433,
+   "sha256": "0a44f368397a497d6b10a7aa1aee0b96e93a1dc2e06e470bc166ddd94962a74f",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\介入科sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_介入科sql.txt",
+   "bytes": 1829,
+   "sha256": "4f2922f866ba4f1cd9ad07089dc0038793609b5592b0f79fc2f477fc6aee5637",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\内镜中心sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_内镜中心sql.txt",
+   "bytes": 998,
+   "sha256": "171a7383f977227feb8f73a71d46799329191c1c12395347065b70c84763f85a",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\急诊转费sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_急诊转费sql.txt",
+   "bytes": 604,
+   "sha256": "740927715876b5e0e2fa929a37ecc6e6f0e46e68d01738ec5895e5d645e9d77e",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\病房护理单元sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_病房护理单元sql.txt",
+   "bytes": 1240,
+   "sha256": "5fae151ddf41ddc00fd5c68849d04d3d79426b0c4d384c420b56362f778f60c6",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\耳鼻喉保健病房工作量提取sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_耳鼻喉保健病房工作量提取sql.txt",
+   "bytes": 1685,
+   "sha256": "e94608ab3fc4a105a9453739340f9a9c6ad3c58b4c9f5bdc65f9bbcfcdbc584a",
+   "ext": ".txt"
+  },
+  {
+   "archive_id": "F0526",
+   "member": "护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）\\门诊护理工作量sql.txt",
+   "dest": "_archive_members\\F0526\\护理项目（病房、门诊、急诊转费、保健病房、产房、内镜）_门诊护理工作量sql.txt",
+   "bytes": 479,
+   "sha256": "9d36e85c61d5d29b8b647dab04639ca499f9a211aac7d40c407fa3ccfb36a884",
+   "ext": ".txt"
+  }
+ ],
+ "errors": []
+}

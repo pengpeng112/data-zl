@@ -1,0 +1,376 @@
+{
+ "run_id": "r197-20260921-s1",
+ "stage": "S6",
+ "approval": {
+  "granted_in_session": "2026-09-21（用户接续指令：S6 探针批准在本会话授予，窗口/通道按探针包所列）",
+  "window": "本会话内执行；每源串行、单条间隔执行",
+  "channel": "sjzc live 受控连接器（8.83 容器，平台只读硬校验+大表门禁，凭据零接触）",
+  "bounds": {
+   "parent_keys_max": 200,
+   "agg_rows_max": 50,
+   "timeout_s": 30,
+   "channel_cap_s": 120
+  },
+  "big_table_guards": "LAB_RESULT 仅以 TEST_NO IN (子查询) 限定；INP_BILL_DETAIL 以 EXISTS(患者+就诊) 限定；聚合返回，无患者明细"
+ },
+ "probes": [
+  {
+   "uid": "Q01",
+   "probe_ids": [
+    "S2-P002",
+    "S2-P004",
+    "S2-P009"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "PAT_VISIT 近窗 VISIT_ID 单列组内患者数（单列连接跨患者串号分母）",
+   "select_sha1": "056e5586114a9efe162415a69d62f39f014dc366",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-01' AND DISCHARGE_DATE_TIME < DATE'2026-09-21'), g AS (SELECT VISIT_ID k, COUNT(*) n FROM pv GROUP BY VISIT_ID) SELECT (SELECT COUNT(*) FROM pv) pv_rows, (SELECT COUNT(*) FROM g) visit_id_groups, (SELECT NVL(MAX(n),0) FROM g) max_patients_per_visit_id, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) dup_visit_ids FROM dual"
+  },
+  {
+   "uid": "Q02",
+   "probe_ids": [
+    "S2-P001",
+    "S2-P010"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "住院万能键唯一性 + 同患者多次住院占比（PATIENT_ID 单列连接缺 VISIT_ID 的放大分母）",
+   "select_sha1": "0d4a1e84fe34ec677335d2a2c4281b573c435dab",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-01' AND DISCHARGE_DATE_TIME < DATE'2026-09-21'), c AS (SELECT PATIENT_ID, COUNT(*) n FROM pv GROUP BY PATIENT_ID) SELECT (SELECT COUNT(*) FROM pv) pv_rows, (SELECT COUNT(*) FROM (SELECT PATIENT_ID, VISIT_ID FROM pv GROUP BY PATIENT_ID, VISIT_ID HAVING COUNT(*) > 1)) dup_visit_keys, (SELECT COUNT(*) FROM c) patients, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM c) multi_visit_patients, (SELECT NVL(MAX(n),0) FROM c) max_visits_per_patient FROM dual"
+  },
+  {
+   "uid": "Q03",
+   "probe_ids": [
+    "S2-P003",
+    "S2-P011"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "CLINIC_MASTER 近窗 CLINIC_NO 与 (VISIT_DATE,VISIT_NO) 重复率",
+   "select_sha1": "33b1ebaab21390257c75f9ad50380454e747c873",
+   "sql": "WITH cm AS (SELECT CLINIC_NO, VISIT_DATE, VISIT_NO FROM OUTPADM.CLINIC_MASTER WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21'), g1 AS (SELECT CLINIC_NO k, COUNT(*) n FROM cm GROUP BY CLINIC_NO), g2 AS (SELECT VISIT_DATE, VISIT_NO, COUNT(*) n FROM cm GROUP BY VISIT_DATE, VISIT_NO) SELECT (SELECT COUNT(*) FROM cm) rows_, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g1) dup_clinic_no, (SELECT NVL(MAX(n),0) FROM g1) max_per_clinic_no, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g2) dup_visit_date_no, (SELECT NVL(MAX(n),0) FROM g2) max_per_visit_date_no FROM dual"
+  },
+  {
+   "uid": "Q04",
+   "probe_ids": [
+    "S2-P005"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "PATS_IN_HOSPITAL PATIENT_ID 组内行数（在院表单列重复）",
+   "select_sha1": "2011127c94599e1df7ef0f1ae086b53a8f50422d",
+   "sql": "WITH g AS (SELECT PATIENT_ID, COUNT(*) n FROM INPADM.PATS_IN_HOSPITAL GROUP BY PATIENT_ID) SELECT (SELECT COUNT(*) FROM g) patients, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) dup_patients, (SELECT NVL(MAX(n),0) FROM g) max_rows FROM dual"
+  },
+  {
+   "uid": "Q05",
+   "probe_ids": [
+    "S2-P006",
+    "S3-P001"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "门诊收据键：OUTP_BILL_ITEMS/OUTP_ORDER_DESC 近窗 RCPT_NO 单列与三列组重复",
+   "select_sha1": "d4642e60e83ffdf884520c2bd5d0e6e2d8b1bdb8",
+   "sql": "WITH gb AS (SELECT RCPT_NO, COUNT(*) n FROM OUTPBILL.OUTP_BILL_ITEMS WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21' GROUP BY RCPT_NO), go1 AS (SELECT RCPT_NO, COUNT(*) n FROM OUTPBILL.OUTP_ORDER_DESC WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21' GROUP BY RCPT_NO), go3 AS (SELECT RCPT_NO, VISIT_NO, VISIT_DATE, COUNT(*) n FROM OUTPBILL.OUTP_ORDER_DESC WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21' GROUP BY RCPT_NO, VISIT_NO, VISIT_DATE) SELECT (SELECT COUNT(*) FROM gb) bill_rcpt_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM gb) bill_rcpt_dup, (SELECT COUNT(*) FROM go1) order_rcpt_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM go1) order_rcpt_dup, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM go3) order_triple_dup FROM dual"
+  },
+  {
+   "uid": "Q06",
+   "probe_ids": [
+    "S2-P012"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "DEPT_DICT DEPT_CODE 重复与 STOP_FLAG 分布（停用/重用）",
+   "select_sha1": "20285611d2a703b64fcdff20cf1e2deef9ede612",
+   "sql": "WITH g AS (SELECT DEPT_CODE, COUNT(*) n FROM COMM.DEPT_DICT GROUP BY DEPT_CODE), s AS (SELECT STOP_FLAG, COUNT(*) n FROM COMM.DEPT_DICT GROUP BY STOP_FLAG) SELECT (SELECT COUNT(*) FROM g) codes, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) dup_codes, (SELECT COUNT(*) FROM s) stop_flag_values FROM dual"
+  },
+  {
+   "uid": "Q07",
+   "probe_ids": [
+    "S2-P013"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "STAFF_DICT EMP_NO 唯一性与 USER_NAME 重复（姓名 JOIN 负例分母，只回计数）",
+   "select_sha1": "8af9dcf400f080a49e242ddbc3cdb0a4495fad4f",
+   "sql": "WITH ge AS (SELECT EMP_NO, COUNT(*) n FROM COMM.STAFF_DICT GROUP BY EMP_NO), gn AS (SELECT USER_NAME, COUNT(*) n FROM COMM.STAFF_DICT GROUP BY USER_NAME) SELECT (SELECT COUNT(*) FROM ge) emp_nos, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM ge) dup_emp_no, (SELECT COUNT(*) FROM gn) names_, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM gn) dup_names, (SELECT NVL(MAX(n),0) FROM gn) max_per_name FROM dual"
+  },
+  {
+   "uid": "Q08",
+   "probe_ids": [
+    "S2-P014"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "历史变体表存在性（PAT_VISIT_NEW/BIS/TEMP）",
+   "select_sha1": "837ab1306daa46452f25d9fd001561ea399c3ed1",
+   "sql": "SELECT OWNER, TABLE_NAME, NVL(NUM_ROWS,0) num_rows FROM ALL_TABLES WHERE TABLE_NAME IN ('PAT_VISIT_NEW','PAT_VISIT_BIS','PAT_VISIT_TEMP')"
+  },
+  {
+   "uid": "Q09",
+   "probe_ids": [
+    "S2-P015"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "MEDREC.OPERATION 近窗 OPER_ID 非空率（AGENTS 历史证据活库复核）",
+   "select_sha1": "4f222c7e1b900f82adf0daf7e051a07f4abfb7ef",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), o AS (SELECT OPER_ID, OPERATION_NO FROM MEDREC.OPERATION op WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = op.PATIENT_ID AND pv.VISIT_ID = op.VISIT_ID)) SELECT (SELECT COUNT(*) FROM pv) visits, (SELECT COUNT(*) FROM o) oper_rows, (SELECT NVL(SUM(CASE WHEN OPER_ID IS NOT NULL THEN 1 ELSE 0 END),0) FROM o) oper_id_nonnull FROM dual"
+  },
+  {
+   "uid": "Q10",
+   "probe_ids": [
+    "S2-P007"
+   ],
+   "source_code": "ods_8_216",
+   "purpose": "CLINIC_MASTER↔OUTP_MR_DIAG_DESC VISIT_NO 单列重复（ODS 侧）",
+   "select_sha1": "b0f16a7b501e2a29bd07412d6d38033715fa6e78",
+   "sql": "WITH d AS (SELECT VISIT_DATE, VISIT_NO FROM HIS.OUTP_MR_DIAG_DESC WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21'), g AS (SELECT VISIT_NO, COUNT(*) n FROM d GROUP BY VISIT_NO) SELECT (SELECT COUNT(*) FROM d) rows_, (SELECT COUNT(*) FROM g) visit_no_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) dup_visit_no FROM dual"
+  },
+  {
+   "uid": "Q11",
+   "probe_ids": [
+    "S2-P008"
+   ],
+   "source_code": "ods_8_216",
+   "purpose": "OUTP_ORDERS↔OUTP_TREAT_REC SERIAL_NO 单列重复（ODS 侧）",
+   "select_sha1": "5e83e9b3cc4de9f8e2b50886b2a932203e2f9e4f",
+   "sql": "WITH t AS (SELECT SERIAL_NO FROM HIS.OUTP_TREAT_REC WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21'), g AS (SELECT SERIAL_NO, COUNT(*) n FROM t GROUP BY SERIAL_NO) SELECT (SELECT COUNT(*) FROM t) rows_, (SELECT COUNT(*) FROM g) serial_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) dup_serial FROM dual"
+  },
+  {
+   "uid": "Q12",
+   "probe_ids": [
+    "S3-P002"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "住院费用守恒：visit 级 INP_BILL_DETAIL.COSTS 对 INP_SETTLE_MASTER.COSTS",
+   "select_sha1": "48eb31c194cc15cdce585d13a74ceab40896df28",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), b AS (SELECT ib.PATIENT_ID, ib.VISIT_ID, SUM(ib.COSTS) s FROM INPBILL.INP_BILL_DETAIL ib WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = ib.PATIENT_ID AND pv.VISIT_ID = ib.VISIT_ID) GROUP BY ib.PATIENT_ID, ib.VISIT_ID), t AS (SELECT sm.PATIENT_ID, sm.VISIT_ID, SUM(sm.COSTS) s, COUNT(*) n FROM INPBILL.INP_SETTLE_MASTER sm WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = sm.PATIENT_ID AND pv.VISIT_ID = sm.VISIT_ID) GROUP BY sm.PATIENT_ID, sm.VISIT_ID) SELECT (SELECT COUNT(*) FROM pv) visits, (SELECT COUNT(*) FROM b) with_bill, (SELECT COUNT(*) FROM t) with_settle, (SELECT COUNT(*) FROM b JOIN t ON b.PATIENT_ID = t.PATIENT_ID AND b.VISIT_ID = t.VISIT_ID WHERE ABS(NVL(b.s,0) - NVL(t.s,0)) < 0.01) matched_amount, (SELECT COUNT(*) FROM t WHERE n > 1) multi_settle_visits FROM dual"
+  },
+  {
+   "uid": "Q13",
+   "probe_ids": [
+    "S3-P003"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "门诊三口径金额对账：明细 SUM vs 收据 TOTAL_COSTS vs 支付净额",
+   "select_sha1": "e922ee297bd4f07805828d89a5f11b74bf894a9a",
+   "sql": "WITH k AS (SELECT DISTINCT RCPT_NO FROM OUTPBILL.OUTP_BILL_ITEMS WHERE VISIT_DATE >= DATE'2026-09-14' AND VISIT_DATE < DATE'2026-09-21' AND ROWNUM <= 300), b AS (SELECT RCPT_NO, SUM(CHARGES) s FROM OUTPBILL.OUTP_BILL_ITEMS WHERE RCPT_NO IN (SELECT RCPT_NO FROM k) GROUP BY RCPT_NO), r AS (SELECT RCPT_NO, TOTAL_COSTS FROM OUTPBILL.OUTP_RCPT_MASTER WHERE RCPT_NO IN (SELECT RCPT_NO FROM k)), p AS (SELECT RCPT_NO, SUM(NVL(PAYMENT_AMOUNT,0)) pay, SUM(NVL(REFUNDED_AMOUNT,0)) ref FROM OUTPBILL.OUTP_PAYMENTS_MONEY WHERE RCPT_NO IN (SELECT RCPT_NO FROM k) GROUP BY RCPT_NO) SELECT (SELECT COUNT(*) FROM k) rcpts, (SELECT COUNT(*) FROM b) with_items, (SELECT COUNT(*) FROM r) with_master, (SELECT COUNT(*) FROM p) with_pay, (SELECT COUNT(*) FROM b JOIN r ON b.RCPT_NO = r.RCPT_NO WHERE ABS(NVL(b.s,0) - NVL(r.TOTAL_COSTS,0)) < 0.01) items_eq_master, (SELECT COUNT(*) FROM b JOIN p ON b.RCPT_NO = p.RCPT_NO WHERE ABS(NVL(b.s,0) - (NVL(p.pay,0) - NVL(p.ref,0))) < 0.01) items_eq_net FROM dual"
+  },
+  {
+   "uid": "Q14",
+   "probe_ids": [
+    "S3-P004"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "预交金三键唯一性：RCPT_NO / ADD 表三列（RCPT_NO+CHECK_NO+BANK_CODE）",
+   "select_sha1": "8b6075bd452bbfb33f63be4ce61412e63a4cb488",
+   "sql": "WITH g1 AS (SELECT RCPT_NO, COUNT(*) n FROM INPBILL.PREPAYMENT_RCPT GROUP BY RCPT_NO), g2 AS (SELECT RCPT_NO, CHECK_NO, BANK_CODE, COUNT(*) n FROM INPBILL.PREPAYMENT_RCPT_ADD GROUP BY RCPT_NO, CHECK_NO, BANK_CODE) SELECT (SELECT COUNT(*) FROM g1) prepay_rcpt_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g1) prepay_rcpt_dup, (SELECT NVL(MAX(n),0) FROM g1) max_per_rcpt, (SELECT COUNT(*) FROM g2) add_3key_groups, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g2) add_3key_dup FROM dual"
+  },
+  {
+   "uid": "Q15",
+   "probe_ids": [
+    "S3-P006"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "OPER_CODE 多义分流：ITEM_CLASS 分组的 OPER_CODE 非空/长格式/EXAM_NO 命中",
+   "select_sha1": "778d7cb49f8fd0aa951e92d96ced469ad8464531",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), ib AS (SELECT ITEM_CLASS, OPER_CODE FROM INPBILL.INP_BILL_DETAIL ibd WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = ibd.PATIENT_ID AND pv.VISIT_ID = ibd.VISIT_ID)) SELECT ITEM_CLASS, COUNT(*) n, SUM(CASE WHEN OPER_CODE IS NOT NULL THEN 1 ELSE 0 END) oper_code_nonnull, SUM(CASE WHEN LENGTH(OPER_CODE) >= 8 THEN 1 ELSE 0 END) len_ge8 FROM ib GROUP BY ITEM_CLASS"
+  },
+  {
+   "uid": "Q16",
+   "probe_ids": [
+    "S3-P007"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "INP_SETTLE_MASTER↔_YB 组合键覆盖与各自重复（草稿8 vs 草稿30）",
+   "select_sha1": "f1368184550e42de469a0ccc425c0ad8cd0f091f",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), a AS (SELECT sm.PATIENT_ID, sm.VISIT_ID, COUNT(*) n FROM INPBILL.INP_SETTLE_MASTER sm WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = sm.PATIENT_ID AND pv.VISIT_ID = sm.VISIT_ID) GROUP BY sm.PATIENT_ID, sm.VISIT_ID), b AS (SELECT yb.PATIENT_ID, yb.VISIT_ID, COUNT(*) n FROM INPBILL.INP_SETTLE_MASTER_YB yb WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = yb.PATIENT_ID AND pv.VISIT_ID = yb.VISIT_ID) GROUP BY yb.PATIENT_ID, yb.VISIT_ID) SELECT (SELECT COUNT(*) FROM a) settle_visits, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM a) settle_dup, (SELECT COUNT(*) FROM b) yb_visits, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM b) yb_dup, (SELECT COUNT(*) FROM a JOIN b ON a.PATIENT_ID = b.PATIENT_ID AND a.VISIT_ID = b.VISIT_ID) both FROM dual"
+  },
+  {
+   "uid": "Q17",
+   "probe_ids": [
+    "S3-P008"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "ID_NO 连接覆盖率（PPI：仅聚合零值回显）",
+   "select_sha1": "f8a4b1c2ea98f10baf7c3c71623a51dd2b52a80b",
+   "sql": "WITH pv AS (SELECT PATIENT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), y AS (SELECT yb.ID_NO idno FROM INPBILL.INP_SETTLE_MASTER_YB yb WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = yb.PATIENT_ID)) SELECT (SELECT COUNT(*) FROM y) yb_rows, (SELECT NVL(SUM(CASE WHEN idno IS NOT NULL THEN 1 ELSE 0 END),0) FROM y) idno_nonnull, (SELECT COUNT(DISTINCT idno) FROM y) distinct_idno, (SELECT COUNT(*) FROM y JOIN MEDREC.PAT_MASTER_INDEX pmi ON pmi.ID_NO = y.idno) hit_pmi FROM dual"
+  },
+  {
+   "uid": "Q18",
+   "probe_ids": [
+    "S4-P001"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "OPERATION 侧每 visit 手术条数分布（直连放大分子侧 A）",
+   "select_sha1": "afd83623aac7fe6c345d3b65ff67b9dc6ab37313",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), g AS (SELECT op.PATIENT_ID, op.VISIT_ID, COUNT(*) n FROM MEDREC.OPERATION op WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = op.PATIENT_ID AND pv.VISIT_ID = op.VISIT_ID) GROUP BY op.PATIENT_ID, op.VISIT_ID) SELECT (SELECT COUNT(*) FROM pv) visits, (SELECT COUNT(*) FROM g) visits_with_op, (SELECT NVL(SUM(n),0) FROM g) op_rows, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) multi_op_visits, (SELECT NVL(MAX(n),0) FROM g) max_per_visit FROM dual"
+  },
+  {
+   "uid": "Q19",
+   "probe_ids": [
+    "S4-P001",
+    "S4-P004",
+    "S2-P015"
+   ],
+   "source_code": "ods_8_216",
+   "purpose": "ODS HIS.OPERATION_MASTER 每 visit 台次分布 + OPER_ID 非空 + 同日多台次",
+   "select_sha1": "abbcec1eeb52207b65025c91ada7312e0a207ec4",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM HIS.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), g AS (SELECT om.PATIENT_ID, om.VISIT_ID, COUNT(*) n, SUM(CASE WHEN om.OPER_ID IS NULL THEN 1 ELSE 0 END) null_op, COUNT(DISTINCT om.START_DATE_TIME) dts FROM HIS.OPERATION_MASTER om WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = om.PATIENT_ID AND pv.VISIT_ID = om.VISIT_ID) GROUP BY om.PATIENT_ID, om.VISIT_ID) SELECT (SELECT COUNT(*) FROM pv) visits, (SELECT COUNT(*) FROM g) visits_with_om, (SELECT NVL(SUM(n),0) FROM g) om_rows, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) multi_om_visits, (SELECT NVL(MAX(n),0) FROM g) max_per_visit, (SELECT NVL(SUM(null_op),0) FROM g) oper_id_null, (SELECT NVL(SUM(CASE WHEN n > dts THEN 1 ELSE 0 END),0) FROM g) same_day_multi FROM dual"
+  },
+  {
+   "uid": "Q20",
+   "probe_ids": [
+    "S4-P002"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "OPERATION_DICT 名称重复率（名称 JOIN 负例证据）",
+   "select_sha1": "9dd2234d65ddab6b690c1a55dac5f1a8bb42dada",
+   "sql": "WITH gn AS (SELECT OPERATION_NAME, COUNT(*) n FROM COMM.OPERATION_DICT GROUP BY OPERATION_NAME), ge AS (SELECT OPERATION_CODE, COUNT(*) n FROM COMM.OPERATION_DICT GROUP BY OPERATION_CODE) SELECT (SELECT COUNT(*) FROM gn) names_, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM gn) dup_names, (SELECT NVL(MAX(n),0) FROM gn) max_per_name, (SELECT COUNT(*) FROM ge) codes, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM ge) dup_codes FROM dual"
+  },
+  {
+   "uid": "Q21",
+   "probe_ids": [
+    "S4-P003"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "OPERATION_SCALE × STOP_FLAG 值域分布（证据收集，确认走值域治理）",
+   "select_sha1": "03f8fa4d9abfc962140d3366e82785e63007864e",
+   "sql": "SELECT OPERATION_SCALE, STOP_FLAG, COUNT(*) n FROM COMM.OPERATION_DICT GROUP BY OPERATION_SCALE, STOP_FLAG"
+  },
+  {
+   "uid": "Q22",
+   "probe_ids": [
+    "S4-P005"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "DIAGNOSIS_TYPE 分布 + DIAGNOSIS_NO=1 覆盖（对照 confirmed 1/2/3/7/8）",
+   "select_sha1": "f87d0c2a742b59d4f3bd69e90f4ff5a10ac1f5f1",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), d AS (SELECT dg.PATIENT_ID, dg.VISIT_ID, dg.DIAGNOSIS_TYPE tp, dg.DIAGNOSIS_NO no_ FROM MEDREC.DIAGNOSIS dg WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = dg.PATIENT_ID AND pv.VISIT_ID = dg.VISIT_ID)) SELECT tp, COUNT(*) n, SUM(CASE WHEN no_ = 1 THEN 1 ELSE 0 END) no1 FROM d GROUP BY tp"
+  },
+  {
+   "uid": "Q23",
+   "probe_ids": [
+    "S4-P006"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "术式码孤儿率：OPERATION.OPERATION_CODE→OPERATION_DICT",
+   "select_sha1": "925fdb9c93568ff75d6a12b7ccac32cae76ba7d4",
+   "sql": "WITH pv AS (SELECT PATIENT_ID, VISIT_ID FROM MEDREC.PAT_VISIT WHERE DISCHARGE_DATE_TIME >= DATE'2026-09-14' AND DISCHARGE_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), o AS (SELECT op.OPERATION_CODE oc FROM MEDREC.OPERATION op WHERE EXISTS (SELECT 1 FROM pv WHERE pv.PATIENT_ID = op.PATIENT_ID AND pv.VISIT_ID = op.VISIT_ID)) SELECT COUNT(*) n, SUM(CASE WHEN oc IS NULL THEN 1 ELSE 0 END) code_null, SUM(CASE WHEN oc IS NOT NULL AND NOT EXISTS (SELECT 1 FROM COMM.OPERATION_DICT od WHERE od.OPERATION_CODE = o.oc) THEN 1 ELSE 0 END) orphans FROM o"
+  },
+  {
+   "uid": "Q24",
+   "probe_ids": [
+    "S5-P001"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "LAB_RESULT 大表约束：TEST_NO 限定下结果行/项目行与单列连接放大",
+   "select_sha1": "2f7681d557a832e90ec25833f5530f2fad92f837",
+   "sql": "WITH seed AS (SELECT TEST_NO FROM LAB.LAB_TEST_MASTER WHERE REQUESTED_DATE_TIME >= DATE'2026-09-14' AND REQUESTED_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), r AS (SELECT lr.TEST_NO, COUNT(*) n FROM LAB.LAB_RESULT lr WHERE lr.TEST_NO IN (SELECT TEST_NO FROM seed) GROUP BY lr.TEST_NO), i AS (SELECT li.TEST_NO, COUNT(*) n FROM LAB.LAB_TEST_ITEMS li WHERE li.TEST_NO IN (SELECT TEST_NO FROM seed) GROUP BY li.TEST_NO), j AS (SELECT NVL(r.n,0) rn, NVL(i.n,0) in_, r.TEST_NO FROM r LEFT JOIN i ON r.TEST_NO = i.TEST_NO) SELECT (SELECT COUNT(*) FROM seed) seed_tests, (SELECT COUNT(*) FROM r) tests_with_results, (SELECT NVL(SUM(n),0) FROM r) result_rows, (SELECT NVL(SUM(n),0) FROM i) item_rows, (SELECT NVL(SUM(rn),0) FROM j) join_left_rows, (SELECT NVL(SUM(rn * in_),0) FROM j) single_key_join_rows FROM dual"
+  },
+  {
+   "uid": "Q25",
+   "probe_ids": [
+    "S5-P002"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "检查链 EXAM_NO 覆盖：ITEMS/REPORT 命中 + EXAM_PAT_MI 两列键覆盖",
+   "select_sha1": "6c96ab7ef142d373ffd34c788f9c0b55d09d7370",
+   "sql": "WITH seed AS (SELECT EXAM_NO, PATIENT_LOCAL_ID, LOCAL_ID_CLASS FROM EXAM.EXAM_MASTER WHERE REQ_DATE_TIME >= DATE'2026-09-14' AND REQ_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), i AS (SELECT DISTINCT EXAM_NO FROM EXAM.EXAM_ITEMS WHERE EXAM_NO IN (SELECT EXAM_NO FROM seed)), rp AS (SELECT DISTINCT EXAM_NO FROM EXAM.EXAM_REPORT WHERE EXAM_NO IN (SELECT EXAM_NO FROM seed)), mi AS (SELECT COUNT(*) n FROM seed s JOIN EXAM.EXAM_PAT_MI m ON m.PATIENT_LOCAL_ID = s.PATIENT_LOCAL_ID AND m.LOCAL_ID_CLASS = s.LOCAL_ID_CLASS) SELECT (SELECT COUNT(*) FROM seed) exams, (SELECT COUNT(*) FROM i) with_items, (SELECT COUNT(*) FROM rp) with_report, (SELECT NVL(n,0) FROM mi) mi_two_col_hits FROM dual"
+  },
+  {
+   "uid": "Q26",
+   "probe_ids": [
+    "S5-P002"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "EXAM_CLASS 中文值分布（AGENTS 硬约束 5 活库复核）",
+   "select_sha1": "d6ecdb5c14b6fc6ff3e49433babcac76cbdb37b3",
+   "sql": "SELECT EXAM_CLASS, COUNT(*) n FROM EXAM.EXAM_MASTER WHERE REQ_DATE_TIME >= DATE'2026-09-14' AND REQ_DATE_TIME < DATE'2026-09-21' GROUP BY EXAM_CLASS"
+  },
+  {
+   "uid": "Q27",
+   "probe_ids": [
+    "S5-P003"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "药品出库单 DOCUMENT_NO 唯一性（近月全库房域）",
+   "select_sha1": "4efd855ed4e781033eddeabe074ab5b62ef5c3dd",
+   "sql": "WITH m AS (SELECT DOCUMENT_NO, COUNT(DISTINCT STORAGE) st, COUNT(*) rw FROM DRUG_USER.DRUG_EXPORT_MASTER WHERE EXPORT_DATE >= DATE'2026-08-01' GROUP BY DOCUMENT_NO) SELECT COUNT(*) docs, SUM(CASE WHEN rw > 1 THEN 1 ELSE 0 END) dup_row_docs, SUM(CASE WHEN st > 1 THEN 1 ELSE 0 END) cross_storage_docs, NVL(MAX(st),0) max_storages FROM m"
+  },
+  {
+   "uid": "Q28",
+   "probe_ids": [
+    "S5-P003"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "出库单主从：近窗 200 单的明细行数与命中",
+   "select_sha1": "03ee0530d86145bf1f3ed1c35669615e4aed43c1",
+   "sql": "WITH m AS (SELECT DOCUMENT_NO FROM DRUG_USER.DRUG_EXPORT_MASTER WHERE EXPORT_DATE >= DATE'2026-09-01' AND ROWNUM <= 200), d AS (SELECT DOCUMENT_NO, COUNT(*) n FROM DRUG_USER.DRUG_EXPORT_DETAIL WHERE DOCUMENT_NO IN (SELECT DOCUMENT_NO FROM m) GROUP BY DOCUMENT_NO) SELECT (SELECT COUNT(*) FROM m) masters, (SELECT COUNT(*) FROM d) matched, (SELECT NVL(SUM(n),0) FROM d) detail_rows, (SELECT NVL(MAX(n),0) FROM d) max_detail_per_doc FROM dual"
+  },
+  {
+   "uid": "Q29",
+   "probe_ids": [
+    "S5-P003"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "库存粒度样本：药码+规格 行数/库房数/批号数分布（PK 元数据活库复核）",
+   "select_sha1": "cf8fe903d6c683088201d02a5dcb49c28777d396",
+   "sql": "WITH s AS (SELECT DRUG_CODE, DRUG_SPEC, STORAGE, BATCH_NO FROM PHARMACY.DRUG_STOCK WHERE ROWNUM <= 5000), g AS (SELECT DRUG_CODE, DRUG_SPEC, COUNT(*) n, COUNT(DISTINCT STORAGE) st, COUNT(DISTINCT BATCH_NO) bt FROM s GROUP BY DRUG_CODE, DRUG_SPEC) SELECT COUNT(*) pairs, SUM(CASE WHEN n>1 THEN 1 ELSE 0 END) multi_rows_pairs, NVL(MAX(n),0) max_rows, NVL(MAX(st),0) max_storages, NVL(MAX(bt),0) max_batches FROM g"
+  },
+  {
+   "uid": "Q30",
+   "probe_ids": [
+    "S5-P004",
+    "S3-P005"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "药价三列键多价并存 + 生效期列空值（样本 8000 行）",
+   "select_sha1": "d05d4ad9393c1d25c1700acacb21c58a565a1d44",
+   "sql": "WITH p AS (SELECT DRUG_CODE, DRUG_SPEC, FIRM_ID, STOP_DATE FROM COMM.DRUG_PRICE_LIST WHERE ROWNUM <= 8000), g AS (SELECT DRUG_CODE, DRUG_SPEC, FIRM_ID, COUNT(*) n, SUM(CASE WHEN STOP_DATE IS NULL THEN 1 ELSE 0 END) open_rows FROM p GROUP BY DRUG_CODE, DRUG_SPEC, FIRM_ID) SELECT COUNT(*) keys_, SUM(CASE WHEN n>1 THEN 1 ELSE 0 END) multi_price_keys, NVL(MAX(n),0) max_prices, SUM(CASE WHEN open_rows > 0 AND open_rows < n THEN 1 ELSE 0 END) partial_stop_keys, SUM(CASE WHEN n = open_rows AND n > 1 THEN 1 ELSE 0 END) multi_open_keys FROM g"
+  },
+  {
+   "uid": "Q31",
+   "probe_ids": [
+    "S5-P006"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "处方号跨日复用：近窗 PRESC_NO 组内日期数",
+   "select_sha1": "0321d3f187aa5e2ecbb23e709c72ff091cc239b3",
+   "sql": "WITH s AS (SELECT PRESC_DATE, PRESC_NO FROM PHARMACY.DRUG_PRESC_MASTER WHERE PRESC_DATE >= DATE'2026-09-14' AND PRESC_DATE < DATE'2026-09-21' AND ROWNUM <= 2000), g AS (SELECT PRESC_NO, COUNT(*) n, COUNT(DISTINCT PRESC_DATE) d FROM s GROUP BY PRESC_NO) SELECT COUNT(*) nos, SUM(CASE WHEN n>1 THEN 1 ELSE 0 END) reuse_nos, NVL(MAX(n),0) max_rows, SUM(CASE WHEN d>1 THEN 1 ELSE 0 END) cross_date_nos FROM g"
+  },
+  {
+   "uid": "Q32",
+   "probe_ids": [
+    "S5-P007"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "检验批次↔申请单：TEST_NO 命中/重复 + PATIENT_ID 单列放大",
+   "select_sha1": "470988478eac887619a0942cf746e83855d63d4b",
+   "sql": "WITH seed AS (SELECT TEST_NO FROM LAB.LAB_TEST_MASTER WHERE REQUESTED_DATE_TIME >= DATE'2026-09-14' AND REQUESTED_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), b AS (SELECT bm.TEST_NO, COUNT(*) n, COUNT(DISTINCT bm.PATIENT_ID) pts FROM LAB.LAB_TEST_BATCH_MASTER bm WHERE bm.TEST_NO IN (SELECT TEST_NO FROM seed) GROUP BY bm.TEST_NO) SELECT (SELECT COUNT(*) FROM seed) seed_tests, (SELECT COUNT(*) FROM b) matched, (SELECT NVL(MAX(n),0) FROM b) max_rows_per_test, (SELECT NVL(MAX(pts),0) FROM b) max_patients_per_test FROM dual"
+  },
+  {
+   "uid": "Q33",
+   "probe_ids": [
+    "S5-P008"
+   ],
+   "source_code": "his_source_10_10_10_15",
+   "purpose": "ORDERS 四列键下游覆盖：EXECUTE_DETAILS/ANTI_DRUG/DISPENSE_REC 命中与一嘱多执行",
+   "select_sha1": "e3a7b1d146f5e338608c10dde668c20d552d0ab9",
+   "sql": "WITH o AS (SELECT PATIENT_ID, VISIT_ID, ORDER_NO, ORDER_SUB_NO FROM ORDADM.ORDERS WHERE START_DATE_TIME >= DATE'2026-09-14' AND START_DATE_TIME < DATE'2026-09-21' AND ROWNUM <= 200), e AS (SELECT COUNT(*) n, COUNT(DISTINCT x.PATIENT_ID || x.VISIT_ID || x.ORDER_NO || x.ORDER_SUB_NO) k FROM ORDADM.ORDERS_EXECUTE_DETAILS x WHERE EXISTS (SELECT 1 FROM o WHERE o.PATIENT_ID = x.PATIENT_ID AND o.VISIT_ID = x.VISIT_ID AND o.ORDER_NO = x.ORDER_NO AND o.ORDER_SUB_NO = x.ORDER_SUB_NO)), a AS (SELECT COUNT(*) n FROM ORDADM.ORDERS_ANTI_DRUG x WHERE EXISTS (SELECT 1 FROM o WHERE o.PATIENT_ID = x.PATIENT_ID AND o.VISIT_ID = x.VISIT_ID AND o.ORDER_NO = x.ORDER_NO AND o.ORDER_SUB_NO = x.ORDER_SUB_NO)), d AS (SELECT COUNT(*) n FROM PHARMACY.DRUG_DISPENSE_REC x WHERE EXISTS (SELECT 1 FROM o WHERE o.PATIENT_ID = x.PATIENT_ID AND o.VISIT_ID = x.VISIT_ID AND o.ORDER_NO = x.ORDER_NO AND o.ORDER_SUB_NO = x.ORDER_SUB_NO)) SELECT (SELECT COUNT(*) FROM o) seed_orders, (SELECT NVL(n,0) FROM e) exec_rows, (SELECT NVL(k,0) FROM e) exec_distinct_keys, (SELECT NVL(n,0) FROM a) anti_rows, (SELECT NVL(n,0) FROM d) dispense_rows FROM dual"
+  },
+  {
+   "uid": "Q34",
+   "probe_ids": [
+    "S5-P005"
+   ],
+   "source_code": "mobile_nursing_oracle_10_10_10_125",
+   "purpose": "护理患者链：近窗 INPATIENTS.pat_index_no ↔ MCS_DOC_FORM.patient_uid 命中",
+   "select_sha1": "ddf041f215a496a818f51b9f5d7de40c91f8bb23",
+   "sql": "WITH p AS (SELECT PAT_INDEX_NO FROM LUNA_MCS_SDSEY.INPATIENTS WHERE ADMISSION_TIME >= DATE'2026-09-14' AND ROWNUM <= 200), f AS (SELECT fm.PATIENT_UID, COUNT(*) n FROM LUNA_MCS_SDSEY.MCS_DOC_FORM fm WHERE fm.PATIENT_UID IN (SELECT PAT_INDEX_NO FROM p) GROUP BY fm.PATIENT_UID) SELECT (SELECT COUNT(*) FROM p) patients, (SELECT COUNT(*) FROM f) with_forms, (SELECT NVL(SUM(n),0) FROM f) form_rows, (SELECT NVL(MAX(n),0) FROM f) max_forms_per_patient FROM dual"
+  },
+  {
+   "uid": "Q35",
+   "probe_ids": [
+    "S5-P005"
+   ],
+   "source_code": "mobile_nursing_oracle_10_10_10_125",
+   "purpose": "表单-记录键 + 同患者同模板重复评估分布（样本 5000）",
+   "select_sha1": "e2f73321619e39de3f4ae616e0ac1eb20252a032",
+   "sql": "WITH fa AS (SELECT PATIENT_UID, TEMPLATE_CODE FROM LUNA_MCS_SDSEY.MCS_DOC_FORM WHERE CREATED_DATE >= DATE'2026-09-14' AND ROWNUM <= 5000), g AS (SELECT PATIENT_UID, TEMPLATE_CODE, COUNT(*) n FROM fa GROUP BY PATIENT_UID, TEMPLATE_CODE), fr AS (SELECT ID FROM LUNA_MCS_SDSEY.MCS_DOC_FORM WHERE ROWNUM <= 500), r AS (SELECT FORM_ID, COUNT(*) n FROM LUNA_MCS_SDSEY.MCS_DOC_FORM_RECORDS WHERE FORM_ID IN (SELECT ID FROM fr) GROUP BY FORM_ID) SELECT (SELECT COUNT(*) FROM g) patient_template_pairs, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM g) repeat_assess_pairs, (SELECT NVL(MAX(n),0) FROM g) max_assess, (SELECT COUNT(*) FROM fr) forms_sample, (SELECT COUNT(*) FROM r) with_records, (SELECT NVL(SUM(CASE WHEN n>1 THEN 1 ELSE 0 END),0) FROM r) dup_formid_records FROM dual"
+  }
+ ]
+}

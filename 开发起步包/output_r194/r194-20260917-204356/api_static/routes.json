@@ -1,0 +1,972 @@
+[
+ {
+  "module": "asset",
+  "path": "/asset",
+  "name": "Asset",
+  "title": "数据资产（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/asset/systems",
+  "rank": "90"
+ },
+ {
+  "module": "catalog",
+  "path": "/catalog",
+  "name": "Catalog",
+  "title": "资产目录",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/asset/systems",
+  "rank": "10"
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/systems",
+  "name": "AssetSystems",
+  "title": "系统与数据资源",
+  "showLink": "true",
+  "auths": [
+   "asset.system.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/systems/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/tables",
+  "name": "AssetTables",
+  "title": "表与字段",
+  "showLink": "true",
+  "auths": [
+   "asset.table.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/tables/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/graph",
+  "name": "AssetGraph",
+  "title": "关系图谱",
+  "showLink": "true",
+  "auths": [
+   "asset.graph.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/graph/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/lineage",
+  "name": "AssetLineage",
+  "title": "血缘与影响",
+  "showLink": "true",
+  "auths": [
+   "asset.lineage.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/lineage/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/metadata/changes",
+  "name": "MetadataChanges",
+  "title": "元数据变更",
+  "showLink": "true",
+  "auths": [
+   "metadata.change.view"
+  ],
+  "activePath": null,
+  "component": "@/views/metadata-changes/changes/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/tables/:schema/:table",
+  "name": "AssetTableDetail",
+  "title": "表详情",
+  "showLink": "false",
+  "auths": [
+   "asset.table.view"
+  ],
+  "activePath": "/asset/tables",
+  "component": "@/views/asset/table-detail/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/sources",
+  "name": "AssetSources",
+  "title": "数据连接（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/asset/systems?tab=connections",
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/relations",
+  "name": "AssetRelations",
+  "title": null,
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "to",
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/graph",
+  "name": null,
+  "title": "关系路径（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/candidates",
+  "name": "AssetCandidates",
+  "title": null,
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "to",
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/asset/relation-review",
+  "name": null,
+  "title": "候选关系（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/metadata/snapshots",
+  "name": "MetadataSnapshots",
+  "title": "快照管理",
+  "showLink": "false",
+  "auths": [
+   "metadata.snapshot.view"
+  ],
+  "activePath": "/metadata/changes",
+  "component": "@/views/metadata-changes/snapshots/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "catalog",
+  "path": "/metadata/diff",
+  "name": "MetadataDiff",
+  "title": "快照对比",
+  "showLink": "false",
+  "auths": [
+   "metadata.diff.view"
+  ],
+  "activePath": "/metadata/changes",
+  "component": "@/views/metadata-changes/diff/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "dict",
+  "path": "/dict",
+  "name": "Dict",
+  "title": "字典中心（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/dict/medical",
+  "rank": "91"
+ },
+ {
+  "module": "error",
+  "path": "/error",
+  "name": null,
+  "title": "异常页面",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/error/403",
+  "rank": "9"
+ },
+ {
+  "module": "error",
+  "path": "/error/403",
+  "name": "403",
+  "title": "403",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/error/403.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "error",
+  "path": "/error/404",
+  "name": "404",
+  "title": "404",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/error/404.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "error",
+  "path": "/error/500",
+  "name": "500",
+  "title": "500",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/error/500.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "governance",
+  "path": "/governance",
+  "name": "Governance",
+  "title": "数据治理（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/value-domains",
+  "rank": "93"
+ },
+ {
+  "module": "home",
+  "path": "/",
+  "name": "Home",
+  "title": "工作台",
+  "showLink": "true",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/workbench",
+  "rank": "0"
+ },
+ {
+  "module": "home",
+  "path": "/workbench",
+  "name": "Workbench",
+  "title": "日常工作台",
+  "showLink": "true",
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/workbench/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "home",
+  "path": "/welcome",
+  "name": "Welcome",
+  "title": "运行总览",
+  "showLink": "true",
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/welcome/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "home",
+  "path": "/asset/overview",
+  "name": "AssetOverview",
+  "title": "资产统计",
+  "showLink": "true",
+  "auths": [
+   "asset.overview.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/overview/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "home",
+  "path": "/asset/system-map",
+  "name": "AssetSystemMap",
+  "title": "平台能力全景",
+  "showLink": "true",
+  "auths": [
+   "asset.overview.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/system-map/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity",
+  "name": "Identity",
+  "title": "人员与权限",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/identity/persons",
+  "rank": "50"
+ },
+ {
+  "module": "identity",
+  "path": "/identity/persons",
+  "name": "IdentityPersons",
+  "title": "人员管理",
+  "showLink": "true",
+  "auths": [
+   "identity.person.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/persons/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/departments",
+  "name": "IdentityDepartments",
+  "title": "科室基线",
+  "showLink": "true",
+  "auths": [
+   "identity.dept.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/departments/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/accounts",
+  "name": "IdentityAccounts",
+  "title": "业务系统账号",
+  "showLink": "true",
+  "auths": [
+   "identity.account.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/accounts/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/local-accounts",
+  "name": "IdentityLocalAccounts",
+  "title": "平台本地账号",
+  "showLink": "true",
+  "auths": [
+   "identity.local_account.manage",
+   "identity.role.manage"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/local-accounts/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/sync-diffs",
+  "name": "IdentitySyncDiffs",
+  "title": "人员同步差异",
+  "showLink": "true",
+  "auths": [
+   "identity.sync_diff.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/sync-diffs/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/sync-logs",
+  "name": "IdentitySyncLogs",
+  "title": "人员同步日志",
+  "showLink": "true",
+  "auths": [
+   "identity.sync_diff.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/sync-logs/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/roles",
+  "name": "IdentityRoles",
+  "title": "平台角色权限",
+  "showLink": "true",
+  "auths": [
+   "identity.role.manage",
+   "identity.role.grant"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/roles/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/authorizations",
+  "name": "IdentityAuthorizations",
+  "title": "人员授权",
+  "showLink": "true",
+  "auths": [
+   "identity.role.grant"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/authorizations/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "identity",
+  "path": "/identity/permission-requests",
+  "name": "IdentityPermissionRequests",
+  "title": "权限申请与审批",
+  "showLink": "true",
+  "auths": [
+   "identity.permission_request.view"
+  ],
+  "activePath": null,
+  "component": "@/views/identity/permission-requests/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "metadata",
+  "path": "/metadata",
+  "name": "Metadata",
+  "title": "变更检测（兼容入口）",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/metadata/changes",
+  "rank": "92"
+ },
+ {
+  "module": "ops",
+  "path": "/ops",
+  "name": "Ops",
+  "title": "平台运维",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/ops/runs",
+  "rank": "60"
+ },
+ {
+  "module": "ops",
+  "path": "/ops/runs",
+  "name": "OpsRuns",
+  "title": "运维任务",
+  "showLink": "true",
+  "auths": [
+   "ops.run.view"
+  ],
+  "activePath": null,
+  "component": "@/views/ops/runs/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "ops",
+  "path": "/ops/sql-workbench",
+  "name": "OpsSqlWorkbench",
+  "title": "受控SQL运维",
+  "showLink": "true",
+  "auths": [
+   "ops.sql.view"
+  ],
+  "activePath": null,
+  "component": "@/views/ops/sql-workbench/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "ops",
+  "path": "/ops/tools",
+  "name": "OpsTools",
+  "title": "运维工具模板",
+  "showLink": "true",
+  "auths": [
+   "ops.tool.manage"
+  ],
+  "activePath": null,
+  "component": "@/views/ops/tools/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "ops",
+  "path": "/ops/audit",
+  "name": "OpsAudit",
+  "title": "操作审计",
+  "showLink": "true",
+  "auths": [
+   "ops.audit.view"
+  ],
+  "activePath": null,
+  "component": "@/views/ops/audit/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "ops",
+  "path": "/asset/admin",
+  "name": "AssetAdmin",
+  "title": "治理基础配置",
+  "showLink": "true",
+  "auths": [
+   "asset.admin.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/admin/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "ops",
+  "path": "/asset/ai-tools",
+  "name": "AssetAiTools",
+  "title": "AI接入与协作",
+  "showLink": "true",
+  "auths": [
+   "asset.ai_draft.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/ai-tools/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality-hub",
+  "name": "QualityHub",
+  "title": "质量治理",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/quality/issues",
+  "rank": "30"
+ },
+ {
+  "module": "quality",
+  "path": "/quality/issues",
+  "name": "QualityIssues",
+  "title": "质量台账",
+  "showLink": "true",
+  "auths": [
+   "quality.issue.read"
+  ],
+  "activePath": null,
+  "component": "@/views/quality/issues/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality/issues/mine",
+  "name": "QualityIssuesMine",
+  "title": "我的质量任务",
+  "showLink": "false",
+  "auths": [
+   "quality.issue.read"
+  ],
+  "activePath": "/quality/issues",
+  "component": "@/views/quality/issues/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality/issues/department",
+  "name": "QualityIssuesDepartment",
+  "title": "科室质量任务",
+  "showLink": "false",
+  "auths": [
+   "quality.issue.read"
+  ],
+  "activePath": "/quality/issues",
+  "component": "@/views/quality/issues/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality/issues/:id",
+  "name": "QualityIssueDetail",
+  "title": "问题详情",
+  "showLink": "false",
+  "auths": [
+   "quality.issue.read"
+  ],
+  "activePath": "/quality/issues",
+  "component": "@/views/quality/issue-detail/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality/controls",
+  "name": "QualityControls",
+  "title": "质控清单",
+  "showLink": "true",
+  "auths": [
+   "quality.control.read"
+  ],
+  "activePath": null,
+  "component": "@/views/quality/controls/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/quality/observations",
+  "name": "QualityObservations",
+  "title": "观测记录",
+  "showLink": "true",
+  "auths": [
+   "quality.observation.read"
+  ],
+  "activePath": null,
+  "component": "@/views/quality/observations/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/probe-findings",
+  "name": "ProbeFindings",
+  "title": "探查发现",
+  "showLink": "true",
+  "auths": [
+   "probe.finding.read"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/probe-findings/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/asset/quality",
+  "name": "AssetQuality",
+  "title": "元数据质控",
+  "showLink": "true",
+  "auths": [
+   "asset.quality.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/quality/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "quality",
+  "path": "/asset/ai-quality",
+  "name": "AssetAiQuality",
+  "title": "AI质量分析",
+  "showLink": "true",
+  "auths": [
+   "asset.quality.ai.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/ai-quality/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "query",
+  "path": "/query",
+  "name": "QueryZone",
+  "title": "查询与指标",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/asset/queries",
+  "rank": "40"
+ },
+ {
+  "module": "query",
+  "path": "/asset/ai-sql",
+  "name": "AssetAiSql",
+  "title": "AI辅助编写",
+  "showLink": "true",
+  "auths": [
+   "ai.context.read"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/ai-sql/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "query",
+  "path": "/asset/queries",
+  "name": "AssetQueries",
+  "title": "查询、指标与产品",
+  "showLink": "true",
+  "auths": [
+   "query.view"
+  ],
+  "activePath": null,
+  "component": "@/views/query-center/queries/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "query",
+  "path": "/asset/queries/accuracy",
+  "name": "AssetQueryAccuracy",
+  "title": "准确性与反馈",
+  "showLink": "true",
+  "auths": [
+   "query.view"
+  ],
+  "activePath": null,
+  "component": "@/views/query-center/accuracy/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "remaining",
+  "path": "/login",
+  "name": "Login",
+  "title": "登录",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/login/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "remaining",
+  "path": "/access-denied",
+  "name": "AccessDenied",
+  "title": "403",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/error/403.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "remaining",
+  "path": "/server-error",
+  "name": "ServerError",
+  "title": "500",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": "@/views/error/500.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "remaining",
+  "path": "/redirect",
+  "name": null,
+  "title": "加载中...",
+  "showLink": "false",
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "remaining",
+  "path": "/redirect/:path(.*)",
+  "name": "Redirect",
+  "title": null,
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": "@/layout/redirect.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/standards",
+  "name": "Standards",
+  "title": "标准与关系",
+  "showLink": null,
+  "auths": [],
+  "activePath": null,
+  "component": null,
+  "redirect": "/value-domains",
+  "rank": "20"
+ },
+ {
+  "module": "standards",
+  "path": "/value-domains",
+  "name": "ValueDomains",
+  "title": "值域知识库",
+  "showLink": "true",
+  "auths": [
+   "value_domain.read"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/value-domains/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/dict/medical",
+  "name": "DictMedical",
+  "title": "诊断手术字典",
+  "showLink": "true",
+  "auths": [
+   "dict.medical.view"
+  ],
+  "activePath": null,
+  "component": "@/views/dict/medical/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/dict/general",
+  "name": "DictGeneral",
+  "title": "通用字典",
+  "showLink": "true",
+  "auths": [
+   "dict.general.view"
+  ],
+  "activePath": null,
+  "component": "@/views/dict/general/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/dict/mappings",
+  "name": "DictMappings",
+  "title": "编码映射",
+  "showLink": "true",
+  "auths": [
+   "dict.mapping.view"
+  ],
+  "activePath": null,
+  "component": "@/views/dict/mappings/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/dict/sync-diffs",
+  "name": "DictSyncDiffs",
+  "title": "字典同步差异",
+  "showLink": "true",
+  "auths": [
+   "dict.sync_diff.view"
+  ],
+  "activePath": null,
+  "component": "@/views/dict/sync-diffs/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/asset/relation-review",
+  "name": "AssetRelationReview",
+  "title": "关系复核",
+  "showLink": "true",
+  "auths": [
+   "asset.relation.review"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/relation-review/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/asset/relation-recipes",
+  "name": "AssetRelationRecipes",
+  "title": "关系配方",
+  "showLink": "true",
+  "auths": [
+   "asset.recipe.view"
+  ],
+  "activePath": null,
+  "component": "@/views/asset/relation-recipes/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/asset/relation-rates",
+  "name": "AssetRelationRates",
+  "title": "关系验证统计",
+  "showLink": "false",
+  "auths": [
+   "asset.relation.view"
+  ],
+  "activePath": "/asset/relation-review",
+  "component": "@/views/asset/relation-rates/index.vue",
+  "redirect": null,
+  "rank": null
+ },
+ {
+  "module": "standards",
+  "path": "/asset/ai-context",
+  "name": "AssetAiContext",
+  "title": "AI上下文预览",
+  "showLink": "false",
+  "auths": [
+   "asset.ai_context.view"
+  ],
+  "activePath": "/asset/relation-recipes",
+  "component": "@/views/asset/ai-context/index.vue",
+  "redirect": null,
+  "rank": null
+ }
+]

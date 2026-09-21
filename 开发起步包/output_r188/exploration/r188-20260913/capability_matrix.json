@@ -1,0 +1,108 @@
+{
+  "schema_version": "r188-capability-matrix/1.0",
+  "run_id": "r188-20260913",
+  "generated_at": "2026-09-13",
+  "new_collector": "backend/scripts/harvest_r188_lowload.py (S1 新增，四引擎统一低负载采集器)",
+  "legacy_audit": {
+    "harvest_oracle_readonly.py": [
+      "OK: SET TRANSACTION READ ONLY / NUM_ROWS+LAST_ANALYZED / 定义读取 / USER_*降级 / owner自动发现隔离系统owner",
+      "GAP(已适配): call_timeout硬编码120000ms → r188默认15s可配",
+      "GAP(已适配): 无分批/节流/预算/检查点 → r188 batch 50对象+2s节流+每50条休60s+预算熔断+原子检查点",
+      "GAP(已适配): 无容量/分区/约束状态 → r188补 ALL_SEGMENTS/分区计数/STATUS",
+      "GAP(已适配): 无脱敏(定义原文) → r188 sanitize_definition 密码模式脱敏+256KiB截断"
+    ],
+    "harvest_mysql_readonly.py": [
+      "OK: SET SESSION TRANSACTION READ ONLY / information_schema采集 / 视图依赖",
+      "GAP(已适配): read_timeout默认90s → r188 15s+5s余量",
+      "GAP(已适配): 无节流/预算/检查点 → r188统一补齐",
+      "NOTE: da_readonly含PROCESS权限，information_schema全量可见(188账号记录)"
+    ],
+    "harvest_sqlserver_readonly.py": [
+      "OK: SET LOCK_TIMEOUT / FK含is_disabled+is_not_trusted / 例程文本 / 行数仅index_id 0/1(无双算)",
+      "GAP(已适配): READ UNCOMMITTED作为隔离手段 → r188改默认隔离+LOCK_TIMEOUT 1000ms，不以NOLOCK作安全替代",
+      "GAP(已适配): 无节流/预算/检查点/容量allocation_units → r188补齐(total_pages*8KB，rows仍仅0/1)"
+    ],
+    "postgresql/huachainsql": [
+      "此前无标准采集器(仓库仅JHEMR vastbase导入脚本，非采集器)",
+      "r188新增PGEngine: pg_catalog(pg_class/pg_attribute/pg_constraint/pg_index)+reltuples+受限pg_total_relation_size",
+      "HuaChainSQL(听力)兼容性未经实证 → S2试点优先验证，函数失败仅记error不中断"
+    ],
+    "import_plan139_sources_to_platform.py": [
+      "固定SOURCE_REGISTRY+CONFIRM_TEXT(APPLY-PLAN139-FOUR-SOURCES/OA)——不得复用旧确认串授权新13源",
+      "S8导入适配: 新写r188导入映射(源→source_code/namespace/schema)，正式FK单列不自动转正式，候选默认review_required"
+    ],
+    "extract_sql_relations.py": "离线解析复用(159先例65边)；旧式JOIN/CTE/UNION覆盖已在159验证，332个T-SQL例程解析失败仅记parse_errors"
+  },
+  "engines": {
+    "oracle": {
+      "covers_B": ["EMERGENCY_CLINIC", "MEDICAL_RECORD_MGMT", "SDDW_PROD(RAC)", "INFECTION_SURVEILLANCE(12c)"],
+      "object_list": "SUPPORTED all_users(oracle_maintained=N)+skip集合(含R4观察项ORACLE_OCM/SPATIAL_*)",
+      "columns": "SUPPORTED ALL_TAB_COLUMNS按owner+50表IN批",
+      "pk_uk_fk": "SUPPORTED P/U/R复合序+STATUS+R_OWNER/R_TABLE/R_COLUMN",
+      "indexes": "SUPPORTED ALL_INDEXES+ALL_IND_COLUMNS复合序(owner+index+table四键连接，R4修正口径)",
+      "partitions": "PARTIAL 仅partition_count标志；子分区明细未采",
+      "definitions": "SUPPORTED 逐对象ALL_VIEWS.TEXT，256KiB截断+脱敏，max 200对象/源/夜",
+      "estimated_rows": "SUPPORTED NUM_ROWS(+LAST_ANALYZED日期)",
+      "space": "SUPPORTED ALL_SEGMENTS聚合(segment粒度，分区子段求和，表/索引/LOB分开，RAC按segment不双算)",
+      "batching_pagination": "SUPPORTED IN列表50对象/批，无高OFFSET",
+      "cancel": "PARTIAL call_timeout客户端取消；S2试点实证连接清理",
+      "readonly_protection": "SUPPORTED SET TRANSACTION READ ONLY(159先例)+受限账号",
+      "masking": "SUPPORTED sanitize_definition",
+      "12c_note": "INFECTION_SURVEILLANCE先读CON_NAME确认容器身份，不执行ALTER SESSION SET CONTAINER"
+    },
+    "mysql": {
+      "covers_B": ["RESEARCH_MYSQL(MariaDB10.6)", "OUTPATIENT_APPT(MySQL8)", "QUEUE(MySQL8)", "ADVERSE_EVENT(MariaDB10.2)"],
+      "object_list": "SUPPORTED information_schema.SCHEMATA(排除系统库)",
+      "columns": "SUPPORTED COLUMNS批量IN",
+      "pk_uk_fk": "SUPPORTED TABLE_CONSTRAINTS+KEY_COLUMN_USAGE(含引用列)",
+      "indexes": "SUPPORTED STATISTICS复合序",
+      "partitions": "PARTIAL 未采分区明细(首轮 TABLES 不展开)",
+      "definitions": "SUPPORTED VIEWS.VIEW_DEFINITION(脱敏+截断)",
+      "estimated_rows": "SUPPORTED TABLE_ROWS(标注估算)",
+      "space": "SUPPORTED DATA_LENGTH/INDEX_LENGTH；DATA_FREE标注共享空间不入表合计",
+      "batching_pagination": "SUPPORTED 批量IN",
+      "cancel": "PARTIAL read_timeout客户端；取消状态未知时冻结该源(计划§3.2)",
+      "readonly_protection": "SUPPORTED SET SESSION TRANSACTION READ ONLY + da_readonly(4库已切换)",
+      "masking": "SUPPORTED sanitize_definition"
+    },
+    "sqlserver": {
+      "covers_B": ["TRANSFUSION_NEW(2012 SP3)"],
+      "object_list": "SUPPORTED sys.databases(ONLINE,>4)→白名单业务库(XH_BIS等)；ReportServer/TempDB列为系统组件不入业务层",
+      "columns": "SUPPORTED sys.columns(U+V)含identity/computed",
+      "pk_uk_fk": "SUPPORTED key_constraints复合序+foreign_keys(is_disabled/is_not_trusted)",
+      "indexes": "SUPPORTED sys.indexes复合序+type_desc",
+      "partitions": "PARTIAL 容量含分区页求和；分区列明细未采",
+      "definitions": "SUPPORTED sys.sql_modules(159先例含例程447文本，r188首轮限视图200)",
+      "estimated_rows": "SUPPORTED sys.partitions仅index_id 0/1求和",
+      "space": "SUPPORTED allocation_units total_pages*8KB(rows仅0/1防双算)",
+      "batching_pagination": "SUPPORTED",
+      "cancel": "PARTIAL pymssql客户端timeout；S2试点实证",
+      "readonly_protection": "PARTIAL 无通用只读开关：LOCK_TIMEOUT 1000ms+默认隔离+元数据-only范围+应用账号Xiheng_user",
+      "masking": "SUPPORTED sanitize_definition(159实测Password=***已脱敏)"
+    },
+    "postgresql": {
+      "covers_B": ["HEARING_TEST(HuaChainSQL兼容)", "BRONCHOSCOPY", "HEMODIALYSIS"],
+      "object_list": "SUPPORTED pg_namespace排除系统schema",
+      "columns": "SUPPORTED pg_attribute批format_type+注释+identity/generated",
+      "pk_uk_fk": "SUPPORTED pg_constraint+get_constraintdef+convalidated",
+      "indexes": "SUPPORTED pg_index+get_indexdef",
+      "partitions": "SUPPORTED relispartition+pg_inherits父子标志(容量去重依据)",
+      "definitions": "SUPPORTED pg_get_viewdef(脱敏+截断)",
+      "estimated_rows": "SUPPORTED reltuples(-1/NULL→未知null)",
+      "space": "PARTIAL pg_total_relation_size逐对象受限限流(400/夜)；国产兼容差异记录",
+      "batching_pagination": "SUPPORTED",
+      "cancel": "SUPPORTED(协议级) statement_timeout服务端取消+idle_in_transaction超时；S2试点实证",
+      "readonly_protection": "SUPPORTED default_transaction_read_only=on+statement_timeout",
+      "masking": "SUPPORTED sanitize_definition",
+      "huachain_risk": "HuaChainSQL元数据函数兼容性未实证——BRONCHOSCOPY/HEMODIALYSIS先行试点，函数级失败只记error"
+    }
+  },
+  "test_evidence": "backend/tests/test_harvest_r188_lowload.py 12 passed (--noconftest纯逻辑, 2026-09-13); DB集成验证待S2夜窗试点",
+  "159_snapshot_validation": {
+    "bloodnew": "身份匹配10.10.8.7:1433 ✅ sha256=9bf9924fc10156bb 已脱敏(Password=***) 结构289表/7227字段 可作S3对照基线",
+    "queue": "身份匹配10.10.8.163:3306 ✅ sha256=f3f8ae127a980363 62表/750字段 可作S3对照基线",
+    "sddw_r4": "身份匹配zjjs-db/orcl ✅ sha256=25cc5343a29daf3c 443表/116视图/859索引列(修正笛卡尔bug) 有效复用",
+    "sddw_old": "sha256=24f909c790bf9b0c 482表含SYSTEM+索引273,631作废——继续隔离不使用",
+    "coverage_gaps": "三快照均无容量/空间数据(S5需夜窗补采)；无Oracle约束STATUS/分区标志；采集龄17天(统计日期以LAST_ANALYZED为准)"
+  }
+}

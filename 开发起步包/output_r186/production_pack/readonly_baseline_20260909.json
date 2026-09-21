@@ -1,0 +1,147 @@
+
+{
+  "collected_at": "2026-09-09T13:06:22.788386+00:00",
+  "scope": "container_readonly",
+  "build": {
+    "build_id": "r186-20260909c",
+    "git_sha": "96ed027-plus174-175"
+  },
+  "settings_186": {
+    "identity_run_mode": "observe",
+    "identity_dual_source_enforce": true,
+    "identity_sync_enabled": false,
+    "identity_nightly_enabled": false,
+    "identity_scheduler_provider": "host_cron",
+    "identity_phase_d_approval_version_set": true,
+    "identity_clock_sampling_enabled": true,
+    "identity_drift_readback_enabled": false,
+    "identity_account_state_batch_limit": 2000,
+    "identity_account_state_total_cap": 5000,
+    "identity_window_max_persons": 20
+  },
+  "alembic_head": "e8f9a0b1c2d3",
+  "action_executors": [
+    {
+      "code": "CDMS_ACCOUNT_DISABLE",
+      "enabled": true,
+      "target": "CDMS",
+      "source": "paperless_cdms_oracle_10_10_10_93",
+      "require_approval": true
+    },
+    {
+      "code": "CDMS_ACCOUNT_ENABLE",
+      "enabled": false,
+      "target": "CDMS",
+      "source": "paperless_cdms_oracle_10_10_10_93",
+      "require_approval": true
+    },
+    {
+      "code": "JHEMR_ACCOUNT_DISABLE",
+      "enabled": true,
+      "target": "JHEMR",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "require_approval": true
+    },
+    {
+      "code": "JHEMR_ACCOUNT_ENABLE",
+      "enabled": false,
+      "target": "JHEMR",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "require_approval": true
+    }
+  ],
+  "purpose_bindings": [
+    {
+      "source": "jhemr_vastbase_10_10_8_177",
+      "purpose": "identity_account_sync",
+      "enabled": true,
+      "credential_status": "configured",
+      "has_ref": true
+    },
+    {
+      "source": "paperless_cdms_oracle_10_10_10_93",
+      "purpose": "identity_account_sync",
+      "enabled": true,
+      "credential_status": "configured",
+      "has_ref": true
+    }
+  ],
+  "source_registry_write_summary": [
+    {
+      "source": "his_source_10_10_10_15",
+      "write_policy": "medical_dict_push",
+      "has_write_ref": true,
+      "credential_status": "configured",
+      "enabled": true
+    },
+    {
+      "source": "jhemr_vastbase_10_10_8_177",
+      "write_policy": "medical_dict_push",
+      "has_write_ref": true,
+      "credential_status": "configured",
+      "enabled": true
+    },
+    {
+      "source": "paperless_cdms_oracle_10_10_10_93",
+      "write_policy": "readonly",
+      "has_write_ref": false,
+      "credential_status": "configured",
+      "enabled": true
+    }
+  ],
+  "identity_counts": {
+    "protected_accounts": 0,
+    "managed_relations_active": 450,
+    "managed_relations_total": 450,
+    "account_state_decisions": 0,
+    "approved_scopes": 1,
+    "window_budgets": 0
+  },
+  "recent_scheduler_runs": [
+    {
+      "run_id": "RUN-ee75de9f7092",
+      "status": "success",
+      "started_at": "2026-09-09 02:00:02.893446+08:00",
+      "finished_at": "2026-09-09 02:00:57.713965+08:00",
+      "cb_triggered": false,
+      "cb_dimension": null,
+      "has_error_message": false
+    },
+    {
+      "run_id": "RUN-514378f88d2e",
+      "status": "success",
+      "started_at": "2026-09-08 02:00:03.149959+08:00",
+      "finished_at": "2026-09-08 02:00:55.296781+08:00",
+      "cb_triggered": false,
+      "cb_dimension": null,
+      "has_error_message": false
+    },
+    {
+      "run_id": "RUN-464a660b0cb3",
+      "status": "success",
+      "started_at": "2026-09-07 02:00:03.560584+08:00",
+      "finished_at": "2026-09-07 02:00:53.183915+08:00",
+      "cb_triggered": false,
+      "cb_dimension": null,
+      "has_error_message": false
+    },
+    {
+      "run_id": "RUN-2df6cd6db381",
+      "status": "success",
+      "started_at": "2026-09-06 08:44:06.220310+08:00",
+      "finished_at": "2026-09-06 08:44:57.575155+08:00",
+      "cb_triggered": false,
+      "cb_dimension": null,
+      "has_error_message": false
+    },
+    {
+      "run_id": "RUN-69e87f7f27dd",
+      "status": "failed",
+      "started_at": "2026-09-06 02:00:03.294696+08:00",
+      "finished_at": "2026-09-06 02:00:52.970347+08:00",
+      "cb_triggered": true,
+      "cb_dimension": "max_change_ratio",
+      "has_error_message": false
+    }
+  ]
+}

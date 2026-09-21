@@ -1,0 +1,133 @@
+{
+ "schema_version": "r188-manifest/1.0",
+ "run_id": "r188-20260913",
+ "generator": "ZCode session 2026-09-13 (day phase)",
+ "plan_ref": "188_未探索业务数据库只读探索执行计划.md v2.1",
+ "phase": "s10_applied_s11_verified_complete",
+ "platform_baseline_at": "2026-09-13 16:22:33.092966+08",
+ "inputs": {
+  "platform_baseline": "sources/platform_baseline_20260913.json",
+  "credrefs": "sources/platform_credrefs_20260913.json",
+  "159_snapshots": "数据资产_七系统源端资产包/snapshots + server sddw_snapshot_r4.json"
+ },
+ "artifacts": {
+  "scope_manifest": "scope_manifest.json",
+  "capability_matrix": "capability_matrix.json",
+  "systems_inventory": "systems_inventory.csv",
+  "classification_proposals": "classification_proposals.csv (A-class 12767 tables, basic-v1)",
+  "classification_stats": "classification_stats_A.json",
+  "relation_candidates": "relation_candidates.json (152 entries from 159 evidence)",
+  "value_domain_candidates": "value_domain_candidates.json (859 offline candidates)",
+  "checkpoint": "checkpoint.json",
+  "unresolved": "unresolved.json",
+  "capacity_metrics": "capacity_metrics.json (night1 3源三层)",
+  "classification_stats_B": "classification_stats_B_all.json (13源逐源终态)",
+  "import_diff": "import_diff.json (final full dry-run basis)",
+  "s9_approval_package": "S9_批准包清单.md (呈报用户, apply未执行)",
+  "final_dryrun_evidence": "logs/dryrun_final.json + logs/pkg_final.sha256",
+  "source_reports": "sources/*.md 13 份（QUEUE/SDDW/TRANSFUSION 日相 + 夜相二 10 份含 BRONCHOSCOPY BLOCKED 简报）"
+ },
+ "source_writes": 0,
+ "source_write_evidence": "day phase: zero source connections; all artifacts from platform read-only + local offline analysis",
+ "code_changes": {
+  "new": [
+   "backend/scripts/harvest_r188_lowload.py",
+   "backend/scripts/run_r188_night.py",
+   "backend/scripts/build_r188_package_and_import.py",
+   "backend/tests/test_harvest_r188_lowload.py",
+   "backend/tests/plan139/test_build_r188_fk_derivation.py"
+  ],
+  "modified": [
+   ".gitignore (+output_r188 rules)",
+   "backend/scripts/import_plan139_sources_to_platform.py (+skipped_prepare 计数)"
+  ]
+ },
+ "sddw_test_excluded": "confirmed absent from platform (S0)",
+ "approval_gaps": [
+  "S10 生产平台 apply：S9 批准包已呈报（S9_批准包清单.md），待用户批准；apply 须带 --systems 13 源避免刷新 plan139 旧 5 源 profile",
+  "院感 NIS5/NIS6 列补采：需 DBA/运维确认 ORA-03156 后小批次另行授权",
+  "气管镜重连验证：需网络科/厂商确认访问策略后用户点名",
+  "输血 XH_BIS/HyAppFrame：待熙恒 DBA 授权，不用 sa/.bak-admin 兜底",
+  "Git 提交：未申请"
+ ],
+ "night1": {
+  "server_dir": "/opt/data-asset/evidence/r188-exploration-20260913/",
+  "snapshots": [
+   "emergency_clinic_10_10_10_120.r2.snapshot.json",
+   "mr_mgmt_10_10_10_55.r2.snapshot.json",
+   "bloodnew_sqlserver_10_10_8_7.xh40.snapshot.json"
+  ],
+  "budget_summary": {
+   "emergency": "74stmt/1.0sDB",
+   "mr_mgmt": "238stmt/6.8sDB",
+   "bloodnew_xh40": "9stmt/0.3sDB"
+  },
+  "source_writes": 0,
+  "incidents": [
+   "ORA-00942 ALL_SEGMENTS×2 → USER_SEGMENTS降级修复（结构数据零损失）",
+   "11g兼容×2 (CON_NAME/oracle_maintained) → 试点期修复",
+   "bloodnew Xiheng_user 仅XH_BIS_4.0可及(HAS_DBACCESS实测) → XH_BIS/HyAppFrame BLOCKED_PRIVILEGE"
+  ]
+ },
+ "night2": {
+  "executed": "2026-09-14/15 (server clock lags local ~8.5h)",
+  "queues": "remaining -> r2fix -> r3fix -> r4fix",
+  "final_status": {
+   "DONE": 9,
+   "PARTIAL": [
+    "INFECTION_SURVEILLANCE(ORA-03156 owner NIS5/NIS6, DBA confirm needed for smaller-batch retry)",
+    "TRANSFUSION_NEW(XH_BIS_4.0 only; XH_BIS/HyAppFrame BLOCKED_PRIVILEGE)"
+   ],
+   "BLOCKED": [
+    "BRONCHOSCOPY(server closed connection, single attempt per plan)"
+   ]
+  },
+  "collector_sha256_16": "8340f579e406d0ac",
+  "analyzer": "_scratch/r188_analyze_all.py refreshed capacity/classification/stats/SHA",
+  "isolated_dry_run": "selftest OK; 3 batches + FINAL full run all exit=0 rollback zero-write; final: 6102/74693 all inserts, eligible_reviews=484",
+  "source_writes": 0,
+  "final_full_dry_run": {
+   "executed": "2026-09-16 server time 18:33-18:48 (container /tmp/r188dry rebuilt after restart)",
+   "exit": 0,
+   "package_totals": {
+    "objects": 6102,
+    "columns": 74693,
+    "fk_candidate_groups": 542,
+    "view_dependencies": 0
+   },
+   "import": {
+    "tables_inserts": 6102,
+    "tables_updates": 0,
+    "columns_writes": 74693,
+    "candidates_in": 542,
+    "prepared_reviews": 486,
+    "skipped_prepare": 28,
+    "eligible_reviews": 484,
+    "skipped_metadata": 2,
+    "source_identity_conflicts": 0
+   },
+   "batch3_eligible0_root_cause": "候选不随 --systems 过滤（跨批端点表缺失所致），非 _resolve_endpoint 大小写问题；全量运行 484 条通过",
+   "evidence": "logs/dryrun_final.json; container pkg SHA=logs/pkg_final.sha256"
+  },
+  "closing_fixes_20260916": [
+   "build_r188_package_and_import.py: Oracle R 行按约束组归并+position 推导被引用列(359/387 组)、PG FK 定义文本解析(31/31)；FK 口径 545 行→542 组，完整键候选 124→514",
+   "import_plan139_sources_to_platform.py: summary 补 skipped_prepare 计数",
+   "回归: tests/plan139/test_build_r188_fk_derivation.py 6 例新增，plan139 套件 64 过"
+  ]
+ },
+ "s10_s11": {
+  "status": "DONE (2026-09-17)",
+  "applied": "5855 tables inserted + 72807 columns + 450 candidate reviews; zero updates; QUEUE canary pre-landed",
+  "platform_totals_after": {
+   "tables": 18684,
+   "columns": 252104,
+   "reviews": 560,
+   "systems": 37,
+   "sources": 40
+  },
+  "exclusions": "17 MEDCOMM (DOCARE-owned) + 80 vendor sample-schema keys; built into builder for idempotent rebuilds",
+  "idempotency": "second same-package dry-run: zero writes, 458 skipped-existing reviews",
+  "env_note": "SSH outage root-caused to local Clash Verge TUN hijacking LAN; fixed via mihomo route-exclude-inet RFC1918 bypass (2026-09-17)",
+  "evidence": "logs/apply_v3.json, logs/dryrun_v3prod.json, logs/dryrun_v3second.json, logs/s11_readback.json"
+ }
+}

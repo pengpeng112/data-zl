@@ -1,0 +1,42 @@
+{
+ "generated_at": "2026-09-21",
+ "run_id": "r197-20260921-s1",
+ "note": "S6 活库证据收集，提交平台 pending 待人工确认（AI 不 confirm）",
+ "candidates": [
+  {
+   "table": "COMM.OPERATION_DICT",
+   "column": "OPERATION_SCALE",
+   "observed": "None/'一'/'一 '(尾随空格!)/'二'/'三'/'四'",
+   "evidence": "Q21",
+   "risk": "带空格变体会使 ='一' 过滤漏数；建议值域治理同时登记清洗建议"
+  },
+  {
+   "table": "COMM.OPERATION_DICT",
+   "column": "STOP_FLAG",
+   "observed": "0/1/第三值（3 组）",
+   "evidence": "Q06(DEPT_DICT 3 值)/Q21",
+   "risk": "字典停用标志语义"
+  },
+  {
+   "table": "EXAM.EXAM_MASTER",
+   "column": "EXAM_CLASS",
+   "observed": "17 个中文值（心电图/B超/CT/磁共振/X线/肺功能/听力检查/消化内镜/支气管镜/脑电图/肌电图/数字胃肠/乳腺钼靶/牙片室/一氧化氮/儿童肺功能/动态血压）",
+   "evidence": "Q26",
+   "risk": "过滤按中文字面，勿 join 字典（AGENTS 硬约束 5 活库复核）"
+  },
+  {
+   "table": "INPBILL.INP_BILL_DETAIL",
+   "column": "ITEM_CLASS",
+   "observed": "A/B/C/D/H/I/J/K/Q 等 12 组，OPER_CODE 非空率≈99%+；LEN≥8 集中在 D 类 17 行",
+   "evidence": "Q15",
+   "risk": "OPER_CODE 多义分流的身份类别值域（与 RCP-S3-07 联动）"
+  },
+  {
+   "table": "INPBILL.INP_BILL_DETAIL",
+   "column": "OPER_CODE",
+   "observed": "长度分布因类而异（D 类出现 ≥8 位手术式样编码）",
+   "evidence": "Q15",
+   "risk": "多义键四身份按费用类别分流（ISS-S3-OPERMULTI）"
+  }
+ ]
+}

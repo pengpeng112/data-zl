@@ -1,0 +1,87 @@
+[
+  {
+    "src": "24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+    "out": "24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+    "view": "V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR"
+  },
+  {
+    "src": "一般手术记录_v_emr_opera_record.sql",
+    "out": "一般手术记录_v_emr_opera_record_jhemr.sql",
+    "view": "V_EMR_OPERA_RECORD_JHEMR"
+  },
+  {
+    "src": "住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+    "out": "住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD_jhemr.sql",
+    "view": "V_EMR_HOS_SUCCESSION_RECORD_JHEMR"
+  },
+  {
+    "src": "入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+    "out": "入院记录(D08标）_v_EMR_ADMISSION_RECORD_jhemr.sql",
+    "view": "V_EMR_ADMISSION_RECORD_JHEMR"
+  },
+  {
+    "src": "其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+    "out": "其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+    "view": "V_EMR_INFOR_OTHERS_JHEMR"
+  },
+  {
+    "src": "出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+    "out": "出院记录(D12标）_v_EMR_DISCHARGE_RECORD_jhemr.sql",
+    "view": "V_EMR_DISCHARGE_RECORD_JHEMR"
+  },
+  {
+    "src": "手术知情同意书_v_emr_infor_operation.sql",
+    "out": "手术知情同意书_v_emr_infor_operation_jhemr.sql",
+    "view": "V_EMR_INFOR_OPERATION_JHEMR"
+  },
+  {
+    "src": "抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+    "out": "抢救记录_v_EMR_HOS_SAVE_RECORD_jhemr.sql",
+    "view": "V_EMR_HOS_SAVE_RECORD_JHEMR"
+  },
+  {
+    "src": "术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+    "out": "术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS_jhemr.sql",
+    "view": "V_EMR_HOS_PREOP_DISCUSS_JHEMR"
+  },
+  {
+    "src": "术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+    "out": "术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD_jhemr.sql",
+    "view": "V_EMR_HOS_POSTOPER_RECORD_JHEMR"
+  },
+  {
+    "src": "死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+    "out": "死亡病历讨论记录_v_EMR_HOS_DND_RECORD_jhemr.sql",
+    "view": "V_EMR_HOS_DND_RECORD_JHEMR"
+  },
+  {
+    "src": "死亡记录表_V_EMR_DEATH_RECORD.sql",
+    "out": "死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+    "view": "V_EMR_DEATH_RECORD_JHEMR"
+  },
+  {
+    "src": "特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+    "out": "特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql",
+    "view": "V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR"
+  },
+  {
+    "src": "电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+    "out": "电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+    "view": "V_EMR_MEDICAL_RECORD_INFO_JHEMR"
+  },
+  {
+    "src": "疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+    "out": "疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS_jhemr.sql",
+    "view": "V_EMR_HOS_DIFFIC_CASE_DISCUSS_JHEMR"
+  },
+  {
+    "src": "病危(重)通知书_v_emr_infor_critically_ill.sql",
+    "out": "病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+    "view": "V_EMR_INFOR_CRITICALLY_ILL_JHEMR"
+  },
+  {
+    "src": "转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+    "out": "转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD_jhemr.sql",
+    "view": "V_EMR_HOS_CHANGE_MAJOR_RECORD_JHEMR"
+  }
+]

@@ -1,0 +1,1370 @@
+[
+ {
+  "schema": "HIS",
+  "table": "STAFF_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 45,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EPR_INPATIENT_DOCINDEX",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 17,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EPR_INPATIENT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 17,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD36",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD_CONTENT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 15,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "PAT_MASTER_INDEX",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 58,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "PAT_VISIT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 57,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "V_EMR_ADMISSION_RECORD",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "DIAGNOSIS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 38,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "ORDERS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 4,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "JHEMR",
+  "table": "JHMR_FILE_INDEX",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 17,
+  "draft_ref": "Y",
+  "extra_systems": "JHEMR_VASTBASE"
+ },
+ {
+  "schema": "JHEMR",
+  "table": "JHMR_FILE_CONTENT_TEXT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 15,
+  "draft_ref": "Y",
+  "extra_systems": "JHEMR_VASTBASE"
+ },
+ {
+  "schema": "HIS",
+  "table": "DEPT_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 49,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "CDA",
+  "table": "CDA_DICTIONARY",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 40,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OPERATION",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 13,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "DOC_REGISTER_EMP_MATCH",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 9,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD9",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_OPERATION_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 13,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_DIAGNOSIS_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_DOC_FORM_RECORDS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 5,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_DOC_FORM",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 6,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "INPATIENTS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 8,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "DEPT_DICT@HIS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 7,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "PAT_VISIT@HIS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 8,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "DIAGNOSIS@HIS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 6,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "CDA_DICTIONARY@SJZX",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 7,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "CONSULTATION_DOCTOR_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "CONSULTATION_DOCTOR_DETAIL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "DRUG_STANDARD_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "CDA_VALUE_DOMAIN_MAP",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 4,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "PORTAL_USER",
+  "table": "PORTAL_SYS_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "DRUG_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "MED_DICT_BASEINFO",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "CDA",
+  "table": "T_JBJL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD41",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "MR_BILL_COSTS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OPERATION_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "REGEXP_REPLACE",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "INP_SETTLE_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "INP_SETTLE_MASTER_YB",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "INP_BILL_DETAIL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "PRICE_LIST",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "PATS_IN_HOSPITAL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 4,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD34",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_ASSESS_FORM_RECORD",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_ASSESS_FORM",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "DIAGNOSIS_BASY",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD31",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "DBO",
+  "table": "PITAYA",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "C##NIS5",
+  "table": "OPERATION_SOURCE",
+  "view_owner": "C##FXPT",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "C##NIS5",
+  "table": "BACTERIA",
+  "view_owner": "C##FXPT",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "C##NIS5",
+  "table": "ANTIBIOTICS",
+  "view_owner": "C##FXPT",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "C##NIS5",
+  "table": "OVERALL",
+  "view_owner": "C##FXPT",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "C##NIS5",
+  "table": "INFECTION",
+  "view_owner": "C##FXPT",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "BD_PSNDOC",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "HI_PSNJOB",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "BD_PSNCL",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "ORG_DEPT",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "MD_ENUMVALUE",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "BD_DEFDOC",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "HI_PSNDOC_EDU",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "HI_PSNDOC_GLBDEF2",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HRPSEY656",
+  "table": "CDA_SECTION_MAP",
+  "view_owner": "HRPSEY656",
+  "deploy_system": "HRP",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "EXAM",
+  "table": "EXAM_MASTER",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "EXAM",
+  "table": "EXAM_ITEMS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "EXAM",
+  "table": "EXAM_REPORT",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "EXAM",
+  "table": "EXAM_APPOINTS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "PAT_MASTER_INDEX",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "DEPT_DICT",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "PAT_VISIT",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "OUTP_TREAT_REC",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "CLINIC_MASTER",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "OUTP_ORDER_DESC",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "SYS_EMPLOYEE",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "D07_EXAM_ITEM_MAP",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "CLINIC_ITEM_MAPPING",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_OPERATION_SCHEDULE",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 4,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_ANESTHESIA_PLAN",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 5,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_CUSTOM_DATA",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 5,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD46",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD44",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD47",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "V_EMR_EXAM_IMAGE_REP",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "V_EMR_INSPECTION_TEST",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "LAB_RESULT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "LAB_TEST_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "LAB_TEST_ITEMS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "CLINIC_ITEM_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_ORDER_DESC",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 4,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "LIS_EXAMINE_ITEM_MAP",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "CLINIC_ITEM_MAPPING_U",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD51",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_VITAL_INFO",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_SYS_USERS",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_EVENT_INFO",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD40",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD49",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD37",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "LUNA_MCS_SDSEY",
+  "table": "MCS_ORDER_SCHEDULE",
+  "view_owner": "LUNA_MCS_SDSEY",
+  "deploy_system": "MOBILE_NURSING",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_TREATMENT",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "REGISTER_HOSPITALIZATION",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "BASE",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "PLAN_PATIENTPRESCRIPTION",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_BEFORESIGNS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_AFTERSIGNS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "REGISTER_VASCULARACCESS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "REGISTER_IDINFOMATION",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "PLAN_PATIENTPRESCRIPTIONMATERIAL",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "PP",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "AUXILIARY_MATERIALINFOMATION",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_DURINGSYMPTOM",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_BEFORECHECK",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "AGE",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "REGISTER_PATIENTINFOMATION",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "H",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "BS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "AFS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "VA",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "IDCARD",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "MAT",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "COMP",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "BC",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "ORGAN_EMPLOYEE",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_DURINGSIGNS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "TREATMENT_DURINGPARAM",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "SIGNS",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "DPARAM",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "ORDER_PATIENTDAYORDERDEAL",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": null,
+  "table": "ORDER_PATIENTDAYORDER",
+  "view_owner": "",
+  "deploy_system": "?",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "ADT_LOG",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "Y",
+  "extra_systems": ""
+ },
+ {
+  "schema": "MTL",
+  "table": "EMRSD42",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SX",
+  "table": "B_T_REQD",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SX",
+  "table": "B_T_XYXXB",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SX",
+  "table": "B_T_REACTIONS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "CLINIC_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 5,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "TITLE_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "ODS",
+  "table": "MUNICIPAL_DICT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_MR",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_RCPT_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 3,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_MR_DIAG_DESC",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "DRUG_PRESC_MASTER",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "DRUG_PRESC_DETAIL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "DRUG_PRICE_LIST",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "INSUR_VSH_CENTER_ITEM_NEW",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SHUNNENG",
+  "table": "APPOINTINFOVIEW",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_BILL_ITEMS",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_PAYMENTS_MONEY",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_TREAT_REC",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "HIS",
+  "table": "OUTP_PRESC_T",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_ANESTHESIA_EVENT",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_PAT_MASTER_INDEX",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 2,
+  "draft_ref": "",
+  "extra_systems": ""
+ },
+ {
+  "schema": "SM",
+  "table": "MED_EMR_ARCHIVE_DETIAL",
+  "view_owner": "ODS",
+  "deploy_system": "DATA_CENTER",
+  "ref_files": 1,
+  "draft_ref": "",
+  "extra_systems": ""
+ }
+]

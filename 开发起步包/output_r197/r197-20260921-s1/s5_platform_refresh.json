@@ -1,0 +1,1809 @@
+{
+ "refreshed_at": "2026-09-21",
+ "s5_tables": 195,
+ "formal_relations_s5_tables": [
+  [
+   "488",
+   "",
+   "MCS_DOC_FORM",
+   "LUNA_MCS_SDSEY",
+   "MCS_DOC_TEMPLATE",
+   "MCS_DOC_FORM(TEMPLATE_CODE) = MCS_DOC_TEMPLATE(CODE)",
+   "A",
+   "verified"
+  ],
+  [
+   "27",
+   "HIS",
+   "PAT_VISIT",
+   "ODS",
+   "DOC_REGISTER_EMP_MATCH",
+   "EMP_NO",
+   "A",
+   "missing_in_8216"
+  ],
+  [
+   "14",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "EXAM_MASTER",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "needs_split"
+  ],
+  [
+   "528",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "553",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "EXAM_MASTER",
+   "PAT_VISIT.PATIENT_ID=EXAM_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=EXAM_MASTER.VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "554",
+   "HIS",
+   "EXAM_MASTER",
+   "HIS",
+   "OUTP_RCPT_MASTER",
+   "EXAM_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(EXAM_MASTER.VISIT_ID,0)=0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "555",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "LAB_TEST_MASTER",
+   "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND PAT_VISIT.VISIT_ID=LAB_TEST_MASTER.VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "556",
+   "HIS",
+   "LAB_TEST_MASTER",
+   "HIS",
+   "OUTP_RCPT_MASTER",
+   "LAB_TEST_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(LAB_TEST_MASTER.VISIT_ID,0)=0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "557",
+   "HIS",
+   "INP_BILL_DETAIL",
+   "HIS",
+   "ORDERS",
+   "INP_BILL_DETAIL.OPER_CODE=ORDERS.APP_NO AND LENGTH(OPER_CODE)>=8",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "558",
+   "HIS",
+   "OUTP_ORDER_DESC",
+   "HIS",
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC.VISIT_DATE=OUTP_BILL_ITEMS.VISIT_DATE AND VISIT_NO AND RCPT_NO",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "559",
+   "HIS",
+   "OUTP_BILL_ITEMS",
+   "HIS",
+   "LAB_RESULT",
+   "OUTP_BILL_ITEMS.APPOINT_NO=LAB_RESULT.TEST_NO AND ITEM_NO=ITEM_NO",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "539",
+   "MEDREC",
+   "PAT_VISIT",
+   "HIS",
+   "PAT_VISIT",
+   "源端 MEDREC.PAT_VISIT → ODS HIS.PAT_VISIT 同名汇聚镜像",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "560",
+   "MEDREC",
+   "PAT_VISIT",
+   "EXAM",
+   "EXAM_MASTER",
+   "PATIENT_ID+VISIT_ID AND EXAM_MASTER.VISIT_ID<>0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "564",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "ORDADM",
+   "ORDERS",
+   "INP_BILL_DETAIL.OPER_CODE=ORDERS.APP_NO AND LENGTH(OPER_CODE)>=8",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "565",
+   "OUTPBILL",
+   "OUTP_ORDER_DESC",
+   "OUTPBILL",
+   "OUTP_BILL_ITEMS",
+   "VISIT_DATE+VISIT_NO+RCPT_NO",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "566",
+   "OUTPBILL",
+   "OUTP_BILL_ITEMS",
+   "LAB",
+   "LAB_RESULT",
+   "APPOINT_NO=TEST_NO AND ITEM_NO=ITEM_NO",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "567",
+   "MEDREC",
+   "DIAGNOSIS",
+   "COMM",
+   "DIAGNOSIS_TYPE_DICT",
+   "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "568",
+   "LAB",
+   "LAB_TEST_ITEMS",
+   "LAB",
+   "LAB_RESULT",
+   "LAB_TEST_ITEMS.TEST_NO=LAB_RESULT.TEST_NO AND LAB_TEST_ITEMS.ITEM_NO=LAB_RESULT.ITEM_NO",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "569",
+   "INPBILL",
+   "INP_SETTLE_MASTER",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "INP_SETTLE_MASTER.PATIENT_ID=INP_BILL_DETAIL.PATIENT_ID AND INP_SETTLE_MASTER.VISIT_ID=INP_BILL_DETAIL.VISIT_ID",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "561",
+   "EXAM",
+   "EXAM_MASTER",
+   "OUTPBILL",
+   "OUTP_RCPT_MASTER",
+   "EXAM_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(VISIT_ID,0)=0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "562",
+   "MEDREC",
+   "PAT_VISIT",
+   "LAB",
+   "LAB_TEST_MASTER",
+   "PATIENT_ID+VISIT_ID AND LAB_TEST_MASTER.VISIT_ID<>0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "11",
+   "HIS",
+   "OUTP_RCPT_MASTER",
+   "HIS",
+   "OUTP_BILL_ITEMS",
+   "OUTP_RCPT_MASTER.RCPT_NO=OUTP_BILL_ITEMS.RCPT_NO",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "21",
+   "HIS",
+   "DIAGNOSIS",
+   "HIS",
+   "DIAGNOSIS_TYPE_DICT",
+   "DIAGNOSIS.DIAGNOSIS_TYPE=DIAGNOSIS_TYPE_DICT.DIAGNOSIS_TYPE_CODE",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "9",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "ORDERS",
+   "PATIENT_ID+VISIT_ID",
+   "B",
+   "verified"
+  ],
+  [
+   "20",
+   "HIS",
+   "DIAGNOSIS",
+   "CDA",
+   "CDA_DICTIONARY",
+   "CDA_DICTIONARY.字典名称='ICD-10诊断编码' AND 系统标识='HIS' AND 院标编码=DIAGNOSIS.DIAGNOSIS_CODE",
+   "B",
+   "sample_verified"
+  ],
+  [
+   "538",
+   "HIS",
+   "CLINIC_MASTER",
+   "HIS",
+   "PAT_MASTER_INDEX",
+   "HIS.CLINIC_MASTER.PATIENT_ID = HIS.PAT_MASTER_INDEX.PATIENT_ID",
+   "B",
+   "sample_pass"
+  ],
+  [
+   "537",
+   "HIS",
+   "INP_BILL_DETAIL",
+   "HIS",
+   "PAT_VISIT",
+   "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID",
+   "B",
+   "sample_pass"
+  ],
+  [
+   "563",
+   "LAB",
+   "LAB_TEST_MASTER",
+   "OUTPBILL",
+   "OUTP_RCPT_MASTER",
+   "LAB_TEST_MASTER.RCPT_NO=OUTP_RCPT_MASTER.RCPT_NO AND NVL(VISIT_ID,0)=0",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "452",
+   "INPADM",
+   "ADT_LOG",
+   "MEDREC",
+   "PAT_VISIT",
+   "INPADM.ADT_LOG(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "453",
+   "ORDADM",
+   "ORDERS",
+   "MEDREC",
+   "PAT_VISIT",
+   "ORDADM.ORDERS(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "458",
+   "LAB",
+   "LAB_TEST_MASTER",
+   "MEDREC",
+   "PAT_VISIT",
+   "LAB.LAB_TEST_MASTER(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "462",
+   "EXAM",
+   "EXAM_MASTER",
+   "MEDREC",
+   "PAT_VISIT",
+   "EXAM.EXAM_MASTER(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "504",
+   "",
+   "MCS_EVENT_INFO",
+   "",
+   "INPATIENTS",
+   "MCS_EVENT_INFO(PATIENT_UID) = INPATIENTS(PAT_INDEX_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "505",
+   "LUNA_MCS_SDSEY",
+   "MCS_HIS_PATIENT",
+   "",
+   "INPATIENTS",
+   "MCS_HIS_PATIENT(PATIENT_UID) = INPATIENTS(PAT_INDEX_NO)",
+   "C",
+   "candidate"
+  ],
+  [
+   "486",
+   "",
+   "MCS_DOC_FORM",
+   "",
+   "INPATIENTS",
+   "MCS_DOC_FORM(PATIENT_UID) = INPATIENTS(PAT_INDEX_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "487",
+   "",
+   "MCS_DOC_FORM_RECORDS",
+   "",
+   "MCS_DOC_FORM",
+   "MCS_DOC_FORM_RECORDS(FORM_ID) = MCS_DOC_FORM(ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "490",
+   "",
+   "MCS_VITAL_INFO",
+   "",
+   "INPATIENTS",
+   "MCS_VITAL_INFO(PATIENT_UID) = INPATIENTS(PAT_INDEX_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "503",
+   "",
+   "MCS_DOC_FORM_RECORDS",
+   "",
+   "INPATIENTS",
+   "MCS_DOC_FORM_RECORDS(PATIENT_UID) = INPATIENTS(PAT_INDEX_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "481",
+   "HISUSER",
+   "V_EMR_EXAM_IMAGE_REP",
+   "EXAM",
+   "EXAM_APPOINTS",
+   "view dependency",
+   "B",
+   "verified_dependency"
+  ],
+  [
+   "482",
+   "HISUSER",
+   "V_EMR_EXAM_IMAGE_REP",
+   "EXAM",
+   "EXAM_ITEMS",
+   "view dependency",
+   "B",
+   "verified_dependency"
+  ],
+  [
+   "465",
+   "EXAM",
+   "EXAM_BILL_ITEMS",
+   "EXAM",
+   "EXAM_MASTER",
+   "EXAM.EXAM_BILL_ITEMS(EXAM_NO) = EXAM.EXAM_MASTER(EXAM_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "464",
+   "EXAM",
+   "EXAM_ITEMS",
+   "EXAM",
+   "EXAM_MASTER",
+   "EXAM.EXAM_ITEMS(EXAM_NO) = EXAM.EXAM_MASTER(EXAM_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "463",
+   "EXAM",
+   "EXAM_REPORT",
+   "EXAM",
+   "EXAM_MASTER",
+   "EXAM.EXAM_REPORT(EXAM_NO) = EXAM.EXAM_MASTER(EXAM_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "483",
+   "HISUSER",
+   "V_EMR_EXAM_IMAGE_REP",
+   "EXAM",
+   "EXAM_MASTER",
+   "view dependency",
+   "B",
+   "verified_dependency"
+  ],
+  [
+   "479",
+   "HISUSER",
+   "V_EMR_EXAM_IMAGE_PATH",
+   "EXAM",
+   "EXAM_REPORT",
+   "view dependency",
+   "B",
+   "verified_dependency"
+  ],
+  [
+   "484",
+   "HISUSER",
+   "V_EMR_EXAM_IMAGE_REP",
+   "EXAM",
+   "EXAM_REPORT",
+   "view dependency",
+   "B",
+   "verified_dependency"
+  ],
+  [
+   "34",
+   "HIS",
+   "CLINIC_MASTER",
+   "HIS",
+   "DEPT_DICT",
+   "CLINIC_MASTER.VISIT_DEPT=DEPT_DICT.DEPT_CODE",
+   "A",
+   "verified"
+  ],
+  [
+   "3",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "DEPT_DICT",
+   "PAT_VISIT.DEPT_ADMISSION_TO=DEPT_DICT.DEPT_CODE",
+   "A",
+   "verified"
+  ],
+  [
+   "4",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "DEPT_DICT",
+   "PAT_VISIT.DEPT_DISCHARGE_FROM=DEPT_DICT.DEPT_CODE",
+   "A",
+   "verified"
+  ],
+  [
+   "32",
+   "MTL",
+   "EPR_INPATIENT_DOCINDEX",
+   "HIS",
+   "DEPT_DICT",
+   "EPR_INPATIENT_DOCINDEX.P_DEPT_CODE=DEPT_DICT.DEPT_CODE",
+   "A",
+   "verified"
+  ],
+  [
+   "2",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "DIAGNOSIS",
+   "PAT_VISIT.PATIENT_ID=DIAGNOSIS.PATIENT_ID AND PAT_VISIT.VISIT_ID=DIAGNOSIS.VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "8",
+   "HIS",
+   "INP_SETTLE_MASTER",
+   "HIS",
+   "INP_BILL_DETAIL",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "15",
+   "HIS",
+   "EXAM_MASTER",
+   "HIS",
+   "EXAM_REPORT",
+   "EXAM_MASTER.EXAM_NO=EXAM_REPORT.EXAM_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "7",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "INP_SETTLE_MASTER",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "26",
+   "JHEMR",
+   "JHMR_FILE_INDEX",
+   "HIS",
+   "DEPT_DICT",
+   "DEPT_CODE",
+   "A",
+   "sample_verified"
+  ],
+  [
+   "18",
+   "HIS",
+   "LAB_TEST_ITEMS",
+   "HIS",
+   "LAB_RESULT",
+   "TEST_NO+ITEM_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "17",
+   "HIS",
+   "LAB_TEST_MASTER",
+   "HIS",
+   "LAB_TEST_ITEMS",
+   "TEST_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "16",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "LAB_TEST_MASTER",
+   "PAT_VISIT.PATIENT_ID=LAB_TEST_MASTER.PATIENT_ID AND (VISIT_ID 相同 OR 0/NULL 按门诊)",
+   "A",
+   "needs_split"
+  ],
+  [
+   "1",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "PAT_MASTER_INDEX",
+   "PAT_VISIT.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "35",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "HIS",
+   "PAT_MASTER_INDEX",
+   "MED_OPERATION_MASTER.PATIENT_ID=PAT_MASTER_INDEX.PATIENT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "6",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "PATS_IN_HOSPITAL",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "33",
+   "HIS",
+   "OPERATION",
+   "HIS",
+   "PAT_VISIT",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "39",
+   "JHEMR",
+   "FIRST_PAGE_COSTS",
+   "HIS",
+   "PAT_VISIT",
+   "FIRST_PAGE_COSTS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(FIRST_PAGE_COSTS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "37",
+   "JHEMR",
+   "JHMR_FILE_CONTENT_DG",
+   "HIS",
+   "PAT_VISIT",
+   "JHMR_FILE_CONTENT_DG.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_CONTENT_DG.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "36",
+   "JHEMR",
+   "JHMR_FILE_INDEX",
+   "HIS",
+   "PAT_VISIT",
+   "JHMR_FILE_INDEX.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(JHMR_FILE_INDEX.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "38",
+   "JHEMR",
+   "PAT_DIAGNOSIS",
+   "HIS",
+   "PAT_VISIT",
+   "PAT_DIAGNOSIS.PATIENT_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(PAT_DIAGNOSIS.VISIT_ID)=TO_CHAR(PAT_VISIT.VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "19",
+   "HIS",
+   "LAB_TEST_MASTER",
+   "HIS",
+   "LAB_RESULT",
+   "TEST_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "10",
+   "HIS",
+   "CLINIC_MASTER",
+   "HIS",
+   "OUTP_RCPT_MASTER",
+   "CLINIC_MASTER->OUTP_RCPT_MASTER",
+   "B",
+   "rejected"
+  ],
+  [
+   "29",
+   "MTL",
+   "EPR_INPATIENT_DOCINDEX",
+   "HIS",
+   "PAT_VISIT",
+   "EPR_INPATIENT_DOCINDEX.P_CLINIC_ID=PAT_VISIT.PATIENT_ID AND TO_CHAR(P_INPATIENT_TIMES)=TO_CHAR(VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "44",
+   "YDHL",
+   "INPATIENTS",
+   "HIS",
+   "PAT_VISIT",
+   "INPATIENTS.MRN=PAT_MASTER_INDEX.INP_NO AND INPATIENTS.SERIES=PAT_VISIT.VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "5",
+   "HIS",
+   "PAT_VISIT",
+   "HIS",
+   "STAFF_DICT",
+   "PAT_VISIT.DOCTOR_IN_CHARGE=STAFF_DICT.EMP_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "468",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "INPBILL",
+   "INP_SETTLE_MASTER",
+   "INPBILL.INP_BILL_DETAIL(RCPT_NO) = INPBILL.INP_SETTLE_MASTER(RCPT_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "461",
+   "LAB",
+   "LAB_TEST_ITEMS_DETAIL",
+   "LAB",
+   "LAB_TEST_ITEMS",
+   "LAB.LAB_TEST_ITEMS_DETAIL(TEST_NO,ITEM_NO) = LAB.LAB_TEST_ITEMS(TEST_NO,ITEM_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "460",
+   "LAB",
+   "LAB_RESULT",
+   "LAB",
+   "LAB_TEST_MASTER",
+   "LAB.LAB_RESULT(TEST_NO) = LAB.LAB_TEST_MASTER(TEST_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "459",
+   "LAB",
+   "LAB_TEST_ITEMS",
+   "LAB",
+   "LAB_TEST_MASTER",
+   "LAB.LAB_TEST_ITEMS(TEST_NO) = LAB.LAB_TEST_MASTER(TEST_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "374",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDCOMM",
+   "MED_PAT_VISIT",
+   "MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID) = MEDCOMM.MED_PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "372",
+   "MEDSURGERY",
+   "MED_OPERATION_SCHEDULE",
+   "MEDCOMM",
+   "MED_PAT_VISIT",
+   "MEDSURGERY.MED_OPERATION_SCHEDULE(PATIENT_ID,VISIT_ID) = MEDCOMM.MED_PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "478",
+   "DRUG_USER",
+   "PHA_CLI_REQUEST_DRUG",
+   "MEDREC",
+   "PAT_MASTER_INDEX",
+   "DRUG_USER.PHA_CLI_REQUEST_DRUG(PAT_ID) = MEDREC.PAT_MASTER_INDEX(PATIENT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "469",
+   "INPBILL",
+   "PREPAYMENT_RCPT",
+   "MEDREC",
+   "PAT_MASTER_INDEX",
+   "INPBILL.PREPAYMENT_RCPT(PATIENT_ID) = MEDREC.PAT_MASTER_INDEX(PATIENT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "448",
+   "MEDREC",
+   "PAT_VISIT",
+   "MEDREC",
+   "PAT_MASTER_INDEX",
+   "MEDREC.PAT_VISIT(PATIENT_ID) = MEDREC.PAT_MASTER_INDEX(PATIENT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "472",
+   "OUTPADM",
+   "CLINIC_MASTER",
+   "MEDREC",
+   "PAT_MASTER_INDEX",
+   "OUTPADM.CLINIC_MASTER(PATIENT_ID) = MEDREC.PAT_MASTER_INDEX(PATIENT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "474",
+   "OUTPBILL",
+   "OUTP_RCPT_MASTER",
+   "MEDREC",
+   "PAT_MASTER_INDEX",
+   "OUTPBILL.OUTP_RCPT_MASTER(PATIENT_ID) = MEDREC.PAT_MASTER_INDEX(PATIENT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "475",
+   "DRUG_USER",
+   "PHA_INP_REQUEST_DRUG",
+   "MEDREC",
+   "PAT_VISIT",
+   "DRUG_USER.PHA_INP_REQUEST_DRUG(PAT_ID,IN_COUNT) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "451",
+   "INPADM",
+   "PATS_IN_HOSPITAL",
+   "MEDREC",
+   "PAT_VISIT",
+   "INPADM.PATS_IN_HOSPITAL(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "467",
+   "INPBILL",
+   "INP_BILL_DETAIL",
+   "MEDREC",
+   "PAT_VISIT",
+   "INPBILL.INP_BILL_DETAIL(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "466",
+   "INPBILL",
+   "INP_SETTLE_MASTER",
+   "MEDREC",
+   "PAT_VISIT",
+   "INPBILL.INP_SETTLE_MASTER(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "470",
+   "INPBILL",
+   "PREPAYMENT_RCPT",
+   "MEDREC",
+   "PAT_VISIT",
+   "INPBILL.PREPAYMENT_RCPT(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "449",
+   "MEDREC",
+   "DIAGNOSIS",
+   "MEDREC",
+   "PAT_VISIT",
+   "MEDREC.DIAGNOSIS(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "450",
+   "MEDREC",
+   "OPERATION",
+   "MEDREC",
+   "PAT_VISIT",
+   "MEDREC.OPERATION(PATIENT_ID,VISIT_ID) = MEDREC.PAT_VISIT(PATIENT_ID,VISIT_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "386",
+   "MEDSURGERY",
+   "MED_ANES_DOC_CHECK",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANES_DOC_CHECK(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "22",
+   "HIS",
+   "PAT_MASTER_INDEX",
+   "MTL",
+   "EPR_INPATIENT_DOCINDEX",
+   "PAT_MASTER_INDEX.INP_NO=EPR_INPATIENT_DOCINDEX.P_INPATIENT_NO AND PAT_VISIT.VISIT_ID=P_INPATIENT_TIMES",
+   "A",
+   "verified"
+  ],
+  [
+   "385",
+   "MEDSURGERY",
+   "MED_ANES_OPERHANDOVER",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANES_OPERHANDOVER(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "378",
+   "MEDSURGERY",
+   "MED_ANESTHESIA_EVENT",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "379",
+   "MEDSURGERY",
+   "MED_ANESTHESIA_EVENT_BACK",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_EVENT_BACK(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "380",
+   "MEDSURGERY",
+   "MED_ANESTHESIA_INPUT_DATA",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_INPUT_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "376",
+   "MEDSURGERY",
+   "MED_ANESTHESIA_PLAN",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_PLAN(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "377",
+   "MEDSURGERY",
+   "MED_ANESTHESIA_SUMMARY",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_ANESTHESIA_SUMMARY(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "384",
+   "MEDSURGERY",
+   "MED_OPERATION_ANALGESIC",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_OPERATION_ANALGESIC(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "375",
+   "MEDSURGERY",
+   "MED_OPERATION_NAME",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_OPERATION_NAME(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "382",
+   "MEDSURGERY",
+   "MED_PATIENT_MONITOR_DATA",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PATIENT_MONITOR_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "381",
+   "MEDSURGERY",
+   "MED_PAT_MONITOR_DATA",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "383",
+   "MEDSURGERY",
+   "MED_PAT_MONITOR_DATA_HISTORY",
+   "MEDSURGERY",
+   "MED_OPERATION_MASTER",
+   "MEDSURGERY.MED_PAT_MONITOR_DATA_HISTORY(PATIENT_ID,VISIT_ID,OPER_ID) = MEDSURGERY.MED_OPERATION_MASTER(PATIENT_ID,VISIT_ID,OPER_ID)",
+   "A",
+   "verified"
+  ],
+  [
+   "373",
+   "MEDSURGERY",
+   "MED_SCHEDULED_OPERATION_NAME",
+   "MEDSURGERY",
+   "MED_OPERATION_SCHEDULE",
+   "MEDSURGERY.MED_SCHEDULED_OPERATION_NAME(PATIENT_ID,VISIT_ID,SCHEDULE_ID) = MEDSURGERY.MED_OPERATION_SCHEDULE(PATIENT_ID,VISIT_ID,SCHEDULE_ID)",
+   "B",
+   "partial"
+  ],
+  [
+   "476",
+   "DRUG_USER",
+   "PHA_INP_REQUEST_DRUG",
+   "ORDADM",
+   "ORDERS",
+   "DRUG_USER.PHA_INP_REQUEST_DRUG(PAT_ID,IN_COUNT,MO_ORDER,ORDER_SUB_NO) = ORDADM.ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "456",
+   "DRUG_USER",
+   "INP_ORDER_EXECDATA",
+   "ORDADM",
+   "ORDERS",
+   "DRUG_USER.INP_ORDER_EXECDATA(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO) = ORDADM.ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "454",
+   "ORDADM",
+   "ORDERS_COSTS",
+   "ORDADM",
+   "ORDERS",
+   "ORDADM.ORDERS_COSTS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO) = ORDADM.ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "455",
+   "ORDADM",
+   "ORDERS_EXECUTE_DETAILS",
+   "ORDADM",
+   "ORDERS",
+   "ORDADM.ORDERS_EXECUTE_DETAILS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO) = ORDADM.ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+   "B",
+   "partial"
+  ],
+  [
+   "473",
+   "OUTPBILL",
+   "OUTP_BILL_ITEMS",
+   "OUTPBILL",
+   "OUTP_RCPT_MASTER",
+   "OUTPBILL.OUTP_BILL_ITEMS(RCPT_NO) = OUTPBILL.OUTP_RCPT_MASTER(RCPT_NO)",
+   "A",
+   "verified"
+  ],
+  [
+   "12",
+   "HIS",
+   "PAT_VISIT",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "PATIENT_ID+VISIT_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "31",
+   "SM",
+   "MED_ANESTHESIA_PLAN",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "PATIENT_ID+VISIT_ID+OPER_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "13",
+   "SM",
+   "MED_OPERATION_MASTER",
+   "SM",
+   "MED_OPERATION_NAME",
+   "PATIENT_ID+VISIT_ID+OPER_ID",
+   "A",
+   "verified"
+  ],
+  [
+   "45",
+   "YDHL",
+   "MCS_ASSESS_FORM",
+   "YDHL",
+   "INPATIENTS",
+   "MCS_ASSESS_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "46",
+   "YDHL",
+   "MCS_DOC_FORM",
+   "YDHL",
+   "INPATIENTS",
+   "MCS_DOC_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+   "A",
+   "verified"
+  ],
+  [
+   "531",
+   "MEDSURGERY",
+   "MED_OPERATION_SCHEDULE",
+   "SM",
+   "MED_OPERATION_SCHEDULE",
+   "same-name object synchronized from Docare to data-center SM",
+   "A",
+   "user_confirmed_sync"
+  ],
+  [
+   "28",
+   "YDHL",
+   "MCS_ASSESS_FORM",
+   "YDHL",
+   "INPATIENTS",
+   "MCS_ASSESS_FORM.PATIENT_UID=INPATIENTS.PAT_INDEX_NO",
+   "A",
+   "sample_verified"
+  ]
+ ],
+ "reviews_touching_s5_tables": [
+  [
+   "2",
+   "approved",
+   "HIS.CLINIC_MASTER",
+   "HIS.PAT_MASTER_INDEX",
+   "HIS.CLINIC_MASTER.PATIENT_ID = HIS.PAT_MASTER_INDEX.PATIENT_ID"
+  ],
+  [
+   "3",
+   "approved",
+   "MEDREC.PAT_VISIT",
+   "HIS.PAT_VISIT",
+   "源端 MEDREC.PAT_VISIT → ODS HIS.PAT_VISIT 同名汇聚镜像"
+  ],
+  [
+   "1",
+   "approved",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.PAT_VISIT",
+   "HIS.INP_BILL_DETAIL.PATIENT_ID = HIS.PAT_VISIT.PATIENT_ID AND HIS.INP_BILL_DETAIL.VISIT_ID = HIS.PAT_VISIT.VISIT_ID"
+  ],
+  [
+   "4",
+   "draft",
+   "MEDREC.TRANSFER",
+   "MEDREC.PAT_VISIT",
+   "MEDREC.TRANSFER.PATIENT_ID = MEDREC.PAT_VISIT.PATIENT_ID AND MEDREC.TRANSFER.VISIT_ID = MEDREC.PAT_VISIT.VISIT_ID"
+  ],
+  [
+   "5",
+   "draft",
+   "MEDREC.TRANSFER",
+   "COMM.DEPT_DICT",
+   "MEDREC.TRANSFER.DEPT_STAYED = COMM.DEPT_DICT.DEPT_CODE"
+  ],
+  [
+   "6",
+   "draft",
+   "MEDADM.STAT_DEPT_MODIFYFIX",
+   "COMM.DEPT_DICT",
+   "MEDADM.STAT_DEPT_MODIFYFIX.STAT_DEPTCODE = COMM.DEPT_DICT.DEPT_CODE"
+  ],
+  [
+   "7",
+   "draft",
+   "OUTPBILL.OUTP_ORDER_DESC",
+   "OUTPBILL.OUTP_RCPT_MASTER",
+   "OUTPBILL.OUTP_ORDER_DESC.RCPT_NO = OUTPBILL.OUTP_RCPT_MASTER.RCPT_NO"
+  ],
+  [
+   "9",
+   "draft",
+   "OUTPBILL.OUTP_BILL_ITEMS",
+   "COMM.STAFF_DICT",
+   "OUTPBILL.OUTP_BILL_ITEMS.ORDERED_BY_DOCTOR = COMM.STAFF_DICT.EMP_NO"
+  ],
+  [
+   "11",
+   "draft",
+   "MEDREC.PAT_VISIT",
+   "COMM.DISCHARGE_DISPOSITION_DICT",
+   "MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION2 = COMM.DISCHARGE_DISPOSITION_DICT.DISCHARGE_DISPOSITION_CODE"
+  ],
+  [
+   "12",
+   "draft",
+   "MEDREC.OPERATION",
+   "COMM.OPERATION_DICT",
+   "MEDREC.OPERATION.OPERATION_CODE = COMM.OPERATION_DICT.OPERATION_CODE"
+  ],
+  [
+   "10",
+   "draft",
+   "INPBILL.INP_BILL_DETAIL",
+   "FXHIS.SYS_DEPARTMENT",
+   "INPBILL.INP_BILL_DETAIL.ORDERED_BY = FXHIS.SYS_DEPARTMENT.DEPTCODE"
+  ],
+  [
+   "14",
+   "draft",
+   "DRUG_USER.PHA_CLI_REQUEST_DRUG",
+   "ORDADM.ORDERS",
+   "DRUG_USER.PHA_CLI_REQUEST_DRUG.PAT_ID = ORDADM.ORDERS.PATIENT_ID AND DRUG_USER.PHA_CLI_REQUEST_DRUG.PRESC_NO = TO_CHAR(ORDADM.ORDERS.CURRENT_PRESC_NO)"
+  ],
+  [
+   "15",
+   "draft",
+   "LAB.LAB_TEST_ITEMS",
+   "COMM.CLINIC_ITEM_DICT",
+   "LAB.LAB_TEST_ITEMS.ITEM_CODE = COMM.CLINIC_ITEM_DICT.ITEM_CODE AND COMM.CLINIC_ITEM_DICT.ITEM_CLASS = 'C'"
+  ],
+  [
+   "16",
+   "draft",
+   "EXAM.EXAM_MASTER",
+   "COMM.DEPT_DICT",
+   "EXAM.EXAM_MASTER.REQ_DEPT = COMM.DEPT_DICT.DEPT_CODE"
+  ],
+  [
+   "17",
+   "draft",
+   "COMM.DEPT_DICT",
+   "COMM.STAFF_DICT",
+   "DEPT_DICT.DEPT_CODE = STAFF_DICT.DEPT_CODE"
+  ],
+  [
+   "24",
+   "rejected",
+   "ORDADM.ORDERS",
+   "DRUG_USER.PHA_INP_REQUEST_DRUG",
+   "AND O.ORDER_NO = A.MO_ORDER AND AND O.ORDER_SUB_NO = A.ORDER_SUB_NO"
+  ],
+  [
+   "25",
+   "rejected",
+   "DRUG_USER.PHA_INP_REQUEST_DRUG",
+   "ORDADM.ORDERS",
+   "A.PAT_ID = O.PATIENT_ID AND AND A.IN_COUNT = O.VISIT_ID"
+  ],
+  [
+   "26",
+   "rejected",
+   "INPADM.ADT_LOG",
+   "MEDREC.PAT_VISIT",
+   "AND ADT2.DEPT_CODE = (CASE WHEN D.DEPT_DISCHARGE_FROM = ADT2.DEPT_CODE THEN D.DEPT_DISCHARGE_FROM ELSE ADT1.DEPT_CODE END)"
+  ],
+  [
+   "27",
+   "rejected",
+   "MEDREC.PAT_VISIT",
+   "INPADM.ADT_LOG",
+   "AND D.DISCHARGE_DATE_TIME = adt_sub.LOG_DATE_TIME THEN adt_sub.DEPT_CODE ELSE ADT1.DEPT_CODE END) ) t"
+  ],
+  [
+   "28",
+   "rejected",
+   "INPADM.ADT_LOG",
+   "MEDREC.PAT_VISIT",
+   "adt_sub.PATIENT_ID = D.PATIENT_ID AND AND adt_sub.VISIT_ID = D.VISIT_ID AND AND adt_sub.ACTION IN ('[REDACTED]', '[REDACTED]','[REDACTED]','[REDACTED]') AND adt_sub.LOG_DATE_TIME > ADT1.LOG_DATE_TIME AND adt_sub.DEPT_CODE = (CASE WHEN D.DEPT_DISCHARGE_FROM = adt_sub.DEPT_CODE"
+  ],
+  [
+   "563",
+   "draft",
+   "HIS.PAT_VISIT",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "t.p_inpatient_times = ttt.visit_id AND pv.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "564",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "HIS.PAT_VISIT",
+   "ttt.patient_id = d2.patient_id AND ttt.visit_id = d2.visit_id"
+  ],
+  [
+   "566",
+   "draft",
+   "HIS.PAT_MASTER_INDEX",
+   "JHEMR.JHMR_FILE_INDEX",
+   "t.PATIENT_ID = tt.inp_no AND t3.PATIENT_ID = t1.inp_no"
+  ],
+  [
+   "567",
+   "draft",
+   "HIS.PAT_VISIT",
+   "JHEMR.JHMR_FILE_INDEX",
+   "t.VISIT_ID = ttt.visit_id AND pv.visit_id = t.VISIT_ID"
+  ],
+  [
+   "569",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = pv.patient_id AND mom.visit_id = pv.visit_id"
+  ],
+  [
+   "570",
+   "draft",
+   "SM.MED_DIAGNOSIS_DICT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.diag_before_operation = c.diagnosis_name AND mom.diag_before_operation = c.diagnosis_name"
+  ],
+  [
+   "572",
+   "draft",
+   "HIS.PAT_MASTER_INDEX",
+   "JHEMR.JHMR_FILE_INDEX",
+   "pmi.patient_id = t.PATIENT_ID AND t.PATIENT_ID = pmi.patient_id"
+  ],
+  [
+   "573",
+   "draft",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "LUNA_MCS_SDSEY.MCS_DOC_FORM",
+   "f.PATIENT_UID = p.pat_index_no AND f.PATIENT_UID = YDZD.pat_index_no"
+  ],
+  [
+   "574",
+   "draft",
+   "LUNA_MCS_SDSEY.MCS_DOC_FORM",
+   "LUNA_MCS_SDSEY.MCS_DOC_FORM_RECORDS",
+   "a.template_code = f.TEMPLATE_CODE AND a.FORM_ID = f.ID"
+  ],
+  [
+   "575",
+   "draft",
+   "HIS.CONSULTATION_DOCTOR_DETAIL",
+   "HIS.CONSULTATION_DOCTOR_MASTER",
+   "t.consultation_id = t1.consultation_id"
+  ],
+  [
+   "576",
+   "draft",
+   "HIS.CONSULTATION_DOCTOR_MASTER",
+   "HIS.PAT_VISIT",
+   "t.patient_id = t2.patient_id AND t.visit_id = t2.visit_id"
+  ],
+  [
+   "577",
+   "draft",
+   "HIS.PAT_MASTER_INDEX",
+   "ODS.CDA_VALUE_DOMAIN_MAP",
+   "t.patient_id = t2.patient_id"
+  ],
+  [
+   "579",
+   "draft",
+   "HIS.PAT_VISIT",
+   "ODS.CDA_VALUE_DOMAIN_MAP",
+   "t.patient_id = pv.patient_id AND t.visit_id = pv.visit_id"
+  ],
+  [
+   "581",
+   "draft",
+   "HIS.ORDERS",
+   "HIS.PAT_MASTER_INDEX",
+   "t.patient_id = t2.patient_id"
+  ],
+  [
+   "582",
+   "draft",
+   "HIS.ORDERS",
+   "HIS.PAT_VISIT",
+   "t.patient_id = pv.patient_id AND t.visit_id = pv.visit_id"
+  ],
+  [
+   "583",
+   "draft",
+   "HIS.DEPT_DICT",
+   "HIS.ORDERS",
+   "ks.dept_code = t.ordering_dept"
+  ],
+  [
+   "584",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "HIS.ORDERS",
+   "cd.院标编码 = t.order_class AND cd.院标编码 = t.order_class"
+  ],
+  [
+   "586",
+   "draft",
+   "HIS.DEPT_DICT",
+   "HIS.PAT_VISIT",
+   "adm_dept.dept_code = a.dept_admission_to AND dis_dept.dept_code = a.dept_discharge_"
+  ],
+  [
+   "587",
+   "draft",
+   "HIS.OPERATION",
+   "HIS.PAT_VISIT",
+   "pv.patient_id = o.patient_id AND pv.visit_id = o.visit_id"
+  ],
+  [
+   "588",
+   "draft",
+   "HIS.OPERATION",
+   "HIS.PAT_MASTER_INDEX",
+   "pmi.patient_id = o.patient_id"
+  ],
+  [
+   "589",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "HIS.PAT_MASTER_INDEX",
+   "pmi.patient_id = a.patient_id AND t.patient_id = t2.patient_id"
+  ],
+  [
+   "590",
+   "draft",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id AND b.PATIENT_ID = p.PATIENT_ID"
+  ],
+  [
+   "591",
+   "draft",
+   "HIS.INP_BILL_DETAIL",
+   "HIS.INP_SETTLE_MASTER_YB",
+   "c.patient_id = a.patient_id AND c.visit_id = a.visit_id"
+  ],
+  [
+   "593",
+   "draft",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "LUNA_MCS_SDSEY.MCS_ASSESS_FORM",
+   "f.PATIENT_UID = YDZD.pat_index_no"
+  ],
+  [
+   "594",
+   "draft",
+   "LUNA_MCS_SDSEY.DIAGNOSIS_BASY",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "dg.VISIT_ID = YDZD.SERIES"
+  ],
+  [
+   "603",
+   "draft",
+   "EXAM.EXAM_APPOINTS",
+   "HISUSER.CLINIC_MASTER",
+   "a.VISIT_DATE = b.VISIT_DATE AND a.VISIT_NO   = b.VISIT_NO"
+  ],
+  [
+   "604",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_OPERATION_SCHEDULE",
+   "a.patient_id = a1.patient_id AND a.visit_id   = a1.visit_id"
+  ],
+  [
+   "605",
+   "draft",
+   "SM.MED_ANESTHESIA_PLAN",
+   "SM.MED_OPERATION_MASTER",
+   "a.patient_id = e3.patient_id AND a.visit_id   = e3.visit_id"
+  ],
+  [
+   "607",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = p.patient_id AND mom.patient_id = p.patient_id"
+  ],
+  [
+   "608",
+   "draft",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "609",
+   "draft",
+   "JHEMR.JHMR_FILE_INDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.visit_id = t.VISIT_ID"
+  ],
+  [
+   "611",
+   "draft",
+   "HIS.PAT_VISIT",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "pv.patient_id = t.p_clinic_id AND pv.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "613",
+   "draft",
+   "HIS.OPERATION",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "o.patient_id = t.p_clinic_id AND o.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "614",
+   "draft",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = t.p_clinic_id AND mom.visit_id = t.p_inpatient_times"
+  ],
+  [
+   "615",
+   "draft",
+   "HIS.PAT_VISIT",
+   "JHEMR.JHMR_FILE_INDEX",
+   "pv.patient_id = t.PATIENT_ID AND pv.visit_id = t.VISIT_ID"
+  ],
+  [
+   "616",
+   "draft",
+   "HIS.OPERATION",
+   "JHEMR.JHMR_FILE_INDEX",
+   "o.patient_id = t.PATIENT_ID AND o.visit_id = t.VISIT_ID"
+  ],
+  [
+   "617",
+   "draft",
+   "JHEMR.JHMR_FILE_INDEX",
+   "SM.MED_OPERATION_MASTER",
+   "mom.patient_id = t.PATIENT_ID AND mom.visit_id = t.VISIT_ID"
+  ],
+  [
+   "618",
+   "draft",
+   "HIS.CLINIC_ITEM_DICT",
+   "HIS.LAB_TEST_ITEMS",
+   "cid.ITEM_CODE = lti.ITEM_CODE AND b.ITEM_CODE = li.ITEM_CODE"
+  ],
+  [
+   "619",
+   "draft",
+   "HIS.LAB_RESULT",
+   "HIS.LAB_TEST_ITEMS",
+   "lti.ITEM_NO = lr.ITEM_NO"
+  ],
+  [
+   "622",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "MTL.EPR_INPATIENT_DOCINDEX",
+   "t.P_INPATIENT_TIMES = ddd.visit_id AND t.P_INPATIENT_TIMES = dddd.visit_id"
+  ],
+  [
+   "623",
+   "draft",
+   "HIS.DIAGNOSIS",
+   "JHEMR.JHMR_FILE_INDEX",
+   "t.VISIT_ID = ddd.visit_id AND t.VISIT_ID = dddd.visit_id"
+  ],
+  [
+   "624",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "HIS.PAT_MASTER_INDEX",
+   "cd.院标编码 = pmi.relationship AND cd.院标编码 = pmi.relationship"
+  ],
+  [
+   "627",
+   "draft",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "LUNA_MCS_SDSEY.MCS_ORDER_SCHEDULE",
+   "WSFL.PATIENT_UID = YDZD.pat_index_no"
+  ],
+  [
+   "662",
+   "draft",
+   "HIS.OUTP_RCPT_MASTER",
+   "ODS.CDA_VALUE_DOMAIN_MAP",
+   "e.patient_id = a.patient_id"
+  ],
+  [
+   "628",
+   "draft",
+   "LUNA_MCS_SDSEY.INPATIENTS",
+   "LUNA_MCS_SDSEY.MCS_VITAL_INFO",
+   "A.PATIENT_UID = YDZD.Pat_Index_No"
+  ],
+  [
+   "644",
+   "draft",
+   "HIS.ADT_LOG",
+   "HIS.PAT_VISIT",
+   "b.patient_id = a.patient_id AND b.visit_id = a.visit_id"
+  ],
+  [
+   "646",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SX.B_T_REQD",
+   "tr.hzbs = p.patient_id AND tr.zycs = p.visit_id"
+  ],
+  [
+   "647",
+   "draft",
+   "HIS.STAFF_DICT",
+   "ODS.TITLE_DICT",
+   "sd.title = td.title_name"
+  ],
+  [
+   "648",
+   "draft",
+   "HIS.CLINIC_MASTER",
+   "HIS.OUTP_MR_DIAG_DESC",
+   "a.visit_date = b.visit_date AND a.visit_no = b.visit_no"
+  ],
+  [
+   "649",
+   "draft",
+   "HIS.OUTP_MR_DIAG_DESC",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = pmi.patient_id AND a.patient_id = pmi.patient_id"
+  ],
+  [
+   "650",
+   "draft",
+   "HIS.CLINIC_MASTER",
+   "HIS.DRUG_PRESC_MASTER",
+   "a.clinic_no = d.clinic_no"
+  ],
+  [
+   "651",
+   "draft",
+   "HIS.DRUG_PRESC_MASTER",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = pmi.patient_id AND pmi.patient_id = a.patient_id"
+  ],
+  [
+   "652",
+   "draft",
+   "HIS.DRUG_DICT",
+   "HIS.DRUG_PRESC_DETAIL",
+   "dp.drug_code = b.drug_code"
+  ],
+  [
+   "653",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "HIS.PAT_MASTER_INDEX",
+   "zd.院标编码 = pmi.id_type AND zd.院标编码 = pmi.id_type"
+  ],
+  [
+   "654",
+   "draft",
+   "HIS.DRUG_PRESC_DETAIL",
+   "HIS.DRUG_PRESC_MASTER",
+   "t.presc_date = a.presc_date AND t.presc_no   = a.presc_no"
+  ],
+  [
+   "655",
+   "draft",
+   "HIS.CLINIC_MASTER",
+   "HIS.DRUG_PRESC_MASTER",
+   "d.clinic_no  = a.clinic_no AND d.patient_id = a.patient_id"
+  ],
+  [
+   "656",
+   "draft",
+   "HIS.DRUG_PRESC_DETAIL",
+   "HIS.MED_DICT_BASEINFO",
+   "m.drug_id = t.drug_code"
+  ],
+  [
+   "658",
+   "draft",
+   "HIS.DRUG_PRESC_DETAIL",
+   "HIS.DRUG_PRICE_LIST",
+   "pl.drug_code = t.drug_code AND pl.firm_id = t.firm_id"
+  ],
+  [
+   "659",
+   "draft",
+   "HIS.CLINIC_MASTER",
+   "SHUNNENG.APPOINTINFOVIEW",
+   "aa.deptid = a.visit_dept"
+  ],
+  [
+   "660",
+   "draft",
+   "HIS.OUTP_RCPT_MASTER",
+   "HIS.PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id"
+  ],
+  [
+   "661",
+   "draft",
+   "HIS.OUTP_BILL_ITEMS",
+   "HIS.PRICE_LIST",
+   "pl.item_class = obi.item_class AND pl.item_code  = obi.item_code"
+  ],
+  [
+   "663",
+   "draft",
+   "LUNA_MCS_SDSEY.MCS_DOC_FORM",
+   "LUNA_MCS_SDSEY.MCS_DOC_FORM_RECORDS",
+   "a.patient_uid = WSFL.Patient_Uid AND a.patient_uid = WSFL.Patient_Uid"
+  ],
+  [
+   "664",
+   "draft",
+   "HIS.DEPT_DICT",
+   "HIS.INP_BILL_DETAIL",
+   "b.DEPT_CODE = d.DEPT_CODE"
+  ],
+  [
+   "665",
+   "draft",
+   "SM.MED_ANESTHESIA_EVENT",
+   "SM.MED_OPERATION_MASTER",
+   "mae.patient_id = b.patient_id AND mae.visit_id   = b.visit_id"
+  ],
+  [
+   "666",
+   "draft",
+   "HIS.PAT_VISIT",
+   "SM.MED_ANESTHESIA_PLAN",
+   "a.patient_id = v.patient_id AND a.visit_id   = v.visit_id"
+  ],
+  [
+   "667",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = b.operation_name AND cd.院标名称 = b.operation_name"
+  ],
+  [
+   "668",
+   "draft",
+   "SM.MED_CUSTOM_DATA",
+   "SM.MED_OPERATION_MASTER",
+   "sq.visit_id   = b.visit_id AND sq.oper_id    = b.oper_id"
+  ],
+  [
+   "669",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_PAT_MASTER_INDEX",
+   "a.patient_id = b.patient_id AND a.patient_id = b.patient_id"
+  ],
+  [
+   "670",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "HIS.PAT_VISIT",
+   "cd.院标名称 = p.blood_type AND cd.院标名称 = p.blood_type_rh"
+  ],
+  [
+   "671",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = a.operation_name"
+  ],
+  [
+   "672",
+   "draft",
+   "SM.MED_OPERATION_MASTER",
+   "SM.MED_OPERATION_SCHEDULE",
+   "mos.patient_id = mom.patient_id AND mos.visit_id = mom.visit_id"
+  ],
+  [
+   "673",
+   "draft",
+   "CDA.CDA_DICTIONARY",
+   "SM.MED_OPERATION_MASTER",
+   "cd.院标名称 = mom.anesthesia_method"
+  ],
+  [
+   "674",
+   "draft",
+   "SM.MED_CUSTOM_DATA",
+   "SM.MED_OPERATION_MASTER",
+   "mcd.patient_id = mom.patient_id AND mcd.visit_id = mom.visit_id"
+  ]
+ ]
+}

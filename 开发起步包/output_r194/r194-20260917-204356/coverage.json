@@ -1,0 +1,59 @@
+{
+ "run_id": "r194-20260917-204356",
+ "case_status_counts": {
+  "PASS": 66,
+  "FAIL": 6,
+  "NOT_RUN": 21,
+  "BLOCKED": 3,
+  "PARTIAL_PASS": 9,
+  "PARTIAL_FAIL": 1,
+  "PASS(doc)": 2
+ },
+ "total_cases": 108,
+ "coverage_by_layer": {
+  "页面访问覆盖": {
+   "done": 41,
+   "denominator": "41 可见叶（G01 整页加载路径）",
+   "blocked_note": "SPA 站内导航路径 0/41（DEF-01）"
+  },
+  "人工交互覆盖(G子项)": {
+   "done": 6,
+   "denominator": "适用 G 子项约 40（41页×部分适用）",
+   "note": "G01 全量 + G02/G05/G07/G10 抽样；其余 NOT_RUN/BLOCKED"
+  },
+  "关键旅程覆盖": {
+   "executed": 6,
+   "attempted_blocked": 2,
+   "not_run": 4,
+   "denominator": 12,
+   "detail": "执行 6：J02(部分：J02a PASS/J02b 未做)、J04、J08(FAIL)、J09、J11(补测 PASS)、J12(FAIL)；尝试被 DEF-01 阻断 2：J01/J07；未做 4：J03/J05/J06/J10。口径=cases.json 单一事实源（2026-09-18 修订：原 executed=8 系把 BLOCKED 尝试计入，且 J11 曾误列 NOT_RUN）"
+  },
+  "API风险分类覆盖": {
+   "classified": 434,
+   "denominator": 434,
+   "api_executed": "约 40 端点被真实调用（矩阵+页面）"
+  },
+  "历史复核覆盖": {
+   "checked": "186/188/190/192/193/173(6条) ",
+   "pending": "173 其余 P3、189/191 活库类、127/129/144/149 深项"
+  },
+  "质量门禁": {
+   "typecheck": "PASS",
+   "vitest": "320/320 PASS",
+   "build+budget": "PASS",
+   "backend_pure_logic": "15P/1S PASS",
+   "backend_full": "1 failed(startup_check 测试债 DEF-11) / 1617 passed / 1 skipped (36m38s)",
+   "o02_retest": "PASS"
+  }
+ },
+ "environment_counts": {
+  "BROWSER_INTEGRATION": 73,
+  "API_INTEGRATION": 25,
+  "STATIC_REVIEW": 8,
+  "HISTORICAL_EVIDENCE": 5,
+  "UNIT": 3,
+  "BROWSER_MOCK": 3
+ },
+ "no_fake_note": "NOT_RUN/BLOCKED 全部保留；O02 首轮字段错误未计通过；历史通过未替代本轮 PASS",
+ "revised_note": "2026-09-18 复核修订（另一 AI 审阅+本仓复核确认）：①关键旅程覆盖与 cases.json 对齐（执行 6+阻断 2+未做 4）；②状态分布与全部 PASS/FAIL 结论零变化；③配套修订见 测试报告.md §8 修订记录 与 progress.md"
+}

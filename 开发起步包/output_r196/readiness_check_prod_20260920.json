@@ -1,0 +1,114 @@
+{
+  "task": "196 AC08-AC10 pre-release readiness check (A-segment, experiment D1 follow-up)",
+  "date": "2026-09-20",
+  "executor": "executing AI (task-level experiment rules, 30-day two-status trial)",
+  "authorization_basis": "user task authorization items 1/2/3 all unfilled => treated as NO: release/AC10-write/AC09-code-list not authorized; only read-only A-segment checks performed",
+  "method": "ssh root@10.10.8.83 (public key) -> docker exec -i data-asset-api python - < _scratch/check_196_readiness_ro.py; SELECT-only platform DB queries + credential filename listing + docker ps; no writes anywhere",
+  "privacy": "counts and booleans only; no user identifiers, no secret values, hosts masked by design of query",
+  "production_image": {
+    "container": "data-asset-api",
+    "image": "data-asset:r194-20260918",
+    "status": "Up 47 hours (healthy)",
+    "conclusion": "196 uncommitted changes are NOT in production; version correspondence requires release"
+  },
+  "workspace_baseline": {
+    "head": "c307a04",
+    "changed_paths_total": 250,
+    "five_files_numstat_vs_head": {
+      "backend/app/services/dict_medical_push.py": "+62/-4",
+      "backend/app/services/dict_sync_executor.py": "+61/-1",
+      "backend/app/services/medical_code_push.py": "+62/-6",
+      "frontend/src/api/dict.ts": "+44/-5",
+      "frontend/src/views/dict/medical/components/PushWizard.vue": "+150/-35",
+      "total": "+379/-51 (matches 196 section 6.1 claim exactly)"
+    },
+    "additional_196_paths_not_in_five_file_list": {
+      "backend/app/services/infect_diag_dict.py": "untracked new file; AC08 fetcher; imported by dict_medical_api.py",
+      "backend/app/api/v1/dict_medical_api.py": "modified +14/-1; all 196-related (options exposure + save echo)",
+      "frontend/src/utils/infectDiagDict.ts": "untracked new file; imported by api/dict.ts and mappings/index.vue; MISSING => frontend build fails",
+      "frontend/src/views/dict/mappings/index.vue": "modified +860/-130; 196 infectious-dropdown hunks MIXED with parallel-task WIP in same file",
+      "tests_not_deployed_but_needed_for_recheck": [
+        "backend/tests/test_infect_diag_dict.py",
+        "backend/tests/dict_sync_112/test_infectious_sync.py",
+        "backend/tests/dict_sync_112/_infectious_sync_cases.py"
+      ]
+    },
+    "excluded_from_196": "frontend/src/router/modules/dict.ts (+49 mostly deletions) belongs to task 186 menu refactor WIP, not 196",
+    "release_package_artifacts": "none built (B-196-pending)"
+  },
+  "systems_his_source": [
+    {"system_code": "HIS_SOURCE", "status": "merged"}
+  ],
+  "his_data_sources": [
+    {
+      "source_code": "his_source_10_10_10_15",
+      "system_code": "HIS",
+      "db_type": "oracle",
+      "enabled": "True",
+      "write_policy": "medical_dict_push",
+      "credential_status": "configured",
+      "has_credential_ref": true,
+      "has_write_credential_ref": true,
+      "service_mode": "service_name"
+    },
+    {
+      "source_code": "hisbase_oracle_10_10_10_14",
+      "system_code": "HIS",
+      "db_type": "oracle",
+      "enabled": "True",
+      "write_policy": "readonly",
+      "credential_status": "configured",
+      "has_credential_ref": true,
+      "has_write_credential_ref": false,
+      "service_mode": "service_name"
+    }
+  ],
+  "his_source_resolution": {
+    "settings_default": "dict_medical_his_source_code='HIS_SOURCE' (config.py:55)",
+    "production_env_override": "ENV_UNSET",
+    "resolution_order_result": "no source row with source_code='HIS_SOURCE' -> falls to source_code='his_source_10_10_10_15' -> HIT (enabled)"
+  },
+  "permission_holders_counts": {
+    "semantics": "replicates backend require_permission: platform_admin bypass + wildcard match on role permissions",
+    "active_users_total": 2,
+    "view_users": 2,
+    "plan_create_users": 2,
+    "approve_users": 2,
+    "two_person_separable": true
+  },
+  "executors_all": [
+    {"executor_code": "CDMS_ACCOUNT_DISABLE", "execution_mode": "adapter_method", "target_system_code": "CDMS", "enabled": "True"},
+    {"executor_code": "CDMS_ACCOUNT_ENABLE", "execution_mode": "adapter_method", "target_system_code": "CDMS", "enabled": "False"},
+    {"executor_code": "JHEMR_ACCOUNT_DISABLE", "execution_mode": "adapter_method", "target_system_code": "JHEMR", "enabled": "True"},
+    {"executor_code": "JHEMR_ACCOUNT_ENABLE", "execution_mode": "adapter_method", "target_system_code": "JHEMR", "enabled": "False"}
+  ],
+  "executor_196": "not registered (expected; consistent with section 4 contract not yet executed)",
+  "executor_gate_alignment": {
+    "code_ref": "backend/app/services/dict_sync_executor.py:346-358 (_require_infectious_executor)",
+    "required_registration_values": {
+      "executor_code": "his_diagnosis_infectious_sync",
+      "enabled": true,
+      "require_approval": true,
+      "execution_mode": "sync_executor",
+      "target_system_code": "HIS_SOURCE (=TARGET_HIS, medical_code_push.py:50)",
+      "target_source_code": "his_source_10_10_10_15 (must equal resolved source.source_code)",
+      "sql_or_endpoint_ref": "COMM.DIAGNOSIS_DICT.DIAGNOSIS_NAME_CRB"
+    },
+    "source_side_checks": "source.system_code in {HIS, HIS_SOURCE} OK (actual: HIS); source.db_type=oracle OK; write_policy=medical_dict_push OK (medical_code_push.py:1076)"
+  },
+  "credential_files_relevant_present": [
+    "his_source_10_10_10_15 (read, for AC08 fetcher)",
+    "his_medical_dict.write (write, for AC10)"
+  ],
+  "ac_readiness_conclusions": {
+    "196-AC08": "blocked only by release; HIS source/credential/account preconditions READY",
+    "196-AC09": "blocked by release + item 3 real hospital code list not provided; two-person separation feasible (2 active users)",
+    "196-AC10": "blocked by item 2 user authorization not named + executor not registered; write policy/write credential preconditions READY; master-switch/confirmation to be checked at release time"
+  },
+  "experiment_metrics_D1": {
+    "clear_status_deliveries": "1/1",
+    "closed_tasks": 0,
+    "handover_cases_executable": "3 cases documented, 0 attempted this round (precondition check only)",
+    "positive_instance_untimed": "A-segment found five-file checklist omitted 2 untracked build-required files; release check by old checklist would omit them and fail the build - corrected in 196 section 6.6"
+  }
+}

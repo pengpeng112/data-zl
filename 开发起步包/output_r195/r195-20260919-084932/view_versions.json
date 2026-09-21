@@ -1,0 +1,3513 @@
+{
+ "generated_at": "2026-09-19T08:57:07.066545",
+ "sql_files": [
+  {
+   "relpath": "governance\\reports\\expand_target_columns_from_source_views.sql",
+   "category": "governance",
+   "sha256": "f7dde950fe64403f2acf673c1b6b288a5bbaebc5cca7ad5ef88837fd016b8c28",
+   "mtime": "2026-06-16 20:30:41",
+   "bytes": 12963,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\11_EMR_OUTPATIENT_RECORD_修正版.sql",
+   "category": "governance",
+   "sha256": "c8ff4cd5ebebe1548e9fc715427a72e419e057f236c182b6ad3e17c188ae4c93",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 7760,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\12_EMR_OUT_FEE_INFO_CHILD_修正版.sql",
+   "category": "governance",
+   "sha256": "d091fea6b0ecb11f4dc6c0ac01ad0897257d67895a806071065cfaae727db5fb",
+   "mtime": "2026-06-08 09:41:31",
+   "bytes": 8240,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\13_EMR_OUTPATIENT_DIAG_修正版.sql",
+   "category": "governance",
+   "sha256": "4cd7d92296115c90e94fe3bbf479d25cc081c4f3daf5ef777c7445ce3134b277",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 6419,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\14_EMR_OUT_FEE_INFO_MAIN_修正版.sql",
+   "category": "governance",
+   "sha256": "d765a427c7f902a4a2ba2ca0e8e71f8061e2cb2aab15dbc19d12987bfcaf3e79",
+   "mtime": "2026-06-08 09:41:31",
+   "bytes": 11347,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\45_EMR_ADMISSION_DEAD_RECORD_TF_修正版.sql",
+   "category": "governance",
+   "sha256": "ade3182eac24cf4ee5540be84cd1cc0cf0bcf23d9606652024e38f6fc0311c79",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 22137,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\46_EMR_OPERA_RECORD_修正版.sql",
+   "category": "governance",
+   "sha256": "a633e0f999372bb02641eab2a8cefe01aa7180750b487b6c94daaaebd0c76cb1",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 12839,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\46_EMR_OPERA_RECORD_目标表扩字段.sql",
+   "category": "governance",
+   "sha256": "fd192de469baa5c25af0a351201be9bac2749ac9ca15c41a8abe37c814dff423",
+   "mtime": "2026-06-08 20:50:09",
+   "bytes": 2591,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\46_V_EMR_OPERA_RECORD_源视图修正版.sql",
+   "category": "governance",
+   "sha256": "c333e95761fae3a02726742f22958a5157df7fce84366df00ffc9ae7816c8cc5",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 38947,
+   "view_names": [
+    "V_EMR_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\47_EMR_BOFORE_OPERA_RECORD_修正版.sql",
+   "category": "governance",
+   "sha256": "fb44d1e2be5b1019d45ff6f7a3161718aa870becabb007d086b59440b49c631c",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 13606,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\48_EMR_ANESTHESIA_RECORD_修正版.sql",
+   "category": "governance",
+   "sha256": "03d606fed89918dffc391d1ff0e623f18f14e9932e119f84ba79f1c43883b20b",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 11068,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\49_EMR_ANES_RECORD_BLOOD_修正版.sql",
+   "category": "governance",
+   "sha256": "e9bf422de3f8ea10b26f33b01d398ffd11e0d286b67c4981a429e08ed7d62de6",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 3247,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\50_EMR_ANES_RECORD_MED_修正版.sql",
+   "category": "governance",
+   "sha256": "51540ecd6acee7883095d98e640162cbee69cbe64d324a74684bf31ea524aec7",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 2666,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\51_EMR_AFTER_OPERA_RECORD_修正版.sql",
+   "category": "governance",
+   "sha256": "c2b4baca2cdd61ba457f64920925d4284ee26950a9d861a57bb5d057d269e448",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 7541,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\revised_views\\EMR_INSPECTION_D18_修正版.sql",
+   "category": "governance",
+   "sha256": "35f15b8ada46e2b3902a180b40efc645074970496d3f02230906d6665938de87",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 21224,
+   "view_names": [
+    "dbo.v_emr_inspection_d18"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\revised_views\\EMR_INSPECTION_ITEM_D06_修正版.sql",
+   "category": "governance",
+   "sha256": "8790ebc4c167a0dba1e30734de132d9ebdaf5fb36fa44f8a1b5af8fc5282ca88",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 7132,
+   "view_names": [
+    "dbo.v_emr_inspection_item_d06"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\revised_views\\EMR_INSPECTION_主库镜像库合并_修正版.sql",
+   "category": "governance",
+   "sha256": "4c30eb36615d5de44b1d5ebfef655af305b7ba3b3137b281133a606fb87beb83",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 56563,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\revised_views\\V_EMR_ICH_源视图修正版.sql",
+   "category": "governance",
+   "sha256": "b99dfdb50316d60dc5a28dc4d465ee0a0f344561103da1d2430920627b02aeb9",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 39701,
+   "view_names": [
+    "V_EMR_ICH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_CONSUMABLES.sql",
+   "category": "governance",
+   "sha256": "fbb148399c8b1db51967ae63bdd98dcc52c39041194d85b262dcad79c1e092ee",
+   "mtime": "2026-09-14 11:05:46",
+   "bytes": 6276,
+   "view_names": [
+    "source_10_10_10_15__HISUSER.V_EMR_CONSUMABLES"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "governance",
+   "sha256": "49875ae6739f9371c942544412446b388a5dbcc5bfd751113e49a818bb8f2131",
+   "mtime": "2026-09-14 11:05:46",
+   "bytes": 3927,
+   "view_names": [
+    "source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\his_source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP.sql",
+   "category": "governance",
+   "sha256": "6b06231cee3bbac45566ce8e2d8f502960ebc1c2aa9c0ffcbc3752010033db4e",
+   "mtime": "2026-09-14 11:05:46",
+   "bytes": 27981,
+   "view_names": [
+    "source_10_10_10_15__HISUSER.V_EMR_EXAM_IMAGE_REP"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\hrp_10_10_10_23__HRPSEY656.EMR_HOS_INFORMATION.sql",
+   "category": "governance",
+   "sha256": "e3ad76a13bfd9b450249b06e9f4c7df999cb3a0117c8b77e316a0f2f32ba7c63",
+   "mtime": "2026-09-14 11:05:46",
+   "bytes": 6078,
+   "view_names": [
+    "HRPSEY656.EMR_HOS_INFORMATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\hrp_10_10_10_23__HRPSEY656.EMR_HOS_PRACTITIONER.sql",
+   "category": "governance",
+   "sha256": "0a836a9313976db4eb92cb3f068410785d1daea5187b3bd3958e6c9814a61442",
+   "mtime": "2026-09-14 11:05:46",
+   "bytes": 13696,
+   "view_names": [
+    "HRPSEY656.EMR_HOS_PRACTITIONER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION.sql",
+   "category": "governance",
+   "sha256": "d8ded606a6e686742ce78f0780550ed979f829001e2354823eaf03d4429a4838",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 28107,
+   "view_names": [
+    "v_EMR_INSPECTION"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ALLERGY.sql",
+   "category": "governance",
+   "sha256": "0fc956ba97a7048963c1e10842d052822259c759afaba34ea710a0fee2ff98eb",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 7649,
+   "view_names": [
+    "v_EMR_INSPECTION_ALLERGY"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.V_EMR_INSPECTION_IMAGE.sql",
+   "category": "governance",
+   "sha256": "fbff052c3cc9a118bb7756b44a6b255dd57d570571eb29d30cc42a828adad47d",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 4107,
+   "view_names": [
+    "V_EMR_INSPECTION_IMAGE"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\lis_sqlserver_10_10_10_73__dbo.v_EMR_INSPECTION_ITEM.sql",
+   "category": "governance",
+   "sha256": "0a1d7140237a5959fdc74d88bb6ff27f841de1031f7304279fb222eb7da45b56",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 15009,
+   "view_names": [
+    "v_EMR_INSPECTION_ITEM"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT.sql",
+   "category": "governance",
+   "sha256": "701d2b9f457abdf07512b18ef431f3adcf4dea57f92f4f052165c0909230b755",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 23951,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH.sql",
+   "category": "governance",
+   "sha256": "b6516ef64a37598711e5811f3287e4d9206bbde805dcd282a2240072f8cf0e6b",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 44903,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS.sql",
+   "category": "governance",
+   "sha256": "af355a9a321e74f3dced8cf15644710e0c5d4ce5a97e317890455d86c322ea19",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 14236,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT.sql",
+   "category": "governance",
+   "sha256": "c39974a35bcc3de8ecdbe5de81af171bc64666d3abade8fdd4fecb6fd5434923",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 17329,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING.sql",
+   "category": "governance",
+   "sha256": "5431602008ebc316321dd0780dbca2dd14c536f0506782ac70c236cb3220b68d",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 15500,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT.sql",
+   "category": "governance",
+   "sha256": "d588ed80ec33f8ac77f4c7dde68eeabba65bf36b1a7d0de1ce58484b23259244",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 10972,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT.sql",
+   "category": "governance",
+   "sha256": "0c5e71aabadbab5a5a0bb640737cd412a9c82a89054b149d4e15ded863f530ab",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 10485,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\mobile_nursing_oracle_10_10_10_125__LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN.sql",
+   "category": "governance",
+   "sha256": "406a38cd46a58df38f80b833f7509435cdf5eeec750080c88760b8151d2b673d",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 15139,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "category": "governance",
+   "sha256": "3be6fbdcb015afce70b958d7f38f8760681a718325e9dcc2bd66aea2ac7d124f",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 6080,
+   "view_names": [
+    "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "category": "governance",
+   "sha256": "df2efcd27468615daadf1cbb1d4706c294fca4334ad829939917acab73b79672",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 14147,
+   "view_names": [
+    "ODS.EMR_HOS_CHANGE_MAJOR_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_DEAD_RECORD_TF.sql",
+   "category": "governance",
+   "sha256": "b09360e0b97b1b941e9e9d379760bcf0f005f616fe9540e011d0c88ca2d2f531",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 26170,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_DIAGNOSIS.sql",
+   "category": "governance",
+   "sha256": "c0ba26b1394236c9e6f961afe545f4d9e6c118182ac8a559435b40a23f02cbe9",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 8275,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_RECORD.sql",
+   "category": "governance",
+   "sha256": "e7e51ab2adc0a9b6836f4e6cc1961a06b89ea9ddd7a4a4a0393f3f7729dae3b6",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 47206,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ADMISSION_RECORD_EXAM.sql",
+   "category": "governance",
+   "sha256": "ab78a70dd0bd831fc08ab9236bcacd5f12ce5ee0404babbca790549cdbdee4c2",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 6135,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD_EXAM"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_AFTER_RECORD.sql",
+   "category": "governance",
+   "sha256": "a106963ae8d4a5c03a53294600b64a0aa18766a69d2799042f9e1de08ea66f20",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 33443,
+   "view_names": [
+    "ODS.V_EMR_ANES_AFTER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_RECORD_BLOOD.sql",
+   "category": "governance",
+   "sha256": "590a76a705885bf651b147c6a031f41d7e1ef7bd0747d542e982b945ce6514af",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 4365,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANES_RECORD_MED.sql",
+   "category": "governance",
+   "sha256": "9f85148774517295636958dd4c793e03f0d7c7ac228cbb2235b8f32a49139e25",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 8976,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_MED"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ANESTHESIA_RECORD.sql",
+   "category": "governance",
+   "sha256": "df8cee13d56dda94b19c7d7bd09c9e98d9fd6c680e38ce105def4c45e4f41e7a",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 27733,
+   "view_names": [
+    "ODS.V_EMR_ANESTHESIA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_BOFORE_OPERA_RECORD.sql",
+   "category": "governance",
+   "sha256": "9eb7d02144df3723e2d525544e57eca52d72f2e8b693c9b2feb5cc771fa7feb7",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 40299,
+   "view_names": [
+    "ODS.V_EMR_BOFORE_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_CONSUMABLES.sql",
+   "category": "governance",
+   "sha256": "238d6a74038d8dfa654190f39a308e68e1b63d37a6bac2c51be933c44fd0d28c",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 3686,
+   "view_names": [
+    "ODS.V_EMR_CONSUMABLES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DEATH_RECORD.sql",
+   "category": "governance",
+   "sha256": "6dccb31de4c5528e7c1e0db44ca68c2af60af638c416efc726d4297d124170b7",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 12852,
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DISCHARGE_RECORD.sql",
+   "category": "governance",
+   "sha256": "35be4bc6acd2f98debc32c621329c03f2552274710600ff21834f21fcc2718f9",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 24855,
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DOC_ORDER_CHECK.sql",
+   "category": "governance",
+   "sha256": "084cf81c8c666b4ce26a2029d4a890720508aa33456228f4495d651a01702444",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 12545,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_CHECK"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_DOC_ORDER_DRUG.sql",
+   "category": "governance",
+   "sha256": "0aa6636ebcfc3788e1feb3179632b0969fe3e3c254ab96b8a50dbfe139bbad2b",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 40099,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_DRUG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "category": "governance",
+   "sha256": "221c289c1e82a6b961840b264d1c88e185fb305d2148d70b3b0e257e665c64d3",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 14149,
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_CONSUL_RECORD.sql",
+   "category": "governance",
+   "sha256": "1511ce1934f2b16f037813476335bdfc043a668f584d44a059ccb832bc726065",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 6487,
+   "view_names": [
+    "ODS.V_EMR_HOS_CONSUL_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+   "category": "governance",
+   "sha256": "18b820ca4f80674cc96fbb548c3e708277450645b46b91870fc13ffd805ae4ce",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 13556,
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_DND_RECORD.sql",
+   "category": "governance",
+   "sha256": "c95b64f79e0d6d87d43c4b92cbd79b80520da6ff55b44a2ca5f4c19ee3955930",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 10353,
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_POSTOPER_RECORD.sql",
+   "category": "governance",
+   "sha256": "e6366328e7c6c0b8e172be395ca9597ef594eb96947f654c3b47533f97199658",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 2718,
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_PREOP_DISCUSS.sql",
+   "category": "governance",
+   "sha256": "6256f63aa8a5be2fb3a1a2ae71e918ece08becff15b9a83b302b8c2821d8dcac",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 16234,
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_SAVE_RECORD.sql",
+   "category": "governance",
+   "sha256": "cd9d9880959c833c4c44388b163df6c158137cafeb4444b44473aa9c73a58c5c",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 25880,
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_HOS_SUCCESSION_RECORD.sql",
+   "category": "governance",
+   "sha256": "e7a1b8bb0051b3a5308073df682868c6b482f44a5e5a5714a48692dec335a333",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 9966,
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH.sql",
+   "category": "governance",
+   "sha256": "c1b92c5431071c9e5935f13eb59fb2f826d226b86585efe95042d5ae6e578107",
+   "mtime": "2026-09-14 11:05:47",
+   "bytes": 56064,
+   "view_names": [
+    "ODS.V_EMR_ICH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_ALLERGIES.sql",
+   "category": "governance",
+   "sha256": "a6d5f2dee326fdf62bb658cb3073ac57312b172ad620cef435e6b9cf9b0a9823",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 5217,
+   "view_names": [
+    "ODS.V_EMR_ICH_ALLERGIES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_CHARGE.sql",
+   "category": "governance",
+   "sha256": "9d54a2114b508e36780d73ad2fb58884393408231844ca216e79f27dabc6cf2c",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 7024,
+   "view_names": [
+    "ODS.V_EMR_ICH_CHARGE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_DIAGNOSIS.sql",
+   "category": "governance",
+   "sha256": "4553748fbe77b7a29fe061c5eab99b17a610a7285153c0c11366895c500fad52",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 15755,
+   "view_names": [
+    "ODS.V_EMR_ICH_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_ICH_OPERATION.sql",
+   "category": "governance",
+   "sha256": "d5ae8b5d372a8f0f68ca52025cce54125b975ebe5c628c0db0859f1144606966",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 17408,
+   "view_names": [
+    "ODS.V_EMR_ICH_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_IN_FEE_INFO_CHILD.sql",
+   "category": "governance",
+   "sha256": "1c3597c4d8a0e673c57ea3ad8706d46b7aa1944dfc1ff98a4c4c2b79ddb5a55d",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 10417,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_IN_FEE_INFO_MAIN.sql",
+   "category": "governance",
+   "sha256": "6aa97b18711e51089d686a9414ffb41a692a51e7c8021fca833d24f497795fbf",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 3727,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_ANESTHESIA.sql",
+   "category": "governance",
+   "sha256": "a2120bdaaac5998ed67cc262c86d4a6a349980746af84188e894c1d4bb6dd218",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 23246,
+   "view_names": [
+    "ODS.V_EMR_INFOR_ANESTHESIA"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_CRITICALLY_ILL.sql",
+   "category": "governance",
+   "sha256": "105f4e352166f4f0f92692d55dfa3cebba27b80f1bb20ba82a815e516cd3cb43",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 20918,
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_OPERATION.sql",
+   "category": "governance",
+   "sha256": "016487ef36e552eb96fd592fb0f290063b4ee2bb78a877ac5a390e02ed662d5c",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 26596,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_OTHERS.sql",
+   "category": "governance",
+   "sha256": "cccc60811045bd44bf4264bcaec8bdd8738a5a44eeba1007b9910de56dbb8bcb",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 22863,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_SPEC_EXAM_TREAT.sql",
+   "category": "governance",
+   "sha256": "7b077df40b1b8324ca5380372fb3c0d46cdecd20cd184b07422f593850e69943",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 17379,
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INFOR_TRANS_BLOOD.sql",
+   "category": "governance",
+   "sha256": "7f59973ea0a18a0b104a4faef3865411e549de15560d1b55e2532f1ddc1b8a69",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 18782,
+   "view_names": [
+    "ODS.V_EMR_INFOR_TRANS_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "category": "governance",
+   "sha256": "fdc9f120afa15d74554c7e8a1b2c7eb81acc7d2be871254e235e200b8140efac",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 10165,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ALLERGY_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_IMAGE_TEST.sql",
+   "category": "governance",
+   "sha256": "29210146509434db133fd369aafdfb23b7cb7c9d5523341e82221e2abf53748f",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 1763,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_IMAGE_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_ITEM_TEST.sql",
+   "category": "governance",
+   "sha256": "bb459146eb5674ff7d5dc4f6ed7e9662b80cc21059eaf65e47f0a52d4ebb79a5",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 20054,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ITEM_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_INSPECTION_TEST.sql",
+   "category": "governance",
+   "sha256": "aaca6fc672af7a30d27b553b3585dafacf4697d70a26cfc6087e1cba8b43eddd",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 33877,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_MEDICAL_RECORD_INFO.sql",
+   "category": "governance",
+   "sha256": "ebb956c732de852683965f51f1f391a9968e514e5128ca7e100a3e836dba801d",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 10463,
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_NURSING_ASSESSMENT.sql",
+   "category": "governance",
+   "sha256": "f7eda4967b959adbd18186060264cbda18d82748e07fd586047d800fb669df28",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 39777,
+   "view_names": [
+    "ODS.V_EMR_NURSING_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OPERA_RECORD.sql",
+   "category": "governance",
+   "sha256": "8e5328c4b419eba9a17f194453e5185a6d6eb0a7000797d4a518c7d950bc259a",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 38392,
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OPERATION_NURSING.sql",
+   "category": "governance",
+   "sha256": "ea9c837d13150a189c8e809330c640c337e044edb4a4a5f2eea0e8bf7c207310",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 31340,
+   "view_names": [
+    "ODS.V_EMR_OPERATION_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "governance",
+   "sha256": "3aadc78a2bb350743e5be42c0f225f20f30edd3313b5028eb3feccb9b179d0f7",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 12994,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUT_FEE_INFO_MAIN.sql",
+   "category": "governance",
+   "sha256": "ab335cfe80fd75e60f77856edf7e8fb12409eab1941ab2d5c984fcec83885bf2",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 27941,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG.sql",
+   "category": "governance",
+   "sha256": "9141525520ded78336c57a72fc7c47fcc353e66b98821514835528186efecd5e",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 21480,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_DIAG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_DIAG_BAK.sql",
+   "category": "governance",
+   "sha256": "1e627d2a5acc214f0a5a2abba1f66115e55c2fffef2e4d2d7d0de39d30ec2653",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 19371,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_DIAG_BAK"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE.sql",
+   "category": "governance",
+   "sha256": "32bba411253f8e9d3f91d77ca7b05f99096052338fece526b2672c77877af2a3",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 13840,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_BAK.sql",
+   "category": "governance",
+   "sha256": "32bf12313535d94ac4cf8a6d4eb2ae1f3d2cd7d7e3973ddd71cf0aff464baf34",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 40619,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE_BAK"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "category": "governance",
+   "sha256": "600c63f6bf1ed04948200b08cd4739c41dbf0386533525d6b653979e01036323",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 40839,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_RECORD.sql",
+   "category": "governance",
+   "sha256": "93c3eea344f4bdf0f001e05e7c1e5986ee0f143d847ec8f51dc03593849b0325",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 27770,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_OUTPATIENT_REGISTER.sql",
+   "category": "governance",
+   "sha256": "2df376ea8170a96a206571f79c457c67a573c782abd39e948bedff5a195f8070",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 18078,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_REGISTER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\ods_8_216__ODS.V_EMR_REFERRAL_HOS_RECORD.sql",
+   "category": "governance",
+   "sha256": "8c7f56ce277ca1faf809f147512fbb18c76e03c0b1b1955639d3d3d4352a2b10",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 7722,
+   "view_names": [
+    "ODS.V_EMR_REFERRAL_HOS_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+   "category": "governance",
+   "sha256": "2777ac8467d0a32f08c55d2a3f8797c4acceafd3b4f90332897dc4a3106a88f4",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 23371,
+   "view_names": [
+    "EMR_MOLECULAR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.EMR_PATHOLOGY_REPORT.sql",
+   "category": "governance",
+   "sha256": "382378a978e76a17e50214e215dbffefc074b8d0b3087e062586dee40e5f5b78",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 47293,
+   "view_names": [
+    "EMR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\live_ddl\\pathology_sqlserver_10_10_9_41__dbo.molecular_pathology_exam_record.sql",
+   "category": "governance",
+   "sha256": "254db99db2de496309ac6ec353a0b22a79a0ae887462bf82ae2e7fd63ba486be",
+   "mtime": "2026-09-14 11:05:48",
+   "bytes": 2993,
+   "view_names": [
+    "molecular_pathology_exam_record"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\11、门诊挂号(D01 标）EMR_OUTPATIENT_REGISTER(2).sql",
+   "category": "governance",
+   "sha256": "070ce04c18e0417dea51904cb0a8ea0626519416512826bf6d8ea05c3ef535cc",
+   "mtime": "2026-06-09 07:48:27",
+   "bytes": 6304,
+   "view_names": [
+    "OUTPATIENT_REGISTER(2)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\13、门（急）诊费用明细表EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "governance",
+   "sha256": "016cc715761cfe26b7874a8e9d5af0890beb4bd9371eedee869cf09f99da0ebb",
+   "mtime": "2026-06-05 21:49:27",
+   "bytes": 7227,
+   "view_names": [
+    "OUT_FEE_INFO_CHILD"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\15、门（急）诊费用信息主表EMR_OUT_FEE_INFO_MAIN.sql",
+   "category": "governance",
+   "sha256": "032af1cd3ae8038c5a0908bbcb5eed162f7d93bb7fe32db92ebf4b74e75196ce",
+   "mtime": "2026-06-05 15:01:00",
+   "bytes": 10349,
+   "view_names": [
+    "OUT_FEE_INFO_MAIN"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\16、住院结算费用信息主表EMR_IN_fee_info_main(1).sql",
+   "category": "governance",
+   "sha256": "84ba85f14dfc9592d2435b6d12180c959ecb81496ff2d79a71b55a0dfcdb35da",
+   "mtime": "2026-06-09 10:08:59",
+   "bytes": 2927,
+   "view_names": [
+    "IN_fee_info_main(1)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\17、住院费用明细表EMR_IN_FEE_INFO_CHILD(1).sql",
+   "category": "governance",
+   "sha256": "5af530ff2f9aecd856c4dc47f9040008f48e28c9128a5f877dbff3cc2b0e7915",
+   "mtime": "2026-06-09 10:08:58",
+   "bytes": 4915,
+   "view_names": [
+    "IN_FEE_INFO_CHILD(1)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_CONSUMABLES_初步版.sql",
+   "category": "governance",
+   "sha256": "86fff61888afa8ca9fb753b3a7b8dc1da536bb814706318ab8df5d21e1d3b3a4",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 3244,
+   "view_names": [
+    "V_EMR_CONSUMABLES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "governance",
+   "sha256": "4959f57c442bc3a012e81d2cdcfd22f3de46b5f1852b9f1e21da0536bbfe31bb",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 4125,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_EXAM_IMAGE_REP.sql",
+   "category": "governance",
+   "sha256": "bac090cbe51c8a77216b83f64c0b94c825c00b3721c1d24f4817b9ede4cc899b",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 13034,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_REP"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "governance\\view_ddl_backup_20260914\\local_sql_from_desktop\\v_EMR_INSPECTION.sql",
+   "category": "governance",
+   "sha256": "b644cb2f18d98191ee79d910a31c85ccf61f2dfe8415ac5509c9afc532991e66",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 15268,
+   "view_names": [
+    "V_EMR_INSPECTION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "scripts\\ear_surgery_cohort_query_修正版.sql",
+   "category": "pkg_scripts_do_not_run",
+   "sha256": "e14200e8fe225e62a628c01ada96b7bc9266cb7709a89d12b08540a42bf0fd17",
+   "mtime": "2026-06-30 08:13:37",
+   "bytes": 37106,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+   "category": "root_main",
+   "sha256": "bf41748bff84b0ea92a50b6d8ffb19bad294179ab48842735cd90fb6094c39eb",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 26795,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\24小时内入院死亡记录_v_emr_admission_dead_record_tf_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "e2501a93aedd17ffc22c1339360a738b9c47c059daf4241348b37de267132689",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 27522,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\11、门诊挂号(D01 标）EMR_OUTPATIENT_REGISTER(2).sql",
+   "category": "history",
+   "sha256": "070ce04c18e0417dea51904cb0a8ea0626519416512826bf6d8ea05c3ef535cc",
+   "mtime": "2026-06-09 07:48:27",
+   "bytes": 6304,
+   "view_names": [
+    "OUTPATIENT_REGISTER(2)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\13、门（急）诊费用明细表EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "history",
+   "sha256": "016cc715761cfe26b7874a8e9d5af0890beb4bd9371eedee869cf09f99da0ebb",
+   "mtime": "2026-06-05 21:49:27",
+   "bytes": 7227,
+   "view_names": [
+    "OUT_FEE_INFO_CHILD"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\15、门（急）诊费用信息主表EMR_OUT_FEE_INFO_MAIN.sql",
+   "category": "history",
+   "sha256": "032af1cd3ae8038c5a0908bbcb5eed162f7d93bb7fe32db92ebf4b74e75196ce",
+   "mtime": "2026-06-05 15:01:00",
+   "bytes": 10349,
+   "view_names": [
+    "OUT_FEE_INFO_MAIN"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\16、住院结算费用信息主表EMR_IN_fee_info_main(1).sql",
+   "category": "history",
+   "sha256": "84ba85f14dfc9592d2435b6d12180c959ecb81496ff2d79a71b55a0dfcdb35da",
+   "mtime": "2026-06-09 10:08:59",
+   "bytes": 2927,
+   "view_names": [
+    "IN_fee_info_main(1)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\17、住院费用明细表EMR_IN_FEE_INFO_CHILD(1).sql",
+   "category": "history",
+   "sha256": "5af530ff2f9aecd856c4dc47f9040008f48e28c9128a5f877dbff3cc2b0e7915",
+   "mtime": "2026-06-09 10:08:58",
+   "bytes": 4915,
+   "view_names": [
+    "IN_FEE_INFO_CHILD(1)"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\v_EMR_CONSUMABLES_初步版.sql",
+   "category": "history",
+   "sha256": "86fff61888afa8ca9fb753b3a7b8dc1da536bb814706318ab8df5d21e1d3b3a4",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 3244,
+   "view_names": [
+    "V_EMR_CONSUMABLES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\v_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "history",
+   "sha256": "4959f57c442bc3a012e81d2cdcfd22f3de46b5f1852b9f1e21da0536bbfe31bb",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 4125,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\v_EMR_EXAM_IMAGE_REP.sql",
+   "category": "history",
+   "sha256": "bac090cbe51c8a77216b83f64c0b94c825c00b3721c1d24f4817b9ede4cc899b",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 13034,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_REP"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\history\\v_EMR_INSPECTION.sql",
+   "category": "history",
+   "sha256": "b644cb2f18d98191ee79d910a31c85ccf61f2dfe8415ac5509c9afc532991e66",
+   "mtime": "2026-09-14 09:49:07",
+   "bytes": 15268,
+   "view_names": [
+    "V_EMR_INSPECTION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\一般手术记录_v_emr_opera_record.sql",
+   "category": "root_main",
+   "sha256": "7558d9bd04ce5b59580088981dd3230f5c881a05edebb66f391697b12257e17a",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 39234,
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\一般手术记录_v_emr_opera_record_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "b3d0a4d9a5d5919b61580611f2eebc6717a42a230c9eea4daba44fa7b7ff7202",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 40287,
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\一般护理记录_v_EMR_GENERAL_NURSING.sql",
+   "category": "root_main",
+   "sha256": "4d328461d537ba6d6926c4699a966283083a2b7fa35eb8c37cc78f5bf3479831",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 15878,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\会诊记录_v_EMR_HOS_CONSUL_RECORD.sql",
+   "category": "root_main",
+   "sha256": "edf98ee9ad728cbbdb42079e0d186aac8ac6ab3e2441487b8d76df3da96cdfba",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 6648,
+   "view_names": [
+    "ODS.V_EMR_HOS_CONSUL_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+   "category": "root_main",
+   "sha256": "0eedbdcfc6705fa12b758d46ff2560085075008bb1c9e0b878b386e85b80a7e3",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 40985,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_DRUG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+   "category": "root_main",
+   "sha256": "f4682206fe426464611d580daf04eb7d21ad496bf5c1f23c3a12a8621a61c3f0",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 12854,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_CHECK"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+   "category": "root_main",
+   "sha256": "5b85454bb5a6648a17eb9a2a17bc9b6a4f077a4f8a4319156270d48742509d8c",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 10227,
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "863bc4c4321ff1f1ab17aa8b16418b319bf0713ddd62071f01b1993e2c70c891",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 10938,
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+   "category": "root_main",
+   "sha256": "9e058c69965d0ee477148d3a220033faa18f08e4540d9a9e19b0c2d721049115",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 56995,
+   "view_names": [
+    "ODS.V_EMR_ICH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+   "category": "root_main",
+   "sha256": "025b6408a1dfa7e1affa7960e1df0d67f3411b7575a5a6fe85f306c458d32e31",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 7191,
+   "view_names": [
+    "ODS.V_EMR_ICH_CHARGE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+   "category": "root_main",
+   "sha256": "3a3c853849e3dd98568437583a3727e47a73be5d7777ecc5e0d6cdb2042e4443",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 17887,
+   "view_names": [
+    "ODS.V_EMR_ICH_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+   "category": "root_main",
+   "sha256": "73ff49043241e653d0c769570bad7d4d79254a8ebd0e2ef7a12682f622b730c6",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 16127,
+   "view_names": [
+    "ODS.V_EMR_ICH_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+   "category": "root_main",
+   "sha256": "3c86dce2325b31b7d709de8fcbf2c5b2208f123e98abeed322af45acebf2aa32",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 5345,
+   "view_names": [
+    "ODS.V_EMR_ICH_ALLERGIES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+   "category": "root_main",
+   "sha256": "41f688e6a011d123e4eb050707264c3d387ba6c5bcbca9b38de5abeba5879a92",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 3825,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+   "category": "root_main",
+   "sha256": "163c84463dbcd4c1f46ea1548244edeb80f831dc553ba44a8827e559c2278ae0",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 10692,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+   "category": "root_main",
+   "sha256": "9c0925a1489a4b21cc5348f95c8a0f2ba3088ea0417794e0e80d0fad5dcc86eb",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 47918,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\入院记录(D08标）_v_EMR_ADMISSION_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "b9f50f66e519db112583a8b6d738916c0ead2f1a9272249717100bb3c6c4d2de",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 48274,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+   "category": "root_main",
+   "sha256": "ea615c3a1ce7c32297ea38d30c1a539d371637e9bc3f507a0c5d22736b222fa8",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 24485,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+   "category": "root_main",
+   "sha256": "ce46dc1ce88a68bf851494e059d4ce50afdc7f9ab342eac995bb74388392ad56",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 8504,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+   "category": "root_main",
+   "sha256": "e0c610bdf89dfb810b7744a4c4b8c2c0dc3b8ec3c145cdb2f9844e6a3f51d0e5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 23411,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\其它知情同意书_v_EMR_INFOR_OTHERS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "41685eb861cfea1dc65ed1f4eebf29ef697f84d966b24c05ad1ade306a77fce5",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 24376,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+   "category": "root_main",
+   "sha256": "3a85e83aab446583decfaf22694aa25e631633edc1b01f34316c0b022989637d",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 25533,
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "1bcf25da40f78317f0787ea6104c3403b959f6bbf8ae2b57daafcca6ccdda08e",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 26273,
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "category": "root_main",
+   "sha256": "011f01855877a5cd15161681edc578473acaf7a9c6dccab41d7ea4cb7dcd8a24",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 6232,
+   "view_names": [
+    "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+   "category": "root_main",
+   "sha256": "55b1a780a038993c18ced32c1e7a753ada1d9af2f2c4373be2b48f66a29d45f3",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 17745,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+   "category": "root_main",
+   "sha256": "36369e6572b1f8b3bdb3f30ca53dd0516318f71ec938fd263de00dc3a2f5f27a",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 23372,
+   "view_names": [
+    "EMR_MOLECULAR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "三甲完成视图\\医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql",
+   "category": "root_main",
+   "sha256": "8fb034881fd538ac47595840b3710626afc1f89abf0904d146b0bdee4894c06c",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 3640,
+   "view_names": [
+    "c##fxpt.emr_infection_information_register"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+   "category": "root_main",
+   "sha256": "96f8cc3ef91451a2383f48c99614448539bb47c54ae7312cf14f6d5396925932",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 13968,
+   "view_names": [
+    "HRPSEY656.EMR_HOS_PRACTITIONER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\24小时内入院死亡记录_v_emr_admission_dead_record_tf.sql",
+   "category": "live_backup_20260914",
+   "sha256": "71f14bc076437745a6d0f2207a21f13f3c994bcd61a6cf3b95e5a97bc6501538",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 26795,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\一般手术记录_v_emr_opera_record.sql",
+   "category": "live_backup_20260914",
+   "sha256": "5ccc17f47b763606afb5a3d2245ed827046cb559993b4307eb98322504b6e797",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 39234,
+   "view_names": [
+    "ODS.V_EMR_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\一般护理记录_v_EMR_GENERAL_NURSING.sql",
+   "category": "live_backup_20260914",
+   "sha256": "95141f70ee84bb28e225f8733747c3e95a0e46865059e7f05562150faaeeac40",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 15878,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\会诊记录_v_EMR_HOS_CONSUL_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "fa1b9dbf30b1f741b38d3c7a948c95eb756d063d917dd5556caed865a9e53cf2",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 6648,
+   "view_names": [
+    "ODS.V_EMR_HOS_CONSUL_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院医嘱信息-药品类医嘱_v_emr_doc_order_drug.sql",
+   "category": "live_backup_20260914",
+   "sha256": "c31320289ef089cad23e82e597235f2dcfb83e3d6374b6bb91c34cdf01fc35df",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 40985,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_DRUG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院医嘱信息-非药品类医嘱_v_EMR_doc_order_check.sql",
+   "category": "live_backup_20260914",
+   "sha256": "144bf7fbcd47fd38e326d10e387bf49b200b90e254ad270e59802e6e36eb0274",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 12854,
+   "view_names": [
+    "ODS.V_EMR_DOC_ORDER_CHECK"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院医师交接班记录_v_EMR_HOS_SUCCESSION_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "b679a300fdb45cfee4f9e4db34c0f7683d30d940008a6a3672457c907bf4b19d",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10227,
+   "view_names": [
+    "ODS.V_EMR_HOS_SUCCESSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院病案首页(电子病历)(D09_D10标）_v_emr_ich.sql",
+   "category": "live_backup_20260914",
+   "sha256": "d18ada73def511dd8ea134dc423eedcf545c063299a63a09214709c036f0ad31",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 56995,
+   "view_names": [
+    "ODS.V_EMR_ICH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院病案首页-住院费用(电子病历)(辅D09_D10标）_V_EMR_ICH_CHARGE.sql",
+   "category": "live_backup_20260914",
+   "sha256": "d3558c09c730d1deb9e995678ba47947b37c8fad8311c0ad63852e446afc0ec9",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 7191,
+   "view_names": [
+    "ODS.V_EMR_ICH_CHARGE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院病案首页-手术(电子病历)(辅D09_D10标）_v_emr_ich_operation.sql",
+   "category": "live_backup_20260914",
+   "sha256": "cdf38c1b21db4aff578578ccfd912d756162552473531af365595efee220d072",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 17887,
+   "view_names": [
+    "ODS.V_EMR_ICH_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院病案首页-诊断(电子病历)(辅D09_D10标）_V_EMR_ICH_DIAGNOSIS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "55e4afd1f866610a1d3c35742169741188d04ad0f6404b08f1fc777abb9042b0",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 16127,
+   "view_names": [
+    "ODS.V_EMR_ICH_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院病案首页-过敏药物(电子病历)(辅D09_D10标）_v_emr_ich_allergies.sql",
+   "category": "live_backup_20260914",
+   "sha256": "f5d15bcbdeacfad84bc0f5a38ce27d0efa63c275a7357d8159085050b1d28a02",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 5345,
+   "view_names": [
+    "ODS.V_EMR_ICH_ALLERGIES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院结算费用信息主表_v_EMR_IN_fee_info_main.sql",
+   "category": "live_backup_20260914",
+   "sha256": "e559d7bc72c0acef3b686b8a4460c1549f521fa2737a35be26957b782f3bcb97",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 3825,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\住院费用明细表_v_EMR_IN_FEE_INFO_CHILD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "0b4bcc3b1d1045388c3d954167624b36bd4a581dae54963137813f6eebae38a4",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10692,
+   "view_names": [
+    "ODS.V_EMR_IN_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\入院记录(D08标）_v_EMR_ADMISSION_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "004ceabafd3c518ef4a199fcaa77406be54705df2b07fbea341eea3693acd998",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 47918,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\入院评估记录_V_EMR_ADMISSION_ASSESSMENT.sql",
+   "category": "live_backup_20260914",
+   "sha256": "ed6ab6a74beaf5e4220a80144c522394862a06b2078a0793d29a3fd02fc85521",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 24485,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\入院诊断表_v_EMR_ADMISSION_DIAGNOSIS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "ce5972f10f81a1f6f95011dc708d1cb53fed80a65460b0e69435459fce15c6b2",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 8504,
+   "view_names": [
+    "ODS.V_EMR_ADMISSION_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\其它知情同意书_v_EMR_INFOR_OTHERS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "e0c610bdf89dfb810b7744a4c4b8c2c0dc3b8ec3c145cdb2f9844e6a3f51d0e5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 23411,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OTHERS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\出院记录(D12标）_v_EMR_DISCHARGE_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "4c02d99d902a72960d6332d4632b75972eab427be9340391b25ce5d98ebc9489",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 25533,
+   "view_names": [
+    "ODS.V_EMR_DISCHARGE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\出院记录-诊断(辅D12标）_EMR_DISCHARGE_RECORD_DIAGNOSIS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "1dabc844b9184a4a72ab67e528dac8a0203e7f7d9ea8075a2c1fd8728d74c3b6",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 6232,
+   "view_names": [
+    "ODS.EMR_DISCHARGE_RECORD_DIAGNOSIS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\出院评估与指导_v_EMR_DISCHARGE_ASSESSMENT.sql",
+   "category": "live_backup_20260914",
+   "sha256": "e6aad6d0f15656c6d401084e9e59891ed673c2c93c7c6b75f08cd052ab2828d5",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 17745,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\分子病理报告_EMR_MOLECULAR_PATHOLOGY_REPORT.sql",
+   "category": "live_backup_20260914",
+   "sha256": "36369e6572b1f8b3bdb3f30ca53dd0516318f71ec938fd263de00dc3a2f5f27a",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 23372,
+   "view_names": [
+    "EMR_MOLECULAR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\医院感染信息登记表_EMR_INFECTION_INFORMATION_REGISTER.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8fb034881fd538ac47595840b3710626afc1f89abf0904d146b0bdee4894c06c",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 3640,
+   "view_names": [
+    "c##fxpt.emr_infection_information_register"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\医院执业人员信息表_EMR_HOS_PRACTITIONER.sql",
+   "category": "live_backup_20260914",
+   "sha256": "96f8cc3ef91451a2383f48c99614448539bb47c54ae7312cf14f6d5396925932",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 13968,
+   "view_names": [
+    "HRPSEY656.EMR_HOS_PRACTITIONER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+   "category": "live_backup_20260914",
+   "sha256": "e99045d5e2aea221fe926c787796fb9cb3ea0d0205076098b4af5cd110e4992a",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28616,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_REP"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\手术护理记录_v_emr_operation_nursing.sql",
+   "category": "live_backup_20260914",
+   "sha256": "4571a7192e574977fc74301c51ac9c93c69eceac7567d4f684836896ce3695f6",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 31939,
+   "view_names": [
+    "ODS.V_EMR_OPERATION_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\手术知情同意书_v_emr_infor_operation.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8f66c9aaaf351227d8b82c798374a35e0af543ee432c865cdd4219b847495f5c",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 27291,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "20dfaa6c8e22d35f0ff55c40f611e819fca6e70871304ac4a2138942e29db788",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 26461,
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "b2ee310890116c86906a43546fed28b31861ce26cd603ca562723a2b8ba84fce",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 16637,
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "7a94dbe113954b00fa37aaa379a03651285ae2080430d6e833f4acad7d7e1864",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 2779,
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "live_backup_20260914",
+   "sha256": "2724cf12cb87a708dd9c1510e5c7ac8de48e1cad23e2fa3dfc75d1e12c2dd2c8",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 4014,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql",
+   "category": "live_backup_20260914",
+   "sha256": "40f5b3bc6f6423892fbfb98058f903d3acfad72833e2e97dbce2365fd1bd1584",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 1823,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_IMAGE_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "category": "live_backup_20260914",
+   "sha256": "1dfb76462a0d542d12751b63df404d2efa51c8a7db2de76890884081c3e13259",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10404,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ALLERGY_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+   "category": "live_backup_20260914",
+   "sha256": "69089fd38d10dcb354d57fc765e8a36b9e1f7a2f1e647f9edcdfef576e62b1f0",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 34593,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+   "category": "live_backup_20260914",
+   "sha256": "9d377e4405a704e4b271edf06b614a4686c40259b1f6646da3593a79eab6605a",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 20654,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ITEM_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "9293080a6809c90747d2723336f432a8e313ae0f6445751934db3215e327a74b",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10614,
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "49eceae1ba64cb31c398e64439d86bcfb0ce8c31d5b1d85b080fd1e4c194b73c",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 13180,
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+   "category": "live_backup_20260914",
+   "sha256": "3ea33d0d5c4050387af4442f70e76e0f9239413075add0e154caf3f7fe43e579",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 17770,
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+   "category": "live_backup_20260914",
+   "sha256": "0c957615bdcd3d018f916a589f315ba8de7812c815151dafbb6acc252bb1385e",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 15493,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+   "category": "live_backup_20260914",
+   "sha256": "28ec5a0981ed7f0df9b0c984c4543180dfa9c15c3a4acd4728835b2d2f9888e8",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10705,
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "3c76f86429823580e6e5482e66896c8df467197d0a2fd0fa48fdc65de443d103",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 13908,
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+   "category": "live_backup_20260914",
+   "sha256": "ba4414f5ccffe299eddadcf8bec8afe514b03a7b7b7dae34447768f1664491db",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 21384,
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+   "category": "live_backup_20260914",
+   "sha256": "e00d9482140d5b98cf184d07a8308b2f900350d2c477a8fcc7c249e7c15f8428",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 11235,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+   "category": "live_backup_20260914",
+   "sha256": "9bee086c5b2b412e5212e8c712a8986bcbfae9640820b2be4924c1bc643e1cb1",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 14598,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\病理报告_EMR_PATHOLOGY_REPORT.sql",
+   "category": "live_backup_20260914",
+   "sha256": "5d858b68c277cea05faf9da07bda25f20cc75476e1c7e09b813efc457759c81d",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 47294,
+   "view_names": [
+    "EMR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "1d0dc180a0c87934d75369e6f50e3b126faea4b93440ac7c5dc7d13e0bc0942e",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 14501,
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "ad6dac97037f5348ebf49a6f9b0e246521e6a198bb423f5e7a875ce2ee5ac9c0",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 7928,
+   "view_names": [
+    "ODS.V_EMR_REFERRAL_HOS_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "90ad5cdc75184f5b2071e5705dcde8b4a40f55e6b39bf9f0c05bc71da7bfafd2",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 19227,
+   "view_names": [
+    "ODS.V_EMR_INFOR_TRANS_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\量表评估_v_emr_nursing_assessment.sql",
+   "category": "live_backup_20260914",
+   "sha256": "5cce35ff5b4e1a491118c8a67a4e874225a52cab2e741e797381c398a207e361",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 10713,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "4e7be9c96743d7af09a6f359da53577dc9689d445536ab07fadf58fe3a0cc636",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28693,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+   "category": "live_backup_20260914",
+   "sha256": "3a30b88715ec4e0b170055c1381e2757a56e3757bbb86f617e69446629a70348",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 21958,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_DIAG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+   "category": "live_backup_20260914",
+   "sha256": "db29acd35ce9d8cb917eeb671b2c7ba13ab02bfd78c2b3bc460b68ae9fb4f997",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 14189,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "category": "live_backup_20260914",
+   "sha256": "5be1b2d2e45dd53b2cf6e73a82a17de32fed1afd1faa0828dc6f4f41382b6b4b",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 41676,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql",
+   "category": "live_backup_20260914",
+   "sha256": "0010f054a063c52cd92395d983842b9bcecc1b2c167ef865f545a58ee0f3b029",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 18555,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_REGISTER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+   "category": "live_backup_20260914",
+   "sha256": "cfcc9c9845f3117455f968e0405fe38fd1228e4fc997c241943adb770bb8a552",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28584,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "ce92aec022f827f582deccbf210ac040fc020ef8fb0815b98e7ecee85dbf19a7",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 13326,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+   "category": "live_backup_20260914",
+   "sha256": "c69b5008d6611681e0601f356deffe47590d1e0f66f36e269d6e2ce42c217086",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 45891,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+   "category": "live_backup_20260914",
+   "sha256": "a76bc9b3c93818f8617f7583f72ff42b23fa2ce6df3bb4ba80450ca16342b321",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 3763,
+   "view_names": [
+    "ODS.V_EMR_CONSUMABLES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql",
+   "category": "live_backup_20260914",
+   "sha256": "441ff3a4a06d5a2183cb9fb16d007197cf0674fab6acbafdbcb0fa09fdaca2d3",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 9236,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_MED"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "9de20d9a7fbf46918adcc2224335491a1b94a27bb1420bdef7bab2a813e6d9ca",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 4465,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "8aaf79913df582f4954853af70c546c03bb45ecbfd03bbb04a7afb046898f4e6",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28399,
+   "view_names": [
+    "ODS.V_EMR_ANESTHESIA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "25610ebf0611a6e71eab44954f3e3e0597c5b7f158041d57e7fe1dd15ed06596",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 41228,
+   "view_names": [
+    "ODS.V_EMR_BOFORE_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+   "category": "live_backup_20260914",
+   "sha256": "20ab3ae8c929d9e8555e2839acb46d25263343b47f263ff0906bbe96aea5d855",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 34066,
+   "view_names": [
+    "ODS.V_EMR_ANES_AFTER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\备份_20260914活库原样\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+   "category": "live_backup_20260914",
+   "sha256": "42d09709874c911ccad1973f4e5620009807a18320c51bddb508765f8cee9704",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 23850,
+   "view_names": [
+    "ODS.V_EMR_INFOR_ANESTHESIA"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\影像诊断报告(D07标）_V_EMR_EXAM_IMAGE_REP.sql",
+   "category": "root_main",
+   "sha256": "8166873af281a030858b54065432bb19b894b2f7b2b7b386aff2dddfeede0d56",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28616,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_REP"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\手术护理记录_v_emr_operation_nursing.sql",
+   "category": "root_main",
+   "sha256": "069cb6f20bd6ed364493c233e04b447bda68a6dfc5b55884a2a9a1a88b495a17",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 31939,
+   "view_names": [
+    "ODS.V_EMR_OPERATION_NURSING"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\手术知情同意书_v_emr_infor_operation.sql",
+   "category": "root_main",
+   "sha256": "31d5e9d32005687542ee0c5d4258ed9b0244a050e8d313fd12f03dfa70ac603d",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 27291,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\手术知情同意书_v_emr_infor_operation_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "129f2b7301ba83e235e3171657bce1c0f781feaefe7a6fac51b5e126b6139f84",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 28089,
+   "view_names": [
+    "ODS.V_EMR_INFOR_OPERATION_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD.sql",
+   "category": "root_main",
+   "sha256": "7d9ad41bf3b31340b0a4f58c1eeee2b2b65ad4ac5b9146b4e0223e61ec10a6e7",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 26461,
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\抢救记录_v_EMR_HOS_SAVE_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "3105cfd8390467001c558ad8a06df3a58de1f28c9df43b86d542de4787e368e5",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 27164,
+   "view_names": [
+    "ODS.V_EMR_HOS_SAVE_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS.sql",
+   "category": "root_main",
+   "sha256": "92e1b7ae3d3d737e20b800e89211ed367bf81cedc49e859bf8da867a27966af9",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 16637,
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\术前讨论与小结_v_EMR_HOS_PREOP_DISCUSS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "f34e5fc9dedd60679d24e604a895be44d5a0c5abb14bd1645e5a023fd2adf3ff",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 17247,
+   "view_names": [
+    "ODS.V_EMR_HOS_PREOP_DISCUSS_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD.sql",
+   "category": "root_main",
+   "sha256": "4ddcc2d0bae19b667c0da6884e39812c04bb9322b962d0dd9f7766bf56a4c84f",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 2779,
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\术后首次病程记录_v_EMR_HOS_POSTOPER_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "1df6a584d856608ff7567013c2820826c60f482b8d22e5af7cdba13266eaaccf",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 3550,
+   "view_names": [
+    "ODS.V_EMR_HOS_POSTOPER_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\检查影像诊断报告子表(辅D07标）_V_EMR_EXAM_IMAGE_PATH.sql",
+   "category": "root_main",
+   "sha256": "2724cf12cb87a708dd9c1510e5c7ac8de48e1cad23e2fa3dfc75d1e12c2dd2c8",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 4014,
+   "view_names": [
+    "V_EMR_EXAM_IMAGE_PATH"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告-图片子表_V_EMR_INSPECTION_IMAGE_TEST.sql",
+   "category": "root_main",
+   "sha256": "40f5b3bc6f6423892fbfb98058f903d3acfad72833e2e97dbce2365fd1bd1584",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 1823,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_IMAGE_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告-药敏子表_V_EMR_INSPECTION_ALLERGY_TEST.sql",
+   "category": "root_main",
+   "sha256": "1dfb76462a0d542d12751b63df404d2efa51c8a7db2de76890884081c3e13259",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10404,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ALLERGY_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告单(D18)_V_EMR_INSPECTION_TEST.sql",
+   "category": "root_main",
+   "sha256": "69089fd38d10dcb354d57fc765e8a36b9e1f7a2f1e647f9edcdfef576e62b1f0",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 34593,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\检验报告单-项目(辅D06标）_V_EMR_INSPECTION_ITEM_TEST.sql",
+   "category": "root_main",
+   "sha256": "9d377e4405a704e4b271edf06b614a4686c40259b1f6646da3593a79eab6605a",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 20654,
+   "view_names": [
+    "ODS.V_EMR_INSPECTION_ITEM_TEST"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD.sql",
+   "category": "root_main",
+   "sha256": "e95ab553a404f3c350d766a548d64639a932a9bfea9406c482254fd2882d510b",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 10614,
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\死亡病历讨论记录_v_EMR_HOS_DND_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "a3ba28e15a2ab904bdd4a520636c87c0fceb3e0b882d0d8c456f9f1ff58b881d",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 11254,
+   "view_names": [
+    "ODS.V_EMR_HOS_DND_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD.sql",
+   "category": "root_main",
+   "sha256": "49eceae1ba64cb31c398e64439d86bcfb0ce8c31d5b1d85b080fd1e4c194b73c",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 13180,
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\死亡记录表_V_EMR_DEATH_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "380efe98c7dae9fb1e5133bf601b484b29f057db7ce61e380fa966b2a04ec262",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 13886,
+   "view_names": [
+    "ODS.V_EMR_DEATH_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat.sql",
+   "category": "root_main",
+   "sha256": "3ea33d0d5c4050387af4442f70e76e0f9239413075add0e154caf3f7fe43e579",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 17770,
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\特殊检查及特殊治疗同意书_v_emr_infor_spec_exam_treat_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "8f69a6381eb5c8d71d2b4698570c2005d4db78efeb0f76331c2c88bf77859c46",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 18636,
+   "view_names": [
+    "ODS.V_EMR_INFOR_SPEC_EXAM_TREAT_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\生命体征测量记录_v_EMR_VITAL_SIGN.sql",
+   "category": "root_main",
+   "sha256": "6881ea53cf5c9fefa722d1ce96e913522352cf8b2510e5a28670dca656debfc1",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 15493,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO.sql",
+   "category": "root_main",
+   "sha256": "28ec5a0981ed7f0df9b0c984c4543180dfa9c15c3a4acd4728835b2d2f9888e8",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 10705,
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\电子病历汇总_V_EMR_MEDICAL_RECORD_INFO_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "b3df28c85b4e10426165bac2ee50fefd5ecc9fb7698aa164e3857bb46bf8b5dd",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 10981,
+   "view_names": [
+    "ODS.V_EMR_MEDICAL_RECORD_INFO_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS.sql",
+   "category": "root_main",
+   "sha256": "e95358522d2be1c3f77be496b45de026b018611f207120e4464dd16f89ad4693",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 13908,
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\疑难病例讨论记录_v_EMR_HOS_DIFFIC_CASE_DISCUSS_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "f556b6ede4f2dc9e59e4cbc613bd1e08c872cf58e9a35a32c1408cb3b1370861",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 14587,
+   "view_names": [
+    "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill.sql",
+   "category": "root_main",
+   "sha256": "ba4414f5ccffe299eddadcf8bec8afe514b03a7b7b7dae34447768f1664491db",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 21384,
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\病危(重)通知书_v_emr_infor_critically_ill_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "bf6ef3092dd3ed56104cfc15c30a2679837f9cba48090f7910e89a9f8f7b3b54",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 22477,
+   "view_names": [
+    "ODS.V_EMR_INFOR_CRITICALLY_ILL_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\病危（重）护理记录-出入量记录_v_EMR_IN_OUT_AMOUNT.sql",
+   "category": "root_main",
+   "sha256": "7be1352a3d461480a85056b06fd3203b6ffaac210952f46e5a22f9f8dd58a805",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 11235,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\病危（重）护理记录_v_EMR_CRITICALLY_ILL_NURS.sql",
+   "category": "root_main",
+   "sha256": "17ed057dae92e05bd093ac9fddf64794f9998b310f13c1521b092915dca8023e",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 14598,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\病理报告_EMR_PATHOLOGY_REPORT.sql",
+   "category": "root_main",
+   "sha256": "5d858b68c277cea05faf9da07bda25f20cc75476e1c7e09b813efc457759c81d",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 47294,
+   "view_names": [
+    "EMR_PATHOLOGY_REPORT"
+   ],
+   "name_source": "ddl",
+   "dialect": "sqlserver"
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗医嘱明细_v_EMR_BLOOD_DIALY_ORDER.sql",
+   "category": "root_main",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗记录_v_EMR_BLOOD_DIALY_RECORD.sql",
+   "category": "root_main",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\血透治疗过程记录_v_EMR_BLOOD_DIALY_DETAIL.sql",
+   "category": "root_main",
+   "sha256": "8981108ec10f0d0b3d7589400473da6f129bffbb17f05e2c96194e304c7365c5",
+   "mtime": "2026-09-14 11:30:31",
+   "bytes": 26219,
+   "view_names": [
+    "v_EMR_BLOOD_DIALY_RECORD",
+    "v_EMR_BLOOD_DIALY_DETAIL",
+    "v_EMR_BLOOD_DIALY_ORDER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD.sql",
+   "category": "root_main",
+   "sha256": "c08570b6ec2667c6d383f8a766e5c68d241271f121fda3959dab42377ebd7e1d",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 14501,
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\转科记录_v_EMR_HOS_CHANGE_MAJOR_RECORD_jhemr.sql",
+   "category": "root_jhemr_draft",
+   "sha256": "895ec3061b058479c8bc5b2f5dd77721ad07d8943a5a2c4b804011bf9ff1168f",
+   "mtime": "2026-09-14 11:50:42",
+   "bytes": 15033,
+   "view_names": [
+    "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD_JHEMR"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\转诊_院纪录（转出记录）_v_EMR_REFERRAL_HOS_RECORD.sql",
+   "category": "root_main",
+   "sha256": "935424aae2511adace5e09944b3ab3ccea22d9813185aca6b3da62cad88e378e",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 7928,
+   "view_names": [
+    "ODS.V_EMR_REFERRAL_HOS_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\输血治疗同意书_v_EMR_INFOR_TRANS_BLOOD.sql",
+   "category": "root_main",
+   "sha256": "90ad5cdc75184f5b2071e5705dcde8b4a40f55e6b39bf9f0c05bc71da7bfafd2",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 19227,
+   "view_names": [
+    "ODS.V_EMR_INFOR_TRANS_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\量表评估_v_emr_nursing_assessment.sql",
+   "category": "root_main",
+   "sha256": "ca912e31dce8bfe4d93db06c020a95d378a1a01b34c2be818f0b267df477e635",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 10713,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门诊_急诊就诊记录(D02标）_v_EMR_OUTPATIENT_RECORD.sql",
+   "category": "root_main",
+   "sha256": "441c1e933e70422e9577abd99d84f3e24f8e64a0d6c972885c855b08be66b47a",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28693,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门诊_急诊就诊诊断表_v_EMR_OUTPATIENT_DIAG.sql",
+   "category": "root_main",
+   "sha256": "3b48c2409cccf410770e530eb240fe37fdf0f237e951c08b63fc2a1f0a441e75",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 21958,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_DIAG"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门诊处方(D03_D04标）_v_EMR_OUTPATIENT_RECIPE.sql",
+   "category": "root_main",
+   "sha256": "37ddd4f107243cf23fa45327cae866b0742a942d87c02857330161f5d783557c",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 14189,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门诊处方明细(辅D03_D04标）_v_EMR_OUTPATIENT_RECIPE_ITEM.sql",
+   "category": "root_main",
+   "sha256": "e29183ca406efc412531ff4a685187e74cbdd34acd32047a60cac88259be0933",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 41676,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门诊挂号(D01标）_v_EMR_OUTPATIENT_REGISTER.sql",
+   "category": "root_main",
+   "sha256": "676d166ba567eb50695bf9316c71b87533f1f15d1c10bc0569a7880a3046644f",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 18555,
+   "view_names": [
+    "ODS.V_EMR_OUTPATIENT_REGISTER"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门（急）诊费用信息主表_v_EMR_out_fee_info_main.sql",
+   "category": "root_main",
+   "sha256": "bb8ddf0e7fa32294d0c4f59b6c9a4d149096251b8cdb7ceabc41fcd9665e72b5",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 28584,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_MAIN"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\门（急）诊费用明细表_v_EMR_OUT_FEE_INFO_CHILD.sql",
+   "category": "root_main",
+   "sha256": "dcc7253b8a427f994f1eeb83305534372276a6bbd52a37b51ecb840a32c5175e",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 13326,
+   "view_names": [
+    "ODS.V_EMR_OUT_FEE_INFO_CHILD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\阴道分娩记录_v_EMR_CHILDBIRTH.sql",
+   "category": "root_main",
+   "sha256": "5aca9bcd96db8203c66bc1655ce0d8ac2f1660c43e54abb4673c3cbf2deabce9",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 45891,
+   "view_names": [
+    "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\高值耗材使用记录_V_EMR_CONSUMABLES.sql",
+   "category": "root_main",
+   "sha256": "d78189afce05dc4e5ff6d9a06ea0f925dbc696de222dff18f148d3265f06f29e",
+   "mtime": "2026-09-14 11:30:30",
+   "bytes": 3763,
+   "view_names": [
+    "ODS.V_EMR_CONSUMABLES"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术中用药记录_v_EMR_ANES_RECORD_MED.sql",
+   "category": "root_main",
+   "sha256": "01cb6757c309a9d24f3d774abf41841d4fbd38d1a45de97eedffc17d1caa9a2e",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 9237,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_MED"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术中用血记录_v_EMR_ANES_RECORD_BLOOD.sql",
+   "category": "root_main",
+   "sha256": "1525a641a7a950a04753c5a22270209b71ef282385c6ae5f930bbaa1e15ccb2e",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 4466,
+   "view_names": [
+    "ODS.V_EMR_ANES_RECORD_BLOOD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉手术记录_v_EMR_ANESTHESIA_RECORD.sql",
+   "category": "root_main",
+   "sha256": "147ba7c3bf502c870ccaec8f6bca513cca7c8548ea4866471479d447273da213",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 28400,
+   "view_names": [
+    "ODS.V_EMR_ANESTHESIA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉术前访视记录_v_EMR_BOFORE_OPERA_RECORD.sql",
+   "category": "root_main",
+   "sha256": "3fcae3104bf9f31028fdaed91dad374fddb6399984a232013d52ab7cc1f15cb6",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 41229,
+   "view_names": [
+    "ODS.V_EMR_BOFORE_OPERA_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉术后访视记录_v_EMR_ANES_AFTER_RECORD.sql",
+   "category": "root_main",
+   "sha256": "206b3734efb5e22dcee2f1abcc1f8d6bcd9ff9c2960841368ec868024f5bbd78",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 34066,
+   "view_names": [
+    "ODS.V_EMR_ANES_AFTER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "三甲完成视图\\麻醉知情同意书_v_emr_infor_anesthesia.sql",
+   "category": "root_main",
+   "sha256": "f05912e06051dc05eb2d5aed721a9a1fbba3b1e8125d610c7cacc09b116cd615",
+   "mtime": "2026-09-14 11:33:00",
+   "bytes": 23850,
+   "view_names": [
+    "ODS.V_EMR_INFOR_ANESTHESIA"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\scripts_旧版检查脚本\\view1_query.sql",
+   "category": "archived_ignore",
+   "sha256": "4f697a626b839d3a675b7db3b4a7a915c76cc048ab10e6df0933c801252e45e7",
+   "mtime": "2026-06-03 21:52:20",
+   "bytes": 5619,
+   "view_names": [
+    "query"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图1_EMR_ADMISSION_RECORD\\EMR_ADMISSION_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "b4ed54b07805c121e73805af568333953ad955a03bdf788c7c5d12d7dabd8526",
+   "mtime": "2026-06-02 22:51:48",
+   "bytes": 40288,
+   "view_names": [
+    "ADMISSION_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图1_EMR_ADMISSION_RECORD\\嘉和病历入院记录sql.sql",
+   "category": "archived_ignore",
+   "sha256": "4763e2ae45932aee760959588d4217b168aec0c5fec30f00b36da78c4a01fefa",
+   "mtime": "2026-06-02 21:56:38",
+   "bytes": 17084,
+   "view_names": [],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图36_EMR_HOS_POSTOPER_RECORD\\EMR_HOS_POSTOPER_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "b775a436f9d5e053d502c391177b985a78a0f5eaf7db339de7e94f28ef120f64",
+   "mtime": "2026-06-04 13:07:10",
+   "bytes": 2524,
+   "view_names": [
+    "v_EMR_HOS_POSTOPER_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图37_EMR_HOS_PREOP_DISCUSS\\EMR_HOS_PREOP_DISCUSS_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "a884cba9d9e399026d9c7c7d60bc8bf6ea46002d1c8b24211739cc68ccc48e64",
+   "mtime": "2026-06-04 19:47:09",
+   "bytes": 15515,
+   "view_names": [
+    "v_emr_hos_preop_discuss"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图38_EMR_HOS_DND_RECORD\\EMR_HOS_DND_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "01c42f5b3f20892e9806dd4106fc7c193e84bf844c2ac923e4c85b32818f741d",
+   "mtime": "2026-06-04 14:30:55",
+   "bytes": 9868,
+   "view_names": [
+    "v_EMR_HOS_DND_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图39_EMR_HOS_DIFFIC_CASE_DISCUSS\\EMR_HOS_DIFFIC_CASE_DISCUSS_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "d4cb73d89c5bc75b80e18b00717cddb6408221350f9fd60683a287c217654c89",
+   "mtime": "2026-06-04 18:29:05",
+   "bytes": 13124,
+   "view_names": [
+    "v_emr_hos_diffic_case_discuss"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图3_EMR_ADMISSION_DIAGNOSIS\\EMR_ADMISSION_DIAGNOSIS_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "c4cbde2db4250d686fbe5d8618cb09e0203e31c099fbea2bd5a2dd7b09c73685",
+   "mtime": "2026-06-05 13:19:26",
+   "bytes": 7145,
+   "view_names": [
+    "v_emr_admission_diagnosis"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图40_EMR_HOS_CHANGE_MAJOR_RECORD\\EMR_HOS_CHANGE_MAJOR_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "a670196f6eb9f4db03dde0d626d437eb566e473ce8f4259519d428b8b24f72ac",
+   "mtime": "2026-06-04 09:46:34",
+   "bytes": 5515,
+   "view_names": [
+    "HOS_CHANGE_MAJOR_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图41_EMR_REFERRAL_HOS_RECORD\\EMR_REFERRAL_HOS_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "bb987ca74df6a8d61522987649d8e68eaf82f3b537ad9ac176bae2c9ed984c1e",
+   "mtime": "2026-06-04 20:30:09",
+   "bytes": 7248,
+   "view_names": [
+    "v_EMR_REFERRAL_HOS_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图42_EMR_HOS_CONSUL_RECORD\\EMR_HOS_CONSUL_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "706e8316f00d14f53411ee2a4700361bc29a5a64ec7a3fd8559b91a2306548ef",
+   "mtime": "2026-06-04 09:46:34",
+   "bytes": 3343,
+   "view_names": [
+    "HOS_CONSUL_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图43_EMR_HOS_SUCCESSION_RECORD\\EMR_HOS_SUCCESSION_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "d2ebb80ae5fd24ea9f2a28977491b34c95f909321906a0d6b1e5314e00ee0b67",
+   "mtime": "2026-06-04 20:39:32",
+   "bytes": 9499,
+   "view_names": [
+    "v_EMR_HOS_SUCCESSION_RECORD"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图44_EMR_HOS_SAVE_RECORD\\EMR_HOS_SAVE_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "efca6c62e56f380395b00c3dc55e1a08440f68f781ba38e22c0569ebec751125",
+   "mtime": "2026-06-04 09:46:34",
+   "bytes": 3823,
+   "view_names": [
+    "HOS_SAVE_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图45_EMR_ADMISSION_DEAD_RECORD_TF\\EMR_ADMISSION_DEAD_RECORD_TF_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "0e161e1d1b64effe0b2f930d86933ed50e5eca2fe55a1bf6aa154b9a0bcb1c52",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 22058,
+   "view_names": [
+    "ADMISSION_DEAD_RECORD_TF_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图46_EMR_OPERA_RECORD\\EMR_OPERA_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "3243d044a4f05f2d07a732f90e96b765ae3e972335c205054efcae59934935c7",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 12760,
+   "view_names": [
+    "OPERA_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图47_EMR_BOFORE_OPERA_RECORD\\EMR_BOFORE_OPERA_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "daf8561ec59f2bc1c94096273890875828e38275cfe93d1055e8ad7e303e9a41",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 13527,
+   "view_names": [
+    "BOFORE_OPERA_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图48_EMR_ANESTHESIA_RECORD\\EMR_ANESTHESIA_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "b16379a56e6c8a5d276a7bbb9f06316e60f0a1aad6c7e31c93277141b830277d",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 10989,
+   "view_names": [
+    "ANESTHESIA_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图49_EMR_ANES_RECORD_BLOOD\\EMR_ANES_RECORD_BLOOD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "f677eadf152dfa31133c793620702bd0b32499e4a043cb15dadf4f38bfb17321",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 3168,
+   "view_names": [
+    "ANES_RECORD_BLOOD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图4_EMR_DISCHARGE_RECORD\\EMR_DISCHARGE_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "1bcdc3398acd551603621913a521ad44742817d4ef03e2b737ca1da6d3fe67b3",
+   "mtime": "2026-06-05 13:30:13",
+   "bytes": 21181,
+   "view_names": [
+    "v_emr_discharge_record"
+   ],
+   "name_source": "ddl",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图50_EMR_ANES_RECORD_MED\\EMR_ANES_RECORD_MED_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "02ae2b288e1fea25638c0749a68341224b04f1cf34f997bb81028520a62c7fdd",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 2587,
+   "view_names": [
+    "ANES_RECORD_MED_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图51_EMR_AFTER_OPERA_RECORD\\EMR_AFTER_OPERA_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "40a5cb183635017268e1a48f73a98ddb92c5883496b2254676df2bcb2734ec12",
+   "mtime": "2026-06-08 08:51:15",
+   "bytes": 7462,
+   "view_names": [
+    "AFTER_OPERA_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\核查完成\\视图5_EMR_DISCHARGE_RECORD_DIAGNOSIS\\EMR_DISCHARGE_RECORD_DIAGNOSIS_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "a3cdd92d6548332dd7d3c0fa943b401327507abfb431e8cdc234412cd552e288",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 2783,
+   "view_names": [
+    "DISCHARGE_RECORD_DIAGNOSIS_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图11_EMR_OUTPATIENT_RECORD\\EMR_OUTPATIENT_RECORD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "4186b7b39f9a2efdcba0659902aa5ec3dcff3028a483248b5ded972abf379ac3",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 7681,
+   "view_names": [
+    "OUTPATIENT_RECORD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图12_EMR_OUT_FEE_INFO_CHILD\\EMR_OUT_FEE_INFO_CHILD_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "af75aa26a78080460f310ca6571c5546e1a20269ffca4d65e9c227f2c19e1c2b",
+   "mtime": "2026-06-08 09:41:31",
+   "bytes": 8161,
+   "view_names": [
+    "OUT_FEE_INFO_CHILD_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图13_EMR_OUTPATIENT_DIAG\\EMR_OUTPATIENT_DIAG_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "93adc99e0e8abc448fa829d2a93f4f55d580cc1980db6fb57c57141730b7b1d5",
+   "mtime": "2026-06-05 14:21:33",
+   "bytes": 6340,
+   "view_names": [
+    "OUTPATIENT_DIAG_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图14_EMR_OUT_FEE_INFO_MAIN\\EMR_OUT_FEE_INFO_MAIN_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "0994578d98a50ff0461a61c9fabbd0daa9e318c2486a81d2e71cb470e062f708",
+   "mtime": "2026-06-08 09:41:31",
+   "bytes": 11268,
+   "view_names": [
+    "OUT_FEE_INFO_MAIN_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图2_EMR_ADMISSION_RECORD_EXAM\\EMR_ADMISSION_RECORD_EXAM_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "951e751f2cb65f4dab904897dce4c71a69a048db77bb7c2322aa9d629a1073e5",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 1698,
+   "view_names": [
+    "ADMISSION_RECORD_EXAM_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图6_EMR_DOC_ORDER_DRUG\\EMR_DOC_ORDER_DRUG_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "528ab924b311448bf9db5ca11dc1a909843eff87b601c31131ce72db69400b01",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 8222,
+   "view_names": [
+    "DOC_ORDER_DRUG_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图7_EMR_DOC_ORDER_CHECK\\EMR_DOC_ORDER_CHECK_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "acc472f2b39102070456a48eb220d24e90022e4b37090ea456c16fb8daade396",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 4673,
+   "view_names": [
+    "DOC_ORDER_CHECK_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图8_EMR_OUTPATIENT_RECIPE\\EMR_OUTPATIENT_RECIPE_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "acbf10ba6851c938f136a6286b0f86edd557ad8861b9ee3b778d7ea668ea678b",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 5103,
+   "view_names": [
+    "OUTPATIENT_RECIPE_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  },
+  {
+   "relpath": "无用文件归档\\核查报告\\视图9_EMR_OUTPATIENT_RECIPE_ITEM\\EMR_OUTPATIENT_RECIPE_ITEM_修正版.sql",
+   "category": "archived_ignore",
+   "sha256": "5d7d719721274215a6afac5950ed5289216cb69cad717f718e67542b143223dd",
+   "mtime": "2026-06-04 09:46:33",
+   "bytes": 9033,
+   "view_names": [
+    "OUTPATIENT_RECIPE_ITEM_修正版"
+   ],
+   "name_source": "select_only_filename",
+   "dialect": "oracle"
+  }
+ ]
+}

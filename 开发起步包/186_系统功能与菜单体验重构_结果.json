@@ -1,0 +1,501 @@
+{
+  "plan": "186",
+  "executed_at": "2026-09-09",
+  "baseline_git_head": "a14ba12",
+  "overall": "v1.10 复核修复+隔离验收+生产部署(S3)+受控登记(S4) 完成；observe 观察夜/试点/230 逐窗推进按计划待验证",
+  "tasks": [
+    {
+      "id": "R0",
+      "status": "DONE",
+      "files": [
+        "frontend/tests/plan186R0RouteDump.test.ts",
+        "开发起步包/output_r186/r0_git_baseline.txt",
+        "r0_route_inventory.json"
+      ],
+      "evidence": "44->40 visible leaves verified; E05/E06 reproduced in source then fixed"
+    },
+    {
+      "id": "I2",
+      "status": "DONE",
+      "files": [
+        "backend/app/services/identity_account_state.py",
+        "backend/app/services/his_identity_sync.py",
+        "backend/app/services/identity_source_collector.py",
+        "backend/app/models/identity_sync.py",
+        "backend/alembic/versions/c6d7e8f9a0b1_account_state_tables.py"
+      ],
+      "tests": "tests/test_identity_account_state_186.py 50P; test_his_identity_sync.py updated (6->7 calls)",
+      "evidence": "output_r186/sys_user_evidence.json: FXHIS.SYS_USER exists, join 2000/2001, STATUS {0:1717,1:284}, 230 user-disabled-employee-enabled population, MODIFIEDTIME 16% NULL -> batch reconciliation"
+    },
+    {
+      "id": "I3",
+      "status": "DONE(local+simulator)/WAITING_APPROVAL(production)",
+      "files": [
+        "backend/app/services/identity_sync_orchestrator.py",
+        "identity_sync_executor_bridge.py",
+        "jhemr_identity_adapter.py",
+        "cdms_identity_adapter.py",
+        "identity_login_sign_sync.py",
+        "backend/app/api/v1/identity.py",
+        "backend/app/core/config.py"
+      ],
+      "tests": "dual-target disable/enable/attribution/partial-retry/idempotency/protected (target,account) pair asserted; T43 thresholds: 230 backlog > max_deactivate=20 trips breaker (threshold unchanged)",
+      "blockers": [
+        {
+          "id": "PROD_PUBLISH",
+          "missing": "production release/apply/write approval"
+        },
+        {
+          "id": "DIALECT",
+          "missing": "real CDMS Oracle / JHEMR Vastbase transaction validation (simulator-only)"
+        }
+      ]
+    },
+    {
+      "id": "N1",
+      "status": "DONE",
+      "files": [
+        "frontend/src/router/modules/{home,catalog,standards,quality,query,identity,ops,asset,dict,metadata,governance}.ts",
+        "frontend/src/router/utils.ts"
+      ],
+      "tests": "plan186Menus.test.ts 16P; full suite 295/295",
+      "evidence": "40 visible leaves 4/5/7/6/3/9/6; no duplicate path/name; old deep links with query passthrough; activePath set; auths unchanged vs backend catalog"
+    },
+    {
+      "id": "N2",
+      "status": "DONE",
+      "files": [
+        "frontend/src/utils/menuPreferences.ts",
+        "frontend/src/layout/components/lay-search/components/SearchModal.vue",
+        "SearchResult.vue",
+        "types.ts",
+        "frontend/src/router/index.ts"
+      ],
+      "tests": "plan186Menus.test.ts user-isolation cases (A/B keys, legacy purge, alias, query whitelist, 20-cap)"
+    },
+    {
+      "id": "N3",
+      "status": "DONE",
+      "files": [
+        "frontend/src/api/routes.ts"
+      ],
+      "evidence": "browser capture: 0 get-async-routes requests across 10 pages (browser_requests_static_mode.json); dynamic failure no longer masked as success"
+    },
+    {
+      "id": "W1",
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/workbench/index.vue"
+      ],
+      "tests": "plan186Features W1 (<=5 first-screen requests, conditional no-permission zero requests, empty-account guidance)",
+      "evidence": "screenshots 02/03/10"
+    },
+    {
+      "id": "A1",
+      "status": "ALREADY_SATISFIED",
+      "evidence": "systems multi-source with source_code + tables back_query preserved (existing tests pass)"
+    },
+    {
+      "id": "A2",
+      "status": "ALREADY_SATISFIED",
+      "evidence": "table-detail source isolation + back_query (plan146StageE test passes)"
+    },
+    {
+      "id": "A3",
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/metadata-changes/changes/index.vue",
+        "asset/relation-review/index.vue",
+        "asset/relation-recipes/index.vue"
+      ],
+      "tests": "plan186Features A3 (independent perms on hidden-page entries)"
+    },
+    {
+      "id": "Q1",
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/query-center/queries/index.vue",
+        "backend/app/api/v1/queries.py"
+      ],
+      "tests": "plan186Features Q1 (whitelist/restore/provenance fields)"
+    },
+    {
+      "id": "Q2",
+      "status": "DONE",
+      "files": [
+        "backend/app/api/v1/ai_accuracy.py",
+        "backend/app/services/ai_feedback_service.py",
+        "frontend/src/views/query-center/accuracy/index.vue",
+        "frontend/src/api/query-center.ts"
+      ],
+      "tests": "tests/plan144_db/test_ai_feedback_list_186.py 7P + existing feedback loop suite 42P"
+    },
+    {
+      "id": "Q3",
+      "status": "DONE",
+      "files": [
+        "frontend/src/store/modules/queryDraftHandoff.ts",
+        "frontend/src/views/asset/ai-sql/index.vue",
+        "frontend/src/views/query-center/queries/index.vue"
+      ],
+      "tests": "plan186Features Q3 (stage/consume/expiry/permission/no-auto-submit/contract fields)"
+    },
+    {
+      "id": "D1",
+      "status": "ALREADY_SATISFIED+enhanced",
+      "evidence": "scope path routing + permission fallback (174) retained; workbench mine entry added"
+    },
+    {
+      "id": "D2",
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/asset/ai-quality/index.vue"
+      ],
+      "tests": "plan186Features D2 (full report sections, patrol tick no resubmit, unmount stops both timers)"
+    },
+    {
+      "id": "I1",
+      "status": "DONE",
+      "files": [
+        "backend/app/api/v1/identity.py",
+        "frontend/src/views/identity/sync-logs/index.vue",
+        "frontend/src/api/identity.ts"
+      ],
+      "evidence": "GET /api/v1/identity/account-states (identity.sync_diff.view) + sync-logs section; screenshot 08"
+    },
+    {
+      "id": "O1",
+      "status": "DONE",
+      "files": [
+        "frontend/src/views/asset/admin/index.vue"
+      ],
+      "tests": "plan186Features O1 (lazy tabs, whitelist, two snapshot kinds distinguished)"
+    },
+    {
+      "id": "U1",
+      "status": "DONE",
+      "files": [
+        "tools/capture_186_screens.py"
+      ],
+      "evidence": "10 screenshots at 1366x768/1920x1080/1024 with deterministic fixtures"
+    },
+    {
+      "id": "V1",
+      "status": "DONE",
+      "results": {
+        "typecheck": "tsc+vue-tsc PASS",
+        "vitest": "295/295",
+        "build": "PASS, main js gz 659.5KB<=700KB",
+        "identity_family": "113/113",
+        "account_state_186": "50/50",
+        "plan144_db": "42/42",
+        "query+security": "23/23",
+        "alembic_roundtrip": "PASS c6d7e8f9a0b1",
+        "backend_full": "1483 passed / 1 skipped / 0 failed, EXIT=0 (34min, isolated data_asset_test; reseeded via import170 after)"
+      }
+    },
+    {
+      "id": "V2",
+      "status": "DONE",
+      "files": [
+        "开发起步包/186_系统功能与菜单体验重构_执行报告.md",
+        "本JSON",
+        "output_r186/*"
+      ]
+    }
+  ],
+  "acceptance_matrix": {
+    "T01-T28_ui": "behavioral tests + plan186Menus/plan186Features + browser screenshots (login static, workbench 3 sizes, tab=runs direct, account-states section, admin tabs)",
+    "T29-T46_identity": "test_identity_account_state_186.py (50 assertions across 18 scenarios; pipeline->simulator chain for T46); dialect-level validation pending real pilot",
+    "scenario_layers": {
+      "pure_logic": "PASS",
+      "mock_simulator": "PASS",
+      "platform_isolated_db": "PASS (data_asset_test, verified cleanable isolated DB; alembic roundtrip)",
+      "target_dialect": "PENDING_AUTHORIZATION",
+      "real_nightly": "PENDING_AUTHORIZATION"
+    }
+  },
+  "waiting_domain": [
+    "production backend image build+release & frontend switch (needs user approval)",
+    "alembic c6d7e8f9a0b1 production apply (with pre-apply backup per ops-runbook)",
+    "identity_sync_enabled + Phase D approval + write credentials confirmation for dual-target enable/disable",
+    "pilot: 1 user-disabled-only + 1 employee-disabled-only + 1 dual-enable recovery, with dual-target readback; then designated run_id nightly acceptance",
+    "backlog disposition: 230 user-disabled-employee-enabled persons exceed max_deactivate=20 (design); needs explicit threshold/batch approval",
+    "keyboard-path automation recording (optional follow-up)"
+  ],
+  "others_domain_untouched": "layout/capture 9 files + skills/docs dirty files preserved; adapter file edits are additive functions required by I3",
+  "review_fixes": {
+    "executed_at": "2026-09-09T21:30:00+08:00",
+    "baseline_git_head": "a14ba12",
+    "p0_fixes": {
+      "P0-1": {
+        "status": "DONE",
+        "evidence": "select_account_state_actions：enforce=false/run_mode=observe 返回空动作结构且保留 population 统计；tests/test_identity_action_gates_186_v110.py 40 项全绿"
+      },
+      "P0-2": {
+        "status": "DONE",
+        "evidence": "enable 按目标分发 origin_disable（gate.dispatch_identity_state_action）；真签名冒烟测试 patch 适配器类而非桥接函数"
+      },
+      "P0-3": {
+        "status": "DONE",
+        "evidence": "run 内分页续跑 + identity_account_state_total_cap(5000)；TestScanPagination：3000 决策全处理 truncated=False；cap=2500 → scanned=2500/truncated=True/remaining=500"
+      },
+      "P0-4": {
+        "status": "DONE",
+        "evidence": "停用回读持久化 target_raw_time；enable 显式关联 origin_disable_attempt_id（迁移 e8f9a0b1c2d3 新列）；executed_at 不再参与归因"
+      },
+      "P0-5": {
+        "status": "DONE",
+        "evidence": "决策缺失/不完整/无主档/冲突逐类计数（blocked_no_decision/incomplete/no_person/conflict）；login_sign 预期集同样要求完整决策；no-candidates 带 unresolved 记 partial"
+      },
+      "P0-6": {
+        "status": "DONE",
+        "evidence": "keyset_fetch_all 稳定键分页两入口共用；source_complete 贯穿决策/水位（不完整不推进水位、批次记 partial）；ORA-01031/00904 原样抛出"
+      },
+      "P0-7": {
+        "status": "DONE",
+        "evidence": "保护映射 HMAC 候选法（protected_fingerprints_by_target）；unresolved 保护行单列计数，不以查不到等同无保护"
+      },
+      "P0-8": {
+        "status": "DONE",
+        "evidence": "target_missing 独立分类不进 done_targets 保留跨夜重试；一目标成功+一缺失=partial；TestTargetMissing 全链断言"
+      },
+      "P0-9": {
+        "status": "DONE",
+        "evidence": "两适配器 ±300 容差与 UTC 贴换删除；目标 raw 值精确比对（target_time_unchanged）；identity_clock_health.py §13.2 组件"
+      },
+      "P0-10": {
+        "status": "DONE",
+        "evidence": "TYPE 必须为 1（NULL fail-closed）；多账号任一 disabled→disabled_multi 否则 unknown；collector 同工号多行合并不覆盖"
+      },
+      "P0-11": {
+        "status": "DONE",
+        "evidence": "identity_sync_action_gate 唯一 dispatch；四执行器种子默认 disabled；桥接二次 fail-closed；govern.executor.manage 权限+治理端点；六类失败 fixture 断言零目标连接"
+      },
+      "P0-12": {
+        "status": "DONE(生产整改完成)",
+        "evidence": "镜像 r186-20260909c + head=e8f9a0b1c2d3 + 旧 cron 停用归档 + 新唯一 cron(observe) + readiness after 检查 ready=true"
+      },
+      "P0-13": {
+        "status": "DONE(机制)/基线对账随观察夜",
+        "evidence": "HMAC 候选保护 + source-missing 决策 unknown 零动作 + target_missing 重试；readonly_baseline_20260909.json；冻结 dry-run 端点就绪"
+      },
+      "P0-14": {
+        "status": "DONE",
+        "evidence": "身份 dispatch 只从 (source_code,purpose) 绑定解析写凭据，零 env/字典 fallback；CDMS readonly/JHEMR 字典策略错配 fixture 均 blocked 零连接"
+      },
+      "P0-15": {
+        "status": "DONE(组件)/校时受阻待输入",
+        "evidence": "时钟健康组件+测试；生产 chrony 公网 pool 不可达（Stratum 0），不擅自配置，clock_health=unhealthy；enable 恒关闭不依赖校时；待用户内网 NTP 源"
+      },
+      "P0-16": {
+        "status": "DONE",
+        "evidence": "CDMS _fetch_user_state 规范小写键从真实 cursor.description 大小写不敏感构建；T51 fake cursor 44 用例全链"
+      },
+      "P0-17": {
+        "status": "DONE",
+        "evidence": "CDMS unlock CAS(FCHANGEDATE 绑定)+rowcount 0 回滚 blocked；写路径 FOR UPDATE 行锁；校验后人工改时间零写用例"
+      },
+      "P0-18": {
+        "status": "DONE",
+        "evidence": "asset_source_purpose_bindings 表+(source_code,purpose) 唯一；PUT/GET/DELETE 用途绑定端点(source:credential_manage+审计)；旧字典路径回归通过"
+      },
+      "P0-19": {
+        "status": "DONE",
+        "evidence": "identity_run_mode 总 dispatch 覆盖新旧入口（含签名/科室补遗门禁）；批准范围冻结名单；T54 observe 全身份零写 pipeline 断言"
+      },
+      "P0-20": {
+        "status": "DONE",
+        "evidence": "本窗计划集阈值判定+持久窗口预算(≤20 唯一人员)+deferred_budget/backlog 单列；同窗重复触发复用名额；限量漂移回读 drift_detected"
+      }
+    },
+    "p1_fixes": {
+      "P1-1": {
+        "status": "DONE",
+        "evidence": "三处「反馈此结果」入口；accuracy 页回读真实 run/digest 不信任 URL；plan186FeedbackChain 8 用例"
+      },
+      "P1-2": {
+        "status": "NOT_DONE(本轮未执行)",
+        "evidence": "A3 浏览器级两链路证据未补录；留待下一会话"
+      },
+      "P1-3": {
+        "status": "NOT_DONE(本轮未执行)",
+        "evidence": "真实隔离 API 浏览器验证未执行；capture 脚本已具备"
+      },
+      "P1-4": {
+        "status": "DONE(材料部分)",
+        "evidence": "production_pack 四件；002494 enable 阻断由 AUTOMATIC_ENABLE_SUPPORTED=False 结构性保证"
+      },
+      "P1-5": {
+        "status": "DONE",
+        "evidence": "account-states 最新决策+attempt 按 fingerprint+rule+transition_seq 对齐+summary 按唯一人员（5 用例）"
+      },
+      "P1-6": {
+        "status": "DONE",
+        "evidence": "两采集入口共用分页与归一化；collector 标记 staging_only 不落决策不推进水位"
+      },
+      "P1-7": {
+        "status": "DONE",
+        "evidence": "report_summary.account_state 分离计数+backlog/deferred/window/protection；as_blocked 不吞 failed"
+      },
+      "P1-8": {
+        "status": "DONE",
+        "evidence": "迁移种子 identity_admin+identity.sync_diff:view（生产已应用）；后端 403 保留"
+      },
+      "P1-9": {
+        "status": "DONE",
+        "evidence": "门禁矩阵：运行模式→执行器注册→Phase D→用途绑定→范围→预算→保护（六类失败 fixture）"
+      },
+      "P1-10": {
+        "status": "DONE",
+        "evidence": "runs/{run_id} 增 account_state_attempts 逐行+计数（4 用例，零写副作用断言）"
+      },
+      "P1-11": {
+        "status": "DONE",
+        "evidence": "output_r186/production_pack/readonly_baseline_20260909.json（零凭据）"
+      },
+      "P1-12": {
+        "status": "DONE",
+        "evidence": "submitted_at DESC NULLS LAST, id DESC；乱序/同时间/NULL/跨页稳定用例"
+      }
+    },
+    "p2_fixes": {
+      "P2-5": {
+        "status": "PARTIAL",
+        "evidence": "键盘主路径 vitest 用例已过；三尺寸截图未重拍（布局未变沿用首轮）"
+      },
+      "P2-6": {
+        "status": "DONE",
+        "evidence": "handoff 消费后 router.replace 去 handoff 保 tab（单测）"
+      },
+      "P2-7": {
+        "status": "N/A_THIS_ROUND",
+        "evidence": "未增删菜单，40 叶子断言不变"
+      },
+      "P2-8": {
+        "status": "DONE",
+        "evidence": "person_code 明文工号口径保持；不默认加掩码"
+      }
+    },
+    "acceptance_t47_t60": {
+      "T47": "DONE 窗口身份持久+时钟 TTL 过期作废（测试）",
+      "T48": "DONE 固定偏差/RTT 超限/区间不相容 → unstable，enable 关闭",
+      "T49": "DONE naive/PRC/DATE raw 原样留存+合同，不贴 UTC",
+      "T50": "DONE 人工重锁/同秒：适配器仅变更检测，所有权由合同缺失关闭（生产恒 blocked）",
+      "T51": "DONE CDMS 真实 cursor 全链 44 用例",
+      "T52": "DONE CAS 0 行 blocked 回滚；commit 未知 pending_reconcile",
+      "T53": "DONE 字典+身份用途并存；错 purpose/缺绑定零目标连接",
+      "T54": "DONE observe pipeline 零 attempt 零适配器连接；disable_only 仅两 disable 逐对象范围",
+      "T55": "DONE 冻结范围不自动扩展；非名单对象 backlog_unapproved 零执行",
+      "T56": "DONE 3000 人口/20 预算/同窗复用名额/change_ratio 仍生效",
+      "T57": "DONE 同代 executed 漂移回读 drift_detected 重规划",
+      "T58": "DONE 隔离往返通过；生产 head=e8f9 + 唯一 provider ready=true",
+      "T59": "DONE 六类状态分离呈现（enable_readiness=closed_no_ownership_contract）",
+      "T60": "DONE submitted_at DESC NULLS LAST + id DESC 稳定分页"
+    },
+    "test_evidence": {
+      "backend_identity_suites": "gates 40P + account_state 51P + target_adapters 44P + nightly 74P + his/identity 24P + login_sign+dict_gates 22P + title 17P + api/run/feedback 18P",
+      "backend_full": "最终全量 1579 passed / 0 failed / 1 skipped / EXIT=0（backend_full_pytest_v110_final.log）；隔离库已按惯例重灌 import170",
+      "frontend": "typecheck 双过；vitest 320/320；build main 659.5KB≤700 PASS",
+      "migration_roundtrip": "data_asset_test base→target→base→target 全过+种子回读"
+    },
+    "deployment": {
+      "backend_image": "data-asset:r186-20260910g",
+      "frontend_release": "r186-20260909c（index-_mee8Zzo.js 逐字一致）",
+      "migration_head": "e8f9a0b1c2d3（生产已升级）",
+      "backup": "/opt/data-asset/backup/data_asset_pre_r186_20260909.dump sha256=31aa001f…",
+      "scheduler": "唯一 host_cron 02:00 observe 阶段；旧 cron 归档；无旧 Phase D/密码写/直连注入",
+      "env": "backend.env 备份 bak-r186-20260909；容器级 SYNC_ENABLED=false（启动校验红线），运行时开关由 cron 注入"
+    },
+    "s4_registration": {
+      "purpose_bindings": "JHEMR/CDMS × identity_account_sync enabled+configured（file:// 服务器已登记写凭据引用）",
+      "executors_enabled": [
+        "JHEMR_ACCOUNT_DISABLE",
+        "CDMS_ACCOUNT_DISABLE"
+      ],
+      "executors_disabled": [
+        "JHEMR_ACCOUNT_ENABLE",
+        "CDMS_ACCOUNT_ENABLE"
+      ],
+      "pilot_scope": [
+        "003740",
+        "001554"
+      ],
+      "approval_ref": "186-20260909-disable-only",
+      "audit": "GovernAuditLog 逐条（operator=ai-186-v110-s4-registration）"
+    },
+    "waiting_validation": [
+      "observe 夜1（2026-09-10 02:00）零目标写/决策采集/时钟报告——明晨只读核验",
+      "observe 夜2（2026-09-11 02:00）稳定幂等复核",
+      "观察满足后 baseline 冻结 dry-run→冻结→cron 切 disable_only→试点双目标回读（最早 2026-09-12 02:00 窗）",
+      "230 基线约 12+ 窗口逐夜推进（每窗≤20 唯一人员，试点共享预算）",
+      "002494：HIS 管理员实际恢复源端后仅验证期望 enabled 与 enable 正确阻断",
+      "校时：待用户提供内网可信 NTP 源（当前公网 pool 不可达）",
+      "P1-2/P1-3 浏览器级证据补录"
+    ],
+    "enable_status": "两 enable 执行器 disabled；AUTOMATIC_ENABLE_SUPPORTED=False（两目标无锁原因/版本/审计合同）；校时完成也不自动开启",
+    "observe_controlled_preruns": {
+      "run1_RUN-e716c99a21cc": "observe 成功；决策采集 2531（disabled 290/enabled 1715/unknown 526，source_complete=True）；attempts_total=0（零目标写）",
+      "run2_RUN-3cfbaf05bc18": "镜像d 复跑成功；subtask 摘要含 run_mode=observe/population=2531/clock_health 不健康如实记录（JHEMR/CDMS 无有效样本——容器无法连通目标或采样失败，降级不阻断）/enable_readiness=closed_no_ownership_contract；零 attempt"
+    },
+    "morning_check_20260910": {
+      "observe_night1": "RUN-0be96c4ce005 success 零写；决策 2531 重采集；门禁无漂移",
+      "fixes": [
+        "cron 补直连连通性开关",
+        "镜像 e 修时钟采样 JHEMR 构建器缺参"
+      ],
+      "clock_health": "JHEMR +20s 真实稳定；CDMS 墙钟与平台一致（+8h 为 UTC 贴标签伪偏差）；enable 仍关闭"
+    },
+    "s5_execution_20260910": {
+      "precheck": "230 类目精确=230（emp enabled+user disabled）；员工侧停用 60 人（54+5+1）不在批准类目，未冻结未执行；dry-run 仅两试点入选",
+      "baseline_frozen": {
+        "scope_id": 2,
+        "members": 230,
+        "fingerprint": "aff87932f9f3e34e…",
+        "category": "employee_enabled+user_disabled",
+        "audit": "GovernAuditLog scope_freeze"
+      },
+      "pilot_run_RUN-66c546ec1dbc": {
+        "003740": "JHEMR executed(after=8, raw_time=10:14:31) + CDMS executed(fuserstate='1', raw_time=10:14:03)；双目标回读一致",
+        "001554": "JHEMR executed(after=8)；CDMS target_missing（该人为 P0-13 已知 2 条 CDMS 缺失关系之一；零建号留重试）",
+        "person_level": "1 success + 1 partial；run 级按保守口径计 failed（partial 不冒充成功）",
+        "window": "WIN-5e66207bd9ae 2/20 名额，重试不重复占额"
+      },
+      "window1_batch_RUN-e9d81ddb808c": {
+        "processed_persons": 19,
+        "actual_updated_persons": 17,
+        "target_success_actions": 29,
+        "full_success": 12,
+        "partial_missing": 5,
+        "blocked_both_missing": 2,
+        "target_missing_detail": "CDMS 缺失×6人（000138/000139/000229/000374/000395/001554重试）；双目标缺失×1人（0002208）",
+        "backlog": "211 pending + deferred",
+        "note": "本窗 2 试点+18 基线=20 名额用满"
+      },
+      "same_day_fixes": {
+        "anti_starvation": "selector 区分 missing-only 池（不占窗口名额；drift 探测目标重现才回队列）——否则 7 个缺失对象每窗吃名额饿死 211 人",
+        "breaker_semantics": "熔断/failed_count 只计真实写失败（failed/pending_reconcile）；target_missing 计入 run partial 不推熔断——否则第 3 窗起熔断 open 死锁",
+        "empty_window_run": "RUN-5c9c57cf8b5a：0 动作/211 延迟/熔断归零/status success（正常空窗）",
+        "image": "r186-20260910g；91 项身份隔离套件全绿"
+      },
+      "cron_now": "disable_only + 直连 + 漂移回读（2026-09-10 起唯一调度入口）",
+      "next_windows": "窗口每 20h：窗口2 开于 09-11 06:13、窗口3 开于 09-12 02:13…共约 11 窗消化 211 人；夜间 cron 02:00 自动兜底，窗口开启后也可人工触发"
+    },
+    "s5_execution_20260911": {
+      "nightly_run_RUN-b78754a272de": "09-11 02:00 定时 disable_only 空窗 success：0 动作/211 延迟/missing_retry=7 单列/熔断归零/时钟双目标采样正常（JHEMR +20.5s、CDMS 一致、healthy=True）——昨日待验证第 9 项完成",
+      "window2_RUN-ab9eef2c0cce": {
+        "processed": 20,
+        "actual_updated_persons": 20,
+        "target_success_actions": 30,
+        "full_dual_success": 11,
+        "partial_cdms_missing": 9,
+        "real_write_failures": 0,
+        "special": "000797 JHEMR 为 2026-06-24 人工旧锁→already_locked 幂等跳过不冒领归因；CDMS 今日正常停用（抽查回读 state=1）",
+        "spot_check": "000560 JHEMR=8(今日 08:52)/CDMS 确无行；000797 JHEMR locked_time=06-24(先于本规则)/CDMS='1'",
+        "window_accounting": "窗口1 于 08:51:25 正常关闭(20/20)；窗口2 WIN-0f60052733f8 20/20；backlog_pending=191 + missing 池≈16",
+        "breaker": "熔断零计数（反饥饿+口径修复生产验证通过）"
+      },
+      "next_windows": "W3 开于 09-12 04:51，之后每 20h；今晚 02:00 cron 预期空窗（W2 已满）；约 10 窗消化 191 人"
+    }
+  }
+}
