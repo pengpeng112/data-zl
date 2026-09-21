@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from ..core.db import SessionLocal
 from ..models.governance_base import GovernAuditLog
+from ..services.data_masking import sanitize_text
 from ..models.identity import IdentityDepartment, IdentityDepartmentSource, IdentityPerson, IdentityPersonSource, IdentitySyncDiff
 
 
@@ -397,7 +398,8 @@ def run_sync(
         db.rollback()
         result.update({
             "status": "failed",
-            "error": str(exc)[:500],
+            # QA ST-013：异常原文过 sanitize_text 再入审计（连接器异常可含 DSN/SQL 片段）。
+            "error": sanitize_text(str(exc), limit=300),
             "finished_at": _now_iso(),
         })
         _audit_sync(

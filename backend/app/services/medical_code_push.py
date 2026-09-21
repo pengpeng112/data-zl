@@ -1,9 +1,9 @@
-"""Diagnosis/operation dictionary push: plan + single-row insert/stop only.
+"""Diagnosis/operation dictionary push with explicit single-row actions.
 
 Hard rules (plan 96 §1.0):
 - INSERT one row per DML only
-- STOP is the only allowed UPDATE (single key)
-- No business-field UPDATE / MERGE / batch / INSERT SELECT / DELETE
+- STOP and separately approved HIS infectious-name sync are the only UPDATEs
+- No generic business-field UPDATE / MERGE / batch / INSERT SELECT / DELETE
 - Grey insurance: diagnosis_dict.ybhm = '灰码'; no contrast row
 """
 
@@ -56,6 +56,14 @@ TARGET_SYSTEM_ALIASES = {
 }
 ACTION_INSERT = "insert"
 ACTION_STOP = "stop"
+ACTION_SYNC_INFECTIOUS = "sync_infectious"
+# Dedicated, single-column exception; no generic business-field UPDATE.
+INFECTIOUS_SYNC_SQL = (
+    "UPDATE COMM.DIAGNOSIS_DICT SET DIAGNOSIS_NAME_CRB = :crb_name "
+    "WHERE DIAGNOSIS_CODE = :code "
+    "AND (DIAGNOSIS_NAME_CRB = :old_crb_name "
+    "OR (DIAGNOSIS_NAME_CRB IS NULL AND :old_crb_name IS NULL))"
+)
 
 OPERATION_INDICATOR_MAP = {
     "手术": "0",
@@ -179,6 +187,9 @@ def validate_push_sql(sql: str, *, action_type: str, target_table: str) -> str:
         # ensure table appears
         if target_table.split(".")[-1].lower() not in cleaned.lower():
             raise ValueError("insert table mismatch")
+    elif action_type == ACTION_SYNC_INFECTIOUS:
+        if table_norm != "COMM.DIAGNOSIS_DICT" or cleaned != INFECTIOUS_SYNC_SQL:
+            raise ValueError("infectious sync requires the exact single-column HIS template")
     elif action_type == ACTION_STOP:
         if not re.match(r"^UPDATE\s+", cleaned, re.IGNORECASE):
             raise ValueError("stop action must be UPDATE")
@@ -298,6 +309,7 @@ def _load_platform_rows(
             "icd_lr_code": _text(extra.get("low_risk_category_code")),
             "icd_lr_name": _text(extra.get("low_risk_disease_name")),
             "infectious_name": _text(extra.get("infectious_disease_name")),
+            "infectious_code": _text(extra.get("infectious_disease_code")),
             "operation_level": _text(extra.get("operation_level")),
             "operation_category": _text(extra.get("operation_category")),
             "level4_flag": _text(extra.get("performance_level4_flag")),
@@ -328,6 +340,26 @@ def _operation_scale(value: Any, *, jhemr: bool) -> str | None:
 # SQL builders (parameterized, single row)
 # ---------------------------------------------------------------------------
 
+def build_his_infectious_sync(row: dict[str, Any]) -> PushAction:
+    code = _text(row.get("local_code"))
+    if not code:
+        raise ValueError("infectious sync requires an explicit diagnosis code")
+    return PushAction(
+        action_id=_action_id(ACTION_SYNC_INFECTIOUS, TARGET_HIS, code),
+        action_type=ACTION_SYNC_INFECTIOUS,
+        category_code="diagnosis",
+        target_system=TARGET_HIS,
+        target_table="COMM.DIAGNOSIS_DICT",
+        item_code=code,
+        item_name=_text(row.get("local_name")),
+        sql_dialect="oracle",
+        sql=INFECTIOUS_SYNC_SQL,
+        params={"code": code, "crb_name": _text(row.get("infectious_name")) or None},
+        plan_status="planned",
+        meta={"field": "DIAGNOSIS_NAME_CRB", "clear_value": not _text(row.get("infectious_name"))},
+    )
+
+
 def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
     sql = (
         "INSERT INTO COMM.DIAGNOSIS_DICT ("
@@ -352,7 +384,8 @@ def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
     )
     mtb_code = row["mtb_code"] or None
     mtb_flag = "1" if mtb_code else "0"
-    crb = row["infectious_name"] or None
+    crb_name = row["infectious_name"] or None
+    crb_code = row.get("infectious_code") or crb_name
     params = {
         "diagnosis_code": row["local_code"],
         "diagnosis_name": row["local_name"][:140],
@@ -367,8 +400,8 @@ def build_his_diagnosis_insert(row: dict[str, Any]) -> PushAction:
         "mtb_name": row["mtb_name"] or None,
         "icd_lr_code": row["icd_lr_code"] or None,
         "icd_lr_name": row["icd_lr_name"] or None,
-        "crb_code": crb,
-        "crb_name": crb,
+        "crb_code": crb_code or None,
+        "crb_name": crb_name,
     }
     return PushAction(
         action_id=_action_id(ACTION_INSERT, TARGET_HIS, "COMM.DIAGNOSIS_DICT", row["local_code"]),
@@ -1080,8 +1113,11 @@ def _open_write_connection(source: AssetDataSource):
 
     if db_type in {"postgresql", "vastbase"}:
         import psycopg
+        # QA ST-011：对齐 Oracle 分支的超时纪律，防 outbox worker 线程永久挂起。
         conn = psycopg.connect(
             host=host, port=port, dbname=database, user=user, password=password,
+            connect_timeout=15,
+            options="-c statement_timeout=60000 -c lock_timeout=15000",
         )
         return conn, "postgresql"
 
@@ -1162,6 +1198,14 @@ def build_readback_select(
         return None
 
     if table == "COMM.DIAGNOSIS_DICT":
+        if action_type == ACTION_SYNC_INFECTIOUS:
+            if dialect != "oracle":
+                return None
+            return (
+                "SELECT DIAGNOSIS_CODE AS code, DIAGNOSIS_NAME_CRB AS crb_name "
+                "FROM COMM.DIAGNOSIS_DICT WHERE DIAGNOSIS_CODE = :code AND ROWNUM <= 2",
+                {"needs_hospital": False},
+            )
         sql = (
             f"SELECT DIAGNOSIS_CODE AS code, STOP_FLAG AS stopped "
             f"FROM COMM.DIAGNOSIS_DICT WHERE DIAGNOSIS_CODE = {code_ph}{limit_clause}"
@@ -1291,6 +1335,15 @@ def readback_actions_on_conn(
                 status_code=409,
                 detail=f"readback found {len(rows)} rows for {table}/{code}; conflict",
             )
+        if action_type == ACTION_SYNC_INFECTIOUS:
+            actual = rows[0].get("crb_name")
+            if actual != params.get("crb_name"):
+                raise HTTPException(status_code=409, detail="infectious sync readback mismatch")
+            details.append({"target_table": table, "item_code": code, "action_type": action_type,
+                            "rows": 1, "field": "DIAGNOSIS_NAME_CRB", "value_matches": True,
+                            "before_value": (act.get("meta") or {}).get("before_value"),
+                            "after_value": actual})
+            continue
         stopped_raw = rows[0].get("stopped")
         try:
             stopped = int(stopped_raw) if stopped_raw is not None else 0
@@ -1424,6 +1477,9 @@ def apply_one_action(
 
     if mode != "apply":
         raise HTTPException(status_code=400, detail="mode must be dry_run or apply")
+
+    if action_type == ACTION_SYNC_INFECTIOUS:
+        raise HTTPException(status_code=403, detail="infectious sync requires an approved plan and registered executor")
 
     if not push_enabled():
         raise HTTPException(

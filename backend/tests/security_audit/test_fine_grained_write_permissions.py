@@ -208,3 +208,14 @@ def test_asset_editor_can_pass_recipe_module_gate():
             break
     assert role_required is not None
     assert "asset_editor" in role_required["recipes"]
+    # 诊断手术字典页给 dict_admin 看，粗前缀必须与 /dictionaries 一样放行该角色。
+    assert "dict_admin" in role_required["dict-medical"]
+    assert "platform_admin" in role_required["dict-medical"]
+
+
+def test_dict_admin_can_open_mapping_page():
+    source = (BACKEND_DIR / "app" / "api" / "v1" / "permissions.py").read_text(encoding="utf-8-sig")
+    start = source.index('"dict_admin":')
+    chunk = source[start : source.index('"ops_admin":', start)]
+    for code in ("dict.medical.view", "dict.medical.edit", "dict.mapping.view"):
+        assert f'"{code}"' in chunk, code

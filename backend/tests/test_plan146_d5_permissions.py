@@ -73,7 +73,7 @@ def test_dict_medical_write_permission_matrix(client: TestClient):
     }).status_code == 401
 
     limited = _limited_client()
-    # /dict-medical 前缀仅 platform_admin，细权限为第二层防线。
+    # /dict-medical 粗前缀放行 platform_admin/dict_admin；无角色 Token 仍 403。
     denied_row = limited.put("/api/v1/dict-medical/mapping-rows", json=MAPPING_ROW_PAYLOAD)
     assert denied_row.status_code == 403
     denied_sync = limited.post("/api/v1/dict-medical/sync/run", json={

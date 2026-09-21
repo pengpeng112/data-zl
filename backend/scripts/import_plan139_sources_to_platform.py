@@ -245,6 +245,7 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         "fk_relation_writes": 0, "fk_relation_inserts": 0, "fk_relation_updates": 0,
         "view_dependency_rows": 0, "view_dependency_replaced": 0,
         "prepared_reviews": 0, "eligible_reviews": 0, "inserted_reviews": 0,
+        "skipped_prepare": 0,
         "skipped_existing_formal": 0, "skipped_existing_review": 0, "skipped_metadata": 0,
         "metadata_error_types": {},
         "prepared_recipes": 0, "eligible_recipes": 0, "inserted_recipes": 0,
@@ -456,6 +457,7 @@ def execute(package_dir: Path, *, run_id: str, apply: bool, confirm: str,
         from plan139_common import prepare_recipe_groups, prepare_review_groups
 
         review_groups, skipped_prepare = prepare_review_groups({"candidates": review_payload})
+        summary["skipped_prepare"] = len(skipped_prepare)
         recipe_groups = prepare_recipe_groups(
             {"recipe_candidates": [dict(item, status="VALID") for item in recipe_payload]},
             recipe_prefix="PLAN139_VIEW",

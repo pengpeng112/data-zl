@@ -323,6 +323,18 @@ class TestCdmsAdapterConstants:
         assert "FDEPT" in mod._SQL_INSERT_EMP
         assert "FDEPTID" not in mod._SQL_SELECT_EMP
 
+    def test_hospitalfoffn_sql_and_dept_type(self):
+        """RoleManage/User 读 T_MSS_HOSPITALFOFFN，FREE1 只能是 I/O/T/H。"""
+        import app.services.cdms_identity_adapter as mod
+        assert "T_MSS_HOSPITALFOFFN" in mod._SQL_INSERT_HOSPITALFOFFN
+        assert "LOGINNAME" in mod._SQL_INSERT_HOSPITALFOFFN
+        assert "FOFFIN" in mod._SQL_INSERT_HOSPITALFOFFN
+        assert "FREE1" in mod._SQL_INSERT_HOSPITALFOFFN
+        assert mod._normalize_dept_type("I") == "I"
+        assert mod._normalize_dept_type("H") == "H"
+        assert mod._normalize_dept_type("其他") == "T"
+        assert mod._normalize_dept_type("") == "I"
+
 
 # ===========================================================================
 # JHEMR adapter unit tests (no real connection)
@@ -439,9 +451,7 @@ class TestJhemrAdapterConstants:
         conn.rollback.assert_not_called()
 
     def test_align_skips_manual_signway_config(self):
-        """003531 事故治本（2026-09-05）：已有任意登录/签名方式行的用户，
-        align 不再按模板插 sublogin/subsign 行——旧语义给人工 2/4/8 配置
-        后插 sign_way=0(default=1) 产生双默认致 EMR 登录报错。"""
+        """已配置 2/4/8：不套 0/2/4 模板；登录多出来的 0 以 default=0 补签名。"""
         from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
 
         adapter = JhemrIdentityAdapter.__new__(JhemrIdentityAdapter)
@@ -451,28 +461,37 @@ class TestJhemrAdapterConstants:
         conn = MagicMock()
         adapter._ensure_conn = lambda: conn
         writes = []
+        signs = [{"sign_way": way} for way in ("2", "4", "8")]
 
         def execute_write(sql, params):
             writes.append((sql, params))
+            if "INSERT" in sql and "users_subsign" in sql:
+                way = next((str(p) for p in params if str(p) in {"0", "2", "4", "8"}), None)
+                if way:
+                    signs.append({"sign_way": way})
             return 1
 
         adapter._execute_write = execute_write
-        adapter._fetch_one = lambda sql, params: {"role_group_id": "001"}
+        adapter._fetch_one = lambda sql, params: (
+            {"in_sign_way": "2,4,8", "login_way": "0,2,4,8", "in_pic_mode": "2,2,2"}
+            if "in_sign_way" in sql
+            else {"role_group_id": "001"}
+        )
         adapter._existing_dept_codes = lambda user_id: {"D001"}
         adapter._fetch_all = lambda sql, params: (
             [{"login_way": way} for way in ("0", "2", "4", "8")]
             if "users_sublogin" in sql
-            else [{"sign_way": way} for way in ("2", "4", "8")]
+            else list(signs)
         )
 
         result = adapter.align_existing_user("E001", "doctor", ["D001"], "001")
 
         assert result["status"] == "success"
-        assert not [s for s, _ in writes if "users_sublogin" in s or "users_subsign" in s]
-        assert any(
-            a["action"] == "skip_configured" and a["table"] == "users_subsign"
-            for a in result["actions"]
-        )
+        assert not [s for s, _ in writes if "INSERT INTO jhemr.users_sublogin" in s]
+        sign_inserts = [p for s, p in writes if "INSERT" in s and "users_subsign" in s]
+        assert len(sign_inserts) == 1
+        assert sign_inserts[0][-1] == "0"
+        assert any(a["action"] == "insert_sign_for_login_gap" for a in result["actions"])
         assert any(
             a["action"] == "skip_configured" and a["table"] == "users_sublogin"
             for a in result["actions"]
@@ -507,6 +526,34 @@ class TestJhemrAdapterConstants:
         assert len(sublogin_writes) == 3
         assert len(subsign_writes) == 3
         assert any(a["action"] == "insert" and a["table"] == "users_subsign" for a in result["actions"])
+
+    def test_align_matched_login_sign_does_not_insert(self):
+        from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
+
+        adapter = JhemrIdentityAdapter.__new__(JhemrIdentityAdapter)
+        adapter.hospital_no = "49557032X"
+        adapter.sync_operator_id = "TEST"
+        adapter._fetch_user = lambda emp_no: {"user_id": emp_no, "education_title": None}
+        conn = MagicMock()
+        adapter._ensure_conn = lambda: conn
+        writes = []
+        adapter._execute_write = lambda sql, params: writes.append((sql, params)) or 1
+        adapter._fetch_one = lambda sql, params: (
+            {"in_sign_way": "0,2,4", "login_way": "0,2,4", "in_pic_mode": "2,2,2"}
+            if "in_sign_way" in sql
+            else {"role_group_id": "001"}
+        )
+        adapter._existing_dept_codes = lambda user_id: {"D001"}
+        adapter._fetch_all = lambda sql, params: (
+            [{"login_way": way} for way in ("0", "2", "4")]
+            if "users_sublogin" in sql
+            else [{"sign_way": way} for way in ("0", "2", "4")]
+        )
+
+        result = adapter.align_existing_user("E001", "doctor", ["D001"], "001")
+        assert result["status"] == "success"
+        assert not [s for s, _ in writes if "users_sublogin" in s or "users_subsign" in s]
+        assert not [s for s, _ in writes if "UPDATE jhemr.users_control_mode" in s]
 
 
 class TestJhemrPasswordGate:

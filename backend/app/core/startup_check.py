@@ -134,6 +134,13 @@ def _validate_credential_dir(settings) -> list[str]:
     return errors
 
 
+def _validate_cookie_secure(settings) -> list[str]:
+    """QA ST-015：production 必须 Secure refresh cookie（防明文链路截获 8h 凭据）。"""
+    if not getattr(settings, "auth_cookie_secure", False):
+        return ["production 必须 APP_AUTH_COOKIE_SECURE=true（refresh cookie Secure 标志）"]
+    return []
+
+
 def _validate_identity(settings) -> list[str]:
     errors: list[str] = []
     if not settings.build_id or settings.build_id == "dev-local":
@@ -158,6 +165,7 @@ def validate_production_config(settings=None) -> list[str]:
     errors += _validate_rbac_and_switches(settings)
     errors += _validate_credential_dir(settings)
     errors += _validate_identity(settings)
+    errors += _validate_cookie_secure(settings)
     return errors
 
 

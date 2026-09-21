@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...core.security import get_current_user, get_request_operator
+from ...core.security import get_current_user, get_request_operator, require_permission
 from ...models.governance import ApiKey, TableOwner, BusinessTerm, MetadataSnapshot
 from ...models.governance_base import GovernAuditLog
 from ...schemas.common import ApiResponse
@@ -140,11 +140,11 @@ def list_owners(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.put("/owners", summary="设置/更新表 Owner")
+@router.put("/owners", summary="设置/更新表 Owner", dependencies=[Depends(require_permission("asset.admin.manage"))])
 def upsert_owner(
     req: OwnerUpsertRequest,
+    request: Request,
     db: Session = Depends(get_db),
-
 ) -> ApiResponse[dict]:
     owner = db.scalar(select(TableOwner).where(TableOwner.full_table_name == req.full_table_name))
     if owner:
@@ -162,6 +162,12 @@ def upsert_owner(
             note=req.note,
         )
         db.add(owner)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="admin", entity_type="table_owner", entity_ref=req.full_table_name, action="upsert",
+        after_data={"owner_name": req.owner_name, "department": req.department},
+        operator=_admin_operator(request),
+    ))
     db.commit()
     db.refresh(owner)
     return ApiResponse(data={
@@ -169,16 +175,21 @@ def upsert_owner(
     })
 
 
-@router.delete("/owners/{owner_id}", summary="删除 Owner")
+@router.delete("/owners/{owner_id}", summary="删除 Owner", dependencies=[Depends(require_permission("asset.admin.manage"))])
 def delete_owner(
     owner_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-
 ) -> ApiResponse[dict]:
     owner = db.get(TableOwner, owner_id)
     if not owner:
         raise HTTPException(status_code=404)
     db.delete(owner)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="admin", entity_type="table_owner", entity_ref=owner.full_table_name, action="delete",
+        operator=_admin_operator(request),
+    ))
     db.commit()
     return ApiResponse(data={"deleted": owner_id})
 
@@ -221,11 +232,11 @@ def list_terms(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.put("/terms", summary="添加/更新业务术语")
+@router.put("/terms", summary="添加/更新业务术语", dependencies=[Depends(require_permission("asset.admin.manage"))])
 def upsert_term(
     req: TermUpsertRequest,
+    request: Request,
     db: Session = Depends(get_db),
-
 ) -> ApiResponse[dict]:
     existing = db.scalar(
         select(BusinessTerm).where(BusinessTerm.term == req.term)
@@ -240,21 +251,32 @@ def upsert_term(
             mapping_type=req.mapping_type, description=req.description,
         )
         db.add(existing)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="admin", entity_type="business_term", entity_ref=req.term, action="upsert",
+        after_data={"mapping_target": req.mapping_target},
+        operator=_admin_operator(request),
+    ))
     db.commit()
     db.refresh(existing)
     return ApiResponse(data={"id": existing.id, "term": existing.term, "mapping_target": existing.mapping_target})
 
 
-@router.delete("/terms/{term_id}", summary="删除业务术语")
+@router.delete("/terms/{term_id}", summary="删除业务术语", dependencies=[Depends(require_permission("asset.admin.manage"))])
 def delete_term(
     term_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-
 ) -> ApiResponse[dict]:
     term = db.get(BusinessTerm, term_id)
     if not term:
         raise HTTPException(status_code=404)
     db.delete(term)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="admin", entity_type="business_term", entity_ref=term.term, action="delete",
+        operator=_admin_operator(request),
+    ))
     db.commit()
     return ApiResponse(data={"deleted": term_id})
 
@@ -280,11 +302,11 @@ class SnapshotCreateRequest(BaseModel):
     label: str | None = None
 
 
-@router.post("/snapshots", summary="创建元数据快照")
+@router.post("/snapshots", summary="创建元数据快照", dependencies=[Depends(require_permission("asset.admin.manage"))])
 def create_snapshot(
     req: SnapshotCreateRequest,
+    request: Request,
     db: Session = Depends(get_db),
-
 ) -> ApiResponse[dict]:
     import json
     from ...models.asset import AssetTable, AssetColumn, AssetRelation
@@ -313,6 +335,12 @@ def create_snapshot(
         data=snapshot_data,
     )
     db.add(sp)
+    db.flush()
+    db.add(GovernAuditLog(
+        module="admin", entity_type="metadata_snapshot", entity_ref=str(sp.id), action="create",
+        after_data={"label": sp.label, "table_count": sp.table_count},
+        operator=_admin_operator(request),
+    ))
     db.commit()
     db.refresh(sp)
     return ApiResponse(data={
@@ -379,8 +407,10 @@ def compare_snapshots(
     })
 
 
-@router.post("/init/backfill-p6", summary="回填 asset_tables/columns 的 system_code/source_code/namespace_name（P6 数据初始化）")
+@router.post("/init/backfill-p6", summary="回填 asset_tables/columns 的 system_code/source_code/namespace_name（P6 数据初始化）",
+             dependencies=[Depends(require_permission("asset.admin.manage"))])
 def backfill_p6(
+    request: Request,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     from ...models.asset import AssetTable, AssetColumn
@@ -453,6 +483,11 @@ def backfill_p6(
 
     count_tables = db.scalar(select(func.count()).select_from(AssetTable)) or 0
 
+    db.add(GovernAuditLog(
+        module="admin", entity_type="init", entity_ref="backfill-p6", action="run",
+        after_data={"tables_updated": updated_t, "columns_updated": updated_c},
+        operator=_admin_operator(request),
+    ))
     db.commit()
 
     return ApiResponse(data={
@@ -463,15 +498,20 @@ def backfill_p6(
     })
 
 
-@router.post("/init/import-his-source", summary="导入 HIS 1234 表资产（从 CSV 读取，仅首次运行）")
+@router.post("/init/import-his-source", summary="导入 HIS 1234 表资产（从 CSV 读取，仅首次运行）",
+             dependencies=[Depends(require_permission("asset.admin.manage"))])
 def import_his_source(
+    request: Request,
+    base_dir: str | None = Query(None, description="资产包目录（默认取 APP_HIS_IMPORT_BASE）"),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     import csv, os
     from ...models.asset import AssetTable, AssetColumn
     from ...models.asset_system import AssetSystem, AssetDataSource
 
-    base = r"F:\python\数据资产\开发起步包\数据资产_HIS源端资产包"
+    # QA ST-016：消除开发机硬编码路径——请求参数优先，其次 APP_HIS_IMPORT_BASE。
+    import os as _os
+    base = base_dir or _os.environ.get("APP_HIS_IMPORT_BASE") or r"F:\python\数据资产\开发起步包\数据资产_HIS源端资产包"
     tables_csv = os.path.join(base, "his_source_tables.csv")
     columns_csv = os.path.join(base, "his_source_columns.csv")
 

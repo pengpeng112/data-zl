@@ -49,6 +49,16 @@ def sync_missing_jhemr_signatures(
     only_emp = (emp_no or "").strip() or None
     if only_emp:
         limit = 1
+    # 186 v1.10 P0-19：observe/disable_only 下签名同步零目标写（含单账号补跑）。
+    from .identity_sync_action_gate import gate_legacy_identity_write
+
+    mode_gate = gate_legacy_identity_write(db, "jhemr_signature_sync")
+    if not mode_gate.allowed:
+        return {
+            "status": "skipped", "reason": mode_gate.reason, "run_id": run_id,
+            "planned_count": 0, "inserted": 0, "skipped_existing": 0, "skipped_no_user": 0,
+            "failed": 0, "error_classes": {}, "failed_fingerprints": [],
+        }
     source_rows: list[tuple[str, bytes, datetime | None]] = []
     source_errors: dict[str, dict[str, int]] = {}
 

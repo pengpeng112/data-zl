@@ -4,6 +4,9 @@ from sqlalchemy.sql import func
 
 from ..core.db import Base
 
+# SQLite 需 INTEGER 主键才能自增；PG 仍为 BIGINT
+PortableBigInt = BigInteger().with_variant(Integer(), "sqlite")
+
 
 class AssetRole(Base):
     __tablename__ = "asset_roles"
@@ -127,7 +130,7 @@ class AssetActionExecutor(Base):
     __tablename__ = "asset_action_executors"
     __table_args__ = {"schema": "asset"}
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(PortableBigInt, primary_key=True)
     executor_code = Column(Text, unique=True, nullable=False)
     executor_name_cn = Column(Text, nullable=False)
     execution_mode = Column(Text, nullable=False)

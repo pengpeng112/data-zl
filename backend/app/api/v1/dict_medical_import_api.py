@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
@@ -29,7 +29,8 @@ router = APIRouter(prefix="/api/v1/dict-medical/imports", tags=["dict-medical-im
 
 
 class ReviewRequest(BaseModel):
-    row_ids: list[int]
+    # QA ST-017：列表参数加上限（对齐 metadata_changes.py:602 的 max_length=500 惯例）。
+    row_ids: list[int] = Field(..., max_length=500)
     action: str  # approve / reject
     review_note: Optional[str] = None
 
@@ -42,7 +43,10 @@ async def upload_diagnosis_mapping(
 ) -> ApiResponse[dict]:
     if not file.filename or not file.filename.endswith((".xlsx", ".xls")):
         raise HTTPException(status_code=400, detail="仅支持 .xlsx/.xls 文件")
-    content = await file.read()
+    # QA ST-017：上传大小上限 10MB，防全量读入内存放大。
+    content = await file.read(10 * 1024 * 1024 + 1)
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="文件超过 10MB 上限")
     result = parse_diagnosis_mapping_excel(content, file.filename)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])

@@ -321,3 +321,173 @@ class IdentitySyncAlert(Base):
     detail = Column(PortableJSON)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     resolved_at = Column(TIMESTAMP(timezone=True))
+
+
+class IdentityAccountStateDecision(Base):
+    """186 I2: one dual-source account-state decision per person capture.
+
+    Persists the §4.6.2 truth-table inputs/outcome so SYS_USER-only changes
+    (invisible to SYS_EMPLOYEE.MODIFIEDTIME) still drive target actions.
+    Employment status stays on IdentityPerson; this row is the *login
+    account* state, never a resignation record.
+    """
+    __tablename__ = "asset_identity_account_state_decisions"
+    __table_args__ = (
+        UniqueConstraint("person_code", "rule_version", "evidence_fingerprint", name="uq_account_state_decision"),
+        Index("ix_account_state_decision_person", "person_code", "created_at"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    person_code = Column(Text, nullable=False)
+    rule_version = Column(Text, nullable=False, server_default="dual_source_v1")
+    employee_state = Column(Text, nullable=False)  # enabled | disabled | unknown
+    employee_state_reason = Column(Text)
+    user_state = Column(Text, nullable=False)  # enabled | disabled | unknown
+    user_state_reason = Column(Text)
+    desired_state = Column(Text, nullable=False)  # enabled | disabled | unknown
+    decision_reason = Column(Text)
+    execution_allowed = Column(Boolean, nullable=False, server_default="false")
+    blocked_reason = Column(Text)
+    employee_evidence = Column(PortableJSON)  # allow-listed projection only
+    user_evidence = Column(PortableJSON)
+    evidence_fingerprint = Column(Text, nullable=False)
+    transition_seq = Column(Integer, nullable=False, server_default="1")
+    source_complete = Column(Boolean, nullable=False, server_default="true")
+    captured_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentityAccountStateAttempt(Base):
+    """186 I3: one target-system enable/disable attempt with attribution.
+
+    Idempotency identity = (fingerprint, action, transition_seq, rule_version)
+    — a repeated same-direction transition replays the same row; a later
+    NEW transition (enabled→disabled→enabled→disabled) gets a fresh ordinal
+    and is never swallowed by the earlier one.
+    """
+    __tablename__ = "asset_identity_account_state_attempts"
+    __table_args__ = (
+        UniqueConstraint(
+            "target_account_fingerprint", "action", "transition_seq", "rule_version",
+            name="uq_account_state_attempt_idempotency",
+        ),
+        Index("ix_account_state_attempt_run", "run_id"),
+        Index("ix_account_state_attempt_person", "person_code"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    run_id = Column(Text)
+    batch_id = Column(Text)
+    decision_id = Column(PortableBigInt)
+    person_code = Column(Text, nullable=False)
+    target_system = Column(Text, nullable=False)  # JHEMR | CDMS
+    target_account_fingerprint = Column(Text, nullable=False)  # HMAC, never plaintext
+    action = Column(Text, nullable=False)  # disable | enable
+    before_state = Column(Text)
+    desired_state = Column(Text, nullable=False)
+    after_state = Column(Text)
+    status = Column(Text, nullable=False, server_default="planned")
+    # planned | executed | skipped | failed | blocked | pending_reconcile | cancelled_stale
+    reason_code = Column(Text)
+    error_class = Column(Text)
+    error_code_masked = Column(Text)
+    lock_attribution = Column(Text)  # by_this_rule | manual_or_unknown | not_applicable
+    attribution_evidence = Column(PortableJSON)
+    rule_version = Column(Text, nullable=False, server_default="dual_source_v1")
+    transition_seq = Column(Integer, nullable=False, server_default="1")
+    # 186 v1.10 P0-4/§13.3：恢复（enable）显式关联本规则前一 executed 停用
+    # 动作；attribution_evidence 内保留目标 raw 时间/类型/精度。executed_at
+    # 只是平台审计时间，绝不作为恢复归因依据。
+    origin_disable_attempt_id = Column(PortableBigInt)
+    executed_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentityApprovedScope(Base):
+    """186 v1.10 P0-19/§13.5：冻结的批准动作范围（审批 token 不是名单）。
+
+    scope_type=pilot 为显式试点人员；scope_type=baseline 为冻结基线类
+    （成员在 freeze 时从新鲜观测交集生成，写死在 members 表，之后新增
+    对象不自动混入）。status: active | closed | superseded。
+    """
+
+    __tablename__ = "asset_identity_action_scopes"
+    __table_args__ = (
+        UniqueConstraint("approval_ref", "action", "scope_type", name="uq_identity_scope_approval"),
+        Index("ix_identity_scope_status", "status"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    scope_type = Column(Text, nullable=False)  # pilot | baseline
+    approval_ref = Column(Text, nullable=False)  # e.g. 186-20260909-disable-only
+    action = Column(Text, nullable=False, server_default="disable")
+    scope_fingerprint = Column(Text)  # hash over frozen members (baseline)
+    status = Column(Text, nullable=False, server_default="active")
+    description = Column(Text)
+    created_by = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentityApprovedScopeMember(Base):
+    """Frozen member of an approved scope (person-level, never auto-extended)."""
+
+    __tablename__ = "asset_identity_action_scope_members"
+    __table_args__ = (
+        UniqueConstraint("scope_id", "person_code", name="uq_identity_scope_member"),
+        Index("ix_identity_scope_member_person", "person_code"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    scope_id = Column(PortableBigInt, nullable=False)
+    person_code = Column(Text, nullable=False)
+    frozen_reason = Column(Text)  # decision_reason at freeze time
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentityWindowBudget(Base):
+    """186 v1.10 §13.5：持久调度窗口预算（试点/人工重跑/重启共享同一窗）。
+
+    窗口身份由持久行决定，不由重启后本地日期重算；8.83 跳时不产生第二份
+    额度（超过 window_hours 才允许开新窗）。
+    """
+
+    __tablename__ = "asset_identity_window_budgets"
+    __table_args__ = (
+        UniqueConstraint("window_key", name="uq_identity_window_key"),
+        Index("ix_identity_window_open", "closed_at"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    window_key = Column(Text, nullable=False)
+    approval_ref = Column(Text, nullable=False)
+    limit_persons = Column(Integer, nullable=False, server_default="20")
+    opened_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    closed_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class IdentityWindowReservation(Base):
+    """One person's slot in one window; retry of the same object/transition
+    never consumes an extra slot (unique per window+person)."""
+
+    __tablename__ = "asset_identity_window_reservations"
+    __table_args__ = (
+        UniqueConstraint("window_id", "person_code", name="uq_identity_window_reservation"),
+        Index("ix_identity_window_reservation_window", "window_id"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    window_id = Column(PortableBigInt, nullable=False)
+    person_code = Column(Text, nullable=False)
+    action = Column(Text, nullable=False, server_default="disable")
+    status = Column(Text, nullable=False, server_default="reserved")  # reserved | executed | failed | released
+    run_id = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())

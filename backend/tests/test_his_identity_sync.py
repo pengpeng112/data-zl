@@ -96,7 +96,8 @@ def test_his_identity_sync_dry_run_does_not_write(monkeypatch):
         assert result["doctor_group_diagnostics"]["unmatched_doctor_user"] == 1
         assert db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "E001")) is None
         assert db.scalar(select(GovernAuditLog).where(GovernAuditLog.module == "sync", GovernAuditLog.entity_ref == "his_source_10_10_10_15")) is None
-        assert len(FakeOracleConnector.calls) == 6
+        # 186 I2：新增第 7 条 SELECT（FXHIS.SYS_USER 安全投影，无凭据列）
+        assert len(FakeOracleConnector.calls) == 7
         assert FakeOracleConnector.last_kwargs["connection_mode"] == "ssh_jump"
         assert FakeOracleConnector.last_kwargs["jump_host"] == "10.10.8.83"
     finally:

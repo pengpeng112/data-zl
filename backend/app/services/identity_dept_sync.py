@@ -246,6 +246,14 @@ def sync_jhemr_user_depts_daily(
         increment_error(result["error_classes"], "audit_config", "MissingAuditContext")
         result["status"] = "misconfigured"
         return result
+    # 186 v1.10 P0-19：observe/disable_only 下科室同步零目标写。
+    from .identity_sync_action_gate import gate_legacy_identity_write
+
+    mode_gate = gate_legacy_identity_write(db, "jhemr_dept_sync")
+    if not mode_gate.allowed:
+        result["status"] = "skipped"
+        result["reason"] = mode_gate.reason
+        return result
     try:
         expected = _read_expected_platform(db)
         result["source"] = {"managed_persons": len(expected)}

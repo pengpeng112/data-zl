@@ -35,6 +35,17 @@ from .value_domain import (  # noqa: F401
     AssetColumnValueDomainEvidence,
     AssetColumnValueDomainVersion,
 )
+from .dataset import (  # noqa: F401  193 B03
+    AssetDsBatch,
+    AssetDsClassification,
+    AssetDsDataset,
+    AssetDsDatasetVersion,
+    AssetDsExport,
+    AssetDsFact,
+    AssetDsGrant,
+    AssetDsIdentityMap,
+    AssetDsQualityAssertion,
+)
 
 __all__ = [
     "AssetTable",

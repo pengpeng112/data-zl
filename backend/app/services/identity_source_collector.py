@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from ..models.asset_system import AssetDataSource
 from ..models.identity import IdentityDepartmentSource, IdentityPersonDepartment, IdentityPersonSource
+from ..core.config import settings
 from ..services.credentials import resolve
 from ..services.db_connectors import DB_CONNECTOR_MAP
 
@@ -267,6 +268,13 @@ def collect_his_persons(
         raise HTTPException(status_code=400, detail=f"source_code not found: {source_code}")
 
     connector = _build_connector(source)
+    # 186 v1.10 P0-6/P1-6：关键来源 keyset 分页与完整性元数据与
+    # his_identity_sync 共用同一 helper；本入口仅 staging，不推进夜跑水位、
+    # 不落 account_state_decisions（夜跑状态以 his_identity_sync 为准）。
+    from .his_identity_sync import keyset_fetch_all
+
+    max_pages = max(1, getattr(settings, "identity_collect_max_pages", 5))
+    sources_meta: dict[str, dict[str, Any]] = {}
     try:
         staff_rows = connector.execute_readonly(
             """
@@ -277,15 +285,24 @@ WHERE ROWNUM <= :max_rows
             params={"max_rows": max_rows},
             max_rows=max_rows,
         )
-        employee_rows = connector.execute_readonly(
-            """
+        try:
+            employee_rows, sources_meta["FXHIS.SYS_EMPLOYEE"] = keyset_fetch_all(
+                connector,
+                inner_sql="""
 SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERID
 FROM FXHIS.SYS_EMPLOYEE
-WHERE ROWNUM <= :max_rows
 """,
-            params={"max_rows": max_rows},
-            max_rows=max_rows,
-        )
+                key_column="EMPLCODE",
+                page_size=max(1, max_rows),
+                max_pages=max_pages,
+                label="FXHIS.SYS_EMPLOYEE",
+            )
+        except Exception as ex:
+            if "ORA-00942" in str(ex) or "does not exist" in str(ex).lower():
+                employee_rows = []
+                sources_meta["FXHIS.SYS_EMPLOYEE"] = {"scanned": 0, "truncated": False, "status": "missing"}
+            else:
+                raise
         doctor_group_rows = connector.execute_readonly(
             """
 SELECT DOCTOR_USER, DEPT_CODE, DOCTOR
@@ -306,6 +323,29 @@ WHERE ROWNUM <= :max_rows
             params={"max_rows": max_rows},
             max_rows=max_rows,
         )
+        # 186 I2：SYS_USER 账号第二来源，与 his_identity_sync 共享同一归一化
+        # 规则（投影仅允许列；表缺失 → 空+meta，按 unknown 处理）。P0-6：
+        # 权限/列错误/截断记 incomplete status，不当"表不存在"。
+        sys_user_rows: list[dict[str, Any]] = []
+        try:
+            sys_user_rows, sources_meta["FXHIS.SYS_USER"] = keyset_fetch_all(
+                connector,
+                inner_sql="""
+SELECT TRIM(u.EMPL_CODE) AS EMPL_CODE, u.STATUS, u.ISDELETED, u.TYPE, u.MODIFIEDTIME
+FROM FXHIS.SYS_USER u
+""",
+                key_column="EMPL_CODE",
+                page_size=max(1, max_rows),
+                max_pages=max_pages,
+                label="FXHIS.SYS_USER",
+                key_expr="TRIM(u.EMPL_CODE)",
+            )
+        except Exception as exc:
+            if "ORA-00942" in str(exc) or "does not exist" in str(exc).lower():
+                sys_user_rows = []
+                sources_meta["FXHIS.SYS_USER"] = {"scanned": 0, "truncated": False, "status": "missing"}
+            else:
+                sources_meta["FXHIS.SYS_USER"] = {"scanned": 0, "truncated": True, "status": "error"}
     finally:
         connector.close()
 
@@ -379,14 +419,67 @@ WHERE ROWNUM <= :max_rows
             group_class=_text_or_none(_row_value(raw, "GROUP_CLASS")),
         ))
 
+    # 186 I2：SYS_USER 状态与 his_identity_sync 同一 normalizer（方向与
+    # SYS_EMPLOYEE.VALIDSTATE 相反：STATUS 1=停用、0=启用）。
+    # P0-10：一人多账号先按工号分组——同人多行合并为一条 staging 记录
+    # （raw 内保留账号数与各行投影），不逐行覆盖同一 source_person_id。
+    from .identity_account_state import SYS_USER_TABLE, normalize_sys_user_row
+
+    sys_user_scanned = 0
+    sys_user_rows_by_code: dict[str, list[dict[str, Any]]] = {}
+    for row in sys_user_rows:
+        raw = dict(row)
+        emp_code = _text_or_none(_row_value(raw, "EMPL_CODE"))
+        if not emp_code:
+            continue
+        sys_user_scanned += 1
+        sys_user_rows_by_code.setdefault(emp_code, []).append(raw)
+    for emp_code, account_rows in sys_user_rows_by_code.items():
+        states = [normalize_sys_user_row(raw) for raw in account_rows]
+        if any(state == "disabled" for state in states):
+            state = "disabled"
+        elif len(states) > 1:
+            state = "unknown"  # 多账号未证实范围（P0-10）
+        else:
+            state = states[0]
+        ins, upd = _upsert_person_source(
+            db,
+            source_system=source_system,
+            source_code=source_code,
+            source_table=SYS_USER_TABLE,
+            source_person_id=emp_code,
+            person_code=emp_code,
+            person_name=None,
+            dept_code=None,
+            status=state,
+            raw={
+                "EMPL_CODE": emp_code,
+                "account_count": len(account_rows),
+                "accounts": [
+                    {key: _row_value(raw, key) for key in ("EMPL_CODE", "STATUS", "ISDELETED", "TYPE")}
+                    for raw in account_rows
+                ],
+            },
+        )
+        inserted_sources += ins
+        updated_sources += upd
+
+    source_complete = all(
+        (meta or {}).get("status") == "ok" and not (meta or {}).get("truncated")
+        for meta in (sources_meta.get("FXHIS.SYS_EMPLOYEE"), sources_meta.get("FXHIS.SYS_USER"))
+    )
     return {
         "status": "success",
         "mode": "live_source",
         "entity_type": "identity_person",
         "source_code": source_code,
         "source_system": source_system,
-        "source_tables": [STAFF_SOURCE_TABLE, EMPLOYEE_SOURCE_TABLE, DOCTOR_GROUP_SOURCE_TABLE, STAFF_GROUP_SOURCE_TABLE],
-        "scanned": len(staff_rows) + len(employee_rows) + len(doctor_group_rows) + len(staff_group_rows),
+        # P1-6：本入口仅 staging；夜跑状态/水位以 his_identity_sync 为准。
+        "staging_only": True,
+        "source_complete": source_complete,
+        "collection_sources": sources_meta,
+        "source_tables": [STAFF_SOURCE_TABLE, EMPLOYEE_SOURCE_TABLE, DOCTOR_GROUP_SOURCE_TABLE, STAFF_GROUP_SOURCE_TABLE, SYS_USER_TABLE],
+        "scanned": len(staff_rows) + len(employee_rows) + len(doctor_group_rows) + len(staff_group_rows) + sys_user_scanned,
         "person_sources_inserted": inserted_sources,
         "person_sources_updated": updated_sources,
         "department_links_created": department_links_created,

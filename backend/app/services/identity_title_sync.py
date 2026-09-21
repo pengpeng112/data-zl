@@ -268,9 +268,18 @@ def sync_jhemr_education_titles_daily(
         "failed": 0, "target_committed_pending_audit": 0,
         "error_classes": {}, "failed_fingerprints": [],
     }
+    # 186 v1.10 P0-19：observe/disable_only 下职称同步零目标写。
+    # （放在审计上下文检查之后：缺审计配置仍是 misconfigured，先于模式门禁）
     if db is None or not run_id:
         increment_error(result["error_classes"], "audit_config", "MissingAuditContext")
         result["status"] = "misconfigured"
+        return result
+    from .identity_sync_action_gate import gate_legacy_identity_write
+
+    mode_gate = gate_legacy_identity_write(db, "education_title_sync")
+    if not mode_gate.allowed:
+        result["status"] = "skipped"
+        result["reason"] = mode_gate.reason
         return result
     try:
         source, source_stats = _read_source(limit)

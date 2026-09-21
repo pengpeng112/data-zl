@@ -527,11 +527,15 @@ class SqlServerConnector(DatabaseConnector):
 
             drivers = [d for d in pyodbc.drivers() if "SQL Server" in d]
             driver = drivers[0] if drivers else "ODBC Driver 17 for SQL Server"
+            def _odbc_val(v: str) -> str:
+                # QA ST-020：ODBC 值需 {} 包裹且内嵌 } 双写，防 ; } 截断/改写属性。
+                return "{" + str(v).replace("}", "}}") + "}"
+
             conn_str = (
                 f"DRIVER={{{driver}}};"
-                f"SERVER={self.host},{self.port};"
-                f"DATABASE={self.database};"
-                f"UID={self.user};PWD={self.password};"
+                f"SERVER={_odbc_val(f'{self.host},{self.port}')};"
+                f"DATABASE={_odbc_val(self.database)};"
+                f"UID={_odbc_val(self.user)};PWD={_odbc_val(self.password)};"
                 f"TrustServerCertificate=yes;"
                 f"ApplicationIntent=ReadOnly;"
                 f"Connection Timeout={timeout_s}"

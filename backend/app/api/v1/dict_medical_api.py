@@ -195,6 +195,7 @@ def list_mapping_rows(
             "low_risk_category_code": extra.get("low_risk_category_code"),
             "low_risk_disease_name": extra.get("low_risk_disease_name"),
             "infectious_disease_name": extra.get("infectious_disease_name"),
+            "infectious_disease_code": extra.get("infectious_disease_code"),
             "source_file": extra.get("source_file"),
             "source_sheet": extra.get("source_sheet"),
             "status": local.status,
@@ -204,7 +205,11 @@ def list_mapping_rows(
 
 @router.get("/mapping-options", summary="诊断手术维护下拉值域")
 def list_mapping_options(category_code: str = Query("diagnosis"), db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    """Return values already used by maintained rows; never invent target-system values."""
+    """Operation options come from already maintained rows.
+
+    Diagnosis infectious options come from HIS COMM.INFECT_DIAG_DICT (readonly);
+    if HIS is unreachable, fall back to names already stored on mapping rows.
+    """
     code_set = "operation_local_clinical" if category_code == "operation" else "diagnosis_local_clinical"
     rows = db.scalars(select(DictMedicalCodeItem).where(DictMedicalCodeItem.code_set_code == code_set)).all()
     def values(key: str) -> list[str]:
@@ -221,6 +226,12 @@ def list_mapping_options(category_code: str = Query("diagnosis"), db: Session = 
             "performance_minimally_invasive_flag": values("performance_minimally_invasive_flag"),
             "restricted_tech_flag": values("restricted_tech_flag"),
         })
+    else:
+        from ...services.infect_diag_dict import load_infect_diag_dict
+
+        infect = load_infect_diag_dict(db)
+        data["infectious_diagnoses"] = infect.get("items") or []
+        data["infectious_source"] = infect.get("source") or "unavailable"
     return ApiResponse(data=data)
 
 
@@ -454,6 +465,7 @@ class MappingRowUpsert(BaseModel):
     low_risk_category_code: str | None = None
     low_risk_disease_name: str | None = None
     infectious_disease_name: str | None = None
+    infectious_disease_code: str | None = None
     status: str | None = "active"
 
 
@@ -548,6 +560,7 @@ def upsert_mapping_row(
         "low_risk_category_code": req.low_risk_category_code,
         "low_risk_disease_name": req.low_risk_disease_name,
         "infectious_disease_name": req.infectious_disease_name,
+        "infectious_disease_code": req.infectious_disease_code,
         "source_file": "系统页面维护",
         "source_sheet": "编码映射维护",
     }

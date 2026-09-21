@@ -24,6 +24,14 @@ from ..models.identity import (
     IdentityPersonSource,
 )
 from ..services.db_connectors import OracleConnector
+from .identity_account_state import (
+    RULE_VERSION as ACCOUNT_STATE_RULE_VERSION,
+    SYS_USER_ALLOWED_COLUMNS,
+    SYS_USER_TABLE,
+    combine_account_state,
+    compute_evidence_fingerprint,
+    next_transition_seq,
+)
 
 DEPT_TABLE = "COMM.DEPT_DICT"
 STAFF_TABLE = "COMM.STAFF_DICT"
@@ -35,6 +43,10 @@ DOCTOR_GROUP_TABLE = "COMM.DOCTOR_GROUP"
 STAFF_GROUP_TABLE = "COMM.STAFF_VS_GROUP"
 # 保留常量仅作文档：活库实测该表 DEPT_CODE 全空，采集不再依赖它（见 _collect 注释）。
 STAFF_GROUP_DICT_TABLE = "COMM.STAFF_GROUP_DICT"
+# 186 I2：HIS 登录账号第二来源。2026-09-09 经 sjzc live 数据字典核实存在
+# （平台元数据漏收）；采集投影固定允许列表，绝不含 PASSWORD/NICKNAME/AVATAR。
+# STATUS 用户口径：1=停用、0=启用（与 SYS_EMPLOYEE.VALIDSTATE 方向相反）。
+SYS_USER_SOURCE_TABLE = SYS_USER_TABLE
 
 SENSITIVE_KEYS = {"ID_NO", "IDENNO", "IDCARD", "CARD_NO", "PHONE", "MOBILE", "ADDRESS"}
 
@@ -81,6 +93,15 @@ def _normalize_status(value: Any) -> str:
     if text == "0":
         return "inactive"
     return "unknown"
+
+
+def _normalize_sys_user_status(status: Any, isdeleted: Any) -> str:
+    """186 I2：归一 FXHIS.SYS_USER.STATUS（用户口径 1=停用，0=启用——与
+    SYS_EMPLOYEE.VALIDSTATE 方向相反，绝不可共用 normalizer）。ISDELETED
+    非 0 优先判停用；NULL/未知码归 unknown，不做布尔转启用。"""
+    from .identity_account_state import normalize_sys_user_row
+
+    return normalize_sys_user_row({"STATUS": status, "ISDELETED": isdeleted})
 
 
 def _normalize_stop_flag(value: Any) -> str:
@@ -176,6 +197,53 @@ def _select(connector: OracleConnector, sql: str, max_rows: int) -> list[dict[st
     return connector.execute_readonly(sql, params={"max_rows": max_rows}, max_rows=max_rows)
 
 
+def keyset_fetch_all(
+    connector: OracleConnector,
+    *,
+    inner_sql: str,
+    key_column: str,
+    page_size: int,
+    max_pages: int,
+    label: str,
+    key_expr: str | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """186 v1.10 P0-6：稳定键 keyset 分页（Oracle：内层 ORDER BY + 外层 ROWNUM）。
+
+    - 每页与全批记录 scanned/truncated/status；截断可审计，不再把前 N 行
+      当完整快照（连接器 max_rows+1 探针 + 页循环双保险）。
+    - 只读、绑定参数、有限页数；不取消 ROWNUM 无界全扫。
+    - ``key_expr``：WHERE 过滤表达式（Oracle WHERE 不能引用列别名，如
+      TRIM(u.EMPL_CODE)）；缺省用 key_column。
+    - 供 his_identity_sync 与 identity_source_collector 共用（P1-6）。
+    """
+    where_expr = key_expr or key_column
+    rows: list[dict[str, Any]] = []
+    last_key: str | None = None
+    for page_index in range(max(1, max_pages)):
+        if page_index == 0:
+            sql = f"SELECT * FROM ({inner_sql} ORDER BY {key_column}) WHERE ROWNUM <= :max_rows"
+            params: dict[str, Any] = {"max_rows": page_size}
+        else:
+            sql = (
+                f"SELECT * FROM ({inner_sql} WHERE {where_expr} > :last_key "
+                f"ORDER BY {key_column}) WHERE ROWNUM <= :max_rows"
+            )
+            params = {"max_rows": page_size, "last_key": last_key}
+        page_rows = connector.execute_readonly(sql, params=params, max_rows=page_size)
+        probe = len(page_rows) > page_size
+        page_rows = page_rows[:page_size]
+        rows.extend(page_rows)
+        if not probe and len(page_rows) < page_size:
+            return rows, {"scanned": len(rows), "truncated": False, "status": "ok"}
+        if not page_rows:
+            return rows, {"scanned": len(rows), "truncated": False, "status": "ok"}
+        last_key = str(_value(page_rows[-1], key_column) or "")
+        if not last_key:
+            # 键列为空：无法继续分页，按截断上报（不静默当完整）。
+            return rows, {"scanned": len(rows), "truncated": True, "status": "key_column_empty"}
+    return rows, {"scanned": len(rows), "truncated": True, "status": "page_limit_reached"}
+
+
 def _select_optional(
     connector: OracleConnector,
     sql: str,
@@ -184,7 +252,11 @@ def _select_optional(
     label: str,
     notes: list[str],
 ) -> list[dict[str, Any]]:
-    """SELECT optional identity tables; missing objects become empty + note (ORA-00942)."""
+    """SELECT optional identity tables; missing objects become empty + note (ORA-00942).
+
+    186 v1.10 P0-6：ORA-01031（权限）/ORA-00904（列错误）/超时等其他错误
+    原样抛出——源端错误不得被当作"表不存在"后静默成功。
+    """
     try:
         return _select(connector, sql, max_rows)
     except Exception as ex:
@@ -213,9 +285,18 @@ def _build_employee_title_map(rows: list[dict[str, Any]]) -> dict[str, str]:
     return {code: next(iter(names)) for code, names in names_by_code.items()}
 
 
-def _collect(max_rows: int) -> tuple[dict[str, list[dict[str, Any]]], list[str]]:
+def _collect(max_rows: int) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """186 v1.10 P0-6：关键来源（SYS_EMPLOYEE/SYS_USER）keyset 分页采集。
+
+    返回 (rows, meta)；meta 含 notes 与逐来源 {scanned, truncated, status}，
+    以及整体 source_complete（关键来源完整才算 true——不完整不得推进水位、
+    不得宣称完整夜跑）。
+    """
     connector = _connector()
     notes: list[str] = []
+    page_size = max(1, max_rows)
+    max_pages = max(1, getattr(settings, "identity_collect_max_pages", 5))
+    sources: dict[str, dict[str, Any]] = {}
     try:
         rows = {
             "departments": _select(connector, f"""
@@ -228,19 +309,9 @@ SELECT EMP_NO, NAME, DEPT_CODE, JOB, TITLE, STATUS, ID_NO, CREATE_DATE
 FROM {STAFF_TABLE}
 WHERE ROWNUM <= :max_rows
 """, max_rows),
-            # FXHIS.SYS_EMPLOYEE：主数据；USERCODE 常空，桥接字段用 EMPLCODE↔STAFF.EMP_NO
-            "employees": _select_optional(
-                connector,
-                f"""
-SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERCODE,
-       ISDELETED, EMPLTYPE, POSICODE, LEVLCODE, CREATEDTIME, MODIFIEDTIME
-FROM {EMPLOYEE_TABLE}
-WHERE ROWNUM <= :max_rows
-""",
-                max_rows,
-                label=EMPLOYEE_TABLE,
-                notes=notes,
-            ),
+            # FXHIS.SYS_EMPLOYEE：主数据（keyset 分页，P0-3/P0-6 配套）；
+            # USERCODE 常空，桥接字段用 EMPLCODE↔STAFF.EMP_NO
+            "employees": [],
             "employee_titles": _select(connector, f"""
 SELECT DICT_CODE, DICT_NAME
 FROM {EMPLOYEE_TITLE_DICT_TABLE}
@@ -261,8 +332,73 @@ SELECT svg.GROUP_CLASS, svg.GROUP_CODE, svg.EMP_NO
 FROM {STAFF_GROUP_TABLE} svg
 WHERE ROWNUM <= :max_rows
 """, max_rows),
+            # 186 I2：HIS 登录账号第二来源（用户口径 STATUS 1=停用/0=启用）。
+            # 投影固定允许列表；表缺失 → 空+note（决策 unknown，缺失≠停用，
+            # 但 source_complete=false——P0-6）；权限/列错误原样抛出。
+            "sys_users": [],
         }
-        return rows, notes
+
+        employee_rows: list[dict[str, Any]] = []
+        try:
+            employee_rows, sources[EMPLOYEE_TABLE] = keyset_fetch_all(
+                connector,
+                inner_sql=f"""
+SELECT EMPLCODE, EMPLNAME, DEPTCODE, DEPTID, VALIDSTATE, IDENNO, USERCODE,
+       ISDELETED, EMPLTYPE, POSICODE, LEVLCODE, CREATEDTIME, MODIFIEDTIME
+FROM {EMPLOYEE_TABLE}
+""",
+                key_column="EMPLCODE",
+                page_size=page_size,
+                max_pages=max_pages,
+                label=EMPLOYEE_TABLE,
+            )
+        except Exception as ex:
+            msg = str(ex)
+            if "ORA-00942" in msg or "does not exist" in msg.lower():
+                notes.append(f"{EMPLOYEE_TABLE}: missing_or_inaccessible ({type(ex).__name__})")
+                sources[EMPLOYEE_TABLE] = {"scanned": 0, "truncated": False, "status": "missing"}
+            else:
+                sources[EMPLOYEE_TABLE] = {"scanned": 0, "truncated": True, "status": "error"}
+                notes.append(f"{EMPLOYEE_TABLE}: error {type(ex).__name__}")
+                raise
+        rows["employees"] = employee_rows
+
+        sys_user_rows: list[dict[str, Any]] = []
+        try:
+            sys_user_rows, sources[SYS_USER_SOURCE_TABLE] = keyset_fetch_all(
+                connector,
+                inner_sql=f"""
+SELECT TRIM(u.EMPL_CODE) AS EMPL_CODE, u.STATUS, u.ISDELETED, u.TYPE, u.MODIFIEDTIME
+FROM {SYS_USER_SOURCE_TABLE} u
+""",
+                key_column="EMPL_CODE",
+                page_size=page_size,
+                max_pages=max_pages,
+                label=SYS_USER_SOURCE_TABLE,
+                key_expr="TRIM(u.EMPL_CODE)",
+            )
+        except Exception as ex:
+            msg = str(ex)
+            if "ORA-00942" in msg or "does not exist" in msg.lower():
+                notes.append(f"{SYS_USER_SOURCE_TABLE}: missing_or_inaccessible ({type(ex).__name__})")
+                sources[SYS_USER_SOURCE_TABLE] = {"scanned": 0, "truncated": False, "status": "missing"}
+            else:
+                # P0-6：ORA-01031/ORA-00904/超时等 → incomplete，不当"表不存在"。
+                sources[SYS_USER_SOURCE_TABLE] = {"scanned": 0, "truncated": True, "status": "error"}
+                notes.append(f"{SYS_USER_SOURCE_TABLE}: error {type(ex).__name__} (incomplete)")
+        rows["sys_users"] = sys_user_rows
+
+        def _source_ok(label: str) -> bool:
+            meta = sources.get(label) or {}
+            return meta.get("status") == "ok" and not meta.get("truncated")
+
+        source_complete = _source_ok(EMPLOYEE_TABLE) and _source_ok(SYS_USER_SOURCE_TABLE)
+        meta = {
+            "notes": notes,
+            "sources": sources,
+            "source_complete": source_complete,
+        }
+        return rows, meta
     finally:
         connector.close()
 
@@ -380,6 +516,92 @@ def _upsert_person(db: Session, person: PersonMaster) -> bool:
     return created
 
 
+def persist_account_state_decisions(
+    db: Session,
+    rows: dict[str, list[dict[str, Any]]],
+    *,
+    notes: list[str] | None = None,
+    source_complete: bool = True,
+    sys_user_available: bool | None = None,
+) -> dict[str, int]:
+    """186 I2：为每个人员落一条双来源判定（§4.6.2 真值表）。
+
+    幂等：相同证据指纹复用同一决策行；状态代次（transition_seq）按
+    历史期望状态变化推进，供动作幂等键使用。employment_status 不受
+    影响——账号停用不等于员工离职。P0-6：来源不完整时决策行带
+    source_complete=false，动作选择据此阻断。
+    """
+    from ..models.identity_sync import IdentityAccountStateDecision
+
+    employee_by_code: dict[str, dict[str, Any]] = {}
+    for row in rows.get("employees", []):
+        code = _text(_value(row, "EMPLCODE"))
+        if code:
+            employee_by_code[code] = row
+
+    sys_user_rows_by_code: dict[str, list[dict[str, Any]]] = {}
+    if sys_user_available is None:
+        sys_user_available = not any(
+            SYS_USER_SOURCE_TABLE in note for note in (notes or [])
+        )
+    for row in rows.get("sys_users", []):
+        code = _text(_value(row, "EMPL_CODE")) or _text(_value(row, "EMPLCODE"))
+        if code:
+            sys_user_rows_by_code.setdefault(code, []).append(row)
+
+    # 判定对象 = 两侧证据的并集（员工在而账号缺 → unknown，不猜测启用）。
+    person_codes = set(employee_by_code) | set(sys_user_rows_by_code)
+
+    created_count = 0
+    updated_count = 0
+    captured_at = _now()
+    for person_code in sorted(person_codes):
+        employee_row = employee_by_code.get(person_code)
+        user_rows = sys_user_rows_by_code.get(person_code, [])
+        decision = combine_account_state(person_code, employee_row, user_rows)
+        fingerprint = compute_evidence_fingerprint(employee_row, user_rows)
+
+        prior = db.scalars(
+            select(IdentityAccountStateDecision).where(
+                IdentityAccountStateDecision.person_code == person_code,
+                IdentityAccountStateDecision.rule_version == ACCOUNT_STATE_RULE_VERSION,
+            ).order_by(IdentityAccountStateDecision.created_at.asc(), IdentityAccountStateDecision.id.asc())
+        ).all()
+        prior_states = [row.desired_state for row in prior]
+        transition_seq = next_transition_seq(prior_states, decision.desired_state)
+
+        existing = next(
+            (row for row in prior if row.evidence_fingerprint == fingerprint),
+            None,
+        )
+        if existing is not None:
+            existing.transition_seq = transition_seq
+            existing.captured_at = captured_at
+            existing.source_complete = source_complete and sys_user_available
+            updated_count += 1
+            continue
+        db.add(IdentityAccountStateDecision(
+            person_code=person_code,
+            rule_version=ACCOUNT_STATE_RULE_VERSION,
+            employee_state=decision.employee_state,
+            employee_state_reason=decision.employee_evidence.get("reason"),
+            user_state=decision.user_state,
+            user_state_reason=decision.user_evidence.get("reason"),
+            desired_state=decision.desired_state,
+            decision_reason=decision.decision_reason,
+            execution_allowed=decision.execution_allowed,
+            blocked_reason=decision.blocked_reason,
+            employee_evidence=decision.employee_evidence,
+            user_evidence=decision.user_evidence,
+            evidence_fingerprint=fingerprint,
+            transition_seq=transition_seq,
+            source_complete=source_complete and sys_user_available,
+            captured_at=captured_at,
+        ))
+        created_count += 1
+    return {"created": created_count, "updated": updated_count}
+
+
 def _build_plan(rows: dict[str, list[dict[str, Any]]], source_system: str, source_code: str) -> dict[str, Any]:
     staff_by_emp_no: dict[str, dict[str, Any]] = {}
     masters: dict[str, PersonMaster] = {}
@@ -485,7 +707,8 @@ def sync_his_identity(
     source_system = "HIS"
     source_code = "his_source_10_10_10_15"
     started_at = _now().isoformat()
-    rows, collect_notes = _collect(max_rows)
+    rows, collect_meta = _collect(max_rows)
+    collect_notes: list[str] = collect_meta["notes"]
     plan = _build_plan(rows, source_system, source_code)
 
     result: dict[str, Any] = {
@@ -495,6 +718,10 @@ def sync_his_identity(
         "source_code": source_code,
         "dry_run": dry_run,
         "started_at": started_at,
+        # 186 v1.10 P0-6：本轮采集开始时间与完整性（不完整不得推进水位）。
+        "collection_started_at": started_at,
+        "source_complete": collect_meta["source_complete"],
+        "collection_sources": collect_meta["sources"],
         "max_rows": max_rows,
         "scanned": {key: len(value) for key, value in rows.items()},
         "collect_notes": collect_notes,
@@ -607,6 +834,40 @@ def sync_his_identity(
             group_class=_text(_value(row, "GROUP_CLASS")),
         ))
 
+    # 186 I2：SYS_USER 账号第二来源入 person_sources（与另一采集器共享）+
+    # 双来源判定落库。投影仅允许列，raw_data 不含任何凭据类字段。
+    for row in rows.get("sys_users", []):
+        emp_code = _text(_value(row, "EMPL_CODE")) or _text(_value(row, "EMPLCODE"))
+        if not emp_code:
+            continue
+        user_state = _normalize_sys_user_status(_value(row, "STATUS"), _value(row, "ISDELETED"))
+        result["upserted"]["person_sources"] += int(_upsert_person_source(
+            db,
+            source_system=source_system,
+            source_code=source_code,
+            source_table=SYS_USER_SOURCE_TABLE,
+            source_person_id=emp_code,
+            person_code=emp_code,
+            person_name=None,
+            dept_code=None,
+            status=user_state,
+            raw={key: _value(row, key) for key in ("EMPL_CODE", "STATUS", "ISDELETED", "TYPE")},
+        ))
+
+    sys_user_source_meta = (collect_meta["sources"]).get(SYS_USER_SOURCE_TABLE) or {}
+    decision_stats = persist_account_state_decisions(
+        db, rows, notes=collect_notes, source_complete=collect_meta["source_complete"],
+        sys_user_available=sys_user_source_meta.get("status") == "ok",
+    )
+    result["account_state_decisions"] = {
+        "rule_version": ACCOUNT_STATE_RULE_VERSION,
+        "sys_user_table": SYS_USER_SOURCE_TABLE,
+        "sys_user_available": sys_user_source_meta.get("status") == "ok",
+        "sys_user_source_status": sys_user_source_meta.get("status"),
+        "sys_user_rows": len(rows.get("sys_users", [])),
+        **decision_stats,
+    }
+
     result["finished_at"] = _now().isoformat()
     if write_audit:
         db.add(GovernAuditLog(
@@ -623,6 +884,7 @@ def sync_his_identity(
                 "bridge": result["bridge"],
                 "doctor_group_diagnostics": result["doctor_group_diagnostics"],
                 "employee_title_diagnostics": result["employee_title_diagnostics"],
+                "account_state_decisions": result.get("account_state_decisions", {}),
             },
             operator=operator,
         ))

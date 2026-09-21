@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import secrets
+import logging
 import threading
 import time
 from collections import defaultdict
@@ -395,6 +396,29 @@ def _save_partial(db: Session, job_id: int, text: str, phase: str) -> None:
 
 
 def _finish_hospital_job(job_id: int, payload: dict, operator: str, request_id: str) -> None:
+    # QA ST-022：daemon 线程兜底包装——内部任何失败（含兜底分支 commit 失败）时，
+    # 用全新会话把 job 置为 failed，杜绝任务永久停留 running。
+    try:
+        _finish_hospital_job_inner(job_id, payload, operator, request_id)
+    except Exception as exc:  # noqa: BLE001
+        logging.getLogger(__name__).exception("hospital job finalizer crashed")
+        try:
+            db2 = SessionLocal()
+            try:
+                job = db2.get(AiQualityJob, job_id)
+                if job and job.status == "running":
+                    job.status = "failed"
+                    job.error_class = "internal"
+                    job.error_summary = "Hospital LLM 后台收尾失败"
+                    job.finished_at = datetime.now(timezone.utc)
+                    db2.commit()
+            finally:
+                db2.close()
+        except Exception:  # noqa: BLE001
+            logging.getLogger(__name__).exception("hospital job finalizer fallback failed")
+
+
+def _finish_hospital_job_inner(job_id: int, payload: dict, operator: str, request_id: str) -> None:
     db = SessionLocal()
     started = time.monotonic()
     try:

@@ -505,9 +505,9 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
         run = db.get(OpsToolRun, run_id)
         if run:
             run.approval_status = "failed"
-            run.execution_summary = f"execution rejected: {e}"
+            run.execution_summary = f"execution rejected: {sanitize_text(str(e), limit=200)}"
             run.error_code = "rejected"
-            run.error_summary_masked = str(e)[:300]
+            run.error_summary_masked = sanitize_text(str(e), limit=300)
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
         raise HTTPException(status_code=400, detail=f"execute rejected: {sanitize_text(str(e))}")
@@ -516,9 +516,10 @@ def execute_run(run_id: int, request: Request, body: ExecuteBody = ExecuteBody()
         run = db.get(OpsToolRun, run_id)
         if run:
             run.approval_status = "failed"
-            run.execution_summary = f"execution failed: {e}"
+            # QA ST-014：SQLAlchemy 异常文本内嵌 SQL/绑定参数，入库前必须脱敏（与响应侧口径一致）。
+            run.execution_summary = f"execution failed: {sanitize_text(str(e), limit=200)}"
             run.error_code = "failed"
-            run.error_summary_masked = str(e)[:300]
+            run.error_summary_masked = sanitize_text(str(e), limit=300)
             run.finished_at = datetime.now(timezone.utc)
             db.commit()
         raise HTTPException(status_code=500, detail=f"execute failed: {sanitize_text(str(e))}")

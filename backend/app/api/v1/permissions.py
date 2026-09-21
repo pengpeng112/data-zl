@@ -9,7 +9,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user, require_permission
+from ...core.security import get_current_user, get_request_operator, require_permission
 from ...models.governance import ApiKey
 from ...models.governance_base import (
     AssetPermissionResource,
@@ -84,6 +84,10 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "identity.permission_request.create", "name_cn": "发起权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
     {"code": "identity.permission_request.approve", "name_cn": "审批权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
     {"code": "identity.permission_request.execute", "name_cn": "执行权限申请", "type": "button", "parent_code": "identity.permission_request.view"},
+    # ===== 治理执行器 governance（186 v1.10 P0-11：默认仅 platform_admin）=====
+    {"code": "govern.executor.manage", "name_cn": "治理执行器注册管理", "type": "button", "parent_code": None},
+    {"code": "govern.config.manage", "name_cn": "治理枚举配置管理（QA ST-019：默认仅 platform_admin）", "type": "button", "parent_code": None},
+    {"code": "asset.admin.manage", "name_cn": "治理后台数据维护（QA ST-016：默认仅 platform_admin）", "type": "button", "parent_code": "asset"},
     # ===== 运维工具 ops =====
     {"code": "ops", "name_cn": "运维工具", "type": "menu", "parent_code": None},
     {"code": "ops.sql.view", "name_cn": "SQL 工作台", "type": "page", "parent_code": "ops"},
@@ -221,6 +225,8 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "identity",
         "identity.person.view",
         "identity.sync.run",
+        # 186 v1.10 P1-8：身份管理员可看同步日志/账号状态页（只读，无目标写权限）
+        "identity.sync_diff.view",
         "identity.role.manage",
         "identity.role.grant",
         "identity.local_account.manage",
@@ -229,7 +235,19 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "identity.permission_request.approve",
         "identity.permission_request.execute",
     ],
-    "dict_admin": ["dict", "dict.medical.view", "dict.medical.edit", "dict.medical.plan.create", "dict.medical.approve", "dict.medical.execute", "dict.medical.retry", "dict.medical.reconcile", "dict.general.view", "dict.general.edit"],
+    "dict_admin": [
+        "dict",
+        "dict.medical.view",
+        "dict.medical.edit",
+        "dict.medical.plan.create",
+        "dict.medical.approve",
+        "dict.medical.execute",
+        "dict.medical.retry",
+        "dict.medical.reconcile",
+        "dict.mapping.view",
+        "dict.general.view",
+        "dict.general.edit",
+    ],
     "ops_admin": [
         "ops",
         "ops.tool.manage",
@@ -510,7 +528,7 @@ def list_user_roles(user_identifier: str | None = Query(None), db: Session = Dep
 
 
 @router.put("/users/{user_identifier}/roles", summary="Replace user roles")
-def replace_user_roles(user_identifier: str, req: UserRoleGrant, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def replace_user_roles(user_identifier: str, req: UserRoleGrant, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     if req.user_identifier != user_identifier:
         raise HTTPException(status_code=400, detail="path user_identifier does not match payload")
     role_codes = sorted(set(req.role_codes))
@@ -521,10 +539,12 @@ def replace_user_roles(user_identifier: str, req: UserRoleGrant, db: Session = D
             raise HTTPException(status_code=400, detail=f"roles not found: {', '.join(missing)}")
     before_rows = db.scalars(select(AssetUserRole).where(AssetUserRole.user_identifier == user_identifier)).all()
     before = sorted({r.role_code for r in before_rows})
+    # QA ST-006：审计 operator 取认证身份，不信任 payload 的 granted_by。
+    operator = get_request_operator(request, default="system")
     db.execute(delete(AssetUserRole).where(AssetUserRole.user_identifier == user_identifier))
     for role_code in role_codes:
-        db.add(AssetUserRole(user_identifier=user_identifier, role_code=role_code, granted_by=req.granted_by))
-    _audit(db, "replace_user_roles", "user", user_identifier, req.granted_by, before={"roles": before}, after={"roles": role_codes}, reason=req.reason)
+        db.add(AssetUserRole(user_identifier=user_identifier, role_code=role_code, granted_by=operator))
+    _audit(db, "replace_user_roles", "user", user_identifier, operator, before={"roles": before}, after={"roles": role_codes}, reason=req.reason)
     db.commit()
     return ApiResponse(data={"user_identifier": user_identifier, "roles": role_codes})
 
@@ -602,7 +622,9 @@ def list_api_keys(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     return ApiResponse(data=[{
         "id": r.id,
         "key_name": r.key_name,
-        "token_masked": (r.token[:8] + "...") if r.token else "",
+        # QA ST-018：不回传 token 材料（含前缀）；仅暴露状态与布尔标记（对齐 admin.py 口径）。
+        "token_masked": ("明文待激活" if r.token else "已哈希"),
+        "has_legacy_token": bool(r.token),
         "enabled": bool(r.enabled),
         "user_identifier": r.user_identifier,
         "created_at": r.created_at.isoformat() if r.created_at else None,
@@ -630,7 +652,7 @@ def list_permission_audit(
 
 
 @router.patch("/api-keys/{key_id}/bind", summary="Bind API key to user identifier")
-def bind_api_key(key_id: int, req: TokenBind, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def bind_api_key(key_id: int, req: TokenBind, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     if req.key_id != key_id:
         raise HTTPException(status_code=400, detail="path key_id does not match payload")
     key = db.get(ApiKey, key_id)
@@ -638,6 +660,7 @@ def bind_api_key(key_id: int, req: TokenBind, db: Session = Depends(get_db)) -> 
         raise HTTPException(status_code=404, detail="api key not found")
     before = {"user_identifier": key.user_identifier}
     key.user_identifier = req.user_identifier or None
-    _audit(db, "bind_api_key", "api_key", str(key_id), req.operator, before=before, after={"user_identifier": key.user_identifier})
+    # QA ST-006：审计 operator 取认证身份，不信任 payload 的 operator。
+    _audit(db, "bind_api_key", "api_key", str(key_id), get_request_operator(request, default="system"), before=before, after={"user_identifier": key.user_identifier})
     db.commit()
     return ApiResponse(data={"id": key.id, "key_name": key.key_name, "user_identifier": key.user_identifier})

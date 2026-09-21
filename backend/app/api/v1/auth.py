@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -180,6 +181,20 @@ def _audit(db: Session, action: str, entity_ref: str, operator: str, before=None
     )
 
 
+def _auth_error_response(e: AuthError) -> JSONResponse:
+    # DEF-09（194）：登录/刷新失败统一 {code,message,data} 信封；
+    # 保留 HTTP 状态与 detail 字段，兼容旧调用方与 FastAPI 默认解析。
+    return JSONResponse(
+        status_code=e.status_code,
+        content={
+            "code": e.status_code,
+            "message": e.message,
+            "data": None,
+            "detail": e.message,
+        },
+    )
+
+
 @router.post("/login", summary="本地账号登录")
 @limiter.limit(settings.auth_login_rate_limit)
 def login(
@@ -204,7 +219,8 @@ def login(
         )
         db.commit()
     except AuthError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.message) from e
+        # DEF-09（194）：统一信封响应（保留状态码与 detail 兼容）
+        return _auth_error_response(e)
 
     _set_refresh_cookie(response, raw_refresh)
     permissions = _permissions_for_roles(db, roles)
@@ -231,9 +247,9 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_db))
         access_token, expires_at = auth_service.create_access_token(user, roles)
         db.commit()
     except AuthError as e:
+        # DEF-09（194）：统一信封响应（保留状态码与 detail 兼容）
         _clear_refresh_cookie(response)
-        raise HTTPException(status_code=e.status_code, detail=e.message) from e
-
+        return _auth_error_response(e)
     _set_refresh_cookie(response, raw_new)
     permissions = _permissions_for_roles(db, roles)
     data = _login_payload(user, access_token, expires_at, roles, permissions)

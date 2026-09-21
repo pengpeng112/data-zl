@@ -1,4 +1,7 @@
-from sqlalchemy import BigInteger, Column, Integer, Text, TIMESTAMP, Boolean
+from sqlalchemy import BigInteger, Column, Integer, Text, TIMESTAMP, Boolean, UniqueConstraint
+
+# SQLite 需 INTEGER 主键才能自增；PG 仍为 BIGINT
+PortableBigInt = BigInteger().with_variant(Integer(), "sqlite")
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
@@ -93,5 +96,32 @@ class AssetSourceSchema(Base):
     table_count = Column(Integer, server_default="0")
     column_count = Column(Integer, server_default="0")
     last_collect_at = Column(TIMESTAMP(timezone=True))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class AssetSourcePurposeBinding(Base):
+    """186 v1.10 P0-18：source registry 受控用途绑定。
+
+    asset_data_sources.write_policy/write_credential_ref 保持既有字典推送用途
+    兼容；身份状态同步等新用途经 (source_code, purpose) 独立绑定专属写引用，
+    互不覆盖。身份 dispatch 只从本表解析凭据，零 env/字典 fallback。
+    """
+
+    __tablename__ = "asset_source_purpose_bindings"
+    __table_args__ = (
+        UniqueConstraint("source_code", "purpose", name="uq_source_purpose_binding"),
+        {"schema": "asset"},
+    )
+
+    id = Column(PortableBigInt, primary_key=True)
+    source_code = Column(Text, nullable=False)
+    purpose = Column(Text, nullable=False)  # e.g. identity_account_sync
+    write_policy = Column(Text, nullable=False, server_default="identity_account_sync")
+    write_credential_ref = Column(Text)
+    credential_status = Column(Text, nullable=False, server_default="unconfigured")
+    enabled = Column(Boolean, nullable=False, server_default="false")
+    approval_ref = Column(Text)
+    description = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())

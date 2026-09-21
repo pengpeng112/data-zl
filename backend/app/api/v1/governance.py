@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
-from ...core.security import get_current_user, get_request_operator
+from ...core.security import get_current_user, get_request_operator, require_permission
 from ...models.governance_base import (
     AssetActionExecutor,
     AssetRole,
@@ -74,9 +74,11 @@ def list_roles(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     ])
 
 
-@router.put("/roles", summary="新增/更新角色")
-def upsert_role(req: RoleUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.put("/roles", summary="新增/更新角色",
+            dependencies=[Depends(require_permission("identity.role.manage"))])
+def upsert_role(req: RoleUpsert, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(AssetRole).where(AssetRole.role_code == req.role_code))
+    before = {"role_code": req.role_code, "role_name_cn": existing.role_name_cn} if existing else None
     if existing:
         existing.role_name_cn = req.role_name_cn
         existing.role_type = req.role_type
@@ -91,17 +93,25 @@ def upsert_role(req: RoleUpsert, db: Session = Depends(get_db)) -> ApiResponse[d
             description=req.description,
         )
         db.add(role)
+    db.flush()
+    _write_audit(db, module="governance", entity_type="role", entity_ref=req.role_code,
+                 action="upsert", operator=get_request_operator(request),
+                 before=before, after={"role_code": req.role_code, "role_name_cn": req.role_name_cn})
     db.commit()
     db.refresh(role)
     return ApiResponse(data={"id": role.id, "role_code": role.role_code})
 
 
-@router.delete("/roles/{role_code}", summary="删除角色")
-def delete_role(role_code: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.delete("/roles/{role_code}", summary="删除角色",
+               dependencies=[Depends(require_permission("identity.role.manage"))])
+def delete_role(role_code: str, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == role_code))
     if not role:
         raise HTTPException(status_code=404)
     db.delete(role)
+    _write_audit(db, module="governance", entity_type="role", entity_ref=role_code,
+                 action="delete", operator=get_request_operator(request),
+                 before={"role_code": role_code})
     db.commit()
     return ApiResponse(data={"deleted": role_code})
 
@@ -127,28 +137,39 @@ def list_permissions(role_code: str, db: Session = Depends(get_db)) -> ApiRespon
     ])
 
 
-@router.post("/roles/{role_code}/permissions", summary="给角色添加权限")
+@router.post("/roles/{role_code}/permissions", summary="给角色添加权限",
+             dependencies=[Depends(require_permission("identity.role.manage"))])
 def add_permission(
-    role_code: str, req: PermissionAssign, db: Session = Depends(get_db)
+    role_code: str, req: PermissionAssign, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
     role = db.scalar(select(AssetRole).where(AssetRole.role_code == role_code))
     if not role:
         raise HTTPException(status_code=404, detail="角色不存在")
     perm = AssetRolePermission(role_code=role_code, resource=req.resource, action=req.action)
     db.add(perm)
+    db.flush()
+    _write_audit(db, module="governance", entity_type="role_permission",
+                 entity_ref=f"{role_code}:{req.resource}:{req.action}", action="grant",
+                 operator=get_request_operator(request),
+                 after={"role_code": role_code, "resource": req.resource, "action": req.action})
     db.commit()
     db.refresh(perm)
     return ApiResponse(data={"id": perm.id})
 
 
-@router.delete("/roles/{role_code}/permissions/{perm_id}", summary="删除角色权限")
+@router.delete("/roles/{role_code}/permissions/{perm_id}", summary="删除角色权限",
+               dependencies=[Depends(require_permission("identity.role.manage"))])
 def remove_permission(
-    role_code: str, perm_id: int, db: Session = Depends(get_db)
+    role_code: str, perm_id: int, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
     perm = db.get(AssetRolePermission, perm_id)
     if not perm or perm.role_code != role_code:
         raise HTTPException(status_code=404)
     db.delete(perm)
+    _write_audit(db, module="governance", entity_type="role_permission",
+                 entity_ref=f"{role_code}:{perm.resource}:{perm.action}", action="revoke",
+                 operator=get_request_operator(request),
+                 before={"role_code": role_code, "resource": perm.resource, "action": perm.action})
     db.commit()
     return ApiResponse(data={"deleted": perm_id})
 
@@ -362,17 +383,28 @@ def audit_logs_summary(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     filters = _audit_filters(module, operator, action, entity_type, entity_ref, created_from, created_to)
-    rows = db.scalars(select(GovernAuditLog).where(*filters)).all()
-    by_module: dict[str, int] = {}
-    by_action: dict[str, int] = {}
-    by_operator: dict[str, int] = {}
-    for r in rows:
-        by_module[r.module] = by_module.get(r.module, 0) + 1
-        by_action[r.action] = by_action.get(r.action, 0) + 1
-        if r.operator:
-            by_operator[r.operator] = by_operator.get(r.operator, 0) + 1
+    stmt = select(GovernAuditLog).where(*filters)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    by_module = {
+        m or "": n for m, n in db.execute(
+            select(GovernAuditLog.module, func.count())
+            .where(*filters).group_by(GovernAuditLog.module)
+        ).all()
+    }
+    by_action = {
+        a or "": n for a, n in db.execute(
+            select(GovernAuditLog.action, func.count())
+            .where(*filters).group_by(GovernAuditLog.action)
+        ).all()
+    }
+    by_operator = {
+        o or "": n for o, n in db.execute(
+            select(GovernAuditLog.operator, func.count())
+            .where(*filters).group_by(GovernAuditLog.operator)
+        ).all() if o
+    }
     return ApiResponse(data={
-        "total": len(rows),
+        "total": total,
         "by_module": by_module,
         "by_action": by_action,
         "by_operator": by_operator,
@@ -380,6 +412,16 @@ def audit_logs_summary(
 
 
 AUDIT_EXPORT_LIMIT = 5000
+
+
+def _csv_cell(value: object) -> str:
+    """同仓 166 六硬约束口径：=+-@ 开头单元格前置单引号防公式注入。"""
+    if value is None:
+        return ""
+    text = str(value).replace("\r", " ").replace("\n", " ")
+    if text[:1] in ("=", "+", "-", "@"):
+        return f"'{text}"
+    return text
 
 
 @router.get("/audit-logs/export", summary="审计日志 CSV 导出（与列表同口径筛选；146 E7）")
@@ -409,8 +451,8 @@ def audit_logs_export(
         writer.writerow([
             r.id,
             r.created_at.isoformat() if r.created_at else "",
-            r.module, r.entity_type, r.entity_ref, r.action,
-            r.operator or "", (r.reason or "").replace(chr(10), " "),
+            _csv_cell(r.module), _csv_cell(r.entity_type), _csv_cell(r.entity_ref), _csv_cell(r.action),
+            _csv_cell(r.operator), _csv_cell(r.reason),
         ])
     buffer.seek(0)
     return StreamingResponse(
@@ -461,9 +503,10 @@ def list_executors(
     ])
 
 
-@router.put("/executors", summary="新增/更新执行器注册")
+@router.put("/executors", summary="新增/更新执行器注册",
+            dependencies=[Depends(require_permission("govern.executor.manage"))])
 def upsert_executor(
-    req: ExecutorUpsert, db: Session = Depends(get_db)
+    req: ExecutorUpsert, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
     existing = db.scalar(
         select(AssetActionExecutor).where(AssetActionExecutor.executor_code == req.executor_code)
@@ -498,15 +541,22 @@ def upsert_executor(
             description=req.description,
         )
         db.add(exe)
+    db.flush()
+    _write_audit(db, module="governance", entity_type="executor", entity_ref=req.executor_code,
+                 action="upsert", operator=get_request_operator(request),
+                 after={"execution_mode": req.execution_mode, "risk_level": req.risk_level,
+                        "enabled": req.enabled, "require_approval": req.require_approval})
     db.commit()
     db.refresh(exe)
     return ApiResponse(data={"id": exe.id, "executor_code": exe.executor_code})
 
 
-@router.patch("/executors/{executor_code}", summary="启用/禁用执行器")
+@router.patch("/executors/{executor_code}", summary="启用/禁用执行器",
+              dependencies=[Depends(require_permission("govern.executor.manage"))])
 def toggle_executor(
     executor_code: str,
     enabled: bool = Query(True),
+    request: Request = None,
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     exe = db.scalar(
@@ -514,8 +564,13 @@ def toggle_executor(
     )
     if not exe:
         raise HTTPException(status_code=404)
+    before = {"enabled": exe.enabled}
     exe.enabled = enabled
     exe.updated_at = datetime.now(timezone.utc)
+    db.flush()
+    _write_audit(db, module="governance", entity_type="executor", entity_ref=executor_code,
+                 action="toggle", operator=get_request_operator(request), before=before,
+                 after={"enabled": enabled})
     db.commit()
     return ApiResponse(data={"executor_code": exe.executor_code, "enabled": exe.enabled})
 
@@ -548,7 +603,8 @@ def list_user_roles(
     ])
 
 
-@router.post("/user-roles", summary="分配用户角色")
+@router.post("/user-roles", summary="分配用户角色",
+             dependencies=[Depends(require_permission("identity.role.manage"))])
 def assign_user_role(
     req: UserRoleAssign, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
@@ -573,7 +629,8 @@ def assign_user_role(
     return ApiResponse(data={"id": ur.id, "user_identifier": ur.user_identifier, "role_code": ur.role_code})
 
 
-@router.delete("/user-roles/{ur_id}", summary="移除用户角色")
+@router.delete("/user-roles/{ur_id}", summary="移除用户角色",
+               dependencies=[Depends(require_permission("identity.role.manage"))])
 def remove_user_role(ur_id: int, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     ur = db.get(AssetUserRole, ur_id)
     if not ur:
@@ -625,8 +682,9 @@ def list_enum_values(
     ])
 
 
-@router.put("/enum-values", summary="新增/更新枚举值")
-def upsert_enum_value(req: EnumValueUpsert, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+@router.put("/enum-values", summary="新增/更新枚举值",
+            dependencies=[Depends(require_permission("govern.config.manage"))])
+def upsert_enum_value(req: EnumValueUpsert, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     existing = db.scalar(select(GovernEnumValue).where(
         GovernEnumValue.enum_code == req.enum_code,
         GovernEnumValue.value_code == req.value_code,
@@ -645,6 +703,11 @@ def upsert_enum_value(req: EnumValueUpsert, db: Session = Depends(get_db)) -> Ap
             enabled=req.enabled,
         )
         db.add(ev)
+    db.flush()
+    _write_audit(db, module="governance", entity_type="enum_value",
+                 entity_ref=f"{req.enum_code}:{req.value_code}", action="upsert",
+                 operator=get_request_operator(request),
+                 after={"value_name_cn": req.value_name_cn, "enabled": req.enabled})
     db.commit()
     db.refresh(ev)
     return ApiResponse(data={"id": ev.id, "enum_code": ev.enum_code, "value_code": ev.value_code})

@@ -1015,7 +1015,7 @@ _INLINE_TOOL_DISPATCH = {
     # 真实执行类工具时，改挂 ai.sql.execute 并在函数体内按工具名分流。
     dependencies=[Depends(require_permission("ai.context.read"))],
 )
-def tool_execute(req: ToolExecuteRequest, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+def tool_execute(req: ToolExecuteRequest, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Never return fake executed=True. Dispatch known read-only helpers or mark unsupported."""
     tool_names = [t["name"] for t in AVAILABLE_TOOLS]
     if req.tool_name not in tool_names:
@@ -1064,7 +1064,8 @@ def tool_execute(req: ToolExecuteRequest, db: Session = Depends(get_db)) -> ApiR
         entity_ref=req.tool_name,
         action="execute" if executed else "unsupported",
         after_data={"params": params, "status": status, "executed": executed},
-        operator=req.system_code,
+        # QA ST-006：审计 operator 取认证身份，不信任 payload。
+        operator=getattr(request.state, "user_identifier", None) or "ai-system",
     ))
     db.commit()
     return ApiResponse(data={

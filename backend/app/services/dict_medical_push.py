@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
@@ -26,7 +27,7 @@ CATEGORY_DIAGNOSIS = "diagnosis"
 CATEGORY_OPERATION = "operation"
 VALID_CATEGORIES = (CATEGORY_DIAGNOSIS, CATEGORY_OPERATION)
 VALID_TARGET_SYSTEMS = ("HIS_SOURCE", "JHEMR_VASTBASE")
-VALID_ACTION_TYPES = ("insert", "stop")
+VALID_ACTION_TYPES = ("insert", "stop", "sync_infectious")
 TARGET_ALIASES = {"HIS": "HIS_SOURCE", "JHEMR": "JHEMR_VASTBASE"}
 
 
@@ -42,6 +43,10 @@ def _local_code_set(category_code: str) -> str:
 
 
 def _compute_plan_hash(items: list[dict[str, Any]]) -> str:
+    if any(item.get("hash_version") == 2 for item in items):
+        canonical = sorted(items, key=lambda item: item.get("item_code", ""))
+        return hashlib.sha256(json.dumps(canonical, ensure_ascii=False, sort_keys=True,
+                                        separators=(",", ":")).encode("utf-8")).hexdigest()[:32]
     parts = []
     for item in sorted(items, key=lambda x: x.get("item_code", "")):
         parts.append("|".join([
@@ -70,6 +75,12 @@ def create_push_plan(
     if action_type not in VALID_ACTION_TYPES:
         raise ValueError(f"无效动作类型: {action_type}")
     target_systems = list(dict.fromkeys(normalize_target_system(ts) for ts in target_systems))
+    if action_type == "sync_infectious":
+        if category_code != CATEGORY_DIAGNOSIS or target_systems != ["HIS_SOURCE"]:
+            raise ValueError("传染病诊断同步仅支持 HIS 诊断字典")
+        if not item_codes or len(item_codes) > 500 or any(not code.strip() for code in item_codes):
+            raise ValueError("传染病同步必须明确选择 1—500 个院内诊断编码")
+        item_codes = list(dict.fromkeys(code.strip() for code in item_codes))
 
     stmt = select(DictMedicalCodeItem).where(
         DictMedicalCodeItem.category_code == category_code,
@@ -81,6 +92,8 @@ def create_push_plan(
     items = list(db.scalars(stmt).all())
     if not items:
         raise ValueError("无符合条件的编码项")
+    if action_type == "sync_infectious" and {i.item_code for i in items} != set(item_codes):
+        raise ValueError("所选诊断包含不存在或已停用的编码，请重新选择")
 
     item_dicts = []
     for item in items:
@@ -103,6 +116,12 @@ def create_push_plan(
             "national_clinical_code": nc_code,
             "insurance_code": ins_code,
             "status": item.status,
+            "hash_version": 2,
+            "action_type": action_type,
+            "target_systems": sorted(target_systems),
+            "category_code": category_code,
+            "infectious_disease_name": str((item.extra or {}).get("infectious_disease_name") or "").strip(),
+            "infectious_disease_code": str((item.extra or {}).get("infectious_disease_code") or "").strip(),
         })
 
     content_hash = _compute_plan_hash(item_dicts)
@@ -133,7 +152,7 @@ def create_push_plan(
                 action_type=action_type,
                 payload=item_dict,
                 status="planned",
-                diff_type="stopped" if action_type == "stop" else "new",
+                diff_type="changed" if action_type == "sync_infectious" else ("stopped" if action_type == "stop" else "new"),
             )
             db.add(action)
 
@@ -170,6 +189,26 @@ def verify_plan_integrity(db: Session, plan: DictMedicalPushPlan) -> bool:
     actions = db.scalars(
         select(DictMedicalPushAction).where(DictMedicalPushAction.plan_id == plan.id)
     ).all()
+    # Bind every action to its approved category/targets/type, not just the
+    # first action of an item. Legacy hashes remain readable for insert/stop.
+    for action in actions:
+        payload = action.payload or {}
+        if action.action_type not in VALID_ACTION_TYPES:
+            return False
+        if action.action_type == "sync_infectious" and payload.get("hash_version") != 2:
+            return False
+        if payload.get("hash_version") == 2:
+            if (payload.get("action_type") != action.action_type
+                    or payload.get("category_code") != plan.category_code
+                    or payload.get("item_code") != action.item_code
+                    or payload.get("target_systems") != sorted(plan.target_systems or [])
+                    or action.target_system not in payload.get("target_systems", [])):
+                return False
+            siblings = [a for a in actions if a.item_code == action.item_code]
+            if (len(siblings) != len(plan.target_systems or [])
+                    or {a.target_system for a in siblings} != set(plan.target_systems or [])
+                    or any(a.payload != payload for a in siblings)):
+                return False
     item_dicts = []
     seen = set()
     for a in actions:
@@ -178,6 +217,9 @@ def verify_plan_integrity(db: Session, plan: DictMedicalPushPlan) -> bool:
             continue
         seen.add(key)
         payload = a.payload or {}
+        if payload.get("hash_version") == 2:
+            item_dicts.append(dict(payload))
+            continue
         item_dicts.append({
             "item_code": payload.get("item_code", a.item_code),
             "item_name_cn": payload.get("item_name_cn", a.item_name_cn or ""),
@@ -203,13 +245,23 @@ def verify_plan_integrity(db: Session, plan: DictMedicalPushPlan) -> bool:
         )).all()
         nc_code = next((m.to_item_code for m in mappings if "clinical" in m.to_code_set), "")
         ins_code = next((m.to_item_code for m in mappings if "insurance" in m.to_code_set), "")
-        current_items.append({
+        current = {
             "item_code": item.item_code,
             "item_name_cn": item.item_name_cn,
             "national_clinical_code": nc_code,
             "insurance_code": ins_code,
             "status": item.status or "active",
-        })
+        }
+        if snapshot.get("hash_version") == 2:
+            current.update({
+                "hash_version": 2,
+                "action_type": snapshot["action_type"],
+                "target_systems": sorted(plan.target_systems or []),
+                "category_code": plan.category_code,
+                "infectious_disease_name": str((item.extra or {}).get("infectious_disease_name") or "").strip(),
+                "infectious_disease_code": str((item.extra or {}).get("infectious_disease_code") or "").strip(),
+            })
+        current_items.append(current)
     return _compute_plan_hash(current_items) == plan.content_hash
 
 
@@ -245,4 +297,10 @@ def get_plan_summary(db: Session, plan_id: int) -> dict[str, Any]:
         "created_by": plan.created_by,
         "approved_by": plan.approved_by,
         "actions_by_system": by_system,
+        "actions": [
+            {"item_code": a.item_code, "item_name_cn": a.item_name_cn,
+             "action_type": a.action_type, "target_system": a.target_system,
+             "infectious_disease_name": (a.payload or {}).get("infectious_disease_name")}
+            for a in actions if a.action_type == "sync_infectious"
+        ],
     }

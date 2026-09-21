@@ -17,6 +17,7 @@ from ...models.identity import (
     IdentityPersonSource,
     IdentitySyncDiff,
 )
+from ...models.identity_sync import IdentityAccountStateDecision
 from ...schemas.common import ApiResponse
 
 router = APIRouter(prefix="/api/v1/identity", tags=["identity"])
@@ -256,6 +257,125 @@ def _diff_item(r: IdentitySyncDiff) -> dict:
         "merge_suggestion": suggestion,
         "created_at": r.created_at.isoformat() if r.created_at else None,
     }
+
+
+@router.get(
+    "/account-states",
+    summary="186 双来源账号启停状态（SYS_EMPLOYEE×SYS_USER 判定与双目标结果）",
+    dependencies=[Depends(require_permission("identity.sync_diff.view"))],
+)
+def list_account_states(
+    desired_state: str | None = Query(None, description="enabled|disabled|unknown"),
+    person_code: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(30, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> ApiResponse[dict]:
+    """§4.6.5：人员在职状态、HIS 人员有效状态、HIS 账号状态、双目标期望
+    与实际状态、原因、来源观察时间、每目标结果。只读；统计按唯一人员
+    与目标动作分别计数。person_code 为平台工号（与既有人员页面口径一致），
+    不返回任何源端凭据或姓名。
+
+    186 v1.10 P1-5：行集 = 每 (person_code, rule_version) 的最新一条决策
+    （子查询 max(id) 分组，SQLite/PG 通用）；filters 作用于最新行；
+    attempt 严格按 fingerprint+rule_version+transition_seq 与当前决策行
+    对齐，禁止串用历史代次；desired_state_summary 按唯一人员统计。"""
+    from ...models.identity_sync import IdentityAccountStateAttempt
+    from ...services.identity_hmac import compute_account_fingerprint
+    from ...core.config import settings
+
+    # P1-5：每 (person_code, rule_version) 仅取最新一条决策（最大 id）。
+    # 不用 PG 专有窗口函数，兼容 SQLite 内存测试库。
+    latest_ids = (
+        select(func.max(IdentityAccountStateDecision.id).label("max_id"))
+        .group_by(
+            IdentityAccountStateDecision.person_code,
+            IdentityAccountStateDecision.rule_version,
+        )
+        .subquery()
+    )
+    latest_filter = IdentityAccountStateDecision.id.in_(select(latest_ids.c.max_id))
+
+    row_stmt = select(IdentityAccountStateDecision).where(latest_filter)
+    if desired_state:
+        row_stmt = row_stmt.where(IdentityAccountStateDecision.desired_state == desired_state)
+    if person_code:
+        row_stmt = row_stmt.where(IdentityAccountStateDecision.person_code == person_code)
+    total = db.scalar(select(func.count()).select_from(row_stmt.subquery())) or 0
+    rows = db.scalars(
+        row_stmt.order_by(
+            IdentityAccountStateDecision.created_at.desc(),
+            IdentityAccountStateDecision.id.desc(),
+        )
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+
+    person_codes = {row.person_code for row in rows if row.person_code}
+    people = {
+        p.person_code: p
+        for p in db.scalars(
+            select(IdentityPerson).where(IdentityPerson.person_code.in_(person_codes))
+        ).all()
+    } if person_codes else {}
+
+    hmac_ref = settings.identity_hmac_key_ref
+    items = []
+    for row in rows:
+        attempts: dict[str, dict] = {}
+        for target in ("JHEMR", "CDMS"):
+            fp = compute_account_fingerprint(row.person_code, target, hmac_ref)
+            # P1-5：attempt 与当前决策行代次严格对齐（fingerprint+rule_version
+            # +transition_seq 同时匹配）；同代 disable/enable 并存时取 id 最大。
+            attempt = db.scalar(
+                select(IdentityAccountStateAttempt).where(
+                    IdentityAccountStateAttempt.target_account_fingerprint == fp,
+                    IdentityAccountStateAttempt.rule_version == row.rule_version,
+                    IdentityAccountStateAttempt.transition_seq == row.transition_seq,
+                ).order_by(IdentityAccountStateAttempt.id.desc())
+            )
+            attempts[target] = {
+                "action": attempt.action if attempt else None,
+                "status": attempt.status if attempt else "no_attempt",
+                "after_state": attempt.after_state if attempt else None,
+                "reason_code": attempt.reason_code if attempt else None,
+                "lock_attribution": attempt.lock_attribution if attempt else None,
+                "transition_seq": attempt.transition_seq if attempt else None,
+                "executed_at": attempt.executed_at.isoformat() if attempt and attempt.executed_at else None,
+            }
+        person = people.get(row.person_code)
+        items.append({
+            "person_code": row.person_code,
+            "employment_status": person.employment_status if person else None,
+            "rule_version": row.rule_version,
+            "employee_state": row.employee_state,
+            "user_state": row.user_state,
+            "desired_state": row.desired_state,
+            "decision_reason": row.decision_reason,
+            "execution_allowed": row.execution_allowed,
+            "blocked_reason": row.blocked_reason,
+            "source_complete": row.source_complete,
+            "captured_at": row.captured_at.isoformat() if row.captured_at else None,
+            "transition_seq": row.transition_seq,
+            "targets": attempts,
+        })
+
+    # P1-5：summary 在（未过滤的）最新行集上按 desired_state 统计唯一人员数。
+    summary = db.execute(
+        select(
+            IdentityAccountStateDecision.desired_state,
+            func.count(func.distinct(IdentityAccountStateDecision.person_code)),
+        )
+        .where(latest_filter)
+        .group_by(IdentityAccountStateDecision.desired_state)
+    ).all()
+    return ApiResponse(data={
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "items": items,
+        "desired_state_summary": {state: int(count or 0) for state, count in summary},
+    })
 
 
 @router.get("/sync-diffs", summary="人员/科室/账号同步差异")

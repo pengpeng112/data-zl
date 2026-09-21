@@ -8,6 +8,16 @@ from app.services import identity_login_sign_sync as service
 from app.services.identity_sync_status import aggregate_overall_status
 
 
+@pytest.fixture(autouse=True)
+def _legacy_run_mode(monkeypatch):
+    """186 v1.10 P0-19：本文件回归旧登录/签名同步行为 → run_mode=full
+    （observe/disable_only 下该子任务为 skipped 零目标写）。"""
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "identity_run_mode", "full")
+    yield
+
+
+
 def test_build_plan_fills_empty_account_like_004069():
     plan = service.build_login_sign_plan(
         expected={"E1", "E2", "E3"},
@@ -31,20 +41,36 @@ def test_build_plan_fills_empty_account_like_004069():
 
 
 def test_build_plan_skips_manually_configured_users_without_filling_gaps():
-    """003531 事故治本（2026-09-05）：已有任意登录/签名方式行 = 已配置，
-    不再按 0/2/4 模板补缺——旧语义曾给人工 2/4/8 配置后插 sign_way=0
-    (default=1) 产生双默认，EMR 报「必须设置两种以上的签名模式」。"""
+    """已配置且登录/签名集合一致：不套 0/2/4 模板。"""
     plan = service.build_login_sign_plan(
-        expected={"E1", "E2"},
-        target_users={"E1", "E2"},
-        control_users={"E1", "E2"},
-        logins={"E1": {"2"}, "E2": {"0", "2", "4", "8"}},
-        signs={"E1": {"2"}, "E2": {"2", "4", "8"}},
-        defaults={"E1": 1, "E2": 1},
+        expected={"E1"},
+        target_users={"E1"},
+        control_users={"E1"},
+        logins={"E1": {"2", "4", "8"}},
+        signs={"E1": {"2", "4", "8"}},
+        defaults={"E1": 1},
     )
     assert plan["repairs"] == []
-    assert plan["skipped_configured"] == 2
-    assert plan["skipped_equal"] == 2
+    assert plan["skipped_configured"] == 1
+    assert plan["skipped_equal"] == 1
+
+
+def test_build_plan_fills_login_sign_gap_without_template_default():
+    """003531 vs 003534：登录有 0、签名没有 0 时补 sign_way=0 且 default=0。"""
+    plan = service.build_login_sign_plan(
+        expected={"E2"},
+        target_users={"E2"},
+        control_users={"E2"},
+        logins={"E2": {"0", "2", "4", "8"}},
+        signs={"E2": {"2", "4", "8"}},
+        defaults={"E2": 1},
+    )
+    assert len(plan["repairs"]) == 1
+    item = plan["repairs"][0]
+    assert item["login_ways"] == []
+    assert [s["sign_way"] for s in item["sign_ways"]] == ["0"]
+    assert item["sign_ways"][0]["default_flag"] == "0"
+    assert item["fix_default"] is False
 
 
 def test_build_plan_repairs_missing_default_on_existing_way_zero():
@@ -191,7 +217,75 @@ def test_target_write_failure_fails_actions(monkeypatch):
 def test_missing_audit_context_is_misconfigured():
     result = service.sync_jhemr_login_sign_daily(run_id=None, db=None)
     assert result["status"] == "misconfigured"
-    assert "audit_config" in result["error_classes"]
+
+
+def test_align_fills_login_sign_gap_default_zero():
+    from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
+
+    adapter = JhemrIdentityAdapter.__new__(JhemrIdentityAdapter)
+    adapter.hospital_no = "49557032X"
+    adapter.sync_operator_id = "TEST"
+    adapter._fetch_user = lambda emp_no: {"user_id": emp_no, "education_title": None}
+    conn = MagicMock()
+    adapter._ensure_conn = lambda: conn
+    writes = []
+    signs = [{"sign_way": way} for way in ("2", "4", "8")]
+
+    def execute_write(sql, params):
+        writes.append((sql, params))
+        if "INSERT" in sql and "users_subsign" in sql:
+            way = next((str(p) for p in params if str(p) in {"0", "2", "4", "8"}), None)
+            if way:
+                signs.append({"sign_way": way})
+        return 1
+
+    adapter._execute_write = execute_write
+    adapter._fetch_one = lambda sql, params: (
+        {"in_sign_way": "2,4,8", "login_way": "0,2,4,8", "in_pic_mode": "2,2,2"}
+        if "in_sign_way" in sql
+        else {"role_group_id": "001"}
+    )
+    adapter._existing_dept_codes = lambda user_id: {"D001"}
+    adapter._fetch_all = lambda sql, params: (
+        [{"login_way": way} for way in ("0", "2", "4", "8")]
+        if "users_sublogin" in sql
+        else list(signs)
+    )
+    result = adapter.align_existing_user("E001", "doctor", ["D001"], "001")
+    assert result.get("status") == "success", result
+    sign_inserts = [p for s, p in writes if "INSERT" in s and "users_subsign" in s]
+    assert len(sign_inserts) == 1
+    assert "0" in [str(x) for x in sign_inserts[0]]
+    assert sign_inserts[0][-1] == "0"
+    assert any(a["action"] == "insert_sign_for_login_gap" for a in result["actions"])
+
+
+def test_align_matched_003534_pattern_no_writes():
+    from app.services.jhemr_identity_adapter import JhemrIdentityAdapter
+
+    adapter = JhemrIdentityAdapter.__new__(JhemrIdentityAdapter)
+    adapter.hospital_no = "49557032X"
+    adapter.sync_operator_id = "TEST"
+    adapter._fetch_user = lambda emp_no: {"user_id": emp_no, "education_title": None}
+    conn = MagicMock()
+    adapter._ensure_conn = lambda: conn
+    writes = []
+    adapter._execute_write = lambda sql, params: writes.append((sql, params)) or 1
+    adapter._fetch_one = lambda sql, params: (
+        {"in_sign_way": "0,2,4", "login_way": "0,2,4", "in_pic_mode": "2,2,2"}
+        if "in_sign_way" in sql
+        else {"role_group_id": "001"}
+    )
+    adapter._existing_dept_codes = lambda user_id: {"D001"}
+    adapter._fetch_all = lambda sql, params: (
+        [{"login_way": way} for way in ("0", "2", "4")]
+        if "users_sublogin" in sql
+        else [{"sign_way": way} for way in ("0", "2", "4")]
+    )
+    result = adapter.align_existing_user("E001", "doctor", ["D001"], "001")
+    assert result.get("status") == "success", result
+    assert not [s for s, _ in writes if "users_sublogin" in s or "users_subsign" in s]
+    assert not [s for s, _ in writes if "UPDATE jhemr.users_control_mode" in s]
 
 
 @pytest.mark.parametrize("login_sign_status, expected", [

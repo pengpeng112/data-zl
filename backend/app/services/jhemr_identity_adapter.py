@@ -29,6 +29,7 @@ all child-table reads and inserts.
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import socket
 import subprocess
@@ -75,6 +76,13 @@ ROLE_CHAIN = {
 }
 
 WRITE_POLICY = "identity_account_sync"
+
+
+def _way_csv(ways: set[str]) -> str:
+    def _key(item: str) -> tuple:
+        return (0, int(item)) if item.isdigit() else (1, item)
+
+    return ",".join(sorted((str(w) for w in ways if w), key=_key))
 
 TEMPLATE_VERSION = "jhemr-login-v1"
 
@@ -173,6 +181,22 @@ def _mask(value: Any) -> str | None:
     if len(text) <= 4:
         return "*" * len(text)
     return f"{text[:2]}{'*' * (len(text) - 4)}{text[-2:]}"
+
+
+def _normalize_raw_time(value: Any) -> str | None:
+    """186 v1.10 §13.3：目标侧时间原始值规范化（仅变更检测用）。
+
+    datetime → isoformat() 字符串；str → strip()；None → None；其余类型 →
+    str()。不做任何时区换算、不做任何容差——时间一致不是锁所有权证明，
+    只是“本规则停用后目标行未被再次修改”的变更检测输入。
+    """
+    if value is None:
+        return None
+    if isinstance(value, dt.datetime):
+        return value.isoformat()
+    if isinstance(value, str):
+        return value.strip()
+    return str(value)
 
 
 # ---------------------------------------------------------------------------
@@ -724,6 +748,87 @@ class JhemrIdentityAdapter:
         if default_signs != 1:
             raise JhemrIdentityError(f"read-back failed: subsign default count={default_signs}")
 
+    def _fill_sign_gaps_for_logins(self, user_id: str, actions: list[dict]) -> int:
+        """Insert sign_way rows that exist as login_way but not as sign_way.
+
+        Never deletes, never changes an existing default_flag. Used so nightly
+        align stays consistent with a working 0/2/4 pair (003534) without
+        re-breaking manual 2/4/8 configs by inserting sign_way=0 as default=1.
+        """
+        logins = {
+            str(row.get("login_way"))
+            for row in self._fetch_all(
+                "SELECT login_way FROM jhemr.users_sublogin "
+                "WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
+                (user_id, self.hospital_no),
+            )
+            if row.get("login_way") is not None
+        }
+        signs = {
+            str(row.get("sign_way"))
+            for row in self._fetch_all(
+                "SELECT sign_way FROM jhemr.users_subsign "
+                "WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
+                (user_id, self.hospital_no),
+            )
+            if row.get("sign_way") is not None
+        }
+        inserted = 0
+        for way in sorted(logins - signs, key=lambda item: int(item) if str(item).isdigit() else 99):
+            self._execute_write(
+                "INSERT INTO jhemr.users_subsign "
+                "(user_id, hospital_no, file_visit_type, sign_way, picmode, "
+                "default_flag, last_modify_time) "
+                "VALUES (%s, %s, '2', %s, '2', '0', CURRENT_TIMESTAMP)",
+                (user_id, self.hospital_no, way),
+            )
+            actions.append({
+                "action": "insert_sign_for_login_gap",
+                "table": "users_subsign",
+                "sign_way": way,
+            })
+            inserted += 1
+            signs.add(way)
+        if logins or signs:
+            self._refresh_control_mode_way_lists(user_id, logins, signs, actions)
+        return inserted
+
+    def _refresh_control_mode_way_lists(
+        self,
+        user_id: str,
+        login_ways: set[str],
+        sign_ways: set[str],
+        actions: list[dict],
+    ) -> None:
+        login_csv = _way_csv(login_ways)
+        sign_csv = _way_csv(sign_ways)
+        pic_csv = ",".join(["2"] * len(sign_ways)) if sign_ways else CONTROL_MODE_DEFAULTS["in_pic_mode"]
+        row = self._fetch_one(
+            "SELECT in_sign_way, login_way, in_pic_mode FROM jhemr.users_control_mode "
+            "WHERE user_id = %s AND hospital_no = %s",
+            (user_id, self.hospital_no),
+        )
+        if row is None:
+            return
+        if (
+            str(row.get("in_sign_way") or "") == sign_csv
+            and str(row.get("login_way") or "") == login_csv
+            and str(row.get("in_pic_mode") or "") == pic_csv
+        ):
+            return
+        self._execute_write(
+            "UPDATE jhemr.users_control_mode "
+            "SET in_sign_way = %s, login_way = %s, in_pic_mode = %s, "
+            "last_modify_date = CURRENT_TIMESTAMP, last_modify_user_id = %s "
+            "WHERE user_id = %s AND hospital_no = %s",
+            (sign_csv, login_csv, pic_csv, self.sync_operator_id, user_id, self.hospital_no),
+        )
+        actions.append({
+            "action": "refresh_control_mode_ways",
+            "table": "users_control_mode",
+            "in_sign_way": sign_csv,
+            "login_way": login_csv,
+        })
 
     # -- idempotent alignment for existing accounts -------------------------
 
@@ -856,6 +961,10 @@ class JhemrIdentityAdapter:
                          sub["picmode"], sub["default_flag"]),
                     )
                     actions.append({"action": "insert", "table": "users_subsign", "sign_way": sub["sign_way"]})
+
+            # 003531 对照 003534：已配置用户不套 0/2/4 模板（防双默认），
+            # 但登录方式有、签名方式没有的缺口要补上（default=0，不改原默认）。
+            self._fill_sign_gaps_for_logins(user_id, actions)
 
             verify_rg = self._fetch_one(
                 "SELECT role_group_id FROM jhemr.jhauth_user_vs_role_group "
@@ -1123,12 +1232,16 @@ class JhemrIdentityAdapter:
                             raise JhemrIdentityError("users_control_mode insert failed")
                         control_inserted += 1
 
+                # The sync account holds SELECT+INSERT only on users_sublogin /
+                # users_subsign; PostgreSQL rejects SELECT ... FOR UPDATE there
+                # (needs UPDATE privilege). The jhemr.users row lock above already
+                # serialises repairs for one user, so plain existence checks suffice.
                 for login_way in item.get("login_ways") or []:
                     way = str(login_way)
                     existing_sl = self._fetch_one(
                         "SELECT user_id FROM jhemr.users_sublogin "
                         "WHERE user_id = %s AND hospital_no = %s "
-                        "AND file_visit_type = '2' AND login_way = %s FOR UPDATE",
+                        "AND file_visit_type = '2' AND login_way = %s",
                         (emp_no, self.hospital_no, way),
                     )
                     if existing_sl is not None:
@@ -1149,7 +1262,7 @@ class JhemrIdentityAdapter:
                     existing_ss = self._fetch_one(
                         "SELECT user_id FROM jhemr.users_subsign "
                         "WHERE user_id = %s AND hospital_no = %s "
-                        "AND file_visit_type = '2' AND sign_way = %s FOR UPDATE",
+                        "AND file_visit_type = '2' AND sign_way = %s",
                         (emp_no, self.hospital_no, way),
                     )
                     if existing_ss is not None:
@@ -1192,6 +1305,9 @@ class JhemrIdentityAdapter:
                 )
                 if cm is None:
                     raise JhemrIdentityError("users_control_mode read-back mismatch")
+                gap_actions: list[dict[str, Any]] = []
+                extra = self._fill_sign_gaps_for_logins(emp_no, gap_actions)
+                subsign_inserted += extra
                 logins = {
                     str(r.get("login_way"))
                     for r in self._fetch_all(
@@ -1200,16 +1316,14 @@ class JhemrIdentityAdapter:
                         (emp_no, self.hospital_no),
                     )
                 }
-                if not {"0", "2", "4"}.issubset(logins):
-                    raise JhemrIdentityError("users_sublogin read-back mismatch")
                 signs = self._fetch_all(
                     "SELECT sign_way, default_flag FROM jhemr.users_subsign "
                     "WHERE user_id = %s AND hospital_no = %s AND file_visit_type = '2'",
                     (emp_no, self.hospital_no),
                 )
                 sign_ways = {str(r.get("sign_way")) for r in signs}
-                if not {"0", "2", "4"}.issubset(sign_ways):
-                    raise JhemrIdentityError("users_subsign read-back mismatch")
+                if not logins.issubset(sign_ways):
+                    raise JhemrIdentityError("users_subsign missing counterpart for login_way")
                 default_count = sum(1 for r in signs if str(r.get("default_flag")) == "1")
                 if default_count < 1:
                     raise JhemrIdentityError("users_subsign default read-back mismatch")
@@ -1276,6 +1390,132 @@ class JhemrIdentityAdapter:
                 "status": "success",
                 "rows_affected": 1,
                 "account_status": ACCOUNT_STATUS_LOCKED,
+                # 186 v1.10 P0-9：停用证据用目标原始时间值（无时区换算），
+                # 供恢复阶段做“精确不变”比对，不再是带容差的时刻。
+                "locked_time_raw": _normalize_raw_time(verified.get("locked_time")),
+            }
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
+    def read_account_state(self, user_id: str) -> dict[str, Any] | None:
+        """186 I3：读单个 JHEMR 账号状态（含锁定时间，供恢复归因）。"""
+        emp = str(user_id or "").strip()
+        if not emp:
+            raise JhemrIdentityError("user_id must not be empty")
+        return self._fetch_one(
+            "SELECT user_id, account_status, locked_time FROM jhemr.users "
+            "WHERE user_id = %s AND hospital_no = %s",
+            (emp, self.hospital_no),
+        )
+
+    def unlock_account(
+        self,
+        user_id: str,
+        *,
+        origin_disable: dict | None = None,
+    ) -> dict[str, Any]:
+        """186 v1.10 §13.3/P0-9：受控恢复 8→0（变更检测 CAS，不是所有权证明）。
+
+        语义边界：本方法只验证“平台持久停用证据（origin_disable）中的目标
+        原始时间值与当前行 locked_time 精确不变”，并以此做条件更新
+        （CAST(account_status AS TEXT)='8'）。时间一致不证明锁归本规则所有
+        ——锁所有权证据（attempt_id、指纹、rule_version 匹配）在编排/门禁层
+        关闭；这里承担的是目标行未被再次修改的变更检测。
+
+        origin_disable keys：``attempt_id``(int)、``target_raw_time``(str|None)、
+        ``target_account_fingerprint``(str)、``rule_version``(str)。
+        - status==0 → skipped already_enabled（幂等）。
+        - status!=8 → blocked unexpected_state（不动）。
+        - origin 缺失 / 任一侧原始时间缺失 → blocked attribution_unknown。
+        - 当前值与 origin 值精确比对（同一规范化后字符串全等，无 ±容差、
+          无时区换算）不等 → blocked attribution_target_changed。
+        - 条件 UPDATE rowcount!=1 → 重读分类（并发已恢复 → skipped
+          already_enabled；否则 raise 回滚）。
+        不重设密码、不重建角色组、只改 account_status。
+        """
+        emp = str(user_id or "").strip()
+        if not emp:
+            raise JhemrIdentityError("user_id must not be empty")
+
+        current = self._fetch_one(
+            "SELECT user_id, account_status, locked_time FROM jhemr.users "
+            "WHERE user_id = %s AND hospital_no = %s FOR UPDATE",
+            (emp, self.hospital_no),
+        )
+        if current is None:
+            return {"status": "missing_target"}
+        status = str(current.get("account_status")).strip()
+        if status == str(ACCOUNT_STATUS_ACTIVE):
+            return {"status": "skipped", "reason": "already_enabled", "account_status": ACCOUNT_STATUS_ACTIVE}
+        if status != str(ACCOUNT_STATUS_LOCKED):
+            return {"status": "blocked", "reason": "unexpected_state", "account_status": status}
+
+        current_raw = _normalize_raw_time(current.get("locked_time"))
+        origin_raw = _normalize_raw_time(
+            (origin_disable or {}).get("target_raw_time")
+            if origin_disable is not None
+            else None
+        )
+        if origin_disable is None or origin_raw is None or current_raw is None:
+            return {
+                "status": "blocked",
+                "reason": "attribution_unknown",
+                "lock_attribution": "manual_or_unknown",
+            }
+        if current_raw != origin_raw:
+            return {
+                "status": "blocked",
+                "reason": "attribution_target_changed",
+                "lock_attribution": "manual_or_unknown",
+            }
+
+        conn = self._ensure_conn()
+        try:
+            affected = self._execute_write(
+                "UPDATE jhemr.users SET account_status = %s "
+                "WHERE user_id = %s AND hospital_no = %s AND CAST(account_status AS TEXT) = %s",
+                (ACCOUNT_STATUS_ACTIVE, emp, self.hospital_no, str(ACCOUNT_STATUS_LOCKED)),
+            )
+            if affected != 1:
+                recheck = self._fetch_one(
+                    "SELECT account_status FROM jhemr.users "
+                    "WHERE user_id = %s AND hospital_no = %s",
+                    (emp, self.hospital_no),
+                )
+                if (
+                    recheck is not None
+                    and str(recheck.get("account_status")).strip() == str(ACCOUNT_STATUS_ACTIVE)
+                ):
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
+                    return {
+                        "status": "skipped",
+                        "reason": "already_enabled",
+                        "account_status": ACCOUNT_STATUS_ACTIVE,
+                    }
+                raise JhemrIdentityError(
+                    f"account unlock update affected {affected} rows; expected 1"
+                )
+            verified = self._fetch_one(
+                "SELECT account_status FROM jhemr.users "
+                "WHERE user_id = %s AND hospital_no = %s",
+                (emp, self.hospital_no),
+            )
+            if not verified or str(verified.get("account_status")).strip() != str(ACCOUNT_STATUS_ACTIVE):
+                raise JhemrIdentityError("account unlock read-back mismatch")
+            conn.commit()
+            return {
+                "status": "success",
+                "rows_affected": 1,
+                "account_status": ACCOUNT_STATUS_ACTIVE,
+                "lock_attribution": "by_this_rule",
+                "origin_disable_attempt_id": origin_disable["attempt_id"],
             }
         except Exception:
             try:

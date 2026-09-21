@@ -168,3 +168,109 @@ def get_feedback_status(db: Session, feedback_id: int) -> dict[str, Any] | None:
         "evaluation_case_id": row.evaluation_case_id,
         "resolved_at": row.resolved_at.isoformat() if row.resolved_at else None,
     }
+
+
+# ---------------------------------------------------------------------------
+# 186 Q2：分页列表 + 所有者/审核范围检查（§4.4 契约）
+# ---------------------------------------------------------------------------
+
+FEEDBACK_STATUSES = set(TRANSITIONS.keys()) | {"resolved"}
+
+MAX_PAGE_SIZE = 100
+
+
+def _feedback_list_item(row: AssetAiFeedback, event: AssetAiAnswerEvent | None) -> dict[str, Any]:
+    return {
+        "feedback_id": row.id,
+        "answer_event_id": row.answer_event_id,
+        "status": row.status,
+        "rating": row.rating,
+        "error_types": row.error_types or [],
+        "submitted_at": row.submitted_at.isoformat() if getattr(row, "submitted_at", None) else None,
+        "query_code": event.query_code if event else None,
+        "query_version": event.query_version if event else None,
+        "metric_code": event.metric_code if event else None,
+        "metric_version": event.metric_version if event else None,
+        "product_code": event.product_code if event else None,
+        "run_id": event.run_id if event else None,
+        "result_digest": event.result_digest if event else None,
+        # §4.4：question_summary/comment 等长文本在详情按权限获取，列表不带
+        # 审核者视角才返回稳定提交者标识；mine 列表对本人无额外价值
+        "submitted_by": row.submitted_by,
+    }
+
+
+def list_feedback(
+    db: Session,
+    *,
+    current_user: str | None,
+    has_review_permission: bool,
+    scope: str = "mine",
+    status: str | None = None,
+    query_code: str | None = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> dict[str, Any]:
+    """§4.4：scope=mine 仅本人历史（legacy 空 submitted_by 不归属任何人）；
+    scope=queue 需要 feedback:review。submitted_at DESC NULLS LAST, id DESC
+    稳定分页（186 v1.10 P1-12/T60，与文档契约一致）。"""
+    from sqlalchemy import func
+
+    if scope not in {"mine", "queue"}:
+        raise ValueError("scope 必须是 mine 或 queue")
+    if scope == "mine" and not current_user:
+        # 未认证身份不可能有“我的”历史——空结果而非伪造
+        return {"items": [], "total": 0, "page": page, "page_size": page_size}
+    if scope == "queue" and not has_review_permission:
+        raise PermissionError("queue 需要 feedback:review 权限")
+
+    stmt = select(AssetAiFeedback)
+    if scope == "mine":
+        stmt = stmt.where(AssetAiFeedback.submitted_by == current_user)
+    if status is not None:
+        if status not in FEEDBACK_STATUSES:
+            raise ValueError(f"未知 status: {status}")
+        stmt = stmt.where(AssetAiFeedback.status == status)
+    if query_code:
+        stmt = stmt.join(
+            AssetAiAnswerEvent,
+            AssetAiFeedback.answer_event_id == AssetAiAnswerEvent.id,
+        ).where(AssetAiAnswerEvent.query_code == query_code)
+
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    # 186 v1.10 P1-12/T60：submitted_at DESC NULLS LAST, id DESC 稳定排序。
+    # NULL（历史缺时间）排末尾；相同 submitted_at 按 id 降序保证跨页不重不漏。
+    # nullslast() 在 PG 原生支持，SQLite 3.30+ 亦支持（SQLAlchemy 1.4+ 通用）。
+    rows = db.scalars(
+        stmt.order_by(
+            AssetAiFeedback.submitted_at.desc().nullslast(),
+            AssetAiFeedback.id.desc(),
+        )
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    events = {
+        e.id: e
+        for e in db.scalars(
+            select(AssetAiAnswerEvent).where(
+                AssetAiAnswerEvent.id.in_([r.answer_event_id for r in rows])
+            )
+        ).all()
+    } if rows else {}
+    items = [_feedback_list_item(r, events.get(r.answer_event_id)) for r in rows]
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def feedback_readable_by(
+    row: AssetAiFeedback,
+    *,
+    current_user: str | None,
+    has_review_permission: bool,
+) -> bool:
+    """单条读取范围：本人提交，或持 feedback:review（审核队列语义）。
+    旧记录 submitted_by 为空 → 不归属任何普通提交者，仅审核可读。"""
+    if has_review_permission:
+        return True
+    if current_user and row.submitted_by:
+        return row.submitted_by == current_user
+    return False

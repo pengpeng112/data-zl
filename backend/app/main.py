@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-from slowapi import _rate_limit_exceeded_handler
 import logging
 import hashlib
 import time
@@ -298,7 +297,16 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="医院数据资产平台 API", version="0.2.0", lifespan=lifespan)
+# QA ST-021：production 关闭交互式文档与 openapi schema（防 431 端点结构对外枚举）。
+_prod_env = (settings.env or "").strip().lower() in ("prod", "production")
+app = FastAPI(
+    title="医院数据资产平台 API",
+    version="0.2.0",
+    lifespan=lifespan,
+    docs_url=None if _prod_env else "/docs",
+    redoc_url=None if _prod_env else "/redoc",
+    openapi_url=None if _prod_env else "/openapi.json",
+)
 
 is_production = (settings.env or "").strip().lower() == "production"
 
@@ -313,7 +321,27 @@ app.add_middleware(
 
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
-app.add_exception_handler(429, _rate_limit_exceeded_handler)
+
+
+def _rate_limit_envelope_handler(request: Request, exc: Exception) -> JSONResponse:
+    # DEF-09（194）：限流响应统一 {code,message,data} 信封；保留 429 状态、
+    # Retry-After/限流头（exc.headers）与 detail/error 兼容字段。
+    message = "请求过于频繁，请稍后再试"
+    detail = getattr(exc, "detail", None) or message
+    headers = getattr(exc, "headers", None) or {}
+    return JSONResponse(
+        status_code=429,
+        content={
+            "code": 429,
+            "message": detail if isinstance(detail, str) else message,
+            "data": None,
+            "detail": detail if isinstance(detail, str) else message,
+        },
+        headers=headers,
+    )
+
+
+app.add_exception_handler(429, _rate_limit_envelope_handler)
 
 PUBLIC_PREFIXES = ("/health", "/docs", "/openapi", "/redoc", "/api/v1/health", "/api/v1/public")
 PUBLIC_EXACT = {
@@ -331,7 +359,8 @@ ROLE_REQUIRED: dict[str, list[str]] = {
     "ops": ["ops_admin", "platform_admin"],
     "identity": ["identity_admin", "platform_admin"],
     "permissions": ["identity_admin", "platform_admin"],
-    "dict-medical": ["platform_admin"],
+    # 与 /dictionaries 一致：dict_admin 持有 dict.medical.*，不能被粗前缀拦在 platform_admin。
+    "dict-medical": ["platform_admin", "dict_admin"],
     "dictionaries": ["platform_admin", "dict_admin"],
     "govern": ["platform_admin", "approver"],
     "admin": ["platform_admin"],
@@ -386,8 +415,13 @@ def _check_token(db, token: str) -> tuple[bool, str | None, object | None]:
     if not key.token_hash:
         key.token_hash = token_hash
         key.token = None
-    key.last_used_at = datetime.now(timezone.utc)
-    db.commit()
+        db.commit()
+        return True, None, key
+    # QA ST-032：last_used_at 写节流——5 分钟内重复请求不再逐次 commit（写放大）。
+    now_utc = datetime.now(timezone.utc)
+    if key.last_used_at is None or (now_utc - key.last_used_at).total_seconds() > 300:
+        key.last_used_at = now_utc
+        db.commit()
     return True, None, key
 
 
@@ -574,6 +608,8 @@ app.include_router(metrics.router)
 app.include_router(data_products.router)
 app.include_router(ai.router)
 app.include_router(ai_accuracy.router)
+from .api.v1 import datasets as datasets_api  # 193 B05：数据集安全网关出口
+app.include_router(datasets_api.router)
 app.include_router(admin.router)
 app.include_router(governance.router)
 app.include_router(governance_ops.router)

@@ -31,6 +31,7 @@ from ..models.dict_medical_push import (
     DictMedicalPushRun,
 )
 from ..models.asset_system import AssetDataSource
+from ..models.governance_base import AssetActionExecutor
 from ..core.config import settings
 from .dict_medical_push import verify_plan_integrity
 from .medical_code_push import (
@@ -38,8 +39,11 @@ from .medical_code_push import (
     _open_write_connection,
     _resolve_serial_from_whitelisted_sequence,
     _run_write_on_conn,
+    _run_select_on_conn,
     _whitelisted_serial_sequence,
     build_his_diagnosis_insert,
+    build_his_infectious_sync,
+    ACTION_SYNC_INFECTIOUS,
     build_his_operation_insert,
     build_jhemr_diagnosis_contrast_insert,
     build_jhemr_diagnosis_dict_insert,
@@ -102,11 +106,23 @@ def _rebuild_actions(
         item_codes=item_codes,
         max_items=len(item_codes) or 50,
     )
+    if any(a.action_type == ACTION_SYNC_INFECTIOUS for a in stored):
+        if {row["local_code"] for row in rows} != set(item_codes):
+            raise HTTPException(status_code=409, detail="infectious sync selection changed; rebuild plan")
     actions: list[dict[str, Any]] = []
     for row in rows:
         if not row["local_code"] or not row["local_name"]:
             continue
         stored_action_type = next((a.action_type for a in stored if a.item_code == row["local_code"]), "insert")
+        if stored_action_type == ACTION_SYNC_INFECTIOUS:
+            if target_system != TARGET_HIS or plan.category_code != "diagnosis":
+                raise HTTPException(status_code=409, detail="invalid infectious sync target/category")
+            approved = next(a for a in stored if a.item_code == row["local_code"])
+            # Freeze the value approved in this plan, even if a concurrent
+            # platform edit happens after the integrity check.
+            frozen = {**row, "infectious_name": (approved.payload or {}).get("infectious_disease_name")}
+            actions.append(_push_to_dict(build_his_infectious_sync(frozen)))
+            continue
         if stored_action_type == "stop":
             stop = build_stop_action(
                 category_code=plan.category_code,
@@ -191,6 +207,30 @@ def _run_target_transaction(
         target_table = act.get("target_table") or ""
         sql = act.get("sql") or ""
         params = dict(act.get("params") or {})
+        if action_type == ACTION_SYNC_INFECTIOUS:
+            sql = validate_push_sql(sql, action_type=action_type, target_table=target_table)
+            if dialect != "oracle" or act.get("target_system") != TARGET_HIS or params.get("code") != act.get("item_code"):
+                raise HTTPException(status_code=409, detail="invalid infectious sync scope")
+            before = _run_select_on_conn(
+                conn, dialect,
+                "SELECT DIAGNOSIS_NAME_CRB AS crb_name FROM COMM.DIAGNOSIS_DICT "
+                "WHERE DIAGNOSIS_CODE = :code AND ROWNUM <= 2",
+                {"code": params["code"]},
+            )
+            if len(before) != 1:
+                raise HTTPException(status_code=409, detail="infectious sync requires exactly one existing HIS diagnosis")
+            old_value = before[0].get("crb_name")
+            act.setdefault("meta", {})["before_value"] = old_value
+            key = act.get("action_id") or act.get("item_code")
+            if old_value == params.get("crb_name"):
+                row_counts[key] = 0
+                continue
+            params["old_crb_name"] = old_value
+            count = _run_write_on_conn(conn, dialect, sql, params)
+            if count != 1:
+                raise HTTPException(status_code=409, detail="infectious sync row count/concurrent change conflict")
+            row_counts[key] = count
+            continue
         if target_table in {"COMM.DIAGNOSIS_DICT", "COMM.OPERATION_DICT"}:
             cur = conn.cursor()
             try:
@@ -298,8 +338,24 @@ def _actions_requiring_readback(
     """Return only actions that changed a row in the current transaction."""
     return [
         action for action in actions
-        if row_counts.get(action.get("action_id") or action.get("item_code"), 0) != 0
+        if (row_counts.get(action.get("action_id") or action.get("item_code"), 0) != 0
+            or action.get("action_type") == ACTION_SYNC_INFECTIOUS)
     ]
+
+
+def _require_infectious_executor(db: Session, source: AssetDataSource) -> None:
+    """Dedicated registration must be approved separately; never auto-seeded."""
+    executor = db.scalar(select(AssetActionExecutor).where(
+        AssetActionExecutor.executor_code == "his_diagnosis_infectious_sync"
+    ))
+    if (executor is None or not executor.enabled or not executor.require_approval
+            or executor.execution_mode != "sync_executor"
+            or executor.target_system_code != TARGET_HIS
+            or executor.target_source_code != source.source_code
+            or executor.sql_or_endpoint_ref != "COMM.DIAGNOSIS_DICT.DIAGNOSIS_NAME_CRB"
+            or (source.system_code or "").upper() not in {"HIS", TARGET_HIS}
+            or (source.db_type or "").lower() != "oracle"):
+        raise HTTPException(status_code=403, detail="infectious sync executor not registered/enabled for this source and field")
 
 
 def dispatch_target(
@@ -347,6 +403,10 @@ def dispatch_target(
         return {"target_system": target_system, "status": "no_runnable_actions", "total_actions": len(actions)}
 
     source = _target_source(db, target_system, his_source_code=his_source_code, jhemr_source_code=jhemr_source_code)
+    if any(a.get("action_type") == ACTION_SYNC_INFECTIOUS for a in runnable):
+        if not plan.approved_by or plan.approved_by == plan.created_by:
+            raise HTTPException(status_code=403, detail="infectious sync requires independent plan approval")
+        _require_infectious_executor(db, source)
     conn, dialect = _open_write_connection(source)
     row_counts: dict[str, int] = {}
     readback_summary: dict[str, Any] | None = None

@@ -28,6 +28,12 @@ from app.models.identity_sync import (
     IdentityDistributedLock,
     IdentitySchedulerRun,
     IdentityCircuitBreaker,
+    IdentityAccountStateDecision,
+    IdentityAccountStateAttempt,
+    IdentityApprovedScope,
+    IdentityApprovedScopeMember,
+    IdentityWindowBudget,
+    IdentityWindowReservation,
 )
 from app.models.identity import IdentityPerson, IdentityPersonDepartment, IdentityPersonSource
 
@@ -57,6 +63,14 @@ def db_session():
         IdentityPerson.__table__,
         IdentityPersonDepartment.__table__,
         IdentityPersonSource.__table__,
+        # 186 I2/I3：双来源判定与目标尝试表（候选选择/夜跑编排引用）
+        IdentityAccountStateDecision.__table__,
+        IdentityAccountStateAttempt.__table__,
+        # 186 v1.10 P0-11/19/20：门禁注册/批准范围/窗口预算表（selector 引用）
+        IdentityApprovedScope.__table__,
+        IdentityApprovedScopeMember.__table__,
+        IdentityWindowBudget.__table__,
+        IdentityWindowReservation.__table__,
     ]
     Base.metadata.create_all(engine, tables=identity_tables)
     Session = sessionmaker(bind=engine)
@@ -77,6 +91,9 @@ def hmac_test_key(monkeypatch):
     from app.services.identity_hmac import reset_key_cache
     monkeypatch.setenv("TEST_HMAC_KEY", "test-only-hmac-key-not-for-prod")
     monkeypatch.setattr(settings, "identity_hmac_key_ref", "env:TEST_HMAC_KEY")
+    # 186 v1.10 P0-19：本文件回归旧全量 pipeline 行为 → run_mode=full
+    # （observe/disable_only 下旧 create/align/lock 路径全为 skipped/blocked）。
+    monkeypatch.setattr(settings, "identity_run_mode", "full")
     reset_key_cache()
     yield
     reset_key_cache()

@@ -1,9 +1,14 @@
+import hashlib
+
 from fastapi.testclient import TestClient
 from sqlalchemy import delete
 
 from app.core.db import SessionLocal
+from app.main import app
 from app.models.asset_system import AssetDataSource
 from app.models.dict_medical import DictMedicalCodeItem, DictMedicalSyncDiff
+from app.models.governance import ApiKey
+from app.models.governance_base import AssetRole, AssetUserRole
 from app.models.governance_ops import SchedulerJob
 
 
@@ -307,3 +312,64 @@ def test_run_medical_sync_endpoint(monkeypatch, client: TestClient):
 def test_run_medical_sync_retry_404(client: TestClient):
     resp = client.post("/api/v1/dict-medical/sync/jobs/999999999/retry")
     assert resp.status_code == 404
+
+
+def _bind_role_client(admin_client: TestClient, *, user: str, token: str, role_code: str) -> TestClient:
+    """Seed catalog then bind a dedicated API key + role (mirrors 001674 / dict_admin)."""
+    seeded = admin_client.post("/api/v1/permissions/seed?operator=tester")
+    assert seeded.status_code == 200, seeded.text
+    token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+    db = SessionLocal()
+    try:
+        if not db.query(AssetRole).filter(AssetRole.role_code == role_code).first():
+            db.add(AssetRole(role_code=role_code, role_name_cn=role_code, role_type="builtin"))
+        key = db.query(ApiKey).filter(ApiKey.key_name == f"rbac-{user}").first()
+        if not key:
+            db.add(ApiKey(key_name=f"rbac-{user}", token_hash=token_hash, user_identifier=user, enabled=True))
+        else:
+            key.token_hash = token_hash
+            key.user_identifier = user
+            key.enabled = True
+        if not db.query(AssetUserRole).filter(
+            AssetUserRole.user_identifier == user,
+            AssetUserRole.role_code == role_code,
+        ).first():
+            db.add(AssetUserRole(user_identifier=user, role_code=role_code, status="active"))
+        db.commit()
+    finally:
+        db.close()
+    return TestClient(app, headers={"Authorization": f"Bearer {token}"})
+
+
+def test_dict_admin_can_read_medical_code_sets_and_push_config(client: TestClient):
+    """001674 现场：dict_admin 打开诊断手术字典页，GET 不得被粗前缀 403。"""
+    dict_admin = _bind_role_client(
+        client,
+        user="rbac-dict-admin-001674",
+        token="test-token-dict-admin-medical-rbac",
+        role_code="dict_admin",
+    )
+    code_sets = dict_admin.get("/api/v1/dict-medical/code-sets?category_code=diagnosis")
+    assert code_sets.status_code == 200, code_sets.text
+    assert isinstance(code_sets.json().get("data"), list)
+    cfg = dict_admin.get("/api/v1/dict-medical/push/config")
+    assert cfg.status_code == 200, cfg.text
+    assert "push_enabled" in (cfg.json().get("data") or {})
+    rows = dict_admin.get("/api/v1/dict-medical/mapping-rows", params={"category_code": "diagnosis", "page_size": 5})
+    assert rows.status_code == 200, rows.text
+    assert isinstance((rows.json().get("data") or {}).get("items"), list)
+
+
+def test_asset_viewer_cannot_read_medical_code_sets(client: TestClient):
+    viewer = _bind_role_client(
+        client,
+        user="rbac-asset-viewer-medical",
+        token="test-token-asset-viewer-medical-rbac",
+        role_code="asset_viewer",
+    )
+    denied = viewer.get("/api/v1/dict-medical/code-sets?category_code=diagnosis")
+    assert denied.status_code == 403
+    assert denied.json().get("message") == "权限不足"
+    denied_cfg = viewer.get("/api/v1/dict-medical/push/config")
+    assert denied_cfg.status_code == 403
+    assert denied_cfg.json().get("message") == "权限不足"

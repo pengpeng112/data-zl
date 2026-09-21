@@ -4,6 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _legacy_run_mode(monkeypatch):
+    """186 v1.10 P0-19：本文件回归旧科室同步全量行为 → run_mode=full。"""
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "identity_run_mode", "full")
+    yield
+
 from app.services import identity_dept_sync as service
 from app.services.identity_sync_status import aggregate_overall_status
 

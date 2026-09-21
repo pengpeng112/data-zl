@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -94,6 +95,11 @@ def _load_key_material(for_sign: bool) -> str | bytes:
         if not secret or secret == "dev-only-change-me":
             if settings.env not in ("dev", "test", "development"):
                 raise AuthError("生产环境必须配置 APP_JWT_SECRET 或 RS256 密钥", "config", 500)
+            # QA ST-023：非本地档使用占位密钥时响亮警告（共享/演示环境应显式换密钥）。
+            logging.getLogger(__name__).warning(
+                "JWT 使用默认占位密钥（env=%s）——共享/演示环境必须设置 APP_JWT_SECRET，"
+                "否则任何持有公开默认密钥者可伪造令牌。", settings.env,
+            )
         return secret
     path = settings.jwt_private_key_path if for_sign else settings.jwt_public_key_path
     if not path:

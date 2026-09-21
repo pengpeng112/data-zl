@@ -3,7 +3,9 @@
 Target system: CDMS (Oracle 11.2.0.1.0, thick mode required).
 Connection path: local -> SSH jump host (10.10.8.83) -> CDMS Oracle.
 Target tables: T_MSS_EMP_DICT (PK=FLOGINNAME), T_MSS_AUTHMAPPING
-(PK=FAUTHMAPPINGID; subject column FID, authority value column FAUTHORITYID).
+(PK=FAUTHMAPPINGID; subject column FID, authority value column FAUTHORITYID),
+T_MSS_HOSPITALFOFFN (PK=FID; LOGINNAME+HOSPITALAREASCODE+FOFFIN is the
+RoleManage/User page source for 所属科室/角色勾选).
 Write policy: identity_account_sync.
 
 Live-schema verification 2026-08-03 (read-only):
@@ -29,12 +31,15 @@ import logging
 import os
 import subprocess
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import oracledb
 
 from .credential_store import credential_path
+
+from .data_masking import sanitize_text
 
 logger = logging.getLogger(__name__)
 
@@ -100,8 +105,111 @@ _SQL_INSERT_AUTH = (
 )
 
 _SQL_LOCK_USER = (
-    "UPDATE CDMS.T_MSS_EMP_DICT SET FUSERSTATE = '1' WHERE FLOGINNAME = :emp_no"
+    "UPDATE CDMS.T_MSS_EMP_DICT SET FUSERSTATE = '1', FCHANGEDATE = SYSDATE "
+    "WHERE FLOGINNAME = :emp_no AND FUSERSTATE = '0'"
 )
+
+# 186 v1.10 §13.3/P0-17：受控恢复 '1'→'0' 的 CAS 变体。FCHANGEDATE 与
+# 停用时记录的原始值一起作为 WHERE 条件（绑定 datetime），目标行在停用
+# 之后被再次改动（哪怕同秒人工重锁后状态又回到 '1' 且时间变化）时
+# rowcount=0 → attribution_target_changed，绝不无条件覆盖。
+_SQL_UNLOCK_USER_CAS = (
+    "UPDATE CDMS.T_MSS_EMP_DICT SET FUSERSTATE = '0', FCHANGEDATE = SYSDATE "
+    "WHERE FLOGINNAME = :emp_no AND FUSERSTATE = '1' AND FCHANGEDATE = :expected_changed"
+)
+
+_SQL_COUNT_HOSPITALFOFFN = (
+    "SELECT COUNT(*) AS CNT FROM CDMS.T_MSS_HOSPITALFOFFN "
+    "WHERE LOGINNAME = :emp_no"
+)
+
+_SQL_INSERT_HOSPITALFOFFN = (
+    "INSERT INTO CDMS.T_MSS_HOSPITALFOFFN "
+    "(FID, LOGINNAME, HOSPITALAREASCODE, FOFFIN, ISDEFAULTFOFFIN, FREE1, FREE2, FREE3) "
+    "VALUES (:fid, :emp_no, :hosp, :dept, 1, :free1, '1', '1')"
+)
+
+_SQL_TOFFIM_FTYPE = (
+    "SELECT FTYPE FROM CDMS.TOFFIM WHERE FOFFN = :dept AND ROWNUM <= 1"
+)
+
+
+def _normalize_dept_type(raw: Any) -> str:
+    """Map TOFFIM.FTYPE to RoleManage 所属科室类别: I/O/T/H."""
+    value = str(raw or "").strip()
+    if value in {"I", "O", "T", "H"}:
+        return value
+    return "T" if value else "I"
+
+
+def _normalize_raw_time(value: Any) -> str | None:
+    """186 v1.10 §13.3：目标侧时间原始值规范化（仅变更检测用）。
+
+    datetime → isoformat() 字符串；str → strip()；None → None；其余类型 →
+    str()。不做时区换算、不做容差——时间一致不是锁所有权证明，只是变更
+    检测输入（所有权证据在编排/门禁层）。
+    """
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, str):
+        return value.strip()
+    return str(value)
+
+
+# _fetch_user_state 的规范小写键（P0-16）：真实 oracledb cursor.description
+# 的列名随 Oracle 端返回大写；读路径统一按大小写不敏感映射到这三个名字。
+_USER_STATE_CANONICAL_KEYS = ("floginname", "fuserstate", "fchangedate")
+
+
+def _ensure_hospitalfoffn(
+    cursor: Any,
+    *,
+    emp_no: str,
+    dept_code: str,
+    hospital_area: str,
+) -> dict[str, str]:
+    """Idempotent insert of the RoleManage/User courtyard-dept row.
+
+    XTWH may lack TOFFIM (ORA-00942); use SAVEPOINT so a missing dictionary
+    does not poison the surrounding identity transaction.
+    """
+    dept = str(dept_code or "").strip()
+    if not dept or dept == "0":
+        return {"action": "skip", "reason": "no_dept"}
+    cursor.execute(_SQL_COUNT_HOSPITALFOFFN, {"emp_no": emp_no})
+    count_row = cursor.fetchone()
+    if count_row and int(count_row[0]) > 0:
+        return {"action": "skip", "reason": "exists"}
+
+    free1 = "I"
+    cursor.execute("SAVEPOINT sp_toffim_ftype")
+    try:
+        cursor.execute(_SQL_TOFFIM_FTYPE, {"dept": dept})
+        type_row = cursor.fetchone()
+        if type_row:
+            free1 = _normalize_dept_type(type_row[0])
+    except Exception:
+        cursor.execute("ROLLBACK TO SAVEPOINT sp_toffim_ftype")
+
+    hosp = str(hospital_area or CDMS_BASE_TEMPLATE["HOSPITALAREACODE"]).strip() or "A00001"
+    cursor.execute("SAVEPOINT sp_hospitalfoffn")
+    try:
+        cursor.execute(
+            _SQL_INSERT_HOSPITALFOFFN,
+            {
+                "fid": uuid.uuid4().hex.upper(),
+                "emp_no": emp_no,
+                "hosp": hosp,
+                "dept": dept,
+                "free1": free1,
+            },
+        )
+        return {"action": "insert", "table": "T_MSS_HOSPITALFOFFN", "foffin": dept, "free1": free1}
+    except Exception as exc:
+        cursor.execute("ROLLBACK TO SAVEPOINT sp_hospitalfoffn")
+        return {"action": "skip", "reason": sanitize_text(str(exc), limit=160)}
 
 
 def _strip_sensitive(data: dict[str, Any]) -> dict[str, Any]:
@@ -495,6 +603,17 @@ class CdmsIdentityAdapter:
 
             # (f) FTYPE=8 and FTYPE=32 are intentionally NOT written
 
+            # (f2) RoleManage/User 读 T_MSS_HOSPITALFOFFN；缺行则角色/所属科室整段空白。
+            hf = _ensure_hospitalfoffn(
+                cursor,
+                emp_no=emp_no,
+                dept_code=dept_code,
+                hospital_area=CDMS_BASE_TEMPLATE["HOSPITALAREACODE"],
+            )
+            actions_log.append(hf)
+            if hf.get("action") == "insert":
+                rows_affected["T_MSS_HOSPITALFOFFN"] = 1
+
             # (g) Read-back verify before commit
             cursor.execute(_SQL_SELECT_EMP, {"emp_no": emp_no})
             verify_emp = cursor.fetchone()
@@ -524,11 +643,12 @@ class CdmsIdentityAdapter:
                 conn.rollback()
             except Exception:
                 logger.debug("rollback error", exc_info=True)
-            actions_log.append({"action": "rollback", "error": str(exc)})
-            logger.error("CDMS apply_single_user failed for emp_no=%s: %s", emp_no, exc)
+            # QA ST-012：异常原文过 sanitize_text，防 ORA 错误内嵌 SQL/绑定值入库存档。
+            actions_log.append({"action": "rollback", "error": sanitize_text(str(exc), limit=300)})
+            logger.error("CDMS apply_single_user failed for emp_no=%s: %s", emp_no, sanitize_text(str(exc), limit=300))
             return {
                 "status": "failed",
-                "reason": str(exc),
+                "reason": sanitize_text(str(exc), limit=300),
                 "rows_affected": rows_affected,
                 "actions": actions_log,
             }
@@ -595,27 +715,57 @@ class CdmsIdentityAdapter:
             missing = [pair for pair in required if pair not in verified]
             if missing:
                 raise RuntimeError("CDMS permission read-back mismatch")
+            hf = _ensure_hospitalfoffn(
+                cursor,
+                emp_no=emp_no,
+                dept_code=dept_code,
+                hospital_area=CDMS_BASE_TEMPLATE["HOSPITALAREACODE"],
+            )
+            actions.append(hf)
             conn.commit()
             return {"status": "success", "actions": actions, "aligned": True}
         except Exception as exc:
             conn.rollback()
-            return {"status": "failed", "reason": f"{type(exc).__name__}: {str(exc)[:200]}", "rolled_back": True}
+            return {"status": "failed", "reason": sanitize_text(f"{type(exc).__name__}: {str(exc)[:200]}", limit=250), "rolled_back": True}
         finally:
             cursor.close()
 
     def lock_user(self, emp_no: str) -> dict[str, Any]:
-        """Lock a CDMS account by setting FUSERSTATE=1 (lock, not delete)."""
+        """Lock a CDMS account: FUSERSTATE '0'→'1' (lock, never delete).
+
+        186 v1.10 P0-16: the row is taken with SELECT ... FOR UPDATE and read
+        through :meth:`_fetch_user_state` (canonical lower-case keys built
+        case-insensitively from the real cursor description — the legacy
+        lower()-then-uppercase-read path crashed on real cursors). Conditional
+        update (expected old state '0'), 0-row classification, pre-commit
+        read-back. FCHANGEDATE=SYSDATE is written and returned raw
+        (``changed_at_raw``) as the precise change-detection evidence for
+        the controlled unlock path; no tolerance is ever applied to it.
+        """
         conn = self._require_conn()
         cursor = conn.cursor()
         try:
+            current = self._fetch_user_state(cursor, emp_no, for_update=True)
+            if current is None:
+                return {"status": "missing_target", "emp_no": emp_no}
+            if str(current.get("fuserstate")).strip() == "1":
+                return {"status": "skipped", "reason": "already_locked", "emp_no": emp_no}
             cursor.execute(_SQL_LOCK_USER, {"emp_no": emp_no})
             affected = cursor.rowcount
+            if affected != 1:
+                raise RuntimeError(f"lock update affected {affected} rows; expected 1")
+            verified = self._fetch_user_state(cursor, emp_no)
+            if verified is None or str(verified.get("fuserstate")).strip() != "1":
+                raise RuntimeError("lock read-back mismatch")
             conn.commit()
             logger.info("CDMS account locked: emp_no=%s, rows=%d", emp_no, affected)
             return {
-                "status": "success" if affected > 0 else "not_found",
+                "status": "success",
                 "rows_affected": affected,
                 "emp_no": emp_no,
+                # 兼容键保留；原始值见 changed_at_raw（精确比对用，无容差）。
+                "changed_at": str(verified.get("fchangedate") or ""),
+                "changed_at_raw": _normalize_raw_time(verified.get("fchangedate")),
             }
         except Exception as exc:
             try:
@@ -623,7 +773,160 @@ class CdmsIdentityAdapter:
             except Exception:
                 logger.debug("rollback error", exc_info=True)
             logger.error("CDMS lock_user failed for emp_no=%s: %s", emp_no, exc)
-            return {"status": "failed", "reason": str(exc), "emp_no": emp_no}
+            return {"status": "failed", "reason": sanitize_text(str(exc), limit=300), "emp_no": emp_no}
+        finally:
+            cursor.close()
+
+    def _fetch_user_state(
+        self,
+        cursor: Any,
+        emp_no: str,
+        *,
+        for_update: bool = False,
+    ) -> dict[str, Any] | None:
+        """Read FLOGINNAME/FUSERSTATE/FCHANGEDATE into canonical lower-case keys.
+
+        186 v1.10 P0-16（全链修复）：真实 oracledb cursor.description 报告
+        Oracle 端的大写列名；此前 cols 被 lower() 而调用方读大写键，真实
+        cursor 路径必然 KeyError。现从 cursor.description 逐列大小写不敏感
+        映射到 {floginname, fuserstate, fchangedate}（未知列忽略）。写路径
+        传 ``for_update=True`` 加行锁。
+        """
+        sql = (
+            "SELECT FLOGINNAME, FUSERSTATE, FCHANGEDATE FROM CDMS.T_MSS_EMP_DICT "
+            "WHERE FLOGINNAME = :emp_no"
+        )
+        if for_update:
+            sql += " FOR UPDATE"
+        cursor.execute(sql, {"emp_no": emp_no})
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        state: dict[str, Any] = {}
+        for desc, value in zip(cursor.description, row):
+            canonical = str(desc[0]).strip().lower()
+            if canonical in _USER_STATE_CANONICAL_KEYS and canonical not in state:
+                state[canonical] = value
+        return state
+
+    def read_account_state(self, emp_no: str) -> dict[str, Any] | None:
+        """186 I3：读单个 CDMS 账号状态（规范小写键，FCHANGEDATE 供归因）。"""
+        conn = self._require_conn()
+        cursor = conn.cursor()
+        try:
+            return self._fetch_user_state(cursor, emp_no)
+        finally:
+            cursor.close()
+
+    def unlock_user(
+        self,
+        emp_no: str,
+        *,
+        origin_disable: dict | None = None,
+    ) -> dict[str, Any]:
+        """186 v1.10 §13.3/P0-17：受控恢复 FUSERSTATE '1'→'0'（变更检测 CAS）。
+
+        语义边界：只验证“平台持久停用证据（origin_disable）中的目标原始
+        时间值与当前行 FCHANGEDATE 精确不变”，并用 CAS 条件更新
+        （FUSERSTATE='1' AND FCHANGEDATE=:expected_changed）落库。时间一致
+        不证明锁归本规则所有——所有权证据在编排/门禁层；这里承担目标行
+        未被再次修改的变更检测（先比对再 UPDATE，双保险）。
+
+        origin_disable keys：``attempt_id``(int)、``target_raw_time``(str|None)、
+        ``target_account_fingerprint``(str)、``rule_version``(str)。
+        - state=='0' → skipped already_enabled；state!='1' → blocked
+          unexpected_state。
+        - origin 缺失 / target_raw_time 缺失 / 当前行 FCHANGEDATE 缺失 /
+          origin raw 不是可解析的 ISO 时间 → blocked attribution_unknown。
+        - 当前原始值与 origin 原始值精确比对（同一规范化后字符串全等，无
+          ±容差、无时区换算）不等 → blocked attribution_target_changed。
+        - CAS UPDATE rowcount==0 → blocked attribution_target_changed（并发
+          修改，rollback）；rowcount>1 → raise 回滚。不重设密码、不改角色。
+        """
+        conn = self._require_conn()
+        cursor = conn.cursor()
+        try:
+            current = self._fetch_user_state(cursor, emp_no, for_update=True)
+            if current is None:
+                return {"status": "missing_target", "emp_no": emp_no}
+            state = str(current.get("fuserstate")).strip()
+            if state == "0":
+                return {"status": "skipped", "reason": "already_enabled", "emp_no": emp_no}
+            if state != "1":
+                return {"status": "blocked", "reason": "unexpected_state", "emp_no": emp_no}
+
+            origin_raw = (
+                origin_disable.get("target_raw_time")
+                if origin_disable is not None
+                else None
+            )
+            origin_raw_text = _normalize_raw_time(origin_raw)
+            current_raw = _normalize_raw_time(current.get("fchangedate"))
+            if (
+                origin_disable is None
+                or origin_raw_text is None
+                or current_raw is None
+            ):
+                return {
+                    "status": "blocked",
+                    "reason": "attribution_unknown",
+                    "lock_attribution": "manual_or_unknown",
+                    "emp_no": emp_no,
+                }
+            if origin_raw_text != current_raw:
+                return {
+                    "status": "blocked",
+                    "reason": "attribution_target_changed",
+                    "lock_attribution": "manual_or_unknown",
+                    "emp_no": emp_no,
+                }
+
+            # CAS 绑定值必须是 datetime（与 Oracle FCHANGEDATE 可比）。
+            if isinstance(origin_raw, datetime):
+                expected_changed = origin_raw
+            else:
+                try:
+                    expected_changed = datetime.fromisoformat(origin_raw_text)
+                except ValueError:
+                    return {
+                        "status": "blocked",
+                        "reason": "attribution_unknown",
+                        "lock_attribution": "manual_or_unknown",
+                        "emp_no": emp_no,
+                    }
+
+            cursor.execute(
+                _SQL_UNLOCK_USER_CAS,
+                {"emp_no": emp_no, "expected_changed": expected_changed},
+            )
+            affected = cursor.rowcount
+            if affected == 0:
+                conn.rollback()
+                return {
+                    "status": "blocked",
+                    "reason": "attribution_target_changed",
+                    "lock_attribution": "manual_or_unknown",
+                    "emp_no": emp_no,
+                }
+            if affected > 1:
+                raise RuntimeError(f"unlock update affected {affected} rows; expected 1")
+            verified = self._fetch_user_state(cursor, emp_no)
+            if verified is None or str(verified.get("fuserstate")).strip() != "0":
+                raise RuntimeError("unlock read-back mismatch")
+            conn.commit()
+            return {
+                "status": "success",
+                "rows_affected": affected,
+                "emp_no": emp_no,
+                "lock_attribution": "by_this_rule",
+                "origin_disable_attempt_id": origin_disable["attempt_id"],
+            }
+        except Exception as exc:
+            try:
+                conn.rollback()
+            except Exception:
+                logger.debug("rollback error", exc_info=True)
+            return {"status": "failed", "reason": sanitize_text(str(exc), limit=300), "emp_no": emp_no}
         finally:
             cursor.close()
 

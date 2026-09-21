@@ -155,6 +155,58 @@ def list_runs(
     return ApiResponse(data=list_sync_runs(db, page=page, page_size=page_size, status=status, emp_no=emp_no))
 
 
+def _account_state_run_detail(db: Session, run_id: str) -> dict[str, Any]:
+    """186 v1.10 P1-10：run 详情中的账号启停 attempt 明细与行级计数。
+
+    只读查询，页面打开零写副作用；不含 fingerprint 全文（仅短指纹）。
+    success/partial 等聚合状态在编排层判定，这里只做行级计数。
+    """
+    from collections import Counter
+
+    from sqlalchemy import select
+
+    from ...models.identity_sync import IdentityAccountStateAttempt
+    from ...services.identity_sync_status import short_fingerprint
+
+    attempts = db.scalars(
+        select(IdentityAccountStateAttempt)
+        .where(IdentityAccountStateAttempt.run_id == run_id)
+        .order_by(
+            IdentityAccountStateAttempt.person_code,
+            IdentityAccountStateAttempt.target_system,
+            IdentityAccountStateAttempt.id,
+        )
+        .limit(2000)
+    ).all()
+    items = [
+        {
+            "person_code": a.person_code,
+            "target_system": a.target_system,
+            "action": a.action,
+            "status": a.status,
+            "reason_code": a.reason_code,
+            "transition_seq": a.transition_seq,
+            "desired_state": a.desired_state,
+            "after_state": a.after_state,
+            "lock_attribution": a.lock_attribution,
+            "origin_disable_attempt_id": a.origin_disable_attempt_id,
+            "short_fingerprint": short_fingerprint(a.target_account_fingerprint),
+            "executed_at": a.executed_at.isoformat() if a.executed_at else None,
+        }
+        for a in attempts
+    ]
+    by_status = Counter(a.status or "unknown" for a in attempts)
+    by_target = Counter(a.target_system or "unknown" for a in attempts)
+    return {
+        "account_state_attempts": items,
+        "account_state_summary": {
+            "total_attempts": len(items),
+            "by_status": dict(sorted(by_status.items())),
+            "by_target_system": dict(sorted(by_target.items())),
+        },
+    }
+
+
 @router.get("/runs/{run_id}", summary="单次同步运行详情")
 def get_run(run_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)) -> ApiResponse[dict]:
     from ...services.identity_sync_log import get_sync_run
@@ -162,6 +214,9 @@ def get_run(run_id: str, db: Session = Depends(get_db), user=Depends(get_current
     data = get_sync_run(db, run_id)
     if not data:
         raise HTTPException(status_code=404, detail="同步运行记录不存在")
+    # 186 v1.10 P1-10：补 IdentityAccountStateAttempt 逐人/逐目标/代次明细
+    # 与行级计数；旧 IdentitySyncAction 序列化字段全部保留不动。
+    data.update(_account_state_run_detail(db, run_id))
     return ApiResponse(data=data)
 
 
