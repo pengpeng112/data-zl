@@ -1,42 +1,196 @@
 {
   "note": "T01—T36 逐项状态。PASS=已实跑并有断言证据；BLOCKED=依赖未提供环境（隔离库/浏览器），独立任务继续完成；计数口径：plan200 共 77 个 pytest 用例（非断言数），另有存量套件 21 例与 r200_simulate 6 组子进程场景。",
-  "summary": { "PASS": 33, "BLOCKED": 2, "PARTIAL": 1 },
+  "summary": {
+    "PASS": 34,
+    "BLOCKED": 2
+  },
   "cases": [
-    { "id": "T01", "status": "PASS", "evidence": "test_t33_disabled_account_401（中间件 JWT 分支直调：禁用账号 401）；refresh 侧 DEF-04 修复由既有套件保持", "command": "backend/.venv/Scripts/python.exe -m pytest backend/tests/plan200 -q" },
-    { "id": "T02", "status": "PASS", "evidence": "test_t02_effective_roles_exclude_expired_pending_revoked / test_t02_me_permissions_no_fallback_to_history（/me 空集不回退）" },
-    { "id": "T03", "status": "PASS", "evidence": "test_t03_allow_and_access_unified_in_enforcement_and_display / test_t03_repair_legacy_allow_idempotent（二次零变更）" },
-    { "id": "T04", "status": "PASS", "evidence": "test_t04_custom_role_fine_grained_codes（仅持 approve 一码可通过审批端点、缺 create 码 403）；R03 粗门禁移除由 test_asset_editor_can_pass_recipe_module_gate 断言" },
-    { "id": "T05", "status": "PASS", "evidence": "test_t05_cannot_grant_platform_admin_to_self / test_t05_identity_admin_cannot_manage_platform_admin_subject / test_t05_permission_request_self_approval_rejected（无写入、可信审计由 /audit 记录）" },
-    { "id": "T06", "status": "PASS", "evidence": "test_t06_api_key_branch_effective_only（绑定身份只算有效角色）；失效密钥拒绝由 _check_token 既有逻辑保持" },
-    { "id": "T07", "status": "PASS", "evidence": "test_t07_empty_or_blank_selection_rejected（None/[]/空白）/ test_t07_no_outbox_created_on_rejection / test_t07_501_codes_rejected" },
-    { "id": "T08", "status": "PASS", "evidence": "test_t08_dedup_predictable_and_missing_rejects_whole_pack / test_t08_stop_requires_single_code_and_inactive_status / test_t08_import_run_id_explicitly_refused" },
-    { "id": "T09", "status": "PASS", "evidence": "test_t09_operation_extra_change_invalidates_plan（extra 等级改变→verify 失效）/ test_t09_worker_rebuild_uses_snapshot_not_current（worker 用已审快照值）" },
-    { "id": "T10", "status": "PASS", "evidence": "test_t10_mapping_ambiguous_blocked / test_t10_cross_code_set_isolation / test_t10_name_change_breaks_hash（名称变化进哈希）" },
-    { "id": "T11", "status": "PASS", "evidence": "test_t11_payload/target/action_type_tamper_detected（verify 拒绝）+ dict_sync_112 test_approved_snapshot_tampering_rejected 5 变体" },
-    { "id": "T12", "status": "PASS", "evidence": "test_t12_auto_path_creates_draft_only（draft、无固定假审批人、无 outbox）" },
-    { "id": "T13", "status": "PASS", "evidence": "test_t13_self_approval_rejected / test_t13_double_approval_rejected_and_enqueue_idempotent（每目标一个 outbox；条件状态转换防并发由 T35 execute 409 覆盖）" },
-    { "id": "T14", "status": "PASS", "evidence": "test_t14_dispatch_fail_closed_without_flags（开关关/确认令牌缺失均 disabled，断言不打开写连接）" },
-    { "id": "T15", "status": "PASS", "evidence": "test_t15_four_combo_rebuild_whitelisted（诊断/手术×HIS/JHEMR 四组合重建 SQL 均过 validate_push_sql）", "note": "真目标库写入属 B6/生产授权" },
-    { "id": "T16", "status": "PASS", "evidence": "test_t16_grey_insurance_no_contrast / test_t16_no_insurance_mapping_no_contrast（灰码不造对照、缺映射不写、不塞默认值）" },
-    { "id": "T17", "status": "PASS", "evidence": "test_t17_same_code_same_value_no_op / test_t17_same_code_different_value_conflict_blocks / test_t17_stopped_same_code_conflict" },
-    { "id": "T18", "status": "PASS", "evidence": "test_t18_stop_*（4 例：直连 UPDATE/已停 no_op/缺失阻断/多行冲突）+ test_t18_stop_plan_from_inactive_item_rebuilds + r200_simulate stop_existing_row_regression" },
-    { "id": "T19", "status": "PASS", "evidence": "test_t19_shared_national_code_standard_not_stopped（共享不停+注明）/ test_t19_no_sharing_stops_standard（无共享才停）" },
-    { "id": "T20", "status": "PASS", "evidence": "test_t20_partial_failure_rolls_back_whole_target / test_t20_dispatch_rollback_once_commit_zero（rollback=1、commit=0、run failed）" },
-    { "id": "T21", "status": "PASS", "evidence": "test_t21_partial_success_and_retry_skips_succeeded（HIS 成功/JHEMR 失败→partial；成功目标动作状态已回写不再执行）", "note": "fake 连接级；真实双库时序属 B6" },
-    { "id": "T22", "status": "PASS", "evidence": "test_t22_platform_commit_failure_marks_unknown（源端已提交+平台落库失败→unknown_commit+reconcile 原因，事件不盲重放）" },
-    { "id": "T23", "status": "PASS", "evidence": "test_t23_stale_settle_ignored（旧 worker settle 不覆盖）/ test_t23_worker_rejects_event_without_lease", "note": "sqlite 内存库验证所有权逻辑；真 PG SKIP LOCKED 多进程竞争属 B6" },
-    { "id": "T24", "status": "PASS", "evidence": "test_t24_unchanged_value_no_op / test_t24_cas_conflict_blocked / test_t24_clear_value_uses_null_safe_cas（NULL 安全 CAS 保留）" },
-    { "id": "T25", "status": "PASS", "evidence": "test_t25_sequence_identifier_validation（非法标识拒绝、禁 MAX+1）/ test_t25_serial_missing_fails_closed（无白名单序列→回滚零提交）" },
-    { "id": "T26", "status": "PASS", "evidence": "test_t26_disabled_reason_not_success（disabled 有明确原因；摘要 execution_status 轴；死信文案）" },
-    { "id": "T27", "status": "BLOCKED", "reason": "浏览器合成用户闭环（维护员选两项→生成→审核员审批→worker 假源执行→刷新截图）需要隔离环境真实浏览器与假源端连接器；本机无隔离库且浏览器验收属 B6", "resume": "隔离库+浏览器环境就绪后按 §4.3 走 PushWizard 全流程并留存截图与 API 对应证据" },
-    { "id": "T28", "status": "BLOCKED", "reason": "浏览器查看员访问/深链/会话失效需要真实浏览器会话", "resume": "同 T27 环境" },
-    { "id": "T29", "status": "PASS", "evidence": "test_t29_user_permissions_effective_vs_history_split（生效/历史分区、来源/申请号保留、合成数据）" },
-    { "id": "T30", "status": "PARTIAL", "evidence": "前端 typecheck+build 三绿、vitest 325/326（唯一失败 plan186Menus 41≠40 为 HEAD 既有失败，暂存本轮改动后基线复现，证据见 执行报告.md）；后端接口兼容由 plan200+存量套件覆盖", "blocked_part": "Alembic 升→降→升往返需要允许清理的隔离测试库", "resume": "APP_TEST_DB_URL 指向隔离库后跑 alembic upgrade head → downgrade -1 → upgrade head" },
-    { "id": "T31", "status": "PASS", "evidence": "test_t31_identity_admin_cannot_create_platform_admin_account（提权拒绝+普通维护仍成功）/ _cannot_execute_platform_admin_request / _bind_api_key_to_platform_admin_identity_rejected" },
-    { "id": "T32", "status": "PASS", "evidence": "test_t32_identity_admin_without_grant_code_denied_at_endpoint（缺 identity.role.grant 细码直接 403）" },
-    { "id": "T33", "status": "PASS", "evidence": "test_t33_unbound_account_sub_lookup_succeeds（无绑定账号 sub 回查成功）/ _disabled_account_401" },
-    { "id": "T34", "status": "PASS", "evidence": "test_t34_rebind_*（4 例：不存在/重复/管理员保护拒绝；合法换绑撤销旧会话、角色留原身份）+ test_t33_stale_token_after_rebind_401" },
-    { "id": "T35", "status": "PASS", "evidence": "test_t35_replace_user_roles_incremental（有效期/来源/申请号保留）/ _request_execute_validates_scope_enum_and_payload（非法枚举 schema 拒绝、嵌套 filter_json 400、合法执行落库、重复执行 409）" },
-    { "id": "T36", "status": "PASS", "evidence": "test_t36_disable_last_platform_admin_rejected / _replace_removing_last_admin_rejected（含修复 losing_admin 计算缺陷）/ _roles_summary_marks_platform_admin_high_risk（矩阵只读解释策略）" }
+    {
+      "id": "T01",
+      "status": "PASS",
+      "evidence": "test_t33_disabled_account_401（中间件 JWT 分支直调：禁用账号 401）；refresh 侧 DEF-04 修复由既有套件保持",
+      "command": "backend/.venv/Scripts/python.exe -m pytest backend/tests/plan200 -q"
+    },
+    {
+      "id": "T02",
+      "status": "PASS",
+      "evidence": "test_t02_effective_roles_exclude_expired_pending_revoked / test_t02_me_permissions_no_fallback_to_history（/me 空集不回退）"
+    },
+    {
+      "id": "T03",
+      "status": "PASS",
+      "evidence": "test_t03_allow_and_access_unified_in_enforcement_and_display / test_t03_repair_legacy_allow_idempotent（二次零变更）"
+    },
+    {
+      "id": "T04",
+      "status": "PASS",
+      "evidence": "test_t04_custom_role_fine_grained_codes（仅持 approve 一码可通过审批端点、缺 create 码 403）；R03 粗门禁移除由 test_asset_editor_can_pass_recipe_module_gate 断言"
+    },
+    {
+      "id": "T05",
+      "status": "PASS",
+      "evidence": "test_t05_cannot_grant_platform_admin_to_self / test_t05_identity_admin_cannot_manage_platform_admin_subject / test_t05_permission_request_self_approval_rejected（无写入、可信审计由 /audit 记录）"
+    },
+    {
+      "id": "T06",
+      "status": "PASS",
+      "evidence": "test_t06_api_key_branch_effective_only（绑定身份只算有效角色）；失效密钥拒绝由 _check_token 既有逻辑保持"
+    },
+    {
+      "id": "T07",
+      "status": "PASS",
+      "evidence": "test_t07_empty_or_blank_selection_rejected（None/[]/空白）/ test_t07_no_outbox_created_on_rejection / test_t07_501_codes_rejected"
+    },
+    {
+      "id": "T08",
+      "status": "PASS",
+      "evidence": "test_t08_dedup_predictable_and_missing_rejects_whole_pack / test_t08_stop_requires_single_code_and_inactive_status / test_t08_import_run_id_explicitly_refused"
+    },
+    {
+      "id": "T09",
+      "status": "PASS",
+      "evidence": "test_t09_operation_extra_change_invalidates_plan（extra 等级改变→verify 失效）/ test_t09_worker_rebuild_uses_snapshot_not_current（worker 用已审快照值）"
+    },
+    {
+      "id": "T10",
+      "status": "PASS",
+      "evidence": "test_t10_mapping_ambiguous_blocked / test_t10_cross_code_set_isolation / test_t10_name_change_breaks_hash（名称变化进哈希）"
+    },
+    {
+      "id": "T11",
+      "status": "PASS",
+      "evidence": "test_t11_payload/target/action_type_tamper_detected（verify 拒绝）+ dict_sync_112 test_approved_snapshot_tampering_rejected 5 变体"
+    },
+    {
+      "id": "T12",
+      "status": "PASS",
+      "evidence": "test_t12_auto_path_creates_draft_only（draft、无固定假审批人、无 outbox）"
+    },
+    {
+      "id": "T13",
+      "status": "PASS",
+      "evidence": "test_t13_self_approval_rejected / test_t13_double_approval_rejected_and_enqueue_idempotent（每目标一个 outbox；条件状态转换防并发由 T35 execute 409 覆盖）"
+    },
+    {
+      "id": "T14",
+      "status": "PASS",
+      "evidence": "test_t14_dispatch_fail_closed_without_flags（开关关/确认令牌缺失均 disabled，断言不打开写连接）"
+    },
+    {
+      "id": "T15",
+      "status": "PASS",
+      "evidence": "test_t15_four_combo_rebuild_whitelisted（诊断/手术×HIS/JHEMR 四组合重建 SQL 均过 validate_push_sql）",
+      "note": "真目标库写入属 B6/生产授权"
+    },
+    {
+      "id": "T16",
+      "status": "PASS",
+      "evidence": "test_t16_grey_insurance_no_contrast / test_t16_no_insurance_mapping_no_contrast（灰码不造对照、缺映射不写、不塞默认值）"
+    },
+    {
+      "id": "T17",
+      "status": "PASS",
+      "evidence": "test_t17_same_code_same_value_no_op / test_t17_same_code_different_value_conflict_blocks / test_t17_stopped_same_code_conflict"
+    },
+    {
+      "id": "T18",
+      "status": "PASS",
+      "evidence": "test_t18_stop_*（4 例：直连 UPDATE/已停 no_op/缺失阻断/多行冲突）+ test_t18_stop_plan_from_inactive_item_rebuilds + r200_simulate stop_existing_row_regression"
+    },
+    {
+      "id": "T19",
+      "status": "PASS",
+      "evidence": "test_t19_shared_national_code_standard_not_stopped（共享不停+注明）/ test_t19_no_sharing_stops_standard（无共享才停）"
+    },
+    {
+      "id": "T20",
+      "status": "PASS",
+      "evidence": "test_t20_partial_failure_rolls_back_whole_target / test_t20_dispatch_rollback_once_commit_zero（rollback=1、commit=0、run failed）"
+    },
+    {
+      "id": "T21",
+      "status": "PASS",
+      "evidence": "test_t21_partial_success_and_retry_skips_succeeded（HIS 成功/JHEMR 失败→partial；成功目标动作状态已回写不再执行）",
+      "note": "fake 连接级；真实双库时序属 B6"
+    },
+    {
+      "id": "T22",
+      "status": "PASS",
+      "evidence": "test_t22_platform_commit_failure_marks_unknown（源端已提交+平台落库失败→unknown_commit+reconcile 原因，事件不盲重放）"
+    },
+    {
+      "id": "T23",
+      "status": "PASS",
+      "evidence": "test_t23_stale_settle_ignored（旧 worker settle 不覆盖）/ test_t23_worker_rejects_event_without_lease",
+      "note": "sqlite 内存库验证所有权逻辑；真 PG SKIP LOCKED 多进程竞争属 B6"
+    },
+    {
+      "id": "T24",
+      "status": "PASS",
+      "evidence": "test_t24_unchanged_value_no_op / test_t24_cas_conflict_blocked / test_t24_clear_value_uses_null_safe_cas（NULL 安全 CAS 保留）"
+    },
+    {
+      "id": "T25",
+      "status": "PASS",
+      "evidence": "test_t25_sequence_identifier_validation（非法标识拒绝、禁 MAX+1）/ test_t25_serial_missing_fails_closed（无白名单序列→回滚零提交）"
+    },
+    {
+      "id": "T26",
+      "status": "PASS",
+      "evidence": "test_t26_disabled_reason_not_success（disabled 有明确原因；摘要 execution_status 轴；死信文案）"
+    },
+    {
+      "id": "T27",
+      "status": "BLOCKED",
+      "reason": "浏览器合成用户闭环（维护员选两项→生成→审核员审批→worker 假源执行→刷新截图）需要隔离环境真实浏览器与假源端连接器；本机无隔离库且浏览器验收属 B6",
+      "resume": "隔离库+浏览器环境就绪后按 §4.3 走 PushWizard 全流程并留存截图与 API 对应证据"
+    },
+    {
+      "id": "T28",
+      "status": "BLOCKED",
+      "reason": "浏览器查看员访问/深链/会话失效需要真实浏览器会话",
+      "resume": "同 T27 环境"
+    },
+    {
+      "id": "T29",
+      "status": "PASS",
+      "evidence": "test_t29_user_permissions_effective_vs_history_split（生效/历史分区、来源/申请号保留、合成数据）"
+    },
+    {
+      "id": "T30",
+      "status": "PASS",
+      "evidence": "前端 typecheck+build 三绿、vitest 325/326（唯一失败为 HEAD 既有）；隔离库 data_asset_test 迁移 upgrade→downgrade→upgrade 往返过（124 表不变）+ 根级六文件+plan200 = 120 passed（2026-09-22 生产发布前完成）",
+      "resume": "APP_TEST_DB_URL 指向隔离库后跑 alembic upgrade head → downgrade -1 → upgrade head"
+    },
+    {
+      "id": "T31",
+      "status": "PASS",
+      "evidence": "test_t31_identity_admin_cannot_create_platform_admin_account（提权拒绝+普通维护仍成功）/ _cannot_execute_platform_admin_request / _bind_api_key_to_platform_admin_identity_rejected"
+    },
+    {
+      "id": "T32",
+      "status": "PASS",
+      "evidence": "test_t32_identity_admin_without_grant_code_denied_at_endpoint（缺 identity.role.grant 细码直接 403）"
+    },
+    {
+      "id": "T33",
+      "status": "PASS",
+      "evidence": "test_t33_unbound_account_sub_lookup_succeeds（无绑定账号 sub 回查成功）/ _disabled_account_401"
+    },
+    {
+      "id": "T34",
+      "status": "PASS",
+      "evidence": "test_t34_rebind_*（4 例：不存在/重复/管理员保护拒绝；合法换绑撤销旧会话、角色留原身份）+ test_t33_stale_token_after_rebind_401"
+    },
+    {
+      "id": "T35",
+      "status": "PASS",
+      "evidence": "test_t35_replace_user_roles_incremental（有效期/来源/申请号保留）/ _request_execute_validates_scope_enum_and_payload（非法枚举 schema 拒绝、嵌套 filter_json 400、合法执行落库、重复执行 409）"
+    },
+    {
+      "id": "T36",
+      "status": "PASS",
+      "evidence": "test_t36_disable_last_platform_admin_rejected / _replace_removing_last_admin_rejected（含修复 losing_admin 计算缺陷）/ _roles_summary_marks_platform_admin_high_risk（矩阵只读解释策略）"
+    }
   ]
 }

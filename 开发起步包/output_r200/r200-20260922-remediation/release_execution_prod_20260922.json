@@ -1,0 +1,90 @@
+{
+  "run_id": "r200-20260922-remediation",
+  "release_id": "r200-20260922",
+  "executed_at": "2026-09-22 22:55—23:20 +0800",
+  "authorization": "用户本会话明确『批准继续处理』（对应 待批准清单.md §1 迁移/§2 allow 修复/§3 发布链）",
+  "baseline": {
+    "git_head_before": "f1b31bc（r198 发布点）",
+    "image_before": "data-asset:r198-20260922（Up healthy）",
+    "alembic_head_before": "a7b8c9d0e1f2",
+    "frontend_current_before": "releases/r197-20260921"
+  },
+  "release_commits": ["75c13a9 feat(r200) 后端 B1—B3", "2f7bf56 test(r200)", "6e8f6e1 feat(r200) 前端", "153c662 docs(r200)", "df749fd fix(r200) allow 冲突合并"],
+  "worktree": "干净 worktree @153c662→df749fd 打包（他人域 plan139 SSL 七文件未入包，工作区保留）",
+  "steps": {
+    "1_db_backup": {
+      "file": "/opt/data-asset/backup/data_asset_pre_r200rel_20260922.dump",
+      "size_bytes": 172769882,
+      "sha256_head16": "ee946a64cdc38145"
+    },
+    "2_image_build": {
+      "base": "data-asset:r198-20260922",
+      "image": "data-asset:r200-20260922",
+      "image_id": "694c90d147a2",
+      "smoke_grep": {
+        "effective_permissions": 5, "subject_policy": 4, "stale_settle_ignored": 1,
+        "legacy-allow/repair": 1, "snapshot_version": 13, "migration_file": 1,
+        "dict-auto-approver_executable": "0（仅 1 处说明性注释，非执行路径）"
+      }
+    },
+    "3_container_swap": {
+      "script": "DATA_ASSET_IMAGE=data-asset:r200-20260922 bash /etc/data-asset/scripts/run_data_asset_api.sh",
+      "container": "c09ca2b14bf6", "status": "healthy",
+      "startup_log": "APScheduler started；Dictionary outbox worker registered interval=5s；identity nightly 保持 disabled（env 未动）"
+    },
+    "4_migration": {
+      "from": "a7b8c9d0e1f2", "to": "b3c4d5e6f7a8",
+      "columns_verified": ["asset.asset_auth_users.account_type(默认 human，2/2 已填)", "asset.asset_dict_medical_push_plans.execution_status"],
+      "roundtrip_preverified": "隔离库 data_asset_test upgrade→downgrade→upgrade 往返过（124 表不变）",
+      "root_db_tests_preverified": "隔离库 test_permissions/test_permission_requests/test_local_auth/test_dict_medical_push/test_dict_medical_maintain_push_sim/test_medical_code_push+plan200 = 120 passed"
+    },
+    "5_readback_six": {
+      "container_healthy": "data-asset:r200-20260922 Up (healthy)",
+      "health": "容器内 /api/v1/health 200；nginx /api/v1/health 200",
+      "env": "APP_ENV=production 等关键值未动（未新增 env 行）",
+      "alembic_head": "b3c4d5e6f7a8",
+      "three_endpoints_401": ["/api/v1/permissions/me 401", "/api/v1/dict-medical/push/plans/1 401", "/api/v1/auth/users 401"],
+      "new_endpoint_gate": "/api/v1/permissions/roles/summary 未授权 401",
+      "image_marker": "镜像内迁移文件存在 grep=1"
+    },
+    "6_allow_repair": {
+      "dry_run": "104 条 action=allow（9 角色；platform_admin 67/ai_user 6/asset_editor 6/identity_admin 6/ops_admin 5/approver 4/quality_admin 4/asset_viewer 3/dict_admin 3）",
+      "collision_finding": "96 条与 access 同 (role,resource) 并存（纯重复，改名撞唯一键）→ 删除；8 条（platform_admin/quality_admin 的陈旧 quality.* 码）→ 改名 access",
+      "backup": "/opt/data-asset/evidence/r200-allow-repair/allow_rows_backup.json（700/600，sha256 前 16 = f61bfd5a97e23d1e）",
+      "transaction": "单事务 delete 96 + update 8 + 审计行（operator=r200-20260922-remediation）",
+      "readback": "allow rows=0；(role,resource) 重复对=0；dict_admin=10/quality_admin=28/platform_admin=116",
+      "service_fix_driven": "纯 update 实现被生产实测证伪 → df749fd 冲突合并（重复删除/无冲突改名）+ plan200 冲突用例"
+    },
+    "7_execution_status_backfill": {
+      "scope": "7 个历史 approved 且 execution_status IS NULL 计划",
+      "rule": "outbox 全 succeeded → 'succeeded'（6 个）；plan 1 无 outbox 事件如实留 NULL（未执行）",
+      "audit": "backfill_execution_status 一行"
+    },
+    "8_frontend": {
+      "build": "pnpm run build 三预算过（main 660.2/700 KB，graph 404.5/430，css 107.5/110）",
+      "entry": "index-BYeBefJf.js",
+      "switch": "release_frontend.sh r200-20260922 → current→releases/r200-20260922（previous 保持 r169 链）",
+      "verify": "nginx / 200；/static/js/index-BYeBefJf.js 200 + SHA 547406ad21330b1f 与本地一致；css 200；HTML 引用资源校验过"
+    }
+  },
+  "rollback": {
+    "backend": "DATA_ASSET_IMAGE=data-asset:r198-20260922 bash /etc/data-asset/scripts/run_data_asset_api.sh + alembic downgrade b3c4d5e6f7a8",
+    "frontend": "current → releases/r197-20260921",
+    "db": "data_asset_pre_r200rel_20260922.dump（ee946a64…）；allow 行备份 allow_rows_backup.json（f61bfd5a…）",
+    "note": "migration/allow 修复为幂等可逆（downgrade 删列；allow 备份可重放）"
+  },
+  "outbox_safety_check": {
+    "finding": "10 条 outbox 事件全部 succeeded，worker 无可消费事件；确认令牌已配置、下发开关 true、D03 后仅人工审批可入队",
+    "plan_states_after": "1=approved/NULL(无事件,未执行) 2-7=approved/succeeded 8=draft"
+  },
+  "git": {
+    "pushed": false,
+    "note": "本地 master 领先 origin 16 提交（含 r200 五个提交）；push 未获点名未执行"
+  },
+  "not_done": [
+    "T27/T28 浏览器闭环（需本地起 backend+种子合成账号+浏览器栈；生产不放合成账号）",
+    "执行器登记与实际写入启用（待具体编码/时段逐例批准；201 口径=196 先 1—3 编码且 200 上线后再写）",
+    "正式角色调整小批试点（待人员/角色名单）",
+    "Git push（未点名）"
+  ]
+}
