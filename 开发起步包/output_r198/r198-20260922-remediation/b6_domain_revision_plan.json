@@ -1,0 +1,784 @@
+[
+ {
+  "id": 283,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "OPERATION_SCALE",
+   "code": "一"
+  },
+  "before_row_sha256": "33384d9401db3d71ba38c022d31e50a8f14257c1a80c86d88494b9dcf7e58387",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q21",
+    "detail": "OPERATION_SCALE×STOP_FLAG 分布含 '一'（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 284,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "OPERATION_SCALE",
+   "code": "二"
+  },
+  "before_row_sha256": "9985b7c4e4c436bd05a4a70ab574ef6a452cd791609447dff683e06119e904dc",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q21",
+    "detail": "OPERATION_SCALE×STOP_FLAG 分布含 '二'（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 285,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "OPERATION_SCALE",
+   "code": "三"
+  },
+  "before_row_sha256": "49a25ccfc84be1c23d394844232e0525a60f9a3a9447b568278e23d8a2ff83fe",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q21",
+    "detail": "OPERATION_SCALE×STOP_FLAG 分布含 '三'（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 286,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "OPERATION_SCALE",
+   "code": "四"
+  },
+  "before_row_sha256": "9ecaaedc752945031e0b22e8b3133dbd894459c6348637cb5c20e21aa214d17f",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q21",
+    "detail": "OPERATION_SCALE×STOP_FLAG 分布含 '四'（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 287,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "OPERATION_SCALE",
+   "code": "一 "
+  },
+  "before_row_sha256": "29a68ab548c0f82aa4fc70e897ad30afc7e5b9e33da27d8af380a90b1237931e",
+  "status_guard": "pending",
+  "revisions": {
+   "meaning": "带尾随空格的变体（trap：='一' 精确比较会漏掉该行）（注意：带尾随空格变体，='一' 过滤会漏数，需 trim 口径）"
+  },
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q21",
+    "detail": "OPERATION_SCALE×STOP_FLAG 分布：'一 '(N=1) 为尾随空格变体（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 288,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "STOP_FLAG",
+   "code": "0"
+  },
+  "before_row_sha256": "6a3a459a723130787487138cec02a8d7ce9de35d282d5ce5eb12ea8b364c24c4",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 289,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "COMM",
+   "table_name": "OPERATION_DICT",
+   "column_name": "STOP_FLAG",
+   "code": "1"
+  },
+  "before_row_sha256": "79dbe114f33dfdfc79da88a6958a865f49a6a31a627e26e24719aebc83f68194",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 290,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "心电图"
+  },
+  "before_row_sha256": "1dd76f82b1db77b147dd2ebbbdf3d0e20161c71f7cdbf4a7ea160a25cd40f9b9",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 291,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "B超"
+  },
+  "before_row_sha256": "24ab7c05118967321f2bb7a9d2be62ca80b1f30b26fbad3bde124aaebadf730f",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 292,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "CT"
+  },
+  "before_row_sha256": "c8efdc3444b924c527d88a74dc426fbeadf08df0f1ea144c133a8f80120badbe",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 293,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "磁共振"
+  },
+  "before_row_sha256": "092dad5abcc759737c327b8fad3c6226d7ddf0b8c89d38051ca39c25fd70cf3c",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 294,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "X线"
+  },
+  "before_row_sha256": "ab8fc07707ee649eece3538f38a59091a948ba15cd4fb67b9eac0452849ed7d4",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 295,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "肺功能"
+  },
+  "before_row_sha256": "ba019f99de93f98477cadd981a54b2fda0cb1fdcda9ecb36fbd08b2df12969b9",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 296,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "听力检查"
+  },
+  "before_row_sha256": "58a77da1801a16f40f6541dcdcfac07bed3d8257bec517bcb22e51f2b9f2cc3b",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 297,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "消化内镜"
+  },
+  "before_row_sha256": "2791562854ccc94f4ebf62df731443ba84bc7ebff7d8e22d4e199a8f2b42aeb6",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 298,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "支气管镜"
+  },
+  "before_row_sha256": "fcc35bfdc14496eaec5dda37f598e93fc22ff9c3ce0fe13af5283695c335f820",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 299,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "脑电图"
+  },
+  "before_row_sha256": "dffeb196ecd0991f66bba5ab71dc939de8c5c9fa8381e2f808740d059e824619",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 300,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "肌电图"
+  },
+  "before_row_sha256": "080fb800ae9474aeb80479f649262b83ddf3eb5b96348a669abacb805262b993",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 301,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "数字胃肠"
+  },
+  "before_row_sha256": "ed02ada07db72f4845ec200b86083d088ee1979c1917275ff022e0f12bec0796",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 302,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "乳腺钼靶"
+  },
+  "before_row_sha256": "66637534b89283d2e7d16c8708f65cb7ed25a1c5721ae3d786e00cf781c20db2",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 303,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "牙片室"
+  },
+  "before_row_sha256": "ee73c4caf758b27e30d361a423b9c2786c2b0abc90857b9e519c79c8a383569c",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 304,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "一氧化氮"
+  },
+  "before_row_sha256": "a07c41dcea648fbd35ae0acd99901e2c56fd5b80a17565cea2bd9a6d869c45b0",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 305,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "儿童肺功能"
+  },
+  "before_row_sha256": "8acfcddd00f76e0209fa9d6613fc12c41a23c4a0e6a665bfb72b8e2aad29da2d",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 306,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "EXAM",
+   "table_name": "EXAM_MASTER",
+   "column_name": "EXAM_CLASS",
+   "code": "动态血压"
+  },
+  "before_row_sha256": "d04b497611c598821f516272d0b8db8fca7825838fffa6daf0b989879615e243",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "sql_corpus",
+    "ref": "r197 语句语料",
+    "detail": "197 历史语句语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 307,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "A"
+  },
+  "before_row_sha256": "4d6b756ca58e11ccf9062594ad4705951c790488b1a4f6f4909f6a17aebda16a",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 308,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "B"
+  },
+  "before_row_sha256": "ece61a9800457950d39bd1d8c385bb8308aa41e8d83968beea08130046cdd97b",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 309,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "C"
+  },
+  "before_row_sha256": "20f14c511700038c82e606617e0661a57e4ef71105eda89936d397a14844eb4e",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 310,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "D"
+  },
+  "before_row_sha256": "e1a3b09a3e754872dc342779d506de90e8ed38710746f0e1b09bd462edd0a008",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 311,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "H"
+  },
+  "before_row_sha256": "b9cb12bc317122cc76ae1b97f906a80f4261618f62b94582bf7b1d13720eb267",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 312,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "I"
+  },
+  "before_row_sha256": "47c87aea3483767244679e478a0ca91d81dbd0eaa034639b0239d77a3d2f8938",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 313,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "J"
+  },
+  "before_row_sha256": "315bd53c3846b1b7adc3c51d3c20915d8a7cd4c27a1403214342cca0ec195fea",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 314,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "K"
+  },
+  "before_row_sha256": "83c582648ed8dff661412bc68c3100e989e3ab60bdc2922cd6182a49371da874",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 315,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "Q"
+  },
+  "before_row_sha256": "b9620e84169a8acca1d7cdf2ce4c89b152aebb47d406524988fd73b4cf399630",
+  "status_guard": "pending",
+  "revisions": {},
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "197 S6 活库观察/语料提取（2026-09-21）"
+   }
+  ]
+ },
+ {
+  "id": 316,
+  "natural_key": {
+   "system_code": "HIS_SOURCE",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "OPER_CODE",
+   "code": "多义键"
+  },
+  "before_row_sha256": "87c3eaad8fcb03cfc4a4a8d0015252e03df035f07302e797038c4ae0e823d5cb",
+  "status_guard": "pending",
+  "revisions": {
+   "meaning": "多义键（观察事实：不同 ITEM_CLASS 分组下非空率/长度分布不同，Q15）;待证假说：检查类=EXAM_NO、检验类=TEST_NO/APPOINT_NO、手术类=OPER_ID——未经同表同列验证，不得据此 JOIN",
+   "note": "ISS-S3-OPERMULTI + S6 Q15/Q33 证据；禁止不分类别直接单列挂靠 | r198:等价语义降级为待证假说（Q15 仅证长度/非空分布）"
+  },
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "OPER_CODE 按 ITEM_CLASS 分组非空/长度分布（2026-09-21 活库聚合，12 组）"
+   }
+  ]
+ },
+ {
+  "new_row": true,
+  "natural_key": {
+   "system_code": "HIS",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "E"
+  },
+  "meaning": "收费项目分类（Q15 观察，含义待字典核）",
+  "note": "r198 补录：Q15 实测 12 类中的遗漏项（197 导入仅 9 类）；含义不按猜测定稿",
+  "status": "pending",
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "ITEM_CLASS 分组计数：E N=18330（2026-09-21；F/G 在 Q15 截断行，补证见 P2B-ITEM_CLASS）"
+   }
+  ]
+ },
+ {
+  "new_row": true,
+  "natural_key": {
+   "system_code": "HIS",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "F"
+  },
+  "meaning": "收费项目分类（Q15 观察，含义待字典核）",
+  "note": "r198 补录：Q15 实测 12 类中的遗漏项（197 导入仅 9 类）；含义不按猜测定稿",
+  "status": "pending",
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "ITEM_CLASS 分组计数：F N=?（2026-09-21；F/G 在 Q15 截断行，补证见 P2B-ITEM_CLASS）"
+   }
+  ]
+ },
+ {
+  "new_row": true,
+  "natural_key": {
+   "system_code": "HIS",
+   "source_code": "his_source_10_10_10_15",
+   "schema_name": "INPBILL",
+   "table_name": "INP_BILL_DETAIL",
+   "column_name": "ITEM_CLASS",
+   "code": "G"
+  },
+  "meaning": "收费项目分类（Q15 观察，含义待字典核）",
+  "note": "r198 补录：Q15 实测 12 类中的遗漏项（197 导入仅 9 类）；含义不按猜测定稿",
+  "status": "pending",
+  "evidence_to_register": [
+   {
+    "source_type": "probe",
+    "ref": "Q15",
+    "detail": "ITEM_CLASS 分组计数：G N=?（2026-09-21；F/G 在 Q15 截断行，补证见 P2B-ITEM_CLASS）"
+   }
+  ]
+ }
+]

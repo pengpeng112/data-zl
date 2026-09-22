@@ -1,0 +1,24 @@
+{
+  "reviews_mapping_ok": true,
+  "families_closure_unexplained": {},
+  "other_not_imported_ids": [],
+  "endpoint_registry_size": 153,
+  "endpoints_cross_system": 59,
+  "endpoints_unknown": 29,
+  "primary_loc_chosen_issues": 0,
+  "unmatched_class_counts": {
+    "unclassified_pending": 20,
+    "suspected_column_as_table_pending": 6,
+    "drg_family_pending": 4,
+    "exp_pharmacy_family_pending": 10,
+    "likely_temp_worktable_pending": 10,
+    "parser_artifact_static": 9,
+    "insurance_related_pending": 10,
+    "parser_artifact_chinese_fragment": 4,
+    "other_db_or_schema_owner": 24,
+    "cte_or_derived_alias": 2
+  },
+  "domains_code_repr_trailing_space": [
+    287
+  ]
+}

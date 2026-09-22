@@ -1,0 +1,12 @@
+{
+  "stateful_families_rereviewed": 59,
+  "recommendations": {
+    "keep_pass_pending_sample_check": 14,
+    "downgrade_insufficient": 27,
+    "keep_failed_with_scope_note": 16,
+    "keep_insufficient": 2
+  },
+  "probe_coverage_parsed": 35,
+  "probes_v2_count": 24,
+  "source_disambiguated_reviews": 0
+}

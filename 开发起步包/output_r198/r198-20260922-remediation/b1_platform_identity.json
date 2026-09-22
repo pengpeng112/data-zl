@@ -1,0 +1,834 @@
+{
+  "systems": [
+    {
+      "system_code": "ADVERSE_EVENT",
+      "system_name": "医疗安全不良事件(火龙果)",
+      "status": "active"
+    },
+    {
+      "system_code": "BRONCHOSCOPY",
+      "system_name": "气管镜系统",
+      "status": "active"
+    },
+    {
+      "system_code": "CORE2DB",
+      "system_name": "门诊病历",
+      "status": "active"
+    },
+    {
+      "system_code": "DATA_CENTER",
+      "system_name": "数据中心",
+      "status": "active"
+    },
+    {
+      "system_code": "DOCARE",
+      "system_name": "Docare手术麻醉",
+      "status": "active"
+    },
+    {
+      "system_code": "DRG",
+      "system_name": "DRG系统",
+      "status": "active"
+    },
+    {
+      "system_code": "ECG",
+      "system_name": "心电系统",
+      "status": "active"
+    },
+    {
+      "system_code": "EMERGENCY_CLINIC",
+      "system_name": "急诊系统(麦迪斯顿)",
+      "status": "active"
+    },
+    {
+      "system_code": "EMR",
+      "system_name": "电子病历",
+      "status": "merged"
+    },
+    {
+      "system_code": "HEARING_TEST",
+      "system_name": "电测听系统",
+      "status": "active"
+    },
+    {
+      "system_code": "HEMODIALYSIS",
+      "system_name": "血透系统",
+      "status": "active"
+    },
+    {
+      "system_code": "HIS",
+      "system_name": "HIS 业务系统",
+      "status": "active"
+    },
+    {
+      "system_code": "HIS_SOURCE",
+      "system_name": "HIS",
+      "status": "merged"
+    },
+    {
+      "system_code": "HRP",
+      "system_name": "HRP",
+      "status": "active"
+    },
+    {
+      "system_code": "INFECTION_SURVEILLANCE",
+      "system_name": "医院感染实时监控(杏林)",
+      "status": "active"
+    },
+    {
+      "system_code": "INTERCONNECT_PROV",
+      "system_name": "互联互通省平台",
+      "status": "active"
+    },
+    {
+      "system_code": "JHEMR_VASTBASE",
+      "system_name": "嘉和电子病历",
+      "status": "active"
+    },
+    {
+      "system_code": "LIS",
+      "system_name": "检验系统",
+      "status": "merged"
+    },
+    {
+      "system_code": "LIS_CACHE",
+      "system_name": "老微度LIS(Cache/Ensemble)",
+      "status": "active"
+    },
+    {
+      "system_code": "LIS_SOURCE",
+      "system_name": "LIS",
+      "status": "active"
+    },
+    {
+      "system_code": "MANDALA_EMR",
+      "system_name": "曼陀罗电子病历",
+      "status": "active"
+    },
+    {
+      "system_code": "MEDICAL_RECORD_MGMT",
+      "system_name": "病案管理系统(华健)",
+      "status": "active"
+    },
+    {
+      "system_code": "MOBILE_NURSING",
+      "system_name": "移动护理",
+      "status": "active"
+    },
+    {
+      "system_code": "OA",
+      "system_name": "OA办公系统",
+      "status": "active"
+    },
+    {
+      "system_code": "OCCUPATIONAL_DISEASE",
+      "system_name": "职业病",
+      "status": "active"
+    },
+    {
+      "system_code": "OUTPATIENT_APPT",
+      "system_name": "门诊预约系统",
+      "status": "active"
+    },
+    {
+      "system_code": "PACS",
+      "system_name": "影像系统",
+      "status": "merged"
+    },
+    {
+      "system_code": "PACS_SOURCE",
+      "system_name": "PACS",
+      "status": "active"
+    },
+    {
+      "system_code": "PAPERLESS_CDMS",
+      "system_name": "无纸化病案",
+      "status": "active"
+    },
+    {
+      "system_code": "PATHOLOGY",
+      "system_name": "病理",
+      "status": "active"
+    },
+    {
+      "system_code": "PHYSICAL_EXAM",
+      "system_name": "体检",
+      "status": "active"
+    },
+    {
+      "system_code": "QUEUE",
+      "system_name": "门诊叫号系统",
+      "status": "active"
+    },
+    {
+      "system_code": "RESEARCH_MYSQL",
+      "system_name": "科研系统MySQL",
+      "status": "active"
+    },
+    {
+      "system_code": "SDDW_PROD",
+      "system_name": "医保结算系统正式(山大地纬)",
+      "status": "active"
+    },
+    {
+      "system_code": "SM",
+      "system_name": "手麻系统",
+      "status": "merged"
+    },
+    {
+      "system_code": "TRANSFUSION_NEW",
+      "system_name": "新输血系统(熙恒)",
+      "status": "active"
+    },
+    {
+      "system_code": "ULTRASOUND_ENDOSCOPY",
+      "system_name": "超声内镜",
+      "status": "active"
+    }
+  ],
+  "sources": [
+    {
+      "source_code": "adverse_event_10_10_10_50",
+      "system_code": "ADVERSE_EVENT",
+      "source_name": "医疗安全不良事件(火龙果) 业务库",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "bloodnew_sqlserver_10_10_8_7",
+      "system_code": "TRANSFUSION_NEW",
+      "source_name": "新输血系统(熙恒) 业务库",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "bronchoscopy_postgresql_10_10_8_240",
+      "system_code": "BRONCHOSCOPY",
+      "source_name": "气管镜系统 业务库",
+      "db_type": "postgresql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "cardionet_sqlserver_10_10_10_80",
+      "system_code": "ECG",
+      "source_name": "心电接口库 cardioNet",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "core2db_mysql_10_10_8_135",
+      "system_code": "CORE2DB",
+      "source_name": "门诊病历 MySQL 业务库",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "dialysis_postgresql_10_10_10_88",
+      "system_code": "HEMODIALYSIS",
+      "source_name": "血透系统 业务库",
+      "db_type": "postgresql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "docare_oracle_10_10_10_68",
+      "system_code": "DOCARE",
+      "source_name": "Docare 手麻业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "drg_postgresql_10_10_10_107",
+      "system_code": "DRG",
+      "source_name": "DRG数仓",
+      "db_type": "postgresql",
+      "host": null,
+      "is_active": true
+    },
+    {
+      "source_code": "ecg_sqlserver_10_10_10_80",
+      "system_code": "ECG",
+      "source_name": "心电系统主库 EDSChinaDB",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "emergency_clinic_10_10_10_120",
+      "system_code": "EMERGENCY_CLINIC",
+      "source_name": "急诊系统(麦迪斯顿) 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "hearing_test_postgresql_10_10_9_187",
+      "system_code": "HEARING_TEST",
+      "source_name": "电测听系统 业务库",
+      "db_type": "postgresql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "hisbase_oracle_10_10_10_14",
+      "system_code": "HIS",
+      "source_name": "HIS基本信息库 10.10.10.14/hisserver",
+      "db_type": "oracle",
+      "host": null,
+      "is_active": true
+    },
+    {
+      "source_code": "his_source_10_10_10_15",
+      "system_code": "HIS",
+      "source_name": "HIS业务库 10.10.10.15/his",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "hrp_10_10_10_23",
+      "system_code": "HRP",
+      "source_name": "HRP源端 10.10.10.23/hrpdb",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "infection_10_10_9_45",
+      "system_code": "INFECTION_SURVEILLANCE",
+      "source_name": "医院感染实时监控(杏林) 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "interconnect_10_10_10_5",
+      "system_code": "INTERCONNECT_PROV",
+      "source_name": "互联互通省平台 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "jhemr_vastbase_10_10_8_177",
+      "system_code": "JHEMR_VASTBASE",
+      "source_name": "嘉和电子病历业务库",
+      "db_type": "vastbase",
+      "host": "10.10.8.*",
+      "is_active": true
+    },
+    {
+      "source_code": "lis_cache_10_10_10_70",
+      "system_code": "LIS_CACHE",
+      "source_name": "老微度LIS Cache 业务库(LIS3)",
+      "db_type": "cache",
+      "host": null,
+      "is_active": true
+    },
+    {
+      "source_code": "lis_sqlserver_10_10_10_73",
+      "system_code": "LIS_SOURCE",
+      "source_name": "LIS SQL Server 业务库",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "mandala_emr_oracle_10_10_10_177",
+      "system_code": "MANDALA_EMR",
+      "source_name": "曼陀罗EMR",
+      "db_type": "oracle",
+      "host": null,
+      "is_active": true
+    },
+    {
+      "source_code": "mobile_nursing_oracle_10_10_10_125",
+      "system_code": "MOBILE_NURSING",
+      "source_name": "移动护理 Oracle 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "mr_mgmt_10_10_10_55",
+      "system_code": "MEDICAL_RECORD_MGMT",
+      "source_name": "病案管理系统(华健) 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "oa_sqlserver_10_10_10_69",
+      "system_code": "OA",
+      "source_name": "医院OA（万户 ezOFFICE）业务库",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "occupational_disease_sqlserver_10_10_8_96",
+      "system_code": "OCCUPATIONAL_DISEASE",
+      "source_name": "职业病 SQL Server 业务库",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_8_216",
+      "system_code": "DATA_CENTER",
+      "source_name": "数据中心 ODS 10.10.8.216/orcl",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_emr",
+      "system_code": "DATA_CENTER",
+      "source_name": "ODS.JHEMR+MTL（数据中心镜像）",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_lis",
+      "system_code": "DATA_CENTER",
+      "source_name": "ODS.LIS（数据中心镜像）",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_pacs",
+      "system_code": "DATA_CENTER",
+      "source_name": "ODS.PACS（数据中心镜像）",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_sm",
+      "system_code": "DATA_CENTER",
+      "source_name": "ODS.SM（数据中心镜像）",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ods_ydhl",
+      "system_code": "DATA_CENTER",
+      "source_name": "ODS.YDHL（数据中心镜像）",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "outpatient_mysql_10_10_8_161",
+      "system_code": "OUTPATIENT_APPT",
+      "source_name": "门诊预约系统 业务库",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "pacs_mysql_10_10_10_191",
+      "system_code": "PACS_SOURCE",
+      "source_name": "PACS MySQL 实例",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "paperless_cdms_oracle_10_10_10_93",
+      "system_code": "PAPERLESS_CDMS",
+      "source_name": "无纸化 CDMS 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "pathology_sqlserver_10_10_9_41",
+      "system_code": "PATHOLOGY",
+      "source_name": "病理 SQL Server 业务实例",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "physical_exam_sqlserver_10_10_10_96",
+      "system_code": "PHYSICAL_EXAM",
+      "source_name": "体检 SQL Server 业务实例",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "queue_mysql_10_10_8_163",
+      "system_code": "QUEUE",
+      "source_name": "门诊叫号系统 业务库",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "research_mysql_10_10_8_200",
+      "system_code": "RESEARCH_MYSQL",
+      "source_name": "科研系统MySQL 业务库",
+      "db_type": "mysql",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "sddw_oracle_10_10_10_151",
+      "system_code": "SDDW_PROD",
+      "source_name": "医保结算正式RAC节点1",
+      "db_type": "oracle",
+      "host": null,
+      "is_active": true
+    },
+    {
+      "source_code": "sddw_oracle_10_10_10_152",
+      "system_code": "SDDW_PROD",
+      "source_name": "医保结算系统正式(山大地纬) 业务库",
+      "db_type": "oracle",
+      "host": "10.10.*.*",
+      "is_active": true
+    },
+    {
+      "source_code": "ultrasound_endoscopy_sqlserver_10_10_10_161",
+      "system_code": "ULTRASOUND_ENDOSCOPY",
+      "source_name": "超声内镜 SQL Server 实例",
+      "db_type": "sqlserver",
+      "host": "10.10.*.*",
+      "is_active": true
+    }
+  ],
+  "gap_wait_bed": [
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "ADMISSION_CAUSE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "BIRTH_CITY",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "BIRTH_COUNT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "BIRTH_PLACE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "BIRTH_PROVINCE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "BIRTH_TOWNSHIP",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CAUSE_WITHIN_SEVEN_DAYS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CHARGE_TYPE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CLINIC_DEPT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CLINIC_DIAGNOSIS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CLINIC_LABEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CLINIC_NO",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CONSULTING_DOCTOR",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "CONTACT_PERSON",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "COST",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "DATE_OF_BIRTH",
+      "data_type": "DATE"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "DAY_SURGERY_FLAG",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "DEPT_WAITING_FOR",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "DOC_DEPT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "IDENTITY",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "IN_DATE",
+      "data_type": "DATE"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "IN_DEPT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "INFORMATION_PRIMARY_HOSPITALS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "IN_OPERATOR",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "IN_OPERATOR_DEPT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "INP_PATIENT_CLASS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "LAST_NOTING_DATE",
+      "data_type": "DATE"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "MAILING_ADDRESS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "NAME",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "NAME_PHONETIC",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "NOTICE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "NOTIFY_TIMES",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PATIENT_CLASS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PATIENT_CONDITION",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PATIENT_ID",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PHONE_NUMBER",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PHONE_NUMBER_MAIL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PRE_CITY",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PRE_COUNT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PRE_PROVINCE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PRE_TOWNSHIP",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "PRIMARY_REFERRALS_FLAG",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "REGISTERING_DATE",
+      "data_type": "DATE"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "SERVICE_AGENCY",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "SEX",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "STATUS",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "VISIT_ID",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "WAIT_NO",
+      "data_type": "NUMBER"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "WARD_CODE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW",
+      "column_name": "ZIP_CODE",
+      "data_type": "VARCHAR2"
+    }
+  ],
+  "gap_drug_catalog": null,
+  "gap_tables_reg": [
+    {
+      "system_code": "HIS",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "COMM",
+      "table_name": "OFFICIAL_DRUG_CATALOG"
+    },
+    {
+      "system_code": "HIS",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "COMM",
+      "table_name": "OFFICIAL_DRUG_CATALOG_CLASS"
+    },
+    {
+      "system_code": "HIS",
+      "source_code": "his_source_10_10_10_15",
+      "schema_name": "INPADM",
+      "table_name": "WAIT_BED_PATS_NEW"
+    }
+  ]
+}

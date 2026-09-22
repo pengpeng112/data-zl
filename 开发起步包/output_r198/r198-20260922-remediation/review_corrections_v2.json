@@ -1,0 +1,6502 @@
+{
+ "generated": "2026-09-22",
+ "counts": {
+  "source_pending_no_context": 129,
+  "confirm_with_source_fix": 20,
+  "columns_changed_review": 12,
+  "propose_reject_or_hold": 6
+ },
+ "system_code_note": "HIS_SOURCE 系统零数据源；现行映射 HIS/his_source_10_10_10_15（业务库）、HIS/hisbase_oracle_10_10_10_14（基本信息库）、DATA_CENTER/ods_8_216（ODS 镜像）",
+ "rows": [
+  {
+   "review_id": 675,
+   "relation_id": "S2F-3EC0DE462A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.RECK_ITEM_CLASS_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0007",
+    "N198-0023",
+    "N198-0153",
+    "N198-0367"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 676,
+   "relation_id": "S2F-C90B6003D8",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_MASTER_INDEX",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0006",
+    "N198-0222"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 677,
+   "relation_id": "S2F-82947C72C9",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.RECK_ITEM_CLASS_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0011"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 678,
+   "relation_id": "S2F-190AFAC505",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_TREAT_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0051"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 679,
+   "relation_id": "S2F-891B95F49D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.TALLY_SUBJECT_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0041"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 680,
+   "relation_id": "S2F-678B3B21E2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.TALLY_SUBJECT_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0093",
+    "N198-0226"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 681,
+   "relation_id": "S2F-C77ABA45F2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DOCTOR_GROUP",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0080",
+    "N198-0309"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 682,
+   "relation_id": "S2F-BDCE2A3160",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_ORDER_DESC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0058",
+    "N198-0267"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 683,
+   "relation_id": "S2F-4A1529052D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.CONSULTATION_DOCTOR_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.CONSULTATION_DOCTOR_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0059"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 684,
+   "relation_id": "S2F-C0E9E1112A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.MARITAL_STATUS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_MASTER_INDEX",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0158"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 685,
+   "relation_id": "S2F-447C413169",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0154"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 686,
+   "relation_id": "S2F-DB7BD1C6F6",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.OUTP_ORDERS",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_TREAT_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0433"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 687,
+   "relation_id": "S2F-00E1F5934D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.NATION_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_MASTER_INDEX",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0234"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 688,
+   "relation_id": "S2F-5B7458DD64",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.OPERATION",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OPERATION_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0236",
+    "N198-0405"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "INFECTION_SURVEILLANCE",
+      "source": "infection_10_10_9_45",
+      "schema": "C##NIS5"
+     },
+     {
+      "system": "INFECTION_SURVEILLANCE",
+      "source": "infection_10_10_9_45",
+      "schema": "C##NIS6"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 689,
+   "relation_id": "S2F-50040F7BC3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_MR_DIAG_DESC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0090"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 690,
+   "relation_id": "S2F-5CB74852EF",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "LAB.LAB_TEST_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_TREAT_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0067"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 691,
+   "relation_id": "S2F-E256C47346",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_ORDER_DESC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0101"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 692,
+   "relation_id": "S2F-6B88D353D7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPADM.CLINIC_RETURNED_ACCT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0042"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 693,
+   "relation_id": "S2F-2C9FE1D3B6",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0120"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 694,
+   "relation_id": "S2F-86227FC71B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPADM.BED_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0128",
+    "N198-0253"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 695,
+   "relation_id": "S2F-FB7AC774E3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.MR_ON_LINE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0159"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 696,
+   "relation_id": "S2F-7034281A87",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.PAT_VISIT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.WAIT_BED_PATS_NEW",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 697,
+   "relation_id": "S2F-CAC61346F1",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.BILL_ITEM_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0172"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 698,
+   "relation_id": "S2F-F9B9C57BF3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_SETTLE_MASTER_YB",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.SETTLE_ZY_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0155"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 699,
+   "relation_id": "S2F-B5154A7469",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_MR",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0089"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 700,
+   "relation_id": "S2F-D3EDFB4370",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_RCPT_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0164"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 701,
+   "relation_id": "S2F-FD2673AB7B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_INDEX",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPADM.CLINIC_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0173"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 702,
+   "relation_id": "S2F-D89F991E47",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_MR",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0088"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 703,
+   "relation_id": "S2F-A5790F6F3E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.PATIENT_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_VISIT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0446"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DOCARE",
+      "source": "docare_oracle_10_10_10_68",
+      "schema": "MEDSURGERY"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 704,
+   "relation_id": "S2F-7F2DBC5ADB",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.ORDER_CLASS_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0376"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 705,
+   "relation_id": "S2F-802768F217",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0342"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 706,
+   "relation_id": "S2F-7D4F63EBE3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.BILL_ITEM_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0130"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 707,
+   "relation_id": "S2F-16574BB093",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_ORDER_DESC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.WAIT_BED_PATS_NEW",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0163"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 708,
+   "relation_id": "S2F-1A98B5707E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0161"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 709,
+   "relation_id": "S2F-F909187A90",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.MEDICAL_CARD_MEMO",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.MEDICAL_CARD_TYPE_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0399",
+    "N198-0402"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 710,
+   "relation_id": "S2F-78EA534A94",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DEPT_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DEPT_VS_WARD",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 711,
+   "relation_id": "S2F-A70D3EBC14",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.OUTP_MR_DIAG_DESC",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_TREAT_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0430"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 712,
+   "relation_id": "S2F-55ACB4FC9A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_MR_DIAG_DESC",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 713,
+   "relation_id": "S2F-54DDF3090C",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_PAYMENTS_MONEY",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_SETTLE_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0113",
+    "N198-0378"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 714,
+   "relation_id": "S2F-836F2A5926",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_SETTLE_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0220"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 715,
+   "relation_id": "S2F-11CEA3F43C",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPADM.CLINIC_PAYMENTS_MONEY",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0175"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 716,
+   "relation_id": "S2F-80190A1266",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_VS_CHARGE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0273"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 717,
+   "relation_id": "S2F-BB4AF449D7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0066"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 718,
+   "relation_id": "S2F-D16F6274AC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.MR_BILL_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0056"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 719,
+   "relation_id": "S2F-FF689C8E0E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAYMENT_RCPT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0456"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 720,
+   "relation_id": "S2F-7E158DBE85",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0272"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 721,
+   "relation_id": "S2F-B6C23A8ACC",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.OUTP_MR",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_MR_DIAG_DESC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0429"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 722,
+   "relation_id": "S2F-797C110153",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.INSUR_VSH_CENTER_ITEM_NEW",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0150"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 723,
+   "relation_id": "S2F-BCB9A63C52",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0271"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 724,
+   "relation_id": "S2F-C1F7CEF65A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DOCTOR_GROUP",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OPERATION_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0310"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 725,
+   "relation_id": "S2F-A4FCF1023F",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.ADT_LOG",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PATIENT_STATUS_CHG_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0127"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 726,
+   "relation_id": "S2F-3B0F594FB5",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0322"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 727,
+   "relation_id": "S2F-7C3491FAB2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DOCT_DRUG_PRESC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0108"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 728,
+   "relation_id": "S2F-6078311B11",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.AREA_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_VISIT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0252"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 729,
+   "relation_id": "S2F-4AB467630E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_INDEX",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.CLINIC_TYPE_SETTING",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0257"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 730,
+   "relation_id": "S2F-FA29D8E7F7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.MEDICAL_CARD_MEMO",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.MEDICAL_CARD_VS_IDNO",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0400"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 731,
+   "relation_id": "S2F-68463732FB",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.ADT_LOG",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.MR_ON_LINE",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0250"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 732,
+   "relation_id": "S2F-35D425985E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DOCTOR_GROUP",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0311"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 733,
+   "relation_id": "S2F-1C9DF9CFDD",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.MEDICAL_CARD_MEMO",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0265"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 734,
+   "relation_id": "S2F-A4F3F1FA73",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_PRESC_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0021"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 735,
+   "relation_id": "S2F-915DEA9EFE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DOCT_DRUG_PRESC_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DOCT_DRUG_PRESC_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0312"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 736,
+   "relation_id": "S3F-7EEAFF05AE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.CLINIC_VS_CHARGE",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0174"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 737,
+   "relation_id": "S3F-98E525FBE7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.CLINIC_VS_CHARGE",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0100"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 738,
+   "relation_id": "S3F-C4039F391C",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS_COSTS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0241",
+    "N198-0416"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 739,
+   "relation_id": "S3F-9C28994D16",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_VS_CHARGE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0274"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 740,
+   "relation_id": "S3F-E7DE652B19",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_NAME_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.CLINIC_VS_CHARGE",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0261"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 741,
+   "relation_id": "S3F-E65D6CED98",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.ORDER_CLASS_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0419"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 742,
+   "relation_id": "S3F-0F3B49513D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS_COSTS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0259"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 743,
+   "relation_id": "S3F-C21F072F9B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.PRICE_ITEM_NAME_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0246"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 744,
+   "relation_id": "S3F-00F35490BC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAY_ACCT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.PREPAY_ACCT_MONEY",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0245"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 745,
+   "relation_id": "S3F-B8DD5D167D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0204"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 746,
+   "relation_id": "S3F-6971C4D4A3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0355"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "EXAM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 747,
+   "relation_id": "S3F-8CF8B4B39E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0353"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "EXAM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 748,
+   "relation_id": "S3F-4E0A7CB9FE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.INP_RCPT_FEE_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0370"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 749,
+   "relation_id": "S3F-21C1208636",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.INSUR_VSH_CENTER_ITEM_NEW",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0386"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 750,
+   "relation_id": "S3F-FF1623FE72",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 751,
+   "relation_id": "S3F-C4FDA97470",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.OUTP_ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_ORDER_DESC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0432"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 752,
+   "relation_id": "S3F-73E9BAF540",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "to_system": "DATA_CENTER",
+    "to_table": "HIS.OUTP_ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0423"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_system_code": "DATA_CENTER",
+    "to_source_code": "ods_8_216"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 753,
+   "relation_id": "S3F-7D08A9E399",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.TALLY_SUBJECT_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0459"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 754,
+   "relation_id": "S3F-F5C0C8EDAE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "LAB.LAB_TEST_ITEMS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0393"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 755,
+   "relation_id": "S3F-9193379481",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.CLINIC_ITEM_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0258"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 756,
+   "relation_id": "S3F-7FDFCCAC38",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.INSUR_VSH_CENTER_ITEM_NEW",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 757,
+   "relation_id": "S3F-3F30DA6B47",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.BILL_ITEM_CLASS_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 758,
+   "relation_id": "S3F-D8F12989E0",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 759,
+   "relation_id": "S3F-C548CAAE32",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 760,
+   "relation_id": "S3F-5020B1B11D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.EXAM_RPT_PATTERN",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0260"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 761,
+   "relation_id": "S3F-A7C9381FA2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0427"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 762,
+   "relation_id": "S3F-5FF4CF0E1A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAYMENT_RCPT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.PREPAYMENT_RCPT_ADD",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0455"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 763,
+   "relation_id": "S3F-3904B0E814",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_ITEM_NAME_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0071"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 764,
+   "relation_id": "S3F-C8B128DDC1",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.PRICE_ITEM_NAME_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0458"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 765,
+   "relation_id": "S3F-24FCB0CB0D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_ITEM_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.PRICE_ITEM_NAME_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0275"
+   ],
+   "endpoint_resolution": {
+    "from": "owner_resolved",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 766,
+   "relation_id": "S3F-CE3037882E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.OFFICIAL_DRUG_CATALOG",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.OFFICIAL_DRUG_CATALOG_CLASS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0404"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 767,
+   "relation_id": "S3F-F2E3960562",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAYMENT_RCPT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.PREPAYMENT_RCPT_ADD",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0368"
+   ],
+   "endpoint_resolution": {
+    "from": "owner_resolved",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 768,
+   "relation_id": "S3F-6E9E76D915",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAY_ACCT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.STAFF_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0457"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 769,
+   "relation_id": "S3F-C752F8DA70",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "HIS.BED_TRANS_LOG",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_VISIT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0255"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "DATA_CENTER",
+    "from_source_code": "ods_8_216",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 770,
+   "relation_id": "S3F-57AB79EC21",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.PREPAYMENT_RCPT_ADD",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.PREPAYMENT_RCPT",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 771,
+   "relation_id": "S3F-5D3D14EBA1",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_RCPT_MASTER",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 772,
+   "relation_id": "S3F-3862E450B1",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DEPT_DICT",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 773,
+   "relation_id": "S5F-57E6B624A0",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_EXPORT_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0062"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 774,
+   "relation_id": "S5F-2A342EA32E",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "YDHL.MCS_DOC_FORM",
+    "to_system": "DATA_CENTER",
+    "to_table": "YDHL.MCS_DOC_FORM_RECORDS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0035"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_ydhl",
+      "schema": "YDHL"
+     },
+     {
+      "system": "MOBILE_NURSING",
+      "source": "mobile_nursing_oracle_10_10_10_125",
+      "schema": "LUNA_MCS_SDSEY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_ydhl",
+      "schema": "YDHL"
+     },
+     {
+      "system": "MOBILE_NURSING",
+      "source": "mobile_nursing_oracle_10_10_10_125",
+      "schema": "LUNA_MCS_SDSEY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 775,
+   "relation_id": "S5F-567E60F5C7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_IMPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_IMPORT_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0091"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 776,
+   "relation_id": "S5F-6D51708E12",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK_LOG_NEW",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0065"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "owner_resolved"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 777,
+   "relation_id": "S5F-55C917604B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_PRESC_DETAIL_TEMP",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_MASTER_TEMP",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0111"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 778,
+   "relation_id": "S5F-58FB18210F",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_NAME_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0063"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 779,
+   "relation_id": "S5F-F8FAA6C79C",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS_EXECUTE_DETAILS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0160",
+    "N198-0417",
+    "N198-0418"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 780,
+   "relation_id": "S5F-09818A1214",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0331"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 781,
+   "relation_id": "S5F-FFEF7998D3",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0315"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 782,
+   "relation_id": "S5F-EFFC080BB2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0215"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "EXAM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 783,
+   "relation_id": "S5F-5429C07ADC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_PRESC_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0110"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 784,
+   "relation_id": "S5F-39A21CC6DC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_IMPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0333"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 785,
+   "relation_id": "S5F-0BF471B7F7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0109"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 786,
+   "relation_id": "S5F-B20ED6ACFC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DOCT_DRUG_PRESC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0198"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 787,
+   "relation_id": "S5F-9750A16A8F",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.CLINIC_VS_CHARGE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0179"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 788,
+   "relation_id": "S5F-82AAEAEC9E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0199"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 789,
+   "relation_id": "S5F-D01C5207CF",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "MEDREC.DIAGNOSIS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.TREATING_RESULT_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0305"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "INFECTION_SURVEILLANCE",
+      "source": "infection_10_10_9_45",
+      "schema": "C##NIS5"
+     },
+     {
+      "system": "INFECTION_SURVEILLANCE",
+      "source": "infection_10_10_9_45",
+      "schema": "C##NIS6"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 790,
+   "relation_id": "S5F-C3192AFD7A",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0202"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 791,
+   "relation_id": "S5F-FC41ABDDDA",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "EXAM.EXAM_PAT_MI",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0212"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "EXAM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 792,
+   "relation_id": "S5F-83CEF7EB9E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.EXP_NAME_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.EXP_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0219"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 793,
+   "relation_id": "S5F-579A0CB0A2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.EXP_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.EXP_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0218"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 794,
+   "relation_id": "S5F-D6CA335877",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0263"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 795,
+   "relation_id": "S5F-37CFA5B5D7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_IMPORT_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0201"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 796,
+   "relation_id": "S5F-4B81FD6A45",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_IMPORT_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STORAGE_DEPT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0334"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 797,
+   "relation_id": "S5F-BC645BBC63",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0200"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 798,
+   "relation_id": "S5F-E84B2B06DC",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STORAGE_DEPT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0332"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 799,
+   "relation_id": "S5F-9757449C01",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_PRE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0323"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 800,
+   "relation_id": "S5F-FEBB0999F9",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "OUTPADM.CLINIC_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "LAB.LAB_TEST_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0264"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "OUTPADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 801,
+   "relation_id": "S5F-D6CC6E5FC6",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DEPT_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_EXPORT_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0133"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_emr",
+      "schema": "JHEMR"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "CRBSB"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 802,
+   "relation_id": "S5F-155FD309A4",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0143"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 803,
+   "relation_id": "S5F-04DD382FAE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0142"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 804,
+   "relation_id": "S5F-3E64FB7320",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0349"
+   ],
+   "endpoint_resolution": {
+    "from": "owner_resolved",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 805,
+   "relation_id": "S5F-9CA85187E2",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0207"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 806,
+   "relation_id": "S5F-DC6165C54E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_PRESC_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0335"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 807,
+   "relation_id": "S5F-6F156FC2B7",
+   "current": {
+    "from_system": "DATA_CENTER",
+    "from_table": "YDHL.MCS_ORDER_SCHEDULE",
+    "to_system": "DATA_CENTER",
+    "to_table": "YDHL.WARDS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0398"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_ydhl",
+      "schema": "YDHL"
+     },
+     {
+      "system": "MOBILE_NURSING",
+      "source": "mobile_nursing_oracle_10_10_10_125",
+      "schema": "LUNA_MCS_SDSEY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_ydhl",
+      "schema": "YDHL"
+     },
+     {
+      "system": "MOBILE_NURSING",
+      "source": "mobile_nursing_oracle_10_10_10_125",
+      "schema": "LUNA_MCS_SDSEY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 808,
+   "relation_id": "S5F-8D31D65915",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_STOCK",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STORAGE_DEPT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0344"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 809,
+   "relation_id": "S5F-91FCC96E1F",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0321"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 810,
+   "relation_id": "S5F-C048B5E8F8",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.EXP_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "OUTPBILL.OUTP_BILL_ITEMS",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 811,
+   "relation_id": "S5F-9328386622",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.EXP_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPBILL.INP_BILL_DETAIL",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 812,
+   "relation_id": "S5F-AC0D6652C7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0420"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 813,
+   "relation_id": "S5F-F0EC7628AA",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS_COSTS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0241",
+    "N198-0416"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 814,
+   "relation_id": "S5F-ABF2F6C279",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DEPT_VS_WARD",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_DISPENSE_PRE",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 815,
+   "relation_id": "S5F-710F585ED1",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_PRE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_DISPENSE_REQ",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0327"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "owner_resolved"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 816,
+   "relation_id": "S5F-22DADEED18",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PROVIDE_APPLICATION",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0320"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 817,
+   "relation_id": "S5F-B1AC8D3067",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_PROVIDE_APPLICATION",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0343"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 818,
+   "relation_id": "S5F-A84F244F96",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_DISPENS_PROPERTY",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0325"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 819,
+   "relation_id": "S5F-D569E00977",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PROVIDE_APPLICATION",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 820,
+   "relation_id": "S5F-AA125F5559",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PROVIDE_APPLICATION",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0209"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 821,
+   "relation_id": "S5F-5AE8B0A597",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "DRUG_USER.DRUG_EXPORT_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PROVIDE_APPLICATION",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0329"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "DRUG_USER"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 822,
+   "relation_id": "S5F-BF863C6D6B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0319"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 823,
+   "relation_id": "S5F-7A9A5FB37B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 824,
+   "relation_id": "S5F-654F6FE714",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "columns_changed",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "columns_changed_review",
+   "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+  },
+  {
+   "review_id": 825,
+   "relation_id": "S5F-D8F81B64AE",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0341"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 826,
+   "relation_id": "S5F-635760EBAB",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_PRE",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0324"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 827,
+   "relation_id": "S5F-5E5767D1DB",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "EXAM.EXAM_MASTER",
+    "to_system": "HIS_SOURCE",
+    "to_table": "EXAM.EXAM_PAT_MI",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0352"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "EXAM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 828,
+   "relation_id": "S5F-83EA9907EA",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPBILL.INP_BILL_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "LAB.LAB_TEST_MASTER",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0372"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPBILL"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 829,
+   "relation_id": "S5F-2F56B5102B",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_PRICE_LIST",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_STOCK",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0340"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 830,
+   "relation_id": "S5F-B99E6BD99E",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_NAME_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0316"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 831,
+   "relation_id": "S5F-9F3095B783",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0326"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 832,
+   "relation_id": "S5F-79264C1422",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.EXP_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.EXP_NAME_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0360"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "confirm_with_source_fix",
+   "note": ""
+  },
+  {
+   "review_id": 833,
+   "relation_id": "S5F-67F4C2968F",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_DETAIL_TEMP",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0318"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 834,
+   "relation_id": "S5F-8958129949",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DOCT_DRUG_PRESC_DETAIL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_DICT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0313"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 835,
+   "relation_id": "S5F-F004BB9BB0",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "LAB.LAB_RESULT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "LAB.LAB_TEST_ITEMS",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0389"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_lis",
+      "schema": "LIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     },
+     {
+      "system": "LIS_SOURCE",
+      "source": "lis_sqlserver_10_10_10_73",
+      "schema": "dbo"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "LAB"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 836,
+   "relation_id": "S5F-AB4C2AA3D7",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "ORDADM.ORDERS_ANTI_DRUG",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0415"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "unique"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "ORDADM"
+     }
+    ],
+    "to_system_code": "HIS",
+    "to_source_code": "his_source_10_10_10_15"
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 837,
+   "relation_id": "S5F-6D34594CB9",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "ORDADM.ORDERS_EXECUTE_DETAILS",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PATS_IN_HOSPITAL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0422"
+   ],
+   "endpoint_resolution": {
+    "from": "unique",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_system_code": "HIS",
+    "from_source_code": "his_source_10_10_10_15",
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 838,
+   "relation_id": "S5F-9EF4214B31",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPADM.PATS_IN_HOSPITAL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "INPADM.PRE_DISCHGED_PATS",
+    "join": null
+   },
+   "mapping_status": "dropped_by_reparse",
+   "new_family_ids": [],
+   "endpoint_resolution": {},
+   "proposed_fix": {},
+   "recommended_action": "propose_reject_or_hold",
+   "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+  },
+  {
+   "review_id": 839,
+   "relation_id": "S5F-D2BC6F1F4D",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "COMM.DRUG_DICT",
+    "to_system": "HIS_SOURCE",
+    "to_table": "PHARMACY.DRUG_PRESC_DETAIL",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0317"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 840,
+   "relation_id": "S5F-6EB49E7BE9",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "INPADM.PATS_IN_HOSPITAL",
+    "to_system": "HIS_SOURCE",
+    "to_table": "MEDREC.PAT_VISIT",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0447"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "INPADM"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "MEDREC"
+     },
+     {
+      "system": "JHEMR_VASTBASE",
+      "source": "jhemr_vastbase_10_10_8_177",
+      "schema": "jhemr"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  },
+  {
+   "review_id": 841,
+   "relation_id": "S5F-2FBB4EFCCD",
+   "current": {
+    "from_system": "HIS_SOURCE",
+    "from_table": "PHARMACY.DRUG_DISPENSE_REC",
+    "to_system": "HIS_SOURCE",
+    "to_table": "COMM.DRUG_PRICE_LIST",
+    "join": null
+   },
+   "mapping_status": "mapped",
+   "new_family_ids": [
+    "N198-0109"
+   ],
+   "endpoint_resolution": {
+    "from": "ambiguous",
+    "to": "ambiguous"
+   },
+   "proposed_fix": {
+    "from_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "PHARMACY"
+     }
+    ],
+    "to_candidates": [
+     {
+      "system": "DATA_CENTER",
+      "source": "ods_8_216",
+      "schema": "HIS"
+     },
+     {
+      "system": "HIS",
+      "source": "his_source_10_10_10_15",
+      "schema": "COMM"
+     }
+    ]
+   },
+   "recommended_action": "source_pending_no_context",
+   "note": ""
+  }
+ ],
+ "method_note": "语料上下文消歧：限定 owner 写法/ODS 标记（V_EMR_/CDR_/@sjzx）为可追溯证据；无证据不默认（F03）。ODS 为结构镜像，列差无法区分两源。"
+}

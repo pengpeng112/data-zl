@@ -1,0 +1,2965 @@
+{
+ "summary": {
+  "stateful_families_rereviewed": 59,
+  "recommendations": {
+   "keep_pass_pending_sample_check": 14,
+   "downgrade_insufficient": 27,
+   "keep_failed_with_scope_note": 16,
+   "keep_insufficient": 2
+  },
+  "probe_coverage_parsed": 35,
+  "probes_v2_count": 24,
+  "source_disambiguated_reviews": 0
+ },
+ "rereview": [
+  {
+   "relation_id": "S2F-4264E2FC1C",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "DIAGNOSIS(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q22",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "DIAGNOSIS",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "DIAGNOSIS",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 5
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0002"
+   ]
+  },
+  {
+   "relation_id": "S2F-C90B6003D8",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "INP_BILL_DETAIL(PATIENT_ID)",
+    "PAT_MASTER_INDEX(PATIENT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q02",
+     "via": "plan",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q02",
+     "via": "payload",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "mismatch",
+   "recommended": "downgrade_insufficient",
+   "reason": "Q02 只测 PAT_VISIT 组合键，未测 PAT_MASTER_INDEX 唯一性或两表覆盖 → 降级 insufficient（间接证据仅支持 PATIENT_ID 单列在 PAT_VISIT 侧表现）",
+   "new_family_ids": [
+    "N198-0006",
+    "N198-0222"
+   ]
+  },
+  {
+   "relation_id": "S2F-60FDE4D634",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "INP_BILL_DETAIL(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q12",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "INP_SETTLE_MASTER",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ],
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_SETTLE_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_SETTLE_MASTER",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0004",
+    "N198-0223"
+   ]
+  },
+  {
+   "relation_id": "S2F-B7763F2E63",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "DEPT_DICT(DEPT_CODE)",
+    "STAFF_DICT(DEPT_CODE)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q06",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DEPT_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q07",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "STAFF_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0009",
+    "N198-0079",
+    "N198-0278"
+   ]
+  },
+  {
+   "relation_id": "S2F-190AFAC505",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "CLINIC_MASTER(VISIT_DATE,VISIT_NO)",
+    "OUTP_TREAT_REC(VISIT_DATE,VISIT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q03",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q03",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q11",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_TREAT_REC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0051"
+   ]
+  },
+  {
+   "relation_id": "S2F-4EB1EB7136",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "OPERATION(OPERATION_CODE)",
+    "OPERATION_DICT(OPERATION_CODE)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q20",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OPERATION_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q23",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OPERATION",
+      "OPERATION_DICT",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "OPERATION",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "OPERATION",
+       "VISIT_ID"
+      ],
+      [
+       "OPERATION_DICT",
+       "OPERATION_CODE",
+       "O",
+       "OC"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0005"
+   ]
+  },
+  {
+   "relation_id": "S2F-6EA01F27EA",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "DEPT_DICT(DEPT_CODE)",
+    "INP_BILL_DETAIL(PERFORMED_BY)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q06",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DEPT_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0032",
+    "N198-0135",
+    "N198-0293"
+   ]
+  },
+  {
+   "relation_id": "S2F-2A80F74804",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OUTP_BILL_ITEMS(RCPT_NO,VISIT_NO,VISIT_DATE)",
+    "OUTP_ORDER_DESC(RCPT_NO,VISIT_NO,VISIT_DATE)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q05",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_ORDER_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0008",
+    "N198-0424"
+   ]
+  },
+  {
+   "relation_id": "S2F-61A57AEFD3",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "DEPT_DICT(DEPT_CODE)",
+    "PAT_VISIT(DEPT_DISCHARGE_FROM)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q06",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DEPT_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0014"
+   ]
+  },
+  {
+   "relation_id": "S2F-D6E536D1CB",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OPERATION_MASTER(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q19",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OPERATION_MASTER",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "OPERATION_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "OPERATION_MASTER",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0024"
+   ]
+  },
+  {
+   "relation_id": "S2F-E9080EA37B",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "ORDERS(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [],
+   "best_coverage": "none",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=none）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0020"
+   ]
+  },
+  {
+   "relation_id": "S2F-BE6DDA7EB6",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "LAB_RESULT(TEST_NO)",
+    "LAB_TEST_MASTER(TEST_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q24",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_RESULT",
+      "LAB_TEST_ITEMS",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "R",
+       "TEST_NO",
+       "I",
+       "TEST_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0019",
+    "N198-0228"
+   ]
+  },
+  {
+   "relation_id": "S2F-89188944F3",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "INP_SETTLE_MASTER(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q12",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "INP_SETTLE_MASTER",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ],
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_SETTLE_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_SETTLE_MASTER",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0025",
+    "N198-0382"
+   ]
+  },
+  {
+   "relation_id": "S2F-9F870E5A7E",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "CLINIC_MASTER(DOCTOR)",
+    "STAFF_DICT(EMP_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q03",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q07",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "STAFF_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0026"
+   ]
+  },
+  {
+   "relation_id": "S2F-333D618107",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OPERATION_MASTER(SURGEON)",
+    "STAFF_DICT(EMP_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q07",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "STAFF_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0018"
+   ]
+  },
+  {
+   "relation_id": "S2F-2DF926CEB5",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "DIAGNOSIS(VISIT_ID)",
+    "PAT_VISIT(VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0017"
+   ]
+  },
+  {
+   "relation_id": "S2F-B460DFC719",
+   "old_state": "failed",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OUTP_BILL_ITEMS(RCPT_NO)",
+    "OUTP_RCPT_MASTER(RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q13",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_PAYMENTS_MONEY",
+      "OUTP_RCPT_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "B",
+       "RCPT_NO",
+       "R",
+       "RCPT_NO"
+      ],
+      [
+       "B",
+       "RCPT_NO",
+       "P",
+       "RCPT_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0013"
+   ]
+  },
+  {
+   "relation_id": "S2F-0BF98D1B1C",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OUTP_BILL_ITEMS(VISIT_DATE,VISIT_NO,RCPT_NO)",
+    "OUTP_ORDER_DESC(VISIT_DATE,VISIT_NO,RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q05",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_ORDER_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0008",
+    "N198-0424"
+   ]
+  },
+  {
+   "relation_id": "S2F-8949408577",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "PATS_IN_HOSPITAL(PATIENT_ID,VISIT_ID)",
+    "PAT_VISIT(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [],
+   "best_coverage": "none",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=none）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0097",
+    "N198-0403",
+    "N198-0448"
+   ]
+  },
+  {
+   "relation_id": "S2F-BDCE2A3160",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "CLINIC_MASTER(CLINIC_NO)",
+    "OUTP_ORDER_DESC(CLINIC_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q03",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q03",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0058",
+    "N198-0267"
+   ]
+  },
+  {
+   "relation_id": "S2F-DB7BD1C6F6",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "OUTP_ORDERS(VISIT_DATE,VISIT_NO,SERIAL_NO)",
+    "OUTP_TREAT_REC(VISIT_DATE,VISIT_NO,SERIAL_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q11",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_TREAT_REC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q11",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_TREAT_REC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0433"
+   ]
+  },
+  {
+   "relation_id": "S2F-EE88384570",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "EXAM_ITEMS(EXAM_NO)",
+    "EXAM_MASTER(EXAM_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q26",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "EXAM_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 17
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0027",
+    "N198-0211",
+    "N198-0348"
+   ]
+  },
+  {
+   "relation_id": "S2F-50040F7BC3",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "CLINIC_MASTER(PATIENT_ID,VISIT_DATE,VISIT_NO)",
+    "OUTP_MR_DIAG_DESC(PATIENT_ID,VISIT_DATE,VISIT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q10",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_MR_DIAG_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q03",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q10",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_MR_DIAG_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0090"
+   ]
+  },
+  {
+   "relation_id": "S2F-E256C47346",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "CLINIC_MASTER(PATIENT_ID,CLINIC_NO)",
+    "OUTP_ORDER_DESC(PATIENT_ID,CLINIC_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q03",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q03",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0101"
+   ]
+  },
+  {
+   "relation_id": "S2F-1008D796C9",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "INP_BILL_DETAIL(VISIT_ID)",
+    "PAT_VISIT(VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0224"
+   ]
+  },
+  {
+   "relation_id": "S2F-2C9FE1D3B6",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "ORDERS(PATIENT_ID)",
+    "PATS_IN_HOSPITAL(PATIENT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q04",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PATS_IN_HOSPITAL"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q04",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PATS_IN_HOSPITAL"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0120"
+   ]
+  },
+  {
+   "relation_id": "S2F-67F8789EE2",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "LAB_RESULT(TEST_NO,ITEM_NO)",
+    "LAB_TEST_ITEMS(TEST_NO,ITEM_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q24",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_RESULT",
+      "LAB_TEST_ITEMS",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "R",
+       "TEST_NO",
+       "I",
+       "TEST_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "downgrade_insufficient",
+   "reason": "Q24 未出现 ITEM_NO，只做 TEST_NO 计数，不能证明 TEST_NO+ITEM_NO 两列对应 → 降级 insufficient",
+   "new_family_ids": [
+    "N198-0115"
+   ]
+  },
+  {
+   "relation_id": "S2F-320B0458DF",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "ORDERS(VISIT_ID,PATIENT_ID)",
+    "PAT_VISIT(VISIT_ID,PATIENT_ID)"
+   ],
+   "evidence": [],
+   "best_coverage": "none",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=none）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0020"
+   ]
+  },
+  {
+   "relation_id": "S2F-D89F991E47",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "CLINIC_MASTER(PATIENT_ID,VISIT_DATE,VISIT_NO)",
+    "OUTP_MR(PATIENT_ID,VISIT_DATE,VISIT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q03",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "CLINIC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0088"
+   ]
+  },
+  {
+   "relation_id": "S2F-040B518C68",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "OUTP_BILL_ITEMS(RCPT_NO)",
+    "OUTP_ORDER_DESC(RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q05",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_ORDER_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0122"
+   ]
+  },
+  {
+   "relation_id": "S2F-1A98B5707E",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "ORDERS(PATIENT_ID,VISIT_ID)",
+    "PATS_IN_HOSPITAL(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q04",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PATS_IN_HOSPITAL"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q02",
+     "via": "payload",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q04",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PATS_IN_HOSPITAL"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0161"
+   ]
+  },
+  {
+   "relation_id": "S2F-3E2BBE8708",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "CLINIC_MASTER(VISIT_NO)",
+    "OUTP_MR_DIAG_DESC(VISIT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q10",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_MR_DIAG_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": []
+  },
+  {
+   "relation_id": "S2F-49E28C0D3F",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "OUTP_ORDERS(SERIAL_NO)",
+    "OUTP_TREAT_REC(SERIAL_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q11",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_TREAT_REC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0096"
+   ]
+  },
+  {
+   "relation_id": "S2F-902589A969",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "DIAGNOSIS(VISIT_ID)",
+    "OPERATION(VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "mismatch",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0193"
+   ]
+  },
+  {
+   "relation_id": "S2F-33FFE8A421",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "INP_BILL_DETAIL(PATIENT_ID)",
+    "PAT_VISIT(PATIENT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q01",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "PAT_VISIT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": []
+  },
+  {
+   "relation_id": "S2F-85177FB98A",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "EXAM_MASTER(EXAM_NO)",
+    "EXAM_REPORT(EXAM_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q26",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "EXAM_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 17
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0145",
+    "N198-0213"
+   ]
+  },
+  {
+   "relation_id": "S2F-A4F3F1FA73",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "DRUG_PRESC_DETAIL(PRESC_NO,PRESC_DATE)",
+    "DRUG_PRESC_MASTER(PRESC_NO,PRESC_DATE)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q31",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRESC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q31",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRESC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0021"
+   ]
+  },
+  {
+   "relation_id": "S3F-FBDD22E3B6",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "OUTP_PAYMENTS_MONEY(RCPT_NO)",
+    "OUTP_RCPT_MASTER(RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q13",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_PAYMENTS_MONEY",
+      "OUTP_RCPT_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "B",
+       "RCPT_NO",
+       "R",
+       "RCPT_NO"
+      ],
+      [
+       "B",
+       "RCPT_NO",
+       "P",
+       "RCPT_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0015"
+   ]
+  },
+  {
+   "relation_id": "S3F-03501B12F4",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "OUTP_ORDER_DESC(RCPT_NO)",
+    "OUTP_RCPT_MASTER(RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q05",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OUTP_BILL_ITEMS",
+      "OUTP_ORDER_DESC"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0085"
+   ]
+  },
+  {
+   "relation_id": "S3F-0841AC6F4F",
+   "old_state": "failed",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "INP_SETTLE_MASTER(PATIENT_ID,VISIT_ID)",
+    "INP_SETTLE_MASTER_YB(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q16",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "INP_SETTLE_MASTER",
+      "INP_SETTLE_MASTER_YB",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_SETTLE_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_SETTLE_MASTER",
+       "VISIT_ID"
+      ],
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_SETTLE_MASTER_YB",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_SETTLE_MASTER_YB",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0380"
+   ]
+  },
+  {
+   "relation_id": "S3F-8CF8B4B39E",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "EXAM_MASTER(EXAM_NO,PATIENT_ID,VISIT_ID)",
+    "INP_BILL_DETAIL(OPER_CODE,PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q15",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 12
+    },
+    {
+     "uid": "Q15",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 12
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "Q15 只有长度/非空分布且未连 EXAM_MASTER，不能证明 EXAM_NO↔OPER_CODE 编码身份 → 降级 insufficient（身份假说待证）",
+   "new_family_ids": [
+    "N198-0353"
+   ]
+  },
+  {
+   "relation_id": "S3F-170685FC38",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "DRUG_PRICE_LIST(DRUG_CODE,FIRM_ID,UNITS)",
+    "INP_BILL_DETAIL(ITEM_CODE,ITEM_SPEC,UNITS)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q30",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRICE_LIST"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": []
+  },
+  {
+   "relation_id": "S3F-D8F12989E0",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "INP_BILL_DETAIL(PATIENT_ID,VISIT_ID,OPER_CODE,ORDER_NO)",
+    "ORDERS(PATIENT_ID,VISIT_ID,APP_NO,ORDER_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q15",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 12
+    },
+    {
+     "uid": "Q15",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "INP_BILL_DETAIL",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_BILL_DETAIL",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "INP_BILL_DETAIL",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 12
+    },
+    {
+     "uid": "Q33",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_DISPENSE_REC",
+      "ORDERS",
+      "ORDERS_ANTI_DRUG",
+      "ORDERS_EXECUTE_DETAILS"
+     ],
+     "probe_edges": [
+      [
+       "O",
+       "PATIENT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "PATIENT_ID"
+      ],
+      [
+       "O",
+       "VISIT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "VISIT_ID"
+      ],
+      [
+       "O",
+       "ORDER_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_NO"
+      ],
+      [
+       "O",
+       "ORDER_SUB_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_SUB_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "Q15/Q33 未验证该 APP_NO 映射对 → 降级 insufficient",
+   "new_family_ids": []
+  },
+  {
+   "relation_id": "S3F-5FF4CF0E1A",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "PREPAYMENT_RCPT(RCPT_NO)",
+    "PREPAYMENT_RCPT_ADD(RCPT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q14",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "PREPAYMENT_RCPT",
+      "PREPAYMENT_RCPT_ADD"
+     ],
+     "probe_edges": [],
+     "executed": "failed",
+     "rows": null
+    },
+    {
+     "uid": "Q14b",
+     "via": "payload",
+     "class": "no_sql_or_uid"
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0455"
+   ]
+  },
+  {
+   "relation_id": "S3F-007BA0B97D",
+   "old_state": "failed",
+   "old_intake": "candidate",
+   "assertion": [
+    "INP_SETTLE_MASTER_YB(ID_NO)",
+    "PAT_MASTER_INDEX(ID_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q17",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "INP_SETTLE_MASTER_YB",
+      "PAT_MASTER_INDEX",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "INP_SETTLE_MASTER_YB",
+       "PATIENT_ID"
+      ],
+      [
+       "PAT_MASTER_INDEX",
+       "ID_NO",
+       "Y",
+       "IDNO"
+      ]
+     ],
+     "executed": "failed",
+     "rows": null
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": []
+  },
+  {
+   "relation_id": "S4F-C9C945D425",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "OPERATION(PATIENT_ID,VISIT_ID)",
+    "OPERATION_MASTER(PATIENT_ID,VISIT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q19",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OPERATION_MASTER",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "OPERATION_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "OPERATION_MASTER",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q21",
+     "via": "plan",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "OPERATION_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 11
+    },
+    {
+     "uid": "Q19",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OPERATION_MASTER",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "OPERATION_MASTER",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "OPERATION_MASTER",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0029",
+    "N198-0406"
+   ]
+  },
+  {
+   "relation_id": "S4F-01DD31DEAC",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "OPERATION(OPERATION_DESC)",
+    "OPERATION_DICT(OPERATION_NAME)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q20",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "OPERATION_DICT"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0057"
+   ]
+  },
+  {
+   "relation_id": "S4F-FEB658BACB",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "DIAGNOSIS(DIAGNOSIS_TYPE)",
+    "DIAGNOSIS_TYPE_DICT(DIAGNOSIS_TYPE_CODE)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q22",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DIAGNOSIS",
+      "PAT_VISIT"
+     ],
+     "probe_edges": [
+      [
+       "PV",
+       "PATIENT_ID",
+       "DIAGNOSIS",
+       "PATIENT_ID"
+      ],
+      [
+       "PV",
+       "VISIT_ID",
+       "DIAGNOSIS",
+       "VISIT_ID"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 5
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0107"
+   ]
+  },
+  {
+   "relation_id": "S5F-57E6B624A0",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "DRUG_EXPORT_DETAIL(DOCUMENT_NO)",
+    "DRUG_EXPORT_MASTER(DOCUMENT_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q29",
+     "via": "plan",
+     "class": "scope_mismatch",
+     "probe_tables": [
+      "DRUG_STOCK"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q27c",
+     "via": "payload",
+     "class": "no_sql_or_uid"
+    },
+    {
+     "uid": "Q28c",
+     "via": "payload",
+     "class": "no_sql_or_uid"
+    }
+   ],
+   "best_coverage": "mismatch",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=mismatch）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0062"
+   ]
+  },
+  {
+   "relation_id": "S5F-2A342EA32E",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "MCS_DOC_FORM(ID)",
+    "MCS_DOC_FORM_RECORDS(FORM_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q35",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "MCS_DOC_FORM",
+      "MCS_DOC_FORM_RECORDS"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q35",
+     "via": "payload",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "MCS_DOC_FORM",
+      "MCS_DOC_FORM_RECORDS"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0035"
+   ]
+  },
+  {
+   "relation_id": "S5F-26095F1933",
+   "old_state": "passed_in_scope",
+   "old_intake": "existing_supplement",
+   "assertion": [
+    "INPATIENTS(PAT_INDEX_NO)",
+    "MCS_DOC_FORM(PATIENT_UID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q35",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "MCS_DOC_FORM",
+      "MCS_DOC_FORM_RECORDS"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0033"
+   ]
+  },
+  {
+   "relation_id": "S5F-C438A80C4D",
+   "old_state": "failed",
+   "old_intake": "candidate",
+   "assertion": [
+    "DRUG_IMPORT_DETAIL(DRUG_CODE,PACKAGE_SPEC,FIRM_ID)",
+    "DRUG_PRICE_LIST(DRUG_CODE,DRUG_SPEC,FIRM_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q30",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRICE_LIST"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0055"
+   ]
+  },
+  {
+   "relation_id": "S5F-F8FAA6C79C",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+    "ORDERS_EXECUTE_DETAILS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q33",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "DRUG_DISPENSE_REC",
+      "ORDERS",
+      "ORDERS_ANTI_DRUG",
+      "ORDERS_EXECUTE_DETAILS"
+     ],
+     "probe_edges": [
+      [
+       "O",
+       "PATIENT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "PATIENT_ID"
+      ],
+      [
+       "O",
+       "VISIT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "VISIT_ID"
+      ],
+      [
+       "O",
+       "ORDER_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_NO"
+      ],
+      [
+       "O",
+       "ORDER_SUB_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_SUB_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q33",
+     "via": "payload",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "DRUG_DISPENSE_REC",
+      "ORDERS",
+      "ORDERS_ANTI_DRUG",
+      "ORDERS_EXECUTE_DETAILS"
+     ],
+     "probe_edges": [
+      [
+       "O",
+       "PATIENT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "PATIENT_ID"
+      ],
+      [
+       "O",
+       "VISIT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "VISIT_ID"
+      ],
+      [
+       "O",
+       "ORDER_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_NO"
+      ],
+      [
+       "O",
+       "ORDER_SUB_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_SUB_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0160",
+    "N198-0417",
+    "N198-0418"
+   ]
+  },
+  {
+   "relation_id": "S5F-A2C52B1B9D",
+   "old_state": "insufficient",
+   "old_intake": "partial",
+   "assertion": [
+    "LAB_TEST_BATCH_MASTER(PATIENT_ID)",
+    "LAB_TEST_MASTER(PATIENT_ID)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q32",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_TEST_BATCH_MASTER",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_insufficient",
+   "reason": "证据不足维持",
+   "new_family_ids": [
+    "N198-0229"
+   ]
+  },
+  {
+   "relation_id": "S5F-DC6165C54E",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "DRUG_PRESC_DETAIL(PRESC_NO)",
+    "DRUG_PRESC_MASTER(PRESC_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q31",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRESC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q31",
+     "via": "payload",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_PRESC_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "downgrade_insufficient",
+   "reason": "探针未同时覆盖两端表（best=indirect）；单表/旁证不能授予关系通过",
+   "new_family_ids": [
+    "N198-0335"
+   ]
+  },
+  {
+   "relation_id": "S5F-D4F66B37E7",
+   "old_state": "insufficient",
+   "old_intake": "candidate",
+   "assertion": [
+    "LAB_TEST_BATCH_MASTER(TEST_NO)",
+    "LAB_TEST_MASTER(TEST_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q32",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_TEST_BATCH_MASTER",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_insufficient",
+   "reason": "证据不足维持",
+   "new_family_ids": [
+    "N198-0391"
+   ]
+  },
+  {
+   "relation_id": "S5F-8B65E05346",
+   "old_state": "failed",
+   "old_intake": "partial",
+   "assertion": [
+    "DRUG_DICT(DRUG_CODE,DRUG_SPEC)",
+    "DRUG_STOCK(DRUG_CODE,DRUG_SPEC)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q29",
+     "via": "plan",
+     "class": "indirect_one_side",
+     "probe_tables": [
+      "DRUG_STOCK"
+     ],
+     "probe_edges": [],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "indirect",
+   "recommended": "keep_failed_with_scope_note",
+   "reason": "负例保留；被否定的是特定聚合/直连用法，正常 1:N 用法不受否定",
+   "new_family_ids": [
+    "N198-0203"
+   ]
+  },
+  {
+   "relation_id": "S5F-F004BB9BB0",
+   "old_state": "passed_in_scope",
+   "old_intake": "partial",
+   "assertion": [
+    "LAB_RESULT(TEST_NO)",
+    "LAB_TEST_ITEMS(TEST_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q24",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_RESULT",
+      "LAB_TEST_ITEMS",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "R",
+       "TEST_NO",
+       "I",
+       "TEST_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q24",
+     "via": "payload",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "LAB_RESULT",
+      "LAB_TEST_ITEMS",
+      "LAB_TEST_MASTER"
+     ],
+     "probe_edges": [
+      [
+       "R",
+       "TEST_NO",
+       "I",
+       "TEST_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0389"
+   ]
+  },
+  {
+   "relation_id": "S5F-AB4C2AA3D7",
+   "old_state": "passed_in_scope",
+   "old_intake": "candidate",
+   "assertion": [
+    "ORDERS(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)",
+    "ORDERS_ANTI_DRUG(PATIENT_ID,VISIT_ID,ORDER_NO,ORDER_SUB_NO)"
+   ],
+   "evidence": [
+    {
+     "uid": "Q33",
+     "via": "plan",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "DRUG_DISPENSE_REC",
+      "ORDERS",
+      "ORDERS_ANTI_DRUG",
+      "ORDERS_EXECUTE_DETAILS"
+     ],
+     "probe_edges": [
+      [
+       "O",
+       "PATIENT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "PATIENT_ID"
+      ],
+      [
+       "O",
+       "VISIT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "VISIT_ID"
+      ],
+      [
+       "O",
+       "ORDER_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_NO"
+      ],
+      [
+       "O",
+       "ORDER_SUB_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_SUB_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    },
+    {
+     "uid": "Q33",
+     "via": "payload",
+     "class": "direct_both_tables",
+     "probe_tables": [
+      "DRUG_DISPENSE_REC",
+      "ORDERS",
+      "ORDERS_ANTI_DRUG",
+      "ORDERS_EXECUTE_DETAILS"
+     ],
+     "probe_edges": [
+      [
+       "O",
+       "PATIENT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "PATIENT_ID"
+      ],
+      [
+       "O",
+       "VISIT_ID",
+       "ORDERS_EXECUTE_DETAILS",
+       "VISIT_ID"
+      ],
+      [
+       "O",
+       "ORDER_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_NO"
+      ],
+      [
+       "O",
+       "ORDER_SUB_NO",
+       "ORDERS_EXECUTE_DETAILS",
+       "ORDER_SUB_NO"
+      ]
+     ],
+     "executed": "executed",
+     "rows": 1
+    }
+   ],
+   "best_coverage": "direct",
+   "recommended": "keep_pass_pending_sample_check",
+   "reason": "探针覆盖两端表；保留 passed（列级对应见 probe_edges）",
+   "new_family_ids": [
+    "N198-0415"
+   ]
+  }
+ ],
+ "probe_coverage": {
+  "Q01": {
+   "tables": [
+    "PAT_VISIT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q02": {
+   "tables": [
+    "PAT_VISIT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q03": {
+   "tables": [
+    "CLINIC_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q04": {
+   "tables": [
+    "PATS_IN_HOSPITAL"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q05": {
+   "tables": [
+    "OUTP_BILL_ITEMS",
+    "OUTP_ORDER_DESC"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q06": {
+   "tables": [
+    "DEPT_DICT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q07": {
+   "tables": [
+    "STAFF_DICT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q08": {
+   "tables": [
+    "ALL_TABLES"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q09": {
+   "tables": [
+    "OPERATION",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "OPERATION",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "OPERATION",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q10": {
+   "tables": [
+    "OUTP_MR_DIAG_DESC"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q11": {
+   "tables": [
+    "OUTP_TREAT_REC"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q12": {
+   "tables": [
+    "INP_BILL_DETAIL",
+    "INP_SETTLE_MASTER",
+    "PAT_VISIT"
+   ],
+   "n_edges": 6,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_BILL_DETAIL",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "INP_BILL_DETAIL",
+     "VISIT_ID"
+    ],
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_SETTLE_MASTER",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "INP_SETTLE_MASTER",
+     "VISIT_ID"
+    ],
+    [
+     "B",
+     "PATIENT_ID",
+     "T",
+     "PATIENT_ID"
+    ],
+    [
+     "B",
+     "VISIT_ID",
+     "T",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q13": {
+   "tables": [
+    "OUTP_BILL_ITEMS",
+    "OUTP_PAYMENTS_MONEY",
+    "OUTP_RCPT_MASTER"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "B",
+     "RCPT_NO",
+     "R",
+     "RCPT_NO"
+    ],
+    [
+     "B",
+     "RCPT_NO",
+     "P",
+     "RCPT_NO"
+    ]
+   ]
+  },
+  "Q14": {
+   "tables": [
+    "PREPAYMENT_RCPT",
+    "PREPAYMENT_RCPT_ADD"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q15": {
+   "tables": [
+    "INP_BILL_DETAIL",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_BILL_DETAIL",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "INP_BILL_DETAIL",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q16": {
+   "tables": [
+    "INP_SETTLE_MASTER",
+    "INP_SETTLE_MASTER_YB",
+    "PAT_VISIT"
+   ],
+   "n_edges": 6,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_SETTLE_MASTER",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "INP_SETTLE_MASTER",
+     "VISIT_ID"
+    ],
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_SETTLE_MASTER_YB",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "INP_SETTLE_MASTER_YB",
+     "VISIT_ID"
+    ],
+    [
+     "A",
+     "PATIENT_ID",
+     "B",
+     "PATIENT_ID"
+    ],
+    [
+     "A",
+     "VISIT_ID",
+     "B",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q17": {
+   "tables": [
+    "INP_SETTLE_MASTER_YB",
+    "PAT_MASTER_INDEX",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "INP_SETTLE_MASTER_YB",
+     "PATIENT_ID"
+    ],
+    [
+     "PAT_MASTER_INDEX",
+     "ID_NO",
+     "Y",
+     "IDNO"
+    ]
+   ]
+  },
+  "Q18": {
+   "tables": [
+    "OPERATION",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "OPERATION",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "OPERATION",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q19": {
+   "tables": [
+    "OPERATION_MASTER",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "OPERATION_MASTER",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "OPERATION_MASTER",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q20": {
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q21": {
+   "tables": [
+    "OPERATION_DICT"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q22": {
+   "tables": [
+    "DIAGNOSIS",
+    "PAT_VISIT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "DIAGNOSIS",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "DIAGNOSIS",
+     "VISIT_ID"
+    ]
+   ]
+  },
+  "Q23": {
+   "tables": [
+    "OPERATION",
+    "OPERATION_DICT",
+    "PAT_VISIT"
+   ],
+   "n_edges": 3,
+   "edges": [
+    [
+     "PV",
+     "PATIENT_ID",
+     "OPERATION",
+     "PATIENT_ID"
+    ],
+    [
+     "PV",
+     "VISIT_ID",
+     "OPERATION",
+     "VISIT_ID"
+    ],
+    [
+     "OPERATION_DICT",
+     "OPERATION_CODE",
+     "O",
+     "OC"
+    ]
+   ]
+  },
+  "Q24": {
+   "tables": [
+    "LAB_RESULT",
+    "LAB_TEST_ITEMS",
+    "LAB_TEST_MASTER"
+   ],
+   "n_edges": 1,
+   "edges": [
+    [
+     "R",
+     "TEST_NO",
+     "I",
+     "TEST_NO"
+    ]
+   ]
+  },
+  "Q25": {
+   "tables": [
+    "EXAM_ITEMS",
+    "EXAM_MASTER",
+    "EXAM_PAT_MI",
+    "EXAM_REPORT"
+   ],
+   "n_edges": 2,
+   "edges": [
+    [
+     "EXAM_PAT_MI",
+     "PATIENT_LOCAL_ID",
+     "SEED",
+     "PATIENT_LOCAL_ID"
+    ],
+    [
+     "EXAM_PAT_MI",
+     "LOCAL_ID_CLASS",
+     "SEED",
+     "LOCAL_ID_CLASS"
+    ]
+   ]
+  },
+  "Q26": {
+   "tables": [
+    "EXAM_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q27": {
+   "tables": [
+    "DRUG_EXPORT_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q28": {
+   "tables": [
+    "DRUG_EXPORT_DETAIL",
+    "DRUG_EXPORT_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q29": {
+   "tables": [
+    "DRUG_STOCK"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q30": {
+   "tables": [
+    "DRUG_PRICE_LIST"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q31": {
+   "tables": [
+    "DRUG_PRESC_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q32": {
+   "tables": [
+    "LAB_TEST_BATCH_MASTER",
+    "LAB_TEST_MASTER"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q33": {
+   "tables": [
+    "DRUG_DISPENSE_REC",
+    "ORDERS",
+    "ORDERS_ANTI_DRUG",
+    "ORDERS_EXECUTE_DETAILS"
+   ],
+   "n_edges": 12,
+   "edges": [
+    [
+     "O",
+     "PATIENT_ID",
+     "ORDERS_EXECUTE_DETAILS",
+     "PATIENT_ID"
+    ],
+    [
+     "O",
+     "VISIT_ID",
+     "ORDERS_EXECUTE_DETAILS",
+     "VISIT_ID"
+    ],
+    [
+     "O",
+     "ORDER_NO",
+     "ORDERS_EXECUTE_DETAILS",
+     "ORDER_NO"
+    ],
+    [
+     "O",
+     "ORDER_SUB_NO",
+     "ORDERS_EXECUTE_DETAILS",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "O",
+     "PATIENT_ID",
+     "ORDERS_ANTI_DRUG",
+     "PATIENT_ID"
+    ],
+    [
+     "O",
+     "VISIT_ID",
+     "ORDERS_ANTI_DRUG",
+     "VISIT_ID"
+    ],
+    [
+     "O",
+     "ORDER_NO",
+     "ORDERS_ANTI_DRUG",
+     "ORDER_NO"
+    ],
+    [
+     "O",
+     "ORDER_SUB_NO",
+     "ORDERS_ANTI_DRUG",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "O",
+     "PATIENT_ID",
+     "DRUG_DISPENSE_REC",
+     "PATIENT_ID"
+    ],
+    [
+     "O",
+     "VISIT_ID",
+     "DRUG_DISPENSE_REC",
+     "VISIT_ID"
+    ],
+    [
+     "O",
+     "ORDER_NO",
+     "DRUG_DISPENSE_REC",
+     "ORDER_NO"
+    ],
+    [
+     "O",
+     "ORDER_SUB_NO",
+     "DRUG_DISPENSE_REC",
+     "ORDER_SUB_NO"
+    ]
+   ]
+  },
+  "Q34": {
+   "tables": [
+    "INPATIENTS",
+    "MCS_DOC_FORM"
+   ],
+   "n_edges": 0,
+   "edges": []
+  },
+  "Q35": {
+   "tables": [
+    "MCS_DOC_FORM",
+    "MCS_DOC_FORM_RECORDS"
+   ],
+   "n_edges": 0,
+   "edges": []
+  }
+ }
+}

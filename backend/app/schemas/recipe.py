@@ -11,7 +11,9 @@ class RecipeCreate(BaseModel):
     business_domain: str | None = None
     description: str | None = None
     primary_tables: list[Any] = Field(default_factory=list)
-    joins: list[Any] = Field(default_factory=list)
+    # 198 T11：joins 允许知识型 dict 形态入库（readiness 显式标记 not_executable），
+    # 但 submit/activate/生成端会被结构校验拒绝，直到重建为标准数组。
+    joins: list[Any] | dict[str, Any] = Field(default_factory=list)
     recipe_json: dict[str, Any] | None = None
 
 
@@ -21,7 +23,7 @@ class RecipeDraftUpdate(BaseModel):
     domain: str | None = None
     business_domain: str | None = None
     primary_tables: list[Any] | None = None
-    joins: list[Any] | None = None
+    joins: list[Any] | dict[str, Any] | None = None
     recipe_json: dict[str, Any] | None = None
 
 

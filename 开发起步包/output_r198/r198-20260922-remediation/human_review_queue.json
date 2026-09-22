@@ -1,0 +1,659 @@
+[
+ {
+  "group": "A1",
+  "id": "review:686",
+  "title": "HIS.OUTP_ORDERS ~ HIS.OUTP_TREAT_REC",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=686; probe P2A-686",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:709",
+  "title": "MEDREC.MEDICAL_CARD_MEMO ~ MEDREC.MEDICAL_CARD_TYPE_DICT",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=709; probe P2A-709",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:711",
+  "title": "HIS.OUTP_MR_DIAG_DESC ~ HIS.OUTP_TREAT_REC",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=711; probe P2A-711",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:721",
+  "title": "HIS.OUTP_MR ~ HIS.OUTP_MR_DIAG_DESC",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=721; probe P2A-721",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:729",
+  "title": "OUTPADM.CLINIC_INDEX ~ COMM.CLINIC_TYPE_SETTING",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=729; probe P2A-729",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:730",
+  "title": "MEDREC.MEDICAL_CARD_MEMO ~ MEDREC.MEDICAL_CARD_VS_IDNO",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=730; probe P2A-730",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:735",
+  "title": "PHARMACY.DOCT_DRUG_PRESC_DETAIL ~ PHARMACY.DOCT_DRUG_PRESC_MASTER",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=735; probe P2A-735",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:742",
+  "title": "COMM.CLINIC_ITEM_CLASS_DICT ~ ORDADM.ORDERS_COSTS",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=742; probe P2A-742",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:744",
+  "title": "INPBILL.PREPAY_ACCT ~ INPBILL.PREPAY_ACCT_MONEY",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=744; probe P2A-744",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:762",
+  "title": "INPBILL.PREPAYMENT_RCPT ~ INPBILL.PREPAYMENT_RCPT_ADD",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=762; probe P2A-762",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:765",
+  "title": "COMM.CLINIC_ITEM_DICT ~ COMM.PRICE_ITEM_NAME_DICT",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=765; probe P2A-765",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:766",
+  "title": "COMM.OFFICIAL_DRUG_CATALOG ~ COMM.OFFICIAL_DRUG_CATALOG_CLASS",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=766; probe P2A-766",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:767",
+  "title": "INPBILL.PREPAYMENT_RCPT ~ INPBILL.PREPAYMENT_RCPT_ADD",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=767; probe P2A-767",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:777",
+  "title": "PHARMACY.DRUG_PRESC_DETAIL_TEMP ~ PHARMACY.DRUG_PRESC_MASTER_TEMP",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=777; probe P2A-777",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:792",
+  "title": "COMM.EXP_NAME_DICT ~ COMM.EXP_PRICE_LIST",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=792; probe P2A-792",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:793",
+  "title": "COMM.EXP_DICT ~ COMM.EXP_PRICE_LIST",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=793; probe P2A-793",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:808",
+  "title": "PHARMACY.DRUG_STOCK ~ PHARMACY.DRUG_STORAGE_DEPT",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=808; probe P2A-808",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:815",
+  "title": "PHARMACY.DRUG_DISPENSE_PRE ~ PHARMACY.DRUG_DISPENSE_REQ",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=815; probe P2A-815",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:817",
+  "title": "PHARMACY.DRUG_PROVIDE_APPLICATION ~ PHARMACY.DRUG_STOCK",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=817; probe P2A-817",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A1",
+  "id": "review:832",
+  "title": "COMM.EXP_DICT ~ COMM.EXP_NAME_DICT",
+  "recommendation": "条件采纳：先补 system/source（HIS/his_source_10_10_10_15），live P2A 双端唯一性通过后 approve",
+  "evidence": "review_corrections_v2.json#review_id=832; probe P2A-832",
+  "formal_path": "review approve → 链接/新建 candidate → 人工审核 → formal",
+  "risk": "中"
+ },
+ {
+  "group": "A2",
+  "id": "reviews:675,676,677,678,679…(129条)",
+  "title": "董哥语料 HIS/ODS 同名表源歧义（无语句级证据）",
+  "recommendation": "待输入：是否接受\"报表 SQL 默认 HIS 业务库、ODS 需显式标记\"语料级默认；或逐条人工",
+  "evidence": "b4_source_disambiguation.json（列差=0 实证 ODS 镜像）；r198_ctx_disambig.py（上下文证据=0）",
+  "formal_path": "裁决后按 A1 路径批量补 source",
+  "risk": "高"
+ },
+ {
+  "group": "A3",
+  "id": "review:696",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S2F-7034281A87",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:710",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S2F-78EA534A94",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:712",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S2F-55ACB4FC9A",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:750",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S3F-FF1623FE72",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:758",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S3F-D8F12989E0",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:759",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S3F-C548CAAE32",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:770",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S3F-57AB79EC21",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:810",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S5F-C048B5E8F8",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:811",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S5F-9328386622",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:819",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S5F-D569E00977",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:823",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S5F-7A9A5FB37B",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A3",
+  "id": "review:824",
+  "title": "复合键拆分/列集变化",
+  "recommendation": "更新列或关闭旧条新建",
+  "evidence": "old_to_new_relations.json#S5F-654F6FE714",
+  "formal_path": "review 更新或 reject+新 review",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:756",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S3F-7FDFCCAC38",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:757",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S3F-3F30DA6B47",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:771",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S3F-5D3D14EBA1",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:772",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S3F-3862E450B1",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:814",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S5F-ABF2F6C279",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "A4",
+  "id": "review:838",
+  "title": "新解析不可复现该边（解析缺陷产物或未再命中）",
+  "recommendation": "驳回，或保留并注明待核",
+  "evidence": "old_to_new_relations.json#S5F-9EF4214B31",
+  "formal_path": "review reject 或保持 draft 备注",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-C90B6003D8",
+  "title": "原 passed 仅旁证（mismatch）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-C90B6003D8",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-B7763F2E63",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-B7763F2E63",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-190AFAC505",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-190AFAC505",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-6EA01F27EA",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-6EA01F27EA",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-61A57AEFD3",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-61A57AEFD3",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-E9080EA37B",
+  "title": "原 passed 仅旁证（none）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-E9080EA37B",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-9F870E5A7E",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-9F870E5A7E",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-333D618107",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-333D618107",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-8949408577",
+  "title": "原 passed 仅旁证（none）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-8949408577",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-BDCE2A3160",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-BDCE2A3160",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-DB7BD1C6F6",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-DB7BD1C6F6",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-EE88384570",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-EE88384570",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-50040F7BC3",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-50040F7BC3",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-E256C47346",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-E256C47346",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-2C9FE1D3B6",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-2C9FE1D3B6",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-67F8789EE2",
+  "title": "原 passed 仅旁证（direct）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-67F8789EE2",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-320B0458DF",
+  "title": "原 passed 仅旁证（none）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-320B0458DF",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-D89F991E47",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-D89F991E47",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-1A98B5707E",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-1A98B5707E",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-85177FB98A",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-85177FB98A",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S2F-A4F3F1FA73",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S2F-A4F3F1FA73",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S3F-8CF8B4B39E",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S3F-8CF8B4B39E",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S3F-D8F12989E0",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S3F-D8F12989E0",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S4F-FEB658BACB",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S4F-FEB658BACB",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S5F-57E6B624A0",
+  "title": "原 passed 仅旁证（mismatch）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S5F-57E6B624A0",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S5F-26095F1933",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S5F-26095F1933",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "B",
+  "id": "S5F-DC6165C54E",
+  "title": "原 passed 仅旁证（indirect）",
+  "recommendation": "采纳降级 insufficient",
+  "evidence": "b4_validation_rereview.json#S5F-DC6165C54E",
+  "formal_path": "以 validation_note 更正语义（不伪造状态）",
+  "risk": "中"
+ },
+ {
+  "group": "C",
+  "id": "recipes:13",
+  "title": "13 条知识型配方（复杂口径/非法表名/未解析引用）",
+  "recommendation": "政策裁决：知识型允许 activate（生成端拒绝）或保持 draft",
+  "evidence": "recipe_payload_v2.json（13/13 not_executable+not_ready_reasons）",
+  "formal_path": "draft →（政策允许时）submitted → approved → active（生成恒拒）",
+  "risk": "中"
+ },
+ {
+  "group": "D",
+  "id": "domains:34+3",
+  "title": "34 存量 evidence 补登+2 语义修订；3 新增（ITEM_CLASS E/F/G）",
+  "recommendation": "批准生产应用后，人工 confirm（F/G 两值待 P2B 补证）",
+  "evidence": "b6_domain_revision_plan.json；b6_rehearsal_result.json",
+  "formal_path": "pending → 人工 confirmed（冲突先裁决）",
+  "risk": "低"
+ },
+ {
+  "group": "E",
+  "id": "probe_package_v2:24",
+  "title": "五要素齐备：源/SQL 哈希/范围/时段/通道",
+  "recommendation": "批准后执行（建议夜窗或点名日间；197 批准不沿用）",
+  "evidence": "probe_package_v2.json",
+  "formal_path": "执行 → 结果回填 B4 终判",
+  "risk": "高"
+ },
+ {
+  "group": "F",
+  "id": "prod_revision",
+  "title": "167/34+3/13 三子包（隔离预演过、逐行可撤销）",
+  "recommendation": "批准后按 b6 工具 --prod 语义经批准入口执行",
+  "evidence": "b6_*_rehearsal.json；review_corrections_v2.json",
+  "formal_path": "审计+回读",
+  "risk": "高"
+ },
+ {
+  "group": "G",
+  "id": "gaps:696/766",
+  "title": "WAIT_BED_PATS_NEW.USER_NAME 列证据缺失；两药目录列级 0 行",
+  "recommendation": "随 E 组批准执行 P2C 后定论（漏采/错选/旧字段）",
+  "evidence": "b1_platform_identity.json",
+  "formal_path": "元数据补采工单或修订",
+  "risk": "低"
+ },
+ {
+  "group": "G",
+  "id": "unmatched:20/99",
+  "title": "125 未匹配对象中 20 条待核（+EXP/DRG/临时族定向）",
+  "recommendation": "定向源字典探针工单（随 E 组）",
+  "evidence": "asset_inventory.json#unmatched_objects",
+  "formal_path": "对象登记或排除",
+  "risk": "低"
+ },
+ {
+  "group": "G",
+  "id": "tail:20+295",
+  "title": "20 条旧边解析尾巴；295 派生边待唯一溯源",
+  "recommendation": "列入后续方言增强或人工核",
+  "evidence": "b3_derived_pending.json；b2_edge_diff_undirected.json",
+  "formal_path": "补证据或排除",
+  "risk": "低"
+ }
+]

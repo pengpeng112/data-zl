@@ -1,0 +1,8956 @@
+[
+ {
+  "old_relation_id": "S2F-79A7F03D1D",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_MASTER_INDEX",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0003",
+   "N198-0450",
+   "N198-0451"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-3EC0DE462A",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "RECK_ITEM_CLASS_DICT",
+   [
+    [
+     "CLASS_ON_RECKONING",
+     "CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0007",
+   "N198-0023",
+   "N198-0153",
+   "N198-0367"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4264E2FC1C",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DIAGNOSIS",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0002"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-CB3BA33251",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0001"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C90B6003D8",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0006",
+   "N198-0222"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-60FDE4D634",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0004",
+   "N198-0223"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B7763F2E63",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DEPT_DICT",
+   "STAFF_DICT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0009",
+   "N198-0079",
+   "N198-0278"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-82947C72C9",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "RECK_ITEM_CLASS_DICT",
+   [
+    [
+     "CLASS_ON_RECKONING",
+     "CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0011"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-190AFAC505",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0051"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4EB1EB7136",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OPERATION",
+   "OPERATION_DICT",
+   [
+    [
+     "OPERATION_CODE",
+     "OPERATION_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0005"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A754A04130",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OPERATION_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0031"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-6EA01F27EA",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DEPT_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DEPT_CODE",
+     "PERFORMED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0032",
+   "N198-0135",
+   "N198-0293"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2A80F74804",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0008",
+   "N198-0424"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-42E060720B",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_ITEMS",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0012",
+   "N198-0230"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-61A57AEFD3",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DEPT_DICT",
+   "PAT_VISIT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_DISCHARGE_FROM"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0014"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D6E536D1CB",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OPERATION_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0024"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E9080EA37B",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0020"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D9B174AAE2",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0052",
+   "N198-0060"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BE6DDA7EB6",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "LAB_RESULT",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0019",
+   "N198-0228"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-89188944F3",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0025",
+   "N198-0382"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4574484543",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0010",
+   "N198-0304"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E30E4C998C",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0043",
+   "N198-0268"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E9F9A0C5FB",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "DEPT_CODE",
+     "PERFORMED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0061",
+   "N198-0078"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-3F4050B114",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "WAIT_BED_PATS_NEW",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0086"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D24A708DF5",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "OPERATION_NAME",
+   [
+    [
+     "OPER_ID",
+     "OPER_ID"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0016"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-9F870E5A7E",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0026"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A2AC280BB4",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0084",
+   "N198-0413"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E1F69F4E85",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OPERATION_MASTER",
+   [
+    [
+     "OPER_CODE",
+     "OPER_ID"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0022"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A0A41D9E5A",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OPERATION",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0045"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0E7BE7E086",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0038"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-891B95F49D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "TALLY_SUBJECT_DICT",
+   [
+    [
+     "SUBJ_CODE",
+     "SUBJ_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0041"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-333D618107",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OPERATION_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "SURGEON",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0018"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-FFFC5B8A88",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0077",
+   "N198-0134"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-64887A96B7",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "STAFF_DICT",
+   [
+    [
+     "ORDERED_BY_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0047"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2DF926CEB5",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "DIAGNOSIS",
+   "PAT_VISIT",
+   [
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0017"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0C86751F48",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0034",
+   "N198-0232",
+   "N198-0395"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B460DFC719",
+  "old_state": "existing_supplement",
+  "old_validation": "failed",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0013"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-678B3B21E2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "TALLY_SUBJECT_DICT",
+   [
+    [
+     "SUBJ_CODE",
+     "SUBJ_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0093",
+   "N198-0226"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-141CC29EA0",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0296"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2CBE5A43AE",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0050"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-46B28879ED",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "DEPT_DICT",
+   [
+    [
+     "VISIT_DEPT",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0036"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0D77903D00",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "PAT_VISIT_NEW",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0048"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-525A3839F9",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "STAFF_DICT",
+   "WAIT_BED_PATS_NEW",
+   [
+    [
+     "EMP_NO",
+     "CONSULTING_DOCTOR"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0068"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-22FEDABB84",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT_NEW",
+   "STAFF_DICT",
+   [
+    [
+     "IN_OPERATOR_NO",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0098"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EF5AE47BD1",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT_NEW",
+   "STAFF_DICT",
+   [
+    [
+     "OUT_OPERATOR_NO",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0099"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-AFE509521C",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OPERATION_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "OPERATING_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0139"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0BF98D1B1C",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0008",
+   "N198-0424"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-8949408577",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "PATS_IN_HOSPITAL",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0097",
+   "N198-0403",
+   "N198-0448"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-11FB0C398E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0073",
+   "N198-0397"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C77ABA45F2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCTOR_GROUP",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DOCTOR_USER",
+     "DOCTOR_USER"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0080",
+   "N198-0309"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E0FB01F26F",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "STAFF_DICT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0009",
+   "N198-0079",
+   "N198-0278"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E83977F6B8",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "ADT_LOG",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0054"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5178A77822",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER_YB",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0037",
+   "N198-0385"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F135E41CC5",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0044",
+   "N198-0298"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-06B1878538",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PAT_VISIT_NEW",
+   [
+    [
+     "DEPT_CODE",
+     "OPERATOR_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0105"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EAC7E864FF",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PAT_VISIT_NEW",
+   [
+    [
+     "DEPT_CODE",
+     "OUT_OPERATOR_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0106"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BDCE2A3160",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "CLINIC_NO",
+     "CLINIC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0058",
+   "N198-0267"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A1E797568B",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "OUTP_MR",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0072"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4A1529052D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_DETAIL",
+   "CONSULTATION_DOCTOR_MASTER",
+   [
+    [
+     "CONSULTATION_ID",
+     "CONSULTATION_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0059"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C0E9E1112A",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MARITAL_STATUS_DICT",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "MARITAL_STATUS_CODE",
+     "MARITAL_STATUS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0158"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B77EBB79A0",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0119",
+   "N198-0238"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-447C413169",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR_NO",
+     "ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0154"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-942AF56C2B",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0081",
+   "N198-0216",
+   "N198-0350"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-DB7BD1C6F6",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OUTP_ORDERS",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "SERIAL_NO",
+     "SERIAL_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0433"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2F6090BE06",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS",
+   "OUTP_ORDERS_COSTS",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "SERIAL_NO",
+     "SERIAL_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0431"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2DFE1F503B",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0435"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-564A1EE688",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS_COSTS",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "ORDER_NO",
+     "ITEM_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0438"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C4A72131D6",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OPERATION_MASTER",
+   [
+    [
+     "ORDERED_BY",
+     "DEPT_STAYED"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0221"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-05D6848137",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "STAFF_DICT",
+   [
+    [
+     "ANESTHESIA_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0074"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-DCC5B4B8B2",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "INP_SETTLE_MASTER_YB",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0070"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-00E1F5934D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "NATION_DICT",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "NATION_CODE",
+     "NATION"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0234"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-65296D207D",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "OPERATION_NAME",
+   [
+    [
+     "OPER_ID",
+     "OPER_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0094"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A3E55A8818",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_NAME",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0095"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E3F678FEEB",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "MR_ON_LINE",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0117"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-8D8BE3D683",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "MR_ON_LINE",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0118"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5B7458DD64",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "OPERATION_MASTER",
+   [
+    [
+     "OPERATION_NO",
+     "OPER_ID"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0236",
+   "N198-0405"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-64444D5F7F",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0049"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4C29B97CA6",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0140"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-196E3BAA1A",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0131"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4591948786",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0132"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EE88384570",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "EXAM_ITEMS",
+   "EXAM_MASTER",
+   [
+    [
+     "EXAM_NO",
+     "EXAM_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0027",
+   "N198-0211",
+   "N198-0348"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-50040F7BC3",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR_DIAG_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0090"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5CB74852EF",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "TEST_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0067"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E256C47346",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "CLINIC_NO",
+     "CLINIC_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0101"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1008D796C9",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_VISIT",
+   [
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0224"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-86D477D1F0",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "ID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-6B88D353D7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "CLINIC_RETURNED_ACCT",
+   [
+    [
+     "CLINIC_LABEL",
+     "CLINIC_LABEL"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ],
+    [
+     "VISIT_TIME_DESC",
+     "TIME_DESC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0042"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-065F70AB35",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0053"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EEF02B44FE",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DEPT_CODE",
+     "WARDCODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0136",
+   "N198-0187"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-89304A7856",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OPERATION_NAME",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0152"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2C9FE1D3B6",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0120"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-86227FC71B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "BED_REC",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "BED_NO",
+     "BED_NO"
+    ],
+    [
+     "WARD_CODE",
+     "WARD_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0128",
+   "N198-0253"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-FB7AC774E3",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MR_ON_LINE",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0159"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-AF65517FED",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "OPERATION",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0191",
+   "N198-0192",
+   "N198-0303"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-CC3A22B4C8",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "ORDERS",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0194"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-6C2E7DDA34",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_VISIT",
+   [
+    [
+     "VISIT_",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-1692CC85EE",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0028"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C2E64B1573",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0195"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F1148F94BD",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PATS_IN_HOSPITAL",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0165"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-67F8789EE2",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "LAB_RESULT",
+   "LAB_TEST_ITEMS",
+   [
+    [
+     "ITEM_NO",
+     "ITEM_NO"
+    ],
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0115"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C36B580C32",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_MR",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0242"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7034281A87",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "WAIT_BED_PATS_NEW",
+   [
+    [
+     "CONSULTING_DOCTOR",
+     "USER_NAME"
+    ],
+    [
+     "DEPT_ADMISSION_TO",
+     "DEPT_WAITING_FOR"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-CAC61346F1",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "BILL_ITEM_CLASS_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "CLASS_CODE",
+     "ITEM_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0172"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-6F84D2F67F",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERING_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0137"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-769FF44047",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "PERFORMED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0138"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F9B9C57BF3",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER_YB",
+   "SETTLE_ZY_REC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0155"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4CB6A6C7F3",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER_YB",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0384"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-02718439BB",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "STAFF_DICT",
+   "STAFF_VS_GROUP",
+   [
+    [
+     "EMP_NO",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0125"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B5154A7469",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0089"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-320B0458DF",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0020"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-AA768A72B9",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_PRESC",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0178"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D3EDFB4370",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_RCPT_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR_NO",
+     "ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0164"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-FD2673AB7B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_INDEX",
+   "CLINIC_MASTER",
+   [
+    [
+     "CLINIC_LABEL",
+     "CLINIC_LABEL"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0173"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D89F991E47",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0088"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-413940AE48",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_MASTER_INDEX",
+   "PREPAYMENT_RCPT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0166"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-24528FCEF4",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_RCPT_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0039"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-10C9EADF7A",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "唯一就诊标识"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-A5790F6F3E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PATIENT_CLASS_DICT",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_CLASS_CODE",
+     "PATIENT_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0446"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7F2DBC5ADB",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "ORDER_CLASS_DICT",
+   [
+    [
+     "ITEM_CLASS",
+     "ORDER_CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0376"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-802768F217",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "DRUG_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0342"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7D4F63EBE3",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "BILL_ITEM_CLASS_DICT",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "CLASS_CODE",
+     "ITEM_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0130"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-16574BB093",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "WAIT_BED_PATS_NEW",
+   [
+    [
+     "ORDERED_BY_DEPT",
+     "CLINIC_DEPT"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0163"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-040B518C68",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0122"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1A98B5707E",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0161"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-629BB5669F",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_MASTER_INDEX",
+   "V_LAB_TEST_BATCH_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0387",
+   "N198-0388"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D84E81F2B1",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "MEDICAL_CARD_MEMO",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0233"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-ABB077BBC9",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "SETTLE_ZY_REC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0225"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F909187A90",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MEDICAL_CARD_MEMO",
+   "MEDICAL_CARD_TYPE_DICT",
+   [
+    [
+     "CARD_TYPE",
+     "TYPE_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0399",
+   "N198-0402"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EB8C099F77",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "TRANSFER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0243"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1F666ABDE9",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "APP_CONFIGER_PARAMETER",
+   "DEPT_DICT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0170"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F62272933D",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_BATCH_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0116",
+   "N198-0157",
+   "N198-0392"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0943448C9F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0088"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C84A01F90E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "MEDICAL_RECORD_REVIEW_TABLE",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0083"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-12DC40C9EC",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "DEPT_VS_WARD",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0290"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-78EA534A94",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "DEPT_VS_WARD",
+   [
+    [
+     "DEPT_CODE",
+     "WARD_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-ED042DDB13",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_DOCTOR_SCHEDULE",
+   "STAFF_DICT",
+   [
+    [
+     "DOCTOR_NO",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0428"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A70D3EBC14",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_MR_DIAG_DESC",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0430"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1962CC8415",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "CONSULTATION_APPLY_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0281"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C84BB2598E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_DETAIL",
+   "STAFF_DICT",
+   [
+    [
+     "CONSULTATION_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0280"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5BCE765C5B",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "ADT_LOG",
+   "DEPT_DICT",
+   [
+    [
+     "WARD_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0169"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-55ACB4FC9A",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR_DIAG_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-3E2BBE8708",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR_DIAG_DESC",
+   [
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-49E28C0D3F",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "OUTP_ORDERS",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "SERIAL_NO",
+     "SERIAL_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0096"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F8EC0A1539",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "信息表",
+   [
+    [
+     "TEST_NO",
+     "检查检验申请号"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-9CAD506D24",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_ITEMS",
+   "信息表",
+   [
+    [
+     "TEST_NO",
+     "检查检验申请号"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-29B5BD5DD7",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_RESULT",
+   "信息表",
+   [
+    [
+     "TEST_NO",
+     "检查检验申请号"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-AE5A0D60B8",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "TRANSFER",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_TRANSFERED_TO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0190"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1036A56300",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0425"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-902589A969",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "DIAGNOSIS",
+   "OPERATION",
+   [
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0193"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F2EB10CC12",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-E9F9B6B9F0",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "SETTLE_ZY_REC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0454"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-54DDF3090C",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_PAYMENTS_MONEY",
+   "INP_SETTLE_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0113",
+   "N198-0378"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-836F2A5926",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "INP_SETTLE_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0220"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-33FFE8A421",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-58D89620A9",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PAT_VISIT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_ADMISSION_TO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0141"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-11CEA3F43C",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "CLINIC_PAYMENTS_MONEY",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0175"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2FAFC5BB63",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS_ANTI_DRUG",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0421"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1CD1EE807A",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "OPERATION_SCHEDULE",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0240"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F1D8F20B7A",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CONSULTATION_DOCTOR_DETAIL",
+   "DEPT_DICT",
+   [
+    [
+     "CONSULTATION_DEPT",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0279"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-2C722937BF",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0002"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-04DFA7C646",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OPERATION_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "OPERATING_ROOM"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0295"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F20C1529B5",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "BED_TRANS_LOG",
+   "DEPT_DICT",
+   [
+    [
+     "WARD_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0254"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-80190A1266",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "PRICE_LIST",
+   [
+    [
+     "CHARGE_ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "CHARGE_ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0273"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BB4AF449D7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0066"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-D16F6274AC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MR_BILL_CLASS_DICT",
+   "PRICE_LIST",
+   [
+    [
+     "MR_BILL_CLASS_CODE",
+     "MR_BILL_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0056"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-FF689C8E0E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PREPAYMENT_RCPT",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR_NO",
+     "ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0456"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7E158DBE85",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR",
+     "ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0272"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F16FF49E4E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "EXAM_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0176"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B6C23A8ACC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_MR",
+   "OUTP_MR_DIAG_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0429"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-17BB014443",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "HISID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0381"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-6419CDF435",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "HISID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-797C110153",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "INSUR_VSH_CENTER_ITEM_NEW",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0150"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B198689143",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_MR_DIAG_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0090"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BCB9A63C52",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "DOCTOR",
+     "USER_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0271"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-90361056DF",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "EXAM_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0146"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-85177FB98A",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "EXAM_MASTER",
+   "EXAM_REPORT",
+   [
+    [
+     "EXAM_NO",
+     "EXAM_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0145",
+   "N198-0213"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F66254FEAA",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "EXAM_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "REQ_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0185"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7427C0DF14",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "EXAM_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "PERFORMED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0184"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-31768536A4",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_MASTER_INDEX",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "唯一就诊标识"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-2FCB132BFF",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0356"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-3B503C4EFC",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "唯一就诊标识"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-E7CB647358",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0396"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-C1F7CEF65A",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCTOR_GROUP",
+   "OPERATION_MASTER",
+   [
+    [
+     "ORDER_GROUP",
+     "DEPT_STAYED"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0310"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-9E31D12931",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCTOR_GROUP",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DOCTOR_USER",
+     "DOCTOR_USER"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0080",
+   "N198-0309"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-8572FD8F83",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "OPERATION_NAME",
+   [
+    [
+     "OPER_ID",
+     "OPER_ID"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0016"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A4FCF1023F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ADT_LOG",
+   "PATIENT_STATUS_CHG_DICT",
+   [
+    [
+     "ACTION",
+     "PATIENT_STATUS_CHG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0127"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-041E567A15",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "OPERATION_NAME",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0412"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B040DC9E3E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OPERATION_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_STAYED"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0104"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4F303AD7E2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "MED_DICT_BASEINFO",
+   [
+    [
+     "ITEM_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S2F-95DD780285",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MED_DICT_BASEINFO",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "DRUG_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0347"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B2553962A7",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "STAFF_DICT",
+   [
+    [
+     "ATTENDING_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0124"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-3B0F594FB5",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "ORDERS",
+   [
+    [
+     "DRUG_CODE",
+     "ORDER_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0322"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-DF5F8AF878",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "STAFF_VS_GROUP",
+   [
+    [
+     "DEPT_CODE",
+     "GROUP_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0301"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1D56B2E12F",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "DOCT_DRUG_PRESC_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0292"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7C3491FAB2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCT_DRUG_PRESC_MASTER",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0108"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-28CA624C33",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_ADT_DAY",
+   "DEPT_DICT",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0289"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5B40330D0C",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "DEPT_VS_WARD",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0290"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-F78A23F649",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PATS_IN_TRANSFERRING",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0449"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A3A2C2111D",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PATS_IN_TRANSFERRING",
+   [
+    [
+     "DEPT_CODE",
+     "DEPT_TRANSFERED_TO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0300"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-6078311B11",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "AREA_DICT",
+   "PAT_VISIT",
+   [
+    [
+     "AREA_CODE",
+     "PATIENT_AREA"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0252"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4AB467630E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_INDEX",
+   "CLINIC_TYPE_SETTING",
+   [
+    [
+     "CLINIC_TYPE",
+     "CLINIC_TYPE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0257"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-106C981A96",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_VISIT",
+   "PAT_VISIT_BIS",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0453"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-FA29D8E7F7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MEDICAL_CARD_MEMO",
+   "MEDICAL_CARD_VS_IDNO",
+   [
+    [
+     "CARD_NO",
+     "CARD_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0400"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-E54644CEB6",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "MEDICAL_CARD_VS_IDNO",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0401"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0846498312",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "STAFF_DICT",
+   [
+    [
+     "ORDERED_BY_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0123"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-4F2611A60A",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "A",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "REFUNDED_RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0248"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-68463732FB",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ADT_LOG",
+   "MR_ON_LINE",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0250"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BBC3503264",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0269"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-8812CEEEFC",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "PAT_MASTER_INDEX",
+   "PAT_VISIT_TEMP",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0452"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-35D425985E",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCTOR_GROUP",
+   "STAFF_DICT",
+   [
+    [
+     "DOCTOR_USER",
+     "USER_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0311"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-EB27457693",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0114"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-1C9DF9CFDD",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "MEDICAL_CARD_MEMO",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0265"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-917C47B1AB",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0337"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-A4F3F1FA73",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DRUG_PRESC_DETAIL",
+   "DRUG_PRESC_MASTER",
+   [
+    [
+     "PRESC_DATE",
+     "PRESC_DATE"
+    ],
+    [
+     "PRESC_NO",
+     "PRESC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0021"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-BE0A807D4A",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_MASTER",
+   "STAFF_DICT",
+   [
+    [
+     "PRESCRIBED_BY",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0339"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-915DEA9EFE",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCT_DRUG_PRESC_DETAIL",
+   "DOCT_DRUG_PRESC_MASTER",
+   [
+    [
+     "PRESC_DATE",
+     "PRESC_DATE"
+    ],
+    [
+     "PRESC_NO",
+     "PRESC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0312"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7E1C8D9306",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_TREAT_REC",
+   [
+    [
+     "APPOINT_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S2F-4A747E122E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0147",
+   "N198-0359"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-5316AF26B6",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "DEPT_CODE",
+     "WARD_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0299"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-B204F9C884",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0008",
+   "N198-0424"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-7A63966E87",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "OUTP_ORDERS_COSTS",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY_DEPT"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0297"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-0C8092BAFC",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS_COSTS",
+   "STAFF_DICT",
+   [
+    [
+     "ORDERED_BY_DOCTOR",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0440"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S2F-02408E08CE",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS_COSTS",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0437"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-FBDD22E3B6",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "OUTP_PAYMENTS_MONEY",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0015"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-03501B12F4",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "OUTP_ORDER_DESC",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0085"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-355B5DFB83",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "PRICE_ITEM_NAME_DICT",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "ITEM_NAME",
+     "ITEM_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0103"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-BE42E3FFB8",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0162"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-7EEAFF05AE",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_DICT",
+   "CLINIC_VS_CHARGE",
+   [
+    [
+     "ITEM_CLASS",
+     "CLINIC_ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "CLINIC_ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0174"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-98E525FBE7",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_DICT",
+   "CLINIC_VS_CHARGE",
+   [
+    [
+     "ITEM_CODE",
+     "CLINIC_ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0100"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-62E947277B",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "CURRENT_PRICE_LIST",
+   [
+    [
+     "CHARGE_ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0102"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C4039F391C",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "ORDERS_COSTS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0241",
+   "N198-0416"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-69A35ED45C",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0008",
+   "N198-0424"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C141BD0D7F",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "CURRENT_PRICE_LIST",
+   [
+    [
+     "CHARGE_ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "CHARGE_ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-9C28994D16",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "PRICE_LIST",
+   [
+    [
+     "CHARGE_ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0274"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-E7DE652B19",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_NAME_DICT",
+   "CLINIC_VS_CHARGE",
+   [
+    [
+     "ITEM_CLASS",
+     "CLINIC_ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "CLINIC_ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0261"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-0841AC6F4F",
+  "old_state": "existing_supplement",
+  "old_validation": "failed",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "INP_SETTLE_MASTER_YB",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0380"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-5581025AFA",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "ORDERS_COSTS",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0284"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-E65D6CED98",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "ORDER_CLASS_DICT",
+   [
+    [
+     "ORDER_CLASS",
+     "ORDER_CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0419"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-0F3B49513D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_CLASS_DICT",
+   "ORDERS_COSTS",
+   [
+    [
+     "CLASS_CODE",
+     "ITEM_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0259"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-00D14B17CE",
+  "old_state": "rejected_negative",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "PRICE_LIST",
+   [
+    [
+     "UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0180"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-2296EA2297",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_ORDERS_COSTS",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0177"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-8ECB821803",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "PRICE_ITEM_NAME_DICT",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0181"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C21F072F9B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PRICE_ITEM_NAME_DICT",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0246"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-00F35490BC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PREPAY_ACCT",
+   "PREPAY_ACCT_MONEY",
+   [
+    [
+     "ACCT_NO",
+     "ACCT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0245"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-654ED25BB1",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0266"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-B8DD5D167D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0204"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-9522A5F378",
+  "old_state": "rejected_negative",
+  "old_validation": "not_run",
+  "old_key": [
+   "DISCHARGE_DISPOSITION_DICT",
+   "PAT_VISIT",
+   [
+    [
+     "DISCHARGE_DISPOSITION_CODE",
+     "DISCHARGE_DISPOSITION"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0308"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-6971C4D4A3",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "EXAM_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0355"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-8CF8B4B39E",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "EXAM_MASTER",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "EXAM_NO",
+     "OPER_CODE"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0353"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-4E0A7CB9FE",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "INP_RCPT_FEE_DICT",
+   [
+    [
+     "CLASS_ON_INP_RCPT",
+     "FEE_CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0370"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-170685FC38",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "ITEM_SPEC"
+    ],
+    [
+     "UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-21C1208636",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INSUR_VSH_CENTER_ITEM_NEW",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0386"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-FF1623FE72",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "DRUG_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "ITEM_SPEC"
+    ],
+    [
+     "UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-38CC8E4235",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "STAFF_DICT",
+   [
+    [
+     "DOCTOR_USER",
+     "EMP_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0377"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C4FDA97470",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "CLINIC_NO",
+     "CLINIC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0432"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-73E9BAF540",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_ORDERS",
+   [
+    [
+     "ORDER_ID",
+     "ORDER_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0423"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-D344927D56",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "TALLY_SUBJECT_DICT",
+   [
+    [
+     "SUBJ_CODE",
+     "SUBJ_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0287"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-D6D49C5D99",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "MR_BILL_CLASS_DICT",
+   [
+    [
+     "MR_BILL_CLASS",
+     "MR_BILL_CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0283"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-7D08A9E399",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PRICE_LIST",
+   "TALLY_SUBJECT_DICT",
+   [
+    [
+     "SUBJ_CODE",
+     "SUBJ_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0459"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C38E45F362",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "INSUR_BILL_DETIAL",
+   [
+    [
+     "ITEM_CODE",
+     "YYXMBM"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0149"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-F5C0C8EDAE",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_ITEMS",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "TEST_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0393"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-9193379481",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_CLASS_DICT",
+   "CLINIC_ITEM_DICT",
+   [
+    [
+     "CLASS_CODE",
+     "ITEM_CLASS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0258"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-7FDFCCAC38",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INSUR_VSH_CENTER_ITEM_NEW",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-3F30DA6B47",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "BILL_ITEM_CLASS_DICT",
+   "PRICE_LIST",
+   [
+    [
+     "CLASS_CODE",
+     "CLASS_ON_RECKONING"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-D8F12989E0",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "ORDERS",
+   [
+    [
+     "OPER_CODE",
+     "APP_NO"
+    ],
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-C548CAAE32",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "ORDERS",
+   [
+    [
+     "ITEM_CODE",
+     "ORDER_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-295B16CA54",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "HISID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-1B570DFBF5",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "唯一就诊标识"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-5020B1B11D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_DICT",
+   "EXAM_RPT_PATTERN",
+   [
+    [
+     "ITEM_CODE",
+     "DESCRIPTION_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0260"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-D09BA261AA",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_PAYMENTS_MONEY",
+   "INP_SETTLE_MASTER",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0113",
+   "N198-0378"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-E307DA535C",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS_COSTS",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "ITEM_SPEC",
+     "ITEM_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0439"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-D4525A54BD",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_RCPT_MASTER",
+   "PREPAYMENT_RCPT_ADD",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0445"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-EEECA20C13",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_RCPT_MASTER",
+   "OUTP_RCPT_MASTER_YB",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0444"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-832C4D19C5",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_MASTER",
+   "PREPAYMENT_RCPT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0227"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-A7C9381FA2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0427"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-5FF4CF0E1A",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "PREPAYMENT_RCPT",
+   "PREPAYMENT_RCPT_ADD",
+   [
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0455"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-715855B0A8",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "PREPAYMENT_RCPT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0270"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-3904B0E814",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "PRICE_ITEM_NAME_DICT",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "ITEM_NAME",
+     "ITEM_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0071"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C8B128DDC1",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "PRICE_ITEM_NAME_DICT",
+   "PRICE_LIST",
+   [
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0458"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-9702FDD8A7",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "CURRENT_PRICE_LIST",
+   "PERFORM_DEPT",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0286"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-24FCB0CB0D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_ITEM_DICT",
+   "PRICE_ITEM_NAME_DICT",
+   [
+    [
+     "ITEM_CLASS",
+     "ITEM_CLASS"
+    ],
+    [
+     "ITEM_CODE",
+     "ITEM_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0275"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-CE3037882E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "OFFICIAL_DRUG_CATALOG",
+   "OFFICIAL_DRUG_CATALOG_CLASS",
+   [
+    [
+     "CONSTRAINED_LEVEL",
+     "CLASS_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0404"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-F080FBDD9A",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS_COSTS",
+   "OUTP_ORDER_DESC",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0436"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-F2E3960562",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PREPAYMENT_RCPT",
+   "PREPAYMENT_RCPT_ADD",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "RCPT_NO",
+     "RCPT_NO"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0368"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-6E9E76D915",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PREPAY_ACCT",
+   "STAFF_DICT",
+   [
+    [
+     "OPERATOR_NO",
+     "ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0457"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-8AAD1D2E5E",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "STAFF_DICT",
+   "V_SETTLE_DETAIL_FOR_REPORT_02",
+   [
+    [
+     "ID",
+     "OPERATOR_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-EB459B5BAF",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_ORDERS",
+   "OUTP_TREAT_REC_T",
+   [
+    [
+     "VISIT_DATE",
+     "VISIT_DATE"
+    ],
+    [
+     "VISIT_NO",
+     "VISIT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0434"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-AE50AE31B8",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OUTP_BILL_ITEMS",
+   "OUTP_TREAT_REC_T",
+   [
+    [
+     "APPOINT_NO",
+     "APPOINT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0426"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-C752F8DA70",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "BED_TRANS_LOG",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0255"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S3F-57AB79EC21",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PREPAYMENT_RCPT_ADD",
+   "PREPAYMENT_RCPT",
+   [
+    [
+     "BANK_CODE",
+     "BANK_CODE"
+    ],
+    [
+     "CHECK_NO",
+     "CHECK_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-007BA0B97D",
+  "old_state": "candidate",
+  "old_validation": "failed",
+  "old_key": [
+   "INP_SETTLE_MASTER_YB",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "ID_NO",
+     "ID_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S3F-5D3D14EBA1",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "OUTP_RCPT_MASTER",
+   [
+    [
+     "OUTP_RCPT_NO",
+     "RCPT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-946D1FA610",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "EINV_COMM_DATA",
+   [
+    [
+     "CLASS_ON_INP_RCPT",
+     "HIS_DICT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-BABF066FF6",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_PAYMENTS_MONEY",
+   "EINV_COMM_DATA",
+   [
+    [
+     "MONEY_TYPE",
+     "HIS_DICT_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-D3F9CA5789",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_SETTLE_DETAIL",
+   "EINV_COMM_DATA",
+   [
+    [
+     "FEE_CLASS_NAME",
+     "HIS_DICT_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-5F33CABCD5",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "INP_BILL_DETAIL_JZ",
+   [
+    [
+     "DRG_CODE",
+     "DRG_CODE"
+    ],
+    [
+     "ZFBL",
+     "ZFBL"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S3F-3862E450B1",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "PRICE_LIST",
+   "DEPT_DICT",
+   [
+    [
+     "PERFORMED_BY",
+     "DEPT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S4F-C9C945D425",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "OPERATION",
+   "OPERATION_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0029",
+   "N198-0406"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-01DD31DEAC",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "OPERATION",
+   "OPERATION_DICT",
+   [
+    [
+     "OPERATION_DESC",
+     "OPERATION_NAME"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0057"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-F25E68DF83",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0046"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-FEB658BACB",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DIAGNOSIS",
+   "DIAGNOSIS_TYPE_DICT",
+   [
+    [
+     "DIAGNOSIS_TYPE",
+     "DIAGNOSIS_TYPE_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0107"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-25378B31C7",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0217"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-F637211D5D",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS_DICT",
+   "YB_MAPPING",
+   [
+    [
+     "YB_CODE",
+     "YB_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0197"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-3F2F386848",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "HISID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S4F-32B9889A40",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_MASTER",
+   "病理病人清单",
+   [
+    [
+     "PATIENT_ID",
+     "HISID号"
+    ],
+    [
+     "VISIT_ID",
+     "住院次数"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S4F-CFAAA0B750",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_DICT",
+   "YB_MAPPING",
+   [
+    [
+     "YB_CODE",
+     "YB_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0411"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-D3BE8D1AD5",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION",
+   "OPERATION_NAME",
+   [
+    [
+     "OPERATION_CODE",
+     "OPERATION_CODE"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0237"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S4F-4D4AB047C4",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "OPERATION_DICT",
+   "OPERATION_NAME",
+   [
+    [
+     "OPERATION_CODE",
+     "OPERATION_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0239"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-57E6B624A0",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_EXPORT_MASTER",
+   [
+    [
+     "DOCUMENT_NO",
+     "DOCUMENT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0062"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-2A342EA32E",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "MCS_DOC_FORM",
+   "MCS_DOC_FORM_RECORDS",
+   [
+    [
+     "ID",
+     "FORM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0035"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-26095F1933",
+  "old_state": "existing_supplement",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "INPATIENTS",
+   "MCS_DOC_FORM",
+   [
+    [
+     "PAT_INDEX_NO",
+     "PATIENT_UID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0033"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-4B05EDDFDE",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0040"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-567E60F5C7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_IMPORT_DETAIL",
+   "DRUG_IMPORT_MASTER",
+   [
+    [
+     "DOCUMENT_NO",
+     "DOCUMENT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0091"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C438A80C4D",
+  "old_state": "candidate",
+  "old_validation": "failed",
+  "old_key": [
+   "DRUG_IMPORT_DETAIL",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "PACKAGE_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0055"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-2EC1F5346C",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "V$LOCKED_OBJECT",
+   "V$SESSION",
+   [
+    [
+     "SESSION_ID",
+     "SID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0167"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-6D51708E12",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "DRUG_STOCK_LOG_NEW",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "PACKAGE_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0065"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-55C917604B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_DETAIL_TEMP",
+   "DRUG_PRESC_MASTER_TEMP",
+   [
+    [
+     "PRESC_DATE",
+     "PRESC_DATE"
+    ],
+    [
+     "PRESC_NO",
+     "PRESC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0111"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-58FB18210F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_NAME_DICT",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0063"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-F8FAA6C79C",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "ORDERS_EXECUTE_DETAILS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0160",
+   "N198-0417",
+   "N198-0418"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-6460E6631D",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_MASTER",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0112",
+   "N198-0338"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-09818A1214",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_STOCK",
+   [
+    [
+     "BATCH_NO",
+     "BATCH_NO"
+    ],
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "PACKAGE_SPEC",
+     "PACKAGE_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0331"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-FFEF7998D3",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_EXPORT_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0315"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-EFFC080BB2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "ORDERS",
+   [
+    [
+     "EXAM_NO",
+     "APP_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0215"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-8B66C16DFC",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0064"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-5429C07ADC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRESC_DETAIL",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "PACKAGE_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0110"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-39A21CC6DC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_IMPORT_DETAIL",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0333"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-1F64D8E654",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL_LOG_NEW",
+   "DRUG_EXPORT_MASTER_LOG_NEW",
+   [
+    [
+     "DOCUMENT_NO",
+     "DOCUMENT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0244"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-0BF471B7F7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0109"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-B20ED6ACFC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCT_DRUG_PRESC_MASTER",
+   "ORDERS",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "PRESC_NO",
+     "CURRENT_PRESC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0198"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-9750A16A8F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_VS_CHARGE",
+   "ORDERS",
+   [
+    [
+     "CLINIC_ITEM_CODE",
+     "ORDER_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0179"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-82AAEAEC9E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_DISPENSE_REC",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0199"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-F8D397A256",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DBA_OBJECTS",
+   "V$LOCKED_OBJECT",
+   [
+    [
+     "OBJECT_ID",
+     "OBJECT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0183"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C6D9B09D1D",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "BL_RYJL",
+   "ZY_ZYYZXXMX",
+   [
+    [
+     "ZYLSH",
+     "ZYJZLSH"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0256"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D01C5207CF",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DIAGNOSIS",
+   "TREATING_RESULT_DICT",
+   [
+    [
+     "TREAT_RESULT",
+     "TREATING_RESULT_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0305"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-653F9C1A82",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "OUTP_PRESC",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0206"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C3192AFD7A",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_PRESC_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0202"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-A2C52B1B9D",
+  "old_state": "partial",
+  "old_validation": "insufficient",
+  "old_key": [
+   "LAB_TEST_BATCH_MASTER",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0229"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-FC41ABDDDA",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "EXAM_PAT_MI",
+   [
+    [
+     "PATIENT_LOCAL_ID",
+     "PATIENT_LOCAL_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0212"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-83CEF7EB9E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_NAME_DICT",
+   "EXP_PRICE_LIST",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0219"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-579A0CB0A2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_DICT",
+   "EXP_PRICE_LIST",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ],
+    [
+     "EXP_SPEC",
+     "EXP_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0218"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D83C05E9A9",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0357",
+   "N198-0358"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D6CA335877",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "DRUG_PRESC_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0263"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-3A3249FB5B",
+  "old_state": "candidate_blocked_source",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "ORDERS",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERING_DEPT"
+    ],
+    [
+     "住院次数",
+     "VISIT_ID"
+    ],
+    [
+     "病人ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-37CFA5B5D7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_IMPORT_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0201"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-4B81FD6A45",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_IMPORT_MASTER",
+   "DRUG_STORAGE_DEPT",
+   [
+    [
+     "STORAGE",
+     "STORAGE_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0334"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-BC645BBC63",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_EXPORT_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0200"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-E84B2B06DC",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_MASTER",
+   "DRUG_STORAGE_DEPT",
+   [
+    [
+     "STORAGE",
+     "STORAGE_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0332"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-9757449C01",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_PRE",
+   "ORDERS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0323"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-FEBB0999F9",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "CLINIC_MASTER",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0264"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D6CC6E5FC6",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_DICT",
+   "DRUG_EXPORT_MASTER",
+   [
+    [
+     "DEPT_CODE",
+     "STORAGE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0133"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-155FD309A4",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "PACKAGE_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "PACKAGE_UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0143"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-04DD382FAE",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_EXPORT_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0142"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-3E64FB7320",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "EXAM_NO",
+     "OPER_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0349"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-9CA85187E2",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "ORDERS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0207"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-39743C3B56",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0208"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-DC6165C54E",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "DRUG_PRESC_DETAIL",
+   "DRUG_PRESC_MASTER",
+   [
+    [
+     "PRESC_NO",
+     "PRESC_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0335"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-6F156FC2B7",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "MCS_ORDER_SCHEDULE",
+   "WARDS",
+   [
+    [
+     "WARD_CODE",
+     "WARD_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0398"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-8D31D65915",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_STOCK",
+   "DRUG_STORAGE_DEPT",
+   [
+    [
+     "STORAGE",
+     "STORAGE_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0344"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-91FCC96E1F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0321"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C048B5E8F8",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_PRICE_LIST",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "EXP_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "ITEM_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-9328386622",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_PRICE_LIST",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "EXP_CODE",
+     "ITEM_CODE"
+    ],
+    [
+     "FIRM_ID",
+     "ITEM_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-4220821021",
+  "old_state": "rejected_negative",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "ORDERS",
+   [
+    [
+     "DOSE_UNITS",
+     "DOSAGE_UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0205"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-AC0D6652C7",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0420"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-F0EC7628AA",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS",
+   "ORDERS_COSTS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0241",
+   "N198-0416"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-ABF2F6C279",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DEPT_VS_WARD",
+   "DRUG_DISPENSE_PRE",
+   [
+    [
+     "DEPT_CODE",
+     "ORDERED_BY"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S5F-710F585ED1",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_PRE",
+   "DRUG_DISPENSE_REQ",
+   [
+    [
+     "OPER_BATCH_NO",
+     "OPER_BATCH_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0327"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-22DADEED18",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_PROVIDE_APPLICATION",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0320"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-B1AC8D3067",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PROVIDE_APPLICATION",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0343"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-A84F244F96",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "DRUG_DISPENS_PROPERTY",
+   [
+    [
+     "DISPENSARY",
+     "DISPENSARY"
+    ],
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0325"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D569E00977",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_PROVIDE_APPLICATION",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "QUANTITY",
+     "QUANTITY"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-AA125F5559",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_PROVIDE_APPLICATION",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0209"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-5AE8B0A597",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_EXPORT_DETAIL",
+   "DRUG_PROVIDE_APPLICATION",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "QUANTITY",
+     "QUANTITY"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0329"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-D4F66B37E7",
+  "old_state": "candidate",
+  "old_validation": "insufficient",
+  "old_key": [
+   "LAB_TEST_BATCH_MASTER",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0391"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-FA2842AB56",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_BATCH_MASTER",
+   "PAT_MASTER_INDEX",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0116",
+   "N198-0157",
+   "N198-0392"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-41797A4A4E",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "LAB_TEST_BATCH_MASTER",
+   "LAB_TEST_ITEMS",
+   [
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0390"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-BF863C6D6B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0319"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-7A9A5FB37B",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-654F6FE714",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "columns_changed",
+  "note": "同表对但列集变化（复合键拆分/合并或解析修正）"
+ },
+ {
+  "old_relation_id": "S5F-D8F81B64AE",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "PACKAGE_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ],
+    [
+     "MIN_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0341"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-635760EBAB",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_PRE",
+   "ORDERS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0324"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-5E5767D1DB",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "EXAM_PAT_MI",
+   [
+    [
+     "LOCAL_ID_CLASS",
+     "LOCAL_ID_CLASS"
+    ],
+    [
+     "PATIENT_LOCAL_ID",
+     "PATIENT_LOCAL_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0352"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-83EA9907EA",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "INP_BILL_DETAIL",
+   "LAB_TEST_MASTER",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0372"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-8B65E05346",
+  "old_state": "partial",
+  "old_validation": "failed",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0203"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-2F56B5102B",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_PRICE_LIST",
+   "DRUG_STOCK",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "PACKAGE_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0340"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-B99E6BD99E",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_NAME_DICT",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0316"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-F7E9633251",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DBA_HIST_ACTIVE_SESS_HISTORY",
+   "DBA_USERS",
+   [
+    [
+     "USER_ID",
+     "USER_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0288"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-B10642FE49",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "V$SESSION",
+   "V$SQL",
+   [
+    [
+     "SQL_ADDRESS",
+     "ADDRESS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0460"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C1A8966D0C",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_IMPORT_DETAIL",
+   "EXP_NAME_DICT",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0363"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-9F3095B783",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "ORDERS",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0326"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-79264C1422",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_DICT",
+   "EXP_NAME_DICT",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0360"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-67F4C2968F",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_PRESC_DETAIL_TEMP",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0318"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-8958129949",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DOCT_DRUG_PRESC_DETAIL",
+   "DRUG_DICT",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0313"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-C9E906EFA4",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_EXPORT_DETAIL",
+   "EXP_EXPORT_MASTER",
+   [
+    [
+     "DOCUMENT_NO",
+     "DOCUMENT_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0362"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-1577F3CF38",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_DICT",
+   "EXP_STOCK",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ],
+    [
+     "EXP_SPEC",
+     "EXP_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0361"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-B275CAE715",
+  "old_state": "candidate_d_crosssource",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXP_PRICE_LIST",
+   "EXP_STOCK",
+   [
+    [
+     "EXP_CODE",
+     "EXP_CODE"
+    ],
+    [
+     "EXP_SPEC",
+     "PACKAGE_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0364"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-11ECDE6ADC",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_ITEMS",
+   "EXAM_REPORT",
+   [
+    [
+     "EXAM_NO",
+     "EXAM_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0351"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-F004BB9BB0",
+  "old_state": "partial",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "LAB_RESULT",
+   "LAB_TEST_ITEMS",
+   [
+    [
+     "TEST_NO",
+     "TEST_NO"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0389"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-CA2C220F46",
+  "old_state": "existing_supplement",
+  "old_validation": "not_run",
+  "old_key": [
+   "EXAM_MASTER",
+   "INP_BILL_DETAIL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0354"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-DB4677BC1A",
+  "old_state": "rejected_negative",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_STOCK",
+   "OUTP_BILL_ITEMS",
+   [
+    [
+     "PACKAGE_UNITS",
+     "UNITS"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0345"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-AB4C2AA3D7",
+  "old_state": "candidate",
+  "old_validation": "passed_in_scope",
+  "old_key": [
+   "ORDERS",
+   "ORDERS_ANTI_DRUG",
+   [
+    [
+     "ORDER_NO",
+     "ORDER_NO"
+    ],
+    [
+     "ORDER_SUB_NO",
+     "ORDER_SUB_NO"
+    ],
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0415"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-6D34594CB9",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "ORDERS_EXECUTE_DETAILS",
+   "PATS_IN_HOSPITAL",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ],
+    [
+     "VISIT_ID",
+     "VISIT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0422"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-9EF4214B31",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "PATS_IN_HOSPITAL",
+   "PRE_DISCHGED_PATS",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [],
+  "mapping_status": "dropped_by_reparse",
+  "note": "新解析下该表对无等值边（旧边为解析缺陷产物或语句未再命中）"
+ },
+ {
+  "old_relation_id": "S5F-D2BC6F1F4D",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DICT",
+   "DRUG_PRESC_DETAIL",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0317"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-6EB49E7BE9",
+  "old_state": "partial",
+  "old_validation": "not_run",
+  "old_key": [
+   "PATS_IN_HOSPITAL",
+   "PAT_VISIT",
+   [
+    [
+     "PATIENT_ID",
+     "PATIENT_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0447"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ },
+ {
+  "old_relation_id": "S5F-2FBB4EFCCD",
+  "old_state": "candidate",
+  "old_validation": "not_run",
+  "old_key": [
+   "DRUG_DISPENSE_REC",
+   "DRUG_PRICE_LIST",
+   [
+    [
+     "DRUG_CODE",
+     "DRUG_CODE"
+    ],
+    [
+     "DRUG_SPEC",
+     "DRUG_SPEC"
+    ],
+    [
+     "FIRM_ID",
+     "FIRM_ID"
+    ]
+   ]
+  ],
+  "new_family_ids": [
+   "N198-0109"
+  ],
+  "mapping_status": "mapped",
+  "note": ""
+ }
+]

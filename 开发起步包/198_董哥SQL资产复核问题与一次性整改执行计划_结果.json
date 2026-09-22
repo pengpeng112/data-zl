@@ -1,0 +1,165 @@
+{
+  "date": "2026-09-22",
+  "task": "197成果独立核查与198一次性整改计划",
+  "status": "b0_b6_local_done_pending_approvals",
+  "evidence_directory": "review\\adhoc\\r197-audit-20260922",
+  "production_reads_only": true,
+  "business_source_queries": 0,
+  "production_writes": 0,
+  "review_count": 167,
+  "all_reviews_draft": true,
+  "all_reviews_missing_both_source_codes": true,
+  "all_reviews_validation_status_null": true,
+  "recipes": 13,
+  "recipe_sql_success": 0,
+  "value_domains": 34,
+  "value_domains_without_evidence": 34,
+  "value_domain_observed_missing_codes": {
+    "INPBILL.INP_BILL_DETAIL.ITEM_CLASS": [
+      "E",
+      "F",
+      "G"
+    ]
+  },
+  "metadata_gaps": [
+    {
+      "id": 696,
+      "side": "to",
+      "table": "INPADM.WAIT_BED_PATS_NEW",
+      "column": "USER_NAME"
+    },
+    {
+      "id": 766,
+      "side": "from",
+      "table": "COMM.OFFICIAL_DRUG_CATALOG",
+      "column": "CONSTRAINED_LEVEL"
+    },
+    {
+      "id": 766,
+      "side": "to",
+      "table": "COMM.OFFICIAL_DRUG_CATALOG_CLASS",
+      "column": "CLASS_CODE"
+    }
+  ],
+  "weak_existing_evidence": 134,
+  "unique_statement_ids": 6172,
+  "relation_counts": {
+    "existing_supplement": 149,
+    "candidate": 146,
+    "partial": 51,
+    "candidate_d_crosssource": 42,
+    "candidate_blocked_source": 13,
+    "rejected_negative": 4
+  },
+  "validation_counts_original": {
+    "not_run": 346,
+    "passed_in_scope": 41,
+    "failed": 16,
+    "insufficient": 2
+  },
+  "missing_probe_sql_uids": [
+    "D4",
+    "Q14b",
+    "Q17b",
+    "Q27b",
+    "Q27c",
+    "Q28b",
+    "Q28c"
+  ],
+  "original_manifest_hashes": "63/63 match",
+  "limitations": [
+    "未重新验证业务源库",
+    "metadata gap不等于活库字段不存在",
+    "未进行生产普通AI接口验收",
+    "当前测试环境pure_logic_ready"
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F02",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F03",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F04",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F05",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F06",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F07",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F08",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F09",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    },
+    {
+      "id": "F10",
+      "status": "confirmed_or_explicitly_scoped_in_plan",
+      "execution": "B0-B9"
+    }
+  ],
+  "execution": {
+    "run_id": "r198-20260922-remediation",
+    "date": "2026-09-22",
+    "report": "开发起步包/output_r198/r198-20260922-remediation/执行报告.md",
+    "t01_t08": "14/14",
+    "t09_t12": "pass(44纯逻辑+6集成,主AI复跑124passed)",
+    "t13_t14": "B4语义落实",
+    "t15": "pass(值域+关系预演)",
+    "t16": "待人工终态",
+    "key_results": {
+      "new_families": 460,
+      "existing_strict": 26,
+      "old_mapped": 360,
+      "old_columns_changed": 25,
+      "old_dropped": 20,
+      "reviews_disposition": {
+        "approvable": 20,
+        "source_pending": 129,
+        "columns_changed": 12,
+        "propose_reject": 6
+      },
+      "passed_kept": 14,
+      "passed_downgraded": 27,
+      "probe_v2_not_executed": 24,
+      "domains_plan": 37,
+      "recipes_v2_knowledge_only": 13,
+      "b5": "backend 5文件+测试124passed",
+      "b5_publish": "未执行待批准"
+    },
+    "pending": [
+      "live探针24条批准",
+      "生产修订三子包",
+      "B5发布",
+      "129源口径人工裁决",
+      "人工治理终态(A-G)"
+    ]
+  }
+}

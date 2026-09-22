@@ -1,0 +1,140 @@
+{
+  "run_id": "r198-20260922-remediation",
+  "plan": "开发起步包/198_董哥SQL资产复核问题与一次性整改执行计划.md",
+  "started": "2026-09-22",
+  "status": "LOCAL_DONE_PENDING_APPROVALS",
+  "stages": {
+    "B0": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": [
+        "入口切片阅读：INDEX/AGENTS/README/55/198 + 审计证据 review/adhoc/r197-audit-20260922 全量结构",
+        "目录自检 check_doc_index：error1/warn5，与 198 §6 记录一致（181 孤儿、55 体例、164/187 标题等既有项，本任务不擅改）",
+        "测试环境 check_test_environment：pure_logic_ready（后经 tools/dev_env.sh 恢复隔离库通道 data_asset_test）",
+        "manifest 63/63 哈希复核全同（b0_freeze.py → b0_baseline.json）",
+        "冻结：405 族逐条 content_sha256 + 三态分布（149/146/51/42/13/4；验证 41/16/2/346）",
+        "冻结：167 导入行 rows_sha256=9709853c…、按导入顺序假定 review_id 675–841（B1 以 r197_insert.sql 复核顺序）",
+        "冻结：13 配方（readback recipe_id + content_hash）、34 值域（id+自然键+row_sha256）",
+        "冻结：_scratch/r197_*.py 30 个脚本 SHA-256；审计证据 8 文件 SHA-256",
+        "git 基线：master 5311952（工作区含 197/198/199 文档未提交变更，既有状态不触碰）",
+        "他人域 13 文件与 domain_baseline.json 全一致",
+        "平台现状重拉（只读，read_only=on + statement_timeout=15s）：167 reviews 仍全 draft/两端 source 缺失/validation NULL、IDs 675–841 与基线一致；13 配方仍全 draft 无 active；34 值域仍全 pending 零 evidence；平台总量 reviews=841、formal relations=1329 → baseline_unchanged=true，无人工先行审核，可按本基线继续"
+      ],
+      "outputs": [
+        "b0_freeze.py", "b0_baseline.json", "b0_summary.json",
+        "b0_platform_repull.py", "b0_platform_current.json", "b0_platform_verdict.json",
+        "checkpoint.json"
+      ],
+      "scope_separation": "本任务只整改 197 关系/配方/值域待审资产与相关 backend 代码缺陷；不接管 output_r197/release_execution_prod_20260921.json 所载 193 等无关发布功能；199 号（无纸化同步恢复）为独立任务，运行标识 r198-20260922-full-resync 与本 run_id 无关",
+      "remaining": [],
+      "needs_approval": [],
+      "resume_hint": "B0 基线在 b0_baseline.json；后续阶段产出追加至本目录，更新本 checkpoint 的 stages"
+    },
+    "B1": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": [
+        "167 reviews 精确映射：review_id↔relation_id 以回读 source_evidence 锚定，payload 顺序假设证实（b1_inventory.py→asset_inventory.json）",
+        "405 族去向重演与 import_diff 零差异闭合（含 internal_pair 两对 junior 识别）",
+        "平台身份事实：HIS_SOURCE 系统零数据源（悬空）；正确映射 HIS(his_source_10_10_10_15+hisbase)/DATA_CENTER(ods_*)",
+        "3 缺口定性：696 平台 50 列无 USER_NAME；766 两表登记但列级 0 行；待 P2C 探针定论",
+        "125 未匹配→归并 99 分类：伪影13/外部库24/EXP10/DRG4/临时10/疑列名6/CTE2/保险10/待核20",
+        "34 值域自然键闭合；id=287 code 尾随空格实证"
+      ],
+      "outputs": ["b1_platform_identity.py", "b1_platform_identity.json", "b1_inventory.py", "asset_inventory.json", "b1_summary.json"],
+      "remaining": [],
+      "needs_approval": []
+    },
+    "B2": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": [
+        "tools/r198_sql_parse.py 作用域感知解析器（查询块/别名父链/JOIN 方向与(+)/OR分支branch/AND组and_group/自连接双实例/CTE派生溯源/函数包裹键/裸列ON宽松定向/全角与未闭合引号方言/前缀裁剪）",
+        "T01—T08 验收 14/14（tools/tests/test_r198_sql_parse.py 纯逻辑）",
+        "全语料 3256 模板重算：含边 913→1099；31 LEFT JOIN 模板 29 分型+2 显式 unresolved；36 自连接找回；179 动态标记全部 concat_only",
+        "新旧差异 +618/−130（b2_edge_diff_undirected.json；旧边逐条归因）"
+      ],
+      "outputs": ["tools/r198_sql_parse.py", "tools/tests/test_r198_sql_parse.py", "b2_reparse_corpus.py", "b2_parsed_templates.jsonl", "b2_summary.json", "b2_edge_diff_undirected.json"],
+      "remaining": ["20 条旧边解析尾巴（create-as 巨型嵌套/LIKE 连接等，显式 unresolved 留档）"],
+      "needs_approval": []
+    },
+    "B3": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": [
+        "平台快照只读拉取（1329 formal/841 reviews）",
+        "新 460 族严格身份重建：existing 严格覆盖 26（F02 实证：197 的 149 existing 中大量证据不足）/candidate 374/blocked 60",
+        "旧 405→新映射：360 mapped/25 columns_changed/20 dropped",
+        "167 草稿处置：20 可批/129 源歧义/12 列变/6 拟撤（review_corrections_v2.json）",
+        "两路离线消歧如实失败（ODS 结构镜像列差=0；语料上下文证据=0）→ 129 列为人工口径组裁决"
+      ],
+      "outputs": ["tools/r198_familybuild.py", "tools/r198_review_corrections.py", "tools/r198_ctx_disambig.py", "b3_pull_relations.py", "b3_platform_relations.json", "b3_new_families.json", "old_to_new_relations.json", "correction_diff.json", "review_corrections.json", "review_corrections_v2.json", "b3_summary.json", "b3_derived_pending.json"],
+      "remaining": ["295 派生边待唯一溯源（b3_derived_pending.json）"],
+      "needs_approval": ["生产修订 167 草稿（B7 F 子包）"]
+    },
+    "B4": {
+      "status": "DONE_LOCAL_LIVE_PENDING",
+      "date": "2026-09-22",
+      "done": [
+        "35 条探针 SQL 新解析器客观覆盖（probe_coverage）",
+        "59 有状态族重审：41 passed→14 keep_pass+27 downgrade_insufficient（F04 全部点名个案）；16 failed 保留注明被否定命题；2 insufficient 维持",
+        "probe_package_v2 24 条五要素齐备（P2A 20/P2B 2/P2C 2）：全部未执行"
+      ],
+      "outputs": ["tools/r198_b4_rereview.py", "b4_validation_rereview.json", "b4_source_disambiguation.json", "probe_package_v2.json", "b4_summary.json"],
+      "remaining": ["live 执行与结果回填"],
+      "needs_approval": ["E 组：probe_package_v2 24 条（源/哈希/范围/时段/通道见包）"]
+    },
+    "B5": {
+      "status": "DONE_REVIEWED",
+      "date": "2026-09-22",
+      "executor": "Luna 子代理实现，主 AI 复核并亲自复跑",
+      "done": [
+        "relation_review_service：严格身份匹配（空→空、无子串、INNER 反向等价/LEFT 翻转、子集不匹配）；approve 不再 sample_pass（not_run）；候选缺身份可定位阻断",
+        "recipe_service：知识型 dict 显式标记 readiness/not_ready_reasons；非法表名/空ON/未解析族ID/复杂口径四道门禁机器可读拒绝；schema 放宽 list|dict",
+        "api/v1/recipes：submit/activate 前结构校验；generate_sql 传 payload",
+        "测试：plan198 纯逻辑 44+集成 6；主 AI 复跑 124 passed（隔离库身份核验 data_asset_test）"
+      ],
+      "outputs": ["backend/app/services/relation_review_service.py", "backend/app/services/recipe_service.py", "backend/app/schemas/recipe.py", "backend/app/api/v1/recipes.py", "backend/tests/conftest.py(+plan198)", "backend/tests/plan198/*", "backend/tests/test_r198_b5_recipe_gates.py"],
+      "remaining": ["生产发布（镜像链）未执行"],
+      "needs_approval": ["B5 代码上线（B7 第 3 项）"]
+    },
+    "B6": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": [
+        "b6_domain_revision_plan 37 条（34 更新：OPER_CODE 等价降待证假说/尾随空格保真/34 evidence 登记；3 新增 ITEM_CLASS E/F/G 按 Q15）",
+        "隔离预演（data_asset_test）：种子→应用（3 更新+34 证据）→重放 0/0；邻接对照（2 值域+2 草稿）不变；批次全 pending；confirmed 守卫拒绝；关系 UPDATE id+before-hash 守卫 3/3、邻接不动",
+        "recipe_payload_v2：13 条重建（合法 qualified tables+结构化 joins），13/13 诚实判知识型 not_executable（非法表名1/未解析引用/复杂口径），保留完整知识 payload"
+      ],
+      "outputs": ["tools/r198_b6_domains.py", "tools/r198_b6_rehearsal.py", "tools/r198_b6_recipes_reviews.py", "b6_domain_revision_plan.json", "b6_rehearsal_result.json", "b6_reviews_rehearsal.json", "recipe_payload_v2.json"],
+      "remaining": [],
+      "needs_approval": ["D/F 组：值域与三子包生产应用"]
+    },
+    "B7": {
+      "status": "PRESENTED_IN_FINAL_REPORT",
+      "date": "2026-09-22",
+      "done": ["批准包四项（live 探针/生产修订三子包/B5 发布/129 口径）在执行报告 §4 呈报"],
+      "needs_approval": ["见执行报告 §4"]
+    },
+    "B8": {
+      "status": "QUEUE_READY_FORMAL_STATES_PENDING_HUMAN",
+      "date": "2026-09-22",
+      "done": ["human_review_queue.csv/json 73 项 9 组（A1 20 逐条+分组项）生成；正式 AI 回读用例备好"],
+      "remaining": ["人工裁决全部治理终态；正式发布后 197 §11.3 八类 AI 回读"],
+      "needs_approval": ["A—G 全组"]
+    },
+    "B9": {
+      "status": "DONE",
+      "date": "2026-09-22",
+      "done": ["执行报告.md（自包含）；README/55/INDEX/197 勘误/198 状态/结果 JSON 同步；checkpoint 滚动"]
+    }
+  },
+  "verification_summary": {
+    "t01_t08": "14/14 pass（纯逻辑）",
+    "t09_t12": "pass（44 纯逻辑+6 集成；主 AI 复跑 124 passed）",
+    "t13_t14": "语义落实（B4 重审 27 降级/16 负例保留注明命题）",
+    "t15": "pass（值域+关系两资产隔离预演；配方数据重建无状态更新）",
+    "t16": "待人工终态（草稿隔离已证：13 配方不可生成、167 仍 draft）"
+  },
+  "git": "本地提交一次（文档+工具+backend 修复+产物清单）；未 push（未获点名）"
+}

@@ -10,7 +10,7 @@ from ...core.security import get_current_user, require_permission
 from ...models.recipe import AssetRelationRecipe
 from ...schemas.common import ApiResponse
 from ...schemas.recipe import RecipeCreate, RecipeDraftUpdate, RecipeReview, RecipeSqlGenerateRequest
-from ...services.recipe_service import assert_transition, canonical_recipe_payload, generate_select_sql, recipe_hash, validate_recipe_tables
+from ...services.recipe_service import assert_transition, canonical_recipe_payload, generate_select_sql, recipe_hash, validate_recipe_structure, validate_recipe_tables
 
 router = APIRouter(prefix="/api/v1/recipes", tags=["recipes"])
 
@@ -99,6 +99,15 @@ def update_version(recipe_id: str, version: int, req: RecipeDraftUpdate, request
 def _transition(recipe_id: str, version: int, target: str, reason: str | None, request: Request, db: Session) -> dict:
     row = db.scalar(select(AssetRelationRecipe).where(AssetRelationRecipe.recipe_id == recipe_id, AssetRelationRecipe.version == version))
     if not row: raise HTTPException(status_code=404, detail="配方版本不存在")
+    # 198 T12：错误 draft 不得 submit/activate——先做结构校验（表名/joins 形态/
+    # 空 ON/族引用/知识型口径），draft 允许未完备但 reasons 记录在 recipe_json。
+    if target in {"submitted", "active"}:
+        structure_reasons = validate_recipe_structure(row.primary_tables, row.joins, payload=row.recipe_json)
+        if structure_reasons:
+            raise HTTPException(
+                status_code=422,
+                detail={"code": "recipe_structure_invalid", "reasons": structure_reasons},
+            )
     assert_transition(row.status, target); user = get_current_user(request)
     row.status, row.updated_by = target, user
     row.review_reason = reason
@@ -136,5 +145,7 @@ def generate_sql(recipe_id: str, version: int, req: RecipeSqlGenerateRequest, db
     if not row: raise HTTPException(status_code=404, detail="配方版本不存在")
     tables = row.primary_tables or []
     if not tables: raise HTTPException(status_code=400, detail="配方没有主表，无法生成 SQL")
-    sql = generate_select_sql(tables, row.joins or [])
+    # 198 T11：知识型/结构未就绪配方在此显式拒绝并说明原因，不降格 SELECT *；
+    # 非法表名、空 ON、族引用问题在治理前以机器可读错误返回。
+    sql = generate_select_sql(tables, row.joins or [], payload=row.recipe_json or None)
     return ApiResponse(data={"recipe_id": recipe_id, "version": version, "dialect": req.dialect, "sql": sql, "executed": False})

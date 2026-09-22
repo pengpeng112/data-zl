@@ -1,0 +1,34 @@
+{
+ "summary": {
+  "new_families": 460,
+  "state_counts": {
+   "existing_supplement": 26,
+   "candidate": 374,
+   "candidate_blocked_source": 60
+  },
+  "groups_total": 2777,
+  "derived_pending_edges": 295,
+  "old_families_mapped": {
+   "mapped": 360,
+   "columns_changed": 25,
+   "dropped_by_reparse": 20
+  },
+  "self_join_families": 13,
+  "mixed_join_families": 3,
+  "outer_families": 79,
+  "ambiguous_endpoint_families": 409,
+  "existing_with_full_coverage": 26
+ },
+ "old_state_vs_new": {
+  "candidate->candidate": 145,
+  "candidate->candidate_blocked_source": 5,
+  "candidate_blocked_source->candidate_blocked_source": 1,
+  "candidate_d_crosssource->candidate_blocked_source": 36,
+  "existing_supplement->candidate": 161,
+  "existing_supplement->candidate_blocked_source": 2,
+  "existing_supplement->existing_supplement": 28,
+  "partial->candidate": 39,
+  "partial->candidate_blocked_source": 3,
+  "rejected_negative->candidate": 4
+ }
+}

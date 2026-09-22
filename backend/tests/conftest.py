@@ -31,6 +31,7 @@ _PURE_LOGIC_SUBDIRS = (
     "plan194",
     "plan185_docare_reliability",
     "plan186_morning_summary",
+    "plan198",
 )
 
 

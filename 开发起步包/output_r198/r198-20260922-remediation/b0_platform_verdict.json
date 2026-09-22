@@ -1,0 +1,31 @@
+{
+  "pulled_at": "2026-09-22 (B0)",
+  "reviews": {
+    "count": 167,
+    "all_draft": true,
+    "all_missing_both_source": true,
+    "non_null_validation": [],
+    "ids_match_baseline": true
+  },
+  "recipes": {
+    "count": 13,
+    "status_set": [
+      "draft"
+    ],
+    "any_active": false,
+    "ids_match_baseline": true
+  },
+  "domains": {
+    "count": 34,
+    "status_set": [
+      "pending"
+    ],
+    "no_evidence": true,
+    "ids_match_baseline": true
+  },
+  "platform_totals": {
+    "total_reviews": 841,
+    "total_formal": 1329
+  },
+  "baseline_unchanged": true
+}

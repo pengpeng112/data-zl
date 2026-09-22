@@ -1,0 +1,2952 @@
+[
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A3",
+   "r_table": "(B)",
+   "r_col": "B3",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A3",
+   "r_table": "(C)",
+   "r_col": "B3",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "76a32007f6dba6f0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A3",
+   "r_table": "(D)",
+   "r_col": "B3",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d301ce8fee3aa183",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d301ce8fee3aa183",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d301ce8fee3aa183",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "fb739669ff920600",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c4dbca646d332579",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8b03739a37aead19",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8b03739a37aead19",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8b03739a37aead19",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "42b36b3e3d1bc4af",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "42b36b3e3d1bc4af",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "42b36b3e3d1bc4af",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "60633a50f2b648bd",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "60633a50f2b648bd",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "60633a50f2b648bd",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "f5e3737bbc1ad9e8",
+  "edge": {
+   "l_table": "LAB_TEST_MASTER",
+   "l_col": "TEST_NO",
+   "r_table": "(F)",
+   "r_col": "APPOINT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4706dfcb1244c1e2",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4706dfcb1244c1e2",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DEPT_WAITING_FOR",
+   "r_table": "PAT_VISIT",
+   "r_col": "DEPT_ADMISSION_TO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4706dfcb1244c1e2",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "USER_NAME",
+   "r_table": "PAT_VISIT",
+   "r_col": "CONSULTING_DOCTOR",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4ccea5d72654f704",
+  "edge": {
+   "l_table": "STAFF_DICT",
+   "l_col": "EMP_NO",
+   "r_table": "(OUTP_BILL_ITEMS)",
+   "r_col": "ORDERED_BY_DOCTOR",
+   "block": "B4"
+  }
+ },
+ {
+  "template_hash": "b65a0bd2ab9fbce6",
+  "edge": {
+   "l_table": "STAFF_DICT",
+   "l_col": "EMP_NO",
+   "r_table": "(OUTP_BILL_ITEMS)",
+   "r_col": "ORDERED_BY_DOCTOR",
+   "block": "B4"
+  }
+ },
+ {
+  "template_hash": "07b603d5fc1b0afc",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "07b603d5fc1b0afc",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "07b603d5fc1b0afc",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "SURGEON",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "07b603d5fc1b0afc",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "07b603d5fc1b0afc",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "VISIT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "59754ad19ec520a8",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "59754ad19ec520a8",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "住院次数",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "3ce37a808584a926",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "3ce37a808584a926",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "0e3d83c66fcd06ba",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "CLASS_ON_RECKONING",
+   "r_table": "RECK_ITEM_CLASS_DICT",
+   "r_col": "CLASS_CODE",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "0e3d83c66fcd06ba",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "0e3d83c66fcd06ba",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DEPT_WAITING_FOR",
+   "r_table": "PAT_VISIT",
+   "r_col": "DEPT_ADMISSION_TO",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "0e3d83c66fcd06ba",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "USER_NAME",
+   "r_table": "PAT_VISIT",
+   "r_col": "CONSULTING_DOCTOR",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "fc513c394919e08d",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "YM",
+   "r_table": "(B)",
+   "r_col": "YM",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "fc513c394919e08d",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DEPT_NAME",
+   "r_table": "(B)",
+   "r_col": "DEPT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "481b4a268368d595",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "YM",
+   "r_table": "(B)",
+   "r_col": "YM",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "481b4a268368d595",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DEPT_NAME",
+   "r_table": "(B)",
+   "r_col": "DEPT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "2e3fd60767fb0471",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DISCHARGE_DATE_TIME",
+   "r_table": "(BB)",
+   "r_col": "ST_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "2e3fd60767fb0471",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "(BB)",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "2e3fd60767fb0471",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0b87393e811d7a40",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DISCHARGE_DATE_TIME",
+   "r_table": "(BB)",
+   "r_col": "DISCHARGE_DATE_TIME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0b87393e811d7a40",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "(BB)",
+   "r_col": "DEPT_ADMISSION_TO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0b87393e811d7a40",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3e72dc0cdeb83b7e",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "(BB)",
+   "r_col": "DEPT_ADMISSION_TO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3e72dc0cdeb83b7e",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "OPERATING_DATE",
+   "r_table": "(BB)",
+   "r_col": "OPERATING_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3e72dc0cdeb83b7e",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "78ebc928fb7a7c2d",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "(BB)",
+   "r_col": "DEPT_ADMISSION_TO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "78ebc928fb7a7c2d",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "SSRQ",
+   "r_table": "(BB)",
+   "r_col": "SSRQ",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "78ebc928fb7a7c2d",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_ADMISSION_TO",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4b76b1db03e8744d",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "4b76b1db03e8744d",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "4b76b1db03e8744d",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "012150f950a97a66",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "012150f950a97a66",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "012150f950a97a66",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "b667dd8f473137d5",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "b667dd8f473137d5",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "b667dd8f473137d5",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "52c311047f616e57",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "52c311047f616e57",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "52c311047f616e57",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "219069bf7c149a2c",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "219069bf7c149a2c",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "219069bf7c149a2c",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "cafb4a6d5e16bdac",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "cafb4a6d5e16bdac",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "cafb4a6d5e16bdac",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8b378c54668787cb",
+  "edge": {
+   "l_table": "(RU)",
+   "l_col": "PATIENT_ID",
+   "r_table": "(CHU)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8b378c54668787cb",
+  "edge": {
+   "l_table": "(RU)",
+   "l_col": "VISIT_ID",
+   "r_table": "(CHU)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d78bf3dcb6984943",
+  "edge": {
+   "l_table": "(RU)",
+   "l_col": "VISIT_ID",
+   "r_table": "(CHU)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d78bf3dcb6984943",
+  "edge": {
+   "l_table": "(RU)",
+   "l_col": "PATIENT_ID",
+   "r_table": "(CHU)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "a8ec314507736060",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "CLASS_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "52c11b07562ba544",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "52c11b07562ba544",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "52c11b07562ba544",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "c99749d4f64f69d3",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c99749d4f64f69d3",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c99749d4f64f69d3",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6d76bb4dcb75f790",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "6d76bb4dcb75f790",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "6d76bb4dcb75f790",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "aa76e7303cc9c9a6",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "aa76e7303cc9c9a6",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "aa76e7303cc9c9a6",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "0f560352102d1477",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(BB)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0f560352102d1477",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(BB)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0f560352102d1477",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "OPER_CODE",
+   "r_table": "(BB)",
+   "r_col": "OPER_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "02d9e78096172903",
+  "edge": {
+   "l_table": "STAFF_DICT",
+   "l_col": "NAME",
+   "r_table": "(A)",
+   "r_col": "ADMITTED_BY",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "02d9e78096172903",
+  "edge": {
+   "l_table": "STAFF_DICT",
+   "l_col": "ID",
+   "r_table": "(A)",
+   "r_col": "OPERATOR_NO",
+   "block": "B5"
+  }
+ },
+ {
+  "template_hash": "a5f396cc6e004302",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "a5f396cc6e004302",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "e5ac5335a0fd5313",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e5ac5335a0fd5313",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "68b9d678ec602b2b",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "手术科室",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e381802f179c2919",
+  "edge": {
+   "l_table": "OUTP_TREAT_REC",
+   "l_col": "ITEM_CODE",
+   "r_table": "(B)",
+   "r_col": "CLINIC_ITEM_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "673b1daf7b2a8287",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "RCPT_NO",
+   "r_table": "OUTP_ORDER_DESC",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "673b1daf7b2a8287",
+  "edge": {
+   "l_table": "PUB_PATIENTINFO_INSURE",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "673b1daf7b2a8287",
+  "edge": {
+   "l_table": "INSURANCE.OUTP_RCPT_MASTER_YB",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "673b1daf7b2a8287",
+  "edge": {
+   "l_table": "INSURANCE.OUTP_RCPT_MASTER_YB",
+   "l_col": "RCPT_NO",
+   "r_table": "(A)",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "f8588b7038b117c7",
+  "edge": {
+   "l_table": "STAFF_DICT",
+   "l_col": "EMP_NO",
+   "r_table": "(OUTP_BILL_ITEMS)",
+   "r_col": "ORDERED_BY_DOCTOR",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "b2a26126eea0fd76",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "b2a26126eea0fd76",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "84c0158e57dc2635",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "84c0158e57dc2635",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "84c0158e57dc2635",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "CLINIC_NO",
+   "r_table": "(OOD)",
+   "r_col": "CLINIC_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "84c0158e57dc2635",
+  "edge": {
+   "l_table": "OUTP_BILL_ITEMS",
+   "l_col": "RCPT_NO",
+   "r_table": "(OOD)",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43c18c600a90fded",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43c18c600a90fded",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43c18c600a90fded",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "CLINIC_NO",
+   "r_table": "(OOD)",
+   "r_col": "CLINIC_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43c18c600a90fded",
+  "edge": {
+   "l_table": "OUTP_BILL_ITEMS",
+   "l_col": "RCPT_NO",
+   "r_table": "(OOD)",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "252a90bf18c22e94",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "d3aca88ac935e816",
+  "edge": {
+   "l_table": "OPERATION",
+   "l_col": "PATIENT_ID",
+   "r_table": "(G)",
+   "r_col": "病人ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d3aca88ac935e816",
+  "edge": {
+   "l_table": "OPERATION",
+   "l_col": "VISIT_ID",
+   "r_table": "(G)",
+   "r_col": "住院次数",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "73352c63959c94ea",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(CCC)",
+   "r_col": "ID号",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "73352c63959c94ea",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(CCC)",
+   "r_col": "住院次数",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e474c08531b4e923",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(PP)",
+   "r_col": "ID号",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e474c08531b4e923",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(PP)",
+   "r_col": "住院次数",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(B)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(C)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(D)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(AO)",
+   "r_col": "A1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(BO)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(CO)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "aa67474612f2f4fa",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "A1",
+   "r_table": "(DO)",
+   "r_col": "B1",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "5ca4517b359b7105",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "5ca4517b359b7105",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "64c75ccb7e98d448",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "64c75ccb7e98d448",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "2ef04f6d29b89ff4",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "2ef04f6d29b89ff4",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "2ef04f6d29b89ff4",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "SURGEON",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "9beec65c7c48a276",
+  "edge": {
+   "l_table": "(F)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "9beec65c7c48a276",
+  "edge": {
+   "l_table": "(F)",
+   "l_col": "VISIT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "877e9ede861b0cb8",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "ID号",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "877e9ede861b0cb8",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "住院次数",
+   "r_table": "(B)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bb4b0c4460631355",
+  "edge": {
+   "l_table": "DEPT_DICT",
+   "l_col": "TJ_KSMC",
+   "r_table": "(OPER_NUM)",
+   "r_col": "TJ_KSMC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bb4b0c4460631355",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B5"
+  }
+ },
+ {
+  "template_hash": "bb4b0c4460631355",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B5"
+  }
+ },
+ {
+  "template_hash": "8c9c01c0ab9664fe",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8c9c01c0ab9664fe",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "7c37c1bc22863592",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "CLASS_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4ab0b9f8b99f2d44",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "CLASS_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43ceeb09dfe463ee",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4eff1686f16c6aad",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "CLASS_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "b1044ac69dab3864",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "b1044ac69dab3864",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "58fe9d43698ff865",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "1846e9781b464fc4",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1846e9781b464fc4",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "c8b09ddd68e49c3e",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "89fde4d715b8c2c1",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "89fde4d715b8c2c1",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "ee08940f0e53851f",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "ee08940f0e53851f",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "8f1e134fbdef390d",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "e48a160ff785ee05",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "CLASS_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "5aa6163ae1790bdb",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "VISIT_ID",
+   "r_table": "(B)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "5aa6163ae1790bdb",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1509adedb4301b49",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "护理单元",
+   "r_table": "(B)",
+   "r_col": "护理单元",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1509adedb4301b49",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "护理单元",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "30b5d13e1db5130a",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DEPT",
+   "r_table": "(B)",
+   "r_col": "DEPT",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "f5f565a73c3ceb7f",
+  "edge": {
+   "l_table": "(E)",
+   "l_col": "ORDERED_BY_DOCTOR",
+   "r_table": "STAFF_DICT",
+   "r_col": "EMP_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "441b72fa8bc695a9",
+  "edge": {
+   "l_table": "(CH)",
+   "l_col": "CLINIC_NO",
+   "r_table": "CLINIC_MASTER",
+   "r_col": "CLINIC_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "da3b2dda7d5bb9cd",
+  "edge": {
+   "l_table": "(OUTP_BILL_ITEMS)",
+   "l_col": "PERFORMED_BY",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "56c62116a9c3747a",
+  "edge": {
+   "l_table": "(OUTP_BILL_ITEMS)",
+   "l_col": "PERFORMED_BY",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "eca4a25c89bfa187",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(F)",
+   "r_col": "PATIENT_ID",
+   "block": "B3"
+  }
+ },
+ {
+  "template_hash": "eca4a25c89bfa187",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(F)",
+   "r_col": "VISIT_ID",
+   "block": "B3"
+  }
+ },
+ {
+  "template_hash": "eca4a25c89bfa187",
+  "edge": {
+   "l_table": "INP_SETTLE_MASTER_YB",
+   "l_col": "PATIENT_ID",
+   "r_table": "(F)",
+   "r_col": "PATIENT_ID",
+   "block": "B4"
+  }
+ },
+ {
+  "template_hash": "eca4a25c89bfa187",
+  "edge": {
+   "l_table": "INP_SETTLE_MASTER_YB",
+   "l_col": "VISIT_ID",
+   "r_table": "(F)",
+   "r_col": "VISIT_ID",
+   "block": "B4"
+  }
+ },
+ {
+  "template_hash": "0d50be61acbcb267",
+  "edge": {
+   "l_table": "(BB)",
+   "l_col": "RCPT_NO",
+   "r_table": "OUTP_BILL_ITEMS",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "0d50be61acbcb267",
+  "edge": {
+   "l_table": "(BB)",
+   "l_col": "RCPT_NO",
+   "r_table": "OUTP_ORDER_DESC",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1c26747d33dbb20b",
+  "edge": {
+   "l_table": "ORDERS",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1c26747d33dbb20b",
+  "edge": {
+   "l_table": "ORDERS",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1ee987306f488a92",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "PATIENT_ID",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "1ee987306f488a92",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "VISIT_ID",
+   "r_table": "(B)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "420bdeac17cf37f1",
+  "edge": {
+   "l_table": "(T)",
+   "l_col": "PATIENT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "420bdeac17cf37f1",
+  "edge": {
+   "l_table": "(T)",
+   "l_col": "VISIT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "420bdeac17cf37f1",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "PATIENT_ID",
+   "r_table": "(TT)",
+   "r_col": "PATIENT_ID",
+   "block": "B5"
+  }
+ },
+ {
+  "template_hash": "420bdeac17cf37f1",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "VISIT_ID",
+   "r_table": "(TT)",
+   "r_col": "VISIT_ID",
+   "block": "B5"
+  }
+ },
+ {
+  "template_hash": "8ec4d119d12c19e4",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "8ec4d119d12c19e4",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "VISIT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "VISIT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "1f5f94702f3a4f98",
+  "edge": {
+   "l_table": "INP_PAYMENTS_MONEY",
+   "l_col": "MONEY_TYPE",
+   "r_table": "(B)",
+   "r_col": "HIS_DICT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "7b36a9b04a14e42c",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "ITEM_CODE",
+   "r_table": "(B)",
+   "r_col": "ITEM_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bb658d0b7330c3d2",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bb658d0b7330c3d2",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "VISIT_ID",
+   "r_table": "(B)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "881826c3a29ffb7e",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "MONEY_TYPE",
+   "r_table": "(B)",
+   "r_col": "HIS_DICT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "46b723a118018667",
+  "edge": {
+   "l_table": "(PP)",
+   "l_col": "PATIENT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "46b723a118018667",
+  "edge": {
+   "l_table": "(PP)",
+   "l_col": "VISIT_ID",
+   "r_table": "INP_BILL_DETAIL",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "eb11f9372305723e",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "CHECK_NO",
+   "r_table": "(B)",
+   "r_col": "CHECK_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "eb11f9372305723e",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "BANK_CODE",
+   "r_table": "(B)",
+   "r_col": "BANK_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bd98bb6414342fd0",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "RCPT_NO",
+   "r_table": "(B)",
+   "r_col": "RCPT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "996f87c83a1a52d5",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "DRG_CODE",
+   "r_table": "(B)",
+   "r_col": "DRG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "996f87c83a1a52d5",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "ZFBL",
+   "r_table": "(B)",
+   "r_col": "ZFBL",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "041f5b76bc3529aa",
+  "edge": {
+   "l_table": "(T)",
+   "l_col": "CLASS_ON_INP_RCPT",
+   "r_table": "(N)",
+   "r_col": "HIS_DICT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6e537595ffe43165",
+  "edge": {
+   "l_table": "(T)",
+   "l_col": "CLASS_ON_INP_RCPT",
+   "r_table": "(N)",
+   "r_col": "HIS_DICT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6cdecfb3c3991cec",
+  "edge": {
+   "l_table": "(T)",
+   "l_col": "CLASS_ON_INP_RCPT",
+   "r_table": "(N)",
+   "r_col": "HIS_DICT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3d2e1c5411c3b741",
+  "edge": {
+   "l_table": "(M)",
+   "l_col": "FEE_CLASS_NAME",
+   "r_table": "(N)",
+   "r_col": "HIS_DICT_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "df04470d8d5ae5ce",
+  "edge": {
+   "l_table": "RECK_ITEM_CLASS_DICT",
+   "l_col": "CLASS_NAME",
+   "r_table": "(E)",
+   "r_col": "SUBJ_NAME",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "11d6e5cc369e38f4",
+  "edge": {
+   "l_table": "INP_BILL_DETAIL",
+   "l_col": "ITEM_CODE",
+   "r_table": "(B)",
+   "r_col": "ITEM_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "CHARGE_TYPE",
+   "r_table": "(DRUG)",
+   "r_col": "CHARGE_TYPE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "(DRUG)",
+   "r_col": "ITEM_CLASS",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "(DRUG)",
+   "r_col": "DRUG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_SPEC",
+   "r_table": "(DRUG)",
+   "r_col": "DRUG_SPEC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B6"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B6"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B6"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B7"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B7"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B7"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B8"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B8"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B8"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B9"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B10"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B10"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B10"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B11"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B11"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B11"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CODE",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CODE",
+   "block": "B12"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_CLASS",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_CLASS",
+   "block": "B12"
+  }
+ },
+ {
+  "template_hash": "e764fa8f6a5292cc",
+  "edge": {
+   "l_table": "(DETAIL)",
+   "l_col": "ITEM_NAME",
+   "r_table": "PRICE_ITEM_NAME_DICT",
+   "r_col": "ITEM_NAME",
+   "block": "B12"
+  }
+ },
+ {
+  "template_hash": "6103c4b5861945db",
+  "edge": {
+   "l_table": "(F)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6103c4b5861945db",
+  "edge": {
+   "l_table": "(F)",
+   "l_col": "VISIT_ID",
+   "r_table": "PAT_VISIT",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "9c21dbfa1263650f",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "OPERATING_DEPT",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "9c21dbfa1263650f",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "d5a3e7a06e1ea476",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_STAYED",
+   "r_table": "(BB)",
+   "r_col": "DEPT_STAYED",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d5a3e7a06e1ea476",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "OPERATING_DATE",
+   "r_table": "(BB)",
+   "r_col": "OPERATING_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "d5a3e7a06e1ea476",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DEPT_STAYED",
+   "r_table": "DEPT_DICT",
+   "r_col": "DEPT_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c3f8b61eece8308e",
+  "edge": {
+   "l_table": "(PAT_VISIT)",
+   "l_col": "PATIENT_ID",
+   "r_table": "MEDICAL_RECORD_REVIEW_TABLE",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c3f8b61eece8308e",
+  "edge": {
+   "l_table": "(PAT_VISIT)",
+   "l_col": "VISIT_ID",
+   "r_table": "MEDICAL_RECORD_REVIEW_TABLE",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c3f8b61eece8308e",
+  "edge": {
+   "l_table": "OPERATION",
+   "l_col": "PATIENT_ID",
+   "r_table": "(PAT_VISIT)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c3f8b61eece8308e",
+  "edge": {
+   "l_table": "OPERATION",
+   "l_col": "VISIT_ID",
+   "r_table": "(PAT_VISIT)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6b4029130413d7b1",
+  "edge": {
+   "l_table": "(PAT_VISIT)",
+   "l_col": "PATIENT_ID",
+   "r_table": "MEDICAL_RECORD_REVIEW_TABLE",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6b4029130413d7b1",
+  "edge": {
+   "l_table": "(PAT_VISIT)",
+   "l_col": "VISIT_ID",
+   "r_table": "MEDICAL_RECORD_REVIEW_TABLE",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6b4029130413d7b1",
+  "edge": {
+   "l_table": "DIAGNOSIS",
+   "l_col": "PATIENT_ID",
+   "r_table": "(PAT_VISIT)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6b4029130413d7b1",
+  "edge": {
+   "l_table": "DIAGNOSIS",
+   "l_col": "VISIT_ID",
+   "r_table": "(PAT_VISIT)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3af09e9ad351f6b6",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "PATIENT_ID",
+   "r_table": "OPERATION",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3af09e9ad351f6b6",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "VISIT_ID",
+   "r_table": "OPERATION",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3af09e9ad351f6b6",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "OPERATION_CODE",
+   "r_table": "OPERATION",
+   "r_col": "OPERATION_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "77ee8a0694258ebd",
+  "edge": {
+   "l_table": "LAB_TEST_MASTER",
+   "l_col": "PATIENT_ID",
+   "r_table": "(F)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "77ee8a0694258ebd",
+  "edge": {
+   "l_table": "LAB_TEST_MASTER",
+   "l_col": "VISIT_ID",
+   "r_table": "(F)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e8fc4d8cb821b797",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "PATIENT_ID",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e8fc4d8cb821b797",
+  "edge": {
+   "l_table": "PAT_VISIT",
+   "l_col": "VISIT_ID",
+   "r_table": "(B)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3104143f4bcadcd6",
+  "edge": {
+   "l_table": "(D)",
+   "l_col": "病人ID",
+   "r_table": "ORDERS",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "3104143f4bcadcd6",
+  "edge": {
+   "l_table": "(D)",
+   "l_col": "住院次数",
+   "r_table": "ORDERS",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "75149edf633a78fb",
+  "edge": {
+   "l_table": "LAB_TEST_MASTER",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "75149edf633a78fb",
+  "edge": {
+   "l_table": "LAB_TEST_MASTER",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bf6ccff69fe3fb9d",
+  "edge": {
+   "l_table": "EXAM_MASTER",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "bf6ccff69fe3fb9d",
+  "edge": {
+   "l_table": "EXAM_MASTER",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "191da13fc42ea752",
+  "edge": {
+   "l_table": "DIAGNOSIS",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "191da13fc42ea752",
+  "edge": {
+   "l_table": "DIAGNOSIS",
+   "l_col": "VISIT_ID",
+   "r_table": "(A)",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "7bc8c5939a49f587",
+  "edge": {
+   "l_table": "OUTP_TREAT_REC",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "7bc8c5939a49f587",
+  "edge": {
+   "l_table": "OUTP_TREAT_REC",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e2b5309356dc60e8",
+  "edge": {
+   "l_table": "OUTP_PRESC",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "e2b5309356dc60e8",
+  "edge": {
+   "l_table": "OUTP_PRESC",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4716f4a1335abbdd",
+  "edge": {
+   "l_table": "OUTP_TREAT_REC",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4716f4a1335abbdd",
+  "edge": {
+   "l_table": "OUTP_TREAT_REC",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "51c41f45e66c5a19",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "PATIENT_ID",
+   "r_table": "(A)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "51c41f45e66c5a19",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_DATE",
+   "r_table": "(A)",
+   "r_col": "VISIT_DATE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "51c41f45e66c5a19",
+  "edge": {
+   "l_table": "CLINIC_MASTER",
+   "l_col": "VISIT_NO",
+   "r_table": "(A)",
+   "r_col": "VISIT_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "43d92c9619deae12",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DRUG_SPEC",
+   "r_table": "DRUG_DICT",
+   "r_col": "DRUG_SPEC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "9c13e711e2dcce56",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DRUG_SPEC",
+   "r_table": "DRUG_DICT",
+   "r_col": "DRUG_SPEC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "49dd08c9321f92ec",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DRUG_CODE",
+   "r_table": "DRUG_PROVIDE_APPLICATION",
+   "r_col": "DRUG_CODE",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "49dd08c9321f92ec",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "DRUG_SPEC",
+   "r_table": "DRUG_PROVIDE_APPLICATION",
+   "r_col": "DRUG_SPEC",
+   "block": "B2"
+  }
+ },
+ {
+  "template_hash": "23d0df0d2c2793e5",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "BAIDENTITY",
+   "r_table": "MEDREC.T_BNZYFY",
+   "r_col": "BAIDENTITY",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "4e49cd4add4a5786",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "PATIENT_ID",
+   "r_table": "(B)",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "a5e6b0fbf47a8c36",
+  "edge": {
+   "l_table": "DRUG_STOCK",
+   "l_col": "DRUG_CODE",
+   "r_table": "(DRUG_IMPORT_DETAIL)",
+   "r_col": "DRUG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "a5e6b0fbf47a8c36",
+  "edge": {
+   "l_table": "DRUG_STOCK",
+   "l_col": "DRUG_SPEC",
+   "r_table": "(DRUG_IMPORT_DETAIL)",
+   "r_col": "DRUG_SPEC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6120ab30334b5144",
+  "edge": {
+   "l_table": "DRUG_STOCK",
+   "l_col": "DRUG_CODE",
+   "r_table": "(DRUG_IMPORT_DETAIL)",
+   "r_col": "DRUG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "6120ab30334b5144",
+  "edge": {
+   "l_table": "DRUG_STOCK",
+   "l_col": "DRUG_SPEC",
+   "r_table": "(DRUG_IMPORT_DETAIL)",
+   "r_col": "DRUG_SPEC",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "fac779b976ca732e",
+  "edge": {
+   "l_table": "DBA_HIST_SQLTEXT",
+   "l_col": "SQL_ID",
+   "r_table": "(B)",
+   "r_col": "SQL_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "fac779b976ca732e",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "SQL_ID",
+   "r_table": "DBA_HIST_ACTIVE_SESS_HISTORY",
+   "r_col": "SQL_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c46b44c6046b2eba",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "PATIENT_ID",
+   "r_table": "ORDERS",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c46b44c6046b2eba",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "VISIT_ID",
+   "r_table": "ORDERS",
+   "r_col": "VISIT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "c46b44c6046b2eba",
+  "edge": {
+   "l_table": "(AA)",
+   "l_col": "ORDER_NO",
+   "r_table": "ORDERS",
+   "r_col": "ORDER_NO",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8d92e6d5177e4db8",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "APPLICATION",
+   "r_table": "SECURITY_TEMPLATE",
+   "r_col": "APPLICATION",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8d92e6d5177e4db8",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "WINDOW",
+   "r_table": "SECURITY_TEMPLATE",
+   "r_col": "WINDOW",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "8d92e6d5177e4db8",
+  "edge": {
+   "l_table": "(A)",
+   "l_col": "CONTROL",
+   "r_table": "SECURITY_TEMPLATE",
+   "r_col": "CONTROL",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "502b8319e49cd5ea",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PATS_IN_HOSPITAL",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "502b8319e49cd5ea",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "502b8319e49cd5ea",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "DRUG_CODE",
+   "r_table": "DRUG_DISPENS_PROPERTY",
+   "r_col": "DRUG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "502b8319e49cd5ea",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "DISPENSARY",
+   "r_table": "DRUG_DISPENS_PROPERTY",
+   "r_col": "DISPENSARY",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "ff307daafe49a2cf",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "DRUG_CODE",
+   "r_table": "DRUG_DISPENS_PROPERTY",
+   "r_col": "DRUG_CODE",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "ff307daafe49a2cf",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "DISPENSARY",
+   "r_table": "DRUG_DISPENS_PROPERTY",
+   "r_col": "DISPENSARY",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "ff307daafe49a2cf",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PATS_IN_HOSPITAL",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ },
+ {
+  "template_hash": "ff307daafe49a2cf",
+  "edge": {
+   "l_table": "(B)",
+   "l_col": "PATIENT_ID",
+   "r_table": "PAT_MASTER_INDEX",
+   "r_col": "PATIENT_ID",
+   "block": "B1"
+  }
+ }
+]

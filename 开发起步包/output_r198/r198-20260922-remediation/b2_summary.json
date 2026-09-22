@@ -1,0 +1,1739 @@
+{
+  "templates_total": 3256,
+  "stats": {
+    "tmpl_with_edges": 1099,
+    "tmpl_with_unresolved": 2057,
+    "tmpl_with_warnings": 106
+  },
+  "explicit_outer_join_templates": 34,
+  "left_join_list": [
+    {
+      "template_hash": "57893d5429795f44",
+      "join_types": [
+        "full"
+      ],
+      "n_edges": 7
+    },
+    {
+      "template_hash": "d27dfaa873627a8b",
+      "join_types": [
+        "full"
+      ],
+      "n_edges": 7
+    },
+    {
+      "template_hash": "e80c7f67f1d287d6",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 4
+    },
+    {
+      "template_hash": "c30ce63e0eeb5237",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 6
+    },
+    {
+      "template_hash": "673b1daf7b2a8287",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 13
+    },
+    {
+      "template_hash": "d54ac66bf091b711",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 14
+    },
+    {
+      "template_hash": "88b0e9f08e5bf887",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 22
+    },
+    {
+      "template_hash": "9beec65c7c48a276",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 7
+    },
+    {
+      "template_hash": "877e9ede861b0cb8",
+      "join_types": [
+        "full"
+      ],
+      "n_edges": 5
+    },
+    {
+      "template_hash": "bb4b0c4460631355",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 4
+    },
+    {
+      "template_hash": "c5f65e4a930798bc",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 3
+    },
+    {
+      "template_hash": "bdb2f43e2c95c5e6",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 7
+    },
+    {
+      "template_hash": "9a28aeb57b281f9b",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "24673ff5fbc892f7",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 8
+    },
+    {
+      "template_hash": "6962f7e5354e3222",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 15
+    },
+    {
+      "template_hash": "bbc13871cf61b80b",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 4
+    },
+    {
+      "template_hash": "7b36a9b04a14e42c",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "11d6e5cc369e38f4",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "6103c4b5861945db",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 2
+    },
+    {
+      "template_hash": "f7a6ec19e6e04bd0",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 2
+    },
+    {
+      "template_hash": "6ff5fc62a58de93d",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 3
+    },
+    {
+      "template_hash": "46d7bd1e483c776b",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 5
+    },
+    {
+      "template_hash": "48f7c4c28da06187",
+      "join_types": [
+        "right"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "c2ea15fe14f21ce7",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "a16492a2423c9324",
+      "join_types": [
+        "right"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "8992989c7ba4a0cc",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "bd7cfc8b2f9915c2",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "808040c8d833c06d",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "17ca2f76dee3d573",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 3
+    },
+    {
+      "template_hash": "77afd76c1475bbd9",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "23d0df0d2c2793e5",
+      "join_types": [
+        "left"
+      ],
+      "n_edges": 1
+    },
+    {
+      "template_hash": "7e8966642b5a5d5b",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 2
+    },
+    {
+      "template_hash": "29fc630054fefa3b",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 2
+    },
+    {
+      "template_hash": "502b8319e49cd5ea",
+      "join_types": [
+        "inner",
+        "left"
+      ],
+      "n_edges": 7
+    }
+  ],
+  "selfjoin_edges_recovered_templates": 37,
+  "selfjoin_sample": [
+    {
+      "template_hash": "4c3f5e6a8ae827b5",
+      "table": "CLINIC_MASTER",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "cd79b8a03845aef4",
+      "table": "INP_SETTLE_MASTER_YB",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "b5d8952482bbc853",
+      "table": "ORDERS",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "27a2d691aac68b90",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "1aff85fbd1a58f14",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "b2a26126eea0fd76",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "1f291bccfcb75126",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "84c0158e57dc2635",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "43c18c600a90fded",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "4743e4f2e4487d34",
+      "table": "STAFF_DICT",
+      "cols": [
+        "DEPT_CODE",
+        "DEPT_CODE"
+      ]
+    },
+    {
+      "template_hash": "b5c6edce06b8af84",
+      "table": "STAFF_DICT",
+      "cols": [
+        "DEPT_CODE",
+        "DEPT_CODE"
+      ]
+    },
+    {
+      "template_hash": "41ed2542f0becdee",
+      "table": "BED_TRANS_LOG",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "bda265db6c3f64fa",
+      "table": "OUTP_BILL_ITEMS",
+      "cols": [
+        "ITEM_CODE",
+        "ITEM_CODE"
+      ]
+    },
+    {
+      "template_hash": "e7a2c9427202dd66",
+      "table": "ADT_LOG",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "1509adedb4301b49",
+      "table": "ADT_LOG",
+      "cols": [
+        "WARD_CODE",
+        "WARD_CODE"
+      ]
+    },
+    {
+      "template_hash": "1c26747d33dbb20b",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "5a434e3f365c65d0",
+      "table": "OUTP_RCPT_MASTER",
+      "cols": [
+        "RCPT_NO",
+        "REFUNDED_RCPT_NO"
+      ]
+    },
+    {
+      "template_hash": "2723c20e1ab33e73",
+      "table": "OUTP_BILL_ITEMS",
+      "cols": [
+        "ITEM_CODE",
+        "ITEM_CODE"
+      ]
+    },
+    {
+      "template_hash": "8153aae0cde38672",
+      "table": "OUTP_BILL_ITEMS",
+      "cols": [
+        "ITEM_CODE",
+        "ITEM_CODE"
+      ]
+    },
+    {
+      "template_hash": "ed6892effaf386a6",
+      "table": "OUTP_BILL_ITEMS",
+      "cols": [
+        "ITEM_CODE",
+        "ITEM_CODE"
+      ]
+    },
+    {
+      "template_hash": "8832c9a67b1ba163",
+      "table": "LAB_TEST_MASTER",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "0454b501731ff649",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "413b8b070e0aa2a0",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "4ece62fa6383b1b2",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "6aad54c731a0d943",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "83af0500463de408",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "e9cdb855446d6180",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "1362ff69a5866d08",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "3385842b5a438fba",
+      "table": "DRUG_PRICE_LIST",
+      "cols": [
+        "DRUG_CODE",
+        "DRUG_CODE"
+      ]
+    },
+    {
+      "template_hash": "75149edf633a78fb",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "bf6ccff69fe3fb9d",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "191da13fc42ea752",
+      "table": "PAT_VISIT",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "7bc8c5939a49f587",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "e2b5309356dc60e8",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "4716f4a1335abbdd",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "51c41f45e66c5a19",
+      "table": "OUTP_MR",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    },
+    {
+      "template_hash": "53237114c468d3ca",
+      "table": "BED_TRANS_LOG",
+      "cols": [
+        "PATIENT_ID",
+        "PATIENT_ID"
+      ]
+    }
+  ],
+  "old_vs_new_edge_gained_top": [
+    [
+      [
+        "RECK_ITEM_CLASS_DICT",
+        "CLASS_NAME",
+        "(E)",
+        "SUBJ_NAME"
+      ],
+      12
+    ],
+    [
+      [
+        "PAT_MASTER_INDEX",
+        "PATIENT_ID",
+        "INP_BILL_DETAIL",
+        "PATIENT_ID"
+      ],
+      12
+    ],
+    [
+      [
+        "INP_BILL_DETAIL",
+        "OPER_CODE",
+        "(BB)",
+        "OPER_ID"
+      ],
+      11
+    ],
+    [
+      [
+        "INP_BILL_DETAIL",
+        "VISIT_ID",
+        "(BB)",
+        "VISIT_ID"
+      ],
+      11
+    ],
+    [
+      [
+        "STAFF_DICT",
+        "EMP_NO",
+        "OPERATION_MASTER",
+        "SURGEON"
+      ],
+      11
+    ],
+    [
+      [
+        "INP_BILL_DETAIL",
+        "PATIENT_ID",
+        "(BB)",
+        "PATIENT_ID"
+      ],
+      11
+    ],
+    [
+      [
+        "RECK_ITEM_CLASS_DICT",
+        "CLASS_CODE",
+        "OUTP_BILL_ITEMS",
+        "CLASS_ON_RECKONING"
+      ],
+      10
+    ],
+    [
+      [
+        "CLINIC_MASTER",
+        "VISIT_NO",
+        "CLINIC_RETURNED_ACCT",
+        "VISIT_NO"
+      ],
+      10
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "VISIT_NO",
+        "OUTP_ORDER_DESC",
+        "VISIT_NO"
+      ],
+      10
+    ],
+    [
+      [
+        "CLINIC_MASTER",
+        "VISIT_DATE",
+        "CLINIC_RETURNED_ACCT",
+        "VISIT_DATE"
+      ],
+      10
+    ],
+    [
+      [
+        "CLINIC_MASTER",
+        "VISIT_TIME_DESC",
+        "CLINIC_RETURNED_ACCT",
+        "TIME_DESC"
+      ],
+      10
+    ],
+    [
+      [
+        "CLINIC_MASTER",
+        "CLINIC_LABEL",
+        "CLINIC_RETURNED_ACCT",
+        "CLINIC_LABEL"
+      ],
+      10
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "RCPT_NO",
+        "OUTP_ORDER_DESC",
+        "RCPT_NO"
+      ],
+      10
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "VISIT_DATE",
+        "OUTP_ORDER_DESC",
+        "VISIT_DATE"
+      ],
+      10
+    ],
+    [
+      [
+        "(E)",
+        "ORDERED_BY_DOCTOR",
+        "STAFF_DICT",
+        "EMP_NO"
+      ],
+      9
+    ],
+    [
+      [
+        "(A)",
+        "A1",
+        "(B)",
+        "B1"
+      ],
+      8
+    ],
+    [
+      [
+        "DRUG_PRICE_LIST",
+        "FIRM_ID",
+        "DRUG_PRICE_LIST",
+        "FIRM_ID"
+      ],
+      8
+    ],
+    [
+      [
+        "DRUG_PRICE_LIST",
+        "DRUG_CODE",
+        "DRUG_PRICE_LIST",
+        "DRUG_CODE"
+      ],
+      8
+    ],
+    [
+      [
+        "DRUG_PRICE_LIST",
+        "DRUG_SPEC",
+        "DRUG_PRICE_LIST",
+        "DRUG_SPEC"
+      ],
+      8
+    ],
+    [
+      [
+        "OPERATION_MASTER",
+        "OPER_ID",
+        "INP_BILL_DETAIL",
+        "OPER_CODE"
+      ],
+      8
+    ],
+    [
+      [
+        "OUTP_MR",
+        "PATIENT_ID",
+        "OUTP_MR",
+        "PATIENT_ID"
+      ],
+      7
+    ],
+    [
+      [
+        "PAT_VISIT",
+        "PATIENT_ID",
+        "PAT_VISIT",
+        "PATIENT_ID"
+      ],
+      7
+    ],
+    [
+      [
+        "(A)",
+        "PATIENT_ID",
+        "PAT_MASTER_INDEX",
+        "PATIENT_ID"
+      ],
+      7
+    ],
+    [
+      [
+        "(A)",
+        "OPERATING_DEPT",
+        "DEPT_DICT",
+        "DEPT_CODE"
+      ],
+      7
+    ],
+    [
+      [
+        "(A)",
+        "A1",
+        "(D)",
+        "B1"
+      ],
+      6
+    ],
+    [
+      [
+        "(A)",
+        "A1",
+        "(C)",
+        "B1"
+      ],
+      6
+    ],
+    [
+      [
+        "EXP_DICT",
+        "EXP_CODE",
+        "INP_BILL_DETAIL",
+        "ITEM_CODE"
+      ],
+      6
+    ],
+    [
+      [
+        "DEPT_DICT",
+        "DEPT_CODE",
+        "STAFF_DICT",
+        "DEPT_CODE"
+      ],
+      6
+    ],
+    [
+      [
+        "DEPT_DICT",
+        "DEPT_CODE",
+        "PAT_VISIT",
+        "DEPT_DISCHARGE_FROM"
+      ],
+      6
+    ],
+    [
+      [
+        "STAFF_DICT",
+        "EMP_NO",
+        "CLINIC_MASTER",
+        "DOCTOR"
+      ],
+      6
+    ]
+  ],
+  "old_vs_new_edge_lost_top": [
+    [
+      [
+        "OPERATION_MASTER",
+        "OPERATING_DEPT",
+        "DEPT_DICT",
+        "DEPT_CODE"
+      ],
+      7
+    ],
+    [
+      [
+        "OPERATION_MASTER",
+        "PATIENT_ID",
+        "PAT_MASTER_INDEX",
+        "PATIENT_ID"
+      ],
+      7
+    ],
+    [
+      [
+        "OPERATION",
+        "VISIT_ID",
+        "PAT_VISIT",
+        "VISIT_ID"
+      ],
+      4
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "PERFORMED_BY",
+        "DEPT_DICT",
+        "DEPT_CODE"
+      ],
+      3
+    ],
+    [
+      [
+        "DIAGNOSIS",
+        "PATIENT_ID",
+        "PAT_VISIT",
+        "PATIENT_ID"
+      ],
+      3
+    ],
+    [
+      [
+        "DIAGNOSIS",
+        "VISIT_ID",
+        "PAT_VISIT",
+        "VISIT_ID"
+      ],
+      3
+    ],
+    [
+      [
+        "STAFF_DICT",
+        "EMP_NO",
+        "OUTP_BILL_ITEMS",
+        "ORDERED_BY_DOCTOR"
+      ],
+      3
+    ],
+    [
+      [
+        "INPBILL.INP_BILL_DETAIL",
+        "PERFORMED_BY",
+        "DEPT_DICT",
+        "DEPT_CODE"
+      ],
+      3
+    ],
+    [
+      [
+        "OPERATION",
+        "PATIENT_ID",
+        "PAT_VISIT",
+        "PATIENT_ID"
+      ],
+      3
+    ],
+    [
+      [
+        "PATS_IN_HOSPITAL",
+        "VISIT_ID",
+        "ORDERS",
+        "VISIT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "CLINIC_VS_CHARGE",
+        "CHARGE_ITEM_CODE",
+        "CURRENT_PRICE_LIST",
+        "ITEM_CODE"
+      ],
+      2
+    ],
+    [
+      [
+        "CLINIC_VS_CHARGE",
+        "CHARGE_ITEM_CLASS",
+        "CURRENT_PRICE_LIST",
+        "ITEM_CLASS"
+      ],
+      2
+    ],
+    [
+      [
+        "DRUG_STOCK",
+        "DRUG_SPEC",
+        "DRUG_IMPORT_DETAIL",
+        "DRUG_SPEC"
+      ],
+      2
+    ],
+    [
+      [
+        "DRUG_STOCK",
+        "DRUG_CODE",
+        "DRUG_IMPORT_DETAIL",
+        "DRUG_CODE"
+      ],
+      2
+    ],
+    [
+      [
+        "INSUR_EXPORT.病理病人清单",
+        "唯一就诊标识",
+        "OUTP_ORDER_DESC",
+        "PATIENT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "OPERATION_MASTER",
+        "VISIT_ID",
+        "PAT_VISIT",
+        "VISIT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "OPERATION_MASTER",
+        "PATIENT_ID",
+        "PAT_VISIT",
+        "PATIENT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "OPERATION_MASTER",
+        "SURGEON",
+        "STAFF_DICT",
+        "EMP_NO"
+      ],
+      2
+    ],
+    [
+      [
+        "PAT_VISIT",
+        "PATIENT_ID",
+        "MEDICAL_RECORD_REVIEW_TABLE",
+        "PATIENT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "PAT_VISIT",
+        "VISIT_ID",
+        "MEDICAL_RECORD_REVIEW_TABLE",
+        "VISIT_ID"
+      ],
+      2
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "VISIT_NO",
+        "OUTP_ORDER_DESC",
+        "VISIT_NO"
+      ],
+      1
+    ],
+    [
+      [
+        "DRUG_IMPORT_DETAIL",
+        "DOCUMENT_NO",
+        "DRUG_IMPORT_MASTER",
+        "DOCUMENT_NO"
+      ],
+      1
+    ],
+    [
+      [
+        "INP_BILL_DETAIL",
+        "SUBJ_CODE",
+        "TALLY_SUBJECT_DICT",
+        "SUBJ_CODE"
+      ],
+      1
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "VISIT_DATE",
+        "OUTP_ORDER_DESC",
+        "VISIT_DATE"
+      ],
+      1
+    ],
+    [
+      [
+        "OUTP_BILL_ITEMS",
+        "RCPT_NO",
+        "OUTP_ORDER_DESC",
+        "RCPT_NO"
+      ],
+      1
+    ],
+    [
+      [
+        "OUTP_ORDER_DESC",
+        "ORDERED_BY_DEPT",
+        "DEPT_DICT",
+        "DEPT_CODE"
+      ],
+      1
+    ],
+    [
+      [
+        "INSUR_VSH_CENTER_ITEM_NEW",
+        "ITEM_CODE",
+        "PRICE_LIST",
+        "ITEM_CODE"
+      ],
+      1
+    ],
+    [
+      [
+        "BILL_ITEM_CLASS_DICT",
+        "CLASS_CODE",
+        "PRICE_LIST",
+        "CLASS_ON_RECKONING"
+      ],
+      1
+    ],
+    [
+      [
+        "ORDERS",
+        "PATIENT_ID",
+        "PAT_VISIT",
+        "PATIENT_ID"
+      ],
+      1
+    ],
+    [
+      [
+        "ORDERS",
+        "VISIT_ID",
+        "PAT_VISIT",
+        "VISIT_ID"
+      ],
+      1
+    ]
+  ],
+  "gained_total": 621,
+  "lost_total": 134,
+  "flag_keys": {
+    "comma_join": 998,
+    "dynamic_sql": 179,
+    "correlated": 396,
+    "table_nameN": 24,
+    "pb_params": 144,
+    "oracle_plus": 134,
+    "dblink": 1
+  },
+  "dynamic_flag_rows": 179,
+  "dynamic_class_counts": {
+    "concat_only_parseable": 179
+  },
+  "dynamic_rows": [
+    {
+      "template_hash": "d9bb439970dc2247",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "f9eaf5ae55e7c1cf",
+      "flags": {
+        "comma_join": 2,
+        "dynamic_sql": 2,
+        "table_nameN": 2,
+        "correlated": 2
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "58dcb10c642d4ff9",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "pb_params": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "e80c7f67f1d287d6",
+      "flags": {
+        "dynamic_sql": 1,
+        "pb_params": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "89024d46c4da3470",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "aea428f4cff0189c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "table_nameN": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "4f81f632cf8ec14b",
+      "flags": {
+        "comma_join": 2,
+        "dynamic_sql": 2,
+        "table_nameN": 2
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "1842f794120da74e",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "e33894bf86caba52",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "ef7412a4f796e8ee",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "table_nameN": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "1c38cfba7a47c99e",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "table_nameN": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "674174ea2f74693c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "650a0b9cd045f707",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "d714dda126d4bb6c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "07b603d5fc1b0afc",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "14dd96d922402696",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "484974942e42474e",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "cd79b8a03845aef4",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "23ff63bf91ce3448",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "3939eba6cec3c1ef",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "5a360e93ee07486e",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "78ebc928fb7a7c2d",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "table_nameN": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "4b76b1db03e8744d",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "012150f950a97a66",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "b667dd8f473137d5",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "52c311047f616e57",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "219069bf7c149a2c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "cafb4a6d5e16bdac",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "c4bcef03eaf7e9f2",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "dad6d0c360908a83",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "ca3f614098724ecd",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "ecfdbc6d0b66772a",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "c9c7934c54e85ae2",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "42af30f7a146185c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "2d0bc943a6fa5081",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "0a1ca83522617b48",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "a2e0aed0c87a9d41",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "be85a7f04da974dd",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "52c11b07562ba544",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "c99749d4f64f69d3",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "6d76bb4dcb75f790",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "62b74c894f88b101",
+      "flags": {
+        "dynamic_sql": 1,
+        "pb_params": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "aa76e7303cc9c9a6",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "0f560352102d1477",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "b41b596d9da3c55c",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "1158f904486e5550",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "db166b01e05d626f",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "8220965dcbe3c873",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "d64848eb6a5c3d2f",
+      "flags": {
+        "comma_join": 4,
+        "dynamic_sql": 4,
+        "correlated": 4
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "7165bcabef11836c",
+      "flags": {
+        "comma_join": 4,
+        "dynamic_sql": 4,
+        "correlated": 4
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "0fa5796867b54947",
+      "flags": {
+        "comma_join": 4,
+        "dynamic_sql": 4
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "a562d6f4cb5a3ecb",
+      "flags": {
+        "comma_join": 4,
+        "dynamic_sql": 4
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "ba70840411ca8b9d",
+      "flags": {
+        "dynamic_sql": 4,
+        "pb_params": 4,
+        "correlated": 4
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "c0f3d13cbf4d4f2d",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "de497cd191fb6b08",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "967ff9d57d48d922",
+      "flags": {
+        "comma_join": 1,
+        "dynamic_sql": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "bb526d9c285fd6a7",
+      "flags": {
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "e02e7ba39485297c",
+      "flags": {
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "2a248bb2198709e9",
+      "flags": {
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    },
+    {
+      "template_hash": "26ebe98d2adfaa33",
+      "flags": {
+        "dynamic_sql": 1,
+        "correlated": 1
+      },
+      "has_concat": true,
+      "has_exec": false,
+      "class": "concat_only_parseable"
+    }
+  ]
+}

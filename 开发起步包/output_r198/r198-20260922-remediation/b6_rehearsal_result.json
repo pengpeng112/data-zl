@@ -1,0 +1,31 @@
+{
+  "db_identity": "data_asset_test",
+  "apply": {
+    "updated": 3,
+    "evidence": 34,
+    "skipped_hash": 0
+  },
+  "replay_zero_effect": true,
+  "replay": {
+    "updated": 0,
+    "evidence": 0
+  },
+  "adjacent_domains_untouched": [
+    {
+      "code": "ADJ0",
+      "meaning": "邻接对照",
+      "note": "r198 rehearsal adjacent（不可被本批修订触碰）",
+      "status": "pending"
+    },
+    {
+      "code": "ADJ1",
+      "meaning": "邻接对照",
+      "note": "r198 rehearsal adjacent（不可被本批修订触碰）",
+      "status": "pending"
+    }
+  ],
+  "adjacent_reviews_untouched": 2,
+  "batch_still_pending": true,
+  "evidence_rows_created": 34,
+  "status_guard_rejects_confirmed": true
+}
