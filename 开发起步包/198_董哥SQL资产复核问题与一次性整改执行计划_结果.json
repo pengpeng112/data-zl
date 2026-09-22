@@ -1,7 +1,7 @@
 {
   "date": "2026-09-22",
   "task": "197成果独立核查与198一次性整改计划",
-  "status": "b0_b6_local_done_pending_approvals",
+  "status": "approved_items_executed_human_states_pending",
   "evidence_directory": "review\\adhoc\\r197-audit-20260922",
   "production_reads_only": true,
   "business_source_queries": 0,
@@ -161,5 +161,13 @@
       "129源口径人工裁决",
       "人工治理终态(A-G)"
     ]
+  },
+  "approved_execution": {
+    "date": "2026-09-22",
+    "live_probes": "24+4 全过（3 条 owner 双拼 bug 修复后补跑）；16 可批/4 重复/1 零样本；696=活库无 USER_NAME（原SQL列错误）、766=平台列级漏采（表空）",
+    "prod_revision": "三子包单事务 COMMIT+回读全过；备份 3ea288d8db53bf81…（14215268B）；167 source 清零+167 附注+20 探针证据+14 降级注；EFG3+evidence37；13 配方 v2 知识型 draft 保持；formal 1329 未动；审计 1 行",
+    "b5_release": "镜像 data-asset:r198-20260922(b4ab6a09704d)；冒烟 4 标记过；回读六项过（healthy/200/401×3/alembic a7b8c9d0e1f2 不变）",
+    "source_caliber_129": "默认 HIS/his_source_10_10_10_15 落地；DATA_CENTER 端（22 处）保留 197 判定补 ods_8_216；他批 79 条 HIS_SOURCE 值域留后续工单",
+    "remaining_human": "A1 approve 20（证据就位）/A3 12/A4 6/B 27 确认/C 配方政策/D 值域 confirm/766 元数据补采"
   }
 }
