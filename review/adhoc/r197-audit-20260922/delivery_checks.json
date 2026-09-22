@@ -1,0 +1,11 @@
+{
+  "work_packages": 10,
+  "finding_groups": 10,
+  "acceptance_cases": 16,
+  "original_manifest_unchanged": 63,
+  "other_domain_files_unchanged": 13,
+  "references": "PASS",
+  "evidence_counts": "PASS",
+  "production_writes": 0,
+  "business_source_queries": 0
+}

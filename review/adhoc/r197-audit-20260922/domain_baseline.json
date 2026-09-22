@@ -1,0 +1,15 @@
+{
+  "frontend/src/layout/index.vue": "5989bf82003ea2c76abe04fc5a141171992570c2df0b69d59ec629a1a0be971b",
+  "frontend/src/layout/components/lay-content/index.vue": "c67d56db1e33b56d898c363eb08afcb7324b466cbfcb1a45cf64f906483e1024",
+  "frontend/src/layout/components/lay-setting/index.vue": "eaaa242cc38978b5da0228f38ec00bfa1c2d8177d13376db7519b21536149ed0",
+  "frontend/src/layout/hooks/useDataThemeChange.ts": "288048786cf11fbe004901e60ad76e7ec86299e140f89b42902a00ca83202b7f",
+  "frontend/src/layout/hooks/useTag.ts": "ef84b3675eda7b06eec3a613e5bfa77a63282661f68ac80e29957dd3e4165bf3",
+  "frontend/src/store/modules/app.ts": "006e20b88f5f0a6d20b9304140270f0b50f06153672ee325ce07fc3e87ff19f6",
+  "frontend/src/layout/captureMode.ts": "51dc7e1929159c5246ecbb07543a875ef9e30869247b2c57675908ad31c5b442",
+  "frontend/tests/competitionCaptureMode.test.ts": "e1d397bfc6770771f969cb5109b072cd1ddd2cb5a40459942a7f9d767aaa2cd5",
+  "tools/capture_ai_patrol_gif.py": "6e53fee5632c867e4c612188267c1350fa79364186d32d6491efec1288b8c8eb",
+  "tools/capture_competition_ai_demos.py": "45cd936bd718a67dd842f0dc332fe78b1a133f540ffddfa7e1226f1b767652cb",
+  "tools/capture_competition_screens.py": "7a36e217703fe244121e55a6e4193d5e7a23ff47f5c8c450714cfae4d1af33cc",
+  "tools/capture_four_governance_screens.py": "c60bd95d22b05a0174b5db4f12aacfc253d1291539957e40a9fab7ebb60fe41a",
+  "tools/capture_governance_gifs.py": "4d0cb6b9b05e5b3310abd9d7c26a3cf2ed8439f69016ef86a80e72945ae39f82"
+}

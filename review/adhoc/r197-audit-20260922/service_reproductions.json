@@ -1,0 +1,74 @@
+{
+  "recipe_results": [
+    {
+      "recipe_id": "R197_rcp-s3-01_41f4e60a13e5",
+      "passed": false,
+      "detail": "表 OUTP_BILL_ITEMS 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-02_5bc0925f69a2",
+      "passed": false,
+      "detail": "表 OUTP_PAYMENTS_MONEY 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-03_01592508080d",
+      "passed": false,
+      "detail": "表 DIAGNOSIS 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-04_d895ac971466",
+      "passed": false,
+      "detail": "表 PRICE_LIST 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-05_25be97132128",
+      "passed": false,
+      "detail": "表 INP_SETTLE_MASTER_YB 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-06_ad331eb98b8f",
+      "passed": false,
+      "detail": "表 PREPAYMENT_RCPT_ADD 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-07_99accc80ba6f",
+      "passed": false,
+      "detail": "表 EXAM_MASTER 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s3-08_15b5ac243c65",
+      "passed": false,
+      "detail": "表 OUTP_BILL_ITEMS 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s5-01_40f80ad33979",
+      "passed": false,
+      "detail": "表 LAB_TEST_ITEMS 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s5-02_b603a28b21a3",
+      "passed": false,
+      "detail": "表 EXAM_ITEMS 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s5-03_97a0e0a3d7b0",
+      "passed": false,
+      "detail": "配方包含非法或缺失的表标识"
+    },
+    {
+      "recipe_id": "R197_rcp-s5-04_2e3651793774",
+      "passed": false,
+      "detail": "表 DRUG_DICT 缺少安全的关联条件"
+    },
+    {
+      "recipe_id": "R197_rcp-s5-05_dd6120af7e14",
+      "passed": false,
+      "detail": "表 MCS_DOC_FORM 缺少安全的关联条件"
+    }
+  ],
+  "recipe_success": 0,
+  "mismatching_columns_returned_ids": [
+    41
+  ],
+  "note": "Pure recipe service and isolated actual matching function body; exact-name alias stub; SQLAlchemy table expressions and fake DB; no engine or DB access"
+}

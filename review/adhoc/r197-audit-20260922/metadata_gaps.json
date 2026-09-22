@@ -1,0 +1,20 @@
+[
+  {
+    "id": 696,
+    "side": "to",
+    "table": "INPADM.WAIT_BED_PATS_NEW",
+    "column": "USER_NAME"
+  },
+  {
+    "id": 766,
+    "side": "from",
+    "table": "COMM.OFFICIAL_DRUG_CATALOG",
+    "column": "CONSTRAINED_LEVEL"
+  },
+  {
+    "id": 766,
+    "side": "to",
+    "table": "COMM.OFFICIAL_DRUG_CATALOG_CLASS",
+    "column": "CLASS_CODE"
+  }
+]

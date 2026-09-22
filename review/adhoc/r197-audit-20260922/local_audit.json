@@ -1,0 +1,4086 @@
+{
+  "relation_counts": {
+    "existing_supplement": 149,
+    "candidate": 146,
+    "partial": 51,
+    "candidate_d_crosssource": 42,
+    "candidate_blocked_source": 13,
+    "rejected_negative": 4
+  },
+  "validation_counts": {
+    "not_run": 346,
+    "passed_in_scope": 41,
+    "failed": 16,
+    "insufficient": 2
+  },
+  "import_rows": 167,
+  "import_missing_source_code": 167,
+  "import_missing_validation_status": 167,
+  "weak_existing_count": 134,
+  "weak_existing": [
+    {
+      "relation_id": "S2F-CB3BA33251",
+      "endpoints": [
+        [
+          "OPERATION",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-60FDE4D634",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "569",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-B7763F2E63",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "STAFF_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-A754A04130",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-6EA01F27EA",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "PERFORMED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-2A80F74804",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "558",
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S2F-42E060720B",
+      "endpoints": [
+        [
+          "LAB_TEST_ITEMS",
+          "TEST_NO"
+        ],
+        [
+          "LAB_TEST_MASTER",
+          "TEST_NO"
+        ]
+      ],
+      "match_ids": [
+        "568"
+      ]
+    },
+    {
+      "relation_id": "S2F-D6E536D1CB",
+      "endpoints": [
+        [
+          "OPERATION_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-E9080EA37B",
+      "endpoints": [
+        [
+          "ORDERS",
+          "PATIENT_ID"
+        ],
+        [
+          "ORDERS",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-D9B174AAE2",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "ORDERED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-BE6DDA7EB6",
+      "endpoints": [
+        [
+          "LAB_RESULT",
+          "TEST_NO"
+        ],
+        [
+          "LAB_TEST_MASTER",
+          "TEST_NO"
+        ]
+      ],
+      "match_ids": [
+        "559",
+        "568"
+      ]
+    },
+    {
+      "relation_id": "S2F-89188944F3",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "569",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-4574484543",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "2",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-E30E4C998C",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-E9F9A0C5FB",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "PERFORMED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-3F4050B114",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "WAIT_BED_PATS_NEW",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29"
+      ]
+    },
+    {
+      "relation_id": "S2F-9F870E5A7E",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-A2AC280BB4",
+      "endpoints": [
+        [
+          "OPERATION_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-E1F69F4E85",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "OPER_CODE"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "OPER_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "557",
+        "564",
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-A0A41D9E5A",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "OPERATION",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-0E7BE7E086",
+      "endpoints": [
+        [
+          "ORDERS",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-333D618107",
+      "endpoints": [
+        [
+          "OPERATION_MASTER",
+          "SURGEON"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-FFFC5B8A88",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-64887A96B7",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "ORDERED_BY_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-0C86751F48",
+      "endpoints": [
+        [
+          "LAB_TEST_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "555",
+        "16",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-141CC29EA0",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "ORDERED_BY_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-2CBE5A43AE",
+      "endpoints": [
+        [
+          "OUTP_ORDER_DESC",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-0D77903D00",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT_NEW",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT_NEW",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-525A3839F9",
+      "endpoints": [
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ],
+        [
+          "WAIT_BED_PATS_NEW",
+          "CONSULTING_DOCTOR"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-22FEDABB84",
+      "endpoints": [
+        [
+          "PAT_VISIT_NEW",
+          "IN_OPERATOR_NO"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-EF5AE47BD1",
+      "endpoints": [
+        [
+          "PAT_VISIT_NEW",
+          "OUT_OPERATOR_NO"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-AFE509521C",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OPERATION_MASTER",
+          "OPERATING_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-0BF98D1B1C",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "558",
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S2F-8949408577",
+      "endpoints": [
+        [
+          "PATS_IN_HOSPITAL",
+          "PATIENT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-E0FB01F26F",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "STAFF_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-E83977F6B8",
+      "endpoints": [
+        [
+          "ADT_LOG",
+          "PATIENT_ID"
+        ],
+        [
+          "ADT_LOG",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-5178A77822",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER_YB",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER_YB",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-F135E41CC5",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "ORDERED_BY_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-06B1878538",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "PAT_VISIT_NEW",
+          "OPERATOR_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-EAC7E864FF",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "PAT_VISIT_NEW",
+          "OUT_OPERATOR_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-A1E797568B",
+      "endpoints": [
+        [
+          "LAB_TEST_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_MR",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "555",
+        "16"
+      ]
+    },
+    {
+      "relation_id": "S2F-B77EBB79A0",
+      "endpoints": [
+        [
+          "OPERATION",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-942AF56C2B",
+      "endpoints": [
+        [
+          "EXAM_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-2DFE1F503B",
+      "endpoints": [
+        [
+          "OUTP_ORDERS",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-C4A72131D6",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "ORDERED_BY"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "DEPT_STAYED"
+        ],
+        [
+          "OPERATION_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION_MASTER",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-05D6848137",
+      "endpoints": [
+        [
+          "OPERATION",
+          "ANESTHESIA_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-DCC5B4B8B2",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "DIAGNOSIS",
+          "VISIT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER_YB",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER_YB",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "2"
+      ]
+    },
+    {
+      "relation_id": "S2F-E3F678FEEB",
+      "endpoints": [
+        [
+          "MR_ON_LINE",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-8D8BE3D683",
+      "endpoints": [
+        [
+          "MR_ON_LINE",
+          "PATIENT_ID"
+        ],
+        [
+          "MR_ON_LINE",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-64444D5F7F",
+      "endpoints": [
+        [
+          "OPERATION",
+          "OPERATOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-4C29B97CA6",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-196E3BAA1A",
+      "endpoints": [
+        [
+          "CONSULTATION_DOCTOR_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-4591948786",
+      "endpoints": [
+        [
+          "CONSULTATION_DOCTOR_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "CONSULTATION_DOCTOR_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-EE88384570",
+      "endpoints": [
+        [
+          "EXAM_ITEMS",
+          "EXAM_NO"
+        ],
+        [
+          "EXAM_MASTER",
+          "EXAM_NO"
+        ]
+      ],
+      "match_ids": [
+        "15"
+      ]
+    },
+    {
+      "relation_id": "S2F-86D477D1F0",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "ID号"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "住院次数"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-065F70AB35",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "DIAGNOSIS",
+          "VISIT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569",
+        "2"
+      ]
+    },
+    {
+      "relation_id": "S2F-EEF02B44FE",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "WARDCODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-AF65517FED",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "DIAGNOSIS",
+          "VISIT_ID"
+        ],
+        [
+          "OPERATION",
+          "PATIENT_ID"
+        ],
+        [
+          "OPERATION",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "2"
+      ]
+    },
+    {
+      "relation_id": "S2F-CC3A22B4C8",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "DIAGNOSIS",
+          "VISIT_ID"
+        ],
+        [
+          "ORDERS",
+          "PATIENT_ID"
+        ],
+        [
+          "ORDERS",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "2"
+      ]
+    },
+    {
+      "relation_id": "S2F-6C2E7DDA34",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "39",
+        "37",
+        "36",
+        "38",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-1692CC85EE",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "PATIENT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-C2E64B1573",
+      "endpoints": [
+        [
+          "DIAGNOSIS",
+          "PATIENT_ID"
+        ],
+        [
+          "DIAGNOSIS",
+          "VISIT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "PATIENT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "2"
+      ]
+    },
+    {
+      "relation_id": "S2F-F1148F94BD",
+      "endpoints": [
+        [
+          "PATS_IN_HOSPITAL",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-C36B580C32",
+      "endpoints": [
+        [
+          "OUTP_MR",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-6F84D2F67F",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "LAB_TEST_MASTER",
+          "ORDERING_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-769FF44047",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "LAB_TEST_MASTER",
+          "PERFORMED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-4CB6A6C7F3",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER_YB",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-02718439BB",
+      "endpoints": [
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ],
+        [
+          "STAFF_VS_GROUP",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-320B0458DF",
+      "endpoints": [
+        [
+          "ORDERS",
+          "PATIENT_ID"
+        ],
+        [
+          "ORDERS",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-413940AE48",
+      "endpoints": [
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ],
+        [
+          "PREPAYMENT_RCPT",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-24528FCEF4",
+      "endpoints": [
+        [
+          "OUTP_RCPT_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-629BB5669F",
+      "endpoints": [
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ],
+        [
+          "V_LAB_TEST_BATCH_MASTER",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-D84E81F2B1",
+      "endpoints": [
+        [
+          "MEDICAL_CARD_MEMO",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-ABB077BBC9",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ],
+        [
+          "SETTLE_ZY_REC",
+          "PATIENT_ID"
+        ],
+        [
+          "SETTLE_ZY_REC",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S2F-EB8C099F77",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ],
+        [
+          "TRANSFER",
+          "PATIENT_ID"
+        ],
+        [
+          "TRANSFER",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-1F666ABDE9",
+      "endpoints": [
+        [
+          "APP_CONFIGER_PARAMETER",
+          "DEPT_CODE"
+        ],
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-F62272933D",
+      "endpoints": [
+        [
+          "LAB_TEST_BATCH_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-C84A01F90E",
+      "endpoints": [
+        [
+          "MEDICAL_RECORD_REVIEW_TABLE",
+          "PATIENT_ID"
+        ],
+        [
+          "MEDICAL_RECORD_REVIEW_TABLE",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-12DC40C9EC",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "DEPT_VS_WARD",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-1962CC8415",
+      "endpoints": [
+        [
+          "CONSULTATION_DOCTOR_MASTER",
+          "CONSULTATION_APPLY_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-C84BB2598E",
+      "endpoints": [
+        [
+          "CONSULTATION_DOCTOR_DETAIL",
+          "CONSULTATION_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-5BCE765C5B",
+      "endpoints": [
+        [
+          "ADT_LOG",
+          "WARD_CODE"
+        ],
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-AE5A0D60B8",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "TRANSFER",
+          "DEPT_TRANSFERED_TO"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-1036A56300",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S2F-F2EB10CC12",
+      "endpoints": [
+        [
+          "OUTP_ORDER_DESC",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_RCPT_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_RCPT_MASTER",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "554",
+        "556",
+        "561",
+        "11",
+        "563"
+      ]
+    },
+    {
+      "relation_id": "S2F-E9F9B6B9F0",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ],
+        [
+          "SETTLE_ZY_REC",
+          "PATIENT_ID"
+        ],
+        [
+          "SETTLE_ZY_REC",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-2FAFC5BB63",
+      "endpoints": [
+        [
+          "ORDERS_ANTI_DRUG",
+          "PATIENT_ID"
+        ],
+        [
+          "ORDERS_ANTI_DRUG",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-F1D8F20B7A",
+      "endpoints": [
+        [
+          "CONSULTATION_DOCTOR_DETAIL",
+          "CONSULTATION_DEPT"
+        ],
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-04DFA7C646",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OPERATION_MASTER",
+          "OPERATING_ROOM"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-F20C1529B5",
+      "endpoints": [
+        [
+          "BED_TRANS_LOG",
+          "WARD_CODE"
+        ],
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-F16FF49E4E",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "EXAM_MASTER",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553"
+      ]
+    },
+    {
+      "relation_id": "S2F-90361056DF",
+      "endpoints": [
+        [
+          "EXAM_MASTER",
+          "EXAM_NO"
+        ],
+        [
+          "OUTP_TREAT_REC",
+          "APPOINT_NO"
+        ]
+      ],
+      "match_ids": [
+        "15"
+      ]
+    },
+    {
+      "relation_id": "S2F-F66254FEAA",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "EXAM_MASTER",
+          "REQ_DEPT"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-7427C0DF14",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "EXAM_MASTER",
+          "PERFORMED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-2FCB132BFF",
+      "endpoints": [
+        [
+          "EXAM_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "EXAM_MASTER",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "554",
+        "561"
+      ]
+    },
+    {
+      "relation_id": "S2F-E7CB647358",
+      "endpoints": [
+        [
+          "LAB_TEST_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "LAB_TEST_MASTER",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "555",
+        "556",
+        "563",
+        "16"
+      ]
+    },
+    {
+      "relation_id": "S2F-B040DC9E3E",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "OPERATION_MASTER",
+          "DEPT_STAYED"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-B2553962A7",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "ATTENDING_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-DF5F8AF878",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "STAFF_VS_GROUP",
+          "GROUP_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-1D56B2E12F",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "DOCT_DRUG_PRESC_MASTER",
+          "ORDERED_BY"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-28CA624C33",
+      "endpoints": [
+        [
+          "DEPT_ADT_DAY",
+          "DEPT_CODE"
+        ],
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-5B40330D0C",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "DEPT_VS_WARD",
+          "DEPT_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-F78A23F649",
+      "endpoints": [
+        [
+          "PATS_IN_TRANSFERRING",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-A3A2C2111D",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "PATS_IN_TRANSFERRING",
+          "DEPT_TRANSFERED_TO"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-106C981A96",
+      "endpoints": [
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT_BIS",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT_BIS",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S2F-E54644CEB6",
+      "endpoints": [
+        [
+          "MEDICAL_CARD_VS_IDNO",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-0846498312",
+      "endpoints": [
+        [
+          "OUTP_ORDER_DESC",
+          "ORDERED_BY_DOCTOR"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-4F2611A60A",
+      "endpoints": [
+        [
+          "A",
+          "REFUNDED_RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S2F-BBC3503264",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29"
+      ]
+    },
+    {
+      "relation_id": "S2F-8812CEEEFC",
+      "endpoints": [
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT_TEMP",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-EB27457693",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S2F-917C47B1AB",
+      "endpoints": [
+        [
+          "DRUG_PRESC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29"
+      ]
+    },
+    {
+      "relation_id": "S2F-BE0A807D4A",
+      "endpoints": [
+        [
+          "DRUG_PRESC_MASTER",
+          "PRESCRIBED_BY"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S2F-7E1C8D9306",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "APPOINT_NO"
+        ],
+        [
+          "OUTP_TREAT_REC",
+          "APPOINT_NO"
+        ]
+      ],
+      "match_ids": [
+        "559"
+      ]
+    },
+    {
+      "relation_id": "S2F-5316AF26B6",
+      "endpoints": [
+        [
+          "DEPT_DICT",
+          "DEPT_CODE"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "WARD_CODE"
+        ]
+      ],
+      "match_ids": [
+        "34",
+        "3",
+        "4",
+        "32"
+      ]
+    },
+    {
+      "relation_id": "S2F-B204F9C884",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "558",
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S3F-FBDD22E3B6",
+      "endpoints": [
+        [
+          "OUTP_PAYMENTS_MONEY",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_RCPT_MASTER",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "554",
+        "556",
+        "561",
+        "11",
+        "563"
+      ]
+    },
+    {
+      "relation_id": "S3F-BE42E3FFB8",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "558"
+      ]
+    },
+    {
+      "relation_id": "S3F-69A35ED45C",
+      "endpoints": [
+        [
+          "OUTP_BILL_ITEMS",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "RCPT_NO"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_ORDER_DESC",
+          "VISIT_NO"
+        ]
+      ],
+      "match_ids": [
+        "558",
+        "11"
+      ]
+    },
+    {
+      "relation_id": "S3F-0841AC6F4F",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER_YB",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER_YB",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S3F-654ED25BB1",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "VISIT_DATE"
+        ],
+        [
+          "OUTP_BILL_ITEMS",
+          "VISIT_DATE"
+        ]
+      ],
+      "match_ids": [
+        "558"
+      ]
+    },
+    {
+      "relation_id": "S3F-38CC8E4235",
+      "endpoints": [
+        [
+          "INP_BILL_DETAIL",
+          "DOCTOR_USER"
+        ],
+        [
+          "STAFF_DICT",
+          "EMP_NO"
+        ]
+      ],
+      "match_ids": [
+        "5"
+      ]
+    },
+    {
+      "relation_id": "S3F-D4525A54BD",
+      "endpoints": [
+        [
+          "OUTP_RCPT_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "OUTP_RCPT_MASTER",
+          "RCPT_NO"
+        ],
+        [
+          "PREPAYMENT_RCPT_ADD",
+          "PATIENT_ID"
+        ],
+        [
+          "PREPAYMENT_RCPT_ADD",
+          "RCPT_NO"
+        ]
+      ],
+      "match_ids": [
+        "554",
+        "556",
+        "561",
+        "11",
+        "563"
+      ]
+    },
+    {
+      "relation_id": "S3F-832C4D19C5",
+      "endpoints": [
+        [
+          "INP_SETTLE_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_SETTLE_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PREPAYMENT_RCPT",
+          "PATIENT_ID"
+        ],
+        [
+          "PREPAYMENT_RCPT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "569"
+      ]
+    },
+    {
+      "relation_id": "S3F-715855B0A8",
+      "endpoints": [
+        [
+          "CLINIC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PREPAYMENT_RCPT",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "538"
+      ]
+    },
+    {
+      "relation_id": "S5F-4B05EDDFDE",
+      "endpoints": [
+        [
+          "DRUG_DISPENSE_REC",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "538",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S5F-6460E6631D",
+      "endpoints": [
+        [
+          "DRUG_PRESC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "DRUG_PRESC_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "537",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S5F-8B66C16DFC",
+      "endpoints": [
+        [
+          "DRUG_PRESC_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "538",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S5F-D83C05E9A9",
+      "endpoints": [
+        [
+          "EXAM_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "EXAM_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "PATIENT_ID"
+        ],
+        [
+          "PATS_IN_HOSPITAL",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "554",
+        "560"
+      ]
+    },
+    {
+      "relation_id": "S5F-39743C3B56",
+      "endpoints": [
+        [
+          "DRUG_DISPENSE_REC",
+          "PATIENT_ID"
+        ],
+        [
+          "DRUG_DISPENSE_REC",
+          "VISIT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_VISIT",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "555",
+        "537",
+        "2",
+        "16",
+        "1",
+        "39",
+        "37",
+        "36",
+        "38",
+        "29",
+        "44"
+      ]
+    },
+    {
+      "relation_id": "S5F-FA2842AB56",
+      "endpoints": [
+        [
+          "LAB_TEST_BATCH_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "PAT_MASTER_INDEX",
+          "PATIENT_ID"
+        ]
+      ],
+      "match_ids": [
+        "538",
+        "1",
+        "35"
+      ]
+    },
+    {
+      "relation_id": "S5F-41797A4A4E",
+      "endpoints": [
+        [
+          "LAB_TEST_BATCH_MASTER",
+          "TEST_NO"
+        ],
+        [
+          "LAB_TEST_ITEMS",
+          "TEST_NO"
+        ]
+      ],
+      "match_ids": [
+        "568"
+      ]
+    },
+    {
+      "relation_id": "S5F-11ECDE6ADC",
+      "endpoints": [
+        [
+          "EXAM_ITEMS",
+          "EXAM_NO"
+        ],
+        [
+          "EXAM_REPORT",
+          "EXAM_NO"
+        ]
+      ],
+      "match_ids": [
+        "15"
+      ]
+    },
+    {
+      "relation_id": "S5F-CA2C220F46",
+      "endpoints": [
+        [
+          "EXAM_MASTER",
+          "PATIENT_ID"
+        ],
+        [
+          "EXAM_MASTER",
+          "VISIT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "PATIENT_ID"
+        ],
+        [
+          "INP_BILL_DETAIL",
+          "VISIT_ID"
+        ]
+      ],
+      "match_ids": [
+        "553",
+        "554",
+        "560",
+        "569",
+        "537"
+      ]
+    }
+  ],
+  "workset_unique_counts": {
+    "s2": 1993,
+    "s3": 1878,
+    "s4": 330,
+    "s5": 1971
+  },
+  "workset_union": 6172,
+  "cross_stage_overlap": [],
+  "probe_package_count": 35,
+  "result_count": 42,
+  "results_missing_from_probe_package": [
+    "D4",
+    "Q14b",
+    "Q17b",
+    "Q27b",
+    "Q27c",
+    "Q28b",
+    "Q28c"
+  ],
+  "synthetic_parser_reproductions": [
+    {
+      "case": "left_join",
+      "sql": "SELECT a.id FROM T_A a LEFT JOIN T_B b ON a.id=b.id",
+      "edges": [
+        {
+          "l": "T_A",
+          "lcol": "ID",
+          "la": "A",
+          "r": "T_B",
+          "rcol": "ID",
+          "ra": "B",
+          "plus": null,
+          "raw": "a.id=b.id",
+          "raw_pos": 0
+        }
+      ],
+      "groups": [
+        {
+          "l": "T_A",
+          "r": "T_B",
+          "lcols": [
+            "ID"
+          ],
+          "rcols": [
+            "ID"
+          ],
+          "join": "inner",
+          "plus_sides": [
+            "None"
+          ],
+          "n_eq": 1,
+          "raw": [
+            "a.id=b.id"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "or_keys",
+      "sql": "SELECT a.id FROM T_A a, T_B b WHERE a.id=b.id OR a.alt=b.alt",
+      "edges": [
+        {
+          "l": "T_A",
+          "lcol": "ID",
+          "la": "A",
+          "r": "T_B",
+          "rcol": "ID",
+          "ra": "B",
+          "plus": null,
+          "raw": "a.id=b.id",
+          "raw_pos": 0
+        },
+        {
+          "l": "T_A",
+          "lcol": "ALT",
+          "la": "A",
+          "r": "T_B",
+          "rcol": "ALT",
+          "ra": "B",
+          "plus": null,
+          "raw": "a.alt=b.alt",
+          "raw_pos": 1
+        }
+      ],
+      "groups": [
+        {
+          "l": "T_A",
+          "r": "T_B",
+          "lcols": [
+            "ID",
+            "ALT"
+          ],
+          "rcols": [
+            "ID",
+            "ALT"
+          ],
+          "join": "inner",
+          "plus_sides": [
+            "None"
+          ],
+          "n_eq": 2,
+          "raw": [
+            "a.id=b.id",
+            "a.alt=b.alt"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "self_join",
+      "sql": "SELECT a.id FROM T_A a,T_A b WHERE a.parent_id=b.id",
+      "edges": [],
+      "groups": []
+    },
+    {
+      "case": "subquery_scope",
+      "sql": "SELECT (SELECT COUNT(*) FROM T_B b WHERE b.x=a.x) FROM T_A a WHERE EXISTS (SELECT 1 FROM T_B b WHERE b.y=a.y)",
+      "edges": [
+        {
+          "l": "T_B",
+          "lcol": "X",
+          "la": "B",
+          "r": "T_A",
+          "rcol": "X",
+          "ra": "A",
+          "plus": null,
+          "raw": "b.x=a.x",
+          "raw_pos": 0
+        },
+        {
+          "l": "T_B",
+          "lcol": "Y",
+          "la": "B",
+          "r": "T_A",
+          "rcol": "Y",
+          "ra": "A",
+          "plus": null,
+          "raw": "b.y=a.y",
+          "raw_pos": 1
+        }
+      ],
+      "groups": [
+        {
+          "l": "T_B",
+          "r": "T_A",
+          "lcols": [
+            "X",
+            "Y"
+          ],
+          "rcols": [
+            "X",
+            "Y"
+          ],
+          "join": "inner",
+          "plus_sides": [
+            "None"
+          ],
+          "n_eq": 2,
+          "raw": [
+            "b.x=a.x",
+            "b.y=a.y"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "inner_control",
+      "sql": "SELECT a.id FROM T_A a JOIN T_B b ON a.id=b.id",
+      "edges": [
+        {
+          "l": "T_A",
+          "lcol": "ID",
+          "la": "A",
+          "r": "T_B",
+          "rcol": "ID",
+          "ra": "B",
+          "plus": null,
+          "raw": "a.id=b.id",
+          "raw_pos": 0
+        }
+      ],
+      "groups": [
+        {
+          "l": "T_A",
+          "r": "T_B",
+          "lcols": [
+            "ID"
+          ],
+          "rcols": [
+            "ID"
+          ],
+          "join": "inner",
+          "plus_sides": [
+            "None"
+          ],
+          "n_eq": 1,
+          "raw": [
+            "a.id=b.id"
+          ]
+        }
+      ]
+    }
+  ],
+  "passed_imported": [
+    {
+      "relation_id": "S2F-C90B6003D8",
+      "validation_note": "PAT_MASTER_INDEX.PATIENT_ID 唯一，行级 N:1 成立；visit 口径聚合需回 PAT_VISIT（Q02/Q07 侧证）",
+      "validation_evidence_uids": [
+        "Q02"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "INP_BILL_DETAIL",
+          "columns": [
+            "PATIENT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPBILL"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "PAT_MASTER_INDEX",
+          "columns": [
+            "PATIENT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "MEDREC"
+            },
+            {
+              "system": "JHEMR_VASTBASE",
+              "source": "jhemr_vastbase_10_10_8_177",
+              "schema": "jhemr"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-190AFAC505",
+      "validation_note": "CLINIC 侧 (VISIT_DATE,VISIT_NO) 唯一（Q03）；SERIAL_NO 单列 0.6% 复用（Q11）",
+      "validation_evidence_uids": [
+        "Q03",
+        "Q11"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "CLINIC_MASTER",
+          "columns": [
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_TREAT_REC",
+          "columns": [
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-BDCE2A3160",
+      "validation_note": "CLINIC_NO 近窗唯一，单列在本窗可用（Q03）",
+      "validation_evidence_uids": [
+        "Q03"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "CLINIC_MASTER",
+          "columns": [
+            "CLINIC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_ORDER_DESC",
+          "columns": [
+            "CLINIC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPBILL"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-DB7BD1C6F6",
+      "validation_note": "三列键 SERIAL_NO 组 0.6% 复用（Q11，量级可忽略但非零）",
+      "validation_evidence_uids": [
+        "Q11"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "OUTP_ORDERS",
+          "columns": [
+            "VISIT_DATE",
+            "VISIT_NO",
+            "SERIAL_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_TREAT_REC",
+          "columns": [
+            "VISIT_DATE",
+            "VISIT_NO",
+            "SERIAL_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-50040F7BC3",
+      "validation_note": "CLINIC 侧三列键唯一（Q03）；子表侧单列 VISIT_NO 38% 重复须用三列（Q10）",
+      "validation_evidence_uids": [
+        "Q03",
+        "Q10"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "CLINIC_MASTER",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_MR_DIAG_DESC",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-E256C47346",
+      "validation_note": "CLINIC_NO 唯一（Q03）",
+      "validation_evidence_uids": [
+        "Q03"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "CLINIC_MASTER",
+          "columns": [
+            "PATIENT_ID",
+            "CLINIC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_ORDER_DESC",
+          "columns": [
+            "PATIENT_ID",
+            "CLINIC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPBILL"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-2C9FE1D3B6",
+      "validation_note": "在院表 PATIENT_ID 唯一（Q04），行级成立",
+      "validation_evidence_uids": [
+        "Q04"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "ORDERS",
+          "columns": [
+            "PATIENT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "PATS_IN_HOSPITAL",
+          "columns": [
+            "PATIENT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPADM"
+            },
+            {
+              "system": "JHEMR_VASTBASE",
+              "source": "jhemr_vastbase_10_10_8_177",
+              "schema": "jhemr"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-D89F991E47",
+      "validation_note": "三列键唯一（Q03）",
+      "validation_evidence_uids": [
+        "Q03"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "CLINIC_MASTER",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "OUTPADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "OUTP_MR",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_DATE",
+            "VISIT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-1A98B5707E",
+      "validation_note": "ORDERS↔PATS_IN_HOSPITAL 组合键；在院表 PATIENT_ID 唯一（Q04）",
+      "validation_evidence_uids": [
+        "Q02",
+        "Q04"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "ORDERS",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "PATS_IN_HOSPITAL",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPADM"
+            },
+            {
+              "system": "JHEMR_VASTBASE",
+              "source": "jhemr_vastbase_10_10_8_177",
+              "schema": "jhemr"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S2F-A4F3F1FA73",
+      "validation_note": "两列键（Q31）",
+      "validation_evidence_uids": [
+        "Q31"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "DRUG_PRESC_DETAIL",
+          "columns": [
+            "PRESC_NO",
+            "PRESC_DATE"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "DRUG_PRESC_MASTER",
+          "columns": [
+            "PRESC_NO",
+            "PRESC_DATE"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S3F-8CF8B4B39E",
+      "validation_note": "检查类 OPER_CODE 分流证据（Q15：非空率高；ITEM_CLASS 身份值域待确认）",
+      "validation_evidence_uids": [
+        "Q15"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "EXAM_MASTER",
+          "columns": [
+            "EXAM_NO",
+            "PATIENT_ID",
+            "VISIT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "EXAM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "INP_BILL_DETAIL",
+          "columns": [
+            "OPER_CODE",
+            "PATIENT_ID",
+            "VISIT_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPBILL"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S3F-D8F12989E0",
+      "validation_note": "四列键挂医嘱 APP_NO（Q15/Q33 侧证）",
+      "validation_evidence_uids": [
+        "Q15",
+        "Q33"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "INP_BILL_DETAIL",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "OPER_CODE",
+            "ORDER_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPBILL"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "ORDERS",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "APP_NO",
+            "ORDER_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S3F-5FF4CF0E1A",
+      "validation_note": "预交金 RCPT_NO 0 重复、ADD 三列键 0 重复（Q14b 样本 20000/10917 组）",
+      "validation_evidence_uids": [
+        "Q14b"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "PREPAYMENT_RCPT",
+          "columns": [
+            "RCPT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPBILL"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "PREPAYMENT_RCPT_ADD",
+          "columns": [
+            "RCPT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "INPBILL"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-57E6B624A0",
+      "validation_note": "覆盖窗 1863 单 0 重复+主从 200/200（Q27c/Q28c）；表停更 2025-07-05 已标注",
+      "validation_evidence_uids": [
+        "Q27c",
+        "Q28c"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "DRUG_EXPORT_DETAIL",
+          "columns": [
+            "DOCUMENT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "DRUG_USER"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "DRUG_EXPORT_MASTER",
+          "columns": [
+            "DOCUMENT_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "DRUG_USER"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-2A342EA32E",
+      "validation_note": "500/500 表单有记录（Q35）；重复评估 22.5% 实证入 RCP-S5-05",
+      "validation_evidence_uids": [
+        "Q35"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "MCS_DOC_FORM",
+          "columns": [
+            "ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_ydhl",
+              "schema": "YDHL"
+            },
+            {
+              "system": "MOBILE_NURSING",
+              "source": "mobile_nursing_oracle_10_10_10_125",
+              "schema": "LUNA_MCS_SDSEY"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "MCS_DOC_FORM_RECORDS",
+          "columns": [
+            "FORM_ID"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_ydhl",
+              "schema": "YDHL"
+            },
+            {
+              "system": "MOBILE_NURSING",
+              "source": "mobile_nursing_oracle_10_10_10_125",
+              "schema": "LUNA_MCS_SDSEY"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-F8FAA6C79C",
+      "validation_note": "四列键 736 行/159 键，一嘱多执行 avg 4.6 实证（Q33）",
+      "validation_evidence_uids": [
+        "Q33"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "ORDERS",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ORDER_NO",
+            "ORDER_SUB_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "ORDERS_EXECUTE_DETAILS",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ORDER_NO",
+            "ORDER_SUB_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-DC6165C54E",
+      "validation_note": "本窗 PRESC_NO 0 复用（Q31）——单列本窗可用，跨日理论风险未观测",
+      "validation_evidence_uids": [
+        "Q31"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "DRUG_PRESC_DETAIL",
+          "columns": [
+            "PRESC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "DRUG_PRESC_MASTER",
+          "columns": [
+            "PRESC_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "PHARMACY"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-F004BB9BB0",
+      "validation_note": "本窗单列 TEST_NO 连接未放大（项目≈1/申请，Q24）——Panel 场景仍建议两列键",
+      "validation_evidence_uids": [
+        "Q24"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "LAB_RESULT",
+          "columns": [
+            "TEST_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_lis",
+              "schema": "LIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "LAB"
+            },
+            {
+              "system": "LIS_SOURCE",
+              "source": "lis_sqlserver_10_10_10_73",
+              "schema": "dbo"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "LAB_TEST_ITEMS",
+          "columns": [
+            "TEST_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "LAB"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    },
+    {
+      "relation_id": "S5F-AB4C2AA3D7",
+      "validation_note": "7 行命中（Q33，样本小但成立）",
+      "validation_evidence_uids": [
+        "Q33"
+      ],
+      "endpoints": {
+        "a": {
+          "table": "ORDERS",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ORDER_NO",
+            "ORDER_SUB_NO"
+          ],
+          "resolved": [
+            {
+              "system": "DATA_CENTER",
+              "source": "ods_8_216",
+              "schema": "HIS"
+            },
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        },
+        "b": {
+          "table": "ORDERS_ANTI_DRUG",
+          "columns": [
+            "PATIENT_ID",
+            "VISIT_ID",
+            "ORDER_NO",
+            "ORDER_SUB_NO"
+          ],
+          "resolved": [
+            {
+              "system": "HIS",
+              "source": "his_source_10_10_10_15",
+              "schema": "ORDADM"
+            }
+          ],
+          "unknown": false
+        }
+      }
+    }
+  ]
+}
