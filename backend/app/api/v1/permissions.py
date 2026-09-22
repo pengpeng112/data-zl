@@ -19,8 +19,25 @@ from ...models.governance_base import (
     GovernAuditLog,
 )
 from ...models.identity import IdentityPerson
+from ...models.auth import AuthUser
 from ...schemas.common import ApiResponse
 from ...services.data_masking import mask_sensitive
+from ...services.effective_permissions import (
+    effective_role_codes,
+    grant_payload,
+    historical_role_grants,
+    is_bare_resource_action,
+    normalize_permission_code,
+    permission_codes_for_roles as _service_permission_codes_for_roles,
+    repair_legacy_allow_rows,
+)
+from ...services.subject_policy import (
+    SubjectPolicyError,
+    can_grant_role,
+    can_manage_subject,
+    ensure_not_losing_last_platform_admin,
+    operator_role_codes,
+)
 
 router = APIRouter(prefix="/api/v1/permissions", tags=["permissions"])
 
@@ -385,13 +402,16 @@ def _role_payload(role: AssetRole) -> dict:
     }
 
 
+def _as_utc(value):
+    """sqlite/驱动可能返回 naive datetime；统一补 UTC 后再比较。"""
+    if value is not None and value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value
+
+
 def _permission_codes_for_roles(db: Session, role_codes: Iterable[str]) -> list[str]:
-    codes = list(set(role_codes))
-    if not codes:
-        return []
-    rows = db.scalars(select(AssetRolePermission).where(AssetRolePermission.role_code.in_(codes))).all()
-    permissions = {r.resource if r.action in (None, "access", "allow", "*") else f"{r.resource}:{r.action}" for r in rows}
-    return sorted(permissions)
+    # 200 R02：统一委托归一化编码服务（allow 与 access 同为裸资源权限）。
+    return _service_permission_codes_for_roles(db, role_codes)
 
 
 @router.post("/seed", summary="Seed builtin roles and permission resources", dependencies=[Depends(require_permission("identity.role.manage"))])
@@ -427,6 +447,8 @@ def seed_permissions(request: Request, operator: str | None = Query(None), db: S
     db.flush()
     for role_code, resources in ROLE_DEFAULT_PERMISSIONS.items():
         for resource in resources:
+            # 200 R02：existing 只统计"裸资源语义"的行（access/allow/* 等）；
+            # 历史 allow 行不再阻止补种 access 行，且补种是幂等的（第二次零新增）。
             exists = db.scalar(select(AssetRolePermission).where(
                 AssetRolePermission.role_code == role_code,
                 AssetRolePermission.resource == resource,
@@ -450,6 +472,69 @@ def list_resources(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
 def list_roles(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(select(AssetRole).order_by(AssetRole.role_code)).all()
     return ApiResponse(data=[_role_payload(r) for r in rows])
+
+
+@router.get("/roles/summary", summary="Role summary with effective user counts (200 §4.1)", dependencies=[Depends(require_permission("identity.role.manage"))])
+def roles_summary(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+    """角色页摘要：角色中文名｜有效人数｜权限数量｜高风险操作｜最近变更。
+
+    - 有效人数按 effective 口径（active 且在有效期窗口内）统计；
+    - 高风险操作列出该角色持有的受保护能力标记（当前仅 platform_admin 全局旁路）；
+    - platform_admin 因全局旁路实际全权，矩阵页应只读展示并解释策略。
+    """
+    roles = db.scalars(select(AssetRole).order_by(AssetRole.role_code)).all()
+    grants = db.scalars(select(AssetUserRole).where(AssetUserRole.status == "active")).all()
+    perm_rows = db.scalars(select(AssetRolePermission)).all()
+    enabled_accounts = {
+        acc.user_identifier
+        for acc in db.scalars(select(AuthUser).where(AuthUser.enabled.is_(True))).all()
+        if acc.user_identifier
+    }
+    now = datetime.now(timezone.utc)
+
+    def _grant_effective(row: AssetUserRole) -> bool:
+        if row.valid_from is not None and _as_utc(row.valid_from) > now:
+            return False
+        if row.expires_at is not None and _as_utc(row.expires_at) <= now:
+            return False
+        return True
+
+    effective_users: dict[str, set[str]] = {}
+    for g in grants:
+        if g.user_identifier and _grant_effective(g):
+            effective_users.setdefault(g.role_code, set()).add(g.user_identifier)
+    perm_count: dict[str, int] = {}
+    for p in perm_rows:
+        perm_count[p.role_code] = perm_count.get(p.role_code, 0) + 1
+    # 最近变更来自审计（每角色最近一条）
+    recent = {}
+    for row in db.scalars(
+        select(GovernAuditLog).where(
+            GovernAuditLog.module == "permission",
+            GovernAuditLog.entity_type == "role",
+        ).order_by(GovernAuditLog.created_at.desc(), GovernAuditLog.id.desc()).limit(200)
+    ).all():
+        ref = row.entity_ref or ""
+        if ref not in recent:
+            recent[ref] = {
+                "action": row.action,
+                "operator": row.operator,
+                "at": row.created_at.isoformat() if row.created_at else None,
+            }
+    items = []
+    for role in roles:
+        users = effective_users.get(role.role_code, set())
+        items.append({
+            "role_code": role.role_code,
+            "role_name_cn": role.role_name_cn,
+            "role_type": role.role_type,
+            "description": role.description,
+            "effective_users": len(users & enabled_accounts) if role.role_code != "platform_admin" else len(users & enabled_accounts),
+            "permission_count": perm_count.get(role.role_code, 0),
+            "high_risk": ["platform_admin_global_bypass"] if role.role_code == "platform_admin" else [],
+            "recent_change": recent.get(role.role_code),
+        })
+    return ApiResponse(data=items)
 
 
 @router.put("/roles", summary="Create or update role", dependencies=[Depends(require_permission("identity.role.manage"))])
@@ -511,24 +596,32 @@ def update_role_matrix(role_code: str, req: MatrixUpdate, request: Request, db: 
     return ApiResponse(data={"role_code": role_code, "granted": after})
 
 
-@router.get("/user-roles", summary="User role assignments")
-def list_user_roles(user_identifier: str | None = Query(None), db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
+@router.get("/user-roles", summary="User role assignments", dependencies=[Depends(require_permission("identity.role.grant"))])
+def list_user_roles(user_identifier: str | None = Query(None), status: str | None = Query(None), db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     stmt = select(AssetUserRole)
     if user_identifier:
         stmt = stmt.where(AssetUserRole.user_identifier == user_identifier)
+    if status:
+        stmt = stmt.where(AssetUserRole.status == status)
     rows = db.scalars(stmt.order_by(AssetUserRole.user_identifier, AssetUserRole.role_code)).all()
     return ApiResponse(data=[{
+        **grant_payload(r),
         "id": r.id,
         "user_identifier": r.user_identifier,
-        "role_code": r.role_code,
-        "granted_by": r.granted_by,
-        "granted_at": r.granted_at.isoformat() if r.granted_at else None,
-        "expires_at": r.expires_at.isoformat() if r.expires_at else None,
     } for r in rows])
 
 
-@router.put("/users/{user_identifier}/roles", summary="Replace user roles")
+@router.put("/users/{user_identifier}/roles", summary="Replace user roles", dependencies=[Depends(require_permission("identity.role.grant"))])
 def replace_user_roles(user_identifier: str, req: UserRoleGrant, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """按授权差异增量更新用户角色（200 R04/R06）。
+
+    - 端点权限：identity.role.grant；
+    - 对象级策略：非 platform_admin 不得授予 platform_admin、不得操作持有
+      platform_admin 授权的主体、不得自改角色（防自提权）；
+    - 增量语义：保留仍有效授权的原始起止/来源/申请号，被移除授权改为
+      revoked（保留历史），新增授权才写新行；不删除任何历史行；
+    - 最后管理员保护：本操作若移除最后一个有效可登录 platform_admin 则拒绝。
+    """
     if req.user_identifier != user_identifier:
         raise HTTPException(status_code=400, detail="path user_identifier does not match payload")
     role_codes = sorted(set(req.role_codes))
@@ -537,28 +630,109 @@ def replace_user_roles(user_identifier: str, req: UserRoleGrant, request: Reques
         missing = [r for r in role_codes if r not in existing_roles]
         if missing:
             raise HTTPException(status_code=400, detail=f"roles not found: {', '.join(missing)}")
-    before_rows = db.scalars(select(AssetUserRole).where(AssetUserRole.user_identifier == user_identifier)).all()
-    before = sorted({r.role_code for r in before_rows})
     # QA ST-006：审计 operator 取认证身份，不信任 payload 的 granted_by。
     operator = get_request_operator(request, default="system")
-    db.execute(delete(AssetUserRole).where(AssetUserRole.user_identifier == user_identifier))
-    for role_code in role_codes:
-        db.add(AssetUserRole(user_identifier=user_identifier, role_code=role_code, granted_by=operator))
-    _audit(db, "replace_user_roles", "user", user_identifier, operator, before={"roles": before}, after={"roles": role_codes}, reason=req.reason)
+    op_roles = operator_role_codes(db, operator)
+    try:
+        # 自改角色仅 platform_admin 允许（普通用户不能给自己加/减权限）。
+        if operator and operator == user_identifier and "platform_admin" not in op_roles:
+            raise SubjectPolicyError("self_modify_forbidden", "不能修改自己的角色授权")
+        can_manage_subject(db, operator=operator, operator_roles=op_roles, target_user=user_identifier)
+        for role_code in role_codes:
+            can_grant_role(db, operator=operator, operator_roles=op_roles, target_user=user_identifier, role_code=role_code)
+    except SubjectPolicyError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
+
+    before_rows = db.scalars(select(AssetUserRole).where(AssetUserRole.user_identifier == user_identifier)).all()
+    before = sorted({r.role_code for r in before_rows})
+    now = datetime.now(timezone.utc)
+    requested = set(role_codes)
+
+    def _still_effective(row: AssetUserRole) -> bool:
+        if row.status != "active":
+            return False
+        if row.valid_from is not None and _as_utc(row.valid_from) > now:
+            return False
+        if row.expires_at is not None and _as_utc(row.expires_at) <= now:
+            return False
+        return True
+
+    # 变更前先快照"当前仍有效"的角色集合：后续撤销会原地改状态，若在
+    # 变更后计算会因 platform_admin 已变 revoked 而漏掉最后管理员保护。
+    before_effective_roles = {r.role_code for r in before_rows if _still_effective(r)}
+
+    revoked: list[str] = []
+    kept: list[str] = []
+    by_role: dict[str, list[AssetUserRole]] = {}
+    for row in before_rows:
+        by_role.setdefault(row.role_code, []).append(row)
+    # 1) 撤销：请求集合之外、且当前仍有效的授权改 revoked（历史保留）。
+    for role_code, rows in by_role.items():
+        if role_code in requested:
+            kept.extend(role_code for row in rows if _still_effective(row))
+            continue
+        for row in rows:
+            if _still_effective(row):
+                row.status = "revoked"
+                revoked.append(role_code)
+    # 2) 新增：请求有而名下没有任何未撤销授权的角色。
+    existing_non_revoked = {rc for rc, rows in by_role.items() if any(r.status != "revoked" for r in rows)}
+    added: list[str] = []
+    for role_code in sorted(requested - existing_non_revoked):
+        db.add(AssetUserRole(
+            user_identifier=user_identifier,
+            role_code=role_code,
+            granted_by=operator,
+            source="direct",
+            status="active",
+            valid_from=now,
+        ))
+        added.append(role_code)
+    # 3) 最后管理员保护：若本次把 platform_admin 从有效集合移除。
+    losing_admin = (
+        "platform_admin" in before_effective_roles
+        and "platform_admin" not in requested
+    )
+    if losing_admin:
+        try:
+            ensure_not_losing_last_platform_admin(db, losing_identifiers={user_identifier})
+        except SubjectPolicyError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
+    after_effective = sorted(requested)
+    _audit(
+        db, "replace_user_roles", "user", user_identifier, operator,
+        before={"roles": before},
+        after={"roles": after_effective, "added": added, "revoked": revoked, "kept": sorted(set(kept))},
+        reason=req.reason,
+    )
     db.commit()
-    return ApiResponse(data={"user_identifier": user_identifier, "roles": role_codes})
+    return ApiResponse(data={
+        "user_identifier": user_identifier,
+        "roles": after_effective,
+        "added": added,
+        "revoked": revoked,
+        "kept": sorted(set(kept)),
+    })
 
 
-@router.get("/users/{user_identifier}/permissions", summary="Effective user permissions")
+@router.get("/users/{user_identifier}/permissions", summary="Effective user permissions", dependencies=[Depends(require_permission("identity.role.grant"))])
 def get_user_permissions(user_identifier: str, db: Session = Depends(get_db)) -> ApiResponse[dict]:
-    role_codes = db.scalars(select(AssetUserRole.role_code).where(AssetUserRole.user_identifier == user_identifier)).all()
-    permissions = _permission_codes_for_roles(db, role_codes)
+    """当前有效权限 + 历史授权单列（200 R01）。
+
+    生效区只含 active 且在有效期窗口内的授权；到期/未生效/已撤销进入
+    history 区并带状态与起止时间，不混入生效区。
+    """
+    effective_codes = sorted(effective_role_codes(db, user_identifier))
+    permissions = _permission_codes_for_roles(db, effective_codes)
+    history = historical_role_grants(db, user_identifier)
     person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == user_identifier))
     return ApiResponse(data={
         "user_identifier": user_identifier,
         "person_name": person.person_name_cn if person else None,
-        "roles": sorted(set(role_codes)),
+        "roles": effective_codes,
         "permissions": permissions,
+        "effective_at": datetime.now(timezone.utc).isoformat(),
+        "history": history,
     })
 
 
@@ -569,19 +743,17 @@ def get_me_permissions(request: Request, db: Session = Depends(get_db)) -> ApiRe
     user_identifier = getattr(request.state, "user_identifier", None)
     auth_via = getattr(request.state, "auth_via", None)
     if user_identifier:
-        role_codes = list(getattr(request.state, "roles", None) or [])
-        if not role_codes:
-            role_codes = db.scalars(
-                select(AssetUserRole.role_code).where(AssetUserRole.user_identifier == user_identifier)
-            ).all()
+        # 200 R01：有效角色为空就是空，不回退到全部历史角色。
+        role_codes = effective_role_codes(db, user_identifier)
         return ApiResponse(data={
             "key_id": None,
             "key_name": None,
             "user_identifier": user_identifier,
-            "roles": sorted(set(role_codes)),
+            "roles": sorted(role_codes),
             "permissions": _permission_codes_for_roles(db, role_codes),
             "unbound_token": False,
             "auth_via": auth_via or "middleware",
+            "effective_at": datetime.now(timezone.utc).isoformat(),
         })
 
     auth = request.headers.get("Authorization", "")
@@ -604,19 +776,21 @@ def get_me_permissions(request: Request, db: Session = Depends(get_db)) -> ApiRe
             "unbound_token": True,
             "auth_via": "api_key",
         })
-    role_codes = db.scalars(select(AssetUserRole.role_code).where(AssetUserRole.user_identifier == key.user_identifier)).all()
+    # 200 R01：ApiKey 绑定身份同样只算有效角色。
+    role_codes = effective_role_codes(db, key.user_identifier)
     return ApiResponse(data={
         "key_id": key.id,
         "key_name": key.key_name,
         "user_identifier": key.user_identifier,
-        "roles": sorted(set(role_codes)),
+        "roles": sorted(role_codes),
         "permissions": _permission_codes_for_roles(db, role_codes),
         "unbound_token": False,
         "auth_via": "api_key",
+        "effective_at": datetime.now(timezone.utc).isoformat(),
     })
 
 
-@router.get("/api-keys", summary="API keys for permission binding")
+@router.get("/api-keys", summary="API keys for permission binding", dependencies=[Depends(require_permission("identity.local_account.manage"))])
 def list_api_keys(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(select(ApiKey).order_by(ApiKey.created_at.desc())).all()
     return ApiResponse(data=[{
@@ -632,7 +806,7 @@ def list_api_keys(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     } for r in rows])
 
 
-@router.get("/audit", summary="Permission audit logs")
+@router.get("/audit", summary="Permission audit logs", dependencies=[Depends(require_permission("identity.role.manage"))])
 def list_permission_audit(
     entity_type: str | None = Query(None),
     entity_ref: str | None = Query(None),
@@ -651,16 +825,45 @@ def list_permission_audit(
     return ApiResponse(data=[_audit_payload(r) for r in rows])
 
 
-@router.patch("/api-keys/{key_id}/bind", summary="Bind API key to user identifier")
+@router.patch("/api-keys/{key_id}/bind", summary="Bind API key to user identifier", dependencies=[Depends(require_permission("identity.role.grant"))])
 def bind_api_key(key_id: int, req: TokenBind, request: Request, db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """密钥绑定（200 R04：对象级策略 + 已登记主体校验）。
+
+    - 绑定目标必须是已登记主体（人员或本地账号绑定的身份）；
+    - 绑定到持有 platform_admin 授权的身份仅 platform_admin 可操作；
+    - 机器/服务密钥允许不绑定人员（不强迫机器账号伪绑定真实人员）。
+    """
     if req.key_id != key_id:
         raise HTTPException(status_code=400, detail="path key_id does not match payload")
     key = db.get(ApiKey, key_id)
     if not key:
         raise HTTPException(status_code=404, detail="api key not found")
+    operator = get_request_operator(request, default="system")
+    target = (req.user_identifier or "").strip() or None
+    if target:
+        person = db.scalar(select(IdentityPerson).where(IdentityPerson.person_code == target))
+        account = db.scalar(select(AuthUser).where(AuthUser.user_identifier == target))
+        if person is None and account is None:
+            raise HTTPException(status_code=400, detail="bind_target_not_registered: 绑定目标必须是已登记人员或本地账号身份")
+        op_roles = operator_role_codes(db, operator)
+        try:
+            can_manage_subject(db, operator=operator, operator_roles=op_roles, target_user=target)
+        except SubjectPolicyError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
     before = {"user_identifier": key.user_identifier}
-    key.user_identifier = req.user_identifier or None
+    key.user_identifier = target
     # QA ST-006：审计 operator 取认证身份，不信任 payload 的 operator。
-    _audit(db, "bind_api_key", "api_key", str(key_id), get_request_operator(request, default="system"), before=before, after={"user_identifier": key.user_identifier})
+    _audit(db, "bind_api_key", "api_key", str(key_id), operator, before=before, after={"user_identifier": key.user_identifier})
     db.commit()
     return ApiResponse(data={"id": key.id, "key_name": key.key_name, "user_identifier": key.user_identifier})
+
+
+@router.post("/legacy-allow/repair", summary="历史 allow 权限码差异清单/幂等修复", dependencies=[Depends(require_permission("identity.role.manage"))])
+def legacy_allow_repair(request: Request, db: Session = Depends(get_db), apply: bool = Query(False)) -> ApiResponse[dict]:
+    """200 R02：只读差异清单（apply=false）与 allow→access 幂等修复（apply=true）。
+
+    只改 action 值，不增删行、不重置用户定制矩阵；生产平台正式执行
+    属独立授权事项，本端点不自动调用。
+    """
+    result = repair_legacy_allow_rows(db, apply=apply)
+    return ApiResponse(data=result)

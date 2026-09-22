@@ -365,6 +365,7 @@ def create_local_user(
     user_identifier: str | None = None,
     must_change_password: bool = True,
     enabled: bool = True,
+    account_type: str = "human",
 ) -> AuthUser:
     existing = db.scalar(select(AuthUser).where(AuthUser.username == username))
     if existing:
@@ -376,6 +377,7 @@ def create_local_user(
         username=username,
         password_hash=hash_password(password),
         user_identifier=user_identifier,
+        account_type=account_type,
         enabled=enabled,
         must_change_password=must_change_password,
         failed_login_count=0,

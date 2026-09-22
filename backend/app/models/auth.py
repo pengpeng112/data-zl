@@ -17,6 +17,9 @@ class AuthUser(Base):
     username = Column(Text, unique=True, nullable=False, index=True)
     password_hash = Column(Text, nullable=False)
     user_identifier = Column(Text)
+    # 200 R05：显式账号类型——human 新账号强制人员绑定；service/emergency
+    # 兼容既有独立维护账号，不因新规则批量锁死。
+    account_type = Column(Text, nullable=False, server_default="human")
     enabled = Column(Boolean, nullable=False, server_default="true")
     must_change_password = Column(Boolean, nullable=False, server_default="false")
     failed_login_count = Column(Integer, nullable=False, server_default="0")

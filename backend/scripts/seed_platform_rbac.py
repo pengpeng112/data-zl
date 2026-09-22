@@ -13,6 +13,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.core.db import SessionLocal
 from app.api.v1.permissions import BUILTIN_ROLES, ROLE_DEFAULT_PERMISSIONS, RESOURCE_CATALOG
 from app.models.governance_base import AssetRole, AssetRolePermission, AssetUserRole
+from app.services.effective_permissions import repair_legacy_allow_rows
+
+# 200 R02：与运行时归一口径一致，allow 与 access 同为"裸资源权限"。
+_BARE_RESOURCE_ACTIONS = (None, "", "access", "allow", "*")
 
 
 def run() -> None:
@@ -35,6 +39,7 @@ def run() -> None:
             existing = {
                 p.resource
                 for p in db.query(AssetRolePermission).filter_by(role_code=role_code).all()
+                if p.action in _BARE_RESOURCE_ACTIONS
             }
             for code in perms:
                 if code in existing:
@@ -43,12 +48,17 @@ def run() -> None:
                     AssetRolePermission(
                         role_code=role_code,
                         resource=code,
-                        # DEF-05（194）：运行时仅认 action∈{None,"","access","*"} 为裸资源权限；
-                        # 原 "allow" 会被归一化为 "code:allow" 导致整类角色 fail-closed。
-                        # 测试套件与 permissions API 均写 "access"，此处对齐。
+                        # 新种子统一写 access；历史 allow 行由
+                        # repair_legacy_allow_rows 幂等修复（--repair-allow）。
                         action="access",
                     )
                 )
+
+        # 200 R02：可选幂等修复历史 allow→access（默认只打印差异清单，
+        # --repair-allow 才落库；重复执行零变更）。
+        repair = "--repair-allow" in sys.argv
+        report = repair_legacy_allow_rows(db, apply=repair)
+        print(f"legacy_allow rows found={report['found']} repaired={report['changed']} (apply={repair})")
 
         # ensure platform-admin user_identifier has platform_admin role
         ur = (

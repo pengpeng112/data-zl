@@ -14,7 +14,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
-from ...core.security import get_current_user
+from ...core.security import get_current_user, require_permission
 from ...models.dict_medical import DictMedicalImportRun
 from ...models.dict_medical_push import DictMedicalImportRow
 from ...schemas.common import ApiResponse
@@ -35,7 +35,7 @@ class ReviewRequest(BaseModel):
     review_note: Optional[str] = None
 
 
-@router.post("/diagnosis-mapping", summary="上传诊断映射 Excel（两行表头）")
+@router.post("/diagnosis-mapping", summary="上传诊断映射 Excel（两行表头）", dependencies=[Depends(require_permission("dict.medical.edit"))])
 async def upload_diagnosis_mapping(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -80,7 +80,7 @@ async def upload_diagnosis_mapping(
     })
 
 
-@router.get("/{run_id}", summary="查询导入批次状态")
+@router.get("/{run_id}", summary="查询导入批次状态", dependencies=[Depends(require_permission("dict.medical.view"))])
 def get_import_run(
     run_id: int,
     db: Session = Depends(get_db),
@@ -115,7 +115,7 @@ def get_import_run(
     })
 
 
-@router.get("/{run_id}/rows", summary="查询暂存行（分页）")
+@router.get("/{run_id}/rows", summary="查询暂存行（分页）", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_import_rows(
     run_id: int,
     page: int = Query(1, ge=1),
@@ -157,7 +157,7 @@ def list_import_rows(
     return ApiResponse(data={"total": total, "page": page, "items": items})
 
 
-@router.post("/{run_id}/rows/review", summary="批量审核暂存行")
+@router.post("/{run_id}/rows/review", summary="批量审核暂存行", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def review_rows(
     run_id: int,
     req: ReviewRequest,
@@ -202,7 +202,7 @@ def review_rows(
     return ApiResponse(data={"reviewed": reviewed, "blocked": blocked})
 
 
-@router.post("/{run_id}/merge", summary="合并已批准行到正式字典")
+@router.post("/{run_id}/merge", summary="合并已批准行到正式字典", dependencies=[Depends(require_permission("dict.medical.edit"))])
 def merge_run(
     run_id: int,
     db: Session = Depends(get_db),

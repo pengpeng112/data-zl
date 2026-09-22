@@ -1,12 +1,15 @@
-from datetime import datetime, timezone
 import logging
 
 from fastapi import Depends, HTTPException, Request
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import get_db
 from ..models.governance_base import AssetRolePermission, AssetUserRole
+from ..services.effective_permissions import (
+    effective_role_codes as _service_effective_role_codes,
+    normalize_permission_code,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,16 +23,9 @@ def get_current_user(request: Request) -> str:
 
 
 def _effective_role_codes(db: Session, user_identifier: str) -> set[str]:
-    now = datetime.now(timezone.utc)
-    rows = db.scalars(
-        select(AssetUserRole).where(
-            AssetUserRole.user_identifier == user_identifier,
-            AssetUserRole.status == "active",
-            or_(AssetUserRole.valid_from.is_(None), AssetUserRole.valid_from <= now),
-            or_(AssetUserRole.expires_at.is_(None), AssetUserRole.expires_at > now),
-        )
-    ).all()
-    return {row.role_code for row in rows}
+    # 200 R01：有效角色计算统一委托 effective_permissions 服务，
+    # 展示（/me、预览）与执行（中间件、端点依赖）共用同一口径。
+    return _service_effective_role_codes(db, user_identifier)
 
 
 def _permission_matches(resource: str, requested: str) -> bool:
@@ -56,10 +52,9 @@ def require_permission(resource_code: str):
         rows = db.scalars(
             select(AssetRolePermission).where(AssetRolePermission.role_code.in_(role_codes))
         ).all() if role_codes else []
-        granted = [
-            f"{row.resource}:{row.action}" if row.action not in (None, "", "access", "*") else row.resource
-            for row in rows
-        ]
+        # 200 R02：与展示侧共用 normalize_permission_code；历史 allow 行
+        # 按"裸资源权限"编码，不再拼成 resource:allow 导致界面勾选而后端拒绝。
+        granted = [normalize_permission_code(row.resource, row.action) for row in rows]
         if not any(_permission_matches(item, resource_code) for item in granted):
             raise HTTPException(status_code=403, detail=f"缺少权限: {resource_code}")
         return user_identifier

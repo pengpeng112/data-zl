@@ -228,9 +228,20 @@ def settle_event(
     handler_result: dict[str, Any],
     *,
     now: datetime | None = None,
+    holder: str | None = None,
 ) -> str:
-    """Record one execution pass result using pure classification helpers."""
+    """Record one execution pass result using pure classification helpers.
+
+    200 D07/T23：holder 传入时做租约所有权条件更新——租约已被接管/重置的
+    旧 worker 的 settle 不再覆盖队列状态（无双写、无错误覆盖结果）。
+    """
     now = now or datetime.now(timezone.utc)
+    if holder is not None and event.lease_holder != holder:
+        logger.warning(
+            "stale settle ignored: event %s lease_holder=%s settling_holder=%s",
+            event.id, event.lease_holder, holder,
+        )
+        return "stale_settle_ignored"
     status, error = classify_event(event.to_dict(), handler_result)
     event.status = status
     event.lease_expires_at = None
@@ -294,7 +305,7 @@ def run_worker_once(
             result = handler(ev)
         except Exception as exc:  # never leak internals into queue state
             result = {"ok": False, "error": f"handler_failed_{type(exc).__name__}"}
-        status = settle_event(db, ev, result, now=now)
+        status = settle_event(db, ev, result, now=now, holder=holder)
         if status == STATUS_SUCCEEDED:
             summary["succeeded"] += 1
         elif status == STATUS_DEAD_LETTER:
@@ -311,6 +322,9 @@ def dispatch_dict_event(db: Session, event: DictSyncOutboxEvent) -> dict[str, An
     Reloads all authoritative state from the platform DB and rechecks the
     immutable plan hash at the worker boundary. The event payload never
     supplies SQL, a connection string, or a source code.
+
+    200 D07：执行前复核事件仍处于 leased（已被本轮 claim 持有），过期被
+    重置或已被并发接管的旧事件拒绝执行，防止双写。
     """
     from fastapi import HTTPException
     from ..core.config import settings
@@ -320,6 +334,8 @@ def dispatch_dict_event(db: Session, event: DictSyncOutboxEvent) -> dict[str, An
 
     if event.category != EVENT_CATEGORY_DICT_PUSH or event.event_type != "plan_approve":
         return {"ok": False, "error": "unsupported_outbox_event"}
+    if event.status != STATUS_LEASED:
+        return {"ok": False, "error": "lease_not_held"}
     plan = db.get(DictMedicalPushPlan, event.plan_id)
     if plan is None or plan.status != "approved":
         return {"ok": False, "error": "plan_not_approved"}

@@ -72,6 +72,9 @@ class DictMedicalPushPlan(Base):
     category_code = Column(Text, nullable=False)
     target_systems = Column(JSONB, nullable=False)
     status = Column(Text, server_default="draft")
+    # 200 D06：执行状态轴（queued/running/succeeded/partial/failed/blocked/
+    # unknown_commit/reconcile_required），与授权状态轴 status 分离。
+    execution_status = Column(Text)
     platform_data_version = Column(Text)
     content_hash = Column(Text)
     expires_at = Column(TIMESTAMP(timezone=True))

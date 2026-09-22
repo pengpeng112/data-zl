@@ -21,6 +21,7 @@ from .core.exceptions import (
 from .core.logging_config import setup_logging
 from .core.rate_limit import limiter
 from .core.startup_check import PROD_ALLOWED_HEADERS, PROD_ALLOWED_METHODS, run_startup_check
+from .models.auth import AuthUser
 from .services.auth_service import decode_access_token
 from slowapi.middleware import SlowAPIMiddleware
 
@@ -359,8 +360,9 @@ ROLE_REQUIRED: dict[str, list[str]] = {
     "ops": ["ops_admin", "platform_admin"],
     "identity": ["identity_admin", "platform_admin"],
     "permissions": ["identity_admin", "platform_admin"],
-    # 与 /dictionaries 一致：dict_admin 持有 dict.medical.*，不能被粗前缀拦在 platform_admin。
-    "dict-medical": ["platform_admin", "dict_admin"],
+    # 200 R03：dict-medical 已整体移交端点级细粒度门禁（见
+    # FINE_GRAINED_Rbac_PREFIXES_174），粗前缀条目移除；dictionaries 为
+    # 通用字典模块，与 dict-medical 无关，维持原粗门禁。
     "dictionaries": ["platform_admin", "dict_admin"],
     "govern": ["platform_admin", "approver"],
     "admin": ["platform_admin"],
@@ -375,7 +377,6 @@ ROLE_PATH_MAP: dict[str, str] = {
     "ops": "/api/v1/ops",
     "identity": "/api/v1/identity",
     "permissions": "/api/v1/permissions",
-    "dict-medical": "/api/v1/dict-medical",
     "dictionaries": "/api/v1/dictionaries",
     "govern": "/api/v1/govern",
     "admin": "/api/v1/admin",
@@ -441,13 +442,16 @@ def _resolve_jwt_roles(db, jwt_payload: dict) -> list[str]:
     return list(jwt_payload.get("roles") or [])
 
 
-# 174 S4：质量治理台账三前缀走端点级细粒度 RBAC（每个路由显式 require_permission，
-# 含普通处理人角色），因此豁免 /api/v1/quality 粗前缀的 quality_admin 门禁；
-# 三个模块任一路由缺失显式权限码都会被 security_audit 静态扫描抓出。
+# 174 S4 + 200 R03：端点级细粒度 RBAC 接管的 URL 前缀。每个路由显式
+# require_permission（缺码会被 security_audit 静态扫描抓出），因此豁免对应
+# 粗前缀角色门禁——自定义角色（如"字典审核员"持 dict.medical.* 细码）不再
+# 被 dict_admin/platform_admin 前缀误拦。
 FINE_GRAINED_Rbac_PREFIXES_174 = (
     "/api/v1/quality-issues",
     "/api/v1/quality-controls",
     "/api/v1/quality-observations",
+    # 200 R03：dict-medical 全部路由已逐条挂 dict.medical.* 端点权限码。
+    "/api/v1/dict-medical",
 )
 
 
@@ -516,34 +520,62 @@ async def auth_and_logging_middleware(request: Request, call_next):
             # 双凭证：先尝试 JWT（人类登录），失败再回退 ApiKey（机器/部署）
             jwt_payload = decode_access_token(token)
             if jwt_payload:
-                request.state.user_identifier = jwt_payload.get("user_identifier") or jwt_payload.get("username")
-                request.state.auth_user_id = jwt_payload.get("sub")
                 request.state.auth_via = "jwt"
                 token_roles = list(jwt_payload.get("roles") or [])
+                # 200 R05：以 JWT 稳定 sub=AuthUser.id 定位本地账号并核对状态，
+                # 修复"无绑定账号登录成功但受保护请求按 user_identifier 查不到
+                # 账号"；不再以用户名回退绕过账号状态检查。
+                auth_user = None
+                sub = jwt_payload.get("sub")
+                if sub:
+                    try:
+                        auth_user = db.scalar(
+                            select(AuthUser).where(AuthUser.id == int(sub))
+                        )
+                    except (TypeError, ValueError):
+                        auth_user = None
+                jwt_identifier = jwt_payload.get("user_identifier") or jwt_payload.get("username")
+                if auth_user is None and jwt_identifier:
+                    auth_user = db.scalar(
+                        select(AuthUser).where(AuthUser.user_identifier == jwt_identifier)
+                    )
+                if auth_user is None or not auth_user.enabled:
+                    db.close()
+                    return JSONResponse(
+                        status_code=401,
+                        content={
+                            "code": 401,
+                            "message": "账号已禁用或不存在，请重新登录",
+                            "data": None,
+                            "request_id": request.state.request_id,
+                        },
+                    )
+                # 绑定一致性：换绑后旧 token 携带的 user_identifier 与账号当前
+                # 绑定不一致 → 旧 access token 立即失效（R05/T34）。
+                if (
+                    auth_user.user_identifier
+                    and jwt_payload.get("user_identifier")
+                    and jwt_payload.get("user_identifier") != auth_user.user_identifier
+                ):
+                    db.close()
+                    return JSONResponse(
+                        status_code=401,
+                        content={
+                            "code": 401,
+                            "message": "账号绑定已变更，请重新登录",
+                            "data": None,
+                            "request_id": request.state.request_id,
+                        },
+                    )
+                current_identifier = auth_user.user_identifier or auth_user.username
+                request.state.user_identifier = current_identifier
+                request.state.auth_user_id = str(auth_user.id)
                 # 可信用户的实时角色是唯一授权来源。即使数据库返回空列表，
                 # 也必须覆盖 JWT 缓存，确保撤权立即生效；查询异常由外层失败关闭。
-                if request.state.user_identifier:
-                    # DEF-04（194 I12）：无状态 JWT 不感知账号禁用/删除；
-                    # 每次请求实时复核账号存在且启用，禁用立即失效（401）。
-                    from .models.auth import AuthUser
-
-                    auth_user = db.scalar(
-                        select(AuthUser).where(
-                            AuthUser.user_identifier == request.state.user_identifier
-                        )
-                    )
-                    if auth_user is None or not auth_user.enabled:
-                        db.close()
-                        return JSONResponse(
-                            status_code=401,
-                            content={
-                                "code": 401,
-                                "message": "账号已禁用或不存在，请重新登录",
-                                "data": None,
-                                "request_id": request.state.request_id,
-                            },
-                        )
-                    token_roles = _resolve_jwt_roles(db, jwt_payload)
+                token_roles = _resolve_jwt_roles(db, {
+                    "user_identifier": current_identifier,
+                    "username": auth_user.username,
+                })
                 request.state.roles = token_roles
             else:
                 ok, err, key = _check_token(db, token)

@@ -41,6 +41,9 @@ class CreateUserRequest(BaseModel):
     username: str = Field(..., min_length=2, max_length=128)
     password: str | None = Field(default=None, max_length=256)
     user_identifier: str | None = None
+    # 200 R05：显式账号类型。human 新账号强制人员绑定；
+    # service/emergency 兼容独立维护与应急账号（不批量锁死既有形态）。
+    account_type: str = Field(default="human", pattern="^(human|service|emergency)$")
     must_change_password: bool = True
     enabled: bool = True
     role_codes: list[str] = Field(default_factory=list)
@@ -372,6 +375,19 @@ def create_user(
 ) -> ApiResponse[dict]:
     operator = _require_admin_roles(request)
     import secrets as _secrets
+    from ...models.governance_base import AssetRole
+    from ...services.subject_policy import (
+        SubjectPolicyError,
+        can_grant_role,
+        operator_role_codes,
+    )
+
+    # 200 R05：human 新账号强制人员绑定；service/emergency 显式豁免。
+    if body.account_type == "human" and not (body.user_identifier or "").strip():
+        raise HTTPException(
+            status_code=400,
+            detail="account_binding_required: 人员类账号必须绑定人员，请从人员管理中选择；服务/应急账号请显式声明 account_type",
+        )
 
     person = None
     if body.user_identifier:
@@ -388,6 +404,30 @@ def create_user(
         if bound:
             raise HTTPException(status_code=409, detail="该人员已绑定本地账号")
 
+    # 200 R04：逐角色存在性 + 授予范围校验（identity_admin 不得建平台管理员）。
+    role_codes = sorted(set(body.role_codes))
+    if role_codes:
+        existing_roles = set(db.scalars(
+            select(AssetRole.role_code).where(AssetRole.role_code.in_(role_codes))
+        ).all())
+        missing = [r for r in role_codes if r not in existing_roles]
+        if missing:
+            raise HTTPException(status_code=400, detail=f"roles not found: {', '.join(missing)}")
+    op_roles = operator_role_codes(db, operator)
+    # 角色授予写入的身份键：有绑定用绑定，无绑定用用户名（与建号写入一致）。
+    grants_identifier = (person.person_code if person else None) or body.username.strip()
+    try:
+        for role_code in role_codes:
+            can_grant_role(
+                db,
+                operator=operator,
+                operator_roles=op_roles,
+                target_user=grants_identifier,
+                role_code=role_code,
+            )
+    except SubjectPolicyError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
+
     password = body.password or _secrets.token_urlsafe(16)
     try:
         user = auth_service.create_local_user(
@@ -397,13 +437,16 @@ def create_user(
             user_identifier=person.person_code if person else None,
             must_change_password=body.must_change_password,
             enabled=body.enabled,
+            account_type=body.account_type,
         )
-        for role in body.role_codes:
+        for role in role_codes:
             db.add(
                 AssetUserRole(
-                    user_identifier=user.user_identifier or user.username,
+                    user_identifier=grants_identifier,
                     role_code=role,
                     granted_by=operator,
+                    source="direct",
+                    status="active",
                 )
             )
         _audit(
@@ -411,7 +454,7 @@ def create_user(
             "create_user",
             user.username,
             operator,
-            after={"username": user.username, "user_identifier": user.user_identifier, "roles": body.role_codes},
+            after={"username": user.username, "user_identifier": user.user_identifier, "account_type": user.account_type, "roles": role_codes},
         )
         db.commit()
     except AuthError as e:
@@ -421,6 +464,7 @@ def create_user(
             "id": user.id,
             "username": user.username,
             "user_identifier": user.user_identifier,
+            "account_type": user.account_type,
             "person_name_cn": person.person_name_cn if person else None,
             "must_change_password": user.must_change_password,
             "initial_password": password if body.password is None else None,
@@ -429,7 +473,7 @@ def create_user(
     )
 
 
-@router.patch("/users/{user_id}", summary="启停/解锁/重置密码")
+@router.patch("/users/{user_id}", summary="启停/解锁/重置密码/换绑")
 def patch_user(
     user_id: int,
     request: Request,
@@ -437,15 +481,61 @@ def patch_user(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     operator = _require_admin_roles(request)
+    from ...services.subject_policy import (
+        SubjectPolicyError,
+        can_manage_subject,
+        ensure_not_losing_last_platform_admin,
+        operator_role_codes,
+    )
+
     user = db.get(AuthUser, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="账号不存在")
+    op_roles = operator_role_codes(db, operator)
+    current_identifier = user.user_identifier
+    try:
+        # 200 R04：操作持有 platform_admin 授权的身份仅平台管理员可执行。
+        if current_identifier:
+            can_manage_subject(db, operator=operator, operator_roles=op_roles, target_user=current_identifier)
+        # 200 R04/T36：停用前最后管理员保护（并发停用/撤权共用该判定）。
+        if body.enabled is False:
+            ensure_not_losing_last_platform_admin(
+                db, losing_identifiers={current_identifier} if current_identifier else set()
+            )
+    except SubjectPolicyError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
+
     before = {
         "enabled": user.enabled,
         "must_change_password": user.must_change_password,
         "locked_until": user.locked_until.isoformat() if user.locked_until else None,
         "user_identifier": user.user_identifier,
     }
+    rebind_revoked_sessions = 0
+    if body.user_identifier is not None and body.user_identifier != (user.user_identifier or ""):
+        # 200 R05：换绑复用建号口径——human 账号目标人员必须存在、未被其他
+        # 账号绑定、过管理员保护；一个平台事务内更新并撤销旧会话（旧
+        # access token 由 main.py 的绑定一致性检查失效）。人员身份的历史
+        # 角色按 user_identifier 天然留给原身份，不随换绑搬迁。
+        new_identifier = body.user_identifier.strip() or None
+        if new_identifier:
+            if (user.account_type or "human") == "human":
+                person = db.scalar(
+                    select(IdentityPerson).where(IdentityPerson.person_code == new_identifier)
+                )
+                if not person:
+                    raise HTTPException(status_code=400, detail="rebind_target_not_found: 换绑目标人员不存在")
+            bound = db.scalar(select(AuthUser).where(
+                AuthUser.user_identifier == new_identifier, AuthUser.id != user.id
+            ))
+            if bound:
+                raise HTTPException(status_code=409, detail="rebind_target_already_bound: 目标人员已绑定其他账号")
+            try:
+                can_manage_subject(db, operator=operator, operator_roles=op_roles, target_user=new_identifier)
+            except SubjectPolicyError as exc:
+                raise HTTPException(status_code=exc.status_code, detail=f"{exc.reason_code}: {exc.message}") from exc
+        user.user_identifier = new_identifier
+        rebind_revoked_sessions = auth_service.revoke_all_user_sessions(db, user.id)
     if body.enabled is not None:
         user.enabled = body.enabled
         if not body.enabled:
@@ -455,8 +545,6 @@ def patch_user(
         user.failed_login_count = 0
     if body.must_change_password is not None:
         user.must_change_password = body.must_change_password
-    if body.user_identifier is not None:
-        user.user_identifier = body.user_identifier or None
     initial_password = None
     if body.reset_password is not None:
         try:
@@ -479,6 +567,7 @@ def patch_user(
             "must_change_password": user.must_change_password,
             "locked_until": user.locked_until.isoformat() if user.locked_until else None,
             "user_identifier": user.user_identifier,
+            "rebind_revoked_sessions": rebind_revoked_sessions,
             "password_reset": body.reset_password is not None,
         },
     )
@@ -490,6 +579,7 @@ def patch_user(
             "enabled": user.enabled,
             "must_change_password": user.must_change_password,
             "locked_until": user.locked_until.isoformat() if user.locked_until else None,
+            "user_identifier": user.user_identifier,
             "initial_password": initial_password,
         }
     )

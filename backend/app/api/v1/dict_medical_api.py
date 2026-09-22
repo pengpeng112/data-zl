@@ -27,7 +27,7 @@ from ...schemas.common import ApiResponse
 router = APIRouter(prefix="/api/v1/dict-medical", tags=["dict-medical"])
 
 
-@router.get("/code-sets", summary="诊断/手术三套编码体系列表")
+@router.get("/code-sets", summary="诊断/手术三套编码体系列表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_code_sets(
     category_code: str | None = Query(None, description="diagnosis/operation"),
     db: Session = Depends(get_db),
@@ -49,7 +49,7 @@ def list_code_sets(
     ])
 
 
-@router.get("/code-sets/{code_set_code}/items", summary="编码项列表")
+@router.get("/code-sets/{code_set_code}/items", summary="编码项列表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_items(
     code_set_code: str,
     keyword: str | None = Query(None),
@@ -83,7 +83,7 @@ def list_items(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.get("/mappings", summary="编码对照关系列表")
+@router.get("/mappings", summary="编码对照关系列表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_mappings(
     category_code: str | None = Query(None),
     review_status: str | None = Query(None),
@@ -125,7 +125,7 @@ def _mapping_row_extra(local: DictMedicalCodeItem) -> dict:
     return local.extra or {}
 
 
-@router.get("/mapping-rows", summary="按院内编码展示诊断/手术完整映射宽表")
+@router.get("/mapping-rows", summary="按院内编码展示诊断/手术完整映射宽表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_mapping_rows(
     category_code: str = Query("diagnosis", description="diagnosis/operation"),
     keyword: str | None = Query(None),
@@ -203,7 +203,7 @@ def list_mapping_rows(
     return ApiResponse(data={"total": total, "page": page, "page_size": page_size, "items": items})
 
 
-@router.get("/mapping-options", summary="诊断手术维护下拉值域")
+@router.get("/mapping-options", summary="诊断手术维护下拉值域", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_mapping_options(category_code: str = Query("diagnosis"), db: Session = Depends(get_db)) -> ApiResponse[dict]:
     """Operation options come from already maintained rows.
 
@@ -411,7 +411,7 @@ def _mapping_rows_for_export(
     return result[:EXPORT_MAX_ROWS]
 
 
-@router.get("/mapping-rows/export", summary="导出诊断/手术映射宽表 Excel")
+@router.get("/mapping-rows/export", summary="导出诊断/手术映射宽表 Excel", dependencies=[Depends(require_permission("dict.medical.view"))])
 def export_mapping_rows(
     category_code: str = Query("diagnosis", description="diagnosis/operation"),
     keyword: str | None = Query(None),
@@ -573,12 +573,11 @@ def upsert_mapping_row(
     db.commit()
     result = {"local_code": local_code, "category_code": req.category_code}
     from ...core.config import settings as app_settings
-    if (
-        app_settings.dict_medical_push_enabled
-        and app_settings.dict_medical_auto_approve_enabled
-        and (req.status or "active") == "active"
-    ):
-        from ...services.dict_medical_push import approve_plan, create_push_plan
+    if app_settings.dict_medical_push_enabled and (req.status or "active") == "active":
+        # 200 D03：自动生成最多到 draft——移除以固定身份 "dict-auto-approver"
+        # 替代独立审核的自动审批与入队；计划须经持 dict.medical.approve 的
+        # 独立登录人审批（不能自审）后才会进入 outbox。
+        from ...services.dict_medical_push import create_push_plan
 
         current_user = get_current_user(request)
         plan = create_push_plan(
@@ -588,14 +587,13 @@ def upsert_mapping_row(
             item_codes=[local_code],
             created_by=str(current_user),
             action_type="insert",
+            hospital_no=app_settings.dict_medical_push_default_hospital_no,
         )
-        approve_plan(
-            db,
-            plan.id,
-            approved_by="dict-auto-approver",
-            note="system auto-approved after mapping-row create",
-        )
-        result.update({"auto_sync": "queued", "plan_id": plan.id})
+        result.update({
+            "auto_sync": "draft_created",
+            "plan_id": plan.id,
+            "note": "已生成待审计划：需独立审批（审批人不能是创建人）后才会入队执行",
+        })
     return ApiResponse(data=result)
 class MappingUpsert(BaseModel):
     category_code: str
@@ -638,7 +636,7 @@ def upsert_mapping(req: MappingUpsert, db: Session = Depends(get_db)) -> ApiResp
     return ApiResponse(data={"id": m.id})
 
 
-@router.get("/sync-diffs", summary="HIS/EMR 诊断手术字典同步差异")
+@router.get("/sync-diffs", summary="HIS/EMR 诊断手术字典同步差异", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_medical_diffs(
     status: str | None = Query(None),
     page: int = Query(1, ge=1),
@@ -929,7 +927,7 @@ def create_dict_cr(req: DictCRCreate, request: Request, db: Session = Depends(ge
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status})
 
 
-@router.get("/change-requests", summary="字典变更请求列表")
+@router.get("/change-requests", summary="字典变更请求列表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_dict_crs(
     approval_status: str | None = Query(None),
     page: int = Query(1, ge=1),
@@ -993,7 +991,7 @@ def execute_dict_cr(cr_id: int, request: Request, db: Session = Depends(get_db))
     return ApiResponse(data={"id": cr.id, "approval_status": cr.approval_status, "executed": True})
 
 
-@router.get("/versions", summary="编码体系版本列表")
+@router.get("/versions", summary="编码体系版本列表", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_versions(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     rows = db.scalars(
         select(DictMedicalCodeSet).order_by(DictMedicalCodeSet.category_code, DictMedicalCodeSet.code_set_code)
@@ -1010,7 +1008,7 @@ def list_versions(db: Session = Depends(get_db)) -> ApiResponse[list[dict]]:
     ])
 
 
-@router.get("/import-runs", summary="诊断手术导入批次日志")
+@router.get("/import-runs", summary="诊断手术导入批次日志", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_import_runs(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
@@ -1053,7 +1051,7 @@ def list_import_runs(
     })
 
 
-@router.get("/import-runs/{run_id}", summary="导入批次详情")
+@router.get("/import-runs/{run_id}", summary="导入批次详情", dependencies=[Depends(require_permission("dict.medical.view"))])
 def get_import_run(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     r = db.get(DictMedicalImportRun, run_id)
     if not r:
@@ -1078,7 +1076,7 @@ def get_import_run(run_id: int, db: Session = Depends(get_db)) -> ApiResponse[di
     })
 
 
-@router.get("/sync-logs", summary="字典同步差异日志摘要")
+@router.get("/sync-logs", summary="字典同步差异日志摘要", dependencies=[Depends(require_permission("dict.medical.view"))])
 def list_sync_logs(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
@@ -1158,7 +1156,7 @@ class MedicalPushExportRequest(BaseModel):
     max_items: int = 100
 
 
-@router.get("/push/config", summary="诊断手术下发开关与硬限制说明")
+@router.get("/push/config", summary="诊断手术下发开关与硬限制说明", dependencies=[Depends(require_permission("dict.medical.view"))])
 def medical_push_config(request: Request) -> ApiResponse[dict]:
     get_current_user(request)
     from ...core.config import settings as app_settings
@@ -1180,7 +1178,7 @@ def medical_push_config(request: Request) -> ApiResponse[dict]:
     })
 
 
-@router.post("/push/export-preview", summary="从平台字典导出待下发宽表（只读）")
+@router.post("/push/export-preview", summary="从平台字典导出待下发宽表（只读）", dependencies=[Depends(require_permission("dict.medical.view"))])
 def medical_push_export_preview(
     req: MedicalPushExportRequest,
     request: Request,

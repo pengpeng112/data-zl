@@ -81,6 +81,8 @@ def main() -> int:
     parser.add_argument("workbook", type=Path)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--dispatch", action="store_true")
+    # 200 D03：审批必须是可信登录身份，禁止固定假审批人替代独立审核。
+    parser.add_argument("--approver", help="独立审批人登录身份（不能与创建人相同）")
     args = parser.parse_args()
     if args.dispatch and not args.apply:
         parser.error("--dispatch requires --apply")
@@ -183,10 +185,17 @@ def main() -> int:
             created_by="controlled-excel-import",
             action_type="insert",
         )
+        if not args.approver:
+            db.commit()
+            summary["plan_id"] = plan.id
+            summary["auto_sync"] = "draft_created"
+            print(json.dumps(summary, ensure_ascii=False))
+            print("plan left as draft: pass --approver <login> to approve independently")
+            return 0
         approve_plan(
             db,
             plan.id,
-            approved_by="dict-auto-approver",
+            approved_by=args.approver,
             note="user-authorized diagnosis workbook dispatch",
         )
         summary["plan_id"] = plan.id
