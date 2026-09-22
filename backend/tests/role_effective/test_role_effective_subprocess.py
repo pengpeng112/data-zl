@@ -22,10 +22,16 @@ from app.services import auth_service
 from app import main
 from app.main import _lookup_roles
 
-# _effective_role_codes 内部构造 select(AssetUserRole).where(...)
+# _effective_role_codes 委托 effective_permissions 服务（200 R01 统一口径），
+# 过滤条件移入服务实现；两侧都必须保持"有效角色"语义。
 from app.core.security import _effective_role_codes
+from app.services import effective_permissions as ep
 src = inspect.getsource(_effective_role_codes)
-assert "valid_from" in src and "expires_at" in src and "status" in src, (
+assert "_service_effective_role_codes" in src or "effective_permissions" in src, (
+    "_effective_role_codes 必须委托 effective_permissions 统一实现"
+)
+svc_src = inspect.getsource(ep.effective_role_grants)
+assert "valid_from" in svc_src and "expires_at" in svc_src and "status" in svc_src, (
     "有效角色查询必须过滤 valid_from/expires_at/status"
 )
 

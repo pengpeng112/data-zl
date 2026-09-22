@@ -119,6 +119,7 @@ def test_plan_creation_freezes_value_and_summary():
         def scalars(self, stmt):
             self.calls += 1
             return NS(all=lambda: [item] if self.calls == 1 else [])
+        def scalar(self, stmt): return None
         def add(self, obj): self.saved.append(obj)
         def flush(self): self.saved[0].id = 1
         def commit(self): pass
@@ -129,31 +130,49 @@ def test_plan_creation_freezes_value_and_summary():
     assert a.payload["infectious_disease_name"] == "模拟"
     assert a.action_type == "sync_infectious" and a.diff_type == "changed"
     assert plans._compute_plan_hash([a.payload]) == p.content_hash
-    db.get = lambda model, key: p
-    db.scalars = lambda stmt: NS(all=lambda: [a])
-    summary = plans.get_plan_summary(db, p.id)
+    # 200 D02：新计划一律 v3 完整快照（传染病也走同一快照形态）。
+    assert a.payload["snapshot_version"] == plans.SNAPSHOT_VERSION
+    class SummaryDB:
+        def __init__(self): self.calls = 0
+        def get(self, model, key): return p
+        def scalars(self, stmt):
+            self.calls += 1
+            return NS(all=lambda: [a] if self.calls == 1 else [])
+        def scalar(self, stmt): return None
+    summary = plans.get_plan_summary(SummaryDB(), p.id)
     assert summary["id"] == 1
     assert summary["actions"][0]["infectious_disease_name"] == "模拟"
+    assert summary["execution_status"] == "draft"
 
 
-def test_rebuild_uses_approved_name_even_if_current_value_races(monkeypatch):
+def test_rebuild_uses_approved_name_even_if_current_value_races():
     db, a, p, item = plan_fixture()
-    monkeypatch.setattr(executor, "_load_platform_rows", lambda *args, **kw: [{"local_code": "SIM_CRB_1", "local_name": "模拟诊断", "infectious_name": "并发新值"}])
+    # 200 D02：worker 按已审快照重建，不再读当前平台行——平台值并发变化
+    # 也不影响冻结值（当前值漂移由 verify_plan_integrity 在写前拦截）。
     rebuilt = executor._rebuild_actions(db, p, "HIS_SOURCE", hospital_no="test")
     assert len(rebuilt) == 1 and rebuilt[0]["params"]["crb_name"] == "模拟"
 
 
-def test_rebuild_refuses_partial_selection(monkeypatch):
-    db, a, p, item = plan_fixture()
-    monkeypatch.setattr(executor, "_load_platform_rows", lambda *args, **kw: [])
+def test_rebuild_refuses_legacy_insert_snapshot():
+    # 200 D02：缺少 v3 完整快照绑定的老版 insert 计划必须重新生成，
+    # 禁止静默补哈希继续写；选择完整性在创建端由 resolve_item_snapshots 整包拒绝。
+    payload = dict(item_code="A", item_name_cn="B", hash_version=2)
+    a = NS(item_code="A", item_name_cn="B", action_type="insert", target_system="HIS_SOURCE", payload=payload)
+    p = NS(id=1, category_code="diagnosis", target_systems=["HIS_SOURCE"])
+    db = NS(scalars=lambda stmt: NS(all=lambda: [a]))
     with pytest.raises(HTTPException):
         executor._rebuild_actions(db, p, "HIS_SOURCE", hospital_no="test")
 
 
-def test_legacy_hash_compatibility():
-    import hashlib
+def test_legacy_v1_payload_no_longer_hashes_as_before():
+    # 200 D02：v1 管道格式哈希不再被静默接受——canonical JSON 重算不等，
+    # 老 v1 计划 verify 失败并要求重新生成（不允许静默补哈希继续写）。
+    import hashlib, json
     data = {"item_code": "A", "item_name_cn": "B", "national_clinical_code": "C", "insurance_code": "D", "status": "active"}
-    assert plans._compute_plan_hash([data]) == hashlib.sha256(b"A|B|C|D|active").hexdigest()[:32]
+    legacy_pipe = hashlib.sha256(b"A|B|C|D|active").hexdigest()[:32]
+    assert plans._compute_plan_hash([data]) != legacy_pipe
+    canonical = hashlib.sha256(json.dumps([data], ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()[:32]
+    assert plans._compute_plan_hash([data]) == canonical
 
 
 @pytest.mark.parametrize("mutation", ["payload", "action", "target", "legacy", "category"])
@@ -189,7 +208,8 @@ def test_dispatch_commits_only_after_readback(monkeypatch, readback_fails):
     p = NS(id=1, status="approved", expires_at=datetime.now(timezone.utc)+timedelta(hours=1), target_systems=["HIS_SOURCE"], approved_by="reviewer", created_by="creator")
     calls = []
     conn = NS(commit=lambda: calls.append("commit"), rollback=lambda: calls.append("rollback"), close=lambda: calls.append("close"))
-    db = NS(add=lambda obj: None, flush=lambda: None, commit=lambda: None)
+    db = NS(add=lambda obj: None, flush=lambda: None, commit=lambda: None,
+            scalars=lambda stmt: NS(all=lambda: []))
     monkeypatch.setattr(executor.settings, "dict_medical_push_enabled", True)
     monkeypatch.setattr(executor.settings, "dict_medical_push_confirmation_token", "test-only")
     monkeypatch.setattr(executor, "verify_plan_integrity", lambda *args: True)

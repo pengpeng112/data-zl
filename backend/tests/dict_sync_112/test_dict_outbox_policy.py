@@ -67,13 +67,29 @@ print("OUTBOX_POLICY_OK")
 """
 
 
+import os
+
+
+import os
+
+def _pure_logic_subprocess_env() -> dict:
+    env = {
+        k: v for k, v in os.environ.items()
+        if not k.startswith("APP_") and not k.startswith("PYTEST_")
+    }
+    env["APP_ENV"] = "test"
+    env["APP_TEST_DB_URL"] = "sqlite:///pure_logic_test.db"
+    env["APP_DB_URL"] = env["APP_TEST_DB_URL"]
+    return env
+
+
 def test_outbox_policy():
     code = _SNIPPET.replace("{BACKEND_DIR}", str(BACKEND_DIR))
     proc = subprocess.run(
         [sys.executable, "-c", code],
         capture_output=True,
         text=True,
-        env={_k: _v for _k, _v in __import__("os").environ.items() if not _k.startswith("APP_") and not _k.startswith("PYTEST_")},
+        env=_pure_logic_subprocess_env(),
     )
     assert "OUTBOX_POLICY_OK" in proc.stdout, proc.stdout + proc.stderr
     assert proc.returncode == 0, proc.stdout + proc.stderr

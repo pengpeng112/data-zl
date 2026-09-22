@@ -74,6 +74,16 @@ def test_api_key_binding_and_me_permissions(client: TestClient):
     finally:
         db.close()
 
+    # 200 R04：绑定目标必须是已登记主体——先登记为人员
+    from app.models.identity import IdentityPerson
+    db2 = SessionLocal()
+    try:
+        if not db2.query(IdentityPerson).filter(IdentityPerson.person_code == "key-bound-user").first():
+            db2.add(IdentityPerson(person_code="key-bound-user", person_name_cn="绑定目标用户"))
+            db2.commit()
+    finally:
+        db2.close()
+
     client.put("/api/v1/permissions/users/key-bound-user/roles", json={
         "user_identifier": "key-bound-user",
         "role_codes": ["identity_admin"],

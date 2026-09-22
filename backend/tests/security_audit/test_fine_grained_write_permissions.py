@@ -202,15 +202,26 @@ def test_asset_editor_can_pass_recipe_module_gate():
     source = (BACKEND_DIR / "app" / "main.py").read_text(encoding="utf-8-sig")
     tree = ast.parse(source)
     role_required = None
+    fine_grained = None
     for node in tree.body:
         if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id == "ROLE_REQUIRED":
             role_required = ast.literal_eval(node.value)
-            break
+        if (isinstance(node, (ast.Assign, ast.AnnAssign))
+                and isinstance(node.targets[0] if isinstance(node, ast.Assign) else node.target, ast.Name)
+                and (node.targets[0] if isinstance(node, ast.Assign) else node.target).id.startswith("FINE_GRAINED")):
+            try:
+                fine_grained = ast.literal_eval(node.value)
+            except Exception:
+                fine_grained = None
     assert role_required is not None
     assert "asset_editor" in role_required["recipes"]
-    # 诊断手术字典页给 dict_admin 看，粗前缀必须与 /dictionaries 一样放行该角色。
-    assert "dict_admin" in role_required["dict-medical"]
-    assert "platform_admin" in role_required["dict-medical"]
+    # 200 R03：dict-medical 已整体移交端点级细粒度门禁——粗前缀条目必须
+    # 已移除（自定义角色不再被 dict_admin/platform_admin 前缀误拦），且
+    # 前缀必须列入细粒度豁免表。
+    assert "dict-medical" not in role_required, "dict-medical 粗门禁应已移交端点级细码"
+    assert fine_grained is not None and "/api/v1/dict-medical" in fine_grained, (
+        "dict-medical 前缀必须列入细粒度豁免表（每个路由已挂 dict.medical.* 端点权限）"
+    )
 
 
 def test_dict_admin_can_open_mapping_page():

@@ -64,10 +64,14 @@ for bad in [
 assert _whitelisted_serial_sequence() is None, "serial whitelist must default to empty (fail-closed)"
 
 # ---- 同目标共享连接：全部成功才执行到 writer；任一失败即抛错、绝不部分提交 ----
+# 200 D05：INSERT 现在先做字段级存在探针（SELECT 业务键+内容字段）再写入；
+# fake 连接需支持 _run_select_on_conn 形态（cursor/description/fetchall）。
 class FakeConn:
     def __init__(self):
         self.calls = []
         self.fail_on = None
+        self.description = [("code",)]
+        self._select_rows = []
     def cursor(self):
         return self
     def execute(self, sql, params=None):
@@ -75,8 +79,13 @@ class FakeConn:
             raise RuntimeError("boom")
         self.calls.append((sql, params))
         self.rowcount = 1
+        self._last_is_select = ("SELECT" in (sql or "").upper())
     def fetchone(self):
+        if self._last_is_select:
+            return self._select_rows[0] if self._select_rows else None
         return (1,)
+    def fetchall(self):
+        return list(self._select_rows)
     def __enter__(self):
         return self
     def __exit__(self, *a):
@@ -84,7 +93,6 @@ class FakeConn:
 
 conn = FakeConn()
 row_counts = {}
-_running_sentinel = {"called": 0}
 
 def make_action(table, sql, params):
     return {
@@ -99,17 +107,18 @@ def make_action(table, sql, params):
         "meta": {},
     }
 
-# 两个动作 -> 同一连接执行两次
+# 两个动作 -> 同一连接：每动作 = 1 次存在探针 + 1 次写入
 conn.fail_on = None
 acts = [
-    make_action("jhemr.diagnosis_dict", "INSERT INTO jhemr.diagnosis_dict (a) VALUES (1)", {"x": 1}),
-    make_action("jhemr.operation_dict", "INSERT INTO jhemr.operation_dict (b) VALUES (2)", {"y": 2}),
+    make_action("jhemr.diagnosis_dict", "INSERT INTO jhemr.diagnosis_dict (a) VALUES (1)", {"diagnosis_code": "D1", "hospital_no": "H"}),
+    make_action("jhemr.operation_dict", "INSERT INTO jhemr.operation_dict (b) VALUES (2)", {"operation_code": "O1", "hospital_no": "H"}),
 ]
 _run_target_transaction(conn, "postgresql", acts, row_counts=row_counts)
-assert len(conn.calls) == 2, "both actions must run on the SAME connection"
+assert len(conn.calls) == 4, "probe+write per action on the SAME connection"
+assert row_counts.get("a1") == 1
 
-# 第二动作失败 -> 抛错（调用方回滚整包，不部分提交）
-conn2 = FakeConn(); conn2.fail_on = 1
+# 第二动作探针失败 -> 抛错（调用方回滚整包，不部分提交）
+conn2 = FakeConn(); conn2.fail_on = 3
 try:
     _run_target_transaction(conn2, "postgresql", acts, row_counts={})
     raise AssertionError("second action failure must propagate")
@@ -120,13 +129,26 @@ print("EXECUTOR_FAILLCLOSED_OK")
 """
 
 
+import os
+
+def _pure_logic_subprocess_env() -> dict:
+    env = {
+        k: v for k, v in os.environ.items()
+        if not k.startswith("APP_") and not k.startswith("PYTEST_")
+    }
+    env["APP_ENV"] = "test"
+    env["APP_TEST_DB_URL"] = "sqlite:///pure_logic_test.db"
+    env["APP_DB_URL"] = env["APP_TEST_DB_URL"]
+    return env
+
+
 def test_executor_fail_closed():
     code = _SNIPPET.replace("{BACKEND_DIR}", str(BACKEND_DIR))
     proc = subprocess.run(
         [sys.executable, "-c", code],
         capture_output=True,
         text=True,
-        env={_k: _v for _k, _v in os.environ.items() if not _k.startswith("APP_") and not _k.startswith("PYTEST_")},
+        env=_pure_logic_subprocess_env(),
     )
     assert "EXECUTOR_FAILLCLOSED_OK" in proc.stdout, proc.stdout + proc.stderr
     assert proc.returncode == 0, proc.stdout + proc.stderr

@@ -29,6 +29,27 @@ def _limited_client() -> TestClient:
     return TestClient(app, headers={"Authorization": f"Bearer {LIMITED_TOKEN}"})
 
 
+# 200 R04/R06：目标必须是已登记主体（人员或本地账号身份）——
+# 测试用的目标用户先登记为人员，再走申请链路。
+_PR_TARGET_USERS = (
+    "pr-target-user", "pr-flow-user", "pr-scope-user", "pr-self-user",
+    "pr-reject-user", "pr-detail-user",
+    "pr-page-user-0", "pr-page-user-1", "pr-page-user-2",
+)
+
+
+def _register_pr_targets() -> None:
+    from app.models.identity import IdentityPerson
+    db = SessionLocal()
+    try:
+        for code in _PR_TARGET_USERS:
+            if not db.query(IdentityPerson).filter(IdentityPerson.person_code == code).first():
+                db.add(IdentityPerson(person_code=code, person_name_cn=f"测试目标-{code}"))
+        db.commit()
+    finally:
+        db.close()
+
+
 def _audit_actions(request_id: int) -> set[str]:
     db = SessionLocal()
     try:
@@ -44,6 +65,7 @@ def _audit_actions(request_id: int) -> set[str]:
 
 def test_create_request_contract_and_validation(client: TestClient):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
 
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "role",
@@ -98,6 +120,7 @@ def test_create_request_contract_and_validation(client: TestClient):
 
 def test_mine_and_pending_pagination(client: TestClient):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     for i in range(3):
         res = client.post("/api/v1/permission-requests", json={
             "request_kind": "role",
@@ -126,6 +149,7 @@ def test_mine_and_pending_pagination(client: TestClient):
 
 def test_approve_execute_revoke_flow_and_audit(client: TestClient, second_user_token: str):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "role",
         "target_user_identifier": "pr-flow-user",
@@ -182,6 +206,7 @@ def test_approve_execute_revoke_flow_and_audit(client: TestClient, second_user_t
 
 def test_data_scope_execute_creates_scope(client: TestClient, second_user_token: str):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "data_scope",
         "target_user_identifier": "pr-scope-user",
@@ -209,6 +234,7 @@ def test_data_scope_execute_creates_scope(client: TestClient, second_user_token:
 
 def test_self_approval_and_duplicate_grant_blocked(client: TestClient, second_user_token: str):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "role",
         "target_user_identifier": "pr-self-user",
@@ -244,6 +270,7 @@ def test_self_approval_and_duplicate_grant_blocked(client: TestClient, second_us
 
 def test_reject_terminal_state(client: TestClient, second_user_token: str):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "role",
         "target_user_identifier": "pr-reject-user",
@@ -264,6 +291,7 @@ def test_reject_terminal_state(client: TestClient, second_user_token: str):
 
 def test_detail_access_and_operator_from_login_state(client: TestClient, second_user_token: str):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     created = client.post("/api/v1/permission-requests", json={
         "request_kind": "role",
         "target_user_identifier": "pr-detail-user",
@@ -286,6 +314,7 @@ def test_detail_access_and_operator_from_login_state(client: TestClient, second_
 
 def test_unauthorized_and_overprivileged_access(client: TestClient):
     client.post("/api/v1/permissions/seed?operator=tester")
+    _register_pr_targets()
     anonymous = TestClient(app)
     assert anonymous.get("/api/v1/permission-requests/mine").status_code == 401
     assert anonymous.post("/api/v1/permission-requests", json={}).status_code == 401
