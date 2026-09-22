@@ -145,19 +145,25 @@ def test_t03_allow_and_access_unified_in_enforcement_and_display(db):
 
 
 def test_t03_repair_legacy_allow_idempotent(db):
+    """冲突合并（生产实测形态）：同对已存在 access 的 allow 是纯重复→删除；
+    无冲突的 allow→改名 access；重复执行零变更。"""
     seed_role(db, "qa_r")
-    db.add(AssetRolePermission(role_code="qa_r", resource="a.view", action="allow"))
-    db.add(AssetRolePermission(role_code="qa_r", resource="b.view", action="access"))
+    db.add(AssetRolePermission(role_code="qa_r", resource="a.view", action="allow"))          # 改名
+    db.add(AssetRolePermission(role_code="qa_r", resource="b.view", action="access"))         # 既有
+    db.add(AssetRolePermission(role_code="qa_r", resource="b.view", action="allow"))          # 纯重复→删除
     db.commit()
     dry = repair_legacy_allow_rows(db, apply=False)
-    assert dry["found"] == 1 and dry["changed"] == 0
+    assert dry["found"] == 2 and dry["changed"] == 0
+    assert dry["rename"] == 1 and dry["drop_duplicates"] == 1
     first = repair_legacy_allow_rows(db, apply=True)
-    assert first["changed"] == 1
+    assert first["changed"] == 2 and first["rename"] == 1 and first["drop_duplicates"] == 1
     second = repair_legacy_allow_rows(db, apply=True)
     assert second["found"] == 0 and second["changed"] == 0, "重复执行零变更"
     rows = db.scalars(select(AssetRolePermission).where(AssetRolePermission.role_code == "qa_r")).all()
     assert all(r.action == "access" for r in rows)
-    assert len(rows) == 2, "不增删行、不覆盖其他定制"
+    assert len(rows) == 2, "每 (role,resource) 恰一行 access，语义不变"
+    codes = permission_codes_for_roles(db, ["qa_r"])
+    assert codes == ["a.view", "b.view"]
 
 
 # ---------------------------------------------------------------------------

@@ -146,18 +146,46 @@ def repair_legacy_allow_rows(db: Session, *, apply: bool = False) -> dict:
     生产平台正式 apply 属独立授权事项，本函数不自动调用。
     """
     rows = legacy_allow_permission_rows(db)
-    diff = [
-        {
-            "role_code": row.role_code,
-            "resource": row.resource,
-            "action_before": row.action,
-            "action_after": "access",
-        }
-        for row in rows
-    ]
+    access_pairs = {
+        (r.role_code, r.resource)
+        for r in db.scalars(
+            select(AssetRolePermission).where(AssetRolePermission.action == "access")
+        ).all()
+    }
+    # 冲突合并（生产实测 104 条中 96 条与 access 同对并存）：
+    # 同 (role, resource) 已有 access 行的 allow 是纯重复——改名会撞
+    # (role_code, resource, action) 唯一键，只能删除重复行；其余改名。
+    rename = [row for row in rows if (row.role_code, row.resource) not in access_pairs]
+    drop = [row for row in rows if (row.role_code, row.resource) in access_pairs]
+    diff = {
+        "rename_to_access": [
+            {"id": row.id, "role_code": row.role_code, "resource": row.resource}
+            for row in rename
+        ],
+        "drop_duplicate": [
+            {"id": row.id, "role_code": row.role_code, "resource": row.resource}
+            for row in drop
+        ],
+    }
     if not apply:
-        return {"apply": False, "found": len(rows), "changed": 0, "diff": diff}
-    for row in rows:
+        return {
+            "apply": False,
+            "found": len(rows),
+            "rename": len(rename),
+            "drop_duplicates": len(drop),
+            "changed": 0,
+            "diff": diff,
+        }
+    for row in drop:
+        db.delete(row)
+    for row in rename:
         row.action = "access"
     db.commit()
-    return {"apply": True, "found": len(rows), "changed": len(rows), "diff": diff}
+    return {
+        "apply": True,
+        "found": len(rows),
+        "rename": len(rename),
+        "drop_duplicates": len(drop),
+        "changed": len(rename) + len(drop),
+        "diff": diff,
+    }
