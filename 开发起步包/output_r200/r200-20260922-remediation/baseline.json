@@ -1,0 +1,57 @@
+{
+  "run_id": "r200-20260922-remediation",
+  "date": "2026-09-22",
+  "git_head_at_start": "f1b31bce52f14238be8f1d9a564f0c16bf26611f",
+  "branch": "master",
+  "baseline_tests_before": {
+    "role_effective+security_audit+dict_sync_112": "14 passed / 7 failed（7 失败均为缺 APP_TEST_DB_URL 的配置性失败，未进入功能断言）",
+    "r200_simulate": "5 组通过 + 1 组停用缺陷复现（按计划转为修复后回归断言）"
+  },
+  "frozen_other_domain": {
+    "plan139_ssl_transport_kwargs": [
+      "backend/app/api/v1/metadata_changes.py",
+      "backend/app/api/v1/systems.py",
+      "backend/app/services/db_connectors.py",
+      "backend/app/services/identity_source_collector.py",
+      "backend/app/services/medical_code_source_collector.py",
+      "backend/app/services/quality_sql_runner.py",
+      "backend/app/services/medical_code_push.py(仅 transport_kwargs 2 行)"
+    ],
+    "note": "并行任务改动全部保留未动；medical_code_push.py 上该任务仅 import+kwargs 两行，200 改动不触碰该 hunk"
+  },
+  "test_env": "pure_logic_ready（无 APP_TEST_DB_URL；plan200 用内存 sqlite + JSONB/BigInteger sqlite 方言钩子）",
+  "r200_scope_files": {
+    "backend/app/core/security.py": "8343b4fffcec1258",
+    "backend/app/services/effective_permissions.py": "43fb9e19c6c4bc7c",
+    "backend/app/services/subject_policy.py": "c7c47690b8a72902",
+    "backend/app/api/v1/permissions.py": "99f193311e8b3c75",
+    "backend/app/api/v1/auth.py": "50d09e8730b75379",
+    "backend/app/services/auth_service.py": "ed6bb43bb96ab5ab",
+    "backend/app/main.py": "f27b565415018eaa",
+    "backend/app/api/v1/permission_requests.py": "ce0970c525f000d0",
+    "backend/scripts/seed_platform_rbac.py": "176a9bdc84c732ea",
+    "backend/app/services/dict_medical_push.py": "038f1adef5dc193f",
+    "backend/app/api/v1/dict_medical_push_api.py": "6a23af7372af7fab",
+    "backend/app/api/v1/dict_medical_api.py": "abee387babb3450c",
+    "backend/app/api/v1/dict_medical_import_api.py": "c243222fb48c3e71",
+    "backend/app/services/dict_sync_executor.py": "abca01e5fb0b14f9",
+    "backend/app/services/dict_sync_worker.py": "86819436b308ff23",
+    "backend/app/models/auth.py": "19e1b6f454191fa4",
+    "backend/app/models/dict_medical_push.py": "06c7af4a7d169cd9",
+    "backend/alembic/versions/b3c4d5e6f7a8_r200_account_type_and_push_execution_status.py": "5ce22c10e006ef72",
+    "backend/scripts/import_diagnosis_mapping_and_dispatch.py": "462acff87d3934e1",
+    "backend/tests/plan200/": "DIR",
+    "backend/tests/conftest.py": "d32a3122d0b25c11",
+    "backend/tests/security_audit/conftest.py": "850e03b211c66846",
+    "backend/tests/dict_sync_112/": "DIR",
+    "backend/tests/role_effective/test_role_effective_subprocess.py": "d8fb18d50ed41248",
+    "backend/tests/security_audit/test_fine_grained_write_permissions.py": "5e9117c08b0259c3",
+    "review/adhoc/r200_simulate.py": "7847e07d704ca0f7",
+    "frontend/src/api/dict.ts": "6c6740137407c1ba",
+    "frontend/src/api/permissions.ts": "47975ac0568ffaee",
+    "frontend/src/utils/errorMessage.ts": "b9fc7317dbcb46c9",
+    "frontend/src/views/dict/medical/components/PushWizard.vue": "cb8056886d075c45",
+    "frontend/src/views/identity/authorizations/index.vue": "7f3c48aef4345391",
+    "frontend/src/views/identity/roles/index.vue": "15a05bb87c0e9d9c"
+  }
+}

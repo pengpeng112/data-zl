@@ -1,0 +1,103 @@
+[
+  {
+    "id": "R01",
+    "title": "权限页面显示的授权不一定是当前有效授权",
+    "fix": "新建 services/effective_permissions.py 作为唯一有效授权服务（status/valid_from/expires_at 过滤）；/me、get_user_permissions、ApiKey 分支、auth_service.lookup_roles、中间件全部委托同一口径；有效为空不回退历史；history 单列展示状态/起止/来源/effective_at",
+    "files": ["backend/app/services/effective_permissions.py", "backend/app/core/security.py", "backend/app/api/v1/permissions.py", "backend/app/services/auth_service.py"],
+    "tests": ["test_t02_effective_roles_exclude_expired_pending_revoked", "test_t02_me_permissions_no_fallback_to_history", "test_t06_api_key_branch_effective_only", "test_t29_user_permissions_effective_vs_history_split"]
+  },
+  {
+    "id": "R02",
+    "title": "历史 allow 界面已勾选、后端拒绝",
+    "fix": "normalize_permission_code 统一展示与执行编码（allow=access=裸资源）；seed 脚本 existing 只统计裸资源语义行；新增 POST /permissions/legacy-allow/repair（默认 dry-run 差异清单，apply 幂等 allow→access，重复执行零变更，不增删行、不动定制矩阵）",
+    "files": ["backend/app/services/effective_permissions.py", "backend/app/core/security.py", "backend/scripts/seed_platform_rbac.py", "backend/app/api/v1/permissions.py"],
+    "tests": ["test_t03_allow_and_access_unified_in_enforcement_and_display", "test_t03_repair_legacy_allow_idempotent"],
+    "pending_approval": "生产平台正式执行 repair(apply=true) 属独立批准事项"
+  },
+  {
+    "id": "R03",
+    "title": "粗角色前缀与细粒度权限双重门禁限制自定义角色",
+    "fix": "dict-medical 全部 33 条路由逐条挂 dict.medical.* 端点权限（读=view/维护与导入=edit/计划=plan.create/审批=approve/执行=execute/重试=retry/对账=reconcile/预览与配置=view）；main.py 移除 dict-medical 粗前缀条目并入 FINE_GRAINED 豁免表；dictionaries 模块维持原粗门禁不借机重构",
+    "files": ["backend/app/api/v1/dict_medical_api.py", "backend/app/api/v1/dict_medical_import_api.py", "backend/app/api/v1/dict_medical_push_api.py", "backend/app/main.py"],
+    "tests": ["test_t04_custom_role_fine_grained_codes", "test_asset_editor_can_pass_recipe_module_gate（更新为细粒度豁免断言）"]
+  },
+  {
+    "id": "R04",
+    "title": "身份管理员能够授予平台管理员，关键端点缺少独立保护",
+    "fix": "新建 services/subject_policy.py（can_manage_subject/can_grant_role/ensure_not_losing_last_platform_admin，目标保护采用未撤销授权保守口径）；replace_user_roles 挂 identity.role.grant+对象级策略+自改限制；create_user 逐角色存在性+授予范围校验；patch_user 停用前最后管理员保护；bind_api_key 挂权限+已登记主体校验+受保护主体限制；permission_requests.approve 高危角色审批人复核、execute 条件状态转换+执行者授予范围复核",
+    "files": ["backend/app/services/subject_policy.py", "backend/app/api/v1/permissions.py", "backend/app/api/v1/auth.py", "backend/app/api/v1/permission_requests.py"],
+    "tests": ["test_t05_cannot_grant_platform_admin_to_self", "test_t05_identity_admin_cannot_manage_platform_admin_subject", "test_t31_identity_admin_cannot_create_platform_admin_account", "test_t31_identity_admin_cannot_execute_platform_admin_request", "test_t31_bind_api_key_to_platform_admin_identity_rejected", "test_t32_identity_admin_without_grant_code_denied_at_endpoint", "test_t36_disable_last_platform_admin_rejected", "test_t36_replace_removing_last_admin_rejected"],
+    "bonus_bug_fixed": "测试抓出 losing_admin 在撤销变更之后用已变更对象计算导致最后管理员保护被绕过的真实缺陷（快照前置修复）"
+  },
+  {
+    "id": "R05",
+    "title": "账号身份回查与建号/换绑规则不一致",
+    "fix": "中间件 JWT 分支以 sub=AuthUser.id 定位账号（回退 user_identifier），修复无绑定账号登录后受保护请求找不到账号；换绑一致性检查使换绑后旧 access token 立即失效；create_user 增加 account_type（human 强制人员绑定，service/emergency 显式豁免，既有账号默认 human 不锁死）；patch_user 换绑复用建号口径（人员存在/唯一绑定/管理员保护）+撤销全部旧会话+角色留原身份不搬迁；AuthUser 增加 account_type 列（迁移 b3c4d5e6f7a8）",
+    "files": ["backend/app/main.py", "backend/app/api/v1/auth.py", "backend/app/models/auth.py", "backend/app/services/auth_service.py", "backend/alembic/versions/b3c4d5e6f7a8_r200_account_type_and_push_execution_status.py"],
+    "tests": ["test_t33_unbound_account_sub_lookup_succeeds", "test_t33_disabled_account_401", "test_t33_stale_token_after_rebind_401", "test_t34_rebind_missing_person_rejected", "test_t34_rebind_person_already_bound_rejected", "test_t34_rebind_revokes_sessions_and_keeps_roles_with_old_identity", "test_t34_rebind_by_identity_admin_on_admin_account_rejected"]
+  },
+  {
+    "id": "R06",
+    "title": "角色替换会丢弃有效期和来源，申请执行需要补最终授权校验",
+    "fix": "replace_user_roles 改增量差异（保留仍有效授权原始起止/来源/申请号，被移除授权改 revoked 保留历史，返回 added/revoked/kept）；create_request schema 校验 scope_type 枚举+filter_json 白名单（字段名/形态/大小/禁嵌套操作符）+目标已登记；approve 高危角色（platform_admin）审批人自身须 platform_admin；execute 条件 UPDATE approved→executed 防并发双执行+执行者授予范围复核+payload 复验+目标重核；已执行请求重复执行 409",
+    "files": ["backend/app/api/v1/permissions.py", "backend/app/api/v1/permission_requests.py"],
+    "tests": ["test_t35_replace_user_roles_incremental", "test_t35_request_execute_validates_scope_enum_and_payload", "test_t05_permission_request_self_approval_rejected"]
+  },
+  {
+    "id": "D01",
+    "title": "普通计划没有明确范围，空选择可扩大为整类字典",
+    "fix": "create_push_plan 对 insert/stop/sync_infectious 一律要求明确 1—500 编码（stop 单编码）；空白编码拒绝；选项不存在或状态不符整包拒绝（invalid_item_state 列出缺失项）；import_run_id 未实现批次解析前显式拒绝（import_run_unsupported）；API 返回 {reason_code,message} 结构化错误；前端 PushWizard 普通新增增加可搜索勾选明确编码 UI（无整库全选）",
+    "files": ["backend/app/services/dict_medical_push.py", "backend/app/api/v1/dict_medical_push_api.py", "frontend/src/views/dict/medical/components/PushWizard.vue"],
+    "tests": ["test_t07_empty_or_blank_selection_rejected", "test_t07_no_outbox_created_on_rejection", "test_t07_501_codes_rejected", "test_t08_dedup_predictable_and_missing_rejects_whole_pack", "test_t08_stop_requires_single_code_and_inactive_status", "test_t08_import_run_id_explicitly_refused"]
+  },
+  {
+    "id": "D02",
+    "title": "审批快照未覆盖全部最终写入内容",
+    "fix": "共享解析器 resolve_item_snapshots（精确 code_set、映射歧义直接阻断、创建/核验/执行同口径，消除创建取最后/核验取第一的不一致）；v3 完整快照覆盖执行器全部写入字段（国标/医保码与名称、手术等级/类别/四级/微创/限制标记、MTB/低风险/传染病字段、灰码派生、hospital_no、snapshot_version）；哈希覆盖全部写入参数；_rebuild_actions 按已审快照重建白名单 SQL（不再读当前平台行，worker 不能执行新值）；老版 insert/stop 计划执行要求重新生成（legacy plan snapshot 409，禁止静默补哈希继续写）；verify 增加动作行 target_system/action_type 与 payload 绑定校验",
+    "files": ["backend/app/services/dict_medical_push.py", "backend/app/services/dict_sync_executor.py"],
+    "tests": ["test_t09_operation_extra_change_invalidates_plan", "test_t09_worker_rebuild_uses_snapshot_not_current", "test_t10_mapping_ambiguous_blocked", "test_t10_cross_code_set_isolation", "test_t10_name_change_breaks_hash", "test_t11_payload_tamper_detected", "test_t11_target_tamper_detected", "test_t11_action_type_tamper_detected", "test_rebuild_refuses_legacy_insert_snapshot"]
+  },
+  {
+    "id": "D03",
+    "title": "自动审批使用固定身份，不能证明独立审核",
+    "fix": "upsert_mapping_row 自动路径只生成 draft（auto_sync=draft_created+提示需独立审批后才会入队）；移除 dict-auto-approver 假审批与自动入队；一次性导入脚本改 --approver 显式参数（缺省留 draft）；审批仍要求非创建人（approve_plan 自审拦截保留）；普通 insert/stop 保持无执行器登记状态：下发开关默认关+确认令牌+worker 白名单校验（与专项传染病一致的生产登记启用留待批）",
+    "files": ["backend/app/api/v1/dict_medical_api.py", "backend/scripts/import_diagnosis_mapping_and_dispatch.py"],
+    "tests": ["test_t12_auto_path_creates_draft_only", "test_t13_self_approval_rejected"]
+  },
+  {
+    "id": "D04",
+    "title": "停用路径两处冲突",
+    "fix": "_run_target_transaction 按动作先分支：stop 不再进入任何 INSERT 存在检查（修复错读参数名后可能跳过 UPDATE 的缺陷，200 原复现探针已转为修复后回归断言）；UPDATE 0 行回读分辨已停用一致 no_op/缺失阻断/多行冲突；stop 计划重建走快照（不再被 _load_platform_rows 的 active 过滤清空）；JHEMR 共享国标术式复核：仍有其他在用院内术式映射同一国标码时不停用标准目录并注明原因（T19）",
+    "files": ["backend/app/services/dict_sync_executor.py"],
+    "tests": ["test_t18_stop_executes_update_directly", "test_t18_stop_zero_rows_already_stopped_no_op", "test_t18_stop_zero_rows_missing_blocked", "test_t18_stop_multi_row_conflict", "test_t18_stop_plan_from_inactive_item_rebuilds", "test_t19_shared_national_code_standard_not_stopped", "test_t19_no_sharing_stops_standard", "stop_existing_row_regression (review/adhoc/r200_simulate.py)"]
+  },
+  {
+    "id": "D05",
+    "title": "已存在同码不等于内容一致，计数会误导",
+    "fix": "INSERT 存在命中改为字段级读回比对（_PROBE_SPECS 按表定义业务键+内容字段，NULL/空串归一比较）：一致 no_op、不一致或已停用同码 conflict 阻断整包（绝不自动改 UPDATE）；outcomes 分列 inserted/stopped/updated/no_op；run.succeeded_count 与 skipped_count 分开，不再把零写入伪装成新增成功",
+    "files": ["backend/app/services/dict_sync_executor.py"],
+    "tests": ["test_t17_same_code_same_value_no_op", "test_t17_same_code_different_value_conflict_blocks", "test_t17_stopped_same_code_conflict"]
+  },
+  {
+    "id": "D06",
+    "title": "计划详情与实际运行状态脱节",
+    "fix": "DictMedicalPushPlan 增加 execution_status（迁移 b3c4d5e6f7a8，授权/执行双轴，授权轴不动 worker 前提）；dispatch 后回写 DictMedicalPushAction.status（succeeded/no_op/failed）+run_id+executed_at；get_plan_summary 返回全部动作业务预览（不再只传染病）、latest_runs、outbox 关联、snapshot_version；前端结果卡分目标显示已写/无需变更/失败/排队中/死信/最后检查时间",
+    "files": ["backend/app/services/dict_medical_push.py", "backend/app/services/dict_sync_executor.py", "backend/app/models/dict_medical_push.py", "frontend/src/views/dict/medical/components/PushWizard.vue"],
+    "tests": ["test_summary_has_dual_axis_and_full_actions", "test_t21_partial_success_and_retry_skips_succeeded", "test_t26_disabled_reason_not_success"]
+  },
+  {
+    "id": "D07",
+    "title": "重试、并发和跨库提交窗口需要验收，不能假设 exactly-once",
+    "fix": "settle_event 增加租约所有权检查（旧 worker 对已被接管事件的 settle 返回 stale_settle_ignored 不覆盖队列状态）；dispatch_dict_event 执行前复核事件处于 leased（未被 claim 的事件拒绝执行）；源端 commit 成功而平台结果落库失败→run 标 unknown_commit+reconcile 原因（rollback 后重设重加再提交尽力留痕，测试抓出并修复了恢复段丢 run 的缺陷），事件必须先对账禁止盲重放；fake 连接级并发/部分成功/回滚场景全部实跑",
+    "files": ["backend/app/services/dict_sync_worker.py", "backend/app/services/dict_sync_executor.py"],
+    "tests": ["test_t22_platform_commit_failure_marks_unknown", "test_t23_stale_settle_ignored", "test_t23_worker_rejects_event_without_lease", "test_t20_dispatch_rollback_once_commit_zero"],
+    "note": "真 PostgreSQL FOR UPDATE SKIP LOCKED 多进程并发与时序验证属 B6 隔离库验收范围"
+  },
+  {
+    "id": "D08",
+    "title": "操作界面缺少一眼可理解的范围、原因和真实结果",
+    "fix": "_dispatch_approved_plan 清除 return 后不可达旧代码（防后续 AI 误接旧路径）；创建计划错误改 {reason_code,message} 结构化信封（empty_selection/blank_item_code/too_many_codes/invalid_item_state/mapping_ambiguous/import_run_unsupported/stop_single_code_only 稳定码+中文说明）；前端 extractErrorDetail 支持结构化 detail；/execute 命名『执行预览（不写入）』，未启用显示『尚未执行：下发开关关闭』而非泛化失败；审批按钮文案『审批并排队』；授权人显示可信登录人去掉可编辑假授权人",
+    "files": ["backend/app/api/v1/dict_medical_push_api.py", "frontend/src/utils/errorMessage.ts", "frontend/src/views/dict/medical/components/PushWizard.vue", "frontend/src/views/identity/authorizations/index.vue"],
+    "tests": ["前端 typecheck/build 三绿", "test_t26_disabled_reason_not_success"]
+  }
+]
