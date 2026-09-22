@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   approveMedicalPushPlan,
@@ -12,12 +12,18 @@ import { listSystems } from "@/api/asset";
 import { useUserStoreHook } from "@/store/modules/user";
 import { extractErrorDetail } from "@/utils/errorMessage";
 import { parseInfectiousSyncItemCodes } from "@/utils/medicalPushPlan";
+import { getMedicalItems } from "@/api/dict";
 
 const step = ref(1);
 const loading = ref(false);
 const targetSystems = ref<string[]>([]);
 const actionType = ref<"insert" | "sync_infectious">("insert");
 const infectiousItemCodesText = ref("");
+// 200 D01：普通新增同样必须明确选择编码（可搜索勾选），不提供"全选整库"
+const insertSelectedItemCodes = ref<string[]>([]);
+const insertCodeOptions = ref<Array<{ code: string; name: string }>>([]);
+const insertOptionsLoading = ref(false);
+const insertSearchKeyword = ref("");
 const existingPlanId = ref("");
 const currentUsername = useUserStoreHook().username;
 // 146 E8（R5）：下发类别可选（此前硬编码 diagnosis，手术计划无法生成）
@@ -55,11 +61,58 @@ async function loadSystemOptions() {
   }
 }
 
+const LOCAL_CODE_SETS: Record<"diagnosis" | "operation", string> = {
+  diagnosis: "diagnosis_local_clinical",
+  operation: "operation_local_clinical"
+};
+
+async function loadInsertCodeOptions() {
+  insertOptionsLoading.value = true;
+  try {
+    const res = await getMedicalItems(LOCAL_CODE_SETS[categoryCode.value], {
+      status: "active",
+      page_size: 500
+    });
+    const rows: Array<Record<string, unknown>> = (res.data as any)?.items || (res.data as any) || [];
+    insertCodeOptions.value = rows
+      .filter((row) => String(row.status ?? "active") === "active")
+      .map((row) => ({
+        code: String(row.item_code ?? ""),
+        name: String(row.item_name_cn ?? "")
+      }))
+      .filter((item) => item.code);
+    // 类别切换后，已选项若不在新类别中则剔除
+    insertSelectedItemCodes.value = insertSelectedItemCodes.value.filter(code =>
+      insertCodeOptions.value.some(option => option.code === code));
+  } catch {
+    insertCodeOptions.value = [];
+  } finally {
+    insertOptionsLoading.value = false;
+  }
+}
+
+function onCategoryChange() {
+  insertSelectedItemCodes.value = [];
+  void loadInsertCodeOptions();
+}
+
+const filteredInsertOptions = computed(() => {
+  const keyword = insertSearchKeyword.value.trim().toLowerCase();
+  if (!keyword) return insertCodeOptions.value.slice(0, 200);
+  return insertCodeOptions.value
+    .filter(option => option.code.toLowerCase().includes(keyword) || option.name.toLowerCase().includes(keyword))
+    .slice(0, 200);
+});
+
 async function createPlan() {
   const isInfectiousSync = actionType.value === "sync_infectious";
-  const uniqueItemCodes = parseInfectiousSyncItemCodes(infectiousItemCodesText.value);
-  if (isInfectiousSync && (uniqueItemCodes.length < 1 || uniqueItemCodes.length > 500)) {
-    ElMessage.warning("专项同步必须填写 1–500 个明确的院内诊断编码");
+  const uniqueItemCodes = isInfectiousSync
+    ? parseInfectiousSyncItemCodes(infectiousItemCodesText.value)
+    : Array.from(new Set(insertSelectedItemCodes.value.map(code => code.trim()).filter(Boolean)));
+  if (uniqueItemCodes.length < 1 || uniqueItemCodes.length > 500) {
+    ElMessage.warning(isInfectiousSync
+      ? "专项同步必须填写 1–500 个明确的院内诊断编码"
+      : "必须先勾选 1–500 个明确的院内编码：不支持空选或隐式整库下发");
     return;
   }
   if (!isInfectiousSync && targetSystems.value.length === 0) {
@@ -72,7 +125,7 @@ async function createPlan() {
       category_code: isInfectiousSync ? "diagnosis" : categoryCode.value,
       target_systems: isInfectiousSync ? ["HIS_SOURCE"] : targetSystems.value,
       action_type: actionType.value,
-      ...(isInfectiousSync ? { item_codes: uniqueItemCodes } : {})
+      item_codes: uniqueItemCodes
     });
     plan.value = res.data;
     step.value = 2;
@@ -163,6 +216,7 @@ async function executePlan() {
 
 onMounted(() => {
   void loadSystemOptions();
+  void loadInsertCodeOptions();
 });
 </script>
 
@@ -203,7 +257,7 @@ onMounted(() => {
       />
       <div v-if="actionType === 'insert'" class="step-form-row">
         <span class="step-label">下发类别</span>
-        <el-radio-group v-model="categoryCode">
+        <el-radio-group v-model="categoryCode" @change="onCategoryChange">
           <el-radio-button value="diagnosis">诊断</el-radio-button>
           <el-radio-button value="operation">手术</el-radio-button>
         </el-radio-group>
@@ -219,6 +273,42 @@ onMounted(() => {
         description="未发现可下发的目标系统：请先在「业务系统与数据资源」完成 HIS/海量连接登记"
         :image-size="72"
       />
+      <!-- 200 D01/§4.3：普通新增必须明确勾选院内编码（可搜索），
+           不提供整库"全选"，空选择无法生成计划 -->
+      <div v-if="actionType === 'insert'" class="step-form-row" style="align-items: flex-start">
+        <span class="step-label">选择院内编码</span>
+        <div style="flex: 1">
+          <el-input
+            v-model="insertSearchKeyword"
+            placeholder="按编码或名称过滤（每次最多展示 200 项）"
+            size="small"
+            clearable
+            class="mb-2"
+            style="max-width: 360px"
+          />
+          <el-select
+            v-model="insertSelectedItemCodes"
+            multiple
+            filterable
+            clearable
+            :loading="insertOptionsLoading"
+            placeholder="勾选要下发的院内编码（1–500 个）"
+            style="width: 100%"
+            :max-collapse-tags="8"
+          >
+            <el-option
+              v-for="opt in filteredInsertOptions"
+              :key="opt.code"
+              :value="opt.code"
+              :label="`${opt.code}｜${opt.name}`"
+            />
+          </el-select>
+          <div class="selection-summary">
+            已选 {{ insertSelectedItemCodes.length }} 项
+            <span v-if="insertSelectedItemCodes.length > 0">｜模式：仅预览+受控排队（实际写入由 worker 按开关执行）</span>
+          </div>
+        </div>
+      </div>
       <el-button v-perms="'dict.medical.plan.create'" type="primary" :loading="loading" @click="createPlan">生成推送计划</el-button>
       <el-divider />
       <div class="step-form-row">
@@ -247,7 +337,44 @@ onMounted(() => {
         <el-descriptions-item label="状态">
           <el-tag :type="plan.status === 'approved' ? 'success' : 'info'" size="small">{{ plan.status }}</el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="执行状态">
+          <el-tag
+            size="small"
+            :type="(plan.execution_status === 'succeeded') ? 'success'
+              : (['failed', 'blocked', 'unknown_commit'].includes(plan.execution_status || '')) ? 'danger'
+              : 'info'"
+          >{{ plan.execution_status || "未执行" }}</el-tag>
+        </el-descriptions-item>
       </el-descriptions>
+      <!-- 200 D06/§4.3：分目标结果卡（run + outbox 关联；未启用=尚未执行，不是失败） -->
+      <div v-if="plan.target_systems?.length" class="target-cards mb-4">
+        <div v-for="target in plan.target_systems" :key="target" class="target-card">
+          <div class="target-card-title">{{ SYSTEM_LABELS[target] || target }}</div>
+          <template v-if="plan.latest_runs?.[target]">
+            <div>run #{{ plan.latest_runs[target].run_id }}｜{{ plan.latest_runs[target].status }}</div>
+            <div class="target-card-counts">
+              <span>已写 {{ plan.latest_runs[target].succeeded_count ?? 0 }}</span>
+              <span>无需变更 {{ plan.latest_runs[target].skipped_count ?? 0 }}</span>
+              <span>失败 {{ plan.latest_runs[target].failed_count ?? 0 }}</span>
+            </div>
+            <div v-if="plan.latest_runs[target].error_masked" class="target-card-error">
+              {{ plan.latest_runs[target].error_masked }}
+            </div>
+            <div v-if="plan.latest_runs[target].finished_at" class="target-card-time">
+              最后检查 {{ plan.latest_runs[target].finished_at }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="target-card-pending">
+              {{ plan.outbox?.[target]?.status === 'dead_letter'
+                ? "队列死信：请查看审计并处理后重试"
+                : plan.outbox?.[target]?.status
+                  ? `排队中（${plan.outbox[target].status}）：尚未执行，实际写入由受控 worker 按开关执行`
+                  : "尚未执行：下发开关关闭或未入队" }}
+            </div>
+          </template>
+        </div>
+      </div>
       <el-alert
         v-if="actionType === 'sync_infectious'"
         class="mb-4"
@@ -307,4 +434,20 @@ onMounted(() => {
 .step-form-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
 
 .step-label { font-size: 13px; color: var(--el-text-color-regular); }
+
+.selection-summary { margin-top: 6px; font-size: 12px; color: var(--el-text-color-secondary); }
+
+.target-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.target-card { flex: 1 1 220px; padding: 10px 12px; border: 1px solid var(--el-border-color-lighter); border-radius: 6px; font-size: 13px; }
+
+.target-card-title { font-weight: 600; margin-bottom: 6px; }
+
+.target-card-counts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; color: var(--el-text-color-regular); }
+
+.target-card-pending { color: var(--el-text-color-secondary); }
+
+.target-card-error { margin-top: 4px; color: var(--el-color-danger); word-break: break-all; }
+
+.target-card-time { margin-top: 4px; font-size: 12px; color: var(--el-text-color-secondary); }
 </style>

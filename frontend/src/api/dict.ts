@@ -57,20 +57,38 @@ export interface MedicalPushPlanSummary {
   id: number;
   plan_code: string;
   status: string;
+  /** 200 D06：执行状态轴（queued/running/succeeded/partial/failed/blocked/unknown_commit） */
+  execution_status?: string | null;
   category_code: string;
   target_systems: string[];
   item_count: number;
   content_hash?: string;
+  snapshot_version?: number | null;
   is_expired: boolean;
   created_by: string;
   approved_by?: string | null;
   actions_by_system?: Record<string, Record<string, number>>;
+  latest_runs?: Record<string, {
+    run_id: number;
+    status: string;
+    total_actions?: number;
+    succeeded_count?: number;
+    failed_count?: number;
+    skipped_count?: number;
+    error_masked?: string | null;
+    finished_at?: string | null;
+  }>;
+  outbox?: Record<string, { status: string; attempt?: number; last_error_masked?: string | null }>;
   actions?: Array<{
     item_code: string;
     item_name_cn: string;
     action_type: string;
     target_system: string;
+    status?: string;
+    run_id?: number | null;
     infectious_disease_name?: string | null;
+    national_clinical_code?: string | null;
+    insurance_code?: string | null;
   }>;
 }
 

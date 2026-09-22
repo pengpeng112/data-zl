@@ -95,6 +95,22 @@ export function getPermissionRoles() {
   return http.request<ApiResponse<PermissionRole[]>>("get", "/api/v1/permissions/roles");
 }
 
+/** 200 §4.1：角色摘要（有效人数/权限数量/高风险操作/最近变更）。 */
+export interface PermissionRoleSummary {
+  role_code: string;
+  role_name_cn: string;
+  role_type?: string | null;
+  description?: string | null;
+  effective_users: number;
+  permission_count: number;
+  high_risk?: string[];
+  recent_change?: { action: string; operator?: string | null; at?: string | null } | null;
+}
+
+export function getPermissionRolesSummary() {
+  return http.request<ApiResponse<PermissionRoleSummary[]>>("get", "/api/v1/permissions/roles/summary");
+}
+
 export function upsertPermissionRole(data: Partial<PermissionRole> & { operator?: string }) {
   return http.request<ApiResponse<PermissionRole>>("put", "/api/v1/permissions/roles", { data });
 }

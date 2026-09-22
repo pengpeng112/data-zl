@@ -24,6 +24,13 @@
             <span class="role-main">
               <strong>{{ role.role_name_cn }}</strong>
               <small>{{ role.role_code }}</small>
+              <small v-if="roleSummaries[role.role_code]" class="role-summary-line">
+                有效 {{ roleSummaries[role.role_code].effective_users }} 人｜权限
+                {{ roleSummaries[role.role_code].permission_count }} 项
+                <template v-if="roleSummaries[role.role_code].high_risk?.length">
+                  ｜<el-tag size="small" type="danger" effect="plain">高风险：全局旁路</el-tag>
+                </template>
+              </small>
             </span>
             <el-tag size="small" :type="role.role_type === 'builtin' ? 'info' : 'primary'">
               {{ role.role_type === "builtin" ? "内置" : "自定义" }}
@@ -128,12 +135,15 @@ import { onBeforeRouteLeave } from "vue-router";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import { hasPerms } from "@/utils/auth";
 import {
-  getPermissionRoles, getPermissionResources, getRoleMatrix, seedPermissions,
-  updateRoleMatrix, upsertPermissionRole, type PermissionResource, type PermissionRole
+  getPermissionRoles, getPermissionResources, getPermissionRolesSummary, getRoleMatrix, seedPermissions,
+  updateRoleMatrix, upsertPermissionRole,
+  type PermissionResource, type PermissionRole, type PermissionRoleSummary
 } from "@/api/permissions";
 
 type PermissionModule = PermissionResource & { items: PermissionResource[] };
 const roles = ref<PermissionRole[]>([]);
+// 200 §4.1：角色摘要（有效人数/权限数量/高风险/最近变更）
+const roleSummaries = ref<Record<string, PermissionRoleSummary>>({});
 const resources = ref<PermissionResource[]>([]);
 const currentRole = ref<PermissionRole | null>(null);
 const selectedCodes = ref(new Set<string>());
@@ -183,6 +193,13 @@ async function loadAll() {
     const [roleRes, resourceRes] = await Promise.all([getPermissionRoles(), getPermissionResources()]);
     roles.value = roleRes.data || [];
     resources.value = resourceRes.data || [];
+    // 摘要失败不阻塞主流程（仅少了统计展示）
+    try {
+      const summaryRes = await getPermissionRolesSummary();
+      roleSummaries.value = Object.fromEntries(
+        ((summaryRes.data || []).map(item => [item.role_code, item]))
+      );
+    } catch { roleSummaries.value = {}; }
     const selected = roles.value.find(r => r.role_code === currentRole.value?.role_code) || roles.value[0];
     if (selected) await selectRole(selected, true);
   } catch { ElMessage.error("加载角色权限失败"); } finally { loading.value = false; }
@@ -255,6 +272,7 @@ onMounted(loadAll);
 .pane-toolbar, .role-footer { padding: 14px; background: var(--bg-card); }
 .role-footer { display: flex; gap: 8px; border-top: 1px solid var(--border-light); }
 .role-list { flex: 1; padding: 8px; overflow: auto; }
+.role-summary-line { display: block; margin-top: 2px; color: var(--el-text-color-secondary); }
 .role-item { width: 100%; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text-primary); text-align: left; cursor: pointer; }
 .role-item:hover { background: var(--el-fill-color-light); }
 .role-item.active { border-color: var(--el-color-primary-light-5); background: var(--el-color-primary-light-9); }

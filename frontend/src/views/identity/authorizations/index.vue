@@ -29,7 +29,8 @@
             </el-select>
           </el-form-item>
           <el-form-item label="授权人">
-            <el-input v-model="grantedBy" placeholder="当前操作人" />
+            <!-- 200 R06：授权人固定为当前可信登录人，去掉可编辑假授权人 -->
+            <el-input :model-value="currentLoginUser" disabled />
           </el-form-item>
           <el-form-item label="原因">
             <el-input v-model="grantReason" type="textarea" :rows="3" placeholder="授权或撤权原因" />
@@ -45,14 +46,55 @@
           </el-form-item>
         </el-form>
 
-        <el-descriptions v-if="effective" title="有效权限" :column="1" border>
+        <!-- 200 R01/§4.1：当前生效权限与历史授权分区展示，不混入生效区 -->
+        <el-descriptions v-if="effective" title="当前生效权限" :column="1" border>
           <el-descriptions-item label="用户">{{ effective.user_identifier }}</el-descriptions-item>
           <el-descriptions-item label="人员姓名">{{ effective.person_name || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="角色">
-            <el-tag v-for="role in effective.roles" :key="role" size="small" class="tag-gap">{{ role }}</el-tag>
+          <el-descriptions-item label="生效角色">
+            <template v-if="effective.roles?.length">
+              <el-tag v-for="role in effective.roles" :key="role" size="small" class="tag-gap">{{ role }}</el-tag>
+            </template>
+            <span v-else class="empty-hint">当前没有生效角色（不回退历史授权）</span>
           </el-descriptions-item>
           <el-descriptions-item label="权限">
             <el-tag v-for="perm in effective.permissions" :key="perm" size="small" effect="plain" class="tag-gap">{{ perm }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="计算时点">{{ effective.effective_at || '-' }}</el-descriptions-item>
+        </el-descriptions>
+
+        <el-table
+          v-if="effective?.history?.length"
+          :data="effective.history"
+          size="small"
+          stripe
+          class="history-table"
+        >
+          <el-table-column prop="role_code" label="历史授权（到期/未生效/已撤销）" min-width="160" />
+          <el-table-column prop="state" label="状态" width="100">
+            <template #default="{ row }">
+              <el-tag size="small" :type="row.state === 'expired' ? 'warning' : row.state === 'pending' ? 'info' : 'danger'">
+                {{ row.state }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="valid_from" label="起" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="expires_at" label="止" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="source" label="来源" width="90" />
+        </el-table>
+
+        <!-- 200 R06：保存授权的差异结果（新增/撤销/保留） -->
+        <el-descriptions v-if="lastSaveDiff" title="最近一次授权差异" :column="3" border size="small" class="history-table">
+          <el-descriptions-item label="新增">
+            <el-tag v-for="r in lastSaveDiff.added" :key="r" size="small" type="success" class="tag-gap">{{ r }}</el-tag>
+            <span v-if="!lastSaveDiff.added?.length">-</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="撤销">
+            <el-tag v-for="r in lastSaveDiff.revoked" :key="r" size="small" type="danger" class="tag-gap">{{ r }}</el-tag>
+            <span v-if="!lastSaveDiff.revoked?.length">-</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="保留">
+            <el-tag v-for="r in lastSaveDiff.kept" :key="r" size="small" type="info" class="tag-gap">{{ r }}</el-tag>
+            <span v-if="!lastSaveDiff.kept?.length">-</span>
           </el-descriptions-item>
         </el-descriptions>
       </section>
@@ -109,6 +151,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useUserStoreHook } from "@/store/modules/user";
 import { ElMessage } from "element-plus";
 import { hasPerms } from "@/utils/auth";
 import {
@@ -129,8 +172,10 @@ const apiKeys = ref<ApiKeyBinding[]>([]);
 const auditLogs = ref<PermissionAuditLog[]>([]);
 const userIdentifier = ref("");
 const selectedRoles = ref<string[]>([]);
-const grantedBy = ref("console");
 const grantReason = ref("");
+// 200 R06：授权人取当前可信登录人；差异结果展示新增/撤销/保留
+const currentLoginUser = (useUserStoreHook().username || "当前登录人") as string;
+const lastSaveDiff = ref<{ added?: string[]; revoked?: string[]; kept?: string[] } | null>(null);
 const effective = ref<any | null>(null);
 const loadingKeys = ref(false);
 const loadingAudit = ref(false);
@@ -195,13 +240,15 @@ async function saveUserRoles() {
   if (!userIdentifier.value) return;
   savingRoles.value = true;
   try {
-    await replaceUserRoles(userIdentifier.value, {
+    const res = await replaceUserRoles(userIdentifier.value, {
       user_identifier: userIdentifier.value,
       role_codes: selectedRoles.value,
-      granted_by: grantedBy.value,
       reason: grantReason.value
     });
-    ElMessage.success("人员授权已保存");
+    lastSaveDiff.value = res.data || null;
+    ElMessage.success(
+      `授权已保存：新增 ${(res.data?.added || []).length} 项，撤销 ${(res.data?.revoked || []).length} 项`
+    );
     await loadUser();
   } catch {
     ElMessage.error("保存人员授权失败");
@@ -218,8 +265,7 @@ async function saveKeyBinding(row: ApiKeyBinding) {
   try {
     await bindPermissionApiKey(row.id, {
       key_id: row.id,
-      user_identifier: row.user_identifier || null,
-      operator: grantedBy.value || "console"
+      user_identifier: row.user_identifier || null
     });
     ElMessage.success("Token 绑定已保存");
     await loadApiKeys();
@@ -279,6 +325,8 @@ onMounted(loadAll);
 }
 .full-width { width: 100%; }
 .token-table { margin-top: 12px; }
+.history-table { margin-top: 12px; }
+.empty-hint { color: var(--el-text-color-secondary); font-size: 12px; }
 @media (max-width: 1100px) {
   .layout-grid {
     grid-template-columns: 1fr;

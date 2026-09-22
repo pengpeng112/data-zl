@@ -42,6 +42,11 @@ interface ErrorLike {
 function asText(value: unknown): string | null {
   if (typeof value === "string" && value.trim()) return value;
   if (value && typeof value === "object") {
+    // 200 D08：后端结构化错误 {reason_code, message} → 优先人话消息
+    const detail = value as { reason_code?: unknown; message?: unknown };
+    if (typeof detail.reason_code === "string" && typeof detail.message === "string" && detail.message.trim()) {
+      return `${detail.reason_code}: ${detail.message}`;
+    }
     try {
       return JSON.stringify(value);
     } catch {
