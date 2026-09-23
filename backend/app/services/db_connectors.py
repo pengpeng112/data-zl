@@ -32,6 +32,20 @@ _FORBIDDEN_SQL = re.compile(
 _LOCK_SQL = re.compile(r"\b(?:LOCK\s+TABLE|FOR\s+(?:UPDATE|SHARE)|LOCK\s+IN\s+SHARE\s+MODE)\b", re.IGNORECASE)
 
 
+def transport_kwargs(db_type: str | None, connection_options: Any) -> dict[str, Any]:
+    """Allowlisted per-source driver options.
+
+    MySQL ``ssl_disabled`` is an explicit opt-in on that source only.
+    Other ``connection_options`` keys (masked usernames, notes) stay out of
+    the driver call, and the flag is never implied by database type.
+    """
+    if not isinstance(connection_options, dict):
+        return {}
+    if (db_type or "").lower() == "mysql" and connection_options.get("ssl_disabled") is True:
+        return {"ssl_disabled": True}
+    return {}
+
+
 def forbidden_keyword_hits(sql: str, keywords: list[str] | tuple[str, ...] = _FORBIDDEN_KEYWORDS) -> list[str]:
     """按整词（\\b 词边界）返回 SQL 中出现的危险关键字列表（B7 公共实现）。
 
