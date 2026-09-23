@@ -9,7 +9,13 @@
     "alembic_head_before": "a7b8c9d0e1f2",
     "frontend_current_before": "releases/r197-20260921"
   },
-  "release_commits": ["75c13a9 feat(r200) 后端 B1—B3", "2f7bf56 test(r200)", "6e8f6e1 feat(r200) 前端", "153c662 docs(r200)", "df749fd fix(r200) allow 冲突合并"],
+  "release_commits": [
+    "75c13a9 feat(r200) 后端 B1—B3",
+    "2f7bf56 test(r200)",
+    "6e8f6e1 feat(r200) 前端",
+    "153c662 docs(r200)",
+    "df749fd fix(r200) allow 冲突合并"
+  ],
   "worktree": "干净 worktree @153c662→df749fd 打包（他人域 plan139 SSL 七文件未入包，工作区保留）",
   "steps": {
     "1_db_backup": {
@@ -22,19 +28,28 @@
       "image": "data-asset:r200-20260922",
       "image_id": "694c90d147a2",
       "smoke_grep": {
-        "effective_permissions": 5, "subject_policy": 4, "stale_settle_ignored": 1,
-        "legacy-allow/repair": 1, "snapshot_version": 13, "migration_file": 1,
+        "effective_permissions": 5,
+        "subject_policy": 4,
+        "stale_settle_ignored": 1,
+        "legacy-allow/repair": 1,
+        "snapshot_version": 13,
+        "migration_file": 1,
         "dict-auto-approver_executable": "0（仅 1 处说明性注释，非执行路径）"
       }
     },
     "3_container_swap": {
       "script": "DATA_ASSET_IMAGE=data-asset:r200-20260922 bash /etc/data-asset/scripts/run_data_asset_api.sh",
-      "container": "c09ca2b14bf6", "status": "healthy",
+      "container": "c09ca2b14bf6",
+      "status": "healthy",
       "startup_log": "APScheduler started；Dictionary outbox worker registered interval=5s；identity nightly 保持 disabled（env 未动）"
     },
     "4_migration": {
-      "from": "a7b8c9d0e1f2", "to": "b3c4d5e6f7a8",
-      "columns_verified": ["asset.asset_auth_users.account_type(默认 human，2/2 已填)", "asset.asset_dict_medical_push_plans.execution_status"],
+      "from": "a7b8c9d0e1f2",
+      "to": "b3c4d5e6f7a8",
+      "columns_verified": [
+        "asset.asset_auth_users.account_type(默认 human，2/2 已填)",
+        "asset.asset_dict_medical_push_plans.execution_status"
+      ],
       "roundtrip_preverified": "隔离库 data_asset_test upgrade→downgrade→upgrade 往返过（124 表不变）",
       "root_db_tests_preverified": "隔离库 test_permissions/test_permission_requests/test_local_auth/test_dict_medical_push/test_dict_medical_maintain_push_sim/test_medical_code_push+plan200 = 120 passed"
     },
@@ -43,7 +58,11 @@
       "health": "容器内 /api/v1/health 200；nginx /api/v1/health 200",
       "env": "APP_ENV=production 等关键值未动（未新增 env 行）",
       "alembic_head": "b3c4d5e6f7a8",
-      "three_endpoints_401": ["/api/v1/permissions/me 401", "/api/v1/dict-medical/push/plans/1 401", "/api/v1/auth/users 401"],
+      "three_endpoints_401": [
+        "/api/v1/permissions/me 401",
+        "/api/v1/dict-medical/push/plans/1 401",
+        "/api/v1/auth/users 401"
+      ],
       "new_endpoint_gate": "/api/v1/permissions/roles/summary 未授权 401",
       "image_marker": "镜像内迁移文件存在 grep=1"
     },
@@ -86,5 +105,18 @@
     "执行器登记与实际写入启用（待具体编码/时段逐例批准；201 口径=196 先 1—3 编码且 200 上线后再写）",
     "正式角色调整小批试点（待人员/角色名单）",
     "Git push（未点名）"
-  ]
+  ],
+  "hotfix_r200b": {
+    "trigger": "用户报告：sjzc live 两条 HIS 查询 ImportError(transport_kwargs)，其他项目会话不可用",
+    "root_cause": "全局技能 ~/.zcode/skills/sjzc/scripts/sjzc_query.py:160 在容器内 import transport_kwargs；该符号为 plan139 未提交 WIP（曾以热补形态存在于旧容器），r200 干净提交态镜像切换后消失",
+    "fix": "仅提交 transport_kwargs 函数块（+14 行，d483861）→ 干净 worktree 打包 → 镜像 data-asset:r200b-20260923（32cc2ba64e55，基底 r200）→ 切换",
+    "verify": [
+      "容器内 from app.services.db_connectors import transport_kwargs → {'ssl_disabled': True}",
+      "alembic head 保持 b3c4d5e6f7a8；nginx health/frontend 200；healthy；近 30 分钟日志 error=0",
+      "sjzc 原路径端到端：live his_source_10_10_10_15 'SELECT 1 AS OK FROM DUAL' → ok:true row_count:1",
+      "连接器单测隔离库 17 passed（裸 sqlite 报错为环境性）"
+    ],
+    "others_domain_preserved": "plan139 的 MysqlConnector ssl_disabled hunk 与 6 个调用方文件+测试保持未提交 WIP，工作区完整还原",
+    "lesson": "已沉淀至 ops-runbook 已踩坑速查"
+  }
 }

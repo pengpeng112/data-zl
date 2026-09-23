@@ -107,5 +107,6 @@ FROM asset.asset_identity_sync_subtasks WHERE run_id=:latest;
 | heredoc 中文经 stdin 编码损坏 | 本地文件 + `<` 重定向，禁 heredoc 长脚本 |
 | 并行会话互踩测试库/僵尸 pytest | 全量前 `tasklist` 清点非本会话 pytest；跑后按隔离库约定恢复要求处理（不默认 import170） |
 | 镜像/发布窗口竞态（他方先发布） | 发布前 git log+docker ps 双快照；改动尽早提交占位 |
+| 干净镜像切换抹掉未提交热补依赖（r200b 实证：全局 sjzc 技能 import 容器内 transport_kwargs，符号原是他人 WIP 热补） | 发布前 grep 全局技能/外部脚本对容器内 app 符号的依赖，与容器实际符号 diff；依赖未提交符号时先最小提交该符号再切镜像 |
 | README/大文件超 25k tokens | Read 带 offset 分段；工具大输出转 stdout 日志文件再读 |
 | 用户选项卡未答 | 必需信息/批准缺失记待输入/待批准，继续独立工作；可选偏好合理等待后用已说明的默认值；仅明确排除或不适用记 SKIP |
