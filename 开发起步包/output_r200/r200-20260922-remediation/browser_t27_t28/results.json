@@ -1,0 +1,83 @@
+{
+ "results": [
+  {
+   "case": "T27-maint-login",
+   "ok": true,
+   "detail": "http://127.0.0.1:8848/#/workbench"
+  },
+  {
+   "case": "T27-target-his-checked",
+   "ok": true,
+   "detail": "visible his checkbox=1"
+  },
+  {
+   "case": "T27-select-2-codes",
+   "ok": true,
+   "detail": "picked=2"
+  },
+  {
+   "case": "T27-create-no-error-toast",
+   "ok": true,
+   "detail": "toasts=[]"
+  },
+  {
+   "case": "T27-plan-created",
+   "ok": true,
+   "detail": "brief={'id': 5, 'status': 'draft', 'created_by': 'qa_t27_maint', 'approved_by': None, 'item_count': 2, 'target_systems': ['HIS_SOURCE'], 'execution_status': 'draft'}"
+  },
+  {
+   "case": "T27-preview-2-actions",
+   "ok": true,
+   "detail": "action_count=2 ui_rows=0 status=draft targets=['HIS_SOURCE']"
+  },
+  {
+   "case": "T27-approver-independent",
+   "ok": true,
+   "detail": "status=approved approved_by=qa_t27_approver created_by=qa_t27_maint ui=True"
+  },
+  {
+   "case": "T27-worker-executed",
+   "ok": true,
+   "detail": "execution_status=succeeded runs=[]"
+  },
+  {
+   "case": "T27-reconcile-ui-loaded",
+   "ok": true,
+   "detail": "plan_id=5 url=http://127.0.0.1:8848/#/dict/medical"
+  },
+  {
+   "case": "T27-role-isolation-viewer",
+   "ok": true,
+   "detail": "向导按钮不可见=True 无成功提示=True url=http://127.0.0.1:8848/#/error/403"
+  },
+  {
+   "case": "T28-viewer-deeplink-403-clean",
+   "ok": true,
+   "detail": "toasts=[] url=http://127.0.0.1:8848/#/error/403"
+  },
+  {
+   "case": "T28-maint-authorizations-visible",
+   "ok": true,
+   "detail": "url=http://127.0.0.1:8848/#/identity/authorizations"
+  },
+  {
+   "case": "T28-session-expiry-redirect",
+   "ok": true,
+   "detail": "回到登录=True 无成功提示=True url=http://127.0.0.1:8848/#/login"
+  },
+  {
+   "case": "T28-role-switch-menu-consistent",
+   "ok": true,
+   "detail": "菜单数=7 含字典区=True"
+  },
+  {
+   "case": "T28-console-clean",
+   "ok": true,
+   "detail": "console errors=[]"
+  }
+ ],
+ "summary": {
+  "pass": 15,
+  "fail": 0
+ }
+}

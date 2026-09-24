@@ -1,0 +1,38 @@
+{
+ "plan_id": 19,
+ "db_run": [
+  [
+   16,
+   "succeeded",
+   2,
+   0,
+   0
+  ]
+ ],
+ "db_actions": [
+  [
+   "QA_T27D01",
+   "succeeded"
+  ],
+  [
+   "QA_T27D02",
+   "succeeded"
+  ]
+ ],
+ "db_outbox": [
+  [
+   "succeeded"
+  ]
+ ],
+ "api_latest_runs_HIS": {
+  "run_id": 16,
+  "status": "succeeded",
+  "total_actions": 2,
+  "succeeded_count": 2,
+  "failed_count": 0,
+  "skipped_count": 0,
+  "error_masked": null,
+  "finished_at": "2026-09-23T09:17:55.414625+08:00"
+ },
+ "api_execution_status": "succeeded"
+}

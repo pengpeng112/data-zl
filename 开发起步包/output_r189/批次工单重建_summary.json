@@ -1,0 +1,57 @@
+{
+  "rebuilt_at": "2026-09-25",
+  "mark": "OFFLINE_REBUILT_NOT_LIVE",
+  "source": "189 v1.1 §7.1/§7.3 + view_ddl_backup（GET_DDL/ALL_VIEWS.TEXT，2026-09-14/18 备份）",
+  "ods41_rows": 44,
+  "hisuser3_rows": 6,
+  "pred_rows": 50,
+  "to_change": 49,
+  "hold": 1,
+  "unparsed_or_missing": [
+    "HISUSER.V_EMR_EXAM_IMAGE_PATH"
+  ],
+  "mtl_caliber": {
+    "batch1_intersect_12": [
+      "V_EMR_ADMISSION_DEAD_RECORD_TF",
+      "V_EMR_ADMISSION_RECORD",
+      "V_EMR_DISCHARGE_RECORD",
+      "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+      "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+      "V_EMR_HOS_DND_RECORD",
+      "V_EMR_HOS_POSTOPER_RECORD",
+      "V_EMR_HOS_PREOP_DISCUSS",
+      "V_EMR_HOS_SAVE_RECORD",
+      "V_EMR_HOS_SUCCESSION_RECORD",
+      "V_EMR_INFOR_OPERATION",
+      "V_EMR_OPERA_RECORD"
+    ],
+    "mtl_total_18": [
+      "V_EMR_ADMISSION_DEAD_RECORD_TF",
+      "V_EMR_ADMISSION_RECORD",
+      "V_EMR_DEATH_RECORD",
+      "V_EMR_DISCHARGE_RECORD",
+      "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+      "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+      "V_EMR_HOS_DND_RECORD",
+      "V_EMR_HOS_POSTOPER_RECORD",
+      "V_EMR_HOS_PREOP_DISCUSS",
+      "V_EMR_HOS_SAVE_RECORD",
+      "V_EMR_HOS_SUCCESSION_RECORD",
+      "V_EMR_INFOR_CRITICALLY_ILL",
+      "V_EMR_INFOR_OPERATION",
+      "V_EMR_INFOR_OTHERS",
+      "V_EMR_INFOR_SPEC_EXAM_TREAT",
+      "V_EMR_MEDICAL_RECORD_INFO",
+      "V_EMR_NURSING_ASSESSMENT",
+      "V_EMR_OPERA_RECORD"
+    ],
+    "remaining_6_to_batch2": [
+      "V_EMR_DEATH_RECORD",
+      "V_EMR_INFOR_CRITICALLY_ILL",
+      "V_EMR_INFOR_OTHERS",
+      "V_EMR_INFOR_SPEC_EXAM_TREAT",
+      "V_EMR_MEDICAL_RECORD_INFO",
+      "V_EMR_NURSING_ASSESSMENT"
+    ]
+  }
+}

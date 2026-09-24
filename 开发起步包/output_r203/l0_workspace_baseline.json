@@ -1,0 +1,66 @@
+{
+  "plan": 203,
+  "phase": "L0",
+  "captured_at": "2026-09-25",
+  "operator": "203 连续执行会话（用户 2026-09-24 授权）",
+  "git": {
+    "head": "3c07465 docs(r200b): transport_kwargs 事故记录",
+    "branch": "master",
+    "origin_master_left_right": "0 19",
+    "note": "本地领先 origin/master 19 提交；Git push 未点名授权",
+    "dirty_files_total": 132,
+    "untracked_total": 25,
+    "last_commit_touching_output_r189": "68f3730 2026-09-21 22:16:17 +0800 docs(193-197 蓄积)"
+  },
+  "doc_index_baseline": {
+    "result": "error 1 / warn 5 / info 24",
+    "known_issues_unchanged": [
+      "error orphan_doc: 181_003531签名模式报错根因排查与双向修复记录.md（他人域）",
+      "warn missing_category: 55 首行缺类别行（既有）",
+      "warn number_title_mismatch: 164 ×2（既有）",
+      "warn orphan_outdir: output_r181/（他人域）",
+      "warn number_title_mismatch: 187（既有）"
+    ],
+    "new_errors_this_session": []
+  },
+  "test_environment": {
+    "state": "pure_logic_ready",
+    "app_test_db_url": "未配置",
+    "note": "数据库集成测试与根级 DB 测试本轮不可跑；只能跑纯逻辑集合；隔离库恢复后补 DB 验收"
+  },
+  "output_r189_facts": {
+    "on_disk": false,
+    "tracked_in_head": 82,
+    "deleted_in_worktree": 82,
+    "git_stash": [],
+    "head_content_summary": "191 号视图交接材料：6 个文档/JSON（191交接、74视图核对清单、已改未改对照表、收尾复核_20260918、时间窗修改记录.json、jhemr视图生成清单.json）+ 76 个 view_ddl_backup/*.sql + manifest.json",
+    "batch1_workorder_in_git": false,
+    "batch2_sql_in_git": false,
+    "deletion_attribution": "无法确定。工作区物理删除、未提交、无 stash。最后提交 2026-09-21 68f3730 时目录仍在；203 编制（09-24）时已缺失。201 会话（09-23）声称曾在该目录生成批次1工单，说明 09-23 时目录可能仍存在",
+    "disposition": "PARTIAL_EVIDENCE_MISSING。HEAD 82 文件可从 Git 安全恢复（先扫敏感信息再回填）；批次1/批次2 工单从未入库，不可恢复，按 L2 重建标 OFFLINE_REBUILT_NOT_LIVE"
+  },
+  "d2_evidence_status": {
+    "output_r195_dir": "存在",
+    "d2_4_products_found": [
+      "195_198_cross_batch_dedupe.csv",
+      "195_关系候选工作单_31条.csv",
+      "195_配方候选工作单_83条.csv",
+      "195_人工治理批次清单.csv",
+      "195_人工治理批次清单说明.md",
+      "cross_batch_dedupe.py",
+      "dedupe_summary.json"
+    ],
+    "d2_6_release_candidate": "发布候选包_D2_20260923.md（未跟踪，存在于 output_r195/r195-20260919-084932/）",
+    "d2_2_browser_v2": "output_r200/r200-20260922-remediation/browser_t27_t28/（未跟踪，存在）"
+  },
+  "first_night_199": {
+    "report": "output_r199/晨检_20260923_首夜full.md（存在）",
+    "conclusion": "首夜 PASS（仅 1/2 夜）"
+  },
+  "counts": {
+    "production_writes": 0,
+    "source_writes": 0,
+    "governance_terminal_actions": 0,
+    "git_pushes": 0
+  }
+}

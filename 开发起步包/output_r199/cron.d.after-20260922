@@ -1,0 +1,8 @@
+# 186 r186-20260909 唯一夜间调度入口（替换旧 identity-nightly-modified-20260805-v1 链）
+# 198 r198-20260922（用户授权）：恢复夜间自动建户/对齐——RUN_MODE disable_only→full，
+# 补两道写入门禁开关（JHEMR 密码写/CDMS FID 语义确认，186 期间曾移出 CLI 注入）。
+# 批准引用：r198-20260922-full-resync；186 的 disable_only 阶段（≤20人/窗人工推进）就此结束。
+# 回滚：/opt/data-asset/evidence/r198/cron.d.before-20260922（原样覆盖本文件即可）。
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+0 2 * * * root flock -n /var/lock/data-asset-identity-nightly.lock docker exec -e PYTHONPATH=/app -e APP_IDENTITY_SYNC_ENABLED=true -e APP_IDENTITY_RUN_MODE=full -e APP_IDENTITY_JHEMR_PASSWORD_WRITE_ENABLED=true -e APP_IDENTITY_CDMS_FID_SEMANTICS_CONFIRMED=true -e APP_IDENTITY_SYNC_DIRECT_CONNECTION=true -e APP_IDENTITY_DRIFT_READBACK_ENABLED=true data-asset-api python /app/scripts/run_identity_modified_nightly.py >> /var/log/data-asset-identity-nightly.log 2>&1

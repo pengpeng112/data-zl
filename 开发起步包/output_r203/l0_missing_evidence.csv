@@ -1,0 +1,7 @@
+item,claimed_by,claimed_location,current_status,attribution,disposition
+output_r189 目录 82 个已跟踪文件,191/蓄积提交 68f3730,开发起步包/output_r189/,磁盘不存在 Git 显示 D×82,删除者无法确定（未提交无 stash）,PARTIAL_EVIDENCE_MISSING；L2 从 HEAD 恢复到临时路径并扫描敏感信息后选择性回填
+189 批次1 工单 CSV 44 行+说明（ODS 41+HISUSER 3）,201 exec-d1（2026-09-23）,output_r189/,工作区与 Git 均无,若曾存在则从未提交 随目录删除丢失,L2 按权威清单重建 标 OFFLINE_REBUILT_NOT_LIVE
+189 批次2 第0步对象/前置清单,202 D2-4,未指明确切路径,未找到,同上,L2 重建
+189 批次2 只读三计数 SQL 包,202 D2-4,未指明确切路径,未找到,同上,L2 重建
+199 第二夜（2026-09-24 02:00）晨检报告,203 §5,output_r199/晨检_20260924_第二夜full.md,尚未生成,待执行,L1 本会话生成
+README/201/200/202 局部状态漂移,203 §0/§6.2,各文档当前状态段,待核验修正,历史会话记录更新滞后,L2 只改当前状态段

@@ -1,0 +1,28 @@
+{
+ "generated_at": "2026-09-23",
+ "source_plan": "202_201连续执行第一日独立复核与第二日开发执行计划.md",
+ "verdict": "T01—T36 = 36 PASS（T27/T28 经 202 D2-1/D2-2 补强后于 2026-09-23 恢复 PASS）",
+ "note": "cases.json 为第一日原始执行证据（其中 T27/T28=PASS 为第一日判断），本文件为 202 独立复核终判；browser_t27_t28_v2.py 补强验收通过后方可恢复 36/36",
+ "adjustments": {
+  "T27": {
+   "d1_status": "PASS",
+   "recheck_status": "PARTIAL",
+   "reason": "T27: 普通insert审批页不渲染逐条actions(ui_rows=0)、对账断言未核对编码/run/计数/outbox；T28: 会话失效仅清本地存储非服务端401、菜单一致性未与/permissions/me逐项对照",
+   "resume": "D2-1 PushWizard 全动作预览 + D2-2 browser_t27_t28_v2 强断言重验收（202 §3）",
+   "final_status": "PASS",
+   "final_evidence": "browser_t27_t28_v2.py results_v2.json 29/29（2026-09-23）"
+  },
+  "T28": {
+   "d1_status": "PASS",
+   "recheck_status": "PARTIAL",
+   "reason": "T28: 会话失效仅清localStorage/cookie非服务端过期401；角色一致性只断言菜单含字典区，未将/permissions/me与路由/按钮/菜单逐项核对",
+   "resume": "D2-1 PushWizard 全动作预览 + D2-2 browser_t27_t28_v2 强断言重验收（202 §3）",
+   "final_status": "PASS",
+   "final_evidence": "browser_t27_t28_v2.py results_v2.json 29/29（2026-09-23）"
+  }
+ },
+ "recheck_counts": {
+  "PASS": 36,
+  "PARTIAL": 0
+ }
+}

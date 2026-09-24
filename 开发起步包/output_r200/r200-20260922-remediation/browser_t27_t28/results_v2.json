@@ -1,0 +1,153 @@
+{
+ "results": [
+  {
+   "case": "T27A-maint-login",
+   "ok": true,
+   "detail": "http://127.0.0.1:8848/#/workbench"
+  },
+  {
+   "case": "T27A-picked-2-codes",
+   "ok": true,
+   "detail": "picked=2"
+  },
+  {
+   "case": "T27A-create-no-error",
+   "ok": true,
+   "detail": "toasts=[]"
+  },
+  {
+   "case": "T27A-plan-draft",
+   "ok": true,
+   "detail": "db=[(19, 'draft', 2, 'qa_t27_maint')]"
+  },
+  {
+   "case": "T27B-preview-table-visible",
+   "ok": true,
+   "detail": "actions 表已对普通 insert 渲染（202 D2-1 修复前不可见）"
+  },
+  {
+   "case": "T27B-two-codes-on-page",
+   "ok": true,
+   "detail": "页面可见编码=['QA_T27D01', 'QA_T27D02']"
+  },
+  {
+   "case": "T27B-ui-action-rows-2",
+   "ok": true,
+   "detail": "ui_rows=2（不得用 API actions=2 替代）"
+  },
+  {
+   "case": "T27C-approver-button-visible",
+   "ok": true,
+   "detail": "count=1"
+  },
+  {
+   "case": "T27C-independent-approval",
+   "ok": true,
+   "detail": "db=[('approved', 'qa_t27_approver', 'qa_t27_maint')]"
+  },
+  {
+   "case": "T27D-api-exec-succeeded",
+   "ok": true,
+   "detail": "execution_status=succeeded"
+  },
+  {
+   "case": "T27D-db-run-ok",
+   "ok": true,
+   "detail": "run=[(16, 'succeeded', 2, 0, 0)]"
+  },
+  {
+   "case": "T27D-db-actions-ok",
+   "ok": true,
+   "detail": "actions=[('QA_T27D01', 'succeeded'), ('QA_T27D02', 'succeeded')]"
+  },
+  {
+   "case": "T27D-db-outbox-ok",
+   "ok": true,
+   "detail": "outbox=[('succeeded',)]"
+  },
+  {
+   "case": "T27D-ui-run-id-match",
+   "ok": true,
+   "detail": "ui_run=16 db_run=16 card=HIS\nrun #16｜succeeded\n已写 2\n无需变更 0\n失败 0\n最后检查 2026-09-23T09:17:55.414625+08:00"
+  },
+  {
+   "case": "T27D-ui-three-counts-visible",
+   "ok": true,
+   "detail": "card=HIS\nrun #16｜succeeded\n已写 2\n无需变更 0\n失败 0\n最后检查 2026-09-23T09:17:55.414625+08:00"
+  },
+  {
+   "case": "T27D-ui-counts-match-db",
+   "ok": true,
+   "detail": "card=HIS\nrun #16｜succeeded\n已写 2\n无需变更 0\n失败 0\n最后检查 2026-09-23T09:17:55.414625+08:00"
+  },
+  {
+   "case": "T27E-viewer-403",
+   "ok": true,
+   "detail": "url=http://127.0.0.1:8848/#/error/403 toasts=[]"
+  },
+  {
+   "case": "T28A-creator-perm-button-consistent",
+   "ok": true,
+   "detail": "perms={'plan.create': True, 'approve': False, 'execute': False} ui={'plan.create': True, 'approve': False, 'execute': False} expected={'plan.create': True, 'approve': False, 'execute': False}"
+  },
+  {
+   "case": "T28A-creator-menu-view-consistent",
+   "ok": true,
+   "detail": "menu_dict=True has_view=True"
+  },
+  {
+   "case": "T28A-approver2-perm-button-consistent",
+   "ok": true,
+   "detail": "perms={'plan.create': False, 'approve': True, 'execute': False} ui={'plan.create': False, 'approve': True, 'execute': False} expected={'plan.create': False, 'approve': True, 'execute': False}"
+  },
+  {
+   "case": "T28A-approver2-menu-view-consistent",
+   "ok": true,
+   "detail": "menu_dict=True has_view=True"
+  },
+  {
+   "case": "T28A-executor-perm-button-consistent",
+   "ok": true,
+   "detail": "perms={'plan.create': False, 'approve': False, 'execute': True} ui={'plan.create': False, 'approve': False, 'execute': True} expected={'plan.create': False, 'approve': False, 'execute': True}"
+  },
+  {
+   "case": "T28A-executor-menu-view-consistent",
+   "ok": true,
+   "detail": "menu_dict=True has_view=True"
+  },
+  {
+   "case": "T28A-aipilot-context-200-sessions-403",
+   "ok": true,
+   "detail": "system-context=200 sessions=403（ai.context.read 可达/粗门禁路由仍拒）"
+  },
+  {
+   "case": "T28B-server-rejects-disabled-account-401",
+   "ok": true,
+   "detail": "patch=200 after=401（服务端真实 401：账号禁用）"
+  },
+  {
+   "case": "T28B-real-401-then-redirect",
+   "ok": true,
+   "detail": "401_responses=['1:8848/api/v1/dict-medical/code-sets?category_code=diagnosis', 'v1/dict-medical/mappings?category_code=diagnosis&page_size=1', '1:8848/api/v1/dict-medical/code-sets?category_code=operation'] back_login=True url=http://127.0.0.1:8848/#/login"
+  },
+  {
+   "case": "T28B-no-success-toast",
+   "ok": true,
+   "detail": "toasts=[]"
+  },
+  {
+   "case": "T28B-account-reenabled",
+   "ok": true,
+   "detail": "patch=200 after=200"
+  },
+  {
+   "case": "T28-console-clean",
+   "ok": true,
+   "detail": "total=343 401 预期日志已排除 non_401=[]"
+  }
+ ],
+ "summary": {
+  "pass": 29,
+  "fail": 0
+ }
+}

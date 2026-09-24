@@ -1,0 +1,61 @@
+{
+  "release_id": "r203-20260925",
+  "executed_at": "2026-09-25 06:49-06:58 +0800",
+  "authorization": "203 §21 候选A/B条件式生产发布（AUTHORIZED_CONDITIONAL，2026-09-24 用户授权处理）；发布前置六条件全部核验通过（见 发布包冻结_L3_20260925.md §4）",
+  "commits": {
+    "candidate_a": "0f68400 fix(r203a): 195 平台缺陷1/2（8 文件，670+/19-）",
+    "candidate_b": "232dd8d fix(r203b): PushWizard（2 文件，292+/8-）",
+    "base": "3c07465（r200b 事故记录）",
+    "note": "从 HEAD git archive 干净打包，plan139 WIP/文档/output_r189 恢复内容零夹带"
+  },
+  "db_backup": {
+    "file": "/opt/data-asset/backup/data_asset_pre_r203_20260925.dump",
+    "size_bytes": 14653195,
+    "sha256_head16": "caffa2e8ce54060b",
+    "migrations": "无新迁移，alembic head=b3c4d5e6f7a8 保持"
+  },
+  "backend_A": {
+    "image": "data-asset:r203-20260925",
+    "image_id": "5c287d22275e",
+    "base_image": "data-asset:r200b-20260923",
+    "hotpatch_dir": "/opt/data-asset/hotpatch/r203-20260925/",
+    "smoke_grep": {
+      "FINE_GRAINED_RBAC_EXACT_195": 2,
+      "FINE_GRAINED_RBAC_PREFIXES_195": 2,
+      "matched_via": 3,
+      "exported_relations": 1,
+      "def transport_kwargs": 1
+    },
+    "readback_six": ["healthy Up", "health 200", "env 关键值未动（MAX_NEW=50/MAX_UPDATE=150）", "alembic b3c4d5e6f7a8 不变", "三端点 401", "镜像标记 grep 4/4"],
+    "readback_ai_route": {
+      "A2_system_context_ai_user": "200 + exported_relations/total_relations/matched_via 全在（缺陷1 ai_user 可达 + 缺陷2 契约，生产实证）",
+      "A3_sessions_ai_user": "403 权限不足（粗门禁未放宽）",
+      "A4_deterministic": "三次同参调用响应体逐字一致（复测脚本）",
+      "A1_note": "空 Bearer 403=无效凭据语义；裸请求 401 已在六项回读验证",
+      "A5_note": "export-context GET 405=方法不匹配（POST 端点），路由存在且未被权限层拦截；可达性由 A2 同机制证明",
+      "residual": "一次性 ApiKey/角色绑定删除后残留 0，审计 create+delete 各 2 行（operator=ai:r203-release）"
+    },
+    "rollback": "DATA_ASSET_IMAGE=data-asset:r200b-20260923 bash /etc/data-asset/scripts/run_data_asset_api.sh"
+  },
+  "frontend_B": {
+    "build_id": "r203-20260925",
+    "entry": "index-kTTk0szS.js",
+    "entry_sha256_head20": "bb005e5e628bbb547e5c",
+    "hash_match_local_server": true,
+    "home": "200",
+    "pushwizard_readback": {
+      "items_page_size_200": "200 + items_len=200（total=38205，向导两码可选）",
+      "items_page_size_500": "422（后端上限拦截=原 bug 根因实证）",
+      "bare_api": "401"
+    },
+    "rollback": "ln -sfn /opt/data-asset/frontend-dist/releases/r200-20260922 /opt/data-asset/frontend-dist/current（r200 目录完好）",
+    "finding_registered": "previous 指针 mtime=2026-09-01（r171 后历史发布未维护 previous 步骤，本次脚本同样未更新成功）；不阻塞，回滚以手动链接命令为准，运维卫生项待后续处理"
+  },
+  "one_time_credentials": "两个一次性 ApiKey（verify-r203-release/verify-r203-pushwizard，绑定临时身份 ai_r203_readback*/ai_r203_readback_b）验证后即删，残留复核 0",
+  "counts": {
+    "production_writes": "发布 1 次（后端镜像切换+前端原子切换）+ 一次性 ApiKey 创建删除 4 行审计 + GovernAuditLog 4 行",
+    "source_writes": 0,
+    "governance_terminal_actions": 0,
+    "git_pushes": 0
+  }
+}

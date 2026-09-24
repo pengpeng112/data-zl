@@ -1,0 +1,47 @@
+{
+  "plan": 203,
+  "updated_at": "2026-09-25",
+  "current_phase": "L4（第一批完成，单日上限收批）",
+  "status": "IN_PROGRESS",
+  "completed_tasks": [
+    "L0 接手自检：目录基线 error1/warn5 无新增、测试环境 pure_logic_ready、git 冻结（132脏+25未跟踪、领先 origin 19）",
+    "L0 output_r189 现场核查：磁盘不存在、HEAD 82 文件、无 stash、批次1/2 工单从未入库→PARTIAL_EVIDENCE_MISSING",
+    "L0 D2 证据链核查：31/83 分单、195×198 查重、发布候选包_D2_20260923.md、浏览器 v2 证据均在（output_r195/output_r200）",
+    "L0 交付：l0_workspace_baseline.json / l0_domain_ownership.md / l0_missing_evidence.csv",
+    "L1 第二夜晨检 PASS：RUN-fde4b0a8c19c（09-24 02:00）fail=0、无熔断、4候选→3建户+1幂等、pending=0、enable 保持 disabled、告警 2 条均已知常态；09-25 第三夜附加观察同样健康；报告 output_r199/晨检_20260924_第二夜full.md",
+    "L1 判定：199 = STABLE_2_OF_2（首夜 09-23 PASS + 第二夜 09-24 PASS，跨 r200b 镜像切换无影响）",
+    "L2 output_r189 恢复：HEAD 提取→_scratch 敏感扫描（仅错误文本/脱敏占位命中）→回填 82 文件哈希一致，git 域干净",
+    "L2 批次工单重建：批次1 44 对象 50 谓词行（49 改 1 HOLD：EXAM_IMAGE_PATH 活库无日期谓词待 live 复核）+批次2 第0步 SQL 包，全部 OFFLINE_REBUILT_NOT_LIVE；MTL 12/18/6 口径机器可读固化",
+    "L2 状态纠偏：README 189/202 行+目录记录、200 状态按日期分段、201 后续附注、195 57视图/134边/83表对三粒度附注、r200 待批准清单 §A 四身份职责分离",
+    "L3 候选A本地门禁：plan195 20P+回归 158P+9P+r200_simulate exit0（与 202 基线逐项一致）",
+    "L3 候选B本地门禁：typecheck 双过+定向 vitest 6P+build 三预算（entry index-kTTk0szS.js 与 202 一致）；浏览器 v2 29/29 证据复核在位未重跑",
+    "L3 发布包冻结：发布包冻结_L3_20260925.md（候选清单/SHA/回滚/回读/六条件核验）",
+    "L5 后端候选A生产发布：提交 0f68400→DB 备份 caffa2e8…→镜像 data-asset:r203-20260925(5c287d22275e 基底 r200b)→冒烟 4/4→切换→六项回读过→AI 路由专项回读（ai_user 200+契约三字段/未挂码 403/三次逐字一致）",
+    "L5 前端候选B生产发布：提交 232dd8d→r203-20260925 原子切换→entry hash 双侧一致 bb005e5e…→首页 200→PushWizard 回读（page_size 200→200条/500→422/裸 401）；发现 previous 指针自 09-01 未被维护已登记",
+    "L4 第一批：live 主清单（draft 833/recipe 77+1/正式 1329 守恒）+自然键级查重（draft 内部 1 组重复：id29×id713 RCPT_NO 放大键保持 draft；195×198 零碰撞）+198 A1 组 20 项 approve（20/20 committed+审计 20 行+八类回读全过，正式 1329 不变）；登记偏差：3 项 system_code=DATA_CENTER vs HIS.* 表（686/711/721）；记录 l4_治理第一批_20260925.md"
+  ],
+  "active_tasks": [
+    "L4 剩余批次（A3 12/A4 6/B 27/C/D、195 31+83、197 167、188 旧批 552、57 视图级配方）——下一会话按 l4_治理第一批_20260925.md §5 模式继续"
+  ],
+  "waiting_input": [
+    "四身份真实账号/工号（H203-02）",
+    "196 编码/当前值/目标值/业务依据（H203-03/04）",
+    "189 DDL/MTL-JHEMR/DataX 具体变更集与冻结哈希（H203-07）",
+    "193 B18 科室编码/目标资源/三类责任人/保留政策（H203-08）"
+  ],
+  "waiting_approval": [
+    "候选 A/B 生产分包发布（条件式已授权，待 L3 完成一致性/无夹带/回滚核验后执行）"
+  ],
+  "blocked_external": [],
+  "evidence_missing": [
+    "output_r189 82 文件（删除归属未定，可从 HEAD 恢复）",
+    "189 批次1 44行工单/批次2 清单与 SQL 包（从未入库，需重建）"
+  ],
+  "production_writes": 1,
+  "source_writes": 0,
+  "governance_terminal_actions": 20,
+  "git_pushes": 0,
+  "production_writes_note": "r203-20260925 生产发布 1 次（后端镜像切换+前端原子切换，候选A/B，授权引用 203 §21）；一次性 ApiKey×2 创建即删（195 S8 先例，审计 4 行）",
+  "governance_note": "198 A1 组 20 项 review approve（条件全核验+逐项 before/after+审计 20 行+八类回读，授权引用 203 §21+用户按建议来）；approve≠formal，正式关系 1329 未动",
+  "next_safe_action": "Git 分域提交（文档纠偏+证据产物，不夹带 plan139 WIP）；下一会话续 L4 第二批（198 A3/A4）"
+}
