@@ -5,7 +5,7 @@ import re
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import func, or_, select
+from sqlalchemy import false, func, or_, select
 from sqlalchemy.orm import Session
 
 from ...core.db import get_db
@@ -824,31 +824,65 @@ def export_context(req: ExportRequest, db: Session = Depends(get_db)) -> ApiResp
 def system_context(
     system_code: str = Query(..., description="系统编码"),
     max_tables: int = Query(30, ge=1, le=100),
+    max_relations: int = Query(200, ge=1, le=1000),
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:
     from ...models.asset_system import AssetSystem
     from ...services.value_domain_service import confirmed_domains_for_injection
     sys = db.scalar(select(AssetSystem).where(AssetSystem.system_code == system_code))
+    # 195 缺陷2：表清单确定性排序（namespace/schema/表名），同一系统两次导出
+    # 与 limit 截断结果稳定，不再依赖数据库返回顺序。
     tables = db.scalars(
-        select(AssetTable).where(AssetTable.system_code == system_code).limit(max_tables)
+        select(AssetTable)
+        .where(AssetTable.system_code == system_code)
+        .order_by(
+            func.coalesce(AssetTable.namespace_name, ""),
+            func.coalesce(AssetTable.schema_name, ""),
+            AssetTable.table_name,
+        )
+        .limit(max_tables)
     ).all()
     total_tables = db.scalar(
         select(func.count()).select_from(AssetTable).where(AssetTable.system_code == system_code)
     ) or 0
 
     table_names = [f"{t.namespace_name or t.schema_name}.{t.table_name}" for t in tables]
-    relations: list[dict] = []
-    if table_names:
-        rels = db.scalars(
-            select(AssetRelation).where(
-                AssetRelation.from_table.in_(table_names) | AssetRelation.to_table.in_(table_names)
-            )
-        ).all()
-        relations = [
-            {"from": r.from_table, "to": r.to_table, "join_condition": r.join_condition,
-             "confidence": r.confidence, "validation_status": r.validation_status}
-            for r in rels
-        ]
+    # 195 缺陷2：关系按端点系统身份取"该系统相关"的关系（主条件），不再只在
+    # 前 N 采样表里找——无序采样命中低关联表时关系段恒空的缺陷；旧数据端点
+    # 四元组为空时回落采样表名匹配（兼容补充）。total_relations 与清单同口径，
+    # 不再退化为全库关系总数。
+    # 202 D2-3：legacy 回落仅限当前系统采样表，且逐条标记 matched_via——
+    # 无端点四元组的旧数据不冒充系统端点已确认关系。
+    endpoint_cond = (AssetRelation.from_system_code == system_code) | (
+        AssetRelation.to_system_code == system_code
+    )
+    legacy_cond = (
+        (AssetRelation.from_system_code.is_(None) & AssetRelation.to_system_code.is_(None))
+        & (
+            (AssetRelation.from_table.in_(table_names) | AssetRelation.to_table.in_(table_names))
+            if table_names
+            else false()
+        )
+    )
+    rel_cond = endpoint_cond | legacy_cond
+    total_relations = (
+        db.scalar(select(func.count()).select_from(AssetRelation).where(rel_cond)) or 0
+    )
+    rels = db.scalars(
+        select(AssetRelation)
+        .where(rel_cond)
+        .order_by(AssetRelation.from_table, AssetRelation.to_table, AssetRelation.id)
+        .limit(max_relations)
+    ).all()
+    relations = []
+    for r in rels:
+        entry = {"from": r.from_table, "to": r.to_table, "join_condition": r.join_condition,
+                 "confidence": r.confidence, "validation_status": r.validation_status}
+        if (r.from_system_code == system_code) or (r.to_system_code == system_code):
+            entry["matched_via"] = "system_endpoint"
+        else:
+            entry["matched_via"] = "legacy_table_name"
+        relations.append(entry)
 
     total_columns = db.scalar(
         select(func.count()).select_from(AssetColumn).where(AssetColumn.system_code == system_code)
@@ -856,9 +890,6 @@ def system_context(
     if total_columns is None:
         # fallback when column.system_code sparse: sum column_count on tables
         total_columns = sum(int(t.column_count or 0) for t in tables)
-    total_relations = db.scalar(select(func.count()).select_from(AssetRelation)) or 0
-    if table_names:
-        total_relations = len(relations)
 
     # 149 P1c 主注入路径：该系统全部 confirmed 值域+陷阱（全量，不依赖列级解析；
     # 未裁决冲突与 pending/deprecated 已在服务层过滤），逐条回带 version_no 供留痕。
@@ -871,6 +902,9 @@ def system_context(
         "total_columns": int(total_columns or 0),
         "total_relations": int(total_relations or 0),
         "exported_tables": len(tables),
+        # 202 D2-3：导出条目数显式回带，与 total_relations（同口径全量计数）
+        # 分列，消费方可直接检测截断（exported < total）。
+        "exported_relations": len(relations),
         "tables": [
             {
                 "name": f"{t.namespace_name or t.schema_name}.{t.table_name}",

@@ -454,6 +454,24 @@ FINE_GRAINED_Rbac_PREFIXES_174 = (
     "/api/v1/dict-medical",
 )
 
+# 195 缺陷1（AI 上下文可达性）：下列 /api/v1/ai 路由已逐条挂
+# require_permission("ai.context.read")（路由级依赖自保护），粗前缀角色门禁
+# （ai: platform_admin/quality_admin）对它们只是冗余的第二层，却把仅持
+# ai.context.read 的合法角色（ai_user、自定义协作角色）整体拦在门外。
+# 精确放行这批自带端点权限码的路径；其余 /api/v1/ai* 路由（含
+# /api/v1/ai-accuracy 与未挂码的 sessions/tool-calls/drafts 等）仍走粗门禁。
+# /api/v1/ai/context/ 为前缀（GET /context/{context_id} 带路径参数），该前缀
+# 下仅有 resolve（POST）与 {context_id}（GET）两条，均已挂码。
+FINE_GRAINED_RBAC_EXACT_195 = {
+    "/api/v1/ai/propose-sql",
+    "/api/v1/ai/export-context",
+    "/api/v1/ai/system-context",
+    "/api/v1/ai/ai-sql/generate",
+    "/api/v1/ai/ai-sql/history",
+    "/api/v1/ai/tool-execute",
+}
+FINE_GRAINED_RBAC_PREFIXES_195 = ("/api/v1/ai/context/",)
+
 
 def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
     """
@@ -466,6 +484,10 @@ def _enforce_rbac(path: str, method: str, token_roles: list[str]) -> str | None:
         return None
     if any(path.startswith(p) for p in FINE_GRAINED_Rbac_PREFIXES_174):
         return None  # 174：端点级细粒度权限接管（见上方注释）
+    if path in FINE_GRAINED_RBAC_EXACT_195 or any(
+        path.startswith(p) for p in FINE_GRAINED_RBAC_PREFIXES_195
+    ):
+        return None  # 195：路由级 ai.context.read 已自保护（见上方注释）
 
     method_u = (method or "GET").upper()
     for role_key, url_prefix in ROLE_PATH_MAP.items():

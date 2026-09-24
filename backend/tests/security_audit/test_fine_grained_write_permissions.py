@@ -210,9 +210,14 @@ def test_asset_editor_can_pass_recipe_module_gate():
                 and isinstance(node.targets[0] if isinstance(node, ast.Assign) else node.target, ast.Name)
                 and (node.targets[0] if isinstance(node, ast.Assign) else node.target).id.startswith("FINE_GRAINED")):
             try:
-                fine_grained = ast.literal_eval(node.value)
+                value = ast.literal_eval(node.value)
             except Exception:
-                fine_grained = None
+                value = None
+            # 195：main.py 允许多个 FINE_GRAINED* 豁免集合（_174 前缀族、_195
+            # 精确路径族等），取并集判定——不再依赖变量声明顺序。
+            if isinstance(value, (list, tuple, set)):
+                items = set(value)
+                fine_grained = items if fine_grained is None else (fine_grained | items)
     assert role_required is not None
     assert "asset_editor" in role_required["recipes"]
     # 200 R03：dict-medical 已整体移交端点级细粒度门禁——粗前缀条目必须
