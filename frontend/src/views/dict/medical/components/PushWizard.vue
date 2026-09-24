@@ -71,7 +71,8 @@ async function loadInsertCodeOptions() {
   try {
     const res = await getMedicalItems(LOCAL_CODE_SETS[categoryCode.value], {
       status: "active",
-      page_size: 500
+      // 后端上限 le=200：传 500 会 422，向导编码选项恒为空（T27 浏览器闭环实测发现）
+      page_size: 200
     });
     const rows: Array<Record<string, unknown>> = (res.data as any)?.items || (res.data as any) || [];
     insertCodeOptions.value = rows
@@ -166,10 +167,42 @@ function infectiousPreviewIsComplete(value: MedicalPushPlanSummary | null): bool
   return value.actions.every(action => Object.prototype.hasOwnProperty.call(action, "infectious_disease_name"));
 }
 
+// 202 D2-1：审批前动作预览完整性（全 action_type 通用）。一个编码在一个目标
+// 系统可能生成多条动作（如 JHEMR 诊断=字典+对照+ICD 三条），因此完整性按
+// 「编码去重数=item_count 且 编码×目标全覆盖」判定，不沿用传染病单目标假设。
+function planActionsAreComplete(value: MedicalPushPlanSummary | null): boolean {
+  if (!value || !Array.isArray(value.actions) || value.actions.length === 0) return false;
+  const codes = new Set(value.actions.map(action => String(action.item_code ?? "")));
+  if (value.item_count != null && codes.size !== value.item_count) return false;
+  const targets = value.target_systems || [];
+  if (targets.length) {
+    const covered = new Set(value.actions.map(action => `${action.item_code}::${action.target_system}`));
+    for (const code of codes) {
+      for (const target of targets) {
+        if (!covered.has(`${code}::${target}`)) return false;
+      }
+    }
+  }
+  if (actionType.value === "sync_infectious") return infectiousPreviewIsComplete(value);
+  return true;
+}
+
+function actionTypeLabel(actionTypeValue: string): string {
+  if (actionTypeValue === "sync_infectious") return "传染病名称同步";
+  if (actionTypeValue === "stop") return "停用";
+  if (actionTypeValue === "insert") return "新增";
+  return actionTypeValue;
+}
+
 async function approvePlan() {
   if (!plan.value) return;
-  if (actionType.value === "sync_infectious" && !infectiousPreviewIsComplete(plan.value)) {
-    ElMessage.error("服务端计划缺少完整的传染病名称快照，不能审批；请重新加载或重建计划");
+  // 202 D2-1：所有 action_type 统一完整性门禁（按钮 disabled 之外的双保险）
+  if (!planActionsAreComplete(plan.value)) {
+    ElMessage.error(
+      actionType.value === "sync_infectious"
+        ? "服务端计划缺少完整的传染病名称快照，不能审批；请重新加载或重建计划"
+        : "计划动作预览不完整（编码×目标覆盖缺失），不能审批；请重新生成计划"
+    );
     return;
   }
   if (plan.value.created_by === currentUsername) {
@@ -383,17 +416,56 @@ onMounted(() => {
         :closable="false"
         title="以下预览来自服务端计划快照；名称为空表示审批后清空 HIS 的 DIAGNOSIS_NAME_CRB。审批仍要求非创建人操作。"
       />
-      <el-table v-if="actionType === 'sync_infectious'" :data="plan.actions || []" stripe size="small" max-height="320" class="mb-4">
-        <el-table-column prop="item_code" label="院内诊断编码" min-width="150" />
-        <el-table-column prop="item_name_cn" label="诊断名称" min-width="180" />
-        <el-table-column label="HIS 传染病诊断名称（空值=清空）" min-width="240">
+      <!-- 202 D2-1：全部 action_type 渲染逐条动作预览（200 D06/T27 完成定义）。
+           公共列：编码/名称/动作/目标/状态；传染病专项加"空值=清空"列，
+           普通新增显示国标/医保目标值，stop 显示精确键停用含义。 -->
+      <el-table
+        v-if="plan.actions?.length"
+        :data="plan.actions"
+        stripe
+        size="small"
+        max-height="320"
+        class="mb-4"
+        data-testid="plan-actions-table"
+      >
+        <el-table-column prop="item_code" label="院内编码" min-width="140" />
+        <el-table-column prop="item_name_cn" label="名称" min-width="160" />
+        <el-table-column label="动作" min-width="110">
+          <template #default="{ row }">{{ actionTypeLabel(row.action_type) }}</template>
+        </el-table-column>
+        <el-table-column label="目标" min-width="110">
+          <template #default="{ row }">{{ SYSTEM_LABELS[row.target_system] || row.target_system }}</template>
+        </el-table-column>
+        <el-table-column v-if="actionType === 'sync_infectious'" label="HIS 传染病诊断名称（空值=清空）" min-width="230">
           <template #default="{ row }">
             <el-tag v-if="row.infectious_disease_name === null || row.infectious_disease_name === ''" type="warning">明确清空</el-tag>
             <el-tag v-else-if="row.infectious_disease_name === undefined" type="danger">缺少服务端快照</el-tag>
             <span v-else>{{ row.infectious_disease_name }}</span>
           </template>
         </el-table-column>
+        <el-table-column v-else label="国标 / 医保目标值" min-width="170">
+          <template #default="{ row }">
+            <span v-if="row.action_type === 'stop'" class="action-stop-note">停用：按精确业务键单条停用</span>
+            <span v-else>{{ [row.national_clinical_code, row.insurance_code].filter(Boolean).join(" / ") || "—" }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" min-width="100">
+          <template #default="{ row }">
+            <el-tag v-if="row.status === 'blocked'" type="danger" size="small">blocked</el-tag>
+            <el-tag v-else-if="row.status === 'conflict'" type="warning" size="small">conflict</el-tag>
+            <span v-else>{{ row.status || "planned" }}</span>
+          </template>
+        </el-table-column>
       </el-table>
+      <el-alert
+        v-if="plan.status === 'draft' && !planActionsAreComplete(plan)"
+        class="mb-4"
+        type="error"
+        show-icon
+        :closable="false"
+        title="计划动作预览不完整（编码×目标覆盖缺失或服务端快照缺失），不能审批；请重新生成计划。"
+        data-testid="actions-incomplete-alert"
+      />
       <el-alert
         v-if="plan.created_by && plan.created_by === currentUsername && plan.status === 'draft'"
         class="mb-4"
@@ -402,7 +474,7 @@ onMounted(() => {
         :closable="false"
         title="当前用户是计划创建人，不能审批。请将计划 ID 提供给另一位审批人加载。"
       />
-      <el-button v-if="plan.status === 'draft' && !plan.is_expired" v-perms="'dict.medical.approve'" type="primary" :loading="loading" :disabled="actionType === 'sync_infectious' && !infectiousPreviewIsComplete(plan)" @click="approvePlan">审批计划并排队</el-button>
+      <el-button v-if="plan.status === 'draft' && !plan.is_expired" v-perms="'dict.medical.approve'" type="primary" :loading="loading" :disabled="!planActionsAreComplete(plan)" @click="approvePlan">审批计划并排队</el-button>
       <el-button v-if="plan.status === 'approved' && !plan.is_expired" type="success" @click="step = 3">查看执行预览</el-button>
       <el-alert v-else-if="plan.is_expired" class="mt-3" type="error" show-icon :closable="false" title="计划已过期，不能审批或进入执行预览；请重新创建计划。" />
       <el-alert v-else-if="plan.status !== 'draft' && plan.status !== 'approved'" class="mt-3" type="info" show-icon :closable="false" :title="`当前状态 ${plan.status} 不支持审批或执行。`" />
@@ -436,6 +508,8 @@ onMounted(() => {
 .step-label { font-size: 13px; color: var(--el-text-color-regular); }
 
 .selection-summary { margin-top: 6px; font-size: 12px; color: var(--el-text-color-secondary); }
+
+.action-stop-note { color: var(--el-text-color-secondary); }
 
 .target-cards { display: flex; gap: 12px; flex-wrap: wrap; }
 
