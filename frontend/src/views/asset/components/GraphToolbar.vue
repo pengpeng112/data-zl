@@ -155,7 +155,7 @@
         {{ statsExpanded ? "收起统计 ▴" : "展开统计 ▾" }}
       </button>
       <div v-show="statsExpanded" class="stats-body">
-        <div class="stats-row">
+        <div class="stats-row" title="当前画布：加载到图中的节点与关系（按展示模式过滤后）">
           <el-tag>节点 {{ normalized.nodes.length }}</el-tag>
           <el-tag type="primary">关系 {{ normalized.edges.length }}</el-tag>
           <el-tag type="success">通过 {{ normalized.passCount }}</el-tag>
@@ -164,14 +164,14 @@
           <el-tag v-if="normalized.reviewHiddenCount" type="danger" effect="plain">已隐藏 D/待分析 {{ normalized.reviewHiddenCount }}</el-tag>
           <el-tag v-if="selectedNodeId" type="success" effect="dark">已聚焦 {{ selectedNodeId }}</el-tag>
         </div>
-        <div v-if="meta" class="meta-row" aria-label="图谱响应统计">
+        <div v-if="meta" class="meta-row" aria-label="图谱响应统计" title="接口响应：服务端总关系数、命中数与本页返回数">
           <el-tag type="info" effect="plain">总数 {{ meta.total_relations }}</el-tag>
           <el-tag type="info" effect="plain">命中 {{ meta.matched_relations }}</el-tag>
           <el-tag type="info" effect="plain">返回 {{ meta.returned_relations }}</el-tag>
           <el-tag v-if="meta.truncated" type="danger" effect="plain" size="small">已截断（limit={{ filters.limit }}）</el-tag>
           <el-tag v-else type="success" effect="plain" size="small">未截断</el-tag>
           <el-tag v-if="meta.unresolved_endpoints" type="warning" effect="plain" size="small">端点未解析 {{ meta.unresolved_endpoints }}</el-tag>
-          <span v-if="meta.backend_build_id" class="meta-build">build:{{ meta.backend_build_id }}</span>
+          <span v-if="isDevBuild && meta.backend_build_id" class="meta-build">build:{{ meta.backend_build_id }}</span>
         </div>
       </div>
     </div>
@@ -180,6 +180,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+
+// 213 UI-06：构建标识仅开发环境显示，生产界面不常驻
+const isDevBuild = import.meta.env.DEV;
 import type { GraphMeta, GraphOptionsData, GraphViewMode } from "@/api/asset";
 import type { NormalizedGraph } from "@/views/asset/graph/graphNormalize";
 import { isGovernanceUser } from "@/utils/userRoles";

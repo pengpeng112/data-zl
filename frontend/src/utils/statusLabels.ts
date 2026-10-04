@@ -72,3 +72,61 @@ export function authHintForStatus(
   if (status === 403) return "API Token 无效或已禁用：请联系管理员重新生成并绑定 Token。";
   return null;
 }
+
+/** 213 UI-09：数据集域枚举中文映射（状态/访问决策/用途/粒度）。 */
+const DATASET_STATUS_LABELS: Record<string, string> = {
+  draft: "草稿",
+  published: "已发布",
+  revoked: "已撤销",
+  archived: "已归档"
+};
+
+const DATASET_DECISION_LABELS: Record<string, string> = {
+  deny_no_grant: "未授权拒绝",
+  deny_no_purpose: "用途不匹配",
+  deny_pending: "待授权",
+  allow: "已授权"
+};
+
+const DATASET_PURPOSE_LABELS: Record<string, string> = {
+  research: "科研",
+  clinical: "临床",
+  quality: "质控",
+  management: "管理",
+  teaching: "教学"
+};
+
+const DATASET_GRAIN_LABELS: Record<string, string> = {
+  patient: "患者级",
+  visit: "就诊级",
+  record: "记录级",
+  daily: "日级"
+};
+
+function lookupLabel(
+  map: Record<string, string>,
+  value?: string | null
+): string | null {
+  if (!value) return null;
+  return map[value] ?? null;
+}
+
+/** 数据集状态中文（无映射时回退原值，便于新枚举可见）。 */
+export function datasetStatusLabel(value?: string | null): string {
+  return lookupLabel(DATASET_STATUS_LABELS, value) ?? value ?? "-";
+}
+
+/** 数据集访问决策中文。 */
+export function datasetDecisionLabel(value?: string | null): string {
+  return lookupLabel(DATASET_DECISION_LABELS, value) ?? value ?? "受限";
+}
+
+/** 数据集用途中文。 */
+export function datasetPurposeLabel(value?: string | null): string {
+  return lookupLabel(DATASET_PURPOSE_LABELS, value) ?? value ?? "-";
+}
+
+/** 数据集粒度中文。 */
+export function datasetGrainLabel(value?: string | null): string {
+  return lookupLabel(DATASET_GRAIN_LABELS, value) ?? value ?? "-";
+}

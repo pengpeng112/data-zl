@@ -1,7 +1,7 @@
 <template>
   <div class="ai-sql-page">
     <RePageHeader title="AI 写 SQL" subtitle="让院内模型依据已验证表关系生成 Oracle 只读 SQL；只生成、永不执行。">
-      <template #actions><el-button @click="$router.push('/asset/ai-quality')">返回 AI 巡查</el-button></template>
+      <template #actions><el-button v-perms="'asset.quality.ai.view'" @click="$router.push('/asset/ai-quality')">AI质量分析</el-button></template>
     </RePageHeader>
     <section class="safety-banner"><strong>Oracle · DATA_CENTER</strong><span>只读 SELECT / CTE</span><span>正式关系证据</span><span>生成 SQL 永不执行</span></section>
     <div class="workbench">

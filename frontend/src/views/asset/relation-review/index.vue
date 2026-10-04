@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from "vue";
+import EpArrowDown from "~icons/ep/arrow-down";
 import { useRoute, useRouter } from "vue-router";
 import {
   approveRelationReview,
@@ -352,6 +353,21 @@ function openAudit(row: Relation) {
   router.push({ path: "/ops/audit", query: { entity_ref: `relation:${row.id}` } });
 }
 
+// 213 UI-03：操作列收纳后「更多」下拉的分发（字段映射/编辑/审计）
+function handleRowCommand(command: string | number | object, row: Relation) {
+  switch (command) {
+    case "mappings":
+      showMappings(row.id);
+      break;
+    case "edit":
+      openEdit(row);
+      break;
+    case "audit":
+      openAudit(row);
+      break;
+  }
+}
+
 watch(() => String(route.query.class || "pending"), value => {
   const next = normalizeRelationClass(value);
   if (next === relationClass.value) return;
@@ -464,7 +480,7 @@ onMounted(() => {
         <el-table-column label="来源表" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <div>{{ row.from_table_name_cn || row.from_table }}</div>
-            <small class="tech-name">{{ row.from_table }}</small>
+            <small v-if="row.from_table_name_cn && row.from_table_name_cn !== row.from_table" class="tech-name">{{ row.from_table }}</small>
           </template>
         </el-table-column>
         <el-table-column label="来源字段" width="160" show-overflow-tooltip>
@@ -475,7 +491,7 @@ onMounted(() => {
         <el-table-column label="目标表" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <div>{{ row.to_table_name_cn || row.to_table }}</div>
-            <small class="tech-name">{{ row.to_table }}</small>
+            <small v-if="row.to_table_name_cn && row.to_table_name_cn !== row.to_table" class="tech-name">{{ row.to_table }}</small>
           </template>
         </el-table-column>
         <el-table-column label="目标字段" width="160" show-overflow-tooltip>
@@ -503,20 +519,30 @@ onMounted(() => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="170" fixed="right">
           <template #default="{ row }">
             <el-button v-perms="'asset.relation.review'" size="small" text type="success" @click="handleApprove(row.id)">批准</el-button>
             <el-button v-perms="'asset.relation.review'" size="small" text type="danger" @click="handleReject(row.id)">驳回</el-button>
-            <el-button size="small" text @click="showMappings(row.id)">字段映射</el-button>
-            <el-button v-perms="'asset.relation.review'" size="small" text @click="openEdit(row)">编辑</el-button>
-            <el-button size="small" text @click="openAudit(row)">审计</el-button>
+            <el-dropdown trigger="click" @command="(cmd: string | number | object) => handleRowCommand(cmd, row)">
+              <el-button size="small" text class="ml-1">更多<el-icon class="el-icon--right"><EpArrowDown /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="mappings">字段映射</el-dropdown-item>
+                  <el-dropdown-item v-perms="'asset.relation.review'" command="edit">编辑</el-dropdown-item>
+                  <el-dropdown-item command="audit">审计</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
+        <template #empty>
+          <el-empty
+            :image-size="70"
+            :description="relationClass === 'pending' ? '当前没有带关联字段的待审关系。无字段的视图推断在「视图推断」页签。' : '当前页签没有数据'"
+          />
+        </template>
       </el-table>
-      <el-empty
-        v-if="!loading && !relations.length"
-        :description="relationClass === 'pending' ? '当前没有带关联字段的待审关系。无字段的视图推断在「视图推断」页签。' : '当前页签没有数据'"
-      />
+
       <!-- 161 P0-1：size-change 必须回到第 1 页；事件首参判定规则——"值/事件对象"须包装，"页码"保留 -->
       <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 50, 100, 200]" layout="total, sizes, prev, pager, next" class="pager" @current-change="loadRelations" @size-change="() => loadRelations(1)" />
     </el-card>
@@ -561,8 +587,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="note" label="备注" min-width="160" show-overflow-tooltip />
+        <template #empty>
+          <el-empty :image-size="70" description="暂无字段映射数据" />
+        </template>
       </el-table>
-      <el-empty v-if="!mappingsLoading && mappings.length === 0" description="暂无字段映射数据" />
     </el-drawer>
   </div>
 </template>

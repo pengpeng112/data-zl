@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { Graph, EdgeEvent, NodeEvent } from "@antv/g6";
+import { Graph, EdgeEvent, NodeEvent, GraphEvent } from "@antv/g6";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import type { GraphEdge, GraphNode } from "@/api/asset";
 import { normalizeGraphData, type GraphGroupBy } from "@/views/asset/graph/graphNormalize";
@@ -199,6 +199,10 @@ function nodeCircleSize(node: any, degree: number, isCenter: boolean): number {
   return base + Math.min(degree, 6) * 2;
 }
 
+function graphDataRefNodes(): number {
+  return normalized.value?.nodes?.length ?? 0;
+}
+
 function layoutOptions() {
   // 知识图谱/分层树状：坐标预计算后写入节点，不用 G6 force（会挤到中心重叠）。
   if (usesPresetPositions()) {
@@ -219,6 +223,14 @@ function layoutOptions() {
   }
   if (props.layoutMode === "grouped") {
     return { type: "force-atlas2", preventOverlap: true, nodeSize: 132, nodeSpacing: 40, kr: 120, kg: 8 };
+  }
+  // 213 UI-06：小图（≤3 节点）不走 force 迭代——render 完成时位置即终态，
+  // fitView 不会被后续迭代推翻；圆周排布保证节点居中可见。
+  if (
+    props.layoutMode === "force" &&
+    graphDataRefNodes() <= 3
+  ) {
+    return { type: "circular", radius: 160, divisions: 1 };
   }
   // force = Neo4j 式知识图谱；layered 仅保留给 path 预计算坐标。
   // 169 G3（round-3 P2 裁决）：G6 v5 type:"force" 是 @antv/layout 的 ForceLayout，
@@ -473,6 +485,22 @@ async function performRender(version: number) {
     await instance.render();
     lastCanvasSize = { width: containerRef.value.clientWidth, height: containerRef.value.clientHeight };
     await instance.fitView({ padding: 56 } as any, false);
+    // 213 UI-06：force 是迭代布局，render() 完成后节点仍可能被后续迭代推出画布；
+    // 布局稳定（AFTER_LAYOUT）后再适配一次视口。
+    const fitAfterLayout = () => {
+      void (async () => {
+        try {
+          await instance.fitView({ padding: 56 } as any, false);
+          if (instance.getZoom() < MIN_ZOOM) {
+            await instance.zoomTo(MIN_ZOOM, false);
+            await instance.fitCenter(false);
+          }
+        } catch {
+          // 布局事件在实例销毁后触发时忽略
+        }
+      })();
+    };
+    instance.on(GraphEvent.AFTER_LAYOUT, fitAfterLayout);
     const MIN_ZOOM = 0.28;
     if (instance.getZoom() < MIN_ZOOM) {
       await instance.zoomTo(MIN_ZOOM, false);

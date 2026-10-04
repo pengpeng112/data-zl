@@ -244,7 +244,6 @@ loadPublicStats();
       </Motion>
     </section>
 
-    // DEF-08（194）：登录卡片不做位移动画，保证按钮坐标稳定、可点击
     <section class="login-card-wrap">
       <div class="login-card">
           <div class="login-card-header">

@@ -43,7 +43,8 @@ vi.mock("@antv/g6", () => {
   return {
     Graph: MockGraph,
     EdgeEvent: { CLICK: "edge:click" },
-    NodeEvent: { CLICK: "node:click" }
+    NodeEvent: { CLICK: "node:click" },
+    GraphEvent: { AFTER_LAYOUT: "afterlayout" }
   };
 });
 

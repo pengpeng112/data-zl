@@ -126,7 +126,9 @@
         </el-table-column>
         <el-table-column prop="version_no" label="版本" width="70" align="center" />
         <el-table-column prop="evidence_count" label="证据" width="70" align="center" />
-        <el-table-column prop="updated_at" label="更新时间" width="170" show-overflow-tooltip />
+        <el-table-column label="更新时间" width="150" show-overflow-tooltip>
+          <template #default="{ row }">{{ formatTime(row.updated_at) }}</template>
+        </el-table-column>
       </el-table>
 
       <div class="pager-row">
@@ -242,7 +244,9 @@
               <el-table-column prop="change_reason" label="变更" width="140" />
               <el-table-column prop="evidence_ref" label="依据" min-width="140" show-overflow-tooltip />
               <el-table-column prop="actor" label="操作人" width="120" show-overflow-tooltip />
-              <el-table-column prop="created_at" label="时间" width="170" />
+              <el-table-column label="时间" width="150">
+              <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+            </el-table-column>
             </el-table>
           </el-tab-pane>
         </el-tabs>
@@ -339,6 +343,7 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import RePageHeader from "@/components/RePageHeader/index.vue";
+import { formatTime } from "@/utils/format";
 import {
   confirmValueDomain,
   deprecateValueDomain,

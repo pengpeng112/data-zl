@@ -105,16 +105,17 @@ watch(
 
 <template>
   <el-breadcrumb class="leading-[50px]! select-none" separator="/">
-    <transition-group name="breadcrumb">
-      <el-breadcrumb-item
-        v-for="item in levelList"
-        :key="item.path"
-        class="inline! items-stretch!"
-      >
-        <a @click.prevent="handleLink(item)">
-          {{ item.meta.title }}
-        </a>
-      </el-breadcrumb-item>
-    </transition-group>
+    <!-- 213 UI-02：transition-group 在本页路由结构下类生命周期卡死
+         （enter-from/leave-from 同挂不释放，旧项永久残留即"乱码面包屑"），
+         根因与位移无关；面包屑仅两级，去动画直渲染根治。 -->
+    <el-breadcrumb-item
+      v-for="item in levelList"
+      :key="item.path"
+      class="inline! items-stretch!"
+    >
+      <a @click.prevent="handleLink(item)">
+        {{ item.meta.title }}
+      </a>
+    </el-breadcrumb-item>
   </el-breadcrumb>
 </template>

@@ -3,9 +3,15 @@
     <RePageHeader title="跨系统账号" subtitle="维护 HIS、EMR、LIS、PACS 等系统账号与平台人员主数据的绑定关系。" />
 
     <section class="account-stat-grid">
-      <ReStatCard label="账号总数" :value="total" tone="primary" />
-      <ReStatCard label="当前页已关联" :value="linkedCount" tone="accent" />
-      <ReStatCard label="当前页未关联" :value="unlinkedCount" tone="warning" />
+      <ReStatCard label="账号总数" :value="total" tone="primary">
+      <template #icon><AccountsIcon /></template>
+    </ReStatCard>
+      <ReStatCard label="当前页已关联" :value="linkedCount" tone="accent">
+      <template #icon><LinkedIcon /></template>
+    </ReStatCard>
+      <ReStatCard label="当前页未关联" :value="unlinkedCount" tone="warning">
+      <template #icon><UnlinkedIcon /></template>
+    </ReStatCard>
     </section>
 
     <el-card shadow="never">
@@ -137,6 +143,9 @@
 
 <script setup lang="ts">
 import RePageHeader from "@/components/RePageHeader/index.vue";
+import AccountsIcon from "~icons/ri/user-3-line";
+import LinkedIcon from "~icons/ri/link";
+import UnlinkedIcon from "~icons/ri/link-unlink";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import { computed, ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";

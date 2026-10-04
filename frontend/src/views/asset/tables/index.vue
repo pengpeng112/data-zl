@@ -126,7 +126,7 @@
             <el-table-column label="名称来源" width="120">
               <template #default="{ row }">
                 <el-tag v-if="row.name_cn_source" size="small" :type="row.name_cn_status === 'confirmed' ? 'success' : 'warning'">{{ row.name_cn_source }}</el-tag>
-                <span v-else>-</span>
+                <span v-else class="muted-col">未标注</span>
               </template>
             </el-table-column>
             <el-table-column prop="domain" label="业务域" width="110" show-overflow-tooltip />
@@ -157,7 +157,7 @@
             <el-table-column prop="column_id" label="#" width="60" align="right" />
             <el-table-column prop="column_name" label="字段名" min-width="180" show-overflow-tooltip />
             <el-table-column prop="column_name_cn" label="字段中文名" min-width="160" show-overflow-tooltip>
-              <template #default="{ row }">{{ row.column_name_cn || row.comment || '-' }}</template>
+              <template #default="{ row }">{{ row.column_name_cn || '—' }}</template>
             </el-table-column>
             <el-table-column prop="data_type" label="类型" width="120" />
             <el-table-column prop="length" label="长度" width="80" align="right" />
@@ -1097,4 +1097,8 @@ onMounted(async () => {
 }
 
 .page-size-select { width: 110px; }
+.muted-col {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+}
 </style>

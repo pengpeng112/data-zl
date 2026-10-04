@@ -233,7 +233,7 @@ onMounted(async () => {
       :closable="false"
       show-icon
       class="mb-12"
-      :title="writeEnabled ? '写开关状态请以服务端为准' : '写开关默认关闭：可设计与 dry-run，正式执行将 403'"
+      :title="writeEnabled ? '写开关状态请以服务端为准' : '写开关默认关闭：可设计与 dry-run，未开启写开关时正式执行将被拒绝'"
     />
     <el-alert
       v-if="!approvalUiEnabled"

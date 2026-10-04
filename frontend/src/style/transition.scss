@@ -9,36 +9,30 @@
   opacity: 0;
 }
 
-/* fade-transform */
+/* fade-transform（213 UI-02：只保留透明度、0.2s，去掉位移防半透明长驻观感） */
 .fade-transform-leave-active,
 .fade-transform-enter-active {
-  transition: all 0.5s;
+  transition: opacity 0.2s ease;
 }
 
-.fade-transform-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
+.fade-transform-enter-from,
 .fade-transform-leave-to {
   opacity: 0;
-  transform: translateX(30px);
 }
 
-/* breadcrumb transition */
+/* breadcrumb transition（213 UI-02：去 translateX 防新旧面包屑叠影；同位淡切） */
 .breadcrumb-enter-active {
-  transition: all 0.4s;
+  transition: opacity 0.2s ease;
 }
 
 .breadcrumb-leave-active {
   position: absolute;
-  transition: all 0.3s;
+  transition: opacity 0.15s ease;
 }
 
 .breadcrumb-enter-from,
 .breadcrumb-leave-active {
   opacity: 0;
-  transform: translateX(20px);
 }
 
 /**

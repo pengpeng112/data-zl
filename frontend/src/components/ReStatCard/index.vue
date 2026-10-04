@@ -1,5 +1,9 @@
 ﻿<script setup lang="ts">
 import ReTrendBadge from "@/components/ReTrendBadge/index.vue";
+import { useSlots } from "vue";
+
+// 213 UI-12：无 icon 插槽时不渲染图标位（此前留 42px 空块）
+const slots = useSlots();
 
 withDefaults(
   defineProps<{
@@ -23,7 +27,7 @@ withDefaults(
   <section class="re-stat-card" :class="`tone-${tone}`">
     <div class="stat-accent" />
     <div class="stat-main">
-      <div class="stat-icon"><slot name="icon" /></div>
+      <div v-if="slots.icon" class="stat-icon"><slot name="icon" /></div>
       <div class="stat-copy">
         <div class="stat-value">{{ value }}</div>
         <div class="stat-label">{{ label }}</div>

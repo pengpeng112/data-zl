@@ -7,6 +7,8 @@ import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import ReRouteSkeleton from "@/components/ReRouteSkeleton/index.vue";
+import { defineAsyncComponent, type Component } from "vue";
 import {
   isUrl,
   openLink,
@@ -57,9 +59,31 @@ Object.keys(modules).forEach(key => {
 });
 
 /** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
-export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
-  formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
+export const constantRoutes: Array<RouteRecordRaw> = withRouteSkeleton(
+  formatTwoStageRoutes(
+    formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
+  )
 );
+
+/** 213 UI-02：路由级骨架——懒加载路由在组件解析前渲染 RouteSkeleton，消除白屏/半透明。
+ * 纯包装（不改原对象），resetRouter 可对干净副本重复调用。 */
+function withRouteSkeleton(records: Array<any>): Array<any> {
+  return records.map(record => {
+    const children = record.children
+      ? withRouteSkeleton(record.children)
+      : undefined;
+    let component = record.component;
+    if (typeof component === "function") {
+      const loader = component as () => Promise<Component>;
+      component = defineAsyncComponent({
+        loader,
+        loadingComponent: ReRouteSkeleton,
+        delay: 0
+      });
+    }
+    return { ...record, component, ...(children ? { children } : {}) };
+  });
+}
 
 /** 初始的静态路由，用于退出登录时重置路由 */
 const initConstantRoutes: Array<RouteRecordRaw> = cloneDeep(constantRoutes);
@@ -100,7 +124,9 @@ export function resetLoadedPaths() {
 /** 重置路由 */
 export function resetRouter() {
   router.clearRoutes();
-  for (const route of initConstantRoutes.concat(...(remainingRouter as any))) {
+  for (const route of withRouteSkeleton(
+    initConstantRoutes.concat(...(remainingRouter as any))
+  )) {
     router.addRoute(route);
   }
   router.options.routes = formatTwoStageRoutes(

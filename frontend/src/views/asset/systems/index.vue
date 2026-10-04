@@ -486,6 +486,11 @@ async function onDisableSource(row: AssetSourceItem) {
   }
 }
 
+// 213 UI-08：系统卡操作收纳后「⋯」下拉分发
+function handleTileCommand(command: string | number | object, code: string) {
+  if (command === "disable") onSoftDisableSystem(code);
+}
+
 async function onSoftDisableSystem(code: string) {
   try {
     await ElMessageBox.confirm(`软停用系统 ${code}？存在连接/资产时不会物理删除。`, "确认", { type: "warning" });
@@ -632,7 +637,14 @@ onMounted(async () => {
                   <div class="tile-actions">
                     <el-button v-perms="'source.manage'" size="small" text @click="openAddConnection(s.system_code)">加连接</el-button>
                     <el-button v-perms="'source.manage'" size="small" text @click="openEdit(s)">编辑</el-button>
-                    <el-button v-perms="'source.manage'" size="small" text type="danger" @click="onSoftDisableSystem(s.system_code)">停用</el-button>
+                    <el-dropdown v-perms="'source.manage'" trigger="click" @command="(cmd: string | number | object) => handleTileCommand(cmd, s.system_code)">
+                      <el-button size="small" text class="ml-1">⋯</el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="disable">停用</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
                   </div>
                 </div>
               </el-card>
@@ -997,7 +1009,7 @@ onMounted(async () => {
 .system-code { margin: 0 0 4px; font-size: 13px; color: var(--text-secondary); }
 .meta-line { margin: 8px 0 0; font-size: 12px; color: var(--text-secondary); }
 .status-tag { margin-left: 4px; }
-.tile-actions { display: flex; flex-direction: column; align-items: flex-end; }
+.tile-actions { display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; }
 .tree-path { margin-left: 12px; color: var(--text-secondary); }
 .tree-note { color: var(--text-secondary); font-size: 13px; }
 .full-width { width: 100%; }

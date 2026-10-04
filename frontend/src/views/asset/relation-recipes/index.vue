@@ -177,6 +177,24 @@ async function saveEditor() {
   }
 }
 
+// 213 §3：操作列收纳后「更多」下拉分发（版本/复制/驳回/导出）
+function handleRecipeCommand(command: string | number | object, row: RecipeItem) {
+  switch (command) {
+    case "versions":
+      openVersions(row);
+      break;
+    case "copy":
+      copyVersion(row);
+      break;
+    case "reject":
+      transition(row, "reject");
+      break;
+    case "export":
+      exportRecipe(row);
+      break;
+  }
+}
+
 async function openVersions(row: RecipeItem) {
   selectedRecipeId.value = row.recipe_id;
   selectedVersion.value = row.version;
@@ -295,22 +313,34 @@ onMounted(load);
         <el-table-column label="状态" width="95"><template #default="{ row }"><el-tag :type="row.status === 'active' ? 'success' : row.status === 'draft' ? 'info' : 'warning'">{{ statusLabels[row.status] || row.status }}</el-tag></template></el-table-column>
         <el-table-column prop="domain" label="业务域" min-width="110" show-overflow-tooltip />
         <el-table-column prop="description" label="说明" min-width="220" show-overflow-tooltip />
-        <el-table-column label="操作" width="330" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
             <el-button size="small" text type="primary" @click="openEdit(row)">{{ row.status === "draft" && hasPerms("recipe.edit") ? "详情/编辑" : "详情" }}</el-button>
-            <el-button size="small" text @click="openVersions(row)">版本</el-button>
-            <el-button v-perms="'recipe.create'" size="small" text @click="copyVersion(row)">复制版本</el-button>
-            <el-button v-perms="'recipe.sql_generate'" size="small" text type="success" @click="previewSql(row)">SQL预览</el-button>
+            <el-tooltip v-if="row.recipe_json?.readiness === 'not_executable'" content="知识型配方不支持生成 SQL" placement="top">
+              <span><el-button v-perms="'recipe.sql_generate'" size="small" text type="success" disabled>SQL预览</el-button></span>
+            </el-tooltip>
+            <el-button v-else v-perms="'recipe.sql_generate'" size="small" text type="success" @click="previewSql(row)">SQL预览</el-button>
             <el-button v-if="row.status === 'draft'" v-perms="'recipe.edit'" size="small" text type="warning" @click="transition(row, 'submit')">提交审核</el-button>
             <el-button v-if="row.status === 'submitted'" v-perms="'recipe.review'" size="small" text type="success" @click="transition(row, 'approve')">批准</el-button>
-            <el-button v-if="row.status === 'submitted'" v-perms="'recipe.review'" size="small" text type="danger" @click="transition(row, 'reject')">驳回</el-button>
             <el-button v-if="row.status === 'approved'" v-perms="'recipe.activate'" size="small" text type="success" @click="transition(row, 'activate')">激活</el-button>
             <el-button v-if="row.status === 'active'" v-perms="'recipe.activate'" size="small" text type="info" @click="transition(row, 'deprecate')">停用</el-button>
-            <el-button size="small" text @click="exportRecipe(row)">导出JSON</el-button>
+            <el-dropdown trigger="click" @command="(cmd: string | number | object) => handleRecipeCommand(cmd, row)">
+              <el-button size="small" text class="ml-1">更多<el-icon class="el-icon--right"><EpArrowDown /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="versions">版本列表</el-dropdown-item>
+                  <el-dropdown-item v-perms="'recipe.create'" command="copy">复制版本</el-dropdown-item>
+                  <el-dropdown-item v-if="row.status === 'submitted'" v-perms="'recipe.review'" command="reject">驳回</el-dropdown-item>
+                  <el-dropdown-item command="export">导出 JSON</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
+        <template #empty>
+          <el-empty :image-size="70" description="暂无符合条件的关系配方" />
+        </template>
       </el-table>
-      <el-empty v-if="!loading && !rows.length" description="暂无符合条件的关系配方" />
       <div class="mt-4 flex justify-end"><el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" :page-sizes="[30, 60, 100]" layout="total, sizes, prev, pager, next" @current-change="load" @size-change="search" /></div>
     </el-card>
 
@@ -347,3 +377,4 @@ onMounted(load);
     <el-dialog v-model="sqlVisible" :title="sqlTitle" width="850px"><el-input v-loading="sqlLoading" :model-value="sqlText" type="textarea" :rows="18" readonly /><template #footer><el-button v-perms="'recipe.sql_generate'" :disabled="!sqlText" @click="downloadSql">下载SQL</el-button><el-button @click="sqlVisible = false">关闭</el-button></template></el-dialog>
   </div>
 </template>
+import EpArrowDown from "~icons/ep/arrow-down";

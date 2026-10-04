@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import ReDetailDrawer from "@/components/ReDetailDrawer/index.vue";
 import RePageHeader from "@/components/RePageHeader/index.vue";
+import { formatTime } from "@/utils/format";
 import ReStatCard from "@/components/ReStatCard/index.vue";
 import ReToolbar from "@/components/ReToolbar/index.vue";
 import { computed, onMounted, reactive, ref } from "vue";
@@ -249,7 +250,9 @@ onMounted(fetchData);
           </template>
         </el-table-column>
         <el-table-column prop="operator" label="操作人" width="140" show-overflow-tooltip />
-        <el-table-column prop="created_at" label="时间" width="190" />
+        <el-table-column label="时间" width="150">
+        <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+      </el-table-column>
         <el-table-column label="操作" width="80" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="openAuditDetail(row)">详情</el-button>
@@ -273,7 +276,9 @@ onMounted(fetchData);
         <el-table-column prop="affected_count" label="影响行" width="90" />
         <el-table-column prop="summary_masked" label="摘要" min-width="180" show-overflow-tooltip />
         <el-table-column prop="operator" label="操作人" width="120" />
-        <el-table-column prop="created_at" label="时间" width="180" />
+        <el-table-column label="时间" width="150">
+        <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+      </el-table-column>
       </el-table>
 
       <el-table
@@ -291,7 +296,9 @@ onMounted(fetchData);
         <el-table-column prop="diagnosis_file_name" label="诊断文件" min-width="160" show-overflow-tooltip />
         <el-table-column prop="operation_file_name" label="手术文件" min-width="160" show-overflow-tooltip />
         <el-table-column prop="error_summary" label="错误" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="created_at" label="时间" width="180" />
+        <el-table-column label="时间" width="150">
+        <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+      </el-table-column>
       </el-table>
 
       <div class="pagination-wrap">

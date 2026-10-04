@@ -137,7 +137,7 @@ const kpis = computed<KpiItem[]>(() => {
 
   const last = d.quality_last_run;
   const lastHint = last
-    ? `最近 run #${last.id} · findings ${last.total_findings ?? 0}`
+    ? `最近 run #${last.id} · 问题 ${last.total_findings ?? 0}`
     : "尚无质量跑批记录";
 
   return [
@@ -166,7 +166,7 @@ const kpis = computed<KpiItem[]>(() => {
       label: "字段资产",
       value: fmt(d.assets.columns),
       unit: fmtUnit(d.assets.columns),
-      helper: "asset_columns 实计",
+      helper: "结构化字段实计",
       trend: "结构",
       trendDirection: "flat" as const,
       tone: "info" as const,
@@ -190,7 +190,7 @@ const kpis = computed<KpiItem[]>(() => {
       label: "人员主档",
       value: String(d.persons),
       helper: `科室 ${d.departments} · 规则 ${d.quality_rules}`,
-      trend: last ? `质量open ${d.quality_findings_open}` : "HIS",
+      trend: last ? `待处理 ${d.quality_findings_open}` : "HIS",
       trendDirection: "flat" as const,
       tone: "accent" as const,
       icon: UserIcon,
@@ -223,16 +223,16 @@ const healthTrendOption = computed<EChartsCoreOption>(() => {
   }
   return {
     tooltip: { trigger: "axis" },
-    legend: { data: ["findings", "pass_rate%"] },
+    legend: { data: ["问题数", "通过率%"] },
     xAxis: {
       type: "category",
       boundaryGap: false,
       data: trend.map(t => t.label)
     },
-    yAxis: [{ type: "value", name: "findings" }, { type: "value", name: "%", max: 100 }],
+    yAxis: [{ type: "value", name: "问题数" }, { type: "value", name: "通过率%", max: 100 }],
     series: [
       {
-        name: "findings",
+        name: "问题数",
         type: "line",
         smooth: true,
         symbolSize: 6,
@@ -240,7 +240,7 @@ const healthTrendOption = computed<EChartsCoreOption>(() => {
         data: trend.map(t => t.findings)
       },
       {
-        name: "pass_rate%",
+        name: "通过率%",
         type: "line",
         smooth: true,
         yAxisIndex: 1,
@@ -444,10 +444,10 @@ onMounted(loadDashboard);
     </section>
 
     <section class="dashboard-grid">
-      <ReDataCard title="质量跑批趋势" subtitle="最近质量检查 run（findings / pass_rate）" glow>
+      <ReDataCard title="质量跑批趋势" subtitle="最近质量检查 run（问题数 / 通过率）" glow>
         <ReChart :option="healthTrendOption" height="320px" />
       </ReDataCard>
-      <ReDataCard title="业务域分布" subtitle="按 asset_tables.domain 实计" glow>
+      <ReDataCard title="业务域分布" subtitle="按表登记的业务域实计" glow>
         <ReChart :option="domainOption" height="320px" />
       </ReDataCard>
       <ReDataCard title="Schema/Owner 表量 Top" subtitle="按 namespace/schema 聚合" glow>

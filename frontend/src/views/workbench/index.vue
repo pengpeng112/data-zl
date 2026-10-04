@@ -342,8 +342,8 @@ onMounted(() => {
         </el-col>
       </el-row>
 
-      <!-- 中：最近访问 + 常用功能 -->
-      <el-row :gutter="12" class="mb-3">
+      <!-- 中：最近访问 + 常用功能（213 UI-07：不等高拉伸） -->
+      <el-row :gutter="12" class="mb-3" align="top" style="align-items: flex-start;">
         <el-col :xs="24" :sm="24" :md="12">
           <el-card shadow="never" class="h-full">
             <template #header><span>最近访问</span></template>
@@ -355,7 +355,7 @@ onMounted(() => {
                 @click="go(item.path)"
               >
                 <span>{{ item.title }}</span>
-                <span class="muted">{{ item.parent }}</span>
+                <el-tag size="small" effect="plain" type="info">{{ item.parent }}</el-tag>
               </div>
             </div>
             <div v-else class="muted pad">
@@ -374,7 +374,7 @@ onMounted(() => {
                 @click="go(item.path)"
               >
                 <span>{{ item.title }}</span>
-                <span class="muted">{{ item.parent }}</span>
+                <el-tag size="small" effect="plain" type="info">{{ item.parent }}</el-tag>
               </div>
             </div>
             <div v-else class="muted pad">当前账号没有可用的业务功能</div>
@@ -500,6 +500,7 @@ onMounted(() => {
 
 .feature-item {
   display: flex;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   padding: 6px 4px;
@@ -511,6 +512,10 @@ onMounted(() => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  :deep(.el-tag) {
+    flex-shrink: 0;
   }
 
   &:hover {
