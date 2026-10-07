@@ -1,16 +1,19 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import http_exception_handler as _fastapi_http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
+import json
 import logging
 import hashlib
 import time
 import uuid
 from contextlib import asynccontextmanager
 
-from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, quality_controls, quality_issues, quality_observations, queries, recipes, relation_reviews, probe, relations, systems, tables, value_domains
+from .api.v1 import admin, ai, ai_accuracy, ai_quality, auth, candidates, data_products, dict_general_api, dict_medical_api, dict_medical_import_api, dict_medical_push_api, governance, governance_ops, graph, graph_analysis, health, identity, identity_sync, lineage, metadata_changes, metrics, ops_tools, permissions, permission_requests, quality, quality_controls, quality_issues, quality_observations, quality_runs, quality_vendors, quality_notifications, queries, recipes, relation_reviews, probe, relations, systems, tables, value_domains
 from .core.config import settings
 from .core.db import SessionLocal
 from .core.exceptions import (
@@ -68,6 +71,31 @@ def _start_scheduler():
             # Register identity nightly sync (plan 107): default OFF
             from .services.identity_nightly_scheduler import register_nightly_job
             register_nightly_job(scheduler)
+            # 207 质量执行调度（默认 OFF；启用须生产配置批准）：入队到期清单运行
+            # + 提升到窗 waiting_window；实际执行由 quality_worker_207.py 领取。
+            if settings.quality_execution_scheduler_enabled:
+                from .services.quality_execution_service import (
+                    enqueue_due_scheduled_runs,
+                    promote_waiting_runs,
+                )
+
+                def _quality_execution_tick() -> None:
+                    from .core.db import SessionLocal as _SL
+                    s = _SL()
+                    try:
+                        enqueue_due_scheduled_runs(s)
+                        promote_waiting_runs(s)
+                        s.commit()
+                    except Exception:
+                        s.rollback()
+                        logger.exception("quality execution tick failed")
+                    finally:
+                        s.close()
+
+                scheduler.add_job(
+                    _quality_execution_tick, "interval", seconds=300,
+                    id="quality_execution_tick", replace_existing=True,
+                )
 
             # 126 P3: query schedules — only when APP_QUERY_SCHEDULE_ENABLED=true
             if settings.query_schedule_enabled:
@@ -222,6 +250,15 @@ def _run_quality_nightly():
         from .api.v1.quality import run_quality_check_core
 
         result = run_quality_check_core(db, triggered_by="nightly_scheduler", include_sql=False)
+        # 207 F04：常态执行结束自动送入台账（open findings → FAIL 观测归并），
+        # 不再依赖人工重跑种子脚本；历史精度如实标注 latest_snapshot。
+        try:
+            from .services.quality_governance_adapters import sync_quality_findings
+            sync_quality_findings(db, actor="nightly:quality_check")
+            db.commit()
+        except Exception as sync_exc:  # 摄取失败不影响主检查结果
+            db.rollback()
+            logger.error("Nightly quality findings sync failed: %s", type(sync_exc).__name__)
         job.status = "success"
         job.finished_at = datetime.now(timezone.utc)
         job.total_processed = result.get("total_rules", 0)
@@ -450,6 +487,10 @@ FINE_GRAINED_Rbac_PREFIXES_174 = (
     "/api/v1/quality-issues",
     "/api/v1/quality-controls",
     "/api/v1/quality-observations",
+    # 207：三个新路由族逐条挂 quality.run/vendor/notification 权限码
+    "/api/v1/quality-runs",
+    "/api/v1/quality-vendors",
+    "/api/v1/quality-notifications",
     # 200 R03：dict-medical 全部路由已逐条挂 dict.medical.* 端点权限码。
     "/api/v1/dict-medical",
 )
@@ -603,7 +644,11 @@ async def auth_and_logging_middleware(request: Request, call_next):
                 ok, err, key = _check_token(db, token)
                 if not ok:
                     db.close()
-                    return JSONResponse(status_code=403, content={"code": 403, "message": err, "data": None})
+                    return JSONResponse(status_code=403, content={
+                        "code": 403, "message": err, "data": None,
+                        "detail": err,  # DEF-01 统一信封：detail 兼容镜像
+                        "request_id": request.state.request_id,
+                    })
                 request.state.user_identifier = key.user_identifier if key else None
                 request.state.auth_via = "api_key"
                 token_roles = _lookup_roles(db, request.state.user_identifier)
@@ -614,6 +659,7 @@ async def auth_and_logging_middleware(request: Request, call_next):
                 db.close()
                 return JSONResponse(status_code=403, content={
                     "code": 403, "message": rbac_err, "data": None,
+                    "detail": rbac_err,  # DEF-01 统一信封：detail 兼容镜像
                     "request_id": request.state.request_id,
                 })
             db.close()
@@ -645,6 +691,42 @@ async def auth_and_logging_middleware(request: Request, call_next):
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def unified_403_envelope_handler(request: Request, exc: StarletteHTTPException):
+    """DEF-01 / 214 E-A2：全站 403 统一信封。
+
+    契约见 开发起步包/output_r214/DEF-01_兼容性清单.md §4：
+    {code:403, message:"权限不足"(权限拒绝族)/原文, data:{"resource_code"}|null,
+     detail:旧文案镜像, request_id}。仅重塑 403，其余状态委托 FastAPI 默认形状。
+    """
+    if exc.status_code != 403:
+        return await _fastapi_http_exception_handler(request, exc)
+    resource_code = getattr(exc, "resource_code", None)
+    if resource_code is not None:
+        message = "权限不足"
+        data: object = {"resource_code": resource_code}
+        detail = getattr(exc, "legacy_detail", None) or f"缺少权限: {resource_code}"
+    elif isinstance(exc.detail, str) and exc.detail:
+        message = exc.detail
+        data = None
+        detail = exc.detail
+    else:
+        message = "权限不足"
+        data = None
+        detail = json.dumps(exc.detail, ensure_ascii=False) if exc.detail is not None else "权限不足"
+    return JSONResponse(
+        status_code=403,
+        content={
+            "code": 403,
+            "message": message,
+            "data": data,
+            "detail": detail,
+            "request_id": getattr(request.state, "request_id", ""),
+        },
+        headers=getattr(exc, "headers", None),
+    )
 
 app.include_router(auth.router)
 app.include_router(graph.router)
@@ -686,6 +768,9 @@ app.include_router(probe.router)
 app.include_router(quality_controls.router)
 app.include_router(quality_observations.router)
 app.include_router(quality_issues.router)
+app.include_router(quality_runs.router)
+app.include_router(quality_vendors.router)
+app.include_router(quality_notifications.router)
 
 @app.get("/", summary="根")
 def root() -> dict[str, str]:

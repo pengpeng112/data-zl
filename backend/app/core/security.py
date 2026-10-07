@@ -14,6 +14,19 @@ from ..services.effective_permissions import (
 logger = logging.getLogger(__name__)
 
 
+class PermissionDenied(HTTPException):
+    """端点级权限拒绝（DEF-01 / 214 E-A2 统一 403 信封）。
+
+    message 固定「权限不足」；resource_code 进 data；旧文案「缺少权限: <码>」
+    由 main.py 的 403 处理器镜像进 detail 兼容字段，老读取方无感。
+    """
+
+    def __init__(self, resource_code: str):
+        super().__init__(status_code=403, detail="权限不足")
+        self.resource_code = resource_code
+        self.legacy_detail = f"缺少权限: {resource_code}"
+
+
 def get_current_user(request: Request) -> str:
     """Return the authenticated user set by the HTTP authentication middleware."""
     user_identifier = getattr(request.state, "user_identifier", None)
@@ -56,7 +69,7 @@ def require_permission(resource_code: str):
         # 按"裸资源权限"编码，不再拼成 resource:allow 导致界面勾选而后端拒绝。
         granted = [normalize_permission_code(row.resource, row.action) for row in rows]
         if not any(_permission_matches(item, resource_code) for item in granted):
-            raise HTTPException(status_code=403, detail=f"缺少权限: {resource_code}")
+            raise PermissionDenied(resource_code)
         return user_identifier
 
     return dependency
