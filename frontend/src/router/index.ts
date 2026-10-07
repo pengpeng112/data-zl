@@ -58,15 +58,19 @@ Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
 });
 
-/** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
-export const constantRoutes: Array<RouteRecordRaw> = withRouteSkeleton(
-  formatTwoStageRoutes(
-    formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
-  )
+/** 拍平后的静态路由（组件仍是原始懒加载函数，供重置时重新包装） */
+const preparedConstantRoutes = formatTwoStageRoutes(
+  formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
 );
 
-/** 213 UI-02：路由级骨架——懒加载路由在组件解析前渲染 RouteSkeleton，消除白屏/半透明。
- * 纯包装（不改原对象），resetRouter 可对干净副本重复调用。 */
+/** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
+export const constantRoutes: Array<RouteRecordRaw> = withRouteSkeleton(
+  preparedConstantRoutes
+);
+
+/** 213 UI-02：路由级骨架——懒加载路由在组件解析前渲染 RouteSkeleton。
+ * 不改原对象。delay 200：已缓存的页面不闪骨架，慢加载才出现。
+ * resetRouter 必须从原始函数重新包装；对已包装结果 cloneDeep 会丢掉异步组件内部状态。 */
 function withRouteSkeleton(records: Array<any>): Array<any> {
   return records.map(record => {
     const children = record.children
@@ -78,15 +82,17 @@ function withRouteSkeleton(records: Array<any>): Array<any> {
       component = defineAsyncComponent({
         loader,
         loadingComponent: ReRouteSkeleton,
-        delay: 0
+        delay: 200
       });
     }
     return { ...record, component, ...(children ? { children } : {}) };
   });
 }
 
-/** 初始的静态路由，用于退出登录时重置路由 */
-const initConstantRoutes: Array<RouteRecordRaw> = cloneDeep(constantRoutes);
+/** 初始的静态路由，用于退出登录时重置路由（未包装的干净副本） */
+const initConstantRoutes: Array<RouteRecordRaw> = cloneDeep(
+  preparedConstantRoutes
+);
 
 /** 用于渲染菜单，保持原始层级 */
 export const constantMenus: Array<RouteComponent> = ascending(
@@ -124,9 +130,10 @@ export function resetLoadedPaths() {
 /** 重置路由 */
 export function resetRouter() {
   router.clearRoutes();
-  for (const route of withRouteSkeleton(
-    initConstantRoutes.concat(...(remainingRouter as any))
-  )) {
+  const resetRoutes = withRouteSkeleton(cloneDeep(initConstantRoutes)).concat(
+    ...(remainingRouter as any)
+  );
+  for (const route of resetRoutes) {
     router.addRoute(route);
   }
   router.options.routes = formatTwoStageRoutes(

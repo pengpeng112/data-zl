@@ -84,25 +84,25 @@ const transitionMain = defineComponent({
     }
   },
   render() {
-    const transitionName =
-      transitions.value(this.route)?.name || "fade-transform";
     const enterTransition = transitions.value(this.route)?.enterTransition;
     const leaveTransition = transitions.value(this.route)?.leaveTransition;
+    const content = this.$slots.default?.();
+    // 213 UI-02：默认不再套 fade-transform。out-in + opacity:0 会在异步页面
+    // 换入时把内容区停在不可见（页签已切、主体空白或仍是上一页）。
+    // 慢加载由路由骨架承担。仅保留路由自己声明的进入/离开动画。
+    if (!enterTransition && !leaveTransition) return content;
     return h(
       Transition,
       {
-        name: enterTransition ? "pure-classes-transition" : transitionName,
-        enterActiveClass: enterTransition
-          ? `animate__animated ${enterTransition}`
-          : undefined,
+        name: "pure-classes-transition",
+        enterActiveClass: `animate__animated ${enterTransition}`,
         leaveActiveClass: leaveTransition
           ? `animate__animated ${leaveTransition}`
           : undefined,
-        mode: "out-in",
-        appear: true
+        appear: false
       },
       {
-        default: () => [this.$slots.default()]
+        default: () => content
       }
     );
   }
