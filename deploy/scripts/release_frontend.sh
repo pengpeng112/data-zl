@@ -59,12 +59,46 @@ if [ "${MISSING}" -gt 0 ]; then
 fi
 echo "[release_frontend] all referenced assets present"
 
-# 3. 原子切换：previous -> 当前 current；current -> 新版本
-if [ -L "${CURRENT_LINK}" ]; then
-  cp -d "${CURRENT_LINK}" "${PREVIOUS_LINK}.tmp"
-  mv -f "${PREVIOUS_LINK}.tmp" "${PREVIOUS_LINK}"
+# 3. 原子切换：previous -> 当前 current 指向；current -> 新版本
+#    214 E-A3 修复（两处叠加缺陷，r169→r203→r210 生产表现=previous 恒指 r169）：
+#    a) 原 `cp -d "${CURRENT_LINK}"` 对“指向目录的软链”在部分 cp 实现下按目录
+#       处理（-r 未指定直接拒绝）；
+#    b) 原 `mv -f "${PREVIOUS_LINK}.tmp" "${PREVIOUS_LINK}"` 在 previous 已是
+#       “指向目录的软链”时把 .tmp 移进目录内部而非替换（缺 -T）——
+#       第二次发布起 previous 永不更新。
+#    改为 readlink 显式取目标 + ln 造 .tmp + `mv -Tf` 原子替换；
+#    同版本复跑视为 no-op（previous 不动，避免覆盖回滚锚点）。
+NEED_SWITCH=1
+if [ -L "${CURRENT_LINK}" ] && [ "$(readlink "${CURRENT_LINK}")" = "${TARGET_DIR}" ]; then
+  NEED_SWITCH=0
 fi
-ln -sfn "${TARGET_DIR}" "${CURRENT_LINK}"
+if [ "${NEED_SWITCH}" = "1" ]; then
+  if [ -L "${CURRENT_LINK}" ]; then
+    OLD_CURRENT_TARGET="$(readlink "${CURRENT_LINK}")"
+    ln -sfn "${OLD_CURRENT_TARGET}" "${PREVIOUS_LINK}.tmp"
+    mv -Tf "${PREVIOUS_LINK}.tmp" "${PREVIOUS_LINK}"
+    echo "[release_frontend] previous -> ${OLD_CURRENT_TARGET}"
+  else
+    echo "[release_frontend] no current link yet; previous left untouched"
+  fi
+  ln -sfn "${TARGET_DIR}" "${CURRENT_LINK}"
+else
+  echo "[release_frontend] current already -> ${TARGET_DIR}; skip switch (previous untouched)"
+fi
+
+# 4. 切换后校验：current 原始链接目标必须等于本次 target；
+#    previous（若存在）不得与 current 同目标。用 readlink 原始值比对，
+#    不用 readlink -f（MSYS 下对末级软链不解析，Linux 行为虽正常但无必要）。
+CUR_NOW="$(readlink "${CURRENT_LINK}")"
+if [ "${CUR_NOW}" != "${TARGET_DIR}" ]; then
+  echo "[release_frontend] ERROR: current does not point to target after switch" >&2
+  exit 1
+fi
+PREV_NOW="$(readlink "${PREVIOUS_LINK}" 2>/dev/null || true)"
+if [ -n "${PREV_NOW}" ] && [ "${PREV_NOW}" = "${CUR_NOW}" ]; then
+  echo "[release_frontend] ERROR: previous must not point to the just-released build" >&2
+  exit 1
+fi
 
 echo "[release_frontend] current -> ${TARGET_DIR}"
 echo "[release_frontend] previous -> $(readlink -f "${PREVIOUS_LINK}" 2>/dev/null || echo none)"
