@@ -20,6 +20,11 @@ import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "~icons/ri/lock-fill";
 import User from "~icons/ri/user-3-fill";
 
+// 品牌区内容即使统计接口异常/为空也有占位文案，避免品牌区与登录卡片观感失衡（214 E-A1 登录页加固）
+const eyebrowText = "Hospital Data Asset Command Center";
+const brandDesc =
+  "让医院数据资产看得见、管得住、用得好，支撑源库探查、治理导入、质量分析与关系图谱协同运行。";
+
 // 登录页展示指标：资产对象/治理关系从后端公开接口实时同步，质量规则保持文案
 const commandMetrics = ref([
   { label: "资产对象", value: "-" },
@@ -222,11 +227,9 @@ loadPublicStats();
       </Motion>
       <Motion :delay="80">
         <div class="brand-copy">
-          <p class="eyebrow">Hospital Data Asset Command Center</p>
+          <p class="eyebrow">{{ eyebrowText }}</p>
           <h1>{{ title }} {{ subTitle }}</h1>
-          <p class="brand-desc">
-            让医院数据资产看得见、管得住、用得好，支撑源库探查、治理导入、质量分析与关系图谱协同运行。
-          </p>
+          <p class="brand-desc">{{ brandDesc }}</p>
         </div>
       </Motion>
       <Motion :delay="160">
