@@ -203,6 +203,9 @@ def build_context_snapshot(
         "products": products,
         "value_domains": value_domains,
         "value_domain_count": len(value_domains),
+        # 210 S8：安全策略增量——结构信息供 SQL 生成 ≠ 数据使用许可；
+        # 候选标签不注入 confirmed，未分类对象受保护读取默认拒绝。
+        "security_policy": _security_policy_block(db),
         "warnings": warnings,
         "unresolved": [],
         "truncated": truncated,
@@ -225,28 +228,69 @@ def build_context_snapshot(
     doc["metric_count"] = len(metrics)
     doc["product_count"] = len(products)
 
-    context_id = f"ctx-{now.strftime('%Y%m%dT%H%M%S')}-{hashlib.sha256((manifest_blob + (question_summary or '')).encode('utf-8')).hexdigest()[:10]}"
-    doc["context_id"] = context_id
-    db.add(
-        AiContextSnapshot(
-            context_id=context_id,
-            schema_version=CONTEXT_SCHEMA_VERSION,
-            question_summary=doc["question_summary"],
-            generated_at=now,
-            expires_at=now + timedelta(hours=DEFAULT_TTL_HOURS),
-            manifest_hash=doc["manifest_hash"],
-            object_count=len(objects),
-            relation_count=len(relations),
-            query_count=len(queries),
-            metric_count=len(metrics),
-            product_count=len(products),
-            truncated=truncated,
-            snapshot_json=doc,
-            created_by=created_by,
+    # 212 DEF212-002：context_id 含内容哈希且时间戳仅到秒，同问题同秒并发构建
+    # 会生成相同 ID 撞唯一约束。细化到微秒，并以 flush 重试兜底；重试只重生成
+    # ID，不改变快照内容与"每次构建留档"语义。
+    from sqlalchemy.exc import IntegrityError
+
+    digest = hashlib.sha256((manifest_blob + (question_summary or '')).encode('utf-8')).hexdigest()[:10]
+    for attempt in range(3):
+        ts = datetime.now(timezone.utc) if attempt else now
+        context_id = f"ctx-{ts.strftime('%Y%m%dT%H%M%S%f')}-{digest}"
+        doc["context_id"] = context_id
+        db.add(
+            AiContextSnapshot(
+                context_id=context_id,
+                schema_version=CONTEXT_SCHEMA_VERSION,
+                question_summary=doc["question_summary"],
+                generated_at=now,
+                expires_at=now + timedelta(hours=DEFAULT_TTL_HOURS),
+                manifest_hash=doc["manifest_hash"],
+                object_count=len(objects),
+                relation_count=len(relations),
+                query_count=len(queries),
+                metric_count=len(metrics),
+                product_count=len(products),
+                truncated=truncated,
+                snapshot_json=doc,
+                created_by=created_by,
+            )
         )
-    )
-    db.flush()
+        try:
+            db.flush()
+            break
+        except IntegrityError:
+            db.rollback()
+    else:
+        raise RuntimeError("AI上下文快照ID冲突重试耗尽")
     return doc
+
+
+def _security_policy_block(db) -> dict[str, Any]:
+    """210 S8：AI 上下文安全策略段（只读、无患者值）。
+
+    明确区分"结构信息供 SQL 生成"与"数据使用许可"；confirmed 分类计数仅作
+    治理覆盖提示，候选标签不注入。
+    """
+    from sqlalchemy import select
+
+    from ..models.dataset import AssetDsClassification
+
+    confirmed = db.scalar(
+        select(AssetDsClassification.id).where(
+            AssetDsClassification.status == "active",
+            AssetDsClassification.label_source == "confirmed").limit(1)
+    ) is not None
+    return {
+        "schema_version": "ds-security/b02_v1",
+        "permission_model": "structure_only",
+        "note": "本上下文仅提供结构信息供SQL生成，不构成任何数据读取/导出/训练许可；"
+                "受保护数据使用需用途授权与独立审批（dataset_security 网关裁决）",
+        "confirmed_label_present": confirmed,
+        "unclassified_warning": None if confirmed else
+        "平台尚无 confirmed 安全分类标签：未分类对象受保护读取/导出默认拒绝"
+        "（fail-closed）；分类候选不是确认定级",
+    }
 
 
 def _table_pair(value: str | None, schema_name: str | None = None, table_name: str | None = None) -> tuple[str, str] | None:
