@@ -1,0 +1,14 @@
+{
+  "task": "211核查整改(214批次B)",
+  "run": "r211-20261008-zcode-r214b",
+  "updated_at": "2026-10-08",
+  "stages": {
+    "A0": "DONE", "A1": "DONE", "A2": "DONE", "A3": "DONE",
+    "A4": "DONE", "A5": "DONE", "A6": "DONE", "A7": "DONE",
+    "A8": "WAITING_APPROVAL(生产/源端不在本轮,无新增申请)"
+  },
+  "current_waiting": [],
+  "history": [
+    "2026-10-08 A0-A7完成: requirements 30条; 419路径/477操作/72UI路径; 11线索核清; FIX-211-01(P1 AI上下文500)+FIX-211-02(P3文档)修复并回归; 候选c211-20261008-r39ca60d+fix01冻结交付212"
+  ]
+}

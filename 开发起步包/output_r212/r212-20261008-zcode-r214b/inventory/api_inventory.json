@@ -1,0 +1,2869 @@
+{
+ "source": "app.openapi() paths (authoritative; include_router is lazy-wrapped)",
+ "api_path_count": 419,
+ "api_operation_count": 477,
+ "routes": [
+  {
+   "method": "GET",
+   "path": "/",
+   "operation_id": "root__get",
+   "summary": "根"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/init/backfill-p6",
+   "operation_id": "backfill_p6_api_v1_admin_init_backfill_p6_post",
+   "summary": "回填 asset_tables/columns 的 system_code/source_code/namespace_name（P6 数据初始化）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/init/import-his-source",
+   "operation_id": "import_his_source_api_v1_admin_init_import_his_source_post",
+   "summary": "导入 HIS 1234 表资产（从 CSV 读取，仅首次运行）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/keys",
+   "operation_id": "list_keys_api_v1_admin_keys_get",
+   "summary": "API Key 列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/keys",
+   "operation_id": "create_key_api_v1_admin_keys_post",
+   "summary": "创建新 API Key"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/admin/keys/{key_id}",
+   "operation_id": "toggle_key_api_v1_admin_keys__key_id__patch",
+   "summary": "禁用/启用 API Key"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/owners",
+   "operation_id": "list_owners_api_v1_admin_owners_get",
+   "summary": "表 Owner 列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/admin/owners",
+   "operation_id": "upsert_owner_api_v1_admin_owners_put",
+   "summary": "设置/更新表 Owner"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/admin/owners/{owner_id}",
+   "operation_id": "delete_owner_api_v1_admin_owners__owner_id__delete",
+   "summary": "删除 Owner"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/snapshots",
+   "operation_id": "list_snapshots_api_v1_admin_snapshots_get",
+   "summary": "快照列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/admin/snapshots",
+   "operation_id": "create_snapshot_api_v1_admin_snapshots_post",
+   "summary": "创建元数据快照"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/snapshots/compare",
+   "operation_id": "compare_snapshots_api_v1_admin_snapshots_compare_get",
+   "summary": "对比两个快照"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/terms",
+   "operation_id": "list_terms_api_v1_admin_terms_get",
+   "summary": "业务术语列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/admin/terms",
+   "operation_id": "upsert_term_api_v1_admin_terms_put",
+   "summary": "添加/更新业务术语"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/admin/terms/lookup",
+   "operation_id": "lookup_term_api_v1_admin_terms_lookup_get",
+   "summary": "按业务词查找映射"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/admin/terms/{term_id}",
+   "operation_id": "delete_term_api_v1_admin_terms__term_id__delete",
+   "summary": "删除业务术语"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/ai-sql/generate",
+   "operation_id": "generate_ai_sql_api_v1_ai_ai_sql_generate_post",
+   "summary": "依据正式关系与值域生成 Oracle 只读 SQL（永不执行）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/ai-sql/history",
+   "operation_id": "ai_sql_history_api_v1_ai_ai_sql_history_get",
+   "summary": "Ai Sql History"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/answers",
+   "operation_id": "register_answer_api_v1_ai_answers_post",
+   "summary": "144 S7：登记 AI 回答 provenance（不保存敏感全文）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/context/resolve",
+   "operation_id": "resolve_context_api_v1_ai_context_resolve_post",
+   "summary": "144 S6：按问题/系统/业务域构建统一上下文快照"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/context/{context_id}",
+   "operation_id": "get_context_api_v1_ai_context__context_id__get",
+   "summary": "144 S6：读取可复现上下文（含过期/截断状态）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/drafts",
+   "operation_id": "list_drafts_api_v1_ai_drafts_get",
+   "summary": "查询草稿列表"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ai/drafts/{draft_id}",
+   "operation_id": "review_draft_api_v1_ai_drafts__draft_id__patch",
+   "summary": "审核草稿（通过/拒绝）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/drafts/{draft_id}/execute",
+   "operation_id": "execute_approved_draft_api_v1_ai_drafts__draft_id__execute_post",
+   "summary": "Execute approved SQL draft in read-only mode"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/evaluations/dashboard",
+   "operation_id": "dashboard_api_api_v1_ai_evaluations_dashboard_get",
+   "summary": "144 S7：准确性看板（只统计已审核反馈与黄金用例）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/evaluations/run",
+   "operation_id": "run_evaluation_api_api_v1_ai_evaluations_run_post",
+   "summary": "144 S7：对候选或现行版本回放受影响黄金用例"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/export-context",
+   "operation_id": "export_context_api_v1_ai_export_context_post",
+   "summary": "导出脱敏 AI 上下文（表/字段/关系，不含患者数据）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/feedback",
+   "operation_id": "list_feedback_api_api_v1_ai_feedback_get",
+   "summary": "186 Q2：反馈分页列表（mine=本人历史 / queue=审核队列）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/feedback",
+   "operation_id": "submit_feedback_api_api_v1_ai_feedback_post",
+   "summary": "144 S7：提交绑定版本/run/context 的准确性反馈"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/feedback/{feedback_id}",
+   "operation_id": "get_feedback_api_api_v1_ai_feedback__feedback_id__get",
+   "summary": "144 S7：查询反馈解决状态与新版本引用"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ai/feedback/{feedback_id}/review",
+   "operation_id": "review_feedback_api_api_v1_ai_feedback__feedback_id__review_patch",
+   "summary": "144 S7：审核反馈（状态机：不自动发布任何资产）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/mcp/catalog",
+   "operation_id": "mcp_catalog_api_v1_ai_mcp_catalog_get",
+   "summary": "126 P5 + 144 S6：MCP 工具目录（全部真实可执行）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/propose-sql",
+   "operation_id": "propose_sql_api_v1_ai_propose_sql_post",
+   "summary": "AI 提交 SQL/视图草稿（仅保存，不执行；149 附精确字段值域）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/sessions",
+   "operation_id": "list_sessions_api_v1_ai_sessions_get",
+   "summary": "查询 AI 会话列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/sessions",
+   "operation_id": "start_session_api_v1_ai_sessions_post",
+   "summary": "创建 AI 探索会话"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/sql-risk-scan",
+   "operation_id": "sql_risk_scan_api_v1_ai_sql_risk_scan_post",
+   "summary": "SQL 风险扫描（P10 增强，独立接口）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/suggest-annotations",
+   "operation_id": "suggest_annotations_api_v1_ai_suggest_annotations_post",
+   "summary": "AI 生成注释草稿（占位，待 P5.5 多数据库驱动就绪）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/system-context",
+   "operation_id": "system_context_api_v1_ai_system_context_get",
+   "summary": "按系统导出 AI 上下文（P10 增强；149 附带全量 confirmed 值域+陷阱）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/tool-call",
+   "operation_id": "log_tool_call_api_v1_ai_tool_call_post",
+   "summary": "记录工具调用（供审计）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/tool-calls",
+   "operation_id": "list_tool_calls_api_v1_ai_tool_calls_get",
+   "summary": "查询工具调用记录"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/tool-execute",
+   "operation_id": "tool_execute_api_v1_ai_tool_execute_post",
+   "summary": "AI 工具执行代理（只读，真实分发或明确不支持）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/tools",
+   "operation_id": "list_tools_api_v1_ai_tools_get",
+   "summary": "获取 AI 可调用工具列表（供 Dify/MCP/外部 AI 注册）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/annotations/missing",
+   "operation_id": "missing_annotations_api_v1_annotations_missing_get",
+   "summary": "缺失中文注释清单（表 + 字段）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/assets/tree",
+   "operation_id": "assets_tree_api_v1_assets_tree_get",
+   "summary": "业务系统 → 连接 → schema 树（默认不含表清单，表按需加载）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/assets/tree/search",
+   "operation_id": "assets_tree_search_api_v1_assets_tree_search_get",
+   "summary": "按表名/中文名搜索（返回完整路径，限量）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/assets/tree/tables",
+   "operation_id": "assets_tree_tables_api_v1_assets_tree_tables_get",
+   "summary": "懒加载：某 source+schema 下的表清单（分页）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/change-password",
+   "operation_id": "change_password_api_v1_auth_change_password_post",
+   "summary": "修改密码"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/login",
+   "operation_id": "login_api_v1_auth_login_post",
+   "summary": "本地账号登录"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/auth/login-events",
+   "operation_id": "login_events_api_v1_auth_login_events_get",
+   "summary": "登录审计（脱敏）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/logout",
+   "operation_id": "logout_api_v1_auth_logout_post",
+   "summary": "登出并撤销会话"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/auth/me",
+   "operation_id": "me_api_v1_auth_me_get",
+   "summary": "当前登录账号摘要"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/refresh",
+   "operation_id": "refresh_api_v1_auth_refresh_post",
+   "summary": "刷新 Access Token"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/auth/users",
+   "operation_id": "list_users_api_v1_auth_users_get",
+   "summary": "本地账号列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/auth/users",
+   "operation_id": "create_user_api_v1_auth_users_post",
+   "summary": "创建本地账号"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/auth/users/{user_id}",
+   "operation_id": "patch_user_api_v1_auth_users__user_id__patch",
+   "summary": "启停/解锁/重置密码/换绑"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/candidates",
+   "operation_id": "list_candidates_api_v1_candidates_get",
+   "summary": "查询候选关系列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/candidates/{candidate_id}/promote",
+   "operation_id": "promote_candidate_api_v1_candidates__candidate_id__promote_post",
+   "summary": "候选关系提升为正式关系"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/candidates/{candidate_id}/reject",
+   "operation_id": "reject_candidate_api_v1_candidates__candidate_id__reject_post",
+   "summary": "拒绝候选关系"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/columns/search",
+   "operation_id": "search_columns_api_v1_columns_search_get",
+   "summary": "字段搜索"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/columns/{column_id}/annotation",
+   "operation_id": "update_column_annotation_api_v1_columns__column_id__annotation_patch",
+   "summary": "更新字段中文名/业务说明/取值说明"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/connections",
+   "operation_id": "list_connections_api_v1_connections_get",
+   "summary": "物理连接列表（按 database_key 去重，别名折叠）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/connections-targets",
+   "operation_id": "list_connection_targets_api_v1_connections_targets_get",
+   "summary": "运维目标数据库列表（含写能力标记）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/connections/test-draft",
+   "operation_id": "test_connection_draft_api_v1_connections_test_draft_post",
+   "summary": "测试未保存连接（密码不落库）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/connections/{connection_id}",
+   "operation_id": "get_connection_api_v1_connections__connection_id__get",
+   "summary": "连接详情（脱敏）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/connections/{connection_id}/test",
+   "operation_id": "test_saved_connection_api_v1_connections__connection_id__test_post",
+   "summary": "测试已保存连接"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dashboard/summary",
+   "operation_id": "dashboard_summary_api_v1_dashboard_summary_get",
+   "summary": "首页指挥中心真实指标（聚合只读）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/data-products",
+   "operation_id": "list_products_api_v1_data_products_get",
+   "summary": "数据产品目录"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products",
+   "operation_id": "create_product_api_v1_data_products_post",
+   "summary": "登记/更新数据产品"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/data-products/ai/context",
+   "operation_id": "ai_context_api_v1_data_products_ai_context_get",
+   "summary": "AI 可读数据产品目录"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/import/metric-results",
+   "operation_id": "import_results_api_v1_data_products_import_metric_results_post",
+   "summary": "从取数 CSV 导入历史月度指标结果（默认 dry-run）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/publish-core",
+   "operation_id": "publish_core_api_v1_data_products_publish_core_post",
+   "summary": "将已导入的 CORE 查询/指标发布为数据产品"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/data-products/{product_code}",
+   "operation_id": "get_product_api_v1_data_products__product_code__get",
+   "summary": "产品详情"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/data-products/{product_code}/execute",
+   "operation_id": "exec_product_api_v1_data_products__product_code__execute_post",
+   "summary": "执行已发布数据产品（禁止任意 SQL）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets",
+   "operation_id": "list_datasets_api_v1_datasets_get",
+   "summary": "数据集目录（元数据浏览；读取许可由网关标注）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets",
+   "operation_id": "create_dataset_api_v1_datasets_post",
+   "summary": "新建数据集（draft）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/admin/replay-revocations",
+   "operation_id": "replay_revocations_api_v1_datasets_admin_replay_revocations_post",
+   "summary": "备份恢复后撤销账本重放（幂等）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/batches/{run_id}",
+   "operation_id": "batch_detail_api_v1_datasets_batches__run_id__get",
+   "summary": "批次详情（检查点/计数）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/batches/{run_id}/records",
+   "operation_id": "ingest_records_api_v1_datasets_batches__run_id__records_post",
+   "summary": "幂等写入（合成批次录入）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/classifications",
+   "operation_id": "list_classifications_api_v1_datasets_classifications_get",
+   "summary": "分类清单（active/pending/候选区分）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/classifications",
+   "operation_id": "set_classification_api_v1_datasets_classifications_post",
+   "summary": "分类提案（严格校验+CAS+降级走审批）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/classifications/candidates:import",
+   "operation_id": "import_candidates_api_v1_datasets_classifications_candidates_import_post",
+   "summary": "离线候选批量导入（隔离库验证用；不覆盖 confirmed）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/classifications/{row_id}/review",
+   "operation_id": "review_classification_api_v1_datasets_classifications__row_id__review_post",
+   "summary": "分类变更审批（审批人≠提案人；hash 失效拒绝）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/exports",
+   "operation_id": "list_exports_api_v1_datasets_exports_get",
+   "summary": "导出清单（本人/待审/全部按权限）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/exports/{export_code}/download",
+   "operation_id": "download_export_api_v1_datasets_exports__export_code__download_post",
+   "summary": "下载（当前主体/用途/版本/工件全量重验）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/exports/{export_code}/generate",
+   "operation_id": "generate_export_api_v1_datasets_exports__export_code__generate_post",
+   "summary": "生成工件（同步+取消+失败可恢复）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/exports/{export_code}/review",
+   "operation_id": "review_export_api_v1_datasets_exports__export_code__review_post",
+   "summary": "导出独立审批（审批人≠申请人）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/grants",
+   "operation_id": "list_grants_api_v1_datasets_grants_get",
+   "summary": "授权清单"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/grants",
+   "operation_id": "create_grant_api_v1_datasets_grants_post",
+   "summary": "用途授权申请（status=pending，需独立审批）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/grants/{grant_id}/review",
+   "operation_id": "review_grant_api_v1_datasets_grants__grant_id__review_post",
+   "summary": "授权审批（审批人≠申请人）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/grants/{grant_id}/revoke",
+   "operation_id": "revoke_grant_api_v1_datasets_grants__grant_id__revoke_post",
+   "summary": "撤权（即时生效+导出传播+账本）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/approve",
+   "operation_id": "approve_api_v1_datasets__code__versions__version_id__approve_post",
+   "summary": "版本人工审批（职责分离）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/exports",
+   "operation_id": "create_export_api_v1_datasets__code__versions__version_id__exports_post",
+   "summary": "受控导出申请（进入待审）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/freeze",
+   "operation_id": "freeze_api_v1_datasets__code__versions__version_id__freeze_post",
+   "summary": "冻结（绑定具体成员）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/manifest",
+   "operation_id": "version_manifest_api_v1_datasets__code__versions__version_id__manifest_get",
+   "summary": "版本清单与成员统计"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/publish",
+   "operation_id": "publish_api_v1_datasets__code__versions__version_id__publish_post",
+   "summary": "发布（三重门禁：持久化质量断言+安全结论+审批）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/revoke",
+   "operation_id": "revoke_api_v1_datasets__code__versions__version_id__revoke_post",
+   "summary": "撤销（导出传播+账本）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/security-review",
+   "operation_id": "security_review_api_v1_datasets__code__versions__version_id__security_review_post",
+   "summary": "独立安全评审（持久化结论；评审人≠冻结人）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/stats/readmission",
+   "operation_id": "stats_readmission_api_v1_datasets__code__versions__version_id__stats_readmission_get",
+   "summary": "再入院主题（版本成员分母）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/timeline/{patient_id}",
+   "operation_id": "timeline_api_v1_datasets__code__versions__version_id__timeline__patient_id__get",
+   "summary": "患者时间线"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/datasets/{code}/versions/{version_id}/training-set",
+   "operation_id": "training_set_api_v1_datasets__code__versions__version_id__training_set_post",
+   "summary": "训练集+数据卡（版本成员）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/db-types",
+   "operation_id": "list_db_types_api_v1_db_types_get",
+   "summary": "支持的数据库类型与字段规则"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/change-requests",
+   "operation_id": "list_dict_crs_api_v1_dict_medical_change_requests_get",
+   "summary": "字典变更请求列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/change-requests",
+   "operation_id": "create_dict_cr_api_v1_dict_medical_change_requests_post",
+   "summary": "创建字典变更请求"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/dict-medical/change-requests/{cr_id}/approve",
+   "operation_id": "approve_dict_cr_api_v1_dict_medical_change_requests__cr_id__approve_patch",
+   "summary": "审批字典变更请求"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/change-requests/{cr_id}/execute",
+   "operation_id": "execute_dict_cr_api_v1_dict_medical_change_requests__cr_id__execute_post",
+   "summary": "执行字典变更请求"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/code-sets",
+   "operation_id": "list_code_sets_api_v1_dict_medical_code_sets_get",
+   "summary": "诊断/手术三套编码体系列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dict-medical/code-sets",
+   "operation_id": "upsert_code_set_api_v1_dict_medical_code_sets_put",
+   "summary": "新增/更新诊断手术编码体系"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/code-sets/{code_set_code}/items",
+   "operation_id": "list_items_api_v1_dict_medical_code_sets__code_set_code__items_get",
+   "summary": "编码项列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/import-runs",
+   "operation_id": "list_import_runs_api_v1_dict_medical_import_runs_get",
+   "summary": "诊断手术导入批次日志"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/import-runs/{run_id}",
+   "operation_id": "get_import_run_api_v1_dict_medical_import_runs__run_id__get",
+   "summary": "导入批次详情"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/imports/diagnosis-mapping",
+   "operation_id": "upload_diagnosis_mapping_api_v1_dict_medical_imports_diagnosis_mapping_post",
+   "summary": "上传诊断映射 Excel（两行表头）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/imports/{run_id}",
+   "operation_id": "get_import_run_api_v1_dict_medical_imports__run_id__get",
+   "summary": "查询导入批次状态"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/imports/{run_id}/merge",
+   "operation_id": "merge_run_api_v1_dict_medical_imports__run_id__merge_post",
+   "summary": "合并已批准行到正式字典"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/imports/{run_id}/rows",
+   "operation_id": "list_import_rows_api_v1_dict_medical_imports__run_id__rows_get",
+   "summary": "查询暂存行（分页）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/imports/{run_id}/rows/review",
+   "operation_id": "review_rows_api_v1_dict_medical_imports__run_id__rows_review_post",
+   "summary": "批量审核暂存行"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dict-medical/items",
+   "operation_id": "upsert_code_item_api_v1_dict_medical_items_put",
+   "summary": "新增/更新编码项"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/mapping-options",
+   "operation_id": "list_mapping_options_api_v1_dict_medical_mapping_options_get",
+   "summary": "诊断手术维护下拉值域"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/mapping-rows",
+   "operation_id": "list_mapping_rows_api_v1_dict_medical_mapping_rows_get",
+   "summary": "按院内编码展示诊断/手术完整映射宽表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dict-medical/mapping-rows",
+   "operation_id": "upsert_mapping_row_api_v1_dict_medical_mapping_rows_put",
+   "summary": "按院内编码新增/更新诊断手术映射宽表行"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/mapping-rows/export",
+   "operation_id": "export_mapping_rows_api_v1_dict_medical_mapping_rows_export_get",
+   "summary": "导出诊断/手术映射宽表 Excel"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/mappings",
+   "operation_id": "list_mappings_api_v1_dict_medical_mappings_get",
+   "summary": "编码对照关系列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dict-medical/mappings",
+   "operation_id": "upsert_mapping_api_v1_dict_medical_mappings_put",
+   "summary": "新增/更新诊断手术编码对照关系"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/apply-one",
+   "operation_id": "medical_push_apply_one_api_v1_dict_medical_push_apply_one_post",
+   "summary": "单条下发（101号整改：仅 dry_run，apply 已关闭）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/push/config",
+   "operation_id": "medical_push_config_api_v1_dict_medical_push_config_get",
+   "summary": "诊断手术下发开关与硬限制说明"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/export-preview",
+   "operation_id": "medical_push_export_preview_api_v1_dict_medical_push_export_preview_post",
+   "summary": "从平台字典导出待下发宽表（只读）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plan",
+   "operation_id": "medical_push_plan_api_v1_dict_medical_push_plan_post",
+   "summary": "生成诊断/手术单行新增下发计划（默认不写业务库）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans",
+   "operation_id": "create_plan_api_v1_dict_medical_push_plans_post",
+   "summary": "创建推送计划（服务端生成）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}",
+   "operation_id": "get_plan_api_v1_dict_medical_push_plans__plan_id__get",
+   "summary": "查询计划详情"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}/approve",
+   "operation_id": "approve_api_v1_dict_medical_push_plans__plan_id__approve_post",
+   "summary": "审批计划（审批即入队，受控 worker 执行）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}/execute",
+   "operation_id": "execute_plan_api_v1_dict_medical_push_plans__plan_id__execute_post",
+   "summary": "执行预览（不写入；实际写入由受控 worker 执行）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/push/plans/{plan_id}/integrity",
+   "operation_id": "check_integrity_api_v1_dict_medical_push_plans__plan_id__integrity_get",
+   "summary": "验证计划完整性"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/push/stop-one",
+   "operation_id": "medical_push_stop_one_api_v1_dict_medical_push_stop_one_post",
+   "summary": "单条停用（唯一允许的 UPDATE 形态）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/sync-diffs",
+   "operation_id": "list_medical_diffs_api_v1_dict_medical_sync_diffs_get",
+   "summary": "HIS/EMR 诊断手术字典同步差异"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/dict-medical/sync-diffs/{diff_id}",
+   "operation_id": "update_medical_diff_api_v1_dict_medical_sync_diffs__diff_id__patch",
+   "summary": "Update diagnosis/operation sync diff status"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/sync-logs",
+   "operation_id": "list_sync_logs_api_v1_dict_medical_sync_logs_get",
+   "summary": "字典同步差异日志摘要"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/sync/jobs/{job_id}/retry",
+   "operation_id": "retry_medical_sync_job_api_v1_dict_medical_sync_jobs__job_id__retry_post",
+   "summary": "Retry diagnosis/operation dictionary sync job"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dict-medical/sync/run",
+   "operation_id": "run_medical_sync_api_v1_dict_medical_sync_run_post",
+   "summary": "Run diagnosis/operation dictionary sync"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dict-medical/versions",
+   "operation_id": "list_versions_api_v1_dict_medical_versions_get",
+   "summary": "编码体系版本列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dictionaries/categories",
+   "operation_id": "list_categories_api_v1_dictionaries_categories_get",
+   "summary": "List Categories"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dictionaries/categories",
+   "operation_id": "upsert_category_api_v1_dictionaries_categories_put",
+   "summary": "Upsert Category"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/dictionaries/import",
+   "operation_id": "import_system_items_api_v1_dictionaries_import_post",
+   "summary": "Import System Items"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dictionaries/mappings",
+   "operation_id": "list_item_mappings_api_v1_dictionaries_mappings_get",
+   "summary": "List Item Mappings"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dictionaries/mappings",
+   "operation_id": "upsert_item_mapping_api_v1_dictionaries_mappings_put",
+   "summary": "Upsert Item Mapping"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dictionaries/standard-items",
+   "operation_id": "list_standard_items_api_v1_dictionaries_standard_items_get",
+   "summary": "List Standard Items"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dictionaries/standard-items",
+   "operation_id": "upsert_standard_item_api_v1_dictionaries_standard_items_put",
+   "summary": "Upsert Standard Item"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dictionaries/system-items",
+   "operation_id": "list_system_items_api_v1_dictionaries_system_items_get",
+   "summary": "List System Items"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dictionaries/system-items",
+   "operation_id": "upsert_system_item_api_v1_dictionaries_system_items_put",
+   "summary": "Upsert System Item"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/dictionaries/system-items/{item_id}/enabled",
+   "operation_id": "set_system_item_enabled_api_v1_dictionaries_system_items__item_id__enabled_patch",
+   "summary": "Set System Item Enabled"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/dictionaries/versions",
+   "operation_id": "list_versions_api_v1_dictionaries_versions_get",
+   "summary": "List Versions"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/dictionaries/versions",
+   "operation_id": "upsert_version_api_v1_dictionaries_versions_put",
+   "summary": "Upsert Version"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/action-executors",
+   "operation_id": "list_action_executors_api_v1_govern_action_executors_get",
+   "summary": "执行器注册清单（含启用状态与目标/来源绑定）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/govern/action-executors/{executor_code}",
+   "operation_id": "patch_action_executor_api_v1_govern_action_executors__executor_code__patch",
+   "summary": "受控变更执行器注册（enable/disable 等；写治理审计）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/audit-logs",
+   "operation_id": "list_audit_logs_api_v1_govern_audit_logs_get",
+   "summary": "审计日志列表（146 E7：时间/操作人/动作/实体筛选 + 详情字段）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/audit-logs/export",
+   "operation_id": "audit_logs_export_api_v1_govern_audit_logs_export_get",
+   "summary": "审计日志 CSV 导出（与列表同口径筛选；146 E7）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/audit-logs/summary",
+   "operation_id": "audit_logs_summary_api_v1_govern_audit_logs_summary_get",
+   "summary": "审计日志全量统计（与列表同口径筛选；146 E7）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/change-requests",
+   "operation_id": "list_change_requests_api_v1_govern_change_requests_get",
+   "summary": "变更请求列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/change-requests",
+   "operation_id": "create_change_request_api_v1_govern_change_requests_post",
+   "summary": "创建变更请求"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/govern/change-requests/{cr_id}/approve",
+   "operation_id": "approve_change_request_api_v1_govern_change_requests__cr_id__approve_patch",
+   "summary": "审批通过"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/govern/change-requests/{cr_id}/reject",
+   "operation_id": "reject_change_request_api_v1_govern_change_requests__cr_id__reject_patch",
+   "summary": "审批拒绝"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/change-rules",
+   "operation_id": "list_change_rules_api_v1_govern_change_rules_get",
+   "summary": "变更规则列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/govern/change-rules",
+   "operation_id": "upsert_change_rule_api_v1_govern_change_rules_put",
+   "summary": "新增/更新变更规则"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/enum-values",
+   "operation_id": "list_enum_values_api_v1_govern_enum_values_get",
+   "summary": "枚举值列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/govern/enum-values",
+   "operation_id": "upsert_enum_value_api_v1_govern_enum_values_put",
+   "summary": "新增/更新枚举值"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/events",
+   "operation_id": "list_events_api_v1_govern_events_get",
+   "summary": "事件/告警列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/events",
+   "operation_id": "create_event_api_v1_govern_events_post",
+   "summary": "创建事件"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/govern/events/{event_id}",
+   "operation_id": "update_event_api_v1_govern_events__event_id__patch",
+   "summary": "更新事件状态"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/executors",
+   "operation_id": "list_executors_api_v1_govern_executors_get",
+   "summary": "执行器列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/govern/executors",
+   "operation_id": "upsert_executor_api_v1_govern_executors_put",
+   "summary": "新增/更新执行器注册"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/govern/executors/{executor_code}",
+   "operation_id": "toggle_executor_api_v1_govern_executors__executor_code__patch",
+   "summary": "启用/禁用执行器"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/identity-scopes",
+   "operation_id": "list_identity_scopes_api_v1_govern_identity_scopes_get",
+   "summary": "批准范围清单（人员计数与指纹，不含明细）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/identity-scopes/baseline/freeze",
+   "operation_id": "freeze_baseline_scope_api_api_v1_govern_identity_scopes_baseline_freeze_post",
+   "summary": "冻结停用基线范围（新鲜观测交集：人员有效+账号停用；冻结后不自动扩展）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/identity-scopes/pilot",
+   "operation_id": "register_pilot_scope_api_api_v1_govern_identity_scopes_pilot_post",
+   "summary": "登记显式试点人员批准范围（token 不是名单；成员此后不自动扩展）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/roles",
+   "operation_id": "list_roles_api_v1_govern_roles_get",
+   "summary": "角色列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/govern/roles",
+   "operation_id": "upsert_role_api_v1_govern_roles_put",
+   "summary": "新增/更新角色"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/govern/roles/{role_code}",
+   "operation_id": "delete_role_api_v1_govern_roles__role_code__delete",
+   "summary": "删除角色"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/roles/{role_code}/permissions",
+   "operation_id": "list_permissions_api_v1_govern_roles__role_code__permissions_get",
+   "summary": "角色权限列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/roles/{role_code}/permissions",
+   "operation_id": "add_permission_api_v1_govern_roles__role_code__permissions_post",
+   "summary": "给角色添加权限"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/govern/roles/{role_code}/permissions/{perm_id}",
+   "operation_id": "remove_permission_api_v1_govern_roles__role_code__permissions__perm_id__delete",
+   "summary": "删除角色权限"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/scheduler/jobs",
+   "operation_id": "list_scheduler_jobs_api_v1_govern_scheduler_jobs_get",
+   "summary": "调度任务列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/scheduler/jobs",
+   "operation_id": "create_scheduler_job_api_v1_govern_scheduler_jobs_post",
+   "summary": "创建调度任务记录"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/scheduler/jobs/{job_id}",
+   "operation_id": "get_scheduler_job_api_v1_govern_scheduler_jobs__job_id__get",
+   "summary": "Scheduler job detail"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/govern/user-roles",
+   "operation_id": "list_user_roles_api_v1_govern_user_roles_get",
+   "summary": "用户角色列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/govern/user-roles",
+   "operation_id": "assign_user_role_api_v1_govern_user_roles_post",
+   "summary": "分配用户角色"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/govern/user-roles/{ur_id}",
+   "operation_id": "remove_user_role_api_v1_govern_user_roles__ur_id__delete",
+   "summary": "移除用户角色"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph",
+   "operation_id": "graph_api_v1_graph_get",
+   "summary": "全局关系图谱"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph-analysis/cycles",
+   "operation_id": "cycle_detection_api_v1_graph_analysis_cycles_get",
+   "summary": "有向环路检测"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph-analysis/impact",
+   "operation_id": "impact_analysis_api_v1_graph_analysis_impact_get",
+   "summary": "影响分析（有向下游）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph-analysis/shortest-path",
+   "operation_id": "shortest_path_api_v1_graph_analysis_shortest_path_get",
+   "summary": "最短路径（有向）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph-analysis/upstream-downstream",
+   "operation_id": "upstream_downstream_api_v1_graph_analysis_upstream_downstream_get",
+   "summary": "上下游查询（有向）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/diagnostics",
+   "operation_id": "diagnostics_api_v1_graph_diagnostics_get",
+   "summary": "关系图谱数据诊断（108号重构口径）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/edges/{edge_id}",
+   "operation_id": "edge_detail_api_v1_graph_edges__edge_id__get",
+   "summary": "单条边证据详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/filter-options",
+   "operation_id": "filter_options_api_v1_graph_filter_options_get",
+   "summary": "级联图谱筛选项"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/neighbors",
+   "operation_id": "neighbors_api_v1_graph_neighbors_get",
+   "summary": "某表邻居图"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/options",
+   "operation_id": "options_api_v1_graph_options_get",
+   "summary": "图谱筛选项"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/overview",
+   "operation_id": "overview_api_v1_graph_overview_get",
+   "summary": "服务端完整资产概览"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/graph/tables/search",
+   "operation_id": "table_search_api_v1_graph_tables_search_get",
+   "summary": "物理资产搜索"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/alerts",
+   "operation_id": "identity_sync_alerts_api_v1_identity_sync_alerts_get",
+   "summary": "Queryable identity sync alerts"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/batches",
+   "operation_id": "list_batches_api_v1_identity_sync_batches_get",
+   "summary": "List sync batches"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity-sync/candidates",
+   "operation_id": "select_candidates_api_v1_identity_sync_candidates_post",
+   "summary": "Read-only candidate selection (no writes)"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/gates",
+   "operation_id": "gate_checks_api_v1_identity_sync_gates_get",
+   "summary": "Pre-execution gate check results"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/nightly/status",
+   "operation_id": "nightly_status_api_v1_identity_sync_nightly_status_get",
+   "summary": "Nightly scheduler status and circuit breakers"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity-sync/nightly/trigger",
+   "operation_id": "nightly_trigger_api_v1_identity_sync_nightly_trigger_post",
+   "summary": "Manual nightly rerun (reuses full pipeline)"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/runs",
+   "operation_id": "list_runs_api_v1_identity_sync_runs_get",
+   "summary": "夜间同步运行日志"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/runs/{run_id}",
+   "operation_id": "get_run_api_v1_identity_sync_runs__run_id__get",
+   "summary": "单次同步运行详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity-sync/status",
+   "operation_id": "sync_status_api_v1_identity_sync_status_get",
+   "summary": "Identity sync feature and nightly status"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity-sync/validation/trigger",
+   "operation_id": "validation_trigger_api_v1_identity_sync_validation_trigger_post",
+   "summary": "Trigger doctor_nurse_dual_target_v1 validation batch"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/account-states",
+   "operation_id": "list_account_states_api_v1_identity_account_states_get",
+   "summary": "186 双来源账号启停状态（SYS_EMPLOYEE×SYS_USER 判定与双目标结果）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/accounts",
+   "operation_id": "list_accounts_api_v1_identity_accounts_get",
+   "summary": "多系统账号列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/identity/accounts/bind",
+   "operation_id": "bind_account_api_v1_identity_accounts_bind_put",
+   "summary": "绑定人员到系统账号"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/identity/accounts/{account_id}/binding",
+   "operation_id": "unbind_account_api_v1_identity_accounts__account_id__binding_delete",
+   "summary": "解绑账号与人员（仅清空 person_code，不删账号；146 E6）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/change-requests",
+   "operation_id": "list_identity_crs_api_v1_identity_change_requests_get",
+   "summary": "身份变更请求列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests",
+   "operation_id": "create_identity_cr_api_v1_identity_change_requests_post",
+   "summary": "创建身份变更请求"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests/batch-approve",
+   "operation_id": "batch_approve_identity_cr_api_v1_identity_change_requests_batch_approve_post",
+   "summary": "批量审批身份变更请求"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests/batch-execute",
+   "operation_id": "batch_execute_identity_cr_api_v1_identity_change_requests_batch_execute_post",
+   "summary": "批量执行已审批身份变更（写平台主档）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/identity/change-requests/{cr_id}/approve",
+   "operation_id": "approve_identity_cr_api_v1_identity_change_requests__cr_id__approve_patch",
+   "summary": "审批身份变更请求"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/change-requests/{cr_id}/execute",
+   "operation_id": "execute_identity_cr_api_v1_identity_change_requests__cr_id__execute_post",
+   "summary": "执行身份变更请求"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/collect-sources",
+   "operation_id": "trigger_collection_api_v1_identity_collect_sources_post",
+   "summary": "Collect identity source data"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/departments",
+   "operation_id": "list_departments_api_v1_identity_departments_get",
+   "summary": "科室基线列表（HIS dept_dict 为核心）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/departments/{dept_code}",
+   "operation_id": "department_profile_api_v1_identity_departments__dept_code__get",
+   "summary": "科室统一画像"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/inconsistencies",
+   "operation_id": "list_inconsistencies_api_v1_identity_inconsistencies_get",
+   "summary": "身份数据不一致列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/persons",
+   "operation_id": "list_persons_api_v1_identity_persons_get",
+   "summary": "人员主数据列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/persons/{person_code}",
+   "operation_id": "person_profile_api_v1_identity_persons__person_code__get",
+   "summary": "人员统一画像"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/persons/{person_code}/profile-change-requests",
+   "operation_id": "list_profile_change_requests_api_v1_identity_persons__person_code__profile_change_requests_get",
+   "summary": "人员画像变更审批记录"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/persons/{person_code}/profile-change-requests",
+   "operation_id": "create_profile_change_request_api_v1_identity_persons__person_code__profile_change_requests_post",
+   "summary": "提交人员画像变更审批"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/review/generate",
+   "operation_id": "generate_identity_review_api_v1_identity_review_generate_post",
+   "summary": "L13 生成主数据复核差异（仅 diff，不自动写主档）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/sync-diffs",
+   "operation_id": "list_sync_diffs_api_v1_identity_sync_diffs_get",
+   "summary": "人员/科室/账号同步差异"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync-diffs/batch-propose-master",
+   "operation_id": "batch_propose_master_from_diffs_api_v1_identity_sync_diffs_batch_propose_master_post",
+   "summary": "L16 批量提出主档变更（默认上限 50）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync-diffs/batch-status",
+   "operation_id": "batch_update_sync_diff_status_api_v1_identity_sync_diffs_batch_status_post",
+   "summary": "批量更新差异状态 open/resolved/ignored"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/identity/sync-diffs/{diff_id}",
+   "operation_id": "get_sync_diff_api_v1_identity_sync_diffs__diff_id__get",
+   "summary": "差异详情（含合并建议，不自动覆盖）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/identity/sync-diffs/{diff_id}",
+   "operation_id": "update_sync_diff_api_v1_identity_sync_diffs__diff_id__patch",
+   "summary": "Update identity sync diff status"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync-diffs/{diff_id}/propose-master",
+   "operation_id": "propose_master_from_diff_api_v1_identity_sync_diffs__diff_id__propose_master_post",
+   "summary": "L16 从差异提出主档变更（默认不直接写）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/his",
+   "operation_id": "sync_his_identity_endpoint_api_v1_identity_sync_his_post",
+   "summary": "Sync HIS identity departments/persons"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/jobs/{job_id}/retry",
+   "operation_id": "retry_identity_sync_job_api_v1_identity_sync_jobs__job_id__retry_post",
+   "summary": "Retry identity sync job"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/identity/sync/run",
+   "operation_id": "run_identity_sync_api_v1_identity_sync_run_post",
+   "summary": "Run identity sync diff generation"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/lineage/impact",
+   "operation_id": "impact_analysis_api_v1_lineage_impact_get",
+   "summary": "精确 object_key 血缘影响分析（typed nodes/edges）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/lineage/sync",
+   "operation_id": "sync_static_lineage_api_v1_lineage_sync_post",
+   "summary": "144 S5：静态血缘确定性导入（默认 dry-run）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/lineage/views",
+   "operation_id": "view_dependencies_api_v1_lineage_views_get",
+   "summary": "查询 ODS 视图依赖"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-changes",
+   "operation_id": "list_changes_api_v1_metadata_changes_get",
+   "summary": "变更事件列表（P14-T6 数据接口）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metadata-changes/batch",
+   "operation_id": "batch_update_changes_api_v1_metadata_changes_batch_post",
+   "summary": "批量更新变更事件状态/负责人/重开（146 E9）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metadata-changes/diff",
+   "operation_id": "run_diff_api_v1_metadata_changes_diff_post",
+   "summary": "对比两个快照生成变更事件（显式治理动作，按对象键幂等）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metadata-changes/diff-preview",
+   "operation_id": "diff_preview_api_v1_metadata_changes_diff_preview_post",
+   "summary": "字段级只读快照对比（零写，146 C3）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-changes/summary",
+   "operation_id": "changes_summary_api_v1_metadata_changes_summary_get",
+   "summary": "变更统计（按系统/变更类型）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/metadata-changes/{change_id}",
+   "operation_id": "update_change_api_v1_metadata_changes__change_id__patch",
+   "summary": "更新变更事件状态/负责人/备注"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-changes/{change_id}/impact",
+   "operation_id": "change_impact_api_v1_metadata_changes__change_id__impact_get",
+   "summary": "变更影响分析"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-snapshots",
+   "operation_id": "list_metadata_snapshots_api_v1_metadata_snapshots_get",
+   "summary": "快照分页列表（默认排除归档项；146 E9）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metadata-snapshots/{snapshot_id}",
+   "operation_id": "metadata_snapshot_detail_api_v1_metadata_snapshots__snapshot_id__get",
+   "summary": "快照受限详情（头部 + 限量字段样本；146 E9）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metadata-snapshots/{snapshot_id}/archive",
+   "operation_id": "archive_metadata_snapshot_api_v1_metadata_snapshots__snapshot_id__archive_post",
+   "summary": "快照受保护软归档（引用存在时拒绝；禁止物理删除；146 E9）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics",
+   "operation_id": "list_metrics_api_v1_metrics_get",
+   "summary": "指标主档列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics/ai/context",
+   "operation_id": "ai_metric_context_api_v1_metrics_ai_context_get",
+   "summary": "AI 可读现行指标上下文"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics/board/overview",
+   "operation_id": "board_overview_api_v1_metrics_board_overview_get",
+   "summary": "126 P5：指标结果看板（按月份透视最新批次）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/ingest",
+   "operation_id": "ingest_api_v1_metrics_ingest_post",
+   "summary": "摄取/修订指标（门禁通过可自动 active）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/results",
+   "operation_id": "post_result_api_v1_metrics_results_post",
+   "summary": "登记可选周期结果（不覆盖历史批次）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics/{metric_code}",
+   "operation_id": "get_metric_detail_api_v1_metrics__metric_code__get",
+   "summary": "指标详情与版本"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/{metric_code}/calculate",
+   "operation_id": "calculate_metric_active_endpoint_api_v1_metrics__metric_code__calculate_post",
+   "summary": "144 S4：按现行 active 版本受控计算指标"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/metrics/{metric_code}/results",
+   "operation_id": "list_results_api_v1_metrics__metric_code__results_get",
+   "summary": "指标周期结果列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/metrics/{metric_code}/versions/{version}/calculate",
+   "operation_id": "calculate_metric_endpoint_api_v1_metrics__metric_code__versions__version__calculate_post",
+   "summary": "144 S4：受控计算指标并登记 metric run/result"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/config",
+   "operation_id": "ops_config_api_v1_ops_config_get",
+   "summary": "运维前端配置（审批 UI / 写开关状态）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/events",
+   "operation_id": "list_ops_events_api_v1_ops_events_get",
+   "summary": "统一运维事件流"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/events/{event_id}",
+   "operation_id": "get_ops_event_api_v1_ops_events__event_id__get",
+   "summary": "事件详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/runs",
+   "operation_id": "list_runs_api_v1_ops_runs_get",
+   "summary": "Ops run list"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs",
+   "operation_id": "create_run_api_v1_ops_runs_post",
+   "summary": "Create ops run request"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ops/runs/{run_id}/approve",
+   "operation_id": "approve_run_api_v1_ops_runs__run_id__approve_patch",
+   "summary": "Approve ops run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/approve",
+   "operation_id": "approve_run_api_v1_ops_runs__run_id__approve_post",
+   "summary": "Approve ops run"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/runs/{run_id}/audit",
+   "operation_id": "get_run_audit_api_v1_ops_runs__run_id__audit_get",
+   "summary": "Get ops run audit logs"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/dry-run",
+   "operation_id": "dry_run_api_v1_ops_runs__run_id__dry_run_post",
+   "summary": "Dry-run approved ops run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/execute",
+   "operation_id": "execute_run_api_v1_ops_runs__run_id__execute_post",
+   "summary": "Execute approved ops run"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/ops/runs/{run_id}/reject",
+   "operation_id": "reject_run_api_v1_ops_runs__run_id__reject_patch",
+   "summary": "Reject ops run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/reject",
+   "operation_id": "reject_run_api_v1_ops_runs__run_id__reject_post",
+   "summary": "Reject ops run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/runs/{run_id}/submit",
+   "operation_id": "submit_run_api_v1_ops_runs__run_id__submit_post",
+   "summary": "Submit ops run for approval"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/sql/runs",
+   "operation_id": "sql_list_runs_api_v1_ops_sql_runs_get",
+   "summary": "SQL 工作台任务列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/runs",
+   "operation_id": "sql_create_run_api_v1_ops_sql_runs_post",
+   "summary": "基于模板创建运维 run"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/sql/runs/{run_id}",
+   "operation_id": "sql_get_run_api_v1_ops_sql_runs__run_id__get",
+   "summary": "SQL run 详情"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/runs/{run_id}/preview",
+   "operation_id": "sql_preview_run_api_v1_ops_sql_runs__run_id__preview_post",
+   "summary": "dry-run 影响行预览"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/templates",
+   "operation_id": "sql_create_template_api_v1_ops_sql_templates_post",
+   "summary": "保存 SQL 模板（管理员可直接发布）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/templates/{tool_code}/approve",
+   "operation_id": "sql_approve_template_api_v1_ops_sql_templates__tool_code__approve_post",
+   "summary": "审批通过 SQL 模板"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/templates/{tool_code}/reject",
+   "operation_id": "sql_reject_template_api_v1_ops_sql_templates__tool_code__reject_post",
+   "summary": "驳回 SQL 模板"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/templates/{tool_code}/submit",
+   "operation_id": "sql_submit_template_api_v1_ops_sql_templates__tool_code__submit_post",
+   "summary": "提交 SQL 模板审批"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ops/sql/validate",
+   "operation_id": "sql_validate_api_v1_ops_sql_validate_post",
+   "summary": "校验受控 SQL（不执行）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ops/tools",
+   "operation_id": "list_tools_api_v1_ops_tools_get",
+   "summary": "Ops tool template list"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/ops/tools",
+   "operation_id": "upsert_tool_api_v1_ops_tools_put",
+   "summary": "Create or update ops tool template"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/overview/charts",
+   "operation_id": "overview_charts_api_v1_overview_charts_get",
+   "summary": "资产总览四图全量聚合（127 S4）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permission-requests",
+   "operation_id": "create_request_api_v1_permission_requests_post",
+   "summary": "Create Request"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permission-requests/mine",
+   "operation_id": "list_mine_api_v1_permission_requests_mine_get",
+   "summary": "List Mine"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permission-requests/pending",
+   "operation_id": "list_pending_api_v1_permission_requests_pending_get",
+   "summary": "List Pending"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permission-requests/{request_id}",
+   "operation_id": "get_request_api_v1_permission_requests__request_id__get",
+   "summary": "Get Request"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/permission-requests/{request_id}/approve",
+   "operation_id": "approve_request_api_v1_permission_requests__request_id__approve_patch",
+   "summary": "Approve Request"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permission-requests/{request_id}/execute",
+   "operation_id": "execute_request_api_v1_permission_requests__request_id__execute_post",
+   "summary": "Execute Request"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/permission-requests/{request_id}/reject",
+   "operation_id": "reject_request_api_v1_permission_requests__request_id__reject_patch",
+   "summary": "Reject Request"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permission-requests/{request_id}/revoke",
+   "operation_id": "revoke_request_api_v1_permission_requests__request_id__revoke_post",
+   "summary": "Revoke Request"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/api-keys",
+   "operation_id": "list_api_keys_api_v1_permissions_api_keys_get",
+   "summary": "API keys for permission binding"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/permissions/api-keys/{key_id}/bind",
+   "operation_id": "bind_api_key_api_v1_permissions_api_keys__key_id__bind_patch",
+   "summary": "Bind API key to user identifier"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/audit",
+   "operation_id": "list_permission_audit_api_v1_permissions_audit_get",
+   "summary": "Permission audit logs"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permissions/legacy-allow/repair",
+   "operation_id": "legacy_allow_repair_api_v1_permissions_legacy_allow_repair_post",
+   "summary": "历史 allow 权限码差异清单/幂等修复"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/me",
+   "operation_id": "get_me_permissions_api_v1_permissions_me_get",
+   "summary": "Current token roles and permissions"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/resources",
+   "operation_id": "list_resources_api_v1_permissions_resources_get",
+   "summary": "Permission resource catalog"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/roles",
+   "operation_id": "list_roles_api_v1_permissions_roles_get",
+   "summary": "Role list"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/permissions/roles",
+   "operation_id": "upsert_role_api_v1_permissions_roles_put",
+   "summary": "Create or update role"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/roles/summary",
+   "operation_id": "roles_summary_api_v1_permissions_roles_summary_get",
+   "summary": "Role summary with effective user counts (200 §4.1)"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/roles/{role_code}/matrix",
+   "operation_id": "get_role_matrix_api_v1_permissions_roles__role_code__matrix_get",
+   "summary": "Role permission matrix"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/permissions/roles/{role_code}/matrix",
+   "operation_id": "update_role_matrix_api_v1_permissions_roles__role_code__matrix_put",
+   "summary": "Replace role permission matrix"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/permissions/seed",
+   "operation_id": "seed_permissions_api_v1_permissions_seed_post",
+   "summary": "Seed builtin roles and permission resources"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/user-roles",
+   "operation_id": "list_user_roles_api_v1_permissions_user_roles_get",
+   "summary": "User role assignments"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/permissions/users/{user_identifier}/permissions",
+   "operation_id": "get_user_permissions_api_v1_permissions_users__user_identifier__permissions_get",
+   "summary": "Effective user permissions"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/permissions/users/{user_identifier}/roles",
+   "operation_id": "replace_user_roles_api_v1_permissions_users__user_identifier__roles_put",
+   "summary": "Replace user roles"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-findings",
+   "operation_id": "list_findings_api_v1_probe_findings_get",
+   "summary": "List Findings"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/probe-findings/export",
+   "operation_id": "export_findings_api_v1_probe_findings_export_post",
+   "summary": "Export Findings"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-findings/{finding_id}",
+   "operation_id": "get_finding_api_v1_probe_findings__finding_id__get",
+   "summary": "Get Finding"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/probe-findings/{finding_id}/transition",
+   "operation_id": "transition_finding_endpoint_api_v1_probe_findings__finding_id__transition_post",
+   "summary": "Transition Finding Endpoint"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-runs",
+   "operation_id": "list_runs_api_v1_probe_runs_get",
+   "summary": "List Runs"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/probe-runs/{run_id}",
+   "operation_id": "get_run_api_v1_probe_runs__run_id__get",
+   "summary": "Get Run"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/public/stats",
+   "operation_id": "public_stats_api_v1_public_stats_get",
+   "summary": "登录页公开统计（免认证）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-controls",
+   "operation_id": "list_controls_api_v1_quality_controls_get",
+   "summary": "List Controls"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-controls",
+   "operation_id": "create_control_api_v1_quality_controls_post",
+   "summary": "Create Control"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-controls/coverage",
+   "operation_id": "control_coverage_api_v1_quality_controls_coverage_get",
+   "summary": "Control Coverage"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-controls/{control_id}",
+   "operation_id": "get_control_api_v1_quality_controls__control_id__get",
+   "summary": "Get Control"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality-controls/{control_id}",
+   "operation_id": "patch_control_api_v1_quality_controls__control_id__patch",
+   "summary": "Patch Control"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-controls/{control_id}/activate",
+   "operation_id": "activate_control_api_v1_quality_controls__control_id__activate_post",
+   "summary": "Activate Control"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-controls/{control_id}/deprecate",
+   "operation_id": "deprecate_control_api_v1_quality_controls__control_id__deprecate_post",
+   "summary": "Deprecate Control"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-controls/{control_id}/observations",
+   "operation_id": "list_control_observations_api_v1_quality_controls__control_id__observations_get",
+   "summary": "List Control Observations"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-controls/{control_id}/preflight",
+   "operation_id": "preflight_control_api_v1_quality_controls__control_id__preflight_post",
+   "summary": "Preflight Control"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-controls/{control_id}/run",
+   "operation_id": "run_control_api_v1_quality_controls__control_id__run_post",
+   "summary": "Run Control"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues",
+   "operation_id": "list_issues_api_v1_quality_issues_get",
+   "summary": "List Issues"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues",
+   "operation_id": "create_issue_api_v1_quality_issues_post",
+   "summary": "Create Issue"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/assignment-options/departments",
+   "operation_id": "assignment_departments_api_v1_quality_issues_assignment_options_departments_get",
+   "summary": "Assignment Departments"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/assignment-options/persons",
+   "operation_id": "assignment_persons_api_v1_quality_issues_assignment_options_persons_get",
+   "summary": "Assignment Persons"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/batch-assign",
+   "operation_id": "batch_assign_api_v1_quality_issues_batch_assign_post",
+   "summary": "Batch Assign"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/export",
+   "operation_id": "export_issues_api_v1_quality_issues_export_post",
+   "summary": "Export Issues"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/summary",
+   "operation_id": "issue_summary_api_v1_quality_issues_summary_get",
+   "summary": "Issue Summary"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/{issue_id}",
+   "operation_id": "get_issue_api_v1_quality_issues__issue_id__get",
+   "summary": "Get Issue"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality-issues/{issue_id}",
+   "operation_id": "patch_issue_api_v1_quality_issues__issue_id__patch",
+   "summary": "Patch Issue"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/accept-risk",
+   "operation_id": "accept_risk_api_v1_quality_issues__issue_id__accept_risk_post",
+   "summary": "Accept Risk"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/assign",
+   "operation_id": "assign_issue_api_v1_quality_issues__issue_id__assign_post",
+   "summary": "Assign Issue"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/comment",
+   "operation_id": "add_comment_api_v1_quality_issues__issue_id__comment_post",
+   "summary": "Add Comment"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/{issue_id}/events",
+   "operation_id": "list_issue_events_api_v1_quality_issues__issue_id__events_get",
+   "summary": "List Issue Events"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/followups",
+   "operation_id": "add_followup_api_v1_quality_issues__issue_id__followups_post",
+   "summary": "Add Followup"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/mark-false-positive",
+   "operation_id": "mark_false_positive_api_v1_quality_issues__issue_id__mark_false_positive_post",
+   "summary": "Mark False Positive"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues/{issue_id}/observations",
+   "operation_id": "list_issue_observations_api_v1_quality_issues__issue_id__observations_get",
+   "summary": "List Issue Observations"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/remind",
+   "operation_id": "remind_issue_api_v1_quality_issues__issue_id__remind_post",
+   "summary": "Remind Issue"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/request-verification",
+   "operation_id": "request_verification_api_v1_quality_issues__issue_id__request_verification_post",
+   "summary": "Request Verification"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/transition",
+   "operation_id": "transition_issue_api_v1_quality_issues__issue_id__transition_post",
+   "summary": "Transition Issue"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-issues/{issue_id}/verify",
+   "operation_id": "verify_issue_api_v1_quality_issues__issue_id__verify_post",
+   "summary": "Verify Issue"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-notifications",
+   "operation_id": "list_my_notifications_api_v1_quality_notifications_get",
+   "summary": "List My Notifications"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-notifications/read-all",
+   "operation_id": "mark_all_read_api_v1_quality_notifications_read_all_post",
+   "summary": "Mark All Read"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-notifications/scan",
+   "operation_id": "run_scan_api_v1_quality_notifications_scan_post",
+   "summary": "Run Scan"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-notifications/{notification_id}/read",
+   "operation_id": "mark_read_api_v1_quality_notifications__notification_id__read_post",
+   "summary": "Mark Read"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-observations",
+   "operation_id": "list_observations_api_v1_quality_observations_get",
+   "summary": "List Observations"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-observations/ingest",
+   "operation_id": "ingest_observation_api_v1_quality_observations_ingest_post",
+   "summary": "Ingest Observation"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-observations/{observation_id}",
+   "operation_id": "get_observation_api_v1_quality_observations__observation_id__get",
+   "summary": "Get Observation"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-runs",
+   "operation_id": "list_runs_api_v1_quality_runs_get",
+   "summary": "List Runs"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-runs/{run_id}",
+   "operation_id": "get_run_api_v1_quality_runs__run_id__get",
+   "summary": "Get Run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-runs/{run_id}/cancel",
+   "operation_id": "cancel_run_api_v1_quality_runs__run_id__cancel_post",
+   "summary": "Cancel Run"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-runs/{run_id}/retry",
+   "operation_id": "retry_run_api_v1_quality_runs__run_id__retry_post",
+   "summary": "Retry Run"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-vendors",
+   "operation_id": "list_vendors_api_v1_quality_vendors_get",
+   "summary": "List Vendors"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality-vendors",
+   "operation_id": "create_vendor_api_v1_quality_vendors_post",
+   "summary": "Create Vendor"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality-vendors/{vendor_id}",
+   "operation_id": "patch_vendor_api_v1_quality_vendors__vendor_id__patch",
+   "summary": "Patch Vendor"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-vendors/{vendor_id}/stats",
+   "operation_id": "vendor_stats_api_v1_quality_vendors__vendor_id__stats_get",
+   "summary": "Vendor Stats"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/connection-test",
+   "operation_id": "connection_test_api_v1_quality_ai_connection_test_post",
+   "summary": "Connection Test"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/governance-report",
+   "operation_id": "create_governance_report_api_v1_quality_ai_governance_report_post",
+   "summary": "Create Governance Report"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/ai/jobs",
+   "operation_id": "jobs_api_v1_quality_ai_jobs_get",
+   "summary": "Jobs"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/jobs",
+   "operation_id": "create_job_api_v1_quality_ai_jobs_post",
+   "summary": "Create Job"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/ai/jobs/{job_id}",
+   "operation_id": "job_detail_api_v1_quality_ai_jobs__job_id__get",
+   "summary": "Job Detail"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/jobs/{job_id}/retry",
+   "operation_id": "retry_job_api_v1_quality_ai_jobs__job_id__retry_post",
+   "summary": "Retry Job"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/patrol/run",
+   "operation_id": "patrol_run_api_v1_quality_ai_patrol_run_post",
+   "summary": "Patrol Run"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/ai/patrol/runs",
+   "operation_id": "patrol_runs_api_v1_quality_ai_patrol_runs_get",
+   "summary": "Patrol Runs"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/ai/patrol/targets",
+   "operation_id": "patrol_targets_api_v1_quality_ai_patrol_targets_get",
+   "summary": "Patrol Targets"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/preview",
+   "operation_id": "preview_api_v1_quality_ai_preview_post",
+   "summary": "Preview"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/ai/results/{result_id}/attach",
+   "operation_id": "attach_result_api_v1_quality_ai_results__result_id__attach_post",
+   "summary": "Attach Result"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality/ai/results/{result_id}/review",
+   "operation_id": "review_result_api_v1_quality_ai_results__result_id__review_patch",
+   "summary": "Review Result"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/ai/status",
+   "operation_id": "status_api_v1_quality_ai_status_get",
+   "summary": "Status"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/checks/run",
+   "operation_id": "run_quality_check_api_v1_quality_checks_run_post",
+   "summary": "手动触发质量检查"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/checks/runs",
+   "operation_id": "list_check_runs_api_v1_quality_checks_runs_get",
+   "summary": "质量检查历史"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/findings",
+   "operation_id": "list_findings_api_v1_quality_findings_get",
+   "summary": "质量问题列表"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality/findings/{finding_id}",
+   "operation_id": "update_finding_api_v1_quality_findings__finding_id__patch",
+   "summary": "更新问题状态"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/findings/{finding_id}/assign",
+   "operation_id": "assign_finding_api_v1_quality_findings__finding_id__assign_post",
+   "summary": "问题分派"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/findings/{finding_id}/recheck",
+   "operation_id": "recheck_finding_api_v1_quality_findings__finding_id__recheck_post",
+   "summary": "单问题复核"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/metrics",
+   "operation_id": "quality_metrics_api_v1_quality_metrics_get",
+   "summary": "质量看板指标"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/rules",
+   "operation_id": "list_rules_api_v1_quality_rules_get",
+   "summary": "获取质量规则列表（分页）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules",
+   "operation_id": "create_rule_api_v1_quality_rules_post",
+   "summary": "新建质控规则"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules/auto-generate",
+   "operation_id": "auto_generate_rules_api_v1_quality_rules_auto_generate_post",
+   "summary": "按主键和已确认关系生成质控规则建议"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules/from-template",
+   "operation_id": "rule_from_template_api_v1_quality_rules_from_template_post",
+   "summary": "从模板生成质控规则"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/quality/rules/{rule_id}",
+   "operation_id": "delete_rule_api_v1_quality_rules__rule_id__delete",
+   "summary": "删除质控规则"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/quality/rules/{rule_id}",
+   "operation_id": "patch_rule_api_v1_quality_rules__rule_id__patch",
+   "summary": "编辑质控规则"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules/{rule_id}/enable",
+   "operation_id": "toggle_rule_api_v1_quality_rules__rule_id__enable_post",
+   "summary": "启用/停用规则"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/quality/rules/{rule_id}/validate-sql",
+   "operation_id": "validate_rule_sql_api_v1_quality_rules__rule_id__validate_sql_post",
+   "summary": "校验只读 SQL 安全性"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/summary",
+   "operation_id": "quality_summary_api_v1_quality_summary_get",
+   "summary": "质量总览"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality/summary/by-system",
+   "operation_id": "quality_summary_by_system_api_v1_quality_summary_by_system_get",
+   "summary": "按系统分组的质量总览"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries",
+   "operation_id": "list_queries_api_v1_queries_get",
+   "summary": "查询主档列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/ai/context",
+   "operation_id": "ai_query_context_api_v1_queries_ai_context_get",
+   "summary": "AI 可读现行查询上下文（兼容层：新 AI 用 /api/v1/ai/context/resolve）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/gate",
+   "operation_id": "gate_preview_api_v1_queries_gate_post",
+   "summary": "SQL 自动门禁试算（不写库）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/impact/table",
+   "operation_id": "impact_table_api_v1_queries_impact_table_get",
+   "summary": "表变更影响分析（查询/指标）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/import/core-48",
+   "operation_id": "import_core_48_api_v1_queries_import_core_48_post",
+   "summary": "导入 48 项核心制度 SQL 试点（默认 dry-run）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/ingest",
+   "operation_id": "ingest_api_v1_queries_ingest_post",
+   "summary": "摄取查询包（自动门禁，通过即 active）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/run",
+   "operation_id": "run_api_v1_queries_run_post",
+   "summary": "执行查询版本（参数不造版本；结果默认不存）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/runs/list",
+   "operation_id": "list_runs_api_v1_queries_runs_list_get",
+   "summary": "运行记录列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/runs/{run_id}",
+   "operation_id": "get_run_api_v1_queries_runs__run_id__get",
+   "summary": "运行详情与可选结果"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/schedules",
+   "operation_id": "upsert_schedule_api_v1_queries_schedules_post",
+   "summary": "登记查询调度（enabled 默认 false；全局开关 APP_QUERY_SCHEDULE_ENABLED）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/schedules/list",
+   "operation_id": "list_schedules_api_v1_queries_schedules_list_get",
+   "summary": "查询调度定义列表（默认均为关闭）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/schedules/seed-core",
+   "operation_id": "seed_core_schedules_api_v1_queries_schedules_seed_core_post",
+   "summary": "为 QRY_CORE_* active 查询种子调度定义（默认 enabled=false）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/sources/capabilities",
+   "operation_id": "source_capabilities_api_v1_queries_sources_capabilities_get",
+   "summary": "126 P5：多源连接适配能力探测"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}",
+   "operation_id": "get_query_api_v1_queries__query_code__get",
+   "summary": "查询主档详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}/relation-candidates",
+   "operation_id": "relation_candidates_api_v1_queries__query_code__relation_candidates_get",
+   "summary": "从查询 SQL 解析 JOIN 候选（不写正式关系）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/{query_code}/revise",
+   "operation_id": "revise_api_v1_queries__query_code__revise_post",
+   "summary": "修订查询（强制新版本）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}/versions",
+   "operation_id": "list_versions_api_v1_queries__query_code__versions_get",
+   "summary": "查询版本列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}/versions/{version}",
+   "operation_id": "get_version_api_v1_queries__query_code__versions__version__get",
+   "summary": "查询版本详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}/versions/{version}/diff",
+   "operation_id": "version_diff_api_v1_queries__query_code__versions__version__diff_get",
+   "summary": "与上一版本 SQL 差异摘要"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/queries/{query_code}/versions/{version}/validate",
+   "operation_id": "validate_query_version_api_v1_queries__query_code__versions__version__validate_post",
+   "summary": "144 S3：运行 G1–G3 元数据/关系/语义验证并落库证据"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/queries/{query_code}/versions/{version}/validation",
+   "operation_id": "get_query_validation_api_v1_queries__query_code__versions__version__validation_get",
+   "summary": "144 S3：查看逐层验证证据（最近一次）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes",
+   "operation_id": "list_recipes_api_v1_recipes_get",
+   "summary": "List Recipes"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes",
+   "operation_id": "create_recipe_api_v1_recipes_post",
+   "summary": "Create Recipe"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes/ai/context",
+   "operation_id": "ai_context_api_v1_recipes_ai_context_get",
+   "summary": "AI 可读配方上下文"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes/{recipe_id}",
+   "operation_id": "get_recipe_api_v1_recipes__recipe_id__get",
+   "summary": "Get Recipe"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes/{recipe_id}/versions",
+   "operation_id": "list_versions_api_v1_recipes__recipe_id__versions_get",
+   "summary": "List Versions"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions",
+   "operation_id": "copy_version_api_v1_recipes__recipe_id__versions_post",
+   "summary": "Copy Version"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}",
+   "operation_id": "get_version_api_v1_recipes__recipe_id__versions__version__get",
+   "summary": "Get Version"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}",
+   "operation_id": "update_version_api_v1_recipes__recipe_id__versions__version__put",
+   "summary": "Update Version"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/activate",
+   "operation_id": "activate_api_v1_recipes__recipe_id__versions__version__activate_post",
+   "summary": "Activate"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/approve",
+   "operation_id": "approve_api_v1_recipes__recipe_id__versions__version__approve_post",
+   "summary": "Approve"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/deprecate",
+   "operation_id": "deprecate_api_v1_recipes__recipe_id__versions__version__deprecate_post",
+   "summary": "Deprecate"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/reject",
+   "operation_id": "reject_api_v1_recipes__recipe_id__versions__version__reject_post",
+   "summary": "Reject"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/sql",
+   "operation_id": "generate_sql_api_v1_recipes__recipe_id__versions__version__sql_post",
+   "summary": "Generate Sql"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/recipes/{recipe_id}/versions/{version}/submit",
+   "operation_id": "submit_api_v1_recipes__recipe_id__versions__version__submit_post",
+   "summary": "Submit"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relation-reviews",
+   "operation_id": "list_reviews_api_v1_relation_reviews_get",
+   "summary": "关系复核草稿列表"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/relation-reviews/batch",
+   "operation_id": "batch_review_api_v1_relation_reviews_batch_post",
+   "summary": "批量批准/拒绝"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relation-reviews/counts",
+   "operation_id": "review_counts_api_v1_relation_reviews_counts_get",
+   "summary": "复核状态计数"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relation-reviews/{review_id}",
+   "operation_id": "get_review_api_v1_relation_reviews__review_id__get",
+   "summary": "复核草稿详情"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/relation-reviews/{review_id}/approve",
+   "operation_id": "approve_api_v1_relation_reviews__review_id__approve_post",
+   "summary": "批准复核草稿（链接既有 formal，禁止重复提升 candidate）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relation-reviews/{review_id}/field-mappings",
+   "operation_id": "field_mappings_api_v1_relation_reviews__review_id__field_mappings_get",
+   "summary": "复核草稿字段映射（数组）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/relation-reviews/{review_id}/reject",
+   "operation_id": "reject_api_v1_relation_reviews__review_id__reject_post",
+   "summary": "拒绝复核草稿（保留证据，不物理删除）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/authority-rule",
+   "operation_id": "get_relation_authority_rule_api_v1_relations_authority_rule_get",
+   "summary": "HISUSER 权威同步规则"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/relations/batch-review",
+   "operation_id": "batch_review_relations_api_v1_relations_batch_review_post",
+   "summary": "批量审核关系（最多100条）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/field-mappings",
+   "operation_id": "list_field_mappings_api_v1_relations_field_mappings_get",
+   "summary": "字段映射列表"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/hit-rates",
+   "operation_id": "list_relation_hit_rates_api_v1_relations_hit_rates_get",
+   "summary": "正式关系命中率（检查/检验分门诊住院）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/list",
+   "operation_id": "list_relations_api_v1_relations_list_get",
+   "summary": "关系列表（复核工作台）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/list-counts",
+   "operation_id": "list_relation_counts_api_v1_relations_list_counts_get",
+   "summary": "复核中心各页签数量"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/relations/path",
+   "operation_id": "relation_path_api_v1_relations_path_get",
+   "summary": "两表之间的关联路径（BFS 最短跳数）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/relations/{relation_id}",
+   "operation_id": "update_relation_api_v1_relations__relation_id__patch",
+   "summary": "编辑关系（P9 复核工作台）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/relations/{relation_id}/review",
+   "operation_id": "review_relation_api_v1_relations__relation_id__review_patch",
+   "summary": "审核关系（通过/拒绝）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/sources",
+   "operation_id": "list_sources_api_v1_sources_get",
+   "summary": "数据源列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/sources",
+   "operation_id": "upsert_source_api_v1_sources_put",
+   "summary": "新增/更新数据源"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/peripheral/bootstrap",
+   "operation_id": "bootstrap_peripheral_sources_api_v1_sources_peripheral_bootstrap_post",
+   "summary": "L14 登记周边系统并可选活库元数据采集（只读）"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/sources/{source_code}",
+   "operation_id": "delete_source_api_v1_sources__source_code__delete",
+   "summary": "禁用数据源（软删除）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/sources/{source_code}",
+   "operation_id": "get_source_api_v1_sources__source_code__get",
+   "summary": "数据源详情（凭据脱敏）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/sources/{source_code}",
+   "operation_id": "patch_source_api_v1_sources__source_code__patch",
+   "summary": "更新连接元数据"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/check",
+   "operation_id": "check_source_api_v1_sources__source_code__check_post",
+   "summary": "数据源连通性检测"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/collect-metadata",
+   "operation_id": "collect_metadata_api_v1_sources__source_code__collect_metadata_post",
+   "summary": "手动触发元数据采集（P14-T5）"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/sources/{source_code}/credential",
+   "operation_id": "clear_source_credential_api_v1_sources__source_code__credential_delete",
+   "summary": "删除凭据文件并清除引用（purpose=readonly|write）"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/sources/{source_code}/credential",
+   "operation_id": "update_source_credential_api_v1_sources__source_code__credential_put",
+   "summary": "写入/轮换凭据（密码只写不回显；支持只读/写账号分离）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/sources/{source_code}/metadata-jobs/{job_id}/retry",
+   "operation_id": "retry_metadata_collect_job_api_v1_sources__source_code__metadata_jobs__job_id__retry_post",
+   "summary": "重试元数据采集任务"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/sources/{source_code}/purpose-bindings",
+   "operation_id": "list_purpose_bindings_api_v1_sources__source_code__purpose_bindings_get",
+   "summary": "用途绑定列表（引用名与状态，不含凭据内容）"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/sources/{source_code}/purpose-bindings/{purpose}",
+   "operation_id": "disable_purpose_binding_api_v1_sources__source_code__purpose_bindings__purpose__delete",
+   "summary": "停用用途绑定（软关闭：enabled=false 保留登记供审计）"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/sources/{source_code}/purpose-bindings/{purpose}",
+   "operation_id": "upsert_purpose_binding_api_v1_sources__source_code__purpose_bindings__purpose__put",
+   "summary": "登记/更新用途绑定（只登记受控引用名，不接收密码；不覆盖字典推送策略）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/sources/{source_code}/snapshots",
+   "operation_id": "source_snapshots_api_v1_sources__source_code__snapshots_get",
+   "summary": "快照历史（P14）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/summary",
+   "operation_id": "summary_api_v1_summary_get",
+   "summary": "数据资产总览"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/systems",
+   "operation_id": "list_systems_api_v1_systems_get",
+   "summary": "系统列表"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/v1/systems",
+   "operation_id": "upsert_system_api_v1_systems_put",
+   "summary": "新增/更新系统"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/systems-with-connections",
+   "operation_id": "create_system_with_connections_api_v1_systems_with_connections_post",
+   "summary": "组合创建系统与一个或多个数据连接"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/v1/systems/{system_code}",
+   "operation_id": "delete_system_api_v1_systems__system_code__delete",
+   "summary": "软停用系统（存在引用时禁止物理删除）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/systems/{system_code}",
+   "operation_id": "patch_system_api_v1_systems__system_code__patch",
+   "summary": "部分更新系统"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/systems/{system_code}/connections",
+   "operation_id": "add_system_connection_api_v1_systems__system_code__connections_post",
+   "summary": "为系统新增连接"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/systems/{system_code}/detail",
+   "operation_id": "system_detail_api_v1_systems__system_code__detail_get",
+   "summary": "系统详情（含连接与统计）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/tables",
+   "operation_id": "list_tables_api_v1_tables_get",
+   "summary": "表清单（搜索/分页）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/tables/{schema}/{table}",
+   "operation_id": "get_table_api_v1_tables__schema___table__get",
+   "summary": "表详情"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/tables/{schema}/{table}/columns",
+   "operation_id": "get_columns_api_v1_tables__schema___table__columns_get",
+   "summary": "表字段清单"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/tables/{schema}/{table}/relations",
+   "operation_id": "get_table_relations_api_v1_tables__schema___table__relations_get",
+   "summary": "该表的关联关系（上下游）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/tables/{table_id}/annotation",
+   "operation_id": "update_table_annotation_api_v1_tables__table_id__annotation_patch",
+   "summary": "更新表中文名/业务说明"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains",
+   "operation_id": "list_value_domains_api_v1_value_domains_get",
+   "summary": "值域列表（过滤 + conflicted 冲突列表 + updated_since 增量）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/value-domains",
+   "operation_id": "create_value_domain_api_v1_value_domains_post",
+   "summary": "提交值域候选（pending；证据必填；先查后插；新建 201/追加证据 200）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains/export",
+   "operation_id": "export_value_domains_api_v1_value_domains_export_get",
+   "summary": "值域 CSV 导出（166 F6：列白名单+防注入+审计；先于 /{domain_id} 注册——B7）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains/{domain_id}",
+   "operation_id": "get_value_domain_api_v1_value_domains__domain_id__get",
+   "summary": "值域详情（含全部证据）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/value-domains/{domain_id}/confirm",
+   "operation_id": "confirm_value_domain_api_v1_value_domains__domain_id__confirm_patch",
+   "summary": "人工确认值域（AI 角色无此权限码）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/value-domains/{domain_id}/deprecate",
+   "operation_id": "deprecate_value_domain_api_v1_value_domains__domain_id__deprecate_patch",
+   "summary": "废弃值域（退出注入链路）"
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/value-domains/{domain_id}/evidences",
+   "operation_id": "add_evidence_api_v1_value_domains__domain_id__evidences_post",
+   "summary": "向既有值域追加证据（含对立证据冲突检测）"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/v1/value-domains/{domain_id}/resolve-conflict",
+   "operation_id": "resolve_conflict_api_v1_value_domains__domain_id__resolve_conflict_patch",
+   "summary": "人工裁决冲突（采纳含义并解除冲突）"
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains/{domain_id}/versions",
+   "operation_id": "list_value_domain_versions_api_v1_value_domains__domain_id__versions_get",
+   "summary": "值域版本时间线"
+  },
+  {
+   "method": "GET",
+   "path": "/get-async-routes",
+   "operation_id": "get_async_routes_get_async_routes_get",
+   "summary": "前端动态路由占位（返回空，使用静态菜单）"
+  },
+  {
+   "method": "GET",
+   "path": "/health",
+   "operation_id": "health_health_get",
+   "summary": "就绪检查（readiness，依赖数据库）"
+  },
+  {
+   "method": "GET",
+   "path": "/health/live",
+   "operation_id": "health_live_health_live_get",
+   "summary": "存活检查（liveness，不依赖数据库）"
+  }
+ ]
+}

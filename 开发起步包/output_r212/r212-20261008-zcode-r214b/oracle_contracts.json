@@ -1,0 +1,68 @@
+{
+  "run": "r212-20261008-zcode-r214b",
+  "frozen_at": "2026-10-08",
+  "note": "真值来源=既有冻结契约（测试断言与计划文档），212不自造业务定义；业务定义缺失处标WAITING_INPUT不入本表",
+  "contracts": [
+    {
+      "oracle_id": "OC-01",
+      "name": "全站403错误信封（DEF-01已裁决A，批次A实施）",
+      "truth_source": "backend/tests/test_forbidden_envelope_214.py（5用例）+ output_r214/DEF-01_兼容性清单.md",
+      "frozen_shape": "require_permission拒绝 -> {code:403,message:'权限不足',data:{resource_code},detail:'缺少权限: <码>',request_id}；其它403保留原文message+同文detail镜像；非403不重塑",
+      "applies_to": "B07/B03/F03",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-02",
+      "name": "AI上下文security_policy段（210 S8 + FIX-211-01）",
+      "truth_source": "tests/test_value_domain_injection.py + tests/plan144_db/test_ai_context_contract.py 断言",
+      "frozen_shape": "schema_version=ds-security/b02_v1; permission_model=structure_only; confirmed_label_present按库内active+confirmed存在性; 无confirmed时unclassified_warning=fail-closed提示",
+      "applies_to": "B14/A13",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-03",
+      "name": "质量观测状态机",
+      "truth_source": "quality_governance模型CHECK+tests/plan207族断言（T34四身份链209 C包复验）",
+      "frozen_shape": "PASS/FAIL/ERROR/NO_DATA/BLOCKED/NOT_RUN互斥；FAIL=bad/total仅当完整定义范围；NO_DATA/ERROR/INCOMPLETE不得显示100%合格",
+      "applies_to": "B14/A05/G05",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-04",
+      "name": "分类fail-closed与候选不等于许可",
+      "truth_source": "210 S10真实负例（deny_unclassified/deny_purpose/自审403）+tests/plan193(210族)",
+      "frozen_shape": "候选/pending不作读取许可；未分类受保护读取默认拒绝；提案与审批职责分离（自审403+拒绝审计）",
+      "applies_to": "B15/B17/G09/G10",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-05",
+      "name": "值域注入只认confirmed",
+      "truth_source": "tests/test_value_domain_injection.py（断言未改）",
+      "frozen_shape": "仅confirmed值域进AI上下文；unknown/pending不权威判错不默认合法；valid_from前不生效",
+      "applies_to": "A04/G04",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-06",
+      "name": "导出公式注入与工件生命周期",
+      "truth_source": "tests/plan193 export族（G11式负例）",
+      "frozen_shape": "=+-@开头文本受阻/转义；下载内容与row/column scope一致；到期/撤销不可再取",
+      "applies_to": "B18/G11",
+      "status": "FROZEN"
+    },
+    {
+      "oracle_id": "OC-07",
+      "name": "迁移链与保护契约",
+      "truth_source": "tests/alembic_env + 210 S10生产迁移链记录",
+      "frozen_shape": "单head=c0d1e2f3a4b5；手写双向；非空downgrade按契约拒绝；asset schema与旧MVP表保留",
+      "applies_to": "D01/D02/D03",
+      "status": "FROZEN"
+    }
+  ],
+  "waiting_input_oracles": [
+    {"name": "启发式分类建议准确率阈值", "reason": "正式上线阈值/金标缺失（212 §8.3-4）→ 报告实测不判PASS/FAIL"},
+    {"name": "20核心指标业务口径", "reason": "R211-080待业务定义 → G07式金标仅测既有已冻结指标"},
+    {"name": "真实患者/真实源判断准确性", "reason": "E4无授权 → 合成样例仅"}
+  ]
+}

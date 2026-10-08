@@ -1,0 +1,237 @@
+{
+ "pages": [
+  {
+   "idx": "01",
+   "route": "/welcome",
+   "title": "运行总览",
+   "pass": true,
+   "evidence": {
+    "hash": "#/welcome",
+    "activeTags": [
+     "首页"
+    ],
+    "h1": null,
+    "mainLen": 464,
+    "head": "DATA ASSET COMMAND CENTER 数据资产指挥中心 指标来自平台库实时聚合（系统/表/关系/人员/质量/复核），点击卡片可跳转对应工作台。 数据时间 2026/10/8 11:33:",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "02",
+   "route": "/asset/tables",
+   "title": "表与字段",
+   "pass": true,
+   "evidence": {
+    "hash": "#/asset/tables",
+    "activeTags": [
+     "表与字段"
+    ],
+    "h1": "资产表目录",
+    "mainLen": 3591,
+    "head": "资产表目录 统一层级：业务系统 → 数据连接 → Schema/Owner → 表 → 字段。一级名称来自系统总览，十个业务系统平行展示。 刷新目录 全部业务系统 HRP 数据中心 嘉和电子病历 Do",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "03",
+   "route": "/asset/graph",
+   "title": "关系图谱",
+   "pass": true,
+   "evidence": {
+    "hash": "#/asset/graph",
+    "activeTags": [
+     "关系图谱"
+    ],
+    "h1": "关系图谱",
+    "mainLen": 392,
+    "head": "关系图谱 知识图谱：业务系统 → Schema/库 → 表 → 字段。单击节点下钻，拖拽查看关系。 业务系统 单击节点进入下一层 · 拖拽/滚轮缩放 资产概览 路径查询 关系探索 证据审核 按业务系统",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "04",
+   "route": "/value-domains",
+   "title": "值域知识库",
+   "pass": true,
+   "evidence": {
+    "hash": "#/value-domains",
+    "activeTags": [
+     "值域知识库"
+    ],
+    "h1": "值域知识库",
+    "mainLen": 1855,
+    "head": "值域知识库 字段值域全量视图：候选、冲突裁决与版本时间线（149 端点族活化）。 刷新 51 导出 CSV 全部 冲突 值域类型 状态 筛选 重置 系统 Schema 表 字段 值码 含义 类型 状态",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "05",
+   "route": "/asset/ai-sql",
+   "title": "AI辅助编写",
+   "pass": true,
+   "evidence": {
+    "hash": "#/asset/ai-sql",
+    "activeTags": [
+     "AI辅助编写"
+    ],
+    "h1": "AI 写 SQL",
+    "mainLen": 277,
+    "head": "AI 写 SQL 让院内模型依据已验证表关系生成 Oracle 只读 SQL；只生成、永不执行。 AI质量分析 Oracle · DATA_CENTER 只读 SELECT / CTE 正式关系证据 ",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "06",
+   "route": "/datasets",
+   "title": "数据集目录",
+   "pass": true,
+   "evidence": {
+    "hash": "#/datasets",
+    "activeTags": [
+     "数据集目录"
+    ],
+    "h1": "数据集目录",
+    "mainLen": 142,
+    "head": "数据集目录 患者纵向数据集目录：分类分级、版本状态与批次；含安全治理闭环（分类/授权/受控导出） 目录 分类治理 用途授权 受控导出 刷新目录 编码 标题 用途 粒度 最新版本 状态 访问 待定级 暂",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "07",
+   "route": "/quality/issues",
+   "title": "质量台账",
+   "pass": true,
+   "evidence": {
+    "hash": "#/quality/issues",
+    "activeTags": [
+     "质量台账"
+    ],
+    "h1": "质量台账",
+    "mainLen": 225,
+    "head": "质量台账 问题能分派到科室和人员、整改、复测、关闭并留痕的治理闭环。 刷新 手工登记问题 导出 CSV 批量分派 覆盖看板 最近运行 我的待办 我的任务 科室任务 全院总览 全院总览（需全院总览权限）",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "08",
+   "route": "/quality/observations",
+   "title": "观测记录",
+   "pass": true,
+   "evidence": {
+    "hash": "#/quality/observations",
+    "activeTags": [
+     "观测记录"
+    ],
+    "h1": "观测记录",
+    "mainLen": 122,
+    "head": "观测记录 不可变观测流水：每次执行在一个窗口、一个范围的固化结果。 刷新 结果 来源 筛选 重置 # 清单 版本 结果 指标 分子 分母 范围 窗口 来源 run_key 观测时间 精度 暂无数据 共",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "09",
+   "route": "/quality/controls",
+   "title": "质控清单",
+   "pass": true,
+   "evidence": {
+    "hash": "#/quality/controls",
+    "activeTags": [
+     "质控清单"
+    ],
+    "h1": "质控清单",
+    "mainLen": 116,
+    "head": "质控清单 版本化的质控规则清单：稳定编码 + 口径版本，绑定检测来源。 刷新 新建清单 状态 筛选 重置 清单编码 名称 状态 类别 维度 主责系统 指标/阈值 检测器 操作 暂无数据 共 0 条 2",
+    "skeleton": false
+   }
+  },
+  {
+   "idx": "10",
+   "route": "/ops/audit",
+   "title": "操作审计",
+   "pass": true,
+   "evidence": {
+    "hash": "#/ops/audit",
+    "activeTags": [
+     "操作审计"
+    ],
+    "h1": "运维审计日志",
+    "mainLen": 403,
+    "head": "运维审计日志 记录运维工具、审批、执行和失败事件，保留操作人、对象和时间证据。 刷新 2 当前页日志 按最近时间排序 0 成功/通过 当前页统计 0 执行动作 当前页统计 0 失败/拒绝 最近：202",
+    "skeleton": false
+   }
+  }
+ ],
+ "f03_viewer": {
+  "landing_hash": "#/workbench",
+  "menu_has_quality_ledger": false,
+  "menu_has_ai_sql": false,
+  "menu_has_ops": false,
+  "menu_text_head": "工作台|日常工作台|运行总览|资产目录|值域知识库|质量治理",
+  "value_domain_confirm_buttons": {
+   "dialog_buttons": 0,
+   "confirm_like_buttons": 0,
+   "page_reachable": true
+  }
+ },
+ "b07": {
+  "viewer_confirm_403": {
+   "step": "write",
+   "status": 403,
+   "body": {
+    "code": 403,
+    "message": "权限不足",
+    "data": {
+     "resource_code": "value_domain.confirm"
+    },
+    "detail": "缺少权限: value_domain.confirm",
+    "request_id": "f656f08d7a6649b9b67d9be4c0a7338b"
+   },
+   "envelope": {
+    "keys": [
+     "code",
+     "data",
+     "detail",
+     "message",
+     "request_id"
+    ],
+    "code": 403,
+    "message": "权限不足",
+    "resource_code": "value_domain.confirm",
+    "detail": "缺少权限: value_domain.confirm",
+    "has_request_id": true
+   }
+  },
+  "admin_non403_shape": {
+   "step": "write",
+   "status": 404,
+   "body": {
+    "detail": "值域记录不存在"
+   },
+   "envelope": {
+    "keys": [
+     "detail"
+    ],
+    "code": null,
+    "message": null,
+    "resource_code": null,
+    "detail": "值域记录不存在",
+    "has_request_id": false
+   }
+  }
+ },
+ "console_errors": [
+  "console.error: Failed to load resource: the server responded with a status of 403 (Forbidden)",
+  "console.error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "browser_mode": "chrome-headed",
+ "admin_login_landing": {
+  "hash": "#/workbench",
+  "head": "日常工作台 今天要做什么：待办任务、常用入口与平台运行摘要 运行总览 资产统计 我的质量任务 更新于 2026-10-08 11:33 暂无待办任务 快捷入口 "
+ },
+ "ai_sql_page": {
+  "mainLen": 277,
+  "head": "AI 写 SQL 让院内模型依据已验证表关系生成 Oracle 只读 SQL；只生成、永不执行。 AI质量分析 Oracle · DATA_CENTER 只读 SELECT / CTE 正式关系证据 ",
+  "has_500_text": false
+ },
+ "logout_back_to_login": true
+}

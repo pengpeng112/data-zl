@@ -1,0 +1,13 @@
+{
+  "run": "r212-20261008-zcode-r214b",
+  "note": "分母从当前候选重建；受阻/未执行项保留在分母内不美化；生产范围另列",
+  "denominators": {
+    "api_operations": {"total": 477, "unique_paths": 419, "source": "inventory/api_inventory.json(OpenAPI实测)", "covered_this_round": "全量pytest 1992用例族 + B07浏览器级抽测 + O01负载7端点", "coverage_mode": "按212 §3以套件族映射+增量面直测，不为凑数逐操作伪造"},
+    "ui_paths": {"total": 72, "route_objects": 74, "source": "inventory/ui_inventory.json", "covered_this_round": "S3抽测10页(候选增量面)+批次A 18/18全页(同候选前端,211未改前端)", "reference_evidence": "output_r214/screenshots/(2026-10-07,同前端候选)"},
+    "requirements": {"total": 30, "active": 27, "needs_confirmation": 3, "mapping": "requirements.csv"},
+    "judgment_branches": "以oracle_contracts.json七冻结契约为真值源;启发式分类/AI建议阈值=WAITING_INPUT(无金标)",
+    "journeys": "J01质量四身份链=T34+209C包复验(207/209批次,候选变更面=403信封→B07重验);J02分类用途导出=210 S10生产负例+plan193套件;J03查询指标=plan144族;J04关系值域治理=plan195/198族+R211-040人工剩余;J05-J07=205/193族套件;J08跨AI=211→212本链即实证"
+  },
+  "statuses": {"PASS": "见cases.jsonl逐条", "BLOCKED_ENV": ["O07离线Linux"], "WAITING_INPUT": ["启发式准确率阈值", "20指标业务口径", "R211-003/004/011等待输入族"], "NOT_RUN_prod": ["E3生产只读", "E4源库live", "真实周期观察"]},
+  "incident": "DEF212-001 双进程并发事故(已登记,单进程重跑为准)"
+}

@@ -1,0 +1,56 @@
+{
+  "run": "r211-20261008-zcode-r214b",
+  "generated_at": "2026-10-08",
+  "clue_verification_211_s4": {
+    "线索1_210生产落地正式定级待人工": {"status": "已核实", "evidence": "55当前表210行 + output_r210/r210-20261002-s10/执行报告.md；confirmed全程0，270,787候选待人工", "finding_id": null},
+    "线索2_207/208三迁移已随210升级": {"status": "已核实", "evidence": "55行18(210行)记录生产迁移链 b3c4d5e6f7a8→c4d5e6f7b8a9[207A1]→a9b8c7d6e5f4[208A3]→c0d1e2f3a4b5[210]；三条迁移文件仍为未跟踪(生产库已依赖，禁止删改)", "finding_id": null},
+    "线索3_55的207行仍写生产待批/209待验收": {"status": "部分过期→已修正(本轮FIX-211-02)", "evidence": "210 S10已发布生产(含207迁移与代码)、209独立验收已执行(09-29)；207行尾巴'剩余=生产发布…与209独立验收'为过期表述", "finding_id": "F-211-02"},
+    "线索4_210正文保留核查期零记录和S10待批描述": {"status": "已由v1.2头部解决", "evidence": "210文件顶部第5行已写明S0—S9 LOCAL_VERIFIED + S10 PROD_VERIFIED + 正式定级属人工治理", "finding_id": null},
+    "线索5_193行残留'尚有210整改项'历史措辞": {"status": "已核实不存在", "evidence": "55行25(193 B18行)现为'旧口径合成闭环已有；2026-10-01新增安全控制缺口由210承接'，无过期措辞", "finding_id": null},
+    "线索6_209两个P2例外": {"status": "已闭合(批次A)", "evidence": "DEF-01=E-A2统一全站403信封(dict_medical 18/18自然转绿+契约测试5/5)；DEF-02=E-A1真实Chrome三轮不复现关闭", "finding_id": null},
+    "线索7_204维护与工具验证项": {"status": "仍开放(204线)", "evidence": "55行29登记D6检查器增强/各客户端实机验证/未检查范围；属204工作线，211不越权处理", "finding_id": null},
+    "线索8_205/195/198关系治理与来源偏差": {"status": "仍开放(人工治理)", "evidence": "R211-040/041；5条探针非pass禁转formal已由214 E-A5登记", "finding_id": null},
+    "线索9_189/191离线完成未代表活库扩窗": {"status": "已核实为开放", "evidence": "55行23：44对象50谓词49改/1HOLD；live/DDL/MTL-JHEMR/DataX未据此完成", "finding_id": null},
+    "线索10_角色196指标B18厂商依赖": {"status": "已核实为待输入", "evidence": "R211-060/080/030 + 55行27外部依赖；缺具体账号/编码/责任人/定义", "finding_id": null},
+    "线索11_177/185残留历史线索": {"status": "已核实为待核实态", "evidence": "55行30历史线索待核实行(不恢复旧任务)", "finding_id": null}
+  },
+  "new_findings": [
+    {
+      "finding_id": "F-211-01",
+      "severity": "P1",
+      "title": "AI上下文构建500：_security_policy_block 缺 select 导入(NameError)",
+      "trigger": "POST /api/v1/ai/context/resolve 及所有调用 build_context_snapshot 的路径",
+      "root_cause": "210 S8工作区WIP在 _security_policy_block 内使用 sqlalchemy.select 但该函数未导入(文件仅在另一函数局部导入)",
+      "impact": "AI上下文/AI写SQL支撑接口全量500；批次A全量pytest的4个失败(3 contract+1 value_domain_injection)即此因",
+      "oracle": "tests/plan144_db/test_ai_context_contract.py + tests/test_value_domain_injection.py 断言未改",
+      "fix_id": "FIX-211-01",
+      "fix": "函数内补 from sqlalchemy import select(与文件line68既有局部导入习惯一致)",
+      "verified": "修后12/12 passed(2026-10-08 08:35)",
+      "note": "属既有WIP缺陷，非211引入；211按归属批次修复"
+    },
+    {
+      "finding_id": "F-211-02",
+      "severity": "P3",
+      "title": "55的207行尾巴仍写'生产发布…与209独立验收'过期表述",
+      "trigger": "阅读55当前批次表",
+      "root_cause": "E-A4只纠偏了209/213/207的README侧与📌，未改207行尾巴",
+      "impact": "读者可能重复安排已完成的209验收或生产发布",
+      "fix_id": "FIX-211-02",
+      "fix": "207行改为：生产迁移/代码已随210 S10落地；209独立验收已执行(09-29)；剩余=专项生产验收(旧记录回填/真实规则试跑/worker配置/调度周期)+试点+T35"
+    },
+    {
+      "finding_id": "F-211-03",
+      "severity": "P3(观察记录，非缺陷)",
+      "title": "graph_sync契约与AI注释占位核清",
+      "detail": "graph_sync: GraphSyncAdapter抽象契约+Unavailable/InMemory两实现+11个测试(test_graph_sync.py)；graph_analysis.py默认_adapter=UnavailableGraphAdapter()(fail-closed，未接真实图库=设计决策)。AI注释建议: /tables/ai/suggest-annotations 为显式占位(summary自述'待P5.5多数据库驱动就绪')，返回空suggestions——非假装实现。214 §4两线索核清，无需整改；若需真实图库/注释生成属新需求待输入。"
+    }
+  ],
+  "deviation_classification_summary": {
+    "P0": 0,
+    "P1": 1,
+    "P1_fixed": ["F-211-01"],
+    "P2": 0,
+    "P3": 2,
+    "notes": "偏离类型分布：实现缺陷(F-211-01,已修)、文档时效(F-211-02,已修)、待输入类人工治理缺口(R211-003/004/010owner/011/020owner/030/040/060/070/080/091)均按214 §6登记待输入，不擅自裁决"
+  }
+}

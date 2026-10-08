@@ -1,0 +1,58 @@
+{
+  "run": "r212-20261008-zcode-r214b",
+  "updated_at": "2026-10-08 12:10",
+  "defects": [
+    {
+      "defect_id": "DEF212-001",
+      "severity": "P3(测试执行事故，非产品缺陷)",
+      "is_existing": false,
+      "category": "环境失败（测试进程并发事故）",
+      "summary": "全量pytest出现大规模ERROR，根因=会话中断后误判首个后台pytest已死(tail管道缓冲致输出文件空)而重启第二个，两套件并发对同一隔离库互相TRUNCATE/seed",
+      "evidence": [
+        "首个任务exec_85bfd61a于09:54完成：'30 failed, 1500 passed, 1 skipped, 472 errors in 4521.77s'(75分钟远超正常52分钟)",
+        "第二任务exec_62ac1f8c日志E簇与首个任务时间窗(08:48-09:54)完全重叠",
+        "外来进程C:/tmp/268-evidence/run_check.py×2属另一项目(ai-hms)，零PG引用，已排除"
+      ],
+      "root_cause": "执行AI失误：重启后台全量pytest前未核实旧进程退出",
+      "resolution": "杀停全部本会话pytest→单进程干净重跑(PID戳记)",
+      "retest": "单进程全量=1991 passed/1 skipped/0 failed exit0(51:56)→缺陷关闭为执行事故",
+      "candidate": "不涉及产品代码"
+    },
+    {
+      "defect_id": "DEF212-002",
+      "severity": "P2",
+      "is_existing": true,
+      "category": "产品缺陷（并发/幂等）",
+      "latest_requirement": "R211-002(212全栈验收)／B12超时预算取消+B08幂等重复精神",
+      "summary": "POST /api/v1/ai/context/resolve 5并发下6×500：context_id=ctx-{秒级时间戳}-{内容哈希}，同问题同秒并发生成相同ID，撞uq_asset_ai_context_snapshots_cid唯一约束→端点吞为'上下文构建失败'500",
+      "minimal_repro": "5线程各持独立Session调用build_context_snapshot(同参数)→3/5报IntegrityError duplicate key ctx-20261008T025849-e5b979169d",
+      "oracle": "同参数并发构建应各自成功留档（每次构建留档语义），不应500",
+      "actual_before": "5并发=6×500(p95 16.6s)；复现3/5 IntegrityError",
+      "impact": "AI工作台/AI写SQL支撑接口在多人同时使用时随机500；单用户无感",
+      "root_cause": "ID设计缺陷：时间戳粒度秒级+内容哈希，并发同问必撞",
+      "fix": "FIX-212-002(经211修复流程)：ai_context_builder.py快照ID时间戳细化到微秒(%f)+IntegrityError时rollback并重生成ID重试(≤3次)；快照内容与留档语义不变",
+      "fixed_candidate": "c212-20261008-fix02(=c211+fix02，工作区同一候选演进)",
+      "retest": [
+        "线程级复现5/5 OK",
+        "回归tests/plan144_db+test_value_domain_injection=51/51 passed",
+        "HTTP层O01复测：ai/context/resolve 5c×50req 5xx=0(修前6×500)"
+      ],
+      "regression_scope": "AI上下文族(144/195/210相关)全部通过"
+    },
+    {
+      "defect_id": "DEF212-003",
+      "severity": "P3(测试工具缺陷，已修)",
+      "is_existing": false,
+      "category": "测试脚本",
+      "summary": "S3浏览器判定脚本三处自身错误：值域页路由写成/asset/value-domains(实际/value-domains)、两页预期标题与菜单名不符(观测记录/质控清单)、B07 fetch缺X-Requested-With被CSRF拦截",
+      "resolution": "修正路由/标题/fetch头后复跑：10/10页PASS+B07信封断言精确命中+viewer按钮隐藏证据成立",
+      "note": "首轮4页FAIL全部为脚本问题非产品问题；首轮B07的CSRF 403响应本身也符合统一信封形状(附带验证了中间件路径)"
+    }
+  ],
+  "closed": ["DEF212-001(执行事故,单进程复跑关闭)", "DEF212-002(已修复+三层复验)", "DEF212-003(脚本修正)"],
+  "waiting_input": [
+    "启发式分类/AI建议准确率阈值(无金标,WAITING_INPUT)",
+    "20核心指标业务口径(R211-080)",
+    "O07干净Linux环境(R211-091)"
+  ]
+}

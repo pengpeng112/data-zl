@@ -1,0 +1,20 @@
+{
+ "recorded_at": "2026-10-08T08:27:56+08:00",
+ "E0_static": {
+  "python": "3.14.4",
+  "ok": true
+ },
+ "E1_isolated_db": {
+  "name": "data_asset_test (经 dev_env.sh 隧道 127.0.0.1:15432 -> 10.10.8.83:5432)",
+  "verified": "批次A同库验收(2026-10-07)；本run复用同一受控推导，URL仅入环境变量不落文件",
+  "cleanable": true,
+  "exclusive_during_browser": "浏览器期间禁止pytest清库"
+ },
+ "E2_browser": {
+  "plan": "真实Chrome+生产构建preview(批次A同法)",
+  "status": "PLANNED"
+ },
+ "E3_prod_readonly": "本轮无授权，NOT_RUN",
+ "E4_source_live": "本轮无授权(205 R8无批准)，NOT_RUN",
+ "occupancy": "ai_handoff claim session=zcode-r214b-211-212-20261008"
+}

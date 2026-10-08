@@ -1,0 +1,60 @@
+{
+ "candidate_id": "c211-20261008-r39ca60d+fix01",
+ "frozen_at": "2026-10-08T08:35:10+08:00",
+ "git_head": "39ca60d134885a877e08a347dda942c4b12eced4",
+ "candidate_definition": "HEAD 39ca60d(批次A已提交态) + 工作区WIP(210/207/208批次未提交改动,非干净基线) + FIX-211-01(ai_context_builder select导入) + FIX-211-02(55行207纠偏)。212受测即此工作区状态,分母清单见 inventory/",
+ "tracked_files_sha256": {
+  "backend/app/services/ai_context_builder.py": "2c1e37e7ceeee026aae4499da5486c252b7fa95cab1c4bdd3a7292597ad586eb",
+  "backend/app/core/security.py": "43287a53f67d18e3bb6ab64222eb9c68c2a4d435e36ae7d91b1da0c5f91f2d63",
+  "backend/app/main.py": "040360e5a63156bb94d1bbacc01084e874b127fb1e10ad3831d5d33db9ca0415",
+  "deploy/scripts/release_frontend.sh": "b539b0eccff2fcbaa7bf1614cef977d95fe869b54e7734fb9a4f03a8ec352491"
+ },
+ "untracked_migrations_sha256": {
+  "backend/alembic/versions/c4d5e6f7b8a9_quality_execution_closed_loop_207.py": "0807c91dbdf09fc560a6bc4739cb75c8d85002be04e67cf740045bae2466ed8f",
+  "backend/alembic/versions/a9b8c7d6e5f4_detector_kind_value_domain_208a.py": "3bedabaa9c80c45f25f15c3741acba77edd848ff61431fbff5be4be6e6659523",
+  "backend/alembic/versions/c0d1e2f3a4b5_dataset_security_closed_loop_210.py": "3f74f3b5d1fb6c5660ae9dd2d5e44c45ca6253dc7af05857a0986582d4d0261c"
+ },
+ "untracked_candidate_code": [
+  "backend/app/api/v1/quality_notifications.py",
+  "backend/app/api/v1/quality_runs.py",
+  "backend/app/api/v1/quality_vendors.py",
+  "backend/app/services/quality_cross_source.py",
+  "backend/app/services/quality_execution_service.py",
+  "backend/app/services/quality_value_domain.py"
+ ],
+ "others_wip_excluded": "工作区其余修改文件(210批次WIP约60+文件)构成运行候选的一部分但非211改动;211未触碰未提交",
+ "fixes": [
+  {
+   "fix_id": "FIX-211-01",
+   "finding": "F-211-01 P1 AI上下文500",
+   "tests": "plan144_db 44/44 + AI族18/18",
+   "status": "LOCAL_VERIFIED"
+  },
+  {
+   "fix_id": "FIX-211-02",
+   "finding": "F-211-02 P3 文档时效",
+   "status": "DONE"
+  }
+ ],
+ "frontend": {
+  "build": "212 S1重跑(批次A已过三预算,本候选前端无新改动)",
+  "package_manager": "pnpm"
+ },
+ "backend": {
+  "migrations_heads": "212 S2核对(三迁移未跟踪但生产/隔离库已应用)",
+  "deps": "backend/.venv不变"
+ },
+ "requirements_matrix": "requirements.csv (30条, sha256见SHA256SUMS)",
+ "known_exceptions": [
+  "R211-003 通知接线待排期; R211-004 platform_admin契约待工单",
+  "待输入族 R211-030/040/060/070/080/091 等(214 §6全表)",
+  "非干净基线: 受测对象含未提交WIP(214 §4已登记)"
+ ],
+ "seeds_for_212": {
+  "isolated_db": "data_asset_test(隧道15432)",
+  "reseed": "import170全量 + create_local_admin + seed_platform_rbac(133权限码) [批次A同法; r213配方种子按需]",
+  "note": "211 A6回归已触发autouse清库;212浏览器前须重灌"
+ },
+ "prod_state_note": "生产状态引用210 S10报告(2026-10-02),本轮无E3实测",
+ "approval_packages_pending": "无新增生产/源端申请;212按各自边界执行"
+}

@@ -1,0 +1,18 @@
+{
+  "task": "212整改后独立测试(214批次B)",
+  "run": "r212-20261008-zcode-r214b",
+  "updated_at": "2026-10-08",
+  "verdict": "LOCAL_VERIFIED_WITH_EXCEPTIONS",
+  "candidate_tested": "c212-20261008-fix02",
+  "stages": {"S0":"DONE","S1":"DONE","S2":"DONE","S3":"DONE","S4":"DONE","S5":"DONE","S6":"DONE(defects全闭环)","S7":"NOT_RUN(无E3/E4批准)"},
+  "cases": "13条=12 PASS + 1 BLOCKED_ENV(O07)",
+  "defects": "DEF212-001(事故关闭)/DEF212-002(P2已修三层复验)/DEF212-003(脚本关闭)；未关闭P0/P1=0",
+  "current_waiting": ["O07待干净Linux", "启发式阈值/指标口径等待输入(见缺陷与受阻清单)"],
+  "history": [
+    "2026-10-08 S0-S1: 分母重建+七oracle冻结+门禁全绿",
+    "2026-10-08 S2: DEF212-001双进程事故→单进程1991P/0F/1S exit0",
+    "2026-10-08 S3: 10/10页+B07信封命中+F03负例; DEF212-003脚本自错修正",
+    "2026-10-08 S4/S5: 敏感性检查过; DEF212-002发现并修复(P2); O01七端点5xx=0; O06真数据恢复对账全等; O10 error0",
+    "2026-10-08 S6: 报告+缺陷清单+SHA256SUMS定稿"
+  ]
+}

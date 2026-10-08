@@ -1,0 +1,26 @@
+{
+  "run": "r212-20261008-zcode-r214b",
+  "role": "独立测试（不接受开发侧绿灯作PASS；分母从当前候选重建）",
+  "recorded_at": "2026-10-08",
+  "candidate": {
+    "source": "211 交接（output_r211/r211-20261008-zcode-r214b/candidate_manifest.json）",
+    "candidate_id": "c211-20261008-r39ca60d+fix01",
+    "verified_by_212": "交接材料齐备（candidate_manifest+requirements+交接给212.md）；HEAD+工作区状态与211记录一致（211 baseline.json dirty 127条）",
+    "dev_claim_accepted_as": "输入证据 only"
+  },
+  "environment_layers": {
+    "E0_static": {"python": "3.14 (backend/.venv)", "node": "frontend pnpm 锁一致", "status": "OK"},
+    "E1_isolated_db": {
+      "db": "data_asset_test",
+      "url": "经 tools/dev_env.sh 隧道推导（127.0.0.1:15432），仅环境变量不落文件",
+      "cleanable_exclusive": "已核实（批次A同库验收；本run独占时段使用）",
+      "usage_plan": "串行：S2迁移检查→全量pytest(autouse清库)→重种合成数据→S3浏览器→O06恢复演练(同库dump/restore)"
+    },
+    "E2_browser": {"plan": "真实Chrome + 生产构建 vite preview :8898 → 隔离库后端 :8000（批次A同法）", "status": "PLANNED"},
+    "E3_prod_readonly": "无授权 NOT_RUN",
+    "E4_source_live": "无授权(205 R8无批准) NOT_RUN"
+  },
+  "db_logical_mapping": {"DB_API": "data_asset_test(全量pytest)", "DB_BROWSER": "data_asset_test(清库重种后串行)", "DB_MIG": "data_asset_test(升级检查在同一窗口串行)", "DB_RECOVERY": "data_asset_test(restore覆盖演练,允许清理)", "note": "单库串行切阶段，每阶段前重新种数；不创建共享库以外的新库"},
+  "occupancy": "ai_handoff session zcode-r214b-211-212-20261008（211→212连续占用）",
+  "denominators": {"api": "419 paths / 477 operations（inventory/api_inventory.json）", "ui": "74 route objects / 72 unique paths（inventory/ui_inventory.json）", "requirements": "30条（211 requirements.csv）"}
+}

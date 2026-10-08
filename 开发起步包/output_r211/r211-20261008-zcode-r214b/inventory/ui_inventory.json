@@ -1,0 +1,551 @@
+{
+ "method": "line-scan v2 over src/router/modules/*.ts (covers nested children)",
+ "module_file_count": 13,
+ "route_object_count": 74,
+ "path_count": 72,
+ "dynamic_param_routes": [
+  {
+   "module": "catalog.ts",
+   "path": "/asset/tables/:schema/:table",
+   "name": "AssetTableDetail",
+   "title": "表详情",
+   "showLink": "false"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/issues/:id",
+   "name": "QualityIssueDetail",
+   "title": "问题详情",
+   "showLink": "false"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/redirect/:path(.*)",
+   "name": "Redirect",
+   "title": "",
+   "showLink": ""
+  }
+ ],
+ "duplicate_paths": {},
+ "duplicate_names": {},
+ "routes": [
+  {
+   "module": "asset.ts",
+   "path": "/asset",
+   "name": "Asset",
+   "title": "数据资产（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/catalog",
+   "name": "Catalog",
+   "title": "资产目录",
+   "showLink": ""
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/systems",
+   "name": "AssetSystems",
+   "title": "系统与数据资源",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/datasets",
+   "name": "DatasetCatalog",
+   "title": "数据集目录",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/tables",
+   "name": "AssetTables",
+   "title": "表与字段",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/graph",
+   "name": "AssetGraph",
+   "title": "关系图谱",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/lineage",
+   "name": "AssetLineage",
+   "title": "血缘与影响",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/metadata/changes",
+   "name": "MetadataChanges",
+   "title": "元数据变更",
+   "showLink": "true"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/tables/:schema/:table",
+   "name": "AssetTableDetail",
+   "title": "表详情",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/sources",
+   "name": "AssetSources",
+   "title": "数据连接（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/relations",
+   "name": "AssetRelations",
+   "title": "",
+   "showLink": ""
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/graph",
+   "name": "",
+   "title": "关系路径（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/candidates",
+   "name": "AssetCandidates",
+   "title": "",
+   "showLink": ""
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/asset/relation-review",
+   "name": "",
+   "title": "候选关系（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/metadata/snapshots",
+   "name": "MetadataSnapshots",
+   "title": "快照管理",
+   "showLink": "false"
+  },
+  {
+   "module": "catalog.ts",
+   "path": "/metadata/diff",
+   "name": "MetadataDiff",
+   "title": "快照对比",
+   "showLink": "false"
+  },
+  {
+   "module": "dict.ts",
+   "path": "/dict",
+   "name": "Dict",
+   "title": "字典中心（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "error.ts",
+   "path": "/error",
+   "name": "",
+   "title": "异常页面",
+   "showLink": "false"
+  },
+  {
+   "module": "error.ts",
+   "path": "/error/403",
+   "name": "403",
+   "title": "403",
+   "showLink": ""
+  },
+  {
+   "module": "error.ts",
+   "path": "/error/404",
+   "name": "404",
+   "title": "404",
+   "showLink": ""
+  },
+  {
+   "module": "error.ts",
+   "path": "/error/500",
+   "name": "500",
+   "title": "500",
+   "showLink": ""
+  },
+  {
+   "module": "governance.ts",
+   "path": "/governance",
+   "name": "Governance",
+   "title": "数据治理（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "home.ts",
+   "path": "/",
+   "name": "Home",
+   "title": "工作台",
+   "showLink": "true"
+  },
+  {
+   "module": "home.ts",
+   "path": "/workbench",
+   "name": "Workbench",
+   "title": "日常工作台",
+   "showLink": "true"
+  },
+  {
+   "module": "home.ts",
+   "path": "/welcome",
+   "name": "Welcome",
+   "title": "运行总览",
+   "showLink": "true"
+  },
+  {
+   "module": "home.ts",
+   "path": "/asset/overview",
+   "name": "AssetOverview",
+   "title": "资产统计",
+   "showLink": "true"
+  },
+  {
+   "module": "home.ts",
+   "path": "/asset/system-map",
+   "name": "AssetSystemMap",
+   "title": "平台能力全景",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity",
+   "name": "Identity",
+   "title": "人员与权限",
+   "showLink": ""
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/persons",
+   "name": "IdentityPersons",
+   "title": "人员管理",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/departments",
+   "name": "IdentityDepartments",
+   "title": "科室基线",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/accounts",
+   "name": "IdentityAccounts",
+   "title": "业务系统账号",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/local-accounts",
+   "name": "IdentityLocalAccounts",
+   "title": "平台本地账号",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/sync-diffs",
+   "name": "IdentitySyncDiffs",
+   "title": "人员同步差异",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/sync-logs",
+   "name": "IdentitySyncLogs",
+   "title": "人员同步日志",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/roles",
+   "name": "IdentityRoles",
+   "title": "平台角色权限",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/authorizations",
+   "name": "IdentityAuthorizations",
+   "title": "人员授权",
+   "showLink": "true"
+  },
+  {
+   "module": "identity.ts",
+   "path": "/identity/permission-requests",
+   "name": "IdentityPermissionRequests",
+   "title": "权限申请与审批",
+   "showLink": "true"
+  },
+  {
+   "module": "metadata.ts",
+   "path": "/metadata",
+   "name": "Metadata",
+   "title": "变更检测（兼容入口）",
+   "showLink": "false"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/ops",
+   "name": "Ops",
+   "title": "平台运维",
+   "showLink": ""
+  },
+  {
+   "module": "ops.ts",
+   "path": "/ops/runs",
+   "name": "OpsRuns",
+   "title": "运维任务",
+   "showLink": "true"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/ops/sql-workbench",
+   "name": "OpsSqlWorkbench",
+   "title": "受控SQL运维",
+   "showLink": "true"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/ops/tools",
+   "name": "OpsTools",
+   "title": "运维工具模板",
+   "showLink": "true"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/ops/audit",
+   "name": "OpsAudit",
+   "title": "操作审计",
+   "showLink": "true"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/asset/admin",
+   "name": "AssetAdmin",
+   "title": "治理基础配置",
+   "showLink": "true"
+  },
+  {
+   "module": "ops.ts",
+   "path": "/asset/ai-tools",
+   "name": "AssetAiTools",
+   "title": "AI接入与协作",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality-hub",
+   "name": "QualityHub",
+   "title": "质量治理",
+   "showLink": ""
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/issues",
+   "name": "QualityIssues",
+   "title": "质量台账",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/issues/mine",
+   "name": "QualityIssuesMine",
+   "title": "我的质量任务",
+   "showLink": "false"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/issues/department",
+   "name": "QualityIssuesDepartment",
+   "title": "科室质量任务",
+   "showLink": "false"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/issues/:id",
+   "name": "QualityIssueDetail",
+   "title": "问题详情",
+   "showLink": "false"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/controls",
+   "name": "QualityControls",
+   "title": "质控清单",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/quality/observations",
+   "name": "QualityObservations",
+   "title": "观测记录",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/probe-findings",
+   "name": "ProbeFindings",
+   "title": "探查发现",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/asset/quality",
+   "name": "AssetQuality",
+   "title": "元数据质控",
+   "showLink": "true"
+  },
+  {
+   "module": "quality.ts",
+   "path": "/asset/ai-quality",
+   "name": "AssetAiQuality",
+   "title": "AI质量分析",
+   "showLink": "true"
+  },
+  {
+   "module": "query.ts",
+   "path": "/query",
+   "name": "QueryZone",
+   "title": "查询与指标",
+   "showLink": ""
+  },
+  {
+   "module": "query.ts",
+   "path": "/asset/ai-sql",
+   "name": "AssetAiSql",
+   "title": "AI辅助编写",
+   "showLink": "true"
+  },
+  {
+   "module": "query.ts",
+   "path": "/asset/queries",
+   "name": "AssetQueries",
+   "title": "查询、指标与产品",
+   "showLink": "true"
+  },
+  {
+   "module": "query.ts",
+   "path": "/asset/queries/accuracy",
+   "name": "AssetQueryAccuracy",
+   "title": "准确性与反馈",
+   "showLink": "true"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/login",
+   "name": "Login",
+   "title": "登录",
+   "showLink": "false"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/access-denied",
+   "name": "AccessDenied",
+   "title": "403",
+   "showLink": "false"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/server-error",
+   "name": "ServerError",
+   "title": "500",
+   "showLink": "false"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/redirect",
+   "name": "",
+   "title": "加载中...",
+   "showLink": "false"
+  },
+  {
+   "module": "remaining.ts",
+   "path": "/redirect/:path(.*)",
+   "name": "Redirect",
+   "title": "",
+   "showLink": ""
+  },
+  {
+   "module": "standards.ts",
+   "path": "/standards",
+   "name": "Standards",
+   "title": "标准与关系",
+   "showLink": ""
+  },
+  {
+   "module": "standards.ts",
+   "path": "/value-domains",
+   "name": "ValueDomains",
+   "title": "值域知识库",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/dict/medical",
+   "name": "DictMedical",
+   "title": "诊断手术字典",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/dict/general",
+   "name": "DictGeneral",
+   "title": "通用字典",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/dict/mappings",
+   "name": "DictMappings",
+   "title": "编码映射",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/dict/sync-diffs",
+   "name": "DictSyncDiffs",
+   "title": "字典同步差异",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/asset/relation-review",
+   "name": "AssetRelationReview",
+   "title": "关系复核",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/asset/relation-recipes",
+   "name": "AssetRelationRecipes",
+   "title": "关系配方",
+   "showLink": "true"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/asset/relation-rates",
+   "name": "AssetRelationRates",
+   "title": "关系验证统计",
+   "showLink": "false"
+  },
+  {
+   "module": "standards.ts",
+   "path": "/asset/ai-context",
+   "name": "AssetAiContext",
+   "title": "AI上下文预览",
+   "showLink": "false"
+  }
+ ]
+}

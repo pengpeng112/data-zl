@@ -1,0 +1,27 @@
+{
+  "run": "r211-20261008-zcode-r214b",
+  "date": "2026-10-08",
+  "changes": [
+    {
+      "fix_id": "FIX-211-01",
+      "path": "backend/app/services/ai_context_builder.py",
+      "change": "函数 _security_policy_block 内补 from sqlalchemy import select（+1行）",
+      "reason": "F-211-01 P1: NameError 致 AI 上下文接口全量500",
+      "tests": ["tests/plan144_db/test_ai_context_contract.py", "tests/test_value_domain_injection.py"]
+    },
+    {
+      "fix_id": "FIX-211-02",
+      "path": "开发起步包/55_系统未完成事项统一执行计划.md",
+      "change": "当前批次表207行剩余表述纠偏（生产迁移/代码已随210 S10落地；209验收已执行；剩余=专项生产验收+试点+T35）",
+      "reason": "F-211-03 P3: 文档时效"
+    },
+    {
+      "fix_id": "DOC-211-01",
+      "path": "开发起步包/output_r211/r211-20261008-zcode-r214b/**",
+      "change": "本run证据产物（requirements/inventory/task_reconciliation/findings/remediation/candidate/交接等）",
+      "reason": "211 §7 最低文件要求"
+    }
+  ],
+  "excluded_others_wip": "工作区其余~126条变更（210/207/208批次WIP、三条未跟踪迁移、ds_export_artifacts、plan139等）未纳入、未触碰、未提交",
+  "candidate_id": "c211-20261008-r39ca60d+fix01"
+}

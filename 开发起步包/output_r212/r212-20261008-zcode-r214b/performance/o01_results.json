@@ -1,0 +1,187 @@
+{
+ "started_at": "2026-10-08T11:18:27",
+ "endpoints": [
+  {
+   "method": "GET",
+   "path": "/api/v1/systems",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 243.5,
+    "p95_ms": 594.3,
+    "max_ms": 665.4,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 299.2,
+    "p95_ms": 420.9,
+    "max_ms": 424.0,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/tables?page=1&page_size=20",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 40.4,
+    "p95_ms": 48.7,
+    "max_ms": 82.2,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 91.5,
+    "p95_ms": 132.1,
+    "max_ms": 172.0,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/value-domains?page=1&page_size=20",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 177.8,
+    "p95_ms": 221.5,
+    "max_ms": 250.3,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 275.6,
+    "p95_ms": 377.8,
+    "max_ms": 386.5,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-issues?page=1&page_size=20",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 52.2,
+    "p95_ms": 99.8,
+    "max_ms": 110.7,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 153.0,
+    "p95_ms": 183.1,
+    "max_ms": 184.8,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/quality-observations?page=1&page_size=20",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 33.7,
+    "p95_ms": 75.1,
+    "max_ms": 77.5,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 197.1,
+    "p95_ms": 231.2,
+    "max_ms": 240.9,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/api/v1/ai/system-context?system_code=HIS&max_tables=10",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 87.0,
+    "p95_ms": 103.4,
+    "max_ms": 131.0,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 285.3,
+    "p95_ms": 334.8,
+    "max_ms": 387.7,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/api/v1/ai/context/resolve",
+   "baseline_1c": {
+    "n": 20,
+    "workers": 1,
+    "p50_ms": 2784.4,
+    "p95_ms": 3007.9,
+    "max_ms": 3275.4,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   },
+   "load_5c": {
+    "n": 50,
+    "workers": 5,
+    "p50_ms": 11007.3,
+    "p95_ms": 12310.7,
+    "max_ms": 13489.8,
+    "error_count": 0,
+    "status_codes": [
+     200
+    ]
+   }
+  }
+ ]
+}

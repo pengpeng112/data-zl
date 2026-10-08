@@ -1,0 +1,62 @@
+{
+ "run": "r211-20261008-zcode-r214b",
+ "commands": [
+  {
+   "cmd": "pytest tests/plan144_db/test_ai_context_contract.py tests/test_value_domain_injection.py",
+   "cwd": "backend",
+   "when": "修复前",
+   "exit": 1,
+   "result": "4 failed(NameError select), 8 passed"
+  },
+  {
+   "cmd": "pytest tests/plan144_db/test_ai_context_contract.py tests/test_value_domain_injection.py",
+   "cwd": "backend",
+   "when": "FIX-211-01后",
+   "exit": 0,
+   "result": "12 passed"
+  },
+  {
+   "cmd": "pytest tests/plan144_db -q",
+   "cwd": "backend",
+   "when": "A6",
+   "exit": 0,
+   "result": "44 passed"
+  },
+  {
+   "cmd": "pytest tests/test_value_domain_injection.py tests/plan195/test_ai_gate_195.py tests/plan195/test_ai_http_195.py -q",
+   "cwd": "backend",
+   "when": "A6",
+   "exit": 0,
+   "result": "18 passed"
+  },
+  {
+   "cmd": "tools/check_doc_index.py --check --json",
+   "cwd": "repo",
+   "when": "A0",
+   "exit": 0,
+   "result": "error 0 / warn 0"
+  },
+  {
+   "cmd": "tools/check_test_environment.py",
+   "cwd": "repo",
+   "when": "A0",
+   "exit": 0,
+   "result": "pure_logic_ready(隧道后E1可用)"
+  },
+  {
+   "cmd": "s0_inventory_apis.py",
+   "cwd": "repo",
+   "when": "A2",
+   "exit": 0,
+   "result": "419 paths/477 operations"
+  },
+  {
+   "cmd": "s0_inventory_routes_v2.mjs",
+   "cwd": "frontend",
+   "when": "A2",
+   "exit": 0,
+   "result": "74 route objects/72 unique paths"
+  }
+ ],
+ "notes": "全量pytest与迁移检查移交212 S2执行(同一隔离库,避免重复清库);前端门禁212 S1重跑"
+}
