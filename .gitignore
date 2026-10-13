@@ -83,6 +83,9 @@ wheelhouse/
 **/wheels*/
 **/*wheels*/
 frontend/dist/
+# 215 E1：历史发布快照/ stash 产物曾误入库（dist_prev_20260920 + dist_stash_ui4 317 文件），出库后防回归
+frontend/dist_prev_*/
+frontend/dist_stash_*/
 deploy/offline/*.tar.gz
 deploy/offline/*.zip
 deploy/offline/SHA256SUMS
@@ -115,6 +118,9 @@ offline/pnpm-store/
 
 backend/identity_unit_test.db
 backend/identity_test.db
+# 215 E1：security_audit 纯逻辑哨兵 sqlite 遗留文件与编码检查中间产物
+backend/pure_logic_test.db
+backend/encoding_check.txt
 
 # 本地备份副本和用户另行保存的上报材料不属于代码发布基线
 *.bak.*
@@ -176,3 +182,10 @@ backend/_r175_work/
 
 # 测试遗留 SQLite 不入库
 /backend/unused_test_guard*.db
+
+# 204: 本机AI文件占用登记（非任务权威状态，不跨机器同步）
+/.agents/collaboration/
+
+# 215 E1: 本机探查/工具私有产物（LIS Cache JDBC 探针 jar、ZCode 会话私有配置）
+/CacheDB.jar
+/.zcodeignore/

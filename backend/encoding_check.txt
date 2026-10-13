@@ -1,2 +1,0 @@
-comment=病人住院主记录
-domain=就诊
