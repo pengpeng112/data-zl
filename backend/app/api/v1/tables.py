@@ -615,7 +615,7 @@ def missing_annotations(
     })
 
 
-@router.post("/ai/suggest-annotations", summary="AI 生成注释草稿（占位，待 P5.5 多数据库驱动就绪）", dependencies=[Depends(require_permission("asset.annotation"))])
+@router.post("/ai/suggest-annotations", summary="AI 生成注释草稿（占位，待 P10 AI SQL 增强阶段实现）", dependencies=[Depends(require_permission("asset.annotation"))])
 def suggest_annotations(
     db: Session = Depends(get_db),
 ) -> ApiResponse[dict]:

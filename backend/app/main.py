@@ -32,6 +32,22 @@ setup_logging()
 logger = logging.getLogger("request")
 
 
+def _should_start_scheduler(jobs) -> bool:
+    """scheduler.start() 的总闸（215 E3）：任一调度开关启用或存在表驱动 job 即启动。
+
+    必须覆盖 quality_execution_scheduler_enabled——只开质量执行调度（207 tick）
+    而 asset_scheduler_jobs 为空、其余开关全关时，调度器也要启动，否则 tick
+    永不运行（round-12 实锤缺陷：原条件漏掉该开关）。
+    """
+    return bool(
+        jobs
+        or settings.identity_nightly_enabled
+        or settings.dict_medical_push_enabled
+        or settings.query_schedule_enabled
+        or settings.quality_execution_scheduler_enabled
+    )
+
+
 def _start_scheduler():
     """APScheduler 定时任务启动：从 asset_scheduler_jobs 读取已定义调度。"""
     try:
@@ -142,8 +158,7 @@ def _start_scheduler():
                     settings.dict_medical_worker_batch_size,
                 )
 
-            query_sched_on = bool(settings.query_schedule_enabled)
-            if jobs or settings.identity_nightly_enabled or settings.dict_medical_push_enabled or query_sched_on:
+            if _should_start_scheduler(jobs):
                 scheduler.start()
                 logger.info("APScheduler started with %d scheduled jobs in %s", len(jobs), settings.scheduler_timezone)
         finally:
