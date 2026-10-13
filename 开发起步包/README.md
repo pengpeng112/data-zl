@@ -195,7 +195,7 @@
 
 ## 当前模块计划
 
-| `215_系统可扩展性与工程治理改进执行计划.md` | **批次1执行中（2026-10-13）** | round-12 方案 v2 终稿（三方互查共识）的执行合同：E1 Git 基线收口（分域本地 commit+dist 产物出库+迁移跟踪对拍检查）/E2 测试互斥（advisory lock）与哨兵作用域/E3 调度 start() 条件缺陷修复/E4 占位文案统一；批次2=AI 上下文缓存、调度运营面、通知接线、/health 扩展、巨石切分、ruff 门禁等；依据 review/round-12/方案.md |
+| `215_系统可扩展性与工程治理改进执行计划.md` | **批次1完成（2026-10-13，LOCAL_VERIFIED_WITH_EXCEPTIONS）**：E1 Git 基线收口 10 提交（dist 317 文件出库、三生产迁移入库、check_migrations_tracked 全绿）/E2 advisory lock 互斥+哨兵作用域（7 conftest 修复，13 新测试全过）/E3 调度 start() 总闸补 quality_execution_scheduler_enabled/E4 占位文案统一；全量 1988P/16F（15=WIP 既有 stash 对拍证实）；批次2 待启动 | round-12 方案 v2 终稿（三方互查共识）的执行合同；批次2=AI 上下文缓存、调度运营面、通知接线、/health 扩展、巨石切分、ruff 门禁等；依据 review/round-12/方案.md |
 | `213_前端界面布局核查与美化整改执行计划.md` | **终态：整改+复拍已收口（2026-10-07，214批次A E-A1）** | 16 页实拍 24 图确认 20 项缺陷（P0×2+P1×7+P2×7+P3×4+BD-01 后端配套）→ F01—F06 整改 → 10-04 复核修订；2026-10-07 普通 Chrome（1600×900、生产构建 preview）复拍 18/18 页通过、DEF-02 不复现关闭；证据 output_r213/ + output_r214/screenshots/（20 张有效复拍），screenshots-fixed 不再作为通过证据 |
 | `output_r213/` | 证据目录（213 界面核查+整改，2026-10-04） | screenshots/ 整改前；screenshots-fixed/ 第一次执行截图（复核判定多数无效，已被 output_r214/screenshots/ 复拍取代）；seed_notes.sql；执行报告.md §7 |
 
@@ -303,6 +303,7 @@
 
 ## 目录更新记录
 
+- 2026-10-13 | **215 批次1执行完成（LOCAL_VERIFIED_WITH_EXCEPTIONS）** | E1：dist_prev/dist_stash 317 文件+encoding_check 出库、三生产迁移入库、WIP 分域收口 10 commit、tools/check_migrations_tracked.py 入 check 工具族；E2：tests/_run_guard.py+根 conftest advisory lock 互斥+7 个哨兵 conftest 条件化（test_run_guard 7 用例）；E3：_should_start_scheduler 补 quality_execution_scheduler_enabled（6 用例）；E4：tables.py 文案统一 P10。验收：全量单进程 1988P/16F/1S（15F 经 stash 基线对拍=工作区 WIP 既有，1F 为新测试退出码断言已修复复验）、混合组合 97P/0F、两检查器全绿、git log 零夹带。55 行 215 同步终态。待核实项呈报：工作区已删《电子病历数据库.md》（未提交）。
 - 2026-10-13 | **新增215号系统可扩展性与工程治理改进执行计划（批次1启动）** | 落定 round-12 方案 v2 终稿（GLM/Kimi/Grok 三方互查共识）为执行合同：批次1 E1 Git 基线收口（分域本地 commit、dist_prev/dist_stash 317 文件出库、check_migrations_tracked 对拍检查）/E2 测试 advisory lock 互斥与纯逻辑哨兵作用域/E3 调度器 start() 条件补 quality_execution_scheduler_enabled/E4 tables.py 占位文案统一；批次2 承接缓存/调度运营面/通知/可观测/切分/lint。55 当前批次表同步新增 215 行。
 - 2026-10-13 | **取数说明口气** | 用户要求以后 `取数/` 全部提取任务的说明和导出表按同事交接来写，不带程序套话。规则写在 `AGENTS.md`「取数说明与交付口气」；`取数/START_HERE.md`、查询治理技能、`取数/exports/_templates/task_readme_template.md` 改为指向该节。未新增编号文档。
 - 2026-10-12 | **目录分类复核与物理索引** | `check_doc_index.py` 编号正文 138 号、配套 61 号、输出目录 36、归档 71 号，error 0 / warn 0。根 `INDEX.md` 增加「物理目录」给后续 AI：编号文档、证据、机器资产、代码、技能、取数、评审、工具私有域分开，不复制完成度。README 补 `数据资产_新HIS逆向资产包/`、外部案例 PDF、`output_domain_baseline.txt`；`截图/` 标为目录已不在。删除空目录 `frontend/开发起步包/`（无文件、无引用）。编号正文未移动。
