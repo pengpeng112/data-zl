@@ -1,0 +1,100 @@
+{
+  "task": "215 批次2：运营弹性与性能 + 长期灵活性（E5-E12）",
+  "status": "LOCAL_VERIFIED",
+  "date": "2026-10-13",
+  "baseline_commit": "6ace236",
+  "final_commit": "845f637..14459b5（9提交）+终态文档提交",
+  "execution_contract": [
+    "开发起步包/215_系统可扩展性与工程治理改进执行计划.md",
+    "review/round-12/方案.md (v2 终稿)"
+  ],
+  "items": {
+    "E5_ai_context_cache": {
+      "status": "DONE",
+      "commit": "845f637",
+      "tests": "test_ai_context_cache.py 9用例 + scheduler_start_gate +2",
+      "migration": "d3e5f6a7b8c9 (asset_ai_context_cache)",
+      "notes": "缓存键弃manifest_hash(含question归一化+权限过滤); 命中仍留档; 并发4线程DEF212-002回归零冲突; 收益口径=待测"
+    },
+    "E6_scheduler_ops_board": {
+      "status": "DONE",
+      "commit": "c8025ed",
+      "tests": "test_scheduler_ops_board.py 2用例(零写+403)",
+      "notes": "GET /govern/scheduler/ops-board只读; 前端三件套; 菜单41→42; 4-C多实例为显式后续"
+    },
+    "E7_notice_wiring": {
+      "status": "DONE",
+      "commit": "233c5a9",
+      "tests": "layNoticeData.test.ts 2用例",
+      "notes": "lay-notice改读quality-notifications; 失败/无权限保持空态"
+    },
+    "E8_openapi_drift_tool": {
+      "status": "DONE",
+      "commit": [
+        "09632fb",
+        "bf0e184"
+      ],
+      "tests": "负路径自测: 无基线exit0/坏JSON exit2/ROOT外路径容错",
+      "notes": "基线420路径/201schema存本目录; 前端106漂移点仅报告"
+    },
+    "E9_observability": {
+      "status": "DONE",
+      "commit": "9cb55e2",
+      "tests": "test_health_extension.py 3用例",
+      "notes": "/health扩展alembic对拍+worker心跳(不新造/healthz); request_id贯穿成功日志; perf_patrol七端点实测留档(全200)"
+    },
+    "E10_placeholder_disposition": {
+      "status": "DONE(文档级决策)",
+      "commit": "904da00",
+      "notes": "AI注释端点降级长期占位(三门重开条件); Neo4j适配器降级不接入; 登记215§4与55"
+    },
+    "E11_monolith_split": {
+      "status": "DONE(路由侧graph+systems)",
+      "commit": "46a525a",
+      "tests": "systems+graph域122测试全过; 两源码护栏测试不改断言过; OpenAPI零漂移",
+      "notes": "graph.py 1989→868+graph_parts/3模块; systems.py→systems/包7模块; 服务侧三巨石登记后续切片; DB_CONNECTOR_MAP确认扩展点"
+    },
+    "E12_ruff_gate": {
+      "status": "DONE",
+      "commit": "14459b5",
+      "tests": "全库 ruff check app/ tests/ 通过",
+      "notes": "风格规则集E4/E7/E9/F; 118文件存量豁免基线; 本批文件全干净; 未接AGENTS验收命令"
+    }
+  },
+  "acceptance": {
+    "pytest_full": "1997P/17F/1S/6E（1:08:58）：15F=批次1已定性WIP既有精确复现零变化；2F+6E（test_run_guard×2、test_quality_execution_207×6）=跑批中段隧道/PG连接中断约20分钟的环境扰动所致（进程无DB会话+CPU停滞取证，恢复后续跑完成），两文件同配置复跑27/27全过，零批次2代码回归",
+    "preexisting_failures_unchanged": 15,
+    "frontend_vitest": "53文件/334用例全过",
+    "frontend_typecheck": "tsc+vue-tsc双过",
+    "frontend_build_budgets": "main 660.7/700, graph 404.6/430, css 108.4/110 (KB gzip) 全PASS",
+    "check_doc_index": "error 0 / warn 0",
+    "check_migrations_tracked": "全绿(head=d3e5f6a7b8c9, 64迁移0未跟踪)",
+    "openapi_drift": "仅GET /health modified(E9有意)",
+    "git_log_clean": true,
+    "transient_disturbance": "全量跑批中段DB连接中断约20分钟：test_run_guard×2F+quality_execution_207×6E落在断口窗口，同配置复跑27/27全过定性环境扰动（批次1同款模式）"
+  },
+  "follow_ups": [
+    "服务侧三巨石切分(identity_sync_orchestrator/jhemr_identity_adapter/quality_execution_service)",
+    "调度4-C多实例支持+slowapi共享存储(另案)",
+    "E10两降级的重开条件跟踪",
+    "E12 ruff接AGENTS验收命令(豁免清单缩减后)",
+    "前端106路径漂移点随域改造消化",
+    "OpenAPI基线下次有意变更时--update-baseline重置"
+  ],
+  "handoff": {
+    "session": "zcode-r215-batch2",
+    "claimed_scopes": [
+      "backend/app",
+      "backend/tests",
+      "backend/alembic",
+      "frontend/src",
+      "frontend/tests",
+      "tools",
+      "开发起步包/215*",
+      "README",
+      "55",
+      "output_r215"
+    ],
+    "released": true
+  }
+}
