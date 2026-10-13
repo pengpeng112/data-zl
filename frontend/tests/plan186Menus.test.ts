@@ -77,8 +77,11 @@ describe("plan186 N1 七分区静态菜单", () => {
     ]);
   });
 
-  it("可见叶子共 40 个（4/5/7/6/3/9/6），与 186 §4.7-4 目标一致", () => {
-    expect(visibleLeaves.length).toBe(40);
+  // 2026-09-29（208 A2）计数依据：r197 蓄积发布 058aa25（2026-09-21）为 193
+  // 数据集目录新增 /datasets（DatasetCatalog）可见叶子，资产目录 5→6，总数 40→41。
+  // 186 §4.7-4 原始目标 40 早于该变更；旧 URL 与隐藏兼容入口全部保留（下方用例仍守护）。
+  it("可见叶子共 41 个（4/6/7/6/3/9/6；186 目标 40 + r197 datasets）", () => {
+    expect(visibleLeaves.length).toBe(41);
     const byParent: Record<string, number> = {};
     for (const m of modules) {
       const visible = (m.children ?? []).filter(
@@ -88,7 +91,7 @@ describe("plan186 N1 七分区静态菜单", () => {
     }
     expect(byParent).toEqual({
       工作台: 4,
-      资产目录: 5,
+      资产目录: 6,
       标准与关系: 7,
       质量治理: 6,
       查询与指标: 3,

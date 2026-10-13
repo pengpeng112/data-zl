@@ -267,7 +267,7 @@ onMounted(() => {
                 <span v-if="todo.updatedAt" class="muted">更新于 {{ todo.updatedAt }}</span>
               </div>
             </template>
-            <div v-if="!canReadIssue" class="muted pad">无 quality.issue.read 权限</div>
+            <div v-if="!canReadIssue" class="muted pad">无质量任务查看权限</div>
             <div v-else v-loading="todo.loading" class="card-body">
               <el-alert
                 v-if="todo.error"

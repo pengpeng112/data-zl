@@ -30,7 +30,7 @@ export default {
       meta: {
         title: "数据集目录",
         showLink: true,
-        auths: ["query.view"]
+        auths: ["ds.read"]
       }
     },
     {

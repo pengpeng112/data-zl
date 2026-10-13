@@ -12,7 +12,7 @@
           <el-option v-for="r in RESULTS" :key="r" :label="r" :value="r" />
         </el-select>
         <el-select v-model="filters.source_kind" placeholder="来源" clearable class="f-item">
-          <el-option v-for="s in SOURCES" :key="s" :label="s" :value="s" />
+          <el-option v-for="s in SOURCES" :key="s.value" :label="s.label" :value="s.value" />
         </el-select>
         <el-input
           v-model="filters.control_id"
@@ -40,6 +40,12 @@
           <template #default="{ row }">
             {{ row.metric_value ?? "-" }}{{ row.metric_unit || "" }}
           </template>
+        </el-table-column>
+        <el-table-column label="分子" width="76" align="right">
+          <template #default="{ row }">{{ row.numerator ?? "-" }}</template>
+        </el-table-column>
+        <el-table-column label="分母" width="76" align="right">
+          <template #default="{ row }">{{ row.denominator ?? "-" }}</template>
         </el-table-column>
         <el-table-column prop="scope_key" label="范围" min-width="200" show-overflow-tooltip />
         <el-table-column label="窗口" width="180">
@@ -100,7 +106,16 @@ defineOptions({ name: "QualityObservations" });
 const router = useRouter();
 
 const RESULTS = ["pass", "fail", "error", "blocked", "skipped", "no_data"];
-const SOURCES = ["probe_finding", "probe_run", "quality_finding", "manual", "external"];
+/** 207：来源筛选含新口径（平台运行/外部上传），保留旧值兼容历史数据。 */
+const SOURCES: { value: string; label: string }[] = [
+  { value: "quality_run", label: "平台运行" },
+  { value: "probe_run", label: "探查运行" },
+  { value: "probe_finding", label: "探查发现" },
+  { value: "quality_finding", label: "质量发现" },
+  { value: "external", label: "外部" },
+  { value: "external_upload", label: "外部上传" },
+  { value: "manual", label: "人工" }
+];
 
 const loading = ref(false);
 const items = ref<QualityObservationItem[]>([]);

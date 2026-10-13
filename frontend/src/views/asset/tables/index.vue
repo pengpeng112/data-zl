@@ -130,7 +130,9 @@
               </template>
             </el-table-column>
             <el-table-column prop="domain" label="业务域" width="110" show-overflow-tooltip />
-            <el-table-column prop="table_role" label="表类型" width="120" show-overflow-tooltip />
+            <el-table-column label="表类型" width="120" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.table_role || "—" }}</template>
+            </el-table-column>
             <el-table-column prop="column_count" label="字段" width="80" align="right" />
           </el-table>
 

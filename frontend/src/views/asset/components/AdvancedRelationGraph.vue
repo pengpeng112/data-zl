@@ -252,6 +252,16 @@ function layoutOptions() {
   };
 }
 
+const MIN_ZOOM = 0.28;
+
+async function fitGraphView(instance: any) {
+  await instance.fitView({ padding: 56 }, false);
+  if (instance.getZoom() < MIN_ZOOM) {
+    await instance.zoomTo(MIN_ZOOM, false);
+    await instance.fitCenter(false);
+  }
+}
+
 async function focusNode(nodeId: string) {
   if (!graph || !nodeId) return;
   const instance = graph as any;
@@ -456,6 +466,12 @@ function createGraph() {
       const raw = displayEdge(resolveRawElement(id, "edge")) || normalized.value.edges.find(edge => edge.id === id);
       if (raw) emit("edge-click", raw as GraphEdge);
     });
+  // 只绑一次。performRender 会复用同一实例，重复 on 会在每次布局结束把视口拉回。
+  instance.on(GraphEvent.AFTER_LAYOUT, () => {
+    void fitGraphView(instance).catch(() => {
+      // 布局事件在实例销毁后触发时忽略
+    });
+  });
   graph = instance;
   graphCreatedAt = layout ? "engine-layout" : "preset";
   return instance;
@@ -484,28 +500,8 @@ async function performRender(version: number) {
     if (layout) instance.setOptions({ layout } as any);
     await instance.render();
     lastCanvasSize = { width: containerRef.value.clientWidth, height: containerRef.value.clientHeight };
-    await instance.fitView({ padding: 56 } as any, false);
-    // 213 UI-06：force 是迭代布局，render() 完成后节点仍可能被后续迭代推出画布；
-    // 布局稳定（AFTER_LAYOUT）后再适配一次视口。
-    const fitAfterLayout = () => {
-      void (async () => {
-        try {
-          await instance.fitView({ padding: 56 } as any, false);
-          if (instance.getZoom() < MIN_ZOOM) {
-            await instance.zoomTo(MIN_ZOOM, false);
-            await instance.fitCenter(false);
-          }
-        } catch {
-          // 布局事件在实例销毁后触发时忽略
-        }
-      })();
-    };
-    instance.on(GraphEvent.AFTER_LAYOUT, fitAfterLayout);
-    const MIN_ZOOM = 0.28;
-    if (instance.getZoom() < MIN_ZOOM) {
-      await instance.zoomTo(MIN_ZOOM, false);
-      await instance.fitCenter(false);
-    }
+    // 213 UI-06：render 后先适配一次；force 的后续迭代由 createGraph 里唯一的 AFTER_LAYOUT 再适配。
+    await fitGraphView(instance);
   } catch (err) {
     console.error("[AdvancedRelationGraph] render failed:", err);
     try {
