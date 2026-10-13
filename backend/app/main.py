@@ -802,7 +802,7 @@ app.include_router(metrics.router)
 app.include_router(data_products.router)
 app.include_router(ai.router)
 app.include_router(ai_accuracy.router)
-from .api.v1 import datasets as datasets_api  # 193 B05：数据集安全网关出口
+from .api.v1 import datasets as datasets_api  # noqa: E402
 app.include_router(datasets_api.router)
 app.include_router(admin.router)
 app.include_router(governance.router)

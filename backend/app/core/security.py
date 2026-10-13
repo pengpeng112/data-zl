@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import get_db
-from ..models.governance_base import AssetRolePermission, AssetUserRole
+from ..models.governance_base import AssetRolePermission
 from ..services.effective_permissions import (
     effective_role_codes as _service_effective_role_codes,
     normalize_permission_code,

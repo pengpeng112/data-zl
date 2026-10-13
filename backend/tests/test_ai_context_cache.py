@@ -12,7 +12,6 @@ from __future__ import annotations
 import threading
 from datetime import datetime, timedelta, timezone
 
-import pytest
 from sqlalchemy import select
 
 from app.models.ai_collab import AiContextCacheEntry, AiContextSnapshot

@@ -67,12 +67,11 @@ def build_context_snapshot(
     """Assemble + persist one ai-data-context/v1 snapshot; returns the doc."""
     from sqlalchemy import select
 
-    from ..models.ai_collab import AiContextSnapshot
     from ..models.asset import AssetRelation
     from ..models.asset_system import AssetSystem
     from ..models.data_product import AssetDataProduct
     from ..models.lineage import AssetLineageEdge
-    from ..models.metric_asset import AssetMetricDefinition, AssetMetricVersion
+    from ..models.metric_asset import AssetMetricVersion
     from ..models.query_asset import AssetQueryDefinition, AssetQueryVersion
 
     now = datetime.now(timezone.utc)

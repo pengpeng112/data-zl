@@ -312,8 +312,6 @@ def neighbors(
     if len(target_parts) != 5:
         raise HTTPException(status_code=422, detail="physical_key 格式应为 system|source|namespace|schema|table")
     t_sys, t_src, _t_ns, t_schema, t_tbl = target_parts
-    t_display = _display_id(t_schema, t_tbl)
-    target_texts = _aliases_for(t_display) if t_display else set()
 
     collected: list[AssetRelation] = []
     seen: set[int] = set()
