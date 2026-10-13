@@ -15,6 +15,7 @@ ALL_SCHEDULER_FLAGS = (
     "dict_medical_push_enabled",
     "query_schedule_enabled",
     "quality_execution_scheduler_enabled",
+    "ai_context_cache_cleanup_enabled",
 )
 
 
@@ -34,9 +35,19 @@ def test_quality_execution_scheduler_alone_starts_scheduler(monkeypatch):
     assert _should_start_scheduler([]) is True
 
 
+def test_ai_context_cleanup_alone_starts_scheduler(monkeypatch):
+    """215 E5：只开上下文过期清理时调度器也要启动，否则清理永不执行。"""
+    monkeypatch.setattr(settings, "ai_context_cache_cleanup_enabled", True)
+    assert _should_start_scheduler([]) is True
+
+
 @pytest.mark.parametrize(
     "flag",
-    ["identity_nightly_enabled", "dict_medical_push_enabled", "query_schedule_enabled"],
+    [
+        "identity_nightly_enabled",
+        "dict_medical_push_enabled",
+        "query_schedule_enabled",
+    ],
 )
 def test_each_other_flag_alone_starts_scheduler(monkeypatch, flag):
     monkeypatch.setattr(settings, flag, True)

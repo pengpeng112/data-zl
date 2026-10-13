@@ -231,9 +231,31 @@ def build_context_snapshot(
     # 212 DEF212-002：context_id 含内容哈希且时间戳仅到秒，同问题同秒并发构建
     # 会生成相同 ID 撞唯一约束。细化到微秒，并以 flush 重试兜底；重试只重生成
     # ID，不改变快照内容与"每次构建留档"语义。
+    doc["context_id"] = _insert_snapshot_row(db, doc, created_by=created_by, first_now=now)
+    return doc
+
+
+def _insert_snapshot_row(
+    db,
+    doc: dict[str, Any],
+    *,
+    created_by: str | None,
+    first_now: datetime | None = None,
+) -> str:
+    """把一份已组装的 context 文档写为留档行，返回落库的 context_id。
+
+    微秒时间戳 + 至多 3 次重试（重试只换 ID 不换内容）。215 E5 缓存命中
+    路径复用本函数——命中不消除留档，且命中留档同样受 DEF212-002 防护。
+    """
     from sqlalchemy.exc import IntegrityError
 
-    digest = hashlib.sha256((manifest_blob + (question_summary or '')).encode('utf-8')).hexdigest()[:10]
+    from ..models.ai_collab import AiContextSnapshot
+
+    now = first_now or datetime.now(timezone.utc)
+    expires_at = now + timedelta(hours=DEFAULT_TTL_HOURS)
+    digest = hashlib.sha256(
+        (doc.get("manifest_hash", "") + (doc.get("question_summary") or "")).encode("utf-8")
+    ).hexdigest()[:10]
     for attempt in range(3):
         ts = datetime.now(timezone.utc) if attempt else now
         context_id = f"ctx-{ts.strftime('%Y%m%dT%H%M%S%f')}-{digest}"
@@ -241,29 +263,27 @@ def build_context_snapshot(
         db.add(
             AiContextSnapshot(
                 context_id=context_id,
-                schema_version=CONTEXT_SCHEMA_VERSION,
-                question_summary=doc["question_summary"],
+                schema_version=doc.get("schema_version", CONTEXT_SCHEMA_VERSION),
+                question_summary=doc.get("question_summary"),
                 generated_at=now,
-                expires_at=now + timedelta(hours=DEFAULT_TTL_HOURS),
-                manifest_hash=doc["manifest_hash"],
-                object_count=len(objects),
-                relation_count=len(relations),
-                query_count=len(queries),
-                metric_count=len(metrics),
-                product_count=len(products),
-                truncated=truncated,
+                expires_at=expires_at,
+                manifest_hash=doc.get("manifest_hash"),
+                object_count=doc.get("object_count", 0),
+                relation_count=doc.get("relation_count", 0),
+                query_count=doc.get("query_count", 0),
+                metric_count=doc.get("metric_count", 0),
+                product_count=doc.get("product_count", 0),
+                truncated=doc.get("truncated", False),
                 snapshot_json=doc,
                 created_by=created_by,
             )
         )
         try:
             db.flush()
-            break
+            return context_id
         except IntegrityError:
             db.rollback()
-    else:
-        raise RuntimeError("AI上下文快照ID冲突重试耗尽")
-    return doc
+    raise RuntimeError("AI上下文快照ID冲突重试耗尽")
 
 
 def _security_policy_block(db) -> dict[str, Any]:

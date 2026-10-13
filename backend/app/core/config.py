@@ -95,6 +95,15 @@ class Settings(BaseSettings):
     # 126 P3: scheduled query runs — default OFF; enable only after explicit authorization.
     query_schedule_enabled: bool = False
 
+    # 215 E5：AI 上下文构建缓存（键=system_code+question归一化+参数+权限过滤，
+    # 不用 manifest_hash）；命中不消除留档。收益口径=待测。
+    ai_context_cache_enabled: bool = True
+    # 过期清理挂现有调度器；删留档行属破坏性动作，生产启用需 ops 批准。
+    ai_context_cache_cleanup_enabled: bool = False
+    ai_context_cache_cleanup_interval_hours: int = 24
+    # 留档快照过期后的可复现宽限（GET /context/{id}）。
+    ai_context_cache_cleanup_grace_hours: int = 72
+
     # Nightly scheduler (plan 107): default OFF until Phase D validation passes.
     identity_nightly_enabled: bool = False
     identity_nightly_cron: str = "0 2 * * *"  # 02:00 Asia/Shanghai

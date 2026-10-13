@@ -1133,16 +1133,18 @@ class ContextResolveRequest(BaseModel):
 
 @router.post(
     "/context/resolve",
-    summary="144 S6：按问题/系统/业务域构建统一上下文快照",
+    summary="144 S6：按问题/系统/业务域构建统一上下文快照（215 E5 起带同参缓存，命中仍留档）",
     dependencies=[Depends(require_permission("ai.context.read"))],
 )
 def resolve_context(
     req: ContextResolveRequest, request: Request, db: Session = Depends(get_db)
 ) -> ApiResponse[dict]:
-    from ...services.ai_context_builder import build_context_snapshot
+    from ...core.security import effective_permission_scope
+    from ...services.ai_context_cache import resolve_context_cached
 
     try:
-        doc = build_context_snapshot(
+        # 缓存键含权限过滤摘要：不同权限域不共享缓存条目（215 E5）。
+        doc, _cache_meta = resolve_context_cached(
             db,
             question_summary=req.question_summary,
             system_code=req.system_code,
@@ -1151,6 +1153,7 @@ def resolve_context(
             max_objects=req.max_objects,
             include_sql=False,  # unified context never carries full SQL (144 §4.6)
             created_by=getattr(request.state, "user_identifier", None),
+            permission_scope=effective_permission_scope(request, db),
         )
         db.commit()
     except Exception as exc:  # sanitized error taxonomy only

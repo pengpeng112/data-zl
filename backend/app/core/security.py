@@ -75,6 +75,26 @@ def require_permission(resource_code: str):
     return dependency
 
 
+def effective_permission_scope(request: Request, db: Session) -> list[str]:
+    """215 E5：调用方有效权限码清单（与 require_permission 同口径）。
+
+    用途：AI 上下文缓存键的权限过滤分量。platform_admin 以通配符入键，
+    保证未来若按权限裁剪快照内容，不同权限域不会共享缓存条目。
+    """
+    user_identifier = getattr(request.state, "user_identifier", None)
+    if not user_identifier:
+        return []
+    role_codes = _effective_role_codes(db, user_identifier)
+    if "platform_admin" in role_codes:
+        return ["platform_admin:*"]
+    rows = db.scalars(
+        select(AssetRolePermission).where(AssetRolePermission.role_code.in_(role_codes))
+    ).all() if role_codes else []
+    return sorted(
+        {normalize_permission_code(row.resource, row.action) for row in rows}
+    )
+
+
 def require_query_view_on_get(request: Request, db: Session = Depends(get_db)) -> None:
     """GET-only query.view gate（153 D1 单份实现）。
 

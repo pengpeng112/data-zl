@@ -38,6 +38,7 @@ def _should_start_scheduler(jobs) -> bool:
     必须覆盖 quality_execution_scheduler_enabled——只开质量执行调度（207 tick）
     而 asset_scheduler_jobs 为空、其余开关全关时，调度器也要启动，否则 tick
     永不运行（round-12 实锤缺陷：原条件漏掉该开关）。
+    215 E5：ai_context_cache_cleanup_enabled 同理入闸（只开过期清理时也要跑）。
     """
     return bool(
         jobs
@@ -45,6 +46,7 @@ def _should_start_scheduler(jobs) -> bool:
         or settings.dict_medical_push_enabled
         or settings.query_schedule_enabled
         or settings.quality_execution_scheduler_enabled
+        or settings.ai_context_cache_cleanup_enabled
     )
 
 
@@ -158,6 +160,22 @@ def _start_scheduler():
                     settings.dict_medical_worker_batch_size,
                 )
 
+            # 215 E5：AI 上下文缓存/留档过期清理（默认 OFF；挂现有调度器不新造）。
+            if settings.ai_context_cache_cleanup_enabled:
+                scheduler.add_job(
+                    _run_ai_context_cleanup_once,
+                    "interval",
+                    hours=max(1, settings.ai_context_cache_cleanup_interval_hours),
+                    id="ai_context_cache_cleanup",
+                    replace_existing=True,
+                    max_instances=1,
+                    coalesce=True,
+                )
+                logger.info(
+                    "AI context cleanup registered: interval=%sh",
+                    settings.ai_context_cache_cleanup_interval_hours,
+                )
+
             if _should_start_scheduler(jobs):
                 scheduler.start()
                 logger.info("APScheduler started with %d scheduled jobs in %s", len(jobs), settings.scheduler_timezone)
@@ -165,6 +183,22 @@ def _start_scheduler():
             db.close()
     except ImportError:
         logger.warning("apscheduler not installed, scheduling disabled")
+
+
+def _run_ai_context_cleanup_once() -> None:
+    """215 E5：清理过期的 AI 上下文缓存条目与留档快照（含 grace 宽限）。"""
+    from .services.ai_context_cache import cleanup_expired_contexts
+
+    db = SessionLocal()
+    try:
+        summary = cleanup_expired_contexts(db)
+        if summary["cache_entries_deleted"] or summary["snapshots_deleted"]:
+            logger.info("AI context cleanup result: %s", summary)
+    except Exception as exc:
+        db.rollback()
+        logger.error("AI context cleanup failed: %s", type(exc).__name__)
+    finally:
+        db.close()
 
 
 def _run_dict_sync_worker_once() -> None:
