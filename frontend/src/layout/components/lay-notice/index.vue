@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { noticesData } from "./data";
+import { ref, computed, onMounted } from "vue";
+import { buildNoticesTabs, noticesData } from "./data";
 import NoticeList from "./components/NoticeList.vue";
+import { listQualityNotifications } from "@/api/quality";
 import BellIcon from "~icons/ep/bell";
 
+// 215 E7：铃铛接线后端站内待办；未读数为徽标值，失败/无权限保持空态不阻塞顶栏
 const noticesNum = ref(0);
 const notices = ref(noticesData);
 const activeKey = ref(noticesData[0]?.key);
 
-notices.value.map(v => (noticesNum.value += v.list.length));
+async function loadNotices() {
+  try {
+    const resp = await listQualityNotifications({ page_size: 50 });
+    notices.value = buildNoticesTabs(resp.items ?? []);
+    noticesNum.value = resp.unread ?? 0;
+  } catch {
+    // 无 quality.notification.read 权限或后端不可达：保持空态默认页签
+  }
+}
+
+onMounted(loadNotices);
 
 const getLabel = computed(
   () => item =>
