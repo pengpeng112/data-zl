@@ -729,11 +729,20 @@ async def auth_and_logging_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         duration_ms = round((time.perf_counter() - start) * 1000, 2)
-        logger.info("%s %s %d %.2fms", request.method, request.url.path, response.status_code, duration_ms)
+        # 215 E9：成功访问日志贯穿 request_id（与异常信封同一关联口径）
+        logger.info(
+            "%s %s %d %.2fms request_id=%s",
+            request.method, request.url.path, response.status_code, duration_ms,
+            getattr(request.state, "request_id", ""),
+        )
         return response
     except Exception:
         duration_ms = round((time.perf_counter() - start) * 1000, 2)
-        logger.error("%s %s 500 %.2fms", request.method, request.url.path, duration_ms)
+        logger.error(
+            "%s %s 500 %.2fms request_id=%s",
+            request.method, request.url.path, duration_ms,
+            getattr(request.state, "request_id", ""),
+        )
         raise
 
 
