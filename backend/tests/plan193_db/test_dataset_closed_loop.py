@@ -42,7 +42,8 @@ def _ingest_body(run_id: str, source: str, patients: list[str], day0="2026-01-01
             "rule_version": "rules_v1", "records": recs}
 
 
-def test_dataset_closed_loop(client: TestClient):
+def test_dataset_closed_loop(client: TestClient, second_user_token: str):
+    T2 = {"Authorization": f"Bearer {second_user_token}"}
     # ---------- 建数据集（draft） ----------
     r = client.post("/api/v1/datasets", json={
         "dataset_code": "DS_SYNTH_193", "title": "193合成纵向数据集",
@@ -72,13 +73,18 @@ def test_dataset_closed_loop(client: TestClient):
 
     # ---------- B04/B05：未分类默认拒绝 → 分类+授权 → 撤权即时生效 ----------
     res = f"dataset:DS_SYNTH_193:{version_id}"
+    # 210：先冻结绑定成员（版本范围查询入口的读前提）
+    r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/freeze",
+                    json={"source_batch_ids": ["RUN-193-A", "RUN-193-B"]}, headers=T)
+    assert r.status_code == 200, r.text
     r = client.get(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}"
                    f"/timeline/DS-Pwhatever", headers=T)
     assert r.status_code == 403
     assert "deny_unclassified" in r.text or "未分类" in r.text
 
+    # 210 契约：object_type + expected_version CAS
     r = client.post("/api/v1/datasets/classifications", json={
-        "object_ref": res,
+        "object_type": "dataset_version", "object_ref": res, "expected_version": 0,
         "labels": {"protection_level": "P3", "personal_info": "sensitive_personal",
                    "business_categories": ["visit", "diagnosis"],
                    "usage_constraints": {"purposes": ["research_synthetic"],
@@ -91,13 +97,22 @@ def test_dataset_closed_loop(client: TestClient):
                    f"{version_id}/stats/readmission", headers=T)
     assert r.status_code == 403 and "deny_no_grant" in r.text
 
-    # 授权（含 export/train）
+    # 授权申请（210：pending 需独立审批；行范围=显式全范围）
     r = client.post("/api/v1/datasets/grants", json={
         "principal": "test-platform-admin", "purpose_code": "research_synthetic",
         "resource_ref": res, "operations": ["read", "export", "train", "derive"],
-        "legal_basis_ref": "SYNTH-193-测试依据", "valid_hours": 2}, headers=T)
+        "legal_basis_ref": "SYNTH-193-测试依据", "valid_hours": 2,
+        "row_scope": {"all": True}}, headers=T)
     assert r.status_code == 200, r.text
     grant_id = r.json()["data"]["grant_id"]
+    assert r.json()["data"]["status"] == "pending"
+    # pending 未审批不可读；第二身份审批后生效
+    r = client.get("/api/v1/datasets/DS_SYNTH_193/versions/"
+                   f"{version_id}/stats/readmission", headers=T)
+    assert r.status_code == 403
+    r = client.post(f"/api/v1/datasets/grants/{grant_id}/review",
+                    json={"decision": "approve"}, headers=T2)
+    assert r.status_code == 200, r.text
 
     # 有授权可读（时间线/统计）
     r = client.get("/api/v1/datasets/DS_SYNTH_193/versions/"
@@ -105,21 +120,34 @@ def test_dataset_closed_loop(client: TestClient):
     assert r.status_code == 200, r.text
     assert r.json()["data"]["denominator_patients"] >= 3
 
-    # ---------- B10：质量门禁失败禁止发布 → 冻结→审批→发布 ----------
-    r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/freeze", json={}, headers=T)
-    assert r.status_code == 200, r.text
+    # ---------- B10：审批（分离）→ 安全评审 → 发布（冻结已在上面完成） ----------
+    # 冻结人=admin 不得自审（210 职责分离）；第二身份审批
     r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/approve",
                     json={"approver": "human-approver-193"}, headers=T)
+    assert r.status_code == 403
+    r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/approve",
+                    json={}, headers=T2)
     assert r.status_code == 200
-    # 质量失败 → 拒绝发布（旧状态保持 approved，可回退重验）
+    # 无持久化质量断言/安全评审 → 拒绝发布（210：不认 body 结论）
     r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/publish",
-                    json={"quality_results": [{"dimension": "coverage", "result": "fail"}],
-                          "security_ok": True, "approved_by": "human-approver-193"}, headers=T)
+                    headers=T)
     assert r.status_code == 409
-    # 质量全过 → 发布成功
+    # 补齐持久化断言与独立安全评审 → 发布成功（发布人=admin≠审批人）
+    from app.core.db import SessionLocal
+    s = SessionLocal()
+    try:
+        pipe.evaluate_assertions(s, "dataset_version", str(version_id), [
+            {"dimension": d, "metric_name": "m193", "numerator": 1, "denominator": 1,
+             "threshold": {"op": ">=", "value": 1}}
+            for d in ("coverage", "identity", "linkage")])
+        s.commit()
+    finally:
+        s.close()
+    r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/security-review",
+                    json={"passed": True, "note": "193 合成评审"}, headers=T2)
+    assert r.status_code == 200, r.text
     r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/publish",
-                    json={"quality_results": [{"dimension": "coverage", "result": "pass"}],
-                          "security_ok": True, "approved_by": "human-approver-193"}, headers=T)
+                    headers=T)
     assert r.status_code == 200, r.text
     assert r.json()["data"]["status"] == "published"
 
@@ -131,16 +159,27 @@ def test_dataset_closed_loop(client: TestClient):
     assert card["future_info_excluded"] >= 0
     assert sum(card["splits"].values()) == card["total_patients"]
 
-    # ---------- B14：受控导出 ----------
-    # 已发布+授权含 export → 申请成功
+    # ---------- B14：受控导出（210 真实闭环：申请→独立审批→生成→下载） ----------
     r = client.post(f"/api/v1/datasets/DS_SYNTH_193/versions/{version_id}/exports",
-                    json={"grant_id": grant_id, "fields": ["fact_key", "kind"],
-                          "free_text_fields": []}, headers=T)
+                    json={"fields": ["fact_key", "fact_kind"]}, headers=T)
     assert r.status_code == 200, r.text
     export_code = r.json()["data"]["export_code"]
-    # 下载鉴权通过（grant 有效）
+    assert r.json()["data"]["status"] == "review_pending"
+    # 申请人自审拒绝；未生成不可下载
+    r = client.post(f"/api/v1/datasets/exports/{export_code}/review",
+                    json={"decision": "approve"}, headers=T)
+    assert r.status_code == 403
+    r = client.post(f"/api/v1/datasets/exports/{export_code}/download", headers=T)
+    assert r.status_code == 403
+    r = client.post(f"/api/v1/datasets/exports/{export_code}/review",
+                    json={"decision": "approve", "note": "193 合成导出"}, headers=T2)
+    assert r.status_code == 200
+    r = client.post(f"/api/v1/datasets/exports/{export_code}/generate", json={},
+                    headers=T)
+    assert r.status_code == 200, r.text
     r = client.post(f"/api/v1/datasets/exports/{export_code}/download", headers=T)
     assert r.status_code == 200
+    assert r.text.startswith("fact_key,fact_kind")  # 真实 CSV 字节，非注释占位
 
     # ---------- B15：撤权即时生效（导出/读取全拒） ----------
     r = client.post(f"/api/v1/datasets/grants/{grant_id}/revoke",

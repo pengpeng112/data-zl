@@ -1,7 +1,13 @@
-"""193 B06—B10：身份关联、批次编排、标准化、质量对账与版本发布。
+"""193 B06—B10 + 210 S4：身份关联、批次编排、标准化、质量对账与版本发布。
 
 合成闭环实现：确定性匹配优先、幂等批次、检查点与提交边界一致、
 未知码隔离、发布门禁（质量/安全/审批独立）、发布失败旧版可用。
+
+210 S4（F07）修订：
+- freeze 绑定具体 fact 行为版本成员（asset_ds_version_members），此后所有
+  读/统计/训练/导出仅取成员清单——新批次/迟到修改不进入旧冻结版本。
+- publish 不再信任请求 body 的质量/安全结论：只认持久化质量断言与独立安全评审
+  （security_conclusion），必需断言缺失/未评/过期一律拒绝。
 """
 from __future__ import annotations
 
@@ -15,7 +21,7 @@ from sqlalchemy.orm import Session
 
 from ..models.dataset import (
     AssetDsBatch, AssetDsDataset, AssetDsDatasetVersion, AssetDsFact,
-    AssetDsIdentityMap, AssetDsQualityAssertion,
+    AssetDsIdentityMap, AssetDsQualityAssertion, AssetDsVersionMember,
 )
 
 # 版本状态机（B10）：合法迁移
@@ -334,6 +340,10 @@ def convert_unit(value: float | None, from_unit: str, to_unit: str) -> tuple[flo
 
 # ---------------- B09 质量断言 ----------------
 
+# 210 S4：发布必需的质量维度（缺失任一维度 = 未评估 = 拒绝发布）
+REQUIRED_QUALITY_DIMENSIONS = ("coverage", "identity", "linkage")
+
+
 def evaluate_assertions(db: Session, scope_type: str, scope_ref: str,
                         checks: list[dict]) -> list[dict]:
     """checks: {dimension, metric_name, numerator, denominator, threshold:{op,value}}。
@@ -360,9 +370,9 @@ def evaluate_assertions(db: Session, scope_type: str, scope_ref: str,
     return results
 
 
-def coverage_by_source_year(db: Session, dataset_version_ref: str) -> dict:
-    """分源分年覆盖统计（B09 验收：分源分年覆盖可查）。"""
-    facts = db.scalars(select(AssetDsFact).where(AssetDsFact.deleted == "false")).all()
+def coverage_by_source_year(db: Session, dataset_version_id: int) -> dict:
+    """分源分年覆盖统计（B09 验收：分源分年覆盖可查；210 S4 改按版本成员取数）。"""
+    facts = version_member_facts(db, dataset_version_id)
     by: dict[tuple[str, str], int] = {}
     for f in facts:
         year = f.business_time.year if f.business_time else "unknown"
@@ -377,44 +387,156 @@ def manifest_digest(manifest: dict) -> str:
                           .encode()).hexdigest()
 
 
-def freeze_version(db: Session, version_id: int) -> dict:
-    """冻结：生成清单与摘要（同输入同摘要，确定性）。"""
+def _fact_content_digest(fact: AssetDsFact) -> str:
+    payload = {
+        "fact_key": fact.fact_key, "fact_kind": fact.fact_kind,
+        "internal_patient_id": fact.internal_patient_id,
+        "source_code": fact.source_code, "original_value_ref": fact.original_value_ref,
+        "standard_value": fact.standard_value, "rule_version": fact.rule_version,
+        "business_time": fact.business_time.isoformat() if fact.business_time else None,
+        "deleted": fact.deleted,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False)
+                          .encode()).hexdigest()
+
+
+def version_batch_run_ids(db: Session, version: AssetDsDatasetVersion) -> list[str]:
+    """版本声明的来源批次 run_id 清单（source_batch_ids）。"""
+    return [str(x) for x in (version.source_batch_ids or [])]
+
+
+def version_scope_facts(db: Session, version: AssetDsDatasetVersion) -> list[AssetDsFact]:
+    """版本范围事实：仅版本声明批次的行，每个 fact_key 取最新规则版本且未删除。"""
+    run_ids = version_batch_run_ids(db, version)
+    if not run_ids:
+        return []
+    facts = db.scalars(select(AssetDsFact).where(
+        AssetDsFact.batch_run_id.in_(run_ids),
+        AssetDsFact.deleted == "false").order_by(AssetDsFact.id)).all()
+    by_key: dict[str, AssetDsFact] = {}
+    for f in facts:
+        by_key[f.fact_key] = f  # id 升序遍历，后写覆盖=最新版本
+    return list(by_key.values())
+
+
+def bind_version_members(db: Session, version: AssetDsDatasetVersion,
+                         facts: list[AssetDsFact]) -> int:
+    """把具体 fact 行绑定为版本冻结成员（幂等：已绑定行跳过）。"""
+    existing = set(db.scalars(select(AssetDsVersionMember.fact_id).where(
+        AssetDsVersionMember.dataset_version_id == version.id)).all())
+    added = 0
+    for f in facts:
+        if f.id in existing:
+            continue
+        db.add(AssetDsVersionMember(dataset_version_id=version.id, fact_id=f.id,
+                                    fact_key=f.fact_key,
+                                    content_sha256=_fact_content_digest(f)))
+        added += 1
+    db.flush()
+    return added
+
+
+def version_member_facts(db: Session, version_id: int) -> list[AssetDsFact]:
+    """版本成员查询入口（210 S4 单一出口）：时间线/统计/训练/覆盖/导出共用。
+
+    冻结后新写入的 fact 行不在成员内（版本隔离硬边界）；成员行本身被迟到删除
+    标记（fact.deleted=true）时按安全控制覆盖读取许可（不返回）。
+    """
+    rows = db.execute(
+        select(AssetDsFact, AssetDsVersionMember)
+        .join(AssetDsVersionMember,
+              AssetDsVersionMember.fact_id == AssetDsFact.id)
+        .where(AssetDsVersionMember.dataset_version_id == version_id,
+               AssetDsFact.deleted == "false")
+        .order_by(AssetDsFact.id)).all()
+    by_key: dict[str, AssetDsFact] = {}
+    for fact, _member in rows:
+        by_key[fact.fact_key] = fact
+    return list(by_key.values())
+
+
+def freeze_version(db: Session, version_id: int, frozen_by: str | None = None) -> dict:
+    """冻结：绑定具体 fact 行成员并生成清单与摘要（同输入同摘要，确定性）。
+
+    210 S4：清单基于成员行；冻结人记录用于审批职责分离对照。
+    """
     v = db.get(AssetDsDatasetVersion, version_id)
     if v is None:
         raise StateMachineError("版本不存在")
-    facts = db.scalars(select(AssetDsFact).where(AssetDsFact.deleted == "false")).all()
-    manifest = {"row_count": len(facts),
-                "kinds": sorted({f.fact_kind for f in facts}),
+    facts = version_scope_facts(db, v)
+    added = bind_version_members(db, v, facts)
+    members = db.scalars(select(AssetDsVersionMember).where(
+        AssetDsVersionMember.dataset_version_id == version_id)).all()
+    manifest = {"row_count": len(members),
+                "kinds": sorted({m.fact_key.split(":")[1] for m in members if ":" in m.fact_key}),
+                "member_digests_added": added,
                 "rule_versions": v.rule_versions or {},
                 "cutoff_at": v.cutoff_at.isoformat() if v.cutoff_at else None}
     v.manifest = manifest
     v.manifest_sha256 = manifest_digest(manifest)
+    if frozen_by:
+        v.frozen_by = frozen_by
     v.status = transition_version(v.status, "validated")
     v.validated_at = datetime.now(timezone.utc)
     return manifest
 
 
-def publish_version(db: Session, version_id: int, quality_results: list[dict],
-                    security_ok: bool, approved_by: str) -> dict:
-    """发布门禁：质量全 pass + 安全结论 + 审批人三独立条件。
+def record_security_review(db: Session, version_id: int, reviewer: str,
+                           passed: bool, note: str = "") -> dict:
+    """210 S4：独立安全评审持久化（发布门禁只认此记录，不认 body 结论）。
 
-    发布失败抛异常且不改状态——旧 published 版本仍可用（发布失败旧版可用）。
-    审批人不得与执行器主体相同（防执行器冒充审批）。
+    评审人与冻结人必须不同（职责分离）——由 API 层校验后调用。
+    """
+    v = db.get(AssetDsDatasetVersion, version_id)
+    if v is None:
+        raise StateMachineError("版本不存在")
+    if not v.manifest_sha256:
+        raise StateMachineError("尚未冻结，缺少清单摘要")
+    v.security_conclusion = {
+        "reviewed_by": reviewer, "passed": bool(passed), "note": note,
+        "manifest_sha256": v.manifest_sha256,
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    db.flush()
+    return dict(v.security_conclusion)
+
+
+def publish_version(db: Session, version_id: int, operator: str = "") -> dict:
+    """发布门禁（210 S4 重写）：质量断言 + 安全结论 + 审批三独立持久化条件。
+
+    - 质量只认 asset_ds_quality_assertions 中 scope=本版本的持久化断言：
+      必需维度（coverage/identity/linkage）齐全且全 pass；缺失/未评/失败拒绝。
+    - 安全只认 record_security_review 持久化结论（通过且绑定当前清单摘要）。
+    - 审批由 API 层完成主体分离核验；本函数不再接收 body 结论。
+    发布失败抛异常且不改状态——旧 published 版本仍可用。
     """
     v = db.get(AssetDsDatasetVersion, version_id)
     if v is None:
         raise StateMachineError("版本不存在")
     if v.status != "approved":
         raise StateMachineError(f"发布前置失败：状态={v.status}（需 approved）")
-    failed = [r for r in quality_results if r.get("result") == "fail"]
+    if not v.manifest_sha256:
+        raise StateMachineError("尚未冻结，缺少清单摘要")
+    assertions = db.scalars(select(AssetDsQualityAssertion).where(
+        AssetDsQualityAssertion.scope_type == "dataset_version",
+        AssetDsQualityAssertion.scope_ref == str(version_id))).all()
+    by_dim: dict[str, AssetDsQualityAssertion] = {a.dimension: a for a in assertions}
+    missing = [d for d in REQUIRED_QUALITY_DIMENSIONS if d not in by_dim]
+    if missing:
+        raise StateMachineError(f"必需质量维度缺失/未评估: {missing}")
+    failed = [f"{a.dimension}:{a.metric_name}" for a in by_dim.values() if a.result != "pass"]
     if failed:
-        v.status = transition_version(v.status, "draft") if False else v.status
-        raise StateMachineError(f"质量门禁未通过：{failed[:3]}")
-    if not security_ok:
-        raise StateMachineError("安全结论未通过")
+        raise StateMachineError(f"质量门禁未通过: {failed[:3]}")
+    sec = v.security_conclusion or {}
+    if not sec.get("passed"):
+        raise StateMachineError("安全结论未通过或未评审（需独立安全评审记录）")
+    if sec.get("manifest_sha256") != v.manifest_sha256:
+        raise StateMachineError("安全评审绑定的清单摘要与当前版本不一致（内容已变动，需重审）")
     v.status = transition_version(v.status, "published")
     v.published_at = datetime.now(timezone.utc)
-    v.quality_conclusion = {"checks": quality_results}
+    v.quality_conclusion = {"checks": [
+        {"dimension": a.dimension, "metric_name": a.metric_name, "result": a.result}
+        for a in by_dim.values()]}
     return {"status": v.status, "manifest_sha256": v.manifest_sha256}
 
 

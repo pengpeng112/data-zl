@@ -35,7 +35,7 @@ from .value_domain import (  # noqa: F401
     AssetColumnValueDomainEvidence,
     AssetColumnValueDomainVersion,
 )
-from .dataset import (  # noqa: F401  193 B03
+from .dataset import (  # noqa: F401  193 B03 + 210 S1
     AssetDsBatch,
     AssetDsClassification,
     AssetDsDataset,
@@ -45,6 +45,8 @@ from .dataset import (  # noqa: F401  193 B03
     AssetDsGrant,
     AssetDsIdentityMap,
     AssetDsQualityAssertion,
+    AssetDsRevocationLedger,
+    AssetDsVersionMember,
 )
 
 __all__ = [

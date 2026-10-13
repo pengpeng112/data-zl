@@ -13,7 +13,7 @@ from ..models.asset_system import AssetDataSource
 from ..models.identity import IdentityDepartmentSource, IdentityPersonDepartment, IdentityPersonSource
 from ..core.config import settings
 from ..services.credentials import resolve
-from ..services.db_connectors import DB_CONNECTOR_MAP
+from ..services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 
 
 DEPARTMENT_SOURCE_TABLE = "COMM.DEPT_DICT"
@@ -38,6 +38,7 @@ def _build_connector(source: AssetDataSource):
         user=user or "",
         password=password or "",
         connection_mode=source.connection_mode or "direct",
+        **transport_kwargs(db_type, getattr(source, "connection_options", None)),
     )
 
 

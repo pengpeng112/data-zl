@@ -174,6 +174,24 @@ RESOURCE_CATALOG: list[dict] = [
     {"code": "quality.control.manage", "name_cn": "质控清单管理", "type": "button", "parent_code": "quality.control.read"},
     {"code": "quality.control.run", "name_cn": "质控执行", "type": "button", "parent_code": "quality.control.read"},
     {"code": "quality.observation.read", "name_cn": "质量观测查看", "type": "page", "parent_code": "quality_governance"},
+    {"code": "quality.run.read", "name_cn": "质量运行查看", "type": "page", "parent_code": "quality_governance"},
+    {"code": "quality.run.manage", "name_cn": "质量运行管理（取消/重试）", "type": "button", "parent_code": "quality.run.read"},
+    {"code": "quality.vendor.manage", "name_cn": "质量厂商维护", "type": "button", "parent_code": "quality_governance"},
+    {"code": "quality.notification.read", "name_cn": "站内质量待办查看", "type": "page", "parent_code": "quality_governance"},
+    # ===== 210: 数据集安全分类分级（B02 §5 权限码；审批与执行分离）=====
+    {"code": "dataset_security", "name_cn": "数据集安全", "type": "menu", "parent_code": None},
+    {"code": "ds.read", "name_cn": "数据集与分类查看", "type": "page", "parent_code": "dataset_security"},
+    {"code": "ds.manage", "name_cn": "数据集与批次管理", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.classification.manage", "name_cn": "分类提案提交", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.classification.review", "name_cn": "分类变更审批", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.grant.request", "name_cn": "用途授权申请", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.grant.approve", "name_cn": "用途授权审批", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.grant.manage", "name_cn": "用途授权撤销", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.version.publish", "name_cn": "版本审批与发布", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.export.request", "name_cn": "导出申请", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.export.approve", "name_cn": "导出审批", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.export.execute", "name_cn": "导出生成执行", "type": "button", "parent_code": "ds.read"},
+    {"code": "ds.p4.access", "name_cn": "P4 严格受限访问", "type": "button", "parent_code": "ds.read"},
 ]
 
 
@@ -208,7 +226,9 @@ BUILTIN_ROLES: list[dict] = [
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     "platform_admin": [r["code"] for r in RESOURCE_CATALOG],
-    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read", "probe", "probe.finding.read", "quality_governance", "quality.issue.read", "quality.control.read", "quality.observation.read"],
+    "asset_viewer": ["asset", "asset.table.view", "asset.graph.view", "value_domain", "value_domain.read", "probe", "probe.finding.read", "quality_governance", "quality.issue.read", "quality.control.read", "quality.observation.read",
+                     # 210：资产查看员可读数据集安全目录（元数据浏览，读取仍需授权）
+                     "dataset_security", "ds.read"],
     "asset_editor": [
         "asset",
         "asset.table.view",
@@ -237,7 +257,9 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
     ],
     "quality_admin": ["asset", "asset.quality.view", "asset.quality.rule.create", "asset.quality.rule.execute", "asset.quality.ai.view", "asset.quality.ai.analyze", "asset.quality.ai.review", "value_domain", "value_domain.read", "ai.sql.execute", "probe", "probe.finding.read", "probe.finding.manage",
                       # 174：质量治理台账全量（含 read_all/verify/accept_risk/export）
-                      "quality_governance", "quality.issue.read", "quality.issue.read_all", "quality.issue.create", "quality.issue.assign", "quality.issue.handle", "quality.issue.verify", "quality.issue.accept_risk", "quality.issue.export", "quality.control.read", "quality.control.manage", "quality.control.run", "quality.observation.read"],
+                      "quality_governance", "quality.issue.read", "quality.issue.read_all", "quality.issue.create", "quality.issue.assign", "quality.issue.handle", "quality.issue.verify", "quality.issue.accept_risk", "quality.issue.export", "quality.control.read", "quality.control.manage", "quality.control.run", "quality.observation.read", "quality.run.read", "quality.run.manage", "quality.vendor.manage", "quality.notification.read",
+                      # 210：质量管理员只读数据集安全目录（B02 §5：只读+候选）
+                      "dataset_security", "ds.read"],
     "identity_admin": [
         "identity",
         "identity.person.view",
@@ -288,6 +310,13 @@ ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
         "ops.sql.review",
         "identity",
         "identity.person.view",
+        # 210：审批人角色覆盖分类/授权/版本/导出审批（不含管理与执行码）
+        "dataset_security",
+        "ds.read",
+        "ds.classification.review",
+        "ds.grant.approve",
+        "ds.version.publish",
+        "ds.export.approve",
     ],
     "ai_user": [
         "ai", "ai.draft.view", "ai.draft.execute", "asset", "asset.table.view", "asset.graph.view",

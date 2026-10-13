@@ -937,7 +937,7 @@ def check_source(source_code: str, db: Session = Depends(get_db)) -> ApiResponse
         raise HTTPException(status_code=404)
 
     try:
-        from ...services.db_connectors import DB_CONNECTOR_MAP
+        from ...services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
         from ...services.credentials import resolve
         user, pwd = resolve(ds.credential_ref)
         connector_cls = DB_CONNECTOR_MAP.get((ds.db_type or "oracle").lower())
@@ -961,6 +961,7 @@ def check_source(source_code: str, db: Session = Depends(get_db)) -> ApiResponse
             user=user or "",
             password=pwd or "",
             connection_mode=ds.connection_mode or "direct",
+            **transport_kwargs(ds.db_type, ds.connection_options),
         )
         ok, msg, elapsed_ms = connector.test_connectivity()
         ds.last_check_status = "connected" if ok else "failed"
@@ -1256,8 +1257,9 @@ def _run_connectivity_test(
     password: str,
     connection_mode: str,
     timeout_ms: int = 10000,
+    connection_options: dict | None = None,
 ) -> dict:
-    from ...services.db_connectors import DB_CONNECTOR_MAP
+    from ...services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 
     # 111 号 S5：连接测试防 SSRF —— 协议/端口/目标网段/超时全部受限。
     ssrf_errors = validate_ssrf_target(db_type, host, port)
@@ -1290,6 +1292,7 @@ def _run_connectivity_test(
         password=password or "",
         connection_mode=connection_mode or "direct",
         timeout_ms=timeout_ms,
+        **transport_kwargs(db_type, connection_options),
     )
     ok, msg, elapsed_ms = connector.test_connectivity()
     safe_msg = (msg or "")[:200]
@@ -1432,7 +1435,8 @@ def test_saved_connection(connection_id: int, request: Request, db: Session = De
     try:
         result = _run_connectivity_test(db_type=ds.db_type or "oracle", host=host, port=port,
             database=database, user=user or "", password=pwd or "",
-            connection_mode=ds.connection_mode or "direct")
+            connection_mode=ds.connection_mode or "direct",
+            connection_options=ds.connection_options if isinstance(ds.connection_options, dict) else None)
     finally:
         _CONNECTION_TEST_SLOTS.release()
     ds.last_test_status = "connected" if result["success"] else "failed"

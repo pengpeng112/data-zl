@@ -21,6 +21,22 @@ class Settings(BaseSettings):
     credential_encrypt_key: str = ""
     scheduler_timezone: str = "Asia/Shanghai"
 
+    # 207 质量执行链：默认全时段允许（隔离/本地验收），生产经批准配置夜间窗口。
+    # allowed_hours 形如 "0-6" 或 "0-6,22-23"；空串=不限。
+    quality_execution_allowed_hours: str = ""
+    # 调度入队循环默认关闭；生产启用需按 ops-runbook 批准（B6 发布包说明）。
+    quality_execution_scheduler_enabled: bool = False
+    quality_execution_lease_seconds: int = 300
+    quality_execution_max_attempts: int = 3
+    quality_run_sql_timeout_s: int = 60
+    quality_sample_limit: int = 20
+    # 隔离/本地演示允许请求内联执行（生产必须为 False，走 worker）。
+    quality_execution_inline: bool = False
+    # 厂商督办提醒策略（隔离环境可配；生产启用由实际配置批准）
+    quality_notify_advance_days: int = 1
+    quality_notify_overdue_daily_max: int = 1
+    quality_notify_escalate_after_days: int = 3
+
     # HIS identity sync source. Password must come from APP_HIS_SOURCE_PASSWORD.
     his_source_host: str = "10.10.10.15"
     his_source_port: int = 1521

@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from ..models.asset_system import AssetDataSource
 from ..models.dict_medical import DictMedicalCodeItem, DictMedicalSyncDiff
 from ..services.credentials import resolve
-from ..services.db_connectors import DB_CONNECTOR_MAP
+from ..services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 
 
 LOCAL_CODE_SETS = {
@@ -36,6 +36,7 @@ def _build_connector(source: AssetDataSource):
         user=user or "",
         password=password or "",
         connection_mode=source.connection_mode or "direct",
+        **transport_kwargs(db_type, getattr(source, "connection_options", None)),
     )
 
 

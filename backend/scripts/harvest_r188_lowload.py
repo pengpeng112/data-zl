@@ -203,6 +203,7 @@ class MySQLEngine(BaseEngine):
                                     user=cred["user"], password=cred["password"],
                                     charset="utf8mb4", use_unicode=False,
                                     connect_timeout=5,
+                                    ssl_disabled=bool(self.cfg.get("mysql_ssl_disabled")),
                                     read_timeout=int(self.cfg["budget"].get(
                                         "statement_timeout_ms", DEFAULTS["statement_timeout_ms"]) / 1000) + 5,
                                     write_timeout=5, cursorclass=pymysql.cursors.DictCursor)
@@ -355,7 +356,11 @@ class PGEngine(BaseEngine):
                 self.cur.execute(sql)
             if self.cur.description is None:
                 return []
-            return [dict(r) for r in self.cur.fetchall()]
+            # PG-compatible engines (Vastbase) fold unquoted column labels to
+            # UPPER case while native PG folds to lower; normalize so stage
+            # code can index lowercase keys on both (no-op on native PG).
+            return [{k.lower(): v for k, v in r.items()}
+                    for r in self.cur.fetchall()]
         except Exception as exc:
             msg = str(exc)
             if "canceling statement" in msg or "timeout" in msg.lower():
@@ -396,6 +401,25 @@ ORACLE_SYSTEM_OWNERS_SKIP = {
     "ORACLE_OCM",  # R4 finding: auxiliary owner recorded as observation item
 }
 ORACLE_SYSTEM_OWNER_PREFIXES_SKIP = ("SPATIAL_", "APEX_", "FLOWS_")
+
+
+def _flush_partial(out, **named_lists):
+    """Progressive flush: mirror accumulated stage lists into the snapshot dict
+    at each per-owner/schema checkpoint so a budget/circuit stop mid-stage keeps
+    every completed unit (r205 fix for lost partial structure on big sources).
+
+    208B (205 R07) patch: REPLACE-by-key. The stage lists passed in are already
+    cumulative within a round, and resume rounds rehydrate them from the prior
+    snapshot (v8), so replacing keeps prior data without re-appending it. The
+    previous ACCUMULATIVE merge appended the full cumulative list on every
+    per-owner flush, duplicating each row ~N-owners times (his_source evidence:
+    295,568 table rows / 4,775 unique = 112x). Products-level _dedupe preserved
+    correctness; this patch removes the snapshot bloat at the source.
+    Offline case matrix (first-collect / repeated flush / crash-resume):
+    _scratch/r205_flush_repro_208B.py."""
+    for key, val in named_lists.items():
+        out[key] = {"provenance": "progressive flush per completed unit (replace-by-key, cumulative list)",
+                    "data": list(val), "collected_at": now()}
 
 
 def stage_oracle(eng, cfg, out, ckpt):
@@ -453,6 +477,8 @@ def stage_oracle(eng, cfg, out, ckpt):
     tables, columns, constraints, indexes = [], [], [], []
     owner_errors = []
     for owner in owners_wanted:
+      if f"struct:{owner}" in ckpt.get("stages_done", []):
+          continue  # r205 resume: owner fully collected in a previous round
       try:
         obj_rows, _ = q("objects", """
             SELECT t.OWNER, t.TABLE_NAME, t.NUM_ROWS, t.LAST_ANALYZED, t.PARTITIONED,
@@ -503,6 +529,8 @@ def stage_oracle(eng, cfg, out, ckpt):
             indexes.extend(idx)
         ckpt["stages_done"].append(f"struct:{owner}")
         save_ckpt(ckpt)
+        _flush_partial(out, tables=tables, columns=columns,
+                       constraints=constraints, indexes=indexes)
       except CircuitBreak:
           raise
       except BudgetExceeded:
@@ -513,14 +541,15 @@ def stage_oracle(eng, cfg, out, ckpt):
           ckpt["stages_done"].append(f"struct_error:{owner}")
     out["owner_struct_errors"] = owner_errors
 
-    out["tables"] = {"provenance": "ALL_TABLES/ALL_VIEWS+partition_count", "data": tables,
-                     "collected_at": now()}
-    out["columns"] = {"provenance": "ALL_TAB_COLUMNS batched", "data": columns,
-                      "collected_at": now()}
-    out["constraints"] = {"provenance": "ALL_CONSTRAINTS P/U/R composite order", "data": constraints,
-                          "collected_at": now()}
-    out["indexes"] = {"provenance": "ALL_INDEXES/ALL_IND_COLUMNS composite order", "data": indexes,
-                      "collected_at": now()}
+    def _final(key, prov, data):
+        prev = out.get(key)
+        prev_rows = prev.get("data") if isinstance(prev, dict) else []
+        out[key] = {"provenance": prov, "data": list(prev_rows or []) + data,
+                    "collected_at": now()}
+    _final("tables", "ALL_TABLES/ALL_VIEWS+partition_count", tables)
+    _final("columns", "ALL_TAB_COLUMNS batched", columns)
+    _final("constraints", "ALL_CONSTRAINTS P/U/R composite order", constraints)
+    _final("indexes", "ALL_INDEXES/ALL_IND_COLUMNS composite order", indexes)
 
     # comments (batched by owner; separate small query)
     comments = []
@@ -615,6 +644,8 @@ def stage_mysql(eng, cfg, out, ckpt):
 
     tables, columns, constraints, indexes, defs = [], [], [], [], []
     for schema in wanted:
+        if f"struct:{schema}" in ckpt.get("stages_done", []):
+            continue  # r205 resume: schema fully collected in a previous round
         t_rows, _ = q("tables", """
             SELECT TABLE_NAME table_name, TABLE_TYPE, ENGINE, TABLE_ROWS estimated_rows,
                    DATA_LENGTH, INDEX_LENGTH, DATA_FREE, TABLE_COMMENT,
@@ -653,6 +684,8 @@ def stage_mysql(eng, cfg, out, ckpt):
         # capacity comes with information_schema.TABLES (DATA_LENGTH/INDEX_LENGTH)
         ckpt["stages_done"].append(f"struct:{schema}")
         save_ckpt(ckpt)
+        _flush_partial(out, tables=tables, columns=columns,
+                       constraints=constraints, indexes=indexes)
 
     out["tables"] = {"provenance": "information_schema.TABLES (TABLE_ROWS estimated)",
                      "data": tables, "collected_at": now()}
@@ -696,6 +729,8 @@ def stage_sqlserver(eng, cfg, out, ckpt):
     out["databases_harvested"] = wanted
 
     for db in wanted:
+        if f"db:{db}" in ckpt.get("stages_done", []):
+            continue  # r205 resume: database fully collected in a previous round
         eng.cur.execute(f"USE [{db.replace(']', ']]')}]")
         tables, _ = q("tables", """
             SELECT s.name schema_name, t.name table_name,
@@ -782,7 +817,8 @@ def stage_sqlserver(eng, cfg, out, ckpt):
 
 def stage_postgres(eng, cfg, out, ckpt):
     q = eng.execute
-    ident, _ = q("identity", "SELECT version() version, current_database() db, current_user")
+    ident, _ = q("identity", "SELECT version() AS version, current_database() AS db, "
+                             "current_user AS current_user")
     schemas, _ = q("schemas", """
         SELECT n.nspname schema_name FROM pg_catalog.pg_namespace n
          WHERE n.nspname NOT IN ('pg_catalog','information_schema')
@@ -796,6 +832,8 @@ def stage_postgres(eng, cfg, out, ckpt):
     tables, columns, constraints, indexes, defs = [], [], [], [], []
     dialect_errors = {}
     for schema in wanted:
+        if f"schema:{schema}" in ckpt.get("stages_done", []):
+            continue  # r205 resume: schema fully collected in a previous round
         try:
             rels, _ = q("relations", """
                 SELECT c.oid, c.relname, c.relkind, c.reltuples::bigint estimated_rows,
@@ -900,6 +938,9 @@ def stage_postgres(eng, cfg, out, ckpt):
                              "definition": s["text"], "truncated": s["truncated"]})
         ckpt["stages_done"].append(f"schema:{schema}")
         save_ckpt(ckpt)
+        _flush_partial(out, tables=tables, columns=columns,
+                       constraints=constraints, indexes=indexes,
+                       view_definitions=defs)
 
     out["tables"] = {"provenance": "pg_class r/p/v/m + reltuples (estimates; -1/None=unknown)",
                      "data": tables, "collected_at": now()}
@@ -1014,6 +1055,25 @@ def main() -> int:
     eng = eng_cls(cfg, budget, log)
     out = {"run_id": cfg.get("run_id"), "source_code": cfg.get("source_code"),
            "engine": cfg["engine"], "collected_at": now(), "budget_cfg": budget.cfg}
+
+    # r205 v7: resume-rehydrate — when resuming (ckpt kept) and a previous snapshot
+    # exists, load its data lists into out so per-owner skip + accumulative flush
+    # keep prior rounds' rows instead of being cleared by stage-end assignment.
+    if ckpt.get("stages_done") and args.output and args.output.exists():
+        try:
+            prev_snap = json.loads(args.output.read_text(encoding="utf-8"))
+            rehydrated = 0
+            for key in ("tables", "columns", "constraints", "indexes",
+                        "view_definitions", "table_comments", "capacity",
+                        "capacity_segments", "databases", "objects"):
+                pd = prev_snap.get(key)
+                if isinstance(pd, dict) and isinstance(pd.get("data"), list) and pd["data"]:
+                    out[key] = pd
+                    rehydrated += len(pd["data"])
+            if rehydrated:
+                log({"event": "resume_rehydrate", "rows": rehydrated})
+        except Exception as exc:
+            log({"event": "resume_rehydrate_error", "error": str(exc)[:120]})
 
     try:
         eng.connect()

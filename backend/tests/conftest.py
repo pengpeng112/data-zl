@@ -34,6 +34,7 @@ _PURE_LOGIC_SUBDIRS = (
     "plan198",
     "plan195",
     "plan200",
+    "plan207",
 )
 
 

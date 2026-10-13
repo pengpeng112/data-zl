@@ -137,15 +137,24 @@ def run_dual_source(tpl: dict, start: date, end: date) -> dict:
         raise RuntimeError(f"side-b BLOCKED: {sb.get('reason', 'blocked')}")
     ra = _rows(sjzc_live(sa["source_code"], render_params(sa["sql"], start, end, sa["dialect"])))
     if sb.get("mode") == "key_lookup":
-        keys = [(r.get("PATIENT_ID"), r.get("VISIT_ID")) for r in ra]
+        # F11（207）：稳定抽样（排序去重）+ 截断标志；空键集合 = NO_DATA
+        # （样本 0 不能算 100% 匹配）；键值经 escape 防注入。
+        keys = sorted({(str(r.get("PATIENT_ID") or ""), str(r.get("VISIT_ID") or "")) for r in ra})
         if not keys:
-            return {"value": 100.0, "detail": {"sampled": 0, "matched": 0}, "unmapped": []}
-        pairs = ", ".join(f"('{p}','{v}')" for p, v in keys[:1000])
+            return {"value": None, "status": "no_data",
+                    "detail": {"sampled": 0, "matched": 0, "truncated": False}, "unmapped": []}
+        truncated = len(keys) > 1000
+        sample = keys[:1000]
+        def _lit(v: str) -> str:
+            return "'" + v.replace("'", "''") + "'"
+        pairs = ", ".join(f"({_lit(p)},{_lit(v)})" for p, v in sample)
         sql = sb["sql"].replace("__KEYS__", pairs)
         rb = _rows(sjzc_live(sb["source_code"], sql, max_rows=1000))
-        hit = {(r.get("PATIENT_ID"), r.get("VISIT_ID")) for r in rb}
-        matched = sum(1 for k in keys if k in hit)
-        return {"value": round(matched / len(keys) * 100, 4), "detail": {"sampled": len(keys), "matched": matched}, "unmapped": []}
+        hit = {(str(r.get("PATIENT_ID") or ""), str(r.get("VISIT_ID") or "")) for r in rb}
+        matched = sum(1 for k in sample if k in hit)
+        return {"value": round(matched / len(sample) * 100, 4),
+                "detail": {"sampled": len(sample), "matched": matched, "truncated": truncated},
+                "unmapped": []}
     rb = _rows(sjzc_live(sb["source_code"], render_params(sb["sql"], start, end, sb["dialect"])))
     mapping = tpl["derive"].get("mapping") or {}
     if mapping:
@@ -179,7 +188,9 @@ def run_probe(tpl: dict, db, start: date, end: date, run_id: str) -> dict:
             res = run_single_source(db, tpl, start, end, run_id)
         else:
             res = run_dual_source(tpl, start, end)
-        rec["metric_value"] = res["value"]
+        rec["metric_value"] = res.get("value")
+        if res.get("status") == "no_data":
+            rec["status"] = "no_data"
         rec["metrics"] = res.get("detail", res.get("extra", {}))
         rec["unmapped"] = res.get("unmapped", [])
         trig = tpl["trigger"]

@@ -175,7 +175,7 @@ def test_drill_policy_supersede_denies(db_session):
     db_session.add(AssetDsGrant(
         principal="u1", purpose_code="rp2", resource_type="dataset_version",
         resource_ref=ref, operations=["read"], legal_basis_ref="t",
-        approved_by="op"))
+        approved_by="op", row_scope={"all": True}))
     db_session.flush()
     r2 = sec.enforce_read(db_session, "u1", "rp2", ref)
     assert r2.allowed
@@ -196,8 +196,10 @@ def test_drill_policy_supersede_denies(db_session):
 
 # ---------- B10：发布失败旧版仍可用（回滚语义） ----------
 
-def test_drill_publish_fail_old_version_usable(client: TestClient):
-    # v1 走完整链到 published
+def test_drill_publish_fail_old_version_usable(client: TestClient,
+                                               second_user_token: str):
+    T2 = {"Authorization": f"Bearer {second_user_token}"}
+    # v1 走完整链到 published（210：审批分离+持久化门禁）
     r = client.post("/api/v1/datasets", json={
         "dataset_code": "DS_RB", "purpose_code": "rp_rb"}, headers=T)
     assert r.status_code == 200
@@ -207,27 +209,41 @@ def test_drill_publish_fail_old_version_usable(client: TestClient):
         "source_code": "SYNTH_A", "records": [
             _rec("RUN-RB", "visit", "P1", "S1")], "rule_version": "rules_v1"}, headers=T)
     client.post("/api/v1/datasets/classifications", json={
-        "object_ref": ref,
+        "object_type": "dataset_version", "object_ref": ref, "expected_version": 0,
         "labels": {"protection_level": "P3", "personal_info": "personal",
                    "usage_constraints": {"purposes": ["rp_rb"], "export_allowed": True,
                                          "training_allowed": True}}}, headers=T)
     client.post("/api/v1/datasets/grants", json={
         "principal": "test-platform-admin", "purpose_code": "rp_rb",
         "resource_ref": ref, "operations": ["read", "export", "derive"],
-        "legal_basis_ref": "t", "valid_hours": 2}, headers=T)
-    client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/freeze", json={}, headers=T)
+        "legal_basis_ref": "t", "valid_hours": 2, "row_scope": {"all": True}},
+        headers=T)
+    gid = client.get("/api/v1/datasets/grants", headers=T).json()["data"][0]["id"]
+    client.post(f"/api/v1/datasets/grants/{gid}/review",
+                json={"decision": "approve"}, headers=T2)
+    client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/freeze",
+                json={"source_batch_ids": ["RUN-RB"]}, headers=T)
     client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/approve",
-                json={"approver": "ap"}, headers=T)
-    r = client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/publish", json={
-        "quality_results": [{"dimension": "coverage", "result": "pass"}],
-        "security_ok": True, "approved_by": "ap"}, headers=T)
+                json={}, headers=T2)
+    from app.core.db import SessionLocal
+    from app.models.dataset import AssetDsDataset, AssetDsDatasetVersion
+    s = SessionLocal()
+    try:
+        pipe.evaluate_assertions(s, "dataset_version", str(v1), [
+            {"dimension": d, "metric_name": "m193", "numerator": 1,
+             "denominator": 1, "threshold": {"op": ">=", "value": 1}}
+            for d in ("coverage", "identity", "linkage")])
+        s.commit()
+    finally:
+        s.close()
+    client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/security-review",
+                json={"passed": True}, headers=T2)
+    r = client.post(f"/api/v1/datasets/DS_RB/versions/{v1}/publish", headers=T)
     assert r.status_code == 200 and r.json()["data"]["status"] == "published"
     # 旧版可读（发布成功基线）
     r = client.get(f"/api/v1/datasets/DS_RB/versions/{v1}/stats/readmission", headers=T)
     assert r.status_code == 200
     # v2 质量失败 → 发布拒绝；v1 仍可读
-    from app.core.db import SessionLocal
-    from app.models.dataset import AssetDsDataset, AssetDsDatasetVersion
     db = SessionLocal()
     ds = db.scalar(select(AssetDsDataset).where(AssetDsDataset.dataset_code == "DS_RB"))
     v2 = AssetDsDatasetVersion(dataset_id=ds.id, version=2)
@@ -235,9 +251,22 @@ def test_drill_publish_fail_old_version_usable(client: TestClient):
     db.commit()
     v2_id = v2.id
     db.close()
-    r = client.post(f"/api/v1/datasets/DS_RB/versions/{v2_id}/publish", json={
-        "quality_results": [{"dimension": "coverage", "result": "fail"}],
-        "security_ok": True, "approved_by": "ap"}, headers=T)
+    client.post(f"/api/v1/datasets/DS_RB/versions/{v2_id}/freeze",
+                json={"source_batch_ids": ["RUN-RB"]}, headers=T)
+    client.post(f"/api/v1/datasets/DS_RB/versions/{v2_id}/approve",
+                json={}, headers=T2)
+    s = SessionLocal()
+    try:
+        # coverage 失败断言（其余必需维度缺失同样拒绝，此处两者皆触发）
+        pipe.evaluate_assertions(s, "dataset_version", str(v2_id), [
+            {"dimension": "coverage", "metric_name": "m193", "numerator": 0,
+             "denominator": 1, "threshold": {"op": ">=", "value": 1}}])
+        s.commit()
+    finally:
+        s.close()
+    client.post(f"/api/v1/datasets/DS_RB/versions/{v2_id}/security-review",
+                json={"passed": True}, headers=T2)
+    r = client.post(f"/api/v1/datasets/DS_RB/versions/{v2_id}/publish", headers=T)
     assert r.status_code == 409  # 质量门禁拒绝
     r = client.get(f"/api/v1/datasets/DS_RB/versions/{v1}/stats/readmission", headers=T)
     assert r.status_code == 200  # 旧版不受影响
@@ -246,37 +275,62 @@ def test_drill_publish_fail_old_version_usable(client: TestClient):
 # ---------- B15：恢复后撤销重放 ----------
 
 def test_drill_restore_replay_revocations(db_session):
-    plan = prod.replay_revocations_after_restore(["EXP-A", "EXP-B"])
-    assert set(plan["replay_export_codes"]) == {"EXP-A", "EXP-B"}
-    assert plan["policy"] == "restore_then_replay_revocations"
+    # 210：真实账本重放——未重放账目由恢复装载，重放后标记，重复重放零作用
+    prod.record_revocation(db_session, "export", "export:EXP-A", "restore drill",
+                           "op", applied_inline=False)
+    prod.record_revocation(db_session, "export", "export:EXP-B", "restore drill",
+                           "op", applied_inline=False)
+    db_session.commit()
+    result = prod.replay_revocations_after_restore(db_session)
+    assert result["entries_replayed"] == 2
+    again = prod.replay_revocations_after_restore(db_session)
+    assert again["entries_replayed"] == 0  # 幂等：重复重放不复活
+    assert again["policy"] == "restore_then_replay_revocations"
 
 
 # ---------- B05：权限反例（API 级） ----------
 
-def test_drill_permission_negatives(client: TestClient):
+def test_drill_permission_negatives(client: TestClient, second_user_token: str):
     r = client.post("/api/v1/datasets", json={
         "dataset_code": "DS_NEG", "purpose_code": "rp_neg"}, headers=T)
     vid = r.json()["data"]["version_id"]
     ref = f"dataset:DS_NEG:{vid}"
     client.post("/api/v1/datasets/classifications", json={
-        "object_ref": ref,
+        "object_type": "dataset_version", "object_ref": ref, "expected_version": 0,
         "labels": {"protection_level": "P3", "personal_info": "personal",
                    "usage_constraints": {"purposes": ["rp_neg"]}}}, headers=T)
-    # 只读授权（无 export）
+    # 只读授权（无 export）；210：需第二身份审批
     r = client.post("/api/v1/datasets/grants", json={
         "principal": "test-platform-admin", "purpose_code": "rp_neg",
         "resource_ref": ref, "operations": ["read"],
-        "legal_basis_ref": "t", "valid_hours": 1}, headers=T)
+        "legal_basis_ref": "t", "valid_hours": 1, "row_scope": {"all": True}},
+        headers=T)
     gid = r.json()["data"]["grant_id"]
-    # 反例1：操作越界（read-only grant 尝试 export）
-    client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/freeze", json={}, headers=T)
+    client.post(f"/api/v1/datasets/grants/{gid}/review",
+                json={"decision": "approve"}, headers=T2)
+    # 反例1：操作越界（read-only grant 尝试 export）——发布链就绪后申请导出
+    client.post("/api/v1/datasets/batches/RUN-NEG/records", json={
+        "source_code": "SYNTH_A", "records": [_rec("RUN-NEG", "visit", "P1", "S1")],
+        "rule_version": "rules_v1"}, headers=T)
+    client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/freeze",
+                json={"source_batch_ids": ["RUN-NEG"]}, headers=T)
     client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/approve",
-                json={"approver": "ap"}, headers=T)
-    client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/publish", json={
-        "quality_results": [{"result": "pass"}], "security_ok": True,
-        "approved_by": "ap"}, headers=T)
+                json={}, headers=T2)
+    from app.core.db import SessionLocal
+    s = SessionLocal()
+    try:
+        pipe.evaluate_assertions(s, "dataset_version", str(vid), [
+            {"dimension": d, "metric_name": "m193", "numerator": 1,
+             "denominator": 1, "threshold": {"op": ">=", "value": 1}}
+            for d in ("coverage", "identity", "linkage")])
+        s.commit()
+    finally:
+        s.close()
+    client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/security-review",
+                json={"passed": True}, headers=T2)
+    client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/publish", headers=T)
     r = client.post(f"/api/v1/datasets/DS_NEG/versions/{vid}/exports",
-                    json={"grant_id": gid, "fields": ["fact_key"]}, headers=T)
+                    json={"fields": ["fact_key"]}, headers=T)
     assert r.status_code == 403
     # 反例2：伪造主体（另一用户 token 无授权）
     r = client.get(f"/api/v1/datasets/DS_NEG/versions/{vid}/stats/readmission",
@@ -288,14 +342,13 @@ def test_drill_permission_negatives(client: TestClient):
         "resource_ref": "*", "operations": ["read"],
         "legal_basis_ref": "t", "valid_hours": 1}, headers=T)
     assert r.status_code == 200
-    from app.core.db import SessionLocal
     s = SessionLocal()
     try:
         # 用途取交（B02 §3.1）：对象标签用途=[rp_neg]不含 rp_other，
         # 即使存在 rp_other 的 global 授权也必须拒绝——分类约束优先于授权宽度
         rr = sec.enforce_read(s, "test-platform-admin", "rp_other", ref)
         assert not rr.allowed
-        assert rr.decision == "deny_level"
+        assert rr.decision == "deny_purpose"
     finally:
         s.rollback()
         s.close()  # 必须关闭：否则空闲事务持锁阻塞 teardown TRUNCATE
@@ -331,7 +384,7 @@ def test_reconcile_old_vs_governed_conserved(db_session):
 
 # ---------- B14：导出到期 ----------
 
-def test_export_expiry_rejected(db_session):
+def test_export_expiry_rejected(db_session, tmp_path):
     from app.models.dataset import AssetDsDataset, AssetDsDatasetVersion
     ds = AssetDsDataset(dataset_code="DS_EXP_T", title="t", purpose_code="p")
     db_session.add(ds)
@@ -342,18 +395,24 @@ def test_export_expiry_rejected(db_session):
     g = AssetDsGrant(principal="u1", purpose_code="p", resource_type="dataset_version",
                      resource_ref=f"dataset:DS_EXP_T:{v.id}",
                      operations=["read", "export"], legal_basis_ref="t",
-                     approved_by="op")
+                     approved_by="op", row_scope={"all": True})
     db_session.add(g)
     db_session.flush()
-    exp = prod.request_export(db_session, g.id, v.id, ["fact_key"], "u1",
-                              expires_in_hours=1)
+    # 210 新契约：申请（不是审批）→ review_pending；独立审批后生成
+    exp = prod.request_export(db_session, principal="u1", purpose_code="p",
+                              resource_ref=f"dataset:DS_EXP_T:{v.id}", version=v,
+                              requested_fields=["fact_key"])
+    db_session.commit()
+    assert exp.status == "review_pending"
+    prod.approve_export(db_session, exp, approver="op2", decision="approve")
     db_session.commit()
     assert exp.status == "approved"
-    # 模拟过期：把 expires_at 拨回过去
+    # 模拟过期：把 expires_at 拨回过去 → 生成拒绝
     exp.expires_at = datetime.now(timezone.utc) - timedelta(hours=2)
     db_session.flush()
     try:
-        prod.generate_export_csv(db_session, exp, [{"fact_key": "k"}])
+        prod.generate_export(db_session, exp, operator="op2",
+                             artifacts_dir=str(tmp_path))
         raise AssertionError("过期导出应被拒绝")
     except PermissionError as e:
         assert "过期" in str(e)

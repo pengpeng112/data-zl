@@ -28,7 +28,7 @@ from ..models.dict_medical import DictMedicalCodeItem, DictMedicalCodeMapping
 from ..models.governance_base import GovernAuditLog
 from ..services.credentials import resolve
 from ..services.data_masking import sanitize_text
-from ..services.db_connectors import DB_CONNECTOR_MAP
+from ..services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -900,6 +900,7 @@ def _build_connector(source: AssetDataSource, *, write: bool = False):
         user=user or "",
         password=password or "",
         connection_mode=source.connection_mode or "direct",
+        **transport_kwargs(db_type, getattr(source, "connection_options", None)),
     )
 
 

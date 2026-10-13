@@ -18,7 +18,7 @@ from ...models.metadata_change import AssetMetadataChangeEvent, AssetMetadataCol
 from ...models.quality import QualityFinding
 from ...services.credentials import resolve
 from ...services.data_masking import sanitize_text
-from ...services.db_connectors import DB_CONNECTOR_MAP
+from ...services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 from ...services.metadata_diff import MetadataDiff
 from ...services.metadata_collector import METADATA_COLLECTOR_MAP
 from ...schemas.common import ApiResponse
@@ -59,6 +59,7 @@ def _build_source_connector(source: AssetDataSource):
         user=user or "",
         password=password or "",
         connection_mode=source.connection_mode or "direct",
+        **transport_kwargs(db_type, getattr(source, "connection_options", None)),
     )
 
 

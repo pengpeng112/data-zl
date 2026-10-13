@@ -64,6 +64,16 @@ def test_b17_perf_benchmark():
         assert r["written"] == 0
         report["rerun_skip_300_s"] = round(t_rerun, 2)
 
+        # --- 数据集/版本+成员冻结（210：所有产品读取按版本成员） ---
+        db.add(AssetDsDataset(dataset_code="PERF", title="perf", purpose_code="perf",
+                              latest_version_id=1))
+        db.add(AssetDsDatasetVersion(
+            id=1, dataset_id=1, version=1,
+            source_batch_ids=[f"RUN-PERF-{i}" for i in range(10)]))
+        db.commit()
+        pipe.freeze_version(db, 1)
+        db.commit()
+
         # --- 分类+授权+网关单次判定 ---
         db.add(AssetDsClassification(
             object_type="dataset_version", object_ref="dataset:PERF:1",
@@ -73,7 +83,7 @@ def test_b17_perf_benchmark():
         db.add(AssetDsGrant(principal="perfuser", purpose_code="perf",
                             resource_type="dataset_version", resource_ref="dataset:PERF:1",
                             operations=["read", "export", "train"], legal_basis_ref="t",
-                            approved_by="op"))
+                            approved_by="op", row_scope={"all": True}))
         db.commit()
         t0 = time.perf_counter()
         n_ok = 0
@@ -88,14 +98,14 @@ def test_b17_perf_benchmark():
         # --- 单患者时间线 ---
         sample_pid = pipe.deterministic_patient_id("SYNTH_PERF", "PF0100")
         t0 = time.perf_counter()
-        tl = prod.patient_timeline(db, sample_pid)
+        tl = prod.patient_timeline(db, 1, sample_pid, row_scope={"all": True})
         t_tl = time.perf_counter() - t0
         assert tl["count"] == FACTS_PER_PATIENT
         report["timeline_1patient_15events_ms"] = round(t_tl * 1000, 1)
 
         # --- 再入院统计（全量扫描 3000 事实） ---
         t0 = time.perf_counter()
-        stats = prod.readmission_rate(db)
+        stats = prod.readmission_rate(db, 1, row_scope={"all": True})
         t_stats = time.perf_counter() - t0
         report["stats_readmission_3000facts_s"] = round(t_stats, 2)
         report["stats_result"] = {"denominator": stats["denominator_patients"],
@@ -108,16 +118,14 @@ def test_b17_perf_benchmark():
         assert ts["data_card"]["total_patients"] == N_PATIENTS
         report["training_set_200patients_s"] = round(t_train, 2)
 
-        # --- 冻结清单（全量 digest） ---
-        db.add(AssetDsDataset(dataset_code="PERF", title="perf", purpose_code="perf",
-                              latest_version_id=1))
-        db.add(AssetDsDatasetVersion(id=1, dataset_id=1, version=1))
-        db.commit()
+        # --- 冻结清单复跑（幂等补绑耗时；版本状态已 validated，改直接调用绑定） ---
         t0 = time.perf_counter()
-        pipe.freeze_version(db, 1)
+        members = pipe.version_scope_facts(db, db.get(AssetDsDatasetVersion, 1))
+        added = pipe.bind_version_members(db, db.get(AssetDsDatasetVersion, 1), members)
         db.commit()
         t_freeze = time.perf_counter() - t0
         report["freeze_manifest_3000facts_s"] = round(t_freeze, 2)
+        report["freeze_members_added_on_rerun"] = added
 
         report["finished_at"] = datetime.now(timezone.utc).isoformat()
         report["note"] = ("合成基准、经 SSH 隧道（含网络往返）；SLO 阈值待 B18 前业务确认，"

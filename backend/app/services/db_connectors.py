@@ -454,14 +454,23 @@ class MysqlConnector(DatabaseConnector):
 
     def connect(self):
         import pymysql
-        self._conn = pymysql.connect(
-            host=self.host, port=self.port, database=self.database,
-            user=self.user, password=self.password,
-            cursorclass=pymysql.cursors.DictCursor,
-            connect_timeout=max(1, self._timeout_ms() // 1000),
-            read_timeout=max(1, self._timeout_ms() // 1000),
-            write_timeout=max(1, self._timeout_ms() // 1000),
-        )
+        params: dict[str, Any] = {
+            "host": self.host,
+            "port": self.port,
+            "database": self.database,
+            "user": self.user,
+            "password": self.password,
+            "cursorclass": pymysql.cursors.DictCursor,
+            "connect_timeout": max(1, self._timeout_ms() // 1000),
+            "read_timeout": max(1, self._timeout_ms() // 1000),
+            "write_timeout": max(1, self._timeout_ms() // 1000),
+        }
+        # PyMySQL 2.2 starts TLS when the server advertises CLIENT_SSL.
+        # core2db (MySQL 5.7.20) then returns WRONG_VERSION_NUMBER. Disable
+        # TLS only when this source's connection_options sets ssl_disabled.
+        if self.extra.get("ssl_disabled") is True:
+            params["ssl_disabled"] = True
+        self._conn = pymysql.connect(**params)
         cursor = self._conn.cursor()
         try:
             cursor.execute("SET SESSION TRANSACTION READ ONLY")
