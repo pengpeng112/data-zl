@@ -66,6 +66,36 @@ os.environ.setdefault("APP_OPS_APPROVAL_UI_ENABLED", "false")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+# 215 E2：同一隔离库单 pytest 进程独占。advisory lock 键=APP_TEST_DB_URL 哈希，
+# 第二个进程对同一库启动时 fail-fast（212 DEF212-001 双进程 TRUNCATE 互清实证）。
+# 锁随下方连接存活，进程退出自动释放；--collect-only/--co 无库收集不触发。
+_RUN_LOCK_CONNECTION = None
+if (
+    not _only_pure_logic_subdirs()
+    and "--collect-only" not in sys.argv
+    and "--co" not in sys.argv
+):
+    from tests._run_guard import try_acquire_run_lock
+
+    try:
+        _RUN_LOCK_CONNECTION, _run_lock_acquired = try_acquire_run_lock(TEST_DB_URL)
+    except Exception as exc:  # noqa: BLE001 - fail-fast 文案统一出口
+        pytest.exit(
+            f"Cannot reach the isolated test database for the run lock "
+            f"(APP_TEST_DB_URL set): {exc!r}. Fix the tunnel/database or run "
+            f"pure-logic subdirs only.",
+            returncode=3,
+        )
+    if not _run_lock_acquired:
+        pytest.exit(
+            "Another pytest session already holds the advisory lock for this "
+            "test database (APP_TEST_DB_URL). Two pytest processes sharing one "
+            "TRUNCATE-able database clear each other's rows (212 DEF212-001). "
+            "Wait for the other run to finish, or point APP_TEST_DB_URL at a "
+            "different isolated database.",
+            returncode=3,
+        )
+
 if not _only_pure_logic_subdirs():
     from app.main import app
     from app.core.config import settings

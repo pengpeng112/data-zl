@@ -6,14 +6,13 @@ plan193_db/ 隔离库集成（需 APP_TEST_DB_URL，走根 conftest）。
 """
 from __future__ import annotations
 
-import os
-
 import pytest
 
+from tests._run_guard import apply_pure_logic_env_sentinel
+
 _SENTINEL = "postgresql+psycopg://plan193-pure-logic-sentinel/test"
-os.environ["APP_TEST_DB_URL"] = _SENTINEL
-os.environ["APP_DB_URL"] = _SENTINEL
-os.environ.setdefault("APP_ENV", "test")
+# 215 E2：无真实测试库配置时才落哨兵（混合目录运行不覆盖真实 URL）。
+apply_pure_logic_env_sentinel(_SENTINEL)
 
 
 @pytest.fixture(autouse=True)

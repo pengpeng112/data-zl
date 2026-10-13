@@ -10,14 +10,15 @@ conftest with an isolated test database.
 """
 from __future__ import annotations
 
-import os
-
 import pytest
 
+from tests._run_guard import apply_pure_logic_env_sentinel
+
 _SENTINEL = "postgresql+psycopg://plan144-pure-logic-sentinel/test"
-os.environ["APP_TEST_DB_URL"] = _SENTINEL
-os.environ["APP_DB_URL"] = _SENTINEL
-os.environ.setdefault("APP_ENV", "test")
+# 215 E2：无真实测试库配置时才落哨兵——混合目录运行保留根 conftest 设置的
+# 真实 APP_TEST_DB_URL/APP_DB_URL，收集期不再全局覆盖污染同进程 DB 集成测试；
+# 哨兵仅满足传递导入 app.core.db 的守卫，引擎惰性构造从不连接。
+apply_pure_logic_env_sentinel(_SENTINEL)
 
 
 @pytest.fixture(autouse=True)
