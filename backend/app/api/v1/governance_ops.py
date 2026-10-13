@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ...core.db import get_db
+from ...core.security import require_permission
 from ...models.governance_ops import ChangeRule, GovernEvent, SchedulerJob
 from ...schemas.common import ApiResponse
 
@@ -104,6 +105,118 @@ def list_scheduler_jobs(
 
 # ── 事件/告警 ──
 
+@router.get(
+    "/scheduler/ops-board",
+    summary="215 E6：worker/调度心跳只读看板（零写操作）",
+    dependencies=[Depends(require_permission("govern.executor.manage"))],
+)
+def scheduler_ops_board(db: Session = Depends(get_db)) -> ApiResponse[dict]:
+    """聚合调度开关、表驱动 job、worker 心跳与启停审计——纯读，不写任何表。
+
+    数据源均为现有字段：asset_scheduler_jobs、asset_quality_runs.heartbeat_at/
+    lease_owner/lease_expires_at、asset_identity_scheduler_runs.provider_heartbeat_at、
+    asset_govern_audit_logs（既有启停/创建端点落审计）。任务启停不在本端点——
+    走既有端点（POST /scheduler/jobs 等，各自落审计）。
+    """
+    from ...core.config import settings
+    from ...models.governance_base import GovernAuditLog
+    from ...models.identity_sync import IdentitySchedulerRun
+    from ...models.quality_governance import QualityRun
+
+    now = datetime.now(timezone.utc)
+
+    switches = {
+        "identity_nightly_enabled": settings.identity_nightly_enabled,
+        "dict_medical_push_enabled": settings.dict_medical_push_enabled,
+        "query_schedule_enabled": settings.query_schedule_enabled,
+        "quality_execution_scheduler_enabled": settings.quality_execution_scheduler_enabled,
+        "ai_context_cache_cleanup_enabled": settings.ai_context_cache_cleanup_enabled,
+        "scheduler_timezone": settings.scheduler_timezone,
+    }
+
+    job_rows = db.scalars(
+        select(SchedulerJob).order_by(SchedulerJob.created_at.desc()).limit(500)
+    ).all()
+    by_status: dict[str, int] = {}
+    by_trigger_mode: dict[str, int] = {}
+    for r in job_rows:
+        by_status[r.status or "unknown"] = by_status.get(r.status or "unknown", 0) + 1
+        by_trigger_mode[r.trigger_mode or "unknown"] = by_trigger_mode.get(r.trigger_mode or "unknown", 0) + 1
+    scheduled_jobs = [
+        {
+            "id": r.id, "job_type": r.job_type, "source_code": r.source_code,
+            "schedule_cron": r.schedule_cron, "status": r.status,
+            "started_at": r.started_at.isoformat() if r.started_at else None,
+            "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+            "total_processed": r.total_processed, "total_changes": r.total_changes,
+            "error_message": r.error_message,
+        }
+        for r in job_rows if r.trigger_mode == "scheduled"
+    ][:50]
+
+    def _age(ts) -> float | None:
+        return (now - ts).total_seconds() if ts is not None else None
+
+    quality_workers = [
+        {
+            "run_id": r.id, "run_code": r.run_code, "status": r.status,
+            "detector_kind": r.detector_kind, "started_at": r.started_at.isoformat() if r.started_at else None,
+            "heartbeat_at": r.heartbeat_at.isoformat() if r.heartbeat_at else None,
+            "heartbeat_age_seconds": _age(r.heartbeat_at),
+            "lease_owner": r.lease_owner,
+            "lease_expires_at": r.lease_expires_at.isoformat() if r.lease_expires_at else None,
+            "lease_active": bool(r.lease_expires_at and r.lease_expires_at > now),
+        }
+        for r in db.scalars(
+            select(QualityRun)
+            .where(QualityRun.status.in_(["running", "waiting_window", "queued"]))
+            .order_by(QualityRun.id.desc())
+            .limit(50)
+        ).all()
+    ]
+
+    identity_runs = [
+        {
+            "run_id": r.run_id, "triggered_by": r.triggered_by, "status": r.status,
+            "lock_holder": r.lock_holder,
+            "started_at": r.started_at.isoformat() if r.started_at else None,
+            "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+            "provider_code": r.provider_code,
+            "provider_heartbeat_at": r.provider_heartbeat_at.isoformat() if r.provider_heartbeat_at else None,
+            "provider_heartbeat_age_seconds": _age(r.provider_heartbeat_at),
+        }
+        for r in db.scalars(
+            select(IdentitySchedulerRun).order_by(IdentitySchedulerRun.id.desc()).limit(5)
+        ).all()
+    ]
+
+    audit_trail = [
+        {
+            "id": a.id, "action": a.action, "operator": a.operator,
+            "entity_type": a.entity_type, "entity_ref": a.entity_ref,
+            "reason": a.reason, "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+        for a in db.scalars(
+            select(GovernAuditLog)
+            .where(GovernAuditLog.entity_type == "scheduler_job")
+            .order_by(GovernAuditLog.id.desc())
+            .limit(20)
+        ).all()
+    ]
+
+    return ApiResponse(data={
+        "generated_at": now.isoformat(),
+        "read_only": True,
+        "scheduler_switches": switches,
+        "jobs_summary": {
+            "total": len(job_rows), "by_status": by_status, "by_trigger_mode": by_trigger_mode,
+        },
+        "scheduled_jobs": scheduled_jobs,
+        "worker_heartbeats": {"quality_runs": quality_workers, "identity_nightly": identity_runs},
+        "scheduler_job_audit_trail": audit_trail,
+    })
+
+
 @router.get("/scheduler/jobs/{job_id}", summary="Scheduler job detail")
 def get_scheduler_job(job_id: int, db: Session = Depends(get_db)) -> ApiResponse[dict]:
     job = db.get(SchedulerJob, job_id)
@@ -124,6 +237,7 @@ def get_scheduler_job(job_id: int, db: Session = Depends(get_db)) -> ApiResponse
         "error_message": job.error_message,
         "created_at": job.created_at.isoformat() if job.created_at else None,
     })
+
 
 class EventCreate(BaseModel):
     event_type: str

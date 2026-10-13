@@ -54,6 +54,17 @@ export default {
       }
     },
     {
+      // 215 E6：调度与Worker心跳只读看板（零写；启停走既有端点并落审计）
+      path: "/ops/scheduler-board",
+      name: "OpsSchedulerBoard",
+      component: () => import("@/views/ops/scheduler-board/index.vue"),
+      meta: {
+        title: "调度看板",
+        showLink: true,
+        auths: ["govern.executor.manage"]
+      }
+    },
+    {
       // 186 N1/O1：治理基础配置自 asset.ts 移入；页内按 owners/terms/tokens/snapshots 分区
       path: "/asset/admin",
       name: "AssetAdmin",

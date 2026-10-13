@@ -150,3 +150,82 @@ export function exportAuditLogs(params?: Record<string, any>) {
 export function getPlatformHealth() {
   return http.request<ApiResponse<Record<string, unknown>>>("get", "/api/v1/health");
 }
+
+// 215 E6：调度运营面只读看板（零写；数据=asset_scheduler_jobs+worker心跳+启停审计）
+export interface SchedulerSwitches {
+  identity_nightly_enabled: boolean;
+  dict_medical_push_enabled: boolean;
+  query_schedule_enabled: boolean;
+  quality_execution_scheduler_enabled: boolean;
+  ai_context_cache_cleanup_enabled: boolean;
+  scheduler_timezone: string;
+}
+
+export interface ScheduledJobRow {
+  id: number;
+  job_type: string;
+  source_code?: string | null;
+  schedule_cron?: string | null;
+  status?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  total_processed?: number | null;
+  total_changes?: number | null;
+  error_message?: string | null;
+}
+
+export interface QualityWorkerRow {
+  run_id: number;
+  run_code: string;
+  status: string;
+  detector_kind?: string | null;
+  started_at?: string | null;
+  heartbeat_at?: string | null;
+  heartbeat_age_seconds?: number | null;
+  lease_owner?: string | null;
+  lease_expires_at?: string | null;
+  lease_active: boolean;
+}
+
+export interface IdentityRunRow {
+  run_id: string;
+  triggered_by: string;
+  status: string;
+  lock_holder?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  provider_code?: string | null;
+  provider_heartbeat_at?: string | null;
+  provider_heartbeat_age_seconds?: number | null;
+}
+
+export interface SchedulerAuditRow {
+  id: number;
+  action: string;
+  operator?: string | null;
+  entity_type: string;
+  entity_ref: string;
+  reason?: string | null;
+  created_at?: string | null;
+}
+
+export interface SchedulerOpsBoard {
+  generated_at: string;
+  read_only: boolean;
+  scheduler_switches: SchedulerSwitches;
+  jobs_summary: {
+    total: number;
+    by_status: Record<string, number>;
+    by_trigger_mode: Record<string, number>;
+  };
+  scheduled_jobs: ScheduledJobRow[];
+  worker_heartbeats: {
+    quality_runs: QualityWorkerRow[];
+    identity_nightly: IdentityRunRow[];
+  };
+  scheduler_job_audit_trail: SchedulerAuditRow[];
+}
+
+export function getSchedulerOpsBoard() {
+  return http.request<ApiResponse<SchedulerOpsBoard>>("get", "/api/v1/govern/scheduler/ops-board");
+}
