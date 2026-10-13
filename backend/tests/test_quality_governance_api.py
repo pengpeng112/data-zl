@@ -364,6 +364,7 @@ class TestRbacAndScope:
                 "passed": True,
                 "reason": "跨科验证通过",
                 "resolution_summary": "复测通过",
+                "manual_evidence_note": "人工抽核通过（207 §4.4 人工路径证据说明）",
             },
         )
         assert rv.status_code == 200, rv.text
@@ -404,6 +405,19 @@ class TestFullLifecycleViaApi:
         assert r.status_code == 200
         lv = r.json()["lock_version"]
 
+        # 207 F12：分派目标须服务端解析有效身份（人员存在且经办有登录账号）
+        from app.models.auth import AuthUser as _AU
+        from app.models.identity import IdentityDepartment as _Dept
+
+        d = db_session
+        if not d.scalar(select(_Dept).where(_Dept.dept_code == "D-API")):
+            d.add(_Dept(dept_code="D-API", dept_name_cn="API测试科", status="active"))
+        if not d.scalar(select(IdentityPerson).where(IdentityPerson.person_code == "qg-handler-1")):
+            d.add(IdentityPerson(person_code="qg-handler-1", person_name_cn="经办一", dept_code="D-API"))
+        if not d.scalar(select(_AU).where(_AU.user_identifier == "qg-handler-1")):
+            d.add(_AU(username="u-qg-handler-1", password_hash="x",
+                      user_identifier="qg-handler-1", enabled=True))
+        d.commit()
         r = client.post(
             f"/api/v1/quality-issues/{issue_id}/assign",
             json={
@@ -447,6 +461,7 @@ class TestFullLifecycleViaApi:
                 "passed": True,
                 "reason": "复测通过：缺失率回落至 0.2%",
                 "resolution_summary": "已修复",
+                "manual_evidence_note": "人工复核观测 #1 通过（207 §4.4）",
             },
         )
         assert r.status_code == 200, r.text
@@ -625,7 +640,8 @@ class TestControlsApi:
             json={"expected_lock_version": lv2, "threshold_value": 2.5, "comparator": "gt"},
         )
         assert r.status_code == 200
-        assert r.json()["version"] == 2
+        # 207 F09：检测器绑定变化（上面的 detectors PATCH）也递增版本 → 3
+        assert r.json()["version"] == 3
 
     def test_control_list_and_observations(self, client, active_control):
         r = client.get("/api/v1/quality-controls", params={"keyword": active_control["code"]})

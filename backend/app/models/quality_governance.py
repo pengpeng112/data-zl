@@ -70,6 +70,15 @@ class QualityControl(Base):
     timezone = Column(String(64))
     verification_policy = Column(String(16), nullable=False, server_default="manual")
     required_pass_count = Column(Integer, server_default="1")
+    # 207 A1 增量：执行计划与调度贯通（缺失必须可解释，不猜测默认执行）
+    source_code = Column(String(64))
+    schedule_enabled = Column(String(8), nullable=False, server_default="false")
+    next_run_at = Column(TIMESTAMP(timezone=True))
+    last_run_at = Column(TIMESTAMP(timezone=True))
+    freshness_hours = Column(Integer)
+    recheck_policy = Column(String(16), server_default="auto")
+    sla_hours = Column(Integer)
+    execution_plan = Column(JSONB)
     lock_version = Column(Integer, nullable=False, server_default="0")
     created_by = Column(String(64))
     updated_by = Column(String(64))
@@ -232,6 +241,18 @@ class QualityIssue(Base):
     risk_reason = Column(Text)
     risk_approver = Column(String(64))
     risk_review_at = Column(Date)
+    # 207 A1/B2 增量：厂商督办 + 复测链
+    primary_vendor_code = Column(String(64))
+    supervisor_user_identifier = Column(String(64))
+    vendor_promised_at = Column(Date)
+    next_followup_at = Column(Date)
+    original_due_at = Column(Date)
+    remediation_submitted_at = Column(TIMESTAMP(timezone=True))
+    last_verification_run_id = Column(BigInteger)
+    recheck_substatus = Column(String(16), server_default="none")
+    recheck_note = Column(Text)
+    recheck_pass_streak = Column(Integer, nullable=False, server_default="0")
+    escalation_level = Column(Integer, nullable=False, server_default="0")
     false_positive_reason = Column(Text)
     suppressed_until = Column(Date)
     suppressed_control_version = Column(Integer)
@@ -241,6 +262,162 @@ class QualityIssue(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     archived_at = Column(TIMESTAMP(timezone=True))
+
+
+class QualityControlRevision(Base):
+    """207 A1：清单版本不可变快照。
+
+    每个 (control_id, version) 冻结当时完整口径（规则定义、检测器版本、源/对象
+    绑定、阈值、窗口/空值/采样/复测口径）；运行单引用快照，编辑清单不影响在途
+    任务。origin=current 表示激活/预检时从当前定义生成；backfill 表示 B4 工具
+    对既有清单的当前版本补建（不伪造历史版本）。
+    """
+
+    __tablename__ = "asset_quality_control_revisions"
+    __table_args__ = (
+        UniqueConstraint("control_id", "version", name="uq_asset_quality_control_revisions"),
+        Index("ix_asset_quality_control_revisions_control", "control_id"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    control_id = Column(
+        BigInteger,
+        ForeignKey("asset.asset_quality_controls.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    version = Column(Integer, nullable=False)
+    definition_snapshot = Column(JSONB, nullable=False)
+    scope_json = Column(JSONB)
+    source_code = Column(String(64))
+    object_key = Column(String(512))
+    detector_versions = Column(JSONB)
+    origin = Column(String(16), nullable=False, server_default="current")
+    created_by = Column(String(64))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class QualityRun(Base):
+    """207 A2：持久运行单（数据库为事实源）。
+
+    多检测器 = 父运行 + 每检测器一个子运行（parent_run_id）；worker 只领取子运行。
+    状态：queued/waiting_window/running/succeeded/partial/failed/cancelled/blocked。
+    运行成功 ≠ 数据通过：数据结论在 result_summary 与观测六态中。
+    """
+
+    __tablename__ = "asset_quality_runs"
+    __table_args__ = (
+        UniqueConstraint("run_code", name="uq_asset_quality_runs_code"),
+        # 幂等唯一：非空 idempotency_key 上唯一；空键回退行自身 id（父子行不冲突）
+        Index(
+            "uq_asset_quality_runs_idem",
+            "control_id",
+            text("COALESCE(NULLIF(idempotency_key, ''), 'row:' || id)"),
+            unique=True,
+        ),
+        Index("ix_asset_quality_runs_status", "status"),
+        Index("ix_asset_quality_runs_control", "control_id"),
+        Index("ix_asset_quality_runs_issue", "issue_id"),
+        Index("ix_asset_quality_runs_parent", "parent_run_id"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    run_code = Column(String(64), nullable=False)
+    control_id = Column(
+        BigInteger,
+        ForeignKey("asset.asset_quality_controls.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    revision_id = Column(
+        BigInteger,
+        ForeignKey("asset.asset_quality_control_revisions.id", ondelete="SET NULL"),
+    )
+    parent_run_id = Column(BigInteger, ForeignKey("asset.asset_quality_runs.id", ondelete="CASCADE"))
+    issue_id = Column(BigInteger, ForeignKey("asset.asset_quality_issues.id", ondelete="SET NULL"))
+    purpose = Column(String(16), nullable=False, server_default="check")
+    trigger_kind = Column(String(16), nullable=False, server_default="manual")
+    requested_by = Column(String(64))
+    status = Column(String(16), nullable=False, server_default="queued")
+    detector_id = Column(BigInteger)
+    detector_kind = Column(String(16))
+    detector_ref = Column(String(64))
+    scope_key = Column(String(256))
+    scope_json = Column(JSONB)
+    system_code = Column(String(64))
+    source_code = Column(String(64))
+    object_key = Column(String(512))
+    window_start = Column(Date)
+    window_end = Column(Date)
+    scheduled_for = Column(TIMESTAMP(timezone=True))
+    next_window_at = Column(TIMESTAMP(timezone=True))
+    started_at = Column(TIMESTAMP(timezone=True))
+    finished_at = Column(TIMESTAMP(timezone=True))
+    heartbeat_at = Column(TIMESTAMP(timezone=True))
+    lease_owner = Column(String(64))
+    lease_expires_at = Column(TIMESTAMP(timezone=True))
+    attempt = Column(Integer, nullable=False, server_default="0")
+    max_attempts = Column(Integer, nullable=False, server_default="3")
+    idempotency_key = Column(String(128))
+    result_summary = Column(JSONB)
+    error_code = Column(String(32))
+    error_message_sanitized = Column(Text)
+    cancel_requested = Column(String(8), nullable=False, server_default="false")
+    cancelled_reason = Column(Text)
+    budget_json = Column(JSONB)
+    lock_version = Column(Integer, nullable=False, server_default="0")
+    created_by = Column(String(64))
+    updated_by = Column(String(64))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class QualityVendor(Base):
+    """207 B2：厂商台账（首期院内经办人代录，不做外部门户，不存凭据）。"""
+
+    __tablename__ = "asset_quality_vendors"
+    __table_args__ = (
+        UniqueConstraint("vendor_code", name="uq_asset_quality_vendors_code"),
+        Index("ix_asset_quality_vendors_status", "status"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    vendor_code = Column(String(64), nullable=False)
+    vendor_name = Column(String(256), nullable=False)
+    status = Column(String(16), nullable=False, server_default="active")
+    contact_note = Column(Text)
+    related_system_codes = Column(JSONB)
+    remark = Column(Text)
+    lock_version = Column(Integer, nullable=False, server_default="0")
+    created_by = Column(String(64))
+    updated_by = Column(String(64))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class QualityNotification(Base):
+    """207 B2：站内待办/提醒（幂等；不外发微信/邮件/第三方工单）。"""
+
+    __tablename__ = "asset_quality_notifications"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_asset_quality_notifications_idem"),
+        Index("ix_asset_quality_notifications_recipient", "recipient"),
+        Index("ix_asset_quality_notifications_issue", "issue_id"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    issue_id = Column(BigInteger, ForeignKey("asset.asset_quality_issues.id", ondelete="SET NULL"))
+    run_id = Column(BigInteger)
+    recipient = Column(String(64), nullable=False)
+    notify_type = Column(String(32), nullable=False)
+    idempotency_key = Column(String(160), nullable=False)
+    payload = Column(JSONB)
+    read_at = Column(TIMESTAMP(timezone=True))
+    handled_at = Column(TIMESTAMP(timezone=True))
+    handled_note = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
 class QualityIssueEvent(Base):

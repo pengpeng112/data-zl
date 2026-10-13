@@ -11,7 +11,7 @@ from ..core.db import SessionLocal
 from ..models.asset_system import AssetDataSource
 from ..services.credentials import resolve
 from ..services.data_masking import mask_sensitive, sanitize_text
-from ..services.db_connectors import DB_CONNECTOR_MAP
+from ..services.db_connectors import DB_CONNECTOR_MAP, transport_kwargs
 
 
 STAT_TOTAL_KEYS = ("TOTAL_CNT", "TOTAL_COUNT", "TOTAL", "CNT")
@@ -71,6 +71,7 @@ def _build_connector(source: AssetDataSource):
         user=user or "",
         password=password or "",
         connection_mode=source.connection_mode or "direct",
+        **transport_kwargs(db_type, getattr(source, "connection_options", None)),
     )
 
 
@@ -205,3 +206,45 @@ def execute_and_collect_findings(
             },
         })
     return findings
+
+
+def fetch_readonly_rows(
+    sql: str,
+    source_code: str,
+    *,
+    max_rows: int = 1000,
+    db: Session | None = None,
+) -> dict:
+    """207 跨源比对专用：受控只读原始行读取（服务端内部使用）。
+
+    与 execute_quality_sql 的区别：返回**原始行**（不脱敏）——行仅流入
+    quality_cross_source 比对器，在受控区内按原键比较；对外产物只有聚合
+    指标与去标识样本，患者明细不出服务端。SQL 安全校验与连接器复用既有链。
+    """
+    from ..services.quality_rule_engine import validate_sql_safety
+
+    validation = validate_sql_safety(sql or "")
+    if not validation.get("valid"):
+        return {"status": "invalid_sql", "rows": [],
+                "errors": validation.get("errors", [])}
+
+    owns_session = db is None
+    session = db or SessionLocal()
+    connector = None
+    try:
+        source = session.scalar(select(AssetDataSource).where(AssetDataSource.source_code == source_code))
+        if source is None:
+            return {"status": "source_not_found", "rows": [],
+                    "note": f"source_code not found: {source_code}"}
+        connector = _build_connector(source)
+        rows = connector.execute_readonly(sql, max_rows=max_rows)
+        truncated = len(rows) >= max(1, max_rows)
+        return {"status": "success", "rows": [dict(r) for r in rows[:max_rows]],
+                "truncated": truncated}
+    except Exception as exc:
+        return {"status": "failed", "rows": [], "note": sanitize_text(f"{type(exc).__name__}: {exc}", limit=500)}
+    finally:
+        if connector is not None:
+            connector.close()
+        if owns_session:
+            session.close()

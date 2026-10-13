@@ -165,7 +165,17 @@ def ingest_observation(
     db: Session = Depends(get_db),
     user: str = Depends(require_permission("quality.control.run")),
 ):
-    """受控来源观测摄取（幂等；重复 run_key 返回 duplicate）。"""
+    """受控来源观测摄取（幂等；重复 run_key 返回 duplicate）。
+
+    F06：HTTP 通道只能上报 external/manual 来源；source_kind=quality_run/probe_run
+    仅限平台 worker 服务身份在服务层直接写入，外部上传不能伪装可信自动复测。
+    """
+    trusted_kinds = ("quality_run", "probe_run")
+    if (req.source_kind or "external") in trusted_kinds:
+        raise HTTPException(
+            status_code=422,
+            detail=f"source_kind={req.source_kind} 为可信自动通道专用，外部上传只能使用 external/manual",
+        )
     try:
         result = qgs.apply_observation(
             db,
@@ -187,7 +197,9 @@ def ingest_observation(
             source_record_ref=req.source_record_ref,
             evidence_digest=req.evidence_digest,
             evidence_ref=req.evidence_ref,
-            historical_precision=req.historical_precision,
+            historical_precision=(
+                "external_upload" if req.historical_precision == "exact" else req.historical_precision
+            ),
             error_code=req.error_code,
             error_message_sanitized=req.error_message_sanitized,
             actor=user,

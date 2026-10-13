@@ -213,15 +213,19 @@ class TestObservationMerging:
         assert issue.issue_type == "monitoring_gap"
 
     def test_blocked_with_active_data_defect_links_not_duplicates(self, db_session):
+        """207 F08 后契约：blocked 观测建**独立**监测缺口单，不并入数据缺陷单。"""
         db = db_session
         control = _mk_control(db)
         _observe(db, control, run_key="r1", result="fail")
         db.commit()
         result = _observe(db, control, run_key="r2", result="blocked")
-        assert result["outcome"] == "issue_updated"
+        assert result["outcome"] == "monitoring_gap_created"
         issues = db.scalars(select(QualityIssue).where(QualityIssue.control_id == control.id)).all()
-        assert len(issues) == 1
-        assert issues[0].issue_type == "data_defect"
+        assert len(issues) == 2
+        types = sorted(i.issue_type for i in issues)
+        assert types == ["data_defect", "monitoring_gap"]
+        gap = [i for i in issues if i.issue_type == "monitoring_gap"][0]
+        assert gap.scope_key.startswith("monitoring:")  # 独立归并键
 
     def test_no_data_policy_blocked_maps_to_monitoring_gap(self, db_session):
         db = db_session

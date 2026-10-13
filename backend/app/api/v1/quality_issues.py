@@ -65,6 +65,19 @@ class IssueOut(BaseModel):
     due_at: date | None
     wait_kind: str | None
     external_ticket_ref: str | None
+    # 207 增量：厂商督办 + 复测链（U02/U05）
+    wait_note: str | None = None
+    primary_vendor_code: str | None = None
+    supervisor_user_identifier: str | None = None
+    vendor_promised_at: date | None = None
+    next_followup_at: date | None = None
+    original_due_at: date | None = None
+    remediation_submitted_at: datetime | None = None
+    last_verification_run_id: int | None = None
+    recheck_substatus: str | None = None
+    recheck_note: str | None = None
+    recheck_pass_streak: int = 0
+    escalation_level: int = 0
     latest_observation_id: int | None
     latest_metric_value: float | None
     latest_result_status: str | None
@@ -149,6 +162,7 @@ class RequestVerificationRequest(BaseModel):
     expected_lock_version: int
     reason: str = Field(..., min_length=1)
     action_plan: str | None = None
+    remediation_evidence_ref: str | None = Field(None, max_length=512)
     correlation_id: str | None = None
 
 
@@ -158,6 +172,9 @@ class VerifyRequest(BaseModel):
     reason: str = Field(..., min_length=1)
     resolution_summary: str | None = None
     verification_observation_id: int | None = None
+    # 207 F03：可信自动复测运行（policy=auto_recheck_manual_close 时必填且须通过校验）
+    verification_run_id: int | None = None
+    manual_evidence_note: str | None = None
     correlation_id: str | None = None
 
 
@@ -462,13 +479,30 @@ def assignment_departments(
 def assignment_persons(
     department_code: str | None = None,
     keyword: str | None = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     user: str = Depends(require_permission("quality.issue.read")),
 ):
+    """F12：分页 + 多科室（IdentityPersonDepartment 并集）+ 有效身份与可登录标记。
+
+    has_login=登录账号存在且启用；无账号可登记主责，但经办须指定可登录账号（代办）。
+    """
     _ensure_assignment_options_access(db, user)
+    from ...models.auth import AuthUser
+    from ...models.identity import IdentityPersonDepartment
+
     q = select(IdentityPerson)
     if department_code:
-        q = q.where(IdentityPerson.dept_code == department_code)
+        dept_persons = select(IdentityPersonDepartment.person_code).where(
+            IdentityPersonDepartment.dept_code == department_code
+        )
+        q = q.where(
+            or_(
+                IdentityPerson.dept_code == department_code,
+                IdentityPerson.person_code.in_(dept_persons),
+            )
+        )
     if keyword:
         q = q.where(
             or_(
@@ -476,7 +510,22 @@ def assignment_persons(
                 IdentityPerson.person_name_cn.ilike(f"%{keyword}%"),
             )
         )
-    rows = db.scalars(q.order_by(IdentityPerson.person_code).limit(500)).all()
+    total = db.scalar(select(func.count()).select_from(q.subquery())) or 0
+    rows = db.scalars(
+        q.order_by(IdentityPerson.person_code)
+        .offset((page - 1) * page_size).limit(page_size)
+    ).all()
+    if rows:
+        logins = {
+            u.user_identifier: u.enabled
+            for u in db.scalars(
+                select(AuthUser).where(
+                    AuthUser.user_identifier.in_([r.person_code for r in rows])
+                )
+            ).all()
+        }
+    else:
+        logins = {}
     return {
         "items": [
             {
@@ -485,9 +534,11 @@ def assignment_persons(
                 "dept_code": r.dept_code,
                 "dept_name_cn": r.dept_name_cn,
                 "employment_status": r.employment_status,
+                "has_login": logins.get(r.person_code) is True,
             }
             for r in rows
-        ]
+        ],
+        "total": total, "page": page, "page_size": page_size,
     }
 
 
@@ -580,6 +631,14 @@ def export_issues(
                 _csv_cell(r.risk_approver),
                 _csv_cell(r.risk_review_at),
                 _csv_cell(r.suppressed_until),
+                _csv_cell(r.primary_vendor_code),
+                _csv_cell(r.vendor_promised_at),
+                _csv_cell(r.next_followup_at),
+                _csv_cell(r.supervisor_user_identifier),
+                _csv_cell(r.recheck_substatus),
+                _csv_cell(r.recheck_pass_streak),
+                _csv_cell(r.last_verification_run_id),
+                _csv_cell(r.remediation_submitted_at),
             ]
         )
 
@@ -778,6 +837,71 @@ def patch_issue(
     return _command_response(db, issue, user)
 
 
+def _validate_assignment_targets(
+    db: Session,
+    *,
+    responsible_person_code: str | None = None,
+    assignee_user_identifier: str | None = None,
+    responsible_dept_code: str | None = None,
+) -> dict[str, Any]:
+    """F12：服务端解析目标身份（不信任客户端快照）；无效分派 422。
+
+    - 责任人必须存在且未离职；经办人必须存在且有可用登录账号（可接收待办）；
+    - 姓名快照一律服务端从 IdentityPerson 解析，客户端传入值被忽略。
+    """
+    out: dict[str, Any] = {
+        "responsible_person_name_snapshot": None,
+        "assignee_name_snapshot": None,
+        "responsible_dept_name_snapshot": None,
+    }
+    if responsible_dept_code:
+        dept = db.scalar(
+            select(IdentityDepartment).where(IdentityDepartment.dept_code == responsible_dept_code)
+        )
+        if dept is None or dept.status != "active":
+            raise HTTPException(
+                status_code=422,
+                detail=f"责任科室无效或停用: {responsible_dept_code}",
+            )
+        out["responsible_dept_name_snapshot"] = dept.dept_name_cn
+    if responsible_person_code:
+        person = db.scalar(
+            select(IdentityPerson).where(IdentityPerson.person_code == responsible_person_code)
+        )
+        if person is None:
+            raise HTTPException(status_code=422, detail=f"责任人不存在: {responsible_person_code}")
+        if (person.employment_status or "").strip() in ("离职", "retired", "resigned", "terminated"):
+            raise HTTPException(
+                status_code=422, detail=f"责任人已离职，不能接单: {responsible_person_code}",
+            )
+        out["responsible_person_name_snapshot"] = person.person_name_cn
+    if assignee_user_identifier:
+        from ...models.auth import AuthUser
+
+        person = db.scalar(
+            select(IdentityPerson).where(IdentityPerson.person_code == assignee_user_identifier)
+        )
+        if person is None:
+            raise HTTPException(
+                status_code=422, detail=f"经办人不存在: {assignee_user_identifier}",
+            )
+        if (person.employment_status or "").strip() in ("离职", "retired", "resigned", "terminated"):
+            raise HTTPException(
+                status_code=422, detail=f"经办人已离职: {assignee_user_identifier}",
+            )
+        login = db.scalar(
+            select(AuthUser).where(AuthUser.user_identifier == assignee_user_identifier)
+        )
+        if login is None or not login.enabled:
+            raise HTTPException(
+                status_code=422,
+                detail=f"经办人 {assignee_user_identifier} 无可用登录账号；可先登记主责（代办），"
+                       "指定可登录经办后再接收待办",
+            )
+        out["assignee_name_snapshot"] = person.person_name_cn
+    return out
+
+
 @router.post("/{issue_id}/assign")
 def assign_issue(
     issue_id: int,
@@ -788,6 +912,16 @@ def assign_issue(
     issue = _get_issue_or_404(db, issue_id)
     perm = _user_permission_map(db, user)
     _ensure_write_access(db, issue, user, perm, detail="无权分派该问题（超出本人/本科室范围）")
+    validated = _validate_assignment_targets(
+        db,
+        responsible_person_code=req.responsible_person_code,
+        assignee_user_identifier=req.assignee_user_identifier,
+        responsible_dept_code=req.responsible_dept_code,
+    )
+    explicit = {
+        k for k in req.model_fields_set
+        if k in ("responsible_dept_code", "responsible_person_code", "assignee_user_identifier")
+    }
     try:
         qgs.assign_issue(
             db,
@@ -796,9 +930,10 @@ def assign_issue(
             responsible_dept_code=req.responsible_dept_code,
             responsible_person_code=req.responsible_person_code,
             assignee_user_identifier=req.assignee_user_identifier,
-            responsible_dept_name_snapshot=req.responsible_dept_name_snapshot,
-            responsible_person_name_snapshot=req.responsible_person_name_snapshot,
-            assignee_name_snapshot=req.assignee_name_snapshot,
+            responsible_dept_name_snapshot=validated["responsible_dept_name_snapshot"],
+            responsible_person_name_snapshot=validated["responsible_person_name_snapshot"],
+            assignee_name_snapshot=validated["assignee_name_snapshot"],
+            explicit_fields=explicit,
             actor=user,
             reason=req.reason,
             correlation_id=req.correlation_id,
@@ -871,9 +1006,11 @@ def request_verification(
     db: Session = Depends(get_db),
     user: str = Depends(require_permission("quality.issue.handle")),
 ):
+    """F02：状态变更与复测任务创建同事务；返回 verification_run_id/计划时点。"""
     issue = _get_issue_or_404(db, issue_id)
     perm = _user_permission_map(db, user)
     _ensure_write_access(db, issue, user, perm, detail="无权处理该问题（超出本人/本科室范围）")
+    recheck_info: dict[str, Any] = {"mode": "manual_required", "verification_run_id": None}
     try:
         qgs.request_verification(
             db,
@@ -882,8 +1019,54 @@ def request_verification(
             actor=user,
             reason=req.reason,
             action_plan=req.action_plan,
+            remediation_evidence_ref=req.remediation_evidence_ref,
             correlation_id=req.correlation_id,
         )
+        # 同一事务内创建自动复测运行（有活动自动检测器且 recheck_policy=auto 时）
+        if issue.control_id is not None:
+            control = db.get(QualityControl, issue.control_id)
+            if control is not None and (control.recheck_policy or "auto") == "auto":
+                from ...models.quality_governance import QualityControlDetector
+
+                has_auto = db.scalar(
+                    select(func.count()).select_from(
+                        select(QualityControlDetector).where(
+                            QualityControlDetector.control_id == control.id,
+                            QualityControlDetector.status == "active",
+                            QualityControlDetector.detector_kind.in_(("quality_rule", "probe_template", "value_domain")),
+                        ).subquery()
+                    )
+                )
+                if has_auto:
+                    if control.lifecycle_status != "active":
+                        recheck_info = {
+                            "mode": "blocked", "verification_run_id": None,
+                            "blocked_reasons": [f"清单生命周期状态 {control.lifecycle_status}，复测暂不可执行"],
+                        }
+                    else:
+                        from ...services import quality_execution_service as qes
+
+                        result = qes.create_run(
+                            db, control, purpose="recheck", trigger_kind="recheck",
+                            requested_by=user,
+                            idempotency_key=f"recheck:{issue.id}:{issue.lock_version}",
+                            issue_id=issue.id, actor=user,
+                        )
+                        if result.get("manual_required") or result.get("run") is None:
+                            recheck_info = {
+                                "mode": "manual_required", "verification_run_id": None,
+                                "blocked_reasons": result.get("blocked_reasons", []),
+                            }
+                        else:
+                            run = result["run"]
+                            recheck_info = {
+                                "mode": "auto",
+                                "verification_run_id": run.id,
+                                "run_status": run.status,
+                                "next_window_at": run.next_window_at.isoformat()
+                                if run.next_window_at else None,
+                                "blocked_reasons": result.get("blocked_reasons", []),
+                            }
         db.commit()
     except qgs.LockConflictError as exc:
         db.rollback()
@@ -895,7 +1078,9 @@ def request_verification(
         db.rollback()
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     db.refresh(issue)
-    return _command_response(db, issue, user)
+    out = _command_response(db, issue, user)
+    out["recheck"] = recheck_info
+    return out
 
 
 @router.post("/{issue_id}/verify")
@@ -905,6 +1090,12 @@ def verify_issue(
     db: Session = Depends(get_db),
     user: str = Depends(require_permission("quality.issue.verify")),
 ):
+    """F03：自动规则问题必须绑定本问题有效可信复测证据才能关闭。
+
+    - 他人问题 PASS / 旧 PASS / 不同范围 / 手工伪造 / 阈值放宽 → 422/409 拒绝；
+    - 管理员也不能豁免缺少数据证据（T19）；
+    - 手工清单（policy=manual）保留人工验证路径，但必须留独立证据说明。
+    """
     issue = _get_issue_or_404(db, issue_id)
     perm = _user_permission_map(db, user)
     _ensure_write_access(
@@ -917,6 +1108,32 @@ def verify_issue(
             status_code=403,
             detail="复测验证不能由最后提交待复测的同一经办人完成（管理员豁免除外）",
         )
+    # ── F03 可信证据强校验（管理员不豁免） ──
+    evidence: dict[str, Any] = {"kind": "manual"}
+    if req.passed:
+        if req.verification_run_id is not None and req.verification_run_id != issue.last_verification_run_id:
+            raise HTTPException(
+                status_code=422,
+                detail=f"verification_run_id {req.verification_run_id} 不是本问题最新复测运行"
+                       f"（当前绑定 #{issue.last_verification_run_id}）",
+            )
+        from ...services import quality_execution_service as qes
+
+        ok, errors, evidence = qes.evaluate_trusted_recheck(db, issue)
+        if not ok:
+            # 证据不适用 → 422；并发/失效（复测后又有新 FAIL/版本变化）→ 409
+            stale = any(("更新" in e or "版本" in e) for e in errors)
+            raise HTTPException(
+                status_code=409 if stale else 422,
+                detail="可信复测证据校验未通过：" + "；".join(errors),
+            )
+        if evidence.get("kind") == "manual_policy" or evidence.get("kind") == "manual_no_control":
+            # 人工路径：必须留独立证据说明或观测引用（界面明确与自动实测不同）
+            if not (req.manual_evidence_note or "").strip() and req.verification_observation_id is None:
+                raise HTTPException(
+                    status_code=422,
+                    detail="人工验证路径必须提供独立证据说明或观测引用（与自动实测区分）",
+                )
     try:
         qgs.verify_issue(
             db,
@@ -927,6 +1144,7 @@ def verify_issue(
             reason=req.reason,
             resolution_summary=req.resolution_summary,
             verification_observation_id=req.verification_observation_id,
+            evidence_snapshot=evidence,
             correlation_id=req.correlation_id,
         )
         db.commit()
@@ -1035,6 +1253,215 @@ def add_comment(
 
 
 # ─────────────────────────────────────────────────────────────────────────
+# 207 B1/B2：批量分派、厂商跟进、催办
+# ─────────────────────────────────────────────────────────────────────────
+
+class BatchAssignItem(BaseModel):
+    issue_id: int
+    expected_lock_version: int
+
+
+class BatchAssignRequest(BaseModel):
+    items: list[BatchAssignItem] = Field(..., min_length=1, max_length=50)
+    responsible_dept_code: str | None = None
+    responsible_person_code: str | None = None
+    assignee_user_identifier: str | None = None
+    reason: str | None = None
+    idempotency_key: str | None = Field(None, max_length=128)
+
+
+@router.post("/batch-assign")
+def batch_assign(
+    req: BatchAssignRequest,
+    db: Session = Depends(get_db),
+    user: str = Depends(require_permission("quality.issue.assign")),
+):
+    """批量分派：逐单校验+乐观锁，逐条反馈成功/冲突/无权限；失败项零变更。"""
+    validated = _validate_assignment_targets(
+        db,
+        responsible_person_code=req.responsible_person_code,
+        assignee_user_identifier=req.assignee_user_identifier,
+        responsible_dept_code=req.responsible_dept_code,
+    )
+    explicit = {
+        k for k in req.model_fields_set
+        if k in ("responsible_dept_code", "responsible_person_code", "assignee_user_identifier")
+    }
+    results: list[dict[str, Any]] = []
+    for item in req.items:
+        entry: dict[str, Any] = {"issue_id": item.issue_id}
+        issue = db.get(QualityIssue, item.issue_id)
+        if issue is None:
+            entry.update(ok=False, error="not_found")
+            results.append(entry)
+            continue
+        perm = _user_permission_map(db, user)
+        try:
+            _ensure_write_access(db, issue, user, perm, detail="无权分派该问题（超出本人/本科室范围）")
+            qgs.assign_issue(
+                db, issue,
+                expected_lock_version=item.expected_lock_version,
+                responsible_dept_code=req.responsible_dept_code,
+                responsible_person_code=req.responsible_person_code,
+                assignee_user_identifier=req.assignee_user_identifier,
+                responsible_dept_name_snapshot=validated["responsible_dept_name_snapshot"],
+                responsible_person_name_snapshot=validated["responsible_person_name_snapshot"],
+                assignee_name_snapshot=validated["assignee_name_snapshot"],
+                explicit_fields=explicit,
+                actor=user, reason=req.reason,
+            )
+            db.commit()  # 逐单独立事务：失败项不影响已成功项（原子性约定=单级）
+            entry.update(ok=True, issue_code=issue.issue_code, lock_version=issue.lock_version)
+        except HTTPException as exc:
+            db.rollback()
+            entry.update(ok=False, error=str(exc.detail), status_code=exc.status_code)
+        except qgs.LockConflictError as exc:
+            db.rollback()
+            entry.update(ok=False, error=str(exc), status_code=409)
+        except qgs.TransitionError as exc:
+            db.rollback()
+            entry.update(ok=False, error=str(exc), status_code=409)
+        except qgs.IssueValidationError as exc:
+            db.rollback()
+            entry.update(ok=False, error=str(exc), status_code=422)
+        results.append(entry)
+    ok_count = sum(1 for r in results if r.get("ok"))
+    db.add(GovernAuditLog(
+        module="quality_governance", entity_type="quality_issue", entity_ref="batch-assign",
+        action="batch_assign",
+        after_data={"total": len(results), "ok": ok_count,
+                    "assignee": req.assignee_user_identifier, "reason": req.reason,
+                    "idempotency_key": req.idempotency_key},
+        operator=user,
+    ))
+    db.commit()
+    return {"items": results, "total": len(results), "ok": ok_count,
+            "failed": len(results) - ok_count}
+
+
+class FollowupRequest(BaseModel):
+    kind: str = Field(..., pattern="^(progress|ticket|commitment|remind)$")
+    note: str = Field(..., min_length=1)
+    vendor_code: str | None = None
+    external_ticket_ref: str | None = Field(None, max_length=128)
+    vendor_promised_at: date | None = None
+    next_followup_at: date | None = None
+    root_cause: str | None = None
+    remediation_plan: str | None = None
+    evidence_ref: str | None = Field(None, max_length=512)
+    change_due_at: date | None = None
+    change_due_reason: str | None = None
+    correlation_id: str | None = None
+
+
+@router.post("/{issue_id}/followups")
+def add_followup(
+    issue_id: int,
+    req: FollowupRequest,
+    db: Session = Depends(get_db),
+    user: str = Depends(require_permission("quality.issue.handle")),
+):
+    """B2 厂商跟进：代录回执/进展/承诺；延期必须留理由并保留原截止日期。"""
+    issue = _get_issue_or_404(db, issue_id)
+    perm = _user_permission_map(db, user)
+    _ensure_write_access(db, issue, user, perm, detail="无权处理该问题（超出本人/本科室范围）")
+    if issue.status in qgs.ISSUE_TERMINAL_STATUSES:
+        raise HTTPException(status_code=409, detail=f"终态问题（{issue.status}）不能追加跟进")
+    if req.vendor_code:
+        from ...models.quality_governance import QualityVendor
+
+        vendor = db.scalar(
+            select(QualityVendor).where(QualityVendor.vendor_code == req.vendor_code)
+        )
+        if vendor is None or vendor.status != "active":
+            raise HTTPException(status_code=422, detail=f"厂商无效或停用: {req.vendor_code}")
+    before = {
+        "primary_vendor_code": issue.primary_vendor_code,
+        "vendor_promised_at": issue.vendor_promised_at.isoformat() if issue.vendor_promised_at else None,
+        "next_followup_at": issue.next_followup_at.isoformat() if issue.next_followup_at else None,
+        "due_at": issue.due_at.isoformat() if issue.due_at else None,
+    }
+    if req.vendor_code:
+        issue.primary_vendor_code = req.vendor_code
+    if req.external_ticket_ref is not None:
+        issue.external_ticket_ref = req.external_ticket_ref
+    if req.vendor_promised_at is not None:
+        issue.vendor_promised_at = req.vendor_promised_at
+    if req.next_followup_at is not None:
+        issue.next_followup_at = req.next_followup_at
+    if req.change_due_at is not None:
+        if not (req.change_due_reason or "").strip():
+            raise HTTPException(status_code=422, detail="延期必须填写理由")
+        if issue.original_due_at is None and issue.due_at:
+            issue.original_due_at = issue.due_at  # 保留原截止，不用改日期消除逾期
+        issue.due_at = req.change_due_at
+    after = {
+        "primary_vendor_code": issue.primary_vendor_code,
+        "vendor_promised_at": issue.vendor_promised_at.isoformat() if issue.vendor_promised_at else None,
+        "next_followup_at": issue.next_followup_at.isoformat() if issue.next_followup_at else None,
+        "due_at": issue.due_at.isoformat() if issue.due_at else None,
+    }
+    qgs._bump(issue, user)
+    qgs.add_event(
+        db, issue, "followup_added", reason=req.note, actor=user,
+        correlation_id=req.correlation_id,
+        before={**before, "kind": req.kind},
+        after={**after, "kind": req.kind, "root_cause": req.root_cause,
+               "remediation_plan": req.remediation_plan, "evidence_ref": req.evidence_ref,
+               "change_due_reason": req.change_due_reason},
+    )
+    db.add(GovernAuditLog(
+        module="quality_governance", entity_type="quality_issue",
+        entity_ref=issue.issue_code, action="followup",
+        after_data={"kind": req.kind, "vendor_code": req.vendor_code}, operator=user,
+        reason=req.note,
+    ))
+    db.commit()
+    db.refresh(issue)
+    return _command_response(db, issue, user)
+
+
+class RemindRequest(BaseModel):
+    reason: str = Field(..., min_length=1)
+    correlation_id: str | None = None
+
+
+@router.post("/{issue_id}/remind")
+def remind_issue(
+    issue_id: int,
+    req: RemindRequest,
+    db: Session = Depends(get_db),
+    user: str = Depends(require_permission("quality.issue.assign")),
+):
+    """催办：事件 + 站内待办（每日每单至多 1 条，幂等键含日期）。"""
+    issue = _get_issue_or_404(db, issue_id)
+    perm = _user_permission_map(db, user)
+    _ensure_write_access(db, issue, user, perm, detail="无权催办该问题（超出本人/本科室范围）")
+    if issue.status in qgs.ISSUE_TERMINAL_STATUSES:
+        raise HTTPException(status_code=409, detail=f"终态问题（{issue.status}）无需催办")
+    from ...services import quality_execution_service as qes
+
+    today = date.today()
+    recipient = issue.assignee_user_identifier or issue.responsible_person_code or qes.NOTIFY_POOL_RECIPIENT
+    notification = qes.create_notification(
+        db, issue_id=issue.id, run_id=None, recipient=recipient, notify_type="reminded",
+        payload={"issue_code": issue.issue_code, "reason": req.reason, "by": user},
+        idempotency_key=f"reminded:{issue.id}:{today.isoformat()}",
+    )
+    qgs.add_event(
+        db, issue, "reminded",
+        reason=req.reason + ("（今日已催办，待办不重复）" if notification is None else ""),
+        actor=user, correlation_id=req.correlation_id,
+        after={"notification_id": notification.id if notification else None},
+    )
+    db.commit()
+    db.refresh(issue)
+    out = _command_response(db, issue, user)
+    out["notification_created"] = notification is not None
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────
 # 受控导出（六硬约束；字面量路由先于 /{issue_id} 注册）
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -1052,6 +1479,10 @@ ISSUE_EXPORT_COLUMNS = (
     "first_seen_at", "last_seen_at",
     "resolution_summary", "risk_reason", "risk_approver", "risk_review_at",
     "suppressed_until",
+    # 207：厂商督办与复测结论（无患者明细；证据以受控引用形式导出）
+    "primary_vendor_code", "vendor_promised_at", "next_followup_at",
+    "supervisor_user_identifier", "recheck_substatus", "recheck_pass_streak",
+    "last_verification_run_id", "remediation_submitted_at",
 )
 ISSUE_EXPORT_LIMIT = 5000
 

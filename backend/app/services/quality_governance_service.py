@@ -103,6 +103,13 @@ EVENT_TYPES = (
     "risk_accepted",
     "suppression_set",
     "duplicate_marked",
+    # 207 新增：厂商跟进/催办/自动复测结论/运行挂接
+    "followup_added",
+    "reminded",
+    "recheck_passed",
+    "recheck_failed",
+    "recheck_blocked",
+    "run_linked",
 )
 
 
@@ -281,18 +288,33 @@ def _bump(issue: QualityIssue, actor: str | None) -> None:
 # ─────────────────────────────────────────────────────────────────────────
 
 def find_active_issue(
-    db: Session, control_id: int, scope_key: str
+    db: Session, control_id: int, scope_key: str, *, issue_type: str = "data_defect"
 ) -> QualityIssue | None:
-    return db.scalar(
-        select(QualityIssue)
-        .where(
-            QualityIssue.control_id == control_id,
-            QualityIssue.scope_key == scope_key,
-            QualityIssue.archived_at.is_(None),
-            QualityIssue.status.notin_(ISSUE_TERMINAL_STATUSES),
-        )
-        .order_by(QualityIssue.id.desc())
+    """按类型查活动问题。
+
+    207 F08：monitoring_gap 使用带前缀的独立归并键（monitoring:{scope}），
+    监测故障不再与数据缺陷共用同一活动问题；data_defect 查询排除 monitoring_gap。
+    """
+    q = select(QualityIssue).where(
+        QualityIssue.control_id == control_id,
+        QualityIssue.archived_at.is_(None),
+        QualityIssue.status.notin_(ISSUE_TERMINAL_STATUSES),
     )
+    if issue_type == "monitoring_gap":
+        q = q.where(
+            QualityIssue.scope_key == _monitoring_scope_key(scope_key),
+            QualityIssue.issue_type == "monitoring_gap",
+        )
+    else:
+        q = q.where(
+            QualityIssue.scope_key == scope_key,
+            QualityIssue.issue_type != "monitoring_gap",
+        )
+    return db.scalar(q.order_by(QualityIssue.id.desc()))
+
+
+def _monitoring_scope_key(scope_key: str) -> str:
+    return ("monitoring:" + (scope_key or ""))[:256]
 
 
 def _suppression_active(db: Session, control_id: int, scope_key: str, control_version: int) -> bool:
@@ -313,17 +335,23 @@ def _suppression_active(db: Session, control_id: int, scope_key: str, control_ve
 
 
 def _latest_terminal_issue(
-    db: Session, control_id: int, scope_key: str
+    db: Session, control_id: int, scope_key: str, *, issue_type: str = "data_defect"
 ) -> QualityIssue | None:
-    return db.scalar(
-        select(QualityIssue)
-        .where(
-            QualityIssue.control_id == control_id,
-            QualityIssue.scope_key == scope_key,
-            QualityIssue.status.in_(("resolved", "accepted_risk")),
-        )
-        .order_by(QualityIssue.id.desc())
+    q = select(QualityIssue).where(
+        QualityIssue.control_id == control_id,
+        QualityIssue.status.in_(("resolved", "accepted_risk")),
     )
+    if issue_type == "monitoring_gap":
+        q = q.where(
+            QualityIssue.scope_key == _monitoring_scope_key(scope_key),
+            QualityIssue.issue_type == "monitoring_gap",
+        )
+    else:
+        q = q.where(
+            QualityIssue.scope_key == scope_key,
+            QualityIssue.issue_type != "monitoring_gap",
+        )
+    return db.scalar(q.order_by(QualityIssue.id.desc()))
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -486,7 +514,8 @@ def _merge_fail(
     correlation_id: str | None,
     issue_type: str,
 ) -> dict[str, Any]:
-    active = find_active_issue(db, control.id, scope_key)
+    # F08：monitoring_gap 用独立归并键查活动问题（监测故障不并入数据缺陷单）
+    active = find_active_issue(db, control.id, scope_key, issue_type=issue_type)
     if active is not None:
         obs.issue_id = active.id
         active.latest_observation_id = obs.id
@@ -514,8 +543,13 @@ def _merge_fail(
     if issue_type == "data_defect" and _suppression_active(db, control.id, scope_key, eff_version):
         return {"outcome": "suppressed", "observation_id": obs.id, "issue_id": None, "issue_code": None}
 
+    # F10：accepted_risk 有效期抑制——复审日期未到时不新建复发单（观测照记）；
+    # 到期后 FAIL 重新发现（复发链），绝不计作整改通过。
+    if issue_type == "data_defect" and _risk_acceptance_active(db, control.id, scope_key):
+        return {"outcome": "risk_suppressed", "observation_id": obs.id, "issue_id": None, "issue_code": None}
+
     # 复发链：同 control+scope 上一条已关闭问题 → recurrence_of + recurrence_no+1
-    prev = _latest_terminal_issue(db, control.id, scope_key)
+    prev = _latest_terminal_issue(db, control.id, scope_key, issue_type=issue_type)
     recurrence_of = prev.id if prev is not None else None
     recurrence_no = (prev.recurrence_no + 1) if prev is not None else 0
 
@@ -533,7 +567,7 @@ def _merge_fail(
         related_system_codes=control.related_system_codes,
         object_key=control.object_key,
         object_name_snapshot=control.object_name_snapshot,
-        scope_key=scope_key,
+        scope_key=_monitoring_scope_key(scope_key) if issue_type == "monitoring_gap" else scope_key,
         severity=(control.default_severity or "medium") if issue_type != "monitoring_gap" else "low",
         priority=(control.default_priority or "P3") if issue_type != "monitoring_gap" else "P4",
         status="new",
@@ -562,10 +596,26 @@ def _merge_fail(
         observation_id=obs.id,
         actor=actor,
         correlation_id=correlation_id,
-        after={"scope_key": scope_key, "recurrence_no": recurrence_no, "issue_type": issue_type},
+        after={"scope_key": issue.scope_key, "recurrence_no": recurrence_no, "issue_type": issue_type},
     )
     outcome = "monitoring_gap_created" if issue_type == "monitoring_gap" else "issue_created"
     return {"outcome": outcome, "observation_id": obs.id, "issue_id": issue.id, "issue_code": issue.issue_code}
+
+
+def _risk_acceptance_active(db: Session, control_id: int, scope_key: str) -> bool:
+    """未到期的 accepted_risk 抑制复发建单（F10；到期后允许重新发现）。"""
+    row = db.scalar(
+        select(QualityIssue)
+        .where(
+            QualityIssue.control_id == control_id,
+            QualityIssue.scope_key == scope_key,
+            QualityIssue.status == "accepted_risk",
+            QualityIssue.risk_review_at.isnot(None),
+            QualityIssue.risk_review_at >= date.today(),
+        )
+        .order_by(QualityIssue.id.desc())
+    )
+    return row is not None
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -683,25 +733,41 @@ def assign_issue(
     responsible_dept_name_snapshot: str | None = None,
     responsible_person_name_snapshot: str | None = None,
     assignee_name_snapshot: str | None = None,
+    explicit_fields: set[str] | None = None,
     actor: str,
     reason: str | None = None,
     correlation_id: str | None = None,
 ) -> QualityIssue:
+    """分派/转派。
+
+    207 §5.1：explicit_fields（请求实际携带的字段名集合）内的字段显式赋值——
+    允许清空旧经办（转派/取消）；未提供的字段保持原值（兼容旧客户端）。
+    """
     _check_lock(issue, expected_lock_version)
     if issue.status == "new":
         raise TransitionError("问题需先确认（acknowledged）再分派")
     if issue.status not in ("acknowledged", "assigned", "in_progress", "waiting_external"):
         raise TransitionError(f"当前状态 {issue.status} 不允许分派")
     before = _issue_snapshot(issue)
-    issue.responsible_dept_code = responsible_dept_code or issue.responsible_dept_code
-    issue.responsible_person_code = responsible_person_code or issue.responsible_person_code
-    issue.assignee_user_identifier = assignee_user_identifier or issue.assignee_user_identifier
+    targets = {
+        "responsible_dept_code": responsible_dept_code,
+        "responsible_person_code": responsible_person_code,
+        "assignee_user_identifier": assignee_user_identifier,
+    }
+    for key, value in targets.items():
+        if explicit_fields is not None and key in explicit_fields:
+            setattr(issue, key, value)  # 显式赋值（含清空）
+        elif value:
+            setattr(issue, key, value)
     if responsible_dept_name_snapshot is not None:
         issue.responsible_dept_name_snapshot = responsible_dept_name_snapshot
     if responsible_person_name_snapshot is not None:
         issue.responsible_person_name_snapshot = responsible_person_name_snapshot
     if assignee_name_snapshot is not None:
         issue.assignee_name_snapshot = assignee_name_snapshot
+    if explicit_fields and "assignee_user_identifier" in explicit_fields and not issue.assignee_user_identifier:
+        # 清空经办：快照同步清空，避免残留姓名误导
+        issue.assignee_name_snapshot = None
     from_status = issue.status
     if from_status == "acknowledged":
         issue.status = "assigned"
@@ -855,9 +921,15 @@ def request_verification(
     actor: str,
     reason: str,
     action_plan: str | None = None,
+    remediation_evidence_ref: str | None = None,
     correlation_id: str | None = None,
 ) -> QualityIssue:
-    """经办提交待复测：assigned/in_progress/waiting_external → waiting_verify。"""
+    """经办提交待复测：assigned/in_progress/waiting_external → waiting_verify。
+
+    F02：状态变更与复测任务创建须同事务——本函数登记整改提交时间与证据引用，
+    复测运行单由路由层在**同一事务**内调用 quality_execution_service.create_run
+    （purpose=recheck）创建；无自动检测器时不制造空执行单（manual_required）。
+    """
     _check_lock(issue, expected_lock_version)
     if issue.status not in ("assigned", "in_progress", "waiting_external"):
         raise TransitionError(f"当前状态 {issue.status} 不允许提交复测")
@@ -869,6 +941,9 @@ def request_verification(
     if action_plan is not None:
         issue.action_plan = action_plan
     issue.status = "waiting_verify"
+    issue.remediation_submitted_at = _now()
+    issue.recheck_substatus = "pending"
+    issue.recheck_note = None
     _bump(issue, actor)
     add_event(
         db,
@@ -880,7 +955,7 @@ def request_verification(
         actor=actor,
         correlation_id=correlation_id,
         before=before,
-        after=_issue_snapshot(issue),
+        after={**_issue_snapshot(issue), "remediation_evidence_ref": remediation_evidence_ref},
     )
     add_audit(
         db,
@@ -905,12 +980,14 @@ def verify_issue(
     reason: str,
     resolution_summary: str | None = None,
     verification_observation_id: int | None = None,
+    evidence_snapshot: dict[str, Any] | None = None,
     correlation_id: str | None = None,
 ) -> QualityIssue:
     """复测验证：waiting_verify → resolved（通过）或 in_progress（不通过）。
 
     验证人不能是最后一次提交 waiting_verify 的同一经办人（174 §7.5）；
     平台管理员豁免（路由层判断并强制 reason）。
+    207 F03：通过类证据快照（auto_recheck/manual）随事件落账，可追溯。
     """
     _check_lock(issue, expected_lock_version)
     if issue.status != "waiting_verify":
@@ -942,7 +1019,7 @@ def verify_issue(
         actor=actor,
         correlation_id=correlation_id,
         before=before,
-        after=_issue_snapshot(issue),
+        after={**_issue_snapshot(issue), **({"evidence": evidence_snapshot} if evidence_snapshot else {})},
     )
     add_audit(
         db,
@@ -952,7 +1029,7 @@ def verify_issue(
         operator=actor,
         reason=reason,
         before=before,
-        after=_issue_snapshot(issue),
+        after={**_issue_snapshot(issue), **({"evidence": evidence_snapshot} if evidence_snapshot else {})},
     )
     return issue
 
@@ -1031,6 +1108,13 @@ def patch_issue(
         "responsible_person_name_snapshot",
         "assignee_name_snapshot",
         "resolution_summary",
+        # 207 厂商督办字段（复测系统字段 recheck_* / last_verification_run_id
+        # / remediation_submitted_at 由 worker 与专用命令管理，禁止通用 PATCH）
+        "primary_vendor_code",
+        "supervisor_user_identifier",
+        "vendor_promised_at",
+        "next_followup_at",
+        "original_due_at",
     }
     blocked = {"status", "issue_code", "id", "lock_version", "control_id", "scope_key"}
     unknown = set(fields) - editable - blocked
