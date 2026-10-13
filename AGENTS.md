@@ -221,6 +221,12 @@ cd F:\python\数据资产\backend
 .\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
+迁移与提交卫生（215 E1 起纳入 check 工具族：alembic heads 链上迁移必须已被 git 跟踪，防干净克隆缺链环）：
+```powershell
+cd F:\python\数据资产
+python tools/check_migrations_tracked.py
+```
+
 前端（**必须用 pnpm**，仓库 `package.json` 有 `preinstall: only-allow pnpm`，锁文件为 `pnpm-lock.yaml`，用 npm/yarn 会失败或引入幻影依赖）：
 ```powershell
 cd F:\python\数据资产\frontend
