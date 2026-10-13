@@ -4,7 +4,7 @@
 
 契约（漂移四要素）：
 1. 键=仓库相对路径（编号仅关联字段；同号多文件不覆盖）；
-2. 字段白名单：path/category_line/status_hint/title/docstring_first_line/size/mtime；
+2. 字段白名单：path/category_line/status_hint/title/docstring_first_line/size/mtime/artifact_class；
    标题/docstring 首行做脱敏（身份/患者/凭据模式 → 掩码）；
 3. 过期判据：任一源文件 mtime 晚于 manifest.generated_at 即过期，须重生成；
 4. 本文件是缓存视图，不是权威入口——状态优先级 55 > README 分组 > 正文类别行；
@@ -33,6 +33,43 @@ CATEGORY = re.compile(r"^>\s*类别：(.+)$", re.M)
 H1 = re.compile(r"^#\s+(.+)$", re.M)
 
 
+def artifact_class(relative_path: str) -> str:
+    """用途分类，不推断完成状态；目录只登记自身，不递归读取私有资料。"""
+    parts = Path(relative_path).parts
+    name = parts[-1]
+    if len(parts) == 1 and name in {"INDEX.md", "AGENTS.md", "CLAUDE.md"}:
+        return "启动与规则"
+    if "_archive" in parts:
+        return "历史归档"
+    if parts[0] == ".agents":
+        return "共享技能与协作配置"
+    if parts[0] in {".zcode", ".v2c", ".video_agent", ".workbuddy"}:
+        return "工具私有域（保持原位）"
+    if parts[0] == ".ssh":
+        return "受控连接配置（保持原位）"
+    if parts[0] in {"_scratch", "artifacts"}:
+        return "临时与构建产物（核实后处理）"
+    if parts[0] == "drivers":
+        return "运行依赖（保持原位）"
+    if parts[0] in {"backend", "frontend", "deploy"}:
+        return "运行代码与部署"
+    if parts[0] == "tools":
+        return "维护工具"
+    if parts[0] in {"review", "verify"}:
+        return "评审与验收证据"
+    if parts[0] == "取数":
+        return "受控查询与交付目录"
+    if name == "README.md" or name.startswith("55_"):
+        return "权威目录或待办入口"
+    if name.startswith("output_r"):
+        return "专题运行证据"
+    if name.startswith("数据资产_") or Path(name).suffix in {".json", ".csv"}:
+        return "机器可读资产或配套结果"
+    if re.match(r"\d+_", name):
+        return "编号专题文档（依README确定角色）"
+    return "参考材料（依INDEX定位）"
+
+
 def sanitize(text: str) -> str:
     for pat, rep in SENSITIVE_PATTERNS:
         text = pat.sub(rep, text)
@@ -56,13 +93,15 @@ def entry(path: Path) -> dict:
     rel = path.relative_to(REPO).as_posix()
     e = {
         "path": rel,
+        "artifact_class": artifact_class(rel),
         "size": path.stat().st_size,
         "mtime": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(),
     }
     category_line = None
     if path.suffix == ".md":
         try:
-            head = path.read_text(encoding="utf-8", errors="ignore")[:4000]
+            with path.open(encoding="utf-8", errors="ignore") as stream:
+                head = stream.read(4000)
         except OSError:
             head = ""
         m = CATEGORY.search(head)
@@ -77,7 +116,8 @@ def entry(path: Path) -> dict:
             e["num"] = int(num.group(1))  # 关联字段，非键
     elif path.suffix == ".py":
         try:
-            doc = (path.read_text(encoding="utf-8", errors="ignore").split('"""')[1:2] or [""])[0]
+            with path.open(encoding="utf-8", errors="ignore") as stream:
+                doc = (stream.read(4000).split('"""')[1:2] or [""])[0]
             first = next((l.strip() for l in doc.splitlines() if l.strip()), "")
             if first:
                 e["docstring_first_line"] = sanitize(first[:100])
@@ -96,6 +136,7 @@ def build(sections: dict[str, list[Path]]) -> dict:
             items[e["path"]] = e
     return {
         "schema_version": 1,
+        "classification_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "contract": {
             "key": "relative path",
@@ -115,7 +156,15 @@ def main(argv: list[str] | None = None) -> int:
 
     kb = REPO / "开发起步包"
     sections = {
+        "root_routes": sorted(REPO.glob("*.md")),
+        "working_domains": [REPO / name for name in
+                           ("backend", "frontend", "deploy", "review", "verify", ".agents",
+                            "drivers", "artifacts", "_scratch", ".ssh",
+                            ".zcode", ".v2c", ".video_agent", ".workbuddy")
+                           if (REPO / name).is_dir()],
         "kb_md": sorted(kb.glob("*.md")),
+        "kb_companions": sorted(kb.glob("*.json")) + sorted(kb.glob("*.csv")),
+        "archives": sorted((kb / "_archive").glob("*")),
         "kb_asset_pkgs": sorted(kb.glob("数据资产_*")),
         "kb_output_r": sorted(kb.glob("output_r*")),
         "tools_py": sorted((REPO / "tools").glob("*.py")),
