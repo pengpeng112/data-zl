@@ -25,9 +25,9 @@
     {
       "path": "columns.csv",
       "role": "full",
-      "bytes": 10518423,
-      "rows": 178618,
-      "sha256": "976c07740ec19f80c212ba14168a5d5ddd7860ad5b070bcb2a14c9dc7d7cffa4",
+      "bytes": 10531225,
+      "rows": 178840,
+      "sha256": "79c1f87a396e20a747edd44af1baf75538bba004addd6290a2582dae22e2b74a",
       "pii_scan": []
     },
     {
@@ -65,9 +65,9 @@
     {
       "path": "tables.csv",
       "role": "full",
-      "bytes": 1124773,
-      "rows": 12811,
-      "sha256": "a4396cb268694c2bdcae969b4ce8c6ad8568ed640de7b4b38a20aa8426391710",
+      "bytes": 1126156,
+      "rows": 12817,
+      "sha256": "f706516489ca5026ed64f2ae08f74b28a62f93c3a60bfc645901b78251585099",
       "pii_scan": []
     },
     {
@@ -98,7 +98,8 @@
       "asset_quality_rules": 422
     },
     "annotations_note": "tables.csv 旧包策展注记（domain/grain/pk/confidence/note/source=curated）按 schema+table 保留；新行 source=platform",
-    "relationships_note": "from_table/to_table 为生产权威三段式（系统.Schema.表）"
+    "relationships_note": "from_table/to_table 为生产权威三段式（系统.Schema.表）",
+    "supplement_20261009": "live 补采 6 张医保表（INSURANCE.SETTLE_ZY_REC / INSUR_VSH_CENTER_ITEM_NEW / DRG_PERSON_INFO / OUTP_RCPT_MASTER_YB / FXHIS.PUB_PATIENTINFO_INSURE / SURGERY.OPERATION_MASTER，222 列；表 6 行），source=live_supplement；下次生产全量同步时若平台已登记会覆盖"
   },
   "catalog_summary": {
     "note": "catalog.json 是核心摘要，不是全量清单；全量见 role=full 的 CSV",

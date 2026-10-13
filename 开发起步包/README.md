@@ -48,6 +48,9 @@
 | 源码与工具 | backend/frontend/deploy/tools/drivers | 不随文档归档搬动运行依赖 |
 | 临时与构建 | _scratch/artifacts/缓存 | 核进程、归属和Git忽略后处理 |
 | 受限本机材料 | 取数/.ssh/工具隐藏目录 | 遵守脱敏、凭据和工具固定路径规则 |
+| 跨仓库 | 根目录三仓库三份 md | 地图是 L2 事实源；检查提示词是归档跳转；问题清单是历史评审 |
+| 外部案例 | `梁志刚数据治理(1).pdf` | 别院数据集实践，不覆盖 40 号口径和 55 |
+| 后续 AI 物理索引 | 根 `INDEX.md`「物理目录」 | 只回答去哪读。完成状态仍以 55 和本文件分组为准 |
 
 ## 当前入口
 
@@ -170,6 +173,7 @@
 | 目录 | 状态 | 用途 |
 |---|---|---|
 | `数据资产_资产包/` | 证据 | 数据中心机器可读表、字段、关系资产；含 `value_domains.json`（149 平台值域离线兜底：版本/内容哈希/导出时间/最大龄期 7 天，由 `tools/export_value_domains_json.py` 单向导出） |
+| `数据资产_新HIS逆向资产包/` | 证据 | 158 号凡科新 HIS 逆向产物：SQL 字典、dnfile 扫描、属性与关系候选。目录入口补在本表，结论仍以 158 正文为准 |
 | `数据资产_HIS源端资产包/` | 证据 | HIS 源端机器可读资产 |
 | `数据资产_HIS_READY复核包/`、`数据资产_HIS_READY治理导入包/`、`数据资产_HIS_READY二次优化包/`、`数据资产_HIS_READY专项核查包/` | 证据 | HIS_READY 活库复核、治理导入与专项核查产物 |
 | `数据资产_HRP源端资产包/` | 当前 | HRP 探查、复核、字段补采的机器可读输入输出 |
@@ -180,7 +184,9 @@
 | `数据资产_四系统源端资产包/` | 证据（已导入） | plan139 四源（core2db/体检/病理/职业病）机器可读资产包：manifest/catalog/objects/columns/constraints/indexes/routines/view_inventory/view_dependencies/relation_candidates/relation_validations/table_governance/import_plan/**import_result** + sources/ 四源子目录；2026-08-22 已幂等导入平台（run_id plan139-20260822T000829Z） |
 | `数据资产_OA源端资产包/` | 证据（已导入；gitignore 不入 Git） | 143 号医院 OA（万户 ezOFFICE）机器可读资产包：1,685 对象/29,956 字段/141 声明 FK/4 视图/12 项引擎与业务链路验证/5 条草稿证据 + import_result；run_id oa-20260822 |
 | `数据资产_七系统源端资产包/` | 证据（未导入平台） | 159 号七系统只读采集产物：4 快照（山大地纬/叫号/新输血/老输血）+ catalog.json + SHA256SUMS；gitignore 不入 Git，权威副本在 8.83 `/opt/data-asset/evidence/newsrc7-20260827/`；本地关系候选已按解析覆盖率修订，服务器副本待下次受控同步 |
-| `截图/` | 参考 | 用户提供的界面与视觉参考；本轮关系图谱以 `images.jpg` 为样式参考，明确不使用 `数据图谱.png` |
+| `截图/` | 目录已不在工作区（2026-10-12 复核） | 2026-08-12 曾作为图谱样式参考。界面证据改看 `output_r213/` 与 `output_r214/screenshots/` |
+| `梁志刚数据治理(1).pdf` | 参考 | 宣武医院从临床数据治理到高水平数据集的外部演示稿（2026-09-18）。只作借鉴，不作为本院表、关系或值域口径 |
+| `output_domain_baseline.txt` | 工具输出 | `tools/dev_env.sh --domain-baseline` 的默认他人域哈希。不是编号文档，不参与完成度判断 |
 | `系统表结构/` | 参考 | 原始 HIS/药房/EMR/移动护理结构资料；不得覆盖活元数据 |
 | `HIS问题表映射.csv` | 当前（外部交付，2026-08-24 已验证登记） | 84 条 HIS 运维台账→知识库 K001-K073 的表级映射（K编号/标题/原台账序号/业务域/风险等级/涉及表）；配套 `F:\python\Wx_ltjl\docs\知识库\HIS日常问题处理知识库.md`，AGENTS 技能路由引用；25 个涉及表现已全部在平台资产可查：原 5 张缺口对象（FXHIS.SPECIAL_CONSUL_MASTER 40 列/特抗药会诊主表、FXHIS.SPECIAL_ANTIMICROBIALS_DETAILS 17 列、FXHIS.SYS_PAYMENT_COMPARE 4 列/银联终端IP对照表、COMM.INPUT_DRUG_LISTS_FOR_PRE 29 列视图、FXHIS.CLI_REQUEST_DRUG_VIEW 21 列双 owner 视图）已于 2026-08-24 经 sjzc live 只读拉取+用户授权补采入平台（111 列含中文注释，幂等+审计 his_kb_backfill_20260824，状态 candidate 待正式复核） |
 | `149_曼陀罗EMR与HIS值域分析报告.md` | 当前 | 2026-08-27 sjzc live 活库实测：HIS 离院方式（互联互通编码，4=非医嘱/5=死亡）+ 治疗结果字典（7值×BA/HLHT双映射）+ 诊断/费别/手术/医嘱/性别/检查类别；曼陀罗EMR 住院文书类型全量统计（20+类含频次）；发现 BAGL（病案首页）与 EPR_OUTPATIENT（门诊）为 **0 行空表**——曼陀罗仅用于住院病历。取数硬约束候选 5 条。 |
@@ -189,6 +195,7 @@
 
 ## 当前模块计划
 
+| `215_系统可扩展性与工程治理改进执行计划.md` | **批次1执行中（2026-10-13）** | round-12 方案 v2 终稿（三方互查共识）的执行合同：E1 Git 基线收口（分域本地 commit+dist 产物出库+迁移跟踪对拍检查）/E2 测试互斥（advisory lock）与哨兵作用域/E3 调度 start() 条件缺陷修复/E4 占位文案统一；批次2=AI 上下文缓存、调度运营面、通知接线、/health 扩展、巨石切分、ruff 门禁等；依据 review/round-12/方案.md |
 | `213_前端界面布局核查与美化整改执行计划.md` | **终态：整改+复拍已收口（2026-10-07，214批次A E-A1）** | 16 页实拍 24 图确认 20 项缺陷（P0×2+P1×7+P2×7+P3×4+BD-01 后端配套）→ F01—F06 整改 → 10-04 复核修订；2026-10-07 普通 Chrome（1600×900、生产构建 preview）复拍 18/18 页通过、DEF-02 不复现关闭；证据 output_r213/ + output_r214/screenshots/（20 张有效复拍），screenshots-fixed 不再作为通过证据 |
 | `output_r213/` | 证据目录（213 界面核查+整改，2026-10-04） | screenshots/ 整改前；screenshots-fixed/ 第一次执行截图（复核判定多数无效，已被 output_r214/screenshots/ 复拍取代）；seed_notes.sql；执行报告.md §7 |
 
@@ -296,11 +303,17 @@
 
 ## 目录更新记录
 
+- 2026-10-13 | **新增215号系统可扩展性与工程治理改进执行计划（批次1启动）** | 落定 round-12 方案 v2 终稿（GLM/Kimi/Grok 三方互查共识）为执行合同：批次1 E1 Git 基线收口（分域本地 commit、dist_prev/dist_stash 317 文件出库、check_migrations_tracked 对拍检查）/E2 测试 advisory lock 互斥与纯逻辑哨兵作用域/E3 调度器 start() 条件补 quality_execution_scheduler_enabled/E4 tables.py 占位文案统一；批次2 承接缓存/调度运营面/通知/可观测/切分/lint。55 当前批次表同步新增 215 行。
+- 2026-10-13 | **取数说明口气** | 用户要求以后 `取数/` 全部提取任务的说明和导出表按同事交接来写，不带程序套话。规则写在 `AGENTS.md`「取数说明与交付口气」；`取数/START_HERE.md`、查询治理技能、`取数/exports/_templates/task_readme_template.md` 改为指向该节。未新增编号文档。
+- 2026-10-12 | **目录分类复核与物理索引** | `check_doc_index.py` 编号正文 138 号、配套 61 号、输出目录 36、归档 71 号，error 0 / warn 0。根 `INDEX.md` 增加「物理目录」给后续 AI：编号文档、证据、机器资产、代码、技能、取数、评审、工具私有域分开，不复制完成度。README 补 `数据资产_新HIS逆向资产包/`、外部案例 PDF、`output_domain_baseline.txt`；`截图/` 标为目录已不在。删除空目录 `frontend/开发起步包/`（无文件、无引用）。编号正文未移动。
+- 2026-10-11 | **28号金额对账：自费住院补回（03/08/12/13/14 重导）** | 库端基准 vs 文件侧逐表核验：03 门诊 165,590,898.03 与库端一致（差 5,583.51 系空段同日同人两就诊号口径）；03 住院文件 707,201,399.32 与库端正常结算 767,397,331.50 差 6,019.59 万 → 定位为 SETTLE_ZY_REC 内连接丢 2,653 个自费住院（金额全非零）→ 03/08/12/13/14 改 LEFT JOIN + clinicNo NVL 回退 patient_id||visit_id 重导，03=794,462（+2,653）、08=262,347、12=18,348、13=882、14=1,446；**03 住院 medfee 重验=767,397,331.50 与库端分毫不差**。04 明细文件 934,220,846.15 ≈ 门诊 165,585,314.52 + 住院明细 768,633,249.70 = 934,218,564.22（差 2,281.93=0.00024% 尾差）。06/07 出入库文件与库端差异均 <0.01%。14 bloodAmt 合计 209,607。05 无金额列（spec 如此）。SQL 修订与 README 对账结论已同步。
+- 2026-10-09 | **28号飞检提取2026窗口改版 + 资产包补采6张医保表** | 用户六项答复落地：①时间窗 2026-01-01~2026-09-30 重导11段（03结算单据79.2万/04明细1,986万行4.9GB/05医嘱359万/09化验793万等）；②12/13/14住院流水号统一为 SETTLE_ZY_REC.zylsh（与03/08同键，14⊂03完全一致，12/13因窗口字段不同仅边界差284/4例）；③08只取出院诊断（diagnosis_type='3'，249,453行）；④门诊异地标志改用 INSURANCE.OUTP_RCPT_MASTER_YB.INSUPLC_ADMDVS（参保地非3701=异地；74.8万门诊中异地11.3万，原恒0）；⑤05医嘱 miCode/miName 占位码置空（用户确认）；⑥入库/出库同窗口。数据资产_资产包/ columns.csv 追加222列、tables.csv 追加6表（INSURANCE.SETTLE_ZY_REC / INSUR_VSH_CENTER_ITEM_NEW / DRG_PERSON_INFO / OUTP_RCPT_MASTER_YB、FXHIS.PUB_PATIENTINFO_INSURE、SURGERY.OPERATION_MASTER，source=live_supplement，备份 .bak.20261009，manifest.json 同步）。服务器与容器 /tmp/export28 遗留（5.7GB）清理完毕。
 - 2026-10-08 | **214 批次B执行完成（211→212，新增 output_r211/r211-20261008-zcode-r214b/ 与 output_r212/r212-20261008-zcode-r214b/）** | 211：A0—A7全阶段（需求矩阵30条、分母419API/72UI、§4线索11/11核清、FIX-211-01 P1 AI上下文NameError修复、FIX-211-02 55行207纠偏、候选c211-20261008-r39ca60d+fix01冻结交接）；212：LOCAL_VERIFIED_WITH_EXCEPTIONS（全量pytest单进程1991P/0F/1S、vitest 332/332、build三预算、S3真实Chrome 10/10页+B07浏览器级403信封五字段命中+404不重塑+viewer负例、敏感性检查过、O01七端点5xx=0、O06真数据备份恢复对账全等、O10 error0；DEF212-002 P2并发缺陷发现修复三层复验；O07 BLOCKED_ENV）。55行211/212/207同步更新；本地分域commit未push
 - 2026-10-07 | **214 批次A执行完成（E-A1—E-A5，新增 output_r214/）** | E-A1：普通Chrome(1600×900)生产构建复拍18/18页通过（screenshots/ 20张）、DEF-02三轮切换不复现关闭、vitest 332/332；E-A2：DEF-01统一全站403信封实施（DEF-01_兼容性清单.md+PermissionDenied+契约测试5/5，dict_medical 18/18自然转绿断言未改，前端零改动）；E-A3：release_frontend.sh previous锚点修复（cp -d与mv缺-T叠加缺陷，干跑全场景）；E-A4：55/README状态纠偏（213终态、207已随r210落地、209两例外有结论，检查器error0/warn0）；E-A5：203 L4防误用登记。全量pytest 1987P/4F/1S，4F经stash-bisect证实为工作区既有（AI上下文族WIP）。随E-A1证据提交213中途修正三文件；未push
 - 2026-10-06 | 新增214号系统人工复核与未完成工作核查报告 | 保存未归档Markdown范围检索及重点证据复核结论，区分人工决策、执行待办、外部依赖与历史线索；登记证据链并同步55证据入口和INDEX路由。仅文档生成，未执行系统整改、数据库连接或生产动作
 - 2026-10-06 | 214号v1.1多方互查修订 | multi-review v5（GLM/Kimi/Grok三方独立审查+命令级证据核验，codex缺席=额度耗尽，证据review/round-11/分歧表.md）：§2收窄镜像论断与confirmed口径、§3补两套403/BC-01双窗/198五条探针非pass禁转正、§4工作区非干净基线与发布脚本previous缺口、§6补6行人工输入、§7重写为执行篇（批次A本地子集+批次B 211→212+显式禁止清单）。仅文档修订，未执行系统整改、未连库、未提交
 - 2026-10-06 | 214号v1.2：DEF-01用户裁决选A | 用户裁决DEF-01选A（统一全站403错误信封）：§3.1/§6/§7.2/§7.4同步，E-A2由"仅兼容清单"升级为按A实施（先盘点调用方兼容性再改形状，不以改断言换全绿）；同日DEF-02用户反馈=普通浏览器不能复现（支持环境相关假设，权威复现在E-A1）。仅文档修订
+- 2026-10-06 | 214号E-A1子任务：生产登录页错乱修复 | 用户反馈 http://10.10.8.83/#/login 内容错乱（左上小卡片+堆叠小字）。排查=代码层无塌缩源（布局CSS稳固、动态块均不塌缩），根因在生产环境（旧静态资源/接口500）；按E-A1修复两处可加固点：登录页品牌区内容占位兜底 + login.css 新增 max-width:1366px 断点（213已点名1366缺位）。typecheck双过+build三预算全过，本地提交 21edde1（仅两文件，未push）。生产恢复正常待重新构建发布
 | 2026-10-04 | **213 复核修订：撤销「T01—T18 全过」** | screenshots-fixed 多数内容区空白，T09 页签与正文不一致。去掉 lay-content 默认透明度过渡；resetRouter 改为从未包装路由树重建；图谱 AFTER_LAYOUT 只绑一次；通知模板假数据清空；表类型空值显示「—」。未重开浏览器，未 push |
 | 2026-10-04 | **213 v1.1 第一次执行（原报告写全过，复核后撤销该结论）** | 前端改动与 ReRouteSkeleton 仍保留。原「面包屑 transition-group 已根治、生产构建复验通过」只代表当时的判断，截图不能支持 |
 

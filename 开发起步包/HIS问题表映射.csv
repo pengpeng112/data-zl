@@ -72,3 +72,4 @@ K070,全院一张床功能,64,8.电子病历与签名,🟡配,无
 K072,不挂号怎么查看患者之前的就诊信息,50,8.电子病历与签名,🟢读,无（全息视图界面）
 K073,门诊换药量统计,69,8.电子病历与签名,🟢读,`OUTPBILL.OUTP_BILL_ITEMS`（门诊病人诊疗费用项目）、`OUTPBILL.OUTP_ORDER_DESC`（开单记录）、`OUTPBIL
 K071,抗菌药物使用强度 DDD 值不准确,42,9.护士站业务,🟡配,无（系统配置·药品基本信息界面）
+K074,门诊病历是否已打印（门诊病历系统查询）,无（2026-10-13实例沉淀）,10.数据查询取数,🟢读,`CORE2DB.data_api_patient`（患者主档id_no）、`CORE2DB.data_api_medicalresources`、`CORE2DB.medical_api_medicalrecords`、`CORE2DB.clinic_api_firstoutrecord.if_print`（源core2db_mysql_10_10_8_135）

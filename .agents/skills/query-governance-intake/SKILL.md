@@ -54,6 +54,10 @@ description: >
 - 平台 API：`/api/v1/queries/*`、`/api/v1/metrics/*`、`/api/v1/data-products/*`、`/api/v1/ai/*`、`/api/v1/lineage/*`
 - 资产包回退：`开发起步包/数据资产_*/manifest.json`（用 `开发起步包/tools/build_asset_manifest.py --verify` 校验）
 
+## 给业务看的说明
+
+交付说明、可转发文字和导出表的写法，以根目录 `AGENTS.md`「取数说明与交付口气」为准（2026-10-13 用户确认，所有 `取数/` 任务适用）。按同事交接来写，写清时间、来源、科室、条数、排除和空列原因。`query_code`、`run_id`、哈希只留在 SQL 文件头或内部备注。导出表只保留对方模板的列。
+
 ## 禁止
 
 - 不写业务源库 DML/DDL；不输出患者明细或凭据

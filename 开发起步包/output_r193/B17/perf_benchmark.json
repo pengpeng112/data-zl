@@ -1,23 +1,24 @@
 {
- "started_at": "2026-09-21T13:34:21.777315+00:00",
+ "started_at": "2026-10-12T03:06:13.885247+00:00",
  "scale": {
   "patients": 200,
   "facts_per_patient": 15
  },
  "env": "isolated data_asset_test via SSH tunnel",
- "ingest_3000_facts_s": 13.16,
- "ingest_throughput_facts_per_s": 227.9,
+ "ingest_3000_facts_s": 11.43,
+ "ingest_throughput_facts_per_s": 262.5,
  "rerun_skip_300_s": 0.02,
- "gateway_50_checks_s": 0.392,
- "gateway_ms_per_check": 7.84,
- "timeline_1patient_15events_ms": 4.8,
- "stats_readmission_3000facts_s": 0.04,
+ "gateway_50_checks_s": 0.313,
+ "gateway_ms_per_check": 6.26,
+ "timeline_1patient_15events_ms": 70.4,
+ "stats_readmission_3000facts_s": 0.17,
  "stats_result": {
   "denominator": 200,
   "readmitted": 200
  },
- "training_set_200patients_s": 0.12,
- "freeze_manifest_3000facts_s": 0.22,
- "finished_at": "2026-09-21T13:34:35.760970+00:00",
+ "training_set_200patients_s": 0.16,
+ "freeze_manifest_3000facts_s": 0.08,
+ "freeze_members_added_on_rerun": 0,
+ "finished_at": "2026-10-12T03:06:26.681917+00:00",
  "note": "合成基准、经 SSH 隧道（含网络往返）；SLO 阈值待 B18 前业务确认，本数字仅作容量参考基线"
 }

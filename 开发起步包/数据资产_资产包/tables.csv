@@ -12810,3 +12810,9 @@ ZONEKINGNET.DBO,WJMeaSure,,0,0,体检,,,live_metadata,,platform
 ZONEKINGNET.DBO,WJReport,,0,0,体检,,,live_metadata,,platform
 ZONEKINGNET.DBO,WJSeries,,0,0,体检,,,live_metadata,,platform
 ZONEKINGNET.DBO,WJStudy,,609,0,体检,,,live_metadata,,platform
+FXHIS,PUB_PATIENTINFO_INSURE,患者参保信息（CBD_TYPE/RQLB/YDBZ/MZDDBZ 等）,,48,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement
+INSURANCE,DRG_PERSON_INFO,DRG 医护人员信息（practice_area/doctor_certificate/yb_code）,,13,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement
+INSURANCE,INSUR_VSH_CENTER_ITEM_NEW,医保项目对照（item_code→ylxmbm 医保编码，多版本重复需 UPPER+最新版去重）,,43,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement
+INSURANCE,OUTP_RCPT_MASTER_YB,医保门诊收据结算附表（BRJSH/INSUPLC_ADMDVS 参保地=异地判定依据）,,39,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement
+INSURANCE,SETTLE_ZY_REC,医保住院结算流水（zylsh/rqlb/sbjgbh，28号飞检住院单据/流水号统一键）,,33,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement
+SURGERY,OPERATION_MASTER,手术主表（OPER_ID 与 MEDREC.OPERATION.OPERATION_NO 关联，START/END/麻醉时间）,,46,医保,,,,,2026-10-09 live 补采（用户授权纳入；28号任务离线缺失靠 live 补证）,live_supplement

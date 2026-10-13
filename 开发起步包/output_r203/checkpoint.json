@@ -1,6 +1,6 @@
 {
   "plan": 203,
-  "updated_at": "2026-09-25",
+  "updated_at": "2026-09-28",
   "current_phase": "L4（第一批完成，单日上限收批）",
   "status": "IN_PROGRESS",
   "completed_tasks": [
@@ -29,19 +29,33 @@
     "189 DDL/MTL-JHEMR/DataX 具体变更集与冻结哈希（H203-07）",
     "193 B18 科室编码/目标资源/三类责任人/保留政策（H203-08）"
   ],
-  "waiting_approval": [
-    "候选 A/B 生产分包发布（条件式已授权，待 L3 完成一致性/无夹带/回滚核验后执行）"
-  ],
+  "waiting_approval": [],
   "blocked_external": [],
-  "evidence_missing": [
-    "output_r189 82 文件（删除归属未定，可从 HEAD 恢复）",
-    "189 批次1 44行工单/批次2 清单与 SQL 包（从未入库，需重建）"
-  ],
+  "evidence_missing": [],
   "production_writes": 1,
   "source_writes": 0,
   "governance_terminal_actions": 20,
   "git_pushes": 0,
   "production_writes_note": "r203-20260925 生产发布 1 次（后端镜像切换+前端原子切换，候选A/B，授权引用 203 §21）；一次性 ApiKey×2 创建即删（195 S8 先例，审计 4 行）",
   "governance_note": "198 A1 组 20 项 review approve（条件全核验+逐项 before/after+审计 20 行+八类回读，授权引用 203 §21+用户按建议来）；approve≠formal，正式关系 1329 未动",
-  "next_safe_action": "Git 分域提交（文档纠偏+证据产物，不夹带 plan139 WIP）；下一会话续 L4 第二批（198 A3/A4）"
+  "next_safe_action": "按55→208 A/B完成本地验收缺口、205离线完整性与治理建议；L4后续先当前清单去重并核具体批准，不复做已审20项。",
+  "status_reconciliation_20260928": {
+    "mode": "LOCAL_EVIDENCE_REVIEW_ONLY",
+    "resolved_current_entries": {
+      "waiting_approval": [
+        "候选 A/B 生产分包发布（条件式已授权，待 L3 完成一致性/无夹带/回滚核验后执行）"
+      ],
+      "evidence_missing": [
+        "output_r189 82 文件（删除归属未定，可从 HEAD 恢复）",
+        "189 批次1 44行工单/批次2 清单与 SQL 包（从未入库，需重建）"
+      ]
+    },
+    "evidence": [
+      "output_r203/release_execution_prod_20260925.json",
+      "output_r203/checkpoint.json completed_tasks L2/L5",
+      "output_r189/批次工单重建说明_20260925.md"
+    ],
+    "note": "只消除已被历史完成证据解决的当前阻塞；不新增批准、不执行生产动作。189 live/DDL/DataX和L4后续未完成。",
+    "routing": "55 → 208 A/B本地收尾与离线分析；外部动作按208具体输入与批准，历史授权不自动续用。"
+  }
 }

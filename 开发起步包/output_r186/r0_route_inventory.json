@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T08:36:38.598Z",
+  "generated_at": "2026-10-12T03:05:23.939Z",
   "visible_leaf_count": 41,
   "total_leaf_count": 52,
   "visible_by_parent": {
@@ -96,7 +96,7 @@
       "title": "数据集目录",
       "showLink": true,
       "auths": [
-        "query.view"
+        "ds.read"
       ],
       "hasComponent": true
     },
