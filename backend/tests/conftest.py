@@ -35,6 +35,7 @@ _PURE_LOGIC_SUBDIRS = (
     "plan195",
     "plan200",
     "plan207",
+    "reporting_pipeline_unit",
 )
 
 
