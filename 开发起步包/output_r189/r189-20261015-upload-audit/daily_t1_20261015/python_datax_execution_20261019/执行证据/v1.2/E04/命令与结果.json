@@ -1,0 +1,34 @@
+{
+ "batch": "E04",
+ "generated_at": "2026-10-19T15:44:23+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "argv": [
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "backend/tests/reporting_pipeline_unit",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 110 tests in 0.317s",
+    "",
+    "OK"
+   ]
+  }
+ ],
+ "delivered": [
+  "readback_types.py（CHAR族右去填充/VARCHAR-CLOB保留空白/Decimal精确不经float/时间精度不归一/动态SYSTEM_TIME出hash/UTF-8字节长度）",
+  "staging.py（attempt隔离/完整清单才可标COMPLETE/旧stage不覆新SUPERSEDED）",
+  "quality.py（行级必填-长度-精度-值域/组隔离继续/父键待父/同键不同内容冲突/批级三方守恒）",
+  "test_quality_staging.py（18测试）"
+ ],
+ "anti_patterns_covered": [
+  "gap_exec same_value 全字符串rstrip不照搬（VARCHAR空白保留有测试）",
+  "float比较拒绝有测试（大整数误判相等防住）"
+ ]
+}

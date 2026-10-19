@@ -1,0 +1,92 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "rules": [
+    {
+      "code": "EXTRACT_FAILED",
+      "trigger": "连接/SQL/驱动/读取不完整/DataX失败或dirty",
+      "severity": "yellow",
+      "upgrade": "接近截止或关键来源受影响升级red"
+    },
+    {
+      "code": "SOURCE_LATE",
+      "trigger": "源或ODS未到约定可见点/异常零行",
+      "severity": "yellow",
+      "upgrade": "超延迟预算或影响截止升级red"
+    },
+    {
+      "code": "VIEW_BLOCKED",
+      "trigger": "INVALID/缺字段或时间/历史范围/定义漂移",
+      "severity": "yellow",
+      "upgrade": "生成局部人工工单；影响截止升级red"
+    },
+    {
+      "code": "QUALITY_BLOCKED",
+      "trigger": "必填/值域/字节精度/冲突ID/父键异常",
+      "severity": "yellow",
+      "upgrade": "已证严重错连或广泛冲突red"
+    },
+    {
+      "code": "RECONCILE_DIFF",
+      "trigger": "同取证范围ID/内容/关系未解释差额",
+      "severity": "red",
+      "upgrade": "立即，不能用条数相等掩盖"
+    },
+    {
+      "code": "COMMIT_UNKNOWN",
+      "trigger": "正式提交/回执结果不明",
+      "severity": "red",
+      "upgrade": "立即，先对账不盲写"
+    },
+    {
+      "code": "WORKER_STALE",
+      "trigger": "worker/控制层长期无心跳",
+      "severity": "red",
+      "upgrade": "独立巡检发出，阈值按实际预算"
+    },
+    {
+      "code": "SLA_AT_RISK",
+      "trigger": "剩余时间不足/逾期",
+      "severity": "yellow",
+      "upgrade": "逾期red，deadline未知保持待配置"
+    },
+    {
+      "code": "DELIVERY_REJECTED",
+      "trigger": "省端拒绝或反馈超时",
+      "severity": "yellow",
+      "upgrade": "按截止和影响范围red，区别于relay失败"
+    },
+    {
+      "code": "ALERT_DELIVERY_FAILED",
+      "trigger": "relay/投递失败/积压",
+      "severity": "red",
+      "upgrade": "relay不健康时本地/独立监测，不递归推给坏relay"
+    },
+    {
+      "code": "RECOVERED",
+      "trigger": "原故障已复核恢复/闭环",
+      "severity": "blue",
+      "upgrade": "notice，新revision关联原incident"
+    },
+    {
+      "code": "QUERY_SLOW",
+      "trigger": "超过具体源/路线/SQL形状/窗口画像的读取预算，不等同源数据晚到",
+      "severity": "yellow",
+      "upgrade": "按该路线已批准取消预算及deadline升级，不统一3分钟"
+    },
+    {
+      "code": "RESCAN_OVERDUE",
+      "trigger": "纳管历史业务月未在覆盖周期完成或待补未收口",
+      "severity": "yellow",
+      "upgrade": "超已配置覆盖预算/影响省端时效red；不只核运行当月"
+    },
+    {
+      "code": "DEADLINE_UNCONFIGURED",
+      "trigger": "表未配置省端截止/达标环节",
+      "severity": "yellow",
+      "upgrade": "日报单列和提醒责任人；SLA为UNKNOWN，不伪报SLA_AT_RISK"
+    }
+  ],
+  "thresholds_status": "CANDIDATE_REQUIRES_OPERATOR_CONFIRMATION",
+  "runtime_state": "NOT_IMPLEMENTED"
+}

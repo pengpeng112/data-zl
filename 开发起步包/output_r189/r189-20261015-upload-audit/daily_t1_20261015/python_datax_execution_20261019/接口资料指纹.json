@@ -1,0 +1,17 @@
+{
+  "read_only_references": true,
+  "provider_repo_modified": false,
+  "relay_contacted": false,
+  "sources": [
+    {
+      "path": "F:\\python\\前后端代码\\qywx\\docs\\08_通用告警推送公共接口对接指南.md",
+      "sha256": "898cfeb3a1cfe3f998a3a36df693a2a0a8cc943cb4c958ad93f04091d8defacf",
+      "bytes": 14894
+    },
+    {
+      "path": "F:\\python\\前后端代码\\qywx\\docs\\06_v2接口与连接器接入指南.md",
+      "sha256": "45917cc17d307bba8923e7da9fa0fead9a78ff249ea18171f0e331c99a8f1d76",
+      "bytes": 8054
+    }
+  ]
+}

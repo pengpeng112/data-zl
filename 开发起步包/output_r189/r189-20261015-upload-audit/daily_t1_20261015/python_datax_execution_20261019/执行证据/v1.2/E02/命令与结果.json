@@ -1,0 +1,36 @@
+{
+ "batch": "E02",
+ "generated_at": "2026-10-19T15:35:59+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "argv": [
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "backend/tests/reporting_pipeline_unit",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 67 tests in 0.030s",
+    "",
+    "OK"
+   ]
+  }
+ ],
+ "model_import_check": {
+  "env": "APP_DB_URL=sqlite:///dummy",
+  "models": 9,
+  "schema": "asset",
+  "note": "模型候选未注册进 models/__init__，未进入当前迁移链；迁移在 E08 隔离验收后手写"
+ },
+ "delivered": [
+  "planner.py（固定窗/keyset唯一键校验/DAG/LIS路由/拆分树/月覆盖账）",
+  "repositories.py（InMemory控制仓储：水位缺口门禁/attempt隔离/fencing租约/incident+outbox不可变事件）",
+  "models/asset_reporting.py（9表候选）",
+  "test_planner.py + test_repositories.py（35测试）"
+ ]
+}

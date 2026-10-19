@@ -1,0 +1,44 @@
+{
+ "batch": "E08",
+ "generated_at": "2026-10-19T16:00:43+00:00",
+ "isolated_integration": {
+  "state": "VERIFIED",
+  "db_identity": "data_asset_test (8.83 隔离库，dev_env.sh 隧道核实)",
+  "migration": "e3f4a5b6c7d8 (9 tables asset_reporting_*)",
+  "commands": [
+   {
+    "name": "alembic upgrade head",
+    "result": "d3e5f6a7b8c9 -> e3f4a5b6c7d8, 9 tables created"
+   },
+   {
+    "name": "constraint checks (5)",
+    "result": "outbox字节往返/outbox唯一/月覆盖复合唯一/gap账本读写/租约唯一 全PASS"
+   },
+   {
+    "name": "alembic downgrade -1",
+    "result": "9 tables dropped, version d3e5f6a7b8c9"
+   },
+   {
+    "name": "alembic upgrade head (round2)",
+    "result": "9 tables recreated, version e3f4a5b6c7d8"
+   },
+   {
+    "name": "pytest tests/reporting_pipeline_integration/ -q",
+    "result": "3 passed (需 source tools/dev_env.sh)"
+   }
+  ],
+  "leftover_test_rows_cleaned": true,
+  "caveat": "PG集成不冒充Oracle事务/LOB兼容；真实插件协议测试属E09"
+ },
+ "production_review_pack": {
+  "state": "READY",
+  "files": [
+   "deploy/reporting_pipeline/README.md",
+   "deploy/reporting_pipeline/生产接入审阅清单.md",
+   "deploy/reporting_pipeline/运行手册草稿.md",
+   "deploy/reporting_pipeline/回滚方案.md",
+   "deploy/reporting_pipeline/观测计划.md"
+  ]
+ },
+ "integration_test_dir": "backend/tests/reporting_pipeline_integration/（无隔离库环境时根conftest快速失败，不静默跳过）"
+}

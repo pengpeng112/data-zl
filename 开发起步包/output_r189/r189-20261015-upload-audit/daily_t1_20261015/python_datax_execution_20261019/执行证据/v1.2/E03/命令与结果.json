@@ -1,0 +1,33 @@
+{
+ "batch": "E03",
+ "generated_at": "2026-10-19T15:41:47+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "argv": [
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "backend/tests/reporting_pipeline_unit",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 92 tests in 0.328s",
+    "",
+    "OK"
+   ]
+  }
+ ],
+ "delivered": [
+  "adapters/python_reader.py（页式探针+递归二分+稳定keyset回退+源级熔断单探针+取消令牌+ORA-12541/12547/DPY-4011断连分类）",
+  "adapters/datax_runner.py（受限模板+白名单+querySql范围复核+退出0≠成功+参数数组进程+EngineRouter无授权不fallback）",
+  "test_adapters.py（25测试：6小时50001行拆窗守恒/字节上限/keyset回退/PARKED/熔断半开/DataX七种结果态）"
+ ],
+ "key_findings": [
+  "_fetch_all改为完整性上限探针（单页limit=cap+1）：无游标推进的重复拉页会造成重复行，禁止；keyset分页显式推进游标",
+  "测试夹具必须落左闭右开区间（末行恰在右开边界会被正确排除）"
+ ]
+}

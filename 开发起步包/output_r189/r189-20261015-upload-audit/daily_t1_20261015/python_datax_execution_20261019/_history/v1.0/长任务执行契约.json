@@ -1,0 +1,415 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1",
+  "version": "1.0",
+  "parent_task": "R189-UPLOAD-AUDIT-2021-2024",
+  "planning_only": true,
+  "repo_root": "F:\\python\\数据资产",
+  "plan": "Python与DataX统一T加1顶层设计及长任务执行计划.md",
+  "prompt": "给执行AI的长任务启动提示词.md",
+  "checkpoint": "开发起步包/output_r189/r189-20261015-upload-audit/checkpoint.json",
+  "checkpoint_node": "daily_t1.engineering_execution_20261019",
+  "result_path": "执行结果总报告.md",
+  "state": "PLAN_READY_EXECUTION_NOT_STARTED",
+  "scope": {
+    "canonical_items": 77,
+    "source_groups": 11,
+    "review_objects": 81,
+    "not_provided_pending_applicability": 1
+  },
+  "user_boundary": "用户人工修改源视图；执行AI负责抽取工程、证据及局部阻塞恢复",
+  "architecture": "Python control + DataX/Python read adapters + staged validation + approved apply + reconcile/delivery",
+  "invariants": [
+    "源只读且通道逐源获准",
+    "生产写入只走适用白名单/批准",
+    "默认77项disabled/UNKNOWN",
+    "固定窗口/完整清单/水位分离",
+    "正式提交未知先回读",
+    "旧批不能覆盖新版本",
+    "父子及仅子变化覆盖",
+    "视图问题局部工单不拖全部",
+    "AI接口只读、不自动审批",
+    "平台asset新表及隔离验收",
+    "不强制特定模型/CLI/工具替换"
+  ],
+  "approvals": {
+    "local_development": "任务范围内可持续开发；核claim与仓库规则",
+    "source_daytime_batch": "PENDING_CURRENT_SCOPE",
+    "business_data_reads": "PER_SQL_KEY_WINDOW_AND_BUDGET_REQUIRED",
+    "isolated_db": "VERIFY_DISPOSABLE_IDENTITY_BEFORE_MUTATION",
+    "production_schema_write_publish_cron_cdc": "NOT_AUTHORIZED_BY_THIS_PLAN",
+    "git_push_tag": "NOT_AUTHORIZED"
+  },
+  "tasks": [
+    {
+      "id": "E00",
+      "maps_to": "T0/T1准备",
+      "objective": "起步/占用/基线、现有调度/脚本/模块查重、输入哈希、权限矩阵，核11源映射和81对象用途",
+      "acceptance": "真实现状/可复用清单、文件域及未决项；缺实值不阻断本地后续",
+      "depends_on": [],
+      "proposed_edit_scope": [
+        "本轮证据目录",
+        "既有文件/模块只读盘点"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E00/命令与结果.json",
+        "执行证据/E00/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E01",
+      "maps_to": "T1本地契约",
+      "objective": "77项配置模型、当前证据导入、动作就绪分级、UNKNOWN拒执行、CLI list/validate/plan",
+      "acceptance": "77不重不漏；1未提供单列；4检验双源不混；候选不能变生产READY",
+      "depends_on": [
+        "E00"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/contracts.py",
+        "backend/scripts/reporting_ctl.py",
+        "本轮77项配置目录"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E01/命令与结果.json",
+        "执行证据/E01/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E02",
+      "maps_to": "T1软件",
+      "objective": "Repository、事件及状态机、租约/幂等/游标，候选手写迁移和恢复规则",
+      "acceptance": "重启不丢状态；非法跃迁拒绝；未决提交不可当失败重放；PG真实约束到E12验",
+      "depends_on": [
+        "E01"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/repositories.py",
+        "backend/app/models/asset_reporting.py",
+        "backend/alembic/versions/候选手写迁移"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E02/命令与结果.json",
+        "执行证据/E02/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E03",
+      "maps_to": "T1软件",
+      "objective": "水位/变更键/快照/CDC键策略接口、固定窗、分页、基线及DAG",
+      "acceptance": "同秒/迟到/子变更/缺撤销/历史旧批及未完整分页模拟正反例",
+      "depends_on": [
+        "E02"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/planner.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E03/命令与结果.json",
+        "执行证据/E03/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E04",
+      "maps_to": "T2开发",
+      "objective": "包装稳定Python流程，取数流式与类型契约、取消、manifest",
+      "acceptance": "注入Reader实测断连/LOB/Decimal/上限/分页；无业务库依赖",
+      "depends_on": [
+        "E03"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/adapters/python_reader.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E04/命令与结果.json",
+        "执行证据/E04/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E05",
+      "maps_to": "T2开发",
+      "objective": "DataX模板/受限进程/脱敏、退出码/dirty/部分stage、适配能力矩阵",
+      "acceptance": "FakeProcess真实跑进程协议测试；真实安装能力标待E12/E14，不能凭fake说DataX已兼容",
+      "depends_on": [
+        "E04"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/adapters/datax_runner.py",
+        "候选DataX模板"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E05/命令与结果.json",
+        "执行证据/E05/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E06",
+      "maps_to": "T2开发",
+      "objective": "暂存完整性、V1.3规则、内容hash、隔离/组守恒",
+      "acceptance": "NULL/中文字节/CLOB/精度/父子错组/冲突均有独立预期；规范歧义待确认",
+      "depends_on": [
+        "E05"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/staging.py",
+        "backend/app/services/reporting_pipeline/quality.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E06/命令与结果.json",
+        "执行证据/E06/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E07",
+      "maps_to": "T2开发",
+      "objective": "ApplyPort、白名单桥接、版本保护和提交凭据协议",
+      "acceptance": "未批准默认拒写；模拟新/改/撤销/未知提交/旧版覆盖；无现成执行器不绕过",
+      "depends_on": [
+        "E06"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/apply_port.py",
+        "适用白名单桥接候选"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E07/命令与结果.json",
+        "执行证据/E07/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E08",
+      "maps_to": "T2开发",
+      "objective": "源目标键及内容对账、父子反向检查、依赖变化失效",
+      "acceptance": "同数不同ID/字段不同能检出；失败不推完整，子表独立变化被处理",
+      "depends_on": [
+        "E07"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/reconcile.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E08/命令与结果.json",
+        "执行证据/E08/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E09",
+      "maps_to": "T2开发",
+      "objective": "调度桥、资源/优先级、退避熔断、互斥/过期接管",
+      "acceptance": "每源限制、同表单写、截止前预警；旧worker无法绕过栅栏，无法栅栏则禁止自动接管",
+      "depends_on": [
+        "E08"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/recovery.py",
+        "backend/app/services/reporting_pipeline/scheduler_bridge.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E09/命令与结果.json",
+        "执行证据/E09/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E10",
+      "maps_to": "T2开发",
+      "objective": "人工视图工单、修复后复核/恢复、日报及反馈状态",
+      "acceptance": "一表受阻其余继续；修改声明不自动闭单；省端无反馈不报成功",
+      "depends_on": [
+        "E09"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/manual_tickets.py",
+        "backend/app/services/reporting_pipeline/reports.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E10/命令与结果.json",
+        "执行证据/E10/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E11",
+      "maps_to": "T2合成预检",
+      "objective": "执行故障矩阵、CLI端到端模拟、文档/密钥扫描、checkpoint与交接",
+      "acceptance": "所有已实现本地必测过；未实现不能通过改fixture混过；剩余集成明确未跑",
+      "depends_on": [
+        "E10"
+      ],
+      "proposed_edit_scope": [
+        "backend/tests/reporting_pipeline_unit/",
+        "本轮证据目录"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E11/命令与结果.json",
+        "执行证据/E11/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E12",
+      "maps_to": "T2隔离集成",
+      "objective": "核可清理隔离库，验PG迁移/并发/崩溃及目标模拟Oracle能力；核实际DataX插件兼容",
+      "acceptance": "只对明确隔离环境做集成；无Oracle隔离则Oracle事务/LOB/类型保持待验，PG不冒充Oracle",
+      "depends_on": [
+        "E11"
+      ],
+      "proposed_edit_scope": [
+        "backend/tests/reporting_pipeline_integration/",
+        "已核允许清理的隔离库（条件依赖）"
+      ],
+      "environment": "VERIFIED_DISPOSABLE_ISOLATED_ENV_ONLY",
+      "evidence": [
+        "执行证据/E12/命令与结果.json",
+        "执行证据/E12/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E13",
+      "maps_to": "T2生产准备",
+      "objective": "汇总可审核部署物、只读试点SQL/计划、对象/操作/额度白名单、暂存DDL候选、备份/回滚、调度切换、指标",
+      "acceptance": "本地软件完整包可验收；源/写/发布缺批准的明确待批，不因此隐藏本地成果",
+      "depends_on": [
+        "E11"
+      ],
+      "proposed_edit_scope": [
+        "deploy/reporting_pipeline/",
+        "本轮生产审阅材料目录"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/E13/命令与结果.json",
+        "执行证据/E13/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E14",
+      "maps_to": "T2真实试点",
+      "objective": "获具体批准后选就绪主子组、异构源和复杂文书，小键集/小窗验证",
+      "acceptance": "源→stage→质量→受控apply→回读→反馈证据，异常恢复演练；不人为改真实患者来造用例",
+      "depends_on": [
+        "E12",
+        "E13"
+      ],
+      "proposed_edit_scope": [
+        "逐对象获批真实试点范围",
+        "本轮试点证据目录"
+      ],
+      "environment": "EXPLICITLY_APPROVED_PRODUCTION_SCOPE_ONLY",
+      "evidence": [
+        "执行证据/E14/命令与结果.json",
+        "执行证据/E14/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E15",
+      "maps_to": "T3分组上线",
+      "objective": "按就绪和来源逐组灰度，单表旧写者交接，77项逐项确认就绪/人工单/不适用待确认",
+      "acceptance": "每组有批准/核差/资源结果；11源非11份同样配置，任何缺依据保持待核",
+      "depends_on": [
+        "E14"
+      ],
+      "proposed_edit_scope": [
+        "逐组获批切换范围",
+        "本轮接入证据目录"
+      ],
+      "environment": "EXPLICITLY_APPROVED_PRODUCTION_SCOPE_ONLY",
+      "evidence": [
+        "执行证据/E15/命令与结果.json",
+        "执行证据/E15/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E16",
+      "maps_to": "T4/T5",
+      "objective": "至少7业务日观测及迟到/订正/撤销/部分失败回放、运维演练/主备交接",
+      "acceptance": "达到约定时效/质量、未解释缺失0、阻断错误闭合及反馈；有未核项只报已批准范围通过",
+      "depends_on": [
+        "E15"
+      ],
+      "proposed_edit_scope": [
+        "已批准范围观测/运维交接",
+        "本轮脱敏观测证据目录"
+      ],
+      "environment": "EXPLICITLY_APPROVED_PRODUCTION_SCOPE_ONLY",
+      "evidence": [
+        "执行证据/E16/命令与结果.json",
+        "执行证据/E16/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    }
+  ],
+  "milestones": [
+    "LOCAL_ENGINE_VERIFIED",
+    "ISOLATED_INTEGRATION_VERIFIED",
+    "PILOT_VERIFIED",
+    "ROLLOUT_PARTIAL_OR_FULL",
+    "OBSERVATION_ACCEPTED",
+    "OPS_HANDOVER_ACCEPTED"
+  ],
+  "done_criteria": [
+    "E00—E11实现和真实离线证据，不虚构命令或测试",
+    "E12隔离验收不能以PG冒充Oracle",
+    "E14—E16只按真实批准和证据判定",
+    "77项均有上线或具体待核/人工/适用性结论",
+    "源目标无未解释差额且时效按省端契约",
+    "报告/目录/checkpoint与等待同步"
+  ]
+}

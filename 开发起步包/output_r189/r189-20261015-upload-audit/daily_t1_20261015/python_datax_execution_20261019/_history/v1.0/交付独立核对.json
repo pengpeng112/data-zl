@@ -1,0 +1,13 @@
+{
+  "file_hashes": "PASS",
+  "zip_integrity_and_exact_contents": "PASS",
+  "repo_root": "PASS",
+  "17_task_states_pending": "PASS",
+  "77_seed_and_64_cases": "PASS",
+  "isolated_block_does_not_block_static_pack": "PASS",
+  "pilot_requires_isolated_and_review": "PASS",
+  "checkpoint_artifacts_and_routes": "PASS",
+  "implementation_tests_executed": 0,
+  "business_db_queries": 0,
+  "production_actions": 0
+}

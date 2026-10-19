@@ -1,0 +1,201 @@
+{
+ "validate_report": {
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "counts": {
+   "canonical_items": 77,
+   "unique_canonical_tables": 77,
+   "source_groups": 11,
+   "dual_source_tables": [
+    "EMR_INSPECTION",
+    "EMR_INSPECTION_IMAGE",
+    "EMR_INSPECTION_ALLERGY",
+    "EMR_INSPECTION_ITEM"
+   ],
+   "not_provided_pending_applicability": [
+    "EMR_NURSE_PLAN"
+   ],
+   "rescan_tables": [
+    "EMR_DOC_ORDER_CHECK",
+    "EMR_IN_FEE_INFO_CHILD"
+   ],
+   "datetime_dependency_tables": [
+    "EMR_DOC_ORDER_CHECK",
+    "EMR_OUT_FEE_INFO_CHILD",
+    "EMR_IN_FEE_INFO_CHILD"
+   ]
+  },
+  "seed_state": {
+   "enabled_any": false,
+   "engine_distribution": {
+    "UNDECIDED": 77
+   },
+   "applicability_distribution": {
+    "TO_VERIFY": 76,
+    "WAITING_BUSINESS_CONFIRMATION": 1
+   },
+   "deadline_state_distribution": {
+    "UNCONFIGURED": 77
+   }
+  },
+  "readiness_layers": {
+   "CONFIG_VALID": {
+    "READY": 77,
+    "NOT_READY": 0,
+    "UNKNOWN": 0
+   },
+   "READ_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "STAGE_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "APPLY_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "REPORT_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   }
+  },
+  "source_group_object_counts": {
+   "adverse": 1,
+   "blood": 4,
+   "dialysis": 3,
+   "his": 2,
+   "hrp": 1,
+   "infection": 1,
+   "lis": 4,
+   "nursing": 8,
+   "ods": 52,
+   "pathology": 2,
+   "physical": 3
+  },
+  "performance_profiles": {
+   "total": 77,
+   "unmeasured": 77,
+   "measured_verified": 0,
+   "missing_action": "REFUSE_PRODUCTION_READY_ALLOW_OFFLINE_DEVELOPMENT"
+  },
+  "lis_routes": {
+   "EMR_INSPECTION": {
+    "segments": 3,
+    "overlap_q4_2023": true,
+    "route_clock_verified": false
+   },
+   "EMR_INSPECTION_IMAGE": {
+    "segments": 3,
+    "overlap_q4_2023": true,
+    "route_clock_verified": false
+   },
+   "EMR_INSPECTION_ALLERGY": {
+    "segments": 3,
+    "overlap_q4_2023": true,
+    "route_clock_verified": false
+   },
+   "EMR_INSPECTION_ITEM": {
+    "segments": 3,
+    "overlap_q4_2023": true,
+    "route_clock_verified": false
+   }
+  },
+  "monthly_rescan": {
+   "tables": [
+    "EMR_DOC_ORDER_CHECK",
+    "EMR_IN_FEE_INFO_CHILD"
+   ],
+   "managed_history_start_month": null,
+   "managed_history_end_month": null,
+   "scope_state": "SCOPE_UNFROZEN_E01_TO_FILL"
+  },
+  "manual_tickets": {
+   "count": 6,
+   "ids": [
+    "E01-DISCHARGE-PERF",
+    "E01-DISCHARGE-QUALITY",
+    "E01-DATETIME-DEPENDENCY",
+    "E01-LIS-LEGACY-ACCESS",
+    "E01-WRITER-HANDOFF",
+    "E01-CREDENTIAL-LIFETIME"
+   ],
+   "never_auto_close": true
+  },
+  "writer_handoff": {
+   "state": "LIVE_SNAPSHOT_REQUIRED_AT_E01_AND_REFRESH_AT_CUTOVER",
+   "snapshot_captured": false,
+   "note": "8.53 进程快照需 ops-runbook 受控通道与具体批准；本轮未 SSH，不把 manual2/dqueue/gap_exec 的用户时点陈述当已停证据"
+  },
+  "long_lived_credentials": {
+   "policy": "APPROVED_SECRET_STORE_REF_NOT_TMP_ENV",
+   "configured_refs": [],
+   "unconfigured_tables": 77
+  },
+  "problems": [],
+  "validation": {
+   "structural_problems": [],
+   "structure_ok": true,
+   "ready_violations": []
+  },
+  "offline": true,
+  "ok": true,
+  "exit_code": 0,
+  "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）"
+ },
+ "list_summary": {
+  "readiness_layers": {
+   "CONFIG_VALID": {
+    "READY": 77,
+    "NOT_READY": 0,
+    "UNKNOWN": 0
+   },
+   "READ_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "STAGE_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "APPLY_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   },
+   "REPORT_READY": {
+    "READY": 0,
+    "NOT_READY": 0,
+    "UNKNOWN": 77
+   }
+  },
+  "source_groups": {
+   "adverse": 1,
+   "blood": 4,
+   "dialysis": 3,
+   "his": 2,
+   "hrp": 1,
+   "infection": 1,
+   "lis": 4,
+   "nursing": 8,
+   "ods": 52,
+   "pathology": 2,
+   "physical": 3
+  },
+  "dual_source": [
+   "EMR_INSPECTION",
+   "EMR_INSPECTION_IMAGE",
+   "EMR_INSPECTION_ALLERGY",
+   "EMR_INSPECTION_ITEM"
+  ],
+  "not_provided": [
+   "EMR_NURSE_PLAN"
+  ]
+ }
+}

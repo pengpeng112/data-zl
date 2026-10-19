@@ -1,0 +1,256 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "tables": [
+    {
+      "canonical_table": "EMR_INSPECTION",
+      "current": {
+        "object_id": "lis__V_EMR_INSPECTION",
+        "role": "primary",
+        "source_group": "lis",
+        "host": "10.10.10.73",
+        "port": 1433,
+        "database_hint": "rmcloudlis7",
+        "owner_hint": "dbo",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION"
+        ],
+        "current_identity_verified": false
+      },
+      "historical": {
+        "object_id": "ods__V_EMR_INSPECTION_TEST",
+        "role": "history",
+        "source_group": "ods",
+        "host": "10.10.8.216",
+        "port": 1521,
+        "database_hint": "orcl",
+        "owner_hint": "ODS",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_TEST"
+        ],
+        "current_identity_verified": false
+      },
+      "business_time_expression": null,
+      "route_clock_and_timezone_verified": false,
+      "segments": [
+        {
+          "start": null,
+          "end_exclusive": "2023-10-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_TEST"
+          ]
+        },
+        {
+          "start_inclusive": "2023-10-01",
+          "end_exclusive": "2024-01-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_TEST",
+            "lis__V_EMR_INSPECTION"
+          ],
+          "mode": "PRESERVE_DOCUMENTED_OVERLAP_REVERIFY_BOUNDARIES"
+        },
+        {
+          "start_inclusive": "2024-01-01",
+          "end": null,
+          "sources": [
+            "lis__V_EMR_INSPECTION"
+          ]
+        }
+      ],
+      "current_evidence_state": "RECORDED_USER_AND_EXECUTOR_REPORT_NOT_NEW_LIVE_VERIFIED",
+      "delete_other_origin_allowed": false,
+      "automatic_business_dedupe_allowed": false,
+      "history_slow_path_may_block_independently": true
+    },
+    {
+      "canonical_table": "EMR_INSPECTION_IMAGE",
+      "current": {
+        "object_id": "lis__V_EMR_INSPECTION_IMAGE",
+        "role": "primary",
+        "source_group": "lis",
+        "host": "10.10.10.73",
+        "port": 1433,
+        "database_hint": "rmcloudlis7",
+        "owner_hint": "dbo",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_IMAGE"
+        ],
+        "current_identity_verified": false
+      },
+      "historical": {
+        "object_id": "ods__V_EMR_INSPECTION_IMAGE_TEST",
+        "role": "history",
+        "source_group": "ods",
+        "host": "10.10.8.216",
+        "port": 1521,
+        "database_hint": "orcl",
+        "owner_hint": "ODS",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_IMAGE_TEST"
+        ],
+        "current_identity_verified": false
+      },
+      "business_time_expression": null,
+      "route_clock_and_timezone_verified": false,
+      "segments": [
+        {
+          "start": null,
+          "end_exclusive": "2023-10-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_IMAGE_TEST"
+          ]
+        },
+        {
+          "start_inclusive": "2023-10-01",
+          "end_exclusive": "2024-01-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_IMAGE_TEST",
+            "lis__V_EMR_INSPECTION_IMAGE"
+          ],
+          "mode": "PRESERVE_DOCUMENTED_OVERLAP_REVERIFY_BOUNDARIES"
+        },
+        {
+          "start_inclusive": "2024-01-01",
+          "end": null,
+          "sources": [
+            "lis__V_EMR_INSPECTION_IMAGE"
+          ]
+        }
+      ],
+      "current_evidence_state": "RECORDED_USER_AND_EXECUTOR_REPORT_NOT_NEW_LIVE_VERIFIED",
+      "delete_other_origin_allowed": false,
+      "automatic_business_dedupe_allowed": false,
+      "history_slow_path_may_block_independently": true
+    },
+    {
+      "canonical_table": "EMR_INSPECTION_ALLERGY",
+      "current": {
+        "object_id": "lis__V_EMR_INSPECTION_ALLERGY",
+        "role": "primary",
+        "source_group": "lis",
+        "host": "10.10.10.73",
+        "port": 1433,
+        "database_hint": "rmcloudlis7",
+        "owner_hint": "dbo",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_ALLERGY"
+        ],
+        "current_identity_verified": false
+      },
+      "historical": {
+        "object_id": "ods__V_EMR_INSPECTION_ALLERGY_TEST",
+        "role": "history",
+        "source_group": "ods",
+        "host": "10.10.8.216",
+        "port": 1521,
+        "database_hint": "orcl",
+        "owner_hint": "ODS",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_ALLERGY_TEST"
+        ],
+        "current_identity_verified": false
+      },
+      "business_time_expression": null,
+      "route_clock_and_timezone_verified": false,
+      "segments": [
+        {
+          "start": null,
+          "end_exclusive": "2023-10-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_ALLERGY_TEST"
+          ]
+        },
+        {
+          "start_inclusive": "2023-10-01",
+          "end_exclusive": "2024-01-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_ALLERGY_TEST",
+            "lis__V_EMR_INSPECTION_ALLERGY"
+          ],
+          "mode": "PRESERVE_DOCUMENTED_OVERLAP_REVERIFY_BOUNDARIES"
+        },
+        {
+          "start_inclusive": "2024-01-01",
+          "end": null,
+          "sources": [
+            "lis__V_EMR_INSPECTION_ALLERGY"
+          ]
+        }
+      ],
+      "current_evidence_state": "RECORDED_USER_AND_EXECUTOR_REPORT_NOT_NEW_LIVE_VERIFIED",
+      "delete_other_origin_allowed": false,
+      "automatic_business_dedupe_allowed": false,
+      "history_slow_path_may_block_independently": true
+    },
+    {
+      "canonical_table": "EMR_INSPECTION_ITEM",
+      "current": {
+        "object_id": "lis__V_EMR_INSPECTION_ITEM",
+        "role": "primary",
+        "source_group": "lis",
+        "host": "10.10.10.73",
+        "port": 1433,
+        "database_hint": "rmcloudlis7",
+        "owner_hint": "dbo",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_ITEM"
+        ],
+        "current_identity_verified": false
+      },
+      "historical": {
+        "object_id": "ods__V_EMR_INSPECTION_ITEM_TEST",
+        "role": "history",
+        "source_group": "ods",
+        "host": "10.10.8.216",
+        "port": 1521,
+        "database_hint": "orcl",
+        "owner_hint": "ODS",
+        "object_name_candidates": [
+          "V_EMR_INSPECTION_ITEM_TEST"
+        ],
+        "current_identity_verified": false
+      },
+      "business_time_expression": null,
+      "route_clock_and_timezone_verified": false,
+      "segments": [
+        {
+          "start": null,
+          "end_exclusive": "2023-10-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_ITEM_TEST"
+          ]
+        },
+        {
+          "start_inclusive": "2023-10-01",
+          "end_exclusive": "2024-01-01",
+          "sources": [
+            "ods__V_EMR_INSPECTION_ITEM_TEST",
+            "lis__V_EMR_INSPECTION_ITEM"
+          ],
+          "mode": "PRESERVE_DOCUMENTED_OVERLAP_REVERIFY_BOUNDARIES"
+        },
+        {
+          "start_inclusive": "2024-01-01",
+          "end": null,
+          "sources": [
+            "lis__V_EMR_INSPECTION_ITEM"
+          ]
+        }
+      ],
+      "current_evidence_state": "RECORDED_USER_AND_EXECUTOR_REPORT_NOT_NEW_LIVE_VERIFIED",
+      "delete_other_origin_allowed": false,
+      "automatic_business_dedupe_allowed": false,
+      "history_slow_path_may_block_independently": true
+    }
+  ],
+  "authority": "执行产物/LIS双源架构记录_20261019.md，文中简述两段与Q4并行需结合读取；上线前逐表按真实业务时钟核边界",
+  "overlap_state": "2023Q4业务级重复ID不同按既有保留口径；不静默去重或物理删另一源",
+  "supersedes": "M-05瑞美放开2021/2022历史的旧归因已被双源证据替代；历史药敏/明细性能待核仍开放",
+  "all_modes_use_routes": [
+    "T1",
+    "LATE_BACKLOG",
+    "LOOKBACK",
+    "MONTHLY_RESCAN",
+    "HISTORICAL_REPAIR"
+  ]
+}

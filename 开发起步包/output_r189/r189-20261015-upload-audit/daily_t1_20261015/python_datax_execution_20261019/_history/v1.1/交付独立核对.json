@@ -1,0 +1,15 @@
+{
+  "version": "1.1",
+  "hashes_and_zip": "PASS",
+  "current_10_phases_and_reference_consistency": "PASS",
+  "old_17_phase_mapping_preserved": "PASS",
+  "88_cases_all_not_run": "PASS",
+  "7_sheet_xlsx_reopened": "PASS",
+  "relay_config_disabled_and_no_secret": "PASS",
+  "protocol_reference_hashes": "PASS",
+  "checkpoint_current_and_history": "PASS",
+  "source_db_queries": 0,
+  "relay_requests_sent": 0,
+  "provider_repo_modified": false,
+  "implementation_tests_run": 0
+}

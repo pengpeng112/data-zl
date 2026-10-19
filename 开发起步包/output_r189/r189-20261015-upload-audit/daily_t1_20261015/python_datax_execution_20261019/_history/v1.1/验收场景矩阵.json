@@ -1,0 +1,799 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.1",
+  "planning_only": true,
+  "count": 88,
+  "cases": [
+    {
+      "id": "AT-001",
+      "category": "CONFIG",
+      "trigger": "77项不重不漏，4检验双源与护理ODS对照分开",
+      "expected": "77个唯一规范项；81候选对象不冒充81张规范表",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-002",
+      "category": "CONFIG",
+      "trigger": "未知源/目标/变更依据/投影触发生产计划",
+      "expected": "拒绝该动作，仍可离线列示及模拟",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-003",
+      "category": "CONFIG",
+      "trigger": "护理计划标未使用无法提供",
+      "expected": "登记待适用性确认，不能自动通过或免报",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-004",
+      "category": "CONFIG",
+      "trigger": "只有READ_READY而请求apply",
+      "expected": "没有写批准/白名单时拒绝",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-005",
+      "category": "CONFIG",
+      "trigger": "变更视图或父定义/字典/目标类型",
+      "expected": "受影响配置失效，只复核变化及依赖项",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-006",
+      "category": "SOURCE",
+      "trigger": "业务源SQL含DML/DDL或多语句",
+      "expected": "执行前拒绝，不绕只读校验",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-007",
+      "category": "SOURCE",
+      "trigger": "返回上限小但底层查询缺键/窗或计划依据",
+      "expected": "拒绝或待计划证明，不把限量当扫描安全",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-008",
+      "category": "SOURCE",
+      "trigger": "空页/0行但源延迟或查询异常",
+      "expected": "源未到/失败与真零区分",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-009",
+      "category": "SOURCE",
+      "trigger": "所有分页完整且证实无业务",
+      "expected": "记录真实零及证据，0分母不自动显示100%",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-010",
+      "category": "SOURCE",
+      "trigger": "同秒多ID与边界秒/跨日",
+      "expected": "完整且无边界遗漏，重试仍用原区间",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-011",
+      "category": "SOURCE",
+      "trigger": "早时间戳晚提交或ODS迟到",
+      "expected": "用已证机制捕获；无覆盖依据则待核，不报完整",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-012",
+      "category": "SOURCE",
+      "trigger": "超过行/字节上限、读取中断",
+      "expected": "标未完整，分片/恢复，水位不越过缺片",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-013",
+      "category": "SOURCE",
+      "trigger": "keyset分页末页之外仍有合法记录",
+      "expected": "检测未完整，不将末页不足当唯一结束证明",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-014",
+      "category": "SOURCE",
+      "trigger": "小表快照读取部分失败",
+      "expected": "不推断缺行删除",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-015",
+      "category": "SOURCE",
+      "trigger": "大表无修改时间且无变更清单",
+      "expected": "UNRESOLVED，不能用固定回看保证任意历史更正",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-016",
+      "category": "SOURCE",
+      "trigger": "业务时间旧但今天补录",
+      "expected": "可信变更机制捕获，不只按昨日业务时间",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-017",
+      "category": "RELATION",
+      "trigger": "父时间未变而子图片/项目变更",
+      "expected": "重建受影响组并刷新合法输出",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-018",
+      "category": "RELATION",
+      "trigger": "同患者多次就诊，JOIN只用患者",
+      "expected": "完整组合键规则检出错连候选/实值异常",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-019",
+      "category": "RELATION",
+      "trigger": "父数据未成功且子已读完",
+      "expected": "延后相关子，其他独立组继续",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-020",
+      "category": "RELATION",
+      "trigger": "父一对多扩增或同ID多内容",
+      "expected": "冲突隔离，不以最后一条覆盖",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-021",
+      "category": "RELATION",
+      "trigger": "子项撤销/从完整子集中消失",
+      "expected": "按已证协议处理撤销，单次缺行不删除",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-022",
+      "category": "RELATION",
+      "trigger": "路径排序序号发生变化",
+      "expected": "检测同ID换路径/同路径换ID，未核稳定前不覆盖",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-023",
+      "category": "TYPE",
+      "trigger": "中文字符数合规但目标字节超限",
+      "expected": "按目标编码/字节契约检出，不自动截断",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-024",
+      "category": "TYPE",
+      "trigger": "CLOB跨连接、换行引号或超长正文",
+      "expected": "完整流式读取/编码/hash可比，展示截断不参与全内容hash",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-025",
+      "category": "TYPE",
+      "trigger": "高精度Decimal金额与负数/舍入边界",
+      "expected": "不经float损失，按批准精度检查",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-026",
+      "category": "TYPE",
+      "trigger": "DATE与TIMESTAMP分数秒或时区差异",
+      "expected": "明确逻辑类型比较，保留精度，不伪造一致",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-027",
+      "category": "TYPE",
+      "trigger": "NULL、空串、空白、多分隔符",
+      "expected": "遵循字段契约，不能任意混同或替'-'",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-028",
+      "category": "TYPE",
+      "trigger": "SYSTEM_TIME每次查询变动但业务不变",
+      "expected": "业务hash不把全表误判修改",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-029",
+      "category": "QUALITY",
+      "trigger": "规范必填/条件必填/值域失败",
+      "expected": "受影响组隔离并计未完成，证据可定位",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-030",
+      "category": "QUALITY",
+      "trigger": "源元数据列可空或长度比目标大",
+      "expected": "仅作为风险，不能冒充实值为空/超长已证",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-031",
+      "category": "QUALITY",
+      "trigger": "源读100行分类含冲突/隔离",
+      "expected": "互斥分类守恒；装载动作统计用独立分母",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-032",
+      "category": "DATAX",
+      "trigger": "querySql模式另配where但querySql未限窗",
+      "expected": "生成校验拒绝；过滤必须进入实际执行SQL",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-033",
+      "category": "DATAX",
+      "trigger": "OracleWriter配置writeMode=update",
+      "expected": "拒绝该假设，改受控stage和ApplyPort",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-034",
+      "category": "DATAX",
+      "trigger": "子进程退出0却有dirty/部分分片/缺manifest",
+      "expected": "不标捕获或质量通过",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-035",
+      "category": "DATAX",
+      "trigger": "进程超时、取消和JVM子孙进程残留",
+      "expected": "只终止本任务进程组，收回资源、保留可恢复stage",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-036",
+      "category": "DATAX",
+      "trigger": "重试多个attempt都部分stage成功",
+      "expected": "按attempt隔离，仅选已完整版本，不重复正式装载",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-037",
+      "category": "DATAX",
+      "trigger": "插件缺失/版本不支持LOB或精度",
+      "expected": "该表路由待确认/已验证Python，禁止无授权自动改通道",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-038",
+      "category": "SECRET",
+      "trigger": "DataX展开job/异常/dirty日志含凭据或患者",
+      "expected": "仅服务器受控私有记录；AI/普通日志/包只脱敏摘要",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-039",
+      "category": "APPLY",
+      "trigger": "正式提交前断连",
+      "expected": "回滚或待判定，stage保留，按原幂等键恢复",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-040",
+      "category": "APPLY",
+      "trigger": "提交已成功但回执响应丢失",
+      "expected": "COMMIT_UNKNOWN；查同事务凭据/目标，不盲重写",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-041",
+      "category": "APPLY",
+      "trigger": "Oracle已提交而平台状态尚未更新",
+      "expected": "凭receipt+manifest核实补记，不重复DML",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-042",
+      "category": "APPLY",
+      "trigger": "同批重复触发或操作幂等键已存在",
+      "expected": "不重复写，返回可核验证据",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-043",
+      "category": "APPLY",
+      "trigger": "历史批晚完成且源版本较旧",
+      "expected": "不覆盖新目标，旧版计无操作/冲突",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-044",
+      "category": "APPLY",
+      "trigger": "同版本不同内容或版本无可信顺序",
+      "expected": "冲突隔离/受控重读，不比较hash大小定新旧",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-045",
+      "category": "APPLY",
+      "trigger": "一个记录组超过事务预算",
+      "expected": "保持stage，明确原子发布方案，不静默发布半组",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-046",
+      "category": "APPLY",
+      "trigger": "前置机没有DATETIME辅助字段",
+      "expected": "显式载荷排除辅助列，不按不存在列删除",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-047",
+      "category": "CONCURRENCY",
+      "trigger": "PG租约过期但旧worker仍可能写Oracle",
+      "expected": "目标栅栏拒旧token，或禁止自动接管并先解未决事务",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-048",
+      "category": "CONCURRENCY",
+      "trigger": "每日增量和历史任务竞争同表写入",
+      "expected": "同表单写并保护新版本；日常优先，历史错峰",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-049",
+      "category": "CONCURRENCY",
+      "trigger": "一个源持续超时但其他源正常",
+      "expected": "该源熔断/告警，其余已获准源继续",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-050",
+      "category": "CONCURRENCY",
+      "trigger": "全局/每源并发及截止重试预算耗尽",
+      "expected": "不超预算继续开线程，分类预警并保留待办",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-051",
+      "category": "RECONCILE",
+      "trigger": "源目标条数相等但ID不同",
+      "expected": "集合核对检出，计数相等不判完整",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-052",
+      "category": "RECONCILE",
+      "trigger": "ID相同但业务字段不同",
+      "expected": "按规范类型/hash/字段diff检出",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-053",
+      "category": "RECONCILE",
+      "trigger": "两次源查询不是同一可解释截点",
+      "expected": "不把变化造成的差额直接定漏数，先建立一致范围证据",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-054",
+      "category": "RECONCILE",
+      "trigger": "源系统有数据但未同步到ODS",
+      "expected": "源至ODS延迟单列，ODS等于目标不能证明全链完整",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-055",
+      "category": "MANUAL",
+      "trigger": "一表缺时间/INVALID，其他表就绪",
+      "expected": "生成局部工单，继续其他表和本地开发",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-056",
+      "category": "MANUAL",
+      "trigger": "用户报告视图已修复",
+      "expected": "重新取证/验证，不能自动闭单",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-057",
+      "category": "MANUAL",
+      "trigger": "修复改变字段/ID导致旧stage不兼容",
+      "expected": "旧stage隔离，受影响范围重抽，新配置/批次留版本",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-058",
+      "category": "DELIVERY",
+      "trigger": "目标已落地但无省端回执或被拒绝",
+      "expected": "区分待反馈/拒绝，不标全链完成",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-059",
+      "category": "DELIVERY",
+      "trigger": "重传更改输出状态或SYSTEM_TIME",
+      "expected": "按省协议已确认规则处理，不猜EXCHANGE_TYPE映射",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-060",
+      "category": "SLA",
+      "trigger": "未提供省端deadline/达标环节",
+      "expected": "参数待确认，模拟可测但生产及时性不标READY",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-061",
+      "category": "SLA",
+      "trigger": "累计7次模拟成功但未观测7业务日",
+      "expected": "本地用例通过，不冒充E10内部观测验收",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-062",
+      "category": "SECURITY",
+      "trigger": "隔离库身份不明或pytest会清共享库",
+      "expected": "停止集成动作，继续纯逻辑工作",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-063",
+      "category": "SECURITY",
+      "trigger": "同表有其他会话在跑/文件被占用",
+      "expected": "保护原域，不杀进程/不改原执行器，准备交接",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-064",
+      "category": "SECURITY",
+      "trigger": "无适用白名单执行器但请求正式写入",
+      "expected": "保持WAITING_APPROVAL/能力缺口，不临时直连写",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-065",
+      "category": "ALERT",
+      "trigger": "中文JSON/空白与实际请求字节签名",
+      "expected": "先冻结UTF-8原始字节后签名，发送同一字节；内容改一字节验签失败（隔离）",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-066",
+      "category": "ALERT",
+      "trigger": "GET事件状态请求",
+      "expected": "使用POST响应UUID，空body HMAC；不能把source_event_id或{}当GET签名body",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-067",
+      "category": "ALERT",
+      "trigger": "POST202且任务pending/processing",
+      "expected": "仅标ACK_QUEUED，查询目标，不标送达",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-068",
+      "category": "ALERT",
+      "trigger": "同事件重试跨时间/进程重启",
+      "expected": "相同ID和body字节/occurred_at，换新秒header时间戳与签名",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-069",
+      "category": "ALERT",
+      "trigger": "POST超时但服务端可能已经入队",
+      "expected": "原ID原字节重试，duplicate后恢复同一UUID，不能重新造事件",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-070",
+      "category": "ALERT",
+      "trigger": "同ID不同内容409或无法分型409",
+      "expected": "内容冲突待人工；不自动换ID掩盖冲突；已证重放才有界跨秒重签",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-071",
+      "category": "ALERT",
+      "trigger": "密钥/时钟错误401",
+      "expected": "暂停自动重试与记录通道异常，不为测试向生产连续错签名触发锁定",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-072",
+      "category": "ALERT",
+      "trigger": "429限流/锁定及503背压",
+      "expected": "429至少60秒并尊重更长Retry-After；503按Retry-After；原事件不变",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-073",
+      "category": "ALERT",
+      "trigger": "400/422报文错误或带receivers",
+      "expected": "发送端拒绝/待修，不盲重试；收件人只能relay订阅配置",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-074",
+      "category": "ALERT",
+      "trigger": "5xx/断网/重试预算耗尽",
+      "expected": "有界退避及持久待办，不丢事件或把通知报成功",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-075",
+      "category": "ALERT",
+      "trigger": "77表同源连接失败和持续重复故障",
+      "expected": "源级聚合并保留表影响明细，去重/频控不压掉首次及red升级",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-076",
+      "category": "ALERT",
+      "trigger": "故障升级、持续提醒或已验证恢复",
+      "expected": "新revision和新事件ID；原payload不改，恢复不等于简单退出0",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-077",
+      "category": "ALERT",
+      "trigger": "部分目标失败/取消/needs_attention或outcome_uncertain",
+      "expected": "不标全目标送达；记录逐目标与不确定状态，不自动admin重放",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-078",
+      "category": "ALERT",
+      "trigger": "POST202但零目标/无任务列表",
+      "expected": "ROUTE_UNRESOLVED并核订阅，不虚报成功或客户端指定接收人",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-079",
+      "category": "ALERT",
+      "trigger": "告警outbox与失败任务状态保存中途崩溃",
+      "expected": "同事务或可证明补偿恢复；事件唯一键去重，不能重复丢失",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-080",
+      "category": "ALERT",
+      "trigger": "控制DB不可用或本地spool满",
+      "expected": "受限脱敏spool有界补偿，满/积压由独立监测可见，不静默丢",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-081",
+      "category": "ALERT",
+      "trigger": "worker/控制进程崩溃无法自发告警",
+      "expected": "独立巡检按心跳识别并通知；不是第二抽取入口",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-082",
+      "category": "ALERT",
+      "trigger": "relay本身故障或凭据错，业务读取正常",
+      "expected": "通知待办不阻塞合法独立组，不递归向坏relay发它自己的失败",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-083",
+      "category": "ALERT",
+      "trigger": "异常字符串/metadata含患者、原SQL、密钥",
+      "expected": "发送端白名单/脱敏，<=32键；通用AI和消息不泄露原载荷",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-084",
+      "category": "ALERT",
+      "trigger": "指南示例接收账号或源名尚未登记",
+      "expected": "保持接入关闭及管理员待办，不能直接使用示例账号/凭据外发",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-085",
+      "category": "ALERT",
+      "trigger": "base_url或metadata被用作任意目标URL",
+      "expected": "端点白名单和固定路径，事件不能注入URL/接收人",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-086",
+      "category": "ALERT",
+      "trigger": "同秒重签仍复用签名/GET高频轮询",
+      "expected": "等待新秒且限制POST+GET总频率，查询有预算/截止，不绕防重放",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-087",
+      "category": "BATCH",
+      "trigger": "E08隔离受阻而生产静态包可做",
+      "expected": "子任务独立继续，E09仍须隔离与审阅门禁，不能由审阅完成冒充集成通过",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    },
+    {
+      "id": "AT-088",
+      "category": "BATCH",
+      "trigger": "E10分组上线完成但尚未实测7业务日",
+      "expected": "rollout/observation/ops_handover分开，批次合并不降低验收",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null,
+      "environment_note": "先映射实际实现的离线/隔离/批准真实验证；不能把模拟冒充真实通过"
+    }
+  ]
+}

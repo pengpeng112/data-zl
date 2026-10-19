@@ -1,0 +1,54 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "snapshot_captured": false,
+  "state": "LIVE_SNAPSHOT_REQUIRED_AT_E01_AND_REFRESH_AT_CUTOVER",
+  "source": "8.53按ops-runbook受控只读进程/状态文件核验；本轮未SSH",
+  "user_reported_tasks": [
+    "discharge_manual2（用户称今晚收尾，未新核）",
+    "出院30个月旧数据重刷（待排期，不据此启动）",
+    "dqueue",
+    "gap_exec"
+  ],
+  "collect_allowlist": [
+    "host",
+    "capture_time",
+    "pid",
+    "ppid",
+    "process_start_time",
+    "elapsed_seconds",
+    "comm",
+    "allowlisted_script_name",
+    "script_sha256",
+    "canonical_tables",
+    "business_windows",
+    "write_mode",
+    "writer_owner",
+    "checkpoint_or_receipt_safe_ref",
+    "commit_unknown_state"
+  ],
+  "never_collect": [
+    "environment_values",
+    "full_command_line",
+    "credentials",
+    "patient_identifiers_or_file_payload"
+  ],
+  "handoff_template": {
+    "table": null,
+    "old_writer_identity": null,
+    "latest_progress_evidence": null,
+    "remaining_windows": null,
+    "pending_commit_resolved": null,
+    "old_writer_stopped_or_fenced_evidence": null,
+    "new_writer_lease_and_target_fence": null,
+    "cutover_snapshot_ref": null,
+    "handoff_owner": null
+  },
+  "gates": [
+    "没有快照不视为旧写者已停",
+    "切换前新快照核PID+启动时间防PID复用",
+    "不因文件done判所有窗成功",
+    "不杀原进程、不覆盖在跑脚本、不启动第二正式writer"
+  ],
+  "local_development_not_blocked_by_snapshot_missing": true
+}

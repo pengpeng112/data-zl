@@ -1,0 +1,37 @@
+{
+ "batch": "E05",
+ "generated_at": "2026-10-19T15:46:24+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "argv": [
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "backend/tests/reporting_pipeline_unit",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 126 tests in 0.257s",
+    "",
+    "OK"
+   ]
+  }
+ ],
+ "delivered": [
+  "apply_port.py（门禁：完整manifest/质量/批准/白名单/围栏；版本保护旧不覆新+hash不当顺序；COMMIT_UNKNOWN拒盲重放；REPLACE_MONTH显式范围键+发布检查单）",
+  "reconcile.py（键集+内容diff/条数相等不判完整/不外推源-ODS同步完整性）",
+  "test_apply_reconcile.py（16测试）"
+ ],
+ "receipt_fields": [
+  "operation_id",
+  "batch_id",
+  "manifest_hash",
+  "rows_affected",
+  "mode",
+  "target"
+ ]
+}

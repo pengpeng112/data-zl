@@ -1,0 +1,50 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "enabled": false,
+  "required_before_drift_tables_production_ready": true,
+  "tables": [
+    "EMR_DOC_ORDER_CHECK",
+    "EMR_IN_FEE_INFO_CHILD"
+  ],
+  "cadence_candidate": "MONTHLY_COVERAGE_CYCLE",
+  "business_month_is_not_run_month": true,
+  "managed_history_scope": "已接受历史基线业务月 + 2026至H0基线 + 此后纳管业务月，至少明确2025；E01填写，不猜起止月",
+  "managed_history_start_month": null,
+  "managed_history_end_month": null,
+  "cycle_max_age_days": null,
+  "coverage_ledger": [
+    "table",
+    "business_month",
+    "route_or_origin",
+    "last_complete_snapshot_cutoff",
+    "last_reconciled_at",
+    "next_due",
+    "pending_slices",
+    "failed_slices",
+    "unresolved_quality",
+    "overdue_reason"
+  ],
+  "scope_missing_action": "BLOCK_THIS_RESCAN_READY_REPORT_COVERAGE_UNKNOWN",
+  "budget": "E01按历史月/每源画像测算整轮成本与完成期限；优先每日，夜间错峰轮巡；到期未扫告警，不承诺未证明可完成的每月全扫",
+  "logical_mode": "REPLACE_COMPLETE_BUSINESS_MONTH_OR_APPROVED_COMPLETE_SUBSLICES",
+  "publish_order": [
+    "freeze_routes_and_scope",
+    "complete_bounded_source_capture",
+    "manifest_and_quality",
+    "stage_verify",
+    "obtain_same_table_writer_and_version_guard",
+    "approved_atomic_replace",
+    "readback_and_receipt",
+    "close_all_slices_then_business_month"
+  ],
+  "delete_before_source_complete_allowed": false,
+  "delete_commit_before_insert_allowed": false,
+  "target_datetime_assumed": false,
+  "window_target_proof": "实际目标业务列或经核完整键清单/来源归属；不能按目标不存在的DATETIME删",
+  "atomicity": "源完整质量通过后，获批执行器在同事务删该发布范围+插完整stage并留提交证据；超预算按完整受控子窗发布，每月全片成功才闭合，父子可见性另外核实",
+  "partial_quality_action": "整月替换不得含未解释隔离；合法组仅通过获批独立按键发布，月仍待补，原目标不盲删",
+  "old_snapshot_guard": "获同表写锁后验证源截点/版本；不能把旧stage替换最新日批。无版本则受控重读或废弃旧stage。",
+  "source_partition_guard": "LIS等多源不可单源整月删除；完整来源账本及父子覆盖先验",
+  "limitations": "仅保证已纳管且完成轮巡的可见截点；任意更早/超范围历史修改仍须覆盖扩展或可靠变更日志，不声称无限历史无漏"
+}

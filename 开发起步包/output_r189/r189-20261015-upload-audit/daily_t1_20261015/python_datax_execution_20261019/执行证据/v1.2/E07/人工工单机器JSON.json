@@ -1,0 +1,173 @@
+{
+ "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+ "tickets": [
+  {
+   "ticket_id": "E01-DISCHARGE-PERF",
+   "tables": [
+    "EMR_DISCHARGE_RECORD"
+   ],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": "R189:discharge_opt_review_20261019/复核报告与整改建议.md",
+   "action": "按正确候选人工修复并验外层窗口下推，不能执行原占位稿或承诺亚秒",
+   "note": "VERIFY_CURRENT_DEFINITION_AND_PERFORMANCE",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  },
+  {
+   "ticket_id": "E01-DISCHARGE-QUALITY",
+   "tables": [
+    "EMR_DISCHARGE_RECORD"
+   ],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": "R189:discharge_opt_review_20261019/问题与后续核查.json",
+   "action": "医师/证号各113、正文1条旧样本缺失需定位修复；不视为当前全量计数",
+   "note": "OPEN",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  },
+  {
+   "ticket_id": "E01-DATETIME-DEPENDENCY",
+   "tables": [
+    "EMR_IN_FEE_INFO_CHILD",
+    "EMR_OUT_FEE_INFO_CHILD",
+    "EMR_DOC_ORDER_CHECK"
+   ],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": null,
+   "action": "核当前DATETIME类型/表达式/依赖指纹与下推，不把辅助列写目标",
+   "note": "REVERIFY_REPORTED_CHANGE",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  },
+  {
+   "ticket_id": "E01-LIS-LEGACY-ACCESS",
+   "tables": [
+    "EMR_INSPECTION_ALLERGY",
+    "EMR_INSPECTION_ITEM"
+   ],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": null,
+   "action": "历史TEST路线先有界访问优化，M-05改为双源，不要求瑞美凭空补上线前历史",
+   "note": "OPEN_HISTORICAL_ROUTE_ONLY",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  },
+  {
+   "ticket_id": "E01-WRITER-HANDOFF",
+   "tables": [],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": null,
+   "action": "核8.53在跑进程与未决提交，逐表交接，开发可继续但新正式写者不能抢跑",
+   "note": "LIVE_SNAPSHOT_REQUIRED",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  },
+  {
+   "ticket_id": "E01-CREDENTIAL-LIFETIME",
+   "tables": [],
+   "source_identity": null,
+   "view_object": null,
+   "problem_category": "OTHER",
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "sql_location_ref": null,
+   "impact_scope": null,
+   "affected_batches": [],
+   "fix_suggestion": null,
+   "expected_output_ref": null,
+   "owner_role": "USER_HUMAN",
+   "blocking_scope": "affected_table_or_group_only",
+   "state": "OPEN",
+   "detail_ref": null,
+   "action": "长期服务接受控密码库，禁止沿用/tmp/e2_env；临时job仅运行时解析后私有短期物化",
+   "note": "LONG_LIVED_SECRET_REF_REQUIRED",
+   "history": [
+    {
+     "to": "OPEN",
+     "reason": "init"
+    }
+   ]
+  }
+ ],
+ "never_auto_close": true
+}

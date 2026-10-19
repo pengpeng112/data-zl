@@ -1,0 +1,99 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "user_policy": "失败范围隔离并告警，继续其他可独立任务，失败项排队补抽",
+  "default": "CONTINUE_INDEPENDENT_SCOPES",
+  "failure_terminal_success_allowed": false,
+  "silent_skip_allowed": false,
+  "persist": [
+    "task",
+    "source_identity",
+    "fixed_window_or_keyset_digest",
+    "attempt",
+    "error_class_and_safe_code",
+    "manifest_state",
+    "next_retry_or_manual_condition",
+    "owner",
+    "alert_incident",
+    "receipt_state",
+    "gap_ledger"
+  ],
+  "rules": [
+    {
+      "error": "ROW_OR_GROUP_QUALITY",
+      "scope": "affected_record_group",
+      "state": "QUARANTINED",
+      "next": "其他完整合法组继续；原载荷持久后可推进捕获游标，但质量/装载仍未闭合"
+    },
+    {
+      "error": "READ_SQL_OR_VIEW_ERROR",
+      "scope": "failed_window_or_route",
+      "state": "WAITING_VIEW_FIX",
+      "next": "保留失败窗和工单；继续独立日/表；不能伪造取到0行"
+    },
+    {
+      "error": "TRANSIENT_READ_DISCONNECT",
+      "scope": "window_then_physical_source_if_repeated",
+      "state": "RETRYABLE_OR_WAITING_SOURCE",
+      "next": "有界退避抖动；源级熔断及单探针半开，不逐表重连风暴"
+    },
+    {
+      "error": "ROW_OR_BYTE_CAP",
+      "scope": "incomplete_slice",
+      "state": "SPLIT_PENDING",
+      "next": "仅完整叶可复用；拆分树持久化，到最小粒度转稳定keyset或待处理"
+    },
+    {
+      "error": "KNOWN_ROLLBACK",
+      "scope": "affected_apply_batch",
+      "state": "RETRYABLE",
+      "next": "确认回滚后同幂等键恢复；其他表继续"
+    },
+    {
+      "error": "COMMIT_UNKNOWN",
+      "scope": "same_target_table_writer",
+      "state": "COMMIT_UNKNOWN",
+      "next": "冻结该表全部写任务，先核同事务凭据；其他表继续，不盲重放或切到下一天写"
+    },
+    {
+      "error": "PARENT_PENDING",
+      "scope": "affected_child_keys_or_groups",
+      "state": "BLOCKED_DEPENDENCY",
+      "next": "暂存待父，其他已证父键的独立子组继续"
+    },
+    {
+      "error": "SOURCE_IDENTITY_MISMATCH",
+      "scope": "affected_physical_source_routes",
+      "state": "BLOCKED_IDENTITY",
+      "next": "拒绝该源，其他已验证源继续"
+    },
+    {
+      "error": "ALERT_RELAY_FAILURE",
+      "scope": "notification_channel",
+      "state": "ALERT_PENDING",
+      "next": "outbox持久重试/独立监测，合法抽取继续，不递归告警"
+    },
+    {
+      "error": "CONTROL_STORE_OR_GLOBAL_FENCE_FAILURE",
+      "scope": "actual_shared_unprovable_scope",
+      "state": "SAFETY_HOLD",
+      "next": "无法持久断点或保证单写时暂停相关领取/写入；只有全局依赖确失效才全局暂停"
+    }
+  ],
+  "source_circuit_key": "physical_source_identity_not_table_name",
+  "retry_budgets": {
+    "max_attempts": null,
+    "max_elapsed_seconds": null,
+    "backoff_jitter_required": true,
+    "half_open_probes": 1,
+    "must_freeze_per_profile_before_enable": true
+  },
+  "watermark": "允许后续独立窗口完成并入区间账本；连续水位只到首个缺片前。质量已完整捕获可按原持久化规则推进捕获游标，装载/质量/回执仍单列未闭合。",
+  "run_summary": [
+    "SUCCESS",
+    "PARTIAL_SUCCESS_WITH_BACKLOG",
+    "WAITING_SHARED_DEPENDENCY",
+    "SAFETY_HOLD"
+  ],
+  "stop_all_on_first_error": false
+}

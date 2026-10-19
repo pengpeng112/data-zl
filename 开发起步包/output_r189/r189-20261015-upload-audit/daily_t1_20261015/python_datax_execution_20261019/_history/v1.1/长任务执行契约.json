@@ -1,0 +1,362 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.1",
+  "version": "1.1",
+  "parent_task": "R189-UPLOAD-AUDIT-2021-2024",
+  "planning_only": true,
+  "repo_root": "F:\\python\\数据资产",
+  "plan": "Python与DataX统一T加1顶层设计及长任务执行计划.md",
+  "prompt": "给执行AI的长任务启动提示词.md",
+  "checkpoint": "开发起步包/output_r189/r189-20261015-upload-audit/checkpoint.json",
+  "checkpoint_node": "daily_t1.engineering_execution_20261019",
+  "result_path": "执行结果总报告.md",
+  "state": "PLAN_READY_EXECUTION_NOT_STARTED",
+  "scope": {
+    "canonical_items": 77,
+    "source_groups": 11,
+    "review_objects": 81,
+    "not_provided_pending_applicability": 1
+  },
+  "user_boundary": "用户人工修改源视图；执行AI负责抽取工程、证据及局部阻塞恢复",
+  "architecture": "Python control + DataX/Python read adapters + staged validation + approved apply + reconcile/delivery",
+  "invariants": [
+    "源只读且通道逐源获准",
+    "生产写入只走适用白名单/批准",
+    "默认77项disabled/UNKNOWN",
+    "固定窗口/完整清单/水位分离",
+    "正式提交未知先回读",
+    "旧批不能覆盖新版本",
+    "父子及仅子变化覆盖",
+    "视图问题局部工单不拖全部",
+    "AI接口只读、不自动审批",
+    "平台asset新表及隔离验收",
+    "不强制特定模型/CLI/工具替换",
+    "告警202只入队、逐目标查送达",
+    "不可变事件及HMAC原字节",
+    "同源聚合/去重/升级恢复、独立失联监测"
+  ],
+  "approvals": {
+    "local_development": "任务范围内可持续开发；核claim与仓库规则",
+    "source_daytime_batch": "PENDING_CURRENT_SCOPE",
+    "business_data_reads": "PER_SQL_KEY_WINDOW_AND_BUDGET_REQUIRED",
+    "isolated_db": "VERIFY_DISPOSABLE_IDENTITY_BEFORE_MUTATION",
+    "production_schema_write_publish_cron_cdc": "NOT_AUTHORIZED_BY_THIS_PLAN",
+    "git_push_tag": "NOT_AUTHORIZED",
+    "relay_registration_subscription_secret_or_real_send": "ADMIN_SETUP_AND_SPECIFIC_TEST_OR_PRODUCTION_SCOPE_REQUIRED"
+  },
+  "alerts": {
+    "design": "企业微信公共告警接口对接设计.md",
+    "config": "告警接入配置候选.json",
+    "rules": "告警触发与升级规则.json",
+    "state": "DESIGN_ONLY_NOT_CONNECTED"
+  },
+  "batch_mapping": "批次合并映射.json",
+  "previous_version": "1.0",
+  "tasks": [
+    {
+      "id": "E01",
+      "maps_to": "T0/T1准备",
+      "objective": "起步盘点、输入/占用/权限核实、77项配置模型与CLI、告警源/订阅管理员待办",
+      "acceptance": "77项不漏不重、UNKNOWN拒生产、11源81候选有据；不以登记代替当前验证",
+      "depends_on": [],
+      "proposed_edit_scope": [
+        "本轮证据及配置目录",
+        "backend/app/services/reporting_pipeline/contracts.py",
+        "backend/scripts/reporting_ctl.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E01/命令与结果.json",
+        "执行证据/v1.1/E01/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E00",
+        "E01"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E02",
+      "maps_to": "T1软件",
+      "objective": "Repository和状态机、幂等/租约/水位、固定窗/分页/DAG/基线；告警incident及outbox契约",
+      "acceptance": "重启恢复、非法跃迁拒绝、同秒/迟到/子变更覆盖、事件不可变、未知提交不盲重放",
+      "depends_on": [
+        "E01"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/repositories.py",
+        "backend/app/services/reporting_pipeline/planner.py",
+        "backend/app/models/asset_reporting.py",
+        "候选手写迁移及alert incident/outbox模型"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E02/命令与结果.json",
+        "执行证据/v1.1/E02/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E02",
+        "E03"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E03",
+      "maps_to": "T2开发",
+      "objective": "合并Python与DataX适配器、逻辑类型/流式/取消、模板/受限进程与manifest",
+      "acceptance": "两引擎同契约；LOB/Decimal/上限/dirty/部分stage/版本兼容模拟，真实能力待验",
+      "depends_on": [
+        "E02"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/adapters/python_reader.py",
+        "backend/app/services/reporting_pipeline/adapters/datax_runner.py",
+        "候选DataX模板"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E03/命令与结果.json",
+        "执行证据/v1.1/E03/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E04",
+        "E05"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E04",
+      "maps_to": "T2开发",
+      "objective": "暂存完整性、V1.3规则、组守恒、内容hash、质量隔离与异常分类",
+      "acceptance": "必填/字节/精度/错组/冲突有独立预期；完整性未证不得装正式或推水位",
+      "depends_on": [
+        "E03"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/staging.py",
+        "backend/app/services/reporting_pipeline/quality.py"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E04/命令与结果.json",
+        "执行证据/v1.1/E04/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E06"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E05",
+      "maps_to": "T2开发",
+      "objective": "受控ApplyPort、版本/提交凭据、源目标键和内容核对、父子/依赖失效",
+      "acceptance": "未批准拒写；commit未知先回读、旧版不覆新、同数不同ID和内容差异均检出",
+      "depends_on": [
+        "E04"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/apply_port.py",
+        "backend/app/services/reporting_pipeline/reconcile.py",
+        "适用白名单桥接候选"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E05/命令与结果.json",
+        "执行证据/v1.1/E05/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E07",
+        "E08"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E06",
+      "maps_to": "T2开发",
+      "objective": "调度/优先级/资源与恢复；企微v2 AlertClient、HMAC、outbox sender、去重/升级/恢复和失联巡检",
+      "acceptance": "同表单写/目标栅栏、故障有界；202只入队、查询各目标送达，重试不改事件内容",
+      "depends_on": [
+        "E05"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/recovery.py",
+        "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+        "backend/app/services/reporting_pipeline/alerts_client.py",
+        "backend/app/services/reporting_pipeline/alerts_outbox.py",
+        "既有独立巡检桥接"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E06/命令与结果.json",
+        "执行证据/v1.1/E06/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E09"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E07",
+      "maps_to": "T2合成预检",
+      "objective": "人工整改闭环、日报/反馈、告警状态展示、CLI端到端与完整故障矩阵、脱敏及交接",
+      "acceptance": "一表问题局部继续；修复声明不自动闭单；抽取和告警分别验收，不虚报真实送达或7日观测",
+      "depends_on": [
+        "E06"
+      ],
+      "proposed_edit_scope": [
+        "backend/app/services/reporting_pipeline/manual_tickets.py",
+        "backend/app/services/reporting_pipeline/reports.py",
+        "backend/tests/reporting_pipeline_unit/",
+        "本轮证据目录"
+      ],
+      "environment": "LOCAL_OFFLINE",
+      "evidence": [
+        "执行证据/v1.1/E07/命令与结果.json",
+        "执行证据/v1.1/E07/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E10",
+        "E11"
+      ],
+      "subtasks": [],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E08",
+      "maps_to": "T2隔离及审阅",
+      "objective": "分别推进隔离库/真实插件协议测试，以及完整生产审阅包、白名单/DDL候选/回滚/接入待办",
+      "acceptance": "隔离身份核实后才测试；Oracle不由PG冒充；隔离受阻仍完成静态审阅包，子状态分开",
+      "depends_on": [
+        "E07"
+      ],
+      "proposed_edit_scope": [
+        "backend/tests/reporting_pipeline_integration/",
+        "明确可清理隔离环境（条件依赖）",
+        "deploy/reporting_pipeline/",
+        "本轮生产审阅材料"
+      ],
+      "environment": "ISOLATED_INTEGRATION_PLUS_INDEPENDENT_STATIC_REVIEW",
+      "evidence": [
+        "执行证据/v1.1/E08/命令与结果.json",
+        "执行证据/v1.1/E08/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E12",
+        "E13"
+      ],
+      "subtasks": [
+        "isolated_integration",
+        "production_review_pack"
+      ],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E09",
+      "maps_to": "T2真实试点",
+      "objective": "具体批准后主子组/异构源/复杂文书有界端到端；管理员指定测试订阅验证企微入队/查询/到达",
+      "acceptance": "E08隔离验收与审阅放行及具体批准齐备；无真实患者造错、无生产源错签名冲击测试",
+      "depends_on": [
+        "E08"
+      ],
+      "proposed_edit_scope": [
+        "逐对象获批真实试点范围",
+        "管理员指定且明确获准的relay测试订阅",
+        "本轮试点证据"
+      ],
+      "environment": "EXPLICITLY_APPROVED_PRODUCTION_AND_RELAY_SCOPE_ONLY",
+      "evidence": [
+        "执行证据/v1.1/E09/命令与结果.json",
+        "执行证据/v1.1/E09/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E14"
+      ],
+      "subtasks": [],
+      "entry_gates": [
+        "E08.isolated_integration=VERIFIED",
+        "E08.production_review_pack=READY",
+        "explicit_current_production_and_relay_approval"
+      ],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    },
+    {
+      "id": "E10",
+      "maps_to": "T3/T4/T5",
+      "objective": "逐源分组灰度、单表旧写者交接、至少7业务日观测及运维主备交接",
+      "acceptance": "上线/观测/运维三个子状态分别验收；77项各有明确结论，含质量/时效/告警反馈证据",
+      "depends_on": [
+        "E09"
+      ],
+      "proposed_edit_scope": [
+        "逐组获批切换及范围内观测",
+        "本轮运维交接/观测证据"
+      ],
+      "environment": "EXPLICITLY_APPROVED_PRODUCTION_AND_RELAY_SCOPE_ONLY",
+      "evidence": [
+        "执行证据/v1.1/E10/命令与结果.json",
+        "执行证据/v1.1/E10/验收说明.md"
+      ],
+      "status_authority": "原run/checkpoint.json -> daily_t1.engineering_execution_20261019.batches",
+      "execution_state": "NOT_STARTED",
+      "legacy_tasks_v1_0": [
+        "E15",
+        "E16"
+      ],
+      "subtasks": [
+        "rollout",
+        "observation",
+        "ops_handover"
+      ],
+      "entry_gates": [],
+      "recovery": "保留成功/失败证据和原批次边界；只暂停必要条件未满足的步骤，继续其他独立任务；不覆盖其他会话或绕门禁"
+    }
+  ],
+  "milestones": [
+    "LOCAL_ENGINE_VERIFIED",
+    "ISOLATED_INTEGRATION_VERIFIED",
+    "PILOT_VERIFIED",
+    "ROLLOUT_PARTIAL_OR_FULL",
+    "OBSERVATION_ACCEPTED",
+    "OPS_HANDOVER_ACCEPTED"
+  ],
+  "done_criteria": [
+    "E01—E07实现和真实离线证据，不虚构命令或测试",
+    "E08隔离验收不能以PG冒充Oracle，静态包可独立推进",
+    "E09—E10只按真实批准和证据判定，E10上线/观测/运维子门禁分开",
+    "告警真实入队与目标送达分开，未注册/配置/获准不得外发",
+    "77项均有上线或具体待核/人工/适用性结论",
+    "源目标无未解释差额且时效按省端契约",
+    "报告/目录/checkpoint与等待同步"
+  ]
+}

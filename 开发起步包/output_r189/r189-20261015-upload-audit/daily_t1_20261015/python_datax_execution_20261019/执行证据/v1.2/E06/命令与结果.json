@@ -1,0 +1,24 @@
+{
+ "batch": "E06",
+ "generated_at": "2026-10-19T15:50:26+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 156 tests in 0.338s",
+    "",
+    "OK"
+   ]
+  }
+ ],
+ "delivered": [
+  "alerts_client.py（HMAC原字节签名/202只入队/逐目标sent判定/401停盲重试/429≥60s且尊重更长Retry-After/503/400永久/409分型/有界退避抖动/跨秒重签不伪造时钟/GET空body签名/metadata白名单32键/无receivers/隐私自检）",
+  "alerts_outbox.py（sender独立处理outbox：POST→ACK_QUEUED→轮询→DELIVERED/ROUTE_UNRESOLVED零目标/NEEDS_ATTENTION；发送失败不阻断抽取）",
+  "recovery.py（逐状态下一安全动作：COMMIT_UNKNOWN冻结同表写者/WAITING_VIEW_FIX继续独立/月漂移进重扫队列）",
+  "scheduler_bridge.py（单入口run_cycle：DAG+模式优先级/同表单写租约/源级熔断不派发/失败继续PARTIAL_SUCCESS_WITH_BACKLOG）",
+  "test_alerts_flow.py（30测试）"
+ ],
+ "real_requests_sent": 0,
+ "transport": "FakeTransport only；真实HTTP仅E09获批联调"
+}

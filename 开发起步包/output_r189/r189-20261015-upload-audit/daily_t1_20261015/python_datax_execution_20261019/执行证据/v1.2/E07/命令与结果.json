@@ -1,0 +1,38 @@
+{
+ "batch": "E07",
+ "generated_at": "2026-10-19T15:55:04+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_all",
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 173 tests in 0.354s",
+    "",
+    "OK"
+   ]
+  },
+  {
+   "name": "ruff_check_new_files",
+   "exit_code": 0,
+   "result_tail": [
+    "All checks passed!"
+   ]
+  },
+  {
+   "name": "reporting_ctl_daily_report",
+   "exit_code": 0
+  },
+  {
+   "name": "reporting_ctl_ticket_export",
+   "exit_code": 0
+  }
+ ],
+ "delivered": [
+  "manual_tickets.py（工单状态机：用户报修→FIX_REPORTED→REVERIFYING 取证，不直接CLOSED；VERIFIED需证据；旧stage复用判定=定义指纹变化→重抽/未变+核对过→受控重放）",
+  "reports.py（日报必列六分节+分母分开77/76/1/0+DEADLINE_UNCONFIGURED→SLA_UNKNOWN+A12+relay入队送达分开）",
+  "CLI daily-report/ticket-export 落地",
+  "故障规则矩阵对拍测试（10条error全部映射到实现+测试）",
+  "xlsx：77项接入状态与人工视图工单_20261019.xlsx"
+ ],
+ "fault_matrix": "故障隔离与继续执行规则.json 10条 error 与 FAULT_RULE_IMPLEMENTATION 1:1 对拍通过"
+}

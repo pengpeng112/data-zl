@@ -1,0 +1,11 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "planning_only": true,
+  "CHAR": "仅已核固定宽CHAR/NCHAR及字段契约去右侧填充空格，不统一strip全部Unicode空白",
+  "VARCHAR_LOB_PATH": "默认完整比较，保留有意义空白/换行，不套CHAR rstrip；另有明确业务规范才变换",
+  "NUMERIC": "int/Decimal精确十进制比较；120和120.00值等价；禁经float、禁任意容差、禁未经批准量化金额",
+  "FLOAT_FROM_DRIVER": "按真实逻辑类型单独处理；声明Decimal/金额却仅获float需兼容验收，不以float比对精确数",
+  "DATE_TIMESTAMP": "核逻辑时区及精度，DATE秒与TIMESTAMP分数秒不静默归一；动态SYSTEM_TIME从业务hash排除",
+  "NULL_EMPTY": "保留原已批准字段语义，不把NULL/空串/占位随意互换",
+  "comparison_audit": "保存规则版本、元数据及内容摘要；类型规整不能修改写入原值来掩盖差异"
+}

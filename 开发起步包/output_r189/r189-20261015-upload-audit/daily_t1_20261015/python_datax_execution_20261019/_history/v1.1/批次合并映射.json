@@ -1,0 +1,62 @@
+{
+  "from_version": "1.0",
+  "from_batches": 17,
+  "to_version": "1.1",
+  "to_batches": 10,
+  "mapping": {
+    "E01": [
+      "E00",
+      "E01"
+    ],
+    "E02": [
+      "E02",
+      "E03"
+    ],
+    "E03": [
+      "E04",
+      "E05"
+    ],
+    "E04": [
+      "E06"
+    ],
+    "E05": [
+      "E07",
+      "E08"
+    ],
+    "E06": [
+      "E09"
+    ],
+    "E07": [
+      "E10",
+      "E11"
+    ],
+    "E08": [
+      "E12",
+      "E13"
+    ],
+    "E09": [
+      "E14"
+    ],
+    "E10": [
+      "E15",
+      "E16"
+    ]
+  },
+  "original_files": "_history/v1.0/",
+  "state_authority": "原checkpoint同节点，旧状态存历史，不按同E编号混用",
+  "subgates": {
+    "E08": [
+      "isolated_integration",
+      "production_review_pack"
+    ],
+    "E09": [
+      "E08两项门禁及具体批准"
+    ],
+    "E10": [
+      "rollout",
+      "observation",
+      "ops_handover"
+    ]
+  },
+  "source_implementation_started": false
+}

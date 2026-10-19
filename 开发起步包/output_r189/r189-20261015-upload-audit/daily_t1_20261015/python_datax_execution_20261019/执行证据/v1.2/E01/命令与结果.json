@@ -1,0 +1,51 @@
+{
+ "batch": "E01",
+ "generated_at": "2026-10-19T15:29:31+00:00",
+ "commands": [
+  {
+   "name": "unittest_discover_reporting_pipeline_unit",
+   "argv": [
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "backend/tests/reporting_pipeline_unit",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "result_tail": [
+    "Ran 32 tests in 0.025s",
+    "",
+    "OK"
+   ]
+  },
+  {
+   "name": "reporting_ctl_validate_offline",
+   "argv": [
+    "backend/scripts/reporting_ctl.py",
+    "validate",
+    "--offline"
+   ],
+   "exit_code": 0,
+   "stdout_bytes": 3211,
+   "stderr_tail": "",
+   "stdout_sha256": "3ca888e809ae5a66c092393da9a86b91a5818aa3b80567b3ac08c694139cb462",
+   "parsed_ok": true,
+   "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）",
+   "reported_exit_code": 0
+  },
+  {
+   "name": "reporting_ctl_list",
+   "argv": [
+    "backend/scripts/reporting_ctl.py",
+    "list"
+   ],
+   "exit_code": 0,
+   "stdout_bytes": 53414,
+   "stderr_tail": "",
+   "stdout_sha256": "17410140d3a064b9009cb4e52a4994f6f70a89f9a34820435270d471a139aeda",
+   "parsed_ok": true
+  }
+ ]
+}

@@ -1,0 +1,126 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+  "read_only_references": true,
+  "server_files_not_freshly_verified": true,
+  "assets": [
+    {
+      "code": "current_source_mapping",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\all_views_review_20261019\\字典核查对象与源配置_不含凭据.json",
+      "exists": true,
+      "sha256": "fb6c2810c7db309e327158e4cab7b890bce31f805fad204b9ac0a6c8b8b78891",
+      "evidence_state": "CURRENT_LOCAL_MAPPING_NOT_PRODUCTION_VERIFIED"
+    },
+    {
+      "code": "gap_exec_reference",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\gap_exec.py",
+      "exists": true,
+      "sha256": "b3dac3d282dacccb6fa44de1e5d4a91fb0e6e18890df8253ee63b38cb4426ea2",
+      "evidence_state": "REFERENCE_ONLY_NO_IMPORT_NO_EXECUTE"
+    },
+    {
+      "code": "lis_dual_source",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\执行产物\\LIS双源架构记录_20261019.md",
+      "exists": true,
+      "sha256": "c5ce6f5cd6a9c625f8ed81a281a7072fb0d694b1152484dbe59e698cfd979ced",
+      "evidence_state": "RECORDED_EVIDENCE_NOT_RETESTED"
+    },
+    {
+      "code": "manual_M01_M08",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\执行产物\\待人工与受阻清单_20261018.md",
+      "exists": true,
+      "sha256": "fef3a2740f79c99ca3a02bb52e9217c9afee0001373b0e0c40d1aab9e516a284",
+      "evidence_state": "M05_SUPERSEDED_BY_LIS_DUAL_SOURCE"
+    },
+    {
+      "code": "conservation_report",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\执行产物\\执行结果汇总_20261018.md",
+      "exists": true,
+      "sha256": "4145443fb9c3b233aafe364bb9114ed93ae860a6682453d0f54bc3f54c1a547b",
+      "evidence_state": "REGRESSION_REFERENCE_NOT_CURRENT_TRUTH"
+    },
+    {
+      "code": "quantity_followup",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\执行产物\\数量核查后续补抽_20261019.md",
+      "exists": true,
+      "sha256": "14d3857b0488f262adaf117541f4d2b8d675118f3a6e9e3e30233ede7ba44a1b",
+      "evidence_state": "HAS_OLDER_LIS_SINGLE_SOURCE_CLAIMS_DO_NOT_REUSE"
+    },
+    {
+      "code": "nursing_patient_route",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\护理出入量通道复核_20261018\\护理出入量_处理结论与续抽交接.md",
+      "exists": true,
+      "sha256": "04962ef5a81602cb066478659b8416e99c11c9de136c600bd6a176d51b6166ee",
+      "evidence_state": "SCOPED_ALTERNATIVE_CONTROLLED_ROUTE"
+    },
+    {
+      "code": "discharge_old_proposal",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\priority_extract_20261018\\大缺口补抽_20261018\\执行产物\\V_EMR_DISCHARGE_RECORD_优化建议_20261019.sql",
+      "exists": true,
+      "sha256": "10adb3a595cecdfce2d2ce5a2af0ec099d38e36ae30cf0ea13b0a23ecc00665a",
+      "evidence_state": "REJECTED_AS_DIRECTLY_EXECUTABLE"
+    },
+    {
+      "code": "discharge_review",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\discharge_opt_review_20261019\\复核报告与整改建议.md",
+      "exists": true,
+      "sha256": "f1f56320c3357fa64bcd120170e8f7335ec05f5b256947899c667a0c4b450a1b",
+      "evidence_state": "CURRENT_REVIEW_WITH_OPEN_QUALITY_ISSUES"
+    },
+    {
+      "code": "discharge_full_ddl",
+      "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\discharge_opt_review_20261019\\V_EMR_DISCHARGE_RECORD_完整替换_含DATETIME.sql",
+      "exists": true,
+      "sha256": "9622185ffafa500534b67ee077acbf258f16b6207bb15c3b9d87f75cd2148628",
+      "evidence_state": "LOCAL_STATIC_ONLY_DEPLOYMENT_AND_PERFORMANCE_UNVERIFIED"
+    }
+  ],
+  "source_alias_changes_since_v11": [
+    {
+      "table": "EMR_BLOOD_DIALY_RECORD",
+      "object_id": "dialysis__V_EMR_BLOOD_DIALY_RECORD",
+      "before_aliases": [
+        "V_EMR_BLOOD_DIALY_RECORD"
+      ],
+      "after_aliases": [
+        "V_EMR_BLOOD_DIALY_RECORD",
+        "EMR_BLOOD_DIALY_RECORD"
+      ],
+      "state": "CURRENT_SHARED_INPUT_ALIAS_DRIFT_RECORDED_NOT_LIVE_VERIFIED"
+    },
+    {
+      "table": "EMR_BLOOD_DIALY_DETAIL",
+      "object_id": "dialysis__V_EMR_BLOOD_DIALY_DETAIL",
+      "before_aliases": [
+        "V_EMR_BLOOD_DIALY_DETAIL"
+      ],
+      "after_aliases": [
+        "V_EMR_BLOOD_DIALY_DETAIL",
+        "EMR_BLOOD_DIALY_DETAIL"
+      ],
+      "state": "CURRENT_SHARED_INPUT_ALIAS_DRIFT_RECORDED_NOT_LIVE_VERIFIED"
+    },
+    {
+      "table": "EMR_BLOOD_DIALY_ORDER",
+      "object_id": "dialysis__V_EMR_BLOOD_DIALY_ORDER",
+      "before_aliases": [
+        "V_EMR_BLOOD_DIALY_ORDER"
+      ],
+      "after_aliases": [
+        "V_EMR_BLOOD_DIALY_ORDER",
+        "EMR_BLOOD_DIALY_ORDER"
+      ],
+      "state": "CURRENT_SHARED_INPUT_ALIAS_DRIFT_RECORDED_NOT_LIVE_VERIFIED"
+    }
+  ],
+  "gap_exec_findings": {
+    "same_value_calls_float": true,
+    "same_value_strips_all_strings": true,
+    "policy": "只拆取经审阅纯逻辑重写，不import/执行原文件，不复制其连接/写入/凭据fallback；类型比较修正后独立测试"
+  },
+  "claimed_numbers": {
+    "doc_order_late_inserted": 42918,
+    "in_fee_late_inserted": 109,
+    "status": "LOCAL_EXECUTOR_REPORT_AND_USER_REPORTED_NOT_NEW_DATABASE_RECONCILIATION"
+  },
+  "redaction": "只登记文件指纹及聚合事实，不复制人工单中的原始ID/载荷/敏感内容"
+}

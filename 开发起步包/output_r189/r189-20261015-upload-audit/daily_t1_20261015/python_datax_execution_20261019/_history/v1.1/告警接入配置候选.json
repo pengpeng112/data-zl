@@ -1,0 +1,91 @@
+{
+  "package_id": "R189-T1-ENGINEERING-20261019-v1.1",
+  "planning_only": true,
+  "enabled": false,
+  "integration_state": "DESIGN_ONLY_NOT_CONNECTED",
+  "base_url_candidate": "http://10.20.1.153:3000",
+  "allowed_paths": [
+    "/api/v2/events",
+    "/api/v2/events/{relay_event_id}"
+  ],
+  "source_id_candidate": "sanjia-etl",
+  "source_id": null,
+  "secret_ref": null,
+  "category_candidate": "sanjia_etl",
+  "auth": "HMAC-SHA256_HEX_LOWER",
+  "signing_input": "UTF8(source_id + \".\" + unix_seconds + \".\") + raw_body_bytes",
+  "get_body": "EMPTY_BYTES",
+  "event_id_for_get": "SERVER_RESPONSE_UUID_NOT_SOURCE_EVENT_ID",
+  "payload_fields": [
+    "source_event_id",
+    "event_type",
+    "category",
+    "severity",
+    "title",
+    "body",
+    "occurred_at",
+    "metadata"
+  ],
+  "metadata_max_keys": 32,
+  "source_event_id_max_characters": 200,
+  "outbox_body_immutable": true,
+  "retry_same_event": "SAME_ID_SAME_BODY_NEW_SECOND_TIMESTAMP_AND_SIGNATURE",
+  "lifecycle_change": "NEW_REVISION_NEW_SOURCE_EVENT_ID",
+  "post_202": "ACK_QUEUED_NOT_DELIVERED",
+  "post_200_duplicate": "RESUME_EXISTING_EVENT_STATUS",
+  "delivered": "ALL_EXPECTED_TARGETS_SENT_NO_UNCERTAIN_NONEMPTY",
+  "candidate_timeouts_seconds": {
+    "connect": 3,
+    "read": 10
+  },
+  "retry": {
+    "401": "PAUSE_AUTH_RETRIES",
+    "409": "CLASSIFY_REPLAY_OR_CONTENT_CONFLICT_NO_NEW_ID_BYPASS",
+    "429_min_delay_seconds": 60,
+    "respect_longer_retry_after": true,
+    "503": "RESPECT_RETRY_AFTER",
+    "400_422": "PERMANENT_PAYLOAD_ERROR",
+    "5xx_timeout": "BOUNDED_BACKOFF_JITTER_SAME_IMMUTABLE_EVENT"
+  },
+  "candidate_poll_seconds": [
+    30,
+    120
+  ],
+  "candidate_dedupe_minutes": 10,
+  "candidate_reminder_minutes": 30,
+  "rate_limit": "POST_PLUS_GET_WITHIN_ADMIN_SOURCE_LIMIT",
+  "daily_report_push_enabled": false,
+  "independent_heartbeat_monitor_required": true,
+  "relay_failure_recursion_allowed": false,
+  "metadata_allowlist": [
+    "system",
+    "environment",
+    "canonical_table",
+    "source_group",
+    "stage",
+    "business_date",
+    "batch_id",
+    "incident_id",
+    "error_class",
+    "error_code",
+    "affected_count",
+    "task_status",
+    "ticket_ref",
+    "deadline",
+    "detail_ref"
+  ],
+  "admin_todo": [
+    "独立源及限流/IP白名单确认",
+    "受控secret_ref配置",
+    "管理员指定测试/正式订阅和收件人",
+    "确认可达路径及实际服务协议",
+    "明确真实联调和投递范围批准"
+  ],
+  "never_send": [
+    "患者标识/姓名/证件/电话/地址/正文/路径载荷",
+    "原SQL和未脱敏异常",
+    "密码/token/secret",
+    "receivers字段"
+  ],
+  "real_requests_sent": 0
+}
