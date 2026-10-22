@@ -372,10 +372,10 @@ class SchedulerBridge:
                 lease_resource=fence_resource,
                 fencing_token=fence_token,
                 anchor=self.anchor,
-                renew=(
-                    lambda r=fence_resource, t=fence_token: self.repository.renew_lease(
-                        r, self.worker_id, t, ttl_seconds=self.lease_ttl_seconds
-                    )
+                renew=self._renew_callback(
+                    read_leases=read_leases,
+                    write_lease=write_lease,
+                    write_resource=resource,
                 ),
             )
             try:
@@ -417,18 +417,52 @@ class SchedulerBridge:
         except ContractViolation:
             pass  # 晚到释放被拒：租约已被新运行顶替，符合预期
 
+    def _renew_callback(self, *, read_leases, write_lease, write_resource: str):
+        """续期本任务领取的全部资源租约，并分别保留读取/写入 TTL。"""
+        def renew_all() -> None:
+            for source, lease in read_leases:
+                self.repository.renew_lease(
+                    f"read:{source}", self.worker_id, lease.fencing_token,
+                    ttl_seconds=self.read_lease_ttl_seconds,
+                )
+            if write_lease is not None:
+                self.repository.renew_lease(
+                    write_resource, self.worker_id, write_lease.fencing_token,
+                    ttl_seconds=self.lease_ttl_seconds,
+                )
+
+        return renew_all
+
     @staticmethod
     def _invoke_task(task: TaskRunnable, context: ExecutionContext) -> dict:
         try:
             sig = inspect.signature(task.run)
-            accepts = any(
-                p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
-                for p in sig.parameters.values()
-            )
+            parameters = sig.parameters
         except (TypeError, ValueError):
-            accepts = True
-        if accepts:
+            parameters = None
+        if parameters is None:
             return task.run(context)
+        context_parameter = parameters.get("context")
+        if context_parameter is not None:
+            if context_parameter.kind == context_parameter.KEYWORD_ONLY:
+                return task.run(context=context)
+            if context_parameter.kind in (
+                context_parameter.POSITIONAL_ONLY,
+                context_parameter.POSITIONAL_OR_KEYWORD,
+            ):
+                return task.run(context)
+        if any(
+            p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD, p.VAR_POSITIONAL)
+            for p in parameters.values()
+        ):
+            return task.run(context)
+        keyword_only = [
+            p for p in parameters.values() if p.kind == p.KEYWORD_ONLY
+        ]
+        if len(keyword_only) == 1:
+            return task.run(**{keyword_only[0].name: context})
+        if any(p.kind == p.VAR_KEYWORD for p in parameters.values()):
+            return task.run(context=context)
         # 旧签名 run()（无参数）：模拟任务兼容路径；生产适配器必须收 ctx
         return task.run()
 

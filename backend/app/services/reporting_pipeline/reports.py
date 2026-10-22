@@ -214,21 +214,47 @@ def build_daily_report(
             }
         )
 
-    # R06：每表昨日运行行（捕获/隔离/待父/装载/回读来自持久化状态）
+    # R06：按业务日统计。snapshot.per_table 是仓储累计数，不能直接作为日报。
     per_table = snapshot.get("per_table", {})
-    per_table_daily = {
-        table: {
+    batches_for_day = [
+        batch for batch in repository.list_batches()
+        if str(batch.business_day)[:10] == business_day
+    ]
+    daily_counts: dict[str, dict] = {}
+    for batch in batches_for_day:
+        table = batch.task_id
+        row = daily_counts.setdefault(
+            table,
+            {"batches": 0, "by_state": {}, "quarantined": 0,
+             "pending_parent": 0, "applied": 0, "commit_unknown": 0},
+        )
+        state = batch.state.value if isinstance(batch.state, BatchState) else str(batch.state)
+        row["batches"] += 1
+        row["by_state"][state] = row["by_state"].get(state, 0) + 1
+        if state == BatchState.QUARANTINED.value:
+            row["quarantined"] += 1
+        elif state == BatchState.BLOCKED_DEPENDENCY.value:
+            row["pending_parent"] += 1
+        elif state == BatchState.APPLIED.value:
+            row["applied"] += 1
+        elif state == BatchState.COMMIT_UNKNOWN.value:
+            row["commit_unknown"] += 1
+
+    # Preserve tables with open gaps even when they had no batch on this business day.
+    per_table_daily = {}
+    for table in set(per_table) | set(daily_counts):
+        row = daily_counts.get(table, {})
+        state_counts = row.get("by_state", {})
+        per_table_daily[table] = {
             "batches": row.get("batches", 0),
-            "by_state": row.get("by_state", {}),
+            "by_state": state_counts,
             "quarantined": row.get("quarantined", 0),
             "pending_parent": row.get("pending_parent", 0),
             "applied": row.get("applied", 0),
             "commit_unknown": row.get("commit_unknown", 0),
-            "readback": row.get("by_state", {}).get("RECONCILED", 0),
-            "earliest_open_gap": row.get("earliest_open_gap"),
+            "readback": state_counts.get(BatchState.RECONCILED.value, 0),
+            "earliest_open_gap": per_table.get(table, {}).get("earliest_open_gap"),
         }
-        for table, row in per_table.items()
-    }
 
     # R06：待补最早窗（逐表，含数量）
     earliest_open_gap = {
@@ -293,9 +319,25 @@ def build_daily_report(
                 "count": age.get("managed_months", 0),
             })
 
+    unresolved_group_batches = [
+        {"batch_id": batch_id, "task": batch["task"], "state": batch["state"]}
+        for batch_id, batch in snapshot["batches"].items()
+        if batch["state"] in (
+            BatchState.QUARANTINED.value,
+            BatchState.BLOCKED_DEPENDENCY.value,
+        )
+    ]
+    if unresolved_group_batches:
+        recommended_actions.append({
+            "action": "RESOLVE_QUARANTINED_OR_PENDING_GROUPS",
+            "scope": "按批次工单核对隔离组和待父组",
+            "count": len(unresolved_group_batches),
+        })
+
     sections = {
         "overall": (
-            "PARTIAL_SUCCESS_WITH_BACKLOG" if failed_windows or commit_unknown_tables
+            "PARTIAL_SUCCESS_WITH_BACKLOG"
+            if failed_windows or commit_unknown_tables or unresolved_group_batches
             else "SUCCESS_WITH_WAITING_ITEMS"
         ),
         "failed_windows_and_next_retry": failed_windows,
@@ -315,6 +357,7 @@ def build_daily_report(
         "alert_channel_monitor": alert_channel_monitor,
         "gap_escalation": gap_escalation,
         "per_table_daily": per_table_daily,
+        "unresolved_group_batches": unresolved_group_batches,
         "earliest_open_gap": earliest_open_gap,
         "continuous_completion": continuous_completion,
         "denominators": denominators,

@@ -149,7 +149,13 @@ class ControlledConnectorRowSource:
     ) -> ReadPage:
         import threading
 
-        sql, params = self._query_builder(window, keyset, self._page_size)
+        # query_builder's third argument is the SQL row limit (not fetchmany's
+        # array size). Fetch one sentinel row beyond the returned limit so
+        # has_more is meaningful even when SQL itself applies the limit. In
+        # particular, _fetch_all requests budget + 1 rows to detect truncation;
+        # passing the driver fetch batch size here could silently cap SQL at
+        # page_size and make an oversized window look complete.
+        sql, params = self._query_builder(window, keyset, limit_rows + 1)
         cursor = self._provider.cursor()
         watchdog_done = threading.Event()
         holder = {"cursor": cursor, "timed_out": False}

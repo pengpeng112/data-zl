@@ -1,0 +1,564 @@
+{
+  "kind": "SUPPLEMENTAL_PLAN_DEFINITIONS_NOT_RUNTIME_CHECKPOINT",
+  "date": "2026-10-20",
+  "parent_package": "R189-T1-ENGINEERING-20261019-v1.2",
+  "state_authority": "../../../checkpoint.json#daily_t1.engineering_execution_20261019",
+  "task_definitions": [
+    {
+      "id": "R01",
+      "original_batch": "E08补强/E01增量",
+      "integration_dependencies": [],
+      "title": "证据与77配置冻结",
+      "implementation": "当前seed/路由/画像/定义/工单及112原场景映射；纠正血透database_hint等错位",
+      "exit_criteria": "77唯一项、冻结指纹、旧结论逐项关联、真实待办清单",
+      "external_dependency": "本地可做；实际源画像另需受控范围与窗口",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R02",
+      "original_batch": "E08补强",
+      "integration_dependencies": [
+        "R01"
+      ],
+      "title": "耐久状态及暂存",
+      "implementation": "Repository接口+PG实现，manifest/隔离/版本/outbox耐久化，租约原子领取与续期",
+      "exit_criteria": "重启可恢复、两工作者并发与旧token拒绝、增量迁移隔离往返",
+      "external_dependency": "实现/纯逻辑可做；PG集成需已核可清理隔离库",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R03",
+      "original_batch": "E08补强",
+      "integration_dependencies": [
+        "R01",
+        "R02"
+      ],
+      "title": "真实采集适配",
+      "implementation": "受控RowSource、真实DataX进程/插件、流式stage及密钥引用，驱动取消",
+      "exit_criteria": "拆窗守恒、LOB完整、dirty不发布、半截捕获拒绝、源风暴有界",
+      "external_dependency": "离线可准备并开发；真实源及stage操作按各自门禁",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R04",
+      "original_batch": "E08补强",
+      "integration_dependencies": [
+        "R01",
+        "R02"
+      ],
+      "title": "受控装载与恢复",
+      "implementation": "平台批准/白名单、目标侧围栏、同事务提交凭据、精确类型版本比较",
+      "exit_criteria": "伪批准/无token被拒；COMMIT_UNKNOWN核证恢复；旧覆盖和不完整月替换被拒",
+      "external_dependency": "接口/模拟可做；目标辅助DDL及实际DML逐例批准",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R05",
+      "original_batch": "E08补强",
+      "integration_dependencies": [
+        "R02",
+        "R03",
+        "R04"
+      ],
+      "title": "运行用例与调度",
+      "implementation": "真实管道/CLI、DAG就绪队列、失败继续且如实总体状态、连续性和历史漂移轮巡",
+      "exit_criteria": "实际入口串通、token贯穿、跳过不误报成功、2026接续无隐性缺窗",
+      "external_dependency": "用例可先模拟开发；生产排程发布另核批准",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R06",
+      "original_batch": "E08补强",
+      "integration_dependencies": [
+        "R01",
+        "R02"
+      ],
+      "title": "告警与真实日报",
+      "implementation": "HTTP transport、耐久投递轮询、认证挂起/限流、结构化错误、真实日报",
+      "exit_criteria": "202不算送达、实际数据不走内存、告警故障不阻断抽取、缺deadline显性",
+      "external_dependency": "本地模拟可独立做；真实订阅与测试接收范围由管理员提供",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R07",
+      "original_batch": "E09",
+      "integration_dependencies": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06"
+      ],
+      "title": "真实小组试点",
+      "implementation": "3—5已就绪项、两相邻日窗、幂等恢复、按键/内容回读、告警逐目标sent",
+      "exit_criteria": "配置/批准/真实执行/回读/投递证据闭合；特殊路线另组补齐",
+      "external_dependency": "实际读/stage/apply/告警分动作取得批准；不扩大范围",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    },
+    {
+      "id": "R08",
+      "original_batch": "E10",
+      "integration_dependencies": [
+        "R07"
+      ],
+      "title": "交接扩围与7日观测",
+      "implementation": "逐表旧写者交接、约5—10项分组、7业务日值守、回退演练和签收",
+      "exit_criteria": "逐表就绪及欠账透明；院内与省端分签；历史月周期保留独立观测",
+      "external_dependency": "生产发布/排程/停旧入口等具备具体批准；省端未知如实单列",
+      "offline_preparation_can_start_before_integration_dependencies": true
+    }
+  ],
+  "supplemental_acceptance_cases": [
+    {
+      "id": "RT1-001",
+      "work_package": "R01",
+      "environment": "OFFLINE",
+      "title": "77项与输入变更",
+      "trigger": "修改一个源身份或依赖哈希，其他通过项不变",
+      "expected": "只使受影响项/依赖失效；不重核无关项、不批量READY",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-002",
+      "work_package": "R01",
+      "environment": "OFFLINE",
+      "title": "血透DSN及故障旧配置",
+      "trigger": "87地址搭配dialysis hint，旧17432网络待办仍存在",
+      "expected": "拒绝未冻结连接身份；确认hdis后更新相关冻结件，作废旧待办而非执行",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-003",
+      "work_package": "R02",
+      "environment": "ISOLATED_PG",
+      "title": "捕获后重启",
+      "trigger": "A持久化完整stage后退出，B恢复",
+      "expected": "复用同一完整manifest，attempt/游标/缺口不丢，半截stage不被视为完整",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestDurableFileStageStore",
+        "note": "A/B 两进程语义=同目录两次打开：块恢复、COMPLETE 清单、截断/取消/半截拒绝",
+        "remaining": "ISOLATED_PG：两进程并发+重启注入（RT1-004/005 同）",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-004",
+      "work_package": "R02",
+      "environment": "ISOLATED_PG",
+      "title": "多工作者租约",
+      "trigger": "两个进程同时领取同一目标/表",
+      "expected": "仅一个成功，重领取后旧token不可续期/提交，无双写",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestLeaseTokenPassthrough::test_stale_token_rejected_after_reacquire",
+        "note": "内存仓储：过期接管 token 前进+旧 token 拒绝；PG 跨进程 FOR UPDATE 原子性待隔离库",
+        "remaining": "ISOLATED_PG：两工作者同时领取只有一个成功（SqlAlchemyControlRepository）",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-005",
+      "work_package": "R02",
+      "environment": "ISOLATED_PG",
+      "title": "耐久原子性",
+      "trigger": "在批次/缺口/游标/outbox事务各边界注入失败并重启",
+      "expected": "无水位越OPEN缺口、无丢事件、无重复已完成批次；恢复动作一致",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-006",
+      "work_package": "R03",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "超窗细分",
+      "trigger": "6小时5万+行、同秒多键、最小粒度仍超限",
+      "expected": "递归拆分守恒，keyset完整；无可靠键则PARKED，不能截断成功",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "既有 test_adapters.TestPythonReaderSplit + test_r02 拆窗守恒（173 内）",
+        "note": "递归拆分/keyset/PARKED 算法既有测试保持通过",
+        "remaining": "ISOLATED_DRIVER：真实 Oracle 驱动上 5 万+行实测",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-007",
+      "work_package": "R03",
+      "environment": "ISOLATED_DRIVER",
+      "title": "阻塞fetch取消",
+      "trigger": "真实驱动fetch阻塞并触发时限/取消",
+      "expected": "在已配置预算内取消实际调用/子进程并释放资源，manifest不完整",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-008",
+      "work_package": "R03",
+      "environment": "ISOLATED_DRIVER",
+      "title": "CLOB及字节",
+      "trigger": "超页LOB、中文、多字节、末尾空白，关闭连接后读取",
+      "expected": "连接关闭前完整转存；字节/类型按契约核对，CLOB尾空白不误裁",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-009",
+      "work_package": "R03",
+      "environment": "ISOLATED_DATAX",
+      "title": "退出0假成功",
+      "trigger": "真实进程exit0但dirty>0/缺指标/读写不同",
+      "expected": "全部拒绝COMPLETE及apply，保存安全指标和失败窗",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r03_r06_adapters_alerts.py::TestRealSubprocessDataX",
+        "note": "真实子进程假 datax：exit0+dirty/缺指标/超时全拒绝 COMPLETE（SubprocessProcessRunner+DataXRunner）",
+        "remaining": "ISOLATED_DATAX：真实 DataX 插件/密钥/stage 装载",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-010",
+      "work_package": "R03",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "源级风暴",
+      "trigger": "同源多表同时ORA-12541/12547/DPY-4011",
+      "expected": "同源有界退避、聚合incident和单半开探针，其他源继续",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-011",
+      "work_package": "R03",
+      "environment": "OFFLINE",
+      "title": "通道与投影",
+      "trigger": "DataX-only失败、source有DATETIME而target无该列",
+      "expected": "不擅自fallback；源列可用于窗，正式投影不含不存在列",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "既有 test_adapters EngineRouter（不自动 fallback）+ JobFileWorkspace 投影白名单测试",
+        "note": "DataX-only 失败不切 Python；job 渲染投影/窗口/白名单拒绝路径覆盖",
+        "remaining": "通道与投影的受控 stage 实测",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-012",
+      "work_package": "R04",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "批准不可伪造",
+      "trigger": "调用方填自定义approved_ref/执行器ID或扩大范围",
+      "expected": "可信平台校验拒绝；不出现实际DML，离线preview可继续",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r04_version_fence.py::TestApprovalCannotBeForged",
+        "note": "PlatformApprovalVerifier 拒未登记批准/停用执行器/失效批准；production_mode 拒静态核验器",
+        "remaining": "接入平台 asset_action_executors 真实查询的联调",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-013",
+      "work_package": "R04",
+      "environment": "ISOLATED_TARGET",
+      "title": "围栏竞态",
+      "trigger": "执行器门禁后旧租约失效、新工作者接管",
+      "expected": "旧工作者在目标提交处被拒，不能只在PG预查一次token",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-014",
+      "work_package": "R04",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "版本精度与隔离",
+      "trigger": "9007199254740992与9007199254740993；跨表同ID；无版本同键异值",
+      "expected": "精确比较；表/租户/目标互不污染；未知顺序CONFLICT，不按采集时间覆盖",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r04_version_fence.py::TestExactVersionCompare + TestVersionScopeIsolation",
+        "note": "float 不可分大整数精确比较；跨表/跨实例同 ID 隔离；未知顺序 CONFLICT",
+        "remaining": "ISOLATED：PG 版本账（asset_reporting_version_evidence）落库验证",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-015",
+      "work_package": "R04",
+      "environment": "ISOLATED_TARGET",
+      "title": "提交后断线",
+      "trigger": "目标commit后响应丢失、进程重启",
+      "expected": "COMMIT_UNKNOWN冻结同表；查同事务operation/manifest再恢复APPLIED，不重复写",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-016",
+      "work_package": "R04",
+      "environment": "ISOLATED_TARGET",
+      "title": "未提交或未能判定",
+      "trigger": "明确回滚、事务状态仍未知分别恢复",
+      "expected": "仅明确回滚可安全重试；仍未知保持冻结，不能因查不到凭据盲重放",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-017",
+      "work_package": "R04",
+      "environment": "ISOLATED_TARGET",
+      "title": "不完整月替换",
+      "trigger": "一个子窗失败/隔离或一个历史来源缺段",
+      "expected": "禁止整月删除发布；其他独立完整组/表可按已批准范围继续",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-018",
+      "work_package": "R04",
+      "environment": "ISOLATED_TARGET",
+      "title": "跨月移动与撤销",
+      "trigger": "源键业务时间改月/撤销，目标缺时间列",
+      "expected": "凭耐久键归属和已批准范围处理；不能查询不存在列或默默残留双份",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-019",
+      "work_package": "R05",
+      "environment": "OFFLINE",
+      "title": "父子优先级",
+      "trigger": "历史父任务+T1子任务，另有独立T1任务",
+      "expected": "父先子后；独立T1可优先；父失败子待父而非写孤儿",
+      "execution_state": "EXECUTED_OFFLINE",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestRunnableQueueOrdering",
+        "note": "历史父先于 T1 子；独立 T1 不受父子约束；周期内派发顺序父先子后",
+        "remaining": "无（离线即完整覆盖该回归）",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-020",
+      "work_package": "R05",
+      "environment": "OFFLINE",
+      "title": "同表多任务",
+      "trigger": "同表T1/历史/重扫与多个窗同时排队",
+      "expected": "按批次和窗保留所有任务，不被canonical_table字典覆盖，正式写串行",
+      "execution_state": "EXECUTED_OFFLINE",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestSameTableMultiTask",
+        "note": "同表 T1/月重扫/回看/多窗全部保留派发，task_key 唯一不覆盖",
+        "remaining": "无（离线即完整覆盖该回归）",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-021",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "按动作就绪",
+      "trigger": "READ/STAGE已核、APPLY已有具体批准、REPORT未知；历史路由一段未知",
+      "expected": "只准已就绪活动路线的相应动作；全链启用/省端报送仍拒绝，未知不改READY",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit（contracts.validate_action）+ CLI plan 动作级就绪输出",
+        "note": "REPORT_UNKNOWN 不阻塞 CAPTURE/STAGE/APPLY 动作判定；全链 validate_enable 语义保留",
+        "remaining": "ISOLATED：路由级动作校验接调度实测",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-022",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "跳过不是成功",
+      "trigger": "所有任务熔断/租约忙；另测run返回失败但不抛异常",
+      "expected": "应完成窗未闭合时PARTIAL/WAITING_WITH_BACKLOG；NO_WORK只用于确实无应运行任务",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestHonestOverallStatus",
+        "note": "熔断全跳过=WAITING_WITH_BACKLOG；run 返回 FAILED/QUARANTINED 计入失败；无任务=NO_WORK",
+        "remaining": "ISOLATED 联调下的周期状态复核",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-023",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "局部失败继续",
+      "trigger": "一行超长、一父组不齐、一个窗失败",
+      "expected": "隔离相关组并告警/留缺口；独立项继续；连续游标不越缺口",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "既有 test_quality_staging（组隔离+独立组继续）+ 逐表快照隔离计数测试",
+        "note": "质量组隔离与 PENDING_PARENT 语义既有测试保持；快照 per_table 可查",
+        "remaining": "ISOLATED：真实装载中的隔离组落 PG 账",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-024",
+      "work_package": "R05",
+      "environment": "OFFLINE",
+      "title": "午夜固定窗",
+      "trigger": "23:59启动，00:01重试，源在不同时区",
+      "expected": "使用冻结的业务时区和H，半开窗不漂移，不用SYSTEM_TIME当变更依据",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestFrozenAnchorWindow",
+        "note": "院区固定昨天半开窗；跨午夜新锚点=新业务日（重试须复用旧锚点）；naive 时钟拒绝",
+        "remaining": "多时区源换算实测（R07）",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-025",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "2026接续缺窗",
+      "trigger": "旧基线只到2025末，当日已经捕获且中间有缺口",
+      "expected": "分开已捕获与连续完成，保留H0后捕获并受控补缺，日报不冒充连续完成",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestContinuousCompletionCursor + test_r06_daily_report",
+        "note": "历史缺口不阻塞日捕获、阻塞连续完成游标；日报两游标分开展示",
+        "remaining": "ISOLATED：PG continuous_through 列与门禁落库验证",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-026",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "历史漂移",
+      "trigger": "对日窗外旧月新增/更正，轮巡管理60个月",
+      "expected": "按覆盖年龄发现并留账；只扫当前月或每月单月轮转不得声称30天覆盖全历史",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestCoverageAgeReport",
+        "note": "只扫当月=NO_HISTORY_VISIT；单月轮转=DEGRADED；全周期=WITHIN；未冻结=SCOPE_UNFROZEN",
+        "remaining": "ISOLATED：月覆盖账真实重访记录",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-027",
+      "work_package": "R05",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "LIS重叠历史路由",
+      "trigger": "2023Q4双源同键异值、2024+新源以及一源暂缺",
+      "expected": "同一路由器覆盖日常/回看/重扫；冲突按核定策略，不单源删完整双源月",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-028",
+      "work_package": "R06",
+      "environment": "LOCAL_HTTP_FAKE",
+      "title": "202与多目标",
+      "trigger": "POST202，GET部分sent/空目标/延迟sent",
+      "expected": "ACK_QUEUED与送达分开；按必需目标状态完成，零目标ROUTE_UNRESOLVED",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-029",
+      "work_package": "R06",
+      "environment": "LOCAL_HTTP_FAKE",
+      "title": "认证与限流",
+      "trigger": "401、429 Retry-After、跨秒重签和幂等冲突",
+      "expected": "401停盲重试；429至少60秒并尊重更长Retry-After；原body不变，新revision新事件",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-030",
+      "work_package": "R06",
+      "environment": "ISOLATED_PG_AND_LOCAL_HTTP",
+      "title": "投递重启",
+      "trigger": "ACK前/ACK后/sent前分别退出再恢复，多个sender并发",
+      "expected": "耐久claim及事件幂等，逐目标继续查询，原字节与revision证据不丢",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-031",
+      "work_package": "R06",
+      "environment": "OFFLINE_AND_ISOLATED",
+      "title": "日报与隐私",
+      "trigger": "真实仓储含失败/隔离/deadline空；异常串含模拟患者字段/SQL/secret",
+      "expected": "正式日报来自耐久状态；SLA_UNKNOWN单列；外发只安全码/汇总/detail_ref",
+      "execution_state": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+      "actual_evidence": {
+        "date": "2026-10-20",
+        "offline": "tests/reporting_pipeline_unit/test_r06_daily_report.py",
+        "note": "日报来自仓储（simulation 标记）；SLA_UNKNOWN 单列；载荷隐私白名单/敏感词拒绝",
+        "remaining": "ISOLATED_PG_AND_LOCAL_HTTP：耐久状态+真实外发脱敏复核",
+        "command": "cd backend && .venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q (233 passed)"
+      }
+    },
+    {
+      "id": "RT1-032",
+      "work_package": "R07",
+      "environment": "APPROVED_PILOT",
+      "title": "真实读取装载告警",
+      "trigger": "已批准3—5项、两相邻日窗及同窗重复；覆盖特殊路线",
+      "expected": "真实数/键/内容守恒、隔离如实、无重复/旧覆盖；告警逐目标sent有回执",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-033",
+      "work_package": "R08",
+      "environment": "APPROVED_ROLLOUT",
+      "title": "旧写者及回退",
+      "trigger": "新鲜快照有同表在途/未知提交；再模拟安全交还",
+      "expected": "不启第二写者；核事务后交接；回退无并发、已提交数据不靠代码回滚抹掉",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    },
+    {
+      "id": "RT1-034",
+      "work_package": "R08",
+      "environment": "BUSINESS_DAY_OBSERVATION",
+      "title": "7日观测及省端分签",
+      "trigger": "7业务日存在隔离/告警失败，省端无回执，月周期未跑完",
+      "expected": "逐项列欠账并延长受影响验收；院内与省端结论分开；月周期另待观测",
+      "execution_state": "NOT_RUN",
+      "actual_evidence": null
+    }
+  ],
+  "original_112_cases": {
+    "file": "../验收场景矩阵.json",
+    "preserve_historical_states": true,
+    "next_action": "逐条映射实际测试/环境/结果/证据；本补充不替代原112条"
+  },
+  "scope": "77规范项，R01—R06=E08运行补强，R07=E09，R08=E10",
+  "no_production_authorization_granted": true,
+  "r01_freeze_artifact": "R01_冻结配置与差异清单_2026-10-20.json",
+  "offline_execution_record": {
+    "date": "2026-10-20",
+    "suite": "backend/tests/reporting_pipeline_unit",
+    "result": "233 passed（原176+新增57回归）",
+    "rule": "离线通过不冒充隔离/真实验收；ISOLATED_*/APPROVED_* 环境项保持未执行"
+  }
+}

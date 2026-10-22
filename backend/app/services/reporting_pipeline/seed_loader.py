@@ -191,7 +191,9 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 def _task_spec_from_seed(item: dict[str, Any]) -> TaskSpec:
     from app.services.reporting_pipeline.contracts import (
+        ApplyPolicy,
         ChangePolicy,
+        ProjectionField,
         ResourceBudget,
         SourceRef,
         StableKey,
@@ -234,6 +236,12 @@ def _task_spec_from_seed(item: dict[str, Any]) -> TaskSpec:
         update_evidence=item.get("update_evidence") or change_raw.get("update_evidence"),
         retract_evidence=item.get("delete_or_retract_evidence") or change_raw.get("retract_evidence"),
         source_version_order=item.get("source_version_order") or change_raw.get("source_version_order"),
+        child_only_change_trigger=list(
+            change_raw.get(
+                "child_only_change_trigger",
+                item.get("child_only_change_trigger", []),
+            )
+        ),
         version_order_verified=bool(
             change_raw.get("version_order_verified", False)
         ),
@@ -244,15 +252,40 @@ def _task_spec_from_seed(item: dict[str, Any]) -> TaskSpec:
         business_time_verified=bool(time_raw.get("business_time_verified", False)),
         change_time_expression=time_raw.get("change_time_expression"),
         change_time_verified=bool(time_raw.get("change_time_verified", False)),
+        visibility_cutoff_rule=time_raw.get("visibility_cutoff_rule"),
         overlap_seconds=time_raw.get("overlap_seconds"),
         timezone=time_raw.get("timezone"),
+        same_second_cursor_rule=time_raw.get("same_second_cursor_rule"),
     )
     budget_raw = item.get("resource_budget") or {}
     resource_budget = ResourceBudget(
+        per_source_concurrency=budget_raw.get("per_source_concurrency"),
         query_timeout_seconds=budget_raw.get("query_timeout_seconds"),
         cancel_supported=bool(budget_raw.get("cancel_supported", False)),
         max_rows_per_slice=budget_raw.get("max_rows_per_slice"),
         max_bytes_per_slice=budget_raw.get("max_bytes_per_slice"),
+        max_attempts=budget_raw.get("max_attempts"),
+        max_elapsed_seconds=budget_raw.get("max_elapsed_seconds"),
+    )
+    projection = [
+        ProjectionField(
+            name=str(field["name"]),
+            target_type=str(field["target_type"]),
+            order=int(field["order"]),
+            source_expression=field.get("source_expression"),
+            type_verified=bool(field.get("type_verified", False)),
+        )
+        for field in item.get("projection", [])
+    ]
+    apply_raw = item.get("apply_policy") or {}
+    apply_policy = ApplyPolicy(
+        executor_ref=apply_raw.get("executor_ref"),
+        allowed_operations=list(apply_raw.get("allowed_operations", [])),
+        idempotency_key=list(apply_raw.get("idempotency_key", [])),
+        txn_row_budget=apply_raw.get("txn_row_budget"),
+        txn_byte_budget=apply_raw.get("txn_byte_budget"),
+        commit_receipt_mode=apply_raw.get("commit_receipt_mode"),
+        approval_refs=list(apply_raw.get("approval_refs", [])),
     )
     table = item["canonical_table"]
     associations = TaskAssociations(
@@ -282,12 +315,15 @@ def _task_spec_from_seed(item: dict[str, Any]) -> TaskSpec:
         target=target,
         stable_key=stable_key,
         associations=associations,
+        projection=projection,
         definition_fingerprint=item.get("definition_fingerprint"),
         dependency_fingerprints=dict(item.get("dependency_fingerprints", {})),
         declared_parent_candidates=list(item.get("declared_parent_candidates", [])),
         change_policy=change_policy,
         time_semantics=time_semantics,
+        apply_policy=apply_policy,
         resource_budget=resource_budget,
+        config_version=item.get("config_version", "v0-seed"),
         note=item.get("note"),
     )
 

@@ -4,8 +4,9 @@ readback→状态/缺口/日报 串成一条链。
 对应整改计划 §R05：
 - CLI 与既有调度调用同一服务；不新增第二常驻调度循环。
 - 模拟装配与生产装配显式分开：build_simulation_cycle 一律内存仓储 +
-  假适配器 + simulation 标记；build_production_cycle 强制 PG 耐久仓储、
-  平台批准核验、目标侧围栏、耐久暂存与真实 transport，缺一即拒。
+  假适配器 + simulation 标记；build_production_cycle 提供 PG 耐久仓储、
+  目标身份检查和暂存，真实读取/质量/装载及批准围栏由注入步骤负责。
+  失败告警只冻结到 outbox；生产步骤与 HTTP sender 尚须明确接线。
 - 任务执行以 ExecutionContext（租约 token + 冻结锚点）贯穿；正式装载
   在目标提交处再验围栏（ApplyPort enforce_fence）。
 - 失败留缺口、隔离组工单化、独立任务继续；总体状态如实（派发≠成功）。
@@ -16,7 +17,7 @@ from __future__ import annotations
 import os
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable, Mapping, Sequence
 
 from app.services.reporting_pipeline.apply_port import (
@@ -24,6 +25,7 @@ from app.services.reporting_pipeline.apply_port import (
     ApplyRequest,
     ApplyRefused,
 )
+from app.services.reporting_pipeline.alerts_client import build_event_body
 from app.services.reporting_pipeline.contracts import (
     ContractViolation,
     PipelineAction,
@@ -253,6 +255,7 @@ class DailyCycleService:
             action_gate=self._action_gate,
         )
         cycle = bridge.run_cycle(tasks, self.config.parents_by_table or None)
+        failure_handling = self._record_cycle_failures(cycle, anchor)
         report = self._daily_report_builder(
             business_day=anchor.business_day.isoformat(),
             repository=self.repository,
@@ -270,6 +273,7 @@ class DailyCycleService:
             },
             "simulation": self.simulation,
             "cycle": cycle.to_dict(),
+            "failure_handling": failure_handling,
             "daily_report": report.to_dict(),
             "unbound_tables": (
                 list(self._unbound_tables_provider())
@@ -277,6 +281,118 @@ class DailyCycleService:
                 else []
             ),
         }
+
+    def _record_cycle_failures(self, cycle, anchor: DailyRunAnchor) -> dict:
+        """把本轮失败记入缺口账本并冻结脱敏 OPENED 事件到本地 outbox。
+
+        此处仅入队，不调用 HTTP sender。失败详情保留在受控的 cycle 结构中；
+        gap 与 outbox 只写稳定表名、业务日和通用错误码，避免异常文本或患者键外泄。
+        """
+        if not cycle.failures:
+            return {"status": "NO_FAILURES", "queued": [], "errors": []}
+
+        window = anchor.business_window()
+        window_fingerprint = window.fingerprint()
+        business_day = anchor.business_day.isoformat()
+        failed_tables = sorted(
+            {task_key.split(":", 1)[0] for task_key in cycle.failures}
+        )
+        queued: list[dict] = []
+        errors: list[dict] = []
+
+        for table in failed_tables:
+            stage = "GAP_RECORD"
+            detail_ref = f"gap://{business_day}/{table}"
+            try:
+                existing_gaps = self.repository.open_gaps(table)
+                if not any(
+                    gap.window.fingerprint() == window_fingerprint
+                    and gap.reason == "SCHEDULER_TASK_FAILED"
+                    for gap in existing_gaps
+                ):
+                    self.repository.record_gap(
+                        table, window, "SCHEDULER_TASK_FAILED"
+                    )
+
+                stage = "ALERT_OUTBOX_ENQUEUE"
+                incident = self.repository.create_incident(
+                    incident_key=f"T1:{business_day}:{table}",
+                    category="EXTRACT_FAILED",
+                    affected_tables=[table],
+                )
+                recommended_action = (
+                    "检查任务配置与源端状态，修复后按原业务日重跑并核对缺口。"
+                )
+                opened_event_id = f"r189t1.{incident.incident_id}.OPENED.1"
+                event = self.repository.get_outbox_event(opened_event_id)
+                if event is None:
+                    title = f"T+1任务 {table} 在 {business_day} 运行失败"
+                    event_metadata = {
+                        "system": "T1_REPORTING",
+                        "environment": "production" if not self.simulation else "simulation",
+                        "canonical_table": table,
+                        "stage": "CAPTURE_OR_APPLY",
+                        "business_date": business_day,
+                        "error_code": "SCHEDULER_RUN_FAILED",
+                        "task_status": "FAILED",
+                        "detail_ref": detail_ref,
+                        "recommended_action": recommended_action,
+                    }
+                    body = build_event_body(
+                        source_event_id=opened_event_id,
+                        event_type="alert",
+                        category="EXTRACT_FAILED",
+                        severity="yellow",
+                        title=title,
+                        body=(
+                            f"业务日 {business_day} 的 {table} 任务未完成。"
+                            f"建议动作：{recommended_action} 详情引用：{detail_ref}。"
+                        ),
+                        occurred_at=datetime.now(timezone.utc).isoformat(),
+                        metadata=event_metadata,
+                    )
+                    event = self.repository.append_incident_event(
+                        incident,
+                        event_kind="OPENED",
+                        severity="yellow",
+                        title=title,
+                        body_bytes=body,
+                        metadata=event_metadata,
+                    )
+                queued.append(
+                    {
+                        "table": table,
+                        "source_event_id": event.source_event_id,
+                        "detail_ref": detail_ref,
+                    }
+                )
+            except Exception as exc:  # noqa: BLE001 - retain independent failures, report safe class only
+                error_class = type(exc).__name__
+                errors.append(
+                    {
+                        "table": table,
+                        "stage": stage,
+                        "error_class": (
+                            error_class
+                            if error_class.isascii() and error_class.isidentifier()
+                            else "UNKNOWN_ERROR"
+                        ),
+                        "error_code": "FAILURE_HANDLING_FAILED",
+                    }
+                )
+
+        result = {
+            "status": "FAILED" if errors else "QUEUED",
+            "queued": queued,
+            "errors": errors,
+        }
+        if errors:
+            cycle.cycle_detail["failure_handling"] = result
+            cycle.overall = (
+                "PARTIAL_SUCCESS_WITH_BACKLOG"
+                if cycle.dispatched else "WAITING_WITH_BACKLOG"
+            )
+        return result
 
     def _action_gate(self, task: PipelineTask) -> None:
         spec = getattr(task, "spec", None)
@@ -399,7 +515,7 @@ def build_production_cycle(
     action_bindings: Sequence[ActionBinding] = (),
     now_fn: Callable[[], datetime] | None = None,
 ) -> DailyCycleService:
-    """生产装配：耐久仓储 + 平台批准 + 围栏 + 耐久暂存 + 真实 transport。
+    """生产装配：耐久仓储 + 平台批准 + 围栏 + 耐久暂存。
 
     - 仓储换 SqlAlchemyControlRepository（PG asset schema）；
     - require_verified_target=True：目标身份未验证的任务不派发；
@@ -409,10 +525,14 @@ def build_production_cycle(
       旧租约；
     - K06：physical_sources 用稳定物理实例资源键（源组@实例:端口），
       读取预算跨进程经仓储租约共享；
-    - relay_base_url 缺省时不装配告警发送（outbox 留存，日报可见），
-      显式提供时用 UrllibTransport（R06）；
+    - 告警仅冻结到 PG outbox；HTTP sender 尚未接入。本 builder 不接受
+      relay_base_url，以免 URL 参数造成已装配真实外发的误判；
     - 本函数不产生任何授权：真实读取/stage/apply 仍按各自门禁逐例批准。
     """
+    if relay_base_url:
+        raise ContractViolation(
+            "生产告警 HTTP sender 尚未接线；当前仅写入 outbox，不使用 relay_base_url"
+        )
     from app.services.reporting_pipeline.pg_repository import (
         SqlAlchemyControlRepository,
     )

@@ -1,0 +1,711 @@
+{
+ "kind": "R01_FROZEN_CONFIG_AND_INPUT_DIFF",
+ "freeze_version": "R01-FREEZE-2026-10-20",
+ "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+ "input_fingerprints": {
+  "seed_77": {
+   "path": "77项任务候选种子.json",
+   "sha256": "5ee7f6c49da7721aa580ddd2d6828fe986ceff594d0c791825923fd6f3ff086f"
+  },
+  "lis_routes": {
+   "path": "LIS双源路由候选.json",
+   "sha256": "bc6b9e5408f1da472fc1413d33164563b0aefd132f1bf9c415c06eb2a14fadac"
+  },
+  "perf_profiles": {
+   "path": "每表性能与通道画像候选.json",
+   "sha256": "c5d2cbb0de085f92bc9ef060d68469684dd7bc5125c4fbf9d3d1d40128d93dc2"
+  },
+  "acceptance_matrix_112": {
+   "path": "验收场景矩阵.json",
+   "sha256": "8380da185ee5bb8ad59fc292c5d57449b750f4b904397ffb6e1b0da90d7ae3d7"
+  },
+  "manual_ticket_seed": {
+   "path": "E01已知人工工单种子.json",
+   "sha256": "0bc2b35d8d8c57fe6f4e1e33725431612052fdef8b32ef7554e5847b47fd4fb9"
+  },
+  "long_task_contract": {
+   "path": "长任务执行契约.json",
+   "sha256": "4edbbbb7523c578a9b09d0768d9f5aeab9b06f1107774c673ec63d5e27f14fda"
+  },
+  "late_drift_policy": {
+   "path": "迟到漂移月度重扫策略.json",
+   "sha256": "10f062fb574df2219ee4666c0964c455448997cf86ad04ce9d7e9ade9f0eaa46"
+  }
+ },
+ "corrections": [
+  {
+   "correction_id": "R01-CORR-DIALYSIS-DB",
+   "scope": "source_group=dialysis（EMR_BLOOD_DIALY_RECORD/DETAIL/ORDER）",
+   "field": "source_candidates[].database_hint",
+   "input_value": "dialysis",
+   "frozen_value": "hdis",
+   "evidence": [
+    "交接终版源 10.10.8.87:5432/hdis（8.86 主库实时只读从库）",
+    "T加1上线前整改与接续验收计划.md §3.3"
+   ],
+   "rule": "冻结件统一 hdis；不得把 hint 拼成连接串；R07 受控实测前 READ_READY 维持 UNKNOWN",
+   "voided_todos": [
+    "旧 17432 防火墙/pg_hba 网络改造待办（17432 仅为备用点，待办作废）"
+   ]
+  }
+ ],
+ "seed_gap_stats": {
+  "total": 77,
+  "identity_unverified": 81,
+  "engine_undecided": 77,
+  "incremental_unresolved": 77,
+  "deadline_unconfigured": 0,
+  "secret_ref_unconfigured": 0,
+  "dialysis_hint_mismatch": [
+   {
+    "table": "EMR_BLOOD_DIALY_RECORD",
+    "object_id": "dialysis__V_EMR_BLOOD_DIALY_RECORD",
+    "input_hint": "dialysis",
+    "frozen_hint": "hdis"
+   },
+   {
+    "table": "EMR_BLOOD_DIALY_DETAIL",
+    "object_id": "dialysis__V_EMR_BLOOD_DIALY_DETAIL",
+    "input_hint": "dialysis",
+    "frozen_hint": "hdis"
+   },
+   {
+    "table": "EMR_BLOOD_DIALY_ORDER",
+    "object_id": "dialysis__V_EMR_BLOOD_DIALY_ORDER",
+    "input_hint": "dialysis",
+    "frozen_hint": "hdis"
+   }
+  ],
+  "enabled": 0
+ },
+ "per_item_pending_fields": {
+  "EMR_ADMISSION_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ADMISSION_RECORD"
+  ],
+  "EMR_ADMISSION_RECORD_EXAM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ADMISSION_RECORD_EXAM"
+  ],
+  "EMR_ADMISSION_DIAGNOSIS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ADMISSION_DIAGNOSIS"
+  ],
+  "EMR_DISCHARGE_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_DISCHARGE_RECORD"
+  ],
+  "EMR_DISCHARGE_RECORD_DIAGNOSIS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__EMR_DISCHARGE_RECORD_DIAGNOSIS"
+  ],
+  "EMR_DOC_ORDER_DRUG": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_DOC_ORDER_DRUG"
+  ],
+  "EMR_DOC_ORDER_CHECK": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_DOC_ORDER_CHECK"
+  ],
+  "EMR_OUTPATIENT_RECIPE": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUTPATIENT_RECIPE"
+  ],
+  "EMR_OUTPATIENT_RECIPE_ITEM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUTPATIENT_RECIPE_ITEM"
+  ],
+  "EMR_OUTPATIENT_REGISTER": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUTPATIENT_REGISTER"
+  ],
+  "EMR_OUTPATIENT_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUTPATIENT_RECORD"
+  ],
+  "EMR_OUT_FEE_INFO_CHILD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUT_FEE_INFO_CHILD"
+  ],
+  "EMR_OUTPATIENT_DIAG": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUTPATIENT_DIAG"
+  ],
+  "EMR_OUT_FEE_INFO_MAIN": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OUT_FEE_INFO_MAIN"
+  ],
+  "EMR_IN_FEE_INFO_MAIN": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_IN_FEE_INFO_MAIN"
+  ],
+  "EMR_IN_FEE_INFO_CHILD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_IN_FEE_INFO_CHILD"
+  ],
+  "EMR_INSPECTION": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:lis__V_EMR_INSPECTION",
+   "identity:ods__V_EMR_INSPECTION_TEST"
+  ],
+  "EMR_INSPECTION_IMAGE": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:lis__V_EMR_INSPECTION_IMAGE",
+   "identity:ods__V_EMR_INSPECTION_IMAGE_TEST"
+  ],
+  "EMR_INSPECTION_ALLERGY": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:lis__V_EMR_INSPECTION_ALLERGY",
+   "identity:ods__V_EMR_INSPECTION_ALLERGY_TEST"
+  ],
+  "EMR_INSPECTION_ITEM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:lis__V_EMR_INSPECTION_ITEM",
+   "identity:ods__V_EMR_INSPECTION_ITEM_TEST"
+  ],
+  "EMR_EXAM_IMAGE_REP": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:his__V_EMR_EXAM_IMAGE_REP"
+  ],
+  "EMR_EXAM_IMAGE_PATH": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:his__V_EMR_EXAM_IMAGE_PATH"
+  ],
+  "EMR_ICH": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ICH"
+  ],
+  "EMR_ICH_OPERATION": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ICH_OPERATION"
+  ],
+  "EMR_ICH_ALLERGIES": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ICH_ALLERGIES"
+  ],
+  "EMR_ICH_CHARGE": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ICH_CHARGE"
+  ],
+  "EMR_ICH_DIAGNOSIS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ICH_DIAGNOSIS"
+  ],
+  "EMR_PHYSICAL_REPORT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:physical__V_EMR_PHYSICAL_REPORT"
+  ],
+  "EMR_PHYSICAL_EXAM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:physical__V_EMR_PHYSICAL_EXAM"
+  ],
+  "EMR_PHYSICAL_EXAM_ITEM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:physical__V_EMR_PHYSICAL_EXAM_ITEM"
+  ],
+  "EMR_BLOOD_APPLY_REPORT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:blood__V_EMR_BLOOD_APPLY_REPORT"
+  ],
+  "EMR_BLOOD_APPLY_REPORT_ITEM": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:blood__V_EMR_BLOOD_APPLY_REPORT_ITEM"
+  ],
+  "EMR_TRANSFUSION_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:blood__V_EMR_TRANSFUSION_RECORD"
+  ],
+  "EMR_BLOOD_DESTROY_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:blood__V_EMR_BLOOD_DESTROY_RECORD"
+  ],
+  "EMR_MEDICAL_RECORD_INFO": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_MEDICAL_RECORD_INFO"
+  ],
+  "EMR_HOS_POSTOPER_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_POSTOPER_RECORD"
+  ],
+  "EMR_HOS_PREOP_DISCUSS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_PREOP_DISCUSS"
+  ],
+  "EMR_HOS_DND_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_DND_RECORD"
+  ],
+  "EMR_HOS_DIFFIC_CASE_DISCUSS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+  ],
+  "EMR_HOS_CHANGE_MAJOR_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_CHANGE_MAJOR_RECORD"
+  ],
+  "EMR_REFERRAL_HOS_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_REFERRAL_HOS_RECORD"
+  ],
+  "EMR_HOS_CONSUL_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_CONSUL_RECORD"
+  ],
+  "EMR_HOS_SUCCESSION_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_SUCCESSION_RECORD"
+  ],
+  "EMR_HOS_SAVE_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_HOS_SAVE_RECORD"
+  ],
+  "EMR_ADMISSION_DEAD_RECORD_TF": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ADMISSION_DEAD_RECORD_TF"
+  ],
+  "EMR_OPERA_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OPERA_RECORD"
+  ],
+  "EMR_BOFORE_OPERA_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_BOFORE_OPERA_RECORD"
+  ],
+  "EMR_ANESTHESIA_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ANESTHESIA_RECORD"
+  ],
+  "EMR_ANES_RECORD_BLOOD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ANES_RECORD_BLOOD"
+  ],
+  "EMR_ANES_RECORD_MED": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_ANES_RECORD_MED"
+  ],
+  "EMR_AFTER_OPERA_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_AFTER_OPERA_RECORD"
+  ],
+  "EMR_ADMISSION_ASSESSMENT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_ADMISSION_ASSESSMENT"
+  ],
+  "EMR_DISCHARGE_ASSESSMENT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_DISCHARGE_ASSESSMENT"
+  ],
+  "EMR_CHILDBIRTH": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_CHILDBIRTH"
+  ],
+  "EMR_GENERAL_NURSING": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_GENERAL_NURSING"
+  ],
+  "EMR_CRITICALLY_ILL_NURS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_CRITICALLY_ILL_NURS"
+  ],
+  "EMR_IN_OUT_AMOUNT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_IN_OUT_AMOUNT"
+  ],
+  "EMR_VITAL_SIGN": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_VITAL_SIGN"
+  ],
+  "EMR_OPERATION_NURSING": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_OPERATION_NURSING"
+  ],
+  "EMR_CONSUMABLES": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_CONSUMABLES"
+  ],
+  "EMR_NURSE_PLAN": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED"
+  ],
+  "EMR_INFOR_OPERATION": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_OPERATION"
+  ],
+  "EMR_INFOR_ANESTHESIA": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_ANESTHESIA"
+  ],
+  "EMR_INFOR_TRANS_BLOOD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_TRANS_BLOOD"
+  ],
+  "EMR_INFOR_SPEC_EXAM_TREAT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_SPEC_EXAM_TREAT"
+  ],
+  "EMR_INFOR_CRITICALLY_ILL": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_CRITICALLY_ILL"
+  ],
+  "EMR_INFOR_OTHERS": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_INFOR_OTHERS"
+  ],
+  "EMR_BLOOD_DIALY_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:dialysis__V_EMR_BLOOD_DIALY_RECORD",
+   "dialysis_hint_corrected_to_hdis"
+  ],
+  "EMR_BLOOD_DIALY_DETAIL": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:dialysis__V_EMR_BLOOD_DIALY_DETAIL",
+   "dialysis_hint_corrected_to_hdis"
+  ],
+  "EMR_BLOOD_DIALY_ORDER": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:dialysis__V_EMR_BLOOD_DIALY_ORDER",
+   "dialysis_hint_corrected_to_hdis"
+  ],
+  "EMR_DEATH_RECORD": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:ods__V_EMR_DEATH_RECORD"
+  ],
+  "EMR_NURSING_ASSESSMENT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:nursing__V_EMR_NURSING_ASSESSMENT",
+   "identity:ods__V_EMR_NURSING_ASSESSMENT"
+  ],
+  "EMR_PATHOLOGY_REPORT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:pathology__EMR_PATHOLOGY_REPORT"
+  ],
+  "EMR_MOLECULAR_PATHOLOGY_REPORT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:pathology__EMR_MOLECULAR_PATHOLOGY_REPORT"
+  ],
+  "EMR_INFECTION_INFORMATION_REGISTER": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:infection__EMR_INFECTION_INFORMATION_REGISTER"
+  ],
+  "EMR_HOS_PRACTITIONER_INFORMATION": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:hrp__EMR_HOS_PRACTITIONER"
+  ],
+  "EMR_ADVERSE_EVENT": [
+   "engine=UNDECIDED",
+   "incremental=UNRESOLVED",
+   "identity:adverse__V_EMR_ADVERSE_EVENT_FINAL"
+  ]
+ },
+ "original_112_cases_summary": {
+  "total": 112,
+  "by_state": {
+   "NOT_RUN": 112
+  },
+  "mapping_note": "112 条 NOT_RUN 保持；离线已实现的先由 RT1 证据覆盖对应主题，逐条映射随隔离/试点推进补 actual_evidence，不批量置 PASS"
+ },
+ "rt1_case_states": {
+  "RT1-001": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-002": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-003": {
+   "environment": "ISOLATED_PG",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestDurableFileStageStore",
+   "evidence_note": "A/B 两进程语义=同目录两次打开：块恢复、COMPLETE 清单、截断/取消/半截拒绝",
+   "remaining": "ISOLATED_PG：两进程并发+重启注入（RT1-004/005 同）"
+  },
+  "RT1-004": {
+   "environment": "ISOLATED_PG",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestLeaseTokenPassthrough::test_stale_token_rejected_after_reacquire",
+   "evidence_note": "内存仓储：过期接管 token 前进+旧 token 拒绝；PG 跨进程 FOR UPDATE 原子性待隔离库",
+   "remaining": "ISOLATED_PG：两工作者同时领取只有一个成功（SqlAlchemyControlRepository）"
+  },
+  "RT1-005": {
+   "environment": "ISOLATED_PG",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-006": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "既有 test_adapters.TestPythonReaderSplit + test_r02 拆窗守恒（173 内）",
+   "evidence_note": "递归拆分/keyset/PARKED 算法既有测试保持通过",
+   "remaining": "ISOLATED_DRIVER：真实 Oracle 驱动上 5 万+行实测"
+  },
+  "RT1-007": {
+   "environment": "ISOLATED_DRIVER",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-008": {
+   "environment": "ISOLATED_DRIVER",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-009": {
+   "environment": "ISOLATED_DATAX",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r03_r06_adapters_alerts.py::TestRealSubprocessDataX",
+   "evidence_note": "真实子进程假 datax：exit0+dirty/缺指标/超时全拒绝 COMPLETE（SubprocessProcessRunner+DataXRunner）",
+   "remaining": "ISOLATED_DATAX：真实 DataX 插件/密钥/stage 装载"
+  },
+  "RT1-010": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-011": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "既有 test_adapters EngineRouter（不自动 fallback）+ JobFileWorkspace 投影白名单测试",
+   "evidence_note": "DataX-only 失败不切 Python；job 渲染投影/窗口/白名单拒绝路径覆盖",
+   "remaining": "通道与投影的受控 stage 实测"
+  },
+  "RT1-012": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r04_version_fence.py::TestApprovalCannotBeForged",
+   "evidence_note": "PlatformApprovalVerifier 拒未登记批准/停用执行器/失效批准；production_mode 拒静态核验器",
+   "remaining": "接入平台 asset_action_executors 真实查询的联调"
+  },
+  "RT1-013": {
+   "environment": "ISOLATED_TARGET",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-014": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r04_version_fence.py::TestExactVersionCompare + TestVersionScopeIsolation",
+   "evidence_note": "float 不可分大整数精确比较；跨表/跨实例同 ID 隔离；未知顺序 CONFLICT",
+   "remaining": "ISOLATED：PG 版本账（asset_reporting_version_evidence）落库验证"
+  },
+  "RT1-015": {
+   "environment": "ISOLATED_TARGET",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-016": {
+   "environment": "ISOLATED_TARGET",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-017": {
+   "environment": "ISOLATED_TARGET",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-018": {
+   "environment": "ISOLATED_TARGET",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-019": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "EXECUTED_OFFLINE",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestRunnableQueueOrdering",
+   "evidence_note": "历史父先于 T1 子；独立 T1 不受父子约束；周期内派发顺序父先子后",
+   "remaining": "无（离线即完整覆盖该回归）"
+  },
+  "RT1-020": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "EXECUTED_OFFLINE",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestSameTableMultiTask",
+   "evidence_note": "同表 T1/月重扫/回看/多窗全部保留派发，task_key 唯一不覆盖",
+   "remaining": "无（离线即完整覆盖该回归）"
+  },
+  "RT1-021": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit（contracts.validate_action）+ CLI plan 动作级就绪输出",
+   "evidence_note": "REPORT_UNKNOWN 不阻塞 CAPTURE/STAGE/APPLY 动作判定；全链 validate_enable 语义保留",
+   "remaining": "ISOLATED：路由级动作校验接调度实测"
+  },
+  "RT1-022": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestHonestOverallStatus",
+   "evidence_note": "熔断全跳过=WAITING_WITH_BACKLOG；run 返回 FAILED/QUARANTINED 计入失败；无任务=NO_WORK",
+   "remaining": "ISOLATED 联调下的周期状态复核"
+  },
+  "RT1-023": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "既有 test_quality_staging（组隔离+独立组继续）+ 逐表快照隔离计数测试",
+   "evidence_note": "质量组隔离与 PENDING_PARENT 语义既有测试保持；快照 per_table 可查",
+   "remaining": "ISOLATED：真实装载中的隔离组落 PG 账"
+  },
+  "RT1-024": {
+   "environment": "OFFLINE",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r05_scheduler_fixes.py::TestFrozenAnchorWindow",
+   "evidence_note": "院区固定昨天半开窗；跨午夜新锚点=新业务日（重试须复用旧锚点）；naive 时钟拒绝",
+   "remaining": "多时区源换算实测（R07）"
+  },
+  "RT1-025": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestContinuousCompletionCursor + test_r06_daily_report",
+   "evidence_note": "历史缺口不阻塞日捕获、阻塞连续完成游标；日报两游标分开展示",
+   "remaining": "ISOLATED：PG continuous_through 列与门禁落库验证"
+  },
+  "RT1-026": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r02_durable_and_watermarks.py::TestCoverageAgeReport",
+   "evidence_note": "只扫当月=NO_HISTORY_VISIT；单月轮转=DEGRADED；全周期=WITHIN；未冻结=SCOPE_UNFROZEN",
+   "remaining": "ISOLATED：月覆盖账真实重访记录"
+  },
+  "RT1-027": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-028": {
+   "environment": "LOCAL_HTTP_FAKE",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-029": {
+   "environment": "LOCAL_HTTP_FAKE",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-030": {
+   "environment": "ISOLATED_PG_AND_LOCAL_HTTP",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-031": {
+   "environment": "OFFLINE_AND_ISOLATED",
+   "state_after_r0x": "PARTIAL_OFFLINE_REMAINING_ISOLATED_OR_APPROVED",
+   "offline_evidence": "tests/reporting_pipeline_unit/test_r06_daily_report.py",
+   "evidence_note": "日报来自仓储（simulation 标记）；SLA_UNKNOWN 单列；载荷隐私白名单/敏感词拒绝",
+   "remaining": "ISOLATED_PG_AND_LOCAL_HTTP：耐久状态+真实外发脱敏复核"
+  },
+  "RT1-032": {
+   "environment": "APPROVED_PILOT",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-033": {
+   "environment": "APPROVED_ROLLOUT",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  },
+  "RT1-034": {
+   "environment": "BUSINESS_DAY_OBSERVATION",
+   "state_after_r0x": "NOT_RUN",
+   "offline_evidence": null,
+   "remaining": "按环境依赖推进（隔离库/真实驱动/批准）"
+  }
+ },
+ "rules": [
+  "本冻结件为执行端唯一配置引用；上游候选 JSON 变更须重跑本脚本生成新版本",
+  "血透 frozen hdis 未经 R07 受控实测不得置 READ_READY=READY",
+  "77 项 enabled=false 保持；启用走 TaskSpec.validate_enable 五层门禁",
+  "旧 zip/旧提示词与本件冲突时以本件+最新证据为准"
+ ],
+ "no_production_authorization_granted": true
+}

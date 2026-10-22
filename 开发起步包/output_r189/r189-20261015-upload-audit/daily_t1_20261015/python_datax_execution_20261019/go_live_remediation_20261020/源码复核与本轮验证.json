@@ -1,0 +1,331 @@
+{
+  "review_date": "2026-10-20",
+  "review_method": "本地源码/既有交付证据审阅，独立只读审阅结果经主执行者复核",
+  "findings": [
+    {
+      "id": "F01",
+      "file": "backend/app/services/reporting_pipeline/repositories.py",
+      "line": 129,
+      "sha256": "9dc9e3ab5e5596e91dd21294258fc48634da7df5d05db596d5acd2d82af514d9",
+      "conclusion": "仅InMemoryControlRepository，无生产PG Repository",
+      "work_package": "R02",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F02",
+      "file": "backend/app/services/reporting_pipeline/staging.py",
+      "line": 51,
+      "sha256": "2bd0ad8376a99b0f5f98d65f7641f58859bce22c318e74c546d4e30d1d739323",
+      "conclusion": "StageStore内存存储，缺耐久分块清单及恢复",
+      "work_package": "R02",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F03",
+      "file": "backend/app/services/reporting_pipeline/adapters/python_reader.py",
+      "line": 75,
+      "sha256": "379a6246006e716c957bad33e89fa83990b50888e191c0baeefa704c94dbfd46",
+      "conclusion": "RowSource为Protocol，真实受控连接器未绑定",
+      "work_package": "R03",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F04",
+      "file": "backend/app/services/reporting_pipeline/adapters/datax_runner.py",
+      "line": 149,
+      "sha256": "21e46ab51015153c3f326d833df30ec4ca3c843c62f6517b7bae1f2e6801f554",
+      "conclusion": "ProcessRunner为Protocol，真实运行/密钥/stage绑定待补",
+      "work_package": "R03",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F05",
+      "file": "backend/app/services/reporting_pipeline/apply_port.py",
+      "line": 228,
+      "sha256": "c63920d9e70474914a9f7d7ad03ed3f8302890e53072235b491c6d14b15b23ab",
+      "conclusion": "现有执行器为InMemoryApplyExecutor，缺平台实际执行器及目标事务凭据",
+      "work_package": "R04",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F06",
+      "file": "backend/app/services/reporting_pipeline/apply_port.py",
+      "line": 121,
+      "sha256": "c63920d9e70474914a9f7d7ad03ed3f8302890e53072235b491c6d14b15b23ab",
+      "conclusion": "批准/白名单由内存集合传入，lease_validator和token可缺省，不能直接作生产权限边界",
+      "work_package": "R04",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F07",
+      "file": "backend/app/services/reporting_pipeline/apply_port.py",
+      "line": 113,
+      "sha256": "c63920d9e70474914a9f7d7ad03ed3f8302890e53072235b491c6d14b15b23ab",
+      "conclusion": "版本先转float，存在大整数精度问题；未声明类型回退字典序",
+      "work_package": "R04",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F08",
+      "file": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "line": 72,
+      "sha256": "04a87d0f0d77a6c70993ee09be58d038d4fc639ac69d2c1b95019eee9b0fae31",
+      "conclusion": "拓扑排序后全局按模式sort可能使T1子先于历史父；by_table会覆盖同表多任务",
+      "work_package": "R05",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F09",
+      "file": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "line": 112,
+      "sha256": "04a87d0f0d77a6c70993ee09be58d038d4fc639ac69d2c1b95019eee9b0fae31",
+      "conclusion": "领取lease后未把token送入task.run，目标资源硬编码DBOPER",
+      "work_package": "R04/R05",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F10",
+      "file": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "line": 129,
+      "sha256": "04a87d0f0d77a6c70993ee09be58d038d4fc639ac69d2c1b95019eee9b0fae31",
+      "conclusion": "总体状态只看exceptions；全部skipped或run返回失败仍可SUCCESS",
+      "work_package": "R05",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F11",
+      "file": "backend/scripts/reporting_ctl.py",
+      "line": 208,
+      "sha256": "fbcd5007773415d0720571341083cbc4dd5d42b0d99128ed6b7055777d212435",
+      "conclusion": "9个主要命令NOT_IMPLEMENTED；daily-report每次创建内存仓储",
+      "work_package": "R05/R06",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F12",
+      "file": "backend/app/services/reporting_pipeline/alerts_client.py",
+      "line": 61,
+      "sha256": "bae62313a4edb0c3a45ec7072f905ce14e4d8e0e577dfbeb3eb1bf2fa8f03b6e",
+      "conclusion": "HTTP Transport仍协议；outbox依赖内存仓储，无实际运行绑定",
+      "work_package": "R06",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F13",
+      "file": "backend/tests/reporting_pipeline_integration/test_control_state_isolated.py",
+      "line": 39,
+      "sha256": "927a3056720445fc38653e1b87e597f68936795fb6a40ca551546c6b9478692f",
+      "conclusion": "3集成测试验证表/不可变字节唯一约束/月覆盖唯一；非Repository恢复并发测试",
+      "work_package": "R02/R07",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F14",
+      "file": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "line": 123,
+      "sha256": "04a87d0f0d77a6c70993ee09be58d038d4fc639ac69d2c1b95019eee9b0fae31",
+      "conclusion": "异常直接异常文本进入failure摘要，生产需安全码/脱敏detail_ref",
+      "work_package": "R05/R06",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    },
+    {
+      "id": "F15",
+      "file": "backend/app/services/reporting_pipeline/contracts.py",
+      "line": 406,
+      "sha256": "5a11f6ae09af70666a00eb94ed0cd1220aae991080199451989a75a5416d1632",
+      "conclusion": "validate_enable要求五层全READY；需保留全链门禁并补动作/活动路由级验证，防省端未知阻塞独立院内动作",
+      "work_package": "R05",
+      "remediation_state": "NOT_IMPLEMENTED_THIS_REVIEW"
+    }
+  ],
+  "actual_verification": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/reporting_pipeline_unit -q",
+      "cwd": "backend",
+      "exit_code": 0,
+      "actual": "173 passed, 1 warning in 1.21s",
+      "warning": "Starlette TestClient/httpx既有弃用提示；不影响本轮通过",
+      "environment": "PURE_LOGIC_NO_DB",
+      "not_a_pass_for": "新补充场景/Oracle/DataX/relay/生产运行"
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe backend/scripts/reporting_ctl.py validate --offline",
+      "exit_code": 0,
+      "actual": {
+        "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+        "counts": {
+          "canonical_items": 77,
+          "unique_canonical_tables": 77,
+          "source_groups": 11,
+          "dual_source_tables": [
+            "EMR_INSPECTION",
+            "EMR_INSPECTION_IMAGE",
+            "EMR_INSPECTION_ALLERGY",
+            "EMR_INSPECTION_ITEM"
+          ],
+          "not_provided_pending_applicability": [
+            "EMR_NURSE_PLAN"
+          ],
+          "rescan_tables": [
+            "EMR_DOC_ORDER_CHECK",
+            "EMR_IN_FEE_INFO_CHILD"
+          ],
+          "datetime_dependency_tables": [
+            "EMR_DOC_ORDER_CHECK",
+            "EMR_OUT_FEE_INFO_CHILD",
+            "EMR_IN_FEE_INFO_CHILD"
+          ]
+        },
+        "seed_state": {
+          "enabled_any": false,
+          "engine_distribution": {
+            "UNDECIDED": 77
+          },
+          "applicability_distribution": {
+            "TO_VERIFY": 76,
+            "WAITING_BUSINESS_CONFIRMATION": 1
+          },
+          "deadline_state_distribution": {
+            "UNCONFIGURED": 77
+          }
+        },
+        "readiness_layers": {
+          "CONFIG_VALID": {
+            "READY": 77,
+            "NOT_READY": 0,
+            "UNKNOWN": 0
+          },
+          "READ_READY": {
+            "READY": 0,
+            "NOT_READY": 0,
+            "UNKNOWN": 77
+          },
+          "STAGE_READY": {
+            "READY": 0,
+            "NOT_READY": 0,
+            "UNKNOWN": 77
+          },
+          "APPLY_READY": {
+            "READY": 0,
+            "NOT_READY": 0,
+            "UNKNOWN": 77
+          },
+          "REPORT_READY": {
+            "READY": 0,
+            "NOT_READY": 0,
+            "UNKNOWN": 77
+          }
+        },
+        "source_group_object_counts": {
+          "adverse": 1,
+          "blood": 4,
+          "dialysis": 3,
+          "his": 2,
+          "hrp": 1,
+          "infection": 1,
+          "lis": 4,
+          "nursing": 8,
+          "ods": 52,
+          "pathology": 2,
+          "physical": 3
+        },
+        "performance_profiles": {
+          "total": 77,
+          "unmeasured": 77,
+          "measured_verified": 0,
+          "missing_action": "REFUSE_PRODUCTION_READY_ALLOW_OFFLINE_DEVELOPMENT"
+        },
+        "lis_routes": {
+          "EMR_INSPECTION": {
+            "segments": 3,
+            "overlap_q4_2023": true,
+            "route_clock_verified": false
+          },
+          "EMR_INSPECTION_IMAGE": {
+            "segments": 3,
+            "overlap_q4_2023": true,
+            "route_clock_verified": false
+          },
+          "EMR_INSPECTION_ALLERGY": {
+            "segments": 3,
+            "overlap_q4_2023": true,
+            "route_clock_verified": false
+          },
+          "EMR_INSPECTION_ITEM": {
+            "segments": 3,
+            "overlap_q4_2023": true,
+            "route_clock_verified": false
+          }
+        },
+        "monthly_rescan": {
+          "tables": [
+            "EMR_DOC_ORDER_CHECK",
+            "EMR_IN_FEE_INFO_CHILD"
+          ],
+          "managed_history_start_month": null,
+          "managed_history_end_month": null,
+          "scope_state": "SCOPE_UNFROZEN_E01_TO_FILL"
+        },
+        "manual_tickets": {
+          "count": 6,
+          "ids": [
+            "E01-DISCHARGE-PERF",
+            "E01-DISCHARGE-QUALITY",
+            "E01-DATETIME-DEPENDENCY",
+            "E01-LIS-LEGACY-ACCESS",
+            "E01-WRITER-HANDOFF",
+            "E01-CREDENTIAL-LIFETIME"
+          ],
+          "never_auto_close": true
+        },
+        "writer_handoff": {
+          "state": "LIVE_SNAPSHOT_REQUIRED_AT_E01_AND_REFRESH_AT_CUTOVER",
+          "snapshot_captured": false,
+          "note": "8.53 进程快照需 ops-runbook 受控通道与具体批准；本轮未 SSH，不把 manual2/dqueue/gap_exec 的用户时点陈述当已停证据"
+        },
+        "long_lived_credentials": {
+          "policy": "APPROVED_SECRET_STORE_REF_NOT_TMP_ENV",
+          "configured_refs": [],
+          "unconfigured_tables": 77
+        },
+        "problems": [],
+        "validation": {
+          "structural_problems": [],
+          "structure_ok": true,
+          "ready_violations": []
+        },
+        "offline": true,
+        "ok": true,
+        "exit_code": 0,
+        "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）"
+      },
+      "note": "结构通过不等于接入通过；SOURCE_READY_EXTRACT_PENDING注释不等于生产READ_READY"
+    },
+    {
+      "command": "python tools/check_test_environment.py",
+      "actual": "pure_logic_ready；APP_TEST_DB_URL未配置"
+    },
+    {
+      "command": "python tools/check_doc_index.py",
+      "actual": "error0/warn1；216缺类别为既有无关提示"
+    }
+  ],
+  "historical_only": "10-19的3项PG集成及迁移往返保留；本轮未运行数据库集成测试",
+  "original_acceptance_cases": {
+    "count": 112,
+    "not_run": 112
+  },
+  "supplemental_case_count": 34,
+  "supplemental_cases_executed": 0,
+  "business_source_queries": 0,
+  "business_writes": 0,
+  "production_deploys": 0,
+  "scheduler_changes": 0,
+  "real_alert_messages": 0,
+  "original_checkpoint_modified": false,
+  "configuration_observation": {
+    "seed_sha256": "5ee7f6c49da7721aa580ddd2d6828fe986ceff594d0c791825923fd6f3ff086f",
+    "dialysis": "当前候选源87且database_hint=dialysis，交接实际DB=hdis，待冻结一致；仍不自动写READY",
+    "input_freshness": "仅代表此时点；执行前比较基线指纹并读取后续证据"
+  }
+}

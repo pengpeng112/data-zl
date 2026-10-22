@@ -1,0 +1,66 @@
+{
+  "verified_at": "2026-10-22T15:21:42+00:00",
+  "initial_development_head": "347bef1fca7922541cc0ea93fff9f3ddbe822345",
+  "current_head": "8bd8964aa3877288e08a148ee568f2ab6738c041",
+  "unit_tests": {
+    "passed": 444,
+    "skipped": 2,
+    "skip_reason": "Windows skips POSIX directory/file mode tests",
+    "log": "单元回归.log"
+  },
+  "isolated_target_pg": {
+    "database": "data_asset_test",
+    "passed": 5,
+    "log": "隔离PG回归.log"
+  },
+  "isolated_control_pg": {
+    "result": "PASS",
+    "checks": [
+      "batch progression",
+      "illegal rollback refused",
+      "feedback progression",
+      "reopen persistence"
+    ],
+    "cleanup": "UUID-owned batch/attempt rows only"
+  },
+  "ruff": "PASS",
+  "migration_tracking": {
+    "head": "a7d8e9f0a1b2",
+    "tracked_chain": 67,
+    "untracked": 0
+  },
+  "production": {
+    "writes": 0,
+    "deployments": 0,
+    "scheduler_changes": 0,
+    "real_alerts_sent": 0,
+    "source_business_queries": 0
+  },
+  "oracle_integration": "NOT_RUN_NO_ISOLATED_ORACLE_ENVIRONMENT",
+  "code_sha256": {
+    "backend/app/services/reporting_pipeline/production_runtime.py": "6d723c7cc93cf93f7dbc401addd29881fb1a5b42c6f6c6db18c6450baeea996e",
+    "backend/app/services/reporting_pipeline/target_executor.py": "72ee93560954d1f62a3e0ca4334c2eb48347f86db5345aa63e09c1fe7958bf85",
+    "backend/app/services/reporting_pipeline/apply_port.py": "f5da72b74ba30ef354fc38af93389c793089313bf8c8a9d744aea83dcdf4390a",
+    "backend/app/services/reporting_pipeline/durable_staging.py": "a8f92bee92040a2c4f71296a8b7e171ecb515a1c6317e3e60e4d656fd2ac6557",
+    "backend/app/services/reporting_pipeline/pg_repository.py": "7d64b419e3e33c8e45b31c0b7e9064aba71168c198b88a56d3e0fd2316b03d46",
+    "backend/app/services/reporting_pipeline/reports.py": "d0940aea9c748fb10469784a9ee6e81a767a5628e38b8e06ca6475c09a9af378",
+    "backend/app/services/reporting_pipeline/runtime.py": "56e9b8e13c93eed2840815622801730f3e8bedf4f710d3c27dfe2dcd55a7a1ca",
+    "backend/app/services/reporting_pipeline/scheduler_bridge.py": "3c28e3fdd390429f930084315dd5048558ce954d11c74d44d774a147dfc8e93c",
+    "backend/app/services/reporting_pipeline/seed_loader.py": "27eb2c77c3c34b861e318d9417e19d162714c344ad92c49e788437862fd1df67",
+    "backend/app/services/reporting_pipeline/adapters/python_reader.py": "79b7fd696bbec79ce3b0d0a1ba8254bfd6ab646837ece0d4f51b4f13ab5e22a5",
+    "backend/app/services/reporting_pipeline/adapters/datax_runner.py": "5f731301f70eb9b29ff9cd41671a95a6c5545834eb95b367da7fc6531f27678f",
+    "backend/scripts/reporting_ctl.py": "95711fcb6b3a2ff48af9455362ba18791b47586a34634ce3c14cd97b316c6876",
+    "backend/tests/reporting_pipeline_unit/test_maintenance_runtime.py": "8c6da82e526b47ad7fd6b8157f4cdc7aabc34339e45fd7b92c05c1b56b31022e",
+    "backend/tests/reporting_pipeline_unit/test_maintenance_adapters.py": "53f537d6d4ff7e5212aba2a872480df71dad06df58d48634577734d9b63831fd",
+    "backend/tests/reporting_pipeline_unit/test_maintenance_ops.py": "1f8dbb35cb9e7409bb4436caafdcfd403a05bf900ab5f0ae26096fb3dfdea4cc",
+    "backend/tests/reporting_pipeline_unit/test_maintenance_alerts.py": "1d6edc61f30584370d19b27e6132469b6df3b2c37ec1b036586783008275b853"
+  },
+  "delivery_checks": {
+    "code_hashes": "PASS",
+    "links_and_status_pointers": "PASS",
+    "domain_baseline_files": 13,
+    "domain_baseline": "UNCHANGED",
+    "doc_index_errors": 0,
+    "doc_index_existing_warning": "216 missing_category"
+  }
+}

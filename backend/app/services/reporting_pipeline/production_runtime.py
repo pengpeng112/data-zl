@@ -18,9 +18,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from typing import Callable, Mapping, Sequence
+from zoneinfo import ZoneInfo
 
 from app.services.reporting_pipeline.adapters.python_reader import (
     ReadBudget,
@@ -75,6 +77,8 @@ class AssemblyInputs:
     approval_refs: Sequence[str] = ()
     receipt_table: str | None = None
     system_time_column: str | None = None
+    # 必须由平台装配；静态 approval_refs 仅供模拟，不能产生生产批准。
+    production_apply_port: ApplyPort | None = None
     allow_simulation: bool = False
 
 
@@ -103,9 +107,9 @@ def next_attempt_id(repository: ControlRepository, batch_id: str) -> str:
     return f"att{len(record.attempts) + 1:03d}"
 
 
-def business_window(business_day: str) -> TimeWindow:
+def business_window(business_day: str, timezone_name: str = "Asia/Shanghai") -> TimeWindow:
     day = date.fromisoformat(business_day)
-    start = datetime(day.year, day.month, day.day, tzinfo=timezone.utc)
+    start = datetime(day.year, day.month, day.day, tzinfo=ZoneInfo(timezone_name))
     return TimeWindow(start, start + timedelta(days=1))
 
 
@@ -122,6 +126,7 @@ def build_manifest(
     payload_sha256: str,
     engine: str = "PYTHON",
     source_visibility_cutoff: str | None = None,
+    definition_fingerprint: str | None = None,
 ) -> BatchManifest:
     from app.services.reporting_pipeline.contracts import Engine
 
@@ -130,7 +135,7 @@ def build_manifest(
         attempt_id=attempt_id,
         task_id=task_id,
         config_version=config_version,
-        definition_fingerprint=None,
+        definition_fingerprint=definition_fingerprint,
         source_identity=source_identity,
         window_fingerprint=window.fingerprint(),
         source_visibility_cutoff=(
@@ -192,6 +197,8 @@ class ProductionAssembly:
         if real:
             _require_real(inputs, "state_db_repository", inputs.repository)
             _require_real(inputs, "stage_root", inputs.stage_store)
+            if isinstance(inputs.repository, InMemoryControlRepository):
+                raise AssemblyRefused("REFUSED_VOLATILE_STATE：真实运行禁止使用内存仓储")
             return cls(inputs, simulation=False)
         if not inputs.allow_simulation:
             raise AssemblyRefused(
@@ -220,6 +227,7 @@ class ProductionAssembly:
     ) -> None:
         """K01：enabled 走全链；未 enabled 须有有效动作绑定。"""
         if spec.enabled:
+            spec.validate_action(action)
             return
         from app.services.reporting_pipeline.runtime import ActionBinding
 
@@ -237,6 +245,45 @@ class ProductionAssembly:
                 "动作绑定（K01：不得绕过整链门禁派发本地动作）"
             )
         spec.validate_action(action)
+
+    def _check_binding(self, spec, binding: TargetBindingConfig, record=None) -> None:
+        if self.simulation:
+            return
+        target = spec.target
+        expected = (f"{target.host}:{target.port}/{target.service}", target.owner, target.table)
+        actual = (binding.target_instance, binding.tenant, binding.table)
+        if actual != expected or not target.current_identity_verified:
+            raise AssemblyRefused("REFUSED_TARGET_BINDING：目标与已核任务配置不符")
+        if record is not None and actual != (
+            record.target_instance, record.tenant, record.target_table
+        ):
+            raise AssemblyRefused("REFUSED_BATCH_BINDING：目标与原批次冻结范围不符")
+        names = {field.name for field in spec.projection}
+        if (not spec.stable_key.verified or tuple(spec.stable_key.candidate) != binding.key_columns
+                or not set(binding.key_columns).issubset(binding.write_columns)
+                or not binding.write_columns or len(set(binding.write_columns)) != len(binding.write_columns)
+                or set(binding.write_columns) != names - {self.inputs.system_time_column}):
+            raise AssemblyRefused("REFUSED_COLUMN_BINDING：稳定键或写列不在已核投影中")
+        if self.inputs.system_time_column in binding.write_columns:
+            raise AssemblyRefused("REFUSED_CLOCK_BINDING：SYSTEM_TIME只能由目标事务生成")
+
+    def _read_target_snapshot(self, binding, keys):
+        factory = _require_real(self.inputs, "target_connection_factory", self.inputs.target_connection_factory)
+        conn = factory()
+        close = getattr(conn, "close", None)
+        if not callable(close):
+            raise AssemblyRefused("REFUSED_CONNECTION_LIFECYCLE：目标连接必须支持close")
+        try:
+            conn.begin()
+            # 在第二条写连接开始前释放预览锁，避免同进程互相等待。
+            return {key: dict(row) for key, row in conn.lock_and_read_rows(
+                binding.table, binding.key_columns, keys
+            ).items()}
+        finally:
+            try:
+                conn.rollback()
+            finally:
+                close()
 
     # -- capture -----------------------------------------------------------
 
@@ -257,8 +304,9 @@ class ProductionAssembly:
         )
 
         spec = self.resolve_spec(table)
+        self._check_binding(spec, binding)
         batch_id = stable_batch_id(binding, mode, business_day)
-        window = business_window(business_day)
+        window = business_window(business_day, spec.time_semantics.timezone or "Asia/Shanghai")
         plan_doc = {
             "batch_id": batch_id,
             "table": table,
@@ -288,6 +336,10 @@ class ProductionAssembly:
             return {"ok": True, "dry_run": True, "plan": plan_doc}
 
         self.require_action(spec, PipelineAction.CAPTURE, bindings)
+        if not self.simulation:
+            _require_real(self.inputs, "row_source_factory", self.inputs.row_source_factory)
+            if spec.engine.value != "PYTHON" or spec.dual_source():
+                raise AssemblyRefused("REFUSED_CAPTURE_ROUTE：DataX或双源任务须接专用路由，禁止按单源Python读取")
 
         repo = self._repo()
         try:
@@ -332,7 +384,12 @@ class ProductionAssembly:
                 )
                 return {"ok": False, "refused": "无 primary 源候选", "batch_id": batch_id}
             source = factory(physical)
-            adapter = PythonReaderAdapter(source, read_budget)
+            budget = read_budget or ReadBudget(**{
+                name: getattr(spec.resource_budget, name)
+                for name in ("max_rows_per_slice", "max_bytes_per_slice", "max_attempts")
+                if getattr(spec.resource_budget, name) is not None
+            })
+            adapter = PythonReaderAdapter(source, budget)
             result = adapter.capture_window(window)
             if not result.complete:
                 repo.record_gap(
@@ -345,17 +402,21 @@ class ProductionAssembly:
                     "ok": False, "batch_id": batch_id,
                     "state": result.error_class, "window": window.fingerprint(),
                 }
-            rows = [dict(zip(("K1", "V1"), r)) for r in result.rows]
+            names = [field.name for field in sorted(spec.projection, key=lambda field: field.order)]
+            if not names or len(names) != len(set(names)):
+                raise AssemblyRefused("REFUSED_PROJECTION：投影为空或列名重复")
+            rows = []
+            for row in result.rows:
+                if len(row) != len(names):
+                    raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列数与冻结投影不一致，禁止截断")
+                rows.append(dict(zip(names, row)))
 
         attempt_id = next_attempt_id(repo, batch_id)
         stage = self.inputs.stage_store
         stage.begin_attempt(batch_id, attempt_id)
         # 暂存格式：JSON 行（每行一条记录）——与 iter_chunk_rows 流式读一致
-        payload_text = "".join(
-            json.dumps(row, ensure_ascii=False, default=str) + "\n"
-            for row in rows
-        )
-        payload_bytes = payload_text.encode("utf-8")
+        from app.services.reporting_pipeline.durable_staging import encode_json_rows
+        payload_bytes = encode_json_rows(rows)
         stage.write_chunk(
             batch_id, attempt_id, "chunk-0001", payload_bytes,
             row_count=len(rows),
@@ -372,6 +433,8 @@ class ProductionAssembly:
             rows=RowClassification(source_read_rows=len(rows), valid=len(rows)),
             total_bytes=len(payload_bytes),
             payload_sha256=hashlib.sha256(payload_bytes).hexdigest(),
+            engine=spec.engine.value,
+            definition_fingerprint=spec.definition_fingerprint,
         )
         stage.mark_complete_against_manifest(
             batch_id, attempt_id, manifest,
@@ -401,13 +464,17 @@ class ProductionAssembly:
         *,
         batch_id: str,
         column_meta: Mapping[str, ColumnMeta] | None = None,
-        group_key_columns: Sequence[str] = ("K1",),
+        group_key_columns: Sequence[str] | None = None,
         sim_quality_check: Callable[[list[dict]], dict] | None = None,
     ) -> dict:
         from app.services.reporting_pipeline.quality import QualityService
 
         repo = self._repo()
         record = repo.get_batch(batch_id)
+        spec = self.resolve_spec(record.task_id)
+        group_key_columns = tuple(group_key_columns or spec.stable_key.candidate)
+        if not group_key_columns:
+            raise AssemblyRefused("REFUSED_QUALITY_KEY：缺少已核稳定键")
         if record.state not in (
             BatchState.CAPTURED, BatchState.RETRYABLE,
         ):
@@ -423,7 +490,7 @@ class ProductionAssembly:
                 batch_id, BatchState.RETRYABLE, reason="暂存不完整"
             )
             return {"ok": False, "refused": "暂存不完整，不能验证", "batch_id": batch_id}
-        stage.load_complete_document(batch_id, manifest.attempt_id)  # 完整清单必须存在
+        self._check_staged_manifest(manifest)
         rows = self._staged_rows(batch_id, manifest.attempt_id)
         repo.transition_batch(batch_id, BatchState.VALIDATING, reason="verify 启动")
         if self.simulation and sim_quality_check is not None:
@@ -433,8 +500,29 @@ class ProductionAssembly:
                 group_key_columns=group_key_columns,
                 column_meta=column_meta,
             )
-            outcome = service.verify(rows)
+            from app.services.reporting_pipeline.quality import RequiredRule, TypeRule, ByteLengthRule
+            metas = column_meta or self._column_meta(TargetBindingConfig(
+                "", "", spec.canonical_table, tuple(group_key_columns),
+                tuple(field.name for field in spec.projection),
+            ), spec)
+            rules = [RequiredRule(tuple(group_key_columns))]
+            for meta in metas.values():
+                expected = {"NUMBER": "decimal", "DECIMAL": "decimal", "NUMERIC": "decimal",
+                            "INT": "int", "INTEGER": "int", "DATE": "datetime", "TIMESTAMP": "datetime"}.get(meta.logical_type)
+                if meta.logical_type in ("CHAR", "NCHAR", "VARCHAR", "VARCHAR2", "NVARCHAR2", "CLOB", "NCLOB", "TEXT"):
+                    expected = "str"
+                if expected:
+                    rules.append(TypeRule(meta.name, expected))
+            for field in spec.projection:
+                declared = re.fullmatch(r"(?:VAR)?CHAR2?\((\d+)\s*(?:BYTE)?\)", field.target_type.upper())
+                if declared:
+                    rules.append(ByteLengthRule(field.name, int(declared.group(1))))
+            service.column_meta = dict(metas)
+            outcome = service.verify(rows, rules=rules)
             outcome_summary = outcome.summary()
+            outcome_summary["valid_rows"] = sum(
+                classification == "VALID" for classification in outcome.classifications.values()
+            )
         ok = bool(outcome_summary.get("valid_rows") == len(rows)) if outcome_summary else False
         if ok:
             repo.transition_batch(
@@ -461,6 +549,25 @@ class ProductionAssembly:
         stage = self.inputs.stage_store
         return list(stage.iter_chunk_rows(batch_id, attempt_id))
 
+    def _check_staged_manifest(self, manifest: BatchManifest) -> None:
+        spec = self.resolve_spec(manifest.task_id)
+        if (manifest.config_version != spec.config_version
+                or manifest.definition_fingerprint != spec.definition_fingerprint):
+            raise AssemblyRefused("REFUSED_CONFIG_DRIFT：暂存后配置或视图定义变了，须复核后重新捕获")
+        stage = self.inputs.stage_store
+        document = stage.load_complete_document(manifest.batch_id, manifest.attempt_id)
+        if (document.get("source_identity") != manifest.source_identity
+                or document.get("window_fingerprint") != manifest.window_fingerprint
+                or document.get("payload_sha256") != manifest.payload_sha256
+                or document.get("definition_fingerprint") != manifest.definition_fingerprint):
+            raise AssemblyRefused("REFUSED_STAGE_BINDING：暂存完整清单与原批次不符")
+        # COMPLETE只证明当时完整；读取和写入前重算字节/行数/哈希。
+        stage.mark_complete_against_manifest(
+            manifest.batch_id, manifest.attempt_id, manifest,
+            source_identity=manifest.source_identity,
+            definition_fingerprint=manifest.definition_fingerprint,
+        )
+
     # -- apply -------------------------------------------------------------
 
     def apply(
@@ -470,6 +577,8 @@ class ProductionAssembly:
         binding: TargetBindingConfig,
         approval_ref: str,
         executor_id: str | None = None,
+        lease_resource: str | None = None,
+        fencing_token: int | None = None,
         sim_target_rows: Mapping[tuple, Mapping] | None = None,
     ) -> dict:
         from datetime import datetime as _dt
@@ -480,6 +589,16 @@ class ProductionAssembly:
 
         repo = self._repo()
         record = repo.get_batch(batch_id)
+        spec = self.resolve_spec(record.task_id)
+        self._check_binding(spec, binding, record)
+        if not self.simulation:
+            port = _require_real(self.inputs, "production_apply_port", self.inputs.production_apply_port)
+            if not port.production_mode or not port.enforce_fence:
+                raise AssemblyRefused("REFUSED_PRODUCTION_GATE：禁止模拟批准或关闭围栏")
+            expected_resource = f"target:{binding.target_instance}.{binding.tenant}.{binding.table}"
+            if lease_resource != expected_resource or fencing_token is None:
+                raise AssemblyRefused("REFUSED_TARGET_LEASE：须提供本表有效写租约及围栏token")
+            port.lease_validator(lease_resource, fencing_token)
         if record.state not in (
             BatchState.VALIDATED, BatchState.APPLY_PENDING,
         ):
@@ -492,30 +611,21 @@ class ProductionAssembly:
                 "batch_id": batch_id,
             }
         manifest = repo.select_manifest(batch_id)
-        stage = self.inputs.stage_store
-        stage.load_complete_document(batch_id, manifest.attempt_id)  # 完整清单必须存在
+        self._check_staged_manifest(manifest)
         rows = self._staged_rows(batch_id, manifest.attempt_id)
         # 目标既有行（生产=受控目标读；模拟=注入快照）
         if self.simulation:
             target_rows = dict(sim_target_rows or {})
         else:
-            factory = _require_real(
-                self.inputs, "target_connection_factory",
-                self.inputs.target_connection_factory,
-            )
-            conn = factory()
-            target_rows = conn.lock_and_read_rows(
-                binding.table, binding.key_columns,
+            target_rows = self._read_target_snapshot(binding,
                 [tuple(r.get(c) for c in binding.key_columns) for r in rows],
             )
-        verifier = StaticApprovalVerifier(set(self.inputs.approval_refs))
-        port = ApplyPort(
-            whitelisted_executors=[executor_id or "sql-target-apply-1"],
-            approval_verifier=verifier,
-            lease_validator=lambda r, t: None,  # CLI 单批路径：围栏由仓储租约外部保证
-            enforce_fence=False,
-            production_mode=False,
-        )
+        if self.simulation:
+            port = ApplyPort(
+                whitelisted_executors=[executor_id or "sql-target-apply-1"],
+                approval_verifier=StaticApprovalVerifier(set(self.inputs.approval_refs)),
+                enforce_fence=False,
+            )
         if self.simulation:
             fake_conn = FakeTargetConnection(
                 dict(target_rows), key_columns=binding.key_columns,
@@ -537,7 +647,9 @@ class ProductionAssembly:
             receipt_table=self.inputs.receipt_table,
         )
         executor = SqlTargetApplyExecutor(
-            executor_conn_factory, config, simulation=self.simulation
+            executor_conn_factory, config, simulation=self.simulation,
+            fence_check=(lambda: port.lease_validator(lease_resource, fencing_token)) if not self.simulation else None,
+            expected_target_rows=target_rows,
         )
         request = ApplyRequest(
             manifest=manifest,
@@ -548,8 +660,10 @@ class ProductionAssembly:
             allowed_operations=("INSERT", "UPDATE"),
             idempotency_key_columns=binding.key_columns,
             rows=tuple(rows),
-            column_meta=self._column_meta(binding),
+            column_meta=self._column_meta(binding, spec),
             mode="MERGE",
+            lease_resource=lease_resource,
+            fencing_token=fencing_token,
         )
         if record.state in (BatchState.VALIDATED, BatchState.WAITING_APPROVAL):
             repo.transition_batch(
@@ -557,10 +671,14 @@ class ProductionAssembly:
             )
         try:
             plan = port.preview(request, target_rows)
+            if plan.counts.get("CONFLICT"):
+                raise AssemblyRefused("REFUSED_VERSION_CONFLICT：存在版本冲突，需隔离后续跑")
             repo.transition_batch(
                 batch_id, BatchState.APPLYING, reason="apply 执行中"
             )
             result = port.apply(request, executor, target_rows=target_rows)
+            if not result.committed:
+                raise AssemblyRefused("REFUSED_NOT_COMMITTED：目标已回滚，不能标记APPLIED")
         except CommitUnknownRaised:
             # COMMIT_UNKNOWN：冻结该表（含依赖链）重叠写，先核目标凭据
             repo.transition_batch(
@@ -576,14 +694,15 @@ class ProductionAssembly:
                 "simulation": self.simulation,
             }
         except Exception as exc:  # ApplyRefused 等：不写目标，回 APPLY_PENDING
-            repo.transition_batch(
-                batch_id, BatchState.APPLY_PENDING,
-                reason=f"apply 被拒: {type(exc).__name__}",
-            )
+            if repo.get_batch(batch_id).state != BatchState.APPLY_PENDING:
+                repo.transition_batch(
+                    batch_id, BatchState.APPLY_PENDING,
+                    reason=f"apply 被拒: {type(exc).__name__}",
+                )
             return {
                 "ok": False,
                 "batch_id": batch_id,
-                "refused": str(exc)[:300],
+                "refused": f"apply被拒：{type(exc).__name__}（详情仅在受控审计中查看）",
                 "simulation": self.simulation,
             }
         repo.transition_batch(
@@ -606,9 +725,10 @@ class ProductionAssembly:
         }
 
     @staticmethod
-    def _column_meta(binding: TargetBindingConfig) -> dict[str, ColumnMeta]:
+    def _column_meta(binding: TargetBindingConfig, spec=None) -> dict[str, ColumnMeta]:
+        types = {field.name: field.target_type for field in spec.projection} if spec else {}
         return {
-            col: ColumnMeta(name=col, logical_type="VARCHAR")
+            col: ColumnMeta(name=col, logical_type=re.split(r"[ (]", types.get(col, "VARCHAR").upper())[0])
             for col in binding.write_columns
         }
 
@@ -625,6 +745,8 @@ class ProductionAssembly:
 
         repo = self._repo()
         record = repo.get_batch(batch_id)
+        spec = self.resolve_spec(record.task_id)
+        self._check_binding(spec, binding, record)
         if record.state != BatchState.APPLIED:
             return {
                 "ok": False,
@@ -632,20 +754,14 @@ class ProductionAssembly:
                 "batch_id": batch_id,
             }
         manifest = repo.select_manifest(batch_id)
-        stage = self.inputs.stage_store
-        stage.load_complete_document(batch_id, manifest.attempt_id)  # 完整清单必须存在
+        self._check_staged_manifest(manifest)
         rows = self._staged_rows(batch_id, manifest.attempt_id)
         keys = [tuple(r.get(c) for c in binding.key_columns) for r in rows]
         if self.simulation:
             target_rows = dict(sim_target_rows or {})
         else:
-            factory = _require_real(
-                self.inputs, "target_connection_factory",
-                self.inputs.target_connection_factory,
-            )
-            conn = factory()
-            target_rows = conn.lock_and_read_rows(binding.table, binding.key_columns, keys)
-        metas = list(self._column_meta(binding).values())
+            target_rows = self._read_target_snapshot(binding, keys)
+        metas = list(self._column_meta(binding, spec).values())
         diffs: list[dict] = []
         missing = [k for k in keys if k not in target_rows]
         for row in rows:
@@ -655,7 +771,7 @@ class ProductionAssembly:
                 continue
             row_diffs = row_diff(row, target_row, metas)
             if row_diffs:
-                diffs.append({"key": list(key), "diffs": row_diffs})
+                diffs.append({"columns": [diff["column"] for diff in row_diffs]})
         ok = not missing and not diffs
         if ok:
             repo.transition_batch(

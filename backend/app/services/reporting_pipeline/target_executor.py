@@ -32,6 +32,7 @@ from app.services.reporting_pipeline.apply_port import (
     TargetCommitCredential,
 )
 from app.services.reporting_pipeline.contracts import ContractViolation
+from app.services.reporting_pipeline.readback_types import content_fingerprint
 
 
 class AmbiguousCommit(RuntimeError):
@@ -115,10 +116,14 @@ class SqlTargetApplyExecutor:
         config: ExecutorTargetConfig,
         *,
         simulation: bool = False,
+        fence_check: Callable[[], None] | None = None,
+        expected_target_rows: Mapping[tuple, Mapping] | None = None,
     ) -> None:
         self._connection_factory = connection_factory
         self._config = config
         self._simulation = simulation
+        self._fence_check = fence_check
+        self._expected_target_rows = expected_target_rows
         if not simulation and not config.receipt_table:
             raise ContractViolation(
                 "正式执行器必须配置已批准的 receipt_table（同事务回执）；"
@@ -127,12 +132,30 @@ class SqlTargetApplyExecutor:
 
     def execute(self, request: ApplyRequest, plan: ApplyPlan) -> ApplyResult:
         cfg = self._config
+        if request.mode != "MERGE":
+            raise ContractViolation("当前SQL执行器仅实现MERGE；禁止将月替换伪装为成功")
+        if tuple(request.idempotency_key_columns) != cfg.key_columns:
+            raise ContractViolation("请求稳定键与执行器绑定不一致")
+        requested_target = request.target_object.rsplit(".", 2)
+        if (len(requested_target) != 3 or requested_target[0] != cfg.target_instance
+                or requested_target[1].upper() != cfg.tenant.upper()
+                or requested_target[2].upper() != cfg.table.rsplit(".", 1)[-1].upper()):
+            raise ContractViolation("请求目标与执行器冻结绑定不一致")
+        if any(action not in (INSERT, UPDATE, "NO_CHANGE") for _, action in plan.actions):
+            raise ContractViolation("存在冲突或未知装载动作，须先隔离，不能签发成功回执")
+        planned_keys = [key for key, _ in plan.actions]
+        row_keys = [tuple(row.get(column) for column in cfg.key_columns) for row in request.rows]
+        if (len(planned_keys) != len(set(planned_keys)) or len(row_keys) != len(set(row_keys))
+                or set(planned_keys) != set(row_keys)):
+            raise ContractViolation("装载计划与暂存键集不完整或有重复")
         operation_id = stable_operation_id(
             request.manifest.batch_id, request.manifest.payload_sha256
         )
         conn = self._connection_factory()
-        conn.begin()
         try:
+            conn.begin()
+            if self._fence_check:
+                self._fence_check()
             # 幂等重放：目标侧回执已存在 → 返回原回执，不再写业务行
             if cfg.receipt_table:
                 existing = conn.find_receipt(cfg.receipt_table, operation_id)
@@ -156,17 +179,31 @@ class SqlTargetApplyExecutor:
             # 被行锁挡住）；INSERT 行由唯一键约束兜底
             plan_keys = [key for key, _ in plan.actions]
             locked = conn.lock_and_read_rows(cfg.table, cfg.key_columns, plan_keys)
+            rows_by_key = {}
+            for row in request.rows:
+                key = tuple(row.get(c) for c in request.idempotency_key_columns)
+                if key in rows_by_key:
+                    raise ContractViolation("执行器拒绝重复稳定键，须先完成质量去重")
+                rows_by_key[key] = row
             # 执行分类动作：只写白名单列；NO_CHANGE 不写；CONFLICT 隔离跳过
             inserts: list[Mapping] = []
             updates: list[Mapping] = []
             for key, action in plan.actions:
-                matching = [
-                    r for r in request.rows
-                    if tuple(r.get(c) for c in request.idempotency_key_columns) == key
-                ]
-                if not matching:
-                    continue  # 行缺失由质量层先拦；执行器不虚构数据
-                row = matching[0]
+                if key not in rows_by_key:
+                    raise ContractViolation("装载计划与暂存键集不一致")
+                row = rows_by_key[key]
+                if ((action == INSERT and key in locked)
+                        or (action in (UPDATE, "NO_CHANGE") and key not in locked)):
+                    raise ContractViolation("TARGET_CHANGED：预览后目标键发生变化，回滚并重新对账")
+                metas = list(request.column_meta.values())
+                if self._expected_target_rows is not None:
+                    expected = self._expected_target_rows.get(key)
+                    current = locked.get(key)
+                    if ((expected is None) != (current is None) or
+                            (expected is not None and content_fingerprint(expected, metas) != content_fingerprint(current, metas))):
+                        raise ContractViolation("TARGET_CHANGED：预览后目标内容发生变化，回滚并重新对账")
+                if action == "NO_CHANGE" and content_fingerprint(row, metas) != content_fingerprint(locked[key], metas):
+                    raise ContractViolation("TARGET_CHANGED：无需更新的记录已发生变化")
                 if action == INSERT and key not in locked:
                     inserts.append(row)
                 elif action == UPDATE and key in locked:
@@ -198,6 +235,8 @@ class SqlTargetApplyExecutor:
                     [_with_system_time(r) for r in updates],
                     key_columns=cfg.key_columns,
                 )
+            if affected != len(inserts) + len(updates):
+                raise ContractViolation("DML_ROWCOUNT_MISMATCH：实际写入行数与计划不符，回滚")
             # 同事务回执：与业务 DML 同一事务持久化（COMMIT 前写入）
             if cfg.receipt_table:
                 conn.insert_receipt(cfg.receipt_table, {
@@ -217,6 +256,8 @@ class SqlTargetApplyExecutor:
                         if cfg.receipt_table else None
                     ),
                 })
+            if self._fence_check:
+                self._fence_check()
             committed = conn.commit()
         except AmbiguousCommit:
             return ApplyResult(
@@ -228,6 +269,13 @@ class SqlTargetApplyExecutor:
             except Exception:  # noqa: BLE001 - 回滚失败保留原异常
                 pass
             raise
+        finally:
+            close = getattr(conn, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except Exception:
+                    pass  # 关闭失败不能把明确提交重新判为失败并触发重放。
         if not committed:
             return ApplyResult(
                 committed=False, operation_id=operation_id, rows_affected=0

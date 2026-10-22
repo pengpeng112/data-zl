@@ -372,7 +372,11 @@ class SqlAlchemyControlRepository:
             with session.begin():
                 row = self._require_batch_row(session, batch_id)
                 record = self._load_batch(session, batch_id)
-                machine = BatchStateMachine()
+                # Rehydrate the state machine from the durable row. Creating a
+                # default machine here would validate every transition as if the
+                # batch were still PLANNED, allowing stale/invalid transitions
+                # and rejecting valid transitions after the first step.
+                machine = BatchStateMachine(BatchState(row.state))
                 machine.transition(
                     target, reason=reason, evidence=evidence, manifest=record.manifest
                 )
@@ -393,30 +397,58 @@ class SqlAlchemyControlRepository:
     def transition_feedback(
         self, batch_id: str, target: FeedbackState, *, reason: str, evidence: str | None = None
     ) -> FeedbackState:
-        machine = FeedbackStateMachine()
-        machine.transition(target, reason=reason, evidence=evidence)
         with self._sessions() as session:
             with session.begin():
                 row = self._require_batch_row(session, batch_id)
+                machine = FeedbackStateMachine(FeedbackState(row.feedback_state))
+                machine.transition(target, reason=reason, evidence=evidence)
                 row.feedback_state = machine.state.value
                 row.updated_at = _utcnow()
         return machine.state
 
     def list_batches(self) -> list[BatchRecord]:
-        out: list[BatchRecord] = []
         with self._sessions() as session:
-            ids = [
-                row
-                for row in session.execute(
-                    select(AssetReportingBatch.batch_id).order_by(
-                        AssetReportingBatch.batch_id
+            rows = (
+                session.execute(
+                    select(AssetReportingBatch).order_by(AssetReportingBatch.batch_id)
+                )
+                .scalars()
+                .all()
+            )
+            if not rows:
+                return []
+            batch_ids = [row.batch_id for row in rows]
+            attempts_by_batch: dict[str, list[AssetReportingBatchAttempt]] = {}
+            for attempt in (
+                session.execute(
+                    select(AssetReportingBatchAttempt).where(
+                        AssetReportingBatchAttempt.batch_id.in_(batch_ids)
                     )
-                ).scalars()
-            ]
-        for batch_id in ids:
-            with self._sessions() as session:
-                out.append(self._load_batch(session, batch_id))
-        return out
+                )
+                .scalars()
+                .all()
+            ):
+                attempts_by_batch.setdefault(attempt.batch_id, []).append(attempt)
+
+            out: list[BatchRecord] = []
+            for row in rows:
+                record = BatchRecord(
+                    batch_id=row.batch_id,
+                    task_id=row.canonical_table,
+                    business_day=str(row.business_day),
+                    state=BatchState(row.state),
+                    feedback_state=FeedbackState(row.feedback_state),
+                    target_instance=row.target_instance,
+                    tenant=row.tenant,
+                    target_table=row.target_table,
+                )
+                for attempt in attempts_by_batch.get(row.batch_id, []):
+                    manifest = manifest_from_dict(attempt.manifest_json)
+                    record.attempts[attempt.attempt_id] = manifest
+                    if row.selected_attempt_id == attempt.attempt_id:
+                        record.manifest = manifest
+                out.append(record)
+            return out
 
     @staticmethod
     def _require_batch_row(session: Session, batch_id: str) -> AssetReportingBatch:

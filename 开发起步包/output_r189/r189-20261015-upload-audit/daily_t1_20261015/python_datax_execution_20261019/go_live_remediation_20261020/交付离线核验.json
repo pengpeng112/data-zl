@@ -1,0 +1,92 @@
+{
+  "kind": "OFFLINE_DELIVERY_VALIDATION",
+  "passed": true,
+  "checks": [
+    {
+      "name": "8个接续任务唯一且映射原E08/E09/E10",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R01依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R02依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R03依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R04依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R05依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R06依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R07依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "R08依赖无前向环",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "34条新增场景仅预期未执行",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "112原场景未改未冒充通过",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "源代码/原checkpoint/原JSON输入均未改",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "新文档所有相对链接均存在",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "xlsx五页/8任务/34场景/77项快照/15源码问题",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "源码定位行存在且哈希一致",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "未新增第二份运行checkpoint",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "JSON全部可解析",
+      "passed": true,
+      "details": null
+    }
+  ],
+  "not_a_runtime_acceptance": "本轮未执行34新增场景/真实驱动DataX/业务查询装载/告警外发/上线观测"
+}

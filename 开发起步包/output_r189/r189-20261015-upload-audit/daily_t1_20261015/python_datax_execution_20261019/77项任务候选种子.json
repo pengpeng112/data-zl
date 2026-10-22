@@ -4241,7 +4241,7 @@
       "canonical_table": "EMR_BLOOD_DIALY_RECORD",
       "business_name": "血透治疗记录",
       "enabled": false,
-      "runtime_readiness": "UNKNOWN",
+      "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
       "applicability": "TO_VERIFY",
       "engine": "UNDECIDED",
       "incremental_strategy": "UNRESOLVED",
@@ -4250,15 +4250,16 @@
           "object_id": "dialysis__V_EMR_BLOOD_DIALY_RECORD",
           "role": "primary",
           "source_group": "dialysis",
-          "host": "10.10.10.88",
+          "host": "10.10.8.87",
           "port": 5432,
           "database_hint": "dialysis",
           "owner_hint": "public",
           "object_name_candidates": [
-            "V_EMR_BLOOD_DIALY_RECORD",
+            "v_EMR_BLOOD_DIALY_RECORD",
             "EMR_BLOOD_DIALY_RECORD"
           ],
-          "current_identity_verified": false
+          "current_identity_verified": false,
+          "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
         }
       ],
       "target_candidate": {
@@ -4296,14 +4297,16 @@
       "monthly_rescan_policy_ref": null,
       "long_lived_credential_ref": null,
       "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
-      "route_policy_ref": null
+      "route_policy_ref": null,
+      "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=0行;RECORD无2026增量(与前置机全量自洽)",
+      "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量"
     },
     {
       "index": 69,
       "canonical_table": "EMR_BLOOD_DIALY_DETAIL",
       "business_name": "血透治疗过程记录",
       "enabled": false,
-      "runtime_readiness": "UNKNOWN",
+      "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
       "applicability": "TO_VERIFY",
       "engine": "UNDECIDED",
       "incremental_strategy": "UNRESOLVED",
@@ -4312,15 +4315,16 @@
           "object_id": "dialysis__V_EMR_BLOOD_DIALY_DETAIL",
           "role": "primary",
           "source_group": "dialysis",
-          "host": "10.10.10.88",
+          "host": "10.10.8.87",
           "port": 5432,
           "database_hint": "dialysis",
           "owner_hint": "public",
           "object_name_candidates": [
-            "V_EMR_BLOOD_DIALY_DETAIL",
+            "v_EMR_BLOOD_DIALY_DETAIL",
             "EMR_BLOOD_DIALY_DETAIL"
           ],
-          "current_identity_verified": false
+          "current_identity_verified": false,
+          "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
         }
       ],
       "target_candidate": {
@@ -4358,14 +4362,16 @@
       "monthly_rescan_policy_ref": null,
       "long_lived_credential_ref": null,
       "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
-      "route_policy_ref": null
+      "route_policy_ref": null,
+      "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=197860行;RECORD无2026增量(与前置机全量自洽)",
+      "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量"
     },
     {
       "index": 70,
       "canonical_table": "EMR_BLOOD_DIALY_ORDER",
       "business_name": "血透治疗医嘱明细",
       "enabled": false,
-      "runtime_readiness": "UNKNOWN",
+      "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
       "applicability": "TO_VERIFY",
       "engine": "UNDECIDED",
       "incremental_strategy": "UNRESOLVED",
@@ -4374,15 +4380,16 @@
           "object_id": "dialysis__V_EMR_BLOOD_DIALY_ORDER",
           "role": "primary",
           "source_group": "dialysis",
-          "host": "10.10.10.88",
+          "host": "10.10.8.87",
           "port": 5432,
           "database_hint": "dialysis",
           "owner_hint": "public",
           "object_name_candidates": [
-            "V_EMR_BLOOD_DIALY_ORDER",
+            "v_EMR_BLOOD_DIALY_ORDER",
             "EMR_BLOOD_DIALY_ORDER"
           ],
-          "current_identity_verified": false
+          "current_identity_verified": false,
+          "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
         }
       ],
       "target_candidate": {
@@ -4420,7 +4427,9 @@
       "monthly_rescan_policy_ref": null,
       "long_lived_credential_ref": null,
       "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
-      "route_policy_ref": null
+      "route_policy_ref": null,
+      "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=24963行;RECORD无2026增量(与前置机全量自洽)",
+      "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量"
     },
     {
       "index": 71,

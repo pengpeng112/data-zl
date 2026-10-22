@@ -5,7 +5,7 @@
 - E02+：plan / simulate / capture / verify / apply / reconcile / delivery /
   resume / retry / daily-report / ticket-export。
 - A02（2026-10-22）：capture/verify/apply/reconcile/delivery/retry 六个
-  真实动作命令落地——真实运行缺状态库/暂存根/绑定/批准即拒绝
+  动作接口已提供，生产连接工厂尚未接线（doctor列明）；缺真实输入即拒绝
   （REFUSED_MISSING_*），不退回内存模拟；--allow-simulation 显式隔离验证；
   delivery 省端接口未接通如实 PENDING_RECEIPT；daily-report 缺省业务日
   改为院区时区昨天（不再硬编码 2026-10-19），无 --state-db 且未显式
@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -38,7 +39,13 @@ IMPLEMENTED_COMMANDS = (
     "plan", "simulate", "resume",
     "capture", "verify", "apply", "reconcile", "delivery", "retry",
     "backfill-plan", "gap-diff-plan", "publish-order",
+    "doctor",
 )
+
+
+def _state_db_url(args: argparse.Namespace) -> str | None:
+    """Use a protected process environment without printing credential URLs."""
+    return getattr(args, "state_db", None) or os.environ.get("APP_REPORTING_CONTROL_DB_URL")
 
 
 def _emit(payload: dict) -> None:
@@ -137,7 +144,7 @@ def cmd_daily_report(args: argparse.Namespace) -> int:
     from app.services.reporting_pipeline.seed_loader import _load_json
 
     bundle = _load_bundle(Path(args.config))
-    state_db = getattr(args, "state_db", None)
+    state_db = _state_db_url(args)
     allow_simulation = bool(getattr(args, "allow_simulation", False))
     business_day = getattr(args, "business_day", None)
     if business_day is None:
@@ -159,7 +166,7 @@ def cmd_daily_report(args: argparse.Namespace) -> int:
         engine = create_engine(state_db)
         repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
         simulation = False
-        state_note = f"durable_state_db={state_db}"
+        state_note = "durable_state_db_configured"
     else:
         if not allow_simulation:
             _emit(
@@ -413,7 +420,7 @@ def cmd_resume(args: argparse.Namespace) -> int:
     from app.services.reporting_pipeline.recovery import RecoveryService
     from app.services.reporting_pipeline.repositories import InMemoryControlRepository
 
-    state_db = getattr(args, "state_db", None)
+    state_db = _state_db_url(args)
     if state_db:
         from app.services.reporting_pipeline.pg_repository import (
             SqlAlchemyControlRepository,
@@ -489,6 +496,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_val = sub.add_parser("validate", help="离线结构校验+未知不可变READY检查")
     p_val.add_argument("--offline", action="store_true", help="显式离线（validate 本身不联网）")
     p_val.set_defaults(func=cmd_validate)
+
+    p_doctor = sub.add_parser("doctor", help="离线核查生产装配缺口；不连库、不创建暂存目录")
+    p_doctor.set_defaults(func=cmd_doctor)
 
     p_report = sub.add_parser("daily-report", help="生成日报（--state-db 真实持久库 / --allow-simulation 显式模拟）")
     p_report.add_argument("--business-day", default=None, help="业务日 YYYY-MM-DD；缺省=院区时区昨天（不再硬编码）")
@@ -621,7 +631,7 @@ def _assembly_inputs(args: argparse.Namespace):
     from app.services.reporting_pipeline.production_runtime import AssemblyInputs
 
     bundle = _load_bundle(Path(args.config))
-    state_db = getattr(args, "state_db", None)
+    state_db = _state_db_url(args)
     stage_root = getattr(args, "stage_root", None)
 
     repository = None
@@ -646,10 +656,11 @@ def _assembly_inputs(args: argparse.Namespace):
         bundle=bundle,
         repository=repository,
         stage_store=stage_store,
+        allow_simulation=bool(getattr(args, "allow_simulation", False)),
     )
     # 目标/源连接绑定文件：真实模式必填（受控连接器配置由运维提供）。
-    # approval_refs 是运维从平台批准登记转录的"已获批准集合"；CLI 的
-    # --approval-ref 只是引用，必须在集合内才可通过（程序不自批）。
+    # approval_refs 仅供显式模拟。生产必须另注入平台批准核验、耐久版本账
+    # 和有效写租约；JSON中的字符串不是生产授权。
     bindings_file = getattr(args, "bindings_file", None)
     executor_id = getattr(args, "executor_id", None)
     if bindings_file:
@@ -665,6 +676,27 @@ def _assembly_inputs(args: argparse.Namespace):
         # 真实源工厂/目标连接由容器内受控连接器装配（本机 CLI 不持凭据）；
         # 缺失时 ProductionAssembly 在真实动作处拒绝（REFUSED_MISSING_*）
     return inputs
+
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    """如实说明命令行与生产装配的边界，禁止把离线测试当上线验收。"""
+    bundle = _load_bundle(Path(args.config))
+    _emit({
+        "ok": False,
+        "production_ready": False,
+        "mode": "offline_inspection",
+        "configured_tasks": len(bundle.tasks),
+        "enabled_tasks": sum(bool(task.enabled) for task in bundle.tasks),
+        "missing_runtime_bindings": [
+            "受控源RowSource工厂（按表投影、分页、时间及双源路由）",
+            "DataX执行/暂存回收与日轮的完整接线",
+            "目标TargetConnection工厂及连接释放",
+            "平台批准核验+耐久版本账+本表写租约的production ApplyPort",
+            "已批准的控制库迁移、目标回执表、正式调度和告警配置",
+        ],
+        "note": "当前CLI未装配生产连接；bindings JSON不提供连接或批准。真实动作缺输入时拒绝。",
+    })
+    return 2
 
 
 def _build_assembly(args: argparse.Namespace):
@@ -712,7 +744,7 @@ def cmd_capture(args: argparse.Namespace) -> int:
     dry_run = bool(args.dry_run)
     # dry-run 只产出审阅计划（不读源不写状态）：缺状态库时允许离线装配，
     # 输出带 simulation 标记；真实 capture 缺输入仍拒绝。
-    if dry_run and not getattr(args, "state_db", None):
+    if dry_run and not _state_db_url(args):
         inputs = _assembly_inputs(args)
         inputs.allow_simulation = True  # dry-run 显式允许（仅产计划，不触源/状态）
         assembly = ProductionAssembly.build(inputs, real=False)
@@ -823,7 +855,7 @@ def cmd_delivery(args: argparse.Namespace) -> int:
         "不涂绿 REPORT_READY）"
     )
     _emit(outcome)
-    return 0
+    return 0 if outcome.get("ok") else 1
 
 
 def cmd_retry(args: argparse.Namespace) -> int:

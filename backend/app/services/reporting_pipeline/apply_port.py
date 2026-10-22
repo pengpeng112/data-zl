@@ -345,7 +345,7 @@ class VersionGuard:
 
     def __init__(self, registry: VersionRegistry | None = None) -> None:
         self._registry = registry or InMemoryVersionRegistry()
-        self._registry_is_memory = registry is None
+        self._registry_is_memory = isinstance(self._registry, InMemoryVersionRegistry)
 
     @property
     def durable(self) -> bool:
@@ -457,13 +457,27 @@ class ApplyPort:
                         key,
                         request.version_order or "applied",
                         operation_id=result.operation_id,
+                        scope=self._version_scope(request),
                     )
         return result
+
+    def _version_scope(self, request: ApplyRequest) -> VersionScope | None:
+        if not self.production_mode:
+            return None
+        # 实例自身可能含点号，只有最右侧的 owner/table 是拆分边界。
+        parts = request.target_object.rsplit(".", 2)
+        if len(parts) != 3 or not all(parts):
+            raise ApplyRefused("生产版本账须绑定目标实例、机构和表")
+        return VersionScope(*parts)
 
     # -- 门禁 ---------------------------------------------------------------
 
     def _gate(self, request: ApplyRequest, executor: ApplyExecutor) -> None:
         problems: list[str] = []
+        if self.production_mode:
+            self._version_scope(request)
+            if request.executor_id != executor.executor_id:
+                problems.append("请求执行器与实际白名单执行器不一致")
         if not request.manifest.pagination_complete:
             problems.append("manifest 分页未完整（缺分片不得装载正式）")
         if not request.quality_verified:
@@ -533,7 +547,8 @@ class ApplyPort:
                 actions.append((key, NO_CHANGE))
                 continue
             verdict = self.version_guard.check(
-                key, request.version_order, version_kind=request.version_kind
+                key, request.version_order, version_kind=request.version_kind,
+                scope=self._version_scope(request),
             )
             if verdict == CONFLICT:
                 actions.append((key, CONFLICT))

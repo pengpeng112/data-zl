@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-22T15:03:24.221603+00:00",
+  "container_cwd": "/app",
+  "files": {
+    "app/services/reporting_pipeline/production_runtime.py": {
+      "exists": false,
+      "sha256": null
+    },
+    "app/services/reporting_pipeline/runtime.py": {
+      "exists": false,
+      "sha256": null
+    },
+    "scripts/reporting_ctl.py": {
+      "exists": false,
+      "sha256": null
+    }
+  },
+  "reporting_tables": [],
+  "scheduler_columns": [
+    "id",
+    "job_type",
+    "source_code",
+    "trigger_mode",
+    "schedule_cron",
+    "status",
+    "started_at",
+    "finished_at",
+    "result_ref",
+    "total_processed",
+    "total_changes",
+    "error_message",
+    "created_at"
+  ],
+  "reporting_scheduler_summary": [],
+  "alembic_version": [
+    "c0d1e2f3a4b5"
+  ]
+}

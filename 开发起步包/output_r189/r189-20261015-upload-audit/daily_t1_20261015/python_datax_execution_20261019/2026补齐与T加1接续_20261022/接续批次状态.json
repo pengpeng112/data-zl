@@ -1,10 +1,10 @@
 {
  "plan_version": "1.1",
  "as_of": "2026-10-22",
- "status": "STAGE1_ISOLATED_PG_AND_EXECUTOR_TX_VERIFIED_B01_DONE_B02_READY",
+ "status": "MAINTENANCE_FIXES_VERIFIED_RUNTIME_WIRING_PENDING_NOT_DEPLOYED",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
- "current_step": "A05b待批(仅生产批准与隔离Oracle方言级验证余项)",
- "next": "生产动作仍按A05_待批清单_v2_20261022.json；隔离Oracle/血透8.87/8.53写者live重核三项待环境或待批通道；B03-B05未启动",
+ "current_step": "本地维护修复及隔离PG复验完成；生产装配和恢复闭环仍须补齐",
+ "next": "先按维护复核说明补运行配置/连接工厂/生产ApplyPort/恢复与月巡闭环，补Oracle隔离验证；再按PA1—PA7审阅、试点与7日观测。血透与8.53晚间核查已见证据，不再重复列为未核。",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -30,19 +30,20 @@
    ]
   },
   "A02": {
-   "status": "COMPLETED_UNIT_VERIFIED",
+   "status": "PARTIAL_LOCAL_FIXED_RUNTIME_WIRING_PENDING",
    "evidence": [
     "六真实命令+production_runtime；本轮新增B02三离线命令(backfill-plan/gap-diff-plan/publish-order)"
-   ]
+   ],
+   "maintenance_review": "六命令存在但CLI尚未装配连接工厂和生产ApplyPort；不能只凭离线测试声称真实入口完成"
   },
   "A03": {
-   "status": "COMPLETED_UNIT_VERIFIED",
+   "status": "LOCAL_AND_ISOLATED_PG_REVERIFIED_ORACLE_PENDING",
    "evidence": [
     "K02结构化冻结(迁移a7d8e9f0a1b2已在data_asset_test往返实测:升级/回退3层/再升级,三列干净增删)"
    ]
   },
   "A04": {
-   "status": "COMPLETED_ISOLATED_PG_VERIFIED_INCL_EXECUTOR_TX",
+   "status": "ISOLATED_PG_REVERIFIED_ORACLE_AND_FULL_RUNTIME_PENDING",
    "evidence": [
     "隔离PG集成测试7项全过(RT1-003/004/005)——test_rt1_004时钟偏差修复(8.83 PG比本机快约3.4秒,测试裕量30秒,产品语义无缺陷)",
     "daily-report --state-db 隔离库实测exit 0,真实状态源,六分节齐(日报样例留档)",
@@ -89,6 +90,8 @@
   }
  },
  "pending_conditions": [
+  "生产装配代码和恢复闭环仍未完成（非单纯待批准）",
+  "DataX/双源/叶子窗口与月度替换须实接实测",
   "PA1-PA7生产批准（A05_待批清单_v2；PA4前置满足；PA7真库事务证明已过,Oracle方言级验证待真schema）",
   "隔离Oracle测试schema（仅剩Oracle方言级验证:oracledb驱动行为;执行器协议级事务证明已在8.83隔离PG完成5项验收）",
   "R06告警六项外部输入（source_id/secret存放/base_url/测试订阅/限流/时段）",
@@ -127,5 +130,26 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "给执行者_接续一次性完成开发说明_20261022.md（本批已执行完其可独立开发范围；后续=A05b获批生产试点→B03月巡/B04省端/B05观测）"
+ "handoff_for_next_ai": "给执行者_接续一次性完成开发说明_20261022.md（本批已执行完其可独立开发范围；后续=A05b获批生产试点→B03月巡/B04省端/B05观测）",
+ "maintenance_review_20261022": {
+  "state": "LOCAL_FIXES_UNIT_AND_ISOLATED_PG_VERIFIED",
+  "report": "../maintenance_review_20261022/T加1维护复核与修复说明.md",
+  "validation": "../maintenance_review_20261022/验收记录.json",
+  "production_inventory": "../maintenance_review_20261022/8.83生产只读核查.json",
+  "completed": [
+   "核心维护与数据完整性修复",
+   "444单元通过/2平台跳过",
+   "目标执行器隔离PG5项及控制状态实库回归",
+   "服务器/抽取/维护/扩表说明"
+  ],
+  "pending": [
+   "真实生产入口装配",
+   "恢复/水位/父子质量及叶子窗口端到端闭环",
+   "DataX/双源及月替换接线",
+   "Oracle隔离方言验收",
+   "生产批准/发布/迁移/持久卷/调度/外发",
+   "首组试点与7业务日观测",
+   "省端回执"
+  ]
+ }
 }

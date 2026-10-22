@@ -503,7 +503,7 @@ def parse_datax_metrics(stdout: str) -> dict:
 
 
 class DataXRunner:
-    """执行渲染后的 job：退出码+指标+dirty 三方判定，不把 0 当成功。"""
+    """执行渲染后的 job：退出码、读写行数和 dirty 指标都齐全才判成功。"""
 
     def __init__(
         self,
@@ -549,7 +549,8 @@ class DataXRunner:
         if proc.exit_code != 0:
             result.end_state = "NON_ZERO_EXIT"
             return result
-        if not metrics:
+        required_metrics = {"rows_read", "rows_written", "dirty"}
+        if not required_metrics.issubset(metrics):
             result.end_state = "METRICS_MISSING"
             return result
         if result.dirty_records and result.dirty_records > 0:
