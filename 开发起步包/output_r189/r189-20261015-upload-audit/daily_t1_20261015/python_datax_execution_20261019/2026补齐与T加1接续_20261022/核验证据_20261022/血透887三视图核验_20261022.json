@@ -1,0 +1,67 @@
+{
+ "doc": "血透8.87三视图身份核验（用户授权经8.53出口隧道，只读）",
+ "as_of": "2026-10-22T22:37~22:38+08:00",
+ "authorization": "用户会话内点名授权（'你可以通过8.53连接进行查询'）",
+ "channel": "容器(凭据受控解析,用户=hdis只读)→127.0.0.1:25872(8.83回环反向隧道)→本机15872→8.53出口(ssh -L经8.53:40022)→10.10.8.87:5432；8.87 pg_hba仅放行8.53，隧道出口IP=8.53合规；凭据全程不出8.83受控环境",
+ "database_resolution": "8.87:5432 上 hdis 库不存在（FATAL: database \"hdis\" does not exist）；实际库名=dialysis（历史线索'8.87:5432/hdis'作废；'17432为备用生产实例'口径不变）",
+ "views_verified": {
+  "v_EMR_BLOOD_DIALY_RECORD": {
+   "schema": "public",
+   "anchor": [
+    "ID",
+    "datetime"
+   ],
+   "column_count": 49,
+   "notable_columns": [
+    "ORG_CODE",
+    "ORG_NAME",
+    "DISTRICT_CODE",
+    "EXCHANGE_TYPE",
+    "SYSTEM_TIME",
+    "REQ_NO",
+    "BD_DATE"
+   ]
+  },
+  "v_EMR_BLOOD_DIALY_DETAIL": {
+   "schema": "public",
+   "anchor": [
+    "ID",
+    "datetime"
+   ],
+   "column_count": 17,
+   "notable_columns": [
+    "ORG_CODE",
+    "EXCHANGE_TYPE",
+    "SYSTEM_TIME",
+    "REQ_NO",
+    "BD_DATE"
+   ]
+  },
+  "v_EMR_BLOOD_DIALY_ORDER": {
+   "schema": "public",
+   "anchor": [
+    "ID",
+    "datetime"
+   ],
+   "column_count": 17,
+   "notable_columns": [
+    "ORG_CODE",
+    "EXCHANGE_TYPE",
+    "SYSTEM_TIME",
+    "REQ_NO",
+    "ORDER_DATE",
+    "EXEC_DATE"
+   ]
+  }
+ },
+ "tenantid_finding": "三视图输出列均无 TenantId 列（information_schema.columns 全列清单已核，只匹配到 ID/datetime 锚点列）——主计划 §五-B01 '血透按最新已登记实例与 TenantId3 核身份' 在视图层无对应列；三视图为已固化输出（含 ORG_CODE/EXCHANGE_TYPE），租户过滤由视图定义承担，按实证修正该假设。底层表租户核验属视图定义审查，另行处理",
+ "first_pass_notes": {
+  "tried_hdis": "OperationalError: FATAL database hdis does not exist",
+  "database_dialysis": "OK",
+  "lowercase_view_query_failed": "ERR:UndefinedTable（视图名为混合大小写需精确引号）",
+  "correction": "第二轮用精确引号名 v_EMR_BLOOD_DIALY_* 重查通过"
+ },
+ "seconds": 0.7,
+ "production_changes": 0,
+ "patient_data_read": "仅字典列清单+视图存在性；未查询患者明细"
+}

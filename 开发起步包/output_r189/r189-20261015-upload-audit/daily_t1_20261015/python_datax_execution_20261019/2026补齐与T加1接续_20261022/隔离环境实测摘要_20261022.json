@@ -1,29 +1,30 @@
 {
-  "doc": "接续批次隔离环境实测摘要（2026-10-22，URL 全程脱敏，只记身份/版本/结果证据）",
-  "session": "zcode-20261022-tplus1-stage2",
-  "isolated_pg": {
-    "identity": {
-      "current_database": "data_asset_test",
-      "current_user": "postgres",
-      "version": "PostgreSQL 14.10 (8.83 宿主, 经 127.0.0.1:15432 隧道)",
-      "derivation": "tools/dev_env.sh 从服务器 backend.env APP_DB_URL 推导并替换库名为 data_asset_test（仓库既有隔离机制，非手工拼接）",
-      "cleanable_evidence": "专用 test 库（库名含 test）；140 张 asset 表由历次隔离迁移往返维护；本轮迁移往返后恢复 a7d8e9f0a1b2 终态"
-    },
-    "integration_tests": "backend/tests/reporting_pipeline_integration 全量 7 passed（含 RT1-003/004/005）",
-    "migration_roundtrip": "upgrade head→a7d8e9f0a1b2；downgrade -3→d3e5f6a7b8c9（a7d8e9f0a1b2/f4a5b6c7d8e9/e3f4a5b6c7d8 三层回退, 批次目标绑定三列干净移除无残留）；再 upgrade head→a7d8e9f0a1b2（三列恢复）",
-    "daily_report_real_state": "reporting_ctl daily-report --state-db <隔离库> --business-day 2026-10-21 退出 0，simulation=false，六分节含 alert_channel_monitor/gap_escalation（样例见同目录 隔离环境实测_日报样例_20261022.json）",
-    "fix_this_round": "集成测试 test_rt1_004 首跑失败：测试用 DB now()-1s 造租约过期, 但 8.83 PG 服务器时钟比测试机快约 3.4 秒, 仓储按应用时钟判定'未过期'。修正测试裕量为 30 秒并注明（产品语义无缺陷: 生产应用与 PG 同宿主同钟域）。该时钟偏差事实对任何本地↔服务器时间比较均有参考价值"
+ "doc": "接续批次隔离环境实测摘要（2026-10-22，URL 全程脱敏，只记身份/版本/结果证据）",
+ "session": "zcode-20261022-tplus1-stage2",
+ "isolated_pg": {
+  "identity": {
+   "current_database": "data_asset_test",
+   "current_user": "postgres",
+   "version": "PostgreSQL 14.10 (8.83 宿主, 经 127.0.0.1:15432 隧道)",
+   "derivation": "tools/dev_env.sh 从服务器 backend.env APP_DB_URL 推导并替换库名为 data_asset_test（仓库既有隔离机制，非手工拼接）",
+   "cleanable_evidence": "专用 test 库（库名含 test）；140 张 asset 表由历次隔离迁移往返维护；本轮迁移往返后恢复 a7d8e9f0a1b2 终态"
   },
-  "isolated_oracle": {
-    "state": "PENDING_ENV",
-    "detail": "无授权隔离 Oracle 测试 schema。8.83 凭据目录已核实无测试型 Oracle 源（全部为业务源只读或已批写凭据）；前置机仅 readonly+field_update_writer。SqlTargetApplyExecutor 的单事务回执/SYSTEM_TIME/行锁围栏/COMMIT_UNKNOWN 裁定重放维持待环境（PA7 Oracle 侧），不以 SQLite 冒充",
-    "recovery": "提供一个可清理的隔离 Oracle schema（或测试实例），经 8.83 受控连接器登记凭据后执行 test_a01_a05_k_fixes 中已写好的 DB 级用例"
-  },
-  "pending_channels": {
-    "dialysis_8_87": "PG 只放行 8.53（pg_hba 拒绝 8.83 容器直连, 报错留证）；与'血透抽取源终版=8.87 只读从库+datax 机 8.53 直连就绪'裁定一致。身份/TenantId3 核验待 8.87 放行 8.83 或 8.53 提供执行通道",
-    "adverse_10_10_10_50": "MysqlConnector SET MAX_EXECUTION_TIME 在旧版 MySQL 报 1193；本地代码已修（尽力而为+驱动 read_timeout 兜底），容器生效待镜像发布批准；本轮经容器内 pymysql 只读会话完成核验（mas.v_emr_adverse_event_final 实存, 锚点 EFFECTIVE_TIME）",
-    "writers_8_53": "已解决（2026-10-22 22:25 用户授权后 live 重核）：root@10.10.8.53:40022 只读快照——dqueue/gap_exec/manual2 零进程、root cron 仅 Datart 保活、datax-web 用户无 cron、DataX 作业目录不存在（0 作业）、datax-admin/executor 空闲常驻。证据=核验证据_20261022/853写者live重核_20261022.json"
-  },
-  "production_actions_this_round": 0,
-  "database_writes_this_round": 0
+  "integration_tests": "backend/tests/reporting_pipeline_integration 全量 7 passed（含 RT1-003/004/005）",
+  "migration_roundtrip": "upgrade head→a7d8e9f0a1b2；downgrade -3→d3e5f6a7b8c9（a7d8e9f0a1b2/f4a5b6c7d8e9/e3f4a5b6c7d8 三层回退, 批次目标绑定三列干净移除无残留）；再 upgrade head→a7d8e9f0a1b2（三列恢复）",
+  "daily_report_real_state": "reporting_ctl daily-report --state-db <隔离库> --business-day 2026-10-21 退出 0，simulation=false，六分节含 alert_channel_monitor/gap_escalation（样例见同目录 隔离环境实测_日报样例_20261022.json）",
+  "fix_this_round": "集成测试 test_rt1_004 首跑失败：测试用 DB now()-1s 造租约过期, 但 8.83 PG 服务器时钟比测试机快约 3.4 秒, 仓储按应用时钟判定'未过期'。修正测试裕量为 30 秒并注明（产品语义无缺陷: 生产应用与 PG 同宿主同钟域）。该时钟偏差事实对任何本地↔服务器时间比较均有参考价值",
+  "executor_transaction_acceptance_20261022_evening": "用户授权在8.83隔离库建测试schema后完成执行器真库事务验收(test_target_executor_isolated_pg.py 5项全过)：同事务回执原子性(回执失败业务行一并回滚)/SYSTEM_TIME=目标库时钟/行锁围栏(双会话锁超时挡第二写者)/幂等重放返回原回执/COMMIT_UNKNOWN不盲重试+裁定后干净重放;真RDBMS事务证明,Oracle方言(oracledb驱动行为)仍留待真Oracle schema"
+ },
+ "isolated_oracle": {
+  "state": "PENDING_ENV",
+  "detail": "无授权隔离 Oracle 测试 schema。8.83 凭据目录已核实无测试型 Oracle 源（全部为业务源只读或已批写凭据）；前置机仅 readonly+field_update_writer。SqlTargetApplyExecutor 的单事务回执/SYSTEM_TIME/行锁围栏/COMMIT_UNKNOWN 裁定重放维持待环境（PA7 Oracle 侧），不以 SQLite 冒充",
+  "recovery": "提供一个可清理的隔离 Oracle schema（或测试实例），经 8.83 受控连接器登记凭据后执行 test_a01_a05_k_fixes 中已写好的 DB 级用例"
+ },
+ "pending_channels": {
+  "dialysis_8_87": "已解决（2026-10-22 22:37 用户授权后经8.53出口隧道只读核验）：库名=dialysis(非hdis)；三视图实存于public；ID+datetime锚点；视图层无TenantId列(按实证修正)。证据=核验证据_20261022/血透887三视图核验_20261022.json",
+  "adverse_10_10_10_50": "MysqlConnector SET MAX_EXECUTION_TIME 在旧版 MySQL 报 1193；本地代码已修（尽力而为+驱动 read_timeout 兜底），容器生效待镜像发布批准；本轮经容器内 pymysql 只读会话完成核验（mas.v_emr_adverse_event_final 实存, 锚点 EFFECTIVE_TIME）",
+  "writers_8_53": "已解决（2026-10-22 22:25 用户授权后 live 重核）：root@10.10.8.53:40022 只读快照——dqueue/gap_exec/manual2 零进程、root cron 仅 Datart 保活、datax-web 用户无 cron、DataX 作业目录不存在（0 作业）、datax-admin/executor 空闲常驻。证据=核验证据_20261022/853写者live重核_20261022.json"
+ },
+ "production_actions_this_round": 0,
+ "database_writes_this_round": 0
 }

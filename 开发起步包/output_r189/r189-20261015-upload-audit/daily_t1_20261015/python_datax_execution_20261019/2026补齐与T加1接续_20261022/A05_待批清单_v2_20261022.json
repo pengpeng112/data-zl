@@ -54,7 +54,7 @@
    "scope": "可清理隔离PG（迁移往返+集成测试）；授权隔离Oracle或测试schema（单事务回执/SYSTEM_TIME/围栏证明，不用SQLite代替）",
    "materials_ready": true,
    "materials": "test_a01_a05_k_fixes端到端隔离流（内存级）已过；DB级用例已写好待环境",
-   "note": "PG侧已实测通过(集成7项+往返+真实状态源日报);Oracle侧仍待环境(无授权隔离schema);只阻塞Oracle事务验收,不阻塞其余"
+   "note": "PG侧全部完成：集成12项(含执行器真库事务验收5项:同事务回执/目标时钟SYSTEM_TIME/行锁围栏/幂等重放/COMMIT_UNKNOWN)+迁移往返+真实状态源日报。余项仅Oracle方言级验证(oracledb驱动行为/Oracle锁语义)待真Oracle schema;执行器协议级事务证明已具备"
   }
  ],
  "reusable_equivalents": [
@@ -65,6 +65,7 @@
  "updates_v2": [
   "PA4 前置条件满足(隔离PG往返+集成实测过),materials_ready=true",
   "PA7 PG侧完成,Oracle侧维持待环境",
-  "PA1/PA2/PA3/PA5/PA6 批准状态不变(未回复不构成批准)"
+  "PA1/PA2/PA3/PA5/PA6 批准状态不变(未回复不构成批准)",
+  "20261022晚:执行器真库事务验收5项在8.83隔离PG测试schema通过(用户授权);血透源经8.53隧道核验;8.53写者零进程"
  ]
 }

@@ -1,7 +1,7 @@
 {
  "task_id": "R189-UPLOAD-AUDIT-2021-2024",
  "version": "1.2",
- "updated_on": "2026-10-19",
+ "updated_on": "2026-10-20",
  "task_book": "核查任务书.md",
  "state": "PASSED_HISTORY_BATCHES_VERIFIED_OTHER_SCOPES_PENDING",
  "planning": {
@@ -296,7 +296,7 @@
    "updated_by_review": "discharge_opt_review_20261019/复核报告与整改建议.md"
   }
  ],
- "current_action": "T+1执行包就地升v1.2，保留10批和既有企微/安全门禁；补历史月漂移轮巡、每表画像/双源Q4路由、在跑快照，以及失败隔离告警后继续独立任务。112未运行预期/28计划检查/22独立核对通过，10页xlsx和zip已重建。原v1.1归档；工程未实现、未SSH/连库/启停/cron/外发，待执行AI按新版继续。",
+ "current_action": "21-25五年终验（ZCode，2026-10-20 12:10）：出院五年ID级完整（83条计数差=源端改日期漂移）；护理族发现~91万计数级缺口已启动7表全量补抽（后台）。等护理跑完后出五年终局结论。",
  "authorization": {
   "database_write": true,
   "datax_or_upload": true,
@@ -474,7 +474,7 @@
   }
  },
  "daily_t1": {
-  "updated_on": "2026-10-19",
+  "updated_on": "2026-10-22",
   "state": "OFFLINE_PLAN_DELIVERED_IMPLEMENTATION_NOT_RUN",
   "report": "daily_t1_20261015/每日T加1报送方案.md",
   "workbook": "daily_t1_20261015/77表每日增量准备清单.xlsx",
@@ -1015,9 +1015,137 @@
     "real_source_reads": 0,
     "real_alert_requests": 0,
     "production_changes": 0
+   },
+   "view_ticket_reverify_20261020": {
+    "discharge_perf": "FIXED_DEF_LAYER_20261020_1106 (取值链已补,业务实值复验待批)",
+    "discharge_quality": "FIX_DEF_LAYER_PENDING_BUSINESS_VALUE",
+    "lis_legacy": "PARTIAL (主源OK,TEST族2024界3处helper仍生效)",
+    "writer_handoff": "UNCHANGED_LIVE_SNAPSHOT_STILL_REQUIRED",
+    "credential": "UNCHANGED"
+   },
+   "e08_runtime_remediation_20261020": {
+    "date": "2026-10-20",
+    "executor": "ZCode GLM-5.3 session zcode-20261020-r01-r06",
+    "scope": "R01-R06 离线实现+纯逻辑验证+R01冻结；隔离库未核实故 PG 集成未跑",
+    "r01": {
+     "state": "DONE_OFFLINE",
+     "artifact": "go_live_remediation_20261020/R01_冻结配置与差异清单_2026-10-20.json",
+     "dialysis_correction": "3项 database_hint dialysis→hdis（冻结件生效，R07 实测前 READ_READY 维持 UNKNOWN）",
+     "rt1_offline_covered": 16
+    },
+    "r02": {
+     "state": "IMPLEMENTED_LOGIC_VERIFIED_PG_PENDING",
+     "files": [
+      "repositories.py（ControlRepository协议+连续完成游标+逐表快照）",
+      "durable_staging.py（分块落盘+原子清单+重启恢复+截断/取消拒绝）",
+      "pg_repository.py（SqlAlchemyControlRepository+PgVersionRegistry）",
+      "models/asset_reporting.py + alembic f4a5b6c7d8e9（version_evidence/quarantine_groups/continuous_through）"
+     ],
+     "pending": "RT1-003/004/005 隔离库两进程并发/重启/失败注入（APP_TEST_DB_URL 未配置）"
+    },
+    "r03": {
+     "state": "OFFLINE_PART_DONE",
+     "files": [
+      "adapters/datax_runner.py（SubprocessProcessRunner+JobFileWorkspace：exit0脏/缺指标/超时拒COMPLETE）",
+      "adapters/python_reader.py（ControlledConnectorRowSource+看门狗硬取消阻塞fetch）"
+     ],
+     "pending": "真实 Oracle/DataX 驱动绑定与受控 stage（按门禁逐例）"
+    },
+    "r04": {
+     "state": "IMPLEMENTED_LOGIC_VERIFIED",
+     "files": [
+      "apply_port.py（精确版本比较/VersionScope/围栏默认强制/PlatformApprovalVerifier/TargetCommitCredential）"
+     ],
+     "pending": "平台执行器白名单真实查询联调；目标同事务凭据 DDL 逐例批准"
+    },
+    "r05": {
+     "state": "IMPLEMENTED_LOGIC_VERIFIED",
+     "files": [
+      "scheduler_bridge.py（可运行节点排序/task_key/token贯穿/如实总体/结构化错误）",
+      "contracts.py（PipelineAction.validate_action 动作级就绪）",
+      "planner.py（DailyRunAnchor 固定窗+coverage_age_report）",
+      "runtime.py（DailyCycleService 模拟/生产装配分开）",
+      "scripts/reporting_ctl.py（plan/simulate/resume；daily-report --state-db 双模式）"
+     ],
+     "pending": "生产排程发布另核批准；capture/verify/apply/reconcile/delivery/retry 保持显式 NOT_IMPLEMENTED"
+    },
+    "r06": {
+     "state": "IMPLEMENTED_LOGIC_VERIFIED_REAL_SEND_PENDING",
+     "files": [
+      "alerts_client.py（UrllibTransport+TransportUnavailable→有界重试）",
+      "alerts_outbox.py（仓储协议泛化）",
+      "reports.py（逐表日报/最早缺口/连续完成/覆盖年龄/建议动作）"
+     ],
+     "pending": "真实订阅联调（管理员 source/secret_ref/测试接收范围）"
+    },
+    "verification": {
+     "unit": "233 passed（原176+新增57），ruff 全绿（改动文件）",
+     "cli": "validate --offline ok（77 保持 disabled/UNKNOWN）；plan/simulate/resume/daily-report 冒烟通过",
+     "alembic": "head=f4a5b6c7d8e9 链正确；隔离库未核实未跑 upgrade",
+     "not_a_pass_for": "PG集成/真实驱动/DataX/告警外发/生产联调（RT1 隔离与批准项保持未执行）"
+    },
+    "no_production_authorization_granted": true,
+    "r03_real_pilot_20261020": {
+     "date": "2026-10-20 晚间",
+     "authorization": "用户会话点名批准小规模真实测试（源只读+本地MySQL暂存，不碰Oracle正式表）",
+     "scope": "ODS V_EMR_ADMISSION_RECORD → DataX(/home/datax 生产引擎零修改) → MySQL sanjia_fushen",
+     "results": {
+      "smoke_5rows": "PASS 读5=写5",
+      "probe_200rows_103cols": "PASS 读200=落地200 脏0 382KB",
+      "month_202402": "PASS 读4137=落地4137 脏0 8.7MB ~100rec/s（ADMISSION_DATE半开区间）",
+      "quality": "ID/ADMISSION_DATE/CHIEF_COMPLAINT 4137/4137非空 ORG_CODE全=49557032X"
+     },
+     "key_finding": "mysqlwriter 必须用 connection:[{jdbcUrl,table}] 数组结构；顶层平铺在 simplifyConf:58 NPE（误导为驱动问题；5.1.47驱动连MySQL9.6正常）",
+     "evidence_doc": "go_live_remediation_20261020/853_DataX真实试点测试报告与操作手册_20261020.md",
+     "server_changes": "生产引擎零修改；/opt/datax_test2试验后已恢复原状；job文件已删；冒烟表已删；试点数据保留sanjia_fushen两张表",
+     "followup_20261020_night": {
+      "idempotency": "PASS 指纹(4137|8781989753283|8844423751902|1434303|62100) TRUNCATE前后完全一致（删当月+插当月语义成立）",
+      "adjacent_window_202403": "PASS 读5574=落地5574 脏0（R07两相邻窗要求-DataX段）",
+      "tool_fixed": "backend/scripts/reporting_853_pilot_window.py（window/idempotency 双模式，ruff干净，复用型）",
+      "second_pitfall": "远端shell吃SQL反引号→base64管道传递；工具已内置",
+      "oracle_review_material": "go_live_remediation_20261020/R04_Oracle装载试点审阅材料_20261020.md（平台登记SQL草稿+DBOPER凭据表DDL草稿+试点范围申请，均待批准未执行）"
+     }
+    },
+    "r04_oracle_pilot_20261020": {
+     "date": "2026-10-20 20:42",
+     "authorization": "用户批准三项（平台登记+凭据表DDL+试点装载）",
+     "steps": {
+      "1_executor_registered": "8.83 asset.asset_action_executors id=5 code=r189_t1_stage_to_dboper risk=high require_approval=true enabled=false",
+      "2_recon": "目标表主键=ID；2024-02段已有4137行(历史datax-web任务写入)→试点转MERGE重放语义",
+      "3_receipts_table": "DBOPER.ASSET_APPLY_RECEIPTS CREATED(OPERATION_ID主键+IX_AAR_BATCH)",
+      "4_merge_apply": "单事务: 4137行MERGE+1行凭据 COMMIT成功 manifest_hash=2e99fed521c1d7b1... 通道=8.83容器oracledb受控脚本(ops-runbook五步)",
+      "5_readback": "PASS: count_delta=0 零新增; keyset_equal=true 双向0差; 20行抽样内容长度0差异; 凭据行(4137, hash)在档",
+      "6_replay_refused": "同OPERATION_ID重跑→REPLAY_REFUSED(凭据行识别已提交, COMMIT_UNKNOWN语义核心验证)",
+      "7_audit": "asset_govern_audit_logs id=420"
+     },
+     "evidence": {
+      "stage_backup": "8.83:/opt/data-asset/evidence/r189_r04/stage_202402.jsonl.gz(600) sha16=f92394c8a62cc4db",
+      "scripts": "go_live_remediation_20261020/r04_pilot_scripts/三件(无密码模板)",
+      "cleanup": "容器与宿主含密码脚本已删; 本机患者数据零落盘"
+     },
+     "verdict": "R07试点验收项'同批次重复请求无新增/不覆盖历史'真实通过；Oracle目标装载全链路(侦察/预检/备份/执行/回读/审计/重放拒绝)首次贯通"
+    }
    }
   },
-  "current_engineering_entry": "daily_t1_20261015/python_datax_execution_20261019/Python与DataX统一T加1顶层设计及长任务执行计划.md"
+  "current_engineering_entry": "daily_t1_20261015/python_datax_execution_20261019/Python与DataX统一T加1顶层设计及长任务执行计划.md",
+  "CONTINUATION_20261022": {
+   "updated_on": "2026-10-22",
+   "session": "zcode-20261022-tplus1-stage2",
+   "state": "EXECUTOR_TX_VERIFIED_ON_REAL_PG_DIALYSIS_VERIFIED_WRITERS_CLEAR",
+   "report": "daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/接续批次状态.json",
+   "baseline_commit": "daa1c38(本地,未push): A01-A05+R01-R08全量入库含两迁移文件,check_migrations_tracked全绿",
+   "isolated_pg": "data_asset_test身份核实+集成7项全过+迁移往返(a7d8e9f0a1b2三层回退再升级)+daily-report真实状态源exit0;时钟偏差3.4秒修复测试裕量",
+   "first_group_readonly_verified": "首组四表稳定键=目标ID主键/锚点DATETIME/目标身份/父子引用全核true;四视图不挡2026(子视图上界已注释,2026-09/10实数据);证据=2026补齐与T加1接续_20261022/核验证据_20261022/",
+   "b01": "77项:目标身份77/77,ID主键76/77(SPEC_EXAM_TREAT无约束工单),源73/77(血透3待环境,护理计划1定源工单);v1.3候选enabled全false",
+   "b02": "三离线工具(backfill.py+三CLI命令)12测试全过;404单元全绿",
+   "production_change_this_subtask": 0,
+   "pending": "A05_待批清单_v2_20261022.json(PA4前置满足);隔离Oracle/血透8.87/8.53写者live重核待环境或通道;B03-B05未启动",
+   "evening_followups_user_authorized": {
+    "writers_8_53": "live零写者(22:25)",
+    "dialysis_8_87": "三视图+锚点核验过,库名=dialysis,B01源核76/77",
+    "executor_tx_pg": "隔离PG测试schema 5项事务验收全过(同事务回执/目标时钟/行锁围栏/幂等重放/COMMIT_UNKNOWN)"
+   }
+  }
  },
  "concurrent_update_preserved_20261017": {
   "previous_current_action": "2026-10-17 21:35八.53只读核验:出院链mn_py_rerun2(--supersede)仍在跑(discharge_fix3正修2025-09月,2025-10月三天失败日三次重试仍败于DPY-4011/ORA-12541);产出抽取现状与机制说明_20261017.md(当前状态/机制三要素/链史J-R+wave2/待抽清单)。",
@@ -1758,6 +1886,20 @@
    "fact": "V_EMR_DISCHARGE_RECORD 是全库第一慢：视图全表COUNT(310,322行)=132s、单日谓词=148s、客户端整窗ID扫描>700s超窗；物化发生在行输出之前，任何客户端方式（gap_exec流式/分批）都压不过源端物化",
    "speed_note": "mn_py逐日切片为当前唯一可行路径（每晚约11天×30min=5.5h）；若DBA在V_EMR_DISCHARGE_RECORD的EFFECTIVE_TIME列建物化/索引，速度可回分钟级",
    "status": "13/31完成（至10-13），4个进程（2+2 pass）在跑；预计2025-10今晚结束、2025-11凌晨"
+  },
+  "discharge_backfill_final_20261020": {
+   "result": "出院记录2025-09/10/11三个月补抽全部完成并计数对账闭合：09=4200/4200、10=4182/4182、11=4472/4472 全SAME",
+   "process": "fix3链终态(09月30/30)→manual2多pass整月补跑(10月31/31、11月30/30唯一日)→11-23单日缺口单独超删重插(131=131)",
+   "fixes": "manual2脚本okdays行首空格grep缺陷修复(否则pass2空跑10月)；虚高计数提前break致11-23漏一日，逐日核验发现后单独补齐",
+   "view_speed": "对账时视图月计数已回落到9-54秒（此前单日148s），推测DBA已应用底表缩圈优化SQL（未确认执行人）",
+   "logs": "8.53 generated/discharge_manual2_20261019.log",
+   "remaining_discharge": "2022-07~2024-12共30个月旧数据重刷（独立批次待排期）"
+  },
+  "five_year_final_check_20261020": {
+   "discharge_five_year": "2021=44726 SAME；2022-2024目标多9条(源改日期)；2025计数差83条经ID级核验missing=0——均为源端事后改出院日期的漂移行，非缺失记录；30个月重刷属内容刷新非补缺",
+   "nursing_family_discovery": "护理族7表计数对账：分娩src多10、出院评估src多40506、一般护理src多376617、病危护理src多496481（计数级合计~91万）；另3表(入院评估/生命体征/护理评估)连全表COUNT都超120s待探。审计\"尚缺数量证据\"实为大额缺口",
+   "nursing_backfill": "run_nursing.sh已在8.53后台跑7表2021-2025全量insertproj（含新增NUMBER精度校验：首例BREATH=16102脏值正确隔离）",
+   "executor_upgrade": "gap_exec新增num_prec校验（整数位>precision-scale隔离），selftest过"
   }
  },
  "accuracy_review_20261019": {
@@ -2080,7 +2222,7 @@
    "夜间窗口执行依据.json"
   ],
   "pipeline_validated": "inspect_definition对今晨4检验视图真实定义干跑通过;SSH通道与data-asset-api容器核验正常",
-  "updated_local": "2026-10-20 (second-phase session zcode-r189-allviews-review-20261019b, offline)",
+  "updated_local": "2026-10-21 (front-machine coverage audit done; succession table flagged)",
   "night_execution": {
    "window": "2026-10-19 22:01起夜间窗口[22:00,06:00),走NIGHT_WINDOW_BATCH_EXPLORATION门",
    "discovery": "11源discovery全部完成;9源直接命中",
@@ -2104,7 +2246,7 @@
    "in_flight": null,
    "not_started": [],
    "waiting": [
-    "13个P1放开/登记二选一决策与验证SELECT执行(经数据查询统一通道+夜间窗口/批准)",
+    "12个P1中:上界类7处(门诊诊断NEW/门诊费用主表内层窗/病案首页诊断/抢救JHEMR分支/影像四桥/体检项目KS/体检明细KS2025)+结构取值类5处(LIS图片重复/住院费用明细膨胀/出院记录必填/ERM输血双版本/血透常量AA)的修改执行与验证(经数据查询统一通道+夜间窗口/批准)",
     "业务确认项:ISS-HIS-002回退链口径/27访次排除/DOCTOR_NAME整改部署/双Owner消费入口/体检rptunitid50/在院上报口径等(见裁定JSON pending)",
     "业务实值验证(时间空值/重复/孤儿/覆盖率,需另行计划批准)"
    ]
@@ -2119,7 +2261,97 @@
    "adverse_mysql_compatible_fetch.py",
    "夜间窗口执行依据.json",
    "在途发现_六对象定义与既有版本比对.json"
-  ]
+  ],
+  "user_decisions_20261020": {
+   "mtl_decommissioned": "MTL(麦特林)2025年7月停用(用户提供);病历文书族2021-2024仅MTL/2025-08+仅JHEMR/重叠期2025-01~07;ISS-ODS-001/012/030/032/033降级登记,抢救ISS-ODS-031维持必改",
+   "lab_ods_family": "检验ODS族方案B:不改视图,登记ODS检验族仅覆盖至2023-12-31,LIS为主源,2026+检验抽取统一走新LIS(ISS-ODS-025降级登记)",
+   "issue_counts_after": "独立57=P1x12/P2x29/P3x16(原14/33/10)"
+  },
+  "live_measurements_20261020": {
+   "state": "DONE_9_LIVE_QUERIES_USER_AUTHORIZED_DAYTIME",
+   "key_results": "多结算217/48.4万(0.045%);LIS图片重复0.7%(ISS-LIS-003降P3);处方flag空0(ISS-ODS-018降P3);ISS-ODS-024降P2;影像2026=465,348行;门诊诊断2026=857,247行;费用明细视图年窗超时(按月分批);fallback0.18%;T1检验路由2024+走LIS与方案B一致;输血种子owner_hint=null需补BIS",
+   "counts_after": "P1x10/P2x29/P3x18",
+   "pending_night": [
+    "体检KS量级",
+    "血透SBP/DBP列类型"
+   ]
+  },
+  "p1_fix_verification_20261020": {
+   "state": "7_OF_10_DONE_DEFINITIONS_VERIFIED",
+   "done": "门诊诊断(2026回流136万行)/门诊费用主表内层窗/病案首页诊断(+DATETIME列,回流55.8万)/抢救记录(回流447行)/影像四桥/体检项目KS/体检明细KS2025",
+   "not_done": "出院记录必填补值(sha未变)/ERM输血处置(原样)/血透三视图常量AA(原样)",
+   "evidence": "all_views_review_20261019/核验20261020/"
+  },
+  "doctor_root_cause_20261020": "定位完成:HIS pat_visit.attending_doctor自2026-10-13停止写入(10-19全空),非视图缺陷;修复=源端治本+视图NVL键兜底(99.5%/94.4%覆盖)+历史回补;证据在裁定JSON _doctor_root_cause_20261020",
+  "dialysis_source_correction_20261020": "用户指出后核实:平台登记血透源10.10.10.88为坏备库(不同步,无业务表);活库=8.83:17432(数据到10-20 08:46);用户已新建v_EMR_BLOOD_DIALY_DETAIL修复DETAIL;RECORD/ORDER活库上仍AA;抽取指向需切换新视图名;10.10.8.87零记载待用户确认",
+  "dialysis_87_switch_20261020": {
+   "state": "87_VERIFIED_BUT_STALE_USER_DECISION_REQUIRED",
+   "credential_facts": "8.87:5432集群无hdis角色;实际角色=postgres(密码即用户所给,已验证连通);凭据文件已更正user为postgres(600权限,受控目录)",
+   "staleness_evidence": "8.87/dialysis多表停更:Treatment_DuringSigns max=2026-08-07(345,634行),Order_PatientDayOrderDeal max=2026-04-09,Register_Hospitalization max=2026-08-10;对照8.83:17432同表=2026-10-20 08:46(479,304行)——8.87同步任务8月中旬已断",
+   "87_views": "8.87上仅三个旧AA视图,无用户的v_EMR_BLOOD_DIALY_DETAIL修复",
+   "options": "A.抽取/读取指向8.83:17432(数据实时+含用户修复,ssh+sudo -u postgres本地peer可读,免密)或B.先修复8.87同步任务再切(需查8月上旬断点原因)——待用户定夺",
+   "decision_pending": "用户原指令\"全部改8.87抽取\"与87停更事实冲突,已呈报证据请用户重新定夺"
+  },
+  "user_fix_reverify_20261020": {
+   "trigger": "用户报告全部视图修改完成",
+   "method": "8源字典SELECT重取(R2+R3单次白天批准,consumed)+逐问题模式判定",
+   "result": "FIXED 20 / NOT_FIXED 17 / CHECK 3；DDL时间戳与判定一致",
+   "report": "all_views_review_20261019/复核报告_20261020.md",
+   "verdicts": "all_views_review_20261019/复核判定_20261020.json",
+   "remaining_blockers": [
+    "血透三视图AA常量+DATETIME",
+    "检验TEST族2024上界3处helper仍生效",
+    "住院费用明细结算JOIN无收敛(错数)",
+    "门诊费用明细PATIENT_ID重复拼接",
+    "处方明细flag父子不统一",
+    "入院记录无去重",
+    "不良事件无DATETIME",
+    "输血申请单时间列VARCHAR",
+    "旧回收表370101",
+    "LIS图片按项目重复×N",
+    "LIS主表粒度未定"
+   ],
+   "business_value_verify": "未执行,需另行批准",
+   "updated_local": "2026-10-20",
+   "r4_afternoon": "BIS输血DATETIME+护理JOIN修复确认；汇总表语义登记改由台账承载；血透源断连BLOCKED；剩余10项未修",
+   "remaining_not_fixed": 10
+  },
+  "dialysis_topology_20261020": {
+   "verified": "8.83:17432为血透生产库本体:成都应用服务器10.10.8.84(ai-hms-backend,账号drill200_app)直连实时读写(pg_stat_activity实证)——216文档\"镜像\"记载有误;用户v_EMR_BLOOD_DIALY_DETAIL修复在生产库上",
+   "ten_86": "10.10.8.86:5432+22开放,PG活着,但pg_hba拒8.53与8.83(白名单另有来源,疑8.84成都段)——现有通道无法查看其数据,待用户提供可连机器/账号",
+   "ten_87": "停更旧镜像(各表停在4月/8月),无用户修复;角色=postgres(密码同用户所给),凭据文件已更正",
+   "ten_88": "坏备库(recovery=true无业务表)",
+   "extract_path": "8.53(datax)→8.83:17432被防火墙REJECT(No route to host;8.53→8.83的22/80通)——抽取落点17432需:①8.83防火墙放行8.53→17432(信息科)②17432建只读账号;之后完成T1种子/源配置切换",
+   "pending_user": "抽取落点定夺(推荐17432)+8.86可连性线索"
+  },
+  "cross_review_20261020": {
+   "state": "DONE_另一AI复核报告经交叉核验:取证真实/判定6项误判/血透源错",
+   "fixed_confirmed_12": "ODS-001/021/022/027/028/030/031/032/033+HIS-001+PHY-001/003+BLD-003(ERM删除)+025(方案B登记)+010(仅性能版)",
+   "misjudged_fixed_6": "ODS-010医师键(8处仍裸键,11:06改的是性能版替换SQL)/008序号/017处方时间/019/PHY-002与004/BLD-004",
+   "still_open_P1": "血透RECORD+ORDER(生产库17432仍AA);出院记录医师键NVLx8",
+   "evidence": "all_views_review_20261019/复核结论_20261020_交叉复核.md + 裁定JSON _re_review_20261020"
+  },
+  "dialysis_final_20261020": {
+   "state": "USER_FIXED_VIA_NEW_VIEWS_ON_PRODUCTION",
+   "detail": "用户在生产库8.83:17432建v_EMR_BLOOD_DIALY三视图(常量/ID_NUM/血压拆列核验通过,行数2万/47.9万/4.7万);源配置与T1种子已切换到8.83:17432+v_对象名;凭据dialysis_production_pg_8_83_17432.readonly已登记",
+   "channel_pending": "容器/8.53直连17432需pg_hba加10.10.8.83条目+防火墙放行8.53(一次性,待用户/信息科);本地读取走ssh+sudo peer现成可用",
+   "p1_now": "仅剩出院记录医师键NVLx8(源端attending_doctor自10-13停写,根治待HIS方)"
+  },
+  "all_p1_closed_20261020": "出院记录8处NVL核验通过(13:51,VALID,sha=c0714c30,裸键0)——13个原始P1全部关闭;遗留:HIS源端根治+历史回补/血透通道两条配置/P2P3择机项",
+  "dialysis_extract_final_20261020": {
+   "decision": "按血透项目方交接文档+用户指令,抽取源终版=10.10.8.87:5432/dialysis(hdis,8.86主库的流复制只读从库)",
+   "verification": "本会话独立复核通过:recovery=True/readonly=on/数据实时13:56/479,610行/streaming槽pg_86_87_primary/三v_视图已同步",
+   "correction": "更正此前\"8.87停更8月\"错误结论(旧15432转发连错实例);凭据文件已改回hdis",
+   "configs": "源配置+T1种子已切8.87;datax直连就绪(pg_hba已放行8.53,无需防火墙变更);17432两条配置待办作废,降为备用读取点"
+  },
+  "dialysis_extract_compare_20261020": "切换完成+前置机比对:历史2023-06~2025-12已抽且质量合格(机构码全对);唯一缺口=2026年增量(DETAIL 197,860/ORDER 24,963/RECORD 0),首抽任务=2026-01-01起;端到端按窗抽测通过;T1种子SOURCE_READY_EXTRACT_PENDING",
+  "handover_doc_review_20261020": "对t1会话交接文档核对完成(复核结论第六节):血透/ERM/出院/检验2024四节已被后续事件取代;R4声称修复中护理JOIN与BIS输血DATETIME真修(关闭),处方DATETIME与体检类型证伪未修;当前P1=0,视图侧待办10项全P2/P3",
+  "final_pending_list_20261020": "终版交付:剩余待改视图清单_含SQL_20261020.md(10项P2/P3,每项含视图/问题/改前改后SQL/验证);P1=0;配套待办4项(owner_hint/实值验证/HIS根治回补/血透2026首抽)",
+  "discharge_gap_root_20261020": "三方对质定性:前置机2025缺口6,910访次100%为视图层(嘉和TOPIC科室变体名未被like %出院记录%匹配,5月起16%),抽取管道零责任(12个月视图产出=前置机分毫不差);ISS-ODS-011升级P1,修复=扩TOPIC匹配+2025年5-12月按月补抽;清单文档新增第0项(含改前改后SQL) | 修复方案终版:MR_CLASS=EMR12.00 AND TOPIC like %出院% 双条件(方案A实测会误纳EMR09三类入出院记录3,052访次/年;纯class有诊断证明等错分类杂质6千份/年);清单第0项已更新",
+  "discharge_topic_fix_20261021": "用户07:01完成MR_CLASS双条件修复,核验通过:2025-10回升4182→4623(+441,剩余排除全合理),2026-09=4473/4889;ISS-ODS-011关闭;待办=2025全年+2026至今按月补抽(全年聚合慢,按月跑)+评估表164/月业务确认",
+  "discharge_backfill_20261021": "TOPIC修复后补抽完成:22个月(2025-01~2026-10)经mn_py_rerun2全部OK;前置机2025全年54,908→59,004(+4,096),排除率11.2%→4.6%(剩余为正确排除类+无文书);2026YTD=46,109;日志在8.53 generated/dc_topicfix_*",
+  "ich_domain_audit_20261021": "对35号任务《六类待定字段核查与修改建议》完成交叉核对(结论在取数/exports/35…/核对结论_六类待定字段_20261021.md):①死亡码位2025-05-01由3切至5(月度TR4交叉+总量守恒实证,边界精确到月,分段死亡规则SQL已给)②第2项转归必须用diagnosis_type=3出院诊断③第3项转归3→6未愈/4→5死亡获148 confirmed背书可定稿④手术等级候选可定稿⑤148的DISCHARGE_DISPOSITION口径仅适用2025-05后,已登记平台值域冲突待更正",
+  "front_coverage_audit_20261021": "68表逐年行数实测(落盘取数/exports/35…/前置机2021-2025逐年覆盖_实测.json);可备案:血透2021-2022(系统2023-06上线)/护理计划(未使用)/分娩2021;不可备案欠账:ICH_OPERATION 2021-2024/ADMISSION_DIAGNOSIS 2021-2023/交接班25行/转院466vs902;护理类2021-2022为系统上线时序;手术知情2025减半待核"
  },
  "previous_action_before_discharge_opt_review_20261019": "按用户要求执行包已升v1.1：17批合并10批，保留内部隔离/真实试点/上线/7日观测门禁；新增企微公共v2告警设计，88验收预期，17规划检查通过。工程及告警客户端尚未实现，未真实发消息或修改qywx，待执行AI按新提示词接续。",
  "discharge_opt_review_20261019": {
@@ -2181,5 +2413,27 @@
    "prior_parameterized_select_timings_do_not_validate_this_view_variant": true
   }
  },
- "previous_action_before_t1_v12_20261019": "按用户要求已交付ODS出院视图完整CREATE OR REPLACE SQL（63列，最后DATETIME DATE）、核查时定义回退及单日验证SELECT；两分支排名增加同访次出院日期以支持外层窗口下推。14项本地静态检查通过，未连库/未执行DDL；新视图现场编译和性能、原医师/正文质量问题仍待验，不沿用参数化SELECT耗时作为视图验收。"
+ "previous_action_before_t1_v12_20261019": "按用户要求已交付ODS出院视图完整CREATE OR REPLACE SQL（63列，最后DATETIME DATE）、核查时定义回退及单日验证SELECT；两分支排名增加同访次出院日期以支持外层窗口下推。14项本地静态检查通过，未连库/未执行DDL；新视图现场编译和性能、原医师/正文质量问题仍待验，不沿用参数化SELECT耗时作为视图验收。",
+ "tplus1_stage1_20261022": {
+  "state": "STAGE1_DEV_VERIFIED_AWAITING_APPROVALS",
+  "session": "zcode-20261022-tplus1-stage1 (ZCode/GLM-5.3, 占用已登记)",
+  "directory": "daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022",
+  "completed": [
+   "K01-K06六卡点修复+45项新测试（392全绿，347原有不破）",
+   "reporting_ctl六真实命令+生产装配（缺真实输入即拒，不退回模拟）",
+   "DataX固定mysqlwriter暂存路线（8.53实测路线受控接通）",
+   "SqlTargetApplyExecutor单事务INSERT/UPDATE+SYSTEM_TIME+同事务回执+幂等重放",
+   "迁移a7d8e9f0a1b2批次目标绑定三列（隔离实测待批）",
+   "A01首组运行配置v1候选+环境前置核；A05上线审阅包+PA1-PA7待批清单"
+  ],
+  "production_actions": 0,
+  "database_queries": 0,
+  "waiting": [
+   "PA1-PA7生产批准（A05_待批清单_20261022.json）",
+   "隔离PG/Oracle环境（集成实测+迁移往返）",
+   "R06告警六项外部输入",
+   "A05a现场核（目标身份/写者/键与锚点/视图2026截止）"
+  ],
+  "next": "A05a只读/隔离闭环→A05b获批小批→A05c唯一排程+真实告警；B01-B05待接续"
+ }
 }

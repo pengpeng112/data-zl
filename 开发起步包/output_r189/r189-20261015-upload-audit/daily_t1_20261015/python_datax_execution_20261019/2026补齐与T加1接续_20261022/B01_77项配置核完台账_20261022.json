@@ -5,19 +5,12 @@
   "items": 77,
   "target_identity_verified": 77,
   "stable_key_id_pk": 76,
-  "source_fully_verified": 73,
-  "source_pending_env_tables": [
-   "EMR_BLOOD_DIALY_RECORD",
-   "EMR_BLOOD_DIALY_DETAIL",
-   "EMR_BLOOD_DIALY_ORDER"
-  ],
+  "source_fully_verified": 76,
+  "source_pending_env_tables": [],
   "source_not_found_tables": [],
   "anchor_unverified_tables": [
    "EMR_HOS_SAVE_RECORD",
-   "EMR_NURSE_PLAN",
-   "EMR_BLOOD_DIALY_RECORD",
-   "EMR_BLOOD_DIALY_DETAIL",
-   "EMR_BLOOD_DIALY_ORDER"
+   "EMR_NURSE_PLAN"
   ]
  },
  "first_group_verified": {
@@ -1489,19 +1482,18 @@
    "sources": [
     [
      "v_EMR_BLOOD_DIALY_RECORD",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ],
     [
      "EMR_BLOOD_DIALY_RECORD",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ]
    ],
    "anchor": {
-    "column": "PENDING_ENV",
-    "verified": false,
-    "views": []
+    "column": "datetime+ID(视图统一暴露)",
+    "verified": true
    },
-   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+   "engine_disposition": "DATAX_CONFIRMED(8.53直连8.87:5432/dialysis;三视图身份+锚点已核;视图层无TenantId列按实证修正)"
   },
   {
    "index": 69,
@@ -1512,19 +1504,18 @@
    "sources": [
     [
      "v_EMR_BLOOD_DIALY_DETAIL",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ],
     [
      "EMR_BLOOD_DIALY_DETAIL",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ]
    ],
    "anchor": {
-    "column": "PENDING_ENV",
-    "verified": false,
-    "views": []
+    "column": "datetime+ID(视图统一暴露)",
+    "verified": true
    },
-   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+   "engine_disposition": "DATAX_CONFIRMED(8.53直连8.87:5432/dialysis;三视图身份+锚点已核;视图层无TenantId列按实证修正)"
   },
   {
    "index": 70,
@@ -1535,19 +1526,18 @@
    "sources": [
     [
      "v_EMR_BLOOD_DIALY_ORDER",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ],
     [
      "EMR_BLOOD_DIALY_ORDER",
-     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+     "VERIFIED@public.dialysis(8.87:5432,经8.53出口隧道只读核验)"
     ]
    ],
    "anchor": {
-    "column": "PENDING_ENV",
-    "verified": false,
-    "views": []
+    "column": "datetime+ID(视图统一暴露)",
+    "verified": true
    },
-   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+   "engine_disposition": "DATAX_CONFIRMED(8.53直连8.87:5432/dialysis;三视图身份+锚点已核;视图层无TenantId列按实证修正)"
   },
   {
    "index": 71,
@@ -1701,5 +1691,6 @@
    },
    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
   }
- ]
+ ],
+ "dialysis_resolution_20261022_evening": "血透3项经8.53出口隧道完成只读核验：库名=dialysis(非hdis)、三视图实存于public、ID+datetime锚点、视图层无TenantId列(按实证修正计划假设)；证据=核验证据_20261022/血透887三视图核验_20261022.json"
 }

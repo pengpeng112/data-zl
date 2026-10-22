@@ -5931,7 +5931,7 @@
       "v_EMR_BLOOD_DIALY_RECORD",
       "EMR_BLOOD_DIALY_RECORD"
      ],
-     "current_identity_verified": false,
+     "current_identity_verified": true,
      "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
     }
    ],
@@ -5979,12 +5979,20 @@
      "verified": true,
      "evidence": "DBOPER all_tables live 2026-10-22"
     },
-    "source_identity": [],
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_RECORD",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_RECORD",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
     "anchor": [
      {
-      "column": "PENDING_ENV",
-      "verified": false,
-      "views": []
+      "column": "datetime+ID",
+      "verified": true
      }
     ],
     "stable_key": {
@@ -5994,7 +6002,7 @@
      "verified": true,
      "evidence": "目标PK=ID"
     },
-    "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
    }
   },
   {
@@ -6019,7 +6027,7 @@
       "v_EMR_BLOOD_DIALY_DETAIL",
       "EMR_BLOOD_DIALY_DETAIL"
      ],
-     "current_identity_verified": false,
+     "current_identity_verified": true,
      "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
     }
    ],
@@ -6067,12 +6075,20 @@
      "verified": true,
      "evidence": "DBOPER all_tables live 2026-10-22"
     },
-    "source_identity": [],
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_DETAIL",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_DETAIL",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
     "anchor": [
      {
-      "column": "PENDING_ENV",
-      "verified": false,
-      "views": []
+      "column": "datetime+ID",
+      "verified": true
      }
     ],
     "stable_key": {
@@ -6082,7 +6098,7 @@
      "verified": true,
      "evidence": "目标PK=ID"
     },
-    "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
    }
   },
   {
@@ -6107,7 +6123,7 @@
       "v_EMR_BLOOD_DIALY_ORDER",
       "EMR_BLOOD_DIALY_ORDER"
      ],
-     "current_identity_verified": false,
+     "current_identity_verified": true,
      "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
     }
    ],
@@ -6155,12 +6171,20 @@
      "verified": true,
      "evidence": "DBOPER all_tables live 2026-10-22"
     },
-    "source_identity": [],
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_ORDER",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_ORDER",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
     "anchor": [
      {
-      "column": "PENDING_ENV",
-      "verified": false,
-      "views": []
+      "column": "datetime+ID",
+      "verified": true
      }
     ],
     "stable_key": {
@@ -6170,7 +6194,7 @@
      "verified": true,
      "evidence": "目标PK=ID"
     },
-    "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
    }
   },
   {
@@ -6790,5 +6814,5 @@
    }
   }
  ],
- "version_note": "B01核完候选(2026-10-22):目标77表身份/约束/列全核,源侧7组只读核验(血透待环境);enabled仍全false;依据见同目录B01台账"
+ "version_note": "B01核完候选(2026-10-22):目标77表身份/约束/列全核,源侧7组只读核验(血透待环境);enabled仍全false;依据见同目录B01台账;20261022晚补:血透3项经8.53出口隧道核验通过(库名dialysis),pending_env清零"
 }
