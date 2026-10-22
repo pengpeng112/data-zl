@@ -19,7 +19,7 @@ from app.services.reporting_pipeline.alerts_client import (
     SendOutcome,
 )
 from app.services.reporting_pipeline.repositories import (
-    InMemoryControlRepository,
+    ControlRepository,
     OutboxEvent,
 )
 
@@ -32,9 +32,17 @@ class SenderBudget:
 
 
 class OutboxSender:
+    """告警 outbox sender（R06 泛化：内存/PG 仓储同一契约）。
+
+    - 独立处理 outbox，不在任务错误回调里同步 HTTP 阻塞抽取；
+    - 耐久仓储下多 sender 并发由 update_outbox_delivery 的行锁/条件更新
+      保护（领取语义在仓储实现），本层幂等发送、逐目标轮询；
+    - relay 不健康时不递归向 relay 发"relay 失败"告警。
+    """
+
     def __init__(
         self,
-        repository: InMemoryControlRepository,
+        repository: ControlRepository,
         client: RelayV2Client,
         *,
         budget: SenderBudget | None = None,

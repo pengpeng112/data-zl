@@ -17,7 +17,14 @@ from app.services.reporting_pipeline.contracts import (
     BatchState,
     ContractViolation,
 )
-from app.services.reporting_pipeline.repositories import InMemoryControlRepository
+from app.services.reporting_pipeline.repositories import ControlRepository
+
+
+# COMMIT_UNKNOWN 冻结范围前缀（K02 结构化）：
+# - "same_target_table_writers:{instance}|{tenant}|{table}" 按目标三元组冻结；
+# - "same_target_table_writers"（无后缀）= 范围不可判定的全局保护，须配
+#   人工定位告警，不得长期停留。
+COMMIT_UNKNOWN_FREEZE_PREFIX = "same_target_table_writers"
 
 
 @dataclass(frozen=True)
@@ -28,32 +35,68 @@ class RecoveryAction:
     blocking: bool       # True=阻塞该范围，False=可与其他任务并行
     precondition: str    # 恢复前置
     alert_code: str | None = None
+    # K02：冻结范围的结构化成分（实例/机构/表）；范围不可判定时为 None。
+    target_instance: str | None = None
+    tenant: str | None = None
+    target_table: str | None = None
+    scope_unresolved: bool = False
 
     def to_dict(self) -> dict:
         return {
             "batch_id": self.batch_id, "action": self.action, "scope": self.scope,
             "blocking": self.blocking, "precondition": self.precondition,
             "alert_code": self.alert_code,
+            "target_instance": self.target_instance, "tenant": self.tenant,
+            "target_table": self.target_table,
+            "scope_unresolved": self.scope_unresolved,
         }
 
 
 class RecoveryService:
-    def __init__(self, repository: InMemoryControlRepository) -> None:
+    """恢复层（K04）：只经仓储公共接口读取批次，内存/PG 同一契约。"""
+
+    def __init__(self, repository: ControlRepository) -> None:
         self.repository = repository
 
     def resume(self, batch_id: str) -> RecoveryAction:
-        record = self.repository._require_batch(batch_id)
-        state = record.machine.state
-        return _next_action(batch_id, state)
+        record = self.repository.get_batch(batch_id)
+        # record.state 是两实现共同的权威状态（内存同步于状态机；PG 读行）
+        return _next_action(batch_id, record.state, record=record)
 
     def resume_all(self) -> list[RecoveryAction]:
-        return [
-            _next_action(record.batch_id, record.machine.state)
-            for record in self.repository.list_batches()
-        ]
+        actions: list[RecoveryAction] = []
+        for record in self.repository.list_batches():
+            state = record.state
+            actions.append(_next_action(record.batch_id, state, record=record))
+        return actions
 
 
-def _next_action(batch_id: str, state: BatchState) -> RecoveryAction:
+def _commit_unknown_scope(record) -> tuple[str, bool, dict]:
+    """K02：提交不明的冻结范围。
+
+    批次带目标绑定（实例/机构/表）→ 结构化范围，只冻结同目标表重叠写；
+    未绑定 → 全局保护 + scope_unresolved（需人工定位，产生明确告警）。
+    """
+    binding = {
+        "target_instance": getattr(record, "target_instance", None),
+        "tenant": getattr(record, "tenant", None),
+        "target_table": getattr(record, "target_table", None),
+    }
+    if all(binding.values()):
+        scope = (
+            f"{COMMIT_UNKNOWN_FREEZE_PREFIX}:"
+            f"{binding['target_instance']}|{binding['tenant']}|{binding['target_table']}"
+        )
+        return scope, False, binding
+    return COMMIT_UNKNOWN_FREEZE_PREFIX, True, binding
+
+
+def _next_action(
+    batch_id: str,
+    state: BatchState,
+    *,
+    record=None,
+) -> RecoveryAction:
     if state == BatchState.PLANNED:
         return RecoveryAction(
             batch_id, "START_CAPTURE", "batch", False,
@@ -88,10 +131,22 @@ def _next_action(batch_id: str, state: BatchState) -> RecoveryAction:
             "等待执行器结果",
         )
     if state == BatchState.COMMIT_UNKNOWN:
+        # K02：范围按批次目标绑定结构化；未绑定时全局保护并显式要求人工定位
+        scope, unresolved, binding = _commit_unknown_scope(record)
         return RecoveryAction(
-            batch_id, "RECONCILE_BEFORE_ANY_WRITE", "same_target_table_writers", True,
-            "先核同事务提交凭据与目标内容；确认后再 APPLIED/APPLY_PENDING",
+            batch_id, "RECONCILE_BEFORE_ANY_WRITE", scope, True,
+            (
+                "先核同事务提交凭据与目标内容；确认后再 APPLIED/APPLY_PENDING"
+                + (
+                    "（范围不可判定：全局临时保护，须人工定位目标绑定）"
+                    if unresolved else ""
+                )
+            ),
             alert_code="COMMIT_UNKNOWN",
+            target_instance=binding["target_instance"],
+            tenant=binding["tenant"],
+            target_table=binding["target_table"],
+            scope_unresolved=unresolved,
         )
     if state == BatchState.APPLIED:
         return RecoveryAction(

@@ -3,11 +3,17 @@
 子命令按批次逐步落地：
 - E01：list / validate（离线、只读任务包 JSON，不连库不外发）
 - E02+：plan / simulate / capture / verify / apply / reconcile / delivery /
-  resume / retry / daily-report / ticket-export（实现一批登记一批，未实现的
-  子命令显式报 NOT_IMPLEMENTED，不假装成功）。
+  resume / retry / daily-report / ticket-export。
+- A02（2026-10-22）：capture/verify/apply/reconcile/delivery/retry 六个
+  真实动作命令落地——真实运行缺状态库/暂存根/绑定/批准即拒绝
+  （REFUSED_MISSING_*），不退回内存模拟；--allow-simulation 显式隔离验证；
+  delivery 省端接口未接通如实 PENDING_RECEIPT；daily-report 缺省业务日
+  改为院区时区昨天（不再硬编码 2026-10-19），无 --state-db 且未显式
+  允许模拟时报错退出（拒绝静默回退模拟）。
 
-退出码：0=通过；2=用法/配置错误；3=结构校验失败；4=业务校验失败。
-所有命令输出结构化 JSON（stdout），关键结论同时给中文摘要字段。
+退出码：0=通过；1=动作未完成（如实记录）；2=用法/配置/装配拒绝；3=结构
+校验失败；4=业务校验失败。所有命令输出结构化 JSON（stdout），关键结论
+同时给中文摘要字段。
 """
 
 from __future__ import annotations
@@ -27,7 +33,11 @@ DEFAULT_CONFIG_DIR = (
     / "daily_t1_20261015" / "python_datax_execution_20261019"
 )
 
-IMPLEMENTED_COMMANDS = ("list", "validate", "daily-report", "ticket-export")
+IMPLEMENTED_COMMANDS = (
+    "list", "validate", "daily-report", "ticket-export",
+    "plan", "simulate", "resume",
+    "capture", "verify", "apply", "reconcile", "delivery", "retry",
+)
 
 
 def _emit(payload: dict) -> None:
@@ -126,26 +136,187 @@ def cmd_daily_report(args: argparse.Namespace) -> int:
     from app.services.reporting_pipeline.seed_loader import _load_json
 
     bundle = _load_bundle(Path(args.config))
-    repo = InMemoryControlRepository()
+    state_db = getattr(args, "state_db", None)
+    allow_simulation = bool(getattr(args, "allow_simulation", False))
+    business_day = getattr(args, "business_day", None)
+    if business_day is None:
+        # 默认业务日 = 院区时区昨天（锚点语义），不再硬编码固定日期
+        from datetime import datetime, timedelta, timezone
+
+        local = datetime.now(timezone.utc).astimezone(
+            timezone(timedelta(hours=8))
+        )
+        business_day = (local - timedelta(days=1)).date().isoformat()
+    if state_db:
+        # 真实持久化状态（R06）：读取耐久仓储，不再每次新建内存仓储
+        from app.services.reporting_pipeline.pg_repository import (
+            SqlAlchemyControlRepository,
+        )
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        engine = create_engine(state_db)
+        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+        simulation = False
+        state_note = f"durable_state_db={state_db}"
+    else:
+        if not allow_simulation:
+            _emit(
+                {
+                    "ok": False,
+                    "error": (
+                        "缺 --state-db：生产日报入口必须指向真实持久化状态库；"
+                        "显式隔离验证请加 --allow-simulation（拒绝静默回退模拟）"
+                    ),
+                    "exit_code": 2,
+                }
+            )
+            return 2
+        repository = InMemoryControlRepository()
+        simulation = True
+        state_note = "simulation_memory_state"
     seed_doc = _load_json(Path(args.config) / "E01已知人工工单种子.json")
     registry = seed_tickets_from_package(seed_doc)
     report = build_daily_report(
-        business_day=args.business_day,
-        repository=repo,
+        business_day=business_day,
+        repository=repository,
         bundle=bundle,
         ticket_registry=registry,
+        simulation=simulation,
     )
     payload = report.to_dict()
     payload["ok"] = True
+    payload["state_source"] = state_note
     payload["结论"] = (
-        "本地日报（模拟状态源）：77项 deadline 全部 UNCONFIGURED→SLA_UNKNOWN；"
-        "relay 处于 WAITING_INTEGRATION_SETUP；无生产运行数据，不虚构进度"
+        "日报来自真实持久化仓储（PG）" if not simulation else
+        "本地日报（模拟状态源，simulation=true）：77项 deadline 全部 "
+        "UNCONFIGURED→SLA_UNKNOWN；relay 处于 WAITING_INTEGRATION_SETUP；"
+        "无生产运行数据，不虚构进度"
     )
     if args.output:
         Path(args.output).write_text(
             json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
         )
     _emit(payload)
+    return 0
+
+
+def cmd_plan(args: argparse.Namespace) -> int:
+    """离线计划：冻结业务日锚点 + 逐任务动作级就绪（不连库）。"""
+    from datetime import datetime, timezone
+
+    from app.services.reporting_pipeline.contracts import PipelineAction
+    from app.services.reporting_pipeline.planner import freeze_daily_anchor
+
+    bundle = _load_bundle(Path(args.config))
+    now = datetime.now(timezone.utc)
+    anchor = freeze_daily_anchor(now)
+    rows = []
+    for task in bundle.tasks:
+        rows.append(
+            {
+                "canonical_table": task.canonical_table,
+                "enabled": task.enabled,
+                "action_readiness": task.action_readiness(),
+                "action_gate": {
+                    action.value: _gate_summary(task, action)
+                    for action in PipelineAction
+                },
+            }
+        )
+    runnable = [
+        r["canonical_table"] for r in rows
+        if r["enabled"] and r["action_readiness"].get("CAPTURE") == "READY"
+    ]
+    _emit(
+        {
+            "ok": True,
+            "business_day": anchor.business_day.isoformat(),
+            "business_window": anchor.business_window().fingerprint(),
+            "anchor_frozen_at": anchor.frozen_at.isoformat(),
+            "planning_only": True,
+            "simulation": True,
+            "runnable_if_dispatched": runnable,
+            "items": rows,
+            "结论": (
+                f"离线计划：业务日 {anchor.business_day}（半开窗冻结）；"
+                f"77项 disabled，可派发=0（READ_READY 未核），动作级就绪已分层列出"
+            ),
+        }
+    )
+    return 0
+
+
+def _gate_summary(task, action) -> dict:
+    from app.services.reporting_pipeline.contracts import ContractViolation
+
+    try:
+        task.validate_action(action)
+        return {"allowed": True}
+    except ContractViolation as exc:
+        return {"allowed": False, "blocked_by": str(exc)[:160]}
+
+
+def cmd_simulate(args: argparse.Namespace) -> int:
+    """模拟日轮：内存仓储 + 假适配器，输出显式 simulation 标记（R05）。"""
+    from datetime import datetime, timezone
+
+    from app.services.reporting_pipeline.runtime import build_simulation_cycle
+
+    bundle = _load_bundle(Path(args.config))
+    ran: list[str] = []
+
+    def fake_capture(context, task):
+        ran.append(task.canonical_table)
+        return {"ok": True, "rows": 0}
+
+    service = build_simulation_cycle(bundle, capture_fn=fake_capture)
+    outcome = service.run_day(datetime.now(timezone.utc))
+    _emit(
+        {
+            "ok": True,
+            **outcome,
+            "结论": (
+                "模拟日轮（simulation=true，内存状态）：77项 disabled → 无可派发"
+                "任务，周期状态如实（无任务=NO_WORK/WAITING），不产生任何生产动作"
+            ),
+        }
+    )
+    return 0
+
+
+def cmd_resume(args: argparse.Namespace) -> int:
+    """恢复视图：从状态仓储读批次给出恢复动作（模拟/真实双模式）。"""
+    from app.services.reporting_pipeline.recovery import RecoveryService
+    from app.services.reporting_pipeline.repositories import InMemoryControlRepository
+
+    state_db = getattr(args, "state_db", None)
+    if state_db:
+        from app.services.reporting_pipeline.pg_repository import (
+            SqlAlchemyControlRepository,
+        )
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        engine = create_engine(state_db)
+        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+        simulation = False
+    else:
+        repository = InMemoryControlRepository()
+        simulation = True
+    service = RecoveryService(repository)
+    actions = [a.to_dict() for a in service.resume_all()]
+    _emit(
+        {
+            "ok": True,
+            "simulation": simulation,
+            "actions": actions,
+            "结论": (
+                f"恢复视图：{len(actions)} 个批次待恢复动作"
+                + ("（模拟：内存仓储无生产状态）" if simulation else "（来自持久化仓储）")
+            ),
+        }
+    )
     return 0
 
 
@@ -196,31 +367,324 @@ def build_parser() -> argparse.ArgumentParser:
     p_val.add_argument("--offline", action="store_true", help="显式离线（validate 本身不联网）")
     p_val.set_defaults(func=cmd_validate)
 
-    p_report = sub.add_parser("daily-report", help="生成日报结构（本地模拟状态）")
-    p_report.add_argument("--business-day", default="2026-10-19")
+    p_report = sub.add_parser("daily-report", help="生成日报（--state-db 真实持久库 / --allow-simulation 显式模拟）")
+    p_report.add_argument("--business-day", default=None, help="业务日 YYYY-MM-DD；缺省=院区时区昨天（不再硬编码）")
+    p_report.add_argument("--state-db", default=None, help="控制面 PG SQLAlchemy URL（缺省须 --allow-simulation）")
+    p_report.add_argument("--allow-simulation", action="store_true", help="显式允许内存模拟状态源（隔离验证）")
     p_report.add_argument("--output", default=None, help="可选：写出 JSON 文件")
     p_report.set_defaults(func=cmd_daily_report)
+
+    p_plan = sub.add_parser("plan", help="离线计划：冻结业务日锚点+动作级就绪分层")
+    p_plan.set_defaults(func=cmd_plan)
+
+    p_sim = sub.add_parser("simulate", help="模拟日轮（内存状态，显式 simulation 标记）")
+    p_sim.set_defaults(func=cmd_simulate)
+
+    p_resume = sub.add_parser("resume", help="恢复视图：批次恢复动作（--state-db 真实持久库）")
+    p_resume.add_argument("--state-db", default=None, help="控制面 PG SQLAlchemy URL（缺省=内存模拟）")
+    p_resume.set_defaults(func=cmd_resume)
 
     p_ticket = sub.add_parser("ticket-export", help="导出人工视图工单机器JSON")
     p_ticket.add_argument("--output", required=True, help="输出 JSON 路径")
     p_ticket.set_defaults(func=cmd_ticket_export)
 
-    for name in ("plan", "simulate", "capture", "verify", "apply", "reconcile",
-                 "delivery", "resume", "retry"):
-        p = sub.add_parser(name, help=f"{name}（按批次实现中）")
-        p.set_defaults(func=_not_implemented, command_name=name)
+    # 六真实动作命令（A02）：真实输入缺失即拒；--allow-simulation 显式隔离验证
+    common_real_args = [
+        (
+            "--state-db",
+            dict(default=None, help="控制面 PG SQLAlchemy URL（真实运行必填）"),
+        ),
+        (
+            "--stage-root",
+            dict(default=None, help="耐久暂存根目录（真实运行必填）"),
+        ),
+        (
+            "--bindings-file",
+            dict(default=None, help="目标/源/批准绑定 JSON（真实运行必填）"),
+        ),
+        (
+            "--allow-simulation",
+            dict(action="store_true", help="显式允许内存模拟（隔离验证专用）"),
+        ),
+    ]
+
+    def _add_common(parser: argparse.ArgumentParser) -> None:
+        for flag, kwargs in common_real_args:
+            parser.add_argument(flag, **kwargs)
+
+    p_capture = sub.add_parser(
+        "capture", help="真实捕获：窗口冻结→读取→耐久暂存→manifest"
+    )
+    p_capture.add_argument("--table", required=True, help="canonical_table")
+    p_capture.add_argument("--business-day", required=True, help="业务日 YYYY-MM-DD")
+    p_capture.add_argument("--mode", default="T1", help="T1/HISTORICAL（默认 T1）")
+    p_capture.add_argument("--dry-run", action="store_true", help="只产出计划，不读源")
+    p_capture.set_defaults(func=cmd_capture)
+    _add_common(p_capture)
+
+    p_verify = sub.add_parser(
+        "verify", help="质量验证：暂存完整性+行级规则+守恒（VALIDATED/QUARANTINED）"
+    )
+    p_verify.add_argument("--batch", required=True, help="稳定 batch_id")
+    p_verify.set_defaults(func=cmd_verify)
+    _add_common(p_verify)
+
+    p_apply = sub.add_parser(
+        "apply", help="正式装载：门禁→单事务 INSERT/UPDATE+SYSTEM_TIME+回执"
+    )
+    p_apply.add_argument("--batch", required=True, help="稳定 batch_id")
+    p_apply.add_argument(
+        "--approval-ref", required=True, help="批准引用（平台核验，非自批）"
+    )
+    p_apply.add_argument("--executor-id", default=None, help="白名单执行器 ID")
+    p_apply.set_defaults(func=cmd_apply)
+    _add_common(p_apply)
+
+    p_reconcile = sub.add_parser(
+        "reconcile", help="独立回读：全键存在性+内容一致性（RECONCILED）"
+    )
+    p_reconcile.add_argument("--batch", required=True, help="稳定 batch_id")
+    p_reconcile.set_defaults(func=cmd_reconcile)
+    _add_common(p_reconcile)
+
+    p_delivery = sub.add_parser(
+        "delivery", help="省端报送状态（接口未接通=PENDING_RECEIPT，不伪造）"
+    )
+    p_delivery.add_argument("--batch", required=True, help="稳定 batch_id")
+    p_delivery.set_defaults(func=cmd_delivery)
+    _add_common(p_delivery)
+
+    p_retry = sub.add_parser(
+        "retry", help="按恢复矩阵给出续跑动作（同稳定 batch_id）"
+    )
+    p_retry.add_argument("--batch", required=True, help="稳定 batch_id")
+    p_retry.set_defaults(func=cmd_retry)
+    _add_common(p_retry)
     return parser
 
 
-def _not_implemented(args: argparse.Namespace) -> int:
-    _emit(
-        {
-            "ok": False,
-            "error": f"子命令 {getattr(args, 'command_name', '?')} 尚未实现（按批次落地）",
-            "exit_code": 2,
-        }
+def _assembly_inputs(args: argparse.Namespace):
+    """构造 AssemblyInputs（不 build）：真实输入缺失保持 None。"""
+    from app.services.reporting_pipeline.production_runtime import AssemblyInputs
+
+    bundle = _load_bundle(Path(args.config))
+    state_db = getattr(args, "state_db", None)
+    stage_root = getattr(args, "stage_root", None)
+
+    repository = None
+    if state_db:
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        from app.services.reporting_pipeline.pg_repository import (
+            SqlAlchemyControlRepository,
+        )
+
+        engine = create_engine(state_db)
+        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+    stage_store = None
+    if stage_root:
+        from app.services.reporting_pipeline.durable_staging import (
+            DurableFileStageStore,
+        )
+
+        stage_store = DurableFileStageStore(stage_root)
+    inputs = AssemblyInputs(
+        bundle=bundle,
+        repository=repository,
+        stage_store=stage_store,
     )
-    return 2
+    # 目标/源连接绑定文件：真实模式必填（受控连接器配置由运维提供）。
+    # approval_refs 是运维从平台批准登记转录的"已获批准集合"；CLI 的
+    # --approval-ref 只是引用，必须在集合内才可通过（程序不自批）。
+    bindings_file = getattr(args, "bindings_file", None)
+    executor_id = getattr(args, "executor_id", None)
+    if bindings_file:
+        try:
+            doc = json.loads(Path(bindings_file).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            _emit({"ok": False, "error": f"绑定文件不可读: {exc!r}", "exit_code": 2})
+            raise SystemExit(2)
+        inputs.receipt_table = doc.get("receipt_table")
+        inputs.system_time_column = doc.get("system_time_column")
+        inputs.approval_refs = tuple(doc.get("approval_refs") or ())
+        inputs.executor_id = doc.get("executor_id") or executor_id
+        # 真实源工厂/目标连接由容器内受控连接器装配（本机 CLI 不持凭据）；
+        # 缺失时 ProductionAssembly 在真实动作处拒绝（REFUSED_MISSING_*）
+    return inputs
+
+
+def _build_assembly(args: argparse.Namespace):
+    """六真实命令共用装配：真实输入缺失即拒（A02 拒绝语义）。"""
+    from app.services.reporting_pipeline.production_runtime import (
+        ProductionAssembly,
+    )
+
+    inputs = _assembly_inputs(args)
+    allow_simulation = bool(getattr(args, "allow_simulation", False))
+    real = not allow_simulation
+    assembly = ProductionAssembly.build(inputs, real=real)
+    return assembly, inputs
+
+
+def _target_binding_from_args(args: argparse.Namespace):
+    from app.services.reporting_pipeline.production_runtime import (
+        TargetBindingConfig,
+    )
+
+    doc = {}
+    bindings_file = getattr(args, "bindings_file", None)
+    if bindings_file:
+        doc = json.loads(Path(bindings_file).read_text(encoding="utf-8"))
+    target = doc.get("target") or {}
+    return TargetBindingConfig(
+        target_instance=target.get(
+            "target_instance",
+            getattr(args, "target_instance", None) or "UNRESOLVED",
+        ),
+        tenant=target.get("tenant", getattr(args, "tenant", None) or "UNRESOLVED"),
+        table=target.get(
+            "table", getattr(args, "table", None) or "UNRESOLVED"
+        ),
+        key_columns=tuple(target.get("key_columns") or ("K1",)),
+        write_columns=tuple(target.get("write_columns") or ("K1", "V1")),
+    )
+
+
+def cmd_capture(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import (
+        ProductionAssembly,
+    )
+
+    dry_run = bool(args.dry_run)
+    # dry-run 只产出审阅计划（不读源不写状态）：缺状态库时允许离线装配，
+    # 输出带 simulation 标记；真实 capture 缺输入仍拒绝。
+    if dry_run and not getattr(args, "state_db", None):
+        inputs = _assembly_inputs(args)
+        inputs.allow_simulation = True  # dry-run 显式允许（仅产计划，不触源/状态）
+        assembly = ProductionAssembly.build(inputs, real=False)
+        binding = _target_binding_from_args(args)
+        outcome = assembly.capture(
+            table=args.table,
+            business_day=args.business_day,
+            binding=binding,
+            mode=args.mode,
+            dry_run=True,
+        )
+    else:
+        from app.services.reporting_pipeline.production_runtime import (
+            AssemblyRefused,
+        )
+
+        try:
+            assembly, _inputs = _build_assembly(args)
+            binding = _target_binding_from_args(args)
+            outcome = assembly.capture(
+                table=args.table,
+                business_day=args.business_day,
+                binding=binding,
+                mode=args.mode,
+                dry_run=dry_run,
+            )
+        except AssemblyRefused as exc:
+            _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+            return 2
+    outcome.setdefault("ok", True)
+    outcome["结论"] = (
+        "capture 计划已产出（dry-run，未读源）" if outcome.get("dry_run")
+        else ("capture 完成" if outcome.get("ok") else "capture 未完成（如实记录）")
+    )
+    _emit(outcome)
+    return 0 if outcome.get("ok") else 1
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+    try:
+        assembly, _inputs = _build_assembly(args)
+        outcome = assembly.verify(batch_id=args.batch)
+    except AssemblyRefused as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    outcome["结论"] = (
+        "质量验证通过（VALIDATED）" if outcome.get("ok")
+        else f"质量验证未全通过: {outcome.get('state')}"
+    )
+    _emit(outcome)
+    return 0 if outcome.get("ok") else 1
+
+
+def cmd_apply(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+    try:
+        assembly, _inputs = _build_assembly(args)
+        binding = _target_binding_from_args(args)
+        outcome = assembly.apply(
+            batch_id=args.batch,
+            binding=binding,
+            approval_ref=args.approval_ref,
+        )
+    except AssemblyRefused as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    outcome["结论"] = (
+        "正式装载提交成功（回执+版本账已登记）" if outcome.get("ok")
+        else f"装载未完成: {outcome.get('state') or outcome.get('refused', '')[:120]}"
+    )
+    _emit(outcome)
+    return 0 if outcome.get("ok") else 1
+
+
+def cmd_reconcile(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+    try:
+        assembly, _inputs = _build_assembly(args)
+        binding = _target_binding_from_args(args)
+        outcome = assembly.reconcile(batch_id=args.batch, binding=binding)
+    except AssemblyRefused as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    outcome["结论"] = (
+        "全键回读一致（RECONCILED）" if outcome.get("ok")
+        else f"回读存在差异: 缺 {outcome.get('missing_keys')} / 差异 "
+             f"{outcome.get('content_diffs')}"
+    )
+    _emit(outcome)
+    return 0 if outcome.get("ok") else 1
+
+
+def cmd_delivery(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+    try:
+        assembly, _inputs = _build_assembly(args)
+        outcome = assembly.delivery(batch_id=args.batch)
+    except AssemblyRefused as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    outcome["结论"] = (
+        "省端接口未接通：delivery 保持 PENDING_RECEIPT（不伪造调用、"
+        "不涂绿 REPORT_READY）"
+    )
+    _emit(outcome)
+    return 0
+
+
+def cmd_retry(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+    try:
+        assembly, _inputs = _build_assembly(args)
+        outcome = assembly.retry(batch_id=args.batch)
+    except AssemblyRefused as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    outcome["结论"] = "恢复矩阵已给出下一动作（同稳定 batch_id 续跑）"
+    _emit(outcome)
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

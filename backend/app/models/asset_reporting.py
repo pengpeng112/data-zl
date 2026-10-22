@@ -72,6 +72,11 @@ class AssetReportingBatch(Base):
     feedback_state = Column(String(24), nullable=False, server_default="NOT_SUBMITTED")
     state_history = Column(JSONB, nullable=False, server_default="[]")
     selected_attempt_id = Column(Text)
+    # K02：目标绑定（实例/机构/表）——COMMIT_UNKNOWN 冻结范围按此结构化，
+    # 单表提交不明不得冻结全批；全部可空（历史行未绑定=范围不可判定）。
+    target_instance = Column(Text, nullable=True)
+    tenant = Column(Text, nullable=True)
+    target_table = Column(Text, nullable=True)
     lock_version = Column(Integer, nullable=False, server_default="0")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
@@ -99,7 +104,11 @@ class AssetReportingBatchAttempt(Base):
 
 
 class AssetReportingWatermark(Base):
-    """三游标分离：capture_h / apply_cursor / delivery_cursor。"""
+    """三游标分离：capture_h / apply_cursor / delivery_cursor。
+
+    R02 增列 continuous_through：最后连续完成日（与捕获水位分开，
+    中间有缺口时不推进；RT1-025）。
+    """
 
     __tablename__ = "asset_reporting_watermarks"
     __table_args__ = (
@@ -112,6 +121,7 @@ class AssetReportingWatermark(Base):
     capture_h = Column(TIMESTAMP(timezone=True))
     apply_cursor = Column(TIMESTAMP(timezone=True))
     delivery_cursor = Column(TIMESTAMP(timezone=True))
+    continuous_through = Column(TIMESTAMP(timezone=True))
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -247,3 +257,59 @@ class AssetReportingAlertOutbox(Base):
     needs_attention_reason = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class AssetReportingVersionEvidence(Base):
+    """R02 版本证据账：键含目标实例/租户/表，跨表同 ID 不互污染（RT1-014）。
+
+    version_value 为已核版本序字符串凭据；version_kind 声明 int/decimal/
+    timestamp；applied_operation_id 关联同事务提交凭据。内存账仅模拟。
+    """
+
+    __tablename__ = "asset_reporting_version_evidence"
+    __table_args__ = (
+        UniqueConstraint(
+            "target_instance", "tenant", "canonical_table", "stable_key",
+            name="uq_asset_reporting_version_key",
+        ),
+        Index(
+            "ix_asset_reporting_version_table",
+            "canonical_table",
+        ),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    target_instance = Column(Text, nullable=False)
+    tenant = Column(Text, nullable=False)
+    canonical_table = Column(Text, nullable=False)
+    stable_key = Column(Text, nullable=False)  # JSON 编码的业务稳定键元组
+    version_value = Column(Text, nullable=False)
+    version_kind = Column(String(16))
+    applied_operation_id = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+class AssetReportingQuarantineGroup(Base):
+    """R02 隔离组账：坏行/组的工单化留痕（独立合法组继续的依据）。"""
+
+    __tablename__ = "asset_reporting_quarantine_groups"
+    __table_args__ = (
+        UniqueConstraint("batch_id", "group_key", name="uq_asset_reporting_quarantine"),
+        Index("ix_asset_reporting_quarantine_state", "canonical_table", "state"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    batch_id = Column(Text, nullable=False)
+    canonical_table = Column(Text, nullable=False)
+    group_key = Column(Text, nullable=False)
+    reason = Column(Text, nullable=False)
+    error_code = Column(String(64))
+    rows_quarantined = Column(Integer, nullable=False, server_default="0")
+    state = Column(String(16), nullable=False, server_default="OPEN")
+    detail_ref = Column(Text)  # 受权限保护的工单/日志引用（不含患者明细）
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    resolved_at = Column(TIMESTAMP(timezone=True))
+    resolution_evidence = Column(Text)

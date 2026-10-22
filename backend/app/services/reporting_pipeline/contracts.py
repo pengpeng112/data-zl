@@ -67,6 +67,35 @@ class ReadinessLayer(str, enum.Enum):
     REPORT_READY = "REPORT_READY"
 
 
+class PipelineAction(str, enum.Enum):
+    """具体执行动作（R05 动作级就绪：只核该动作实际需要的层）。
+
+    全链启用（enabled=True）仍走 validate_enable() 的五层 READY 门禁；
+    动作级校验解决的是"省端回执未知（REPORT_READY=UNKNOWN）不应连带
+    阻塞院内读取/暂存"——读取只核 CONFIG+READ，逐动作递进。
+    """
+
+    CAPTURE = "CAPTURE"      # 源读取：CONFIG_VALID + READ_READY
+    STAGE = "STAGE"          # 受控暂存：+ STAGE_READY
+    APPLY = "APPLY"          # 正式装载：+ APPLY_READY（真实批准另核）
+    REPORT = "REPORT"        # 省端报送：+ REPORT_READY（= 全链）
+
+    def required_layers(self) -> tuple[ReadinessLayer, ...]:
+        if self is PipelineAction.CAPTURE:
+            return (ReadinessLayer.CONFIG_VALID, ReadinessLayer.READ_READY)
+        if self is PipelineAction.STAGE:
+            return (
+                ReadinessLayer.CONFIG_VALID, ReadinessLayer.READ_READY,
+                ReadinessLayer.STAGE_READY,
+            )
+        if self is PipelineAction.APPLY:
+            return (
+                ReadinessLayer.CONFIG_VALID, ReadinessLayer.READ_READY,
+                ReadinessLayer.STAGE_READY, ReadinessLayer.APPLY_READY,
+            )
+        return tuple(ReadinessLayer)  # REPORT = 全链
+
+
 class LayerStatus(str, enum.Enum):
     READY = "READY"
     NOT_READY = "NOT_READY"
@@ -418,6 +447,44 @@ class TaskSpec:
             raise ContractViolation(
                 f"TaskSpec[{self.canonical_table}] 禁止启用: " + "; ".join(problems)
             )
+
+    def validate_action(self, action: "PipelineAction") -> None:
+        """动作级就绪（R05）：只核该动作所需层；UNKNOWN 层阻塞但不出 READY。
+
+        与 validate_enable 的区别：全链启用仍要求五层 READY；本方法允许在
+        REPORT_READY=UNKNOWN（省端回执未知）时执行院内读取/暂存/装载动作，
+        但每个动作仍须其所需层全部 READY。LIS 历史段路由未知只阻塞依赖该
+        路由的动作（调用方按 route 解析结果决定），本方法不放宽任何层。
+        """
+        verdicts = self.layer_verdicts()
+        problems: list[str] = []
+        for layer in action.required_layers():
+            verdict = verdicts[layer]
+            if verdict.status != LayerStatus.READY:
+                problems.append(
+                    f"{layer.value}={verdict.status.value}: {verdict.reasons[:3]}"
+                )
+        if problems:
+            raise ContractViolation(
+                f"TaskSpec[{self.canonical_table}] 动作 {action.value} 未就绪: "
+                + "; ".join(problems)
+            )
+
+    def action_readiness(self) -> dict[str, str]:
+        """四类动作的就绪概览（list/CLI 用；不改变 UNKNOWN 语义）。"""
+        out: dict[str, str] = {}
+        for action in PipelineAction:
+            verdicts = self.layer_verdicts()
+            worst = LayerStatus.READY
+            for layer in action.required_layers():
+                status = verdicts[layer].status
+                if status == LayerStatus.NOT_READY:
+                    worst = LayerStatus.NOT_READY
+                    break
+                if status == LayerStatus.UNKNOWN:
+                    worst = LayerStatus.UNKNOWN
+            out[action.value] = worst.value
+        return out
 
     def dual_source(self) -> bool:
         return len([s for s in self.source_candidates if s.role in ("primary", "history")]) > 1

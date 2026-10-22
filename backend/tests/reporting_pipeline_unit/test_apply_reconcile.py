@@ -66,11 +66,15 @@ def _request(**overrides) -> ApplyRequest:
 
 
 class TestApplyGates(unittest.TestCase):
-    def _port(self) -> ApplyPort:
-        return ApplyPort(
+    def _port(self, **overrides) -> ApplyPort:
+        # 模拟模式：显式关闭围栏强制（R04 起默认强制，模拟必须显式声明）
+        params = dict(
             whitelisted_executors=["sim-apply-1"],
             approved_refs={"APPROVAL-1"},
+            enforce_fence=False,
         )
+        params.update(overrides)
+        return ApplyPort(**params)
 
     def test_happy_path_insert(self):
         port = self._port()
@@ -113,15 +117,38 @@ class TestApplyGates(unittest.TestCase):
             port.apply(_request(), executor, target_rows={})
         self.assertIn("COMMIT_UNKNOWN", str(ctx.exception))
 
+    def test_missing_commit_credential_refused(self):
+        """R04：已提交但无同事务提交凭据 → 拒绝（不能当已确认提交）。"""
+        port = self._port()
+        executor = InMemoryApplyExecutor(omit_credential=True)
+        with self.assertRaises(ApplyRefused) as ctx:
+            port.apply(_request(), executor, target_rows={})
+        self.assertIn("提交凭据", str(ctx.exception))
+
+    def test_default_enforces_fence(self):
+        """R04：默认 enforce_fence=True 时无 lease/token 的请求被拒。"""
+        port = ApplyPort(
+            whitelisted_executors=["sim-apply-1"],
+            approved_refs={"APPROVAL-1"},
+        )
+        with self.assertRaises(ApplyRefused) as ctx:
+            port.apply(_request(), InMemoryApplyExecutor(), target_rows={})
+        self.assertIn("lease_validator", str(ctx.exception))
+
+    def test_production_mode_requires_platform_trust(self):
+        """R04：生产模式拒绝静态批准集合/内存版本账/无围栏校验器。"""
+        with self.assertRaises(ApplyRefused):
+            ApplyPort(
+                whitelisted_executors=["sim-apply-1"],
+                approved_refs={"APPROVAL-1"},
+                production_mode=True,
+            )
+
     def test_fence_validation_enforced(self):
         def failing_validator(resource, token):
             raise ApplyRefused("围栏不匹配")
 
-        port = ApplyPort(
-            whitelisted_executors=["sim-apply-1"],
-            approved_refs={"APPROVAL-1"},
-            lease_validator=failing_validator,
-        )
+        port = self._port(lease_validator=failing_validator)
         with self.assertRaises(ApplyRefused) as ctx:
             port.apply(_request(lease_resource="target:DBOPER.T", fencing_token=1),
                        InMemoryApplyExecutor(), target_rows={})
@@ -149,7 +176,8 @@ class TestVersionGuard(unittest.TestCase):
 class TestMonthReplace(unittest.TestCase):
     def test_replace_month_requires_explicit_scope(self):
         port = ApplyPort(
-            whitelisted_executors=["sim-apply-1"], approved_refs={"APPROVAL-1"}
+            whitelisted_executors=["sim-apply-1"], approved_refs={"APPROVAL-1"},
+            enforce_fence=False,
         )
         with self.assertRaises(ApplyRefused) as ctx:
             port.apply(
@@ -162,7 +190,8 @@ class TestMonthReplace(unittest.TestCase):
     def test_replace_month_atomic_delete_and_insert(self):
         """月替换：同事务删发布范围+插 stage；目标原有范围外键保留。"""
         port = ApplyPort(
-            whitelisted_executors=["sim-apply-1"], approved_refs={"APPROVAL-1"}
+            whitelisted_executors=["sim-apply-1"], approved_refs={"APPROVAL-1"},
+            enforce_fence=False,
         )
         executor = InMemoryApplyExecutor()
         # 既有目标：OLD1 在发布范围内（应被替换），KEEP 在范围外（应保留）

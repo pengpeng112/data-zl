@@ -17,7 +17,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Callable, Mapping, Sequence
+from typing import Callable, Mapping, Protocol, Sequence
 
 from app.services.reporting_pipeline.contracts import (
     BatchManifest,
@@ -43,6 +43,85 @@ class Watermarks:
     capture_h: datetime | None = None
     apply_cursor: datetime | None = None
     delivery_cursor: datetime | None = None
+    # 最后连续完成日（R05/RT1-025）：与捕获水位分开——中间有缺口时，
+    # 后续成功窗可先落地（capture_h 前进），但连续完成游标不越过缺口。
+    continuous_through: datetime | None = None
+
+
+class ControlRepository(Protocol):
+    """控制状态仓储协议（R02）：生产 PG 实现与内存模拟共用同一契约。
+
+    语义要点（实现必须遵守，测试按此验收）：
+    - 批次/attempt/水位/缺口/月覆盖/租约/incident/outbox 全部持久化，
+      进程重启后可恢复；内存实现仅供单进程模拟。
+    - acquire_lease 跨进程原子（两工作者同时领取只有一个成功）；
+      fencing_token 单调，旧 token 续期/提交被拒。
+    - advance_capture_watermark 不得越过 OPEN 缺口；
+      advance_continuous_completion 同样受缺口门禁。
+    - append_incident_event 同 source_event_id 重试要求字节不变。
+    """
+
+    def save_task(self, task_id: str, spec_dict: dict) -> None: ...
+    def get_task(self, task_id: str) -> dict | None: ...
+    def create_batch(
+        self,
+        batch_id: str,
+        task_id: str,
+        business_day: str,
+        *,
+        target_instance: str | None = None,
+        tenant: str | None = None,
+        target_table: str | None = None,
+    ) -> BatchRecord: ...
+    def get_batch(self, batch_id: str) -> BatchRecord: ...
+    def attach_attempt_manifest(self, batch_id: str, manifest: BatchManifest) -> None: ...
+    def select_manifest(self, batch_id: str) -> BatchManifest: ...
+    def transition_batch(
+        self, batch_id: str, target: BatchState, *, reason: str, evidence: str | None = None
+    ) -> BatchState: ...
+    def transition_feedback(
+        self, batch_id: str, target: FeedbackState, *, reason: str, evidence: str | None = None
+    ) -> FeedbackState: ...
+    def list_batches(self) -> list[BatchRecord]: ...
+    def get_watermarks(self, task_id: str) -> Watermarks: ...
+    def advance_capture_watermark(self, task_id: str, new_h: datetime) -> Watermarks: ...
+    def advance_apply_cursor(self, task_id: str, new_cursor: datetime) -> Watermarks: ...
+    def advance_delivery_cursor(self, task_id: str, new_cursor: datetime) -> Watermarks: ...
+    def advance_continuous_completion(self, task_id: str, through: datetime) -> Watermarks: ...
+    def record_gap(self, task_id: str, window: TimeWindow, reason: str) -> GapRecord: ...
+    def open_gaps(self, task_id: str) -> list[GapRecord]: ...
+    def close_gap(self, gap_id: int, evidence: str) -> GapRecord: ...
+    def upsert_month_coverage(self, record: MonthCoverageRecord) -> MonthCoverageRecord: ...
+    def month_coverage(self, table: str) -> list[MonthCoverageRecord]: ...
+    def overdue_months(self, table: str) -> list[MonthCoverageRecord]: ...
+    def acquire_lease(self, resource: str, holder: str, ttl_seconds: int) -> Lease: ...
+    def renew_lease(
+        self,
+        resource: str,
+        holder: str,
+        fencing_token: int,
+        *,
+        ttl_seconds: int = 3600,
+    ) -> Lease: ...
+    def validate_fencing(
+        self, resource: str, fencing_token: int, *, holder: str | None = None
+    ) -> None: ...
+    def release_lease(
+        self, resource: str, holder: str, *, fencing_token: int | None = None
+    ) -> None: ...
+    def create_incident(
+        self, incident_key: str, category: str, affected_tables: Sequence[str] | None = None
+    ) -> AlertIncident: ...
+    def append_incident_event(
+        self, incident: AlertIncident, *, event_kind: str, severity: str,
+        title: str, body_bytes: bytes, metadata: Mapping[str, object] | None = None,
+        source_id: str | None = None, secret_ref: str | None = None,
+    ) -> OutboxEvent: ...
+    def get_outbox_event(self, source_event_id: str) -> OutboxEvent | None: ...
+    def queued_outbox(self) -> list[OutboxEvent]: ...
+    def pending_outbox(self) -> list[OutboxEvent]: ...
+    def update_outbox_delivery(self, source_event_id: str, **kwargs) -> OutboxEvent: ...
+    def snapshot(self) -> dict: ...
 
 
 @dataclass
@@ -124,10 +203,28 @@ class BatchRecord:
     machine: BatchStateMachine = field(default_factory=BatchStateMachine)
     feedback_machine: FeedbackStateMachine = field(default_factory=FeedbackStateMachine)
     created_at: datetime = field(default_factory=_utcnow)
+    # K02：批次的目标绑定（实例/机构/表）。COMMIT_UNKNOWN 的冻结范围按此
+    # 结构化判定；未绑定的批次只能全局保护并产生需人工定位的告警。
+    target_instance: str | None = None
+    tenant: str | None = None
+    target_table: str | None = None
+
+    def target_scope_fingerprint(self) -> str | None:
+        """结构化冻结范围键；任一成分缺失返回 None（范围不可判定）。"""
+        if not (self.target_instance and self.tenant and self.target_table):
+            return None
+        return f"{self.target_instance}|{self.tenant}|{self.target_table}"
 
 
 class InMemoryControlRepository:
-    """模拟控制存储：单进程确定性实现，时钟可注入；不含任何凭据/患者数据。"""
+    """模拟控制存储：单进程确定性实现，时钟可注入；不含任何凭据/患者数据。
+
+    K03 语义（与 PG 实现一致，测试按此验收）：
+    - fencing token 序列（_fencing_seq）独立于租约行持久：释放后重获
+      token 严格递增，历史 token 永不重用；
+    - validate_fencing 校验 token + 有效期（+可选 holder）；
+    - release_lease 可绑定 token，旧进程晚到释放不得撤销新租约。
+    """
 
     def __init__(self, now_fn: Callable[[], datetime] = _utcnow) -> None:
         self._now = now_fn
@@ -152,7 +249,16 @@ class InMemoryControlRepository:
 
     # -- 批次与 manifest（attempt 隔离） --------------------------------
 
-    def create_batch(self, batch_id: str, task_id: str, business_day: str) -> BatchRecord:
+    def create_batch(
+        self,
+        batch_id: str,
+        task_id: str,
+        business_day: str,
+        *,
+        target_instance: str | None = None,
+        tenant: str | None = None,
+        target_table: str | None = None,
+    ) -> BatchRecord:
         if batch_id in self._batches:
             raise ContractViolation(f"batch_id 已存在: {batch_id}")
         record = BatchRecord(
@@ -160,9 +266,16 @@ class InMemoryControlRepository:
             task_id=task_id,
             business_day=business_day,
             state=BatchState.PLANNED,
+            target_instance=target_instance,
+            tenant=tenant,
+            target_table=target_table,
         )
         self._batches[batch_id] = record
         return record
+
+    def get_batch(self, batch_id: str) -> BatchRecord:
+        """公共批次读取（K04）：恢复层不得依赖仓储私有方法。"""
+        return self._require_batch(batch_id)
 
     def attach_attempt_manifest(self, batch_id: str, manifest: BatchManifest) -> None:
         """按 attempt 归档 manifest；不覆盖其他 attempt 的部分结果。"""
@@ -247,6 +360,28 @@ class InMemoryControlRepository:
         wm.delivery_cursor = new_cursor
         return wm
 
+    def advance_continuous_completion(
+        self, task_id: str, through: datetime
+    ) -> Watermarks:
+        """推进最后连续完成日：不越过 OPEN 缺口（RT1-025）。
+
+        与捕获水位分离：H0 之后的日常捕获可以先落地（capture_h 前进），
+        但 2026 基线到 H0 之间的历史缺口未补齐前，连续完成游标停在缺口
+        之前——日报不得用捕获水位冒充连续完成。
+        """
+        wm = self.get_watermarks(task_id)
+        if wm.continuous_through is not None and through < wm.continuous_through:
+            raise ContractViolation("连续完成游标不能后退")
+        for gap in self.open_gaps(task_id):
+            if gap.window.start < through:
+                raise ContractViolation(
+                    f"存在未闭合缺口 {gap.window.fingerprint()}（起点 "
+                    f"{gap.window.start.isoformat()}），连续完成游标不得推进到 "
+                    f"{through.isoformat()}"
+                )
+        wm.continuous_through = through
+        return wm
+
     # -- 缺口账本 ---------------------------------------------------------
 
     def record_gap(self, task_id: str, window: TimeWindow, reason: str) -> GapRecord:
@@ -305,7 +440,14 @@ class InMemoryControlRepository:
         self._leases[resource] = lease
         return lease
 
-    def renew_lease(self, resource: str, holder: str, fencing_token: int) -> Lease:
+    def renew_lease(
+        self,
+        resource: str,
+        holder: str,
+        fencing_token: int,
+        *,
+        ttl_seconds: int = 3600,
+    ) -> Lease:
         lease = self._leases.get(resource)
         if lease is None or lease.holder != holder:
             raise LeaseDenied(f"租约不存在或持有者不符: {resource}")
@@ -315,20 +457,43 @@ class InMemoryControlRepository:
             )
         if lease.expires_at <= self._now():
             raise LeaseDenied(f"租约已过期，不能续期: {resource}")
-        lease.expires_at = self._now() + timedelta(seconds=3600)
+        lease.expires_at = self._now() + timedelta(seconds=ttl_seconds)
         return lease
 
-    def validate_fencing(self, resource: str, fencing_token: int) -> None:
+    def validate_fencing(
+        self, resource: str, fencing_token: int, *, holder: str | None = None
+    ) -> None:
+        """K03：围栏校验含有效期；过期租约的 token 不得再通过提交门。"""
         lease = self._leases.get(resource)
         if lease is None or lease.fencing_token != fencing_token:
             raise LeaseDenied(
                 f"围栏校验失败: {resource} 期望 token={lease.fencing_token if lease else None}"
             )
+        if lease.expires_at <= self._now():
+            raise LeaseDenied(f"租约已过期，token 不再有效: {resource}")
+        if holder is not None and lease.holder != holder:
+            raise LeaseDenied(f"围栏持有者不符: {resource} {lease.holder} != {holder}")
 
-    def release_lease(self, resource: str, holder: str) -> None:
+    def release_lease(
+        self, resource: str, holder: str, *, fencing_token: int | None = None
+    ) -> None:
+        """K03：释放绑定 token——旧进程晚到释放不得撤销新租约。
+
+        token 省略时按持有者释放（兼容旧调用方）；给了 token 则必须与当前
+        租约一致才生效（持有者已换也拒绝，防同名旧进程误撤新租约）。token
+        序列独立持久（_fencing_seq），释放后重获 token 严格递增。
+        """
         lease = self._leases.get(resource)
-        if lease and lease.holder == holder:
-            del self._leases[resource]
+        if lease is None:
+            return
+        if fencing_token is not None and lease.fencing_token != fencing_token:
+            raise LeaseDenied(
+                f"释放被拒（token 不属于当前租约）: {resource} "
+                f"释放 token={fencing_token} 当前={lease.fencing_token}"
+            )
+        if lease.holder != holder:
+            return  # 持有者已被顶替：晚到的同名/旧进程释放不生效
+        del self._leases[resource]
 
     # -- 告警 incident / outbox（不可变事件） ------------------------------
 
@@ -481,6 +646,51 @@ class InMemoryControlRepository:
     # -- 导出（报表/测试断言用） -------------------------------------------
 
     def snapshot(self) -> dict:
+        per_table: dict[str, dict] = {}
+        for bid, r in sorted(self._batches.items()):
+            row = per_table.setdefault(
+                r.task_id,
+                {
+                    "task": r.task_id,
+                    "batches": 0,
+                    "by_state": {},
+                    "quarantined": 0,
+                    "pending_parent": 0,
+                    "applied": 0,
+                    "commit_unknown": 0,
+                    "earliest_open_gap": None,
+                },
+            )
+            row["batches"] += 1
+            row["by_state"][r.state.value] = row["by_state"].get(r.state.value, 0) + 1
+            if r.state == BatchState.QUARANTINED:
+                row["quarantined"] += 1
+            elif r.state == BatchState.BLOCKED_DEPENDENCY:
+                row["pending_parent"] += 1
+            elif r.state == BatchState.APPLIED:
+                row["applied"] += 1
+            elif r.state == BatchState.COMMIT_UNKNOWN:
+                row["commit_unknown"] += 1
+        open_by_task: dict[str, list[GapRecord]] = {}
+        for g in self._gaps:
+            if g.state == "OPEN":
+                open_by_task.setdefault(g.task_id, []).append(g)
+        for task, gaps in open_by_task.items():
+            row = per_table.setdefault(
+                task,
+                {
+                    "task": task, "batches": 0, "by_state": {}, "quarantined": 0,
+                    "pending_parent": 0, "applied": 0, "commit_unknown": 0,
+                    "earliest_open_gap": None,
+                },
+            )
+            earliest = min(gaps, key=lambda g: g.window.start)
+            row["earliest_open_gap"] = {
+                "gap_id": earliest.gap_id,
+                "window": earliest.window.fingerprint(),
+                "reason": earliest.reason,
+                "open_gap_count": len(gaps),
+            }
         return {
             "batches": {
                 bid: {
@@ -492,11 +702,15 @@ class InMemoryControlRepository:
                 }
                 for bid, r in self._batches.items()
             },
+            "per_table": per_table,
             "watermarks": {
                 t: {
                     "capture_h": w.capture_h.isoformat() if w.capture_h else None,
                     "apply_cursor": w.apply_cursor.isoformat() if w.apply_cursor else None,
                     "delivery_cursor": w.delivery_cursor.isoformat() if w.delivery_cursor else None,
+                    "continuous_through": (
+                        w.continuous_through.isoformat() if w.continuous_through else None
+                    ),
                 }
                 for t, w in self._watermarks.items()
             },
@@ -506,6 +720,7 @@ class InMemoryControlRepository:
                     "task": g.task_id,
                     "window": g.window.fingerprint(),
                     "reason": g.reason,
+                    "created_at": g.created_at.isoformat(),
                 }
                 for g in self._gaps if g.state == "OPEN"
             ],
@@ -536,6 +751,12 @@ class InMemoryControlRepository:
                     "acceptance": e.acceptance_state,
                     "delivery": e.delivery_state,
                     "attempts": e.attempts,
+                    "created_at": e.created_at.isoformat(),
+                    "next_attempt_at": (
+                        e.next_attempt_at.isoformat()
+                        if e.next_attempt_at else None
+                    ),
+                    "needs_attention": e.needs_attention_reason,
                 }
                 for e in self._outbox.values()
             ],

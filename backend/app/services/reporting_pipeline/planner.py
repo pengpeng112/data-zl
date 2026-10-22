@@ -75,6 +75,67 @@ def plan_capture_window(
     return window
 
 
+# ---------------------------------------------------------------------------
+# 院区固定业务日窗（R05：跨午夜重试不漂窗）
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DailyRunAnchor:
+    """一次日轮的冻结锚点：业务日、业务时区、冻结时刻 H。
+
+    - 业务日 D = 冻结时刻在院区业务时区下的"昨天"（T+1 语义）。
+    - 业务窗固定为院区时区下的 [D 00:00, D+1 00:00)，半开。
+    - 同一轮的所有重试复用同一锚点：23:59 启动、00:01 重试都用当初
+      冻结的 D 与 H，不因真实时钟跨午夜而漂到新的业务日。
+    - H 只作捕获可见上界参考，不作为变更捕获依据（变更必须依赖已核
+      业务/变更时间语义，禁止用动态 SYSTEM_TIME 当水位）。
+    """
+
+    business_day: date
+    business_tz_name: str
+    frozen_at: datetime
+    visibility_cutoff: datetime
+
+    def business_window(self) -> TimeWindow:
+        start = datetime(
+            self.business_day.year, self.business_day.month, self.business_day.day
+        )
+        return TimeWindow(start, start + timedelta(days=1))
+
+    def fingerprint(self) -> str:
+        return (
+            f"anchor:{self.business_day.isoformat()}@{self.business_tz_name}"
+            f"/{self.frozen_at.isoformat()}"
+        )
+
+
+def freeze_daily_anchor(
+    now: datetime, *, business_tz_name: str = "Asia/Shanghai"
+) -> DailyRunAnchor:
+    """按冻结时刻计算本轮 T+1 锚点（业务日=院区时区昨天）。
+
+    now 必须带时区信息。业务时区固定为院区确认值，不随源库时区漂移；
+    跨源不同时区时，源侧时间换算到业务时区后再判窗。
+    """
+    if now.tzinfo is None:
+        raise ContractViolation("冻结锚点需要带时区的当前时刻（naive 时钟不可用）")
+    try:
+        import zoneinfo
+
+        tz = zoneinfo.ZoneInfo(business_tz_name)
+    except Exception as exc:  # noqa: BLE001 - 未知时区名统一拒绝
+        raise ContractViolation(f"未知业务时区: {business_tz_name} ({exc})") from exc
+    local = now.astimezone(tz)
+    business_day = (local - timedelta(days=1)).date()
+    return DailyRunAnchor(
+        business_day=business_day,
+        business_tz_name=business_tz_name,
+        frozen_at=now,
+        visibility_cutoff=now,
+    )
+
+
 @dataclass(frozen=True)
 class KeysetCursor:
     """复合键游标：order_columns 必须构成唯一键（verified），比较为严格字典序。"""
@@ -334,3 +395,74 @@ def month_days(month: str) -> int:
 
 def days_in_year(year: int) -> int:
     return 366 if calendar.isleap(year) else 365
+
+
+# ---------------------------------------------------------------------------
+# 覆盖年龄（R05：只扫当月不得冒充无限历史保障）
+# ---------------------------------------------------------------------------
+
+
+def coverage_age_report(
+    *,
+    managed_months: Sequence[str],
+    last_visit_month_by_key: Mapping[str, str],
+    now_month: str,
+    cycle_days: int,
+) -> dict:
+    """按"每个月被重访的最长间隔"评估历史漂移保障等级。
+
+    managed_months：声明的管理历史月清单（起止冻结后的完整清单，不是
+    只扫过的月）。last_visit_month_by_key：每业务月最后一次重访所在的
+    调度月（YYYY-MM）。cycle_days：声明的重访周期（天）。
+
+    只扫当月（各月从未被重访）或 60 个月每月只轮访 1 个月时，最大重访
+    间隔是全部历史，不能宣称"30 天内可见历史变化"；报告按月列
+    max_interval_months 与保障等级，供日报如实展示与降级声明。
+    """
+    if not managed_months:
+        return {
+            "managed_months": 0,
+            "coverage_level": "SCOPE_UNFROZEN",
+            "note": "管理历史范围未冻结，不声称任何历史漂移保障",
+        }
+    now_start, _ = month_bounds(now_month)
+    rows: list[dict] = []
+    worst_gap_days = 0
+    never_visited = 0
+    for month in managed_months:
+        visit = last_visit_month_by_key.get(month)
+        if visit is None:
+            never_visited += 1
+            gap_days = (now_start - month_bounds(month)[0]).days
+        else:
+            visit_start, _ = month_bounds(visit)
+            gap_days = max(0, (now_start - visit_start).days)
+        worst_gap_days = max(worst_gap_days, gap_days)
+        rows.append(
+            {
+                "month": month,
+                "last_visit_month": visit,
+                "days_since_visit": gap_days,
+                "overdue": visit is None or gap_days > cycle_days,
+            }
+        )
+    if never_visited == len(managed_months):
+        level = "NO_HISTORY_VISIT"
+    elif worst_gap_days > cycle_days * 2:
+        level = "DEGRADED_BEYOND_DECLARED_CYCLE"
+    elif worst_gap_days > cycle_days:
+        level = "AT_DECLARED_CYCLE_EDGE"
+    else:
+        level = "WITHIN_DECLARED_CYCLE"
+    return {
+        "managed_months": len(managed_months),
+        "never_visited": never_visited,
+        "max_days_since_any_visit": worst_gap_days,
+        "declared_cycle_days": cycle_days,
+        "coverage_level": level,
+        "rows": rows,
+        "note": (
+            "保障等级按每个月实际被重访的最长间隔计算；只扫当前月或单月轮转"
+            "不得声称全历史周期内可见"
+        ),
+    }

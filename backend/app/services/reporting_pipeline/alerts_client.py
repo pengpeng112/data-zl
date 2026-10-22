@@ -66,6 +66,65 @@ class Transport(Protocol):
     def get(self, url: str, headers: dict[str, str], *, timeout_seconds: float) -> TransportResponse: ...
 
 
+class TransportUnavailable(Exception):
+    """传输层不可达/超时（DNS、连接拒绝、读超时等）。
+
+    客户端把它映射为 RETRY_SCHEDULED（有界退避），不当作送达或永久失败；
+    调用方不得把异常文本（可能含内部主机名）写进告警正文。
+    """
+
+
+class UrllibTransport:
+    """真实 HTTP transport（R06）：urllib 实现，连接/读超时落在 socket 上。
+
+    - 仅在显式提供 base_url 的生产装配中实例化；本模块不含任何生产 URL。
+    - 不在 transport 内重试：重试节奏由 outbox sender 的退避与轮询预算
+      控制，避免双层重试放大。
+    - 超时同时约束连接和单次读；阻塞读被超时打断后连接被关闭。
+    """
+
+    def post(
+        self, url: str, headers: dict[str, str], body: bytes, *, timeout_seconds: float
+    ) -> TransportResponse:
+        return self._call("POST", url, headers, body, timeout_seconds)
+
+    def get(
+        self, url: str, headers: dict[str, str], *, timeout_seconds: float
+    ) -> TransportResponse:
+        return self._call("GET", url, headers, None, timeout_seconds)
+
+    def _call(
+        self,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        body: bytes | None,
+        timeout_seconds: float,
+    ) -> TransportResponse:
+        import urllib.error
+        import urllib.request
+
+        request = urllib.request.Request(url, data=body, method=method)
+        for key, value in headers.items():
+            request.add_header(key, value)
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                return TransportResponse(
+                    status_code=response.status,
+                    body=response.read(),
+                    headers={k: v for k, v in response.headers.items()},
+                )
+        except urllib.error.HTTPError as exc:
+            # HTTPError 也是响应：保留状态码/头/体供分型（401/429/409 等）
+            return TransportResponse(
+                status_code=exc.code,
+                body=exc.read() if exc.fp else b"",
+                headers={k: v for k, v in (exc.headers or {}).items()},
+            )
+        except Exception as exc:  # noqa: BLE001 - DNS/拒绝/超时统一映射不可达
+            raise TransportUnavailable(type(exc).__name__) from exc
+
+
 def now_unix_seconds() -> int:
     return int(datetime.now(timezone.utc).timestamp())
 
@@ -188,10 +247,17 @@ class RelayV2Client:
             unix_ts=ts,
             body=body_bytes,
         )
-        response = self.transport.post(
-            self.config.base_url + PATH_POST, headers, body_bytes,
-            timeout_seconds=self.config.read_timeout_seconds,
-        )
+        try:
+            response = self.transport.post(
+                self.config.base_url + PATH_POST, headers, body_bytes,
+                timeout_seconds=self.config.read_timeout_seconds,
+            )
+        except TransportUnavailable:
+            # 抽取不等告警 HTTP 返回；不可达 → 有界退避，outbox 留存重试
+            return SendOutcome(
+                "RETRY_SCHEDULED", None, self._bounded_backoff(), None,
+                "TRANSPORT_UNAVAILABLE",
+            )
         return self._classify_post(response)
 
     def _classify_post(self, response: TransportResponse) -> SendOutcome:
@@ -240,9 +306,14 @@ class RelayV2Client:
             unix_ts=ts, body=b"",
         )
         url = self.config.base_url + PATH_GET_TEMPLATE.format(relay_event_id=relay_event_id)
-        response = self.transport.get(
-            url, headers, timeout_seconds=self.config.read_timeout_seconds
-        )
+        try:
+            response = self.transport.get(
+                url, headers, timeout_seconds=self.config.read_timeout_seconds
+            )
+        except TransportUnavailable:
+            return PollOutcome(
+                "RETRY_SCHEDULED", {"retry_after": 60}, None
+            )
         if response.status_code == 401:
             return PollOutcome("PAUSED_AUTH", {}, 401)
         if response.status_code == 404:

@@ -1,12 +1,19 @@
 """受控装载：ApplyPort（白名单/批准/围栏/版本保护/同事务凭据）与月度原子发布。
 
-对应计划 §5/§6.2/§4.1：
+对应计划 §5/§6.2/§4.1 与 R04 整改（F05/F06/F07）：
 - ApplyPort 只接收已验证不可变 manifest、批准引用、白名单执行器、明确目标
   与允许动作、幂等键及版本规则；不接收任意自由 SQL 或源库写凭据。
-- 版本保护：拒绝旧版本覆盖；hash 只判异同，不作版本顺序（采集晚不证明
-  内容新）。无可靠版本顺序时同键不同内容进 CONFLICT 隔离，不盲覆盖。
-- 正式提交凭据（operation_id、batch_id、manifest_hash、结果摘要）由执行器
-  与正式 DML 同目标事务持久化；执行器结果不明 → COMMIT_UNKNOWN。
+- 批准由可信核验器裁决（ApprovalVerifier）：静态集合仅模拟；生产装配
+  用 PlatformApprovalVerifier 查平台白名单与批准登记，调用方传入的
+  approval_ref 只是引用，不是凭据。
+- 围栏强制成体系：enforce_fence=True（默认）时缺 lease_validator、缺
+  lease_resource/fencing_token 均拒绝；production_mode 再要求平台级批准
+  核验与耐久版本账。
+- 版本保护：精确比较（int/Decimal/规范化时间戳），不再转 float（大整数
+  丢精度）也不回退字典序；无法建立可靠顺序 → CONFLICT。版本键带
+  VersionScope（目标实例/租户/表），跨表同 ID 不互相污染。
+- 正式提交凭据（operation_id、batch_id、manifest_hash、范围、结果摘要）
+  由执行器与正式 DML 同目标事务持久化；执行器结果不明 → COMMIT_UNKNOWN。
 - 月重扫发布语义：先完整捕获/质量/stage，后同事务替换完整发布范围；
   禁止先删后等源、禁止先删提交、双源月不得单源整月删。
 """
@@ -14,7 +21,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Protocol, Sequence
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
+from typing import Callable, Mapping, Protocol, Sequence
 
 from app.services.reporting_pipeline.contracts import (
     BatchManifest,
@@ -37,6 +46,143 @@ class ApplyRefused(ContractViolation):
     """装载被拒绝（门禁未满足）。"""
 
 
+class CommitUnknownRaised(ApplyRefused):
+    """执行器提交结果不明：冻结该表重叠写并先核目标凭据，禁止盲重放。
+
+    独立子类让装配层能区分"门禁拒绝（回 APPLY_PENDING）"与
+    "COMMIT_UNKNOWN（进 COMMIT_UNKNOWN 状态冻结）"。
+    """
+
+
+# ---------------------------------------------------------------------------
+# 版本键作用域与精确比较（R04/F07：float 精度与字典序回退整改）
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class VersionScope:
+    """版本键作用域：目标实例/租户/表 + 业务稳定键。
+
+    跨表相同业务 ID 不得互相污染：版本账必须按 (目标实例, 租户, 表, 键)
+    分账登记（RT1-014）。
+    """
+
+    target_instance: str
+    tenant: str
+    table: str
+
+    def full_key(self, stable_key: tuple) -> tuple:
+        return (self.target_instance, self.tenant, self.table, stable_key)
+
+
+@dataclass(frozen=True)
+class TargetCommitCredential:
+    """同事务提交凭据：由执行器与正式 DML 在同一目标事务内持久化。
+
+    恢复/COMMIT_UNKNOWN 裁定时查目标侧同事务凭据（operation_id +
+    manifest_hash + 范围 + 结果摘要），不能拿 PG 控制面状态当 Oracle
+    已提交证明。
+    """
+
+    operation_id: str
+    batch_id: str
+    manifest_hash: str
+    target_object: str
+    scope_summary: str
+    rows_affected: int
+    committed: bool | None  # None = COMMIT_UNKNOWN
+
+
+class VersionRegistry(Protocol):
+    """版本账仓储（耐久实现见 pg_repository；内存版仅模拟）。"""
+
+    def current_version(self, scope: VersionScope, stable_key: tuple) -> str | None: ...
+
+    def register_version(
+        self,
+        scope: VersionScope,
+        stable_key: tuple,
+        version: str,
+        *,
+        operation_id: str,
+    ) -> None: ...
+
+
+class InMemoryVersionRegistry:
+    """内存版本账（模拟）：生产装配必须换耐久实现。"""
+
+    def __init__(self) -> None:
+        self._versions: dict[tuple, str] = {}
+
+    def current_version(self, scope: VersionScope, stable_key: tuple) -> str | None:
+        return self._versions.get(scope.full_key(stable_key))
+
+    def register_version(
+        self,
+        scope: VersionScope,
+        stable_key: tuple,
+        version: str,
+        *,
+        operation_id: str,
+    ) -> None:
+        self._versions[scope.full_key(stable_key)] = version
+
+
+# 已核版本类型：调用方按核验结论声明；未声明时按保守精确尝试
+VERSION_KIND_INT = "int"
+VERSION_KIND_DECIMAL = "decimal"
+VERSION_KIND_TIMESTAMP = "timestamp"
+
+
+def compare_versions(a: str, b: str, kind: str | None = None) -> int | None:
+    """精确版本比较：返回 >0/<0/=0；无法建立可靠顺序返回 None。
+
+    F07 整改：
+    - 不再先转 float（9007199254740992 与 ...93 会误判相等）；
+    - 整数走 int，小数走 Decimal，时间戳走规范化 datetime；
+    - 未声明类型时按 int → decimal → timestamp 依次**精确**尝试；
+    - 全部失败返回 None（调用方必须按 CONFLICT 处理，不得回退字典序
+      冒充顺序，也不用采集时间冒充版本）。
+    """
+    if kind == VERSION_KIND_INT:
+        return _cmp_exact(int(a), int(b))
+    if kind == VERSION_KIND_DECIMAL:
+        return _cmp_exact(Decimal(str(a)), Decimal(str(b)))
+    if kind == VERSION_KIND_TIMESTAMP:
+        ta, tb = _parse_ts(a), _parse_ts(b)
+        if ta is None or tb is None:
+            return None
+        return _cmp_exact(ta, tb)
+    # 未声明：精确尝试链（int 优先，避免 "10" < "9" 的字典序假序）
+    try:
+        return _cmp_exact(int(a), int(b))
+    except (TypeError, ValueError):
+        pass
+    try:
+        return _cmp_exact(Decimal(str(a)), Decimal(str(b)))
+    except (InvalidOperation, ValueError, TypeError):
+        pass
+    ta, tb = _parse_ts(a), _parse_ts(b)
+    if ta is not None and tb is not None:
+        return _cmp_exact(ta, tb)
+    return None
+
+
+def _cmp_exact(a, b) -> int:
+    if a > b:
+        return 1
+    if a < b:
+        return -1
+    return 0
+
+
+def _parse_ts(value: str) -> datetime | None:
+    try:
+        return datetime.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
 @dataclass(frozen=True)
 class ApplyRequest:
     manifest: BatchManifest
@@ -53,6 +199,7 @@ class ApplyRequest:
     lease_resource: str | None = None
     fencing_token: int | None = None
     version_order: str | None = None  # 已核源版本顺序说明
+    version_kind: str | None = None  # int/decimal/timestamp（已核类型）
 
 
 @dataclass
@@ -73,6 +220,7 @@ class ApplyResult:
     committed: bool | None  # None = COMMIT_UNKNOWN
     operation_id: str
     rows_affected: int
+    credential: TargetCommitCredential | None = None  # 同事务提交凭据
 
 
 class ApplyExecutor(Protocol):
@@ -80,42 +228,167 @@ class ApplyExecutor(Protocol):
 
     executor_id: str
 
-    def execute(self, request: ApplyRequest, plan: ApplyPlan) -> ApplyResult:
-        ...
+    def execute(self, request: ApplyRequest, plan: ApplyPlan) -> ApplyResult: ...
+
+
+# ---------------------------------------------------------------------------
+# 批准校验器（R04/F06：批准由可信平台核验，调用方字符串不作凭据）
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ApprovalDecision:
+    approved: bool
+    trust_level: str  # platform / simulation
+    reason: str
+
+
+class ApprovalVerifier(Protocol):
+    """批准核验协议：复核对象/实例/操作/范围/调用身份。"""
+
+    trust_level: str
+
+    def verify(
+        self,
+        *,
+        approval_ref: str,
+        executor_id: str,
+        target_object: str,
+        allowed_operations: Sequence[str],
+    ) -> ApprovalDecision: ...
+
+
+class StaticApprovalVerifier:
+    """静态集合校验（模拟）：调用方自报批准集合，不作生产权限边界。"""
+
+    trust_level = "simulation"
+
+    def __init__(self, approved_refs: set[str]) -> None:
+        self.approved_refs = set(approved_refs)
+
+    def verify(
+        self,
+        *,
+        approval_ref: str,
+        executor_id: str,
+        target_object: str,
+        allowed_operations: Sequence[str],
+    ) -> ApprovalDecision:
+        if approval_ref in self.approved_refs:
+            return ApprovalDecision(True, self.trust_level, "静态集合登记（模拟）")
+        return ApprovalDecision(
+            False, self.trust_level, f"批准引用未登记: {approval_ref}"
+        )
+
+
+class PlatformApprovalVerifier:
+    """平台侧批准核验：查 asset_action_executors 白名单 + 批准登记。
+
+    生产装配注入两个只读查询（由 session 工厂构造的 callable）：
+    - executor_lookup(executor_code, target_object) -> 启用的执行器记录；
+    - approval_lookup(approval_ref, executor_code) -> 有效批准记录。
+    调用方传入的 approval_ref 只是引用；是否真的被批准由平台数据决定，
+    不存在"传一组字符串就自认已批准"的路径。查询本身只读，不产生授权。
+    """
+
+    trust_level = "platform"
+
+    def __init__(
+        self,
+        *,
+        executor_lookup: Callable[[str, str], Mapping | None],
+        approval_lookup: Callable[[str, str], Mapping | None],
+    ) -> None:
+        self._executor_lookup = executor_lookup
+        self._approval_lookup = approval_lookup
+
+    def verify(
+        self,
+        *,
+        approval_ref: str,
+        executor_id: str,
+        target_object: str,
+        allowed_operations: Sequence[str],
+    ) -> ApprovalDecision:
+        executor = self._executor_lookup(executor_id, target_object)
+        if executor is None:
+            return ApprovalDecision(
+                False, self.trust_level,
+                f"执行器不在平台白名单或未启用: {executor_id}",
+            )
+        if not executor.get("enabled", False):
+            return ApprovalDecision(
+                False, self.trust_level, f"执行器已停用: {executor_id}"
+            )
+        approval = self._approval_lookup(approval_ref, executor_id)
+        if approval is None:
+            return ApprovalDecision(
+                False, self.trust_level, f"批准引用在平台无有效记录: {approval_ref}"
+            )
+        if not approval.get("valid", False):
+            return ApprovalDecision(
+                False, self.trust_level, f"批准已失效或范围不符: {approval_ref}"
+            )
+        return ApprovalDecision(
+            True, self.trust_level, "平台白名单+批准登记核验通过"
+        )
 
 
 class VersionGuard:
-    """版本保护：旧版本不得覆盖新版本；hash 不当顺序。"""
+    """版本保护：旧版本不得覆盖新版本；hash 不当顺序。
 
-    def __init__(self) -> None:
-        self._applied_versions: dict[tuple, str] = {}
+    R04 整改：
+    - 键必须带 VersionScope（目标/租户/表），跨表同 ID 不互污染；
+    - 比较走 compare_versions 精确路径；无法建立顺序 → CONFLICT；
+    - 可注入耐久 VersionRegistry（生产），内存账仅模拟。
+    """
 
-    def register_applied(self, stable_key: tuple, version_evidence: str) -> None:
-        self._applied_versions[stable_key] = version_evidence
+    def __init__(self, registry: VersionRegistry | None = None) -> None:
+        self._registry = registry or InMemoryVersionRegistry()
+        self._registry_is_memory = registry is None
 
-    def check(self, stable_key: tuple, incoming_version: str | None) -> str:
+    @property
+    def durable(self) -> bool:
+        return not self._registry_is_memory
+
+    def register_applied(
+        self,
+        stable_key: tuple,
+        version_evidence: str,
+        *,
+        scope: VersionScope | None = None,
+        operation_id: str = "sim",
+    ) -> None:
+        scope = scope or VersionScope("_sim", "_sim", "_sim")
+        self._registry.register_version(
+            scope, stable_key, version_evidence, operation_id=operation_id
+        )
+
+    def check(
+        self,
+        stable_key: tuple,
+        incoming_version: str | None,
+        *,
+        scope: VersionScope | None = None,
+        version_kind: str | None = None,
+    ) -> str:
         """返回 NO_CHANGE / UPDATE / CONFLICT。
 
         无已核版本顺序（version=None）且内容键不同 → CONFLICT，不盲覆盖。
         """
-        current = self._applied_versions.get(stable_key)
+        scope = scope or VersionScope("_sim", "_sim", "_sim")
+        current = self._registry.current_version(scope, stable_key)
         if current is None:
-            return INSERT if incoming_version is None else INSERT
+            return INSERT
         if incoming_version is None:
-            return CONFLICT if stable_key in self._applied_versions else INSERT
+            return CONFLICT
         if incoming_version == current:
             return NO_CHANGE
-        # 顺序判定必须由已核版本序（如 SCN/提交序号/单调时间戳+规则）给出；
-        # 调用方给的 incoming_version 已是该语义的字符串凭据。
-        return UPDATE if _version_after(incoming_version, current) else CONFLICT
-
-
-def _version_after(a: str, b: str) -> bool:
-    """已核版本序比较：数值可比较则数值比，否则字典序（由核验方保证语义）。"""
-    try:
-        return float(a) > float(b)
-    except (TypeError, ValueError):
-        return str(a) > str(b)
+        verdict = compare_versions(incoming_version, current, version_kind)
+        if verdict is None:
+            # 无法建立可靠顺序：不按采集时间/字典序冒充，进冲突隔离
+            return CONFLICT
+        return UPDATE if verdict > 0 else CONFLICT
 
 
 class ApplyPort:
@@ -123,14 +396,31 @@ class ApplyPort:
         self,
         *,
         whitelisted_executors: Sequence[str],
-        approved_refs: set[str],
-        lease_validator=None,
+        approved_refs: set[str] | None = None,
+        lease_validator: Callable[[str, int], None] | None = None,
         version_guard: VersionGuard | None = None,
+        approval_verifier: ApprovalVerifier | None = None,
+        enforce_fence: bool = True,
+        production_mode: bool = False,
     ) -> None:
         self.whitelisted_executors = set(whitelisted_executors)
-        self.approved_refs = set(approved_refs)
+        self.approval_verifier = approval_verifier or StaticApprovalVerifier(
+            approved_refs or set()
+        )
         self.lease_validator = lease_validator  # callable(resource, token) -> None
         self.version_guard = version_guard or VersionGuard()
+        self.enforce_fence = enforce_fence
+        self.production_mode = production_mode
+        if production_mode:
+            # 生产模式硬性要求：平台级批准核验 + 耐久版本账 + 围栏校验器
+            if self.approval_verifier.trust_level != "platform":
+                raise ApplyRefused(
+                    "生产装载禁止使用静态批准集合（须 PlatformApprovalVerifier）"
+                )
+            if not self.version_guard.durable:
+                raise ApplyRefused("生产装载禁止内存版本账（须耐久 VersionRegistry）")
+            if self.lease_validator is None:
+                raise ApplyRefused("生产装载必须提供 lease_validator（目标侧围栏）")
 
     def preview(self, request: ApplyRequest, target_rows: Mapping[tuple, Mapping]) -> ApplyPlan:
         actions = self._classify(request, target_rows)
@@ -151,15 +441,22 @@ class ApplyPort:
         result = executor.execute(request, plan)
         if result.committed is None:
             # COMMIT_UNKNOWN：冻结同表写者是上层调度职责；此处不再重放
-            raise ApplyRefused(
+            raise CommitUnknownRaised(
                 f"[{request.manifest.batch_id}] 执行器结果不明（COMMIT_UNKNOWN），"
                 "须先核同事务提交凭据，禁止盲重放"
             )
         if result.committed:
+            if result.credential is None:
+                raise ApplyRefused(
+                    f"[{request.manifest.batch_id}] 执行器未提供同事务提交凭据"
+                    "（TargetCommitCredential），不能当作已确认提交"
+                )
             for key, action in plan.actions:
                 if action in (INSERT, UPDATE, NO_CHANGE):
                     self.version_guard.register_applied(
-                        key, request.version_order or "applied"
+                        key,
+                        request.version_order or "applied",
+                        operation_id=result.operation_id,
                     )
         return result
 
@@ -171,17 +468,37 @@ class ApplyPort:
             problems.append("manifest 分页未完整（缺分片不得装载正式）")
         if not request.quality_verified:
             problems.append("质量未验证（隔离未闭合不得装载）")
-        if request.approval_ref not in self.approved_refs:
-            problems.append(f"批准引用未登记: {request.approval_ref}")
+        decision = self.approval_verifier.verify(
+            approval_ref=request.approval_ref,
+            executor_id=executor.executor_id,
+            target_object=request.target_object,
+            allowed_operations=request.allowed_operations,
+        )
+        if not decision.approved:
+            problems.append(f"批准核验未通过: {decision.reason}")
         if executor.executor_id not in self.whitelisted_executors:
             problems.append(f"执行器不在白名单: {executor.executor_id}")
         if request.mode not in ("MERGE", "REPLACE_MONTH"):
             problems.append(f"非法装载模式: {request.mode}")
-        if self.lease_validator is not None:
+        # 围栏（R04/F09：生产路径不得缺省 lease_validator / token）
+        if self.enforce_fence:
+            if self.lease_validator is None:
+                problems.append("未配置 lease_validator（禁止无围栏装载）")
+            elif request.lease_resource is None or request.fencing_token is None:
+                problems.append(
+                    "装载请求缺 lease_resource/fencing_token（禁止无 token 正式写）"
+                )
+            else:
+                try:
+                    self.lease_validator(request.lease_resource, request.fencing_token)
+                except Exception as exc:  # LeaseDenied 等围栏失败
+                    problems.append(f"围栏校验失败: {exc}")
+        elif self.lease_validator is not None:
+            # 显式声明模拟（enforce_fence=False）：给了校验器仍然执行
             try:
                 if request.lease_resource is not None:
                     self.lease_validator(request.lease_resource, request.fencing_token)
-            except Exception as exc:  # LeaseDenied 等围栏失败
+            except Exception as exc:  # noqa: BLE001
                 problems.append(f"围栏校验失败: {exc}")
         if problems:
             raise ApplyRefused(
@@ -215,7 +532,9 @@ class ApplyPort:
             if source_fp == target_fp:
                 actions.append((key, NO_CHANGE))
                 continue
-            verdict = self.version_guard.check(key, request.version_order)
+            verdict = self.version_guard.check(
+                key, request.version_order, version_kind=request.version_kind
+            )
             if verdict == CONFLICT:
                 actions.append((key, CONFLICT))
             elif verdict == NO_CHANGE:
@@ -230,10 +549,11 @@ class InMemoryApplyExecutor:
 
     executor_id = "sim-apply-1"
 
-    def __init__(self, *, force_unknown: bool = False) -> None:
+    def __init__(self, *, force_unknown: bool = False, omit_credential: bool = False) -> None:
         self.target: dict[tuple, Mapping] = {}
         self.receipts: list[dict] = []
         self.force_unknown = force_unknown
+        self.omit_credential = omit_credential
         self._seq = 0
 
     def execute(self, request: ApplyRequest, plan: ApplyPlan) -> ApplyResult:
@@ -262,6 +582,20 @@ class InMemoryApplyExecutor:
                 elif action == UPDATE and matching:
                     self.target[key] = dict(matching[0])
                     affected += 1
+        credential = None
+        if not self.omit_credential:
+            credential = TargetCommitCredential(
+                operation_id=operation_id,
+                batch_id=request.manifest.batch_id,
+                manifest_hash=request.manifest.payload_sha256,
+                target_object=request.target_object,
+                scope_summary=(
+                    f"{request.mode}:{len(request.replace_scope_keys or ())}"
+                    if request.mode == "REPLACE_MONTH" else request.mode
+                ),
+                rows_affected=affected,
+                committed=True,
+            )
         self.receipts.append(
             {
                 "operation_id": operation_id,
@@ -272,7 +606,10 @@ class InMemoryApplyExecutor:
                 "target": request.target_object,
             }
         )
-        return ApplyResult(committed=True, operation_id=operation_id, rows_affected=affected)
+        return ApplyResult(
+            committed=True, operation_id=operation_id,
+            rows_affected=affected, credential=credential,
+        )
 
 
 @dataclass

@@ -87,6 +87,136 @@ class RowSource(Protocol):
         ...
 
 
+class ConnectionProvider(Protocol):
+    """受控连接提供者（R03）：由仓库受控连接器实现（如 db_connectors 的
+    OracleConnector 封装），只读身份；实现负责凭据与 thick 模式。"""
+
+    def cursor(self) -> "ManagedCursor":
+        ...
+
+
+class ManagedCursor(Protocol):
+    """受管游标：支持超时关闭底层连接（阻塞 fetch 的硬取消）。"""
+
+    def execute(self, sql: str, params: Sequence) -> None: ...
+
+    def fetchmany(self, size: int) -> list[tuple]: ...
+
+    def close(self) -> None: ...
+
+
+class FetchTimeoutReached(SourceError):
+    """驱动级 fetch 超时：连接被关闭打断，attempt 不得发布。"""
+
+
+class ControlledConnectorRowSource:
+    """受控连接器行源（R03）：真实驱动绑定 + 页间取消 + 阻塞 fetch 硬取消。
+
+    - 连接只经注入的 ConnectionProvider（平台受控连接器/只读身份），
+      本类不新建直连、不持有明文凭据；
+    - 驱动超时落实在"看门狗关闭连接"：页间协作取消只能中止下一页，
+      不能中断正在阻塞的 fetch——超时时看门狗线程关闭底层连接强制打断，
+      之后 attempt 按不完整处理，不伪造完整结束；
+    - CLOB 等大对象必须在连接关闭前读完（本类逐行同步取值）；流式
+      转存由装配方在 row_transform 中处理，关闭后不再触达 LOB 惰性读取。
+    """
+
+    def __init__(
+        self,
+        *,
+        physical_source: str,
+        provider: ConnectionProvider,
+        query_builder: Callable[[TimeWindow, KeysetCursor | None, int], tuple[str, Sequence]],
+        row_transform: Callable[[tuple], tuple] | None = None,
+        page_size: int = 5000,
+        fetch_timeout_seconds: float = 300.0,
+        cancellation: CancellationToken | None = None,
+    ) -> None:
+        self.physical_source = physical_source
+        self._provider = provider
+        self._query_builder = query_builder
+        self._row_transform = row_transform
+        self._page_size = page_size
+        self._fetch_timeout = fetch_timeout_seconds
+        self._cancellation = cancellation or CancellationToken()
+
+    def fetch_page(
+        self,
+        window: TimeWindow,
+        *,
+        limit_rows: int,
+        keyset: KeysetCursor | None = None,
+    ) -> ReadPage:
+        import threading
+
+        sql, params = self._query_builder(window, keyset, self._page_size)
+        cursor = self._provider.cursor()
+        watchdog_done = threading.Event()
+        holder = {"cursor": cursor, "timed_out": False}
+
+        def _watchdog() -> None:
+            if not watchdog_done.wait(self._fetch_timeout):
+                holder["timed_out"] = True
+                # 阻塞 fetch 的硬取消：关闭游标/连接打断底层 socket 读
+                try:
+                    cursor.close()
+                except Exception:  # noqa: BLE001 - 取消路径尽力而为
+                    pass
+
+        watchdog = threading.Thread(target=_watchdog, daemon=True)
+        watchdog.start()
+        rows: list[tuple] = []
+        row_bytes = 0
+        try:
+            self._cancellation.check()
+            cursor.execute(sql, params)
+            while len(rows) < limit_rows:
+                self._cancellation.check()
+                batch = cursor.fetchmany(min(self._page_size, limit_rows - len(rows)))
+                if not batch:
+                    break
+                for raw in batch:
+                    row = self._row_transform(raw) if self._row_transform else raw
+                    rows.append(row)
+                    row_bytes += _approx_row_bytes(row)
+            has_more = len(rows) >= limit_rows and bool(
+                cursor.fetchmany(1)
+            )
+            last_key = rows[-1][:2] if rows else None
+            return ReadPage(rows=rows, row_bytes=row_bytes, last_key=last_key, has_more=has_more)
+        except OperationCancelled:
+            raise
+        except Exception as exc:  # noqa: BLE001 - 分类后抛 SourceError
+            if holder["timed_out"]:
+                raise FetchTimeoutReached(
+                    "FETCH_TIMEOUT",
+                    "DRIVER_FETCH_TIMEOUT",
+                    f"阻塞 fetch 超时（>{self._fetch_timeout}s），连接已关闭打断",
+                ) from exc
+            raise SourceError(
+                classify_source_error(str(exc)),
+                "READ_PAGE_FAILED",
+                type(exc).__name__,
+            ) from exc
+        finally:
+            watchdog_done.set()
+            watchdog.join(timeout=1.0)
+            try:
+                cursor.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+
+def _approx_row_bytes(row: tuple) -> int:
+    total = 0
+    for value in row:
+        if isinstance(value, str):
+            total += len(value.encode("utf-8"))
+        elif value is not None:
+            total += 32
+    return total
+
+
 @dataclass
 class ReadPage:
     rows: list[tuple]

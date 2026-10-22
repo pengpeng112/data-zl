@@ -359,11 +359,14 @@ class TestRecovery(unittest.TestCase):
 
 
 class FakeTask:
-    def __init__(self, table, mode="T1", sources=("ods__A",), fail=False):
+    def __init__(self, table, mode="T1", sources=("ods__A",), fail=False,
+                 wants_apply=False):
         self.canonical_table = table
         self.mode = mode
         self.physical_sources = tuple(sources)
         self.fail = fail
+        # K06：捕获任务不占目标写租约；正式装载（wants_apply）才领写租约
+        self._apply_fn = (lambda *a, **k: None) if wants_apply else None
         self.ran = False
 
     def run(self):
@@ -398,8 +401,8 @@ class TestSchedulerBridge(unittest.TestCase):
             FakeTask("T_GOOD"),
         ]
         report = bridge.run_cycle(tasks)
-        self.assertIn("T_BAD", report.failures)
-        self.assertIn("T_GOOD", report.dispatched)
+        self.assertIn("T_BAD:T1", report.failures)
+        self.assertIn("T_GOOD:T1", report.dispatched)
         self.assertEqual(report.overall, "PARTIAL_SUCCESS_WITH_BACKLOG")
 
     def test_open_breaker_skips_source(self):
@@ -407,17 +410,22 @@ class TestSchedulerBridge(unittest.TestCase):
         bridge = SchedulerBridge(repository=repo, source_open_predicate=lambda s: s == "ods__X")
         tasks = [FakeTask("T_X", sources=("ods__X",)), FakeTask("T_OK", sources=("ods__Y",))]
         report = bridge.run_cycle(tasks)
-        self.assertEqual(report.skipped["T_X"], "物理源熔断 OPEN")
-        self.assertIn("T_OK", report.dispatched)
+        self.assertEqual(report.skipped["T_X:T1"], "物理源熔断 OPEN")
+        self.assertIn("T_OK:T1", report.dispatched)
 
     def test_single_writer_lease(self):
         repo = InMemoryControlRepository()
         repo.acquire_lease("target:DBOPER.T_HELD", "other-worker", ttl_seconds=600)
         bridge = SchedulerBridge(repository=repo)
-        tasks = [FakeTask("T_HELD")]
+        # K06：正式装载任务被单写者租约挡住
+        tasks = [FakeTask("T_HELD", wants_apply=True)]
         report = bridge.run_cycle(tasks)
-        self.assertIn("T_HELD", report.skipped)
-        self.assertIn("单写者", report.skipped["T_HELD"])
+        self.assertIn("T_HELD:T1", report.skipped)
+        self.assertIn("单写者", report.skipped["T_HELD:T1"])
+        # 捕获任务不占目标写租约：即使写租约被他人持有仍可捕获
+        capture_tasks = [FakeTask("T_HELD_CAP", sources=("ods__B",))]
+        capture_report = bridge.run_cycle(capture_tasks)
+        self.assertIn("T_HELD_CAP:T1", capture_report.dispatched)
 
     def test_source_concurrency_budget(self):
         repo = InMemoryControlRepository()

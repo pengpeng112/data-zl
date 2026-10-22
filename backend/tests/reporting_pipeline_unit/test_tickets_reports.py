@@ -210,11 +210,33 @@ class TestCliCommands(unittest.TestCase):
     def test_daily_report_command(self):
         from scripts.reporting_ctl import main
 
+        # A02：无 --state-db 且未显式允许模拟 → 拒绝静默回退模拟（exit 2）
         exit_code = main([
             "--config", str(PACKAGE_DIR), "daily-report",
             "--business-day", "2026-10-19",
         ])
+        self.assertEqual(exit_code, 2)
+        # 显式 --allow-simulation 才走内存模拟（exit 0，输出带 simulation）
+        exit_code = main([
+            "--config", str(PACKAGE_DIR), "daily-report",
+            "--business-day", "2026-10-19", "--allow-simulation",
+        ])
         self.assertEqual(exit_code, 0)
+
+    def test_daily_report_default_day_not_hardcoded(self):
+        """A02：默认业务日=院区时区昨天，不再硬编码 2026-10-19。"""
+        from scripts import reporting_ctl
+
+        parser = reporting_ctl.build_parser()
+        sub = next(
+            a for a in parser._subparsers._group_actions[0].choices.items()
+            if a[0] == "daily-report"
+        )[1]
+        self.assertIsNone(
+            next(
+                a for a in sub._actions if a.dest == "business_day"
+            ).default
+        )
 
     def test_ticket_export_command(self):
         from scripts.reporting_ctl import main
@@ -228,9 +250,18 @@ class TestCliCommands(unittest.TestCase):
         self.assertTrue(out.exists())
 
     def test_not_implemented_command_explicit(self):
+        # A02 后六真实命令已实现：本测试改为验证"缺真实装配输入即拒绝"
         from scripts.reporting_ctl import main
 
-        exit_code = main(["--config", str(PACKAGE_DIR), "apply"])
+        # 缺必填参数（--batch/--approval-ref）→ argparse 用法错误（exit 2）
+        with self.assertRaises(SystemExit) as ctx:
+            main(["--config", str(PACKAGE_DIR), "apply"])
+        self.assertEqual(ctx.exception.code, 2)
+        # 参数齐但缺状态库/暂存根（未允许模拟）→ 装配拒绝（exit 2）
+        exit_code = main([
+            "--config", str(PACKAGE_DIR), "apply",
+            "--batch", "B-NOASSEMBLY", "--approval-ref", "REF-X",
+        ])
         self.assertEqual(exit_code, 2)
 
 

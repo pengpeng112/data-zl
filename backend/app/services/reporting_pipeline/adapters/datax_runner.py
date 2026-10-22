@@ -22,8 +22,79 @@ from typing import Mapping, Protocol, Sequence
 from app.services.reporting_pipeline.contracts import ContractViolation
 
 ALLOWED_READER_PLUGINS = ("oraclereader",)
+# 直写目标白名单（oraclewriter/rdbmswriter）；mysqlwriter 仅限固定暂存
+# 路线（MysqlStageRoute），见 render_job_for_stage_route。
 ALLOWED_WRITER_PLUGINS = ("oraclewriter", "rdbmswriter")
+STAGE_WRITER_PLUGINS = ("mysqlwriter",)
 FORBIDDEN_JOB_KEYS = ("preSql", "postSql", "shell", "command")
+# mysqlwriter 受限参数白名单（固定暂存路线）：其余 writer 参数一律拒绝
+_MYSQLWRITER_ALLOWED_PARAMS = frozenset({
+    "username", "password", "writeMode", "column", "connection",
+    "batchSize", "batchByteSize",
+})
+_MYSQLWRITER_ALLOWED_WRITE_MODES = frozenset({"insert"})
+
+
+@dataclass(frozen=True)
+class MysqlStageRoute:
+    """固定 MySQL 暂存路线（A02）：8.53 已实测 Oracle→MySQL 暂存。
+
+    - 只允许写入固定暂存实例/库/表（host/port/database + 表白名单）；
+    - connection 数组固定单连接，jdbcUrl 由本配置渲染，不接受调用方
+      传入任意连接串；
+    - 凭据只接受 credential_ref，明文在授权 worker 侧解析；
+    - 本路线只做暂存：正式写前置机统一交受控执行器，DataX 不直写目标。
+    """
+
+    route_id: str
+    version: str
+    host: str
+    port: int
+    database: str
+    table_whitelist: tuple[str, ...]
+    credential_ref: str
+
+    def jdbc_url(self) -> str:
+        return (
+            f"jdbc:mysql://{self.host}:{self.port}/{self.database}"
+            "?useUnicode=true&characterEncoding=utf8"
+            "&zeroDateTimeBehavior=convertToNull"
+        )
+
+    def allows_table(self, table: str) -> bool:
+        return table in self.table_whitelist
+
+    def fingerprint(self) -> str:
+        canonical = json.dumps(
+            {
+                "route_id": self.route_id,
+                "version": self.version,
+                "host": self.host,
+                "port": self.port,
+                "database": self.database,
+                "tables": sorted(self.table_whitelist),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    def validate(self) -> None:
+        problems: list[str] = []
+        if not self.route_id or not self.version:
+            problems.append("route_id/version 为空")
+        if not self.host or not (0 < int(self.port) < 65536):
+            problems.append(f"host/port 非法: {self.host!r}/{self.port!r}")
+        if not self.database:
+            problems.append("database 为空")
+        if not self.table_whitelist:
+            problems.append("暂存表白名单为空")
+        if not self.credential_ref:
+            problems.append("credential_ref 为空")
+        if problems:
+            raise DataxTemplateError(
+                f"MysqlStageRoute[{self.route_id}]: " + "; ".join(problems)
+            )
 
 
 class DataxTemplateError(ContractViolation):
@@ -146,6 +217,111 @@ def render_job(
     }
 
 
+def render_job_for_stage_route(
+    template: DataxJobTemplate,
+    *,
+    route: MysqlStageRoute,
+    source_object: str,
+    stage_table: str,
+    window_start: str,
+    window_end_exclusive: str,
+    extra: Mapping[str, str] | None = None,
+) -> dict:
+    """固定 MySQL 暂存路线渲染（A02）：mysqlwriter 只进受控暂存。
+
+    与 render_job 的区别：
+    - writer 固定 mysqlwriter，connection 数组由路线配置渲染（单连接、
+      固定 jdbcUrl），调用方不能自带连接串或任意 writer 参数；
+    - 表名必须在路线白名单内，并带 attempt/batch 隔离前缀由调用方在
+      stage_table 中显式给出（表级隔离防串批）；
+    - 正式写前置机不在本路线：DataX 暂存读出成不可变清单后交统一装载端。
+    """
+    route.validate()
+    extra = dict(extra or {})
+    for key in FORBIDDEN_JOB_KEYS:
+        if key in extra:
+            raise DataxTemplateError(f"job 参数禁止携带 {key}")
+    if template.reader_plugin not in ALLOWED_READER_PLUGINS:
+        raise DataxTemplateError(f"reader 插件不在白名单: {template.reader_plugin}")
+    if template.writer_plugin not in STAGE_WRITER_PLUGINS:
+        raise DataxTemplateError(
+            f"暂存路线 writer 只允许 {STAGE_WRITER_PLUGINS}: {template.writer_plugin}"
+        )
+    if not route.allows_table(stage_table):
+        raise DataxTemplateError(
+            f"暂存表不在固定路线白名单: {stage_table}"
+            f"（route={route.route_id}）"
+        )
+    query_sql = render_query_sql(
+        template,
+        source_object=source_object,
+        window_start=window_start,
+        window_end_exclusive=window_end_exclusive,
+    )
+    if window_start not in query_sql or window_end_exclusive not in query_sql:
+        raise DataxTemplateError("渲染产物未携带窗口字面量")
+    return {
+        "job": {
+            "setting": {"speed": {"channel": 1}},
+            "content": [
+                {
+                    "reader": {
+                        "name": template.reader_plugin,
+                        "parameter": {
+                            "username": "${credential:user}",
+                            "password": "${credential:password}",
+                            "credentialRef": route.credential_ref,
+                            "querySql": [query_sql],
+                        },
+                    },
+                    "writer": {
+                        "name": "mysqlwriter",
+                        "parameter": {
+                            "username": "${stage:user}",
+                            "password": "${stage:password}",
+                            "writeMode": "insert",
+                            "column": list(template.projection_columns),
+                            "connection": [
+                                {
+                                    "jdbcUrl": route.jdbc_url(),
+                                    "table": [stage_table],
+                                }
+                            ],
+                        },
+                    },
+                }
+            ],
+        },
+        "templateFingerprint": template.fingerprint(),
+        "stageRouteFingerprint": route.fingerprint(),
+    }
+
+
+def validate_stage_route_writer_params(parameter: Mapping) -> None:
+    """复核（已渲染/外部构造的）mysqlwriter 参数在受限集合内。
+
+    供运行前防御：未列名参数（session、preSql 变体包装等）一律拒绝，
+    connection 只允许单元素且 jdbcUrl 必须命中已登记路线。
+    """
+    unknown = set(parameter) - _MYSQLWRITER_ALLOWED_PARAMS
+    if unknown:
+        raise DataxTemplateError(
+            f"mysqlwriter 参数越白名单: {sorted(unknown)}"
+        )
+    if parameter.get("writeMode") not in _MYSQLWRITER_ALLOWED_WRITE_MODES:
+        raise DataxTemplateError(
+            f"mysqlwriter writeMode 受限: {parameter.get('writeMode')!r}"
+        )
+    connections = parameter.get("connection") or []
+    if not isinstance(connections, list) or len(connections) != 1:
+        raise DataxTemplateError("mysqlwriter connection 必须是单元素数组")
+    conn = connections[0]
+    if not isinstance(conn, Mapping) or "jdbcUrl" not in conn or "table" not in conn:
+        raise DataxTemplateError("mysqlwriter connection 缺 jdbcUrl/table")
+    if not str(conn.get("jdbcUrl", "")).startswith("jdbc:mysql://"):
+        raise DataxTemplateError("mysqlwriter jdbcUrl 必须为受控 mysql 暂存连接")
+
+
 class ProcessRunner(Protocol):
     """进程执行抽象：真实实现启动受限 DataX 进程；测试注入 Fake。"""
 
@@ -160,6 +336,140 @@ class ProcessResult:
     stderr: str
     timed_out: bool = False
     argv_sha256: str | None = None
+
+
+class SubprocessProcessRunner:
+    """真实进程执行（R03）：参数数组、无 shell、超时杀进程组。
+
+    - argv 必须是字符串序列（禁止 shell=True / 拼接字符串命令）；
+    - 超时先 SIGTERM 整个进程组，宽限后强杀；阻塞读被截止；
+    - stdout/stderr 只保留汇总指标行（截断到 64KB），不回显 SQL 正文
+      或凭据；命令行本身不含明文凭据（凭据走 job 文件）。
+    """
+
+    MAX_OUTPUT_CHARS = 65536
+
+    def __init__(self, *, kill_grace_seconds: float = 5.0) -> None:
+        self._kill_grace = kill_grace_seconds
+
+    def run(self, argv: Sequence[str], *, timeout_seconds: int) -> ProcessResult:
+        import shutil
+        import subprocess
+
+        if not argv or not all(isinstance(a, str) for a in argv):
+            raise DataxTemplateError("argv 必须为非空字符串数组（禁止 shell 拼接）")
+        argv_sha256 = hashlib.sha256(json.dumps(list(argv)).encode("utf-8")).hexdigest()
+        creationflags = 0
+        start_new_session = True
+        if shutil.which("cmd") and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
+            creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
+            start_new_session = False
+        try:
+            proc = subprocess.Popen(
+                list(argv),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=creationflags,
+                start_new_session=start_new_session,
+            )
+        except OSError as exc:
+            return ProcessResult(
+                exit_code=-1, stdout="", stderr=f"{type(exc).__name__}",
+                timed_out=False, argv_sha256=argv_sha256,
+            )
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout_seconds)
+            timed_out = False
+        except subprocess.TimeoutExpired:
+            self._terminate(proc)
+            try:
+                stdout, stderr = proc.communicate(timeout=self._kill_grace)
+            except subprocess.TimeoutExpired:
+                self._kill(proc)
+                stdout, stderr = proc.communicate()
+            timed_out = True
+        return ProcessResult(
+            exit_code=proc.returncode,
+            stdout=(stdout or "")[: self.MAX_OUTPUT_CHARS],
+            stderr=(stderr or "")[: self.MAX_OUTPUT_CHARS],
+            timed_out=timed_out,
+            argv_sha256=argv_sha256,
+        )
+
+    def _terminate(self, proc) -> None:
+        import signal
+
+        try:
+            if hasattr(proc, "send_signal"):
+                proc.send_signal(signal.CTRL_BREAK_EVENT)  # Windows 进程组
+            else:
+                proc.terminate()
+        except (OSError, ValueError, AttributeError):
+            try:
+                proc.terminate()
+            except (OSError, ValueError):
+                pass
+
+    def _kill(self, proc) -> None:
+        try:
+            proc.kill()
+        except (OSError, ValueError):
+            pass
+
+
+class JobFileWorkspace:
+    """受控 job 文件工作区（R03）：短期私有文件 + 完成清理。
+
+    - 目录由装配方指定（授权 worker 暂存区），本类不自建随机目录；
+    - job 文件写入前解析 credential_ref → 明文只进文件（chmod 600），
+      不进 argv、不出现在任何日志/结果对象；
+    - use 结束清理（正常与异常路径都调用 cleanup）；文件名含 attempt_id
+      便于残留审计。密钥不回显：写文件内容不返回给调用方。
+    """
+
+    def __init__(self, root: str, credential_resolver=None) -> None:
+        import os
+        from pathlib import Path
+
+        self.root = Path(root)
+        self.root.mkdir(parents=True, exist_ok=True)
+        self._credential_resolver = credential_resolver
+        self._os = os
+
+    def materialize(self, job: dict, attempt_id: str) -> str:
+        """把渲染 job 的 ${credential:*} 占位解析进私有文件，返回路径。"""
+        import tempfile
+
+        document = json.dumps(job, ensure_ascii=False)
+        if self._credential_resolver is not None:
+            # 占位形如 ${credential:user}/${credential:password} 与
+            # credentialRef 字段：解析器返回 {user, password}；明文只进文件
+            creds = self._credential_resolver(job)
+            document = document.replace("${credential:user}", creds["user"])
+            document = document.replace("${credential:password}", creds["password"])
+        elif "${credential:" in document:
+            raise DataxTemplateError(
+                "job 含凭据占位但未配置 credential_resolver（拒绝落盘明文缺失的 job）"
+            )
+        fd, path = tempfile.mkstemp(
+            prefix=f"datax-job-{attempt_id}-", suffix=".json", dir=str(self.root)
+        )
+        with self._os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(document)
+        try:
+            self._os.chmod(path, 0o600)
+        except OSError:
+            pass  # Windows 无 POSIX 权限位；目录级受控
+        return path
+
+    def cleanup(self, path: str) -> None:
+        try:
+            self._os.remove(path)
+        except OSError:
+            pass
 
 
 @dataclass
@@ -205,7 +515,9 @@ class DataXRunner:
         self.datax_home = datax_home
         self.timeout_seconds = timeout_seconds
 
-    def run_capture(self, job: dict, attempt_id: str) -> DataxRunResult:
+    def run_capture(
+        self, job: dict, attempt_id: str, *, job_file: str | None = None
+    ) -> DataxRunResult:
         query_sql = (
             job["job"]["content"][0]["reader"]["parameter"]["querySql"][0]
         )
@@ -216,7 +528,7 @@ class DataXRunner:
             )
         argv = [
             f"{self.datax_home}/bin/datax.py",
-            "--jobfile", "job.json",  # job 文件由授权 worker 物化，路径不进 argv
+            "--jobfile", job_file if job_file is not None else "job.json",
             "--mode", "standalone",
         ]
         argv_hash = hashlib.sha256(json.dumps(argv).encode("utf-8")).hexdigest()
