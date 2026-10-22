@@ -22,7 +22,7 @@
   "pending_channels": {
     "dialysis_8_87": "PG 只放行 8.53（pg_hba 拒绝 8.83 容器直连, 报错留证）；与'血透抽取源终版=8.87 只读从库+datax 机 8.53 直连就绪'裁定一致。身份/TenantId3 核验待 8.87 放行 8.83 或 8.53 提供执行通道",
     "adverse_10_10_10_50": "MysqlConnector SET MAX_EXECUTION_TIME 在旧版 MySQL 报 1193；本地代码已修（尽力而为+驱动 read_timeout 兜底），容器生效待镜像发布批准；本轮经容器内 pymysql 只读会话完成核验（mas.v_emr_adverse_event_final 实存, 锚点 EFFECTIVE_TIME）",
-    "writers_8_53": "dqueue/gap_exec/manual2 live 重核需 ops-runbook 受控通道（8.53:40022 dataasset 公钥 shell 被拒）；8.83 侧已 live 核实无任何抽取进程与抽取 cron；8.53 按 2026-10-20 盘点报告无在跑作业且 job 目录为空"
+    "writers_8_53": "已解决（2026-10-22 22:25 用户授权后 live 重核）：root@10.10.8.53:40022 只读快照——dqueue/gap_exec/manual2 零进程、root cron 仅 Datart 保活、datax-web 用户无 cron、DataX 作业目录不存在（0 作业）、datax-admin/executor 空闲常驻。证据=核验证据_20261022/853写者live重核_20261022.json"
   },
   "production_actions_this_round": 0,
   "database_writes_this_round": 0

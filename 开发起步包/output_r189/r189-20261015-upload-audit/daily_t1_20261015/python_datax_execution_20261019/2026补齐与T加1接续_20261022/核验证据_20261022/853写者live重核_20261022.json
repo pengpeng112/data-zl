@@ -1,0 +1,30 @@
+{
+  "doc": "8.53 在跑写者 live 重核（用户授权后执行，全程只读）",
+  "as_of": "2026-10-22T22:25:30~22:27:00+08:00",
+  "authorization": "用户会话内点名授权（'这个授权做'）；按 ops-runbook 技能执行",
+  "channel": "本机 ssh -p 40022 root@10.10.8.53（公钥 id_ed25519_ai，与 853 试点脚本 reporting_853_pilot_window.py 同一标准件；此前失败原因是错用 dataasset 用户）",
+  "checks": {
+    "1_writer_processes": {
+      "pattern": "dqueue|gap_exec|manual2|datax.py|sjf|extract|reporting",
+      "result": "0 个匹配进程（无任何在跑写者/抽取进程）"
+    },
+    "2_all_python_java": {
+      "result": "仅平台常驻：Dify celery+gunicorn、datax-admin/datax-executor(java 512m 空闲)、Datart、tuned/firewalld 系统服务；无 datax.py 作业进程"
+    },
+    "3_crontab": {
+      "root": "仅 Datart 保活两行（@reboot + */5 pgrep DatartServerApplication）",
+      "datax-web及其他用户": "无 crontab；/etc/cron.d 仅系统条目（0hourly/dailyjobs/timezone.cron）",
+      "extraction_cron": "无"
+    },
+    "4_datax_job_dir": {
+      "path": "/home/datax-web/job/datax-web-json/",
+      "result": "目录不存在（作业数=0；10-20 盘点时为空目录，现不存在，均无排队/登记作业）"
+    },
+    "5_datax_services": {
+      "result": "datax-admin 与 datax-executor 常驻运行（java），无执行中作业"
+    }
+  },
+  "conclusion": "2026-10-22 22:25 时点 8.53 无 dqueue/gap_exec/manual2 在跑进程、无抽取类定时任务、DataX 作业队列为空——与 8.83 侧 live 核验（零进程零 cron）互证，旧写者交接前提成立，首组接手无同表双写风险",
+  "note": "本核验为时点快照；A05b 生产试点执行前如间隔超24小时建议按同命令重拍一次",
+  "production_changes": 0
+}

@@ -63,11 +63,13 @@
   "PA1-PA7生产批准（A05_待批清单_v2_20261022.json；PA4前置已满足）",
   "隔离Oracle测试schema（单事务回执/SYSTEM_TIME/围栏证明；PG侧已完成）",
   "血透8.87身份/TenantId3核验通道（pg_hba放行8.83或8.53执行通道）",
-  "8.53在跑写者(dqueue/gap_exec/manual2) live重核（ops-runbook受控通道）",
   "R06告警六项外部输入（source_id/secret存放/base_url/测试订阅/限流/时段）",
   "省端协议及逐表回执（B04）",
   "未来7业务日观测（B05）"
  ],
+ "resolved_20261022_evening": {
+  "writers_8_53_live_recheck": "用户授权后完成（22:25时点root只读快照）：dqueue/gap_exec/manual2零进程/无抽取cron/DataX作业目录不存在/datax-admin与executor空闲。证据=核验证据_20261022/853写者live重核_20261022.json；A05b执行前若间隔超24小时建议重拍"
+ },
  "protected_root_checkpoint_modified": false,
  "stage2_execution": {
   "session": "zcode-20261022-tplus1-stage2",
