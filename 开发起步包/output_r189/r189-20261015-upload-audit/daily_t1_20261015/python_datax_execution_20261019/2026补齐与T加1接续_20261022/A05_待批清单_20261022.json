@@ -1,0 +1,65 @@
+{
+  "doc": "A05 待批清单：首组上线所需生产批准（材料已就绪项标注 ready_for_approval；等价批准核实后复用，不重复索取）",
+  "as_of": "2026-10-22",
+  "pending_approvals": [
+    {
+      "id": "PA1",
+      "item": "首组生产 INSERT/差异 UPDATE（前置机 10.10.8.74/orcl DBOPER）",
+      "scope": "EMR_ICH/EMR_ICH_DIAGNOSIS/EMR_ICH_OPERATION/EMR_ICH_CHARGE 四表，首个获批日窗+2026历史窗分月",
+      "materials_ready": true,
+      "materials": "A05审阅包§4/§5；A01配置；capture dry-run计划可离线产出",
+      "note": "原审批4（四表15字段UPDATE）不覆盖本项；不得外推"
+    },
+    {
+      "id": "PA2",
+      "item": "SYSTEM_TIME 列随真实 INSERT/UPDATE 写入（目标事务内取目标时钟）",
+      "scope": "仅首组四表真实装载事务；不含496,006历史重打标（另批且须重核最近提交时刻）",
+      "materials_ready": true,
+      "materials": "target_executor单事务实现+测试；执行细节（NULL不用=old匹配、不预选整点）已落代码"
+    },
+    {
+      "id": "PA3",
+      "item": "前置机回执表 DDL（DBOPER.ASSET_T1_RECEIPTS）",
+      "scope": "一张辅助表，纯增量，PK=OPERATION_ID；回退=drop前导出",
+      "materials_ready": true,
+      "materials": "A05审阅包§3精确DDL与回退",
+      "note": "未获批前正式执行器拒绝装载（不自动建表）"
+    },
+    {
+      "id": "PA4",
+      "item": "控制面迁移 apply（a7d8e9f0a1b2 批次目标绑定三列）",
+      "scope": "asset.asset_reporting_batches 增3可空列；前置条件=可清理隔离库往返实测通过",
+      "materials_ready": false,
+      "blocked_by": "隔离PG环境（集成测试+迁移往返待环境）",
+      "note": "不与PA1捆绑；PA1依赖本表结构用于结构化冻结范围"
+    },
+    {
+      "id": "PA5",
+      "item": "T+1 定时任务注册与执行时段",
+      "scope": "asset_scheduler_jobs 唯一注册一项 T+1 日任务（候选02:00）；重试时段06/12/18；启用/停用开关",
+      "materials_ready": true,
+      "materials": "A05审阅包§7；scheduler_bridge单入口+misfire语义已在代码"
+    },
+    {
+      "id": "PA6",
+      "item": "真实告警外发（测试订阅范围）",
+      "scope": "R06六项外部输入到位后联调：source_id/secret受控存放/base_url/测试订阅/限流/时段；仅脱敏测试事件",
+      "materials_ready": true,
+      "materials": "alerts_client v2协议实现+outbox+日报通道监控；R06输入清单可直接转发管理员",
+      "note": "无已批可达告警或确认替代值守渠道，不启用无人值守"
+    },
+    {
+      "id": "PA7",
+      "item": "隔离验证环境确认（PG+Oracle）",
+      "scope": "可清理隔离PG（迁移往返+集成测试）；授权隔离Oracle或测试schema（单事务回执/SYSTEM_TIME/围栏证明，不用SQLite代替）",
+      "materials_ready": true,
+      "materials": "test_a01_a05_k_fixes端到端隔离流（内存级）已过；DB级用例已写好待环境",
+      "note": "A05a闭环的硬前置；只阻塞真实事务验收，不阻塞其余开发"
+    }
+  ],
+  "reusable_equivalents": [
+    "ODS 8.216 只读（用户确认2026-10-21）——首组源读直接复用",
+    "审批4（四表15字段既有ID UPDATE）——仅历史字段修正已完成部分，不扩权",
+    "2026-10-19 基础PG迁移隔离通过说明——f4a5b6c7d8e9 前链按版本分层沿用"
+  ]
+}

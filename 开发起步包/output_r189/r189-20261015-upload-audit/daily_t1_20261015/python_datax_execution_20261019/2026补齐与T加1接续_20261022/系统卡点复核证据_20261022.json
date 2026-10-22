@@ -1,0 +1,129 @@
+{
+  "as_of": "2026-10-22",
+  "plan_version": "1.1",
+  "review_type": "静态源码复核＋不连库的最小行为复现",
+  "database_calls": 0,
+  "production_actions": 0,
+  "runtime_code_modified": false,
+  "findings": [
+    {
+      "id": "K01",
+      "file": "backend/app/services/reporting_pipeline/runtime.py",
+      "line": 226,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "K02",
+      "file": "backend/app/services/reporting_pipeline/recovery.py",
+      "line": 92,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "K03",
+      "file": "backend/app/services/reporting_pipeline/pg_repository.py",
+      "line": 698,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "K04",
+      "file": "backend/app/services/reporting_pipeline/recovery.py",
+      "line": 45,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "K05",
+      "file": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "line": 306,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "K06",
+      "file": "backend/app/services/reporting_pipeline/runtime.py",
+      "line": 233,
+      "status": "SOURCE_CONFIRMED_IMPLEMENTATION_PENDING"
+    }
+  ],
+  "pure_probes": {
+    "unknown_commit_generic_scope": "same_target_table_writers",
+    "independent_demo_tables_both_frozen": {
+      "DEMO_A:T1": "COMMIT_UNKNOWN_FROZEN",
+      "DEMO_B:T1": "COMMIT_UNKNOWN_FROZEN"
+    },
+    "unrecognized_state_currently_classified_success": true,
+    "empty_result_currently_classified_success": true,
+    "pg_resume_private_method_absent": true,
+    "pg_release_deletes_token_record": true,
+    "pg_validate_fencing_missing_expiry_check": true,
+    "enabled_filter_count": 2
+  },
+  "source_hashes": [
+    {
+      "path": "backend/app/services/reporting_pipeline/runtime.py",
+      "sha256": "a55fced512ef01481681b8265c383e55064c1bb6a11008b11ed8380f70eb8306"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+      "sha256": "af40c6c7585180f08b61b374e7866d3fa666b6cfc5c8cd320d612d9e0fbcad12"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/recovery.py",
+      "sha256": "8fa19a7bc95a86d75d9ef3efae1624ed940e0006958a82dbfc15b0bc704ebf4d"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/pg_repository.py",
+      "sha256": "cada829fae0868cfa2c86d7c237bb3021cefd572f1f2614ab716e2671fb88328"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/repositories.py",
+      "sha256": "50ce4578fa769d5cc0709ee90a4682dd81b32742b2e7cc3998fc19eb75bfa99b"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/contracts.py",
+      "sha256": "4e805afa6252f6020cc7bab7e9685374a5ab3567fca224b65be8efefac2d07e3"
+    }
+  ],
+  "scope_note": "租约竞争、目标事务与真实调度需后续隔离/生产验收；本轮不伪称已实测生产问题",
+  "prior_evidence_note": "20261019基础PG迁移有历史通过说明；20261020耐久扩展及当前修复需对应版本补证，不以本机无URL否定旧证据",
+  "document_checks": {
+    "six_code_findings": true,
+    "action_schedule": true,
+    "independent_table_continues": true,
+    "persistent_tokens": true,
+    "expiry_and_stale_release": true,
+    "public_recovery": true,
+    "strict_result": true,
+    "source_budget": true,
+    "early_dependencies": true,
+    "no_self_approval": true,
+    "first_group_scope": true,
+    "late_group_backlog": true,
+    "existing_parent": true,
+    "resource_and_disk": true,
+    "real_autorun": true,
+    "no_code_apply": true
+  },
+  "local_markdown_links_checked": 7,
+  "package_files": [
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/2026年补齐与每日T加1_两阶段开发与上线执行计划.md",
+      "sha256": "3d96132060b1729d86c64639a382acd3789b5f73f427a7d72d1c09ae1f162166"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/系统卡点复核与执行补充_20261022.md",
+      "sha256": "9b16f4a774deeaf74ffddd842abd5a6668ea0e800e2b7e86231ab48f9c77f336"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/给执行者_第一阶段启动说明.md",
+      "sha256": "bd407e19e3705f72e6443d310db817cf4136d1bb4297fc941d428f5cec50f205"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/给执行者_第二阶段启动说明.md",
+      "sha256": "590f006bb4cec8e89bbc981306046a05e9c8e986be0588dda6707839075f6cab"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/验收说明复核及修订意见_20261022.md",
+      "sha256": "05d394195438ef4e6e96915555a91a3feeffbfe1123819816223f3ca6bcac48f"
+    }
+  ],
+  "checks_summary": "16项文档约束核验通过；10批保留；目录0错误/1既有警告；他人域13文件未变"
+}

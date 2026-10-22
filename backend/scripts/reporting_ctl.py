@@ -37,6 +37,7 @@ IMPLEMENTED_COMMANDS = (
     "list", "validate", "daily-report", "ticket-export",
     "plan", "simulate", "resume",
     "capture", "verify", "apply", "reconcile", "delivery", "retry",
+    "backfill-plan", "gap-diff-plan", "publish-order",
 )
 
 
@@ -257,6 +258,128 @@ def _gate_summary(task, action) -> dict:
         return {"allowed": False, "blocked_by": str(exc)[:160]}
 
 
+def cmd_backfill_plan(args: argparse.Namespace) -> int:
+    """B02 离线拆窗预演：[start,end) 月→日→小时递归 + 互斥叶窗覆盖验收。"""
+    from datetime import datetime
+
+    from app.services.reporting_pipeline.backfill import (
+        plan_backfill_windows,
+        uniform_profile_estimate,
+    )
+
+    try:
+        start = datetime.fromisoformat(args.start)
+        end = datetime.fromisoformat(args.end)
+    except ValueError as exc:
+        _emit({"ok": False, "error": f"日期格式非法: {exc}", "exit_code": 2})
+        return 2
+    estimate = uniform_profile_estimate(args.rows_per_day, args.bytes_per_row)
+    out = plan_backfill_windows(
+        start, end, estimate,
+        max_rows_per_leaf=args.max_rows_per_leaf,
+        max_bytes_per_leaf=args.max_bytes_per_leaf,
+    )
+    coverage_ok = out["coverage"]["ok"]
+    _emit(
+        {
+            "ok": coverage_ok,
+            "planning_only": True,
+            "profile_model": (
+                f"均匀画像 rows_per_day={args.rows_per_day} "
+                f"bytes_per_row={args.bytes_per_row}（预演假设，正式执行前用实测画像替换）"
+            ),
+            "totals": out["totals"],
+            "coverage": out["coverage"],
+            "leaves": out["leaves"],
+            "结论": (
+                f"历史范围 {start.date()}→{end.date()} 拆出 {out['totals']['leaves']} 个叶窗"
+                f"（keyset 回退 {out['totals']['keyset_leaves']}），"
+                + ("覆盖无空洞/重叠 ✔" if coverage_ok else "覆盖校验失败 ✘")
+            ),
+        }
+    )
+    return 0 if coverage_ok else 4
+
+
+def cmd_gap_diff_plan(args: argparse.Namespace) -> int:
+    """B02 缺口差异框架：产出双侧键集只读 SQL 模板 + 框架演示（真实执行等批准）。"""
+    from datetime import datetime
+
+    from app.services.reporting_pipeline.backfill import (
+        build_gap_diff,
+        gap_diff_keyset_sql,
+    )
+    from app.services.reporting_pipeline.planner import TimeWindow
+
+    window = TimeWindow(datetime.fromisoformat(args.start), datetime.fromisoformat(args.end))
+    source_sql = gap_diff_keyset_sql(args.source_object, args.key_expr, args.anchor)
+    target_sql = gap_diff_keyset_sql(args.target_object, args.key_expr, args.anchor)
+    # 框架演示（显式 DEMO 标记）：模拟键集证明分账逻辑，不连任何库
+    demo = build_gap_diff(
+        "DEMO_TABLE", window,
+        source_keys=["k1", "k2", "k2", "k3"],
+        target_keys={"k2", "k3", "k9"},
+        content_equal=lambda k: k != "k3",
+    ).to_dict()
+    _emit(
+        {
+            "ok": True,
+            "planning_only": True,
+            "table": args.table,
+            "window": window.fingerprint(),
+            "source_keyset_sql": source_sql,
+            "target_keyset_sql": target_sql,
+            "demo_ledger": demo,
+            "note": (
+                "真实双侧键集读取（源=ODS只读已确认通道，目标=前置机只读凭据）与"
+                "差异装载均等批准后执行；本命令只产出模板与框架分账演示"
+            ),
+        }
+    )
+    return 0
+
+
+def cmd_publish_order(args: argparse.Namespace) -> int:
+    """B02 父子发布顺序编排：父先子后波次 + 已有父复用 + 缺父等待自动唤醒。"""
+    from app.services.reporting_pipeline.backfill import build_publish_order
+
+    bundle = _load_bundle(Path(args.config))
+
+    def _parent_name(raw) -> str:
+        return raw["parent"] if isinstance(raw, dict) else str(raw)
+
+    tasks = [
+        {
+            "index": t.index,
+            "canonical_table": t.canonical_table,
+            "declared_parent_candidates": [
+                {"parent": _parent_name(p)} for p in t.declared_parent_candidates
+            ],
+        }
+        for t in bundle.tasks
+    ]
+    if args.tables:
+        keep = set(args.tables.split(","))
+        tasks = [t for t in tasks if t["canonical_table"] in keep]
+    out = build_publish_order(tasks)
+    _emit(
+        {
+            "ok": True,
+            "planning_only": True,
+            "wave_count": len(out["waves"]),
+            "waves": out["waves"],
+            "tables": out["tables"],
+            "waiting_parent_tables": out["waiting_parent_tables"],
+            "semantics": out["semantics"],
+            "结论": (
+                f"{len(tasks)} 项编排为 {len(out['waves'])} 波（父先子后）；"
+                f"缺父等待 {len(out['waiting_parent_tables'])} 项（父提交后自动唤醒）"
+            ),
+        }
+    )
+    return 0
+
+
 def cmd_simulate(args: argparse.Namespace) -> int:
     """模拟日轮：内存仓储 + 假适配器，输出显式 simulation 标记（R05）。"""
     from datetime import datetime, timezone
@@ -460,6 +583,36 @@ def build_parser() -> argparse.ArgumentParser:
     p_retry.add_argument("--batch", required=True, help="稳定 batch_id")
     p_retry.set_defaults(func=cmd_retry)
     _add_common(p_retry)
+
+    # B02 离线工具（2026历史补齐；不连源不写目标）
+    p_bf = sub.add_parser(
+        "backfill-plan", help="B02 离线拆窗预演：月→日→小时 + 覆盖验收（均匀画像假设）"
+    )
+    p_bf.add_argument("--start", required=True, help="范围起点 YYYY-MM-DD（含）")
+    p_bf.add_argument("--end", required=True, help="范围终点 YYYY-MM-DD（不含，=H）")
+    p_bf.add_argument("--rows-per-day", type=int, default=100000, help="均匀画像假设行/日")
+    p_bf.add_argument("--bytes-per-row", type=int, default=512, help="均匀画像假设字节/行")
+    p_bf.add_argument("--max-rows-per-leaf", type=int, default=2_000_000)
+    p_bf.add_argument("--max-bytes-per-leaf", type=int, default=512 * 1024 * 1024)
+    p_bf.set_defaults(func=cmd_backfill_plan)
+
+    p_gd = sub.add_parser(
+        "gap-diff-plan", help="B02 缺口差异框架：双侧键集只读 SQL 模板 + 分账演示（真实执行等批准）"
+    )
+    p_gd.add_argument("--table", required=True, help="canonical_table")
+    p_gd.add_argument("--source-object", required=True, help="源对象（如 ODS.V_EMR_ICH）")
+    p_gd.add_argument("--target-object", required=True, help="目标对象（如 DBOPER.EMR_ICH）")
+    p_gd.add_argument("--key-expr", default="ID", help="稳定键表达式")
+    p_gd.add_argument("--anchor", default="DATETIME", help="业务时间锚点列")
+    p_gd.add_argument("--start", required=True, help="窗起 YYYY-MM-DD（含）")
+    p_gd.add_argument("--end", required=True, help="窗止 YYYY-MM-DD（不含）")
+    p_gd.set_defaults(func=cmd_gap_diff_plan)
+
+    p_po = sub.add_parser(
+        "publish-order", help="B02 父子发布顺序编排（父先子后/已有父复用/缺父等待自动唤醒）"
+    )
+    p_po.add_argument("--tables", default=None, help="逗号分隔的表清单（缺省=全部77项）")
+    p_po.set_defaults(func=cmd_publish_order)
     return parser
 
 

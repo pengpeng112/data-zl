@@ -1,0 +1,91 @@
+{
+ "doc": "第一阶段A01-A05交付核验：修改文件与指纹",
+ "as_of": "2026-10-22",
+ "git_baseline": "cd21abe+未提交改动",
+ "tests": {
+  "reporting_pipeline_unit": "392 passed (347原有全绿+45新增)",
+  "ruff": "全部改动文件通过"
+ },
+ "files": [
+  {
+   "path": "backend/scripts/reporting_ctl.py",
+   "sha256": "6bbf933d81aac3b01d9cf60816640973f8a4cbcc62591e5d7e7b9f8dbeff713c",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/repositories.py",
+   "sha256": "0b8093f0e5e1f47ad08787c3e1f5ec6a750074c72b7a524468cd6a844a045d4d",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/pg_repository.py",
+   "sha256": "a1e401dcf72712cec97a7ab45c87a370c9d94bd6e7e8ba0cb1484a57258d96c2",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/recovery.py",
+   "sha256": "201ac38e828ecd8c4cf0f8ea5c22ba2c7e109e5921fa47d3844bb660b2091ad4",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/scheduler_bridge.py",
+   "sha256": "1929ef5fc2d60156ff9941934216423bb983ff30cbba2d4ec3c68ae141a0c310",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/runtime.py",
+   "sha256": "7ec051ab7f733accf7f2b4e9908bb3069081a3a92b7275b8426ec2d2f0fb0787",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/apply_port.py",
+   "sha256": "a4a000239151ac8b2b51ae98fe417892f42c21817c5b6b28db3173f4fd381f3b",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/reports.py",
+   "sha256": "259bf5f219b77ecceafe7c703dc9ef6ee937f3b3d8dfb4c9f59342238cd35db5",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/production_runtime.py",
+   "sha256": "9869da03847139787175497ca5e8256940cdd5dab3759b077788311395c22906",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/target_executor.py",
+   "sha256": "4303dc1541ae5a26e2a66196d35802610b49315866bf5e85f3300afac13ac6bf",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/services/reporting_pipeline/adapters/datax_runner.py",
+   "sha256": "cdcb66f94b85a1df6eefd03c0164a0dd621dc9af0ebd12d5cfb1e0d819019257",
+   "status": "modified"
+  },
+  {
+   "path": "backend/app/models/asset_reporting.py",
+   "sha256": "4b54ec0f1dd571ec34fef5b18c404f262bd345c42f7f8d38355cad1df9427d54",
+   "status": "modified"
+  },
+  {
+   "path": "backend/alembic/versions/a7d8e9f0a1b2_reporting_batch_target_binding.py",
+   "sha256": "8ceb735ca3d2c3d6aa12b5006c0d715d3862061ef644efb9c179e05013b9094b",
+   "status": "modified"
+  },
+  {
+   "path": "backend/tests/reporting_pipeline_unit/test_a01_a05_k_fixes.py",
+   "sha256": "7f1d28e7d8565bf08c5390c077e582fb59bc8260f3e75ff1ea218c2d835520d2",
+   "status": "modified"
+  },
+  {
+   "path": "backend/tests/reporting_pipeline_unit/test_alerts_flow.py",
+   "sha256": "00e71ee157db56c2a67c03abeb2072ba6b256204c12c11e9dbde3d7b66d37bce",
+   "status": "modified"
+  },
+  {
+   "path": "backend/tests/reporting_pipeline_unit/test_tickets_reports.py",
+   "sha256": "3aca8e57c3acc1c38c30d712df8183f874fdd4c5d5b683ce10c14e3a71f0df28",
+   "status": "modified"
+  }
+ ]
+}

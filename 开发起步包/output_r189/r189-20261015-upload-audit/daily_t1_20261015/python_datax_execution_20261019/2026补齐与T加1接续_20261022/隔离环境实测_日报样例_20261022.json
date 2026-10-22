@@ -1,0 +1,184 @@
+{
+ "business_day": "2026-10-21",
+ "simulation": false,
+ "overall": "SUCCESS_WITH_WAITING_ITEMS",
+ "failed_windows_and_next_retry": [],
+ "commit_unknown_tables": [],
+ "affected_child_groups": {},
+ "monthly_coverage_overdue": {
+  "scope_state": "SCOPE_UNFROZEN_E01_TO_FILL",
+  "rows": [],
+  "rescan_tables": [
+   "EMR_DOC_ORDER_CHECK",
+   "EMR_IN_FEE_INFO_CHILD"
+  ]
+ },
+ "rescan_coverage_age": {
+  "EMR_DOC_ORDER_CHECK": {
+   "managed_months": 0,
+   "coverage_level": "SCOPE_UNFROZEN",
+   "note": "管理历史范围未冻结，不声称任何历史漂移保障"
+  },
+  "EMR_IN_FEE_INFO_CHILD": {
+   "managed_months": 0,
+   "coverage_level": "SCOPE_UNFROZEN",
+   "note": "管理历史范围未冻结，不声称任何历史漂移保障"
+  }
+ },
+ "deadline_unconfigured": {
+  "sla": "SLA_UNKNOWN",
+  "tables": [
+   "EMR_ADMISSION_RECORD",
+   "EMR_ADMISSION_RECORD_EXAM",
+   "EMR_ADMISSION_DIAGNOSIS",
+   "EMR_DISCHARGE_RECORD",
+   "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+   "EMR_DOC_ORDER_DRUG",
+   "EMR_DOC_ORDER_CHECK",
+   "EMR_OUTPATIENT_RECIPE",
+   "EMR_OUTPATIENT_RECIPE_ITEM",
+   "EMR_OUTPATIENT_REGISTER",
+   "EMR_OUTPATIENT_RECORD",
+   "EMR_OUT_FEE_INFO_CHILD",
+   "EMR_OUTPATIENT_DIAG",
+   "EMR_OUT_FEE_INFO_MAIN",
+   "EMR_IN_FEE_INFO_MAIN",
+   "EMR_IN_FEE_INFO_CHILD",
+   "EMR_INSPECTION",
+   "EMR_INSPECTION_IMAGE",
+   "EMR_INSPECTION_ALLERGY",
+   "EMR_INSPECTION_ITEM",
+   "EMR_EXAM_IMAGE_REP",
+   "EMR_EXAM_IMAGE_PATH",
+   "EMR_ICH",
+   "EMR_ICH_OPERATION",
+   "EMR_ICH_ALLERGIES",
+   "EMR_ICH_CHARGE",
+   "EMR_ICH_DIAGNOSIS",
+   "EMR_PHYSICAL_REPORT",
+   "EMR_PHYSICAL_EXAM",
+   "EMR_PHYSICAL_EXAM_ITEM",
+   "EMR_BLOOD_APPLY_REPORT",
+   "EMR_BLOOD_APPLY_REPORT_ITEM",
+   "EMR_TRANSFUSION_RECORD",
+   "EMR_BLOOD_DESTROY_RECORD",
+   "EMR_MEDICAL_RECORD_INFO",
+   "EMR_HOS_POSTOPER_RECORD",
+   "EMR_HOS_PREOP_DISCUSS",
+   "EMR_HOS_DND_RECORD",
+   "EMR_HOS_DIFFIC_CASE_DISCUSS",
+   "EMR_HOS_CHANGE_MAJOR_RECORD",
+   "EMR_REFERRAL_HOS_RECORD",
+   "EMR_HOS_CONSUL_RECORD",
+   "EMR_HOS_SUCCESSION_RECORD",
+   "EMR_HOS_SAVE_RECORD",
+   "EMR_ADMISSION_DEAD_RECORD_TF",
+   "EMR_OPERA_RECORD",
+   "EMR_BOFORE_OPERA_RECORD",
+   "EMR_ANESTHESIA_RECORD",
+   "EMR_ANES_RECORD_BLOOD",
+   "EMR_ANES_RECORD_MED",
+   "EMR_AFTER_OPERA_RECORD",
+   "EMR_ADMISSION_ASSESSMENT",
+   "EMR_DISCHARGE_ASSESSMENT",
+   "EMR_CHILDBIRTH",
+   "EMR_GENERAL_NURSING",
+   "EMR_CRITICALLY_ILL_NURS",
+   "EMR_IN_OUT_AMOUNT",
+   "EMR_VITAL_SIGN",
+   "EMR_OPERATION_NURSING",
+   "EMR_CONSUMABLES",
+   "EMR_NURSE_PLAN",
+   "EMR_INFOR_OPERATION",
+   "EMR_INFOR_ANESTHESIA",
+   "EMR_INFOR_TRANS_BLOOD",
+   "EMR_INFOR_SPEC_EXAM_TREAT",
+   "EMR_INFOR_CRITICALLY_ILL",
+   "EMR_INFOR_OTHERS",
+   "EMR_BLOOD_DIALY_RECORD",
+   "EMR_BLOOD_DIALY_DETAIL",
+   "EMR_BLOOD_DIALY_ORDER",
+   "EMR_DEATH_RECORD",
+   "EMR_NURSING_ASSESSMENT",
+   "EMR_PATHOLOGY_REPORT",
+   "EMR_MOLECULAR_PATHOLOGY_REPORT",
+   "EMR_INFECTION_INFORMATION_REGISTER",
+   "EMR_HOS_PRACTITIONER_INFORMATION",
+   "EMR_ADVERSE_EVENT"
+  ],
+  "todo": "A12：省端截止/达标环节/反馈协议待业务确认；不猜截止"
+ },
+ "relay_delivery_state": {
+  "integration_state": "WAITING_INTEGRATION_SETUP",
+  "events_total": 0,
+  "delivered": 0,
+  "queued_or_pending": 0,
+  "needs_attention_or_paused": 0,
+  "note": "202=入队≠送达；全期望目标 sent 才 DELIVERED"
+ },
+ "alert_channel_monitor": {
+  "oldest_undelivered_age_seconds": null,
+  "undelivered_events": 0,
+  "escalation_threshold_seconds": 3600,
+  "escalate_now": false,
+  "note": "无独立值守渠道时，本节即告警通道故障的发现手段：最老未送达事件超过阈值须人工介入（复检 relay 配置与 worker 心跳）"
+ },
+ "gap_escalation": [],
+ "per_table_daily": {},
+ "earliest_open_gap": {},
+ "continuous_completion": {},
+ "denominators": {
+  "canonical_items_total": 77,
+  "applicable_now": 76,
+  "not_provided_pending_applicability": 1,
+  "approved_for_production": 0,
+  "warning": "完成率不自除未提供项；approved 为 0（无生产授权）"
+ },
+ "recommended_actions": [],
+ "waiting_human_view_fix": [
+  {
+   "ticket_id": "E01-DISCHARGE-PERF",
+   "tables": [
+    "EMR_DISCHARGE_RECORD"
+   ],
+   "state": "OPEN"
+  },
+  {
+   "ticket_id": "E01-DISCHARGE-QUALITY",
+   "tables": [
+    "EMR_DISCHARGE_RECORD"
+   ],
+   "state": "OPEN"
+  },
+  {
+   "ticket_id": "E01-DATETIME-DEPENDENCY",
+   "tables": [
+    "EMR_IN_FEE_INFO_CHILD",
+    "EMR_OUT_FEE_INFO_CHILD",
+    "EMR_DOC_ORDER_CHECK"
+   ],
+   "state": "OPEN"
+  },
+  {
+   "ticket_id": "E01-LIS-LEGACY-ACCESS",
+   "tables": [
+    "EMR_INSPECTION_ALLERGY",
+    "EMR_INSPECTION_ITEM"
+   ],
+   "state": "OPEN"
+  },
+  {
+   "ticket_id": "E01-WRITER-HANDOFF",
+   "tables": [],
+   "state": "OPEN"
+  },
+  {
+   "ticket_id": "E01-CREDENTIAL-LIFETIME",
+   "tables": [],
+   "state": "OPEN"
+  }
+ ],
+ "ok": true,
+ "state_source": "durable_state_db=postgresql+psycopg://postgres:admin123@127.0.0.1:15432/data_asset_test",
+ "结论": "日报来自真实持久化仓储（PG）"
+}

@@ -1,0 +1,43 @@
+{
+  "doc": "第一阶段收尾：首组四表 verified=false 字段只读核验结果（2026-10-22）",
+  "channels": "前置机=sanjia_front_oracle_10_10_8_74.readonly(8.83容器受控连接器); ODS=ods_8_216(只读已确认2026-10-21)。全程字典/有界聚合 SELECT，零写零DDL",
+  "target_identity": {
+    "conclusion": "四表全部实存于 DBOPER：EMR_ICH(200列)/EMR_ICH_DIAGNOSIS(26列)/EMR_ICH_OPERATION(39列)/EMR_ICH_CHARGE(15列)；ASSET_T1_RECEIPTS 不存在（符合 PA3 未批不建表）",
+    "identity_verified": true
+  },
+  "stable_key": {
+    "conclusion": "目标唯一约束=各表单列主键 ID VARCHAR2(100) NOT NULL，无其他唯一约束。真实稳定键=ID（源视图构造：父=机构码|患者ID|就诊次数；诊断+|诊断类型|诊断序号；手术+|手术序号；费用+|费用分类代码）",
+    "correction": "A01 候选键(PATIENT_ID+VISIT_ID[+序号])是 ID 的组成部分而非目标约束本身；v2 配置改按目标约束冻结 key=ID，业务复合键保留为幂等语义说明",
+    "verified": true
+  },
+  "business_anchor": {
+    "conclusion": "四视图统一暴露 DATETIME（父出院时间 discharge_date_time，半开窗谓词列）；EMR_ICH_CHARGE 无自身业务时间列（继承父 DATETIME，与计划一致）；EMR_ICH 视图内 SYSTEM_TIME=CAST(SYSDATE) 技术列，内容指纹与水位不得使用",
+    "verified": true
+  },
+  "parent_child": {
+    "conclusion": "EMR_ICH_OPERATION.ICH_ID / EMR_ICH_CHARGE.ICH_ID / EMR_ICH_DIAGNOSIS.DCS_ID = 父 EMR_ICH.ID（视图定义注释明确'必须与EMR_ICH.ID一致'）",
+    "verified": true
+  },
+  "view_2026_cutoff_check": {
+    "conclusion": "四视图不挡 2026，无需开工单：V_EMR_ICH 主 WHERE 仅 >= 2020-01-01 无上界；三个子视图的 '< date 2026-01-01' 上界均已被注释（--）；V_EMR_ICH 中 2026-01-01 字面量属扩展字段分段逻辑（2026起取扩展表，2025及以前用旧代理字段），非截止过滤",
+    "sample_window_proof": "DATETIME>=2026-09-01 有界聚合：V_EMR_ICH 9月4889行/10月(至22日)3712行；诊断 57305/41978；手术 7379/4712；费用 63151/47599",
+    "definition_sha256": {
+      "V_EMR_ICH": "6d7da9c09ab86fa2...",
+      "V_EMR_ICH_CHARGE": "f7fffd46204dff58...",
+      "V_EMR_ICH_DIAGNOSIS": "0f7ea6bcb5792c3e...",
+      "V_EMR_ICH_OPERATION": "b65c222993cfb979...",
+      "note": "完整64位哈希见 核验证据_20261022/ods_views_bulk.json 与 ods_view_defs.json"
+    }
+  },
+  "required_and_byte_length": {
+    "conclusion": "四表 NOT NULL 列与字节长度已全量落账（3303 列含首组 280 列），装载投影与必填校验以该清单为准（证据：核验证据_20261022/target_dict_bulk.json）",
+    "examples": [
+      "EMR_ICH_DIAGNOSIS 必填：DCS_ID/SN/DIAGNOSIS_TYPE/DISEASE_CODE(20)/DISEASE(100)/IS_CAWM_DIAGNOSIS(CHAR1)/DISTRICT_CODE(6)/EXCHANGE_TYPE(10)/HIGHEST_DIAG_NAME(32)/ORG_CODE(32)/ORG_NAME(70)/ADMISSION_ID(20)/NAME(50)/SEX_CODE(1)/ID_NUM(18)",
+      "EMR_ICH_CHARGE 必填：ICH_ID/CHARGE_TYPE_CODE(6)/CHARGE_TYPE(32)/CHARGE_AMOUNT(NUMBER 2,9)；金额精度 9 位小数已核",
+      "目标列 SYSTEM_TIME TIMESTAMP(6) NOT NULL（诊断/手术/费用表），随真实事务写入仍按 PA2 待批"
+    ]
+  },
+  "tickets_raised": [],
+  "evidence_dir": "核验证据_20261022/",
+  "result": "首组四表 verified=false 字段全部核成 true（稳定键/业务锚点/目标身份/2026覆盖）；无新增工单"
+}

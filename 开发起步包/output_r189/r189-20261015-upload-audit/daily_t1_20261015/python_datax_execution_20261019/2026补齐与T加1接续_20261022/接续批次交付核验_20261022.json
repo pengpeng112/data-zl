@@ -1,0 +1,56 @@
+{
+ "doc": "接续一次性开发（stage2）交付核验：修改文件与指纹",
+ "as_of": "2026-10-22",
+ "session": "zcode-20261022-tplus1-stage2",
+ "baseline_commit": "daa1c38（上一会话16指纹文件全对+392测试绿后提交，含迁移f4a5b6c7d8e9+a7d8e9f0a1b2，本地未push）",
+ "commits": [
+  "daa1c38 基线（R01-R08+A01-A05全量入库+两迁移）",
+  "（本批代码与文档见后续commit，同规则仅本地）"
+ ],
+ "tests": {
+  "reporting_pipeline_unit": "404 passed（392原有+12新增B02）",
+  "reporting_pipeline_integration": "7 passed（隔离PG data_asset_test，环境门禁生效）",
+  "ruff": "本批全部改动文件通过；backend全库存量213处违规为历史漂移（cd21abe即存在，非本批引入，不阻塞）",
+  "acceptance_commands": "list/validate/plan=ok；check_migrations_tracked=全绿；check_doc_index=无新增问题；check_test_environment=pure_logic_ready+隔离PG实测补齐"
+ },
+ "code_files": [
+  {
+   "path": "backend/app/services/reporting_pipeline/backfill.py",
+   "status": "new",
+   "sha256": "a613ded53a9b2949467935afc2d583944d32544beba44711c49bea513c9cf55a"
+  },
+  {
+   "path": "backend/tests/reporting_pipeline_unit/test_b02_backfill_tools.py",
+   "status": "new",
+   "sha256": "35b5ec171becd3e7c363f6a0cc1c26354a5c1111391511dacbd9425dee9853ee"
+  },
+  {
+   "path": "backend/scripts/reporting_ctl.py",
+   "status": "modified（新增backfill-plan/gap-diff-plan/publish-order三离线命令）",
+   "sha256": "794b25bc2fc20b8ef082c4266365a4f0164781e4e30c59f24fc92819af6a5207"
+  },
+  {
+   "path": "backend/app/services/db_connectors.py",
+   "status": "modified（MysqlConnector对旧版MySQL/MariaDB的MAX_EXECUTION_TIME尽力而为，驱动read_timeout兜底）",
+   "sha256": "b06d4b070607154e6fb3276eb5b3d68c4a6e7482a3ab6a90b61354ddb4df9a3a"
+  },
+  {
+   "path": "backend/tests/reporting_pipeline_integration/test_durable_repository_isolated.py",
+   "status": "modified（租约过期测试裕量30秒：8.83 PG比本机快约3.4秒）",
+   "sha256": "e16759510b58096f0edde830a27a547b12d9e00a5f13e431f53f33b166234ae8"
+  }
+ ],
+ "evidence_files": [
+  "隔离环境实测摘要_20261022.json",
+  "隔离环境实测_日报样例_20261022.json",
+  "首组四表核验结果_20261022.json",
+  "A01_首组运行配置冻结_v2候选_20261022.json",
+  "A05_待批清单_v2_20261022.json",
+  "B01_77项配置核完台账_20261022.json",
+  "B01_77项任务运行配置_v1.3候选.json",
+  "核验证据_20261022/（8个原始只读核验JSON）"
+ ],
+ "production_actions": 0,
+ "database_writes": 0,
+ "readonly_queries": "前置机DBOPER字典+有界月聚合；ODS字典/视图定义/有界月聚合；护理/HIS/LIS/输血/体检/病理/感染/HRP/不良事件字典；平台库asset_data_sources字典（全部经8.83受控通道或隧道只读）"
+}

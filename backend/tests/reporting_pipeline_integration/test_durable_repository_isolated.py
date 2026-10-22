@@ -86,14 +86,16 @@ class TestDurableRepositoryIsolated(unittest.TestCase):
         lease_a = repo_a.acquire_lease("it-res-1", "worker-a", 60)
         with self.assertRaises(LeaseDenied):
             repo_b.acquire_lease("it-res-1", "worker-b", 60)
-        # a 过期后 b 接管：token 前进；旧 token 续期/围栏被拒
+        # a 过期后 b 接管：token 前进；旧 token 续期/围栏被拒。
+        # 裕量 30 秒：仓储按应用时钟判过期，而此处用 DB now() 造过期值，
+        # 测试机与 8.83 PG 实测存在数秒时钟偏差，1 秒裕量会误判"未过期"。
         with self.engine.begin() as conn:
             from sqlalchemy import text
 
             conn.execute(
                 text(
                     "UPDATE asset.asset_reporting_leases SET expires_at = now() - "
-                    "interval '1 second' WHERE resource = 'it-res-1'"
+                    "interval '30 seconds' WHERE resource = 'it-res-1'"
                 )
             )
         lease_b = repo_b.acquire_lease("it-res-1", "worker-b", 60)

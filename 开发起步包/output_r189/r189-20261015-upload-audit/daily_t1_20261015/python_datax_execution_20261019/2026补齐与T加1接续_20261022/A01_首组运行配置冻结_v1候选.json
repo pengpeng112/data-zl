@@ -1,0 +1,203 @@
+{
+  "config_id": "R189-T1-FIRSTGROUP-RUNTIME-CONFIG",
+  "version": "v1-candidate",
+  "frozen_at": "2026-10-22",
+  "status": "CANDIDATE_NOT_ENABLED",
+  "note": "A01 候选冻结：首组四表运行配置。enabled 全部 false——正式启用（A05c）才置 true 并最终冻结 H。字段级 verified 标注核验状态；false/未核字段不因本文件获得任何生产许可。缺口数为 C04 截至 2026-10-22 00:00 快照（不含该时刻），仅作交接基准，正式执行前重新冻结。",
+  "candidate_h": {
+    "value": "2026-10-24T00:00:00+08:00",
+    "status": "CANDIDATE_ONLY",
+    "rule": "H=首组正式启用当天00:00 Asia/Shanghai；A01只拟候选，不因开发延后重设已生效H；晚加入表G日启用时另建 [H,G) 日窗欠账"
+  },
+  "history_backfill_range": "[2026-01-01T00:00:00+08:00, H)",
+  "first_group_order": ["EMR_ICH", "EMR_ICH_DIAGNOSIS", "EMR_ICH_OPERATION", "EMR_ICH_CHARGE"],
+  "group_note": "父先子后为发布顺序，不代表父已提交；子发布前查真实父键及回执（目标已有父直接复用）。费用局部未就绪只暂停该项，不连坐。",
+  "tables": {
+    "EMR_ICH": {
+      "business_name": "住院病案首页(电子病历)",
+      "source": {
+        "instance": "10.10.8.216:1521/orcl",
+        "source_group": "ods_8_216",
+        "object": "V_EMR_ICH",
+        "read_channel": "PYTHON受控连接器(8.83容器)",
+        "readonly_rule": "ODS只读已确认(2026-10-21用户确认)",
+        "verified": true
+      },
+      "target": {
+        "instance": "10.10.8.74:1521/orcl",
+        "tenant": "DBOPER",
+        "table": "EMR_ICH",
+        "identity_verified": false,
+        "verify_todo": "A05a 现场核目标表存在/列结构/既有写者"
+      },
+      "engine": "PYTHON",
+      "engine_note": "首版 PYTHON；DataX 仅限已证 8.53 mysqlwriter 固定暂存路线（route-853），正式写统一执行器",
+      "key": {
+        "candidate": ["PATIENT_ID", "VISIT_ID"],
+        "verified": false,
+        "verify_todo": "按目标唯一约束与C04审计口径复核；未核前不得作为幂等键正式装载"
+      },
+      "business_anchor": {
+        "candidate": "出院/入院时间(视图业务锚点)",
+        "verified": false,
+        "verify_todo": "逐表核视图定义的业务时间列；源SQL统一 >= start AND < end 半开窗"
+      },
+      "change_evidence": {
+        "candidate": "视图无独立变更时间列，候选 SNAPSHOT_DIFF 全窗比对",
+        "verified": false,
+        "verify_todo": "A05a 核视图是否固定截止2025挡2026；是则先交人工改视图"
+      },
+      "gap_2026_snapshot": {
+        "missing_ids": 49825,
+        "as_of": "2026-10-22T00:00:00+08:00",
+        "note": "正式执行前重新冻结并验键唯一；不作为固定写入指标"
+      },
+      "system_time_column": "目标无DATETIME则不插该列，窗口与追溯保存在控制面",
+      "receipt_table": "TBD_AWAITING_DDL_APPROVAL",
+      "credential_ref": "vault:reporting/ods(读) + /etc/data-asset/credentials/(写执行器侧)",
+      "mode": "T1+HISTORICAL",
+      "enabled": false
+    },
+    "EMR_ICH_DIAGNOSIS": {
+      "business_name": "住院病案首页-诊断",
+      "source": {
+        "instance": "10.10.8.216:1521/orcl",
+        "source_group": "ods_8_216",
+        "object": "V_EMR_ICH_DIAGNOSIS",
+        "read_channel": "PYTHON受控连接器(8.83容器)",
+        "readonly_rule": "ODS只读已确认",
+        "verified": true
+      },
+      "target": {
+        "instance": "10.10.8.74:1521/orcl",
+        "tenant": "DBOPER",
+        "table": "EMR_ICH_DIAGNOSIS",
+        "identity_verified": false,
+        "verify_todo": "同EMR_ICH"
+      },
+      "engine": "PYTHON",
+      "key": {
+        "candidate": ["PATIENT_ID", "VISIT_ID", "诊断序号"],
+        "verified": false,
+        "verify_todo": "按目标唯一约束复核"
+      },
+      "parent": {
+        "table": "EMR_ICH",
+        "key_inheritance": "PATIENT_ID+VISIT_ID",
+        "note": "562,923缺行中6,794条父首页已在前置机（可直接验后复用父）；其余待父先入库"
+      },
+      "gap_2026_snapshot": {
+        "missing_ids": 562923,
+        "as_of": "2026-10-22T00:00:00+08:00",
+        "note": "全诊断分支；旧8,093仅为局部候选不再作总数"
+      },
+      "enabled": false
+    },
+    "EMR_ICH_OPERATION": {
+      "business_name": "住院病案首页-手术",
+      "source": {
+        "instance": "10.10.8.216:1521/orcl",
+        "source_group": "ods_8_216",
+        "object": "V_EMR_ICH_OPERATION",
+        "read_channel": "PYTHON受控连接器(8.83容器)",
+        "readonly_rule": "ODS只读已确认",
+        "verified": true
+      },
+      "target": {
+        "instance": "10.10.8.74:1521/orcl",
+        "tenant": "DBOPER",
+        "table": "EMR_ICH_OPERATION",
+        "identity_verified": false
+      },
+      "engine": "PYTHON",
+      "key": {
+        "candidate": ["PATIENT_ID", "VISIT_ID", "手术序号"],
+        "verified": false
+      },
+      "parent": {
+        "table": "EMR_ICH",
+        "key_inheritance": "PATIENT_ID+VISIT_ID",
+        "note": "71,731缺行中214条父首页已在前置机；1,404跨年手术已补不重插"
+      },
+      "gap_2026_snapshot": {
+        "missing_ids": 71731,
+        "as_of": "2026-10-22T00:00:00+08:00"
+      },
+      "enabled": false
+    },
+    "EMR_ICH_CHARGE": {
+      "business_name": "住院病案首页-住院费用",
+      "source": {
+        "instance": "10.10.8.216:1521/orcl",
+        "source_group": "ods_8_216",
+        "object": "V_EMR_ICH_CHARGE",
+        "read_channel": "PYTHON受控连接器(8.83容器)",
+        "readonly_rule": "ODS只读已确认",
+        "verified": true
+      },
+      "target": {
+        "instance": "10.10.8.74:1521/orcl",
+        "tenant": "DBOPER",
+        "table": "EMR_ICH_CHARGE",
+        "identity_verified": false
+      },
+      "engine": "PYTHON",
+      "key": {
+        "candidate": ["PATIENT_ID", "VISIT_ID", "费用序号"],
+        "verified": false
+      },
+      "parent": {
+        "table": "EMR_ICH",
+        "key_inheritance": "PATIENT_ID+VISIT_ID",
+        "note": "7,948仅为465个已有跨年父的子行缺口，非全院2026费用总缺口；全院盘点B02执行"
+      },
+      "gap_2026_snapshot": {
+        "missing_ids_at_least": 7948,
+        "as_of": "2026-10-22T00:00:00+08:00",
+        "note": "费用切片b不重启；1例历史换键单独隔离不连带"
+      },
+      "enabled": false
+    }
+  },
+  "environment_checks": {
+    "isolated_pg": {
+      "state": "pure_logic_ready_local",
+      "detail": "本机无 APP_TEST_DB_URL；20261019 基础迁移有历史通过说明（f4a5b6c7d8e9 前链）；新增 a7d8e9f0a1b2（批次目标绑定三列）待可清理隔离库实测",
+      "blocking": "隔离PG集成测试+迁移往返=待环境"
+    },
+    "isolated_oracle": {
+      "state": "NOT_AVAILABLE_LOCALLY",
+      "detail": "目标事务证明（单事务回执/SYSTEM_TIME/围栏）需明确授权的隔离Oracle或测试schema；不得用SQLite模拟代替",
+      "blocking": "真实事务验收=待环境"
+    },
+    "alert_subscription": {
+      "state": "DESIGN_ONLY_NOT_CONNECTED",
+      "detail": "R06六项外部输入待管理员（source_id/secret受控存放/base_url/测试订阅/限流/联调时段）；代码已就绪",
+      "blocking": "真实外发=待输入；无告警不启用无人值守"
+    },
+    "scheduler_registration": {
+      "state": "EXISTING_PLATFORM_SCHEDULER",
+      "detail": "平台APScheduler经asset_scheduler_jobs表注册（backend/app/main.py _start_scheduler）为唯一注册点；当前无T+1任务登记；A05c绑定唯一注册+停用开关+重启补调"
+    },
+    "running_writers": {
+      "state": "SNAPSHOT_AT_20261022_00:00_NO_PROCESSES",
+      "detail": "10月22日零时快照无dqueue/gap_exec/manual2进程；开工时不得据此推断仍无进程，A05a现场重核并留存交接证据"
+    },
+    "approvals": {
+      "state": "NONE_FOR_INSERT",
+      "detail": "原四表15字段审批4仅为既有ID UPDATE；不授权2026 INSERT/SYSTEM_TIME/DDL/调度；逐项见A05待批清单"
+    }
+  },
+  "source_budget": {
+    "per_source_concurrency": 1,
+    "physical_source_key_rule": "source_group@host:port（K06稳定键，跨进程经仓储租约共享）",
+    "capture_lease": "read:{physical_source_key}",
+    "write_lease": "target:{instance}.{tenant}.{table}（仅APPLY任务领取）"
+  },
+  "datax_stage_route": {
+    "route_id": "stage-853",
+    "route": "Oracle(源)→mysqlwriter→固定暂存(10.10.8.53:3306/datax_stage)",
+    "tables_whitelist_pending_ops": ["stage_t1_ich"],
+    "note": "受控路线已实现（MysqlStageRoute/render_job_for_stage_route）；表清单与凭据引用待运维登记后冻结；DataX只进暂存不写前置机"
+  }
+}

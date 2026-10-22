@@ -474,7 +474,12 @@ class MysqlConnector(DatabaseConnector):
         cursor = self._conn.cursor()
         try:
             cursor.execute("SET SESSION TRANSACTION READ ONLY")
-            cursor.execute("SET SESSION MAX_EXECUTION_TIME = %s", (self._timeout_ms(),))
+            try:
+                cursor.execute("SET SESSION MAX_EXECUTION_TIME = %s", (self._timeout_ms(),))
+            except pymysql.err.OperationalError:
+                # 旧版 MySQL/MariaDB（如不良事件 10.10.10.50）无此系统变量（1193）。
+                # 尽力而为：pymysql read_timeout 仍在驱动层兜底执行时限。
+                pass
             cursor.execute("START TRANSACTION READ ONLY")
         finally:
             cursor.close()

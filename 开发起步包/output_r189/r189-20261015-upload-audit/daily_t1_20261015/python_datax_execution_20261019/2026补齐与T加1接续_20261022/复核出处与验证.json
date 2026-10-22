@@ -1,0 +1,124 @@
+{
+  "as_of": "2026-10-22",
+  "review_scope": "本地报告、JSON与源码复核；不代表独立生产重验",
+  "head": "cd21abebe9a5883600a589b67b413af1c03e0dcd",
+  "existing_worktree_status_entries_at_review": 456,
+  "sources": [
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/一次性排查整改验收说明_20261022.md",
+      "sha256": "c5ecfd49d9911fea62315a82da858296be54c3a9f2fd223a7afb04fd55472812"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C01_冻结映射与预算_20261022.json",
+      "sha256": "2110fe34f8c1012cb4d1d1675c5f3c79361bbba75105655a47d75e1ef9603e92"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C02_修正ID与近期刷新交集_20261021.json",
+      "sha256": "170796ffa3a391bc80e32c4f57d72271b8711c284e11920804ce625bbb367781"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C02_修正ID与近期刷新交集v2_手术分页_20261021.json",
+      "sha256": "ba5b2b3ba8574e3cd65a78a0c60e8e902e66de8071c877a5e2f376e64d53c2b8"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C02_SYSTEM_TIME受控修复包_20261022.md",
+      "sha256": "c4454939258972bf24006e7bd049e8d82467f81f05c8ebbce254cedfad0ff496"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C04_缺行去重键集审计_20261022.json",
+      "sha256": "8c18a9e956f77790e17aab4f281e89b7d19ab33cec1951f220a4e440073f75cc"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/C05_修正后分布抽查_20261022.json",
+      "sha256": "32072bb81ca23b2a881b5d1564be33ea96f3fc9e466981a0b3bb6dee55294a70"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/c02_overlap_check.py",
+      "sha256": "20f7eedb0a023e70471a6b049aec5e9f0c081289d2b4775cfc0f55c1c8b552e3"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/c02_overlap_paged.py",
+      "sha256": "2fec005e6e4b2a47bdfadd4dba919bfce581e6120d37f505938066a0b215f9eb"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/full_history_sync_20261021/c04_missing_audit.py",
+      "sha256": "3c00c6b281658e18575ed36c29c11442788ba9d5e2b4be487d23d1aefcfffa79"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/specialty_ods_view_audit_20261021/field_update_apply_20261021/UPDATE执行状态与恢复入口.json",
+      "sha256": "212fc154f6b00ade8042c90e1dde04ab204b5d1c81ee881d3ec780a120c73c52"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/77项任务候选种子.json",
+      "sha256": "5ee7f6c49da7721aa580ddd2d6828fe986ceff594d0c791825923fd6f3ff086f"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/go_live_remediation_20261020/R01至R06离线补强执行报告_20261020.md",
+      "sha256": "e3081380f8e10e2579eda99ab8527dda610ffac26a24bf5ee3bf3fdf7d54dce8"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/go_live_remediation_20261020/R04_Oracle装载试点审阅材料_20261020.md",
+      "sha256": "f4b7ae8f1d4f6399e7ece61f77b219dab7762ad2159a7cc3dce1e2c1699dcbfb"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/go_live_remediation_20261020/r04_pilot_scripts/_r04b_apply.py",
+      "sha256": "2dff05248f228d78610228c208281b590e6704cb9a549b4c2504f4279c9e072e"
+    },
+    {
+      "path": "backend/scripts/reporting_ctl.py",
+      "sha256": "e4409f9c084f75bc218aefa8325a4e9585ebfcc03ad65837fece1f83406418ef"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/adapters/datax_runner.py",
+      "sha256": "5fe77826df4d9da4277ad168a1c4e559e87c4b1568ea59eb48893577db390db3"
+    },
+    {
+      "path": "backend/scripts/reporting_853_pilot_window.py",
+      "sha256": "11b2c9b76b27e2000d964c520f8dae5d5f1b142c52776e0873769c52d66e355c"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/runtime.py",
+      "sha256": "a55fced512ef01481681b8265c383e55064c1bb6a11008b11ed8380f70eb8306"
+    },
+    {
+      "path": "backend/app/services/reporting_pipeline/apply_port.py",
+      "sha256": "9014f92b373d00600de67fb14e3dc2b4832748715f2d86700327437de258e71e"
+    },
+    {
+      "path": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/2026年补齐与每日T加1_两阶段开发与上线执行计划.md",
+      "sha256": "cbb254fc383b54c06f9d4eb68100eb9cbfa18c8e94f64f34ab19ad1d7855c32f"
+    }
+  ],
+  "checks": [
+    {
+      "command": "python tools/check_doc_index.py",
+      "result": "error 0 / warn 1；216首行类别既有警告，未扩大编辑范围"
+    },
+    {
+      "command": "python tools/check_test_environment.py",
+      "result": "pure_logic_ready；APP_TEST_DB_URL未配置；未跑数据库集成或迁移"
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe -m pytest backend/tests/reporting_pipeline_unit -q",
+      "result": "347 passed, 1 warning in 4.15s；纯逻辑目录覆盖根清库fixture"
+    },
+    {
+      "command": "reporting_ctl list / validate --offline / plan",
+      "result": "全部退出0；CONFIG_VALID READY77，READ/STAGE/APPLY/REPORT UNKNOWN各77；plan planning_only=true/simulation=true"
+    },
+    {
+      "command": "dev_env.sh --domain-check 本轮独立基线",
+      "result": "他人域13文件与基线一致"
+    }
+  ],
+  "critical_corrections": [
+    "496006已修正ID减去SYSTEM_TIME>=2026-10-18交集得到483188，不能证明修正后已刷新；12818被扣行须再核",
+    "费用7948是465跨年父集合，非全院2026费用缺口",
+    "C04为多次分页快照；正式发布重验唯一键与一致性；诊断手术反向多余须补证",
+    "六个真实CLI命令NOT_IMPLEMENTED，通用DataX writer与mysqlwriter实测路线不一致",
+    "本地347项单元测试通过，隔离集成未获可定位成功证据，生产E09/E10未完成"
+  ],
+  "no_production_actions": true,
+  "root_checkpoint_changed": false,
+  "revision_notice": "本文件保留v1.0复核当时的源码/文档指纹；计划现为v1.1，新增系统复核见系统卡点复核证据_20261022.json；历史哈希不表示当前文件未修改。"
+}

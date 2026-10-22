@@ -1,0 +1,1705 @@
+{
+ "doc": "B01 77项配置核完台账(2026-10-22,只读核验,生产动作零)",
+ "verification_channels": "8.83容器受控连接器只读字典查询;ODS只读已确认(2026-10-21);前置机readonly凭据;各独立源readonly凭据",
+ "summary": {
+  "items": 77,
+  "target_identity_verified": 77,
+  "stable_key_id_pk": 76,
+  "source_fully_verified": 73,
+  "source_pending_env_tables": [
+   "EMR_BLOOD_DIALY_RECORD",
+   "EMR_BLOOD_DIALY_DETAIL",
+   "EMR_BLOOD_DIALY_ORDER"
+  ],
+  "source_not_found_tables": [],
+  "anchor_unverified_tables": [
+   "EMR_HOS_SAVE_RECORD",
+   "EMR_NURSE_PLAN",
+   "EMR_BLOOD_DIALY_RECORD",
+   "EMR_BLOOD_DIALY_DETAIL",
+   "EMR_BLOOD_DIALY_ORDER"
+  ]
+ },
+ "first_group_verified": {
+  "EMR_ICH": "稳定键=ID(机构码|患者|就诊),锚点DATETIME,目标身份核验通过",
+  "EMR_ICH_DIAGNOSIS": "ID=机构码|患者|就诊|诊断类型|诊断序号;DCS_ID=父ID",
+  "EMR_ICH_OPERATION": "ID=机构码|患者|就诊|手术序号;ICH_ID=父ID",
+  "EMR_ICH_CHARGE": "ID=机构码|患者|就诊|费用分类代码;ICH_ID=父ID;无自身业务时间列,继承父DATETIME"
+ },
+ "view_2026_check": {
+  "conclusion": "四视图不挡2026:子视图上界已注释(-- < date 2026-01-01),父视图无上界;2026-09/10实数据在流(4889/57305/7379/63151行@9月)",
+  "definition_sha256": {
+   "V_EMR_ICH": "6d7da9c09ab86fa2ba831a6aa54aeeafd4acebb3011402e59e54b70247228031",
+   "V_EMR_ICH_CHARGE": "f7fffd46204dff588371a26bbfa4f55b009e1476b452fb5a0c113bb1c64a3e03",
+   "V_EMR_ICH_DIAGNOSIS": "0f7ea6bcb5792c3e50426f11106229cb5f6585c651cfeb8e6464c74cb069a187",
+   "V_EMR_ICH_OPERATION": "b65c222993cfb97956f88744bf944e29eaf95ebb8dda8e6999ba43d5863a5264"
+  }
+ },
+ "tickets": [
+  {
+   "id": "T-B01-65",
+   "table": "EMR_INFOR_SPEC_EXAM_TREAT",
+   "issue": "目标无ID主键/唯一约束",
+   "action": "DDL工单候选:用户决定补建唯一约束或人工定键后再冻结"
+  },
+  {
+   "id": "T-B01-61",
+   "table": "EMR_NURSE_PLAN",
+   "issue": "无源候选(种子为空)",
+   "action": "人工定源工单:护理计划记录需用户指定来源系统/对象"
+  },
+  {
+   "id": "T-B01-44",
+   "table": "EMR_HOS_SAVE_RECORD",
+   "issue": "源视图V_EMR_HOS_SAVE_RECORD无DATETIME类业务时间列(ID有,REPORT_TIME/CREATE_TIME/SIGN_TIME均无)",
+   "action": "人工视图工单:补业务时间锚点列或由用户指定锚点后再冻结增量策略"
+  }
+ ],
+ "items": [
+  {
+   "index": 1,
+   "table": "EMR_ADMISSION_RECORD",
+   "business_name": "入院记录(D08 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADMISSION_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ADMISSION_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 2,
+   "table": "EMR_ADMISSION_RECORD_EXAM",
+   "business_name": "入院记录-辅助检查(辅 D08 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADMISSION_RECORD_EXAM",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ADMISSION_RECORD_EXAM"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 3,
+   "table": "EMR_ADMISSION_DIAGNOSIS",
+   "business_name": "入院诊断表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADMISSION_DIAGNOSIS",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ADMISSION_DIAGNOSIS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 4,
+   "table": "EMR_DISCHARGE_RECORD",
+   "business_name": "出院记录(D12 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_DISCHARGE_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_DISCHARGE_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 5,
+   "table": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+   "business_name": "出院记录-诊断(辅 D12 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+     "VERIFIED@ODS"
+    ],
+    [
+     "V_EMR_DISCHARGE_RECORD_DIAGNOSIS",
+     "NOT_FOUND"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "EMR_DISCHARGE_RECORD_DIAGNOSIS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 6,
+   "table": "EMR_DOC_ORDER_DRUG",
+   "business_name": "住院医嘱信息-药品类医嘱",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_DOC_ORDER_DRUG",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_DOC_ORDER_DRUG"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 7,
+   "table": "EMR_DOC_ORDER_CHECK",
+   "business_name": "住院医嘱信息-非药品类医嘱",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_DOC_ORDER_CHECK",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_DOC_ORDER_CHECK"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 8,
+   "table": "EMR_OUTPATIENT_RECIPE",
+   "business_name": "门诊处方(D03/D04 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUTPATIENT_RECIPE",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUTPATIENT_RECIPE"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 9,
+   "table": "EMR_OUTPATIENT_RECIPE_ITEM",
+   "business_name": "门诊处方明细(辅 D03/D04 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUTPATIENT_RECIPE_ITEM",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUTPATIENT_RECIPE_ITEM"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 10,
+   "table": "EMR_OUTPATIENT_REGISTER",
+   "business_name": "门诊挂号(D01 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUTPATIENT_REGISTER",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUTPATIENT_REGISTER"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 11,
+   "table": "EMR_OUTPATIENT_RECORD",
+   "business_name": "门诊/急诊就诊记录(D02 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUTPATIENT_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUTPATIENT_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 12,
+   "table": "EMR_OUT_FEE_INFO_CHILD",
+   "business_name": "门（急）诊费用明细表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUT_FEE_INFO_CHILD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUT_FEE_INFO_CHILD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 13,
+   "table": "EMR_OUTPATIENT_DIAG",
+   "business_name": "门诊/急诊就诊诊断表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUTPATIENT_DIAG",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUTPATIENT_DIAG"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 14,
+   "table": "EMR_OUT_FEE_INFO_MAIN",
+   "business_name": "门（急）诊费用信息主表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OUT_FEE_INFO_MAIN",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OUT_FEE_INFO_MAIN"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 15,
+   "table": "EMR_IN_FEE_INFO_MAIN",
+   "business_name": "住院结算费用信息主表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_IN_FEE_INFO_MAIN",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_IN_FEE_INFO_MAIN"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 16,
+   "table": "EMR_IN_FEE_INFO_CHILD",
+   "business_name": "住院费用明细表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_IN_FEE_INFO_CHILD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_IN_FEE_INFO_CHILD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 17,
+   "table": "EMR_INSPECTION",
+   "business_name": "检验报告单(D18)",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INSPECTION",
+     "VERIFIED@dbo"
+    ],
+    [
+     "V_EMR_INSPECTION_TEST",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INSPECTION",
+     "V_EMR_INSPECTION_TEST"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 18,
+   "table": "EMR_INSPECTION_IMAGE",
+   "business_name": "检验报告-图片子表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INSPECTION_IMAGE",
+     "VERIFIED@dbo"
+    ],
+    [
+     "V_EMR_INSPECTION_IMAGE_TEST",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INSPECTION_IMAGE",
+     "V_EMR_INSPECTION_IMAGE_TEST"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 19,
+   "table": "EMR_INSPECTION_ALLERGY",
+   "business_name": "检验报告-药敏子表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INSPECTION_ALLERGY",
+     "VERIFIED@dbo"
+    ],
+    [
+     "V_EMR_INSPECTION_ALLERGY_TEST",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INSPECTION_ALLERGY",
+     "V_EMR_INSPECTION_ALLERGY_TEST"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 20,
+   "table": "EMR_INSPECTION_ITEM",
+   "business_name": "检验报告单-项目(辅 D06 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INSPECTION_ITEM",
+     "VERIFIED@dbo"
+    ],
+    [
+     "V_EMR_INSPECTION_ITEM_TEST",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INSPECTION_ITEM",
+     "V_EMR_INSPECTION_ITEM_TEST"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 21,
+   "table": "EMR_EXAM_IMAGE_REP",
+   "business_name": "影像诊断报告( D07 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_EXAM_IMAGE_REP",
+     "VERIFIED@HISUSER"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_EXAM_IMAGE_REP"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 22,
+   "table": "EMR_EXAM_IMAGE_PATH",
+   "business_name": "检查影像诊断报告子表(辅 D07 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_EXAM_IMAGE_PATH",
+     "VERIFIED@HISUSER"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_EXAM_IMAGE_PATH"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 23,
+   "table": "EMR_ICH",
+   "business_name": "住院病案首页(电子病历) (D09/D10 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ICH",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ICH"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 24,
+   "table": "EMR_ICH_OPERATION",
+   "business_name": "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ICH_OPERATION",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ICH_OPERATION"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 25,
+   "table": "EMR_ICH_ALLERGIES",
+   "business_name": "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ICH_ALLERGIES",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ICH_ALLERGIES"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 26,
+   "table": "EMR_ICH_CHARGE",
+   "business_name": "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ICH_CHARGE",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ICH_CHARGE"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 27,
+   "table": "EMR_ICH_DIAGNOSIS",
+   "business_name": "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ICH_DIAGNOSIS",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ICH_DIAGNOSIS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 28,
+   "table": "EMR_PHYSICAL_REPORT",
+   "business_name": "体检报告单(D69）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_PHYSICAL_REPORT",
+     "VERIFIED@dbo"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_PHYSICAL_REPORT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 29,
+   "table": "EMR_PHYSICAL_EXAM",
+   "business_name": "体检项目表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_PHYSICAL_EXAM",
+     "VERIFIED@dbo"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_PHYSICAL_EXAM"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 30,
+   "table": "EMR_PHYSICAL_EXAM_ITEM",
+   "business_name": "体检项目明细表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_PHYSICAL_EXAM_ITEM",
+     "VERIFIED@dbo"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_PHYSICAL_EXAM_ITEM"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 31,
+   "table": "EMR_BLOOD_APPLY_REPORT",
+   "business_name": "输血申请单",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_BLOOD_APPLY_REPORT",
+     "VERIFIED@BIS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_BLOOD_APPLY_REPORT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 32,
+   "table": "EMR_BLOOD_APPLY_REPORT_ITEM",
+   "business_name": "输血申请单明细",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_BLOOD_APPLY_REPORT_ITEM",
+     "VERIFIED@BIS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_BLOOD_APPLY_REPORT_ITEM"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 33,
+   "table": "EMR_TRANSFUSION_RECORD",
+   "business_name": "输血记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_TRANSFUSION_RECORD",
+     "VERIFIED@BIS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_TRANSFUSION_RECORD"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 34,
+   "table": "EMR_BLOOD_DESTROY_RECORD",
+   "business_name": "血袋回收记录表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_BLOOD_DESTROY_RECORD",
+     "VERIFIED@ERM"
+    ],
+    [
+     "EMR_BLOOD_DESTROY_RECORD",
+     "NOT_FOUND"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_BLOOD_DESTROY_RECORD"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 35,
+   "table": "EMR_MEDICAL_RECORD_INFO",
+   "business_name": "电子病历汇总",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_MEDICAL_RECORD_INFO",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_MEDICAL_RECORD_INFO"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 36,
+   "table": "EMR_HOS_POSTOPER_RECORD",
+   "business_name": "术后首次病程记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_POSTOPER_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_POSTOPER_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 37,
+   "table": "EMR_HOS_PREOP_DISCUSS",
+   "business_name": "术前讨论与小结",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_PREOP_DISCUSS",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_PREOP_DISCUSS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 38,
+   "table": "EMR_HOS_DND_RECORD",
+   "business_name": "死亡病历讨论记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_DND_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_DND_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 39,
+   "table": "EMR_HOS_DIFFIC_CASE_DISCUSS",
+   "business_name": "疑难病例讨论记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 40,
+   "table": "EMR_HOS_CHANGE_MAJOR_RECORD",
+   "business_name": "转科记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_CHANGE_MAJOR_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 41,
+   "table": "EMR_REFERRAL_HOS_RECORD",
+   "business_name": "转诊/院纪录（转出记录）",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_REFERRAL_HOS_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_REFERRAL_HOS_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 42,
+   "table": "EMR_HOS_CONSUL_RECORD",
+   "business_name": "会诊记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_CONSUL_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_CONSUL_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 43,
+   "table": "EMR_HOS_SUCCESSION_RECORD",
+   "business_name": "住院医师交接班记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_SUCCESSION_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_HOS_SUCCESSION_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 44,
+   "table": "EMR_HOS_SAVE_RECORD",
+   "business_name": "抢救记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_HOS_SAVE_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": null,
+    "verified": false
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 45,
+   "table": "EMR_ADMISSION_DEAD_RECORD_TF",
+   "business_name": "24小时内入院死亡记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADMISSION_DEAD_RECORD_TF",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ADMISSION_DEAD_RECORD_TF"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 46,
+   "table": "EMR_OPERA_RECORD",
+   "business_name": "一般手术记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OPERA_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OPERA_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 47,
+   "table": "EMR_BOFORE_OPERA_RECORD",
+   "business_name": "麻醉术前访视记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_BOFORE_OPERA_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_BOFORE_OPERA_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 48,
+   "table": "EMR_ANESTHESIA_RECORD",
+   "business_name": "麻醉手术记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ANESTHESIA_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ANESTHESIA_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 49,
+   "table": "EMR_ANES_RECORD_BLOOD",
+   "business_name": "麻醉手术中用血记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ANES_RECORD_BLOOD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ANES_RECORD_BLOOD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 50,
+   "table": "EMR_ANES_RECORD_MED",
+   "business_name": "麻醉手术中用药记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ANES_RECORD_MED",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ANES_RECORD_MED"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 51,
+   "table": "EMR_AFTER_OPERA_RECORD",
+   "business_name": "麻醉术后访视记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_AFTER_OPERA_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_AFTER_OPERA_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 52,
+   "table": "EMR_ADMISSION_ASSESSMENT",
+   "business_name": "入院评估记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADMISSION_ASSESSMENT",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_ADMISSION_ASSESSMENT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 53,
+   "table": "EMR_DISCHARGE_ASSESSMENT",
+   "business_name": "出院评估与指导",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_DISCHARGE_ASSESSMENT",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_DISCHARGE_ASSESSMENT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 54,
+   "table": "EMR_CHILDBIRTH",
+   "business_name": "阴道分娩记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_CHILDBIRTH",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_CHILDBIRTH"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 55,
+   "table": "EMR_GENERAL_NURSING",
+   "business_name": "一般护理记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_GENERAL_NURSING",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_GENERAL_NURSING"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 56,
+   "table": "EMR_CRITICALLY_ILL_NURS",
+   "business_name": "病危（重）护理记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_CRITICALLY_ILL_NURS",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_CRITICALLY_ILL_NURS"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 57,
+   "table": "EMR_IN_OUT_AMOUNT",
+   "business_name": "病危（重）护理记录-出入量记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_IN_OUT_AMOUNT",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_IN_OUT_AMOUNT"
+    ]
+   },
+   "engine_disposition": "DATAX_ONLY_PROVEN(route-853已证通道,主计划五-B01特殊项)"
+  },
+  {
+   "index": 58,
+   "table": "EMR_VITAL_SIGN",
+   "business_name": "生命体征测量记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_VITAL_SIGN",
+     "VERIFIED@LUNA_MCS_SDSEY"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_VITAL_SIGN"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 59,
+   "table": "EMR_OPERATION_NURSING",
+   "business_name": "手术护理记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_OPERATION_NURSING",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_OPERATION_NURSING"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 60,
+   "table": "EMR_CONSUMABLES",
+   "business_name": "高值耗材使用记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_CONSUMABLES",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_CONSUMABLES"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 61,
+   "table": "EMR_NURSE_PLAN",
+   "business_name": "护理计划记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [],
+   "anchor": {
+    "column": null,
+    "verified": false
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 62,
+   "table": "EMR_INFOR_OPERATION",
+   "business_name": "手术知情同意书",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INFOR_OPERATION",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_OPERATION"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 63,
+   "table": "EMR_INFOR_ANESTHESIA",
+   "business_name": "麻醉知情同意书",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INFOR_ANESTHESIA",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_ANESTHESIA"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 64,
+   "table": "EMR_INFOR_TRANS_BLOOD",
+   "business_name": "输血治疗同意书",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INFOR_TRANS_BLOOD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_TRANS_BLOOD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 65,
+   "table": "EMR_INFOR_SPEC_EXAM_TREAT",
+   "business_name": "特殊检查及特殊治疗同意书",
+   "target_identity": true,
+   "stable_key_id_pk": false,
+   "sources": [
+    [
+     "V_EMR_INFOR_SPEC_EXAM_TREAT",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_SPEC_EXAM_TREAT"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 66,
+   "table": "EMR_INFOR_CRITICALLY_ILL",
+   "business_name": "病危(重)通知书",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INFOR_CRITICALLY_ILL",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_CRITICALLY_ILL"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 67,
+   "table": "EMR_INFOR_OTHERS",
+   "business_name": "其它知情同意书",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_INFOR_OTHERS",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_INFOR_OTHERS"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 68,
+   "table": "EMR_BLOOD_DIALY_RECORD",
+   "business_name": "血透治疗记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "v_EMR_BLOOD_DIALY_RECORD",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ],
+    [
+     "EMR_BLOOD_DIALY_RECORD",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ]
+   ],
+   "anchor": {
+    "column": "PENDING_ENV",
+    "verified": false,
+    "views": []
+   },
+   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+  },
+  {
+   "index": 69,
+   "table": "EMR_BLOOD_DIALY_DETAIL",
+   "business_name": "血透治疗过程记录",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "v_EMR_BLOOD_DIALY_DETAIL",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ],
+    [
+     "EMR_BLOOD_DIALY_DETAIL",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ]
+   ],
+   "anchor": {
+    "column": "PENDING_ENV",
+    "verified": false,
+    "views": []
+   },
+   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+  },
+  {
+   "index": 70,
+   "table": "EMR_BLOOD_DIALY_ORDER",
+   "business_name": "血透治疗医嘱明细",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "v_EMR_BLOOD_DIALY_ORDER",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ],
+    [
+     "EMR_BLOOD_DIALY_ORDER",
+     "PENDING_ENV:8.87仅放行8.53,容器通道pg_hba拒绝"
+    ]
+   ],
+   "anchor": {
+    "column": "PENDING_ENV",
+    "verified": false,
+    "views": []
+   },
+   "engine_disposition": "DATAX_CANDIDATE(8.53直连裁定;身份/TenantId3待现场核)"
+  },
+  {
+   "index": 71,
+   "table": "EMR_DEATH_RECORD",
+   "business_name": "死亡记录表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_DEATH_RECORD",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_DEATH_RECORD"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 72,
+   "table": "EMR_NURSING_ASSESSMENT",
+   "business_name": "量表评估",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_NURSING_ASSESSMENT",
+     "VERIFIED@ODS"
+    ],
+    [
+     "V_EMR_NURSING_ASSESSMENT",
+     "VERIFIED@ODS"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "V_EMR_NURSING_ASSESSMENT",
+     "V_EMR_NURSING_ASSESSMENT"
+    ]
+   },
+   "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+  },
+  {
+   "index": 73,
+   "table": "EMR_PATHOLOGY_REPORT",
+   "business_name": "病理报告",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "EMR_PATHOLOGY_REPORT",
+     "VERIFIED@dbo@pitaya"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "EMR_PATHOLOGY_REPORT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 74,
+   "table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+   "business_name": "分子病理报告",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "EMR_MOLECULAR_PATHOLOGY_REPORT",
+     "VERIFIED@dbo@pitaya"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "EMR_MOLECULAR_PATHOLOGY_REPORT"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 75,
+   "table": "EMR_INFECTION_INFORMATION_REGISTER",
+   "business_name": "医院感染信息登记表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "EMR_INFECTION_INFORMATION_REGISTER",
+     "VERIFIED@C##FXPT"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "EMR_INFECTION_INFORMATION_REGISTER"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 76,
+   "table": "EMR_HOS_PRACTITIONER_INFORMATION",
+   "business_name": "医院执业人员信息表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "EMR_HOS_PRACTITIONER",
+     "VERIFIED@HRPSEY656"
+    ]
+   ],
+   "anchor": {
+    "column": "DATETIME",
+    "verified": true,
+    "views": [
+     "EMR_HOS_PRACTITIONER"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  },
+  {
+   "index": 77,
+   "table": "EMR_ADVERSE_EVENT",
+   "business_name": "不良事件表",
+   "target_identity": true,
+   "stable_key_id_pk": true,
+   "sources": [
+    [
+     "V_EMR_ADVERSE_EVENT_FINAL",
+     "VERIFIED@mas"
+    ]
+   ],
+   "anchor": {
+    "column": "EFFECTIVE_TIME",
+    "verified": true,
+    "views": [
+     "v_emr_adverse_event_final"
+    ]
+   },
+   "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+  }
+ ]
+}

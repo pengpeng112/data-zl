@@ -1,0 +1,92 @@
+{
+ "plan_version": "1.1",
+ "as_of": "2026-10-22",
+ "status": "STAGE1_VERIFIED_ON_ISOLATED_PG_B01_CONFIG_DONE_B02_TOOLS_READY",
+ "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
+ "current_step": "A05b待批+待环境项收敛",
+ "next": "生产动作仍按A05_待批清单_v2_20261022.json；隔离Oracle/血透8.87/8.53写者live重核三项待环境或待批通道；B03-B05未启动",
+ "production_actions_this_review": 0,
+ "database_writes_this_review": 0,
+ "first_stage": ["A01","A02","A03","A04","A05"],
+ "second_stage": ["B01","B02","B03","B04","B05"],
+ "batches": {
+  "A01": {
+   "status": "COMPLETED_CANDIDATE_V2",
+   "evidence": [
+    "A01_首组运行配置冻结_v2候选_20261022.json（verified全true:稳定键=目标ID主键/锚点DATETIME/目标身份/2026覆盖）",
+    "首组四表核验结果_20261022.json + 核验证据_20261022/（字典与有界聚合只读证据）"
+   ]
+  },
+  "A02": {"status": "COMPLETED_UNIT_VERIFIED", "evidence": ["六真实命令+production_runtime；本轮新增B02三离线命令(backfill-plan/gap-diff-plan/publish-order)"]},
+  "A03": {
+   "status": "COMPLETED_UNIT_VERIFIED",
+   "evidence": ["K02结构化冻结(迁移a7d8e9f0a1b2已在data_asset_test往返实测:升级/回退3层/再升级,三列干净增删)"]
+  },
+  "A04": {
+   "status": "COMPLETED_ISOLATED_PG_VERIFIED",
+   "evidence": [
+    "隔离PG集成测试7项全过(RT1-003/004/005)——test_rt1_004时钟偏差修复(8.83 PG比本机快约3.4秒,测试裕量30秒,产品语义无缺陷)",
+    "daily-report --state-db 隔离库实测exit 0,真实状态源,六分节齐(日报样例留档)",
+    "隔离Oracle=仍待环境(无授权隔离schema,不以SQLite冒充)"
+   ]
+  },
+  "A05": {
+   "status": "MATERIALS_READY_AWAITING_APPROVAL_V2",
+   "evidence": [
+    "A05_待批清单_v2_20261022.json：PA4前置条件满足(隔离PG实测过,materials_ready=true)；PA7 PG侧完成/Oracle侧待环境；PA1/2/3/5/6不变",
+    "A05a只读闭环完成：首组四表核验全true、四视图不挡2026、在跑写者8.83零进程零cron(8.53侧待ops-runbook通道)"
+   ],
+   "pending": "未执行任何生产动作；首组上线不声明通过"
+  },
+  "B01": {
+   "status": "COMPLETED_CANDIDATE_V2",
+   "evidence": [
+    "B01_77项配置核完台账_20261022.json：77项目标身份全核、76项ID主键稳定键、73项源全核(源侧10组只读核验:ODS52/护理7/HIS2/LIS4+双源裁定/输血4/体检3/病理2/感染1/HRP1/不良1)",
+    "血透3项待环境(8.87仅放行8.53,pg_hba拒绝8.83容器)；EMR_NURSE_PLAN无源工单",
+    "B01_77项任务运行配置_v1.3候选.json（enabled全false,validate --offline过,结构ok）",
+    "工单3张：T-B01-65(EMR_INFOR_SPEC_EXAM_TREAT目标无唯一约束)/T-B01-61(护理计划定源)/T-B01-44(抢救记录视图无业务时间列)"
+   ]
+  },
+  "B02": {
+   "status": "COMPLETED_OFFLINE_TOOLS_UNIT_VERIFIED",
+   "evidence": [
+    "backend/app/services/reporting_pipeline/backfill.py 三工具：拆窗预演(月→日→小时+覆盖硬验收+KEYSET回退)/键集差异框架(缺失/多余/内容/重复分账+只读SQL模板)/父子发布编排(父先子后波次+已有父复用+缺父自动唤醒+循环拒绝)",
+    "reporting_ctl新增backfill-plan/gap-diff-plan/publish-order三离线命令(实测:77项编2波,首组4项父波0子波1)",
+    "test_b02_backfill_tools.py 12项测试全过(互斥覆盖/空洞重叠检测/年界/分账/循环拒绝)；404项单元测试全绿"
+   ]
+  },
+  "B03": {"status": "NOT_STARTED", "evidence": []},
+  "B04": {"status": "NOT_STARTED", "evidence": []},
+  "B05": {"status": "NOT_STARTED", "evidence": []}
+ },
+ "pending_conditions": [
+  "PA1-PA7生产批准（A05_待批清单_v2_20261022.json；PA4前置已满足）",
+  "隔离Oracle测试schema（单事务回执/SYSTEM_TIME/围栏证明；PG侧已完成）",
+  "血透8.87身份/TenantId3核验通道（pg_hba放行8.83或8.53执行通道）",
+  "8.53在跑写者(dqueue/gap_exec/manual2) live重核（ops-runbook受控通道）",
+  "R06告警六项外部输入（source_id/secret存放/base_url/测试订阅/限流/时段）",
+  "省端协议及逐表回执（B04）",
+  "未来7业务日观测（B05）"
+ ],
+ "protected_root_checkpoint_modified": false,
+ "stage2_execution": {
+  "session": "zcode-20261022-tplus1-stage2",
+  "tool": "ZCode",
+  "model": "GLM-5.3",
+  "baseline_commit": "daa1c38（16文件指纹全对+两个迁移文件入库,check_migrations_tracked全绿）",
+  "tests": "404 passed (392+12 B02) / ruff本批文件全过 / 集成7 passed(隔离PG)",
+  "production_actions": 0,
+  "database_queries": "只读:前置机字典+有界聚合/ODS字典+定义+有界聚合/9个独立源字典/平台库asset_data_sources字典",
+  "fixes": [
+   "MysqlConnector SET MAX_EXECUTION_TIME旧版MySQL兼容(本地已修,容器生效待镜像发布批准)",
+   "集成测试时钟偏差裕量(30秒)"
+  ]
+ },
+ "system_review": {
+  "status": "K01_K06_FIXED_ISOLATED_PG_VERIFIED",
+  "evidence": "系统卡点复核证据_20261022.json + 第一阶段A01-A05执行报告_20261022.md + 隔离环境实测摘要_20261022.json",
+  "findings_fixed": ["K01","K02","K03","K04","K05","K06"],
+  "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
+ },
+ "handoff_for_next_ai": "给执行者_接续一次性完成开发说明_20261022.md（本批已执行完其可独立开发范围；后续=A05b获批生产试点→B03月巡/B04省端/B05观测）"
+}
