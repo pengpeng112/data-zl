@@ -130,26 +130,11 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "给执行者_接续一次性完成开发说明_20261022.md（本批已执行完其可独立开发范围；后续=A05b获批生产试点→B03月巡/B04省端/B05观测）",
+ "handoff_for_next_ai": "给执行者_两批接续执行提示词_20261022.md（终版：基线含0fd6ba0维护修复；第一批补齐运行链→第二批按批准上线）",
  "maintenance_review_20261022": {
-  "state": "LOCAL_FIXES_UNIT_AND_ISOLATED_PG_VERIFIED",
-  "report": "../maintenance_review_20261022/T加1维护复核与修复说明.md",
-  "validation": "../maintenance_review_20261022/验收记录.json",
-  "production_inventory": "../maintenance_review_20261022/8.83生产只读核查.json",
-  "completed": [
-   "核心维护与数据完整性修复",
-   "444单元通过/2平台跳过",
-   "目标执行器隔离PG5项及控制状态实库回归",
-   "服务器/抽取/维护/扩表说明"
-  ],
-  "pending": [
-   "真实生产入口装配",
-   "恢复/水位/父子质量及叶子窗口端到端闭环",
-   "DataX/双源及月替换接线",
-   "Oracle隔离方言验收",
-   "生产批准/发布/迁移/持久卷/调度/外发",
-   "首组试点与7业务日观测",
-   "省端回执"
-  ]
+  "session": "codex-t1-maintenance-20261022",
+  "main_ai_review": "zcode-20261022-tplus1-stage2d 复核通过(测试复跑/16指纹全对/关键修复抽查属实/checkpoint语义diff仅13处精准更新),交付已提交0fd6ba0",
+  "doc": "maintenance_review_20261022/T加1维护复核与修复说明.md",
+  "production_reality": "8.83容器无T+1程序/无asset_reporting_*控制表(迁移c0d1e2f3a4b5)/未挂暂存卷"
  }
 }
