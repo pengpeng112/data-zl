@@ -1,0 +1,56 @@
+{
+ "doc": "A05 待批清单 v3（第一批完成后更新；承接 v2 20261022）",
+ "updated_on": "2026-10-23",
+ "baseline": {
+  "code": "本地 commit（本批第一批：运行链接线+隔离验收；未 push）",
+  "tests": "单元 478 过+2 跳；隔离 PG 集成 18 过（含正式 CLI 入口全链 6 场景）；ruff 净；迁移链全绿 head=b8c9d0e1f2a3",
+  "production_reality": "8.83 容器镜像 r210-20261002-s10 仍无 T+1 程序；平台库迁移停在 c0d1e2f3a4b5；未挂暂存卷；生产零动作维持"
+ },
+ "pa_items": {
+  "PA1_镜像发布": {
+   "content": "按本轮代码构建新镜像并发布 8.83 data-asset-api（含 T+1 模块与 reporting_ctl）",
+   "new_in_v3": "镜像须包含批1 新模块（runtime_config/source_factory/target_factory/production_apply/apply_policy/datax_route/outbox_daemon）与 CLI 新命令",
+   "status": "PENDING_APPROVAL"
+  },
+  "PA2_调度注册": {
+   "content": "T+1 日轮调度登记（report/t1/189）与值守排班；outbox-send 守护进程部署",
+   "new_in_v3": "outbox 守护须独立进程常驻（不同步 HTTP 卡抽取）；relay 六项外部输入先补齐",
+   "status": "PENDING_APPROVAL"
+  },
+  "PA3_回执表DDL": {
+   "content": "前置机 DBOPER 建 ASSET_T1_RECEIPTS 回执表（列对齐 executor insert_receipt 契约：operation_id 主键/batch_id/manifest_hash/target_object/scope_summary/rows_affected/system_time/committed_at）",
+   "new_in_v3": "隔离验收已按该列集实测回执原子性；DDL 语句随批准包附上",
+   "status": "PENDING_APPROVAL"
+  },
+  "PA4_小窗试点": {
+   "content": "首组按首页→诊断→手术→费用顺序小窗试点（前置：PA1/PA3 + 旧写者退出确认距 10-22 快照<24h 须重拍 + approval-register 登记当次批准 + freeze-config 生成 environment=production 启用冻结件 A05c）",
+   "new_in_v3": "试点执行链=本批验收同链（租约/批准/回执/版本账/CAS/缺口）；命令序列已在隔离验收跑通",
+   "status": "PENDING_APPROVAL（前置满足）"
+  },
+  "PA5_控制库迁移全链": {
+   "content": "平台库从 c0d1e2f3a4b5 升级到 b8c9d0e1f2a3：e3f4a5b6c7d8 报表控制状态 → f4a5b6c7d8e9 耐久扩展（水位连续完成列+版本证据+隔离组账）→ a7d8e9f0a1b2 批次目标绑定 → b8c9d0e1f2a3 批准登记表",
+   "new_in_v3": "v2 只批最后一个三列绑定迁移的表述作废：生产无任何 asset_reporting_* 表，须批准整条链；隔离库已 upgrade head 往返验证",
+   "status": "PENDING_APPROVAL"
+  },
+  "PA6_暂存持久卷": {
+   "content": "8.83 容器挂载 T+1 耐久暂存卷（DurableFileStageStore 根目录；0700/0600 权限）与容量/保留策略",
+   "status": "PENDING_APPROVAL"
+  },
+  "PA7_执行器事务证明": {
+   "content": "目标执行器真库事务证明",
+   "new_in_v3": "PG 侧已完成（隔离 5 项+本批全链）；Oracle 方言级验证待授权隔离 schema（如实 NOT_RUN）",
+   "status": "PG_DONE_ORACLE_PENDING_ENV"
+  }
+ },
+ "h_freeze_and_backlog": {
+  "rule": "首组正式启用当天 00:00（Asia/Shanghai）冻结 H；登记 [2026-01-01,H) 欠账；T+1 优先、历史补齐低优先并行；已生效 H 不因开发延后重设",
+  "candidate_h": "试点批准日次日 00:00（A01 v2 候选 2026-10-24 仅供参考）"
+ },
+ "observation": "B05 连续 7 业务日观测（准时率/缺口/重试/源负载/磁盘/连续完成水位，各组各算各的）；省端接收单列 UNKNOWN 不冒充院内回读完成",
+ "approval_rule": "逐项会话内呈报；未回复不构成批准；ODS 只读（2026-10-21）与审批4边界等价批准核实后复用",
+ "related": {
+  "第一批报告": "第一批执行报告_20261023.md",
+  "生产冻结件": "首组四表运行配置冻结件_v1_20261023.json（environment=production，enabled 全 false，指纹 7f8fb38a…）",
+  "维护复核": "../maintenance_review_20261022/T加1维护复核与修复说明.md"
+ }
+}

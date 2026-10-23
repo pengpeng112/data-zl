@@ -215,6 +215,183 @@ def blocked_scopes(actions: Sequence[RecoveryAction]) -> list[str]:
     return [a.scope for a in actions if a.blocking]
 
 
+class RecoveryExecutor:
+    """恢复执行化（第一批批1-5）：把建议落成账面动作。
+
+    - close_success：reconcile 全键一致后只关闭对应窗口的缺口，再按
+      缺口门禁推进捕获水位与连续完成水位（历史空洞未闭合不推连续
+      完成）；曾有 OPEN 事件的表补发 RECOVERED（入 outbox，不 HTTP）。
+    - plan_retry_windows：失败窗口自动排队（OPEN 缺口 → 待重跑业务日
+      清单，供 resume --execute / 日轮派发消费）。
+    - record_rescan_coverage：回看/月度重扫的独立覆盖账（route=
+      RESCAN，与 T+1 水位分离，不互相冒充）。
+
+    水位推进被缺口门禁拒绝时不抛异常：如实记 blocked 原因——门禁
+    本身是核心不变量，不能为了推进而绕开。
+    """
+
+    def __init__(self, repository) -> None:
+        self.repository = repository
+
+    # -- 成功闭合 -----------------------------------------------------------
+
+    def close_success(
+        self,
+        *,
+        batch_id: str,
+        task_id: str,
+        business_day: str,
+        window_fingerprint: str,
+        evidence: str,
+    ) -> dict:
+
+        result: dict = {
+            "batch_id": batch_id,
+            "closed_gaps": [],
+            "watermarks": {},
+            "recovered_incident": None,
+            "blocked": [],
+        }
+        gaps = [
+            gap for gap in self.repository.open_gaps(task_id)
+            if gap.window.fingerprint() == window_fingerprint
+        ]
+        for gap in gaps:
+            self.repository.close_gap(gap.gap_id, evidence=f"{batch_id}:{evidence}")
+            result["closed_gaps"].append(gap.gap_id)
+        if not gaps:
+            # 无对应缺口：直接按窗口端点尝试推水位（首日无缺口属正常）
+            pass
+        window_end = self._window_end_from_day(business_day)
+        if window_end is not None:
+            for name, advance in (
+                ("capture_h", self.repository.advance_capture_watermark),
+                ("continuous_through", self.repository.advance_continuous_completion),
+            ):
+                try:
+                    advance(task_id, window_end)
+                    result["watermarks"][name] = window_end.isoformat()
+                except Exception as exc:  # noqa: BLE001 - 门禁拒绝如实记录
+                    result["blocked"].append(f"{name}: {type(exc).__name__}")
+        result["recovered_incident"] = self._emit_recovered_if_open(
+            task_id, business_day
+        )
+        result["still_open_gaps"] = len(self.repository.open_gaps(task_id))
+        return result
+
+    def _emit_recovered_if_open(self, task_id: str, business_day: str):
+        """该业务日曾 OPEN 且缺口已全闭合 → 补发 RECOVERED（幂等）。"""
+        incident_key = f"T1:{business_day}:{task_id}"
+        finder = getattr(self.repository, "find_open_incident", None)
+        incident = finder(incident_key) if callable(finder) else None
+        if incident is None:
+            return None
+        source_event_id = f"r189t1.{incident.incident_id}.RECOVERED.1"
+        if self.repository.get_outbox_event(source_event_id) is not None:
+            return source_event_id
+        from datetime import datetime, timezone
+
+        from app.services.reporting_pipeline.alerts_client import build_event_body
+
+        opened_event_id = f"r189t1.{incident.incident_id}.OPENED.1"
+        title = f"T+1任务 {task_id} 业务日 {business_day} 已恢复"
+        metadata = {
+            "system": "T1_REPORTING",
+            "canonical_table": task_id,
+            "business_date": business_day,
+            "recovered": True,
+            "detail_ref": f"gap://{business_day}/{task_id}",
+        }
+        body = build_event_body(
+            source_event_id=source_event_id,
+            event_type="alert",
+            category="EXTRACT_FAILED",
+            severity="yellow",
+            title=title,
+            body=(
+                f"业务日 {business_day} 的 {task_id} 缺口已闭合并回读一致"
+                f"（关联事件 {opened_event_id}）。"
+            ),
+            occurred_at=datetime.now(timezone.utc).isoformat(),
+            metadata=metadata,
+        )
+        event = self.repository.append_incident_event(
+            incident,
+            event_kind="RECOVERED",
+            severity="yellow",
+            title=title,
+            body_bytes=body,
+            metadata=metadata,
+        )
+        return event.source_event_id
+
+    @staticmethod
+    def _window_end_from_day(business_day: str):
+        from datetime import date, datetime, time, timedelta, timezone
+
+        try:
+            day = date.fromisoformat(business_day)
+        except ValueError:
+            return None
+        # 院区时区次日 00:00（左闭右开窗端点）
+        return datetime.combine(day + timedelta(days=1), time(0), tzinfo=timezone(timedelta(hours=8)))
+
+    # -- 失败窗口自动排队 ------------------------------------------------------
+
+    def plan_retry_windows(self, task_id: str | None = None) -> list[dict]:
+        [task_id] if task_id else sorted(
+            {gap.task_id for batch in self.repository.list_batches()
+             for gap in self.repository.open_gaps(batch.task_id)}
+        )
+        # 上面按批次反查表集合代价高；直接扫缺口更简单——仓储未提供全表
+        # 缺口扫描，这里按批次清单聚合。
+        plan: dict[tuple[str, str], dict] = {}
+        for record in self.repository.list_batches():
+            for gap in self.repository.open_gaps(record.task_id):
+                day = gap.window.start.date().isoformat()
+                key = (record.task_id, day)
+                if key not in plan:
+                    plan[key] = {
+                        "task_id": record.task_id,
+                        "business_day": day,
+                        "reason": gap.reason,
+                        "window": gap.window.fingerprint(),
+                    }
+        if task_id:
+            return [item for (tid, _), item in sorted(plan.items()) if tid == task_id]
+        return [item for _, item in sorted(plan.items())]
+
+    # -- 回看/重扫覆盖账 --------------------------------------------------------
+
+    def record_rescan_coverage(
+        self,
+        *,
+        table: str,
+        business_month: str,
+        reconciled_at,
+        cycle_days: int = 30,
+        pending_slices: int = 0,
+        failed_slices: int = 0,
+    ) -> None:
+        """月度重扫/回看的独立覆盖账（RESCAN 路由，与 T+1 水位分离）。"""
+        from app.services.reporting_pipeline.planner import MonthCoverageRecord
+
+        self.repository.upsert_month_coverage(
+            MonthCoverageRecord(
+                table=table,
+                business_month=business_month,
+                route_or_origin="RESCAN",
+                last_reconciled_at=reconciled_at,
+                cycle_days=cycle_days,
+                pending_slices=pending_slices,
+                failed_slices=failed_slices,
+            )
+        )
+
+    def rescan_overdue(self, table: str) -> list:
+        return self.repository.overdue_months(table)
+
+
 # 故障隔离与继续执行规则.json 的 error → 本工程实现落点（矩阵测试对拍用）。
 # 每个 error 必须能指到具体模块/测试，未映射即视为规则未实现。
 FAULT_RULE_IMPLEMENTATION = {

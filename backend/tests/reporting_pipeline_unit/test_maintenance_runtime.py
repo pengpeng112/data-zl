@@ -157,10 +157,12 @@ def test_short_dml_count_cannot_commit_receipt():
     assert conn.rows == {} and conn.receipts == {}
 
 
-def test_month_replace_is_not_silently_treated_as_merge():
+def test_month_replace_requires_explicit_scope_keys():
+    """批1-5：REPLACE_MONTH 已实现（同事务先删后插），但缺显式范围键清单
+    仍拒绝——不得按不存在列删除。原"仅支持MERGE"拒绝语义已由实现取代。"""
     from dataclasses import replace
     executor = SqlTargetApplyExecutor(lambda: pytest.fail("must not open target"), _EXEC_CONFIG, simulation=True)
-    with pytest.raises(c.ContractViolation, match="MERGE"):
+    with pytest.raises(c.ContractViolation, match="REPLACE_MONTH"):
         executor.execute(replace(_apply_request([]), mode="REPLACE_MONTH"), ApplyPlan([], {}))
 
 

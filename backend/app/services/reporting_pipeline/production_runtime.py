@@ -70,8 +70,17 @@ class AssemblyInputs:
     stage_store: DurableFileStageStore | None = None
     # 源绑定：物理源 -> RowSource 工厂（生产由受控连接器构造）
     row_source_factory: Callable[[str], RowSource] | None = None
+    # 表级 RowSource 工厂（批1-2a：按 canonical_table 解析冻结投影；
+    # 与 row_source_factory 二选一，表级优先）
+    table_row_source_factory: Callable[[str], RowSource] | None = None
     # 目标绑定：TargetConnection 工厂（生产由受控连接器+长期凭据构造）
     target_connection_factory: Callable[[], TargetConnection] | None = None
+    # DataX 路由工厂（批1-3：engine=DATAX 表的固定暂存路线）
+    datax_route_factory: Callable | None = None
+    # 冻结运行配置（批1-1）：候选转完整 TaskSpec + 哈希冻结
+    runtime_config: object | None = None
+    # 版本账只读器（批1-4 CAS：键 → 上次登记源内容哈希）
+    version_reader: Callable | None = None
     # 执行器/批准
     executor_id: str | None = None
     approval_refs: Sequence[str] = ()
@@ -89,6 +98,15 @@ class TargetBindingConfig:
     table: str
     key_columns: tuple[str, ...]
     write_columns: tuple[str, ...]
+
+
+def logical_target_object(binding: TargetBindingConfig) -> str:
+    """逻辑目标三元组：{instance}.{tenant}.{table末段}（表名可带 schema 前缀，
+    身份取末段；SQL 对象名另用 binding.table 全名）。"""
+    return (
+        f"{binding.target_instance}.{binding.tenant}."
+        f"{binding.table.rsplit('.', 1)[-1]}"
+    )
 
 
 def stable_batch_id(
@@ -222,10 +240,42 @@ class ProductionAssembly:
                 return spec
         raise AssemblyRefused(f"任务包中不存在表: {table}")
 
+    def runtime_spec(self, table: str):
+        """冻结运行配置的单表完整 TaskSpec（批1-1）；无冻结配置返回 None。"""
+        if self.inputs.runtime_config is None:
+            return None
+        try:
+            return self.inputs.runtime_config.table(table)
+        except Exception as exc:  # RuntimeConfigError 等
+            raise AssemblyRefused(f"冻结运行配置解析失败 [{table}]: {exc}") from exc
+
+    def _config_identity(self, table: str) -> tuple[str, str | None]:
+        """配置身份：(config_version, definition_fingerprint)。
+
+        有冻结运行配置时以冻结件为准（版本+表指纹），否则回退种子包。
+        """
+        spec_rt = self.runtime_spec(table)
+        if spec_rt is not None:
+            rc = self.inputs.runtime_config
+            return f"{rc.version}:{rc.file_sha256[:12]}", spec_rt.fingerprint
+        spec = self.resolve_spec(table)
+        return spec.config_version, spec.definition_fingerprint
+
     def require_action(
         self, spec, action: PipelineAction, bindings: Sequence = ()
     ) -> None:
-        """K01：enabled 走全链；未 enabled 须有有效动作绑定。"""
+        """K01：enabled 走全链；未 enabled 须有有效动作绑定。
+
+        冻结运行配置在档时按冻结件合成已核规格校验（verified 事实来自
+        冻结件与核验证据，非放宽门禁）。
+        """
+        spec_rt = self.runtime_spec(spec.canonical_table)
+        if spec_rt is not None:
+            from app.services.reporting_pipeline.runtime_config import (
+                synthesize_task_spec,
+            )
+
+            spec = synthesize_task_spec(spec_rt, seed_spec=spec)
         if spec.enabled:
             spec.validate_action(action)
             return
@@ -252,20 +302,41 @@ class ProductionAssembly:
         target = spec.target
         expected = (f"{target.host}:{target.port}/{target.service}", target.owner, target.table)
         actual = (binding.target_instance, binding.tenant, binding.table)
-        if actual != expected or not target.current_identity_verified:
-            raise AssemblyRefused("REFUSED_TARGET_BINDING：目标与已核任务配置不符")
+        spec_rt = self.runtime_spec(spec.canonical_table)
+        if spec_rt is not None:
+            # 冻结运行配置（批1-1）为目标绑定权威：身份/稳定键/写列
+            # 全部以哈希冻结件为准（隔离验收冻结件的目标身份与种子包
+            # 不同属正常，由 environment 标记区分）。
+            frozen = (
+                spec_rt.target_instance, spec_rt.tenant, spec_rt.target_table
+            )
+            if actual != frozen:
+                raise AssemblyRefused("REFUSED_TARGET_BINDING：目标与冻结运行配置不符")
+            write_cols = spec_rt.write_columns()
+            if (not spec_rt.stable_key
+                    or tuple(spec_rt.stable_key) != binding.key_columns
+                    or not set(binding.key_columns).issubset(binding.write_columns)
+                    or not binding.write_columns
+                    or len(set(binding.write_columns)) != len(binding.write_columns)
+                    or tuple(sorted(binding.write_columns)) != tuple(sorted(write_cols))):
+                raise AssemblyRefused("REFUSED_COLUMN_BINDING：稳定键或写列与冻结投影不符")
+            if self.inputs.system_time_column in binding.write_columns:
+                raise AssemblyRefused("REFUSED_CLOCK_BINDING：SYSTEM_TIME只能由目标事务生成")
+        else:
+            if actual != expected or not target.current_identity_verified:
+                raise AssemblyRefused("REFUSED_TARGET_BINDING：目标与已核任务配置不符")
+            names = {field.name for field in spec.projection}
+            if (not spec.stable_key.verified or tuple(spec.stable_key.candidate) != binding.key_columns
+                    or not set(binding.key_columns).issubset(binding.write_columns)
+                    or not binding.write_columns or len(set(binding.write_columns)) != len(binding.write_columns)
+                    or set(binding.write_columns) != names - {self.inputs.system_time_column}):
+                raise AssemblyRefused("REFUSED_COLUMN_BINDING：稳定键或写列不在已核投影中")
+            if self.inputs.system_time_column in binding.write_columns:
+                raise AssemblyRefused("REFUSED_CLOCK_BINDING：SYSTEM_TIME只能由目标事务生成")
         if record is not None and actual != (
             record.target_instance, record.tenant, record.target_table
         ):
             raise AssemblyRefused("REFUSED_BATCH_BINDING：目标与原批次冻结范围不符")
-        names = {field.name for field in spec.projection}
-        if (not spec.stable_key.verified or tuple(spec.stable_key.candidate) != binding.key_columns
-                or not set(binding.key_columns).issubset(binding.write_columns)
-                or not binding.write_columns or len(set(binding.write_columns)) != len(binding.write_columns)
-                or set(binding.write_columns) != names - {self.inputs.system_time_column}):
-            raise AssemblyRefused("REFUSED_COLUMN_BINDING：稳定键或写列不在已核投影中")
-        if self.inputs.system_time_column in binding.write_columns:
-            raise AssemblyRefused("REFUSED_CLOCK_BINDING：SYSTEM_TIME只能由目标事务生成")
 
     def _read_target_snapshot(self, binding, keys):
         factory = _require_real(self.inputs, "target_connection_factory", self.inputs.target_connection_factory)
@@ -284,6 +355,62 @@ class ProductionAssembly:
                 conn.rollback()
             finally:
                 close()
+
+    def _compute_partition(self, spec_rt, binding, rows, target_rows):
+        """批1-4：SNAPSHOT_DIFF CAS + 父存在性分区（真实模式专用）。"""
+        from app.services.reporting_pipeline.apply_policy import (
+            build_parent_presence,
+            snapshot_diff_partition,
+        )
+
+        metas = list(self._column_meta(binding, spec_rt).values())
+        target_object = logical_target_object(binding)
+        version_reader = self.inputs.version_reader
+        if version_reader is None:
+            raise AssemblyRefused(
+                "REFUSED_VERSION_READER：SNAPSHOT_DIFF 分区需版本账只读器（耐久）"
+            )
+
+        def registered(key: tuple) -> str | None:
+            return version_reader(target_object, key)
+
+        parent_present = None
+        if spec_rt.parent_table and spec_rt.parent_key_column:
+            parent_spec = self.runtime_spec(spec_rt.parent_table)
+            if parent_spec is None:
+                raise AssemblyRefused(
+                    f"冻结配置缺父表 {spec_rt.parent_table}，父存在性无法核验"
+                )
+            parent_binding = TargetBindingConfig(
+                target_instance=binding.target_instance,
+                tenant=binding.tenant,
+                table=parent_spec.target_table,
+                key_columns=tuple(parent_spec.stable_key),
+                write_columns=parent_spec.write_columns(),
+            )
+            parent_values = sorted(
+                {
+                    row.get(spec_rt.parent_key_column)
+                    for row in rows
+                    if row.get(spec_rt.parent_key_column) is not None
+                },
+                key=str,
+            )
+            parent_keys = [(value,) for value in parent_values]
+            parent_rows = self._read_target_snapshot(parent_binding, parent_keys)
+            parent_present = build_parent_presence(
+                parent_rows=parent_rows,
+                parent_key_columns=tuple(parent_spec.stable_key),
+            )
+        return snapshot_diff_partition(
+            rows=rows,
+            key_columns=binding.key_columns,
+            metas=metas,
+            target_rows=target_rows,
+            registered_version=registered,
+            parent_present=parent_present,
+            parent_key_column=spec_rt.parent_key_column,
+        )
 
     # -- capture -----------------------------------------------------------
 
@@ -336,9 +463,21 @@ class ProductionAssembly:
             return {"ok": True, "dry_run": True, "plan": plan_doc}
 
         self.require_action(spec, PipelineAction.CAPTURE, bindings)
+        spec_rt = self.runtime_spec(table)
         if not self.simulation:
-            _require_real(self.inputs, "row_source_factory", self.inputs.row_source_factory)
-            if spec.engine.value != "PYTHON" or spec.dual_source():
+            if spec_rt is not None and spec_rt.engine == "DATAX":
+                if self.inputs.datax_route_factory is None:
+                    raise AssemblyRefused(
+                        "REFUSED_CAPTURE_ROUTE：engine=DATAX 须装配 DataX 固定暂存路线工厂"
+                    )
+            elif self.inputs.row_source_factory is None and self.inputs.table_row_source_factory is None:
+                raise AssemblyRefused(
+                    "真实运行缺 row_source_factory/table_row_source_factory"
+                    "（REFUSED_MISSING_ROW_SOURCE_FACTORY）；不退回内存模拟"
+                )
+            if spec_rt is None and (
+                spec.engine.value != "PYTHON" or spec.dual_source()
+            ):
                 raise AssemblyRefused("REFUSED_CAPTURE_ROUTE：DataX或双源任务须接专用路由，禁止按单源Python读取")
 
         repo = self._repo()
@@ -373,43 +512,88 @@ class ProductionAssembly:
                 return {"ok": False, "refused": "模拟 capture 需要 sim_rows_provider", "batch_id": batch_id}
             rows = sim_rows_provider()
         else:
-            factory = _require_real(self.inputs, "row_source_factory", self.inputs.row_source_factory)
-            physical = next(
-                (s.source_group for s in spec.source_candidates if s.role == "primary"),
-                None,
-            )
-            if physical is None:
-                repo.transition_batch(
-                    batch_id, BatchState.WAITING_INPUT, reason="无 primary 源"
-                )
-                return {"ok": False, "refused": "无 primary 源候选", "batch_id": batch_id}
-            source = factory(physical)
-            budget = read_budget or ReadBudget(**{
-                name: getattr(spec.resource_budget, name)
-                for name in ("max_rows_per_slice", "max_bytes_per_slice", "max_attempts")
-                if getattr(spec.resource_budget, name) is not None
-            })
-            adapter = PythonReaderAdapter(source, budget)
-            result = adapter.capture_window(window)
-            if not result.complete:
-                repo.record_gap(
-                    table, window, f"capture 不完整: {result.error_class}"
-                )
-                repo.transition_batch(
-                    batch_id, BatchState.RETRYABLE, reason="捕获不完整已记缺口"
-                )
-                return {
-                    "ok": False, "batch_id": batch_id,
-                    "state": result.error_class, "window": window.fingerprint(),
-                }
-            names = [field.name for field in sorted(spec.projection, key=lambda field: field.order)]
+            attempt_hint = next_attempt_id(repo, batch_id)
+            if spec_rt is not None and spec_rt.engine == "DATAX":
+                outcome = self.inputs.datax_route_factory(table, window, attempt_hint)
+                if not outcome.complete:
+                    repo.record_gap(
+                        table, window, f"capture 不完整: {outcome.end_reason}"
+                    )
+                    repo.transition_batch(
+                        batch_id, BatchState.RETRYABLE,
+                        reason=f"DataX 捕获不完整: {outcome.end_reason}",
+                    )
+                    return {
+                        "ok": False, "batch_id": batch_id,
+                        "state": outcome.end_reason, "window": window.fingerprint(),
+                    }
+                rows = list(outcome.rows)
+            else:
+                if spec_rt is not None and self.inputs.table_row_source_factory is not None:
+                    source = self.inputs.table_row_source_factory(table)
+                    budget_kwargs = {
+                        name: spec_rt.budget.get(name)
+                        for name in (
+                            "max_rows_per_slice", "max_bytes_per_slice", "max_attempts",
+                        )
+                        if spec_rt.budget.get(name) is not None
+                    }
+                    budget = read_budget or ReadBudget(**budget_kwargs)
+                else:
+                    factory = _require_real(
+                        self.inputs, "row_source_factory", self.inputs.row_source_factory
+                    )
+                    physical = next(
+                        (s.source_group for s in spec.source_candidates if s.role == "primary"),
+                        None,
+                    )
+                    if physical is None:
+                        repo.transition_batch(
+                            batch_id, BatchState.WAITING_INPUT, reason="无 primary 源"
+                        )
+                        return {"ok": False, "refused": "无 primary 源候选", "batch_id": batch_id}
+                    source = factory(physical)
+                    budget = read_budget or ReadBudget(**{
+                        name: getattr(spec.resource_budget, name)
+                        for name in ("max_rows_per_slice", "max_bytes_per_slice", "max_attempts")
+                        if getattr(spec.resource_budget, name) is not None
+                    })
+                adapter = PythonReaderAdapter(source, budget)
+                keyset_kwargs = {}
+                if spec_rt is not None:
+                    keyset_kwargs = {
+                        "keyset_columns": tuple(spec_rt.stable_key),
+                        "keyset_unique_verified": True,
+                    }
+                result = adapter.capture_window(window, **keyset_kwargs)
+                if not result.complete:
+                    repo.record_gap(
+                        table, window, f"capture 不完整: {result.error_class}"
+                    )
+                    repo.transition_batch(
+                        batch_id, BatchState.RETRYABLE, reason="捕获不完整已记缺口"
+                    )
+                    return {
+                        "ok": False, "batch_id": batch_id,
+                        "state": result.error_class, "window": window.fingerprint(),
+                    }
+            if spec_rt is not None:
+                names = [field.name for field in spec_rt.projection]
+            else:
+                names = [field.name for field in sorted(spec.projection, key=lambda field: field.order)]
             if not names or len(names) != len(set(names)):
                 raise AssemblyRefused("REFUSED_PROJECTION：投影为空或列名重复")
-            rows = []
-            for row in result.rows:
-                if len(row) != len(names):
-                    raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列数与冻结投影不一致，禁止截断")
-                rows.append(dict(zip(names, row)))
+            staged_rows = []
+            for row in (rows if spec_rt is not None and spec_rt.engine == "DATAX" else result.rows):
+                if isinstance(row, dict):
+                    if set(row.keys()) != set(names):
+                        raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列集与冻结投影不一致，禁止截断")
+                    staged_rows.append({name: row.get(name) for name in names})
+                else:
+                    if len(row) != len(names):
+                        raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列数与冻结投影不一致，禁止截断")
+                    staged_rows.append(dict(zip(names, row)))
+            rows = staged_rows
 
         attempt_id = next_attempt_id(repo, batch_id)
         stage = self.inputs.stage_store
@@ -421,25 +605,29 @@ class ProductionAssembly:
             batch_id, attempt_id, "chunk-0001", payload_bytes,
             row_count=len(rows),
         )
+        config_version, definition_fingerprint = self._config_identity(table)
         manifest = build_manifest(
             batch_id=batch_id,
             attempt_id=attempt_id,
             task_id=table,
-            config_version=spec.config_version,
+            config_version=config_version,
             source_identity=str(
                 [s.object_id for s in spec.source_candidates]
+            ) if spec_rt is None else (
+                f"{spec_rt.source_group}:{spec_rt.source_object}"
+                + (f"@sha256:{spec_rt.object_sha256[:12]}" if spec_rt.object_sha256 else "")
             ),
             window=window,
             rows=RowClassification(source_read_rows=len(rows), valid=len(rows)),
             total_bytes=len(payload_bytes),
             payload_sha256=hashlib.sha256(payload_bytes).hexdigest(),
-            engine=spec.engine.value,
-            definition_fingerprint=spec.definition_fingerprint,
+            engine=spec_rt.engine if spec_rt is not None else spec.engine.value,
+            definition_fingerprint=definition_fingerprint,
         )
         stage.mark_complete_against_manifest(
             batch_id, attempt_id, manifest,
             source_identity=manifest.source_identity,
-            definition_fingerprint=spec.definition_fingerprint,
+            definition_fingerprint=definition_fingerprint,
         )
         repo.attach_attempt_manifest(batch_id, manifest)
         # 推进 CAPTURED 前必须选中完整 attempt（状态机要求 manifest 在档）
@@ -472,7 +660,13 @@ class ProductionAssembly:
         repo = self._repo()
         record = repo.get_batch(batch_id)
         spec = self.resolve_spec(record.task_id)
-        group_key_columns = tuple(group_key_columns or spec.stable_key.candidate)
+        spec_rt = self.runtime_spec(record.task_id)
+        # 质量规则按冻结运行配置投影（种子包投影可能为空）
+        verify_spec = spec_rt if spec_rt is not None else spec
+        group_key_columns = tuple(
+            group_key_columns
+            or (spec_rt.stable_key if spec_rt is not None else spec.stable_key.candidate)
+        )
         if not group_key_columns:
             raise AssemblyRefused("REFUSED_QUALITY_KEY：缺少已核稳定键")
         if record.state not in (
@@ -502,9 +696,10 @@ class ProductionAssembly:
             )
             from app.services.reporting_pipeline.quality import RequiredRule, TypeRule, ByteLengthRule
             metas = column_meta or self._column_meta(TargetBindingConfig(
-                "", "", spec.canonical_table, tuple(group_key_columns),
-                tuple(field.name for field in spec.projection),
-            ), spec)
+                "", "", verify_spec.canonical_table if hasattr(verify_spec, "canonical_table") else record.task_id,
+                tuple(group_key_columns),
+                tuple(field.name for field in verify_spec.projection),
+            ), verify_spec)
             rules = [RequiredRule(tuple(group_key_columns))]
             for meta in metas.values():
                 expected = {"NUMBER": "decimal", "DECIMAL": "decimal", "NUMERIC": "decimal",
@@ -513,7 +708,7 @@ class ProductionAssembly:
                     expected = "str"
                 if expected:
                     rules.append(TypeRule(meta.name, expected))
-            for field in spec.projection:
+            for field in verify_spec.projection:
                 declared = re.fullmatch(r"(?:VAR)?CHAR2?\((\d+)\s*(?:BYTE)?\)", field.target_type.upper())
                 if declared:
                     rules.append(ByteLengthRule(field.name, int(declared.group(1))))
@@ -550,9 +745,9 @@ class ProductionAssembly:
         return list(stage.iter_chunk_rows(batch_id, attempt_id))
 
     def _check_staged_manifest(self, manifest: BatchManifest) -> None:
-        spec = self.resolve_spec(manifest.task_id)
-        if (manifest.config_version != spec.config_version
-                or manifest.definition_fingerprint != spec.definition_fingerprint):
+        config_version, definition_fingerprint = self._config_identity(manifest.task_id)
+        if (manifest.config_version != config_version
+                or manifest.definition_fingerprint != definition_fingerprint):
             raise AssemblyRefused("REFUSED_CONFIG_DRIFT：暂存后配置或视图定义变了，须复核后重新捕获")
         stage = self.inputs.stage_store
         document = stage.load_complete_document(manifest.batch_id, manifest.attempt_id)
@@ -586,6 +781,7 @@ class ProductionAssembly:
         from app.services.reporting_pipeline.target_executor import (
             FakeTargetConnection,
         )
+        from app.services.reporting_pipeline.apply_policy import record_partition_ledger
 
         repo = self._repo()
         record = repo.get_batch(batch_id)
@@ -595,7 +791,7 @@ class ProductionAssembly:
             port = _require_real(self.inputs, "production_apply_port", self.inputs.production_apply_port)
             if not port.production_mode or not port.enforce_fence:
                 raise AssemblyRefused("REFUSED_PRODUCTION_GATE：禁止模拟批准或关闭围栏")
-            expected_resource = f"target:{binding.target_instance}.{binding.tenant}.{binding.table}"
+            expected_resource = f"target:{logical_target_object(binding)}"
             if lease_resource != expected_resource or fencing_token is None:
                 raise AssemblyRefused("REFUSED_TARGET_LEASE：须提供本表有效写租约及围栏token")
             port.lease_validator(lease_resource, fencing_token)
@@ -620,6 +816,37 @@ class ProductionAssembly:
             target_rows = self._read_target_snapshot(binding,
                 [tuple(r.get(c) for c in binding.key_columns) for r in rows],
             )
+        # 批1-4 SNAPSHOT_DIFF CAS 分区：坏组隔离留账、合法组继续
+        spec_rt = self.runtime_spec(record.task_id)
+        partition = None
+        ledger_records: list[dict] = []
+        if (not self.simulation and spec_rt is not None
+                and spec_rt.change_mode == "SNAPSHOT_DIFF"):
+            partition = self._compute_partition(
+                spec_rt, binding, rows, target_rows,
+            )
+            ledger_records = record_partition_ledger(
+                repo,
+                batch_id=batch_id,
+                canonical_table=record.task_id,
+                partition=partition,
+            )
+            if not partition.ok_rows and (partition.conflict_keys or partition.missing_parent_keys):
+                repo.transition_batch(
+                    batch_id, BatchState.QUARANTINED,
+                    reason="CAS/缺父分组后无合法组可装载",
+                    evidence=json.dumps(partition.ledger_summary(), ensure_ascii=False),
+                )
+                return {
+                    "ok": False,
+                    "batch_id": batch_id,
+                    "state": "QUARANTINED",
+                    "partition": partition.ledger_summary(),
+                    "quarantine_ledger": ledger_records,
+                    "refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写",
+                    "simulation": self.simulation,
+                }
+            rows = list(partition.ok_rows)
         if self.simulation:
             port = ApplyPort(
                 whitelisted_executors=[executor_id or "sql-target-apply-1"],
@@ -656,7 +883,7 @@ class ProductionAssembly:
             quality_verified=True,
             approval_ref=approval_ref,
             executor_id=executor_id or executor.executor_id,
-            target_object=f"{binding.target_instance}.{binding.tenant}.{binding.table}",
+            target_object=logical_target_object(binding),
             allowed_operations=("INSERT", "UPDATE"),
             idempotency_key_columns=binding.key_columns,
             rows=tuple(rows),
@@ -664,6 +891,10 @@ class ProductionAssembly:
             mode="MERGE",
             lease_resource=lease_resource,
             fencing_token=fencing_token,
+            cas_preverified=partition is not None,
+            row_version_evidences=(
+                dict(partition.row_version_evidences) if partition is not None else None
+            ),
         )
         if record.state in (BatchState.VALIDATED, BatchState.WAITING_APPROVAL):
             repo.transition_batch(
@@ -707,7 +938,11 @@ class ProductionAssembly:
             }
         repo.transition_batch(
             batch_id, BatchState.APPLIED, reason="提交回执已确认",
-            evidence=result.operation_id,
+            evidence=(
+                result.operation_id
+                if partition is None
+                else f"{result.operation_id}|partition={json.dumps(partition.ledger_summary(), ensure_ascii=False)}"
+            ),
         )
         return {
             "ok": True,
@@ -715,6 +950,8 @@ class ProductionAssembly:
             "operation_id": result.operation_id,
             "rows_affected": result.rows_affected,
             "plan_counts": plan.counts,
+            "partition": partition.ledger_summary() if partition is not None else None,
+            "quarantine_ledger": ledger_records or None,
             "credential": {
                 "operation_id": result.credential.operation_id,
                 "manifest_hash": result.credential.manifest_hash,
@@ -762,21 +999,46 @@ class ProductionAssembly:
         else:
             target_rows = self._read_target_snapshot(binding, keys)
         metas = list(self._column_meta(binding, spec).values())
+        # 批1-4/批1-5：开隔离组的键不计入 missing（留账未闭合单列），
+        # 但存在未闭合隔离组时不转 RECONCILED（报送未闭合）。
+        quarantined_keys: set[tuple] = set()
+        spec_rt = self.runtime_spec(record.task_id)
+        if not self.simulation and spec_rt is not None and spec_rt.change_mode == "SNAPSHOT_DIFF":
+            partition = self._compute_partition(spec_rt, binding, rows, target_rows)
+            quarantined_keys = set(partition.conflict_keys) | set(partition.missing_parent_keys)
         diffs: list[dict] = []
-        missing = [k for k in keys if k not in target_rows]
+        missing = [
+            k for k in keys if k not in target_rows and k not in quarantined_keys
+        ]
+        quarantined_pending = sum(1 for k in keys if k in quarantined_keys)
         for row in rows:
             key = tuple(row.get(c) for c in binding.key_columns)
+            if key in quarantined_keys:
+                continue
             target_row = target_rows.get(key)
             if target_row is None:
                 continue
             row_diffs = row_diff(row, target_row, metas)
             if row_diffs:
                 diffs.append({"columns": [diff["column"] for diff in row_diffs]})
-        ok = not missing and not diffs
+        ok = not missing and not diffs and not quarantined_pending
+        recovery_result = None
         if ok:
             repo.transition_batch(
                 batch_id, BatchState.RECONCILED, reason="全键回读一致",
                 evidence=f"keys={len(keys)}",
+            )
+            # 批1-5 恢复执行化：回读一致后关对应缺口、按门禁推水位、
+            # 补发 RECOVERED（如有 OPEN 事件）
+            from app.services.reporting_pipeline.recovery import RecoveryExecutor
+
+            executor = RecoveryExecutor(repo)
+            recovery_result = executor.close_success(
+                batch_id=batch_id,
+                task_id=record.task_id,
+                business_day=record.business_day,
+                window_fingerprint=manifest.window_fingerprint,
+                evidence=f"reconcile:keys={len(keys)}",
             )
         return {
             "ok": ok,
@@ -784,7 +1046,9 @@ class ProductionAssembly:
             "keys_checked": len(keys),
             "missing_keys": len(missing),
             "content_diffs": len(diffs),
+            "quarantined_pending": quarantined_pending,
             "diff_sample": diffs[:5],
+            "recovery": recovery_result,
             "state_before": record.state.value,
             "simulation": self.simulation,
         }

@@ -39,6 +39,7 @@ IMPLEMENTED_COMMANDS = (
     "plan", "simulate", "resume",
     "capture", "verify", "apply", "reconcile", "delivery", "retry",
     "backfill-plan", "gap-diff-plan", "publish-order",
+    "freeze-config", "approval-register", "outbox-send", "outbox-inspect",
     "doctor",
 )
 
@@ -415,41 +416,6 @@ def cmd_simulate(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_resume(args: argparse.Namespace) -> int:
-    """恢复视图：从状态仓储读批次给出恢复动作（模拟/真实双模式）。"""
-    from app.services.reporting_pipeline.recovery import RecoveryService
-    from app.services.reporting_pipeline.repositories import InMemoryControlRepository
-
-    state_db = _state_db_url(args)
-    if state_db:
-        from app.services.reporting_pipeline.pg_repository import (
-            SqlAlchemyControlRepository,
-        )
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
-
-        engine = create_engine(state_db)
-        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
-        simulation = False
-    else:
-        repository = InMemoryControlRepository()
-        simulation = True
-    service = RecoveryService(repository)
-    actions = [a.to_dict() for a in service.resume_all()]
-    _emit(
-        {
-            "ok": True,
-            "simulation": simulation,
-            "actions": actions,
-            "结论": (
-                f"恢复视图：{len(actions)} 个批次待恢复动作"
-                + ("（模拟：内存仓储无生产状态）" if simulation else "（来自持久化仓储）")
-            ),
-        }
-    )
-    return 0
-
-
 def cmd_ticket_export(args: argparse.Namespace) -> int:
     from app.services.reporting_pipeline.manual_tickets import seed_tickets_from_package
     from app.services.reporting_pipeline.seed_loader import _load_json
@@ -478,6 +444,438 @@ def cmd_ticket_export(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# 批1 新增命令：freeze-config / approval-register / outbox-send /
+# outbox-inspect / resume --execute
+# ---------------------------------------------------------------------------
+
+
+def _sha256_file(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def cmd_freeze_config(args: argparse.Namespace) -> int:
+    """批1-1：首组四表候选 → 完整 TaskSpec 冻结件（路径/版本/哈希显式）。"""
+    import re as _re
+    from datetime import datetime, timedelta, timezone
+
+    from app.services.reporting_pipeline.runtime_config import (
+        RuntimeConfigError,
+        build_freeze_document,
+        build_table_document,
+    )
+
+    config_dir = Path(args.config)
+    evidence_dir = config_dir / "2026补齐与T加1接续_20261022" / "核验证据_20261022"
+    a01_path = (
+        config_dir / "2026补齐与T加1接续_20261022"
+        / "A01_首组运行配置冻结_v2候选_20261022.json"
+    )
+    target_dict_path = evidence_dir / "target_dict_bulk.json"
+    views_bulk_path = evidence_dir / "ods_views_bulk.json"
+    snapshot_path = Path(args.metadata_snapshot)
+    for path in (a01_path, target_dict_path, views_bulk_path, snapshot_path):
+        if not path.exists():
+            _emit({"ok": False, "error": f"输入文件不存在: {path}", "exit_code": 2})
+            return 2
+
+    a01 = json.loads(a01_path.read_text(encoding="utf-8"))
+    target_dict = json.loads(target_dict_path.read_text(encoding="utf-8"))
+    views_bulk = json.loads(views_bulk_path.read_text(encoding="utf-8"))
+    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    override_doc = {}
+    if args.override and Path(args.override).exists():
+        override_doc = json.loads(Path(args.override).read_text(encoding="utf-8"))
+
+    # 目标列字典：{table: [ {name,type,length,nullable} ]}
+    columns_by_table: dict[str, list[dict]] = {}
+    for col in target_dict.get("columns") or []:
+        columns_by_table.setdefault(col["TABLE_NAME"], []).append(
+            {
+                "name": col["COLUMN_NAME"],
+                "target_type": (
+                    f"{col['DATA_TYPE']}({col['DATA_LENGTH']})"
+                    if col.get("DATA_LENGTH") and col["DATA_TYPE"].startswith("VAR")
+                    else col["DATA_TYPE"]
+                ),
+                "nullable": col.get("NULLABLE") != "N",
+                "data_length": col.get("DATA_LENGTH"),
+            }
+        )
+    # 源视图 DDL 别名覆盖证明（目标列 ⊆ 视图暴露列）
+    def view_aliases(view_name: str) -> set[str]:
+        ddl = (
+            snapshot.get("schemas", {}).get("ODS", {}).get("views", {})
+            .get(view_name, {}).get("ddl", "")
+        )
+        return {
+            a.upper()
+            for a in _re.findall(r"as\s+([A-Za-z_][A-Za-z0-9_]+)", ddl or "", _re.IGNORECASE)
+        }
+
+    source_inputs = [
+        {"path": str(a01_path), "sha256": _sha256_file(a01_path), "role": "A01候选"},
+        {"path": str(target_dict_path), "sha256": _sha256_file(target_dict_path), "role": "目标字典(DBOPER)"},
+        {"path": str(views_bulk_path), "sha256": _sha256_file(views_bulk_path), "role": "源视图定义哈希"},
+        {"path": str(snapshot_path), "sha256": _sha256_file(snapshot_path), "role": "08元数据快照(视图DDL)"},
+    ]
+    definitions = (views_bulk.get("definitions") or {})
+    defaults = {"max_rows_per_slice": 50000, "max_bytes_per_slice": 268435456, "max_attempts": 3}
+    tables: dict[str, dict] = {}
+    coverage_problems: list[str] = []
+    for name, table_cfg in (a01.get("tables") or {}).items():
+        target_table = table_cfg["target"]["table"]
+        cols = columns_by_table.get(target_table)
+        if not cols:
+            _emit({"ok": False, "error": f"目标字典缺表 {target_table}", "exit_code": 3})
+            return 3
+        view_name = table_cfg["source"]["object"]
+        aliases = view_aliases(view_name)
+        missing = [c["name"] for c in cols if c["name"].upper() not in aliases]
+        if missing:
+            coverage_problems.append(f"{name}: 视图未暴露 {len(missing)} 列（如 {missing[:3]}）")
+        system_time_column = (
+            table_cfg.get("system_time_column")
+            if isinstance(table_cfg.get("system_time_column"), str)
+            and table_cfg.get("system_time_column")
+            else None
+        )
+        projection = [
+            {
+                "name": c["name"],
+                "target_type": c["target_type"],
+                "source_expression": c["name"],
+                "nullable": c["nullable"],
+                "data_length": c["data_length"],
+            }
+            for c in sorted(cols, key=lambda item: item["name"])
+            if c["name"] != system_time_column
+        ]
+        parent_cfg = table_cfg.get("parent")
+        source_override = (override_doc.get("sources") or {}).get(
+            table_cfg["source"].get("source_group")
+        )
+        target_override = (override_doc.get("targets") or {}).get(name)
+        dialect = (source_override or {}).get("dialect", "oracle")
+        tables[name] = build_table_document(
+            canonical_table=name,
+            business_name=table_cfg.get("business_name", name),
+            engine=table_cfg.get("engine", "PYTHON"),
+            modes=["T1", "HISTORICAL"],
+            source_group=table_cfg["source"]["source_group"],
+            dialect=dialect,
+            source_object=(
+                (source_override or {}).get("object")
+                or f"ODS.{table_cfg['source']['object']}"
+            ),
+            credential_ref=(
+                (source_override or {}).get("credential_ref")
+                or table_cfg.get("credential_ref")
+                or "container-credentials:ods_8_216"
+            ),
+            target_instance=(
+                (target_override or {}).get("instance")
+                or f"{table_cfg['target']['instance']}"
+            ),
+            tenant=(target_override or {}).get("tenant") or table_cfg["target"]["tenant"],
+            target_table=(
+                (target_override or {}).get("table") or table_cfg["target"]["table"]
+            ),
+            stable_key=table_cfg["key"]["candidate"],
+            anchor_column=(
+                "DATETIME"
+                if not str(table_cfg.get("business_anchor", {}).get("column", "DATETIME")).startswith("DATETIME")
+                else "DATETIME"
+            ),
+            anchor_inherited_from_parent=bool(table_cfg.get("parent")),
+            projection=projection,
+            change_mode=table_cfg.get("change_evidence", {}).get("mode", "SNAPSHOT_DIFF"),
+            budget={**defaults, **(table_cfg.get("budget") or {})},
+            object_sha256=(
+                (definitions.get(view_name) or {}).get("sha256")
+            ),
+            system_time_column=system_time_column,
+            receipt_table=table_cfg.get("receipt_table")
+            if isinstance(table_cfg.get("receipt_table"), str)
+            and table_cfg.get("receipt_table").startswith(("DBOPER", "t1_"))
+            else None,
+            parent=(
+                {"table": parent_cfg["table"], "key_column": (
+                    "DCS_ID" if name == "EMR_ICH_DIAGNOSIS" else "ICH_ID"
+                )}
+                if parent_cfg else None
+            ),
+            notes={
+                "anchor_evidence": table_cfg.get("business_anchor", {}).get("verified_by", ""),
+                "key_evidence": table_cfg.get("key", {}).get("verified_by", ""),
+                "view_column_coverage": "verified" if not missing else f"missing={len(missing)}",
+            },
+        )
+    if coverage_problems and not args.allow_view_gap:
+        _emit({
+            "ok": False,
+            "error": "视图列覆盖不完整，拒绝冻结（--allow-view-gap 可强制但会留 notes）",
+            "problems": coverage_problems,
+            "exit_code": 3,
+        })
+        return 3
+    environment = args.environment
+    document = build_freeze_document(
+        environment=environment,
+        tables=tables,
+        source_inputs=source_inputs,
+        frozen_at=datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds"),
+        notes={
+            "coverage_problems": coverage_problems or [],
+            "candidate_h": a01.get("candidate_h", {}),
+            "enabled": "全部 false（候选停用；启用另出冻结走 A05c）",
+        },
+    )
+    output = Path(args.output)
+    output.write_text(
+        json.dumps(document, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+    # 自校验：装载即验哈希
+    from app.services.reporting_pipeline.runtime_config import (
+        load_frozen_runtime_config,
+    )
+
+    try:
+        loaded = load_frozen_runtime_config(output)
+        _emit({
+            "ok": True,
+            "output": str(output),
+            "environment": loaded.environment,
+            "tables": sorted(loaded.tables),
+            "config_fingerprint": loaded.config_fingerprint,
+            "结论": (
+                f"冻结件已生成并自校验通过（{len(loaded.tables)} 表，"
+                f"environment={loaded.environment}，enabled 全 false）"
+            ),
+        })
+        return 0
+    except RuntimeConfigError as exc:
+        _emit({"ok": False, "error": f"冻结件自校验失败: {exc}", "exit_code": 3})
+        return 3
+
+
+def cmd_approval_register(args: argparse.Namespace) -> int:
+    """批1-2c：登记耐久批准（管理动作；管道永不自批）。"""
+    from datetime import datetime, timedelta, timezone
+
+    from app.services.reporting_pipeline.production_apply import (
+        ProductionApplyError,
+        register_approval,
+    )
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    state_db = _state_db_url(args)
+    if not state_db:
+        _emit({"ok": False, "error": "approval-register 需要 --state-db", "exit_code": 2})
+        return 2
+    engine = create_engine(state_db)
+    now = datetime.now(timezone.utc)
+    try:
+        record = register_approval(
+            sessionmaker(bind=engine),
+            approval_ref=args.approval_ref,
+            executor_code=args.executor_code,
+            target_scope=args.target_scope,
+            valid_from=now,
+            valid_until=now + timedelta(hours=int(args.valid_hours)),
+            registered_by=args.registered_by,
+            note=args.note,
+        )
+    except ProductionApplyError as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    record["结论"] = (
+        f"批准已登记: {args.approval_ref}（{args.executor_code} → {args.target_scope}，"
+        f"有效期 {args.valid_hours} 小时；管道装载时只读核验）"
+    )
+    _emit({"ok": True, **record})
+    return 0
+
+
+def _outbox_repository(args: argparse.Namespace):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.services.reporting_pipeline.pg_repository import (
+        SqlAlchemyControlRepository,
+    )
+
+    state_db = _state_db_url(args)
+    if not state_db:
+        return None
+    engine = create_engine(state_db)
+    return SqlAlchemyControlRepository(sessionmaker(bind=engine))
+
+
+def cmd_outbox_send(args: argparse.Namespace) -> int:
+    """批1-6：独立 outbox sender（一轮或常驻循环；不同步 HTTP 卡抽取）。"""
+    from app.services.reporting_pipeline.outbox_daemon import (
+        DaemonConfig,
+        OutboxDaemon,
+        OutboxDaemonError,
+        build_relay_client_from_env,
+    )
+
+    repository = _outbox_repository(args)
+    if repository is None:
+        _emit({"ok": False, "error": "outbox-send 需要 --state-db", "exit_code": 2})
+        return 2
+    try:
+        client = build_relay_client_from_env()
+    except OutboxDaemonError as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+        return 2
+    daemon = OutboxDaemon(
+        repository, client,
+        config=DaemonConfig(
+            interval_seconds=float(args.interval),
+            max_cycles=int(args.max_cycles) if args.max_cycles else None,
+        ),
+    )
+    summary = daemon.run_once() if not args.loop else daemon.run_loop()
+    summary["ok"] = True
+    summary["结论"] = (
+        f"outbox 本轮派发完成：send={summary.get('send_attempted', 0)}，"
+        f"newly_queued={summary.get('newly_queued', 0)}，polls={summary.get('polls', 0)}"
+    )
+    _emit(summary)
+    return 0
+
+
+def cmd_outbox_inspect(args: argparse.Namespace) -> int:
+    from app.services.reporting_pipeline.outbox_daemon import inspect_outbox
+
+    repository = _outbox_repository(args)
+    if repository is None:
+        _emit({"ok": False, "error": "outbox-inspect 需要 --state-db", "exit_code": 2})
+        return 2
+    payload = inspect_outbox(repository)
+    payload["ok"] = True
+    payload["结论"] = (
+        "outbox 巡检：" + "，".join(
+            f"{key}={value}" for key, value in payload["summary"].items()
+        ) + "（PAUSED_AUTH/NEEDS_ATTENTION 需人工）"
+    )
+    _emit(payload)
+    return 0
+
+
+def cmd_resume(args: argparse.Namespace) -> int:
+    """恢复视图（--execute 时按恢复矩阵实际执行下一动作）。"""
+    from app.services.reporting_pipeline.recovery import RecoveryService
+    from app.services.reporting_pipeline.repositories import InMemoryControlRepository
+
+    state_db = _state_db_url(args)
+    if state_db:
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        from app.services.reporting_pipeline.pg_repository import (
+            SqlAlchemyControlRepository,
+        )
+
+        engine = create_engine(state_db)
+        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+        simulation = False
+    else:
+        repository = InMemoryControlRepository()
+        simulation = True
+    execute = bool(getattr(args, "execute", False))
+    service = RecoveryService(repository)
+    actions = [a.to_dict() for a in service.resume_all()]
+    executed: list[dict] = []
+    if execute and not simulation:
+        from app.services.reporting_pipeline.production_runtime import AssemblyRefused
+
+        try:
+            assembly, inputs = _build_assembly(args)
+        except (AssemblyRefused, SystemExit):
+            assembly = None
+        if assembly is None:
+            executed.append({"ok": False, "refused": "装配失败，未执行恢复动作"})
+        else:
+            for action in actions:
+                batch_id = action["batch_id"]
+                record = repository.get_batch(batch_id)
+                try:
+                    if action["action"] in ("START_CAPTURE", "REREAD_INCOMPLETE_SLICES", "RETRY_SAME_IDEMPOTENT_KEY"):
+                        binding = _target_binding_from_args(args, record.task_id)
+                        outcome = assembly.capture(
+                            table=record.task_id,
+                            business_day=record.business_day,
+                            binding=binding,
+                            mode=_mode_from_batch(batch_id),
+                            bindings=_action_bindings_from_doc(_bindings_doc(args)),
+                        )
+                    elif action["action"] == "VALIDATE_QUALITY":
+                        outcome = assembly.verify(batch_id=batch_id)
+                    elif action["action"] in ("REQUEST_APPROVED_APPLY",):
+                        if not args.approval_ref:
+                            executed.append({
+                                "batch_id": batch_id, "ok": False,
+                                "refused": "resume --execute 的 apply 需要 --approval-ref",
+                            })
+                            continue
+                        binding = _target_binding_from_args_for_record(args, record)
+                        outcome = {"ok": False, "refused": "apply 须经正式 apply 命令（含租约获取），resume 不代办"}
+                    elif action["action"] == "RECONCILE_AND_REPORT":
+                        binding = _target_binding_from_args(args, record.task_id)
+                        outcome = assembly.reconcile(batch_id=batch_id, binding=binding)
+                    else:
+                        outcome = {"ok": True, "note": f"动作 {action['action']} 需人工/外部输入，未自动执行"}
+                    executed.append({"batch_id": batch_id, "action": action["action"], **{
+                        k: v for k, v in outcome.items() if k in ("ok", "refused", "state", "rows")
+                    }})
+                except Exception as exc:  # noqa: BLE001 - 单批失败不连坐
+                    executed.append({
+                        "batch_id": batch_id, "ok": False,
+                        "error_class": type(exc).__name__,
+                    })
+    _emit(
+        {
+            "ok": True,
+            "simulation": simulation,
+            "actions": actions,
+            "executed": executed,
+            "结论": (
+                f"恢复视图：{len(actions)} 个批次待恢复动作"
+                + ("（模拟：内存仓储无生产状态）" if simulation else "（来自持久化仓储）")
+                + (f"；已执行 {len(executed)} 项" if executed else "")
+            ),
+        }
+    )
+    return 0
+
+
+def _target_binding_from_args_for_record(args: argparse.Namespace, record):
+    from app.services.reporting_pipeline.production_runtime import (
+        TargetBindingConfig,
+    )
+
+    doc = {}
+    bindings_file = getattr(args, "bindings_file", None)
+    if bindings_file:
+        doc = json.loads(Path(bindings_file).read_text(encoding="utf-8"))
+    target = doc.get("target") or {}
+    return TargetBindingConfig(
+        target_instance=target.get(
+            "target_instance", record.target_instance or "UNRESOLVED"
+        ),
+        tenant=target.get("tenant", record.tenant or "UNRESOLVED"),
+        table=target.get("table", record.target_table or "UNRESOLVED"),
+        key_columns=tuple(target.get("key_columns") or ("ID",)),
+        write_columns=tuple(target.get("write_columns") or ("ID",)),
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="reporting_ctl",
@@ -498,6 +896,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_val.set_defaults(func=cmd_validate)
 
     p_doctor = sub.add_parser("doctor", help="离线核查生产装配缺口；不连库、不创建暂存目录")
+    p_doctor.add_argument("--runtime-config", default=None, help="冻结运行配置 JSON（可选）")
     p_doctor.set_defaults(func=cmd_doctor)
 
     p_report = sub.add_parser("daily-report", help="生成日报（--state-db 真实持久库 / --allow-simulation 显式模拟）")
@@ -513,13 +912,67 @@ def build_parser() -> argparse.ArgumentParser:
     p_sim = sub.add_parser("simulate", help="模拟日轮（内存状态，显式 simulation 标记）")
     p_sim.set_defaults(func=cmd_simulate)
 
-    p_resume = sub.add_parser("resume", help="恢复视图：批次恢复动作（--state-db 真实持久库）")
+    p_resume = sub.add_parser("resume", help="恢复视图：批次恢复动作（--state-db 真实持久库；--execute 执行下一动作）")
     p_resume.add_argument("--state-db", default=None, help="控制面 PG SQLAlchemy URL（缺省=内存模拟）")
+    p_resume.add_argument("--execute", action="store_true", help="按恢复矩阵实际执行下一动作（apply 仍走正式命令）")
+    p_resume.add_argument("--approval-ref", default=None, help="execute 模式下 apply 动作的批准引用")
+    p_resume.add_argument("--bindings-file", default=None, help="目标/源绑定 JSON")
+    p_resume.add_argument("--stage-root", default=None, help="耐久暂存根目录")
+    p_resume.add_argument("--runtime-config", default=None, help="冻结运行配置 JSON")
+    p_resume.add_argument("--allow-simulation", action="store_true")
     p_resume.set_defaults(func=cmd_resume)
 
     p_ticket = sub.add_parser("ticket-export", help="导出人工视图工单机器JSON")
     p_ticket.add_argument("--output", required=True, help="输出 JSON 路径")
     p_ticket.set_defaults(func=cmd_ticket_export)
+
+    p_freeze = sub.add_parser(
+        "freeze-config",
+        help="批1-1：首组候选 → 完整 TaskSpec 冻结件（路径/版本/哈希显式冻结）",
+    )
+    p_freeze.add_argument("--output", required=True, help="冻结件输出 JSON 路径")
+    p_freeze.add_argument(
+        "--metadata-snapshot",
+        default=str(REPO_ROOT / "开发起步包" / "08_数据中心元数据快照.json"),
+        help="08 元数据快照（视图 DDL 列覆盖证明）",
+    )
+    p_freeze.add_argument(
+        "--environment",
+        default="production",
+        choices=["production", "isolated_acceptance"],
+        help="冻结环境标记（隔离验收冻结件目标身份不同属正常）",
+    )
+    p_freeze.add_argument("--override", default=None, help="环境覆盖 JSON（sources/targets）")
+    p_freeze.add_argument("--allow-view-gap", action="store_true", help="视图列覆盖不全时仍冻结（notes 留痕）")
+    p_freeze.set_defaults(func=cmd_freeze_config)
+
+    p_appr = sub.add_parser(
+        "approval-register",
+        help="批1-2c：登记耐久批准（管理动作，管道永不自批）",
+    )
+    p_appr.add_argument("--state-db", required=True, help="控制面 PG SQLAlchemy URL")
+    p_appr.add_argument("--approval-ref", required=True)
+    p_appr.add_argument("--executor-code", required=True)
+    p_appr.add_argument("--target-scope", required=True, help="target:{instance}.{tenant}.{table}")
+    p_appr.add_argument("--registered-by", required=True, help="登记人（可追溯）")
+    p_appr.add_argument("--valid-hours", default=24)
+    p_appr.add_argument("--note", default=None)
+    p_appr.set_defaults(func=cmd_approval_register)
+
+    p_osend = sub.add_parser(
+        "outbox-send", help="批1-6：独立 outbox sender（一轮/常驻循环；配置取环境变量）"
+    )
+    p_osend.add_argument("--state-db", required=True)
+    p_osend.add_argument("--loop", action="store_true", help="常驻循环（默认一轮）")
+    p_osend.add_argument("--interval", default=30, help="循环间隔秒")
+    p_osend.add_argument("--max-cycles", default=None, help="循环最大轮数")
+    p_osend.set_defaults(func=cmd_outbox_send)
+
+    p_oinfo = sub.add_parser(
+        "outbox-inspect", help="批1-6：outbox 巡检（分组清单，不触发发送）"
+    )
+    p_oinfo.add_argument("--state-db", required=True)
+    p_oinfo.set_defaults(func=cmd_outbox_inspect)
 
     # 六真实动作命令（A02）：真实输入缺失即拒；--allow-simulation 显式隔离验证
     common_real_args = [
@@ -534,6 +987,10 @@ def build_parser() -> argparse.ArgumentParser:
         (
             "--bindings-file",
             dict(default=None, help="目标/源/批准绑定 JSON（真实运行必填）"),
+        ),
+        (
+            "--runtime-config",
+            dict(default=None, help="冻结运行配置 JSON（批1-1；装载即验哈希）"),
         ),
         (
             "--allow-simulation",
@@ -570,6 +1027,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--approval-ref", required=True, help="批准引用（平台核验，非自批）"
     )
     p_apply.add_argument("--executor-id", default=None, help="白名单执行器 ID")
+    p_apply.add_argument("--lease-ttl", default=900, help="本表写租约 TTL 秒（批1-2c 单写者）")
     p_apply.set_defaults(func=cmd_apply)
     _add_common(p_apply)
 
@@ -635,6 +1093,7 @@ def _assembly_inputs(args: argparse.Namespace):
     stage_root = getattr(args, "stage_root", None)
 
     repository = None
+    session_factory = None
     if state_db:
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
@@ -644,7 +1103,8 @@ def _assembly_inputs(args: argparse.Namespace):
         )
 
         engine = create_engine(state_db)
-        repository = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+        session_factory = sessionmaker(bind=engine)
+        repository = SqlAlchemyControlRepository(session_factory)
     stage_store = None
     if stage_root:
         from app.services.reporting_pipeline.durable_staging import (
@@ -663,6 +1123,7 @@ def _assembly_inputs(args: argparse.Namespace):
     # 和有效写租约；JSON中的字符串不是生产授权。
     bindings_file = getattr(args, "bindings_file", None)
     executor_id = getattr(args, "executor_id", None)
+    doc: dict = {}
     if bindings_file:
         try:
             doc = json.loads(Path(bindings_file).read_text(encoding="utf-8"))
@@ -673,28 +1134,130 @@ def _assembly_inputs(args: argparse.Namespace):
         inputs.system_time_column = doc.get("system_time_column")
         inputs.approval_refs = tuple(doc.get("approval_refs") or ())
         inputs.executor_id = doc.get("executor_id") or executor_id
-        # 真实源工厂/目标连接由容器内受控连接器装配（本机 CLI 不持凭据）；
-        # 缺失时 ProductionAssembly 在真实动作处拒绝（REFUSED_MISSING_*）
+    # 批1-1 冻结运行配置：装载即验哈希，漂移拒绝
+    runtime_config_path = getattr(args, "runtime_config", None)
+    if runtime_config_path:
+        from app.services.reporting_pipeline.runtime_config import (
+            RuntimeConfigError,
+            load_frozen_runtime_config,
+        )
+
+        try:
+            inputs.runtime_config = load_frozen_runtime_config(runtime_config_path)
+        except RuntimeConfigError as exc:
+            _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+            raise SystemExit(2)
+    # 批1-2 源工厂：bindings.sources + 冻结配置 → 表级 RowSource
+    if inputs.runtime_config is not None and doc.get("sources"):
+        from app.services.reporting_pipeline.source_factory import (
+            build_table_row_source,
+        )
+
+        runtime_tables = inputs.runtime_config.tables
+        source_bindings = doc["sources"]
+
+        def _table_source(table: str):
+            return build_table_row_source(runtime_tables[table], source_bindings)
+
+        inputs.table_row_source_factory = _table_source
+    # 批1-2 目标连接工厂：bindings.target（方言/受控URL环境变量/凭据引用）
+    target_cfg = doc.get("target") or {}
+    if target_cfg.get("dialect"):
+        from app.services.reporting_pipeline.target_factory import (
+            TargetFactoryError,
+            build_target_connection_factory,
+        )
+
+        try:
+            inputs.target_connection_factory = build_target_connection_factory(
+                dialect=target_cfg.get("dialect", ""),
+                url_env=target_cfg.get("url_env"),
+                dsn=target_cfg.get("dsn"),
+                credential_ref=target_cfg.get("credential_ref"),
+                fault_injection=doc.get("fault_injection"),
+                lock_wait_seconds=int(target_cfg.get("lock_wait_seconds", 10)),
+            )
+        except TargetFactoryError as exc:
+            _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+            raise SystemExit(2)
+    # 批1-2c 生产 ApplyPort + 版本账只读器：真实模式有状态库与执行器时装配
+    if (repository is not None and session_factory is not None
+            and inputs.executor_id and not inputs.allow_simulation):
+        from app.services.reporting_pipeline.production_apply import (
+            ProductionApplyError,
+            build_production_apply_port,
+        )
+
+        try:
+            inputs.production_apply_port = build_production_apply_port(
+                session_factory=session_factory,
+                repository=repository,
+                executor_codes=[inputs.executor_id],
+            )
+        except ProductionApplyError as exc:
+            _emit({"ok": False, "refused": str(exc), "exit_code": 2})
+            raise SystemExit(2)
+        if inputs.runtime_config is not None:
+            from app.services.reporting_pipeline.apply_port import VersionScope
+            from app.services.reporting_pipeline.pg_repository import (
+                PgVersionRegistry,
+            )
+
+            registry = PgVersionRegistry(session_factory)
+
+            def _version_reader(target_object: str, key: tuple):
+                parts = target_object.rsplit(".", 2)
+                if len(parts) != 3:
+                    return None
+                return registry.current_version(VersionScope(*parts), tuple(key))
+
+            inputs.version_reader = _version_reader
     return inputs
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
     """如实说明命令行与生产装配的边界，禁止把离线测试当上线验收。"""
     bundle = _load_bundle(Path(args.config))
+    runtime_config_path = getattr(args, "runtime_config", None)
+    runtime_config_status = "未提供（--runtime-config 冻结运行配置）"
+    if runtime_config_path:
+        from app.services.reporting_pipeline.runtime_config import (
+            RuntimeConfigError,
+            load_frozen_runtime_config,
+        )
+
+        try:
+            loaded = load_frozen_runtime_config(runtime_config_path)
+            runtime_config_status = (
+                f"已装载（environment={loaded.environment}，"
+                f"{len(loaded.tables)} 表，指纹校验通过）"
+            )
+        except RuntimeConfigError as exc:
+            runtime_config_status = f"装载失败: {exc}"
     _emit({
         "ok": False,
         "production_ready": False,
         "mode": "offline_inspection",
         "configured_tasks": len(bundle.tasks),
         "enabled_tasks": sum(bool(task.enabled) for task in bundle.tasks),
-        "missing_runtime_bindings": [
-            "受控源RowSource工厂（按表投影、分页、时间及双源路由）",
-            "DataX执行/暂存回收与日轮的完整接线",
-            "目标TargetConnection工厂及连接释放",
-            "平台批准核验+耐久版本账+本表写租约的production ApplyPort",
-            "已批准的控制库迁移、目标回执表、正式调度和告警配置",
+        "runtime_config": runtime_config_status,
+        "wired_this_batch": [
+            "批1-1 freeze-config 冻结件（路径/版本/哈希；装载即验）",
+            "批1-2a 源工厂（Oracle ROWNUM/PG LIMIT 投影查询+受控连接器+双源路由器）",
+            "批1-2b 目标连接工厂（PgTargetConnection 入 app；Oracle 方言已实现待隔离环境）",
+            "批1-2c 生产 ApplyPort（平台白名单+耐久批准登记+租约围栏+耐久版本账）+ approval-register",
+            "批1-3 DataX 固定暂存路线接入 capture（真实引擎实测须 8.53）",
+            "批1-4 SNAPSHOT_DIFF CAS 分区+父存在性+隔离组账",
+            "批1-5 恢复执行化（回读关缺口/水位门禁/RECOVERED/rescan 覆盖账）+ REPLACE_MONTH 执行器",
+            "批1-6 outbox-send/outbox-inspect（独立 sender；真实外发须 R06 六项输入）",
         ],
-        "note": "当前CLI未装配生产连接；bindings JSON不提供连接或批准。真实动作缺输入时拒绝。",
+        "still_missing_for_production": [
+            "控制库迁移全链 apply（生产在 c0d1e2f3a4b5，整条报表链待批 PA5）",
+            "目标回执表 DDL（PA3）、暂存持久卷挂载（PA6）",
+            "正式调度注册与告警订阅（R06 外部输入）",
+            "镜像发布与 8.53 DataX 引擎级实测（PA 批准后）",
+        ],
+        "note": "CLI 已可按 bindings+冻结配置装配真实运行链；生产部署与外发仍逐例待批。",
     })
     return 2
 
@@ -712,27 +1275,75 @@ def _build_assembly(args: argparse.Namespace):
     return assembly, inputs
 
 
-def _target_binding_from_args(args: argparse.Namespace):
+def _action_bindings_from_doc(doc: dict):
+    """K01：未 enabled 表的本地动作绑定（须带批准来源与有效期）。
+
+    声明形如 {"action_bindings": [{"canonical_table": ..., "actions":
+    ["CAPTURE","STAGE","APPLY"], "valid_hours": 8, "approval_ref": ...,
+    "granted_by": ...}]}。程序不得自造绑定；来源对应平台批准登记。
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from app.services.reporting_pipeline.contracts import PipelineAction
+    from app.services.reporting_pipeline.runtime import ActionBinding
+
+    now = datetime.now(timezone.utc)
+    out = []
+    for item in doc.get("action_bindings") or []:
+        out.append(ActionBinding(
+            canonical_table=item["canonical_table"],
+            actions=tuple(PipelineAction(a) for a in item.get("actions") or ()),
+            valid_from=now,
+            valid_until=now + timedelta(hours=int(item.get("valid_hours", 8))),
+            approval_ref=item["approval_ref"],
+            granted_by=item["granted_by"],
+        ))
+    return tuple(out)
+
+
+def _bindings_doc(args: argparse.Namespace) -> dict:
+    bindings_file = getattr(args, "bindings_file", None)
+    if bindings_file:
+        return json.loads(Path(bindings_file).read_text(encoding="utf-8"))
+    return {}
+
+
+def _table_from_batch(batch_id: str, doc: dict | None = None) -> str:
+    """batch_id = {table}.{mode}.{day}.{digest}；table 为绑定表名（可为
+    schema 限定）。返回 canonical_table：按 targets_by_table 反查绑定表名。"""
+    parts = batch_id.rsplit(".", 3)
+    prefix = parts[0] if len(parts) == 4 else batch_id.split(".", 1)[0]
+    for canonical, entry in (doc or {}).get("targets_by_table", {}).items():
+        if entry.get("table") == prefix or canonical == prefix:
+            return canonical
+    return prefix
+
+
+def _mode_from_batch(batch_id: str) -> str:
+    parts = batch_id.rsplit(".", 3)
+    return parts[1] if len(parts) == 4 else "T1"
+
+
+def _target_binding_from_args(args: argparse.Namespace, canonical_table: str | None = None):
     from app.services.reporting_pipeline.production_runtime import (
         TargetBindingConfig,
     )
 
-    doc = {}
-    bindings_file = getattr(args, "bindings_file", None)
-    if bindings_file:
-        doc = json.loads(Path(bindings_file).read_text(encoding="utf-8"))
+    doc = _bindings_doc(args)
     target = doc.get("target") or {}
+    per_table = (
+        (doc.get("targets_by_table") or {}).get(canonical_table)
+        if canonical_table else None
+    ) or {}
+    resolved = {**target, **per_table}
     return TargetBindingConfig(
-        target_instance=target.get(
-            "target_instance",
-            getattr(args, "target_instance", None) or "UNRESOLVED",
+        target_instance=resolved.get(
+            "target_instance", resolved.get("instance") or "UNRESOLVED"
         ),
-        tenant=target.get("tenant", getattr(args, "tenant", None) or "UNRESOLVED"),
-        table=target.get(
-            "table", getattr(args, "table", None) or "UNRESOLVED"
-        ),
-        key_columns=tuple(target.get("key_columns") or ("K1",)),
-        write_columns=tuple(target.get("write_columns") or ("K1", "V1")),
+        tenant=resolved.get("tenant") or "UNRESOLVED",
+        table=resolved.get("table") or getattr(args, "table", None) or "UNRESOLVED",
+        key_columns=tuple(resolved.get("key_columns") or ("ID",)),
+        write_columns=tuple(resolved.get("write_columns") or ("ID",)),
     )
 
 
@@ -748,7 +1359,7 @@ def cmd_capture(args: argparse.Namespace) -> int:
         inputs = _assembly_inputs(args)
         inputs.allow_simulation = True  # dry-run 显式允许（仅产计划，不触源/状态）
         assembly = ProductionAssembly.build(inputs, real=False)
-        binding = _target_binding_from_args(args)
+        binding = _target_binding_from_args(args, args.table)
         outcome = assembly.capture(
             table=args.table,
             business_day=args.business_day,
@@ -763,13 +1374,14 @@ def cmd_capture(args: argparse.Namespace) -> int:
 
         try:
             assembly, _inputs = _build_assembly(args)
-            binding = _target_binding_from_args(args)
+            binding = _target_binding_from_args(args, args.table)
             outcome = assembly.capture(
                 table=args.table,
                 business_day=args.business_day,
                 binding=binding,
                 mode=args.mode,
                 dry_run=dry_run,
+                bindings=_action_bindings_from_doc(_bindings_doc(args)),
             )
         except AssemblyRefused as exc:
             _emit({"ok": False, "refused": str(exc), "exit_code": 2})
@@ -803,17 +1415,67 @@ def cmd_verify(args: argparse.Namespace) -> int:
 def cmd_apply(args: argparse.Namespace) -> int:
     from app.services.reporting_pipeline.production_runtime import AssemblyRefused
 
+    state_db = _state_db_url(args)
+    allow_simulation = bool(getattr(args, "allow_simulation", False))
+    lease = None
+    lease_repo = None
+    if state_db and not allow_simulation:
+        # 批1-2c：正式装载前取本表写租约（单写者 + 围栏 token），结束释放
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        from app.services.reporting_pipeline.pg_repository import (
+            SqlAlchemyControlRepository,
+        )
+        from app.services.reporting_pipeline.repositories import LeaseDenied
+        from app.services.reporting_pipeline.runtime import unique_worker_id
+
+        engine = create_engine(state_db)
+        lease_repo = SqlAlchemyControlRepository(sessionmaker(bind=engine))
+        doc = _bindings_doc(args)
+        per_table = (doc.get("targets_by_table") or {}).get(
+            _table_from_batch(args.batch, doc)
+        ) or {}
+        target = {**(doc.get("target") or {}), **per_table}
+        resource = "target:{instance}.{tenant}.{table}".format(
+            instance=target.get("target_instance") or target.get("instance", ""),
+            tenant=target.get("tenant", ""),
+            table=(target.get("table") or "").rsplit(".", 1)[-1],
+        )
+        try:
+            lease = lease_repo.acquire_lease(
+                resource, unique_worker_id("r189t1-apply"),
+                ttl_seconds=int(getattr(args, "lease_ttl", 900)),
+            )
+        except LeaseDenied as exc:
+            _emit({
+                "ok": False, "refused": f"REFUSED_TARGET_LEASE：{exc}",
+                "resource": resource, "exit_code": 2,
+            })
+            return 2
     try:
         assembly, _inputs = _build_assembly(args)
-        binding = _target_binding_from_args(args)
+        binding = _target_binding_from_args(
+            args, _table_from_batch(args.batch, _bindings_doc(args))
+        )
         outcome = assembly.apply(
             batch_id=args.batch,
             binding=binding,
             approval_ref=args.approval_ref,
+            lease_resource=lease.resource if lease else None,
+            fencing_token=lease.fencing_token if lease else None,
         )
     except AssemblyRefused as exc:
         _emit({"ok": False, "refused": str(exc), "exit_code": 2})
         return 2
+    finally:
+        if lease is not None and lease_repo is not None:
+            try:
+                lease_repo.release_lease(
+                    lease.resource, lease.holder, fencing_token=lease.fencing_token
+                )
+            except Exception:  # noqa: BLE001 - 释放失败不掩盖主结果（TTL兜底）
+                pass
     outcome["结论"] = (
         "正式装载提交成功（回执+版本账已登记）" if outcome.get("ok")
         else f"装载未完成: {outcome.get('state') or outcome.get('refused', '')[:120]}"
@@ -827,7 +1489,9 @@ def cmd_reconcile(args: argparse.Namespace) -> int:
 
     try:
         assembly, _inputs = _build_assembly(args)
-        binding = _target_binding_from_args(args)
+        binding = _target_binding_from_args(
+            args, _table_from_batch(args.batch, _bindings_doc(args))
+        )
         outcome = assembly.reconcile(batch_id=args.batch, binding=binding)
     except AssemblyRefused as exc:
         _emit({"ok": False, "refused": str(exc), "exit_code": 2})

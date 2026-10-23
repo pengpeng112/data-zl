@@ -1,10 +1,10 @@
 {
  "plan_version": "1.1",
- "as_of": "2026-10-22",
- "status": "MAINTENANCE_FIXES_VERIFIED_RUNTIME_WIRING_PENDING_NOT_DEPLOYED",
+ "as_of": "2026-10-23",
+ "status": "BATCH1_RUNTIME_CHAIN_WIRED_ISOLATED_ACCEPTED_NOT_DEPLOYED",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
- "current_step": "本地维护修复及隔离PG复验完成；生产装配和恢复闭环仍须补齐",
- "next": "先按维护复核说明补运行配置/连接工厂/生产ApplyPort/恢复与月巡闭环，补Oracle隔离验证；再按PA1—PA7审阅、试点与7日观测。血透与8.53晚间核查已见证据，不再重复列为未核。",
+ "current_step": "第一批（补齐运行链+隔离验收）完成：正式CLI入口全链6场景过；生产部署与上线动作全部待批（第二批）",
+ "next": "第二批：逐项呈报PA1-PA7（含新迁移b8c9d0e1f2a3批准登记表与整条控制链）、小窗试点、H冻结、7日观测。Oracle方言/DataX真实引擎/8.53实测待环境或批准",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -30,9 +30,10 @@
    ]
   },
   "A02": {
-   "status": "PARTIAL_LOCAL_FIXED_RUNTIME_WIRING_PENDING",
+   "status": "COMPLETED_RUNTIME_WIRED_ISOLATED_ACCEPTED",
    "evidence": [
-    "六真实命令+production_runtime；本轮新增B02三离线命令(backfill-plan/gap-diff-plan/publish-order)"
+    "六真实命令+production_runtime；B02三离线命令",
+    "批1(2026-10-23)：源工厂/目标连接工厂/生产ApplyPort/耐久版本账/租约获取全部接线进CLI；freeze-config冻结件装载即验哈希；正式入口全链=test_full_chain_cli_isolated_pg.py 6场景过"
    ],
    "maintenance_review": "六命令存在但CLI尚未装配连接工厂和生产ApplyPort；不能只凭离线测试声称真实入口完成"
   },
@@ -43,12 +44,13 @@
    ]
   },
   "A04": {
-   "status": "ISOLATED_PG_REVERIFIED_ORACLE_AND_FULL_RUNTIME_PENDING",
+   "status": "ISOLATED_PG_FULL_CHAIN_ACCEPTED_ORACLE_PENDING",
    "evidence": [
     "隔离PG集成测试7项全过(RT1-003/004/005)——test_rt1_004时钟偏差修复(8.83 PG比本机快约3.4秒,测试裕量30秒,产品语义无缺陷)",
     "daily-report --state-db 隔离库实测exit 0,真实状态源,六分节齐(日报样例留档)",
     "隔离Oracle=仍待环境(无授权隔离schema,不以SQLite冒充)",
-    "执行器真库事务验收5项（隔离PG测试schema t1_exec_it,真行锁/原子性/目标时钟）"
+    "执行器真库事务验收5项（隔离PG测试schema t1_exec_it,真行锁/原子性/目标时钟）",
+    "批1验收(2026-10-23)：reporting_ctl CLI 全链 6 场景全过（首日全链/源故障恢复/迟到RESCAN+CAS/缺父隔离+父后闭合/COMMIT_UNKNOWN干净重放/并发变化CAS不盲覆盖/日报+resume）；隔离PG 18项全过"
    ]
   },
   "A05": {
@@ -130,11 +132,30 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "给执行者_两批接续执行提示词_20261022.md（终版：基线含0fd6ba0维护修复；第一批补齐运行链→第二批按批准上线）",
+ "handoff_for_next_ai": "两批接续：第一批已完成(见batch1_first_batch)；第二批按A05_待批清单_v3_20261023.json逐项会话内呈报批准后执行（生产动作零预支）",
  "maintenance_review_20261022": {
   "session": "codex-t1-maintenance-20261022",
   "main_ai_review": "zcode-20261022-tplus1-stage2d 复核通过(测试复跑/16指纹全对/关键修复抽查属实/checkpoint语义diff仅13处精准更新),交付已提交0fd6ba0",
   "doc": "maintenance_review_20261022/T加1维护复核与修复说明.md",
   "production_reality": "8.83容器无T+1程序/无asset_reporting_*控制表(迁移c0d1e2f3a4b5)/未挂暂存卷"
+ },
+ "batch1_first_batch": {
+  "finished_on": "2026-10-23",
+  "scope": "第一批六项：冻结运行配置/受控源工厂/目标连接工厂(Pg入app+Oracle方言)/生产ApplyPort(平台白名单+耐久批准登记+租约围栏+耐久版本账)/DataX固定暂存路线/SNAPSHOT_DIFF CAS分区+父存在性+隔离组账/恢复执行化(回读关缺口+水位门禁+RECOVERED+rescan覆盖账+REPLACE_MONTH执行器)/outbox守护",
+  "tests": "单元478过+2跳(净增34)；隔离PG集成18过(新增全链6)；ruff净；迁移链全绿(head=b8c9d0e1f2a3)",
+  "artifacts": [
+   "backend/app/services/reporting_pipeline/{runtime_config,source_factory,target_factory,production_apply,apply_policy,datax_route,outbox_daemon}.py（新增7模块）",
+   "backend/scripts/reporting_ctl.py：freeze-config/approval-register/outbox-send/outbox-inspect/resume --execute/--runtime-config/--bindings-file/租约获取",
+   "backend/alembic/versions/b8c9d0e1f2a3_reporting_approval_refs.py（asset_reporting_approval_refs）",
+   "首组四表运行配置冻结件_v1_20261023.json（production, fingerprint=7f8fb38a…，enabled全false）",
+   "backend/tests/reporting_pipeline_integration/test_full_chain_cli_isolated_pg.py"
+  ],
+  "not_run_recorded": [
+   "Oracle方言集成验证（无隔离Oracle环境，NOT_RUN，不以SQLite/PG冒充；方言级SQL与院区时区绑定已单测）",
+   "DataX真实引擎+MySQL暂存实测（须8.53环境与批准；假进程+假暂存访问器单测覆盖流程/拆窗/回收/行数核对）",
+   "relay真实外发（R06六项外部输入未齐；401/503/超时/重启持久化用假传输单测覆盖）"
+  ],
+  "production_actions": 0,
+  "database_writes": "隔离库data_asset_test内测试schema与控制表（alembic upgrade head+测试数据），零生产动作"
  }
 }

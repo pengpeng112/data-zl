@@ -62,7 +62,15 @@ class MysqlStageRoute:
         )
 
     def allows_table(self, table: str) -> bool:
-        return table in self.table_whitelist
+        """白名单=表前缀归属：基表或其 attempt/叶子隔离子表（前缀_后续）。
+
+        表级隔离防串批要求每次运行的暂存表带批次/叶标识后缀；白名单
+        校验的是"该前缀归本路线"，不是精确表名。
+        """
+        return any(
+            table == item or table.startswith(f"{item}_")
+            for item in self.table_whitelist
+        )
 
     def fingerprint(self) -> str:
         canonical = json.dumps(

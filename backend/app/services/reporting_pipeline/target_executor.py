@@ -58,6 +58,15 @@ class TargetConnection(Protocol):
         self, table: str, columns: Sequence[str], rows: Sequence[Mapping]
     ) -> int: ...
 
+    def delete_rows(
+        self,
+        table: str,
+        key_columns: Sequence[str],
+        keys: Sequence[tuple],
+    ) -> int:
+        """按稳定键删除（REPLACE_MONTH 同事务先删后插）。"""
+        ...
+
     def update_rows(
         self,
         table: str,
@@ -132,8 +141,13 @@ class SqlTargetApplyExecutor:
 
     def execute(self, request: ApplyRequest, plan: ApplyPlan) -> ApplyResult:
         cfg = self._config
-        if request.mode != "MERGE":
-            raise ContractViolation("当前SQL执行器仅实现MERGE；禁止将月替换伪装为成功")
+        if request.mode not in ("MERGE", "REPLACE_MONTH"):
+            raise ContractViolation(f"装载模式未实现: {request.mode}")
+        if request.mode == "REPLACE_MONTH" and not request.replace_scope_keys:
+            raise ContractViolation(
+                "REPLACE_MONTH 需要显式发布范围键清单（目标无已证 DATETIME 列，"
+                "不得按不存在列删除）"
+            )
         if tuple(request.idempotency_key_columns) != cfg.key_columns:
             raise ContractViolation("请求稳定键与执行器绑定不一致")
         requested_target = request.target_object.rsplit(".", 2)
@@ -141,7 +155,9 @@ class SqlTargetApplyExecutor:
                 or requested_target[1].upper() != cfg.tenant.upper()
                 or requested_target[2].upper() != cfg.table.rsplit(".", 1)[-1].upper()):
             raise ContractViolation("请求目标与执行器冻结绑定不一致")
-        if any(action not in (INSERT, UPDATE, "NO_CHANGE") for _, action in plan.actions):
+        if (request.mode == "MERGE" and any(
+            action not in (INSERT, UPDATE, "NO_CHANGE") for _, action in plan.actions
+        )):
             raise ContractViolation("存在冲突或未知装载动作，须先隔离，不能签发成功回执")
         planned_keys = [key for key, _ in plan.actions]
         row_keys = [tuple(row.get(column) for column in cfg.key_columns) for row in request.rows]
@@ -178,37 +194,34 @@ class SqlTargetApplyExecutor:
             # 目标侧围栏：事务内锁定本批涉及键的既有行（旧写者并发同键写
             # 被行锁挡住）；INSERT 行由唯一键约束兜底
             plan_keys = [key for key, _ in plan.actions]
-            locked = conn.lock_and_read_rows(cfg.table, cfg.key_columns, plan_keys)
+            scope_keys = (
+                list(request.replace_scope_keys)
+                if request.mode == "REPLACE_MONTH" else plan_keys
+            )
+            locked = conn.lock_and_read_rows(cfg.table, cfg.key_columns, scope_keys)
             rows_by_key = {}
             for row in request.rows:
                 key = tuple(row.get(c) for c in request.idempotency_key_columns)
                 if key in rows_by_key:
                     raise ContractViolation("执行器拒绝重复稳定键，须先完成质量去重")
                 rows_by_key[key] = row
-            # 执行分类动作：只写白名单列；NO_CHANGE 不写；CONFLICT 隔离跳过
-            inserts: list[Mapping] = []
-            updates: list[Mapping] = []
-            for key, action in plan.actions:
-                if key not in rows_by_key:
-                    raise ContractViolation("装载计划与暂存键集不一致")
-                row = rows_by_key[key]
-                if ((action == INSERT and key in locked)
-                        or (action in (UPDATE, "NO_CHANGE") and key not in locked)):
-                    raise ContractViolation("TARGET_CHANGED：预览后目标键发生变化，回滚并重新对账")
-                metas = list(request.column_meta.values())
-                if self._expected_target_rows is not None:
+            # 预览快照 CAS：范围键的目标内容与预览时不一致 → 回滚重对账
+            if self._expected_target_rows is not None:
+                metas_all = list(request.column_meta.values())
+                for key in scope_keys:
                     expected = self._expected_target_rows.get(key)
                     current = locked.get(key)
                     if ((expected is None) != (current is None) or
-                            (expected is not None and content_fingerprint(expected, metas) != content_fingerprint(current, metas))):
-                        raise ContractViolation("TARGET_CHANGED：预览后目标内容发生变化，回滚并重新对账")
-                if action == "NO_CHANGE" and content_fingerprint(row, metas) != content_fingerprint(locked[key], metas):
-                    raise ContractViolation("TARGET_CHANGED：无需更新的记录已发生变化")
-                if action == INSERT and key not in locked:
-                    inserts.append(row)
-                elif action == UPDATE and key in locked:
-                    updates.append(row)
-                # NO_CHANGE / CONFLICT / 重复键错分类：跳过（隔离账在控制面）
+                            (expected is not None and content_fingerprint(expected, metas_all) != content_fingerprint(current, metas_all))):
+                        raise ContractViolation("TARGET_CHANGED：预览后目标键发生变化，回滚并重新对账")
+            if request.mode == "REPLACE_MONTH":
+                # 月替换：同事务先删范围键再全量插入（源为该窗权威内容）；
+                # 范围键必须覆盖本批全部行键，否则拒绝（防漏删半替换）
+                missing_scope = [k for k in rows_by_key if k not in set(scope_keys)]
+                if missing_scope:
+                    raise ContractViolation(
+                        f"REPLACE_MONTH 范围键清单未覆盖本批行键（{len(missing_scope)} 键），拒绝执行"
+                    )
             system_time = (
                 conn.current_timestamp() if cfg.system_time_column else None
             )
@@ -224,19 +237,49 @@ class SqlTargetApplyExecutor:
                 return out
 
             affected = 0
-            if inserts:
+            deleted = 0
+            if request.mode == "REPLACE_MONTH":
+                deleted = conn.delete_rows(
+                    cfg.table, cfg.key_columns,
+                    [k for k in scope_keys if k in locked],
+                )
                 affected += conn.insert_rows(
                     cfg.table, columns,
-                    [_with_system_time(r) for r in inserts],
+                    [_with_system_time(r) for r in request.rows],
                 )
-            if updates:
-                affected += conn.update_rows(
-                    cfg.table, columns,
-                    [_with_system_time(r) for r in updates],
-                    key_columns=cfg.key_columns,
-                )
-            if affected != len(inserts) + len(updates):
-                raise ContractViolation("DML_ROWCOUNT_MISMATCH：实际写入行数与计划不符，回滚")
+                if affected != len(request.rows):
+                    raise ContractViolation("DML_ROWCOUNT_MISMATCH：月替换插入行数与计划不符，回滚")
+            else:
+                # 执行分类动作：只写白名单列；NO_CHANGE 不写；CONFLICT 隔离跳过
+                inserts: list[Mapping] = []
+                updates: list[Mapping] = []
+                for key, action in plan.actions:
+                    if key not in rows_by_key:
+                        raise ContractViolation("装载计划与暂存键集不一致")
+                    row = rows_by_key[key]
+                    if ((action == INSERT and key in locked)
+                            or (action in (UPDATE, "NO_CHANGE") and key not in locked)):
+                        raise ContractViolation("TARGET_CHANGED：预览后目标键发生变化，回滚并重新对账")
+                    if action == "NO_CHANGE" and content_fingerprint(row, list(request.column_meta.values())) != content_fingerprint(locked[key], list(request.column_meta.values())):
+                        raise ContractViolation("TARGET_CHANGED：无需更新的记录已发生变化")
+                    if action == INSERT and key not in locked:
+                        inserts.append(row)
+                    elif action == UPDATE and key in locked:
+                        updates.append(row)
+                    # NO_CHANGE / CONFLICT / 重复键错分类：跳过（隔离账在控制面）
+                if inserts:
+                    affected += conn.insert_rows(
+                        cfg.table, columns,
+                        [_with_system_time(r) for r in inserts],
+                    )
+                if updates:
+                    affected += conn.update_rows(
+                        cfg.table, columns,
+                        [_with_system_time(r) for r in updates],
+                        key_columns=cfg.key_columns,
+                    )
+                if affected != len(inserts) + len(updates):
+                    raise ContractViolation("DML_ROWCOUNT_MISMATCH：实际写入行数与计划不符，回滚")
             # 同事务回执：与业务 DML 同一事务持久化（COMMIT 前写入）
             if cfg.receipt_table:
                 conn.insert_receipt(cfg.receipt_table, {
@@ -246,6 +289,11 @@ class SqlTargetApplyExecutor:
                     "target_object": request.target_object,
                     "scope_summary": (
                         f"{request.mode}:keys={len(plan.actions)}"
+                        if request.mode != "REPLACE_MONTH"
+                        else (
+                            f"{request.mode}:deleted={deleted},"
+                            f"inserted={len(request.rows)},scope={len(scope_keys)}"
+                        )
                     ),
                     "rows_affected": affected,
                     "system_time": (
@@ -343,6 +391,19 @@ class FakeTargetConnection:
             self.rows[key] = {c: row.get(c) for c in columns}
             count += 1
         self.inserted_count += count
+        return count
+
+    def delete_rows(
+        self,
+        table: str,
+        key_columns: Sequence[str],
+        keys: Sequence[tuple],
+    ) -> int:
+        count = 0
+        for key in keys:
+            if key in self.rows:
+                del self.rows[key]
+                count += 1
         return count
 
     def update_rows(

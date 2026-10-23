@@ -200,6 +200,12 @@ class ApplyRequest:
     fencing_token: int | None = None
     version_order: str | None = None  # 已核源版本顺序说明
     version_kind: str | None = None  # int/decimal/timestamp（已核类型）
+    # 批1-4 SNAPSHOT_DIFF CAS：调用方已完成"目标内容=上次登记内容"核验，
+    # _classify 对内容差异直接 UPDATE（内容哈希不可排序，CAS 即安全依据；
+    # 执行器仍在提交前做 TARGET_CHANGED 复核）。
+    cas_preverified: bool = False
+    # 逐键版本证据（SNAPSHOT_DIFF=源内容哈希；不用采集时间冒充源版本）。
+    row_version_evidences: Mapping[tuple, str] | None = None
 
 
 @dataclass
@@ -451,13 +457,15 @@ class ApplyPort:
                     f"[{request.manifest.batch_id}] 执行器未提供同事务提交凭据"
                     "（TargetCommitCredential），不能当作已确认提交"
                 )
+            scope = self._version_scope(request)
+            evidences = request.row_version_evidences or {}
             for key, action in plan.actions:
                 if action in (INSERT, UPDATE, NO_CHANGE):
                     self.version_guard.register_applied(
                         key,
-                        request.version_order or "applied",
+                        evidences.get(key) or request.version_order or "applied",
                         operation_id=result.operation_id,
-                        scope=self._version_scope(request),
+                        scope=scope,
                     )
         return result
 
@@ -545,6 +553,12 @@ class ApplyPort:
             target_fp = content_fingerprint(target_row, metas)
             if source_fp == target_fp:
                 actions.append((key, NO_CHANGE))
+                continue
+            if request.cas_preverified:
+                # 批1-4 SNAPSHOT_DIFF：调用方分区已核"目标内容=上次登记
+                # 内容"（CAS 通过）；内容差异合法 UPDATE，不按内容哈希
+                # 不可比而误判 CONFLICT。提交前执行器仍复核 TARGET_CHANGED。
+                actions.append((key, UPDATE))
                 continue
             verdict = self.version_guard.check(
                 key, request.version_order, version_kind=request.version_kind,

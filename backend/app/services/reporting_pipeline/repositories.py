@@ -112,6 +112,7 @@ class ControlRepository(Protocol):
     def create_incident(
         self, incident_key: str, category: str, affected_tables: Sequence[str] | None = None
     ) -> AlertIncident: ...
+    def find_open_incident(self, incident_key: str) -> AlertIncident | None: ...
     def append_incident_event(
         self, incident: AlertIncident, *, event_kind: str, severity: str,
         title: str, body_bytes: bytes, metadata: Mapping[str, object] | None = None,
@@ -121,6 +122,22 @@ class ControlRepository(Protocol):
     def queued_outbox(self) -> list[OutboxEvent]: ...
     def pending_outbox(self) -> list[OutboxEvent]: ...
     def update_outbox_delivery(self, source_event_id: str, **kwargs) -> OutboxEvent: ...
+    def record_quarantine_group(
+        self,
+        *,
+        batch_id: str,
+        canonical_table: str,
+        group_key: str,
+        reason: str,
+        error_code: str | None = None,
+        rows_quarantined: int = 0,
+        detail_ref: str | None = None,
+    ) -> None: ...
+    def resolve_quarantine_group(
+        self, batch_id: str, group_key: str, *, evidence: str
+    ) -> None: ...
+    def open_quarantine_groups(self, batch_id: str) -> list[dict]: ...
+    def outbox_overview(self, *, limit: int = 20) -> dict: ...
     def snapshot(self) -> dict: ...
 
 
@@ -238,6 +255,7 @@ class InMemoryControlRepository:
         self._fencing_seq: dict[str, int] = {}
         self._incidents: dict[str, AlertIncident] = {}
         self._outbox: dict[str, OutboxEvent] = {}
+        self._quarantine_groups: dict[tuple[str, str], dict] = {}
 
     # -- 任务配置 -------------------------------------------------------
 
@@ -516,6 +534,12 @@ class InMemoryControlRepository:
         self._incidents[incident_id] = incident
         return incident
 
+    def find_open_incident(self, incident_key: str) -> AlertIncident | None:
+        for inc in self._incidents.values():
+            if inc.incident_key == incident_key and inc.state != "RECOVERED":
+                return inc
+        return None
+
     def append_incident_event(
         self,
         incident: AlertIncident,
@@ -642,6 +666,83 @@ class InMemoryControlRepository:
             event.needs_attention_reason = needs_attention_reason
         event.updated_at = self._now()
         return event
+
+    # -- 隔离组账（批1-4：坏组/缺父留痕，独立合法组继续） --------------------
+
+    def record_quarantine_group(
+        self,
+        *,
+        batch_id: str,
+        canonical_table: str,
+        group_key: str,
+        reason: str,
+        error_code: str | None = None,
+        rows_quarantined: int = 0,
+        detail_ref: str | None = None,
+    ) -> None:
+        key = (batch_id, group_key)
+        if key in self._quarantine_groups:
+            raise ContractViolation(f"隔离组已登记: {batch_id}/{group_key}")
+        self._quarantine_groups[key] = {
+            "batch_id": batch_id,
+            "canonical_table": canonical_table,
+            "group_key": group_key,
+            "reason": reason,
+            "error_code": error_code,
+            "rows_quarantined": rows_quarantined,
+            "detail_ref": detail_ref,
+            "state": "OPEN",
+            "created_at": self._now(),
+            "resolved_at": None,
+            "resolution_evidence": None,
+        }
+
+    def resolve_quarantine_group(
+        self, batch_id: str, group_key: str, *, evidence: str
+    ) -> None:
+        record = self._quarantine_groups.get((batch_id, group_key))
+        if record is None:
+            raise ContractViolation(f"隔离组不存在: {batch_id}/{group_key}")
+        record["state"] = "RESOLVED"
+        record["resolved_at"] = self._now()
+        record["resolution_evidence"] = evidence
+
+    def open_quarantine_groups(self, batch_id: str) -> list[dict]:
+        return [
+            dict(record)
+            for (bid, _), record in sorted(self._quarantine_groups.items())
+            if bid == batch_id and record["state"] == "OPEN"
+        ]
+
+    def outbox_overview(self, *, limit: int = 20) -> dict:
+        """全量投递状态分组统计 + 近期事件（巡检用，含暂停/待人工/退避中）。"""
+        events = sorted(
+            self._outbox.values(), key=lambda e: (e.updated_at, e.source_event_id)
+        )
+        groups: dict[str, list] = {}
+        for event in events:
+            state = event.delivery_state
+            if state == "NOT_SENT" and event.acceptance_state in ("ACK_QUEUED", "DUPLICATE"):
+                state = "ACK_QUEUED"
+            elif state == "NOT_SENT" and event.next_attempt_at is not None:
+                state = "BACKOFF_RETRYING"
+            groups.setdefault(state, []).append(event)
+        def view(e: OutboxEvent) -> dict:
+            return {
+                "source_event_id": e.source_event_id,
+                "event_kind": e.event_kind,
+                "delivery_state": e.delivery_state,
+                "acceptance_state": e.acceptance_state,
+                "attempts": e.attempts,
+                "next_attempt_at": (
+                    e.next_attempt_at.isoformat() if e.next_attempt_at else None
+                ),
+                "needs_attention_reason": e.needs_attention_reason,
+            }
+        return {
+            "counts": {state: len(items) for state, items in sorted(groups.items())},
+            "recent": [view(e) for e in events[-limit:]],
+        }
 
     # -- 导出（报表/测试断言用） -------------------------------------------
 

@@ -870,6 +870,16 @@ class SqlAlchemyControlRepository:
                 session.flush()
                 return self._incident_from_row(row)
 
+    def find_open_incident(self, incident_key: str) -> AlertIncident | None:
+        with self._sessions() as session:
+            row = session.execute(
+                select(AssetReportingAlertIncident).where(
+                    AssetReportingAlertIncident.incident_key == incident_key,
+                    AssetReportingAlertIncident.state != "RECOVERED",
+                )
+            ).scalar_one_or_none()
+            return self._incident_from_row(row) if row is not None else None
+
     @staticmethod
     def _incident_from_row(row) -> AlertIncident:
         return AlertIncident(
@@ -1146,6 +1156,74 @@ class SqlAlchemyControlRepository:
                 row.state = "RESOLVED"
                 row.resolved_at = _utcnow()
                 row.resolution_evidence = evidence
+
+    def open_quarantine_groups(self, batch_id: str) -> list[dict]:
+        with self._sessions() as session:
+            rows = (
+                session.execute(
+                    select(AssetReportingQuarantineGroup)
+                    .where(
+                        AssetReportingQuarantineGroup.batch_id == batch_id,
+                        AssetReportingQuarantineGroup.state == "OPEN",
+                    )
+                    .order_by(AssetReportingQuarantineGroup.id)
+                )
+                .scalars()
+                .all()
+            )
+            return [
+                {
+                    "batch_id": row.batch_id,
+                    "canonical_table": row.canonical_table,
+                    "group_key": row.group_key,
+                    "reason": row.reason,
+                    "error_code": row.error_code,
+                    "rows_quarantined": row.rows_quarantined,
+                    "detail_ref": row.detail_ref,
+                    "state": row.state,
+                }
+                for row in rows
+            ]
+
+    def outbox_overview(self, *, limit: int = 20) -> dict:
+        """全量投递状态分组统计 + 近期事件（巡检用，含暂停/待人工/退避中）。"""
+        with self._sessions() as session:
+            rows = (
+                session.execute(
+                    select(AssetReportingAlertOutbox).order_by(
+                        AssetReportingAlertOutbox.updated_at
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            events = [self._event_from_row(r) for r in rows]
+        groups: dict[str, list] = {}
+        for event in events:
+            state = event.delivery_state
+            if state == "NOT_SENT" and event.acceptance_state in ("ACK_QUEUED", "DUPLICATE"):
+                state = "ACK_QUEUED"
+            elif state == "NOT_SENT" and event.next_attempt_at is not None:
+                state = "BACKOFF_RETRYING"
+            groups.setdefault(state, []).append(event)
+
+        def view(e) -> dict:
+            return {
+                "source_event_id": e.source_event_id,
+                "event_kind": e.event_kind,
+                "delivery_state": e.delivery_state,
+                "acceptance_state": e.acceptance_state,
+                "attempts": e.attempts,
+                "next_attempt_at": (
+                    e.next_attempt_at.isoformat() if e.next_attempt_at else None
+                ),
+                "needs_attention_reason": e.needs_attention_reason,
+            }
+
+        return {
+            "counts": {state: len(items) for state, items in sorted(groups.items())},
+            "recent": [view(e) for e in events[-limit:]],
+        }
 
     # -- 导出 ------------------------------------------------------------
 

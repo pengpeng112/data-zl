@@ -32,7 +32,7 @@ METADATA_ALLOWLIST = frozenset({
     "system", "environment", "canonical_table", "source_group", "stage",
     "business_date", "batch_id", "incident_id", "error_class", "error_code",
     "affected_count", "task_status", "ticket_ref", "deadline", "detail_ref",
-    "recommended_action",
+    "recommended_action", "recovered",
 })
 PAYLOAD_TOP_KEYS = frozenset({
     "source_event_id", "event_type", "category", "severity", "title", "body",

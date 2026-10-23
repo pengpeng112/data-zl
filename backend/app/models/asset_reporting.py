@@ -313,3 +313,31 @@ class AssetReportingQuarantineGroup(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     resolved_at = Column(TIMESTAMP(timezone=True))
     resolution_evidence = Column(Text)
+
+
+class AssetReportingApprovalRef(Base):
+    """T+1 正式装载的耐久批准登记（批1-2c）。
+
+    管道自身永远不写本表：只有运维经 reporting_ctl approval-register
+    （显式管理动作，对应用户会话内批准）登记；装载时由
+    PlatformApprovalVerifier 只读核验。JSON 里的字符串不是生产批准，
+    本表是唯一耐久批准源。
+    """
+
+    __tablename__ = "asset_reporting_approval_refs"
+    __table_args__ = (
+        UniqueConstraint("approval_ref", "executor_code", name="uq_asset_reporting_approval"),
+        Index("ix_asset_reporting_approval_ref", "approval_ref"),
+        {"schema": "asset"},
+    )
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    approval_ref = Column(Text, nullable=False)
+    executor_code = Column(Text, nullable=False)
+    target_scope = Column(Text, nullable=False)  # target:{instance}.{tenant}.{table}
+    allowed_operations = Column(Text, nullable=False, server_default="INSERT,UPDATE")
+    valid_from = Column(TIMESTAMP(timezone=True), nullable=False)
+    valid_until = Column(TIMESTAMP(timezone=True), nullable=False)
+    registered_by = Column(Text, nullable=False)
+    note = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
