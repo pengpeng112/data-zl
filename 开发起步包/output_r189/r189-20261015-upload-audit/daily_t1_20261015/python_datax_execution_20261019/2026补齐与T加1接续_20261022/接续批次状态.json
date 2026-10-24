@@ -4,7 +4,7 @@
  "status": "BACKLOG_BACKFILLED_FIRST_GROUP_ATTENDED_MODE",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
  "current_step": "欠账补齐完成+310行工单裁定处置完成：309行CAS按用户裁定以目标侧为准关单（差异分类证据=切口/手术等级与10-21受控修正一致）；余1行源端缺手术编码工单保留待源端补数",
- "next": "R06告警六项输入待用户提供（source_id/secret/base_url/测试订阅/限流/时段）→接真实外发转无人值守；B05 7日观测；源端补1行手术编码后重放该键；扩表/DataX后续",
+ "next": "①扩表73项+DataX实测（8.53）→ 新会话按《给执行者_扩表73项与DataX实测_20261024.md》执行；②R06告警六项输入=用户暂缓（2026-10-24 用户确认可等，待用户提供 source_id/secret/base_url/测试订阅/限流/时段 后接真实外发转无人值守）；③B05 7日观测积累；④源端补1行手术编码后重放该键；⑤3张B01工单待工单处置",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -133,7 +133,7 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "第二批执行报告_20261024.md；值守期日常=cron自动日报+人工按第二批准登记逐日T+1（approval-register续期）；异常按 resume/retry 矩阵",
+ "handoff_for_next_ai": "给执行者_扩表73项与DataX实测_20261024.md（承接 batch1/batch2/backfill/tickets 全部成果；含生产实况快照/分批顺序/已知坑/DataX实测步骤/硬约束）",
  "maintenance_review_20261022": {
   "session": "codex-t1-maintenance-20261022",
   "main_ai_review": "zcode-20261022-tplus1-stage2d 复核通过(测试复跑/16指纹全对/关键修复抽查属实/checkpoint语义diff仅13处精准更新),交付已提交0fd6ba0",
