@@ -54,10 +54,11 @@ TEST_TABLE = "EMR_ICH_OPERATION"
 SOURCE_OBJECT = "ODS.V_EMR_ICH_OPERATION"
 ANCHOR = "DATETIME"
 STABLE_KEY = ("ID",)
+# 投影列取自首组生产冻结件 EMR_ICH_OPERATION 已核验列（DATETIME 只作锚点谓词）
 PROJECTION = (
-    "ID", "ICH_ID", "DATETIME", "OPERATION_CODE", "OPERATION_NAME",
-    "OPERATION_DATE", "OPERATION_LEVEL_CODE", "OPERATION_LEVEL_NAME",
-    "INCISION_CATEGORY", "OPERATION_GRADE", "OPERATOR_ID", "OPERATOR_NAME",
+    "ID", "ICH_ID", "OPERATION_CODE", "OPERATION_NAME", "OPERATION_DATE",
+    "INCISION_CATEGORY", "OPERATION_GRADE", "SURGEON_CODE", "SURGEON_NAME",
+    "ELECTIVE_EMERGENCY", "HEALING_GRADE_CODE", "ANAESTHESIA_NAME",
 )
 WHITELIST = (f"t1_{TEST_TABLE.lower()}",)
 
@@ -210,14 +211,16 @@ def _safe(attempt_id: str) -> str:
 
 
 def fetch_source_credentials(session: SshSession, mpw: str) -> dict:
-    """ODS 源凭据：8.53 datax_web.job_jdbc_datasource（内存使用，禁导出）。"""
+    """ODS 源连接+凭据：8.53 datax_web.job_jdbc_datasource（内存使用，禁导出）。"""
     code, out = session.mysql(
-        "SELECT jdbc_username, jdbc_password FROM datax_web.job_jdbc_datasource "
+        "SELECT jdbc_url, jdbc_username, jdbc_password "
+        "FROM datax_web.job_jdbc_datasource "
         "WHERE datasource_name='数据中心ODS_ORACLE'", mpw)
     if code != 0 or not out.strip():
         raise RuntimeError(f"ODS 源凭据获取失败: {out[:200]}")
-    user, _, password = out.strip().splitlines()[0].partition("\t")
-    return {"user": user, "password": password}
+    url, _, rest = out.strip().splitlines()[0].partition("\t")
+    user, _, password = rest.partition("\t")
+    return {"jdbc_url": url, "user": user, "password": password}
 
 
 def resolve_document(job: dict, source_creds: dict, mpw: str) -> str:
@@ -264,7 +267,7 @@ class RemoteStageWorkspace:
             pass  # 清理尽力而为（残留审计靠文件名前缀 .t1_job_）
 
 
-def make_route() -> MysqlStageRoute:
+def make_route(source_jdbc_urls: tuple) -> MysqlStageRoute:
     return MysqlStageRoute(
         route_id="route-853",
         version="v1",
@@ -273,6 +276,7 @@ def make_route() -> MysqlStageRoute:
         database=STAGE_DB,
         table_whitelist=WHITELIST,
         credential_ref="853:datax_web.job_jdbc_datasource/数据中心ODS_ORACLE",
+        source_jdbc_urls=tuple(source_jdbc_urls),
     )
 
 
@@ -328,10 +332,11 @@ def main() -> int:
             return 3
         source_creds = fetch_source_credentials(session, mpw)
         stage_access = MysqlCliStageAccess(session, mpw)
-        route = make_route()
+        route = make_route((source_creds["jdbc_url"],))
         template = make_template()
+        # 8.53 实证：datax.py 不可执行且无 python（只有 python3）——经解释器调用
         runner = DataXRunner(RemoteExecRunner(session), datax_home=DATAX_HOME,
-                             timeout_seconds=1800)
+                             timeout_seconds=1800, interpreter=("python3",))
         workspace = RemoteStageWorkspace(
             session, source_creds, mpw, stage_access, PROJECTION)
 
@@ -406,7 +411,7 @@ def main() -> int:
                 stage_table_prefix=WHITELIST[0],
                 column_names=list(PROJECTION),
                 budget=ReadBudget(
-                    max_rows_per_slice=10, max_bytes_per_slice=268435456,
+                    max_rows_per_slice=100, max_bytes_per_slice=268435456,
                     max_attempts=3),
             )
             outcome = capture.capture_window(

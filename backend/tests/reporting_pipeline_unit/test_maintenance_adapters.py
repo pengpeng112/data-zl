@@ -177,10 +177,12 @@ class TestDurableStageIntegrity(unittest.TestCase):
 class TestAdapterCompletenessEvidence(unittest.TestCase):
     def test_datax_dirty_metric_without_read_write_counts_is_incomplete(self):
         job = {
-            "job": {"content": [{"reader": {"parameter": {"querySql": [
-                "SELECT ID FROM T WHERE DT >= TO_DATE('2026-10-01','YYYY-MM-DD') "
-                "AND DT < TO_DATE('2026-10-02','YYYY-MM-DD')"
-            ]}}}]}
+            "job": {"content": [{"reader": {"parameter": {"connection": [{
+                "querySql": [
+                    "SELECT ID FROM T WHERE DT >= TO_DATE('2026-10-01','YYYY-MM-DD') "
+                    "AND DT < TO_DATE('2026-10-02','YYYY-MM-DD')"
+                ]
+            }]}}}]},
         }
         runner = DataXRunner(_ProcessRunner("读写失败总数 : 0\n"))
         result = runner.run_capture(job, "A1")

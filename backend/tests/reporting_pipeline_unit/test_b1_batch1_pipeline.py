@@ -649,6 +649,7 @@ def _route(stage_access, runner, budget=None):
         route_id="r1", version="v1", host="10.10.8.53", port=3306,
         database="stage", table_whitelist=("t1_emr_test_att1",),
         credential_ref="container-credentials:stage",
+        source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
     )
     template = DataxJobTemplate(
         template_id="t1", version="v1", reader_plugin="oraclereader",

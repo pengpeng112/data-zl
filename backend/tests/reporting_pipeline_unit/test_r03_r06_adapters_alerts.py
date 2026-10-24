@@ -53,6 +53,7 @@ def _job() -> dict:
         window_start="2026-10-19 00:00:00",
         window_end_exclusive="2026-10-20 00:00:00",
         credential_ref="secret-ref-1",
+        source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
     )
 
 

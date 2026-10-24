@@ -225,7 +225,7 @@
  "expand73_datax_20261024": {
   "session": "zcode-20261024-expand73-datax",
   "started_on": "2026-10-24",
-  "status": "A1_ENGINEERED_BATCH1_FROZEN_AWAITING_APPROVAL",
+  "status": "A1_DONE_BATCH1_FROZEN_B2_DATAX_PASSED_AWAITING_PILOT_APPROVAL",
   "a1_engineering": {
    "code_changes": [
     "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -253,13 +253,25 @@
   },
   "b_datax": {
    "b1_findings": "8.53 独立 datax.py 可直跑（/home/datax/bin/datax.py，DATAX-OPENSOURCE-3.0，python3.9）；oraclereader/mysqlwriter/rdbmswriter 插件在；写者快照重拍=零写者（进程仅 datax-web admin9527/executor9504 常驻+celery+mysqld；root cron 无抽取；/home/datax/job/datax-web-json 空）；MySQL 9.x@3306 监听中；10-20 已有真实试点先例（月窗4137行/幂等/相邻窗全过，暂存库 sanjia_fushen，mysqlwriter 必须 connection 数组结构）",
-   "b2_driver": "b2_datax实测驱动_20261024.py 就绪（本地编排+8.53本地进程执行+SFTP 0600 job文件+mysql CLI base64 回收；正常/dirty破坏/超预算拆窗三样例）；测试表=首组 EMR_ICH_OPERATION 2026-10-23 单日窗（131行）",
-   "blocked_on": "MPW（8.53 MySQL root 密码，10-20 先例经环境变量注入零落盘）或专用暂存账号——待用户提供；暂存库计划 t1_stage（新建专用库，不复用 sanjia_fushen）"
+   "status": "B2_REAL_ENGINE_TESTED_PASSED",
+   "finished_on": "2026-10-24",
+   "samples": "正常(读131=写131=COUNT131=回收131,dirty0)/dirty破坏(DIRTY拒收131)/超预算拆窗(100行片→递归二分收集131完整) 三样例全过",
+   "defects_fixed_on_real_engine": [
+    "argv --jobfile→位置参数(引擎无该选项)",
+    "JobFileWorkspace 解析 ${stage:*} 暂存凭据占位(残缺拒绝)",
+    "DataXRunner 增 interpreter 前缀(8.53 无 python 只有 python3,脚本不可执行)",
+    "reader 平铺 querySql→connection:[{querySql,jdbcUrl[]}] 数组结构(平铺=NPE recognizeTableOrQuerySqlMode:239);源jdbcUrl进 MysqlStageRoute.source_jdbc_urls(入指纹+校验)",
+    "parse_datax_metrics 补英文 Total N records...Error M 行(该版引擎中文汇总块无写入总数行,写侧在Communicator行,取最后一行)"
+   ],
+   "tests": "单元 500 过(499+1真实措辞解析) + 2跳；ruff 净",
+   "cleanup": "t1_stage 整库drop/13张白名单表全drop/job文件零残留/remote_exec已撤/datax-web与sanjia_fushen零影响(核查过)",
+   "evidence": "DataX实测证据_20261024.json + DataX实测报告_20261024.md + b2_datax实测驱动_20261024.py(同目录)",
+   "engine_advice": "首组与批1小表不切DataX维持Python;大表候选待画像实测后逐表冻结engine=DATAX;生产装配只差source_jdbc_urls+interpreter+远端job文件执行器(驱动已验证)"
   },
   "awaiting_user": [
-   "批1试点批准（镜像发布 r212+冻结件/绑定上传 t1-config+5表当日窗试点+adverse 库名 SHOW DATABASES 核验）",
-   "MPW 或暂存专用账号（B2 DataX 实测前置）"
+   "批1试点批准（镜像发布 r212+冻结件/绑定上传 t1-config+adverse库名SHOW DATABASES核验+5表当日窗试点）"
   ],
-  "production_actions_this_session": 0
+  "production_actions_this_session": 0,
+  "note_853_actions": "8.53 侧仅 DataX 实测暂存（t1_stage 用完整库 drop+job文件零残留+datax-web零影响），生产平台与业务源库零动作"
  }
 }

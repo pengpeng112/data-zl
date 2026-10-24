@@ -1,0 +1,60 @@
+{
+ "as_of": "2026-10-24T15:29:35+08:00",
+ "engine": "ssh:10.10.8.53:40022 → 8.53本地进程 python3 /home/datax/bin/datax.py",
+ "stage": "mysql 127.0.0.1:3306/t1_stage（白名单前缀 t1_emr_ich_operation_，用完即drop）",
+ "table": "EMR_ICH_OPERATION",
+ "source_object": "ODS.V_EMR_ICH_OPERATION",
+ "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+ "business_day": "2026-10-23",
+ "samples": [
+  {
+   "label": "normal",
+   "stage_table": "t1_emr_ich_operation_normal_2026_10_23",
+   "success": true,
+   "end_state": "COMPLETE",
+   "rows_read": 131,
+   "rows_written": 131,
+   "dirty_records": 0,
+   "stage_count": 131,
+   "count_match": true,
+   "recycle_rows": 131,
+   "recycle_match": true,
+   "stage_dropped": true
+  },
+  {
+   "label": "dirty-sabotage",
+   "stage_table": "t1_emr_ich_operation_dirty_2026_10_23",
+   "success": false,
+   "end_state": "DIRTY",
+   "rows_read": 131,
+   "rows_written": 131,
+   "dirty_records": 131,
+   "stage_dropped": true
+  }
+ ],
+ "normal_pass": true,
+ "dirty_sample_refused": true,
+ "split_sample": {
+  "complete": true,
+  "end_reason": "WINDOW_COMPLETE",
+  "rows_collected": 131,
+  "rows_read": null,
+  "rows_written": null,
+  "split_children": 2,
+  "stage_tables_touched": [
+   "t1_emr_ich_operation_normal_2026_10_23",
+   "t1_emr_ich_operation_split_2026_10_23",
+   "t1_emr_ich_operation_split_2026_10_23_270ea597f00",
+   "t1_emr_ich_operation_split_2026_10_23_270ea5b7610",
+   "t1_emr_ich_operation_split_2026_10_23_270ea5b7750",
+   "t1_emr_ich_operation_split_2026_10_23_270ea5be8d0",
+   "t1_emr_ich_operation_split_2026_10_23_270ea5fc270",
+   "t1_emr_ich_operation_split_2026_10_23_270ea63a150",
+   "t1_emr_ich_operation_split_2026_10_23_270eaa04510",
+   "t1_emr_ich_operation_split_2026_10_23_270eaa04640"
+  ]
+ },
+ "split_sample_pass": true,
+ "ok": true,
+ "conclusion": "DataX 真实引擎+真实 MySQL 暂存实测通过：生产代码路径（render→受限job→0600远端文件→真实进程→指标三条件→暂存回收对账）全链走通"
+}

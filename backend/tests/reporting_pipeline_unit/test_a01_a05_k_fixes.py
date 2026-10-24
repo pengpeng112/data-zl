@@ -603,6 +603,7 @@ def _route(tables=("stage_t1_ich",)) -> MysqlStageRoute:
         host="10.10.8.53", port=3306, database="datax_stage",
         table_whitelist=tuple(tables),
         credential_ref="vault:reporting/stage853",
+        source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
     )
 
 
@@ -614,6 +615,15 @@ class TestDataxMysqlStageRoute(unittest.TestCase):
             window_start="2026-10-23 00:00:00",
             window_end_exclusive="2026-10-24 00:00:00",
         )
+        reader = job["job"]["content"][0]["reader"]
+        reader_conn = reader["parameter"]["connection"]
+        self.assertEqual(len(reader_conn), 1)
+        self.assertEqual(
+            reader_conn[0]["jdbcUrl"],
+            ["jdbc:oracle:thin:@10.10.8.216:1521/orcl"],
+        )
+        self.assertIn("TO_DATE(", reader_conn[0]["querySql"][0])
+        self.assertNotIn("querySql", reader["parameter"])  # 平铺结构=NPE坑，必须无
         writer = job["job"]["content"][0]["writer"]
         self.assertEqual(writer["name"], "mysqlwriter")
         conn = writer["parameter"]["connection"]
@@ -686,6 +696,7 @@ class TestDataxMysqlStageRoute(unittest.TestCase):
                 window_start="2026-10-23 00:00:00",
                 window_end_exclusive="2026-10-24 00:00:00",
                 credential_ref="vault:x",
+                source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
             )
 
 

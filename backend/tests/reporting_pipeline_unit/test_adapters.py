@@ -257,8 +257,9 @@ class TestDataxRunner(unittest.TestCase):
             window_start="2026-10-18 00:00:00",
             window_end_exclusive="2026-10-19 00:00:00",
             credential_ref="vault:reporting/ods",
+            source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
         )
-        query = job["job"]["content"][0]["reader"]["parameter"]["querySql"][0]
+        query = job["job"]["content"][0]["reader"]["parameter"]["connection"][0]["querySql"][0]
         self.assertIn("TO_DATE('2026-10-18 00:00:00'", query)
         self.assertIn("MODIFIED_AT <", query)
         self.assertIn("credentialRef", json_dumps(job))
@@ -276,6 +277,7 @@ class TestDataxRunner(unittest.TestCase):
                 window_start="2026-10-18 00:00:00",
                 window_end_exclusive="2026-10-19 00:00:00",
                 credential_ref="vault:x",
+                source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
                 extra={"preSql": "DELETE FROM real_table"},
             )
 
@@ -288,6 +290,7 @@ class TestDataxRunner(unittest.TestCase):
                 window_start="2026-10-18 00:00:00",
                 window_end_exclusive="2026-10-19 00:00:00",
                 credential_ref="vault:x",
+                source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
             )
 
     def test_render_rejects_missing_window(self):
@@ -303,6 +306,7 @@ class TestDataxRunner(unittest.TestCase):
             window_start="2026-10-18 00:00:00",
             window_end_exclusive="2026-10-19 00:00:00",
             credential_ref="vault:reporting/ods",
+            source_jdbc_urls=("jdbc:oracle:thin:@10.10.8.216:1521/orcl",),
         )
 
     def test_exit_zero_with_metrics_success(self):
@@ -347,7 +351,7 @@ class TestDataxRunner(unittest.TestCase):
 
     def test_job_without_range_predicate_rejected(self):
         job = self._job()
-        job["job"]["content"][0]["reader"]["parameter"]["querySql"] = [
+        job["job"]["content"][0]["reader"]["parameter"]["connection"][0]["querySql"] = [
             "SELECT ID FROM ODS.V"
         ]
         runner = DataXRunner(FakeProcessRunner(ProcessResult(0, "x", "")))
@@ -363,6 +367,42 @@ class TestDataxRunner(unittest.TestCase):
         self.assertNotIn("--jobfile", fake.argv_seen)
         self.assertIn("--mode", fake.argv_seen)
         self.assertTrue(fake.argv_seen[-1].endswith(".json"))
+
+    def test_interpreter_prefix_prepended(self):
+        fake = FakeProcessRunner(ProcessResult(0, "读出记录总数 : 1\n总计写入总数 : 1\n读写失败总数 : 0\n", ""))
+        runner = DataXRunner(fake, interpreter=("python3",))
+        runner.run_capture(self._job(), "A2")
+        self.assertEqual(fake.argv_seen[0], "python3")
+        self.assertTrue(fake.argv_seen[1].endswith("datax.py"))
+
+    def test_real_engine_metric_wording_parsed(self):
+        # 8.53 真实引擎（DATAX-OPENSOURCE-3.0，2026-10-24 实测）措辞：
+        # 中文汇总块无写入总数行；写侧在英文 Communicator 行（多行进度
+        # 取最后一行）；读侧=读出记录总数。
+        real_stdout = (
+            "2026-10-24 15:26:29.458 [job-0] INFO  StandAloneJobContainerCommunicator"
+            " - Total 50 records, 6000 bytes | Speed 0.6KB/s | Error 0 records"
+            " | Percentage 50.00%\n"
+            "2026-10-24 15:26:29.458 [job-0] INFO  StandAloneJobContainerCommunicator"
+            " - Total 131 records, 12586 bytes | Speed 1.23KB/s | Error 0 records"
+            " | Percentage 100.00%\n"
+            "记录写入速度                    :             13rec/s\n"
+            "读出记录总数                    :                 131\n"
+            "读写失败总数                    :                   0\n"
+        )
+        from app.services.reporting_pipeline.adapters.datax_runner import (
+            parse_datax_metrics,
+        )
+
+        metrics = parse_datax_metrics(real_stdout)
+        self.assertEqual(metrics["rows_read"], 131)
+        self.assertEqual(metrics["rows_written"], 131)  # 最后一行 English total
+        self.assertEqual(metrics["dirty"], 0)
+        # 全链：三条件齐 → COMPLETE
+        fake = FakeProcessRunner(ProcessResult(0, real_stdout, ""))
+        result = DataXRunner(fake).run_capture(self._job(), "A3")
+        self.assertTrue(result.success)
+        self.assertEqual(result.end_state, "COMPLETE")
 
 
 class TestEngineRouter(unittest.TestCase):

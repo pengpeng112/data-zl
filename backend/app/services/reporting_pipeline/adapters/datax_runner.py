@@ -53,6 +53,10 @@ class MysqlStageRoute:
     database: str
     table_whitelist: tuple[str, ...]
     credential_ref: str
+    # 源侧读端点（固定路线的 Oracle 端）：真实引擎 reader 必须
+    # connection:[{querySql, jdbcUrl[]}] 数组结构，平铺 querySql 会 NPE
+    # （recognizeTableOrQuerySqlMode:239；2026-10-24 8.53 实证）。
+    source_jdbc_urls: tuple[str, ...] = ()
 
     def jdbc_url(self) -> str:
         return (
@@ -81,6 +85,7 @@ class MysqlStageRoute:
                 "port": self.port,
                 "database": self.database,
                 "tables": sorted(self.table_whitelist),
+                "source_jdbc_urls": sorted(self.source_jdbc_urls),
             },
             ensure_ascii=False,
             sort_keys=True,
@@ -99,6 +104,8 @@ class MysqlStageRoute:
             problems.append("暂存表白名单为空")
         if not self.credential_ref:
             problems.append("credential_ref 为空")
+        if not self.source_jdbc_urls:
+            problems.append("source_jdbc_urls 为空（真实引擎 reader 需连接数组结构）")
         if problems:
             raise DataxTemplateError(
                 f"MysqlStageRoute[{self.route_id}]: " + "; ".join(problems)
@@ -170,9 +177,14 @@ def render_job(
     window_start: str,
     window_end_exclusive: str,
     credential_ref: str,
+    source_jdbc_urls: Sequence[str],
     extra: Mapping[str, str] | None = None,
 ) -> dict:
-    """渲染完整 job dict。违规键、越白名单目标、缺范围 → 拒绝。"""
+    """渲染完整 job dict。违规键、越白名单目标、缺范围 → 拒绝。
+
+    reader 采用 connection:[{querySql, jdbcUrl[]}] 数组结构（真实引擎
+    平铺 querySql 会 NPE，2026-10-24 8.53 实证）。
+    """
     extra = dict(extra or {})
     for key in FORBIDDEN_JOB_KEYS:
         if key in extra:
@@ -205,7 +217,12 @@ def render_job(
                             "username": "${credential:user}",
                             "password": "${credential:password}",
                             "credentialRef": credential_ref,
-                            "querySql": [query_sql],
+                            "connection": [
+                                {
+                                    "querySql": [query_sql],
+                                    "jdbcUrl": list(source_jdbc_urls),
+                                }
+                            ],
                         },
                     },
                     "writer": {
@@ -279,7 +296,12 @@ def render_job_for_stage_route(
                             "username": "${credential:user}",
                             "password": "${credential:password}",
                             "credentialRef": route.credential_ref,
-                            "querySql": [query_sql],
+                            "connection": [
+                                {
+                                    "querySql": [query_sql],
+                                    "jdbcUrl": list(route.source_jdbc_urls),
+                                }
+                            ],
                         },
                     },
                     "writer": {
@@ -507,11 +529,26 @@ class DataxRunResult:
 
 
 def parse_datax_metrics(stdout: str) -> dict:
-    """解析 DataX 汇总指标（容忍字段差异；只认数值行，不解析业务数据）。"""
+    """解析 DataX 汇总指标（容忍字段差异；只认数值行，不解析业务数据）。
+
+    真实引擎（DATAX-OPENSOURCE-3.0，8.53 实证 2026-10-24）的中文汇总块
+    只有 读出记录总数/读写失败总数，**没有中文写入总数行**；写侧总数在
+    英文 Communicator 行 "Total N records ... Error M records"（进度与
+    最终行同格式，取最后一行=100% 时的总数）。
+    """
+    import re
+
     metrics: dict = {}
+    total_line = re.compile(r"Total\s+(\d+)\s+records.*Error\s+(\d+)\s+records")
     for line in (stdout or "").splitlines():
         line = line.strip()
         try:
+            match = total_line.search(line)
+            if match:
+                # 最后一行胜出（=最终写通信总数与错误数）
+                metrics["rows_written"] = int(match.group(1))
+                metrics["dirty"] = int(match.group(2))
+                continue
             if "读出记录总数" in line:
                 metrics["rows_read"] = int(line.split(":")[-1].strip())
             elif "读写失败总数" in line or "脏数据条数" in line:
@@ -531,23 +568,33 @@ class DataXRunner:
         process_runner: ProcessRunner,
         datax_home: str = "/opt/datax",
         timeout_seconds: int = 3600,
+        interpreter: Sequence[str] = (),
     ) -> None:
         self.process_runner = process_runner
         self.datax_home = datax_home
         self.timeout_seconds = timeout_seconds
+        # 8.53 实证（2026-10-24）：datax.py 不可执行且系统无 python 只有
+        # python3，须经解释器调用（datax-web 同用 datax-python3.sh 包装）。
+        # 生产在 8.53 装配时传 ("python3",)；本地直跑环境可留空。
+        self.interpreter = tuple(interpreter)
 
     def run_capture(
         self, job: dict, attempt_id: str, *, job_file: str | None = None
     ) -> DataxRunResult:
-        query_sql = (
-            job["job"]["content"][0]["reader"]["parameter"]["querySql"][0]
-        )
+        parameter = job["job"]["content"][0]["reader"]["parameter"]
+        connections = parameter.get("connection") or []
+        if not connections:
+            raise DataxTemplateError(
+                f"[{attempt_id}] job reader 缺 connection 数组（真实引擎结构），拒绝执行"
+            )
+        query_sql = connections[0]["querySql"][0]
         # 复核：job 携带的 querySql 必须带范围谓词（防外部构造的 job 绕过渲染）
         if ">= TO_DATE(" not in query_sql or "< TO_DATE(" not in query_sql:
             raise DataxTemplateError(
                 f"[{attempt_id}] job querySql 缺范围谓词，拒绝执行"
             )
         argv = [
+            *self.interpreter,
             f"{self.datax_home}/bin/datax.py",
             # 真实 datax.py（DATAX-OPENSOURCE-3.0）无 --jobfile 选项：
             # job 路径是位置参数（usage: datax.py [options] job-url-or-path；
