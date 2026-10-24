@@ -359,7 +359,10 @@ class TestDataxRunner(unittest.TestCase):
         runner = DataXRunner(fake)
         runner.run_capture(self._job(), "A1")
         self.assertEqual(fake.argv_seen[0].endswith("datax.py"), True)
-        self.assertIn("--jobfile", fake.argv_seen)
+        # 真实引擎 job 路径是位置参数（无 --jobfile 选项；8.53 实证 2026-10-24）
+        self.assertNotIn("--jobfile", fake.argv_seen)
+        self.assertIn("--mode", fake.argv_seen)
+        self.assertTrue(fake.argv_seen[-1].endswith(".json"))
 
 
 class TestEngineRouter(unittest.TestCase):

@@ -662,7 +662,7 @@ def _route(stage_access, runner, budget=None):
         runner=DataXRunner(runner, datax_home="/opt/datax"),
         workspace=JobFileWorkspace(
             tempfile.mkdtemp(prefix="b1dx-"),
-            credential_resolver=lambda job: {"user": "u", "password": "p"},
+            credential_resolver=lambda job: {"user": "u", "password": "p", "stage_user": "su", "stage_password": "sp"},
         ),
         stage_access=stage_access,
         source_object="ODS.V_TEST",

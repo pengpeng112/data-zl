@@ -666,6 +666,190 @@ def cmd_freeze_config(args: argparse.Namespace) -> int:
         return 3
 
 
+def cmd_freeze_config_batch(args: argparse.Namespace) -> int:
+    """扩表 A1：B01 v1.3 逐表 → 批冻结件（v4 约定；工单表/未核证据拒绝）。"""
+    import re as _re
+    from datetime import datetime, timedelta, timezone
+
+    from app.services.reporting_pipeline.freeze_batch import (
+        FreezeBatchError,
+        build_batch_freeze,
+    )
+    from app.services.reporting_pipeline.runtime_config import (
+        RuntimeConfigError,
+        load_frozen_runtime_config,
+    )
+
+    config_dir = Path(args.config)
+    handoff_dir = config_dir / "2026补齐与T加1接续_20261022"
+    evidence_dir = handoff_dir / "核验证据_20261022"
+
+    def _resolve(explicit: str | None, default: Path) -> Path:
+        return Path(explicit) if explicit else default
+
+    b01_path = _resolve(args.b01, handoff_dir / "B01_77项任务运行配置_v1.3候选.json")
+    target_dict_path = _resolve(
+        args.target_dict, evidence_dir / "target_dict_bulk.json"
+    )
+    views_bulk_path = _resolve(
+        args.views_bulk, evidence_dir / "ods_views_bulk.json"
+    )
+    profiles_path = _resolve(
+        args.profiles,
+        config_dir / "每表性能与通道画像候选.json",
+    )
+    source_bindings_path = _resolve(
+        args.source_bindings, handoff_dir / f"扩表源绑定_{args.batch_label}_候选.json"
+    )
+    target_overrides_path = _resolve(
+        args.target_overrides, handoff_dir / "生产环境override_20261024.json"
+    )
+    snapshot_path = Path(args.metadata_snapshot)
+    for path in (b01_path, target_dict_path, source_bindings_path, snapshot_path):
+        if not path.exists():
+            _emit({"ok": False, "error": f"输入文件不存在: {path}", "exit_code": 2})
+            return 2
+    if args.tables and args.tables_file:
+        _emit({"ok": False, "error": "--tables 与 --tables-file 二选一", "exit_code": 2})
+        return 2
+    if args.tables_file:
+        tables = [
+            line.strip()
+            for line in Path(args.tables_file).read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
+    else:
+        tables = [name.strip() for name in (args.tables or "").split(",") if name.strip()]
+    if not tables:
+        _emit({"ok": False, "error": "未指定表（--tables 或 --tables-file）", "exit_code": 2})
+        return 2
+
+    b01 = json.loads(b01_path.read_text(encoding="utf-8"))
+    target_dict = json.loads(target_dict_path.read_text(encoding="utf-8"))
+    source_bindings = json.loads(source_bindings_path.read_text(encoding="utf-8"))
+    target_overrides = (
+        json.loads(target_overrides_path.read_text(encoding="utf-8"))
+        if target_overrides_path.exists() else {}
+    )
+    views_bulk = (
+        json.loads(views_bulk_path.read_text(encoding="utf-8"))
+        if views_bulk_path.exists() else {}
+    )
+    profiles = (
+        json.loads(profiles_path.read_text(encoding="utf-8"))
+        if profiles_path.exists() else {}
+    )
+    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+    # 目标列字典预处理：{裸表名: [{name,target_type,nullable,data_length}]}
+    columns_by_table: dict[str, list[dict]] = {}
+    for col in target_dict.get("columns") or []:
+        columns_by_table.setdefault(col["TABLE_NAME"], []).append(
+            {
+                "name": col["COLUMN_NAME"],
+                "target_type": (
+                    f"{col['DATA_TYPE']}({col['DATA_LENGTH']})"
+                    if col.get("DATA_LENGTH") and col["DATA_TYPE"].startswith("VAR")
+                    else col["DATA_TYPE"]
+                ),
+                "nullable": col.get("NULLABLE") != "N",
+                "data_length": col.get("DATA_LENGTH"),
+            }
+        )
+
+    def view_aliases(view_name: str) -> set[str] | None:
+        ddl = (
+            snapshot.get("schemas", {}).get("ODS", {}).get("views", {})
+            .get(view_name, {}).get("ddl", "")
+        )
+        if not ddl:
+            return None
+        return {
+            a.upper()
+            for a in _re.findall(r"as\s+([A-Za-z_][A-Za-z0-9_]+)", ddl, _re.IGNORECASE)
+        }
+
+    aliases_by_name: dict[str, set[str]] = {}
+    definitions = views_bulk.get("definitions") or {}
+    sha_by_view = {name: doc.get("sha256") for name, doc in definitions.items()}
+    for group_doc in (source_bindings.get("sources") or {}).values():
+        for view_name in (group_doc.get("view_by_table") or {}).values():
+            aliases = view_aliases(str(view_name))
+            if aliases is not None:
+                aliases_by_name[str(view_name)] = aliases
+
+    budgets_by_table: dict[str, dict] = {}
+    for profile in profiles.get("profiles") or []:
+        table = str(profile.get("canonical_table"))
+        budgets_by_table[table] = {
+            "max_rows_per_slice": profile.get("max_rows"),
+            "max_bytes_per_slice": profile.get("max_bytes"),
+            "max_attempts": profile.get("max_attempts"),
+        }
+
+    source_inputs = [
+        {"path": str(b01_path), "sha256": _sha256_file(b01_path), "role": "B01 v1.3候选"},
+        {"path": str(target_dict_path), "sha256": _sha256_file(target_dict_path),
+         "role": "目标字典(DBOPER)"},
+        {"path": str(source_bindings_path), "sha256": _sha256_file(source_bindings_path),
+         "role": "扩表源绑定(操作者按平台元数据准备)"},
+        {"path": str(snapshot_path), "sha256": _sha256_file(snapshot_path),
+         "role": "08元数据快照(视图DDL)"},
+    ]
+    if views_bulk_path.exists():
+        source_inputs.append({
+            "path": str(views_bulk_path), "sha256": _sha256_file(views_bulk_path),
+            "role": "源视图定义哈希(ODS)",
+        })
+
+    try:
+        document, report = build_batch_freeze(
+            environment=args.environment,
+            batch_label=args.batch_label,
+            b01_items=b01.get("items") or [],
+            table_names=tables,
+            target_columns=columns_by_table,
+            source_bindings=source_bindings.get("sources") or {},
+            target_overrides=target_overrides.get("targets") or {},
+            parent_overrides=source_bindings.get("parents") or {},
+            object_sha256_by_view=sha_by_view,
+            view_aliases_by_name=aliases_by_name,
+            budgets_by_table=budgets_by_table,
+            frozen_at=datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds"),
+            allow_view_gap=args.allow_view_gap,
+            source_inputs=source_inputs,
+        )
+    except FreezeBatchError as exc:
+        _emit({"ok": False, "refused": str(exc), "exit_code": 3})
+        return 3
+
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(document, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+    try:
+        loaded = load_frozen_runtime_config(output)
+        _emit({
+            "ok": True,
+            "output": str(output),
+            "environment": loaded.environment,
+            "batch": args.batch_label,
+            "tables": sorted(loaded.tables),
+            "config_fingerprint": loaded.config_fingerprint,
+            "per_table": report["tables"],
+            "coverage_problems": report["coverage_problems"],
+            "结论": (
+                f"批冻结件已生成并自校验通过（{len(loaded.tables)} 表，"
+                f"environment={loaded.environment}，enabled 全 false）"
+            ),
+        })
+        return 0
+    except RuntimeConfigError as exc:
+        _emit({"ok": False, "error": f"冻结件自校验失败: {exc}", "exit_code": 3})
+        return 3
+
+
 def cmd_approval_register(args: argparse.Namespace) -> int:
     """批1-2c：登记耐久批准（管理动作；管道永不自批）。"""
     from datetime import datetime, timedelta, timezone
@@ -950,6 +1134,37 @@ def build_parser() -> argparse.ArgumentParser:
     p_freeze.add_argument("--override", default=None, help="环境覆盖 JSON（sources/targets）")
     p_freeze.add_argument("--allow-view-gap", action="store_true", help="视图列覆盖不全时仍冻结（notes 留痕）")
     p_freeze.set_defaults(func=cmd_freeze_config)
+
+    p_freeze_b = sub.add_parser(
+        "freeze-config-batch",
+        help="扩表A1：B01 v1.3 逐表生成批冻结件（v4 约定；工单表/未核证据拒绝）",
+    )
+    p_freeze_b.add_argument("--output", required=True, help="批冻结件输出 JSON 路径")
+    p_freeze_b.add_argument("--batch-label", required=True, help="批标签（如 批1_病理感染HRP不良）")
+    p_freeze_b.add_argument(
+        "--tables", default=None, help="逗号分隔表名清单（与 --tables-file 二选一）"
+    )
+    p_freeze_b.add_argument("--tables-file", default=None, help="表名清单文件（每行一表，#注释）")
+    p_freeze_b.add_argument("--b01", default=None, help="B01 v1.3 候选 JSON（默认 config 目录）")
+    p_freeze_b.add_argument("--target-dict", default=None, help="目标字典 target_dict_bulk.json")
+    p_freeze_b.add_argument("--views-bulk", default=None, help="ODS 视图定义哈希（ODS 源）")
+    p_freeze_b.add_argument("--profiles", default=None, help="每表性能与通道画像候选 JSON")
+    p_freeze_b.add_argument(
+        "--source-bindings", default=None,
+        help="扩表源绑定 JSON（sources: {组: {dialect,dsn,credential_ref,source_objects,view_by_table}}）",
+    )
+    p_freeze_b.add_argument("--target-overrides", default=None, help="目标覆写 JSON（默认生产override_20261024）")
+    p_freeze_b.add_argument(
+        "--metadata-snapshot",
+        default=str(REPO_ROOT / "开发起步包" / "08_数据中心元数据快照.json"),
+        help="08 元数据快照（视图 DDL 列覆盖证明）",
+    )
+    p_freeze_b.add_argument(
+        "--environment", default="production",
+        choices=["production", "isolated_acceptance"],
+    )
+    p_freeze_b.add_argument("--allow-view-gap", action="store_true", help="视图列覆盖不全时仍冻结（notes 留痕）")
+    p_freeze_b.set_defaults(func=cmd_freeze_config_batch)
 
     p_appr = sub.add_parser(
         "approval-register",
@@ -1368,7 +1583,7 @@ def cmd_capture(args: argparse.Namespace) -> int:
     dry_run = bool(args.dry_run)
     window = None
     if getattr(args, "window_start", None) or getattr(args, "window_end", None):
-        from datetime import datetime, time, timedelta, timezone
+        from datetime import datetime, timedelta, timezone
 
         from app.services.reporting_pipeline.planner import TimeWindow
 

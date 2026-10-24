@@ -1,0 +1,45 @@
+{
+ "doc": "批1（病理2+感染1+HRP1+不良1）扩表源绑定：操作者按平台元数据(asset_data_sources 2026-10-24)与B01核验证据准备；对象全名显式，不拼不猜",
+ "as_of": "2026-10-24",
+ "sources": {
+  "pathology": {
+   "dialect": "sqlserver",
+   "dsn": "10.10.9.41:1433/pitaya",
+   "credential_ref": "container-credentials:pathology_sqlserver_10_10_9_41.readonly",
+   "driver": "pymssql(容器实测2.3.11可用,pyodbc无libodbc不可用)",
+   "source_objects": {
+    "EMR_PATHOLOGY_REPORT": "dbo.EMR_PATHOLOGY_REPORT",
+    "EMR_MOLECULAR_PATHOLOGY_REPORT": "dbo.EMR_MOLECULAR_PATHOLOGY_REPORT"
+   },
+   "evidence": "verify3more.json: dbo 两表 ID+datetime 锚点实存；平台库名=pitaya"
+  },
+  "infection": {
+   "dialect": "oracle",
+   "dsn": "10.10.9.45:1521/orcl",
+   "credential_ref": "container-credentials:infection_oracle_10_10_9_45.readonly",
+   "source_objects": {
+    "EMR_INFECTION_INFORMATION_REGISTER": "C##FXPT.EMR_INFECTION_INFORMATION_REGISTER"
+   },
+   "evidence": "verify3more.json: C##FXPT 视图 VIEW + ID/DATETIME 实存；service=B01 hint orcl，试点连接即验"
+  },
+  "hrp": {
+   "dialect": "oracle",
+   "dsn": "10.10.10.23:1521/hrpdb",
+   "credential_ref": "container-credentials:hrp_10_10_10_23.readonly",
+   "source_objects": {
+    "EMR_HOS_PRACTITIONER_INFORMATION": "HRPSEY656.EMR_HOS_PRACTITIONER"
+   },
+   "evidence": "verify3more.json: HRPSEY656 视图 VIEW + ID/DATETIME 实存；service=B01 hint hrpdb，试点连接即验"
+  },
+  "adverse": {
+   "dialect": "mysql",
+   "dsn": "10.10.10.50:3306/mas",
+   "credential_ref": "container-credentials:adverse_event_mysql_10_10_10_50.readonly",
+   "source_objects": {
+    "EMR_ADVERSE_EVENT": "mas.v_emr_adverse_event_final"
+   },
+   "evidence": "B01台账 VERIFIED@mas（multi_source_verify 曾以库名 adverse_event 连接失败=Unknown database；库名按台账 mas 候选，试点前 SHOW DATABASES 核验）；视图名小写=台账 anchor views；锚点 EFFECTIVE_TIME"
+  }
+ },
+ "parents": {}
+}

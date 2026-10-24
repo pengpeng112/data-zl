@@ -152,9 +152,116 @@ class PgProjectionQueryBuilder:
         return sql, params
 
 
+class SqlServerProjectionQueryBuilder:
+    """SQL Server 投影查询：TOP (?) 限量 + 序内 keyset（pymssql %s 绑定）。
+
+    TOP 参数占位符在 SQL 文本首位，因此参数序列以 limit 开头；
+    旧版 SQL Server 无 OFFSET/FETCH，统一 TOP。锚点/键列名按源端
+    大小写不敏感处理（SQL Server 默认排序规则）。
+    """
+
+    def __init__(self, spec: TableRuntimeSpec) -> None:
+        self._object = spec.source_object
+        self._columns = [f.source_expression for f in spec.projection]
+        self._anchor = spec.anchor_column
+        if not self._anchor:
+            raise SourceFactoryError(
+                f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
+            )
+        self._keys = list(spec.stable_key)
+        if not self._keys:
+            raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
+
+    def __call__(
+        self, window: TimeWindow, keyset: KeysetCursor | None, limit_rows: int
+    ) -> tuple[str, list]:
+        column_list = ", ".join(self._columns)
+        # TOP (%s) 在文本首位：参数序 = [limit, start, end, *keyset]
+        params: list = [int(limit_rows), _wall_clock(window.start), _wall_clock(window.end_exclusive)]
+        sql = (
+            f"SELECT TOP (%s) {column_list} FROM {self._object} "
+            f"WHERE {self._anchor} >= %s AND {self._anchor} < %s"
+        )
+        if keyset is not None:
+            sql += " AND (" + self._keyset_predicate(keyset, params) + ")"
+        sql += " ORDER BY " + ", ".join(self._keys)
+        return sql, params
+
+    def _keyset_predicate(self, keyset: KeysetCursor, params: list) -> str:
+        if list(keyset.order_columns) != self._keys:
+            raise SourceFactoryError(
+                "keyset 排序列与冻结稳定键不一致（禁止未核键续页）"
+            )
+        columns = self._keys
+        values = list(keyset.last_values)
+        parts: list[str] = []
+        for depth in range(len(columns)):
+            binds: list[str] = []
+            for value in values[:depth]:
+                binds.append("%s")
+                params.append(value)
+            equality = " AND ".join(
+                f"{columns[i]} = {binds[i]}" for i in range(depth)
+            )
+            strict = f"{columns[depth]} > %s"
+            params.append(values[depth])
+            parts.append(f"({strict})" if not equality else f"({equality} AND {strict})")
+        return " OR ".join(parts)
+
+
+class MySqlProjectionQueryBuilder:
+    """MySQL 投影查询：LIMIT 限量 + 序内 keyset（pymysql %s 绑定）。
+
+    对象名大小写敏感（Linux 服务器默认 lower_case_table_names=0），
+    冻结件对象名必须与源端实名一致；列名大小写不敏感。
+    """
+
+    def __init__(self, spec: TableRuntimeSpec) -> None:
+        self._object = spec.source_object
+        self._columns = [f.source_expression for f in spec.projection]
+        self._anchor = spec.anchor_column
+        if not self._anchor:
+            raise SourceFactoryError(
+                f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
+            )
+        self._keys = list(spec.stable_key)
+        if not self._keys:
+            raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
+
+    def __call__(
+        self, window: TimeWindow, keyset: KeysetCursor | None, limit_rows: int
+    ) -> tuple[str, list]:
+        column_list = ", ".join(self._columns)
+        params: list = [_wall_clock(window.start), _wall_clock(window.end_exclusive)]
+        sql = (
+            f"SELECT {column_list} FROM {self._object} "
+            f"WHERE {self._anchor} >= %s AND {self._anchor} < %s"
+        )
+        if keyset is not None:
+            if list(keyset.order_columns) != self._keys:
+                raise SourceFactoryError(
+                    "keyset 排序列与冻结稳定键不一致（禁止未核键续页）"
+                )
+            columns = self._keys
+            values = list(keyset.last_values)
+            parts: list[str] = []
+            for depth in range(len(columns)):
+                equality = " AND ".join(f"{columns[i]} = %s" for i in range(depth))
+                params.extend(values[:depth])
+                strict = f"{columns[depth]} > %s"
+                params.append(values[depth])
+                parts.append(f"({strict})" if not equality else f"({equality} AND {strict})")
+            sql += " AND (" + " OR ".join(parts) + ")"
+        sql += " ORDER BY " + ", ".join(self._keys) + " LIMIT %s"
+        params.append(int(limit_rows))
+        return sql, params
+
+
 QUERY_BUILDER_BY_DIALECT: Mapping[str, Callable[[TableRuntimeSpec], Callable]] = {
     "oracle": OracleProjectionQueryBuilder,
     "pg": PgProjectionQueryBuilder,
+    "sqlserver": SqlServerProjectionQueryBuilder,
+    "mysql": MySqlProjectionQueryBuilder,
 }
 
 
@@ -222,13 +329,62 @@ class PgConnectionProvider:
         return DbapiCursorAdapter(cursor)
 
 
+class SqlServerConnectionProvider:
+    """SQL Server 源连接提供者：pymssql 连接工厂注入。
+
+    T-SQL 无会话级 READ ONLY 语句，只读性由受控只读账号保证
+    （凭据文件 .readonly；本类不写任何 SET 会话项）。
+    """
+
+    def __init__(self, connection_factory: Callable[[], object]) -> None:
+        self._connection_factory = connection_factory
+
+    def cursor(self) -> DbapiCursorAdapter:
+        conn = self._connection_factory()
+        try:
+            cursor = conn.cursor()
+        except Exception:
+            try:
+                conn.close()
+            except Exception:  # noqa: BLE001
+                pass
+            raise
+        return DbapiCursorAdapter(cursor)
+
+
+class MySqlConnectionProvider:
+    """MySQL 源连接提供者：pymysql 连接工厂注入。
+
+    打开连接即 SET SESSION TRANSACTION READ ONLY（5.6+）；
+    旧版服务器不支持该语句时如实抛错，不退化为可写会话。
+    """
+
+    def __init__(self, connection_factory: Callable[[], object]) -> None:
+        self._connection_factory = connection_factory
+
+    def cursor(self) -> DbapiCursorAdapter:
+        conn = self._connection_factory()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SET SESSION TRANSACTION READ ONLY")
+        except Exception:
+            try:
+                conn.close()
+            except Exception:  # noqa: BLE001
+                pass
+            raise
+        return DbapiCursorAdapter(cursor)
+
+
 PROVIDER_BY_DIALECT: Mapping[str, type] = {
     "oracle": OracleConnectionProvider,
     "pg": PgConnectionProvider,
+    "sqlserver": SqlServerConnectionProvider,
+    "mysql": MySqlConnectionProvider,
 }
 
 
-def resolve_oracle_credentials(credential_ref: str) -> tuple[str, str]:
+def resolve_container_credentials(credential_ref: str) -> tuple[str, str]:
     """容器侧凭据文件解析（首行 user:password）；文件缺失即拒绝。
 
     生产仅在 8.83 容器内可用；本机/隔离环境无该文件时如实拒绝，
@@ -240,20 +396,24 @@ def resolve_oracle_credentials(credential_ref: str) -> tuple[str, str]:
     marker = "container-credentials:"
     if not credential_ref.startswith(marker):
         raise SourceFactoryError(
-            f"Oracle 凭据引用格式非法（须 {marker}<源名>）: {credential_ref!r}"
+            f"容器凭据引用格式非法（须 {marker}<源名>）: {credential_ref!r}"
         )
     name = credential_ref[len(marker):]
     path = Path("/etc/data-asset/credentials") / name
     if not path.exists():
         raise SourceFactoryError(
             f"容器凭据文件不存在: {name}（本机无 /etc/data-asset/credentials；"
-            "Oracle 生产源只能在 8.83 容器内装配）"
+            "业务源只能在 8.83 容器内装配）"
         )
     first_line = path.read_text(encoding="utf-8").splitlines()[0]
     user, _, password = first_line.partition(":")
     if not user or not password:
         raise SourceFactoryError(f"凭据文件首行格式非法: {name}")
     return user, password
+
+
+# 兼容旧名（Oracle 首组先例）；语义已泛化为容器凭据通用解析
+resolve_oracle_credentials = resolve_container_credentials
 
 
 def _ensure_oracle_thick() -> None:
@@ -312,6 +472,68 @@ def build_pg_connection_factory(*, url: str) -> Callable[[], object]:
     return factory
 
 
+def build_sqlserver_connection_factory(
+    *, dsn: str, credential_ref: str, timeout_seconds: int = 300
+) -> Callable[[], object]:
+    """构造 pymssql 连接工厂（SQL Server 源；凭据容器侧解析）。
+
+    dsn 形如 host:port/database（database 必填——pitaya 等 SQLServer
+    实例默认库不猜）。只读性由只读账号保证（见 Provider 注释）。
+    """
+    host_port, _, database = dsn.partition("/")
+    host, _, port = host_port.partition(":")
+    if not host or not database:
+        raise SourceFactoryError(f"SQLServer dsn 非法（须 host:port/database）: {dsn!r}")
+
+    def factory() -> object:
+        import pymssql
+
+        user, password = resolve_container_credentials(credential_ref)
+        return pymssql.connect(
+            server=host,
+            port=int(port or 1433),
+            user=user,
+            password=password,
+            database=database,
+            login_timeout=30,
+            timeout=timeout_seconds,
+        )
+
+    return factory
+
+
+def build_mysql_connection_factory(
+    *, dsn: str, credential_ref: str, timeout_seconds: int = 300
+) -> Callable[[], object]:
+    """构造 pymysql 连接工厂（MySQL 源；凭据容器侧解析）。
+
+    dsn 形如 host:port/database（database 必填）；游标为元组游标
+    （投影按位置取列，不用 DictCursor）。
+    """
+    host_port, _, database = dsn.partition("/")
+    host, _, port = host_port.partition(":")
+    if not host or not database:
+        raise SourceFactoryError(f"MySQL dsn 非法（须 host:port/database）: {dsn!r}")
+
+    def factory() -> object:
+        import pymysql
+
+        user, password = resolve_container_credentials(credential_ref)
+        return pymysql.connect(
+            host=host,
+            port=int(port or 3306),
+            user=user,
+            password=password,
+            database=database,
+            connect_timeout=30,
+            read_timeout=timeout_seconds,
+            write_timeout=timeout_seconds,
+            charset="utf8mb4",
+        )
+
+    return factory
+
+
 def build_connection_factory(
     *, dialect: str, dsn: str | None = None, url_env: str | None = None,
     credential_ref: str | None = None,
@@ -320,6 +542,18 @@ def build_connection_factory(
         if not dsn or not credential_ref:
             raise SourceFactoryError("Oracle 源需 dsn + credential_ref")
         return build_oracle_connection_factory(
+            dsn=dsn, credential_ref=credential_ref
+        )
+    if dialect == "sqlserver":
+        if not dsn or not credential_ref:
+            raise SourceFactoryError("SQLServer 源需 dsn(host:port/database) + credential_ref")
+        return build_sqlserver_connection_factory(
+            dsn=dsn, credential_ref=credential_ref
+        )
+    if dialect == "mysql":
+        if not dsn or not credential_ref:
+            raise SourceFactoryError("MySQL 源需 dsn(host:port/database) + credential_ref")
+        return build_mysql_connection_factory(
             dsn=dsn, credential_ref=credential_ref
         )
     if dialect == "pg":

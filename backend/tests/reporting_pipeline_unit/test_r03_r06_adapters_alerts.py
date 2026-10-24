@@ -137,7 +137,7 @@ class TestRealSubprocessDataX(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             ws = JobFileWorkspace(
                 root,
-                credential_resolver=lambda job: {"user": "u1", "password": "p1"},
+                credential_resolver=lambda job: {"user": "u1", "password": "p1", "stage_user": "su1", "stage_password": "sp1"},
             )
             path = ws.materialize(_job(), "att-5")
             content = Path(path).read_text(encoding="utf-8")
@@ -145,6 +145,31 @@ class TestRealSubprocessDataX(unittest.TestCase):
             self.assertNotIn("${credential:password}", content)
             ws.cleanup(path)
             self.assertFalse(Path(path).exists())
+
+    def test_job_file_resolves_stage_placeholders(self):
+        with tempfile.TemporaryDirectory() as root:
+            ws = JobFileWorkspace(
+                root,
+                credential_resolver=lambda job: {"user": "u1", "password": "p1", "stage_user": "su1", "stage_password": "sp1"},
+            )
+            path = ws.materialize(_job(), "att-stage-1")
+            content = Path(path).read_text(encoding="utf-8")
+            self.assertNotIn("${stage:user}", content)
+            self.assertNotIn("${stage:password}", content)
+            ws.cleanup(path)
+
+    def test_job_file_refuses_incomplete_stage_resolver(self):
+        with tempfile.TemporaryDirectory() as root:
+            ws = JobFileWorkspace(
+                root,
+                credential_resolver=lambda job: {"user": "u1", "password": "p1"},
+            )
+            from app.services.reporting_pipeline.adapters.datax_runner import (
+                DataxTemplateError,
+            )
+
+            with self.assertRaises(DataxTemplateError):
+                ws.materialize(_job(), "att-stage-2")
 
     def test_job_file_refuses_placeholder_without_resolver(self):
         with tempfile.TemporaryDirectory() as root:

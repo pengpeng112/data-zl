@@ -448,17 +448,30 @@ class JobFileWorkspace:
         self._os = os
 
     def materialize(self, job: dict, attempt_id: str) -> str:
-        """把渲染 job 的 ${credential:*} 占位解析进私有文件，返回路径。"""
+        """把渲染 job 的 ${credential:*}/${stage:*} 占位解析进私有文件，返回路径。"""
         import tempfile
 
         document = json.dumps(job, ensure_ascii=False)
         if self._credential_resolver is not None:
-            # 占位形如 ${credential:user}/${credential:password} 与
-            # credentialRef 字段：解析器返回 {user, password}；明文只进文件
+            # 占位形如 ${credential:user}/${credential:password}（源读）与
+            # ${stage:user}/${stage:password}（暂存写）：解析器返回
+            # {user, password, stage_user?, stage_password?}；明文只进文件
             creds = self._credential_resolver(job)
             document = document.replace("${credential:user}", creds["user"])
-            document = document.replace("${credential:password}", creds["password"])
-        elif "${credential:" in document:
+            document = document.replace(
+                "${credential:password}", creds["password"]
+            )
+            if "${stage:user}" in document or "${stage:password}" in document:
+                if creds.get("stage_user") is None or creds.get("stage_password") is None:
+                    raise DataxTemplateError(
+                        "job 含 ${stage:*} 占位但解析器未提供 stage_user/stage_password"
+                        "（拒绝落盘占位残缺的 job）"
+                    )
+                document = document.replace("${stage:user}", creds["stage_user"])
+                document = document.replace(
+                    "${stage:password}", creds["stage_password"]
+                )
+        elif "${credential:" in document or "${stage:" in document:
             raise DataxTemplateError(
                 "job 含凭据占位但未配置 credential_resolver（拒绝落盘明文缺失的 job）"
             )
@@ -536,8 +549,11 @@ class DataXRunner:
             )
         argv = [
             f"{self.datax_home}/bin/datax.py",
-            "--jobfile", job_file if job_file is not None else "job.json",
+            # 真实 datax.py（DATAX-OPENSOURCE-3.0）无 --jobfile 选项：
+            # job 路径是位置参数（usage: datax.py [options] job-url-or-path；
+            # 2026-10-24 对照 8.53 真实引擎 help 实证）
             "--mode", "standalone",
+            job_file if job_file is not None else "job.json",
         ]
         argv_hash = hashlib.sha256(json.dumps(argv).encode("utf-8")).hexdigest()
         proc = self.process_runner.run(argv, timeout_seconds=self.timeout_seconds)

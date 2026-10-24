@@ -221,5 +221,45 @@
   "ruling": "用户裁定2026-10-24：以目标侧为准",
   "closed": "309行CAS（OPERATION 01-03月308+ICH 01月1）；差异分类证据 ticket_diff_class_20261024.json（仅INCISION_CATEGORY/OPERATION_GRADE/CURRENT_ADDRESS_TOWN，与10-21受控字段修正一致）",
   "open": "1行QUALITY_REQUIRED_NULL（OPERATION 10P，源视图OPERATION_CODE空，目标无此行）——源端数据缺口，待源端补数后单键重放"
+ },
+ "expand73_datax_20261024": {
+  "session": "zcode-20261024-expand73-datax",
+  "started_on": "2026-10-24",
+  "status": "A1_ENGINEERED_BATCH1_FROZEN_AWAITING_APPROVAL",
+  "a1_engineering": {
+   "code_changes": [
+    "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
+    "source_factory 新增 SqlServer/MySql 投影查询构建器+连接提供者+连接工厂（pymssql TOP/%s、pymysql LIMIT/%s；MySQL 会话级 READ ONLY，SQLServer 只读性由账号保证）",
+    "resolve_oracle_credentials 泛化为 resolve_container_credentials（旧名别名保留）",
+    "新模块 freeze_batch.py（B01 v1.3 逐表批冻结生成器；工单表/未核证据/缺绑定/键不在投影/视图覆盖缺口一律拒绝）",
+    "reporting_ctl 新子命令 freeze-config-batch",
+    "datax_runner 两处真实引擎缺陷修复：①argv 用位置参数（真实 datax.py 无 --jobfile 选项，8.53 实证）②JobFileWorkspace 解析 ${stage:*} 暂存凭据占位（残缺即拒绝）",
+    "新增 backend/scripts/t1_daily_run.py 每日值守驱动（批准人工触发，缺批准跳过并打印登记命令；单表失败不连坐）"
+   ],
+   "tests": "单元 498 过（基线478+20新增）+2跳；隔离 PG 集成 18/18；ruff 净；validate --offline 过；check_migrations_tracked 全绿",
+   "bugs_found_by_tests": "SQLServer keyset 谓词丢列名（((%s))→修复为 (ID > %s)）"
+  },
+  "batch1_freeze": {
+   "tables": [
+    "EMR_PATHOLOGY_REPORT",
+    "EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "EMR_INFECTION_INFORMATION_REGISTER",
+    "EMR_HOS_PRACTITIONER_INFORMATION",
+    "EMR_ADVERSE_EVENT"
+   ],
+   "freeze_file": "扩表冻结件_批1_病理感染HRP不良_v1_20261024.json（fingerprint=1f5a09ef…，装载自校验过）",
+   "source_bindings": "扩表源绑定_批1_20261024.json+扩表bindings_批1_20261024.json（运行时 sources/targets_by_table 合并）",
+   "notes": "批1全为独立源：病理=SQLServer 10.10.9.41:1433/pitaya(dbo)、感染=Oracle 10.10.9.45:1521/orcl(C##FXPT)、HRP=Oracle 10.10.10.23:1521/hrpdb(HRPSEY656)、不良=MySQL 10.10.10.50:3306 库名按台账 mas 候选待试点核验（multi_source_verify 曾以 adverse_event 库名连接失败）；凭据四源均已在容器登记；容器 pymssql 2.3.11/pymysql 2.2.8 可用（pyodbc 无 libodbc 不可用）"
+  },
+  "b_datax": {
+   "b1_findings": "8.53 独立 datax.py 可直跑（/home/datax/bin/datax.py，DATAX-OPENSOURCE-3.0，python3.9）；oraclereader/mysqlwriter/rdbmswriter 插件在；写者快照重拍=零写者（进程仅 datax-web admin9527/executor9504 常驻+celery+mysqld；root cron 无抽取；/home/datax/job/datax-web-json 空）；MySQL 9.x@3306 监听中；10-20 已有真实试点先例（月窗4137行/幂等/相邻窗全过，暂存库 sanjia_fushen，mysqlwriter 必须 connection 数组结构）",
+   "b2_driver": "b2_datax实测驱动_20261024.py 就绪（本地编排+8.53本地进程执行+SFTP 0600 job文件+mysql CLI base64 回收；正常/dirty破坏/超预算拆窗三样例）；测试表=首组 EMR_ICH_OPERATION 2026-10-23 单日窗（131行）",
+   "blocked_on": "MPW（8.53 MySQL root 密码，10-20 先例经环境变量注入零落盘）或专用暂存账号——待用户提供；暂存库计划 t1_stage（新建专用库，不复用 sanjia_fushen）"
+  },
+  "awaiting_user": [
+   "批1试点批准（镜像发布 r212+冻结件/绑定上传 t1-config+5表当日窗试点+adverse 库名 SHOW DATABASES 核验）",
+   "MPW 或暂存专用账号（B2 DataX 实测前置）"
+  ],
+  "production_actions_this_session": 0
  }
 }

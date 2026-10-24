@@ -28,7 +28,7 @@ from app.services.reporting_pipeline.contracts import ContractViolation
 
 FREEZE_DOC_VERSION = "v1"
 SUPPORTED_ENVIRONMENTS = ("production", "isolated_acceptance")
-SUPPORTED_DIALECTS = ("oracle", "pg")
+SUPPORTED_DIALECTS = ("oracle", "pg", "sqlserver", "mysql")
 SUPPORTED_ENGINES = ("PYTHON", "DATAX")
 
 
