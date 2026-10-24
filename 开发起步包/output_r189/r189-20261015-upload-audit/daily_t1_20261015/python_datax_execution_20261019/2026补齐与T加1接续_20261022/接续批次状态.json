@@ -225,7 +225,7 @@
   "expand73_datax_20261024": {
     "session": "zcode-20261024-expand73-datax",
     "started_on": "2026-10-24",
-    "status": "BATCH1_PILOT_DONE_5_OF_5",
+    "status": "BATCH1_DONE_BATCH2_PLAN_ISSUED",
     "a1_engineering": {
       "code_changes": [
         "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -318,6 +318,27 @@
         "R06六项输入待用户（未变）"
       ],
       "production_actions_this_session": "镜像r212热补链发布（含缺陷修复与A端锚点表达式支持迭代重建）+配置卷批1件v1→v5+五表2026-10-23当日窗试点装载（5/5 RECONCILED，HRP经A端修复同批号续跑收口）+版本账/隔离组修复闭合（均在用户批复范围：①②③④全批+A端）"
+    },
+    "batch2_plan": {
+      "authored_on": "2026-10-25",
+      "session": "zcode-20261025-b2plan",
+      "status": "PLAN_ISSUED_AWAITING_USER_APPROVAL",
+      "scope_adjustment": "原A2批2=体检3+输血4；预核（只读，批2预核证据_20261025/）实证调整为试点3表（EMR_PHYSICAL_REPORT+EMR_EXAM_IMAGE_REP/PATH）+工单3张不执行",
+      "tickets": [
+        "T-B02-1 体检两子表：PATIENT_ID/NAME/SEX_CODE/ID_NUM目标NOT NULL源视图不暴露，源视图补列后上量",
+        "T-B02-2 输血四表：旧库10.10.10.67停更(3-7月)+新库10.10.8.7 XH_BIS凭据2026-10-25实测18456登录失败，待用户/厂商恢复并核上报视图",
+        "T-B02-3 父子核验：体检EXAM/ITEM×REPORT覆盖率95.12%/95.91%已测；PATH×REP待测（PATH去父试点）"
+      ],
+      "key_probe_facts": [
+        "体检源对象实名=dbo.v_EMR_PHYSICAL_REPORT（小写v；大写V_为CI排序规则误认不存在）；TDS7.0；dsn须带/JZCIS",
+        "REPORT目标55列全覆盖；START/END_DTIME源为'yyyyMMdd HHmmss'字符串需CASE LIKE+CONVERT表达式；锚点DATETIME=datetime不进投影无需表达式",
+        "HIS=10.10.10.15:1521/his（服务名his，凭据his_source_10_10_10_15无后缀）；影像两表DATETIME=DATE无坑；REP 131列目标仅ORDER_NAME（可空）缺列置NULL；当日活跃",
+        "零代码改动预期（r212能力齐备），HIS白天试点须用户单独点头"
+      ],
+      "handoff_doc": "给执行者_批2试点一次性执行计划_20261025.md",
+      "awaiting_user": [
+        "批2计划①冻结件生成与上传②三表试点全链 点名批复后交执行AI"
+      ]
     }
   }
 }
