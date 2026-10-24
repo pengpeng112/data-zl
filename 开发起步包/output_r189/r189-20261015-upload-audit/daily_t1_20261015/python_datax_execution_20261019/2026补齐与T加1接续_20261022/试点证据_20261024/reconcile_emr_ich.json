@@ -1,0 +1,23 @@
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5",
+ "keys_checked": 206,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-24T00:00:00+08:00",
+   "continuous_through": "2026-10-24T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}

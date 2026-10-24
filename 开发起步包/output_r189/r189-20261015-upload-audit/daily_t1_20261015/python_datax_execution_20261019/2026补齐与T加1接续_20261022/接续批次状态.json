@@ -1,10 +1,10 @@
 {
  "plan_version": "1.1",
- "as_of": "2026-10-23",
- "status": "BATCH1_RUNTIME_CHAIN_WIRED_ISOLATED_ACCEPTED_NOT_DEPLOYED",
+ "as_of": "2026-10-24",
+ "status": "BATCH2_PILOT_LIVE_FIRST_GROUP_RECONCILED_ATTENDED_MODE",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
- "current_step": "第一批（补齐运行链+隔离验收）完成：正式CLI入口全链6场景过；生产部署与上线动作全部待批（第二批）",
- "next": "第二批：逐项呈报PA1-PA7（含新迁移b8c9d0e1f2a3批准登记表与整条控制链）、小窗试点、H冻结、7日观测。Oracle方言/DataX真实引擎/8.53实测待环境或批准",
+ "current_step": "第二批完成：生产发布+迁移+首组四表试点全 RECONCILED+H冻结；值守运行（relay未接）",
+ "next": "B05 连续7业务日观测（cron日报载体）；R06 告警六项输入补齐后转无人值守；历史欠账[2026-01-01,H)低优先补齐；扩表与DataX真实引擎后续批次",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -54,10 +54,11 @@
    ]
   },
   "A05": {
-   "status": "MATERIALS_READY_AWAITING_APPROVAL_V2",
+   "status": "PILOT_EXECUTED_FIRST_GROUP_RECONCILED",
    "evidence": [
     "A05_待批清单_v2_20261022.json：PA4前置条件满足(隔离PG实测过,materials_ready=true)；PA7 PG侧完成/Oracle侧待环境；PA1/2/3/5/6不变",
-    "A05a只读闭环完成：首组四表核验全true、四视图不挡2026、在跑写者8.83零进程零cron(8.53侧待ops-runbook通道)"
+    "A05a只读闭环完成：首组四表核验全true、四视图不挡2026、在跑写者8.83零进程零cron(8.53侧待ops-runbook通道)",
+    "第二批(2026-10-24)：PA1-PA6全执行；四表5365行RECONCILED；H=2026-10-24T00:00+08冻结；欠账月覆盖账登记；PA2 cron值守排程"
    ],
    "pending": "未执行任何生产动作；首组上线不声明通过"
   },
@@ -132,7 +133,7 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "两批接续：第一批已完成(见batch1_first_batch)；第二批按A05_待批清单_v3_20261023.json逐项会话内呈报批准后执行（生产动作零预支）",
+ "handoff_for_next_ai": "第二批执行报告_20261024.md；值守期日常=cron自动日报+人工按第二批准登记逐日T+1（approval-register续期）；异常按 resume/retry 矩阵",
  "maintenance_review_20261022": {
   "session": "codex-t1-maintenance-20261022",
   "main_ai_review": "zcode-20261022-tplus1-stage2d 复核通过(测试复跑/16指纹全对/关键修复抽查属实/checkpoint语义diff仅13处精准更新),交付已提交0fd6ba0",
@@ -157,5 +158,51 @@
   ],
   "production_actions": 0,
   "database_writes": "隔离库data_asset_test内测试schema与控制表（alembic upgrade head+测试数据），零生产动作"
+ },
+ "batch2_20261024": {
+  "finished_on": "2026-10-24",
+  "approval": "用户会话批准（第一批报告逐项呈报PA1-PA7后批复继续）",
+  "production": {
+   "image": "data-asset:r211-20261024-t1k（11次迭代healthy）",
+   "migration": "c0d1e2f3a4b5→b8c9d0e1f2a3（12控制表）",
+   "receipt_table": "DBOPER.ASSET_T1_RECEIPTS（PK OPERATION_ID+IDX BATCH_ID）",
+   "executor": "sql-target-apply-1（白名单enabled）",
+   "pilot": {
+    "business_day": "2026-10-23",
+    "tables": {
+     "EMR_ICH": {
+      "rows": 206,
+      "state": "RECONCILED",
+      "operation": "OPR-...-4de7175f768f"
+     },
+     "EMR_ICH_DIAGNOSIS": {
+      "rows": 2365,
+      "state": "RECONCILED",
+      "operation": "OPR-...-07451cf264c1"
+     },
+     "EMR_ICH_OPERATION": {
+      "rows": 131,
+      "state": "RECONCILED",
+      "operation": "OPR-...-bdf7df02fb99"
+     },
+     "EMR_ICH_CHARGE": {
+      "rows": 2663,
+      "state": "RECONCILED",
+      "operation": "OPR-...-b80cf3662749"
+     }
+    },
+    "first_day_check": "206键全在/0差异/SYSTEM_TIME单事务时钟08:02:15全非空/回执4张/版本账齐/双水位=H"
+   },
+   "h_freeze": "2026-10-24T00:00+08:00；欠账[2026-01-01,H)月覆盖账9月×4表HISTORICAL_BACKLOG",
+   "cron": "07:35日报+07:45outbox巡检（relay未接值守）",
+   "backup": "data_asset_pre_t1_20261024_073653.dump (sha5faa0436afaeaf5e)",
+   "defects_fixed_in_prod_chain": 6
+  },
+  "pending": [
+   "R06告警六项输入（转无人值守前置）",
+   "B05 7日观测积累",
+   "历史欠账补齐（低优先）",
+   "扩表/DataX真实引擎（后续批）"
+  ]
  }
 }

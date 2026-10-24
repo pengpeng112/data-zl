@@ -428,6 +428,11 @@ class ApplyPort:
             if self.lease_validator is None:
                 raise ApplyRefused("生产装载必须提供 lease_validator（目标侧围栏）")
 
+    def precheck(self, request: ApplyRequest, executor) -> None:
+        """公开门禁预检：批准/围栏/白名单在进 APPLYING 前核完，
+        拒绝时批次留在 APPLY_PENDING（不产生 APPLYING 之后的非法回退）。"""
+        self._gate(request, executor)
+
     def preview(self, request: ApplyRequest, target_rows: Mapping[tuple, Mapping]) -> ApplyPlan:
         actions = self._classify(request, target_rows)
         plan = ApplyPlan(actions=actions, counts={}, preview_only=True)

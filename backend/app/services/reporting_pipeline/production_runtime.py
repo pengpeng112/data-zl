@@ -195,6 +195,25 @@ def _simulation_or_real(inputs: AssemblyInputs, what: str, value, simulator):
     )
 
 
+
+
+def _coerce_time_like(name, value, time_like: dict):
+    """视图把时间列暴露为 VARCHAR2(19) 字符串时按冻结目标类型转 datetime；
+    解析失败原样返回（交质量门隔离，不静默丢弃）。"""
+    if not time_like or name not in time_like or not isinstance(value, str):
+        return value
+    text = value.strip()
+    if not text:
+        return value
+    from datetime import datetime
+
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+    return value
+
 class ProductionAssembly:
     """六真实动作的装配与执行（repository 为唯一事实源）。"""
 
@@ -584,15 +603,30 @@ class ProductionAssembly:
             if not names or len(names) != len(set(names)):
                 raise AssemblyRefused("REFUSED_PROJECTION：投影为空或列名重复")
             staged_rows = []
+            time_like = {}
+            if spec_rt is not None:
+                from app.services.reporting_pipeline.readback_types import TIME_LIKE
+
+                time_like = {
+                    field.name: field.target_type.upper().split("(")[0].strip()
+                    for field in spec_rt.projection
+                    if field.target_type.upper().split("(")[0].strip() in TIME_LIKE
+                }
             for row in (rows if spec_rt is not None and spec_rt.engine == "DATAX" else result.rows):
                 if isinstance(row, dict):
                     if set(row.keys()) != set(names):
                         raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列集与冻结投影不一致，禁止截断")
-                    staged_rows.append({name: row.get(name) for name in names})
+                    staged_rows.append({
+                        name: _coerce_time_like(name, row.get(name), time_like)
+                        for name in names
+                    })
                 else:
                     if len(row) != len(names):
                         raise AssemblyRefused("REFUSED_ROW_WIDTH：源行列数与冻结投影不一致，禁止截断")
-                    staged_rows.append(dict(zip(names, row)))
+                    staged_rows.append({
+                        name: _coerce_time_like(name, value, time_like)
+                        for name, value in zip(names, row)
+                    })
             rows = staged_rows
 
         attempt_id = next_attempt_id(repo, batch_id)
@@ -708,10 +742,15 @@ class ProductionAssembly:
                     expected = "str"
                 if expected:
                     rules.append(TypeRule(meta.name, expected))
+            charset = (
+                getattr(verify_spec, "target_charset", None) or "utf-8"
+            )
             for field in verify_spec.projection:
                 declared = re.fullmatch(r"(?:VAR)?CHAR2?\((\d+)\s*(?:BYTE)?\)", field.target_type.upper())
                 if declared:
-                    rules.append(ByteLengthRule(field.name, int(declared.group(1))))
+                    rules.append(
+                        ByteLengthRule(field.name, int(declared.group(1)), charset)
+                    )
             service.column_meta = dict(metas)
             outcome = service.verify(rows, rules=rules)
             outcome_summary = outcome.summary()
@@ -887,7 +926,8 @@ class ProductionAssembly:
             allowed_operations=("INSERT", "UPDATE"),
             idempotency_key_columns=binding.key_columns,
             rows=tuple(rows),
-            column_meta=self._column_meta(binding, spec),
+            # 列型以冻结件为准（种子包投影为空→默认 VARCHAR 会漏 CHAR 空格规整）
+            column_meta=self._column_meta(binding, spec_rt if spec_rt is not None else spec),
             mode="MERGE",
             lease_resource=lease_resource,
             fencing_token=fencing_token,
@@ -901,6 +941,8 @@ class ProductionAssembly:
                 batch_id, BatchState.APPLY_PENDING, reason="apply 门禁启动"
             )
         try:
+            if not self.simulation:
+                port.precheck(request, executor)
             plan = port.preview(request, target_rows)
             if plan.counts.get("CONFLICT"):
                 raise AssemblyRefused("REFUSED_VERSION_CONFLICT：存在版本冲突，需隔离后续跑")
@@ -925,11 +967,20 @@ class ProductionAssembly:
                 "simulation": self.simulation,
             }
         except Exception as exc:  # ApplyRefused 等：不写目标，回 APPLY_PENDING
+            import os as _os
+
+            if _os.environ.get("T1_DEBUG_TRACEBACK"):
+                import traceback as _tb
+
+                _tb.print_exc()
             if repo.get_batch(batch_id).state != BatchState.APPLY_PENDING:
-                repo.transition_batch(
-                    batch_id, BatchState.APPLY_PENDING,
-                    reason=f"apply 被拒: {type(exc).__name__}",
-                )
+                try:
+                    repo.transition_batch(
+                        batch_id, BatchState.APPLY_PENDING,
+                        reason=f"apply 被拒: {type(exc).__name__}",
+                    )
+                except Exception:  # noqa: BLE001 - APPLYING 后回退非法：留待恢复矩阵
+                    pass
             return {
                 "ok": False,
                 "batch_id": batch_id,
@@ -998,11 +1049,13 @@ class ProductionAssembly:
             target_rows = dict(sim_target_rows or {})
         else:
             target_rows = self._read_target_snapshot(binding, keys)
-        metas = list(self._column_meta(binding, spec).values())
+        spec_rt = self.runtime_spec(record.task_id)
+        metas = list(
+            self._column_meta(binding, spec_rt if spec_rt is not None else spec).values()
+        )
         # 批1-4/批1-5：开隔离组的键不计入 missing（留账未闭合单列），
         # 但存在未闭合隔离组时不转 RECONCILED（报送未闭合）。
         quarantined_keys: set[tuple] = set()
-        spec_rt = self.runtime_spec(record.task_id)
         if not self.simulation and spec_rt is not None and spec_rt.change_mode == "SNAPSHOT_DIFF":
             partition = self._compute_partition(spec_rt, binding, rows, target_rows)
             quarantined_keys = set(partition.conflict_keys) | set(partition.missing_parent_keys)

@@ -474,8 +474,8 @@
   }
  },
  "daily_t1": {
-  "updated_on": "2026-10-23",
-  "state": "BATCH1_RUNTIME_CHAIN_WIRED_ISOLATED_ACCEPTED_NOT_DEPLOYED",
+  "updated_on": "2026-10-24",
+  "state": "BATCH2_PILOT_LIVE_FIRST_GROUP_RECONCILED_ATTENDED_MODE",
   "report": "daily_t1_20261015/每日T加1报送方案.md",
   "workbook": "daily_t1_20261015/77表每日增量准备清单.xlsx",
   "evidence": "daily_t1_20261015/离线核对结果.json",
@@ -1146,6 +1146,10 @@
    "result": "第一批完成：补齐运行链并隔离验收通过，未动生产",
    "tests": "单元478+2跳；隔离PG集成18过（正式CLI入口全链6场景）；ruff净；迁移链全绿head=b8c9d0e1f2a3",
    "waiting": "第二批按PA逐项批准（含新迁移b8c9批准登记表）；Oracle方言/DataX真实引擎/R06告警外部输入待环境或批准"
+  },
+  "batch2_20261024": {
+   "result": "第二批完成：生产发布(r211-20261024-t1k)+迁移(b8c9d0e1f2a3)+回执表+首组四表试点RECONCILED(5365行)+H冻结(2026-10-24T00:00+08)+欠账登记+cron值守",
+   "waiting": "R06告警六项输入→无人值守；B05 7日观测积累；历史欠账补齐低优先；扩表/DataX后续"
   }
  },
  "concurrent_update_preserved_20261017": {

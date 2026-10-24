@@ -17,6 +17,8 @@ WORKDIR /app
 COPY app /app/app
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
+# 189 T+1：控制入口与运维脚本进镜像（容器内 docker exec 运行 reporting_ctl）
+COPY scripts /app/scripts
 
 ENV APP_BUILD_ID=hotpatch-local
 ENV PYTHONPATH=/app

@@ -1,0 +1,9 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+today_rows/system_time_nonnull/min/max: (206, 206, datetime.datetime(2026, 10, 24, 8, 2, 15), datetime.datetime(2026, 10, 24, 8, 2, 15))
+receipt: ('OPR-DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5-4de7175f768f', 206, '2026-10-24T08:02:15.841000+08:00', '2026-10-24T08:02:16.002000+08:00', 'MERGE:keys=206')
+receipt_total: 4
+version_evidence: 206 | batch_state: RECONCILED | watermarks: (datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))

@@ -256,10 +256,27 @@ def resolve_oracle_credentials(credential_ref: str) -> tuple[str, str]:
     return user, password
 
 
+def _ensure_oracle_thick() -> None:
+    """Oracle 11g 须 thick 模式；lib 目录取容器约定路径（幂等初始化）。"""
+    import os
+
+    import oracledb
+
+    lib_dir = (
+        os.environ.get("APP_ORACLE_CLIENT_LIB_DIR")
+        or ("/opt/oracle" if os.path.isdir("/opt/oracle") else "/opt/oracle/instantclient_21")
+    )
+    try:
+        oracledb.init_oracle_client(lib_dir=lib_dir)
+    except Exception:  # noqa: BLE001 - 已初始化（重复 init）继续连接
+        pass
+
+
 def build_oracle_connection_factory(
     *, dsn: str, credential_ref: str, timeout_ms: int = 600_000
 ) -> Callable[[], object]:
-    """构造 oracledb 连接工厂（thick 模式由容器环境负责初始化）。"""
+    """构造 oracledb 连接工厂（thick 模式；凭据容器侧解析）。"""
+    _ensure_oracle_thick()
 
     def factory() -> object:
         import oracledb
@@ -320,6 +337,17 @@ def build_connection_factory(
 # -- RowSource 工厂 ----------------------------------------------------------
 
 
+def _normalize_numeric_types(row: tuple) -> tuple:
+    """驱动数值规整：Oracle 计算列可能返回 float；金额类精确数值必须
+    Decimal（质量门拒绝 float 进 hash，str(float) 最短 repr 无损往返）。"""
+    from decimal import Decimal
+
+    return tuple(
+        Decimal(str(value)) if type(value) is float else value
+        for value in row
+    )
+
+
 def build_row_source(
     spec: TableRuntimeSpec,
     *,
@@ -336,6 +364,7 @@ def build_row_source(
         physical_source=f"{spec.source_group}@{spec.source_object}",
         provider=provider_cls(connection_factory),
         query_builder=builder_cls(spec),
+        row_transform=_normalize_numeric_types,
         fetch_timeout_seconds=fetch_timeout_seconds,
     )
 

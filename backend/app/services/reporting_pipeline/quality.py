@@ -41,6 +41,7 @@ class RequiredRule:
 class ByteLengthRule:
     column: str
     max_bytes: int
+    charset: str = "utf-8"  # 目标库字符集（Oracle VARCHAR2 BYTE 语义按库字符集计）
 
 
 @dataclass(frozen=True)
@@ -197,10 +198,11 @@ class QualityService:
                                             "必填缺失/空串"))
             elif isinstance(rule, ByteLengthRule):
                 value = row.get(rule.column)
-                if value is not None and byte_length(value) > rule.max_bytes:
+                actual = byte_length(value, rule.charset)
+                if value is not None and actual > rule.max_bytes:
                     out.append(RowIssue(
                         idx, group_key, rule.column, "BYTE_LENGTH",
-                        f"UTF-8 字节长 {byte_length(value)} > {rule.max_bytes}",
+                        f"{rule.charset} 字节长 {actual} > {rule.max_bytes}",
                     ))
             elif isinstance(rule, PrecisionRule):
                 value = row.get(rule.column)

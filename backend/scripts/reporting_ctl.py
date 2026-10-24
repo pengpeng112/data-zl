@@ -536,11 +536,14 @@ def cmd_freeze_config(args: argparse.Namespace) -> int:
         missing = [c["name"] for c in cols if c["name"].upper() not in aliases]
         if missing:
             coverage_problems.append(f"{name}: 视图未暴露 {len(missing)} 列（如 {missing[:3]}）")
+        # SYSTEM_TIME 只能由目标事务生成（A01 候选该字段是中文说明句，
+        # 不是列名）：按目标字典实列判定——目标存在 SYSTEM_TIME 列即定为
+        # 事务时钟列并从装载投影剔除（不采视图 CAST(SYSDATE) 技术列）。
+        target_column_names = {c["name"] for c in cols}
+        declared = table_cfg.get("system_time_column")
         system_time_column = (
-            table_cfg.get("system_time_column")
-            if isinstance(table_cfg.get("system_time_column"), str)
-            and table_cfg.get("system_time_column")
-            else None
+            declared if isinstance(declared, str) and declared in target_column_names
+            else ("SYSTEM_TIME" if "SYSTEM_TIME" in target_column_names else None)
         )
         projection = [
             {
@@ -559,6 +562,7 @@ def cmd_freeze_config(args: argparse.Namespace) -> int:
         )
         target_override = (override_doc.get("targets") or {}).get(name)
         dialect = (source_override or {}).get("dialect", "oracle")
+        target_charset = (target_override or {}).get("charset")
         tables[name] = build_table_document(
             canonical_table=name,
             business_name=table_cfg.get("business_name", name),
@@ -612,6 +616,7 @@ def cmd_freeze_config(args: argparse.Namespace) -> int:
                 "key_evidence": table_cfg.get("key", {}).get("verified_by", ""),
                 "view_column_coverage": "verified" if not missing else f"missing={len(missing)}",
             },
+            target_charset=target_charset,
         )
     if coverage_problems and not args.allow_view_gap:
         _emit({

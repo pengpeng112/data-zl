@@ -77,6 +77,7 @@ class TableRuntimeSpec:
     parent_table: str | None
     parent_key_column: str | None
     fingerprint: str
+    target_charset: str = "utf-8"  # 目标库字符集（BYTE 长度语义按此度量）
 
     def write_columns(self) -> tuple[str, ...]:
         names = tuple(f.name for f in self.projection)
@@ -288,6 +289,7 @@ def load_frozen_runtime_config(path: str | Path) -> FrozenRuntimeConfig:
             parent_table=str(parent["table"]) if parent else None,
             parent_key_column=str(parent["key_column"]) if parent else None,
             fingerprint=actual_table_fp,
+            target_charset=str(target.get("charset") or "utf-8"),
         )
     return FrozenRuntimeConfig(
         environment=environment,
@@ -329,6 +331,7 @@ def build_table_document(
     parent: Mapping[str, str] | None = None,
     timezone: str = "Asia/Shanghai",
     notes: Mapping[str, str] | None = None,
+    target_charset: str | None = None,
 ) -> dict:
     """构造单表文档并计算指纹（投影顺序即文档顺序）。"""
     ordered = [
@@ -353,6 +356,7 @@ def build_table_document(
             "tenant": tenant,
             "table": target_table,
             "identity_verified": True,
+            **({"charset": target_charset} if target_charset else {}),
         },
         "stable_key": {"columns": list(stable_key), "verified": True},
         "anchor": {

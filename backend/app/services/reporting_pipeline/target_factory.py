@@ -234,6 +234,16 @@ class OracleTargetConnection:
         return self._conn
 
     @staticmethod
+    def _normalize_read(value):
+        """Oracle 读回规整：NUMBER 可能以 float 返回（同源侧约定），
+        精确数值一律 Decimal(str)（比较/hash 禁 float）。"""
+        from decimal import Decimal
+
+        if type(value) is float:
+            return Decimal(str(value))
+        return value
+
+    @staticmethod
     def _ident(name: str) -> str:
         if not name or any(c in name for c in ';"'):
             raise TargetFactoryError(f"非法标识符: {name!r}")
@@ -284,7 +294,11 @@ class OracleTargetConnection:
                 columns = [d[0].upper() for d in cursor.description]
                 for raw in cursor.fetchall():
                     row = {
-                        col: _wall_clock(value) if isinstance(value, datetime) else value
+                        col: (
+                            _wall_clock(value).replace(tzinfo=None)
+                            if isinstance(value, datetime)
+                            else self._normalize_read(value)
+                        )
                         for col, value in zip(columns, raw)
                     }
                     key = tuple(row.get(c.upper()) for c in key_columns)
@@ -311,17 +325,21 @@ class OracleTargetConnection:
         return deleted
 
     def current_timestamp(self) -> datetime:
+        """目标库时钟：SYSTIMESTAMP 原样取回（旧版 Oracle 时区文件缺区域名，
+        AT TIME ZONE 'Asia/Shanghai' 会 ORA-01805），时区换算在 Python 侧
+        按 +08 偏移完成（偏移换算不依赖库时区文件）。"""
         conn = self._connection()
         cursor = conn.cursor()
         try:
-            cursor.execute(
-                "SELECT SYSTIMESTAMP AT TIME ZONE 'Asia/Shanghai' FROM DUAL"
-            )
+            cursor.execute("SELECT SYSTIMESTAMP FROM DUAL")
             value = cursor.fetchone()[0]
         finally:
             cursor.close()
-        if isinstance(value, datetime) and value.tzinfo is None:
-            return value.replace(tzinfo=BUSINESS_TZ)
+        if isinstance(value, datetime):
+            if value.tzinfo is None:
+                # 无时区的库本地时间：服务器为院区时区（CST）
+                return value.replace(tzinfo=BUSINESS_TZ)
+            return value.astimezone(BUSINESS_TZ)
         return value
 
     def _dml_rows(self, rows: Sequence[Mapping], columns: Sequence[str]) -> list[dict]:
@@ -387,7 +405,10 @@ class OracleTargetConnection:
         if raw is None:
             return None
         return {
-            col: (_wall_clock(v) if isinstance(v, datetime) else v)
+            col: (
+                _wall_clock(v).replace(tzinfo=None) if isinstance(v, datetime)
+                else self._normalize_read(v)
+            )
             for col, v in zip(columns, raw)
         }
 
@@ -407,10 +428,10 @@ class OracleTargetConnection:
 
     @staticmethod
     def _bind_receipt(receipt: Mapping) -> dict:
+        """回执绑定：datetime→院区墙钟 isoformat 字符串；str/int 原样。"""
         return {
             k.lower(): (
-                _wall_clock(v) if isinstance(v, datetime)
-                else (v.isoformat() if isinstance(v, str) else v)
+                _wall_clock(v).isoformat() if isinstance(v, datetime) else v
             )
             for k, v in receipt.items()
         }

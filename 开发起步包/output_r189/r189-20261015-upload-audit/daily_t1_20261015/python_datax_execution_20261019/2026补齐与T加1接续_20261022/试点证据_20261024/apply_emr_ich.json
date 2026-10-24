@@ -1,0 +1,26 @@
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5",
+ "operation_id": "OPR-DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5-4de7175f768f",
+ "rows_affected": 206,
+ "plan_counts": {
+  "INSERT": 206
+ },
+ "partition": {
+  "ok": 206,
+  "insert": 206,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_ICH.T1.2026-10-23.da7ae38534c5-4de7175f768f",
+  "manifest_hash": "4de7175f768f1218197669b3fb02a8d5ebcd04198897d7c7ae312a67d756b64c",
+  "rows_affected": 206
+ },
+ "simulation": false,
+ "applied_at": "2026-10-24T00:02:35+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}

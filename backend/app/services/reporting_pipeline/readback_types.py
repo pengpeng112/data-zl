@@ -78,13 +78,36 @@ def values_equal(a, b, meta: ColumnMeta) -> bool:
     return na == nb
 
 
-def byte_length(value) -> int:
-    """UTF-8 字节长度（不是字符数）：超长判断按字节语义。"""
+# Oracle 库字符集名 → Python 编码名（BYTE 长度按库字符集计）
+ORACLE_CHARSET_CODECS = {
+    "ZHS16GBK": "gbk",
+    "ZHS16CGB231280": "gbk",
+    "ZHS32GB18030": "gb18030",
+    "AL32UTF8": "utf-8",
+    "UTF8": "utf-8",
+    "WE8ISO8859P1": "latin-1",
+    "ZHT16BIG5": "big5",
+    "JA16EUC": "euc_jp",
+}
+
+
+def byte_length(value, charset: str = "utf-8") -> int:
+    """按目标库字符集的字节长度（不是字符数）：超长判断按字节语义。
+
+    Oracle VARCHAR2(n BYTE) 的 n 以库字符集计（如 ZHS16GBK 中文 2 字节）；
+    值含目标字符集不可编码字符时回退 UTF-8 长度（该值插入本会失败，
+    按超长隔离是安全方向）。
+    """
     if value is None:
         return 0
-    if isinstance(value, str):
-        return len(value.encode("utf-8"))
-    return len(str(value).encode("utf-8"))
+    text = value if isinstance(value, str) else str(value)
+    codec = ORACLE_CHARSET_CODECS.get((charset or "").upper(), charset or "utf-8")
+    if codec.lower() not in ("utf-8", "utf8"):
+        try:
+            return len(text.encode(codec))
+        except (UnicodeEncodeError, LookupError):
+            pass
+    return len(text.encode("utf-8"))
 
 
 def _encode_for_hash(value, meta: ColumnMeta) -> bytes:
