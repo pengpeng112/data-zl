@@ -171,6 +171,7 @@ class TestFullChainFromCli(unittest.TestCase):
                     )
                 """))
                 exprs = ['"ID"', '"DATETIME"']
+                numeric = {"NUMBER", "NUMERIC", "DECIMAL", "FLOAT"}
                 for c in cols:
                     column = c["COLUMN_NAME"]
                     if column in ("ID", "DATETIME"):
@@ -182,6 +183,12 @@ class TestFullChainFromCli(unittest.TestCase):
                             "SPLIT_PART(\"ID\", '|', 3)"
                         )
                         exprs.append(f'{derived} AS "{column}"')
+                    elif c.get("NULLABLE") == "N":
+                        # 目标 NOT NULL 列：给类型匹配的非空占位（质量门强制必填）
+                        if (c["DATA_TYPE"] or "").upper() in numeric:
+                            exprs.append(f"CAST(0 AS text) AS \"{column}\"")
+                        else:
+                            exprs.append(f"CAST('X' AS text) AS \"{column}\"")
                     else:
                         exprs.append(f'CAST(NULL AS text) AS "{column}"')
                 conn.execute(text(

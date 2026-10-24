@@ -214,6 +214,50 @@ def _coerce_time_like(name, value, time_like: dict):
             continue
     return value
 
+def _build_quality_rules(verify_spec, group_key_columns):
+    """按冻结规格构建基础质量规则（verify/apply/reconcile 共用，确定性一致）：
+    稳定键必填 + 目标 NOT NULL 列必填 + 字节长度（目标库字符集）。"""
+    from app.services.reporting_pipeline.quality import (
+        ByteLengthRule,
+        RequiredRule,
+    )
+
+    # 种子包 ProjectionField 无 nullable 信息（getattr 默认可空，不加规则）
+    not_null = tuple(
+        f.name for f in verify_spec.projection if not getattr(f, "nullable", True)
+    )
+    rules = [RequiredRule(tuple(group_key_columns))]
+    if not_null:
+        rules.append(RequiredRule(not_null))
+    charset = getattr(verify_spec, "target_charset", None) or "utf-8"
+    for field in verify_spec.projection:
+        declared = re.fullmatch(
+            r"(?:VAR)?CHAR2?\((\d+)\s*(?:BYTE)?\)", field.target_type.upper()
+        )
+        if declared:
+            rules.append(ByteLengthRule(field.name, int(declared.group(1)), charset))
+    return rules
+
+
+def _quality_metatable(verify_spec, binding, rows):
+    """返回 (合法行, 坏键集, 列型元数据)：与 verify 同规则重放，
+    供生产 apply 合法子集装载与 reconcile 排除。"""
+    from app.services.reporting_pipeline.quality import QualityService
+
+    metas = ProductionAssembly._column_meta(binding, verify_spec)
+    service = QualityService(
+        group_key_columns=tuple(binding.key_columns), column_meta=dict(metas)
+    )
+    rules = _build_quality_rules(verify_spec, binding.key_columns)
+    outcome = service.verify(rows, rules=rules)
+    bad_keys = set(outcome.quarantined_group_keys)
+    good_rows = [
+        row for row in rows
+        if tuple(row.get(c) for c in binding.key_columns) not in bad_keys
+    ]
+    return good_rows, bad_keys, metas
+
+
 class ProductionAssembly:
     """六真实动作的装配与执行（repository 为唯一事实源）。"""
 
@@ -444,6 +488,7 @@ class ProductionAssembly:
         dry_run: bool = False,
         read_budget: ReadBudget | None = None,
         sim_rows_provider: Callable[[], list[dict]] | None = None,
+        window: TimeWindow | None = None,
     ) -> dict:
         from app.services.reporting_pipeline.adapters.python_reader import (
             PythonReaderAdapter,
@@ -452,7 +497,10 @@ class ProductionAssembly:
         spec = self.resolve_spec(table)
         self._check_binding(spec, binding)
         batch_id = stable_batch_id(binding, mode, business_day)
-        window = business_window(business_day, spec.time_semantics.timezone or "Asia/Shanghai")
+        if window is None:
+            window = business_window(
+                business_day, spec.time_semantics.timezone or "Asia/Shanghai"
+            )
         plan_doc = {
             "batch_id": batch_id,
             "table": table,
@@ -728,13 +776,15 @@ class ProductionAssembly:
                 group_key_columns=group_key_columns,
                 column_meta=column_meta,
             )
-            from app.services.reporting_pipeline.quality import RequiredRule, TypeRule, ByteLengthRule
+            from app.services.reporting_pipeline.quality import TypeRule
             metas = column_meta or self._column_meta(TargetBindingConfig(
                 "", "", verify_spec.canonical_table if hasattr(verify_spec, "canonical_table") else record.task_id,
                 tuple(group_key_columns),
                 tuple(field.name for field in verify_spec.projection),
             ), verify_spec)
-            rules = [RequiredRule(tuple(group_key_columns))]
+            # 基础规则（稳定键+目标 NOT NULL 必填+字节长度）走共享构建器，
+            # 与 apply 合法子集重放/ reconcile 排除保持确定性一致
+            rules = _build_quality_rules(verify_spec, group_key_columns)
             for meta in metas.values():
                 expected = {"NUMBER": "decimal", "DECIMAL": "decimal", "NUMERIC": "decimal",
                             "INT": "int", "INTEGER": "int", "DATE": "datetime", "TIMESTAMP": "datetime"}.get(meta.logical_type)
@@ -742,15 +792,6 @@ class ProductionAssembly:
                     expected = "str"
                 if expected:
                     rules.append(TypeRule(meta.name, expected))
-            charset = (
-                getattr(verify_spec, "target_charset", None) or "utf-8"
-            )
-            for field in verify_spec.projection:
-                declared = re.fullmatch(r"(?:VAR)?CHAR2?\((\d+)\s*(?:BYTE)?\)", field.target_type.upper())
-                if declared:
-                    rules.append(
-                        ByteLengthRule(field.name, int(declared.group(1)), charset)
-                    )
             service.column_meta = dict(metas)
             outcome = service.verify(rows, rules=rules)
             outcome_summary = outcome.summary()
@@ -835,7 +876,7 @@ class ProductionAssembly:
                 raise AssemblyRefused("REFUSED_TARGET_LEASE：须提供本表有效写租约及围栏token")
             port.lease_validator(lease_resource, fencing_token)
         if record.state not in (
-            BatchState.VALIDATED, BatchState.APPLY_PENDING,
+            BatchState.VALIDATED, BatchState.APPLY_PENDING, BatchState.QUARANTINED,
         ):
             return {
                 "ok": False,
@@ -859,6 +900,50 @@ class ProductionAssembly:
         spec_rt = self.runtime_spec(record.task_id)
         partition = None
         ledger_records: list[dict] = []
+        # 质量级合法组继续：生产路径按同一规则重放取合法子集装载（覆盖
+        # QUARANTINED 首装与 APPLY_PENDING 重试），坏组留质量工单账
+        # （报送未闭合直至工单处置）
+        if not self.simulation and spec_rt is not None:
+            good_rows, bad_keys, _ = _quality_metatable(spec_rt, binding, rows)
+            if bad_keys:
+                exists = any(
+                    g.get("group_key") == "quality-required-null"
+                    for g in repo.open_quarantine_groups(batch_id)
+                )
+                if not exists:
+                    repo.record_quarantine_group(
+                        batch_id=batch_id,
+                        canonical_table=record.task_id,
+                        group_key="quality-required-null",
+                        reason="目标 NOT NULL 列缺失（工单化；合法组继续装载）",
+                        error_code="QUALITY_REQUIRED_NULL",
+                        rows_quarantined=len(bad_keys),
+                        detail_ref=f"keys={len(bad_keys)}",
+                    )
+                ledger_records.append({
+                    "group_key": "quality-required-null",
+                    "error_code": "QUALITY_REQUIRED_NULL",
+                    "rows": len(bad_keys),
+                })
+            if not good_rows:
+                if record.state != BatchState.QUARANTINED:
+                    repo.transition_batch(
+                        batch_id, BatchState.QUARANTINED,
+                        reason="质量隔离后无合法组可装载",
+                    )
+                return {
+                    "ok": False, "batch_id": batch_id, "state": "QUARANTINED",
+                    "refused": "全部行质量隔离（NOT NULL 缺失）：留工单待处置",
+                    "simulation": self.simulation,
+                }
+            if bad_keys:
+                rows = good_rows
+                if record.state == BatchState.QUARANTINED:
+                    repo.transition_batch(
+                        batch_id, BatchState.VALIDATED,
+                        reason=f"质量合法组继续（隔离 {len(bad_keys)} 行留工单）",
+                    )
+                    record = repo.get_batch(batch_id)
         if (not self.simulation and spec_rt is not None
                 and spec_rt.change_mode == "SNAPSHOT_DIFF"):
             partition = self._compute_partition(
@@ -1056,9 +1141,17 @@ class ProductionAssembly:
         # 批1-4/批1-5：开隔离组的键不计入 missing（留账未闭合单列），
         # 但存在未闭合隔离组时不转 RECONCILED（报送未闭合）。
         quarantined_keys: set[tuple] = set()
-        if not self.simulation and spec_rt is not None and spec_rt.change_mode == "SNAPSHOT_DIFF":
-            partition = self._compute_partition(spec_rt, binding, rows, target_rows)
-            quarantined_keys = set(partition.conflict_keys) | set(partition.missing_parent_keys)
+        if not self.simulation and spec_rt is not None:
+            has_quality_ledger = any(
+                str(g.get("group_key", "")).startswith("quality-")
+                for g in repo.open_quarantine_groups(batch_id)
+            )
+            if has_quality_ledger:
+                _, quality_bad, _ = _quality_metatable(spec_rt, binding, rows)
+                quarantined_keys |= quality_bad
+            if spec_rt.change_mode == "SNAPSHOT_DIFF":
+                partition = self._compute_partition(spec_rt, binding, rows, target_rows)
+                quarantined_keys |= set(partition.conflict_keys) | set(partition.missing_parent_keys)
         diffs: list[dict] = []
         missing = [
             k for k in keys if k not in target_rows and k not in quarantined_keys

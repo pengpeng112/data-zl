@@ -1,10 +1,10 @@
 {
  "plan_version": "1.1",
  "as_of": "2026-10-24",
- "status": "BATCH2_PILOT_LIVE_FIRST_GROUP_RECONCILED_ATTENDED_MODE",
+ "status": "BACKLOG_BACKFILLED_FIRST_GROUP_ATTENDED_MODE",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
- "current_step": "第二批完成：生产发布+迁移+首组四表试点全 RECONCILED+H冻结；值守运行（relay未接）",
- "next": "B05 连续7业务日观测（cron日报载体）；R06 告警六项输入补齐后转无人值守；历史欠账[2026-01-01,H)低优先补齐；扩表与DataX真实引擎后续批次",
+ "current_step": "历史欠账[2026-01-01,H)四表补齐完成：40月窗/134.2万行插入/36窗RECONCILED_CLOSED/310行隔离工单/守恒核验过；T+1值守运行",
+ "next": "R06告警六项输入→无人值守；B05 7日观测；310行隔离工单人工裁定；扩表(73项)逐批冻结+试点；DataX真实引擎后续",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -204,5 +204,17 @@
    "历史欠账补齐（低优先）",
    "扩表/DataX真实引擎（后续批）"
   ]
+ },
+ "backfill_20261024": {
+  "finished_on": "2026-10-24",
+  "windows": "4表×10窗(2026-01..09+10P部分月[H止])",
+  "inserts": 1342463,
+  "closed_months": 32,
+  "quarantine_months": 4,
+  "quarantined_rows": 310,
+  "conservation": "视图1,354,236 vs 管道写入1,352,358,差=隔离310+NO_CHANGE既有~1,565+漂移;回执48笔1,352,370行",
+  "code_changes": "capture月窗(--window-start/end)+质量合法组继续(目标NOT NULL必填+QUARANTINED批合法子集+工单留账+reconcile排除质量键);镜像r211-20261024-t1m;单元478+隔离6/6回归",
+  "evidence": "试点证据_20261024/backfill_*.json|*.log|backfill_closeout|backfill_conservation",
+  "report": "历史欠账补齐执行报告_20261024.md"
  }
 }

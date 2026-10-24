@@ -304,6 +304,7 @@
 5. 不在文档中记录密码、Token 或连接串。仅记录环境变量名、密钥引用和脱敏网络信息。
 
 ## 目录更新记录
+> 2026-10-24：189 T+1历史欠账补齐——四表[2026-01-01,H)40月窗插入134.2万行/36窗闭合/310行隔离工单/守恒核验过；capture月窗+质量合法组继续入镜像t1m；新增《历史欠账补齐执行报告_20261024.md》与试点证据_20261024/backfill_*（见 2026补齐与T加1接续_20261022/）。
 > 2026-10-24：189 T+1第二批（按批准上线）——生产发布r211-20261024-t1k+迁移b8c9d0e1f2a3+回执表DDL+首组四表试点5,365行RECONCILED+H冻结+欠账登记+cron值守；新增《第二批执行报告_20261024.md》《生产bindings/override/冻结件v4》《试点证据_20261024/》（见 2026补齐与T加1接续_20261022/）。
 > 2026-10-23：189 T+1第一批（补齐运行链+隔离验收）——新增 backend 报表管道7模块（runtime_config/source_factory/target_factory/production_apply/apply_policy/datax_route/outbox_daemon）、CLI五命令（freeze-config/approval-register/outbox-send/outbox-inspect/resume --execute）、迁移b8c9d0e1f2a3（批准登记表）、隔离全链测试6场景；执行目录新增《第一批执行报告_20261023.md》《A05_待批清单_v3_20261023.json》《首组四表运行配置冻结件_v1_20261023.json》（见 2026补齐与T加1接续_20261022/）。
 - 2026-10-23 | **189五批收口完成（终局）** | [最终交付与验收报告](output_r189/r189-20261015-upload-audit/admission_route_audit_20261022/189五批收口_最终交付与验收报告_20261022.md)：批1旧02核对0差异（AR 258,185/ICH 275,297）；批2 AR 120,533/ICH 272,454+SPEC 4,593（approval 2633）；批3文书补插11/11表共22,798行（verify_docs ALL_MATCH=true；EMR_INFOR_CRITICALLY_ILL 修复 ORA-12899——SYSTEM_TIME VARCHAR2(19) 按列型绑定——后补插10行）；批4四表SYSTEM_TIME 5,937,800（幂等复跑0）；批5终验收全过（回执CLOCK=5,937,800/SPEC=4,593/DOC_INSERT=22,798，两表幂等复跑0新插）。人工待办7项见报告§六。[执行状态](output_r189/r189-20261015-upload-audit/admission_route_audit_20261022/执行状态_20261022_五批执行.md)

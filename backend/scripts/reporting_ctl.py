@@ -1014,6 +1014,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_capture.add_argument("--business-day", required=True, help="业务日 YYYY-MM-DD")
     p_capture.add_argument("--mode", default="T1", help="T1/HISTORICAL（默认 T1）")
     p_capture.add_argument("--dry-run", action="store_true", help="只产出计划，不读源")
+    p_capture.add_argument(
+        "--window-start", default=None,
+        help="历史月窗起 YYYY-MM-DD（含；--business-day 作为批次标识，如 2026-09）",
+    )
+    p_capture.add_argument(
+        "--window-end", default=None,
+        help="历史月窗止 YYYY-MM-DD（不含）",
+    )
     p_capture.set_defaults(func=cmd_capture)
     _add_common(p_capture)
 
@@ -1358,6 +1366,25 @@ def cmd_capture(args: argparse.Namespace) -> int:
     )
 
     dry_run = bool(args.dry_run)
+    window = None
+    if getattr(args, "window_start", None) or getattr(args, "window_end", None):
+        from datetime import datetime, time, timedelta, timezone
+
+        from app.services.reporting_pipeline.planner import TimeWindow
+
+        if not (getattr(args, "window_start", None) and getattr(args, "window_end", None)):
+            _emit({"ok": False, "error": "月窗须同时给 --window-start/--window-end", "exit_code": 2})
+            return 2
+        start = datetime.strptime(args.window_start, "%Y-%m-%d").replace(
+            tzinfo=timezone(timedelta(hours=8))
+        )
+        end = datetime.strptime(args.window_end, "%Y-%m-%d").replace(
+            tzinfo=timezone(timedelta(hours=8))
+        )
+        if end <= start:
+            _emit({"ok": False, "error": "月窗止须大于起", "exit_code": 2})
+            return 2
+        window = TimeWindow(start, end)
     # dry-run 只产出审阅计划（不读源不写状态）：缺状态库时允许离线装配，
     # 输出带 simulation 标记；真实 capture 缺输入仍拒绝。
     if dry_run and not _state_db_url(args):
@@ -1371,6 +1398,7 @@ def cmd_capture(args: argparse.Namespace) -> int:
             binding=binding,
             mode=args.mode,
             dry_run=True,
+            window=window,
         )
     else:
         from app.services.reporting_pipeline.production_runtime import (
@@ -1387,6 +1415,7 @@ def cmd_capture(args: argparse.Namespace) -> int:
                 mode=args.mode,
                 dry_run=dry_run,
                 bindings=_action_bindings_from_doc(_bindings_doc(args)),
+                window=window,
             )
         except AssemblyRefused as exc:
             _emit({"ok": False, "refused": str(exc), "exit_code": 2})

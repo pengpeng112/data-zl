@@ -1,0 +1,152 @@
+{
+ "2026-01": {
+  "rows": 5256,
+  "partition": {
+   "ok": 4825,
+   "insert": 4825,
+   "update": 0,
+   "no_change": 430,
+   "cas_conflict": 1,
+   "missing_parent": 0
+  },
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 1
+ },
+ "2026-02": {
+  "rows": 4232,
+  "partition": {
+   "ok": 4202,
+   "insert": 4202,
+   "update": 0,
+   "no_change": 30,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-03": {
+  "rows": 5651,
+  "partition": {
+   "ok": 5648,
+   "insert": 5648,
+   "update": 0,
+   "no_change": 3,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-04": {
+  "rows": 5679,
+  "partition": {
+   "ok": 5679,
+   "insert": 5679,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-05": {
+  "rows": 5312,
+  "partition": {
+   "ok": 5311,
+   "insert": 5311,
+   "update": 0,
+   "no_change": 1,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-06": {
+  "rows": 4917,
+  "partition": {
+   "ok": 4917,
+   "insert": 4917,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-07": {
+  "rows": 5426,
+  "partition": {
+   "ok": 5426,
+   "insert": 5426,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-08": {
+  "rows": 5389,
+  "partition": {
+   "ok": 5389,
+   "insert": 5389,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-09": {
+  "rows": 4889,
+  "partition": {
+   "ok": 4740,
+   "insert": 4740,
+   "update": 0,
+   "no_change": 149,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ },
+ "2026-10P": {
+  "rows": 3919,
+  "partition": {
+   "ok": 3713,
+   "insert": 3713,
+   "update": 0,
+   "no_change": 206,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined": 0
+ }
+}

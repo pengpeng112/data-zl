@@ -475,7 +475,7 @@
  },
  "daily_t1": {
   "updated_on": "2026-10-24",
-  "state": "BATCH2_PILOT_LIVE_FIRST_GROUP_RECONCILED_ATTENDED_MODE",
+  "state": "BACKLOG_BACKFILLED_FIRST_GROUP_ATTENDED_MODE",
   "report": "daily_t1_20261015/每日T加1报送方案.md",
   "workbook": "daily_t1_20261015/77表每日增量准备清单.xlsx",
   "evidence": "daily_t1_20261015/离线核对结果.json",
@@ -1150,6 +1150,10 @@
   "batch2_20261024": {
    "result": "第二批完成：生产发布(r211-20261024-t1k)+迁移(b8c9d0e1f2a3)+回执表+首组四表试点RECONCILED(5365行)+H冻结(2026-10-24T00:00+08)+欠账登记+cron值守",
    "waiting": "R06告警六项输入→无人值守；B05 7日观测积累；历史欠账补齐低优先；扩表/DataX后续"
+  },
+  "backfill_20261024": {
+   "result": "欠账[2026-01-01,H)补齐完成:40月窗/插入134.2万/36窗闭合/310行隔离工单/守恒核验过(报告:2026补齐与T加1接续_20261022/历史欠账补齐执行报告_20261024.md)",
+   "waiting": "310行工单人工裁定;R06六项输入;B05观测;扩表/DataX后续"
   }
  },
  "concurrent_update_preserved_20261017": {

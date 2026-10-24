@@ -1,0 +1,5 @@
+{
+ "2026-10P": {
+  "capture": "批次 DBOPER.EMR_ICH_OPERATION.HISTORICAL.2026-10-01.3268dd1828fb 处于 APPLY_PENDING，不允许重复 capture（按 resume/retry 语义续跑）"
+ }
+}

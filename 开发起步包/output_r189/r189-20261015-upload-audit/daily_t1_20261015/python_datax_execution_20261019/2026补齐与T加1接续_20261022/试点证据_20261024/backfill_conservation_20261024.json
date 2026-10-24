@@ -1,0 +1,22 @@
+{
+ "EMR_ICH": {
+  "view_rows": 50670,
+  "written_by_pipeline": 50205,
+  "delta": 465
+ },
+ "EMR_ICH_DIAGNOSIS": {
+  "view_rows": 567658,
+  "written_by_pipeline": 567661,
+  "delta": -3
+ },
+ "EMR_ICH_OPERATION": {
+  "view_rows": 73756,
+  "written_by_pipeline": 72340,
+  "delta": 1416
+ },
+ "EMR_ICH_CHARGE": {
+  "view_rows": 662152,
+  "written_by_pipeline": 662152,
+  "delta": 0
+ }
+}
