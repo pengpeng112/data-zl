@@ -3,8 +3,8 @@
  "as_of": "2026-10-24",
  "status": "BACKLOG_BACKFILLED_FIRST_GROUP_ATTENDED_MODE",
  "parent_run": "开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019",
- "current_step": "历史欠账[2026-01-01,H)四表补齐完成：40月窗/134.2万行插入/36窗RECONCILED_CLOSED/310行隔离工单/守恒核验过；T+1值守运行",
- "next": "R06告警六项输入→无人值守；B05 7日观测；310行隔离工单人工裁定；扩表(73项)逐批冻结+试点；DataX真实引擎后续",
+ "current_step": "欠账补齐完成+310行工单裁定处置完成：309行CAS按用户裁定以目标侧为准关单（差异分类证据=切口/手术等级与10-21受控修正一致）；余1行源端缺手术编码工单保留待源端补数",
+ "next": "R06告警六项输入待用户提供（source_id/secret/base_url/测试订阅/限流/时段）→接真实外发转无人值守；B05 7日观测；源端补1行手术编码后重放该键；扩表/DataX后续",
  "production_actions_this_review": 0,
  "database_writes_this_review": 0,
  "first_stage": [
@@ -216,5 +216,10 @@
   "code_changes": "capture月窗(--window-start/end)+质量合法组继续(目标NOT NULL必填+QUARANTINED批合法子集+工单留账+reconcile排除质量键);镜像r211-20261024-t1m;单元478+隔离6/6回归",
   "evidence": "试点证据_20261024/backfill_*.json|*.log|backfill_closeout|backfill_conservation",
   "report": "历史欠账补齐执行报告_20261024.md"
+ },
+ "tickets_20261024": {
+  "ruling": "用户裁定2026-10-24：以目标侧为准",
+  "closed": "309行CAS（OPERATION 01-03月308+ICH 01月1）；差异分类证据 ticket_diff_class_20261024.json（仅INCISION_CATEGORY/OPERATION_GRADE/CURRENT_ADDRESS_TOWN，与10-21受控字段修正一致）",
+  "open": "1行QUALITY_REQUIRED_NULL（OPERATION 10P，源视图OPERATION_CODE空，目标无此行）——源端数据缺口，待源端补数后单键重放"
  }
 }

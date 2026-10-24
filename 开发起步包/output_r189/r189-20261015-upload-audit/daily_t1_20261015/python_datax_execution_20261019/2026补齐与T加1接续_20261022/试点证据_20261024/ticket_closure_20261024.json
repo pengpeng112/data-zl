@@ -1,0 +1,33 @@
+{
+ "closed": [
+  {
+   "batch": "DBOPER.EMR_ICH.HISTORICAL.2026-01-01.0dd725ff33be",
+   "table": "EMR_ICH",
+   "month": "2026-01"
+  },
+  {
+   "batch": "DBOPER.EMR_ICH_OPERATION.HISTORICAL.2026-01-01.e73d1e30e394",
+   "table": "EMR_ICH_OPERATION",
+   "month": "2026-01"
+  },
+  {
+   "batch": "DBOPER.EMR_ICH_OPERATION.HISTORICAL.2026-02-01.0189d231cf48",
+   "table": "EMR_ICH_OPERATION",
+   "month": "2026-02"
+  },
+  {
+   "batch": "DBOPER.EMR_ICH_OPERATION.HISTORICAL.2026-03-01.9df094b1c09a",
+   "table": "EMR_ICH_OPERATION",
+   "month": "2026-03"
+  }
+ ],
+ "evidence": "人工裁定2026-10-24：以目标侧为准。差异分类证据ticket_diff_class_20261024.json：OPERATION 308行仅INCISION_CATEGORY(267)/OPERATION_GRADE(86)与2026-10-21受控字段修正一致（目标=修正后值，源视图历史月仍产旧值）；EMR_ICH 1行仅CURRENT_ADDRESS_TOWN。不回写，保留目标内容。",
+ "remaining_open": [
+  [
+   "DBOPER.EMR_ICH_OPERATION.HISTORICAL.2026-10-01.3268dd1828fb",
+   "EMR_ICH_OPERATION",
+   "quality-required-null",
+   1
+  ]
+ ]
+}

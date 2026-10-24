@@ -1,0 +1,19 @@
+{
+ "EMR_ICH|cas-conflict": {
+  "rows_compared_with_target_diff": 1,
+  "column_distribution": {
+   "CURRENT_ADDRESS_TOWN": 1
+  }
+ },
+ "EMR_ICH_OPERATION|cas-conflict": {
+  "rows_compared_with_target_diff": 3,
+  "column_distribution": {
+   "INCISION_CATEGORY": 3
+  }
+ },
+ "EMR_ICH_OPERATION|quality-required-null": {
+  "bad_rows": 1,
+  "already_in_target": 0,
+  "null_checked_cols": 21
+ }
+}
