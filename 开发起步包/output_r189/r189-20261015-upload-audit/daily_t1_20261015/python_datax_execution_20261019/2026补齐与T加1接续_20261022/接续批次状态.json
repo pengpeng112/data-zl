@@ -133,7 +133,7 @@
   ],
   "note": "DB级租约竞争/迁移往返已在隔离PG实测过；Oracle目标事务证明仍待环境"
  },
- "handoff_for_next_ai": "给执行者_扩表73项与DataX实测_20261024.md（承接 batch1/batch2/backfill/tickets 全部成果；含生产实况快照/分批顺序/已知坑/DataX实测步骤/硬约束）",
+ "handoff_for_next_ai": "给执行者_批1试点一次性执行计划_20261024.md（批1试点①②③④全批已批；承接 9c7fcc2+0a316ae 两提交；含镜像r212发布/配置卷上传/不良库名核验/五表试点全命令模板）",
  "maintenance_review_20261022": {
   "session": "codex-t1-maintenance-20261022",
   "main_ai_review": "zcode-20261022-tplus1-stage2d 复核通过(测试复跑/16指纹全对/关键修复抽查属实/checkpoint语义diff仅13处精准更新),交付已提交0fd6ba0",
@@ -225,7 +225,7 @@
  "expand73_datax_20261024": {
   "session": "zcode-20261024-expand73-datax",
   "started_on": "2026-10-24",
-  "status": "A1_DONE_BATCH1_FROZEN_B2_DATAX_PASSED_AWAITING_PILOT_APPROVAL",
+  "status": "B2_PASSED_BATCH1_APPROVED_HANDOFF_ISSUED",
   "a1_engineering": {
    "code_changes": [
     "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -268,10 +268,17 @@
    "evidence": "DataX实测证据_20261024.json + DataX实测报告_20261024.md + b2_datax实测驱动_20261024.py(同目录)",
    "engine_advice": "首组与批1小表不切DataX维持Python;大表候选待画像实测后逐表冻结engine=DATAX;生产装配只差source_jdbc_urls+interpreter+远端job文件执行器(驱动已验证)"
   },
-  "awaiting_user": [
-   "批1试点批准（镜像发布 r212+冻结件/绑定上传 t1-config+adverse库名SHOW DATABASES核验+5表当日窗试点）"
-  ],
+  "awaiting_user": [],
   "production_actions_this_session": 0,
-  "note_853_actions": "8.53 侧仅 DataX 实测暂存（t1_stage 用完整库 drop+job文件零残留+datax-web零影响），生产平台与业务源库零动作"
+  "note_853_actions": "8.53 侧仅 DataX 实测暂存（t1_stage 用完整库 drop+job文件零残留+datax-web零影响），生产平台与业务源库零动作",
+  "batch1_pilot_approval": {
+   "approved_on": "2026-10-24",
+   "user_reply": "①②③④全批，请你给出一次性的详细执行计划任务，我让别的ai一次完成",
+   "scope": "①镜像发布r212(基座r210-20261002-s10已核在8.83) ②配置卷上传(freeze_batch1_v1+bindings_batch1,首组生产件不动) ③不良库名核验(SHOW DATABASES只读) ④五表当日窗试点(业务日2026-10-23,感染→HRP→病理→分子病理→不良)",
+   "handoff_doc": "给执行者_批1试点一次性执行计划_20261024.md（一次性执行提示词，含命令模板/预期行为/失败处置/交付物）",
+   "bindings_fix_20261024": "扩表bindings_批1_20261024.json 已补批1五表 action_bindings(T1-EXPAND-B1-20261024:<小写表名>,24h)——原沿首组绑定会在capture门禁被拒",
+   "credential_record": "DataX实测连接与凭据记录_20261024.md（用户点名记录含明文,内部查阅禁外发）",
+   "executed_by": "后续AI会话（一次性完成）"
+  }
  }
 }

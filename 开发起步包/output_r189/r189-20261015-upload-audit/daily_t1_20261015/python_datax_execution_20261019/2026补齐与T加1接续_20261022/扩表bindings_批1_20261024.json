@@ -630,48 +630,59 @@
  },
  "action_bindings": [
   {
-   "canonical_table": "EMR_ICH",
+   "canonical_table": "EMR_PATHOLOGY_REPORT",
    "actions": [
     "CAPTURE",
     "STAGE",
     "APPLY"
    ],
-   "valid_hours": 48,
-   "approval_ref": "T1-PILOT-20261024:emr_ich",
-   "granted_by": "用户会话批准2026-10-24(第二批PA4)"
+   "valid_hours": 24,
+   "approval_ref": "T1-EXPAND-B1-20261024:emr_pathology_report",
+   "granted_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)"
   },
   {
-   "canonical_table": "EMR_ICH_DIAGNOSIS",
+   "canonical_table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
    "actions": [
     "CAPTURE",
     "STAGE",
     "APPLY"
    ],
-   "valid_hours": 48,
-   "approval_ref": "T1-PILOT-20261024:emr_ich_diagnosis",
-   "granted_by": "用户会话批准2026-10-24(第二批PA4)"
+   "valid_hours": 24,
+   "approval_ref": "T1-EXPAND-B1-20261024:emr_molecular_pathology_report",
+   "granted_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)"
   },
   {
-   "canonical_table": "EMR_ICH_OPERATION",
+   "canonical_table": "EMR_INFECTION_INFORMATION_REGISTER",
    "actions": [
     "CAPTURE",
     "STAGE",
     "APPLY"
    ],
-   "valid_hours": 48,
-   "approval_ref": "T1-PILOT-20261024:emr_ich_operation",
-   "granted_by": "用户会话批准2026-10-24(第二批PA4)"
+   "valid_hours": 24,
+   "approval_ref": "T1-EXPAND-B1-20261024:emr_infection_information_register",
+   "granted_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)"
   },
   {
-   "canonical_table": "EMR_ICH_CHARGE",
+   "canonical_table": "EMR_HOS_PRACTITIONER_INFORMATION",
    "actions": [
     "CAPTURE",
     "STAGE",
     "APPLY"
    ],
-   "valid_hours": 48,
-   "approval_ref": "T1-PILOT-20261024:emr_ich_charge",
-   "granted_by": "用户会话批准2026-10-24(第二批PA4)"
+   "valid_hours": 24,
+   "approval_ref": "T1-EXPAND-B1-20261024:emr_hos_practitioner_information",
+   "granted_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)"
+  },
+  {
+   "canonical_table": "EMR_ADVERSE_EVENT",
+   "actions": [
+    "CAPTURE",
+    "STAGE",
+    "APPLY"
+   ],
+   "valid_hours": 24,
+   "approval_ref": "T1-EXPAND-B1-20261024:emr_adverse_event",
+   "granted_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)"
   }
  ]
 }
