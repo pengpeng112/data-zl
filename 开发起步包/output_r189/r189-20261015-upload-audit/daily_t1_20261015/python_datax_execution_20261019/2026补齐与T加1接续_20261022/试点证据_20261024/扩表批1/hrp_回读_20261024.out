@@ -1,0 +1,8 @@
+
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 1866
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_HOS_PRACTITIONER_INFORMATION.T1.2026-10-23.1a4a6ada8330-e3b0c44298fc', 'DBOPER.EMR_HOS_PRACTITIONER_INFORMATION.T1.2026-10-23.1a4a6ada8330', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PRACTITIONER_INFORMATION', 'MERGE:keys=0', 0, '2026-10-24T21:30:59.812000+08:00', '2026-10-24T21:30:59.812000+08:00', datetime.datetime(2026, 10, 24, 21, 30, 59))
+receipt_total: 54
+batch_state: [('DBOPER.EMR_HOS_PRACTITIONER_INFORMATION.T1.2026-10-23.1a4a6ada8330', 'RECONCILED')]
+version_evidence: 0 | watermarks: (datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))

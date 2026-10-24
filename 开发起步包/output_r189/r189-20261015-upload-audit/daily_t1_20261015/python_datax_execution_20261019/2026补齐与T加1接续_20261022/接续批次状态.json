@@ -225,7 +225,7 @@
   "expand73_datax_20261024": {
     "session": "zcode-20261024-expand73-datax",
     "started_on": "2026-10-24",
-    "status": "BATCH1_PILOT_DONE",
+    "status": "BATCH1_PILOT_DONE_5_OF_5",
     "a1_engineering": {
       "code_changes": [
         "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -283,7 +283,7 @@
     "batch1_pilot": {
       "executed_by": "zcode-20261024-b1pilot-run",
       "finished_on": "2026-10-24",
-      "status": "PILOT_DONE_4_OF_5_HRP_SUSPENDED",
+      "status": "PILOT_DONE_5_OF_5_HRP_RESOLVED_VIA_A",
       "report": "批1试点执行报告_20261024.md",
       "evidence_dir": "试点证据_20261024/扩表批1/",
       "results": {
@@ -291,10 +291,10 @@
         "EMR_PATHOLOGY_REPORT": "RECONCILED 96行（v2操作落库+v4复放no_change收口+版本账按v4指纹修复96行）",
         "EMR_MOLECULAR_PATHOLOGY_REPORT": "RECONCILED 15行INSERT v4一次过",
         "EMR_ADVERSE_EVENT": "RECONCILED 零行窗合规收口（源当日窗0行）",
-        "EMR_HOS_PRACTITIONER_INFORMATION": "SUSPENDED：源视图锚点列CHAR(19)与时间谓词不兼容ORA-01843+源数据最新仅2026-10-13；RETRYABLE批+缺口账保留水位未推进"
+        "EMR_HOS_PRACTITIONER_INFORMATION": "A端修复后RECONCILED（零行窗）：锚点列DATETIME=底表CREATIONTIME为CHAR(19)（HRP全库时间列皆字符串），隐式转换ORA-01843→冻结件anchor.expression声明TO_DATE包装（代码：runtime_config+四方言构建器）+视图不暴露的4目标列（MOBILE/NAME/PK_PSNCL/SEX全可空）投影NULL；同批号1a4a6ada8330续跑（capture 0行→空装载→RECONCILED），缺口#1闭合，水位推进"
       },
       "image": "data-asset:r212-20261024-b1（基座r210-20261002-s10热补链，含9c7fcc2+0a316ae+本会话5项代码缺陷修复；六项回读两轮全过；回滚=r211-20261024-t1m）",
-      "runtime_config_in_production": "freeze_batch1_v4.json（指纹4af5e9d3…，v1→v4试点迭代均留档；bindings_batch1.json未变；首组生产件未动）",
+      "runtime_config_in_production": "freeze_batch1_v5.json（指纹19777245…；v4+HRP锚点表达式+4无源列NULL，其余四表与v4逐字一致；v1→v5迭代均留档）",
       "adverse_db_check": "mas 在列，按台账走，bindings未改",
       "defects_found_and_fixed": [
         "SQLServer需TDS7.0（source_factory回退，代码）",
@@ -304,17 +304,20 @@
         "oracledb4.x CLOB回读LOB定位符（target_factory _normalize_read读出，代码）",
         "零行批误隔离（production_runtime，代码）",
         "QUARANTINED重入缺VALIDATED回转（production_runtime，代码）",
-        "t1_daily_run emit flush笔误（脚本）"
+        "t1_daily_run emit flush笔误（脚本）",
+        "HRP字符串时间锚点ORA-01843（anchor.expression冻结件声明+四方言谓词，代码）",
+        "HRP目标4列视图不暴露（v5投影NULL，来源补齐归B端工单）",
+        "TestProductionAssembly绑定窗固定NOW±48h时间炸弹（2026-10-24过期，改动态窗）"
       ],
       "daily_run_dry": "四表连通性过；按日批准T1-DAILY-*未登记按设计跳过并打印登记命令（管道不自批）",
-      "tests": "单元502过+2跳（基线500+2新增）；ruff净；隔离库未用（无DB依赖纯逻辑）",
+      "tests": "单元508过+2跳（基线500+8新增含锚点表达式6项与时间炸弹修复）；ruff净",
       "leftovers": [
-        "HRP工单挂起待源端DATE化或管道CHAR锚点支持，恢复后补2026-10-23及后续窗",
+        "B端工单：HRP视图暴露MODIFIEDTIME改锚点语义（现CREATIONTIME只捕新增职工，变更漏日常窗）+按需补4列+EMR_HOS_INFORMATION视图无DATETIME列须先定锚点；源侧DDL由信息科/HRP方执行后管道重冻",
         "五表历史回补[2026-01-01,H)低优先后续批",
         "容器内subprocess驱动SIGSEGV根因未查（直跑sh -c稳定，值守编排前需排查）",
         "R06六项输入待用户（未变）"
       ],
-      "production_actions_this_session": "镜像r212热补链发布（含缺陷修复迭代重建）+配置卷批1件上传+五表2026-10-23当日窗试点装载+版本账/隔离组修复闭合（均在①②③④批复范围）"
+      "production_actions_this_session": "镜像r212热补链发布（含缺陷修复与A端锚点表达式支持迭代重建）+配置卷批1件v1→v5+五表2026-10-23当日窗试点装载（5/5 RECONCILED，HRP经A端修复同批号续跑收口）+版本账/隔离组修复闭合（均在用户批复范围：①②③④全批+A端）"
     }
   }
 }

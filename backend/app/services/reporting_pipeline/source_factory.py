@@ -60,6 +60,9 @@ class OracleProjectionQueryBuilder:
             raise SourceFactoryError(
                 f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
             )
+        # 字符串时间锚点（如 HRP DATETIME CHAR(19)）：冻结件声明锚点表达式，
+        # 显式 TO_DATE 谓词（隐式转换会 ORA-01843；HRP 批1试点实证）
+        self._anchor_term = getattr(spec, "anchor_expression", None) or self._anchor
         self._keys = list(spec.stable_key)
         if not self._keys:
             raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
@@ -73,7 +76,7 @@ class OracleProjectionQueryBuilder:
         sql = (
             f"SELECT {column_list} FROM ("
             f"SELECT {column_list} FROM {self._object} "
-            f"WHERE {self._anchor} >= :1 AND {self._anchor} < :2"
+            f"WHERE {self._anchor_term} >= :1 AND {self._anchor_term} < :2"
         )
         if keyset is not None:
             sql += " AND (" + self._keyset_predicate(keyset, params) + ")"
@@ -117,6 +120,8 @@ class PgProjectionQueryBuilder:
             raise SourceFactoryError(
                 f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
             )
+        # 表达式锚点原样进谓词（不可加引号）；纯列名保持标识符引号
+        self._anchor_term = getattr(spec, "anchor_expression", None) or f'"{self._anchor}"'
         self._keys = list(spec.stable_key)
         if not self._keys:
             raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
@@ -128,7 +133,7 @@ class PgProjectionQueryBuilder:
         params: list = [_wall_clock(window.start), _wall_clock(window.end_exclusive)]
         sql = (
             f"SELECT {column_list} FROM {self._object} "
-            f'WHERE "{self._anchor}" >= %s AND "{self._anchor}" < %s'
+            f"WHERE {self._anchor_term} >= %s AND {self._anchor_term} < %s"
         )
         if keyset is not None:
             if list(keyset.order_columns) != self._keys:
@@ -168,6 +173,7 @@ class SqlServerProjectionQueryBuilder:
             raise SourceFactoryError(
                 f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
             )
+        self._anchor_term = getattr(spec, "anchor_expression", None) or self._anchor
         self._keys = list(spec.stable_key)
         if not self._keys:
             raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
@@ -180,7 +186,7 @@ class SqlServerProjectionQueryBuilder:
         params: list = [int(limit_rows), _wall_clock(window.start), _wall_clock(window.end_exclusive)]
         sql = (
             f"SELECT TOP (%s) {column_list} FROM {self._object} "
-            f"WHERE {self._anchor} >= %s AND {self._anchor} < %s"
+            f"WHERE {self._anchor_term} >= %s AND {self._anchor_term} < %s"
         )
         if keyset is not None:
             sql += " AND (" + self._keyset_predicate(keyset, params) + ")"
@@ -224,6 +230,7 @@ class MySqlProjectionQueryBuilder:
             raise SourceFactoryError(
                 f"[{spec.canonical_table}] 冻结配置缺业务锚点列，无法构建窗口查询"
             )
+        self._anchor_term = getattr(spec, "anchor_expression", None) or self._anchor
         self._keys = list(spec.stable_key)
         if not self._keys:
             raise SourceFactoryError(f"[{spec.canonical_table}] 稳定键为空")
@@ -235,7 +242,7 @@ class MySqlProjectionQueryBuilder:
         params: list = [_wall_clock(window.start), _wall_clock(window.end_exclusive)]
         sql = (
             f"SELECT {column_list} FROM {self._object} "
-            f"WHERE {self._anchor} >= %s AND {self._anchor} < %s"
+            f"WHERE {self._anchor_term} >= %s AND {self._anchor_term} < %s"
         )
         if keyset is not None:
             if list(keyset.order_columns) != self._keys:

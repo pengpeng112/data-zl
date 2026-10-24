@@ -23,10 +23,12 @@ from app.services.reporting_pipeline.freeze_batch import (  # noqa: E402
     build_batch_freeze,
 )
 from app.services.reporting_pipeline.runtime_config import (  # noqa: E402
+    RuntimeConfigError,
     load_frozen_runtime_config,
 )
 from app.services.reporting_pipeline.source_factory import (  # noqa: E402
     MySqlProjectionQueryBuilder,
+    OracleProjectionQueryBuilder,
     SqlServerProjectionQueryBuilder,
     SourceFactoryError,
     build_connection_factory,
@@ -49,6 +51,7 @@ class _FakeSpec:
     anchor_column: str = "DATETIME"
     stable_key: tuple = ("ID",)
     dialect: str = "sqlserver"
+    anchor_expression: str | None = None
 
 
 def _spec(dialect: str) -> _FakeSpec:
@@ -88,6 +91,113 @@ class TestSqlServerQueryBuilder(unittest.TestCase):
         self.assertIn("WHERE DATETIME >= %s AND DATETIME < %s", sql)
         self.assertTrue(sql.endswith("ORDER BY ID"))
         self.assertEqual(params, [500, datetime(2026, 10, 23, 0, 0), datetime(2026, 10, 24, 0, 0)])
+
+    def test_anchor_expression_used_in_predicate(self):
+        """字符串时间锚点（HRP CHAR(19)）声明表达式时谓词按表达式包装。"""
+        spec = _spec("sqlserver")
+        spec.anchor_expression = "CONVERT(DATETIME, DATETIME, 120)"
+        sql, params = SqlServerProjectionQueryBuilder(spec)(_FakeWindow(), None, 500)
+        self.assertIn(
+            "WHERE CONVERT(DATETIME, DATETIME, 120) >= %s "
+            "AND CONVERT(DATETIME, DATETIME, 120) < %s", sql)
+        self.assertNotIn("WHERE DATETIME >=", sql)
+        self.assertEqual(params[0], 500)
+
+
+class TestOracleAnchorExpression(unittest.TestCase):
+    """HRP 批1试点：DATETIME CHAR(19) 隐式转换 ORA-01843 → 冻结件声明
+    锚点表达式（显式 TO_DATE），Oracle 读端按表达式构建窗口谓词。"""
+
+    def _hrp_spec(self, expression=None):
+        spec = _FakeSpec(
+            canonical_table="EMR_HOS_PRACTITIONER_INFORMATION",
+            source_object="HRPSEY656.EMR_HOS_PRACTITIONER",
+            dialect="oracle",
+            projection=[
+                _FakeField("ID", "ID", "VARCHAR2(50)", 1),
+                _FakeField("NAME", "NAME", "VARCHAR2(100)", 2),
+                _FakeField("DATETIME", "DATETIME", "DATE", 3),
+            ],
+        )
+        spec.anchor_expression = expression
+        return spec
+
+    def test_expression_wraps_anchor_both_sides(self):
+        expr = "TO_DATE(DATETIME, 'YYYY-MM-DD HH24:MI:SS')"
+        sql, params = OracleProjectionQueryBuilder(self._hrp_spec(expr))(
+            _FakeWindow(), None, 50000)
+        self.assertEqual(
+            sql.count(f"WHERE {expr} >= :1 AND {expr} < :2"), 1)
+        self.assertNotIn("WHERE DATETIME >=", sql)
+        self.assertEqual(
+            params,
+            [datetime(2026, 10, 23, 0, 0), datetime(2026, 10, 24, 0, 0), 50000])
+
+    def test_no_expression_falls_back_to_column(self):
+        sql, params = OracleProjectionQueryBuilder(self._hrp_spec(None))(
+            _FakeWindow(), None, 50000)
+        self.assertIn("WHERE DATETIME >= :1 AND DATETIME < :2", sql)
+        self.assertEqual(len(params), 3)
+
+    def test_keyset_predicate_unaffected(self):
+        from app.services.reporting_pipeline.planner import KeysetCursor
+
+        expr = "TO_DATE(DATETIME, 'YYYY-MM-DD HH24:MI:SS')"
+        keyset = KeysetCursor(order_columns=("ID",), last_values=("K9",), unique_verified=True)
+        sql, params = OracleProjectionQueryBuilder(self._hrp_spec(expr))(
+            _FakeWindow(), keyset, 100)
+        self.assertIn("(ID > :3)", sql)
+        self.assertEqual(params[2], "K9")
+
+    def test_expression_loaded_from_freeze_document(self):
+        """端到端：冻结件 anchor.expression → 装载 → spec.anchor_expression。"""
+        import json
+        import tempfile
+
+        from app.services.reporting_pipeline.runtime_config import (
+            compute_config_fingerprint,
+            compute_table_fingerprint,
+        )
+
+        document, _report = TestBuildBatchFreeze()._run()
+        table = document["tables"]["T_SRC_A"]
+        expr = "TO_DATE(DATETIME, 'YYYY-MM-DD HH24:MI:SS')"
+        table["anchor"]["expression"] = expr
+        table["fingerprint"] = compute_table_fingerprint(table)
+        document["config_fingerprint"] = compute_config_fingerprint(document)
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".json", delete=False, encoding="utf-8"
+        ) as handle:
+            json.dump(document, handle, ensure_ascii=False)
+            path = handle.name
+        loaded = load_frozen_runtime_config(path)
+        self.assertEqual(loaded.table("T_SRC_A").anchor_expression, expr)
+        self.assertIsNone(
+            TestBuildBatchFreeze()._run()[0]["tables"]["T_SRC_A"]["anchor"].get("expression"))
+        Path(path).unlink()
+
+    def test_blank_expression_refused(self):
+        import json
+        import tempfile
+
+        from app.services.reporting_pipeline.runtime_config import (
+            compute_config_fingerprint,
+            compute_table_fingerprint,
+        )
+
+        document, _report = TestBuildBatchFreeze()._run()
+        table = document["tables"]["T_SRC_A"]
+        table["anchor"]["expression"] = "   "
+        table["fingerprint"] = compute_table_fingerprint(table)
+        document["config_fingerprint"] = compute_config_fingerprint(document)
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".json", delete=False, encoding="utf-8"
+        ) as handle:
+            json.dump(document, handle, ensure_ascii=False)
+            path = handle.name
+        with self.assertRaises(RuntimeConfigError):
+            load_frozen_runtime_config(path)
+        Path(path).unlink()
 
     def test_keyset_predicate_appended(self):
         from app.services.reporting_pipeline.planner import KeysetCursor

@@ -78,6 +78,10 @@ class TableRuntimeSpec:
     parent_key_column: str | None
     fingerprint: str
     target_charset: str = "utf-8"  # 目标库字符集（BYTE 长度语义按此度量）
+    # 锚点谓词表达式（覆盖列名进 WHERE）：字符串时间锚点（如 HRP DATETIME
+    # CHAR(19)）需显式 TO_DATE 包装——Oracle 隐式转换报 ORA-01843（批1试点
+    # HRP 实证）。进表指纹；冻结件声明，代码不猜。
+    anchor_expression: str | None = None
 
     def write_columns(self) -> tuple[str, ...]:
         names = tuple(f.name for f in self.projection)
@@ -195,6 +199,9 @@ def _validate_table_document(name: str, doc: Mapping) -> None:
     # 不要求出现在目标装载投影中；但必须显式声明（不猜列名）。
     if not anchor.get("inherited_from_parent") and not anchor.get("column"):
         raise RuntimeConfigError(f"{where} 业务锚点未声明（窗口谓词列不可缺）")
+    anchor_expr = anchor.get("expression")
+    if anchor_expr is not None and (not isinstance(anchor_expr, str) or not anchor_expr.strip()):
+        raise RuntimeConfigError(f"{where} anchor.expression 非法（须非空字符串）")
     budget = _require(doc, "budget", where)
     for field_name in ("max_rows_per_slice", "max_bytes_per_slice", "max_attempts"):
         if not isinstance(budget.get(field_name), int) or budget[field_name] <= 0:
@@ -290,6 +297,7 @@ def load_frozen_runtime_config(path: str | Path) -> FrozenRuntimeConfig:
             parent_key_column=str(parent["key_column"]) if parent else None,
             fingerprint=actual_table_fp,
             target_charset=str(target.get("charset") or "utf-8"),
+            anchor_expression=(str(anchor_expr) if (anchor_expr := anchor.get("expression")) else None),
         )
     return FrozenRuntimeConfig(
         environment=environment,

@@ -137,6 +137,15 @@ def _binding(
     )
 
 
+def _live_binding(*args, **kwargs) -> ActionBinding:
+    """相对真实时钟的绑定：供内部用 datetime.now 校验的生产装配测试用
+    （固定 NOW±48h 会随日期过期——2026-10-24 实证挂 TestProductionAssembly）。"""
+    now = datetime.now(timezone.utc)
+    kwargs.setdefault("valid_from", now - timedelta(hours=48))
+    kwargs.setdefault("valid_until", now + timedelta(hours=48))
+    return _binding(*args, **kwargs)
+
+
 # ---------------------------------------------------------------------------
 # K01：动作排程绑定
 # ---------------------------------------------------------------------------
@@ -949,7 +958,7 @@ class TestProductionAssembly(unittest.TestCase):
         # 带有效绑定 → 允许 capture
         outcome = assembly.capture(
             table="EMR_TEST_TABLE", business_day="2026-10-21",
-            binding=binding, bindings=[_binding(table="EMR_TEST_TABLE")],
+            binding=binding, bindings=[_live_binding(table="EMR_TEST_TABLE")],
             sim_rows_provider=lambda: [{"K1": "k1", "V1": "v"}],
         )
         self.assertTrue(outcome["ok"])
@@ -983,7 +992,7 @@ class TestProductionAssembly(unittest.TestCase):
             table="EMR_TEST_TABLE", key_columns=("K1",),
             write_columns=("K1", "V1"),
         )
-        bindings = [_binding(
+        bindings = [_live_binding(
             table="EMR_TEST_TABLE",
             actions=(
                 c.PipelineAction.CAPTURE, c.PipelineAction.STAGE,
