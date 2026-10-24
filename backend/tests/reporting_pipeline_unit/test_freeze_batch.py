@@ -150,6 +150,65 @@ class TestConnectionFactoryDialects(unittest.TestCase):
         with self.assertRaises(SourceFactoryError):
             build_connection_factory(dialect="mongodb", dsn="x", credential_ref="y")
 
+    def test_sqlserver_tds70_fallback_on_operational_error(self):
+        """老 SQL Server（病理 pitaya）默认 TDS 握手失败时回退 tds_version=7.0。"""
+        import sys
+        import types
+        from unittest import mock
+
+        real_factory = build_connection_factory(
+            dialect="sqlserver",
+            dsn="10.10.9.41:1433/pitaya",
+            credential_ref="container-credentials:x",
+        )
+        fake_pymssql = types.ModuleType("pymssql")
+        fake_exceptions = types.ModuleType("pymssql.exceptions")
+        class _OperationalError(Exception):
+            pass
+        fake_exceptions.OperationalError = _OperationalError
+        fake_pymssql.exceptions = fake_exceptions
+        calls = []
+        def _connect(**kwargs):
+            calls.append(kwargs.get("tds_version"))
+            if len(calls) == 1:
+                raise _OperationalError("20002 Adaptive Server connection failed")
+            return object()
+        fake_pymssql.connect = _connect
+        with mock.patch.dict(sys.modules, {"pymssql": fake_pymssql,
+                                           "pymssql.exceptions": fake_exceptions}), \
+             mock.patch("app.services.reporting_pipeline.source_factory"
+                        ".resolve_container_credentials", return_value=("u", "p")):
+            conn = real_factory()
+        self.assertIsNotNone(conn)
+        self.assertEqual(calls, [None, "7.0"])
+
+    def test_oracle_read_normalizes_lob_locators(self):
+        """CLOB 目标回读须读出内容而非 LOB 定位符（否则指纹 repr 不稳定）。
+
+        批1试点病理表发现：oracledb 4.x 默认回 LOB 对象且无 fetch_lobs 开关，
+        content_fingerprint 走 repr(地址) 分支，CLOB 列永远指纹不等。
+        """
+        from app.services.reporting_pipeline.target_factory import (
+            OracleTargetConnection,
+        )
+
+        class _FakeLob:
+            def read(self):
+                return "中文CLOB内容"
+        class _FakeBytesLob:
+            def read(self):
+                return b"\x01\x02"
+
+        self.assertEqual(
+            OracleTargetConnection._normalize_read(_FakeLob()), "中文CLOB内容")
+        self.assertEqual(
+            OracleTargetConnection._normalize_read(_FakeBytesLob()), b"\x01\x02")
+        self.assertIsNone(OracleTargetConnection._normalize_read(None))
+        self.assertEqual(OracleTargetConnection._normalize_read("普通串"), "普通串")
+        from decimal import Decimal
+        self.assertEqual(
+            OracleTargetConnection._normalize_read(1.5), Decimal("1.5"))
+
 
 # -- 批冻结生成器 ------------------------------------------------------------
 

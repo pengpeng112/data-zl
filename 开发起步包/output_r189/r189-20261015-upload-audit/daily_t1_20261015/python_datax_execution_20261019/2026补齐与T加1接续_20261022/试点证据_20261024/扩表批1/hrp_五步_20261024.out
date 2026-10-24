@@ -1,0 +1,27 @@
+
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B1-20261024:emr_hos_practitioner_information",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PRACTITIONER_INFORMATION",
+ "valid_from": "2026-10-24T08:47:14.414832+00:00",
+ "valid_until": "2026-10-25T08:47:14.414832+00:00",
+ "registered_by": "用户会话批准2026-10-24扩表批1试点",
+ "结论": "批准已登记: T1-EXPAND-B1-20261024:emr_hos_practitioner_information（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PRACTITIONER_INFORMATION，有效期 24 小时；管道装载时只读核验）"
+}
+===CAPTURE===
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_HOS_PRACTITIONER_INFORMATION.T1.2026-10-23.1a4a6ada8330",
+ "state": "SOURCE_UNKNOWN_ERROR",
+ "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+ "结论": "capture 未完成（如实记录）"
+}
+EXIT=1
+
+@@@处置记录（2026-10-24 16:50）
+@@@根因：HRPSEY656.EMR_HOS_PRACTITIONER 为视图，其 DATETIME 列=CHAR(19)（存 'YYYY-MM-DD HH24:MI:SS' 字符串，最新值 '2026-10-13 08:21:17'），非 DATE/TIMESTAMP。
+@@@机制：source_factory Oracle 读端谓词 `DATETIME >= :1 AND DATETIME < :2` 绑定时间参数，与 CHAR 列比较触发 Oracle 隐式转换 ORA-01843（无效月份）→ capture 报 SOURCE_UNKNOWN_ERROR，批次 RETRYABLE（state_history: CAPTURING→RETRYABLE 捕获不完整已记缺口）。
+@@@对照：服务名 hrpdb 与平台 asset_data_sources（hrp_10_10_10_23, service_mode=service_name, last_test connected）一致；同凭据同 dsn 直连成功（容器 oracledb）——计划内"改 dsn 重生成重试"路径不适用。
+@@@决定：按执行计划§七.4 挂起本表不连坐，开工单（QUALITY 类：锚点列类型 CHAR(19) 与时间窗谓词不兼容，需源端确认/管道 CHAR 锚点支持后再补 2026-10-23 及后续窗）；RETRYABLE 批次与缺口账保留（水位未推进，修复后同 batch_id 续跑）；t1-stage 残留 attempt 目录留给续跑。
+@@@附带发现：源视图数据最新到 2026-10-13 08:21（当日窗 2026-10-23 本为零行窗），源端同步新鲜度异常一并入工单。

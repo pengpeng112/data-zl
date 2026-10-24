@@ -1,0 +1,161 @@
+
+ "结论": "批准已登记: T1-EXPAND-B1-20261024:emr_adverse_event（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ADVERSE_EVENT，有效期 24 小时；管道装载时只读核验）"
+}
+===CAPTURE===
+  "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_ADVERSE_EVENT"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+===VERIFY===
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 743, in verify
+    record = repo.get_batch(batch_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 315, in get_batch
+    return self._load_batch(session, batch_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 248, in _load_batch
+    raise ContractViolation(f"批次不存在: {batch_id}")
+app.services.reporting_pipeline.contracts.ContractViolation: 批次不存在: DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.9f0f6a470802
+===APPLY===
+  File "/app/scripts/reporting_ctl.py", line 1795, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1791, in main
+    return int(args.func(args))
+               ^^^^^^^^^^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1710, in cmd_apply
+    outcome = assembly.apply(
+              ^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 867, in apply
+    record = repo.get_batch(batch_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 315, in get_batch
+    return self._load_batch(session, batch_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 248, in _load_batch
+    raise ContractViolation(f"批次不存在: {batch_id}")
+app.services.reporting_pipeline.contracts.ContractViolation: 批次不存在: DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.9f0f6a470802
+===RECONCILE===
+Traceback (most recent call last):
+  File "/app/scripts/reporting_ctl.py", line 1795, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1791, in main
+    return int(args.func(args))
+               ^^^^^^^^^^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1744, in cmd_reconcile
+    outcome = assembly.reconcile(batch_id=args.batch, binding=binding)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 1120, in reconcile
+    record = repo.get_batch(batch_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 315, in get_batch
+    return self._load_batch(session, batch_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/pg_repository.py", line 248, in _load_batch
+    raise ContractViolation(f"批次不存在: {batch_id}")
+app.services.reporting_pipeline.contracts.ContractViolation: 批次不存在: DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.9f0f6a470802
+EXIT=0
+
+  "valid_groups": 0,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 0
+ },
+ "rows": 0,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+===APPLY===
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "state": "QUARANTINED",
+ "refused": "全部行质量隔离（NOT NULL 缺失）：留工单待处置",
+ "simulation": false,
+ "结论": "装载未完成: QUARANTINED"
+}
+===RECONCILE===
+{
+ "ok": false,
+ "refused": "批次状态 QUARANTINED 不允许 reconcile（须 APPLIED）",
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "结论": "回读存在差异: 缺 None / 差异 None"
+}
+EXIT=0
+
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "refused": "apply被拒：ContractViolation（详情仅在受控审计中查看）",
+ "simulation": false,
+ "结论": "装载未完成: apply被拒：ContractViolation（详情仅在受控审计中查看）"
+}
+===RECONCILE===
+{
+ "ok": false,
+ "refused": "批次状态 QUARANTINED 不允许 reconcile（须 APPLIED）",
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "结论": "回读存在差异: 缺 None / 差异 None"
+}
+EXIT=0
+
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "operation_id": "OPR-DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0-e3b0c44298fc",
+ "rows_affected": 0,
+ "plan_counts": {},
+ "partition": {
+  "ok": 0,
+  "insert": 0,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0-e3b0c44298fc",
+  "manifest_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rows_affected": 0
+ },
+ "simulation": false,
+ "applied_at": "2026-10-24T09:22:53+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+===RECONCILE===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+ "keys_checked": 0,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_ADVERSE_EVENT.T1.2026-10-23.62286d1c17d0",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-24T00:00:00+08:00",
+   "continuous_through": "2026-10-24T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+EXIT=0

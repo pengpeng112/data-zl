@@ -1,0 +1,9 @@
+
+applywin_rows/system_time_nonnull/min/max: (96, 96, datetime.datetime(2026, 10, 24, 17, 0, 33), datetime.datetime(2026, 10, 24, 17, 0, 33))
+table_total_rows: 131810
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983-48c1f93edb8b', 'DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983', '48c1f93edb8ba99dbe88bdf8e409e7f160d854ea5e5af857c7d9e139ebf8b136', '10.10.8.74:1521/orcl.DBOPER.EMR_PATHOLOGY_REPORT', 'MERGE:keys=96', 96, '2026-10-24T17:00:33.657000+08:00', '2026-10-24T17:00:33.766000+08:00', datetime.datetime(2026, 10, 24, 17, 0, 33))
+receipt: ('OPR-DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983-713df244b865', 'DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983', '713df244b8650af033f8c4b955a5cd352fcd559374a3bd33faaa837ba32380d6', '10.10.8.74:1521/orcl.DBOPER.EMR_PATHOLOGY_REPORT', 'MERGE:keys=0', 0, '2026-10-24T17:15:33.300000+08:00', '2026-10-24T17:15:33.300000+08:00', datetime.datetime(2026, 10, 24, 17, 15, 33))
+receipt_total: 53
+batch_state: [('DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983', 'RECONCILED')]
+version_evidence: 96 | watermarks: (datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))

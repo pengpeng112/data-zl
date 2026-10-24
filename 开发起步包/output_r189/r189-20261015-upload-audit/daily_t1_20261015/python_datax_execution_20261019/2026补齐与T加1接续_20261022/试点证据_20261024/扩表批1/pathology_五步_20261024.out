@@ -1,0 +1,59 @@
+
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "attempt_id": "att001",
+ "rows": 96,
+ "plan": {
+  "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+  "table": "EMR_PATHOLOGY_REPORT",
+  "business_day": "2026-10-23",
+  "mode": "T1",
+  "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_PATHOLOGY_REPORT"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+EXIT=0
+
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "state": "QUARANTINED",
+ "quality": {
+  "counts": {
+   "QUARANTINED": 96
+  },
+  "valid_groups": 0,
+  "quarantined_groups": 96,
+  "ticket_hint": "人工工单候选：96 组隔离，规则见 issues",
+  "valid_rows": 0
+ },
+ "rows": 96,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证未全通过: QUARANTINED"
+}
+===APPLY===
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "refused": "apply被拒：ContractViolation（详情仅在受控审计中查看）",
+ "simulation": false,
+ "结论": "装载未完成: apply被拒：ContractViolation（详情仅在受控审计中查看）"
+}
+===RECONCILE===
+{
+ "ok": false,
+ "refused": "批次状态 QUARANTINED 不允许 reconcile（须 APPLIED）",
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "结论": "回读存在差异: 缺 None / 差异 None"
+}
+EXIT=1

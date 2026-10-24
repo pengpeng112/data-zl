@@ -236,11 +236,15 @@ class OracleTargetConnection:
     @staticmethod
     def _normalize_read(value):
         """Oracle 读回规整：NUMBER 可能以 float 返回（同源侧约定），
-        精确数值一律 Decimal(str)（比较/hash 禁 float）。"""
+        精确数值一律 Decimal(str)（比较/hash 禁 float）；LOB 定位符
+        （CLOB/BLOB，oracledb 4.x 无 fetch_lobs 开关）读出内容——
+        不读则指纹走 repr(对象地址)，CLOB 列永远不可对账（批1试点病理表实证）。"""
         from decimal import Decimal
 
         if type(value) is float:
             return Decimal(str(value))
+        if hasattr(value, "read") and not isinstance(value, (str, bytes, memoryview)):
+            return value.read()
         return value
 
     @staticmethod

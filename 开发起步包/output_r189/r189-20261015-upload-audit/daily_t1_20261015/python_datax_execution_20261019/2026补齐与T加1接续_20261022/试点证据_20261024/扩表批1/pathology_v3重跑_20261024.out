@@ -1,0 +1,74 @@
+
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "attempt_id": "att001",
+ "rows": 96,
+ "plan": {
+  "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+  "table": "EMR_PATHOLOGY_REPORT",
+  "business_day": "2026-10-23",
+  "mode": "T1",
+  "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_PATHOLOGY_REPORT"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+===VERIFY===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 96
+  },
+  "valid_groups": 96,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 96
+ },
+ "rows": 96,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+===APPLY===
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "state": "QUARANTINED",
+ "partition": {
+  "ok": 0,
+  "insert": 0,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 96,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": [
+  {
+   "group_key": "cas-conflict",
+   "error_code": "VERSION_CONFLICT",
+   "rows": 96
+  }
+ ],
+ "refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写",
+ "simulation": false,
+ "结论": "装载未完成: QUARANTINED"
+}
+===RECONCILE===
+{
+ "ok": false,
+ "refused": "批次状态 QUARANTINED 不允许 reconcile（须 APPLIED）",
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "结论": "回读存在差异: 缺 None / 差异 None"
+}
+EXIT=1

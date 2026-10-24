@@ -1,0 +1,112 @@
+@@@批1试点 五步输出：EMR_INFECTION_INFORMATION_REGISTER（感染，源 10.10.9.45:1521/orcl C##FXPT 视图）
+@@@执行时间 2026-10-24 16:36—16:45；通道=8.83 容器 r212 直跑 reporting_ctl（逐命令 sh -c）
+@@@备注：首跑经容器内 subprocess 驱动时 capture 段错误（SIGSEGV rc=-11，无输出，未留任何状态）；同命令直接 docker exec sh -c 复跑成功——已改用直跑通道；apply 首跑 ORA-12541（TCP 三连正常，判定瞬时），重试即成功。
+
+@@@STEP approval-register rc=0
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B1-20261024:emr_infection_information_register",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_INFECTION_INFORMATION_REGISTER",
+ "valid_from": "2026-10-24T08:36:25.801512+00:00",
+ "valid_until": "2026-10-25T08:36:25.801512+00:00",
+ "registered_by": "用户会话批准2026-10-24(扩表批1试点①②③④全批)",
+ "结论": "批准已登记: T1-EXPAND-B1-20261024:emr_infection_information_register（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_INFECTION_INFORMATION_REGISTER，有效期 24 小时；管道装载时只读核验）"
+}
+
+@@@STEP capture rc=0（直跑复跑；batch_id=DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a）
+{
+ "attempt_id": "att001",
+ "rows": 28,
+ "plan": {
+  "batch_id": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a",
+  "table": "EMR_INFECTION_INFORMATION_REGISTER",
+  "business_day": "2026-10-23",
+  "mode": "T1",
+  "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+
+@@@STEP verify rc=0
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 28
+  },
+  "valid_groups": 28,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 28
+ },
+ "rows": 28,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+
+@@@STEP apply rc=0（首跑 ORA-12541 TNS:无监听，TCP正常判瞬时，重试成功）
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a",
+ "operation_id": "OPR-DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a-ffb4174aaa94",
+ "rows_affected": 28,
+ "plan_counts": {
+  "INSERT": 28
+ },
+ "partition": {
+  "ok": 28,
+  "insert": 28,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a-ffb4174aaa94",
+  "manifest_hash": "ffb4174aaa9457d6567964afa3af29f70d80352618ca4df42f6d0075853cac91",
+  "rows_affected": 28
+ },
+ "simulation": false,
+ "applied_at": "2026-10-24T08:43:25+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+
+@@@STEP reconcile rc=0
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a",
+ "keys_checked": 28,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-24T00:00:00+08:00",
+   "continuous_through": "2026-10-24T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+
+@@@DONE EMR_INFECTION_INFORMATION_REGISTER（回读证据见 infection_回读_20261024.out：apply窗28行/SYSTEM_TIME单时钟16:43:08/回执28/版本账28/RECONCILED/水位2026-10-24）

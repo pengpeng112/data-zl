@@ -1,0 +1,2102 @@
+{
+ "doc_version": "v1",
+ "freeze_id": "R189-T1-RUNTIME-CONFIG-FREEZE",
+ "environment": "production",
+ "version": "v3",
+ "frozen_at": "2026-10-24T17:25:00+08:00",
+ "source_inputs": [
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\B01_77项任务运行配置_v1.3候选.json",
+   "sha256": "428fe526087da41575424271edef81a67d6c72c5bfec8e2692e248bca65f1926",
+   "role": "B01 v1.3候选"
+  },
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\target_dict_bulk.json",
+   "sha256": "6941648fda6e95b4c8e2542f876239f791bf24a622e680dc13400e3fee56548c",
+   "role": "目标字典(DBOPER)"
+  },
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\扩表源绑定_批1_20261024.json",
+   "sha256": "8ffeb9ee57e5a2d401983a598321ead60b42f9abf80d97acbc76162be3f834f3",
+   "role": "扩表源绑定(操作者按平台元数据准备)"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\08_数据中心元数据快照.json",
+   "sha256": "223aa9efccc9ae3c9808a6e741f1dd21df2a0d2313001a4a85a93801de0fae16",
+   "role": "08元数据快照(视图DDL)"
+  },
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\ods_views_bulk.json",
+   "sha256": "794158f9381c45cc6806fd197ddb25154b206e300dae9c0f0f90ed48867572ff",
+   "role": "源视图定义哈希(ODS)"
+  }
+ ],
+ "tables": {
+  "EMR_PATHOLOGY_REPORT": {
+   "canonical_table": "EMR_PATHOLOGY_REPORT",
+   "business_name": "病理报告",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "pathology",
+    "dialect": "sqlserver",
+    "object": "dbo.EMR_PATHOLOGY_REPORT",
+    "credential_ref": "container-credentials:pathology_sqlserver_10_10_9_41.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_PATHOLOGY_REPORT",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "AGE_DAY",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_DAY",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "AGE_HOUR",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_HOUR",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 4,
+     "name": "AGE_MONTH",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 5,
+     "name": "APPLY_FORM_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "APPLY_FORM_NO",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 6,
+     "name": "APPLY_ORDER_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "APPLY_ORDER_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 7,
+     "name": "APPLY_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), APPLY_TIME, 120), 120) AS APPLY_TIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 8,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 60
+    },
+    {
+     "order": 9,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "DEP_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_NUM",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 11,
+     "name": "DIFFERENTIATION_DEGREE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DIFFERENTIATION_DEGREE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "EXAM_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), EXAM_TIME, 120), 120) AS EXAM_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 13,
+     "name": "FROZEN_SECTION_RESULT",
+     "target_type": "CLOB",
+     "source_expression": "FROZEN_SECTION_RESULT",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 14,
+     "name": "GROSS_FINDING",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "GROSS_FINDING",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 15,
+     "name": "HAS_MOLECULAR_TEST",
+     "target_type": "CHAR",
+     "source_expression": "HAS_MOLECULAR_TEST",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 16,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 17,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 18,
+     "name": "IHC_RESULT",
+     "target_type": "CLOB",
+     "source_expression": "IHC_RESULT",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 19,
+     "name": "LYMPHATIC_INVASION",
+     "target_type": "CHAR",
+     "source_expression": "LYMPHATIC_INVASION",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 20,
+     "name": "LYMPHOVASCULAR_INVASION",
+     "target_type": "CHAR",
+     "source_expression": "LYMPHOVASCULAR_INVASION",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 21,
+     "name": "LYMPH_NODE_METASTASIS",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "LYMPH_NODE_METASTASIS",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 22,
+     "name": "MICROSCOPIC_FINDING",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "MICROSCOPIC_FINDING",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 23,
+     "name": "MOLECULAR_TEST_METHOD",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "MOLECULAR_TEST_METHOD",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 24,
+     "name": "MOLECULAR_TEST_RESULT",
+     "target_type": "CLOB",
+     "source_expression": "MOLECULAR_TEST_RESULT",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 25,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 26,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 27,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 28,
+     "name": "OTHER_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "OTHER_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 29,
+     "name": "OTHER_ID_TYPE",
+     "target_type": "VARCHAR2(11)",
+     "source_expression": "OTHER_ID_TYPE",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 30,
+     "name": "PATHOLOGY_DIAGNOSIS",
+     "target_type": "CLOB",
+     "source_expression": "PATHOLOGY_DIAGNOSIS",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 31,
+     "name": "PATHOLOGY_EXAM_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATHOLOGY_EXAM_NO",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 32,
+     "name": "PATHOLOGY_EXAM_TYPE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "PATHOLOGY_EXAM_TYPE_CODE",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 33,
+     "name": "PATHOLOGY_EXAM_TYPE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PATHOLOGY_EXAM_TYPE_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 34,
+     "name": "PATHOLOGY_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATHOLOGY_NO",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 35,
+     "name": "PATHOLOGY_STAGE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATHOLOGY_STAGE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 36,
+     "name": "PATIENT_TYPE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "PATIENT_TYPE_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 37,
+     "name": "PATIENT_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_TYPE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 38,
+     "name": "PERINEURAL_INVASION",
+     "target_type": "CHAR",
+     "source_expression": "PERINEURAL_INVASION",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 39,
+     "name": "PM_STAGE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "PM_STAGE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 40,
+     "name": "PN_STAGE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "PN_STAGE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 41,
+     "name": "PT_STAGE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "PT_STAGE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 42,
+     "name": "RECORD_STATUS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "RECORD_STATUS",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 43,
+     "name": "REPORT_DELAY_REASON",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "REPORT_DELAY_REASON",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 44,
+     "name": "REPORT_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REPORT_NO",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 45,
+     "name": "REPORT_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), REPORT_TIME, 120), 120) AS REPORT_TIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 46,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 47,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 48,
+     "name": "SPECIMEN_COLLECT_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, SPECIMEN_COLLECT_TIME) AS SPECIMEN_COLLECT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 49,
+     "name": "SPECIMEN_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SPECIMEN_NO",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 50,
+     "name": "SPECIMEN_RECEIVE_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), SPECIMEN_RECEIVE_TIME, 120), 120) AS SPECIMEN_RECEIVE_TIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 51,
+     "name": "SPECIMEN_SITE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "SPECIMEN_SITE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 52,
+     "name": "SPECIMEN_SOURCE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "SPECIMEN_SOURCE",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 53,
+     "name": "TELEPHONE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TELEPHONE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 54,
+     "name": "TNM_STAGE_VERSION",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TNM_STAGE_VERSION",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 55,
+     "name": "VASCULAR_INVASION",
+     "target_type": "CHAR",
+     "source_expression": "VASCULAR_INVASION",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 56,
+     "name": "VISITING_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "VISITING_NUM",
+     "nullable": false,
+     "data_length": 32
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批1_病理感染HRP不良",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['EMR_PATHOLOGY_REPORT']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验",
+    "revision_v2_20261024": "试点v1全隔离根因：源列SPECIMEN_COLLECT_TIME为varchar(英文样式100字符串时间)被按DATE直投；改CONVERT(DATETIME,...)表达式（源端只读实测可解析，样本'Oct 16 2026  1:07PM'→datetime(2026,10,16,13,7)）；其余字段与四表不动",
+    "revision_v3_20261024": "v2试点apply后reconcile CAS全冲突：SQLServer datetime毫秒 vs Oracle DATE秒回读不等致严格指纹不等；受影响列源侧截断到秒（含v2的CONVERT列），暂存=落库=回读一致；感染/不良表不动"
+   },
+   "fingerprint": "494e5a77d24047e4499161455afa0d8f8eca3440d762712339f08642e6f79e35"
+  },
+  "EMR_MOLECULAR_PATHOLOGY_REPORT": {
+   "canonical_table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+   "business_name": "分子病理报告",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "pathology",
+    "dialect": "sqlserver",
+    "object": "dbo.EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "credential_ref": "container-credentials:pathology_sqlserver_10_10_9_41.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "AGE_DAY",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_DAY",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "AGE_HOUR",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_HOUR",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 4,
+     "name": "AGE_MONTH",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 5,
+     "name": "ALLELE_FREQUENCY",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ALLELE_FREQUENCY",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 6,
+     "name": "AMINO_ACID_CHANGE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "AMINO_ACID_CHANGE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 7,
+     "name": "APPLY_FORM_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "APPLY_FORM_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 8,
+     "name": "APPLY_ORDER_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "APPLY_ORDER_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 9,
+     "name": "APPLY_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), APPLY_TIME, 120), 120) AS APPLY_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 10,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 60
+    },
+    {
+     "order": 11,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "DEP_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 13,
+     "name": "EXON",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EXON",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "GENE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "GENE_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 15,
+     "name": "GENOTYPE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "GENOTYPE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 16,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 17,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 18,
+     "name": "LOCUS",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "LOCUS",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 19,
+     "name": "MOLECULAR_PATHOLOGY_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "MOLECULAR_PATHOLOGY_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 20,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "NUCLEOTIDE_CHANGE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NUCLEOTIDE_CHANGE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 22,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 23,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 24,
+     "name": "OTHER_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "OTHER_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 25,
+     "name": "OTHER_ID_TYPE",
+     "target_type": "VARCHAR2(11)",
+     "source_expression": "OTHER_ID_TYPE",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 26,
+     "name": "PATHOLOGY_EXAM_TYPE_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PATHOLOGY_EXAM_TYPE_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 27,
+     "name": "PATHOLOGY_EXAM_TYPE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PATHOLOGY_EXAM_TYPE_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 28,
+     "name": "PATIENT_TYPE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "PATIENT_TYPE_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 29,
+     "name": "PATIENT_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_TYPE_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 30,
+     "name": "RECORD_STATUS",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "RECORD_STATUS",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 31,
+     "name": "REPORT_DELAY_REASON",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "REPORT_DELAY_REASON",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 32,
+     "name": "REPORT_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REPORT_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 33,
+     "name": "REPORT_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), REPORT_TIME, 120), 120) AS REPORT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 34,
+     "name": "SAMPLING_SITE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "SAMPLING_SITE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 35,
+     "name": "SEQUENCING_DEPTH",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SEQUENCING_DEPTH",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 36,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 37,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SEX_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 38,
+     "name": "SPECIMEN_TYPE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SPECIMEN_TYPE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 39,
+     "name": "TELEPHONE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TELEPHONE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 40,
+     "name": "TEST_CONTENT",
+     "target_type": "CLOB",
+     "source_expression": "TEST_CONTENT",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 41,
+     "name": "TEST_ITEM",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "TEST_ITEM",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 42,
+     "name": "TEST_METHOD",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "TEST_METHOD",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 43,
+     "name": "TEST_PLATFORM",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TEST_PLATFORM",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 44,
+     "name": "TEST_RESULT",
+     "target_type": "CLOB",
+     "source_expression": "TEST_RESULT",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 45,
+     "name": "TEST_SERIAL_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TEST_SERIAL_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 46,
+     "name": "TEST_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONVERT(DATETIME, CONVERT(CHAR(19), TEST_TIME, 120), 120) AS TEST_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 47,
+     "name": "TRANSCRIPT_ID",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TRANSCRIPT_ID",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 48,
+     "name": "TUMOR_MUTATION_BURDEN",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TUMOR_MUTATION_BURDEN",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 49,
+     "name": "VARIANT_INTERPRETATION",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "VARIANT_INTERPRETATION",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 50,
+     "name": "VARIANT_TYPE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "VARIANT_TYPE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 51,
+     "name": "VISITING_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "VISITING_NUM",
+     "nullable": true,
+     "data_length": 32
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批1_病理感染HRP不良",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['EMR_MOLECULAR_PATHOLOGY_REPORT']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验",
+    "revision_v3_20261024": "v2试点apply后reconcile CAS全冲突：SQLServer datetime毫秒 vs Oracle DATE秒回读不等致严格指纹不等；受影响列源侧截断到秒（含v2的CONVERT列），暂存=落库=回读一致；感染/不良表不动"
+   },
+   "fingerprint": "6ae2ca001cf16135c6353fd47e886afdc8b306fd6ab8c36990b7971cfbf655c4"
+  },
+  "EMR_INFECTION_INFORMATION_REGISTER": {
+   "canonical_table": "EMR_INFECTION_INFORMATION_REGISTER",
+   "business_name": "医院感染信息登记表",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "infection",
+    "dialect": "oracle",
+    "object": "C##FXPT.EMR_INFECTION_INFORMATION_REGISTER",
+    "credential_ref": "container-credentials:infection_oracle_10_10_9_45.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_INFECTION_INFORMATION_REGISTER",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ADMISSION_ID",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 2,
+     "name": "ANAE_METHOD_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ANAE_METHOD_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 3,
+     "name": "ANAE_METHOD_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ANAE_METHOD_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 4,
+     "name": "BACTERIA",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "BACTERIA",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 5,
+     "name": "CONFIRMED_TIME",
+     "target_type": "DATE",
+     "source_expression": "CONFIRMED_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 6,
+     "name": "CONFIRMER",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CONFIRMER",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 7,
+     "name": "DANGEROUS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DANGEROUS",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 8,
+     "name": "DOCTOR_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 9,
+     "name": "DRUG_RESISTANT",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DRUG_RESISTANT",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 10,
+     "name": "FEVER_DAYS",
+     "target_type": "NUMBER",
+     "source_expression": "FEVER_DAYS",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 11,
+     "name": "FOCUS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "FOCUS",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 12,
+     "name": "GENERATETIME",
+     "target_type": "DATE",
+     "source_expression": "GENERATETIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 13,
+     "name": "GROUPID",
+     "target_type": "NUMBER",
+     "source_expression": "GROUPID",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 14,
+     "name": "HEALING_GRADE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "HEALING_GRADE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 15,
+     "name": "HEALING_GRADE_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "HEALING_GRADE_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 16,
+     "name": "ICU_DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ICU_DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 17,
+     "name": "ICU_DEP_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ICU_DEP_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 18,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 19,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 20,
+     "name": "INCISION_INFECTION",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "INCISION_INFECTION",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 21,
+     "name": "INCISION_TYPE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "INCISION_TYPE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 22,
+     "name": "INFECTED_DEPT_CODE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "INFECTED_DEPT_CODE",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 23,
+     "name": "INFECTED_DEPT_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "INFECTED_DEPT_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 24,
+     "name": "INFECTED_PART",
+     "target_type": "VARCHAR2(15)",
+     "source_expression": "INFECTED_PART",
+     "nullable": true,
+     "data_length": 15
+    },
+    {
+     "order": 25,
+     "name": "INFECTED_TIME",
+     "target_type": "DATE",
+     "source_expression": "INFECTED_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 26,
+     "name": "INFECTION_DIAGNOSIS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "INFECTION_DIAGNOSIS",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 27,
+     "name": "ISNOSOCOMIAL",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ISNOSOCOMIAL",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 28,
+     "name": "IS_ANTIBIOTIC_USE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_ANTIBIOTIC_USE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 29,
+     "name": "IS_HOSPITAL_ACQUIRED",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_HOSPITAL_ACQUIRED",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 30,
+     "name": "IS_ICU",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_ICU",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 31,
+     "name": "IS_NEWBORN",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_NEWBORN",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 32,
+     "name": "IS_PATHOGEN_TEST",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_PATHOGEN_TEST",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 33,
+     "name": "IS_SEND",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "IS_SEND",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 34,
+     "name": "IS_SURGERY",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IS_SURGERY",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 35,
+     "name": "NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 36,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 37,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 38,
+     "name": "OUTCOM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OUTCOM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 39,
+     "name": "OUTCOM_REPORTER",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "OUTCOM_REPORTER",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 40,
+     "name": "OUTCOM_REPORT_TIME",
+     "target_type": "DATE",
+     "source_expression": "OUTCOM_REPORT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 41,
+     "name": "OUTCOM_TIME",
+     "target_type": "DATE",
+     "source_expression": "OUTCOM_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 42,
+     "name": "OUTSIDE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OUTSIDE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 43,
+     "name": "REASON",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "REASON",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 44,
+     "name": "RELATIONSHIP",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "RELATIONSHIP",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 45,
+     "name": "REPORT_CONTENT",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "REPORT_CONTENT",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 46,
+     "name": "REPORT_DOCTOR",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "REPORT_DOCTOR",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 47,
+     "name": "REPORT_TIME",
+     "target_type": "DATE",
+     "source_expression": "REPORT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 48,
+     "name": "SPECIMEN",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SPECIMEN",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 49,
+     "name": "STATE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "STATE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 50,
+     "name": "STYPE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "STYPE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 51,
+     "name": "SURGERY_INFECTION_TYPE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "SURGERY_INFECTION_TYPE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 52,
+     "name": "SURGERY_TYPE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "SURGERY_TYPE",
+     "nullable": true,
+     "data_length": 2
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批1_病理感染HRP不良",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['EMR_INFECTION_INFORMATION_REGISTER']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "0a9cd0763d5d6a8ac7182563205746ece3c7030908f4259141f8dd1c71444809"
+  },
+  "EMR_HOS_PRACTITIONER_INFORMATION": {
+   "canonical_table": "EMR_HOS_PRACTITIONER_INFORMATION",
+   "business_name": "医院执业人员信息表",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "hrp",
+    "dialect": "oracle",
+    "object": "HRPSEY656.EMR_HOS_PRACTITIONER",
+    "credential_ref": "container-credentials:hrp_10_10_10_23.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_HOS_PRACTITIONER_INFORMATION",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMIN_POSITION",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ADMIN_POSITION",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 2,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "DEPT_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DEPT_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 4,
+     "name": "DEPT_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DEPT_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 5,
+     "name": "EDUCATION",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EDUCATION",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 6,
+     "name": "EMP_CATEGORY",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EMP_CATEGORY",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 7,
+     "name": "EMP_ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EMP_ID",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 8,
+     "name": "EMP_STATUS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EMP_STATUS",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 9,
+     "name": "ETHNICITY",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ETHNICITY",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 10,
+     "name": "HOSP_DEPT_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "HOSP_DEPT_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 11,
+     "name": "HOSP_DEPT_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "HOSP_DEPT_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 12,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 13,
+     "name": "ID_NUMBER",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ID_NUMBER",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 14,
+     "name": "INSURANCE_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "INSURANCE_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 15,
+     "name": "JOB_TITLE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "JOB_TITLE",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 16,
+     "name": "LEVE_START_TIME",
+     "target_type": "DATE",
+     "source_expression": "LEVE_START_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 17,
+     "name": "LICENSE_NO",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "LICENSE_NO",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 18,
+     "name": "MOBILE",
+     "target_type": "VARCHAR2(30)",
+     "source_expression": "MOBILE",
+     "nullable": true,
+     "data_length": 30
+    },
+    {
+     "order": 19,
+     "name": "NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 20,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(64)",
+     "source_expression": "ORG_CODE",
+     "nullable": true,
+     "data_length": 64
+    },
+    {
+     "order": 21,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORG_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 22,
+     "name": "PK_PSNCL",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PK_PSNCL",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 23,
+     "name": "PRACTICE_QUAL",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PRACTICE_QUAL",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 24,
+     "name": "PROF_TITLE_LEVEL",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PROF_TITLE_LEVEL",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 25,
+     "name": "SEX",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SEX",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 26,
+     "name": "TECH_TITLE_APPOINT_DATE",
+     "target_type": "DATE",
+     "source_expression": "TECH_TITLE_APPOINT_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 27,
+     "name": "WARD_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "WARD_NAME",
+     "nullable": true,
+     "data_length": 200
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批1_病理感染HRP不良",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['EMR_HOS_PRACTITIONER']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "e1dbff4a42863d0d3e7f3c88acdc527d9d54b6a34e00c65d667e7fdf5496009c"
+  },
+  "EMR_ADVERSE_EVENT": {
+   "canonical_table": "EMR_ADVERSE_EVENT",
+   "business_name": "不良事件表",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "adverse",
+    "dialect": "mysql",
+    "object": "mas.v_emr_adverse_event_final",
+    "credential_ref": "container-credentials:adverse_event_mysql_10_10_10_50.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_ADVERSE_EVENT",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "EFFECTIVE_TIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ATTENDING_DOCTOR_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ATTENDING_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 2,
+     "name": "ATTENDING_DOCTOR_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ATTENDING_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 3,
+     "name": "CASE_NUM",
+     "target_type": "VARCHAR2(25)",
+     "source_expression": "CASE_NUM",
+     "nullable": true,
+     "data_length": 25
+    },
+    {
+     "order": 4,
+     "name": "EFFECTIVE_DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EFFECTIVE_DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 5,
+     "name": "EFFECTIVE_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EFFECTIVE_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 6,
+     "name": "EFFECTIVE_PLACE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EFFECTIVE_PLACE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 7,
+     "name": "EFFECTIVE_PLACE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EFFECTIVE_PLACE_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 8,
+     "name": "EFFECTIVE_TIME",
+     "target_type": "TIMESTAMP(6)",
+     "source_expression": "EFFECTIVE_TIME",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 9,
+     "name": "EVENT_CLASS",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EVENT_CLASS",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 10,
+     "name": "EVENT_COURSE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "EVENT_COURSE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 11,
+     "name": "EVENT_LEVEL_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EVENT_LEVEL_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 12,
+     "name": "EVENT_LEVEL_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EVENT_LEVEL_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 13,
+     "name": "EVENT_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EVENT_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 14,
+     "name": "FRIST_DISEASE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "FRIST_DISEASE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 15,
+     "name": "FRIST_DISEASE_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "FRIST_DISEASE_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 16,
+     "name": "HANDLE_MEASURE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "HANDLE_MEASURE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 17,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 18,
+     "name": "INPATIENT_TIMES",
+     "target_type": "NUMBER",
+     "source_expression": "INPATIENT_TIMES",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 19,
+     "name": "MAIN_PARTY",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 20,
+     "name": "MAIN_PARTY_DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY_DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 21,
+     "name": "MAIN_PARTY_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "MAIN_PARTY_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 22,
+     "name": "MAIN_PARTY_TITLE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY_TITLE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 23,
+     "name": "MAIN_PARTY_TITLE_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY_TITLE_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 24,
+     "name": "MAIN_PARTY_TYPE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY_TYPE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 25,
+     "name": "MAIN_PARTY_TYPE_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PARTY_TYPE_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 26,
+     "name": "MAIN_PARTY_WORK_YEARS",
+     "target_type": "NUMBER",
+     "source_expression": "MAIN_PARTY_WORK_YEARS",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 27,
+     "name": "MAIN_PATIENT_TYPE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PATIENT_TYPE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 28,
+     "name": "MAIN_PATIENT_TYPE_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MAIN_PATIENT_TYPE_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 29,
+     "name": "NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 30,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ORG_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 31,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ORG_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 32,
+     "name": "PATIENT_DAMAGE_DEGREE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "PATIENT_DAMAGE_DEGREE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 33,
+     "name": "PATIENT_TYPE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "PATIENT_TYPE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 34,
+     "name": "REASON_ANALYZE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "REASON_ANALYZE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 35,
+     "name": "REPORT_DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "REPORT_DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 36,
+     "name": "REPORT_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REPORT_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 37,
+     "name": "VISTING_NUM",
+     "target_type": "VARCHAR2(25)",
+     "source_expression": "VISTING_NUM",
+     "nullable": true,
+     "data_length": 25
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批1_病理感染HRP不良",
+    "anchor_evidence": "b01_verification.anchor verified 列 EFFECTIVE_TIME（views=['v_emr_adverse_event_final']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "5285393de2cccaf9093c53900bb0bfff9dfa5722646f4280f1bc867b799d6b43"
+  }
+ },
+ "enabled_policy": "全部 enabled=false（候选停用保留）；正式启用另出启用冻结并走 A05c 审批，动作级派发走 K01 ActionBinding，不手工置 READY",
+ "notes": {
+  "batch": "批1_病理感染HRP不良",
+  "coverage_problems": [],
+  "enabled": "全部 false（候选停用；启用走独立启用冻结）",
+  "revision_v2_20261024": "批1试点发现病理SPECIMEN_COLLECT_TIME源列varchar按DATE直投致全隔离，仅修该列source_expression并重算指纹（感染已按v1完成2026-10-23批，批号与表指纹无关不受影响）",
+  "revision_v3_20261024": "批1试点二轮修复：病理两表datetime列源侧截断到秒（Oracle DATE无小数秒）"
+ },
+ "config_fingerprint": "a16b82a44ffcf5cacd06e8d7f9002723596324e6a6ed50daac6f8cc25f837c0d"
+}

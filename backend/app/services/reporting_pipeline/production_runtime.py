@@ -925,7 +925,9 @@ class ProductionAssembly:
                     "error_code": "QUALITY_REQUIRED_NULL",
                     "rows": len(bad_keys),
                 })
-            if not good_rows:
+            # 零行批（当日窗无源数据）不是质量隔离：无行可坏，照常空装载
+            # 收口（执行计划口径"零行日窗照常 RECONCILED"；批1试点不良表实证）
+            if rows and not good_rows:
                 if record.state != BatchState.QUARANTINED:
                     repo.transition_batch(
                         batch_id, BatchState.QUARANTINED,
@@ -938,12 +940,18 @@ class ProductionAssembly:
                 }
             if bad_keys:
                 rows = good_rows
-                if record.state == BatchState.QUARANTINED:
-                    repo.transition_batch(
-                        batch_id, BatchState.VALIDATED,
-                        reason=f"质量合法组继续（隔离 {len(bad_keys)} 行留工单）",
-                    )
-                    record = repo.get_batch(batch_id)
+            # QUARANTINED 重入（首装隔离/零行批复跑）取到合法续跑时回 VALIDATED，
+            # 否则后续 APPLYING 转换非法（状态机 QUARANTINED 只允许
+            # CANCELLED/VALIDATED；批1试点不良表零行复跑实证）
+            if record.state == BatchState.QUARANTINED:
+                repo.transition_batch(
+                    batch_id, BatchState.VALIDATED,
+                    reason=(
+                        f"质量合法组继续（隔离 {len(bad_keys)} 行留工单）"
+                        if bad_keys else "零行批质量复跑通过"
+                    ),
+                )
+                record = repo.get_batch(batch_id)
         if (not self.simulation and spec_rt is not None
                 and spec_rt.change_mode == "SNAPSHOT_DIFF"):
             partition = self._compute_partition(

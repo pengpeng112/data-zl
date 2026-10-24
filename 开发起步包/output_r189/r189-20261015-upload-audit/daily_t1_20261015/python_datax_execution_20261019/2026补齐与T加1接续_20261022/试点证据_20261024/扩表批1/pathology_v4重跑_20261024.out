@@ -1,0 +1,68 @@
+
+CAP=0
+ "quality": {
+  "counts": {
+   "VALID": 96
+  },
+  "valid_groups": 96,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 96
+ },
+ "rows": 96,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+===APPLY===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "operation_id": "OPR-DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983-713df244b865",
+ "rows_affected": 0,
+ "plan_counts": {},
+ "partition": {
+  "ok": 0,
+  "insert": 0,
+  "update": 0,
+  "no_change": 96,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983-713df244b865",
+  "manifest_hash": "713df244b8650af033f8c4b955a5cd352fcd559374a3bd33faaa837ba32380d6",
+  "rows_affected": 0
+ },
+ "simulation": false,
+ "applied_at": "2026-10-24T09:15:50+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+===RECONCILE===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+ "keys_checked": 96,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_PATHOLOGY_REPORT.T1.2026-10-23.582eb96fe983",
+  "closed_gaps": [
+   2
+  ],
+  "watermarks": {
+   "capture_h": "2026-10-24T00:00:00+08:00",
+   "continuous_through": "2026-10-24T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+EXIT=0

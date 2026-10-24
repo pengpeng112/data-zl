@@ -1,0 +1,8 @@
+
+applywin_rows/system_time_nonnull/min/max: (28, 28, datetime.datetime(2026, 10, 24, 16, 43, 8), datetime.datetime(2026, 10, 24, 16, 43, 8))
+table_total_rows: 93389
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a-ffb4174aaa94', 'DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a', 'ffb4174aaa9457d6567964afa3af29f70d80352618ca4df42f6d0075853cac91', '10.10.8.74:1521/orcl.DBOPER.EMR_INFECTION_INFORMATION_REGISTER', 'MERGE:keys=28', 28, '2026-10-24T16:43:08.286000+08:00', '2026-10-24T16:43:08.348000+08:00', datetime.datetime(2026, 10, 24, 16, 43, 8))
+receipt_total: 49
+batch_state: [('DBOPER.EMR_INFECTION_INFORMATION_REGISTER.T1.2026-10-23.43673c972b0a', 'RECONCILED')]
+version_evidence: 28 | watermarks: (datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, datetime.datetime(2026, 10, 24, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))

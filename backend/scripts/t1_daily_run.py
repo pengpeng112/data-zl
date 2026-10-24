@@ -28,7 +28,7 @@ from pathlib import Path
 
 
 def _emit(document: dict) -> None:
-    print(json.dumps(document, ensure_ascii=False, flush=True))
+    print(json.dumps(document, ensure_ascii=False), flush=True)
 
 
 def build_parser() -> argparse.ArgumentParser:

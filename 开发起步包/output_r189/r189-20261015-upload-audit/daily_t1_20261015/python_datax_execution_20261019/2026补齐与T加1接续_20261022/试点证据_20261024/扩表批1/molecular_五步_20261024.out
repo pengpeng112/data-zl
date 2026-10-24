@@ -1,0 +1,96 @@
+
+ "registered_by": "用户会话批准2026-10-24扩表批1试点",
+ "结论": "批准已登记: T1-EXPAND-B1-20261024:emr_molecular_pathology_report（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT，有效期 24 小时；管道装载时只读核验）"
+}
+===CAPTURE===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+ "attempt_id": "att001",
+ "rows": 15,
+ "plan": {
+  "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+  "table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+  "business_day": "2026-10-23",
+  "mode": "T1",
+  "window": "win:2026-10-23T00:00:00+08:00/2026-10-24T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+
+ "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 15
+  },
+  "valid_groups": 15,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 15
+ },
+ "rows": 15,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+===APPLY===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+ "operation_id": "OPR-DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c-61aaa67b7a31",
+ "rows_affected": 15,
+ "plan_counts": {
+  "INSERT": 15
+ },
+ "partition": {
+  "ok": 15,
+  "insert": 15,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c-61aaa67b7a31",
+  "manifest_hash": "61aaa67b7a31ed52a036806fbff2e2b46986b6510f62e747680f26a56004ec57",
+  "rows_affected": 15
+ },
+ "simulation": false,
+ "applied_at": "2026-10-24T09:17:19+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+===RECONCILE===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+ "keys_checked": 15,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_MOLECULAR_PATHOLOGY_REPORT.T1.2026-10-23.fb56ddfd1b7c",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-24T00:00:00+08:00",
+   "continuous_through": "2026-10-24T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+EXIT=0

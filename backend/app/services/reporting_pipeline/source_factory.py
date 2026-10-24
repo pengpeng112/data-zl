@@ -489,7 +489,7 @@ def build_sqlserver_connection_factory(
         import pymssql
 
         user, password = resolve_container_credentials(credential_ref)
-        return pymssql.connect(
+        options = dict(
             server=host,
             port=int(port or 1433),
             user=user,
@@ -498,6 +498,12 @@ def build_sqlserver_connection_factory(
             login_timeout=30,
             timeout=timeout_seconds,
         )
+        try:
+            return pymssql.connect(**options)
+        except pymssql.exceptions.OperationalError:
+            # 老 SQL Server（如病理 10.10.9.41/pitaya）需 TDS 7.0；
+            # 与平台 db_connectors.SqlServerConnector 同一回退模式
+            return pymssql.connect(**options, tds_version="7.0")
 
     return factory
 
