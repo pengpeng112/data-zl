@@ -225,7 +225,7 @@
   "expand73_datax_20261024": {
     "session": "zcode-20261024-expand73-datax",
     "started_on": "2026-10-24",
-    "status": "BATCH2_APPROVED_AWAITING_EXECUTION",
+    "status": "BATCH2_RUNNING_BATCH4_BATCH5_PLANS_ISSUED",
     "a1_engineering": {
       "code_changes": [
         "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -342,6 +342,29 @@
         "user_reply": "给出提示词 我让别的ai执行（承接上一轮'继续下一批任务…我让别的ai一次性执行完成'）",
         "scope": "计划§三（冻结件生成与修订）§四（上传装载即验）§五（三表试点全链）——HIS白天执行仍须单独点头（默认夜间）"
       }
+    },
+    "parallel_expansion_20261025": {
+      "approved_on": "2026-10-25",
+      "user_reply": "除了上述还有那几个表能并行处理，再次生成个计划 我让别的ai继续一次性执行吧，可以给出多个一次性执行的任务",
+      "coordination": "并行包=批2(已发)+批4护理8表+批5 ODS首波8表；三包不同源(体检96/HIS15/护理125/ODS216)、零代码改动、批准前缀独立(T1-EXPAND-B2/B4/B5-20261025:*)、git 显式清单、共享文件只动自己节；任何包需代码/镜像变更即挂起该包不得实施",
+      "batch4_plan": {
+        "status": "PLAN_ISSUED_AWAITING_USER",
+        "handoff_doc": "给执行者_批4护理8表一次性执行计划_20261025.md",
+        "probe": "批4预核证据_20261025/（7/8全绿：DATE锚点/列全覆盖/无父子；NURSING_ASSESSMENT视图重COUNT超时→排尾+窗探查+工单T-B04-1预案；IN_OUT_AMOUNT 2376万行为最大表）",
+        "scope": "EMR_ADMISSION_ASSESSMENT/DISCHARGE_ASSESSMENT/CHILDBIRTH/GENERAL_NURSING/CRITICALLY_ILL_NURS/IN_OUT_AMOUNT/VITAL_SIGN/NURSING_ASSESSMENT @10.10.10.125:1521/ewell"
+      },
+      "batch5_plan": {
+        "status": "PLAN_ISSUED_AWAITING_USER",
+        "handoff_doc": "给执行者_批5ODS首波一次性执行计划_20261025.md",
+        "scope": "EMR_ADMISSION_RECORD/DISCHARGE_RECORD/ADMISSION_DIAGNOSIS/OUTPATIENT_REGISTER/OUTPATIENT_RECORD/MEDICAL_RECORD_INFO/DEATH_RECORD/ICH_ALLERGIES @ODS 10.10.8.216",
+        "notes": "首组ODS通道复用；ICH_ALLERGIES去父试点(R关系verified:False,工单T-B05-1)；下一波33张子表系等父表上线；ODS白天例外可白天跑"
+      },
+      "not_parallel_queue": [
+        "批9 LIS 4张：需DualSourceRouter接进capture（production_runtime现拒双源路由表）+隔离验收——代码工程，须串行独占",
+        "批10 血透3张：需重建8.53出口隧道(核17432端口)+复合锚点'datetime+ID'语义解读（血透887三视图核验_20261022.json）——基础设施+语义前置",
+        "ODS后续波33张：等批5父表RECONCILED后逐波放开（ADMISSION_RECORD_EXAM/DISCHARGE_RECORD_DIAGNOSIS/OUTPATIENT_RECIPE_ITEM/INFOR_*系等）",
+        "工单挂账不变：输血4(T-B02-2凭据18456)、体检子表2(T-B02-1)、NURSE_PLAN(T-B01-61)、SAVE_RECORD(T-B01-44)、SPEC_EXAM_TREAT(T-B01-65)、父子核验(T-B02-3/T-B05-1)"
+      ]
     }
   }
 }
