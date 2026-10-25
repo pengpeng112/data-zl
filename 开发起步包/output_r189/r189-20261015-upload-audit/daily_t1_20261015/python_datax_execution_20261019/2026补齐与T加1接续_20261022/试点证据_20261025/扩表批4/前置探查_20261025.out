@@ -1,0 +1,16 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+== 试点前置探查（业务日 2026-10-24 ）==
+EMR_ADMISSION_ASSESSMENT: view=True ALIGN_OK 目标68列 窗COUNT(2026-10-24)=150
+EMR_DISCHARGE_ASSESSMENT: view=True ALIGN_OK 目标33列 窗COUNT(2026-10-24)=122
+EMR_CHILDBIRTH: view=True ALIGN_OK 目标96列 窗COUNT(2026-10-24)=0
+EMR_GENERAL_NURSING: view=True ALIGN_OK 目标59列 窗COUNT(2026-10-24)=1102
+EMR_CRITICALLY_ILL_NURS: view=True ALIGN_OK 目标39列 窗COUNT(2026-10-24)=1378
+EMR_IN_OUT_AMOUNT: view=True ALIGN_OK 目标40列 窗COUNT(2026-10-24)=18306
+EMR_VITAL_SIGN: view=True ALIGN_OK 目标35列 窗COUNT(2026-10-24)=2442
+EMR_NURSING_ASSESSMENT: view=True ALIGN_OK 目标19列 窗COUNT=TIMEOUT_OR_ERR(DatabaseError: DPY-4024: call timeout of 60000 ms exceeded
+DPI-1067: call timeout of 60000 ms exceeded wi)
+== 探查结束 ==

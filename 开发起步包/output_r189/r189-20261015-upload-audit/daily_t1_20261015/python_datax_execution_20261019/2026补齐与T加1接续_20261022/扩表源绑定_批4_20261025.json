@@ -1,0 +1,23 @@
+{
+ "doc": "批4（护理8表）扩表源绑定：操作者按批4预核证据_20261025（2026-10-25 只读限量探查）与平台登记凭据准备；对象全名显式，不拼不猜；组键 nursing=B01 source_group（生成器按组键精确匹配）",
+ "as_of": "2026-10-25",
+ "sources": {
+  "nursing": {
+   "dialect": "oracle",
+   "dsn": "10.10.10.125:1521/ewell",
+   "credential_ref": "container-credentials:mobile_nursing_oracle_10_10_10_125.readonly",
+   "source_objects": {
+    "EMR_ADMISSION_ASSESSMENT": "LUNA_MCS_SDSEY.V_EMR_ADMISSION_ASSESSMENT",
+    "EMR_DISCHARGE_ASSESSMENT": "LUNA_MCS_SDSEY.V_EMR_DISCHARGE_ASSESSMENT",
+    "EMR_CHILDBIRTH": "LUNA_MCS_SDSEY.V_EMR_CHILDBIRTH",
+    "EMR_GENERAL_NURSING": "LUNA_MCS_SDSEY.V_EMR_GENERAL_NURSING",
+    "EMR_CRITICALLY_ILL_NURS": "LUNA_MCS_SDSEY.V_EMR_CRITICALLY_ILL_NURS",
+    "EMR_IN_OUT_AMOUNT": "LUNA_MCS_SDSEY.V_EMR_IN_OUT_AMOUNT",
+    "EMR_VITAL_SIGN": "LUNA_MCS_SDSEY.V_EMR_VITAL_SIGN",
+    "EMR_NURSING_ASSESSMENT": "LUNA_MCS_SDSEY.V_EMR_NURSING_ASSESSMENT"
+   },
+   "evidence": "批4预核证据_20261025/批4预核结论_20261025.md：8 视图全 VIEW 实存、ID=VARCHAR2/DATETIME=DATE（无锚点表达式坑）；7/8 目标列全覆盖，EMR_NURSING_ASSESSMENT 列对齐未完成→试点排最后+前置窗探查（60s 超时即工单 T-B04-1）"
+  }
+ },
+ "parents": {}
+}

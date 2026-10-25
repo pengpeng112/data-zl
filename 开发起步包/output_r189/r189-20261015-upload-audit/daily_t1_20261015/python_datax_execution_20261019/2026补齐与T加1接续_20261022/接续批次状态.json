@@ -348,7 +348,7 @@
       "user_reply": "除了上述还有那几个表能并行处理，再次生成个计划 我让别的ai继续一次性执行吧，可以给出多个一次性执行的任务",
       "coordination": "并行包=批2(已发)+批4护理8表+批5 ODS首波8表；三包不同源(体检96/HIS15/护理125/ODS216)、零代码改动、批准前缀独立(T1-EXPAND-B2/B4/B5-20261025:*)、git 显式清单、共享文件只动自己节；任何包需代码/镜像变更即挂起该包不得实施",
       "batch4_plan": {
-        "status": "PLAN_ISSUED_AWAITING_USER",
+        "status": "EXECUTED_20261025_7_OF_8_RECONCILED_TICKET_TB04_1",
         "handoff_doc": "给执行者_批4护理8表一次性执行计划_20261025.md",
         "probe": "批4预核证据_20261025/（7/8全绿：DATE锚点/列全覆盖/无父子；NURSING_ASSESSMENT视图重COUNT超时→排尾+窗探查+工单T-B04-1预案；IN_OUT_AMOUNT 2376万行为最大表）",
         "scope": "EMR_ADMISSION_ASSESSMENT/DISCHARGE_ASSESSMENT/CHILDBIRTH/GENERAL_NURSING/CRITICALLY_ILL_NURS/IN_OUT_AMOUNT/VITAL_SIGN/NURSING_ASSESSMENT @10.10.10.125:1521/ewell"
@@ -365,6 +365,28 @@
         "ODS后续波33张：等批5父表RECONCILED后逐波放开（ADMISSION_RECORD_EXAM/DISCHARGE_RECORD_DIAGNOSIS/OUTPATIENT_RECIPE_ITEM/INFOR_*系等）",
         "工单挂账不变：输血4(T-B02-2凭据18456)、体检子表2(T-B02-1)、NURSE_PLAN(T-B01-61)、SAVE_RECORD(T-B01-44)、SPEC_EXAM_TREAT(T-B01-65)、父子核验(T-B02-3/T-B05-1)"
       ]
+    },
+    "batch4_pilot": {
+      "executed_by": "zcode-20261025-b4pilot-run",
+      "finished_on": "2026-10-25",
+      "status": "PILOT_DONE_7_OF_8_NURSING_ASSESSMENT_TICKETED",
+      "report": "批4试点执行报告_20261025.md",
+      "evidence_dir": "试点证据_20261025/扩表批4/",
+      "freeze": "扩表冻结件_批4_护理8表_v1_20261025.json（fingerprint=4964c938…，v1即定版：锚点全DATE直谓词/零列表达式/无父子；配置卷=/opt/data-asset/t1-config/freeze_batch4_v1.json+bindings_batch4.json，600，装载即验过）",
+      "business_day": "2026-10-24",
+      "results": {
+        "EMR_CHILDBIRTH": "RECONCILED 零行窗合规（源窗0行，回执MERGE:keys=0）",
+        "EMR_DISCHARGE_ASSESSMENT": "RECONCILED INSERT 122 四方一致",
+        "EMR_ADMISSION_ASSESSMENT": "RECONCILED INSERT 150 四方一致",
+        "EMR_CRITICALLY_ILL_NURS": "RECONCILED INSERT 1378 四方一致",
+        "EMR_GENERAL_NURSING": "RECONCILED INSERT 1102 四方一致",
+        "EMR_IN_OUT_AMOUNT": "RECONCILED INSERT 18306 四方一致（2376万行表当日窗单片一次捕完，apply 5.4分钟）",
+        "EMR_VITAL_SIGN": "RECONCILED INSERT 2442 四方一致",
+        "EMR_NURSING_ASSESSMENT": "工单T-B04-1未跑：前置探查窗COUNT 60s超时（DPY-4024）；列对齐ALIGN_OK(19列全覆盖，预核遗留项已关闭)；冻结件已含该表，源端优化视图/补索引后按报告§2补跑"
+      },
+      "conservation": "capture=源端窗计数=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（七表零隔离/零CAS/零缺零差）；回执账55→62；水位七表推进2026-10-25",
+      "zero_code_change": true,
+      "backlog": "八表历史回补[2026-01-01,H)不在本包（目标vs源总量差额见报告§5.1）；日常T+1值守按T1-DAILY-<日>:<表>逐日登记驱动"
     }
   }
 }

@@ -1,0 +1,53 @@
+## 批4 冻结件生成（本地，2026-10-25）— freeze-config-batch v1 输出摘要
+
+命令：
+cd backend && ./.venv/Scripts/python.exe scripts/reporting_ctl.py   --config <output_r189/.../python_datax_execution_20261019> freeze-config-batch   --output <本目录>/扩表冻结件_批4_护理8表_v1_20261025.json   --batch-label 批4_护理8表   --tables EMR_ADMISSION_ASSESSMENT,EMR_DISCHARGE_ASSESSMENT,EMR_CHILDBIRTH,EMR_GENERAL_NURSING,EMR_CRITICALLY_ILL_NURS,EMR_IN_OUT_AMOUNT,EMR_VITAL_SIGN,EMR_NURSING_ASSESSMENT   --b01 <本目录>/B01_77项任务运行配置_v1.3候选.json（原件，8 表 declared_parent_candidates 全空，无需派生输入）  --source-bindings <本目录>/扩表源绑定_批4_20261025.json（组键 nursing=B01 source_group）
+
+输出（生成器装载自校验过）：
+ok: true | environment: production | 8 表
+config_fingerprint: 4964c938bfdec8542274fcb87dc5fd476c8497ec2353045b52cbdff3ccc34a8d
+per_table（锚点全 DATETIME 无表达式、parent 全 null、budget 5万行/256MB/3次）：
+  EMR_ADMISSION_ASSESSMENT 68列 | EMR_DISCHARGE_ASSESSMENT 33列 | EMR_CHILDBIRTH 96列
+  EMR_GENERAL_NURSING 59列 | EMR_CRITICALLY_ILL_NURS 39列 | EMR_IN_OUT_AMOUNT 40列
+  EMR_VITAL_SIGN 35列 | EMR_NURSING_ASSESSMENT 19列
+coverage_problems: []（独立源无DDL，试点回读核验）
+**v1 即定版**（锚点 DATE 型、列全覆盖、零列表达式修订，计划§三.2 预期达成，无 v2）
+
+注：渲染断言初版曾误报 EMR_ADMISSION_ASSESSMENT 含 CASE——实为列名 SPECIAL_CASE 子串，
+表达式级 token 复核后确认零表达式（见下方 b4_local_freeze_verify.py 输出）。
+
+## 本地装载即验 + Oracle 渲染断言（b4_local_freeze_verify.py）
+
+load OK: environment=production
+config fp: 4964c938bfdec8542274fcb87dc5fd476c8497ec2353045b52cbdff3ccc34a8d
+tables: ['EMR_ADMISSION_ASSESSMENT', 'EMR_CHILDBIRTH', 'EMR_CRITICALLY_ILL_NURS', 'EMR_DISCHARGE_ASSESSMENT', 'EMR_GENERAL_NURSING', 'EMR_IN_OUT_AMOUNT', 'EMR_NURSING_ASSESSMENT', 'EMR_VITAL_SIGN']
+EMR_ADMISSION_ASSESSMENT: render OK | proj=68列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_CHILDBIRTH: render OK | proj=96列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_CRITICALLY_ILL_NURS: render OK | proj=39列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_DISCHARGE_ASSESSMENT: render OK | proj=33列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_GENERAL_NURSING: render OK | proj=59列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_IN_OUT_AMOUNT: render OK | proj=40列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_NURSING_ASSESSMENT: render OK | proj=19列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+EMR_VITAL_SIGN: render OK | proj=35列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 24, 0, 0), datetime.datetime(2026, 10, 25, 0, 0), 50000]
+
+ALL OK: 8 tables, plain DATE anchor predicates, zero column expressions,
+projection == bindings write_columns (programmatic check).
+  "structure_ok": true,
+  "ready_violations": []
+ },
+ "offline": true,
+ "ok": true,
+ "exit_code": 0,
+ "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）"
+}
+
+
+## 容器装载即验（8.83，2026-10-25 21:40）
+
+scp 上传 freeze_batch4_v1.json(89295B) + bindings_batch4.json(12844B) → chmod 600
+docker exec data-asset-api python -c load_frozen_runtime_config(.../freeze_batch4_v1.json)
+  → production 4964c938bfdec8542274fcb87dc5fd476c8497ec2353045b52cbdff3ccc34a8d（与本地一致）
+    [EMR_ADMISSION_ASSESSMENT, EMR_CHILDBIRTH, EMR_CRITICALLY_ILL_NURS, EMR_DISCHARGE_ASSESSMENT,
+     EMR_GENERAL_NURSING, EMR_IN_OUT_AMOUNT, EMR_NURSING_ASSESSMENT, EMR_VITAL_SIGN]
+  → anchor_plain_and_no_parent_all_8: True（八表锚点=DATETIME 无表达式、无父子）
+批1/批2 生产件核验未动：freeze_batch1_v5.json 10月24 21:31、freeze_batch2_v2.json/bindings_batch2.json 10月25 17:48 时间戳原样（600）

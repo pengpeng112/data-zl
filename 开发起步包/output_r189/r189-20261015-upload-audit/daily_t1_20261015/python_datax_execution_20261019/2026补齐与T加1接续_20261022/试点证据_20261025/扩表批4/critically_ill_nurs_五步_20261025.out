@@ -1,0 +1,117 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_CRITICALLY_ILL_NURS 业务日 2026-10-24 ===
+=== STEP1 approval-register ===
+2026-10-25 22:06:24
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B4-20261025:emr_critically_ill_nurs",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_CRITICALLY_ILL_NURS",
+ "valid_from": "2026-10-25T14:06:25.199899+00:00",
+ "valid_until": "2026-10-26T14:06:25.199899+00:00",
+ "registered_by": "用户会话批准2026-10-25(扩表批4并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B4-20261025:emr_critically_ill_nurs（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_CRITICALLY_ILL_NURS，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-25 22:06:25
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+ "attempt_id": "att001",
+ "rows": 1378,
+ "plan": {
+  "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+  "table": "EMR_CRITICALLY_ILL_NURS",
+  "business_day": "2026-10-24",
+  "mode": "T1",
+  "window": "win:2026-10-24T00:00:00+08:00/2026-10-25T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_CRITICALLY_ILL_NURS"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d
+=== STEP3 verify ===
+2026-10-25 22:06:47
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 1378
+  },
+  "valid_groups": 1378,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 1378
+ },
+ "rows": 1378,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+ "operation_id": "OPR-DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d-3dbb6d5166e3",
+ "rows_affected": 1378,
+ "plan_counts": {
+  "INSERT": 1378
+ },
+ "partition": {
+  "ok": 1378,
+  "insert": 1378,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d-3dbb6d5166e3",
+  "manifest_hash": "3dbb6d5166e3c89566dfd046407238307e52137a1e20ade6ce5405873d6b5838",
+  "rows_affected": 1378
+ },
+ "simulation": false,
+ "applied_at": "2026-10-25T14:07:04+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-25 22:06:49 2026-10-25 22:07:04
+=== STEP5 reconcile ===
+2026-10-25 22:07:04
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+ "keys_checked": 1378,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_CRITICALLY_ILL_NURS.T1.2026-10-24.906d0e02ea7d",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-25T00:00:00+08:00",
+   "continuous_through": "2026-10-25T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_CRITICALLY_ILL_NURS ===
