@@ -410,6 +410,39 @@
       "conservation": "六表capture=探查=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（零隔离零CAS零缺零差）；ADMISSION_RECORD 121四方一致+2行隔离留账；回执账62→69；六表水位推进2026-10-26",
       "zero_code_change": true,
       "backlog": "八表历史回补[2026-01-01,H)不在本包；日常T+1按T1-DAILY-<日>:<表>逐日登记驱动；下一波33张子表触发条件=父表RECONCILED且水位推进（DISCHARGE_RECORD_DIAGNOSIS父已就绪/ADMISSION_RECORD_EXAM另需T-B05-3/OUTPATIENT_RECIPE_ITEM须父RECIPE先上线/INFOR_*按父表逐波）"
+    },
+    "next_waves_20261026": {
+      "planned_on": "2026-10-26",
+      "session": "zcode-20261026-b678plan",
+      "status": "PLANS_ISSUED_READY_FOR_DISPATCH",
+      "user_intent": "用户2026-10-26：'剩余33张表能分三次任务完成吗？……生成剩余表的任务'——33张=ODS剩余全部；分3包并行交执行AI",
+      "census": "批678预核证据_20261026/（活源普查33表：全无LOB→T-B05-2不阻塞；DISCHARGE_RECORD_DIAGNOSIS视图缺失→工单T-B06-1剔除；错配6表13列预写表达式；超时预案2张INFOR_OPERATION/OTHERS；盲区2列；真缺口1列RECIPE_ITEM.VISIT_DATE可空NULL投影；快照补充件已建AFTER_OPERA_RECORD）",
+      "waves": {
+        "batch6": {
+          "plan": "给执行者_批6ODS二波11表一次性执行计划_20261026.md",
+          "prefix": "T1-EXPAND-B6-20261026:*",
+          "tables": 11,
+          "channel": "零表达式零缺口快通道(v1即定版,批4同款)",
+          "window_rows": 5668
+        },
+        "batch7": {
+          "plan": "给执行者_批7ODS二波11表一次性执行计划_20261026.md",
+          "prefix": "T1-EXPAND-B7-20261026:*",
+          "tables": 11,
+          "channel": "表达式修订+父子对(v1 allow-view-gap→v2注入13列表达式+VISIT_DATE NULL；RR03去父；快照补充件)",
+          "window_rows": 3059
+        },
+        "batch8": {
+          "plan": "给执行者_批8ODS二波10表一次性执行计划_20261026.md",
+          "prefix": "T1-EXPAND-B8-20261026:*",
+          "tables": 10,
+          "channel": "大表宽表+风险预案(IN_FEE_INFO_CHILD 50043跨页首例；INFOR_OPERATION/OTHERS COUNT超时预案capture先试；RR01去父)",
+          "window_rows": 72211
+        }
+      },
+      "ticketed": "T-B06-1 DISCHARGE_RECORD_DIAGNOSIS源视图缺失(源端建视图后按批5范式补跑)",
+      "same_source_note": "三包同源ODS(批2/4/5不同源纪律的明示例外):只读并行无碍/行级INSERT无锁竞争/同表不跨包重跑/批2 HIS夜间补跑收口前禁镜像重建",
+      "not_in_scope": "LIS4(双源代码工程)/血透3(8.53隧道+复合锚点)/输血4(凭据18456)/体检2(T-B02-1)/NURSE_PLAN(T-B01-61)不变排队"
     }
   }
 }
