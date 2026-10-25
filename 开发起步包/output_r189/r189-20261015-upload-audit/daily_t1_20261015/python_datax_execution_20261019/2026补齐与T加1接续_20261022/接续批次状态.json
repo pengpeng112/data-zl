@@ -225,7 +225,7 @@
   "expand73_datax_20261024": {
     "session": "zcode-20261024-expand73-datax",
     "started_on": "2026-10-24",
-    "status": "BATCH1_DONE_BATCH2_PLAN_ISSUED",
+    "status": "BATCH2_APPROVED_AWAITING_EXECUTION",
     "a1_engineering": {
       "code_changes": [
         "runtime_config.SUPPORTED_DIALECTS += sqlserver/mysql",
@@ -322,7 +322,7 @@
     "batch2_plan": {
       "authored_on": "2026-10-25",
       "session": "zcode-20261025-b2plan",
-      "status": "PLAN_ISSUED_AWAITING_USER_APPROVAL",
+      "status": "APPROVED_EXECUTION_PROMPT_ISSUED",
       "scope_adjustment": "原A2批2=体检3+输血4；预核（只读，批2预核证据_20261025/）实证调整为试点3表（EMR_PHYSICAL_REPORT+EMR_EXAM_IMAGE_REP/PATH）+工单3张不执行",
       "tickets": [
         "T-B02-1 体检两子表：PATIENT_ID/NAME/SEX_CODE/ID_NUM目标NOT NULL源视图不暴露，源视图补列后上量",
@@ -336,9 +336,12 @@
         "零代码改动预期（r212能力齐备），HIS白天试点须用户单独点头"
       ],
       "handoff_doc": "给执行者_批2试点一次性执行计划_20261025.md",
-      "awaiting_user": [
-        "批2计划①冻结件生成与上传②三表试点全链 点名批复后交执行AI"
-      ]
+      "awaiting_user": [],
+      "approval": {
+        "approved_on": "2026-10-25",
+        "user_reply": "给出提示词 我让别的ai执行（承接上一轮'继续下一批任务…我让别的ai一次性执行完成'）",
+        "scope": "计划§三（冻结件生成与修订）§四（上传装载即验）§五（三表试点全链）——HIS白天执行仍须单独点头（默认夜间）"
+      }
     }
   }
 }
