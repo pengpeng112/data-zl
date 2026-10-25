@@ -1,0 +1,4 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+两列TO_CHAR+窗谓词: OK rows=3 sample=[('44', '44'), ('44', '44')]
+TO_CHAR嵌套子查询: OK rows=3 sample=[('17',), ('47',)]

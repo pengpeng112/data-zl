@@ -1,0 +1,28 @@
+load OK: environment=production
+config fp: 2dee69233915ed3f69d16ecad65f99d297b2a2c8802d3bfec3fe3eee1791c753
+tables: ['EMR_ADMISSION_DIAGNOSIS', 'EMR_ADMISSION_RECORD', 'EMR_DEATH_RECORD', 'EMR_DISCHARGE_RECORD', 'EMR_ICH_ALLERGIES', 'EMR_MEDICAL_RECORD_INFO', 'EMR_OUTPATIENT_RECORD', 'EMR_OUTPATIENT_REGISTER']
+EMR_ADMISSION_DIAGNOSIS: render OK | proj=24列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_ADMISSION_RECORD: render OK | proj=102列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_DEATH_RECORD: render OK | proj=26列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_DISCHARGE_RECORD: render OK | proj=61列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_ICH_ALLERGIES: render OK | proj=14列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_MEDICAL_RECORD_INFO: render OK | proj=16列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUTPATIENT_RECORD: render OK | proj=50列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUTPATIENT_REGISTER: render OK | proj=68列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+
+ALL OK: 8 tables, plain DATE anchor predicates, zero column expressions,
+projection == bindings write_columns (programmatic check).
+note: EMR_ADMISSION_RECORD ADMISSION_COUNT 覆盖缺口=DDL 隐式别名正则盲区，
+活源 ALL_TAB_COLUMNS 已证 gap=NONE（见 生产实况复核与活源列对齐_20261026.out）。
+--- validate --offline ---
+usage: reporting_ctl [-h] [--config CONFIG]
+                     {list,validate,doctor,daily-report,plan,simulate,resume,ticket-export,freeze-config,freeze-config-batch,approval-register,outbox-send,outbox-inspect,capture,verify,apply,reconcile,delivery,retry,backfill-plan,gap-diff-plan,publish-order} ...
+reporting_ctl: error: unrecognized arguments: --runtime-config ../开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/扩表冻结件_批5_ODS首波_v1_20261025.json --bindings-file ../开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/扩表bindings_批5_20261025.json
+  "structure_ok": true,
+  "ready_violations": []
+ },
+ "offline": true,
+ "ok": true,
+ "exit_code": 0,
+ "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）"
+}

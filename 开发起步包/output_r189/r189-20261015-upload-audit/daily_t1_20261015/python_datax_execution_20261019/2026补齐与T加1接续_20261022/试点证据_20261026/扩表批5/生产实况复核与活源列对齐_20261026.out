@@ -1,0 +1,16 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+alembic head: b8c9d0e1f2a3
+executors: [('JHEMR_ACCOUNT_ENABLE', False), ('CDMS_ACCOUNT_ENABLE', False), ('JHEMR_ACCOUNT_DISABLE', True), ('CDMS_ACCOUNT_DISABLE', True), ('r189_t1_stage_to_dboper', False), ('r189_ich_field_update', True), ('r189_home_clock_refresh', True), ('r189_doc_missing_insert', True), ('r189_spec_exam_field_update', True), ('sql-target-apply-1', True)]
+receipt_total(DBOPER): 62
+target tables present: ['EMR_ADMISSION_DIAGNOSIS', 'EMR_ADMISSION_RECORD', 'EMR_DEATH_RECORD', 'EMR_DISCHARGE_RECORD', 'EMR_ICH_ALLERGIES', 'EMR_MEDICAL_RECORD_INFO', 'EMR_OUTPATIENT_RECORD', 'EMR_OUTPATIENT_REGISTER']
+== ODS 活源列对齐（ALL_TAB_COLUMNS vs 目标列）==
+EMR_ADMISSION_DIAGNOSIS: view=True 目标24列 gap=NONE DATETIME_type=DATE 视图列数=26
+EMR_ADMISSION_RECORD: view=True 目标102列 gap=NONE DATETIME_type=DATE 视图列数=104
+EMR_DEATH_RECORD: view=True 目标26列 gap=NONE DATETIME_type=DATE 视图列数=28
+EMR_DISCHARGE_RECORD: view=True 目标61列 gap=NONE DATETIME_type=DATE 视图列数=63
+EMR_ICH_ALLERGIES: view=True 目标14列 gap=NONE DATETIME_type=DATE 视图列数=16
+EMR_MEDICAL_RECORD_INFO: view=True 目标16列 gap=NONE DATETIME_type=DATE 视图列数=18
+EMR_OUTPATIENT_RECORD: view=True 目标50列 gap=NONE DATETIME_type=DATE 视图列数=52
+EMR_OUTPATIENT_REGISTER: view=True 目标68列 gap=NONE DATETIME_type=DATE 视图列数=70
+== 探查结束 ==

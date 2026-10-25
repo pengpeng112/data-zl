@@ -1,0 +1,6810 @@
+{
+ "package_id": "R189-T1-ENGINEERING-20261019-v1.3-b01",
+ "planning_only": true,
+ "scope": 77,
+ "items": [
+  {
+   "index": 1,
+   "canonical_table": "EMR_ADMISSION_RECORD",
+   "business_name": "入院记录(D08 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ADMISSION_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ADMISSION_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADMISSION_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ADMISSION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADMISSION_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ADMISSION_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 2,
+   "canonical_table": "EMR_ADMISSION_RECORD_EXAM",
+   "business_name": "入院记录-辅助检查(辅 D08 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ADMISSION_RECORD_EXAM",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ADMISSION_RECORD_EXAM"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADMISSION_RECORD_EXAM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ADMISSION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_ADMISSION_RECORD",
+     "child_key": "AR_ID",
+     "parent_key": "ID",
+     "relation_id": "R01",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADMISSION_RECORD_EXAM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ADMISSION_RECORD_EXAM"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 3,
+   "canonical_table": "EMR_ADMISSION_DIAGNOSIS",
+   "business_name": "入院诊断表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ADMISSION_DIAGNOSIS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ADMISSION_DIAGNOSIS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADMISSION_DIAGNOSIS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ADMISSION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADMISSION_DIAGNOSIS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ADMISSION_DIAGNOSIS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 4,
+   "canonical_table": "EMR_DISCHARGE_RECORD",
+   "business_name": "出院记录(D12 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_DISCHARGE_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_DISCHARGE_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DISCHARGE_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCHARGE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DISCHARGE_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_DISCHARGE_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 5,
+   "canonical_table": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+   "business_name": "出院记录-诊断(辅 D12 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__EMR_DISCHARGE_RECORD_DIAGNOSIS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+      "V_EMR_DISCHARGE_RECORD_DIAGNOSIS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DISCHARGE_RECORD_DIAGNOSIS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCHARGE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_DISCHARGE_RECORD",
+     "child_key": "DR_ID",
+     "parent_key": "ID",
+     "relation_id": "R02",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DISCHARGE_RECORD_DIAGNOSIS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "EMR_DISCHARGE_RECORD_DIAGNOSIS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 6,
+   "canonical_table": "EMR_DOC_ORDER_DRUG",
+   "business_name": "住院医嘱信息-药品类医嘱",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_DOC_ORDER_DRUG",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_DOC_ORDER_DRUG"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DOC_ORDER_DRUG",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "START_DATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DOC_ORDER_DRUG__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_DOC_ORDER_DRUG"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 7,
+   "canonical_table": "EMR_DOC_ORDER_CHECK",
+   "business_name": "住院医嘱信息-非药品类医嘱",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_DOC_ORDER_CHECK",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_DOC_ORDER_CHECK"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DOC_ORDER_CHECK",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "START_DATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DOC_ORDER_CHECK__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": "迟到漂移月度重扫策略.json",
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_DOC_ORDER_CHECK"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 8,
+   "canonical_table": "EMR_OUTPATIENT_RECIPE",
+   "business_name": "门诊处方(D03/D04 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUTPATIENT_RECIPE",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUTPATIENT_RECIPE"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUTPATIENT_RECIPE",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECIPE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUTPATIENT_RECIPE__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUTPATIENT_RECIPE"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 9,
+   "canonical_table": "EMR_OUTPATIENT_RECIPE_ITEM",
+   "business_name": "门诊处方明细(辅 D03/D04 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUTPATIENT_RECIPE_ITEM",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUTPATIENT_RECIPE_ITEM"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUTPATIENT_RECIPE_ITEM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECIPE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_OUTPATIENT_RECIPE",
+     "child_key": "OR_ID",
+     "parent_key": "ID",
+     "relation_id": "R03",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUTPATIENT_RECIPE_ITEM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUTPATIENT_RECIPE_ITEM"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 10,
+   "canonical_table": "EMR_OUTPATIENT_REGISTER",
+   "business_name": "门诊挂号(D01 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUTPATIENT_REGISTER",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUTPATIENT_REGISTER"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUTPATIENT_REGISTER",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "EFFECTIVE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUTPATIENT_REGISTER__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUTPATIENT_REGISTER"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 11,
+   "canonical_table": "EMR_OUTPATIENT_RECORD",
+   "business_name": "门诊/急诊就诊记录(D02 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUTPATIENT_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUTPATIENT_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUTPATIENT_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUTPATIENT_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUTPATIENT_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 12,
+   "canonical_table": "EMR_OUT_FEE_INFO_CHILD",
+   "business_name": "门（急）诊费用明细表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUT_FEE_INFO_CHILD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUT_FEE_INFO_CHILD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUT_FEE_INFO_CHILD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RCD_DT",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUT_FEE_INFO_CHILD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUT_FEE_INFO_CHILD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 13,
+   "canonical_table": "EMR_OUTPATIENT_DIAG",
+   "business_name": "门诊/急诊就诊诊断表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUTPATIENT_DIAG",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUTPATIENT_DIAG"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUTPATIENT_DIAG",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUTPATIENT_DIAG__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUTPATIENT_DIAG"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 14,
+   "canonical_table": "EMR_OUT_FEE_INFO_MAIN",
+   "business_name": "门（急）诊费用信息主表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OUT_FEE_INFO_MAIN",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OUT_FEE_INFO_MAIN"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OUT_FEE_INFO_MAIN",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "VISIT_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OUT_FEE_INFO_MAIN__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OUT_FEE_INFO_MAIN"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 15,
+   "canonical_table": "EMR_IN_FEE_INFO_MAIN",
+   "business_name": "住院结算费用信息主表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_IN_FEE_INFO_MAIN",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_IN_FEE_INFO_MAIN"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_IN_FEE_INFO_MAIN",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCHARGE_DATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_IN_FEE_INFO_MAIN__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_IN_FEE_INFO_MAIN"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 16,
+   "canonical_table": "EMR_IN_FEE_INFO_CHILD",
+   "business_name": "住院费用明细表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_IN_FEE_INFO_CHILD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_IN_FEE_INFO_CHILD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_IN_FEE_INFO_CHILD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_IN_FEE_INFO_CHILD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": "迟到漂移月度重扫策略.json",
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_IN_FEE_INFO_CHILD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 17,
+   "canonical_table": "EMR_INSPECTION",
+   "business_name": "检验报告单(D18)",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "lis__V_EMR_INSPECTION",
+     "role": "primary",
+     "source_group": "lis",
+     "host": "10.10.10.73",
+     "port": 1433,
+     "database_hint": "rmcloudlis7",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION"
+     ],
+     "current_identity_verified": false
+    },
+    {
+     "object_id": "ods__V_EMR_INSPECTION_TEST",
+     "role": "history",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_TEST"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INSPECTION",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INSPECTION__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": "LIS双源路由候选.json",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INSPECTION",
+       "V_EMR_INSPECTION_TEST"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 18,
+   "canonical_table": "EMR_INSPECTION_IMAGE",
+   "business_name": "检验报告-图片子表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "lis__V_EMR_INSPECTION_IMAGE",
+     "role": "primary",
+     "source_group": "lis",
+     "host": "10.10.10.73",
+     "port": 1433,
+     "database_hint": "rmcloudlis7",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_IMAGE"
+     ],
+     "current_identity_verified": false
+    },
+    {
+     "object_id": "ods__V_EMR_INSPECTION_IMAGE_TEST",
+     "role": "history",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_IMAGE_TEST"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INSPECTION_IMAGE",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_INSPECTION",
+     "child_key": "REPORT_ID",
+     "parent_key": "ID",
+     "relation_id": "R04",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INSPECTION_IMAGE__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": "LIS双源路由候选.json",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INSPECTION_IMAGE",
+       "V_EMR_INSPECTION_IMAGE_TEST"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 19,
+   "canonical_table": "EMR_INSPECTION_ALLERGY",
+   "business_name": "检验报告-药敏子表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "lis__V_EMR_INSPECTION_ALLERGY",
+     "role": "primary",
+     "source_group": "lis",
+     "host": "10.10.10.73",
+     "port": 1433,
+     "database_hint": "rmcloudlis7",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_ALLERGY"
+     ],
+     "current_identity_verified": false
+    },
+    {
+     "object_id": "ods__V_EMR_INSPECTION_ALLERGY_TEST",
+     "role": "history",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_ALLERGY_TEST"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INSPECTION_ALLERGY",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_INSPECTION",
+     "child_key": "REPORT_ID",
+     "parent_key": "ID",
+     "relation_id": "R05",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INSPECTION_ALLERGY__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": "LIS双源路由候选.json",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INSPECTION_ALLERGY",
+       "V_EMR_INSPECTION_ALLERGY_TEST"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 20,
+   "canonical_table": "EMR_INSPECTION_ITEM",
+   "business_name": "检验报告单-项目(辅 D06 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "lis__V_EMR_INSPECTION_ITEM",
+     "role": "primary",
+     "source_group": "lis",
+     "host": "10.10.10.73",
+     "port": 1433,
+     "database_hint": "rmcloudlis7",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_ITEM"
+     ],
+     "current_identity_verified": false
+    },
+    {
+     "object_id": "ods__V_EMR_INSPECTION_ITEM_TEST",
+     "role": "history",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INSPECTION_ITEM_TEST"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INSPECTION_ITEM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_INSPECTION",
+     "child_key": "REPORT_ID",
+     "parent_key": "ID",
+     "relation_id": "R06",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INSPECTION_ITEM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": "LIS双源路由候选.json",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INSPECTION_ITEM",
+       "V_EMR_INSPECTION_ITEM_TEST"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 21,
+   "canonical_table": "EMR_EXAM_IMAGE_REP",
+   "business_name": "影像诊断报告( D07 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "his__V_EMR_EXAM_IMAGE_REP",
+     "role": "primary",
+     "source_group": "his",
+     "host": "10.10.10.15",
+     "port": 1521,
+     "database_hint": "his",
+     "owner_hint": "HISUSER",
+     "object_name_candidates": [
+      "V_EMR_EXAM_IMAGE_REP"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_EXAM_IMAGE_REP",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "REPORT_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_EXAM_IMAGE_REP__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_EXAM_IMAGE_REP"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 22,
+   "canonical_table": "EMR_EXAM_IMAGE_PATH",
+   "business_name": "检查影像诊断报告子表(辅 D07 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "his__V_EMR_EXAM_IMAGE_PATH",
+     "role": "primary",
+     "source_group": "his",
+     "host": "10.10.10.15",
+     "port": 1521,
+     "database_hint": "his",
+     "owner_hint": "HISUSER",
+     "object_name_candidates": [
+      "V_EMR_EXAM_IMAGE_PATH"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_EXAM_IMAGE_PATH",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "EFFECTIVE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_EXAM_IMAGE_REP",
+     "child_key": "IMAGE_ID",
+     "parent_key": "ID",
+     "relation_id": "R07",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_EXAM_IMAGE_PATH__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_EXAM_IMAGE_PATH"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 23,
+   "canonical_table": "EMR_ICH",
+   "business_name": "住院病案首页(电子病历) (D09/D10 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ICH",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ICH"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ICH",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCHARGE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ICH__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ICH"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 24,
+   "canonical_table": "EMR_ICH_OPERATION",
+   "business_name": "住院病案首页-手术(电子病历) (辅 D09/D10 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ICH_OPERATION",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ICH_OPERATION"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ICH_OPERATION",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATED_AT",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_ICH",
+     "child_key": "ICH_ID",
+     "parent_key": "ID",
+     "relation_id": "R08",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ICH_OPERATION__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ICH_OPERATION"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 25,
+   "canonical_table": "EMR_ICH_ALLERGIES",
+   "business_name": "住院病案首页-过敏药物(电子病历) (辅 D09/D10 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ICH_ALLERGIES",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ICH_ALLERGIES"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ICH_ALLERGIES",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATED_AT",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ICH_ALLERGIES__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ICH_ALLERGIES"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 26,
+   "canonical_table": "EMR_ICH_CHARGE",
+   "business_name": "住院病案首页-住院费用(电子病历) (辅 D09/D10 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ICH_CHARGE",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ICH_CHARGE"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ICH_CHARGE",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATED_AT",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_ICH",
+     "child_key": "ICH_ID",
+     "parent_key": "ID",
+     "relation_id": "R10",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ICH_CHARGE__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ICH_CHARGE"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 27,
+   "canonical_table": "EMR_ICH_DIAGNOSIS",
+   "business_name": "住院病案首页-诊断(电子病历) (辅 D09/D10 标）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ICH_DIAGNOSIS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ICH_DIAGNOSIS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ICH_DIAGNOSIS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DIAGNOSIS_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_ICH",
+     "child_key": "DCS_ID",
+     "parent_key": "ID",
+     "relation_id": "R11",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ICH_DIAGNOSIS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ICH_DIAGNOSIS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 28,
+   "canonical_table": "EMR_PHYSICAL_REPORT",
+   "business_name": "体检报告单(D69）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "physical__V_EMR_PHYSICAL_REPORT",
+     "role": "primary",
+     "source_group": "physical",
+     "host": "10.10.10.96",
+     "port": 1433,
+     "database_hint": "JZCIS",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_PHYSICAL_REPORT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_PHYSICAL_REPORT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CHECK_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_PHYSICAL_REPORT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_PHYSICAL_REPORT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 29,
+   "canonical_table": "EMR_PHYSICAL_EXAM",
+   "business_name": "体检项目表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "physical__V_EMR_PHYSICAL_EXAM",
+     "role": "primary",
+     "source_group": "physical",
+     "host": "10.10.10.96",
+     "port": 1433,
+     "database_hint": "JZCIS",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_PHYSICAL_EXAM"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_PHYSICAL_EXAM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "PERFORM_DTIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_PHYSICAL_REPORT",
+     "child_key": "HEALTH_EXAM_NO",
+     "parent_key": "HEALTH_EXAM_NO",
+     "relation_id": "R12",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_PHYSICAL_EXAM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_PHYSICAL_EXAM"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 30,
+   "canonical_table": "EMR_PHYSICAL_EXAM_ITEM",
+   "business_name": "体检项目明细表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "physical__V_EMR_PHYSICAL_EXAM_ITEM",
+     "role": "primary",
+     "source_group": "physical",
+     "host": "10.10.10.96",
+     "port": 1433,
+     "database_hint": "JZCIS",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "V_EMR_PHYSICAL_EXAM_ITEM"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_PHYSICAL_EXAM_ITEM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "EFFECTIVE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [
+    {
+     "parent": "EMR_PHYSICAL_REPORT",
+     "child_key": "HEALTH_EXAM_NO",
+     "parent_key": "HEALTH_EXAM_NO",
+     "relation_id": "R13",
+     "verified": false
+    }
+   ],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_PHYSICAL_EXAM_ITEM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_PHYSICAL_EXAM_ITEM"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 31,
+   "canonical_table": "EMR_BLOOD_APPLY_REPORT",
+   "business_name": "输血申请单",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "blood__V_EMR_BLOOD_APPLY_REPORT",
+     "role": "primary",
+     "source_group": "blood",
+     "host": "10.10.10.67",
+     "port": 1521,
+     "database_hint": "ORCLBIS",
+     "owner_hint": null,
+     "object_name_candidates": [
+      "V_EMR_BLOOD_APPLY_REPORT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_APPLY_REPORT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_APPLY_REPORT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_BLOOD_APPLY_REPORT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 32,
+   "canonical_table": "EMR_BLOOD_APPLY_REPORT_ITEM",
+   "business_name": "输血申请单明细",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "blood__V_EMR_BLOOD_APPLY_REPORT_ITEM",
+     "role": "primary",
+     "source_group": "blood",
+     "host": "10.10.10.67",
+     "port": 1521,
+     "database_hint": "ORCLBIS",
+     "owner_hint": null,
+     "object_name_candidates": [
+      "V_EMR_BLOOD_APPLY_REPORT_ITEM"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_APPLY_REPORT_ITEM",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_APPLY_REPORT_ITEM__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_BLOOD_APPLY_REPORT_ITEM"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 33,
+   "canonical_table": "EMR_TRANSFUSION_RECORD",
+   "business_name": "输血记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "blood__V_EMR_TRANSFUSION_RECORD",
+     "role": "primary",
+     "source_group": "blood",
+     "host": "10.10.10.67",
+     "port": 1521,
+     "database_hint": "ORCLBIS",
+     "owner_hint": null,
+     "object_name_candidates": [
+      "V_EMR_TRANSFUSION_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_TRANSFUSION_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "START_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_TRANSFUSION_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_TRANSFUSION_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 34,
+   "canonical_table": "EMR_BLOOD_DESTROY_RECORD",
+   "business_name": "血袋回收记录表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "blood__V_EMR_BLOOD_DESTROY_RECORD",
+     "role": "primary",
+     "source_group": "blood",
+     "host": "10.10.10.67",
+     "port": 1521,
+     "database_hint": "ORCLBIS",
+     "owner_hint": null,
+     "object_name_candidates": [
+      "V_EMR_BLOOD_DESTROY_RECORD",
+      "EMR_BLOOD_DESTROY_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_DESTROY_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DESTROY_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_DESTROY_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_BLOOD_DESTROY_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 35,
+   "canonical_table": "EMR_MEDICAL_RECORD_INFO",
+   "business_name": "电子病历汇总",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_MEDICAL_RECORD_INFO",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_MEDICAL_RECORD_INFO"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_MEDICAL_RECORD_INFO",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_MEDICAL_RECORD_INFO__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_MEDICAL_RECORD_INFO"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 36,
+   "canonical_table": "EMR_HOS_POSTOPER_RECORD",
+   "business_name": "术后首次病程记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_POSTOPER_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_POSTOPER_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_POSTOPER_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_POSTOPER_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_POSTOPER_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 37,
+   "canonical_table": "EMR_HOS_PREOP_DISCUSS",
+   "business_name": "术前讨论与小结",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_PREOP_DISCUSS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_PREOP_DISCUSS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_PREOP_DISCUSS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCUSS_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_PREOP_DISCUSS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_PREOP_DISCUSS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 38,
+   "canonical_table": "EMR_HOS_DND_RECORD",
+   "business_name": "死亡病历讨论记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_DND_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_DND_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_DND_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCUSS_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_DND_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_DND_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 39,
+   "canonical_table": "EMR_HOS_DIFFIC_CASE_DISCUSS",
+   "business_name": "疑难病例讨论记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCUSS_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_DIFFIC_CASE_DISCUSS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_DIFFIC_CASE_DISCUSS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 40,
+   "canonical_table": "EMR_HOS_CHANGE_MAJOR_RECORD",
+   "business_name": "转科记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_CHANGE_MAJOR_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_CHANGE_MAJOR_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_CHANGE_MAJOR_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ROLL_OUT_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_CHANGE_MAJOR_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_CHANGE_MAJOR_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 41,
+   "canonical_table": "EMR_REFERRAL_HOS_RECORD",
+   "business_name": "转诊/院纪录（转出记录）",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_REFERRAL_HOS_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_REFERRAL_HOS_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_REFERRAL_HOS_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_REFERRAL_HOS_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_REFERRAL_HOS_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 42,
+   "canonical_table": "EMR_HOS_CONSUL_RECORD",
+   "business_name": "会诊记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_CONSUL_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_CONSUL_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_CONSUL_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CONSULTATION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_CONSUL_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_CONSUL_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 43,
+   "canonical_table": "EMR_HOS_SUCCESSION_RECORD",
+   "business_name": "住院医师交接班记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_SUCCESSION_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_SUCCESSION_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_SUCCESSION_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_SUCCESSION_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_HOS_SUCCESSION_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 44,
+   "canonical_table": "EMR_HOS_SAVE_RECORD",
+   "business_name": "抢救记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_HOS_SAVE_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_HOS_SAVE_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_SAVE_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_SAVE_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": null,
+      "verified": false
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 45,
+   "canonical_table": "EMR_ADMISSION_DEAD_RECORD_TF",
+   "business_name": "24小时内入院死亡记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ADMISSION_DEAD_RECORD_TF",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ADMISSION_DEAD_RECORD_TF"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADMISSION_DEAD_RECORD_TF",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DEATH_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADMISSION_DEAD_RECORD_TF__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ADMISSION_DEAD_RECORD_TF"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 46,
+   "canonical_table": "EMR_OPERA_RECORD",
+   "business_name": "一般手术记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OPERA_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OPERA_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OPERA_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "OPERA_START_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OPERA_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OPERA_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 47,
+   "canonical_table": "EMR_BOFORE_OPERA_RECORD",
+   "business_name": "麻醉术前访视记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_BOFORE_OPERA_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_BOFORE_OPERA_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BOFORE_OPERA_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "SIGNATURE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BOFORE_OPERA_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_BOFORE_OPERA_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 48,
+   "canonical_table": "EMR_ANESTHESIA_RECORD",
+   "business_name": "麻醉手术记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ANESTHESIA_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ANESTHESIA_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ANESTHESIA_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ANES_END_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ANESTHESIA_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ANESTHESIA_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 49,
+   "canonical_table": "EMR_ANES_RECORD_BLOOD",
+   "business_name": "麻醉手术中用血记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ANES_RECORD_BLOOD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ANES_RECORD_BLOOD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ANES_RECORD_BLOOD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "END_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ANES_RECORD_BLOOD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ANES_RECORD_BLOOD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 50,
+   "canonical_table": "EMR_ANES_RECORD_MED",
+   "business_name": "麻醉手术中用药记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_ANES_RECORD_MED",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_ANES_RECORD_MED"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ANES_RECORD_MED",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DRUG_ENDTIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ANES_RECORD_MED__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ANES_RECORD_MED"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 51,
+   "canonical_table": "EMR_AFTER_OPERA_RECORD",
+   "business_name": "麻醉术后访视记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_AFTER_OPERA_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_AFTER_OPERA_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_AFTER_OPERA_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "AWAKE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_AFTER_OPERA_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_AFTER_OPERA_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 52,
+   "canonical_table": "EMR_ADMISSION_ASSESSMENT",
+   "business_name": "入院评估记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_ADMISSION_ASSESSMENT",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_ADMISSION_ASSESSMENT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADMISSION_ASSESSMENT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ADMISSION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADMISSION_ASSESSMENT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_ADMISSION_ASSESSMENT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 53,
+   "canonical_table": "EMR_DISCHARGE_ASSESSMENT",
+   "business_name": "出院评估与指导",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_DISCHARGE_ASSESSMENT",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_DISCHARGE_ASSESSMENT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DISCHARGE_ASSESSMENT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DISCHARGE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DISCHARGE_ASSESSMENT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_DISCHARGE_ASSESSMENT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 54,
+   "canonical_table": "EMR_CHILDBIRTH",
+   "business_name": "阴道分娩记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_CHILDBIRTH",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_CHILDBIRTH"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_CHILDBIRTH",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "LABOR_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_CHILDBIRTH__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_CHILDBIRTH"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 55,
+   "canonical_table": "EMR_GENERAL_NURSING",
+   "business_name": "一般护理记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_GENERAL_NURSING",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_GENERAL_NURSING"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_GENERAL_NURSING",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_GENERAL_NURSING__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_GENERAL_NURSING"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 56,
+   "canonical_table": "EMR_CRITICALLY_ILL_NURS",
+   "business_name": "病危（重）护理记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_CRITICALLY_ILL_NURS",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_CRITICALLY_ILL_NURS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_CRITICALLY_ILL_NURS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_CRITICALLY_ILL_NURS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_CRITICALLY_ILL_NURS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 57,
+   "canonical_table": "EMR_IN_OUT_AMOUNT",
+   "business_name": "病危（重）护理记录-出入量记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_IN_OUT_AMOUNT",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_IN_OUT_AMOUNT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_IN_OUT_AMOUNT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "SIGNATURE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_IN_OUT_AMOUNT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "legacy_view_transport_hint": "DATAX_ONLY_REPORTED_DO_NOT_AUTOFALLBACK",
+   "alternative_route_evidence": "priority_extract_20261018/护理出入量通道复核_20261018/护理出入量_处理结论与续抽交接.md",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_IN_OUT_AMOUNT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "DATAX_ONLY_PROVEN(route-853已证通道,主计划五-B01特殊项)"
+   }
+  },
+  {
+   "index": 58,
+   "canonical_table": "EMR_VITAL_SIGN",
+   "business_name": "生命体征测量记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_VITAL_SIGN",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_VITAL_SIGN"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_VITAL_SIGN",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_VITAL_SIGN__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_VITAL_SIGN"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 59,
+   "canonical_table": "EMR_OPERATION_NURSING",
+   "business_name": "手术护理记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_OPERATION_NURSING",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_OPERATION_NURSING"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_OPERATION_NURSING",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_OPERATION_NURSING__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_OPERATION_NURSING"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 60,
+   "canonical_table": "EMR_CONSUMABLES",
+   "business_name": "高值耗材使用记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_CONSUMABLES",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_CONSUMABLES"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_CONSUMABLES",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "RECORD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_CONSUMABLES__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_CONSUMABLES"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 61,
+   "canonical_table": "EMR_NURSE_PLAN",
+   "business_name": "护理计划记录",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "WAITING_BUSINESS_CONFIRMATION",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_NURSE_PLAN",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_NURSE_PLAN__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": null,
+      "verified": false
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 62,
+   "canonical_table": "EMR_INFOR_OPERATION",
+   "business_name": "手术知情同意书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_OPERATION",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_OPERATION"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_OPERATION",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "OPERATION_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_OPERATION__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_OPERATION"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 63,
+   "canonical_table": "EMR_INFOR_ANESTHESIA",
+   "business_name": "麻醉知情同意书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_ANESTHESIA",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_ANESTHESIA"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_ANESTHESIA",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_ANESTHESIA__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_ANESTHESIA"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 64,
+   "canonical_table": "EMR_INFOR_TRANS_BLOOD",
+   "business_name": "输血治疗同意书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_TRANS_BLOOD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_TRANS_BLOOD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_TRANS_BLOOD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_TRANS_BLOOD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_TRANS_BLOOD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 65,
+   "canonical_table": "EMR_INFOR_SPEC_EXAM_TREAT",
+   "business_name": "特殊检查及特殊治疗同意书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_SPEC_EXAM_TREAT",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_SPEC_EXAM_TREAT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_SPEC_EXAM_TREAT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "PATIENT_SIGN_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": false
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_SPEC_EXAM_TREAT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_SPEC_EXAM_TREAT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": false,
+     "evidence": "目标PK=无约束"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 66,
+   "canonical_table": "EMR_INFOR_CRITICALLY_ILL",
+   "business_name": "病危(重)通知书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_CRITICALLY_ILL",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_CRITICALLY_ILL"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_CRITICALLY_ILL",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CRITICAL_NOTICE_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_CRITICALLY_ILL__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_CRITICALLY_ILL"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 67,
+   "canonical_table": "EMR_INFOR_OTHERS",
+   "business_name": "其它知情同意书",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_INFOR_OTHERS",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_INFOR_OTHERS"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFOR_OTHERS",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "PATIENT_SIGN_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFOR_OTHERS__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_INFOR_OTHERS"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 68,
+   "canonical_table": "EMR_BLOOD_DIALY_RECORD",
+   "business_name": "血透治疗记录",
+   "enabled": false,
+   "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "dialysis__V_EMR_BLOOD_DIALY_RECORD",
+     "role": "primary",
+     "source_group": "dialysis",
+     "host": "10.10.8.87",
+     "port": 5432,
+     "database_hint": "dialysis",
+     "owner_hint": "public",
+     "object_name_candidates": [
+      "v_EMR_BLOOD_DIALY_RECORD",
+      "EMR_BLOOD_DIALY_RECORD"
+     ],
+     "current_identity_verified": true,
+     "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_DIALY_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "BD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_DIALY_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=0行;RECORD无2026增量(与前置机全量自洽)",
+   "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_RECORD",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_RECORD",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
+    "anchor": [
+     {
+      "column": "datetime+ID",
+      "verified": true
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
+   }
+  },
+  {
+   "index": 69,
+   "canonical_table": "EMR_BLOOD_DIALY_DETAIL",
+   "business_name": "血透治疗过程记录",
+   "enabled": false,
+   "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "dialysis__V_EMR_BLOOD_DIALY_DETAIL",
+     "role": "primary",
+     "source_group": "dialysis",
+     "host": "10.10.8.87",
+     "port": 5432,
+     "database_hint": "dialysis",
+     "owner_hint": "public",
+     "object_name_candidates": [
+      "v_EMR_BLOOD_DIALY_DETAIL",
+      "EMR_BLOOD_DIALY_DETAIL"
+     ],
+     "current_identity_verified": true,
+     "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_DIALY_DETAIL",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "BD_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_DIALY_DETAIL__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=197860行;RECORD无2026增量(与前置机全量自洽)",
+   "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_DETAIL",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_DETAIL",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
+    "anchor": [
+     {
+      "column": "datetime+ID",
+      "verified": true
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
+   }
+  },
+  {
+   "index": 70,
+   "canonical_table": "EMR_BLOOD_DIALY_ORDER",
+   "business_name": "血透治疗医嘱明细",
+   "enabled": false,
+   "runtime_readiness": "SOURCE_READY_EXTRACT_PENDING",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "dialysis__V_EMR_BLOOD_DIALY_ORDER",
+     "role": "primary",
+     "source_group": "dialysis",
+     "host": "10.10.8.87",
+     "port": 5432,
+     "database_hint": "dialysis",
+     "owner_hint": "public",
+     "object_name_candidates": [
+      "v_EMR_BLOOD_DIALY_ORDER",
+      "EMR_BLOOD_DIALY_ORDER"
+     ],
+     "current_identity_verified": true,
+     "source_note": "2026-10-20终版:8.87只读从库(8.86主库流复制,datax机8.53经pg_hba放行可直连,scram/hdis);v_三视图已同步;JDBC带options只读+timeout;备用=8.83:17432"
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_BLOOD_DIALY_ORDER",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "ORDER_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_BLOOD_DIALY_ORDER__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "source_ready_note": "2026-10-20终版源=10.10.8.87只读从库(hdis,v_视图,8.53直连);端到端按窗抽测通过;前置机已抽至2025-12-31且机构码全部正确(无AA污染),2026年增量待抽=24963行;RECORD无2026增量(与前置机全量自洽)",
+   "historical_backfill_note": "历史窗口2023-06-14~2025-12-31已在前置机,质量核验通过;首个任务=2026-01-01起增量",
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [
+     [
+      "v_EMR_BLOOD_DIALY_ORDER",
+      "VERIFIED@public.dialysis"
+     ],
+     [
+      "EMR_BLOOD_DIALY_ORDER",
+      "VERIFIED@public.dialysis"
+     ]
+    ],
+    "anchor": [
+     {
+      "column": "datetime+ID",
+      "verified": true
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "DATAX_CONFIRMED(8.53直连;视图层无TenantId列按实证修正)"
+   }
+  },
+  {
+   "index": 71,
+   "canonical_table": "EMR_DEATH_RECORD",
+   "business_name": "死亡记录表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "ods__V_EMR_DEATH_RECORD",
+     "role": "primary",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_DEATH_RECORD"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_DEATH_RECORD",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "DEATH_DATE",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_DEATH_RECORD__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_DEATH_RECORD"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 72,
+   "canonical_table": "EMR_NURSING_ASSESSMENT",
+   "business_name": "量表评估",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "nursing__V_EMR_NURSING_ASSESSMENT",
+     "role": "primary",
+     "source_group": "nursing",
+     "host": "10.10.10.125",
+     "port": 1521,
+     "database_hint": "ewell",
+     "owner_hint": "LUNA_MCS_SDSEY",
+     "object_name_candidates": [
+      "V_EMR_NURSING_ASSESSMENT"
+     ],
+     "current_identity_verified": false
+    },
+    {
+     "object_id": "ods__V_EMR_NURSING_ASSESSMENT",
+     "role": "comparison",
+     "source_group": "ods",
+     "host": "10.10.8.216",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "ODS",
+     "object_name_candidates": [
+      "V_EMR_NURSING_ASSESSMENT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_NURSING_ASSESSMENT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "CREATE_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_NURSING_ASSESSMENT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "V_EMR_NURSING_ASSESSMENT",
+       "V_EMR_NURSING_ASSESSMENT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)"
+   }
+  },
+  {
+   "index": 73,
+   "canonical_table": "EMR_PATHOLOGY_REPORT",
+   "business_name": "病理报告",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "pathology__EMR_PATHOLOGY_REPORT",
+     "role": "primary",
+     "source_group": "pathology",
+     "host": "10.10.9.41",
+     "port": 1433,
+     "database_hint": "pitaya",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "EMR_PATHOLOGY_REPORT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_PATHOLOGY_REPORT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_PATHOLOGY_REPORT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "EMR_PATHOLOGY_REPORT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 74,
+   "canonical_table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+   "business_name": "分子病理报告",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "pathology__EMR_MOLECULAR_PATHOLOGY_REPORT",
+     "role": "primary",
+     "source_group": "pathology",
+     "host": "10.10.9.41",
+     "port": 1433,
+     "database_hint": "pitaya",
+     "owner_hint": "dbo",
+     "object_name_candidates": [
+      "EMR_MOLECULAR_PATHOLOGY_REPORT"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_MOLECULAR_PATHOLOGY_REPORT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_MOLECULAR_PATHOLOGY_REPORT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "EMR_MOLECULAR_PATHOLOGY_REPORT"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 75,
+   "canonical_table": "EMR_INFECTION_INFORMATION_REGISTER",
+   "business_name": "医院感染信息登记表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "infection__EMR_INFECTION_INFORMATION_REGISTER",
+     "role": "primary",
+     "source_group": "infection",
+     "host": "10.10.9.45",
+     "port": 1521,
+     "database_hint": "orcl",
+     "owner_hint": "C##FXPT",
+     "object_name_candidates": [
+      "EMR_INFECTION_INFORMATION_REGISTER"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_INFECTION_INFORMATION_REGISTER",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_INFECTION_INFORMATION_REGISTER__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "EMR_INFECTION_INFORMATION_REGISTER"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 76,
+   "canonical_table": "EMR_HOS_PRACTITIONER_INFORMATION",
+   "business_name": "医院执业人员信息表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "hrp__EMR_HOS_PRACTITIONER",
+     "role": "primary",
+     "source_group": "hrp",
+     "host": "10.10.10.23",
+     "port": 1521,
+     "database_hint": "hrpdb",
+     "owner_hint": "HRPSEY656",
+     "object_name_candidates": [
+      "EMR_HOS_PRACTITIONER"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_HOS_PRACTITIONER_INFORMATION",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": "LEVE_START_TIME",
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_HOS_PRACTITIONER_INFORMATION__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "DATETIME",
+      "verified": true,
+      "views": [
+       "EMR_HOS_PRACTITIONER"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  },
+  {
+   "index": 77,
+   "canonical_table": "EMR_ADVERSE_EVENT",
+   "business_name": "不良事件表",
+   "enabled": false,
+   "runtime_readiness": "UNKNOWN",
+   "applicability": "TO_VERIFY",
+   "engine": "UNDECIDED",
+   "incremental_strategy": "UNRESOLVED",
+   "source_candidates": [
+    {
+     "object_id": "adverse__V_EMR_ADVERSE_EVENT_FINAL",
+     "role": "primary",
+     "source_group": "adverse",
+     "host": "10.10.10.50",
+     "port": 3306,
+     "database_hint": "",
+     "owner_hint": null,
+     "object_name_candidates": [
+      "V_EMR_ADVERSE_EVENT_FINAL"
+     ],
+     "current_identity_verified": false
+    }
+   ],
+   "target_candidate": {
+    "host": "10.10.8.74",
+    "port": 1521,
+    "service": "orcl",
+    "owner": "DBOPER",
+    "table": "EMR_ADVERSE_EVENT",
+    "current_identity_verified": true
+   },
+   "historical_business_time_hint": null,
+   "business_time": null,
+   "change_evidence": null,
+   "delete_or_retract_evidence": null,
+   "source_version_order": null,
+   "stable_key": {
+    "candidate": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "projection": [],
+   "deadline": null,
+   "declared_parent_candidates": [],
+   "approval_refs": [],
+   "apply_executor_ref": null,
+   "definition_fingerprint": null,
+   "dependency_fingerprints": {},
+   "human_view_ticket_state": "TO_REVIEW",
+   "alert_policy_ref": "告警触发与升级规则.json",
+   "note": "规划种子；历史时间/来源/目标是线索，未证明生产可执行，不含SQL或凭据",
+   "failure_policy_ref": "故障隔离与继续执行规则.json",
+   "performance_profile_ref": "EMR_ADVERSE_EVENT__PENDING_ROUTE_PROFILES",
+   "deadline_state": "UNCONFIGURED",
+   "monthly_rescan_policy_ref": null,
+   "long_lived_credential_ref": null,
+   "running_writer_handoff_state": "NOT_LIVE_VERIFIED",
+   "route_policy_ref": null,
+   "b01_verification": {
+    "as_of": "2026-10-22",
+    "target_identity": {
+     "verified": true,
+     "evidence": "DBOPER all_tables live 2026-10-22"
+    },
+    "source_identity": [],
+    "anchor": [
+     {
+      "column": "EFFECTIVE_TIME",
+      "verified": true,
+      "views": [
+       "v_emr_adverse_event_final"
+      ]
+     }
+    ],
+    "stable_key": {
+     "candidate": [
+      "ID"
+     ],
+     "verified": true,
+     "evidence": "目标PK=ID"
+    },
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)"
+   }
+  }
+ ],
+ "version_note": "B01核完候选(2026-10-22):目标77表身份/约束/列全核,源侧7组只读核验(血透待环境);enabled仍全false;依据见同目录B01台账;20261022晚补:血透3项经8.53出口隧道核验通过(库名dialysis),pending_env清零 | 批5派生输入2026-10-26：EMR_ICH_ALLERGIES declared_parent_candidates 置空（B01 声明父=EMR_ICH relation R09 verified:False，R 关系未核，未经审核父子不进正式配置；去父试点，父子覆盖率核验开工单 T-B05-1）。其余 76 项与 v1.3 原件逐字段一致。"
+}

@@ -1,0 +1,33 @@
+{
+ "doc": "批5（ODS首波8表）扩表源绑定：源=ODS 10.10.8.216:1521/orcl（首组同款通道，dsn/credential_ref 照抄首组生产 bindings 的 ods_8_216 段）；对象 ODS.V_EMR_<表名> 显式全名，不拼不猜；组键 ods=B01 source_group（生成器按组键精确匹配）；view_by_table 供 ODS 视图列覆盖核验（08 快照 DDL 别名 + ods_views_bulk 定义哈希）。EMR_ICH_ALLERGIES 去父试点：R09 verified:False，生成输入（批5去父派生 B01）置空 declared_parent_candidates，父子覆盖率核验开工单 T-B05-1。",
+ "as_of": "2026-10-26",
+ "sources": {
+  "ods": {
+   "dialect": "oracle",
+   "dsn": "10.10.8.216:1521/orcl",
+   "credential_ref": "container-credentials:ods_8_216",
+   "source_objects": {
+    "EMR_ADMISSION_RECORD": "ODS.V_EMR_ADMISSION_RECORD",
+    "EMR_DISCHARGE_RECORD": "ODS.V_EMR_DISCHARGE_RECORD",
+    "EMR_ADMISSION_DIAGNOSIS": "ODS.V_EMR_ADMISSION_DIAGNOSIS",
+    "EMR_OUTPATIENT_REGISTER": "ODS.V_EMR_OUTPATIENT_REGISTER",
+    "EMR_OUTPATIENT_RECORD": "ODS.V_EMR_OUTPATIENT_RECORD",
+    "EMR_MEDICAL_RECORD_INFO": "ODS.V_EMR_MEDICAL_RECORD_INFO",
+    "EMR_DEATH_RECORD": "ODS.V_EMR_DEATH_RECORD",
+    "EMR_ICH_ALLERGIES": "ODS.V_EMR_ICH_ALLERGIES"
+   },
+   "view_by_table": {
+    "EMR_ADMISSION_RECORD": "V_EMR_ADMISSION_RECORD",
+    "EMR_DISCHARGE_RECORD": "V_EMR_DISCHARGE_RECORD",
+    "EMR_ADMISSION_DIAGNOSIS": "V_EMR_ADMISSION_DIAGNOSIS",
+    "EMR_OUTPATIENT_REGISTER": "V_EMR_OUTPATIENT_REGISTER",
+    "EMR_OUTPATIENT_RECORD": "V_EMR_OUTPATIENT_RECORD",
+    "EMR_MEDICAL_RECORD_INFO": "V_EMR_MEDICAL_RECORD_INFO",
+    "EMR_DEATH_RECORD": "V_EMR_DEATH_RECORD",
+    "EMR_ICH_ALLERGIES": "V_EMR_ICH_ALLERGIES"
+   },
+   "evidence": "ods_views_bulk.json（2026-10-22 批量核验：8 视图全 VIEW 实存+定义哈希）+ 08 元数据快照 DDL；预验（2026-10-26 本地）：八表视图列别名覆盖 7 表全对齐，EMR_ADMISSION_RECORD 的 ADMISSION_COUNT 为 DDL 隐式别名（t.visit_id ADMISSION_COUNT，无 as 关键字）正则盲区非真实缺口，核因证据见批5报告§2，活源列对齐以前置探查 ALL_TAB_COLUMNS 为准"
+  }
+ },
+ "parents": {}
+}

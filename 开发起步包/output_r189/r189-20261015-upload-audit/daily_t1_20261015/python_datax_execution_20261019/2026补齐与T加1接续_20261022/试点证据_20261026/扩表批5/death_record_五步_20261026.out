@@ -1,0 +1,110 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+=== TABLE EMR_DEATH_RECORD 业务日 2026-10-25 ===
+=== STEP1 approval-register ===
+2026-10-26 06:18:49
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B5-20261025:emr_death_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_DEATH_RECORD",
+ "valid_from": "2026-10-25T22:18:50.243569+00:00",
+ "valid_until": "2026-10-26T22:18:50.243569+00:00",
+ "registered_by": "用户会话批准2026-10-25(扩表批5并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B5-20261025:emr_death_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_DEATH_RECORD，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-26 06:18:50
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+ "attempt_id": "att001",
+ "rows": 0,
+ "plan": {
+  "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+  "table": "EMR_DEATH_RECORD",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_DEATH_RECORD"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023
+=== STEP3 verify ===
+2026-10-26 06:18:59
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {},
+  "valid_groups": 0,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 0
+ },
+ "rows": 0,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+ "operation_id": "OPR-DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023-e3b0c44298fc",
+ "rows_affected": 0,
+ "plan_counts": {},
+ "partition": {
+  "ok": 0,
+  "insert": 0,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023-e3b0c44298fc",
+  "manifest_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rows_affected": 0
+ },
+ "simulation": false,
+ "applied_at": "2026-10-25T22:19:05+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 06:19:02 2026-10-26 06:19:06
+=== STEP5 reconcile ===
+2026-10-26 06:19:06
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+ "keys_checked": 0,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_DEATH_RECORD ===

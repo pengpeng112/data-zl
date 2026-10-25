@@ -1,0 +1,114 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+=== TABLE EMR_ADMISSION_DIAGNOSIS 业务日 2026-10-25 ===
+=== STEP1 approval-register ===
+2026-10-26 06:18:15
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B5-20261025:emr_admission_diagnosis",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_DIAGNOSIS",
+ "valid_from": "2026-10-25T22:18:17.186647+00:00",
+ "valid_until": "2026-10-26T22:18:17.186647+00:00",
+ "registered_by": "用户会话批准2026-10-25(扩表批5并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B5-20261025:emr_admission_diagnosis（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_DIAGNOSIS，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-26 06:18:18
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+ "attempt_id": "att001",
+ "rows": 593,
+ "plan": {
+  "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+  "table": "EMR_ADMISSION_DIAGNOSIS",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_ADMISSION_DIAGNOSIS"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54
+=== STEP3 verify ===
+2026-10-26 06:18:30
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 593
+  },
+  "valid_groups": 593,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 593
+ },
+ "rows": 593,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+ "operation_id": "OPR-DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54-46978d695738",
+ "rows_affected": 593,
+ "plan_counts": {
+  "INSERT": 593
+ },
+ "partition": {
+  "ok": 593,
+  "insert": 593,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54-46978d695738",
+  "manifest_hash": "46978d695738f10493ca90f984df4916eadfb095f56c4fd717e5d49ce6133540",
+  "rows_affected": 593
+ },
+ "simulation": false,
+ "applied_at": "2026-10-25T22:18:40+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 06:18:32 2026-10-26 06:18:41
+=== STEP5 reconcile ===
+2026-10-26 06:18:41
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+ "keys_checked": 593,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_ADMISSION_DIAGNOSIS.T1.2026-10-25.a0eca64b5a54",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_ADMISSION_DIAGNOSIS ===

@@ -1,0 +1,11 @@
+load OK: production 729f66bf0b89d03bf33294aac5b59f049b314c1df5ed4dd4cd14f74d18a7cfac
+EMR_ADMISSION_DIAGNOSIS: render OK | 零表达式（与 v1 一致）
+EMR_ADMISSION_RECORD: render OK | TO_CHAR(BED_CODE)x2 + TO_CHAR(SICKBED_NUM)x2（嵌套分页两遍）| 其余100列恒等
+EMR_DEATH_RECORD: render OK | 零表达式（与 v1 一致）
+EMR_DISCHARGE_RECORD: render OK | 零表达式（与 v1 一致）
+EMR_ICH_ALLERGIES: render OK | 零表达式（与 v1 一致）
+EMR_MEDICAL_RECORD_INFO: render OK | 零表达式（与 v1 一致）
+EMR_OUTPATIENT_RECORD: render OK | 零表达式（与 v1 一致）
+EMR_OUTPATIENT_REGISTER: render OK | 零表达式（与 v1 一致）
+指纹变化表（预期仅 ADMISSION_RECORD）: ['EMR_ADMISSION_RECORD']
+ALL OK: v2 = v1 + ADMISSION_RECORD 两列 TO_CHAR，其余七表指纹逐字不变

@@ -1,0 +1,17 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+production 2dee69233915ed3f69d16ecad65f99d297b2a2c8802d3bfec3fe3eee1791c753 ['EMR_ADMISSION_DIAGNOSIS', 'EMR_ADMISSION_RECORD', 'EMR_DEATH_RECORD', 'EMR_DISCHARGE_RECORD', 'EMR_ICH_ALLERGIES', 'EMR_MEDICAL_RECORD_INFO', 'EMR_OUTPATIENT_RECORD', 'EMR_OUTPATIENT_REGISTER']
+anchor_plain_and_no_parent_all_8: True
+---
+-rw-------  1 root root  15581 10月 24 16:31 bindings_batch1.json
+-rw-------  1 root root   6357 10月 25 17:48 bindings_batch2.json
+-rw-------  1 root root  12844 10月 25 21:40 bindings_batch4.json
+-rw-------  1 root root   8454 10月 24 07:40 bindings_production.json
+-rw-------  1 root root  53306 10月 24 16:31 freeze_batch1_v1.json
+-rw-------  1 root root  53888 10月 24 17:00 freeze_batch1_v2.json
+-rw-------  1 root root  54979 10月 24 17:06 freeze_batch1_v3.json
+-rw-------  1 root root  57496 10月 24 17:13 freeze_batch1_v4.json
+-rw-------  1 root root  58238 10月 24 21:31 freeze_batch1_v5.json
+-rw-------  1 root root  46141 10月 25 17:48 freeze_batch2_v2.json
+-rw-------  1 root root  89295 10月 25 21:40 freeze_batch4_v1.json
+-rw-------  1 root root  61188 10月 24 07:50 freeze_production_v4.json

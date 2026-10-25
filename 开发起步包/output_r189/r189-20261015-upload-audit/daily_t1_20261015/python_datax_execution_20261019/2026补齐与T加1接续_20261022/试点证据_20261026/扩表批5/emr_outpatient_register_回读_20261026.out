@@ -1,0 +1,12 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+applywin_rows/system_time_nonnull/min/max: (1487, 1487, datetime.datetime(2026, 10, 26, 6, 20, 43), datetime.datetime(2026, 10, 26, 6, 20, 43))
+table_total_rows: 3026554
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OUTPATIENT_REGISTER.T1.2026-10-25.f0eb0e4dd67b-0b297f25c6e1', 'DBOPER.EMR_OUTPATIENT_REGISTER.T1.2026-10-25.f0eb0e4dd67b', '0b297f25c6e1922cb92d0568a3f8f8340a57af6b6c5a7e96852fb381db19ff47', '10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_REGISTER', 'MERGE:keys=1487', 1487, '2026-10-26T06:20:43.149000+08:00', '2026-10-26T06:20:54.365000+08:00', datetime.datetime(2026, 10, 26, 6, 20, 54))
+receipt_total: 69
+batch_state: [('DBOPER.EMR_OUTPATIENT_REGISTER.T1.2026-10-25.f0eb0e4dd67b', 'RECONCILED')]
+version_evidence: 1487
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_OUTPATIENT_REGISTER ==

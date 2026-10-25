@@ -1,0 +1,12 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 1734
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023-e3b0c44298fc', 'DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '10.10.8.74:1521/orcl.DBOPER.EMR_DEATH_RECORD', 'MERGE:keys=0', 0, '2026-10-26T06:18:46.887000+08:00', '2026-10-26T06:18:46.887000+08:00', datetime.datetime(2026, 10, 26, 6, 18, 46))
+receipt_total: 69
+batch_state: [('DBOPER.EMR_DEATH_RECORD.T1.2026-10-25.c400200dc023', 'RECONCILED')]
+version_evidence: 0
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_DEATH_RECORD ==

@@ -1,0 +1,13 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+=== TABLE EMR_ADMISSION_RECORD 业务日 2026-10-25 ===
+=== STEP1 approval-register SKIPPED（已登记） ===
+=== STEP2 capture ===
+2026-10-26 06:26:59
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_ADMISSION_RECORD.T1.2026-10-25.37e1efef1420",
+ "state": "SOURCE_UNKNOWN_ERROR",
+ "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+ "结论": "capture 未完成（如实记录）"
+}

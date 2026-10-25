@@ -1,0 +1,4 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+production 729f66bf0b89d03bf33294aac5b59f049b314c1df5ed4dd4cd14f74d18a7cfac
+ADMISSION_RECORD expr cols: ['BED_CODE', 'SICKBED_NUM']

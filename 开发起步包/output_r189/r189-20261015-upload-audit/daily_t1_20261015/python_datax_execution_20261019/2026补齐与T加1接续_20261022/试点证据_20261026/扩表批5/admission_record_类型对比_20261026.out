@@ -1,0 +1,35 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+源/目标类型错配（剔除 SYSTEM_TIME；同族视为匹配）：
+  同族不同型 ADMISSION_TYPE_CODE: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 ADMISSION_TYPE_NAME: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 ADM_WAY_CODE: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 ADM_WAY_NAME: src=NVARCHAR2 tgt=VARCHAR2
+  BED_CODE: src=NUMBER(0) tgt=CHAR(9) fam N->S
+  同族不同型 CAMPUS_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 CAMPUS_NAME: src=CHAR tgt=VARCHAR2
+  同族不同型 CHIEF_COMPLAINT: src=VARCHAR2 tgt=CLOB
+  同族不同型 CITY: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 COUNTY: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 CREATED_AT: src=DATE tgt=TIMESTAMP(6)
+  同族不同型 DEI: src=CHAR tgt=VARCHAR2
+  同族不同型 DISTRICT_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 EXCHANGE_TYPE: src=CHAR tgt=VARCHAR2
+  同族不同型 IN_HOS_ORG_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 IN_HOS_ORG_NAME: src=CHAR tgt=VARCHAR2
+  同族不同型 IS_BMIDO: src=CHAR tgt=VARCHAR2
+  同族不同型 IS_INFECTIOUS: src=VARCHAR2 tgt=CHAR
+  同族不同型 LINKMAN_RELATION_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 MARITAL_STATUS_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 NATION_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 NODE_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 ORG_CODE: src=CHAR tgt=VARCHAR2
+  同族不同型 ORG_NAME: src=CHAR tgt=VARCHAR2
+  同族不同型 PROVINCE: src=NVARCHAR2 tgt=VARCHAR2
+  同族不同型 REGISTRATION_NUMBER: src=CHAR tgt=VARCHAR2
+  同族不同型 SEX_CODE: src=VARCHAR2 tgt=CHAR
+  SICKBED_NUM: src=NUMBER(0) tgt=VARCHAR2(20) fam N->S
+  同族不同型 STATUS: src=CHAR tgt=VARCHAR2
+  同族不同型 TOWN: src=CHAR tgt=VARCHAR2
+  同族不同型 VILLAGE: src=CHAR tgt=VARCHAR2
+错配列数: 2

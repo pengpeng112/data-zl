@@ -1,0 +1,42 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+=== TABLE EMR_MEDICAL_RECORD_INFO 业务日 2026-10-25 ===
+=== STEP1 approval-register ===
+2026-10-26 06:15:23
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B5-20261025:emr_medical_record_info",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_MEDICAL_RECORD_INFO",
+ "valid_from": "2026-10-25T22:15:25.653369+00:00",
+ "valid_until": "2026-10-26T22:15:25.653369+00:00",
+ "registered_by": "用户会话批准2026-10-25(扩表批5并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B5-20261025:emr_medical_record_info（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_MEDICAL_RECORD_INFO，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-26 06:15:26
+Traceback (most recent call last):
+  File "/app/scripts/reporting_ctl.py", line 1795, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1791, in main
+    return int(args.func(args))
+               ^^^^^^^^^^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1626, in cmd_capture
+    outcome = assembly.capture(
+              ^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 685, in capture
+    payload_bytes = encode_json_rows(rows)
+                    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/durable_staging.py", line 156, in encode_json_rows
+    _encode_json_value(row), ensure_ascii=False,
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/durable_staging.py", line 106, in _encode_json_value
+    "value": [
+             ^
+  File "/app/app/services/reporting_pipeline/durable_staging.py", line 107, in <listcomp>
+    [_encode_json_value(key), _encode_json_value(item)]
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/durable_staging.py", line 111, in _encode_json_value
+    raise ContractViolation(
+app.services.reporting_pipeline.contracts.ContractViolation: 暂存 JSON 遇到不支持且不可无损编码的类型: LOB

@@ -1,0 +1,10 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+batches before: [('DBOPER.EMR_MEDICAL_RECORD_INFO.T1.2026-10-25.66bc845f9852', 'EMR_MEDICAL_RECORD_INFO', 'CAPTURING', datetime.date(2026, 10, 25))]
+  DBOPER.EMR_MEDICAL_RECORD_INFO.T1.2026-10-25.66bc845f9852: attempts=0 quarantine_groups=0
+stage dirs: DBOPER.EMR_MEDICAL_RECORD_INFO.T1.2026-10-25.66bc845f9852
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+deleted: batches=1 attempts=0 quarantine_groups=0
+remaining batches for table: 0
+stage dir removed: /opt/data-asset/t1-stage/DBOPER.EMR_MEDICAL_RECORD_INFO.T1.2026-10-25.66bc845f9852 (files=0)

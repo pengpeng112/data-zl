@@ -354,10 +354,11 @@
         "scope": "EMR_ADMISSION_ASSESSMENT/DISCHARGE_ASSESSMENT/CHILDBIRTH/GENERAL_NURSING/CRITICALLY_ILL_NURS/IN_OUT_AMOUNT/VITAL_SIGN/NURSING_ASSESSMENT @10.10.10.125:1521/ewell"
       },
       "batch5_plan": {
-        "status": "PLAN_ISSUED_AWAITING_USER",
+        "status": "EXECUTED_20261026_6_RECONCILED_1_APPLIED_1_TICKETED",
         "handoff_doc": "给执行者_批5ODS首波一次性执行计划_20261025.md",
         "scope": "EMR_ADMISSION_RECORD/DISCHARGE_RECORD/ADMISSION_DIAGNOSIS/OUTPATIENT_REGISTER/OUTPATIENT_RECORD/MEDICAL_RECORD_INFO/DEATH_RECORD/ICH_ALLERGIES @ODS 10.10.8.216",
-        "notes": "首组ODS通道复用；ICH_ALLERGIES去父试点(R关系verified:False,工单T-B05-1)；下一波33张子表系等父表上线；ODS白天例外可白天跑"
+        "notes": "首组ODS通道复用；ICH_ALLERGIES去父试点(R关系verified:False,工单T-B05-1)；下一波33张子表系等父表上线；ODS白天例外可白天跑",
+        "report": "批5试点执行报告_20261025.md"
       },
       "not_parallel_queue": [
         "批9 LIS 4张：需DualSourceRouter接进capture（production_runtime现拒双源路由表）+隔离验收——代码工程，须串行独占",
@@ -387,6 +388,28 @@
       "conservation": "capture=源端窗计数=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（七表零隔离/零CAS/零缺零差）；回执账55→62；水位七表推进2026-10-25",
       "zero_code_change": true,
       "backlog": "八表历史回补[2026-01-01,H)不在本包（目标vs源总量差额见报告§5.1）；日常T+1值守按T1-DAILY-<日>:<表>逐日登记驱动"
+    },
+    "batch5_pilot": {
+      "executed_by": "zcode-20261026-b5pilot-run",
+      "finished_on": "2026-10-26",
+      "status": "PILOT_DONE_6_RECONCILED_ADMISSION_RECORD_APPLIED_MEDICAL_TICKETED",
+      "report": "批5试点执行报告_20261025.md",
+      "evidence_dir": "试点证据_20261026/扩表批5/",
+      "freeze": "扩表冻结件_批5_ODS首波_v3_20261025.json（fingerprint=b20cd9d7…，生产基准；v1(2dee6923,视图覆盖ADMISSION_COUNT=隐式别名正则盲区核因后allow-view-gap留痕)→v2(729f66bf,TO_CHAR漏AS试错)→v3；ICH_ALLERGIES去父=派生B01输入；组键ods=B01 source_group；配置卷=/opt/data-asset/t1-config/freeze_batch5_v1/v2/v3.json+bindings_batch5.json，600，装载即验过）",
+      "business_day": "2026-10-25",
+      "results": {
+        "EMR_ADMISSION_DIAGNOSIS": "RECONCILED INSERT 593 四方一致",
+        "EMR_DEATH_RECORD": "RECONCILED 零行窗合规（目标SYSTEM_TIME为VARCHAR2观察项）",
+        "EMR_ICH_ALLERGIES": "RECONCILED 零行窗合规（去父试点通过，R09未核不进正式配置，T-B05-1留账）",
+        "EMR_DISCHARGE_RECORD": "RECONCILED INSERT 132 四方一致",
+        "EMR_OUTPATIENT_RECORD": "RECONCILED INSERT 1464 四方一致",
+        "EMR_OUTPATIENT_REGISTER": "RECONCILED INSERT 1487 四方一致",
+        "EMR_ADMISSION_RECORD": "APPLIED 合法子集121/123（v1全隔离根因=BED_CODE/SICKBED_NUM源NUMBER→目标字符跨族错配，v3 TO_CHAR..AS列表达式解决；余2行同键双行仅SIGNATURE_DATE异→防御性隔离OPEN，工单T-B05-3；水位按设计未推进，收口后续跑推进）",
+        "EMR_MEDICAL_RECORD_INFO": "工单T-B05-2未跑：MED_NOTE源侧CLOB暂存ContractViolation(LOB)，477/80357行超4000字节无配置级无损路径→源侧LOB读取=代码改动触发零代码红线挂单；失败批A4清理留行数；冻结件已含该表待代码支持后补跑"
+      },
+      "conservation": "六表capture=探查=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（零隔离零CAS零缺零差）；ADMISSION_RECORD 121四方一致+2行隔离留账；回执账62→69；六表水位推进2026-10-26",
+      "zero_code_change": true,
+      "backlog": "八表历史回补[2026-01-01,H)不在本包；日常T+1按T1-DAILY-<日>:<表>逐日登记驱动；下一波33张子表触发条件=父表RECONCILED且水位推进（DISCHARGE_RECORD_DIAGNOSIS父已就绪/ADMISSION_RECORD_EXAM另需T-B05-3/OUTPATIENT_RECIPE_ITEM须父RECIPE先上线/INFOR_*按父表逐波）"
     }
   }
 }

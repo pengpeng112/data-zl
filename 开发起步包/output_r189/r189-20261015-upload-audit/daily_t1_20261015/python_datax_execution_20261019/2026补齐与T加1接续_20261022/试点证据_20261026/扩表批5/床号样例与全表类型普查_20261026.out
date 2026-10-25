@@ -1,0 +1,19 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+== 目标既有 ADMISSION_RECORD 床号样例（RTRIP 后）==
+  bed_code='20' sickbed_num='20'
+  bed_code='31' sickbed_num='31'
+  bed_code='10' sickbed_num='10'
+  bed_code='38' sickbed_num='38'
+  bed_code='17' sickbed_num='17'
+  bed_code='36' sickbed_num='36'
+== 全八表跨族错配普查（N->S / S->N / S<->D / N<->D）==
+EMR_MEDICAL_RECORD_INFO: NONE
+EMR_ADMISSION_DIAGNOSIS: NONE
+EMR_DEATH_RECORD: NONE
+EMR_ICH_ALLERGIES: NONE
+EMR_DISCHARGE_RECORD: NONE
+EMR_OUTPATIENT_RECORD: NONE
+EMR_OUTPATIENT_REGISTER: NONE
+EMR_ADMISSION_RECORD: SICKBED_NUM:NUMBER->VARCHAR2; CREATED_AT:DATE->TIMESTAMP(6); BED_CODE:NUMBER->CHAR
+== 结束 ==

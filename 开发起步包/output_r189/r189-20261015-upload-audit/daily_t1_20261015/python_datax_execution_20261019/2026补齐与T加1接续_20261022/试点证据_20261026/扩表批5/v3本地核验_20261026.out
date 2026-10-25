@@ -1,0 +1,10 @@
+load OK: production b20cd9d7c57374fe2d8affd3a89008dbd11da0b28dd55650e6b90a66154432a5
+EMR_ADMISSION_DIAGNOSIS: render OK | 零表达式
+EMR_ADMISSION_RECORD: render OK | TO_CHAR(..) AS 别名齐
+EMR_DEATH_RECORD: render OK | 零表达式
+EMR_DISCHARGE_RECORD: render OK | 零表达式
+EMR_ICH_ALLERGIES: render OK | 零表达式
+EMR_MEDICAL_RECORD_INFO: render OK | 零表达式
+EMR_OUTPATIENT_RECORD: render OK | 零表达式
+EMR_OUTPATIENT_REGISTER: render OK | 零表达式
+ALL OK: v3 = v1 + 两列 TO_CHAR AS 别名表达式；其余七表不变

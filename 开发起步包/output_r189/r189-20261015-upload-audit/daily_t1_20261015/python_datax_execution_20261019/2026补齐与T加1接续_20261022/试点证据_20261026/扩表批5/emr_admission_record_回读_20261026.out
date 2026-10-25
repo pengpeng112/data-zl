@@ -1,0 +1,12 @@
+** This session may be vulnerable to "store now, decrypt later" attacks.
+
+applywin_rows/system_time_nonnull/min/max: (121, 121, datetime.datetime(2026, 10, 26, 6, 30, 7), datetime.datetime(2026, 10, 26, 6, 30, 7))
+table_total_rows: 267207
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_ADMISSION_RECORD.T1.2026-10-25.37e1efef1420-38ff10fd79d4', 'DBOPER.EMR_ADMISSION_RECORD.T1.2026-10-25.37e1efef1420', '38ff10fd79d49471e59a1fd9208152d3e1ceb2b43e7eac327c6d52087ed600a7', '10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_RECORD', 'MERGE:keys=121', 121, '2026-10-26T06:30:07.004000+08:00', '2026-10-26T06:30:14.894000+08:00', datetime.datetime(2026, 10, 26, 6, 30, 14))
+receipt_total: 69
+batch_state: [('DBOPER.EMR_ADMISSION_RECORD.T1.2026-10-25.37e1efef1420', 'APPLIED')]
+version_evidence: 121
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): []
+quarantine_groups(last_1d): [('quality-required-null', '目标 NOT NULL 列缺失（工单化；合法组继续装载）', 'QUALITY_REQUIRED_NULL', 1, 'OPEN')]
+== readback done: EMR_ADMISSION_RECORD ==
