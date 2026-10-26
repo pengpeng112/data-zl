@@ -1,0 +1,10 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_ADMISSION_DEAD_RECORD_TF 业务日 2026-10-25 ===
+=== STEP1 approval-register SKIPPED（已登记） ===
+=== STEP2 capture ===
+2026-10-26 21:19:32
+Segmentation fault (core dumped)

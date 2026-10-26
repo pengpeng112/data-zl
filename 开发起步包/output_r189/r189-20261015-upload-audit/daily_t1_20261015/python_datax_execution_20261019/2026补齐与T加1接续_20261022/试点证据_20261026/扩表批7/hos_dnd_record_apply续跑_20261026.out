@@ -1,0 +1,14 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== HOS_DND apply（QUARANTINED 合法子集 0 行装载）===
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_HOS_DND_RECORD.T1.2026-10-25.5079f22ad978",
+ "state": "QUARANTINED",
+ "refused": "全部行质量隔离（NOT NULL 缺失）：留工单待处置",
+ "simulation": false,
+ "结论": "装载未完成: QUARANTINED"
+}

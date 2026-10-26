@@ -1,0 +1,14 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+executing full projection ...
+Traceback (most recent call last):
+  File "<stdin>", line 21, in <module>
+  File "/usr/local/lib/python3.11/site-packages/oracledb/cursor.py", line 859, in execute
+    impl.execute(self)
+  File "src/oracledb/impl/thick/cursor.pyx", line 337, in oracledb.thick_impl.ThickCursorImpl.execute
+  File "src/oracledb/impl/thick/utils.pyx", line 486, in oracledb.thick_impl._raise_from_odpi
+  File "src/oracledb/impl/thick/utils.pyx", line 476, in oracledb.thick_impl._raise_from_info
+oracledb.exceptions.DatabaseError: ORA-01861: 文字与格式字符串不匹配

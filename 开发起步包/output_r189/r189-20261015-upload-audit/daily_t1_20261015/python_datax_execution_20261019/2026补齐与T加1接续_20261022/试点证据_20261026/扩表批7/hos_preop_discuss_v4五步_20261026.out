@@ -1,0 +1,16 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_HOS_PREOP_DISCUSS 业务日 2026-10-25 ===
+=== STEP1 approval-register SKIPPED（已登记） ===
+=== STEP2 capture ===
+2026-10-26 21:50:21
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+ "state": "SOURCE_UNKNOWN_ERROR",
+ "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+ "结论": "capture 未完成（如实记录）"
+}

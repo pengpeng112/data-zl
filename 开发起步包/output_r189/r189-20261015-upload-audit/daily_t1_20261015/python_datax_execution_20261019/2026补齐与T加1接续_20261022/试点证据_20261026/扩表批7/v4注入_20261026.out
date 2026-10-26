@@ -1,0 +1,3 @@
+v4 written: 扩表冻结件_批7_ODS二波_v4_20261026.json
+config_fingerprint(v4): 70ad7cbc9f7a9755bb6c4ab42c464dc575018a50e9570891e3719bf3b7ae848f
+changed 1 column: PREOP.PERFORM_OPERATION_DATE -> 幂等三分支

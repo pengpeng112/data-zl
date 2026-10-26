@@ -1,0 +1,85 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_OPERATION_NURSING 业务日 2026-10-25 ===
+=== STEP1 approval-register SKIPPED（已登记） ===
+=== STEP2 capture ===
+2026-10-26 21:46:04
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+ "attempt_id": "att001",
+ "rows": 32,
+ "plan": {
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+  "table": "EMR_OPERATION_NURSING",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_OPERATION_NURSING"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e
+=== STEP3 verify ===
+2026-10-26 21:47:25
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 32
+  },
+  "valid_groups": 32,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 32
+ },
+ "rows": 32,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+Traceback (most recent call last):
+  File "/app/scripts/reporting_ctl.py", line 1795, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1791, in main
+    return int(args.func(args))
+               ^^^^^^^^^^^^^^^
+  File "/app/scripts/reporting_ctl.py", line 1710, in cmd_apply
+    outcome = assembly.apply(
+              ^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 896, in apply
+    target_rows = self._read_target_snapshot(binding,
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/production_runtime.py", line 411, in _read_target_snapshot
+    conn.begin()
+  File "/app/app/services/reporting_pipeline/target_factory.py", line 276, in begin
+    conn = self._connection()
+           ^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/target_factory.py", line 233, in _connection
+    self._conn = self._connection_factory()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/reporting_pipeline/source_factory.py", line 461, in factory
+    conn = oracledb.connect(user=user, password=password, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/oracledb/connection.py", line 1768, in connect
+    return conn_class(dsn=dsn, pool=pool, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/oracledb/connection.py", line 895, in __init__
+    impl.connect(params_impl, pool_impl)
+  File "src/oracledb/impl/thick/connection.pyx", line 527, in oracledb.thick_impl.ThickConnImpl.connect
+  File "src/oracledb/impl/thick/utils.pyx", line 476, in oracledb.thick_impl._raise_from_info
+oracledb.exceptions.DatabaseError: ORA-12541: TNS: 无监听程序

@@ -1,0 +1,110 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_HOS_PREOP_DISCUSS 业务日 2026-10-25 ===
+=== STEP1 approval-register SKIPPED（已登记） ===
+=== STEP2 capture ===
+2026-10-26 21:55:30
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+ "attempt_id": "att001",
+ "rows": 39,
+ "plan": {
+  "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+  "table": "EMR_HOS_PREOP_DISCUSS",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_HOS_PREOP_DISCUSS"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25
+=== STEP3 verify ===
+2026-10-26 21:55:32
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 39
+  },
+  "valid_groups": 39,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 39
+ },
+ "rows": 39,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+ "operation_id": "OPR-DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25-c5a8e5c75107",
+ "rows_affected": 39,
+ "plan_counts": {
+  "INSERT": 39
+ },
+ "partition": {
+  "ok": 39,
+  "insert": 39,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25-c5a8e5c75107",
+  "manifest_hash": "c5a8e5c751079f76d4172088749878d167597d7fd7ca100e4295a3bd03b78bfe",
+  "rows_affected": 39
+ },
+ "simulation": false,
+ "applied_at": "2026-10-26T13:55:38+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 21:55:34 2026-10-26 21:55:38
+=== STEP5 reconcile ===
+2026-10-26 21:55:38
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+ "keys_checked": 39,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25",
+  "closed_gaps": [
+   7,
+   8,
+   9
+  ],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_HOS_PREOP_DISCUSS ===

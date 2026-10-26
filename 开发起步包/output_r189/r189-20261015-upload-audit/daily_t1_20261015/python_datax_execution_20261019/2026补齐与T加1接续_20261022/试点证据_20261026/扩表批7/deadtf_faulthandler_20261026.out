@@ -1,0 +1,12 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_ADMISSION_DEAD_RECORD_TF.T1.2026-10-25.f6643f85c19f",
+ "state": "FETCH_TIMEOUT",
+ "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+ "结论": "capture 未完成（如实记录）"
+}

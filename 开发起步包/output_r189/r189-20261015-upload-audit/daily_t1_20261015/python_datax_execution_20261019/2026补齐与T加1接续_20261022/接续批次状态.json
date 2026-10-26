@@ -468,6 +468,41 @@
       "conservation": "十表capture=探查=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（零隔离零CAS零缺零差）；合计INSERT 5636；回执账69→79；十表水位推进2026-10-26",
       "zero_code_change": true,
       "backlog": "工单T-B06-1(DISCHARGE_RECORD_DIAGNOSIS源视图缺失,预核已开本批登记确认)/T-B06-2(OPERA_RECORD视图重)/T-B06-3(CRITICALLY_ILL SYSTEM_TIME列型对齐决策=DDL须用户批准)；11表历史回补[2026-01-01,H)后续批；日常T+1按T1-DAILY-<日>:<表>逐日登记驱动；EMR_OPERA_RECORD批准未消费24h自行过期"
+    },
+    "batch7_pilot": {
+      "executed_by": "zcode-20261026-b7pilot",
+      "finished_on": "2026-10-26",
+      "status": "PILOT_DONE_9_RECONCILED_DEADTF_HOSDND_TICKETED",
+      "report": "批7试点执行报告_20261026.md",
+      "evidence_dir": "试点证据_20261026/扩表批7/",
+      "freeze": "扩表冻结件_批7_ODS二波_v5_20261026.json（fingerprint=b953b17e…，生产基准；v1(b8fc36ed,allow-view-gap留痕RECIPE_ITEM缺OR_ID盲区+VISIT_DATE真缺口,核因后强制)→v2(d2f708a4,14处表达式=13错配列+VISIT_DATE NULL,活源预核定mask含REFERRAL.SURGERY_START_DATE实测NLS DD-MON-YY中文月新形态)→v3(242e3694,OPN六列三分支幂等)→v4(70ad7cbc试错,PREOP透传类型混合ORA-00932)→v5(b953b17e,PREOP单类型TO_CHAR透传定版)；本批最重要发现=渲染SQL嵌套两遍投影结构要求列表达式两遍幂等：TO_DATE类CASE第二遍对DATE隐式NLS串REGEXP不匹配→ELSE NULL(OPN 32/32整窗隔离实证)、双参TO_CHAR第二遍ORA-01481；REFERRAL NLS正则/TO_NUMBER/单参TO_CHAR/NULL AS天然幂等免修；B01派生输入=批7去父输入(RECIPE_ITEM declared_parent_candidates置空R03 verified:False+version_note留证T-B07-1)；--metadata-snapshot=元数据快照补充_批7_20261026.json(08结构+AFTER_OPERA_RECORD活源DDL注入,该表生成成功=补充件生效)；配置卷=/opt/data-asset/t1-config/freeze_batch7_v1~v5.json+bindings_batch7.json(600,各版装载即验指纹一致)；bindings key_columns从runtime spec派生全['ID']规避批6笔误)",
+      "business_day": "2026-10-25",
+      "results": {
+        "EMR_REFERRAL_HOS_RECORD": "RECONCILED 零行窗合规（SURGERY_START_DATE NLS表达式随零行窗未触发，幂等已离线验证）",
+        "EMR_ADMISSION_DEAD_RECORD_TF": "工单T-B07-3未跑：capture三次SIGSEGV(无输出崩,批1未解根因合流解释=oracledb thick超时中断竞态)→faulthandler直跑干净复现FETCH_TIMEOUT；源视图重=零行窗直查24-29s(deadtf_fetch计时)+52列全投影超60s；批次RETRYABLE留痕attempts留档无stage残留；源端优化后同批号补跑",
+        "EMR_HOS_DIFFIC_CASE_DISCUSS": "RECONCILED 零行窗合规",
+        "EMR_HOS_DND_RECORD": "工单T-B07-4：当日窗1行缺必填ATTENDING_PHYSICIAN_NAME(NOT NULL源为NULL,行内另6个NULL全为可空列)整窗隔离→零合法组管道设计停QUARANTINED(apply拒绝装载未完成)；源端补数后单行重放；水位未推进",
+        "EMR_HOS_SUCCESSION_RECORD": "RECONCILED 零行窗合规",
+        "EMR_OPERATION_NURSING": "RECONCILED INSERT 32 四方一致（v2曾32/32整窗隔离=两遍嵌套幂等缺陷首例，v3三分支幂等修复后全过；六列S→D NOT NULL表达式生产实证；apply首试ORA-12541瞬时同批号重跑成功）",
+        "EMR_HOS_PREOP_DISCUSS": "RECONCILED INSERT 39 四方一致（v3 ORA-01481/v4 ORA-00932试错留痕，v5单类型TO_CHAR透传定版；PERFORM_OPERATION_DATE 14字符紧凑格式新写者落地，目标既有值9字符22691+14字符79681双形态留观察）",
+        "EMR_AFTER_OPERA_RECORD": "RECONCILED INSERT 36 四方一致（快照补充件表+ANES_METHOD_CODE S→N NOT NULL表达式全过=脏值防御未触发）",
+        "EMR_INFOR_ANESTHESIA": "RECONCILED INSERT 37 四方一致（AGE_MONTH N→S，活源位数≤2无VARCHAR2(2)超长）",
+        "EMR_OUTPATIENT_RECIPE": "RECONCILED INSERT 1202 四方一致（201万旧量目标当日窗零CAS=全为新键；父表角色先行上线）",
+        "EMR_OUTPATIENT_RECIPE_ITEM": "RECONCILED INSERT 1727 四方一致（殿后三合一实证：VISIT_DATE真缺口NULL投影1727行全NULL合法+OR_ID盲区列恒等投影实捕成功+RR03去父试点通过无父门禁拦截；458万旧量目标零CAS）"
+      },
+      "receipts": "79→88（本批+9）",
+      "watermarks": "9表推进2026-10-26（DEAD_TF/HOS_DND未推进待工单收口）",
+      "insert_total": 3073,
+      "daily_run_dry": "11表skipped_missing_approval设计性跳过（管道不自批，批1/4/5/6先例一致）",
+      "local_gates": "pytest reporting_pipeline_unit 508 passed+2 skipped；ruff app/tests净；check_migrations_tracked 68环全绿(head=b8c9d0e1f2a3)",
+      "zero_code": "r212未重建零代码改动；首组/批1/2/4/5/6生产件未动；幂等缺陷走冻结件表达式配置级修订无代码诉求",
+      "tickets": [
+        "T-B07-1 RR03父子覆盖率核验(父表本包已上线可测)",
+        "T-B07-2 VISIT_DATE无源源端补列建议(补列后重冻去NULL投影)",
+        "T-B07-3 DEAD_TF视图重FETCH_TIMEOUT+SIGSEGV竞态(源端优化后同批号补跑)",
+        "T-B07-4 HOS_DND缺必填主治医师姓名(源端补数后单行重放)"
+      ],
+      "lessons": "嵌套两遍幂等约束沉淀：批8及后续表达式修订批次v2前置检查项加两遍嵌套幂等矩阵验证(本批v3/v5范式可复用)"
     }
   }
 }

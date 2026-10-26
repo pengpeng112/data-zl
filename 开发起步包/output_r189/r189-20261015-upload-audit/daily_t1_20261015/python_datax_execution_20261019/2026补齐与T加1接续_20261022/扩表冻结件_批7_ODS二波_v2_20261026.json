@@ -1,0 +1,4226 @@
+{
+ "doc_version": "v1",
+ "freeze_id": "R189-T1-RUNTIME-CONFIG-FREEZE",
+ "environment": "production",
+ "version": "v2",
+ "frozen_at": "2026-10-26T20:09:30+08:00",
+ "source_inputs": [
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\B01_77项任务运行配置_v1.3候选_批7去父输入_20261026.json",
+   "sha256": "ff27e8880e211b448ed75f21cbc53b2aefdec0f53e3127774953f15925200a95",
+   "role": "B01 v1.3候选"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\target_dict_bulk.json",
+   "sha256": "6941648fda6e95b4c8e2542f876239f791bf24a622e680dc13400e3fee56548c",
+   "role": "目标字典(DBOPER)"
+  },
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\扩表源绑定_批7_20261026.json",
+   "sha256": "49dbafa843a4219f315cdfb6e5c1317f9f9baede85661335a5bf607d91866d11",
+   "role": "扩表源绑定(操作者按平台元数据准备)"
+  },
+  {
+   "path": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\元数据快照补充_批7_20261026.json",
+   "sha256": "0843043036ddf3720ecda13b80ac66115690238f1120e73f62a3a53a83e4b345",
+   "role": "08元数据快照(视图DDL)"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\ods_views_bulk.json",
+   "sha256": "794158f9381c45cc6806fd197ddb25154b206e300dae9c0f0f90ed48867572ff",
+   "role": "源视图定义哈希(ODS)"
+  }
+ ],
+ "tables": {
+  "EMR_REFERRAL_HOS_RECORD": {
+   "canonical_table": "EMR_REFERRAL_HOS_RECORD",
+   "business_name": "转诊/院纪录（转出记录）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_REFERRAL_HOS_RECORD",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "4e44750d187ad44410f97b29f559b18cc712c9fcc2fc5ce8e7959ffd06b1e3ba"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_REFERRAL_HOS_RECORD",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AUX_EXAM_RESULT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "AUX_EXAM_RESULT",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 2,
+     "name": "DIAG_DATE",
+     "target_type": "DATE",
+     "source_expression": "DIAG_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 3,
+     "name": "DIAG_ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "DIAG_ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 4,
+     "name": "DISEASE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DISEASE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 5,
+     "name": "DISEASE_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DISEASE_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 6,
+     "name": "DISPOSAL_PLAN",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DISPOSAL_PLAN",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 7,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 8,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 9,
+     "name": "HEALTH_ASSESSMENT",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "HEALTH_ASSESSMENT",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 10,
+     "name": "HEALTH_RECORD_CODE",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "HEALTH_RECORD_CODE",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 11,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 12,
+     "name": "INTO_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "INTO_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 13,
+     "name": "INTO_ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "INTO_ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 14,
+     "name": "MAJOR_TREAT_MEASURES",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "MAJOR_TREAT_MEASURES",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 15,
+     "name": "OPERATION_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "OPERATION_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 16,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 17,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 18,
+     "name": "PATIENT_TYPE",
+     "target_type": "CHAR",
+     "source_expression": "PATIENT_TYPE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 19,
+     "name": "REFERRAL_DATE",
+     "target_type": "DATE",
+     "source_expression": "REFERRAL_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 20,
+     "name": "REFERRAL_DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REFERRAL_DOC_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "REFERRAL_REASON",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "REFERRAL_REASON",
+     "nullable": false,
+     "data_length": 2000
+    },
+    {
+     "order": 22,
+     "name": "REFERRAL_RECORD",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "REFERRAL_RECORD",
+     "nullable": false,
+     "data_length": 2000
+    },
+    {
+     "order": 23,
+     "name": "REHAB_MEASURES",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "REHAB_MEASURES",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 24,
+     "name": "ROLL_OUT_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ROLL_OUT_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 25,
+     "name": "ROLL_OUT_ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ROLL_OUT_ORG_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 26,
+     "name": "ROLL_OUT_ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ROLL_OUT_ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 27,
+     "name": "SURGERY_START_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"SURGERY_START_DATE\",'^[0-9]{2}-[0-9]{1,2}月 ?-[0-9]{2}$') THEN TO_DATE(\"SURGERY_START_DATE\",'DD-MON-YY','NLS_DATE_LANGUAGE=''SIMPLIFIED CHINESE''') ELSE NULL END AS SURGERY_START_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 28,
+     "name": "SYMPTOMS",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "SYMPTOMS",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 29,
+     "name": "TREAT_OPTIONS",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "TREAT_OPTIONS",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 30,
+     "name": "VISTING_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "VISTING_NUM",
+     "nullable": false,
+     "data_length": 32
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_REFERRAL_HOS_RECORD']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "b05c0d6ceda3ffda20b2a6e6219650a7c1a6894726d8dc27ee0a6f2c228a7175"
+  },
+  "EMR_ADMISSION_DEAD_RECORD_TF": {
+   "canonical_table": "EMR_ADMISSION_DEAD_RECORD_TF",
+   "business_name": "24小时内入院死亡记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "4b125610ecc2efd90171b6af68a84ffeffee441782e3beea47a1d89a37bb8b59"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_ADMISSION_DEAD_RECORD_TF",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADDRESS_CITY",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_CITY",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 2,
+     "name": "ADDRESS_COUNTRY",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_COUNTRY",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 3,
+     "name": "ADDRESS_HAMLET",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_HAMLET",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 4,
+     "name": "ADDRESS_HNUM",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_HNUM",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 5,
+     "name": "ADDRESS_PROV",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_PROV",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 6,
+     "name": "ADDRESS_VILLAGE",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ADDRESS_VILLAGE",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 7,
+     "name": "ADMISSION_DATE",
+     "target_type": "DATE",
+     "source_expression": "ADMISSION_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 8,
+     "name": "ADMISSION_SITUATION",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "ADMISSION_SITUATION",
+     "nullable": false,
+     "data_length": 2000
+    },
+    {
+     "order": 9,
+     "name": "ADMISSION_UN_NUM",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_UN_NUM",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 11,
+     "name": "AGE_MONTH",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 8
+    },
+    {
+     "order": 12,
+     "name": "ATTENDING_PHYSICIAN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ATTENDING_PHYSICIAN_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 13,
+     "name": "CHIEF_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CHIEF_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "DAP_CONTACT_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "DAP_CONTACT_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 15,
+     "name": "DAP_CONTACT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DAP_CONTACT_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 16,
+     "name": "DEATH_CAUSE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DEATH_CAUSE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 17,
+     "name": "DEATH_TIME",
+     "target_type": "DATE",
+     "source_expression": "DEATH_TIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 18,
+     "name": "DIAGNOSIS_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DIAGNOSIS_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 19,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 20,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 21,
+     "name": "FOUR_DIAGNOSIS",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "FOUR_DIAGNOSIS",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 22,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 23,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": false,
+     "data_length": 18
+    },
+    {
+     "order": 24,
+     "name": "IN_HOS_CH_DIAG_CD_CODE",
+     "target_type": "VARCHAR2(9)",
+     "source_expression": "IN_HOS_CH_DIAG_CD_CODE",
+     "nullable": true,
+     "data_length": 9
+    },
+    {
+     "order": 25,
+     "name": "IN_HOS_CH_DIAG_CD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "IN_HOS_CH_DIAG_CD_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 26,
+     "name": "IN_HOS_CH_DIAG_CSYN_CODE",
+     "target_type": "VARCHAR2(9)",
+     "source_expression": "IN_HOS_CH_DIAG_CSYN_CODE",
+     "nullable": true,
+     "data_length": 9
+    },
+    {
+     "order": 27,
+     "name": "IN_HOS_CH_DIAG_CSYN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "IN_HOS_CH_DIAG_CSYN_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 28,
+     "name": "IN_HOS_WE_DIAG_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "IN_HOS_WE_DIAG_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 29,
+     "name": "IN_HOS_WE_DIAG_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "IN_HOS_WE_DIAG_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 30,
+     "name": "IS_RELIABLE",
+     "target_type": "CHAR",
+     "source_expression": "IS_RELIABLE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 31,
+     "name": "JOB_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"JOB_CODE\",'^[0-9]+\\.?[0-9]*$') THEN TO_NUMBER(\"JOB_CODE\") ELSE NULL END AS JOB_CODE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 32,
+     "name": "JOB_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "JOB_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 33,
+     "name": "MARITAL_STATUS",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "MARITAL_STATUS",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 34,
+     "name": "MARITAL_STATUS_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "MARITAL_STATUS_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 35,
+     "name": "NATION_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "NATION_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 36,
+     "name": "NATION_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NATION_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 37,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 38,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 39,
+     "name": "OUT_HOS_CH_DIAG_CD_CODE",
+     "target_type": "VARCHAR2(9)",
+     "source_expression": "OUT_HOS_CH_DIAG_CD_CODE",
+     "nullable": true,
+     "data_length": 9
+    },
+    {
+     "order": 40,
+     "name": "OUT_HOS_CH_DIAG_CD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OUT_HOS_CH_DIAG_CD_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 41,
+     "name": "OUT_HOS_CH_DIAG_CSYN_CODE",
+     "target_type": "VARCHAR2(9)",
+     "source_expression": "OUT_HOS_CH_DIAG_CSYN_CODE",
+     "nullable": true,
+     "data_length": 9
+    },
+    {
+     "order": 42,
+     "name": "OUT_HOS_CH_DIAG_CSYN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OUT_HOS_CH_DIAG_CSYN_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 43,
+     "name": "OUT_HOS_WE_DIAG_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OUT_HOS_WE_DIAG_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 44,
+     "name": "OUT_HOS_WE_DIAG_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OUT_HOS_WE_DIAG_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 45,
+     "name": "PATIENT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 46,
+     "name": "REPRESENTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REPRESENTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 47,
+     "name": "RESIDENT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "RESIDENT_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 48,
+     "name": "SEX_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 49,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(11)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 11
+    },
+    {
+     "order": 50,
+     "name": "SIG_DATE",
+     "target_type": "DATE",
+     "source_expression": "SIG_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 51,
+     "name": "TREATMENT_METHOD",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "TREATMENT_METHOD",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 52,
+     "name": "TREAT_NOTE",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "TREAT_NOTE",
+     "nullable": true,
+     "data_length": 2000
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_ADMISSION_DEAD_RECORD_TF']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "7a612053bc60ca9024f54952e2ed1952d6e57cc052537456bc8a66e9d0559c57"
+  },
+  "EMR_HOS_DIFFIC_CASE_DISCUSS": {
+   "canonical_table": "EMR_HOS_DIFFIC_CASE_DISCUSS",
+   "business_name": "疑难病例讨论记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "8bd14766df9815b71c0946940e19844e5572839c045e0b8afa62ca86e53fd434"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_UN_NUM",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_UN_NUM",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 2,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 3,
+     "name": "ATTENDING_PHYSICIAN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ATTENDING_PHYSICIAN_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 4,
+     "name": "CHIEF_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CHIEF_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "CH_MED_PRES_DA_CONTENT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "CH_MED_PRES_DA_CONTENT",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 6,
+     "name": "DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 7,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 8,
+     "name": "DISCUSS_ADDRESS",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DISCUSS_ADDRESS",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 9,
+     "name": "DISCUSS_DATE",
+     "target_type": "DATE",
+     "source_expression": "DISCUSS_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 10,
+     "name": "DISCUSS_OPINION",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DISCUSS_OPINION",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 11,
+     "name": "DISCUSS_PEOPLE_LIST",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "DISCUSS_PEOPLE_LIST",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 12,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 13,
+     "name": "DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DOC_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 15,
+     "name": "FOUR_DIAGNOSIS",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "FOUR_DIAGNOSIS",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 16,
+     "name": "HOET_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "HOET_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 17,
+     "name": "HOST_OPINION",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "HOST_OPINION",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 18,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 19,
+     "name": "MEDICATION_METHOD",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "MEDICATION_METHOD",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 20,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 21,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 22,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 23,
+     "name": "SYN_DIFFER_DES",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "SYN_DIFFER_DES",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 24,
+     "name": "WARD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "WARD_NUM",
+     "nullable": true,
+     "data_length": 10
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_HOS_DIFFIC_CASE_DISCUSS']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "d8d90bb2124ae1e995cfe4be189b0bd0874eafee7f450e797ea109dcd3f2a8cb"
+  },
+  "EMR_HOS_DND_RECORD": {
+   "canonical_table": "EMR_HOS_DND_RECORD",
+   "business_name": "死亡病历讨论记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_HOS_DND_RECORD",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "9c81c8ed706239c35ddfa72a20ae2c0a0a11a9074d1a8de5fc6a3869d51af083"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_HOS_DND_RECORD",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_ID",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_ID",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 2,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 3,
+     "name": "ATTENDING_PHYSICIAN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ATTENDING_PHYSICIAN_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 4,
+     "name": "CHIEF_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CHIEF_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "DEATH_DIAG_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEATH_DIAG_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 6,
+     "name": "DEATH_DIAG_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DEATH_DIAG_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 7,
+     "name": "DEATH_DISCUSS_RECORD",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DEATH_DISCUSS_RECORD",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 8,
+     "name": "DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 9,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "DIRECT_CAUSE_DEATH_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "DIRECT_CAUSE_DEATH_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 11,
+     "name": "DIRECT_CAUSE_DEATH_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DIRECT_CAUSE_DEATH_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 12,
+     "name": "DISCUSS_ADDRESS",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DISCUSS_ADDRESS",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 13,
+     "name": "DISCUSS_DATE",
+     "target_type": "DATE",
+     "source_expression": "DISCUSS_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 14,
+     "name": "DISCUSS_PEOPLE_LIST",
+     "target_type": "VARCHAR2(300)",
+     "source_expression": "DISCUSS_PEOPLE_LIST",
+     "nullable": false,
+     "data_length": 300
+    },
+    {
+     "order": 15,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 16,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 17,
+     "name": "FAMILY_AGREE_AUTO_SIGN",
+     "target_type": "CHAR",
+     "source_expression": "FAMILY_AGREE_AUTO_SIGN",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 18,
+     "name": "HOET_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "HOET_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 19,
+     "name": "HOST_OPINION",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "HOST_OPINION",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 20,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 21,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 22,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 23,
+     "name": "PROF_TECH_CATE_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "PROF_TECH_CATE_CODE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 24,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 25,
+     "name": "SIGN_DATE",
+     "target_type": "DATE",
+     "source_expression": "SIGN_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 26,
+     "name": "WARD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "WARD_NUM",
+     "nullable": true,
+     "data_length": 10
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_HOS_DND_RECORD']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "c84ab5f62fe0baca5079bc4aa5931e4c7406099cb41501de1fed1e33e8ebe043"
+  },
+  "EMR_HOS_SUCCESSION_RECORD": {
+   "canonical_table": "EMR_HOS_SUCCESSION_RECORD",
+   "business_name": "住院医师交接班记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_HOS_SUCCESSION_RECORD",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "68548fd2115826fe40561f801986f0ffeb9cb1c6ccb97bf543fce5b8ca66796c"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_HOS_SUCCESSION_RECORD",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_UN_NUM",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_UN_NUM",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 2,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 3,
+     "name": "CURR_DIAG_CD_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "CURR_DIAG_CD_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 4,
+     "name": "CURR_DIAG_CD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CURR_DIAG_CD_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "CURR_DIAG_CSYN_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "CURR_DIAG_CSYN_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 6,
+     "name": "CURR_DIAG_CSYN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CURR_DIAG_CSYN_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 7,
+     "name": "CURR_DIAG_WE_DIAG_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "CURR_DIAG_WE_DIAG_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 8,
+     "name": "CURR_DIAG_WE_DIAG_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CURR_DIAG_WE_DIAG_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 9,
+     "name": "DEPT_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEPT_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 11,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 12,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 13,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 14,
+     "name": "MATTERS_ATTENTION",
+     "target_type": "VARCHAR2(1500)",
+     "source_expression": "MATTERS_ATTENTION",
+     "nullable": true,
+     "data_length": 1500
+    },
+    {
+     "order": 15,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 16,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 17,
+     "name": "PRESENT_SITUATION",
+     "target_type": "VARCHAR2(2500)",
+     "source_expression": "PRESENT_SITUATION",
+     "nullable": false,
+     "data_length": 2500
+    },
+    {
+     "order": 18,
+     "name": "RECORD_TYPE",
+     "target_type": "CHAR",
+     "source_expression": "RECORD_TYPE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 19,
+     "name": "SUCCEED_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SUCCEED_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 20,
+     "name": "SUCCESSION_DATE",
+     "target_type": "DATE",
+     "source_expression": "SUCCESSION_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 21,
+     "name": "SUCCESSION_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SUCCESSION_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 22,
+     "name": "SUCCESSOR_DIAG_PLAN",
+     "target_type": "VARCHAR2(2500)",
+     "source_expression": "SUCCESSOR_DIAG_PLAN",
+     "nullable": true,
+     "data_length": 2500
+    },
+    {
+     "order": 23,
+     "name": "TREAT_NOTE",
+     "target_type": "VARCHAR2(2500)",
+     "source_expression": "TREAT_NOTE",
+     "nullable": false,
+     "data_length": 2500
+    },
+    {
+     "order": 24,
+     "name": "WARD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "WARD_NUM",
+     "nullable": true,
+     "data_length": 10
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_HOS_SUCCESSION_RECORD']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "eb89d9c15664e8be8a3b0de141118bae2859131ff62f9dc512d43108800544bb"
+  },
+  "EMR_OPERATION_NURSING": {
+   "canonical_table": "EMR_OPERATION_NURSING",
+   "business_name": "手术护理记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_OPERATION_NURSING",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "5e290bdc9d16b252b6cef826e37d2eb4836333b962cdd232dedb36eddff18624"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_OPERATION_NURSING",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ABO_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "ABO_CODE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "ADMISSION_ID",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_ID",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 3,
+     "name": "AFTER_CHECK_CODE",
+     "target_type": "CHAR",
+     "source_expression": "AFTER_CHECK_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 4,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 5,
+     "name": "AGE_MONTH",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 6,
+     "name": "ALLERGIES",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "ALLERGIES",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 7,
+     "name": "ALLERGIES_CODE",
+     "target_type": "CHAR",
+     "source_expression": "ALLERGIES_CODE",
+     "nullable": false,
+     "data_length": 2
+    },
+    {
+     "order": 8,
+     "name": "BEFORE_CHECK_CODE",
+     "target_type": "CHAR",
+     "source_expression": "BEFORE_CHECK_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 9,
+     "name": "BEFORE_OPER_CD",
+     "target_type": "CHAR",
+     "source_expression": "BEFORE_OPER_CD",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 10,
+     "name": "BLOOD_ABO_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "BLOOD_ABO_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 11,
+     "name": "BLOOD_RH_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "BLOOD_RH_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "DEPT_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEPT_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 13,
+     "name": "DEPT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEPT_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "DIAGNOSIS_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "DIAGNOSIS_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 15,
+     "name": "DISEASE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DISEASE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 16,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 17,
+     "name": "EORD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EORD_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 18,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 19,
+     "name": "HANDOVER_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"HANDOVER_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"HANDOVER_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS HANDOVER_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 20,
+     "name": "HANDOVER_NURSE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "HANDOVER_NURSE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "HANDOVER_PROJECT",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "HANDOVER_PROJECT",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 22,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 23,
+     "name": "INS_NURSE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "INS_NURSE_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 24,
+     "name": "IN_ROOM_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"IN_ROOM_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"IN_ROOM_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS IN_ROOM_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 25,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 26,
+     "name": "NURSE_LEVEL_CODE",
+     "target_type": "CHAR",
+     "source_expression": "NURSE_LEVEL_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 27,
+     "name": "NURSE_LEVEL_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NURSE_LEVEL_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 28,
+     "name": "NURSE_OBSERVE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NURSE_OBSERVE_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 29,
+     "name": "NURSE_OBSERVE_RESULT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "NURSE_OBSERVE_RESULT",
+     "nullable": false,
+     "data_length": 1000
+    },
+    {
+     "order": 30,
+     "name": "NURSE_PROJECT",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NURSE_PROJECT",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 31,
+     "name": "NURSE_PROJECT_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NURSE_PROJECT_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 32,
+     "name": "NURSE_PROJECT_RESULT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "NURSE_PROJECT_RESULT",
+     "nullable": false,
+     "data_length": 1000
+    },
+    {
+     "order": 33,
+     "name": "OPERATION_BP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OPERATION_BP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 34,
+     "name": "OPERATION_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "OPERATION_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 35,
+     "name": "OPERATION_DISEASE_CD",
+     "target_type": "CHAR",
+     "source_expression": "OPERATION_DISEASE_CD",
+     "nullable": false,
+     "data_length": 2
+    },
+    {
+     "order": 36,
+     "name": "OPERATION_END_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"OPERATION_END_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"OPERATION_END_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS OPERATION_END_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 37,
+     "name": "OPERATION_ITEM",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OPERATION_ITEM",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 38,
+     "name": "OPERATION_NAME",
+     "target_type": "VARCHAR2(150)",
+     "source_expression": "OPERATION_NAME",
+     "nullable": false,
+     "data_length": 150
+    },
+    {
+     "order": 39,
+     "name": "OPERATION_ROOM_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OPERATION_ROOM_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 40,
+     "name": "OPERATION_START_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"OPERATION_START_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"OPERATION_START_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS OPERATION_START_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 41,
+     "name": "OPERA_DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OPERA_DOC_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 42,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 43,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 44,
+     "name": "OUT_ROOM_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"OUT_ROOM_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"OUT_ROOM_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS OUT_ROOM_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 45,
+     "name": "PREPARATION",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "PREPARATION",
+     "nullable": false,
+     "data_length": 1000
+    },
+    {
+     "order": 46,
+     "name": "RECORD_DATE",
+     "target_type": "DATE",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"RECORD_DATE\",'^[0-9]{4}-[0-9]{2}-[0-9]{2}([ ][0-9]{2}:[0-9]{2}:[0-9]{2})?$') THEN TO_DATE(\"RECORD_DATE\",'YYYY-MM-DD HH24:MI:SS') ELSE NULL END AS RECORD_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 47,
+     "name": "RH_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "RH_CODE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 48,
+     "name": "ROUND_NURSE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ROUND_NURSE_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 49,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 50,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 51,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 52,
+     "name": "SKIN_CHECK_NOTE",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "SKIN_CHECK_NOTE",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 53,
+     "name": "TRANS_DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TRANS_DOC_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 54,
+     "name": "WARD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "WARD_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 55,
+     "name": "WEIGHT",
+     "target_type": "NUMBER",
+     "source_expression": "WEIGHT",
+     "nullable": false,
+     "data_length": 22
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_OPERATION_NURSING']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "e8c07b71b7ae249a4535cdbcacba6326ceaa34471447a798c91f723736b699d0"
+  },
+  "EMR_HOS_PREOP_DISCUSS": {
+   "canonical_table": "EMR_HOS_PREOP_DISCUSS",
+   "business_name": "术前讨论与小结",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_HOS_PREOP_DISCUSS",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "2a14e3154cf81e1507366e9006d0c8c7cbf38a451ac8d81da642e820f3cb3811"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_HOS_PREOP_DISCUSS",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_ID",
+     "target_type": "VARCHAR2(91)",
+     "source_expression": "ADMISSION_ID",
+     "nullable": true,
+     "data_length": 91
+    },
+    {
+     "order": 2,
+     "name": "ALLERGY_HISTORY",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "ALLERGY_HISTORY",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 3,
+     "name": "ALLERGY_HISTORY_MARK",
+     "target_type": "VARCHAR2(5)",
+     "source_expression": "ALLERGY_HISTORY_MARK",
+     "nullable": true,
+     "data_length": 5
+    },
+    {
+     "order": 4,
+     "name": "ANAE_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAE_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 6,
+     "name": "AUX_EXAM_RESULT",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "AUX_EXAM_RESULT",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 7,
+     "name": "BEFOPER_DCODE",
+     "target_type": "VARCHAR2(150)",
+     "source_expression": "BEFOPER_DCODE",
+     "nullable": true,
+     "data_length": 150
+    },
+    {
+     "order": 8,
+     "name": "BEFOPER_DNAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "BEFOPER_DNAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 9,
+     "name": "DEP_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 11,
+     "name": "DIAGNOSIS_BASIS",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DIAGNOSIS_BASIS",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 12,
+     "name": "DISCUSS_ADDRESS",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DISCUSS_ADDRESS",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 13,
+     "name": "DISCUSS_CONCLUSION",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DISCUSS_CONCLUSION",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 14,
+     "name": "DISCUSS_DATE",
+     "target_type": "DATE",
+     "source_expression": "DISCUSS_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 15,
+     "name": "DISCUSS_OPINION",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DISCUSS_OPINION",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 16,
+     "name": "DISCUSS_PEOPLE_LIST",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DISCUSS_PEOPLE_LIST",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 17,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": true,
+     "data_length": 6
+    },
+    {
+     "order": 18,
+     "name": "DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DOC_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 19,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 20,
+     "name": "HOET_NAME",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "HOET_NAME",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 21,
+     "name": "ID",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 22,
+     "name": "MATTERS_ATTENTION",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "MATTERS_ATTENTION",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 23,
+     "name": "MEDICAL_RECORDS_SUNNARY",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "MEDICAL_RECORDS_SUNNARY",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 24,
+     "name": "OPERATION_MAIN_POINTS",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "OPERATION_MAIN_POINTS",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 25,
+     "name": "OPERATION_SCHEME",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "OPERATION_SCHEME",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 26,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 27,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 28,
+     "name": "PERFORM_ANES_CODE",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "TO_CHAR(\"PERFORM_ANES_CODE\") AS PERFORM_ANES_CODE",
+     "nullable": true,
+     "data_length": 36
+    },
+    {
+     "order": 29,
+     "name": "PERFORM_OPERATION_CODE",
+     "target_type": "VARCHAR2(150)",
+     "source_expression": "PERFORM_OPERATION_CODE",
+     "nullable": true,
+     "data_length": 150
+    },
+    {
+     "order": 30,
+     "name": "PERFORM_OPERATION_DATE",
+     "target_type": "VARCHAR2(14)",
+     "source_expression": "TO_CHAR(\"PERFORM_OPERATION_DATE\",'YYYYMMDDHH24MISS') AS PERFORM_OPERATION_DATE",
+     "nullable": true,
+     "data_length": 14
+    },
+    {
+     "order": 31,
+     "name": "PERFORM_OPERATION_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "PERFORM_OPERATION_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 32,
+     "name": "PERFORM_OPERATION_PART_NAME",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "PERFORM_OPERATION_PART_NAME",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 33,
+     "name": "PREOPERATIVE_PREPARATION",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "PREOPERATIVE_PREPARATION",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 34,
+     "name": "PROF_TECH_CATE_CODE",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "TO_CHAR(\"PROF_TECH_CATE_CODE\") AS PROF_TECH_CATE_CODE",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 35,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 36,
+     "name": "SIGN_DATE",
+     "target_type": "TIMESTAMP(6)",
+     "source_expression": "SIGN_DATE",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 37,
+     "name": "SURGERY_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "SURGERY_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 38,
+     "name": "SURGICAL_CONTRIANDICATIONS",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "SURGICAL_CONTRIANDICATIONS",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 39,
+     "name": "SURGICAL_INDICATION",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "SURGICAL_INDICATION",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 40,
+     "name": "SURGICAL_INDICATIONS",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "SURGICAL_INDICATIONS",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 41,
+     "name": "WARD_NUM",
+     "target_type": "CHAR",
+     "source_expression": "WARD_NUM",
+     "nullable": true,
+     "data_length": 10
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_HOS_PREOP_DISCUSS']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "827ded35d6b3e687d874076b71095afb8146b3b443f4c0c29686bfa56068bf15"
+  },
+  "EMR_AFTER_OPERA_RECORD": {
+   "canonical_table": "EMR_AFTER_OPERA_RECORD",
+   "business_name": "麻醉术后访视记录",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_AFTER_OPERA_RECORD",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "4ba82d2d1de155d8dc840034afe69197f58f8998c241923459d56d1d9c5e7179"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_AFTER_OPERA_RECORD",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AFTER_DISEASE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "AFTER_DISEASE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 2,
+     "name": "AFTER_OPERA_DIAGNOSIS",
+     "target_type": "VARCHAR2(16)",
+     "source_expression": "AFTER_OPERA_DIAGNOSIS",
+     "nullable": true,
+     "data_length": 16
+    },
+    {
+     "order": 3,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 4,
+     "name": "ANAESTHESIA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAESTHESIA_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "ANANSTHESIA",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ANANSTHESIA",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 6,
+     "name": "ANES_AFTER_NOTE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ANES_AFTER_NOTE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 7,
+     "name": "ANES_METHOD_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "CASE WHEN REGEXP_LIKE(\"ANES_METHOD_CODE\",'^[0-9]+\\.?[0-9]*$') THEN TO_NUMBER(\"ANES_METHOD_CODE\") ELSE NULL END AS ANES_METHOD_CODE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 8,
+     "name": "APPLY_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_NUM",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 9,
+     "name": "ATTENTION_MATTER",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "ATTENTION_MATTER",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 10,
+     "name": "AWAKE_DATE",
+     "target_type": "DATE",
+     "source_expression": "AWAKE_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 11,
+     "name": "DEPT_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEPT_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 12,
+     "name": "DEPT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEPT_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 13,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 14,
+     "name": "DOCTOR_ADVICE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DOCTOR_ADVICE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 15,
+     "name": "DOCTOR_NAME",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 16,
+     "name": "EORD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EORD_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 17,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 18,
+     "name": "GENERAL_EXAM_RESULT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "GENERAL_EXAM_RESULT",
+     "nullable": false,
+     "data_length": 1000
+    },
+    {
+     "order": 19,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 20,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "OPERATION_CODE",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "OPERATION_CODE",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 22,
+     "name": "OPERATION_NAME",
+     "target_type": "VARCHAR2(150)",
+     "source_expression": "OPERATION_NAME",
+     "nullable": true,
+     "data_length": 150
+    },
+    {
+     "order": 23,
+     "name": "OPERA_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OPERA_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 24,
+     "name": "OPERA_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "OPERA_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 25,
+     "name": "OPERA_WINDPIPE",
+     "target_type": "CHAR",
+     "source_expression": "OPERA_WINDPIPE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 26,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 27,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 28,
+     "name": "PATIENT_TYPE",
+     "target_type": "CHAR",
+     "source_expression": "PATIENT_TYPE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 29,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 30,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 12
+    },
+    {
+     "order": 31,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 32,
+     "name": "SIGNATURE_DATE",
+     "target_type": "DATE",
+     "source_expression": "SIGNATURE_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 33,
+     "name": "VISTING_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "VISTING_NUM",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 34,
+     "name": "WARD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "WARD_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 35,
+     "name": "WEIGHT",
+     "target_type": "NUMBER",
+     "source_expression": "WEIGHT",
+     "nullable": false,
+     "data_length": 22
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_AFTER_OPERA_RECORD']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "0d3ad4ebc73ff4da2f42dfb60c3f8ca85f3476fa8aef33dcb325b397a0891aeb"
+  },
+  "EMR_INFOR_ANESTHESIA": {
+   "canonical_table": "EMR_INFOR_ANESTHESIA",
+   "business_name": "麻醉知情同意书",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_INFOR_ANESTHESIA",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "ceb05cc68d4cb3ca83dc5ca2b45e5a1ad19182ca29a40ba2fe8adb7367a48ce3"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_INFOR_ANESTHESIA",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMISSION_ID",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ADMISSION_ID",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 2,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "AGE_MONTH",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "TO_CHAR(\"AGE_MONTH\") AS AGE_MONTH",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 4,
+     "name": "ANADOC",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANADOC",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "ANADOC_DATE",
+     "target_type": "DATE",
+     "source_expression": "ANADOC_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 6,
+     "name": "ANAESTHESIA_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "ANAESTHESIA_CODE",
+     "nullable": false,
+     "data_length": 2
+    },
+    {
+     "order": 7,
+     "name": "ANAESTHESIA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAESTHESIA_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 8,
+     "name": "ANA_SAFETY_SIGN",
+     "target_type": "CHAR",
+     "source_expression": "ANA_SAFETY_SIGN",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 9,
+     "name": "AOC_ANESTHESIA",
+     "target_type": "VARCHAR2(2500)",
+     "source_expression": "AOC_ANESTHESIA",
+     "nullable": false,
+     "data_length": 2500
+    },
+    {
+     "order": 10,
+     "name": "APPLY_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "APPLY_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 11,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "DEPT_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEPT_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 13,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 15,
+     "name": "EFFECTS_BD_ANESTHESIA",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "EFFECTS_BD_ANESTHESIA",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 16,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 17,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 18,
+     "name": "INFORMED_CONSENT_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "INFORMED_CONSENT_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 19,
+     "name": "INFORMED_CONSENT_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "INFORMED_CONSENT_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 20,
+     "name": "OPERATION",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "OPERATION",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "OPERATION_DATE",
+     "target_type": "DATE",
+     "source_expression": "OPERATION_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 22,
+     "name": "OPERATION_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "OPERATION_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 23,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 24,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 25,
+     "name": "ORG_VIEW",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "ORG_VIEW",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 26,
+     "name": "PATIENT_BASIC_CONDITION",
+     "target_type": "VARCHAR2(500)",
+     "source_expression": "PATIENT_BASIC_CONDITION",
+     "nullable": true,
+     "data_length": 500
+    },
+    {
+     "order": 27,
+     "name": "PATIENT_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 28,
+     "name": "PATIENT_SIGN_DATE",
+     "target_type": "DATE",
+     "source_expression": "PATIENT_SIGN_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 29,
+     "name": "PATIENT_SIGN_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_SIGN_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 30,
+     "name": "PATIENT_VIEW",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "PATIENT_VIEW",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 31,
+     "name": "PERFORM_IO_DM",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "PERFORM_IO_DM",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 32,
+     "name": "PREOPERATIVE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PREOPERATIVE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 33,
+     "name": "PREOPERATIVE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PREOPERATIVE_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 34,
+     "name": "SAP_RELATIONSHIP",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "SAP_RELATIONSHIP",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 35,
+     "name": "SAP_RELATIONSHIP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SAP_RELATIONSHIP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 36,
+     "name": "SEX_CODE",
+     "target_type": "NUMBER",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 37,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 38,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 10
+    },
+    {
+     "order": 39,
+     "name": "SIGN_ANA_PUMP",
+     "target_type": "CHAR",
+     "source_expression": "SIGN_ANA_PUMP",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 40,
+     "name": "STATUTORY_AGENT_VIEW",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "STATUTORY_AGENT_VIEW",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 41,
+     "name": "WARD_NUM",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "WARD_NUM",
+     "nullable": true,
+     "data_length": 10
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_INFOR_ANESTHESIA']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "868d4839d6ecf106cdad1578f2310d34d270720235da43958e62250fba837e3c"
+  },
+  "EMR_OUTPATIENT_RECIPE": {
+   "canonical_table": "EMR_OUTPATIENT_RECIPE",
+   "business_name": "门诊处方(D03/D04 标）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_OUTPATIENT_RECIPE",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "9a5f35427a76d17a772c2fefd1c78e07a3f7f3cddf770159dd855c31c05ee20c"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_OUTPATIENT_RECIPE",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "AGE_DAY",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_DAY",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "AGE_HOUR",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_HOUR",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 4,
+     "name": "AGE_MONTH",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 5,
+     "name": "CASE_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "CASE_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 6,
+     "name": "CF_NOTES",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CF_NOTES",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 7,
+     "name": "CHECKER_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "CHECKER_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 8,
+     "name": "CHECKER_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CHECKER_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 9,
+     "name": "CHECK_DATE",
+     "target_type": "DATE",
+     "source_expression": "CHECK_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 10,
+     "name": "CH_METHOD",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CH_METHOD",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 11,
+     "name": "DEI",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEI",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_CODE",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 13,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 14,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 15,
+     "name": "DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 16,
+     "name": "DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 17,
+     "name": "EFFECTIVE_DAYS",
+     "target_type": "NUMBER",
+     "source_expression": "EFFECTIVE_DAYS",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 18,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 19,
+     "name": "FY_DOCTOR",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "FY_DOCTOR",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 20,
+     "name": "HD_DOCTOR",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "HD_DOCTOR",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 21,
+     "name": "HOS_DEP_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "HOS_DEP_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 22,
+     "name": "HOS_DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "HOS_DEP_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 23,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 24,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 25,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 26,
+     "name": "NODE_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NODE_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 27,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 28,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 29,
+     "name": "OTHER_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "OTHER_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 30,
+     "name": "OTHER_ID_TYPE",
+     "target_type": "VARCHAR2(11)",
+     "source_expression": "OTHER_ID_TYPE",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 31,
+     "name": "OTHER_ID_TYPE_NAME",
+     "target_type": "VARCHAR2(30)",
+     "source_expression": "OTHER_ID_TYPE_NAME",
+     "nullable": true,
+     "data_length": 30
+    },
+    {
+     "order": 32,
+     "name": "OUTPATIENT_NUM",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "OUTPATIENT_NUM",
+     "nullable": false,
+     "data_length": 36
+    },
+    {
+     "order": 33,
+     "name": "PRESCRIBE_DATE",
+     "target_type": "DATE",
+     "source_expression": "PRESCRIBE_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 34,
+     "name": "RECIPE_CLASS_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "RECIPE_CLASS_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 35,
+     "name": "RECIPE_CLASS_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "RECIPE_CLASS_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 36,
+     "name": "RECIPE_CLINIC_CODE",
+     "target_type": "CHAR",
+     "source_expression": "RECIPE_CLINIC_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 37,
+     "name": "RECIPE_CLINIC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "RECIPE_CLINIC_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 38,
+     "name": "RECIPE_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "RECIPE_NUM",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 39,
+     "name": "RECIPE_TYPE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "RECIPE_TYPE_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 40,
+     "name": "RECIPE_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "RECIPE_TYPE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 41,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 42,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "SEX_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 43,
+     "name": "TP_DOCTOR",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TP_DOCTOR",
+     "nullable": true,
+     "data_length": 50
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_OUTPATIENT_RECIPE']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "verified"
+   },
+   "fingerprint": "a6a2ecff8a0c98d0a5de4f5bcc7b524ad865434da9456e5a0a6cc24e46cf757a"
+  },
+  "EMR_OUTPATIENT_RECIPE_ITEM": {
+   "canonical_table": "EMR_OUTPATIENT_RECIPE_ITEM",
+   "business_name": "门诊处方明细(辅 D03/D04 标）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "ods",
+    "dialect": "oracle",
+    "object": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM",
+    "credential_ref": "container-credentials:ods_8_216",
+    "object_sha256": "0ce161289e46f6fbeb17b0ceb5c3e8c8ceaeeaf22b5002f198701ad04449801d"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "ADMINISTRATION_DAYS",
+     "target_type": "NUMBER",
+     "source_expression": "ADMINISTRATION_DAYS",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "ALL_AMOUNT",
+     "target_type": "NUMBER",
+     "source_expression": "ALL_AMOUNT",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "ANTI_USE_GRADE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "ANTI_USE_GRADE_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 4,
+     "name": "ANTI_USE_GRADE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANTI_USE_GRADE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 5,
+     "name": "CANCEL_REASON",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CANCEL_REASON",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 6,
+     "name": "CANCEL_TIME",
+     "target_type": "DATE",
+     "source_expression": "CANCEL_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 7,
+     "name": "CH_DRUG_NOTES",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "CH_DRUG_NOTES",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 8,
+     "name": "CREATED_AT",
+     "target_type": "DATE",
+     "source_expression": "CREATED_AT",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 9,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 10,
+     "name": "DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 11,
+     "name": "DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 12,
+     "name": "DOSAGE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DOSAGE",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 13,
+     "name": "DOSAGE_UNIT",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DOSAGE_UNIT",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 14,
+     "name": "DOSAGE_UNIT_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DOSAGE_UNIT_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 15,
+     "name": "DRUG_ADMINISTRATION_ROUTE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DRUG_ADMINISTRATION_ROUTE",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 16,
+     "name": "DRUG_ALL_NUM",
+     "target_type": "NUMBER",
+     "source_expression": "DRUG_ALL_NUM",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 17,
+     "name": "DRUG_ALL_UNIT",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DRUG_ALL_UNIT",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 18,
+     "name": "DRUG_AMOUNT",
+     "target_type": "NUMBER",
+     "source_expression": "DRUG_AMOUNT",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 19,
+     "name": "DRUG_CLASS_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DRUG_CLASS_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 20,
+     "name": "DRUG_CLASS_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DRUG_CLASS_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 21,
+     "name": "DRUG_CODE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DRUG_CODE",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 22,
+     "name": "DRUG_COMMON_NAME",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "DRUG_COMMON_NAME",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 23,
+     "name": "DRUG_DOSE",
+     "target_type": "NUMBER",
+     "source_expression": "DRUG_DOSE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 24,
+     "name": "DRUG_FORM_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DRUG_FORM_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 25,
+     "name": "DRUG_FORM_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DRUG_FORM_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 26,
+     "name": "DRUG_FREQUENCY_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DRUG_FREQUENCY_CODE",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 27,
+     "name": "DRUG_FREQUENCY_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DRUG_FREQUENCY_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 28,
+     "name": "DRUG_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DRUG_NAME",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 29,
+     "name": "DRUG_PRICE",
+     "target_type": "NUMBER",
+     "source_expression": "DRUG_PRICE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 30,
+     "name": "DRUG_ROUTE_CODE",
+     "target_type": "VARCHAR2(4)",
+     "source_expression": "DRUG_ROUTE_CODE",
+     "nullable": true,
+     "data_length": 4
+    },
+    {
+     "order": 31,
+     "name": "DRUG_ROUTE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DRUG_ROUTE_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 32,
+     "name": "DRUG_WAY_CD",
+     "target_type": "NUMBER",
+     "source_expression": "DRUG_WAY_CD",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 33,
+     "name": "DRUG_WAY_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DRUG_WAY_NAME",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 34,
+     "name": "DTCODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DTCODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 35,
+     "name": "DURATION_TIME",
+     "target_type": "NUMBER",
+     "source_expression": "DURATION_TIME",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 36,
+     "name": "ESSENTIL_GRADE",
+     "target_type": "CHAR",
+     "source_expression": "ESSENTIL_GRADE",
+     "nullable": false,
+     "data_length": 4
+    },
+    {
+     "order": 37,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 38,
+     "name": "GROUP_NO",
+     "target_type": "NUMBER",
+     "source_expression": "GROUP_NO",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 39,
+     "name": "HERB_NUM",
+     "target_type": "NUMBER",
+     "source_expression": "HERB_NUM",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 40,
+     "name": "ID",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 41,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "ID_NUM",
+     "nullable": false,
+     "data_length": 36
+    },
+    {
+     "order": 42,
+     "name": "IF_YF",
+     "target_type": "CHAR",
+     "source_expression": "IF_YF",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 43,
+     "name": "IS_ANTI",
+     "target_type": "CHAR",
+     "source_expression": "IS_ANTI",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 44,
+     "name": "IS_ESSENTIAL",
+     "target_type": "CHAR",
+     "source_expression": "IS_ESSENTIAL",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 45,
+     "name": "IS_EXTERNAL_PRES",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "IS_EXTERNAL_PRES",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 46,
+     "name": "ITEM_NUM",
+     "target_type": "VARCHAR2(40)",
+     "source_expression": "ITEM_NUM",
+     "nullable": true,
+     "data_length": 40
+    },
+    {
+     "order": 47,
+     "name": "ITEM_TYPE_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "ITEM_TYPE_CODE",
+     "nullable": false,
+     "data_length": 2
+    },
+    {
+     "order": 48,
+     "name": "ITEM_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ITEM_TYPE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 49,
+     "name": "JL_UNIT",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "JL_UNIT",
+     "nullable": true,
+     "data_length": 8
+    },
+    {
+     "order": 50,
+     "name": "MEDICATION_METHOD",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "MEDICATION_METHOD",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 51,
+     "name": "NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 52,
+     "name": "NHSA_STANDARD_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "NHSA_STANDARD_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 53,
+     "name": "ODR_TYPE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ODR_TYPE",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 54,
+     "name": "ONCE_AMOUNT",
+     "target_type": "NUMBER",
+     "source_expression": "ONCE_AMOUNT",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 55,
+     "name": "ORDER_CATEGORY_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_CATEGORY_CODE",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 56,
+     "name": "ORDER_CATEGORY_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_CATEGORY_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 57,
+     "name": "ORDER_DOSAGE",
+     "target_type": "NUMBER",
+     "source_expression": "ORDER_DOSAGE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 58,
+     "name": "ORDER_ITEM_CODE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ORDER_ITEM_CODE",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 59,
+     "name": "ORDER_ITEM_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "ORDER_ITEM_NAME",
+     "nullable": false,
+     "data_length": 200
+    },
+    {
+     "order": 60,
+     "name": "ORDER_NUM_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_NUM_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 61,
+     "name": "ORDER_STATUS",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_STATUS",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 62,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 63,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 64,
+     "name": "OR_ID",
+     "target_type": "VARCHAR2(130)",
+     "source_expression": "OR_ID",
+     "nullable": false,
+     "data_length": 130
+    },
+    {
+     "order": 65,
+     "name": "OUTPATIENT_NUM",
+     "target_type": "VARCHAR2(40)",
+     "source_expression": "OUTPATIENT_NUM",
+     "nullable": false,
+     "data_length": 40
+    },
+    {
+     "order": 66,
+     "name": "QUANTITY",
+     "target_type": "NUMBER",
+     "source_expression": "QUANTITY",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 67,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 68,
+     "name": "SKIN_TEST_RESULT",
+     "target_type": "CHAR",
+     "source_expression": "SKIN_TEST_RESULT",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 69,
+     "name": "SN",
+     "target_type": "NUMBER",
+     "source_expression": "SN",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 70,
+     "name": "SPEC",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "SPEC",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 71,
+     "name": "STATUS_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "STATUS_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 72,
+     "name": "STATUS_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "STATUS_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 73,
+     "name": "TCM_DECOCTION_METHOD",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "TCM_DECOCTION_METHOD",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 74,
+     "name": "UNIT",
+     "target_type": "VARCHAR2(12)",
+     "source_expression": "UNIT",
+     "nullable": true,
+     "data_length": 12
+    },
+    {
+     "order": 75,
+     "name": "UNIT_DOSE",
+     "target_type": "NUMBER",
+     "source_expression": "UNIT_DOSE",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 76,
+     "name": "VISIT_DATE",
+     "target_type": "DATE",
+     "source_expression": "NULL AS VISIT_DATE",
+     "nullable": true,
+     "data_length": 7
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批7_ODS二波",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_OUTPATIENT_RECIPE_ITEM']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PYTHON_PLANNED(ODS通道复用+首组PYTHON先例;实测画像后冻结)",
+    "view_column_coverage": "missing=2"
+   },
+   "fingerprint": "f54afad2f6ccb5a1a5a824034069b0e194d5f8576af9b1791778deeb53b4296f"
+  }
+ },
+ "enabled_policy": "全部 enabled=false（候选停用保留）；正式启用另出启用冻结并走 A05c 审批，动作级派发走 K01 ActionBinding，不手工置 READY",
+ "notes": {
+  "batch": "批7_ODS二波",
+  "coverage_problems": [
+   "EMR_OUTPATIENT_RECIPE_ITEM: 视图 V_EMR_OUTPATIENT_RECIPE_ITEM 未暴露 2 列（如 ['OR_ID', 'VISIT_DATE']）"
+  ],
+  "enabled": "全部 false（候选停用；启用走独立启用冻结）"
+ },
+ "config_fingerprint": "d2f708a4004b60f44d53415e5dbde3d3d62429ba88d579d6f6bfc8f2654c3fed"
+}

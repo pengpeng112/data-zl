@@ -1,0 +1,4 @@
+
+ERROR: NameError name 'datetime' is not defined
+
+ERROR: DatabaseError ORA-00932: 数据类型不一致: 应为 DATE, 但却获得 CHAR

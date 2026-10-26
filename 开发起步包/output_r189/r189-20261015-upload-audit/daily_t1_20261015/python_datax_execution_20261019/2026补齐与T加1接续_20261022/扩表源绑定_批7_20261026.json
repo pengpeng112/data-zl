@@ -1,0 +1,39 @@
+{
+ "doc": "批7（ODS二波11表·表达式修订+父子对通道）扩表源绑定：源=ODS 10.10.8.216:1521/orcl（首组同款通道，dsn/credential_ref 照抄首组生产 bindings 的 ods_8_216 段）；对象 ODS.V_EMR_<表名> 显式全名，不拼不猜；组键 ods=B01 source_group（生成器按组键精确匹配）；view_by_table 供 ODS 视图列覆盖核验。本包特征（批678预核结论_20261026）：6 表 13 列跨族类型错配（v2 列表达式）、RECIPE_ITEM.VISIT_DATE 真缺口（目标 DATE 可空→NULL 投影）、RECIPE_ITEM.OR_ID 生成器 as 正则盲区（活源实存非真缺，核因后 allow-view-gap）、RECIPE_ITEM 去父试点（RR03=B01 relation_id R03 verified:False，派生 B01 输入置空）、AFTER_OPERA_RECORD 08 快照缺 DDL（用《元数据快照补充_批7_20261026.json》作 --metadata-snapshot）。全部无 LOB、DATETIME 全 DATE、锚点直谓词。",
+ "as_of": "2026-10-26",
+ "sources": {
+  "ods": {
+   "dialect": "oracle",
+   "dsn": "10.10.8.216:1521/orcl",
+   "credential_ref": "container-credentials:ods_8_216",
+   "source_objects": {
+    "EMR_REFERRAL_HOS_RECORD": "ODS.V_EMR_REFERRAL_HOS_RECORD",
+    "EMR_ADMISSION_DEAD_RECORD_TF": "ODS.V_EMR_ADMISSION_DEAD_RECORD_TF",
+    "EMR_HOS_DIFFIC_CASE_DISCUSS": "ODS.V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "EMR_HOS_DND_RECORD": "ODS.V_EMR_HOS_DND_RECORD",
+    "EMR_HOS_SUCCESSION_RECORD": "ODS.V_EMR_HOS_SUCCESSION_RECORD",
+    "EMR_OPERATION_NURSING": "ODS.V_EMR_OPERATION_NURSING",
+    "EMR_HOS_PREOP_DISCUSS": "ODS.V_EMR_HOS_PREOP_DISCUSS",
+    "EMR_AFTER_OPERA_RECORD": "ODS.V_EMR_AFTER_OPERA_RECORD",
+    "EMR_INFOR_ANESTHESIA": "ODS.V_EMR_INFOR_ANESTHESIA",
+    "EMR_OUTPATIENT_RECIPE": "ODS.V_EMR_OUTPATIENT_RECIPE",
+    "EMR_OUTPATIENT_RECIPE_ITEM": "ODS.V_EMR_OUTPATIENT_RECIPE_ITEM"
+   },
+   "view_by_table": {
+    "EMR_REFERRAL_HOS_RECORD": "V_EMR_REFERRAL_HOS_RECORD",
+    "EMR_ADMISSION_DEAD_RECORD_TF": "V_EMR_ADMISSION_DEAD_RECORD_TF",
+    "EMR_HOS_DIFFIC_CASE_DISCUSS": "V_EMR_HOS_DIFFIC_CASE_DISCUSS",
+    "EMR_HOS_DND_RECORD": "V_EMR_HOS_DND_RECORD",
+    "EMR_HOS_SUCCESSION_RECORD": "V_EMR_HOS_SUCCESSION_RECORD",
+    "EMR_OPERATION_NURSING": "V_EMR_OPERATION_NURSING",
+    "EMR_HOS_PREOP_DISCUSS": "V_EMR_HOS_PREOP_DISCUSS",
+    "EMR_AFTER_OPERA_RECORD": "V_EMR_AFTER_OPERA_RECORD",
+    "EMR_INFOR_ANESTHESIA": "V_EMR_INFOR_ANESTHESIA",
+    "EMR_OUTPATIENT_RECIPE": "V_EMR_OUTPATIENT_RECIPE",
+    "EMR_OUTPATIENT_RECIPE_ITEM": "V_EMR_OUTPATIENT_RECIPE_ITEM"
+   },
+   "evidence": "ods_views_bulk.json（2026-10-22 批量核验）+ 批678活源普查（批678预核证据_20261026/剩余33表活源普查_20261026.out：11表 view=True/无LOB/DATETIME 全DATE）+ 元数据快照补充_批7_20261026.json（08结构+V_EMR_AFTER_OPERA_RECORD 活源 DDL 注入，预核已验该表 0 盲区 0 缺口）+ 窗计数（业务日2026-10-25 普查）：0/0/0/0/0/32/35/36/37/1198/1721；执行时活源复核见试点证据_20261026/扩表批7/"
+  }
+ },
+ "parents": {}
+}

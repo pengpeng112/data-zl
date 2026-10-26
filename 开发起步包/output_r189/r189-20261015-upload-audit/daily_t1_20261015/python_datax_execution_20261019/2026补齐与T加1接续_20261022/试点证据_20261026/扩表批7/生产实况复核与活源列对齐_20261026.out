@@ -1,0 +1,23 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+alembic head: b8c9d0e1f2a3
+executors: [('JHEMR_ACCOUNT_ENABLE', False), ('CDMS_ACCOUNT_ENABLE', False), ('JHEMR_ACCOUNT_DISABLE', True), ('CDMS_ACCOUNT_DISABLE', True), ('r189_t1_stage_to_dboper', False), ('r189_ich_field_update', True), ('r189_home_clock_refresh', True), ('r189_doc_missing_insert', True), ('r189_spec_exam_field_update', True), ('sql-target-apply-1', True)]
+receipt_total(DBOPER): 79
+target tables present: ['EMR_ADMISSION_DEAD_RECORD_TF', 'EMR_AFTER_OPERA_RECORD', 'EMR_HOS_DIFFIC_CASE_DISCUSS', 'EMR_HOS_DND_RECORD', 'EMR_HOS_PREOP_DISCUSS', 'EMR_HOS_SUCCESSION_RECORD', 'EMR_INFOR_ANESTHESIA', 'EMR_OPERATION_NURSING', 'EMR_OUTPATIENT_RECIPE', 'EMR_OUTPATIENT_RECIPE_ITEM', 'EMR_REFERRAL_HOS_RECORD']
+target SYSTEM_TIME types: [('EMR_ADMISSION_DEAD_RECORD_TF', 'TIMESTAMP(6)'), ('EMR_AFTER_OPERA_RECORD', 'TIMESTAMP(6)'), ('EMR_HOS_DIFFIC_CASE_DISCUSS', 'TIMESTAMP(6)'), ('EMR_HOS_DND_RECORD', 'TIMESTAMP(6)'), ('EMR_HOS_PREOP_DISCUSS', 'TIMESTAMP(6)'), ('EMR_HOS_SUCCESSION_RECORD', 'TIMESTAMP(6)'), ('EMR_INFOR_ANESTHESIA', 'TIMESTAMP(6)'), ('EMR_OPERATION_NURSING', 'TIMESTAMP(6)'), ('EMR_OUTPATIENT_RECIPE', 'TIMESTAMP(6)'), ('EMR_OUTPATIENT_RECIPE_ITEM', 'TIMESTAMP(6)'), ('EMR_REFERRAL_HOS_RECORD', 'TIMESTAMP(6)')]
+== ODS 活源列对齐（ALL_TAB_COLUMNS vs 目标列）==
+EMR_REFERRAL_HOS_RECORD: view=True 目标30列 gap=NONE DATETIME_type=DATE 视图列数=32
+EMR_ADMISSION_DEAD_RECORD_TF: view=True 目标52列 gap=NONE DATETIME_type=DATE 视图列数=54
+EMR_HOS_DIFFIC_CASE_DISCUSS: view=True 目标24列 gap=NONE DATETIME_type=DATE 视图列数=26
+EMR_HOS_DND_RECORD: view=True 目标26列 gap=NONE DATETIME_type=DATE 视图列数=28
+EMR_HOS_SUCCESSION_RECORD: view=True 目标24列 gap=NONE DATETIME_type=DATE 视图列数=26
+EMR_OPERATION_NURSING: view=True 目标55列 gap=NONE DATETIME_type=DATE 视图列数=57
+EMR_HOS_PREOP_DISCUSS: view=True 目标41列 gap=NONE DATETIME_type=DATE 视图列数=43
+EMR_AFTER_OPERA_RECORD: view=True 目标35列 gap=NONE DATETIME_type=DATE 视图列数=37
+EMR_INFOR_ANESTHESIA: view=True 目标41列 gap=NONE DATETIME_type=DATE 视图列数=43
+EMR_OUTPATIENT_RECIPE: view=True 目标43列 gap=NONE DATETIME_type=DATE 视图列数=45
+EMR_OUTPATIENT_RECIPE_ITEM: view=True 目标76列 gap=['VISIT_DATE'] DATETIME_type=DATE 视图列数=77
+== 复核结束 ==

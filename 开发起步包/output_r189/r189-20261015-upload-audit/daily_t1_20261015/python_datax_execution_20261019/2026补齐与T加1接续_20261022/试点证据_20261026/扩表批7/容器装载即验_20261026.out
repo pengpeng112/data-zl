@@ -1,0 +1,35 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+environment: production
+config_fingerprint: d2f708a4004b60f44d53415e5dbde3d3d62429ba88d579d6f6bfc8f2654c3fed
+tables: ['EMR_ADMISSION_DEAD_RECORD_TF', 'EMR_AFTER_OPERA_RECORD', 'EMR_HOS_DIFFIC_CASE_DISCUSS', 'EMR_HOS_DND_RECORD', 'EMR_HOS_PREOP_DISCUSS', 'EMR_HOS_SUCCESSION_RECORD', 'EMR_INFOR_ANESTHESIA', 'EMR_OPERATION_NURSING', 'EMR_OUTPATIENT_RECIPE', 'EMR_OUTPATIENT_RECIPE_ITEM', 'EMR_REFERRAL_HOS_RECORD']
+EMR_ADMISSION_DEAD_RECORD_TF: OK exprs=1
+EMR_AFTER_OPERA_RECORD: OK exprs=1
+EMR_HOS_DIFFIC_CASE_DISCUSS: OK exprs=0
+EMR_HOS_DND_RECORD: OK exprs=0
+EMR_HOS_PREOP_DISCUSS: OK exprs=3
+EMR_HOS_SUCCESSION_RECORD: OK exprs=0
+EMR_INFOR_ANESTHESIA: OK exprs=1
+EMR_OPERATION_NURSING: OK exprs=6
+EMR_OUTPATIENT_RECIPE: OK exprs=0
+EMR_OUTPATIENT_RECIPE_ITEM: OK exprs=1
+EMR_REFERRAL_HOS_RECORD: OK exprs=1
+anchor_plain_no_parent_expr_count_all_11: True
+fingerprint_match_local: True
+
+v1 environment: production
+v1 fingerprint: b8fc36edd48f317b5d9d03b2d533772378ab8920e706fc0d5980dedb264ab533
+v1 fingerprint_match_local: True, tables: 11
+
+v3 environment: production
+v3 fingerprint: 242e3694cfc5722ca796f101360c1c9a30b4013df4c54c066e054bc83aaea7e2
+v3 fingerprint_match_local: True, tables: 11
+
+v4 fingerprint: 70ad7cbc9f7a9755bb6c4ab42c464dc575018a50e9570891e3719bf3b7ae848f
+v4 fingerprint_match_local: True, tables: 11
+
+v5 fingerprint: b953b17e11241e6d8c2711ba54ee95e721109e7c7045000ec068c1cd64f42e6f
+v5 fingerprint_match_local: True

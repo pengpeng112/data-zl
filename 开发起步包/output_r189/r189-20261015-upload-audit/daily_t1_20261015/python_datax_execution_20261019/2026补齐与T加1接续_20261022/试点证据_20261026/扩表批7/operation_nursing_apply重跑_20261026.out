@@ -1,0 +1,58 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== OPN apply 重跑（ORA-12541 瞬时后同批号）===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+ "operation_id": "OPR-DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e-47565d85a7c2",
+ "rows_affected": 32,
+ "plan_counts": {
+  "INSERT": 32
+ },
+ "partition": {
+  "ok": 32,
+  "insert": 32,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e-47565d85a7c2",
+  "manifest_hash": "47565d85a7c2530f03ca0df9e6c33c943e3d03b2b855c3f4b53960ecbf3a5ec4",
+  "rows_affected": 32
+ },
+ "simulation": false,
+ "applied_at": "2026-10-26T13:48:08+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 21:48:06 2026-10-26 21:48:09
+=== OPN reconcile ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+ "keys_checked": 32,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE ===

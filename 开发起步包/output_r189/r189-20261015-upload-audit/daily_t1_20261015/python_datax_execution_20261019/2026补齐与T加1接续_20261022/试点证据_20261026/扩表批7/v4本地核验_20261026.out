@@ -1,0 +1,21 @@
+load OK: environment=production
+config fp: d2f708a4004b60f44d53415e5dbde3d3d62429ba88d579d6f6bfc8f2654c3fed
+tables: ['EMR_ADMISSION_DEAD_RECORD_TF', 'EMR_AFTER_OPERA_RECORD', 'EMR_HOS_DIFFIC_CASE_DISCUSS', 'EMR_HOS_DND_RECORD', 'EMR_HOS_PREOP_DISCUSS', 'EMR_HOS_SUCCESSION_RECORD', 'EMR_INFOR_ANESTHESIA', 'EMR_OPERATION_NURSING', 'EMR_OUTPATIENT_RECIPE', 'EMR_OUTPATIENT_RECIPE_ITEM', 'EMR_REFERRAL_HOS_RECORD']
+EMR_ADMISSION_DEAD_RECORD_TF: render OK | proj=52列（表达式1） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_AFTER_OPERA_RECORD: render OK | proj=35列（表达式1） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_DIFFIC_CASE_DISCUSS: render OK | proj=24列（表达式0） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_DND_RECORD: render OK | proj=26列（表达式0） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_PREOP_DISCUSS: render OK | proj=41列（表达式3） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_SUCCESSION_RECORD: render OK | proj=24列（表达式0） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_INFOR_ANESTHESIA: render OK | proj=41列（表达式1） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OPERATION_NURSING: render OK | proj=55列（表达式6） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUTPATIENT_RECIPE: render OK | proj=43列（表达式0） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUTPATIENT_RECIPE_ITEM: render OK | proj=76列（表达式1） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_REFERRAL_HOS_RECORD: render OK | proj=30列（表达式1） | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+
+ALL OK: 11 tables, plain DATE anchor predicates, no parents,
+14 column expressions (13 mismatch + VISIT_DATE NULL) each rendered twice
+(nested pagination), all other columns identity,
+projection == bindings write_columns (programmatic check).
+note: RECIPE_ITEM coverage gap notes 留痕（OR_ID 活源实存 as 正则盲区+VISIT_DATE 真缺口 NULL 投影）；
+mask 依据=活源预核（NLS DD-MON-YY 中文月=REFERRAL 全表唯一形态；OPN 六列全 'YYYY-MM-DD HH24:MI:SS'）。

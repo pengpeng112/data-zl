@@ -1,0 +1,63 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_HOS_DND_RECORD 业务日 2026-10-25 ===
+=== STEP1 approval-register ===
+2026-10-26 21:16:07
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B7-20261026:emr_hos_dnd_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_DND_RECORD",
+ "valid_from": "2026-10-26T13:16:08.207926+00:00",
+ "valid_until": "2026-10-27T13:16:08.207926+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批7并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B7-20261026:emr_hos_dnd_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_DND_RECORD，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-26 21:16:08
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_HOS_DND_RECORD.T1.2026-10-25.5079f22ad978",
+ "attempt_id": "att001",
+ "rows": 1,
+ "plan": {
+  "batch_id": "DBOPER.EMR_HOS_DND_RECORD.T1.2026-10-25.5079f22ad978",
+  "table": "EMR_HOS_DND_RECORD",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_HOS_DND_RECORD"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_HOS_DND_RECORD.T1.2026-10-25.5079f22ad978
+=== STEP3 verify ===
+2026-10-26 21:16:11
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_HOS_DND_RECORD.T1.2026-10-25.5079f22ad978",
+ "state": "QUARANTINED",
+ "quality": {
+  "counts": {
+   "QUARANTINED": 1
+  },
+  "valid_groups": 0,
+  "quarantined_groups": 1,
+  "ticket_hint": "人工工单候选：1 组隔离，规则见 issues",
+  "valid_rows": 0
+ },
+ "rows": 1,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证未全通过: QUARANTINED"
+}

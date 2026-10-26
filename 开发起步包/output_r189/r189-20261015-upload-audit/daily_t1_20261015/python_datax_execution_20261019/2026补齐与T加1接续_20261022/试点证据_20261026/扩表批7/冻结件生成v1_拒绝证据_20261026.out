@@ -1,0 +1,5 @@
+{
+ "ok": false,
+ "refused": "视图列覆盖不完整，拒绝冻结（--allow-view-gap 人工核因后强制并留痕）: EMR_OUTPATIENT_RECIPE_ITEM: 视图 V_EMR_OUTPATIENT_RECIPE_ITEM 未暴露 2 列（如 ['OR_ID', 'VISIT_DATE']）",
+ "exit_code": 3
+}

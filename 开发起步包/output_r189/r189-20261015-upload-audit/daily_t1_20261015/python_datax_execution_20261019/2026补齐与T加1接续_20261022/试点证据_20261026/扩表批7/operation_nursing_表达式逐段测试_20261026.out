@@ -1,0 +1,12 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+== 六列表达式在 Oracle 端逐段测试 ==
+REGEXP匹配= 1 | 值= '2026-10-24 16:17:00' | 类型= str
+REGEXP匹配= 1 | 值= '2026-10-20 23:00:00' | 类型= str
+REGEXP匹配= 1 | 值= '2026-10-23 13:14:00' | 类型= str
+TO_DATE= 2026-10-23 13:14:00 | 值= '2026-10-23 13:14:00' | 源类型= str
+TO_DATE= 2026-10-20 23:00:00 | 值= '2026-10-20 23:00:00' | 源类型= str
+TO_DATE= 2026-10-24 16:17:00 | 值= '2026-10-24 16:17:00' | 源类型= str

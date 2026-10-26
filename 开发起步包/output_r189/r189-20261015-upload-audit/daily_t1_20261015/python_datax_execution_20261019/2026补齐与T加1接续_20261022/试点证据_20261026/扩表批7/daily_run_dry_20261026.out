@@ -1,0 +1,6 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+{"ok": false, "stats_path": "/opt/data-asset/t1-stage/daily/t1_daily_2026-10-25.json", "skipped_missing_approval": ["EMR_REFERRAL_HOS_RECORD", "EMR_ADMISSION_DEAD_RECORD_TF", "EMR_HOS_DIFFIC_CASE_DISCUSS", "EMR_HOS_DND_RECORD", "EMR_HOS_SUCCESSION_RECORD", "EMR_OPERATION_NURSING", "EMR_HOS_PREOP_DISCUSS", "EMR_AFTER_OPERA_RECORD", "EMR_INFOR_ANESTHESIA", "EMR_OUTPATIENT_RECIPE", "EMR_OUTPATIENT_RECIPE_ITEM"]}

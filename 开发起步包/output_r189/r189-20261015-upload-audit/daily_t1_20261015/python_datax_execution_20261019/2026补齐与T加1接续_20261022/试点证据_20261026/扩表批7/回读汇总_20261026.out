@@ -1,0 +1,93 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+===== EMR_REFERRAL_HOS_RECORD =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 466
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_REFERRAL_HOS_RECORD.T1.2026-10-25.a65f875f9d34-e3b0c44298fc', 'DBOPER.EMR_REFERRAL_HOS_RECORD.T1.2026-10-25.a65f875f9d34', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '10.10.8.74:1521/orcl.DBOPER.EMR_REFERRAL_HOS_RECORD', 'MERGE:keys=0', 0, '2026-10-26T20:12:38.060000+08:00', '2026-10-26T20:12:38.060000+08:00', datetime.datetime(2026, 10, 26, 20, 12, 38))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_REFERRAL_HOS_RECORD.T1.2026-10-25.a65f875f9d34', 'RECONCILED')]
+version_evidence: 0
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_REFERRAL_HOS_RECORD ==
+===== EMR_HOS_DIFFIC_CASE_DISCUSS =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 345
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS.T1.2026-10-25.8acb46bf3d40-e3b0c44298fc', 'DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS.T1.2026-10-25.8acb46bf3d40', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '10.10.8.74:1521/orcl.DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS', 'MERGE:keys=0', 0, '2026-10-26T20:21:15.334000+08:00', '2026-10-26T20:21:15.334000+08:00', datetime.datetime(2026, 10, 26, 20, 21, 15))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS.T1.2026-10-25.8acb46bf3d40', 'RECONCILED')]
+version_evidence: 0
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_HOS_DIFFIC_CASE_DISCUSS ==
+===== EMR_HOS_SUCCESSION_RECORD =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 25
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_HOS_SUCCESSION_RECORD.T1.2026-10-25.493614760318-e3b0c44298fc', 'DBOPER.EMR_HOS_SUCCESSION_RECORD.T1.2026-10-25.493614760318', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '10.10.8.74:1521/orcl.DBOPER.EMR_HOS_SUCCESSION_RECORD', 'MERGE:keys=0', 0, '2026-10-26T21:18:45.929000+08:00', '2026-10-26T21:18:45.929000+08:00', datetime.datetime(2026, 10, 26, 21, 18, 45))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_HOS_SUCCESSION_RECORD.T1.2026-10-25.493614760318', 'RECONCILED')]
+version_evidence: 0
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_HOS_SUCCESSION_RECORD ==
+===== EMR_OPERATION_NURSING =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 48703
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e-47565d85a7c2', 'DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e', '47565d85a7c2530f03ca0df9e6c33c943e3d03b2b855c3f4b53960ecbf3a5ec4', '10.10.8.74:1521/orcl.DBOPER.EMR_OPERATION_NURSING', 'MERGE:keys=32', 32, '2026-10-26T21:47:48.994000+08:00', '2026-10-26T21:47:49.306000+08:00', datetime.datetime(2026, 10, 26, 21, 47, 49))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_OPERATION_NURSING.T1.2026-10-25.356ff105342e', 'RECONCILED')]
+version_evidence: 32
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_OPERATION_NURSING ==
+===== EMR_HOS_PREOP_DISCUSS =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 103355
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25-c5a8e5c75107', 'DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25', 'c5a8e5c751079f76d4172088749878d167597d7fd7ca100e4295a3bd03b78bfe', '10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PREOP_DISCUSS', 'MERGE:keys=39', 39, '2026-10-26T21:55:16.844000+08:00', '2026-10-26T21:55:18.651000+08:00', datetime.datetime(2026, 10, 26, 21, 55, 18))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_HOS_PREOP_DISCUSS.T1.2026-10-25.d97091ce0f25', 'RECONCILED')]
+version_evidence: 39
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_HOS_PREOP_DISCUSS ==
+===== EMR_AFTER_OPERA_RECORD =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 73136
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_AFTER_OPERA_RECORD.T1.2026-10-25.5f86e9de2616-b12fd5736c18', 'DBOPER.EMR_AFTER_OPERA_RECORD.T1.2026-10-25.5f86e9de2616', 'b12fd5736c18a309e8480de2e37a36e7e99531633867b7a9aa8585945f96defe', '10.10.8.74:1521/orcl.DBOPER.EMR_AFTER_OPERA_RECORD', 'MERGE:keys=36', 36, '2026-10-26T21:55:40.012000+08:00', '2026-10-26T21:55:40.309000+08:00', datetime.datetime(2026, 10, 26, 21, 55, 40))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_AFTER_OPERA_RECORD.T1.2026-10-25.5f86e9de2616', 'RECONCILED')]
+version_evidence: 36
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_AFTER_OPERA_RECORD ==
+===== EMR_INFOR_ANESTHESIA =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 91420
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_INFOR_ANESTHESIA.T1.2026-10-25.aa02672e8c93-1d21e109057d', 'DBOPER.EMR_INFOR_ANESTHESIA.T1.2026-10-25.aa02672e8c93', '1d21e109057d9e2b07981756bbaffd1081540f647f0f7646fb4412b696a70ebc', '10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_ANESTHESIA', 'MERGE:keys=37', 37, '2026-10-26T21:56:15.095000+08:00', '2026-10-26T21:56:15.142000+08:00', datetime.datetime(2026, 10, 26, 21, 56, 15))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_INFOR_ANESTHESIA.T1.2026-10-25.aa02672e8c93', 'RECONCILED')]
+version_evidence: 37
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_INFOR_ANESTHESIA ==
+===== EMR_OUTPATIENT_RECIPE =====
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 2016530
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OUTPATIENT_RECIPE.T1.2026-10-25.c679c34a745e-f288e64657f5', 'DBOPER.EMR_OUTPATIENT_RECIPE.T1.2026-10-25.c679c34a745e', 'f288e64657f5fb74609c8351af8ef5b1037e489a48f1383d4b446afd4ccca88e', '10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECIPE', 'MERGE:keys=1202', 1202, '2026-10-26T21:56:33.387000+08:00', '2026-10-26T21:56:33.809000+08:00', datetime.datetime(2026, 10, 26, 21, 56, 33))
+receipt_total: 88
+batch_state: [('DBOPER.EMR_OUTPATIENT_RECIPE.T1.2026-10-25.c679c34a745e', 'RECONCILED')]
+version_evidence: 1202
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_OUTPATIENT_RECIPE ==
