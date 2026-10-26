@@ -322,7 +322,7 @@
     "batch2_plan": {
       "authored_on": "2026-10-25",
       "session": "zcode-20261025-b2plan",
-      "status": "APPROVED_EXECUTION_PROMPT_ISSUED",
+      "status": "EXECUTED_20261026_3_OF_3_RECONCILED",
       "scope_adjustment": "原A2批2=体检3+输血4；预核（只读，批2预核证据_20261025/）实证调整为试点3表（EMR_PHYSICAL_REPORT+EMR_EXAM_IMAGE_REP/PATH）+工单3张不执行",
       "tickets": [
         "T-B02-1 体检两子表：PATIENT_ID/NAME/SEX_CODE/ID_NUM目标NOT NULL源视图不暴露，源视图补列后上量",
@@ -503,6 +503,25 @@
         "T-B07-4 HOS_DND缺必填主治医师姓名(源端补数后单行重放)"
       ],
       "lessons": "嵌套两遍幂等约束沉淀：批8及后续表达式修订批次v2前置检查项加两遍嵌套幂等矩阵验证(本批v3/v5范式可复用)"
+    },
+    "batch2_pilot": {
+      "executed_by": "zcode-20261025-b2pilot-run",
+      "finished_on": "2026-10-26",
+      "status": "PILOT_DONE_3_OF_3_RECONCILED",
+      "report": "批2试点执行报告_20261025.md",
+      "evidence_dir": "试点证据_20261025/扩表批2/",
+      "freeze": "扩表冻结件_批2_体检影像_v2_20261025.json（fingerprint=9faf0f50…，生产基准；v1(b2b14986)生成后修订：REPORT START/END_DTIME CASE LIKE+CONVERT表达式、REP ORDER_NAME置NULL、PATH去父=派生B01输入+notes留证；配置卷=/opt/data-asset/t1-config/freeze_batch2_v2.json+bindings_batch2.json，600，装载即验过）",
+      "business_day": "2026-10-24",
+      "results": {
+        "EMR_PHYSICAL_REPORT": "RECONCILED 零行窗合规（周六静默；源侧核验窗0行/max=10-23/总量22017；TDS7.0实连；10-25昼执行=体检源非HIS无门禁）",
+        "EMR_EXAM_IMAGE_REP": "RECONCILED INSERT 508 四方一致（131列宽表含NULL AS ORDER_NAME零隔离；单时钟22:05:53；源侧窗计数508精确一致）",
+        "EMR_EXAM_IMAGE_PATH": "RECONCILED INSERT 508 四方一致（去父试点missing_parent=0；单时钟22:11:13）"
+      },
+      "his_window_compliance": "原定10-25 22:00夜间定时器因机器休眠10-26 08:28才触发；10-26晨呈报白天执行请批未获答复（未答复不构成批准）→按计划默认10-26 22:00夜间窗口执行REP/PATH（22:05-22:12）",
+      "conservation": "REP/PATH各capture508=源侧窗计数=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（六方一致零隔离零CAS零缺零差）；回执账54→55(体检)→89/90(REP/PATH)，中间+33为批4/5/6/7/8他批写入已对账",
+      "zero_code_change": true,
+      "daily_run_dry": "三表识别正常；按日批准T1-DAILY-*未登记按设计跳过（批1同形态先例）",
+      "backlog": "三表历史回补[2026-01-01,H)不在本批（体检19332vs源22017差额属历史窗）；10-25业务窗起按T1-DAILY-<日>:<表>逐日登记驱动；REPORT两时间列表达式零行窗未触发待首有行业务日验证；工单3张挂账（T-B02-1/2/3）"
     }
   }
 }

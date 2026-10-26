@@ -1,0 +1,1789 @@
+{
+ "doc_version": "v1",
+ "freeze_id": "R189-T1-RUNTIME-CONFIG-FREEZE",
+ "environment": "production",
+ "version": "v1",
+ "frozen_at": "2026-10-25T17:44:20+08:00",
+ "source_inputs": [
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\B01_77项任务运行配置_v1.3候选_批2去父输入_20261025.json",
+   "sha256": "91f8c66cd290ff00500d716a2d5221c5ccd764252796ced8b2c251f0769b2d1e",
+   "role": "B01 v1.3候选"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\target_dict_bulk.json",
+   "sha256": "6941648fda6e95b4c8e2542f876239f791bf24a622e680dc13400e3fee56548c",
+   "role": "目标字典(DBOPER)"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\扩表源绑定_批2_20261025.json",
+   "sha256": "0171bf0acb434205c19fad128e115a2e7fa6beef8e5de3c6a7814141c17b853f",
+   "role": "扩表源绑定(操作者按平台元数据准备)"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\08_数据中心元数据快照.json",
+   "sha256": "223aa9efccc9ae3c9808a6e741f1dd21df2a0d2313001a4a85a93801de0fae16",
+   "role": "08元数据快照(视图DDL)"
+  },
+  {
+   "path": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\核验证据_20261022\\ods_views_bulk.json",
+   "sha256": "794158f9381c45cc6806fd197ddb25154b206e300dae9c0f0f90ed48867572ff",
+   "role": "源视图定义哈希(ODS)"
+  }
+ ],
+ "tables": {
+  "EMR_PHYSICAL_REPORT": {
+   "canonical_table": "EMR_PHYSICAL_REPORT",
+   "business_name": "体检报告单(D69）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "physical",
+    "dialect": "sqlserver",
+    "object": "dbo.v_EMR_PHYSICAL_REPORT",
+    "credential_ref": "container-credentials:physical_exam_sqlserver_10_10_10_96.readonly"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_PHYSICAL_REPORT",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "BLOOD_TYPE",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "BLOOD_TYPE",
+     "nullable": true,
+     "data_length": 8
+    },
+    {
+     "order": 3,
+     "name": "BORN_DATE",
+     "target_type": "DATE",
+     "source_expression": "BORN_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 4,
+     "name": "BORN_PLACE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "BORN_PLACE",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 5,
+     "name": "CHECK_DOCTOR",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "CHECK_DOCTOR",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 6,
+     "name": "CHECK_DOCTOR_IDCARD",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "CHECK_DOCTOR_IDCARD",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 7,
+     "name": "CHECK_TIME",
+     "target_type": "DATE",
+     "source_expression": "CHECK_TIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 8,
+     "name": "CITY",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "CITY",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 9,
+     "name": "COUNTY",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "COUNTY",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 10,
+     "name": "DIAG_EXPLAN",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DIAG_EXPLAN",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 11,
+     "name": "DIA_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DIA_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 12,
+     "name": "DIA_NAME",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DIA_NAME",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 13,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 14,
+     "name": "DRINK",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "DRINK",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 15,
+     "name": "DRINK_YEAR",
+     "target_type": "VARCHAR2(4)",
+     "source_expression": "DRINK_YEAR",
+     "nullable": true,
+     "data_length": 4
+    },
+    {
+     "order": 16,
+     "name": "END_DTIME",
+     "target_type": "DATE",
+     "source_expression": "END_DTIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 17,
+     "name": "EXAM_NAME",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_NAME",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 18,
+     "name": "EXAM_RESULT_CODE",
+     "target_type": "CHAR",
+     "source_expression": "EXAM_RESULT_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 19,
+     "name": "EXAM_RESULT_NAME",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_RESULT_NAME",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 20,
+     "name": "EXAM_SUMMARY",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "EXAM_SUMMARY",
+     "nullable": false,
+     "data_length": 4000
+    },
+    {
+     "order": 21,
+     "name": "EXAM_TYPE",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "EXAM_TYPE",
+     "nullable": false,
+     "data_length": 8
+    },
+    {
+     "order": 22,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 23,
+     "name": "FOOD_GUIDANCE",
+     "target_type": "CLOB",
+     "source_expression": "FOOD_GUIDANCE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 24,
+     "name": "HABBIT",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "HABBIT",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 25,
+     "name": "HEALTH_EXAM_NO",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "HEALTH_EXAM_NO",
+     "nullable": false,
+     "data_length": 36
+    },
+    {
+     "order": 26,
+     "name": "HEIGHT",
+     "target_type": "NUMBER",
+     "source_expression": "HEIGHT",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 27,
+     "name": "HOUSE_NUM",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "HOUSE_NUM",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 28,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 29,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": false,
+     "data_length": 18
+    },
+    {
+     "order": 30,
+     "name": "MARITAL_STATUS_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MARITAL_STATUS_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 31,
+     "name": "MARITAL_STATUS_NAME",
+     "target_type": "VARCHAR2(64)",
+     "source_expression": "MARITAL_STATUS_NAME",
+     "nullable": true,
+     "data_length": 64
+    },
+    {
+     "order": 32,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 33,
+     "name": "NATION_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "NATION_CODE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 34,
+     "name": "NATION_NAME",
+     "target_type": "VARCHAR2(16)",
+     "source_expression": "NATION_NAME",
+     "nullable": true,
+     "data_length": 16
+    },
+    {
+     "order": 35,
+     "name": "NOTES",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "NOTES",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 36,
+     "name": "OCCUPATION_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OCCUPATION_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 37,
+     "name": "OCCUPATION_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "OCCUPATION_NAME",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 38,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 39,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 40,
+     "name": "PATIENT_ID",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "PATIENT_ID",
+     "nullable": false,
+     "data_length": 36
+    },
+    {
+     "order": 41,
+     "name": "PHONE",
+     "target_type": "VARCHAR2(24)",
+     "source_expression": "PHONE",
+     "nullable": true,
+     "data_length": 24
+    },
+    {
+     "order": 42,
+     "name": "PRINT_TIME",
+     "target_type": "DATE",
+     "source_expression": "PRINT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 43,
+     "name": "PROVINCE",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "PROVINCE",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 44,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 45,
+     "name": "SMOKE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "SMOKE",
+     "nullable": true,
+     "data_length": 2
+    },
+    {
+     "order": 46,
+     "name": "SMOKE_YEAR",
+     "target_type": "VARCHAR2(4)",
+     "source_expression": "SMOKE_YEAR",
+     "nullable": true,
+     "data_length": 4
+    },
+    {
+     "order": 47,
+     "name": "START_DTIME",
+     "target_type": "DATE",
+     "source_expression": "START_DTIME",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 48,
+     "name": "SUMMARIZE_TIME",
+     "target_type": "DATE",
+     "source_expression": "SUMMARIZE_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 49,
+     "name": "TOTAL_AMOUNT",
+     "target_type": "NUMBER",
+     "source_expression": "TOTAL_AMOUNT",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 50,
+     "name": "TOWN",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "TOWN",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 51,
+     "name": "VILLAGE",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "VILLAGE",
+     "nullable": true,
+     "data_length": 70
+    },
+    {
+     "order": 52,
+     "name": "WEIGHT",
+     "target_type": "NUMBER",
+     "source_expression": "WEIGHT",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 53,
+     "name": "WORKING_ORG",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "WORKING_ORG",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 54,
+     "name": "ZJ_DOC_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ZJ_DOC_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 55,
+     "name": "ZJ_DOC_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ZJ_DOC_NAME",
+     "nullable": true,
+     "data_length": 50
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批2_体检影像",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_PHYSICAL_REPORT']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "77fa3b8d5ba914405e73fe3b246d5765e18508c5cea62d3f971e8d9dd035e485"
+  },
+  "EMR_EXAM_IMAGE_REP": {
+   "canonical_table": "EMR_EXAM_IMAGE_REP",
+   "business_name": "影像诊断报告( D07 标）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "his",
+    "dialect": "oracle",
+    "object": "HISUSER.V_EMR_EXAM_IMAGE_REP",
+    "credential_ref": "container-credentials:his_source_10_10_10_15"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_EXAM_IMAGE_REP",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "AGE",
+     "target_type": "NUMBER",
+     "source_expression": "AGE",
+     "nullable": false,
+     "data_length": 22
+    },
+    {
+     "order": 2,
+     "name": "AGE_DAY",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_DAY",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 3,
+     "name": "AGE_HOUR",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_HOUR",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 4,
+     "name": "AGE_MONTH",
+     "target_type": "NUMBER",
+     "source_expression": "AGE_MONTH",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 5,
+     "name": "ALARM_STATE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "ALARM_STATE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 6,
+     "name": "ANAE_DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ANAE_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 7,
+     "name": "ANAE_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAE_DOCTOR_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 8,
+     "name": "ANAE_EASTWEST_FLAG",
+     "target_type": "CHAR",
+     "source_expression": "ANAE_EASTWEST_FLAG",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 9,
+     "name": "ANAE_METHOD_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAE_METHOD_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 10,
+     "name": "ANAE_METHOD_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "ANAE_METHOD_NAME",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 11,
+     "name": "ANAE_OBSERVATION",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "ANAE_OBSERVATION",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 12,
+     "name": "APPLY_APPOINTMENT_DATE",
+     "target_type": "DATE",
+     "source_expression": "APPLY_APPOINTMENT_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 13,
+     "name": "APPLY_DATE",
+     "target_type": "DATE",
+     "source_expression": "APPLY_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 14,
+     "name": "APPLY_DEPT_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_DEPT_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 15,
+     "name": "APPLY_DEPT_NAME",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "APPLY_DEPT_NAME",
+     "nullable": false,
+     "data_length": 60
+    },
+    {
+     "order": 16,
+     "name": "APPLY_DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 17,
+     "name": "APPLY_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "APPLY_DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 18,
+     "name": "APPLY_HOSP_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_HOSP_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 19,
+     "name": "APPLY_HOSP_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "APPLY_HOSP_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 20,
+     "name": "APPLY_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_NUM",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 21,
+     "name": "AREA_NAME",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "AREA_NAME",
+     "nullable": true,
+     "data_length": 60
+    },
+    {
+     "order": 22,
+     "name": "AUDIT_DATE",
+     "target_type": "DATE",
+     "source_expression": "AUDIT_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 23,
+     "name": "AUDIT_DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "AUDIT_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 24,
+     "name": "AUDIT_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "AUDIT_DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 25,
+     "name": "BARCODE_NO",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "BARCODE_NO",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 26,
+     "name": "CALL_DATE",
+     "target_type": "DATE",
+     "source_expression": "CALL_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 27,
+     "name": "CARD_TYPE",
+     "target_type": "CHAR",
+     "source_expression": "CARD_TYPE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 28,
+     "name": "CHECKER_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "CHECKER_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 29,
+     "name": "CHIEF_COMPLAINT",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "CHIEF_COMPLAINT",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 30,
+     "name": "CITIZEN_ID",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "CITIZEN_ID",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 31,
+     "name": "CREATED_AT",
+     "target_type": "TIMESTAMP(6)",
+     "source_expression": "CREATED_AT",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 32,
+     "name": "CRITICAL_VALUE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "CRITICAL_VALUE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 33,
+     "name": "CZRK_ID",
+     "target_type": "VARCHAR2(36)",
+     "source_expression": "CZRK_ID",
+     "nullable": true,
+     "data_length": 36
+    },
+    {
+     "order": 34,
+     "name": "DEI",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEI",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 35,
+     "name": "DEP_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "DEP_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 36,
+     "name": "DEP_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DEP_NUM",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 37,
+     "name": "DIAGNOSE_DATE",
+     "target_type": "DATE",
+     "source_expression": "DIAGNOSE_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 38,
+     "name": "DIAGNOSE_HOSP_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "DIAGNOSE_HOSP_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 39,
+     "name": "DIAGNOSE_HOSP_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "DIAGNOSE_HOSP_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 40,
+     "name": "DIAGNOSIS_IDEA",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "DIAGNOSIS_IDEA",
+     "nullable": false,
+     "data_length": 2000
+    },
+    {
+     "order": 41,
+     "name": "DIAGNOSIS_TREAT_NO",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DIAGNOSIS_TREAT_NO",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 42,
+     "name": "DISEASE_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "DISEASE_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 43,
+     "name": "DISEASE_NAME",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "DISEASE_NAME",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 44,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 45,
+     "name": "EFFECTIVE_TIME",
+     "target_type": "DATE",
+     "source_expression": "EFFECTIVE_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 46,
+     "name": "EXAM_AIM",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "EXAM_AIM",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 47,
+     "name": "EXAM_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EXAM_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 48,
+     "name": "EXAM_DATE",
+     "target_type": "DATE",
+     "source_expression": "EXAM_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 49,
+     "name": "EXAM_DEPT_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_DEPT_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 50,
+     "name": "EXAM_DEPT_NAME",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "EXAM_DEPT_NAME",
+     "nullable": false,
+     "data_length": 60
+    },
+    {
+     "order": 51,
+     "name": "EXAM_DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 52,
+     "name": "EXAM_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EXAM_DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 53,
+     "name": "EXAM_ENGINEER_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_ENGINEER_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 54,
+     "name": "EXAM_ENGINEER_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EXAM_ENGINEER_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 55,
+     "name": "EXAM_HOSPITAL_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "EXAM_HOSPITAL_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 56,
+     "name": "EXAM_HOSPITAL_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EXAM_HOSPITAL_NAME",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 57,
+     "name": "EXAM_METHOD",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EXAM_METHOD",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 58,
+     "name": "EXAM_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "EXAM_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 59,
+     "name": "EXAM_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EXAM_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 60,
+     "name": "EXAM_POS_CODE",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "EXAM_POS_CODE",
+     "nullable": true,
+     "data_length": 8
+    },
+    {
+     "order": 61,
+     "name": "EXAM_POS_NAME",
+     "target_type": "VARCHAR2(80)",
+     "source_expression": "EXAM_POS_NAME",
+     "nullable": true,
+     "data_length": 80
+    },
+    {
+     "order": 62,
+     "name": "EXAM_QUANT_RESULT",
+     "target_type": "NUMBER",
+     "source_expression": "EXAM_QUANT_RESULT",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 63,
+     "name": "EXAM_QUANT_UNIT",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EXAM_QUANT_UNIT",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 64,
+     "name": "EXAM_REPORT_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "EXAM_REPORT_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 65,
+     "name": "EXAM_RESULT_CODE",
+     "target_type": "CHAR",
+     "source_expression": "EXAM_RESULT_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 66,
+     "name": "EXAM_RESULT_NOTE",
+     "target_type": "VARCHAR2(800)",
+     "source_expression": "EXAM_RESULT_NOTE",
+     "nullable": true,
+     "data_length": 800
+    },
+    {
+     "order": 67,
+     "name": "EXAM_TYPE",
+     "target_type": "VARCHAR2(17)",
+     "source_expression": "EXAM_TYPE",
+     "nullable": true,
+     "data_length": 17
+    },
+    {
+     "order": 68,
+     "name": "EXAM_TYPE_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "EXAM_TYPE_CODE",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 69,
+     "name": "EXAM_TYPE_NAME",
+     "target_type": "VARCHAR2(80)",
+     "source_expression": "EXAM_TYPE_NAME",
+     "nullable": false,
+     "data_length": 80
+    },
+    {
+     "order": 70,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 71,
+     "name": "HOS_EXAM_TYPE_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "HOS_EXAM_TYPE_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 72,
+     "name": "HOS_EXAM_TYPE_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "HOS_EXAM_TYPE_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 73,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 74,
+     "name": "ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 75,
+     "name": "IMAGE_DEVICE",
+     "target_type": "VARCHAR2(64)",
+     "source_expression": "IMAGE_DEVICE",
+     "nullable": true,
+     "data_length": 64
+    },
+    {
+     "order": 76,
+     "name": "IMAGE_DEVICE_CODE",
+     "target_type": "VARCHAR2(200)",
+     "source_expression": "IMAGE_DEVICE_CODE",
+     "nullable": true,
+     "data_length": 200
+    },
+    {
+     "order": 77,
+     "name": "IMAGE_RESULTS",
+     "target_type": "VARCHAR2(3000)",
+     "source_expression": "IMAGE_RESULTS",
+     "nullable": false,
+     "data_length": 3000
+    },
+    {
+     "order": 78,
+     "name": "IMAGE_TYPE_CODE",
+     "target_type": "VARCHAR2(2)",
+     "source_expression": "IMAGE_TYPE_CODE",
+     "nullable": false,
+     "data_length": 2
+    },
+    {
+     "order": 79,
+     "name": "IMAGE_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "IMAGE_TYPE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 80,
+     "name": "INTER_BODY",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "INTER_BODY",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 81,
+     "name": "LOCAL_EXAM_CODE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "LOCAL_EXAM_CODE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 82,
+     "name": "LOCAL_EXAM_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "LOCAL_EXAM_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 83,
+     "name": "MTU_REC_LIMIT_MARK",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "MTU_REC_LIMIT_MARK",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 84,
+     "name": "MTU_REC_MARK",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "MTU_REC_MARK",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 85,
+     "name": "NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 86,
+     "name": "NODE_CODE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "NODE_CODE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 87,
+     "name": "OPER_CODE",
+     "target_type": "VARCHAR2(8)",
+     "source_expression": "OPER_CODE",
+     "nullable": true,
+     "data_length": 8
+    },
+    {
+     "order": 88,
+     "name": "OPER_DATE",
+     "target_type": "DATE",
+     "source_expression": "OPER_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 89,
+     "name": "OPER_METHODE",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "OPER_METHODE",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 90,
+     "name": "OPER_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "OPER_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 91,
+     "name": "OPER_TIMES",
+     "target_type": "NUMBER",
+     "source_expression": "OPER_TIMES",
+     "nullable": true,
+     "data_length": 22
+    },
+    {
+     "order": 92,
+     "name": "ORDER_ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_ID",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 93,
+     "name": "ORDER_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ORDER_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 94,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 95,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 96,
+     "name": "OTHER_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "OTHER_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 97,
+     "name": "OTHER_ID_TYPE",
+     "target_type": "VARCHAR2(11)",
+     "source_expression": "OTHER_ID_TYPE",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 98,
+     "name": "PATIENT_TYPE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "PATIENT_TYPE_CODE",
+     "nullable": false,
+     "data_length": 5
+    },
+    {
+     "order": 99,
+     "name": "PATIENT_TYPE_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PATIENT_TYPE_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 100,
+     "name": "PRINT_PERSON",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "PRINT_PERSON",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 101,
+     "name": "PRINT_TIME",
+     "target_type": "DATE",
+     "source_expression": "PRINT_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 102,
+     "name": "PROJECT_CODE",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PROJECT_CODE",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 103,
+     "name": "PROJECT_NAME",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "PROJECT_NAME",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 104,
+     "name": "REPORT_DATE",
+     "target_type": "DATE",
+     "source_expression": "REPORT_DATE",
+     "nullable": false,
+     "data_length": 7
+    },
+    {
+     "order": 105,
+     "name": "REPORT_DOCTOR_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "REPORT_DOCTOR_CODE",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 106,
+     "name": "REPORT_DOCTOR_ID_NUM",
+     "target_type": "VARCHAR2(18)",
+     "source_expression": "REPORT_DOCTOR_ID_NUM",
+     "nullable": true,
+     "data_length": 18
+    },
+    {
+     "order": 107,
+     "name": "REPORT_DOCTOR_NAME",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "REPORT_DOCTOR_NAME",
+     "nullable": false,
+     "data_length": 50
+    },
+    {
+     "order": 108,
+     "name": "REPORT_LINK",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "REPORT_LINK",
+     "nullable": true,
+     "data_length": 100
+    },
+    {
+     "order": 109,
+     "name": "REPORT_NOTE",
+     "target_type": "VARCHAR2(1000)",
+     "source_expression": "REPORT_NOTE",
+     "nullable": true,
+     "data_length": 1000
+    },
+    {
+     "order": 110,
+     "name": "REPORT_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "REPORT_NUM",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 111,
+     "name": "REPORT_OBJECTIVE",
+     "target_type": "VARCHAR2(4000)",
+     "source_expression": "REPORT_OBJECTIVE",
+     "nullable": true,
+     "data_length": 4000
+    },
+    {
+     "order": 112,
+     "name": "REPORT_SUBJECTIVE",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "REPORT_SUBJECTIVE",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 113,
+     "name": "SAMPLE_FIXATIVE",
+     "target_type": "VARCHAR2(60)",
+     "source_expression": "SAMPLE_FIXATIVE",
+     "nullable": true,
+     "data_length": 60
+    },
+    {
+     "order": 114,
+     "name": "SAMPLE_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SAMPLE_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 115,
+     "name": "SAMPLE_RECEIVE_DATE",
+     "target_type": "DATE",
+     "source_expression": "SAMPLE_RECEIVE_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 116,
+     "name": "SAMPLE_STATUS",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SAMPLE_STATUS",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 117,
+     "name": "SAMPLE_TAKE_DATE",
+     "target_type": "DATE",
+     "source_expression": "SAMPLE_TAKE_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 118,
+     "name": "SAMPLE_TYPE",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SAMPLE_TYPE",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 119,
+     "name": "SECRECT_CLASS",
+     "target_type": "VARCHAR2(128)",
+     "source_expression": "SECRECT_CLASS",
+     "nullable": true,
+     "data_length": 128
+    },
+    {
+     "order": 120,
+     "name": "SEX_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SEX_CODE",
+     "nullable": false,
+     "data_length": 1
+    },
+    {
+     "order": 121,
+     "name": "SEX_NAME",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SEX_NAME",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 122,
+     "name": "SICKBED_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "SICKBED_NUM",
+     "nullable": true,
+     "data_length": 20
+    },
+    {
+     "order": 123,
+     "name": "SIGN_BEGIN_DATE",
+     "target_type": "DATE",
+     "source_expression": "SIGN_BEGIN_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 124,
+     "name": "SIGN_END_DATE",
+     "target_type": "DATE",
+     "source_expression": "SIGN_END_DATE",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 125,
+     "name": "SIGN_NOTE",
+     "target_type": "VARCHAR2(1200)",
+     "source_expression": "SIGN_NOTE",
+     "nullable": true,
+     "data_length": 1200
+    },
+    {
+     "order": 126,
+     "name": "SOURCE_CODE",
+     "target_type": "CHAR",
+     "source_expression": "SOURCE_CODE",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 127,
+     "name": "SPEC_EXAM_FLAG",
+     "target_type": "CHAR",
+     "source_expression": "SPEC_EXAM_FLAG",
+     "nullable": true,
+     "data_length": 1
+    },
+    {
+     "order": 128,
+     "name": "STATUS",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "STATUS",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 129,
+     "name": "TELEPHONE",
+     "target_type": "VARCHAR2(50)",
+     "source_expression": "TELEPHONE",
+     "nullable": true,
+     "data_length": 50
+    },
+    {
+     "order": 130,
+     "name": "TREAT_NOTE",
+     "target_type": "VARCHAR2(2000)",
+     "source_expression": "TREAT_NOTE",
+     "nullable": true,
+     "data_length": 2000
+    },
+    {
+     "order": 131,
+     "name": "VISITING_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "VISITING_NUM",
+     "nullable": false,
+     "data_length": 32
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批2_体检影像",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_EXAM_IMAGE_REP']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "fb5ddd59e8653d943599dccf4da1e1848983e1c5dfc067a1e7d3b09932818f02"
+  },
+  "EMR_EXAM_IMAGE_PATH": {
+   "canonical_table": "EMR_EXAM_IMAGE_PATH",
+   "business_name": "检查影像诊断报告子表(辅 D07 标）",
+   "engine": "PYTHON",
+   "modes": [
+    "T1",
+    "HISTORICAL"
+   ],
+   "enabled": false,
+   "source": {
+    "source_group": "his",
+    "dialect": "oracle",
+    "object": "HISUSER.V_EMR_EXAM_IMAGE_PATH",
+    "credential_ref": "container-credentials:his_source_10_10_10_15"
+   },
+   "target": {
+    "instance": "10.10.8.74:1521/orcl",
+    "tenant": "DBOPER",
+    "table": "DBOPER.EMR_EXAM_IMAGE_PATH",
+    "identity_verified": true,
+    "charset": "ZHS16GBK"
+   },
+   "stable_key": {
+    "columns": [
+     "ID"
+    ],
+    "verified": true
+   },
+   "anchor": {
+    "column": "DATETIME",
+    "inherited_from_parent": false,
+    "half_open": true,
+    "timezone": "Asia/Shanghai"
+   },
+   "change_mode": "SNAPSHOT_DIFF 全窗比对",
+   "projection": [
+    {
+     "order": 1,
+     "name": "APPLY_NUM",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "APPLY_NUM",
+     "nullable": true,
+     "data_length": 32
+    },
+    {
+     "order": 2,
+     "name": "CREATED_AT",
+     "target_type": "TIMESTAMP(6)",
+     "source_expression": "CREATED_AT",
+     "nullable": true,
+     "data_length": 11
+    },
+    {
+     "order": 3,
+     "name": "DISTRICT_CODE",
+     "target_type": "VARCHAR2(6)",
+     "source_expression": "DISTRICT_CODE",
+     "nullable": false,
+     "data_length": 6
+    },
+    {
+     "order": 4,
+     "name": "EFFECTIVE_TIME",
+     "target_type": "DATE",
+     "source_expression": "EFFECTIVE_TIME",
+     "nullable": true,
+     "data_length": 7
+    },
+    {
+     "order": 5,
+     "name": "EXCHANGE_TYPE",
+     "target_type": "VARCHAR2(10)",
+     "source_expression": "EXCHANGE_TYPE",
+     "nullable": false,
+     "data_length": 10
+    },
+    {
+     "order": 6,
+     "name": "ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 7,
+     "name": "IMAGE_ID",
+     "target_type": "VARCHAR2(100)",
+     "source_expression": "IMAGE_ID",
+     "nullable": false,
+     "data_length": 100
+    },
+    {
+     "order": 8,
+     "name": "IMAGE_SAVE_PATH",
+     "target_type": "VARCHAR2(512)",
+     "source_expression": "IMAGE_SAVE_PATH",
+     "nullable": false,
+     "data_length": 512
+    },
+    {
+     "order": 9,
+     "name": "ORG_CODE",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "ORG_CODE",
+     "nullable": false,
+     "data_length": 32
+    },
+    {
+     "order": 10,
+     "name": "ORG_NAME",
+     "target_type": "VARCHAR2(70)",
+     "source_expression": "ORG_NAME",
+     "nullable": false,
+     "data_length": 70
+    },
+    {
+     "order": 11,
+     "name": "REPORT_NUM",
+     "target_type": "VARCHAR2(20)",
+     "source_expression": "REPORT_NUM",
+     "nullable": false,
+     "data_length": 20
+    },
+    {
+     "order": 12,
+     "name": "STATUS",
+     "target_type": "VARCHAR2(32)",
+     "source_expression": "STATUS",
+     "nullable": true,
+     "data_length": 32
+    }
+   ],
+   "system_time_column": "SYSTEM_TIME",
+   "receipt_table": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "parent": null,
+   "notes": {
+    "batch": "批2_体检影像",
+    "anchor_evidence": "b01_verification.anchor verified 列 DATETIME（views=['V_EMR_EXAM_IMAGE_PATH']）",
+    "key_evidence": "B01 stable_key verified（目标PK=ID）",
+    "engine_disposition": "PENDING_ENGINE_EVIDENCE(独立源通道未实测画像)",
+    "view_column_coverage": "独立源无DDL，试点回读核验"
+   },
+   "fingerprint": "0902160843eb85a85aeb4dbe1f6b77c167a93ceb467a24d572853435f1280989"
+  }
+ },
+ "enabled_policy": "全部 enabled=false（候选停用保留）；正式启用另出启用冻结并走 A05c 审批，动作级派发走 K01 ActionBinding，不手工置 READY",
+ "notes": {
+  "batch": "批2_体检影像",
+  "coverage_problems": [],
+  "enabled": "全部 false（候选停用；启用走独立启用冻结）"
+ },
+ "config_fingerprint": "b2b1498691917c807657ed05a61f1dfc9178159c00ffbee86c072c2808be0297"
+}

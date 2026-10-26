@@ -1,0 +1,27 @@
+{
+ "doc": "批2（体检1+影像2）扩表源绑定：操作者按平台元数据与批2预核证据_20261025/批2预核结论_20261025.md 准备；对象全名显式，不拼不猜",
+ "as_of": "2026-10-25",
+ "sources": {
+  "physical": {
+   "dialect": "sqlserver",
+   "dsn": "10.10.10.96:1433/JZCIS",
+   "credential_ref": "container-credentials:physical_exam_sqlserver_10_10_10_96.readonly",
+   "driver": "pymssql(容器实测可用,TDS 7.0 回退已入 r212)",
+   "source_objects": {
+    "EMR_PHYSICAL_REPORT": "dbo.v_EMR_PHYSICAL_REPORT"
+   },
+   "evidence": "批2预核结论§一.1：sys.objects BINARY 精确匹配下源对象实名=dbo.v_EMR_PHYSICAL_REPORT（小写v；大写V_为CI排序规则误认不存在）；TDS 7.0；实例多库(EIS,JZCIS,ZONEKINGNET)，dsn 必须带 /JZCIS"
+  },
+  "his": {
+   "dialect": "oracle",
+   "dsn": "10.10.10.15:1521/his",
+   "credential_ref": "container-credentials:his_source_10_10_10_15",
+   "source_objects": {
+    "EMR_EXAM_IMAGE_REP": "HISUSER.V_EMR_EXAM_IMAGE_REP",
+    "EMR_EXAM_IMAGE_PATH": "HISUSER.V_EMR_EXAM_IMAGE_PATH"
+   },
+   "evidence": "批2预核结论§一.2-3：服务名=his（orcl 报 ORA-12514），凭据文件名 his_source_10_10_10_15 无 .readonly 后缀；两对象均为 VIEW（HISUSER），DATETIME=DATE 型无坑；HIS 源库白天门禁按 AGENTS"
+  }
+ },
+ "parents": {}
+}
