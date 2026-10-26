@@ -1,0 +1,117 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_IN_FEE_INFO_MAIN 业务日 2026-10-25 ===
+=== STEP1 approval-register ===
+2026-10-26 19:07:59
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B6-20261026:emr_in_fee_info_main",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_IN_FEE_INFO_MAIN",
+ "valid_from": "2026-10-26T11:08:01.087175+00:00",
+ "valid_until": "2026-10-27T11:08:01.087175+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批6并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B6-20261026:emr_in_fee_info_main（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_IN_FEE_INFO_MAIN，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-26 19:08:01
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+ "attempt_id": "att001",
+ "rows": 134,
+ "plan": {
+  "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+  "table": "EMR_IN_FEE_INFO_MAIN",
+  "business_day": "2026-10-25",
+  "mode": "T1",
+  "window": "win:2026-10-25T00:00:00+08:00/2026-10-26T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_IN_FEE_INFO_MAIN"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e
+=== STEP3 verify ===
+2026-10-26 19:08:03
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 134
+  },
+  "valid_groups": 134,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 134
+ },
+ "rows": 134,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+ "operation_id": "OPR-DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e-661443ff25a2",
+ "rows_affected": 134,
+ "plan_counts": {
+  "INSERT": 134
+ },
+ "partition": {
+  "ok": 134,
+  "insert": 134,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e-661443ff25a2",
+  "manifest_hash": "661443ff25a25c78c70e56d30cc697f5e52b1b80dee26ebb4f845d9d8200565f",
+  "rows_affected": 134
+ },
+ "simulation": false,
+ "applied_at": "2026-10-26T11:08:08+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 19:08:04 2026-10-26 19:08:08
+=== STEP5 reconcile ===
+2026-10-26 19:08:08
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+ "keys_checked": 134,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_IN_FEE_INFO_MAIN.T1.2026-10-25.7f1e8f550c3e",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_IN_FEE_INFO_MAIN ===

@@ -1,0 +1,58 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== RETRY apply (ORA-12541 transient at 18:47, target reachable re-verified) ===
+2026-10-26 18:48:32
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.T1.2026-10-25.0359a9df1e3b",
+ "operation_id": "OPR-DBOPER.EMR_INFOR_TRANS_BLOOD.T1.2026-10-25.0359a9df1e3b-e3b0c44298fc",
+ "rows_affected": 0,
+ "plan_counts": {},
+ "partition": {
+  "ok": 0,
+  "insert": 0,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_INFOR_TRANS_BLOOD.T1.2026-10-25.0359a9df1e3b-e3b0c44298fc",
+  "manifest_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rows_affected": 0
+ },
+ "simulation": false,
+ "applied_at": "2026-10-26T10:48:34+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-26 18:48:32 2026-10-26 18:48:34
+=== STEP5 reconcile ===
+2026-10-26 18:48:34
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.T1.2026-10-25.0359a9df1e3b",
+ "keys_checked": 0,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.T1.2026-10-25.0359a9df1e3b",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-26T00:00:00+08:00",
+   "continuous_through": "2026-10-26T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE retry INFOR_TRANS_BLOOD ===

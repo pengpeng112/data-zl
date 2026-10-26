@@ -1,0 +1,15 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+applywin_rows/system_time_nonnull/min/max: (36, 36, datetime.datetime(2026, 10, 26, 18, 52, 38), datetime.datetime(2026, 10, 26, 18, 52, 38))
+table_total_rows: 63206
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_BOFORE_OPERA_RECORD.T1.2026-10-25.ae41917da4fe-2ae20bdcbac5', 'DBOPER.EMR_BOFORE_OPERA_RECORD.T1.2026-10-25.ae41917da4fe', '2ae20bdcbac51c42cadf6bc8603d6ff361ff968d7a6e7a01a81002a2011e0545', '10.10.8.74:1521/orcl.DBOPER.EMR_BOFORE_OPERA_RECORD', 'MERGE:keys=36', 36, '2026-10-26T18:52:38.026000+08:00', '2026-10-26T18:52:38.073000+08:00', datetime.datetime(2026, 10, 26, 18, 52, 38))
+receipt_total: 75
+batch_state: [('DBOPER.EMR_BOFORE_OPERA_RECORD.T1.2026-10-25.ae41917da4fe', 'RECONCILED')]
+version_evidence: 36
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_BOFORE_OPERA_RECORD ==

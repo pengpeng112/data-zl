@@ -1,0 +1,15 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+applywin_rows/system_time_nonnull/min/max: (37, 37, datetime.datetime(2026, 10, 26, 18, 53, 5), datetime.datetime(2026, 10, 26, 18, 53, 5))
+table_total_rows: 79097
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_ANESTHESIA_RECORD.T1.2026-10-25.96467aaa709c-c07c2355927f', 'DBOPER.EMR_ANESTHESIA_RECORD.T1.2026-10-25.96467aaa709c', 'c07c2355927fce1297ebaa28e69f58cb33280576c03ff8214701dc55421cd780', '10.10.8.74:1521/orcl.DBOPER.EMR_ANESTHESIA_RECORD', 'MERGE:keys=37', 37, '2026-10-26T18:53:05.677000+08:00', '2026-10-26T18:53:05.786000+08:00', datetime.datetime(2026, 10, 26, 18, 53, 5))
+receipt_total: 76
+batch_state: [('DBOPER.EMR_ANESTHESIA_RECORD.T1.2026-10-25.96467aaa709c', 'RECONCILED')]
+version_evidence: 37
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_ANESTHESIA_RECORD ==

@@ -1,0 +1,30 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+== 批6 前置探查（业务日 2026-10-25 源=ODS 10.10.8.216）==
+EMR_INFOR_TRANS_BLOOD: 窗COUNT(2026-10-25)=0
+EMR_HOS_CHANGE_MAJOR_RECORD: 窗COUNT(2026-10-25)=0
+EMR_ANES_RECORD_BLOOD: 窗COUNT(2026-10-25)=4
+EMR_INFOR_CRITICALLY_ILL: 窗COUNT(2026-10-25)=9
+EMR_HOS_POSTOPER_RECORD: 窗COUNT(2026-10-25)=35
+EMR_BOFORE_OPERA_RECORD: 窗COUNT(2026-10-25)=36
+EMR_ANESTHESIA_RECORD: 窗COUNT(2026-10-25)=37
+EMR_OPERA_RECORD: 窗COUNT(2026-10-25)=48
+EMR_IN_FEE_INFO_MAIN: 窗COUNT(2026-10-25)=134
+EMR_HOS_CONSUL_RECORD: 窗COUNT(2026-10-25)=164
+EMR_DOC_ORDER_CHECK: 窗COUNT(2026-10-25)=5217
+== 目标现量（DBOPER@8.74）==
+EMR_INFOR_TRANS_BLOOD: target_total=24452
+EMR_HOS_CHANGE_MAJOR_RECORD: target_total=8366
+EMR_ANES_RECORD_BLOOD: target_total=4009
+EMR_INFOR_CRITICALLY_ILL: target_total=14845
+EMR_HOS_POSTOPER_RECORD: target_total=108495
+EMR_BOFORE_OPERA_RECORD: target_total=63170
+EMR_ANESTHESIA_RECORD: target_total=79060
+EMR_OPERA_RECORD: target_total=117738
+EMR_IN_FEE_INFO_MAIN: target_total=274723
+EMR_HOS_CONSUL_RECORD: target_total=235943
+EMR_DOC_ORDER_CHECK: target_total=10537074
+== 探查结束 ==

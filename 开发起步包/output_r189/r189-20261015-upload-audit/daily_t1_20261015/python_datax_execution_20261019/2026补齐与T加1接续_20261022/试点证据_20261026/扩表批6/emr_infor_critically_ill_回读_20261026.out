@@ -1,0 +1,49 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 14854
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899-f55a5929a758', 'DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899', 'f55a5929a758aa602885bc134dafd583c8631e2b3be906c050a73bd042bb1223', '10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_CRITICALLY_ILL', 'MERGE:keys=9', 9, '2026-10-26T18:50:44.905000+08:00', '2026-10-26T18:50:45.046000+08:00', datetime.datetime(2026, 10, 26, 18, 50, 45))
+receipt_total: 73
+batch_state: [('DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899', 'RECONCILED')]
+version_evidence: 9
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_INFOR_CRITICALLY_ILL ==
+== 表4 字符串SYSTEM_TIME窗口格式修正复验（实测写入为ISO带T格式 '2026-10-26T18:50:44.905000+08:00'，批5观察的'YYYY-MM-DD HH24:MI:SS'为三甲旧批量写者格式） ==
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 14854
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899-f55a5929a758', 'DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899', 'f55a5929a758aa602885bc134dafd583c8631e2b3be906c050a73bd042bb1223', '10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_CRITICALLY_ILL', 'MERGE:keys=9', 9, '2026-10-26T18:50:44.905000+08:00', '2026-10-26T18:50:45.046000+08:00', datetime.datetime(2026, 10, 26, 18, 50, 45))
+receipt_total: 73
+batch_state: [('DBOPER.EMR_INFOR_CRITICALLY_ILL.T1.2026-10-25.de782791e899', 'RECONCILED')]
+version_evidence: 9
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 26, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_INFOR_CRITICALLY_ILL ==
+
+recent SYSTEM_TIME: '26-10月-26'
+recent SYSTEM_TIME: '26-10月-26'
+recent SYSTEM_TIME: '26-10月-26'
+recent SYSTEM_TIME: '26-10月-26'
+recent SYSTEM_TIME: '26-10月-26'
+count LIKE 2026-10-26%: 0
+column type: ('VARCHAR2', 19)
+
+value/reps: '2026-06-18 08:16:00' 11678
+value/reps: '2026-10-15 05:30:46' 315
+value/reps: '2026-10-15 05:30:19' 274
+value/reps: '2026-10-15 05:29:50' 274
+value/reps: '2026-10-15 05:28:54' 273
+value/reps: '2026-10-15 05:28:26' 268
+value/reps: '2026-10-15 05:27:02' 262
+value/reps: '2026-10-15 05:27:58' 253
+count('26-10月-26'): 9

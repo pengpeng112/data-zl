@@ -1,0 +1,34 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+environment: production
+config_fingerprint: 776a394e7ab68317acbec45924fbe48ec3c4f6667d8b56d902acbe23d8f69900
+tables: ['EMR_ANESTHESIA_RECORD', 'EMR_ANES_RECORD_BLOOD', 'EMR_BOFORE_OPERA_RECORD', 'EMR_DOC_ORDER_CHECK', 'EMR_HOS_CHANGE_MAJOR_RECORD', 'EMR_HOS_CONSUL_RECORD', 'EMR_HOS_POSTOPER_RECORD', 'EMR_INFOR_CRITICALLY_ILL', 'EMR_INFOR_TRANS_BLOOD', 'EMR_IN_FEE_INFO_MAIN', 'EMR_OPERA_RECORD']
+anchor_plain_and_no_parent_all_11: True
+fingerprint_match_local: True
+---
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+-rw-------  1 root root  15581 10月 24 16:31 bindings_batch1.json
+-rw-------  1 root root   6357 10月 25 17:48 bindings_batch2.json
+-rw-------  1 root root  12844 10月 25 21:40 bindings_batch4.json
+-rw-------  1 root root  12091 10月 26 06:12 bindings_batch5.json
+-rw-------  1 root root  14665 10月 26 18:41 bindings_batch6.json
+-rw-------  1 root root   8454 10月 24 07:40 bindings_production.json
+-rw-------  1 root root  53306 10月 24 16:31 freeze_batch1_v1.json
+-rw-------  1 root root  53888 10月 24 17:00 freeze_batch1_v2.json
+-rw-------  1 root root  54979 10月 24 17:06 freeze_batch1_v3.json
+-rw-------  1 root root  57496 10月 24 17:13 freeze_batch1_v4.json
+-rw-------  1 root root  58238 10月 24 21:31 freeze_batch1_v5.json
+-rw-------  1 root root  46141 10月 25 17:48 freeze_batch2_v2.json
+-rw-------  1 root root  89295 10月 25 21:40 freeze_batch4_v1.json
+-rw-------  1 root root  84546 10月 26 06:12 freeze_batch5_v1.json
+-rw-------  1 root root  85047 10月 26 06:26 freeze_batch5_v2.json
+-rw-------  1 root root  85102 10月 26 06:29 freeze_batch5_v3.json
+-rw-------  1 root root  95724 10月 26 18:41 freeze_batch6_v1.json
+-rw-------  1 root root  61188 10月 24 07:50 freeze_production_v4.json

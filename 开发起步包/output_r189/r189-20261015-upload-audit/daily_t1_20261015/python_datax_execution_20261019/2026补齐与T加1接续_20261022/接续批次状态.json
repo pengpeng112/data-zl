@@ -443,6 +443,31 @@
       "ticketed": "T-B06-1 DISCHARGE_RECORD_DIAGNOSIS源视图缺失(源端建视图后按批5范式补跑)",
       "same_source_note": "三包同源ODS(批2/4/5不同源纪律的明示例外):只读并行无碍/行级INSERT无锁竞争/同表不跨包重跑/批2 HIS夜间补跑收口前禁镜像重建",
       "not_in_scope": "LIS4(双源代码工程)/血透3(8.53隧道+复合锚点)/输血4(凭据18456)/体检2(T-B02-1)/NURSE_PLAN(T-B01-61)不变排队"
+    },
+    "batch6_pilot": {
+      "executed_by": "zcode-20261026-b6pilot-run",
+      "finished_on": "2026-10-26",
+      "status": "PILOT_DONE_10_RECONCILED_OPERA_RECORD_TICKETED",
+      "report": "批6试点执行报告_20261026.md",
+      "evidence_dir": "试点证据_20261026/扩表批6/",
+      "freeze": "扩表冻结件_批6_ODS二波_v1_20261026.json（fingerprint=776a394e…，v1即定版=生产基准；零列表达式零父子，B01原件直用，组键ods=B01 source_group；IN_FEE_INFO_MAIN视图覆盖缺口核因=08快照DDL过期(2026-10-20费用视图修改前旧版)+活源隐式别名(pv.discharge_date_time,无as)正则盲区非真实缺口，活源gap=NONE且11视图live sha==views_bulk全MATCH佐证，批7补充件同款证据文件级零代码→元数据快照补充_批6_20261026.json作生成输入+核因后allow-view-gap留痕(notes missing=1)；配置卷=/opt/data-asset/t1-config/freeze_batch6_v1.json+bindings_batch6.json，600，装载即验过；bindings首版key_columns笔误被REFUSED_COLUMN_BINDING拦截零残留，修正重传全绿）",
+      "business_day": "2026-10-25",
+      "results": {
+        "EMR_INFOR_TRANS_BLOOD": "RECONCILED 零行窗合规",
+        "EMR_HOS_CHANGE_MAJOR_RECORD": "RECONCILED 零行窗合规",
+        "EMR_ANES_RECORD_BLOOD": "RECONCILED INSERT 4 四方一致（NOT NULL 13/13高压零隔离）",
+        "EMR_INFOR_CRITICALLY_ILL": "RECONCILED INSERT 9 四方一致（目标SYSTEM_TIME=VARCHAR2(19)，新写者NLS有损串26-10月-26与旧写者YYYY-MM-DD混存→工单T-B06-3，回答批5§5遗留观察）",
+        "EMR_HOS_POSTOPER_RECORD": "RECONCILED INSERT 35 四方一致",
+        "EMR_BOFORE_OPERA_RECORD": "RECONCILED INSERT 36 四方一致",
+        "EMR_ANESTHESIA_RECORD": "RECONCILED INSERT 37 四方一致",
+        "EMR_OPERA_RECORD": "工单T-B06-2未跑：capture FETCH_TIMEOUT（窗COUNT 48行快但62列全投影3次重试10分钟超时=COUNT快capture慢首例，批4 T-B04-1同族反向）；失败批A4检查RETRYABLE留痕attempts=0无stage残留；源端优化后同批号补跑",
+        "EMR_IN_FEE_INFO_MAIN": "RECONCILED INSERT 134 四方一致（DISCHARGE_DATE_TIME实捕成功=allow-view-gap核因生产实证）",
+        "EMR_HOS_CONSUL_RECORD": "RECONCILED INSERT 164 四方一致",
+        "EMR_DOC_ORDER_CHECK": "RECONCILED INSERT 5217 四方一致（殿后，1054万旧量目标当日窗全为新键零CAS）"
+      },
+      "conservation": "十表capture=探查=INSERT=SYSTEM_TIME apply窗=版本账=回执keys（零隔离零CAS零缺零差）；合计INSERT 5636；回执账69→79；十表水位推进2026-10-26",
+      "zero_code_change": true,
+      "backlog": "工单T-B06-1(DISCHARGE_RECORD_DIAGNOSIS源视图缺失,预核已开本批登记确认)/T-B06-2(OPERA_RECORD视图重)/T-B06-3(CRITICALLY_ILL SYSTEM_TIME列型对齐决策=DDL须用户批准)；11表历史回补[2026-01-01,H)后续批；日常T+1按T1-DAILY-<日>:<表>逐日登记驱动；EMR_OPERA_RECORD批准未消费24h自行过期"
     }
   }
 }

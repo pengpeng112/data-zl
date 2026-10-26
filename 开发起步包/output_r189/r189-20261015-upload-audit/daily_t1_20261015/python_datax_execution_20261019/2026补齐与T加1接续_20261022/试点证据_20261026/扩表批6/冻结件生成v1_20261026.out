@@ -1,0 +1,5 @@
+{
+ "ok": false,
+ "refused": "视图列覆盖不完整，拒绝冻结（--allow-view-gap 人工核因后强制并留痕）: EMR_IN_FEE_INFO_MAIN: 视图 V_EMR_IN_FEE_INFO_MAIN 未暴露 1 列（如 ['DISCHARGE_DATE_TIME']）",
+ "exit_code": 3
+}

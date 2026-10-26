@@ -1,0 +1,14 @@
+== REFUSED_COLUMN_BINDING 定位（2026-10-26 18:44 首跑表1 INFOR_TRANS_BLOOD 被拒） ==
+== 根因: bindings key_columns 误取冻结件 stable_key 字典键名['columns','verified']，修正为['ID']后重传 ==
+
+EMR_ANESTHESIA_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_ANES_RECORD_BLOOD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_BOFORE_OPERA_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_DOC_ORDER_CHECK | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_HOS_CHANGE_MAJOR_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_HOS_CONSUL_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_HOS_POSTOPER_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_INFOR_CRITICALLY_ILL | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_INFOR_TRANS_BLOOD | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_IN_FEE_INFO_MAIN | cols_eq= True | key_eq= True | st_in= False | target_eq= True
+EMR_OPERA_RECORD | cols_eq= True | key_eq= True | st_in= False | target_eq= True

@@ -1,0 +1,193 @@
+{
+ "ok": true,
+ "output": "F:\\python\\数据资产\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\扩表冻结件_批6_ODS二波_v1_20261026.json",
+ "environment": "production",
+ "batch": "批6_ODS二波",
+ "tables": [
+  "EMR_ANESTHESIA_RECORD",
+  "EMR_ANES_RECORD_BLOOD",
+  "EMR_BOFORE_OPERA_RECORD",
+  "EMR_DOC_ORDER_CHECK",
+  "EMR_HOS_CHANGE_MAJOR_RECORD",
+  "EMR_HOS_CONSUL_RECORD",
+  "EMR_HOS_POSTOPER_RECORD",
+  "EMR_INFOR_CRITICALLY_ILL",
+  "EMR_INFOR_TRANS_BLOOD",
+  "EMR_IN_FEE_INFO_MAIN",
+  "EMR_OPERA_RECORD"
+ ],
+ "config_fingerprint": "776a394e7ab68317acbec45924fbe48ec3c4f6667d8b56d902acbe23d8f69900",
+ "per_table": {
+  "EMR_INFOR_TRANS_BLOOD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 38,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_HOS_CHANGE_MAJOR_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 36,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_ANES_RECORD_BLOOD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_ANES_RECORD_BLOOD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 13,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_INFOR_CRITICALLY_ILL": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 29,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_HOS_POSTOPER_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_HOS_POSTOPER_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 15,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_BOFORE_OPERA_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 59,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_ANESTHESIA_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_ANESTHESIA_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 54,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_OPERA_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_OPERA_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 61,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_IN_FEE_INFO_MAIN": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_IN_FEE_INFO_MAIN",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 19,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": [
+    "DISCHARGE_DATE_TIME"
+   ]
+  },
+  "EMR_HOS_CONSUL_RECORD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_HOS_CONSUL_RECORD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 26,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_DOC_ORDER_CHECK": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_DOC_ORDER_CHECK",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 41,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  }
+ },
+ "coverage_problems": [
+  "EMR_IN_FEE_INFO_MAIN: 视图 V_EMR_IN_FEE_INFO_MAIN 未暴露 1 列（如 ['DISCHARGE_DATE_TIME']）"
+ ],
+ "结论": "批冻结件已生成并自校验通过（11 表，environment=production，enabled 全 false）"
+}

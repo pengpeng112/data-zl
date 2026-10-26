@@ -1,0 +1,39 @@
+{
+ "doc": "批6（ODS二波11表·零表达式快通道）扩表源绑定：源=ODS 10.10.8.216:1521/orcl（首组同款通道，dsn/credential_ref 照抄首组生产 bindings 的 ods_8_216 段）；对象 ODS.V_EMR_<表名> 显式全名，不拼不猜；组键 ods=B01 source_group（生成器按组键精确匹配）；view_by_table 供 ODS 视图列覆盖核验（08 快照 DDL 别名 + ods_views_bulk 定义哈希）。本包 11 表 B01 原件直用（declared_parent_candidates 全空，无去父输入）；预核（批678普查+2026-10-26 活源复核）：全表视图实存、无 LOB、DATETIME 全 DATE、活源列对齐 gap=NONE、无跨族类型错配、08 快照 as 正则全覆盖——预期 v1 即定版零旗标零表达式。",
+ "as_of": "2026-10-26",
+ "sources": {
+  "ods": {
+   "dialect": "oracle",
+   "dsn": "10.10.8.216:1521/orcl",
+   "credential_ref": "container-credentials:ods_8_216",
+   "source_objects": {
+    "EMR_INFOR_TRANS_BLOOD": "ODS.V_EMR_INFOR_TRANS_BLOOD",
+    "EMR_HOS_CHANGE_MAJOR_RECORD": "ODS.V_EMR_HOS_CHANGE_MAJOR_RECORD",
+    "EMR_ANES_RECORD_BLOOD": "ODS.V_EMR_ANES_RECORD_BLOOD",
+    "EMR_INFOR_CRITICALLY_ILL": "ODS.V_EMR_INFOR_CRITICALLY_ILL",
+    "EMR_HOS_POSTOPER_RECORD": "ODS.V_EMR_HOS_POSTOPER_RECORD",
+    "EMR_BOFORE_OPERA_RECORD": "ODS.V_EMR_BOFORE_OPERA_RECORD",
+    "EMR_ANESTHESIA_RECORD": "ODS.V_EMR_ANESTHESIA_RECORD",
+    "EMR_OPERA_RECORD": "ODS.V_EMR_OPERA_RECORD",
+    "EMR_IN_FEE_INFO_MAIN": "ODS.V_EMR_IN_FEE_INFO_MAIN",
+    "EMR_HOS_CONSUL_RECORD": "ODS.V_EMR_HOS_CONSUL_RECORD",
+    "EMR_DOC_ORDER_CHECK": "ODS.V_EMR_DOC_ORDER_CHECK"
+   },
+   "view_by_table": {
+    "EMR_INFOR_TRANS_BLOOD": "V_EMR_INFOR_TRANS_BLOOD",
+    "EMR_HOS_CHANGE_MAJOR_RECORD": "V_EMR_HOS_CHANGE_MAJOR_RECORD",
+    "EMR_ANES_RECORD_BLOOD": "V_EMR_ANES_RECORD_BLOOD",
+    "EMR_INFOR_CRITICALLY_ILL": "V_EMR_INFOR_CRITICALLY_ILL",
+    "EMR_HOS_POSTOPER_RECORD": "V_EMR_HOS_POSTOPER_RECORD",
+    "EMR_BOFORE_OPERA_RECORD": "V_EMR_BOFORE_OPERA_RECORD",
+    "EMR_ANESTHESIA_RECORD": "V_EMR_ANESTHESIA_RECORD",
+    "EMR_OPERA_RECORD": "V_EMR_OPERA_RECORD",
+    "EMR_IN_FEE_INFO_MAIN": "V_EMR_IN_FEE_INFO_MAIN",
+    "EMR_HOS_CONSUL_RECORD": "V_EMR_HOS_CONSUL_RECORD",
+    "EMR_DOC_ORDER_CHECK": "V_EMR_DOC_ORDER_CHECK"
+   },
+   "evidence": "ods_views_bulk.json（2026-10-22 批量核验）+ 08 元数据快照 DDL；批678活源普查（批678预核证据_20261026/剩余33表活源普查_20261026.out：11表 view=True/无LOB/gap=NONE/零错配）；2026-10-26 执行时活源复核（试点证据_20261026/扩表批6/生产实况复核与活源列对齐_20261026.out：11表 gap=NONE、DATETIME 全 DATE）；窗计数（业务日2026-10-25，前置探查_20261026.out）：0/0/4/9/35/36/37/48/134/164/5217（HOS_POSTOPER/OPERA/IN_FEE_MAIN 较普查+5/+9/+2=迟到行）"
+  }
+ },
+ "parents": {}
+}

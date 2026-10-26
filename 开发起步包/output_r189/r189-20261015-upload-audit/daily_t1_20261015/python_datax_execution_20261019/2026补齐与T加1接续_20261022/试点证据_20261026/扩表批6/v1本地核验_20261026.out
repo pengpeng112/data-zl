@@ -1,0 +1,173 @@
+load OK: environment=production
+config fp: 776a394e7ab68317acbec45924fbe48ec3c4f6667d8b56d902acbe23d8f69900
+tables: ['EMR_ANESTHESIA_RECORD', 'EMR_ANES_RECORD_BLOOD', 'EMR_BOFORE_OPERA_RECORD', 'EMR_DOC_ORDER_CHECK', 'EMR_HOS_CHANGE_MAJOR_RECORD', 'EMR_HOS_CONSUL_RECORD', 'EMR_HOS_POSTOPER_RECORD', 'EMR_INFOR_CRITICALLY_ILL', 'EMR_INFOR_TRANS_BLOOD', 'EMR_IN_FEE_INFO_MAIN', 'EMR_OPERA_RECORD']
+EMR_ANESTHESIA_RECORD: render OK | proj=54列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_ANES_RECORD_BLOOD: render OK | proj=13列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_BOFORE_OPERA_RECORD: render OK | proj=59列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_DOC_ORDER_CHECK: render OK | proj=41列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_CHANGE_MAJOR_RECORD: render OK | proj=36列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_CONSUL_RECORD: render OK | proj=26列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_HOS_POSTOPER_RECORD: render OK | proj=15列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_INFOR_CRITICALLY_ILL: render OK | proj=29列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_INFOR_TRANS_BLOOD: render OK | proj=38列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_IN_FEE_INFO_MAIN: render OK | proj=19列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OPERA_RECORD: render OK | proj=61列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+
+ALL OK: 11 tables, plain DATE anchor predicates, zero column expressions,
+projection == bindings write_columns (programmatic check).
+note: EMR_IN_FEE_INFO_MAIN DISCHARGE_DATE_TIME 覆盖缺口核因=08快照DDL过期
+(2026-10-20费用视图修改前旧版)+活源隐式别名(pv.discharge_date_time,无as)正则盲区，
+活源 ALL_TAB_COLUMNS gap=NONE 且 11 视图 live sha==views_bulk(2026-10-22) 全 MATCH，
+核因后按生成器既定语义 --allow-view-gap 强制留痕；生成输入=元数据快照补充_批6
+(08结构+活源DBMS_METADATA DDL注入，批7补充件同款证据文件级零代码范式)。
+usage: reporting_ctl [-h] [--config CONFIG]
+                     {list,validate,doctor,daily-report,plan,simulate,resume,ticket-export,freeze-config,freeze-config-batch,approval-register,outbox-send,outbox-inspect,capture,verify,apply,reconcile,delivery,retry,backfill-plan,gap-diff-plan,publish-order} ...
+reporting_ctl: error: unrecognized arguments: --runtime-config F:/python/数据资产/开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/扩表冻结件_批6_ODS二波_v1_20261026.json --bindings-file F:/python/数据资产/开发起步包/output_r189/r189-20261015-upload-audit/daily_t1_20261015/python_datax_execution_20261019/2026补齐与T加1接续_20261022/扩表bindings_批6_20261026.json
+{
+ "package_id": "R189-T1-ENGINEERING-20261019-v1.2",
+ "counts": {
+  "canonical_items": 77,
+  "unique_canonical_tables": 77,
+  "source_groups": 11,
+  "dual_source_tables": [
+   "EMR_INSPECTION",
+   "EMR_INSPECTION_IMAGE",
+   "EMR_INSPECTION_ALLERGY",
+   "EMR_INSPECTION_ITEM"
+  ],
+  "not_provided_pending_applicability": [
+   "EMR_NURSE_PLAN"
+  ],
+  "rescan_tables": [
+   "EMR_DOC_ORDER_CHECK",
+   "EMR_IN_FEE_INFO_CHILD"
+  ],
+  "datetime_dependency_tables": [
+   "EMR_DOC_ORDER_CHECK",
+   "EMR_OUT_FEE_INFO_CHILD",
+   "EMR_IN_FEE_INFO_CHILD"
+  ]
+ },
+ "seed_state": {
+  "enabled_any": false,
+  "engine_distribution": {
+   "UNDECIDED": 77
+  },
+  "applicability_distribution": {
+   "TO_VERIFY": 76,
+   "WAITING_BUSINESS_CONFIRMATION": 1
+  },
+  "deadline_state_distribution": {
+   "UNCONFIGURED": 77
+  }
+ },
+ "readiness_layers": {
+  "CONFIG_VALID": {
+   "READY": 77,
+   "NOT_READY": 0,
+   "UNKNOWN": 0
+  },
+  "READ_READY": {
+   "READY": 0,
+   "NOT_READY": 0,
+   "UNKNOWN": 77
+  },
+  "STAGE_READY": {
+   "READY": 0,
+   "NOT_READY": 0,
+   "UNKNOWN": 77
+  },
+  "APPLY_READY": {
+   "READY": 0,
+   "NOT_READY": 0,
+   "UNKNOWN": 77
+  },
+  "REPORT_READY": {
+   "READY": 0,
+   "NOT_READY": 0,
+   "UNKNOWN": 77
+  }
+ },
+ "source_group_object_counts": {
+  "adverse": 1,
+  "blood": 4,
+  "dialysis": 3,
+  "his": 2,
+  "hrp": 1,
+  "infection": 1,
+  "lis": 4,
+  "nursing": 8,
+  "ods": 52,
+  "pathology": 2,
+  "physical": 3
+ },
+ "performance_profiles": {
+  "total": 77,
+  "unmeasured": 77,
+  "measured_verified": 0,
+  "missing_action": "REFUSE_PRODUCTION_READY_ALLOW_OFFLINE_DEVELOPMENT"
+ },
+ "lis_routes": {
+  "EMR_INSPECTION": {
+   "segments": 3,
+   "overlap_q4_2023": true,
+   "route_clock_verified": false
+  },
+  "EMR_INSPECTION_IMAGE": {
+   "segments": 3,
+   "overlap_q4_2023": true,
+   "route_clock_verified": false
+  },
+  "EMR_INSPECTION_ALLERGY": {
+   "segments": 3,
+   "overlap_q4_2023": true,
+   "route_clock_verified": false
+  },
+  "EMR_INSPECTION_ITEM": {
+   "segments": 3,
+   "overlap_q4_2023": true,
+   "route_clock_verified": false
+  }
+ },
+ "monthly_rescan": {
+  "tables": [
+   "EMR_DOC_ORDER_CHECK",
+   "EMR_IN_FEE_INFO_CHILD"
+  ],
+  "managed_history_start_month": null,
+  "managed_history_end_month": null,
+  "scope_state": "SCOPE_UNFROZEN_E01_TO_FILL"
+ },
+ "manual_tickets": {
+  "count": 6,
+  "ids": [
+   "E01-DISCHARGE-PERF",
+   "E01-DISCHARGE-QUALITY",
+   "E01-DATETIME-DEPENDENCY",
+   "E01-LIS-LEGACY-ACCESS",
+   "E01-WRITER-HANDOFF",
+   "E01-CREDENTIAL-LIFETIME"
+  ],
+  "never_auto_close": true
+ },
+ "writer_handoff": {
+  "state": "LIVE_SNAPSHOT_REQUIRED_AT_E01_AND_REFRESH_AT_CUTOVER",
+  "snapshot_captured": false,
+  "note": "8.53 进程快照需 ops-runbook 受控通道与具体批准；本轮未 SSH，不把 manual2/dqueue/gap_exec 的用户时点陈述当已停证据"
+ },
+ "long_lived_credentials": {
+  "policy": "APPROVED_SECRET_STORE_REF_NOT_TMP_ENV",
+  "configured_refs": [],
+  "unconfigured_tables": 77
+ },
+ "problems": [],
+ "validation": {
+  "structural_problems": [],
+  "structure_ok": true,
+  "ready_violations": []
+ },
+ "offline": true,
+ "ok": true,
+ "exit_code": 0,
+ "结论": "任务包结构校验通过；77项保持 disabled/UNKNOWN，生产层全部 UNKNOWN（未知不可变READY）"
+}

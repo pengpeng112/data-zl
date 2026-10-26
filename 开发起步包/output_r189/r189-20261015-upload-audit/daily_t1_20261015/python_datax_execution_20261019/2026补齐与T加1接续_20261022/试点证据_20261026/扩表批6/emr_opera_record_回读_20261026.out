@@ -1,0 +1,14 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+applywin_rows/system_time_nonnull/min/max: (0, 0, None, None)
+table_total_rows: 117738
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt_total: 76
+batch_state: []
+version_evidence: 0
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): []
+quarantine_groups(last_1d): []
+== readback done: EMR_OPERA_RECORD ==

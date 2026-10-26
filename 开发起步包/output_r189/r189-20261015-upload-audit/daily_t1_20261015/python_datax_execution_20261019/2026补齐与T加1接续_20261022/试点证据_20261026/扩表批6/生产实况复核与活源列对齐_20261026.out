@@ -1,0 +1,24 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+data-asset-api data-asset:r212-20261024-b1 Up 45 hours (healthy)
+alembic head: b8c9d0e1f2a3
+executors: [('JHEMR_ACCOUNT_ENABLE', False), ('CDMS_ACCOUNT_ENABLE', False), ('JHEMR_ACCOUNT_DISABLE', True), ('CDMS_ACCOUNT_DISABLE', True), ('r189_t1_stage_to_dboper', False), ('r189_ich_field_update', True), ('r189_home_clock_refresh', True), ('r189_doc_missing_insert', True), ('r189_spec_exam_field_update', True), ('sql-target-apply-1', True)]
+receipt_total(DBOPER): 69
+target tables present: ['EMR_ANESTHESIA_RECORD', 'EMR_ANES_RECORD_BLOOD', 'EMR_BOFORE_OPERA_RECORD', 'EMR_DOC_ORDER_CHECK', 'EMR_HOS_CHANGE_MAJOR_RECORD', 'EMR_HOS_CONSUL_RECORD', 'EMR_HOS_POSTOPER_RECORD', 'EMR_INFOR_CRITICALLY_ILL', 'EMR_INFOR_TRANS_BLOOD', 'EMR_IN_FEE_INFO_MAIN', 'EMR_OPERA_RECORD']
+target SYSTEM_TIME types: [('EMR_ANESTHESIA_RECORD', 'TIMESTAMP(6)'), ('EMR_ANES_RECORD_BLOOD', 'TIMESTAMP(6)'), ('EMR_BOFORE_OPERA_RECORD', 'TIMESTAMP(6)'), ('EMR_DOC_ORDER_CHECK', 'TIMESTAMP(6)'), ('EMR_HOS_CHANGE_MAJOR_RECORD', 'TIMESTAMP(6)'), ('EMR_HOS_CONSUL_RECORD', 'TIMESTAMP(6)'), ('EMR_HOS_POSTOPER_RECORD', 'TIMESTAMP(6)'), ('EMR_INFOR_CRITICALLY_ILL', 'VARCHAR2'), ('EMR_INFOR_TRANS_BLOOD', 'TIMESTAMP(6)'), ('EMR_IN_FEE_INFO_MAIN', 'TIMESTAMP(6)'), ('EMR_OPERA_RECORD', 'TIMESTAMP(6)')]
+== ODS 活源列对齐（ALL_TAB_COLUMNS vs 目标列）==
+EMR_INFOR_TRANS_BLOOD: view=True 目标38列 gap=NONE DATETIME_type=DATE 视图列数=40
+EMR_HOS_CHANGE_MAJOR_RECORD: view=True 目标36列 gap=NONE DATETIME_type=DATE 视图列数=38
+EMR_ANES_RECORD_BLOOD: view=True 目标13列 gap=NONE DATETIME_type=DATE 视图列数=15
+EMR_INFOR_CRITICALLY_ILL: view=True 目标29列 gap=NONE DATETIME_type=DATE 视图列数=31
+EMR_HOS_POSTOPER_RECORD: view=True 目标15列 gap=NONE DATETIME_type=DATE 视图列数=17
+EMR_BOFORE_OPERA_RECORD: view=True 目标59列 gap=NONE DATETIME_type=DATE 视图列数=61
+EMR_ANESTHESIA_RECORD: view=True 目标54列 gap=NONE DATETIME_type=DATE 视图列数=56
+EMR_OPERA_RECORD: view=True 目标61列 gap=NONE DATETIME_type=DATE 视图列数=63
+EMR_IN_FEE_INFO_MAIN: view=True 目标19列 gap=NONE DATETIME_type=DATE 视图列数=21
+EMR_HOS_CONSUL_RECORD: view=True 目标26列 gap=NONE DATETIME_type=DATE 视图列数=28
+EMR_DOC_ORDER_CHECK: view=True 目标41列 gap=NONE DATETIME_type=DATE 视图列数=43
+== 复核结束 ==
