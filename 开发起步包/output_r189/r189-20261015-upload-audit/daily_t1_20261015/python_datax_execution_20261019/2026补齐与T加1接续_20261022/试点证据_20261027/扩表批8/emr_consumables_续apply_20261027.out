@@ -1,0 +1,49 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_CONSUMABLES 续跑（QUARANTINED 合法子集 apply）===
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b",
+ "operation_id": "OPR-DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b-bee099a00f6e",
+ "rows_affected": 1293,
+ "plan_counts": {
+  "INSERT": 1293
+ },
+ "partition": {
+  "ok": 1293,
+  "insert": 1293,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b-bee099a00f6e",
+  "manifest_hash": "bee099a00f6ee7e688bb34f290989b43eb0fcb29eddbc92e007a1978aebca531",
+  "rows_affected": 1293
+ },
+ "simulation": false,
+ "applied_at": "2026-10-27T10:43:55+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-27 18:43:33 2026-10-27 18:43:55
+=== STEP5 reconcile ===
+2026-10-27 18:43:55
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b",
+ "keys_checked": 1456,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 163,
+ "diff_sample": [],
+ "recovery": null,
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "回读存在差异: 缺 0 / 差异 0"
+}

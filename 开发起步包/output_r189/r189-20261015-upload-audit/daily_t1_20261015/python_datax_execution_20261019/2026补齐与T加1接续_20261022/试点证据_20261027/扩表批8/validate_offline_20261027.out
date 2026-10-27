@@ -1,0 +1,3 @@
+package_id: R189-T1-ENGINEERING-20261019-v1.2
+problems: []
+counts: {'canonical_items': 77, 'unique_canonical_tables': 77, 'source_groups': 11, 'dual_source_tables': ['EMR_INSPECTION', 'EMR_INSPECTION_IMAGE', 'EMR_INSPECTION_ALLERGY', 'EMR_INSPECTION_ITEM'], 'not_provided_pending_applicability': ['EMR_NURSE_PLAN'], 'rescan_tables': ['EMR_DOC_ORDER_CHECK', 'EMR_IN_FEE_INFO_CHILD'], 'datetime_dependency_tables': ['EMR_DOC_ORDER_CHECK', 'EMR_OUT_FEE_INFO_CHILD', 'EMR_IN_FEE_INFO_CHILD']}

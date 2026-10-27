@@ -1,0 +1,9 @@
+
+同键多行组数: 26 | 行数分布: [2, 3]
+组大小分布: {3: 1, 2: 25}
+隔离行数合计(组内全部行): 53
+样例组 ID 尾4位=….300 行数=3
+两行差异列: ['DOCTOR_ID_NUM', 'DOCTOR_NAME']
+  DOCTOR_ID_NUM: len=18 vs len=18 (值脱敏)
+  DOCTOR_NAME: len=3 vs len=2 (值脱敏)
+前50组差异列分布: {'DOCTOR_ID_NUM': 26, 'DOCTOR_NAME': 26}

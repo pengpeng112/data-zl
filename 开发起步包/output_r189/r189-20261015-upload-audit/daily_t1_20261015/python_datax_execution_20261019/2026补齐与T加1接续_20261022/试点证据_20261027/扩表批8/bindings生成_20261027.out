@@ -1,0 +1,12 @@
+EMR_ANES_RECORD_MED: key=['ID'] write_cols=19 交叉核对OK
+EMR_ADMISSION_RECORD_EXAM: key=['ID'] write_cols=16 交叉核对OK
+EMR_CONSUMABLES: key=['ID'] write_cols=29 交叉核对OK
+EMR_OUTPATIENT_DIAG: key=['ID'] write_cols=26 交叉核对OK
+EMR_DOC_ORDER_DRUG: key=['ID'] write_cols=68 交叉核对OK
+EMR_OUT_FEE_INFO_MAIN: key=['ID'] write_cols=62 交叉核对OK
+EMR_OUT_FEE_INFO_CHILD: key=['ID'] write_cols=49 交叉核对OK
+EMR_IN_FEE_INFO_CHILD: key=['ID'] write_cols=46 交叉核对OK
+EMR_INFOR_OPERATION: key=['ID'] write_cols=43 交叉核对OK
+EMR_INFOR_OTHERS: key=['ID'] write_cols=30 交叉核对OK
+bindings written: F:\python\数据资产\开发起步包\output_r189\r189-20261015-upload-audit\daily_t1_20261015\python_datax_execution_20261019\2026补齐与T加1接续_20261022\扩表bindings_批8_20261026.json
+tables=10 action_bindings=10

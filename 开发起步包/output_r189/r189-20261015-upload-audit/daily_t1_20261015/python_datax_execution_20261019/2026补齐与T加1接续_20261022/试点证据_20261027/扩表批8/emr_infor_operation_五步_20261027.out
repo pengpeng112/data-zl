@@ -1,0 +1,27 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_INFOR_OPERATION 业务日 2026-10-26 ===
+=== STEP1 approval-register ===
+2026-10-27 19:02:44
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B8-20261026:emr_infor_operation",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_OPERATION",
+ "valid_from": "2026-10-27T11:02:45.934562+00:00",
+ "valid_until": "2026-10-28T11:02:45.934562+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批8并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B8-20261026:emr_infor_operation（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_OPERATION，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-27 19:02:46
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_INFOR_OPERATION.T1.2026-10-26.b87fa22f6b72",
+ "state": "FETCH_TIMEOUT",
+ "window": "win:2026-10-26T00:00:00+08:00/2026-10-27T00:00:00+08:00",
+ "结论": "capture 未完成（如实记录）"
+}

@@ -1,0 +1,3 @@
+
+窗内至少缺一 NOT NULL 列的行数: 163
+  DEPT_NAME IS NULL: 163 行

@@ -1,0 +1,117 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_DOC_ORDER_DRUG 业务日 2026-10-26 ===
+=== STEP1 approval-register ===
+2026-10-27 18:50:30
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B8-20261026:emr_doc_order_drug",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_DOC_ORDER_DRUG",
+ "valid_from": "2026-10-27T10:50:31.178909+00:00",
+ "valid_until": "2026-10-28T10:50:31.178909+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批8并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B8-20261026:emr_doc_order_drug（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_DOC_ORDER_DRUG，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-27 18:50:31
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+ "attempt_id": "att001",
+ "rows": 7772,
+ "plan": {
+  "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+  "table": "EMR_DOC_ORDER_DRUG",
+  "business_day": "2026-10-26",
+  "mode": "T1",
+  "window": "win:2026-10-26T00:00:00+08:00/2026-10-27T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_DOC_ORDER_DRUG"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+BATCH_ID=DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1
+=== STEP3 verify ===
+2026-10-27 18:50:37
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+ "state": "VALIDATED",
+ "quality": {
+  "counts": {
+   "VALID": 7772
+  },
+  "valid_groups": 7772,
+  "quarantined_groups": 0,
+  "ticket_hint": null,
+  "valid_rows": 7772
+ },
+ "rows": 7772,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证通过（VALIDATED）"
+}
+=== STEP4 apply ===
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+ "operation_id": "OPR-DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1-5d400eebae25",
+ "rows_affected": 7772,
+ "plan_counts": {
+  "INSERT": 7772
+ },
+ "partition": {
+  "ok": 7772,
+  "insert": 7772,
+  "update": 0,
+  "no_change": 0,
+  "cas_conflict": 0,
+  "missing_parent": 0
+ },
+ "quarantine_ledger": null,
+ "credential": {
+  "operation_id": "OPR-DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1-5d400eebae25",
+  "manifest_hash": "5d400eebae25b78819ae9dc1d03c023481944f60ef1014ae2436cd3ad1ff216d",
+  "rows_affected": 7772
+ },
+ "simulation": false,
+ "applied_at": "2026-10-27T10:51:23+00:00",
+ "结论": "正式装载提交成功（回执+版本账已登记）"
+}
+APPLY_WINDOW=2026-10-27 18:50:42 2026-10-27 18:51:23
+=== STEP5 reconcile ===
+2026-10-27 18:51:23
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+ "keys_checked": 7772,
+ "missing_keys": 0,
+ "content_diffs": 0,
+ "quarantined_pending": 0,
+ "diff_sample": [],
+ "recovery": {
+  "batch_id": "DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1",
+  "closed_gaps": [],
+  "watermarks": {
+   "capture_h": "2026-10-27T00:00:00+08:00",
+   "continuous_through": "2026-10-27T00:00:00+08:00"
+  },
+  "recovered_incident": null,
+  "blocked": [],
+  "still_open_gaps": 0
+ },
+ "state_before": "APPLIED",
+ "simulation": false,
+ "结论": "全键回读一致（RECONCILED）"
+}
+=== DONE EMR_DOC_ORDER_DRUG ===

@@ -1,0 +1,183 @@
+{
+ "ok": true,
+ "output": "..\\开发起步包\\output_r189\\r189-20261015-upload-audit\\daily_t1_20261015\\python_datax_execution_20261019\\2026补齐与T加1接续_20261022\\扩表冻结件_批8_ODS二波_v1_20261026.json",
+ "environment": "production",
+ "batch": "批8_ODS二波",
+ "tables": [
+  "EMR_ADMISSION_RECORD_EXAM",
+  "EMR_ANES_RECORD_MED",
+  "EMR_CONSUMABLES",
+  "EMR_DOC_ORDER_DRUG",
+  "EMR_INFOR_OPERATION",
+  "EMR_INFOR_OTHERS",
+  "EMR_IN_FEE_INFO_CHILD",
+  "EMR_OUTPATIENT_DIAG",
+  "EMR_OUT_FEE_INFO_CHILD",
+  "EMR_OUT_FEE_INFO_MAIN"
+ ],
+ "config_fingerprint": "f09d6b0ae74c697acad3ba830b8adae3e886c5c7a40ae01d9c602581749035a0",
+ "per_table": {
+  "EMR_ANES_RECORD_MED": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_ANES_RECORD_MED",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 19,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_ADMISSION_RECORD_EXAM": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_ADMISSION_RECORD_EXAM",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 16,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_CONSUMABLES": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_CONSUMABLES",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 29,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_OUTPATIENT_DIAG": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_OUTPATIENT_DIAG",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 26,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_DOC_ORDER_DRUG": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_DOC_ORDER_DRUG",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 68,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": [
+    "DRUG_FREQUENCY_CODE"
+   ]
+  },
+  "EMR_OUT_FEE_INFO_MAIN": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 62,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": [
+    "VISIT_DATE"
+   ]
+  },
+  "EMR_OUT_FEE_INFO_CHILD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 49,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_IN_FEE_INFO_CHILD": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 46,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": [
+    "PROJ_DENO"
+   ]
+  },
+  "EMR_INFOR_OPERATION": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_INFOR_OPERATION",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 43,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  },
+  "EMR_INFOR_OTHERS": {
+   "source_group": "ods",
+   "dialect": "oracle",
+   "source_object": "ODS.V_EMR_INFOR_OTHERS",
+   "anchor_column": "DATETIME",
+   "system_time_column": "SYSTEM_TIME",
+   "projection_columns": 30,
+   "parent": null,
+   "budget": {
+    "max_rows_per_slice": 50000,
+    "max_bytes_per_slice": 268435456,
+    "max_attempts": 3
+   },
+   "view_coverage_missing": null
+  }
+ },
+ "coverage_problems": [
+  "EMR_DOC_ORDER_DRUG: 视图 V_EMR_DOC_ORDER_DRUG 未暴露 1 列（如 ['DRUG_FREQUENCY_CODE']）",
+  "EMR_OUT_FEE_INFO_MAIN: 视图 V_EMR_OUT_FEE_INFO_MAIN 未暴露 1 列（如 ['VISIT_DATE']）",
+  "EMR_IN_FEE_INFO_CHILD: 视图 V_EMR_IN_FEE_INFO_CHILD 未暴露 1 列（如 ['PROJ_DENO']）"
+ ],
+ "结论": "批冻结件已生成并自校验通过（10 表，environment=production，enabled 全 false）"
+}

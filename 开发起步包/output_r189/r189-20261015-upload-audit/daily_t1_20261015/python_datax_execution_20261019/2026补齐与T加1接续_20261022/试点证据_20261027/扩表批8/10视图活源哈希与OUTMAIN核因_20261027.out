@@ -1,0 +1,672 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+== 10 视图 ALL_VIEWS.TEXT sha256 vs ods_views_bulk(2026-10-22) ==
+V_EMR_ANES_RECORD_MED: live_sha=c0e6598c617268b3f611ed880624c410c996b76f085f54857dbe89bd92fc2976
+V_EMR_ADMISSION_RECORD_EXAM: live_sha=cf86dd36a54e2b28037cc36a10d1332869229196354d4377d4714fb0b66e3fe6
+V_EMR_CONSUMABLES: live_sha=7ef3bfe2a021d7df7e7663123cdcfa341ce060d2909974f7085d4eb5665f67e2
+V_EMR_OUTPATIENT_DIAG: live_sha=f1bcbf00216153e94f39529b9cc88549ea3dabadf89dc7756d0bdc2193403f58
+V_EMR_DOC_ORDER_DRUG: live_sha=ad9967031eb74e327a64d4424af57d7ee7255d35521ff34774d469a37ff369ca
+V_EMR_OUT_FEE_INFO_MAIN: live_sha=9d38cb363259e02bebc9ffbf73922b7abd801efe29afd51799b6cce7ca5b1b21
+V_EMR_OUT_FEE_INFO_CHILD: live_sha=06fb8995697aac907629586276ac98d99183d6bebd61b540537f596c75cc5247
+V_EMR_IN_FEE_INFO_CHILD: live_sha=ff6793883b9d321588201402bba8279b833413c5009dc10bee9b5287b6a418e3
+V_EMR_INFOR_OPERATION: live_sha=ea01c07151b3d21d1fdc64176f5df67e2b3d4a6231ebbe8f948b6ac052070c38
+V_EMR_INFOR_OTHERS: live_sha=b3732c60ed52f87d09e051e6aaddf20ccb36d974c7f044b25ed8d6f826d78733
+
+== V_EMR_OUT_FEE_INFO_MAIN 活源 DBMS_METADATA DDL（VISIT_DATE 核因）==
+live ddl length: 26288
+live header cols: 64
+VISIT_DATE in live header: True
+ctx: ... , "YYCLF", "YCXYYCLF", "QTF", "EXCHANGE_TYPE", "SYSTEM_TIME", "DISTRICT_CODE", "VISIT_DATE", "DATETIME") AS    select substr('49557032X' ||  ...
+ctx: ...  100) as ID, -- 内码，主键         substr(nvl(c.clinic_no, b.patient_id || to_char(b.visit_date, 'yyyymmdd')), 1, 32) as PATIENT_ID, -- 门诊唯一标识号   ...
+ctx: ... amp) as SYSTEM_TIME, -- 数据上传时间戳         '370104' as DISTRICT_CODE, -- 所属行政区划  b.visit_date , b.visit_date  DATETIME   from HIS.pat_master_in ...
+ctx: ... TIME, -- 数据上传时间戳         '370104' as DISTRICT_CODE, -- 所属行政区划  b.visit_date , b.visit_date  DATETIME   from HIS.pat_master_index a    join H ...
+ctx: ...      and pl.mr_bill_class is not null                                   and obi.visit_date >= pl.start_date                                  ...
+ctx: ...              pl.stop_date is null                                        or obi.visit_date < pl.stop_date                                    ...
+ddl saved to /tmp/b8_out_fee_main_live_ddl.sql (container side)
+===DDL_DUMP===
+
+  CREATE OR REPLACE FORCE VIEW "ODS"."V_EMR_OUT_FEE_INFO_MAIN" ("ID", "PATIENT_ID", "TOTAL_FEE", "INUMBERD_PAY", "YB_PAY", "TC_PAY", "GWY_PAY", "DB_PAY", "MZJZ_PAY", "QT_PAY", "PAY_MODE", "PAY_MODE_NAME", "SO_CARD", "ID_NUM", "ORG_CODE", "ORG_NAME", "ZFY", "JJZFYBTCJJZF", "JJZFGWYYLBZ", "JJZFYFDXYLBZ", "JJZFZGDEYLFY", "JJZFJMDBBCBX", "JJZFQYBCYLBX", "JJZFQTBCYLBX", "JJZFYLJZ", "ZFZJE", "ZFJEYBGRZHZFJE", "ZFJE", "YBYLFWF", "GHF", "ZCF", "CWF", "ZLCZF", "HLF", "QTFY", "BLZDF", "SYSZDF", "YXXZDF", "LCZDXMF", "FSSZLXMF", "WLZLF", "SSZLF", "MZF", "SSF", "KFF", "ZYZLF", "XYF", "KJYWFY", "ZCYF", "ZCYF1", "XF", "BDBLZPF", "QDBLZPF", "NXYZLZPF", "XBYZLZPF", "HCYYCLF", "YYCLF", "YCXYYCLF", "QTF", "EXCHANGE_TYPE", "SYSTEM_TIME", "DISTRICT_CODE", "VISIT_DATE", "DATETIME") AS 
+  select substr('49557032X' || '|' || b.rcpt_no, 1, 100) as ID, -- 内码，主键
+
+       substr(nvl(c.clinic_no, b.patient_id || to_char(b.visit_date, 'yyyymmdd')), 1, 32) as PATIENT_ID, -- 门诊唯一标识号
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(b.total_charges, 0))
+                   else nvl(b.total_charges, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as TOTAL_FEE, -- 总费用（元）
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.self_pay_amount, 0))
+                   else nvl(pay.self_pay_amount, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as INUMBERD_PAY, -- 自付金额（元）
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then
+                       -abs(
+                           nvl(pay.tc_pay, 0)
+                         + nvl(pay.gwy_pay, 0)
+                         + nvl(pay.db_pay, 0)
+                         + nvl(pay.mzjz_pay, 0)
+                         + nvl(pay.yfdx_pay, 0)
+                         + nvl(pay.qt_pay, 0)
+                       )
+                   else
+                       nvl(pay.tc_pay, 0)
+                     + nvl(pay.gwy_pay, 0)
+                     + nvl(pay.db_pay, 0)
+                     + nvl(pay.mzjz_pay, 0)
+                     + nvl(pay.yfdx_pay, 0)
+                     + nvl(pay.qt_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as YB_PAY, -- 医保报销费用/基金类支付合计，当前按支付明细推算
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.tc_pay, 0))
+                   else nvl(pay.tc_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as TC_PAY, -- 统筹基金支付
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.gwy_pay, 0))
+                   else nvl(pay.gwy_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as GWY_PAY, -- 公务员基金支付
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.db_pay, 0))
+                   else nvl(pay.db_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as DB_PAY, -- 大病基金支付
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.mzjz_pay, 0))
+                   else nvl(pay.mzjz_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as MZJZ_PAY, -- 民政救助支付
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.qt_pay, 0))
+                   else nvl(pay.qt_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as QT_PAY, -- 其他基金支付
+
+       substr(nvl(pay.pay_mode, '99'), 1, 2) as PAY_MODE, -- 费用支付方式
+
+       substr(nvl(pay.pay_mode_name, '其他'), 1, 26) as PAY_MODE_NAME, -- 费用支付方式名称
+
+       substr(a.insur_card_no, 1, 25) as SO_CARD, -- 社保卡号码
+
+       substr(nvl(nvl(a.insurance_no, a.id_no), '000000000000000000'), 1, 18) as ID_NUM, -- 社会保障号/身份证号
+
+       '49557032X' as ORG_CODE, -- 医院组织机构编码
+
+       '山东省第二人民医院' as ORG_NAME, -- 医院名称
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(b.total_charges, 0))
+                   else nvl(b.total_charges, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as ZFY, -- 结算总费用
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.tc_pay, 0))
+                   else nvl(pay.tc_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFYBTCJJZF, -- 基金支付-医保统筹基金支付
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.gwy_pay, 0))
+                   else nvl(pay.gwy_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFGWYYLBZ, -- 基金支付-公务员医疗补助
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.yfdx_pay, 0))
+                   else nvl(pay.yfdx_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFYFDXYLBZ, -- 基金支付-优抚对象医疗补助
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.db_pay, 0))
+                   else nvl(pay.db_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFZGDEYLFY, -- 基金支付-职工大额医疗费用，当前暂按大病类支付归集，需结合医保字段再确认
+
+       cast(0 as number(10, 2)) as JJZFJMDBBCBX, -- 基金支付-居民大病补充保险，暂无明确来源
+
+       cast(0 as number(10, 2)) as JJZFQYBCYLBX, -- 基金支付-企业补充医疗保险，暂无明确来源
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.qt_pay, 0))
+                   else nvl(pay.qt_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFQTBCYLBX, -- 基金支付-其他补充医疗保险
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.mzjz_pay, 0))
+                   else nvl(pay.mzjz_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as JJZFYLJZ, -- 基金支付-医疗救助
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.self_pay_amount, 0))
+                   else nvl(pay.self_pay_amount, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as ZFZJE, -- 自费金额
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.account_pay, 0))
+                   else nvl(pay.account_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as ZFJEYBGRZHZFJE, -- 自费金额-医保个人账户支付金额
+
+       cast(
+           round(
+               case
+                   when b.charge_indicator = 2 then -abs(nvl(pay.self_pay_amount, 0) - nvl(pay.account_pay, 0))
+                   else nvl(pay.self_pay_amount, 0) - nvl(pay.account_pay, 0)
+               end,
+               2
+           ) as number(10, 2)
+       ) as ZFJE, -- 自费金额-自付金额
+
+       nvl(d.YBYLFWF, cast(0 as number(10, 2))) as YBYLFWF, -- 一般医疗服务费
+
+       nvl(d.GHF, cast(0 as number(10, 2))) as GHF, -- 挂号费/医事服务费
+
+       nvl(d.ZCF, cast(0 as number(10, 2))) as ZCF, -- 诊察费
+
+       nvl(d.CWF, cast(0 as number(10, 2))) as CWF, -- 床位费
+
+       nvl(d.ZLCZF, cast(0 as number(10, 2))) as ZLCZF, -- 一般治疗操作费
+
+       nvl(d.HLF, cast(0 as number(10, 2))) as HLF, -- 护理费
+
+       nvl(d.QTFY, cast(0 as number(10, 2))) as QTFY, -- 综合医疗服务类其他费用
+
+       nvl(d.BLZDF, cast(0 as number(10, 2))) as BLZDF, -- 病理诊断费
+
+       nvl(d.SYSZDF, cast(0 as number(10, 2))) as SYSZDF, -- 实验室诊断费
+
+       nvl(d.YXXZDF, cast(0 as number(10, 2))) as YXXZDF, -- 影像学诊断费
+
+       nvl(d.LCZDXMF, cast(0 as number(10, 2))) as LCZDXMF, -- 临床诊断项目费
+
+       nvl(d.FSSZLXMF, cast(0 as number(10, 2))) as FSSZLXMF, -- 非手术治疗项目费
+
+       nvl(d.WLZLF, cast(0 as number(10, 2))) as WLZLF, -- 临床物理治疗费
+
+       nvl(d.SSZLF, cast(0 as number(10, 2))) as SSZLF, -- 手术治疗费
+
+       nvl(d.MZF, cast(0 as number(10, 2))) as MZF, -- 麻醉费
+
+       nvl(d.SSF, cast(0 as number(10, 2))) as SSF, -- 手术费
+
+       nvl(d.KFF, cast(0 as number(10, 2))) as KFF, -- 康复费
+
+       nvl(d.ZYZLF, cast(0 as number(10, 2))) as ZYZLF, -- 中医治疗费
+
+       nvl(d.XYF, cast(0 as number(10, 2))) as XYF, -- 西药费
+
+       nvl(d.KJYWFY, cast(0 as number(10, 2))) as KJYWFY, -- 抗菌药物费用
+
+       nvl(d.ZCYF, cast(0 as number(10, 2))) as ZCYF, -- 中成药费
+
+       nvl(d.ZCYF1, cast(0 as number(10, 2))) as ZCYF1, -- 中草药费
+
+       nvl(d.XF, cast(0 as number(10, 2))) as XF, -- 血费
+
+       nvl(d.BDBLZPF, cast(0 as number(10, 2))) as BDBLZPF, -- 白蛋白类制品费
+
+       nvl(d.QDBLZPF, cast(0 as number(10, 2))) as QDBLZPF, -- 球蛋白类制品费
+
+       nvl(d.NXYZLZPF, cast(0 as number(10, 2))) as NXYZLZPF, -- 凝血因子类制品费
+
+       nvl(d.XBYZLZPF, cast(0 as number(10, 2))) as XBYZLZPF, -- 细胞因子类制品费
+
+       nvl(d.HCYYCLF, cast(0 as number(10, 2))) as HCYYCLF, -- 检查用一次性医用材料费
+
+       nvl(d.YYCLF, cast(0 as number(10, 2))) as YYCLF, -- 治疗用一次性医用材料费
+
+       nvl(d.YCXYYCLF, cast(0 as number(10, 2))) as YCXYYCLF, -- 手术用一次性医用材料费
+
+       cast(
+           round(
+               nvl(d.QTF_BASE, 0)
+               +
+               (
+                   case
+                       when b.charge_indicator = 2 then -abs(nvl(b.total_charges, 0))
+                       else nvl(b.total_charges, 0)
+                   end
+                   - nvl(d.ITEM_FEE_SUM, 0)
+               ),
+               2
+           ) as number(10, 2)
+       ) as QTF, -- 其他费用，含主表总额与明细分类合计差额调整
+
+       'INSERT' as EXCHANGE_TYPE, -- 交换类型
+
+       cast(systimestamp as timestamp) as SYSTEM_TIME, -- 数据上传时间戳
+
+       '370104' as DISTRICT_CODE, -- 所属行政区划
+ b.visit_date , b.visit_date  DATETIME
+  from HIS.pat_master_index a
+
+  join HIS.outp_rcpt_master b
+    on a.patient_id = b.patient_id
+
+  left join (
+        select od.rcpt_no,
+               max(od.clinic_no) as clinic_no
+          from HIS.outp_order_desc od
+         group by od.rcpt_no
+       ) c
+    on b.rcpt_no = c.rcpt_no
+
+  left join (
+        select x.rcpt_no,
+
+               cast(round(sum(case when x.mr_bill_class = '01' then x.fee else 0 end), 2) as number(10, 2)) as YBYLFWF,
+
+               cast(round(sum(case
+                                  when x.mr_bill_class = '00'
+                                   and (
+                                           x.item_code like '1101%'
+                                        or regexp_like(x.item_name, '挂号|医事服务')
+                                       )
+                                  then x.fee
+                                  else 0
+                              end), 2) as number(10, 2)) as GHF,
+
+               cast(round(sum(case
+                                  when x.mr_bill_class = '00'
+                                   and (
+                                           x.item_code like '1102%'
+                                        or regexp_like(x.item_name, '诊察|诊查')
+                                       )
+                                  then x.fee
+                                  else 0
+                              end), 2) as number(10, 2)) as ZCF,
+
+               cast(round(sum(case
+                                  when x.mr_bill_class = '00'
+                                   and (
+                                           x.item_code like '1109%'
+                                        or regexp_like(x.item_name, '床位')
+                                       )
+                                  then x.fee
+                                  else 0
+                              end), 2) as number(10, 2)) as CWF,
+
+               cast(round(sum(case when x.mr_bill_class = '02' then x.fee else 0 end), 2) as number(10, 2)) as ZLCZF,
+
+               cast(round(sum(case when x.mr_bill_class = '03' then x.fee else 0 end), 2) as number(10, 2)) as HLF,
+
+               cast(round(sum(case when x.mr_bill_class = '04' then x.fee else 0 end), 2) as number(10, 2)) as QTFY,
+
+               cast(round(sum(case when x.mr_bill_class = '05' then x.fee else 0 end), 2) as number(10, 2)) as BLZDF,
+
+               cast(round(sum(case when x.mr_bill_class = '06' then x.fee else 0 end), 2) as number(10, 2)) as SYSZDF,
+
+               cast(round(sum(case when x.mr_bill_class = '07' then x.fee else 0 end), 2) as number(10, 2)) as YXXZDF,
+
+               cast(round(sum(case when x.mr_bill_class = '08' then x.fee else 0 end), 2) as number(10, 2)) as LCZDXMF,
+
+               cast(round(sum(case when x.mr_bill_class = '09' then x.fee else 0 end), 2) as number(10, 2)) as FSSZLXMF,
+
+               cast(round(sum(case when x.mr_bill_class = '0901' then x.fee else 0 end), 2) as number(10, 2)) as WLZLF,
+
+               cast(round(sum(case when x.mr_bill_class = '10' then x.fee else 0 end), 2) as number(10, 2)) as SSZLF,
+
+               cast(round(sum(case when x.mr_bill_class = '1001' then x.fee else 0 end), 2) as number(10, 2)) as MZF,
+
+               cast(round(sum(case when x.mr_bill_class = '1002' then x.fee else 0 end), 2) as number(10, 2)) as SSF,
+
+               cast(round(sum(case when x.mr_bill_class = '11' then x.fee else 0 end), 2) as number(10, 2)) as KFF,
+
+               cast(round(sum(case when x.mr_bill_class = '12' then x.fee else 0 end), 2) as number(10, 2)) as ZYZLF,
+
+               cast(round(sum(case when x.mr_bill_class = '13' then x.fee else 0 end), 2) as number(10, 2)) as XYF,
+
+               cast(round(sum(case when x.mr_bill_class = '1301' then x.fee else 0 end), 2) as number(10, 2)) as KJYWFY,
+
+               cast(round(sum(case when x.mr_bill_class = '14' then x.fee else 0 end), 2) as number(10, 2)) as ZCYF,
+
+               cast(round(sum(case when x.mr_bill_class = '15' then x.fee else 0 end), 2) as number(10, 2)) as ZCYF1,
+
+               cast(round(sum(case when x.mr_bill_class = '16' then x.fee else 0 end), 2) as number(10, 2)) as XF,
+
+               cast(round(sum(case when x.mr_bill_class = '17' then x.fee else 0 end), 2) as number(10, 2)) as BDBLZPF,
+
+               cast(round(sum(case when x.mr_bill_class = '18' then x.fee else 0 end), 2) as number(10, 2)) as QDBLZPF,
+
+               cast(round(sum(case when x.mr_bill_class = '19' then x.fee else 0 end), 2) as number(10, 2)) as NXYZLZPF,
+
+               cast(round(sum(case when x.mr_bill_class = '20' then x.fee else 0 end), 2) as number(10, 2)) as XBYZLZPF,
+
+               cast(round(sum(case when x.mr_bill_class = '21' then x.fee else 0 end), 2) as number(10, 2)) as HCYYCLF,
+
+               cast(round(sum(case when x.mr_bill_class = '22' then x.fee else 0 end), 2) as number(10, 2)) as YYCLF,
+
+               cast(round(sum(case when x.mr_bill_class = '23' then x.fee else 0 end), 2) as number(10, 2)) as YCXYYCLF,
+
+               cast(round(sum(case
+                                  when x.mr_bill_class = '24'
+                                    or x.mr_bill_class in ('1003', '1201', '1202')
+                                    or x.mr_bill_class is null
+                                    or x.mr_bill_class not in (
+                                           '00', '01', '02', '03', '04', '05', '06', '07', '08',
+                                           '09', '0901', '10', '1001', '1002', '11', '12', '13',
+                                           '1301', '14', '15', '16', '17', '18', '19', '20',
+                                           '21', '22', '23', '24', '1003', '1201', '1202'
+                                       )
+                                    or (
+                                           x.mr_bill_class = '00'
+                                       and not (
+                                                x.item_code like '1101%'
+                                             or x.item_code like '1102%'
+                                             or x.item_code like '1109%'
+                                             or regexp_like(x.item_name, '挂号|医事服务|诊察|诊查|床位')
+                                           )
+                                       )
+                                  then x.fee
+                                  else 0
+                              end), 2) as number(10, 2)) as QTF_BASE,
+
+               cast(round(sum(x.fee), 2) as number(10, 2)) as ITEM_FEE_SUM
+
+          from (
+                select obi.rcpt_no,
+                       obi.item_code,
+                       obi.item_name,
+
+                       nvl(
+                           (
+                               select max(pl.mr_bill_class) keep (
+                                          dense_rank last order by pl.start_date
+                                      )
+                                 from HIS.price_list pl
+                                where pl.item_class = obi.item_class
+                                  and pl.item_code  = obi.item_code
+                                  and nvl(pl.item_spec, '-') = nvl(obi.item_spec, '-')
+                                  and nvl(pl.units, '-')     = nvl(obi.units, '-')
+                                  and pl.mr_bill_class is not null
+                                  and obi.visit_date >= pl.start_date
+                                  and (
+                                          pl.stop_date is null
+                                       or obi.visit_date < pl.stop_date
+                                      )
+                           ),
+                           (
+                               select max(pl.mr_bill_class) keep (
+                                          dense_rank last order by pl.start_date
+                                      )
+                                 from HIS.price_list pl
+                                where pl.item_class = obi.item_class
+                                  and pl.item_code  = obi.item_code
+                                  and pl.mr_bill_class is not null
+                                  and obi.visit_date >= pl.start_date
+                                  and (
+                                          pl.stop_date is null
+                                       or obi.visit_date < pl.stop_date
+                                      )
+                                  and abs(nvl(pl.price, -999999) - nvl(obi.item_price, -999999)) < 0.001
+                           )
+                       ) as mr_bill_class,
+
+                       case
+                           when rm.charge_indicator = 2 then -abs(nvl(obi.charges, 0))
+                           else nvl(obi.charges, 0)
+                       end as fee
+
+                  from HIS.outp_bill_items obi
+                  join HIS.outp_rcpt_master rm
+                    on rm.rcpt_no = obi.rcpt_no
+                 where rm.visit_date >= date '2020-01-01'
+                 --  and rm.visit_date <  date '2026-01-01'
+               ) x
+         group by x.rcpt_no
+       ) d
+    on b.rcpt_no = d.rcpt_no
+
+  left join (
+        select x.rcpt_no,
+
+               sum(
+                   case
+                       when x.money_type in ('现金', '预交金', '银联pos', '银行卡', '银行卡支付', '医保卡', '账户金', '舍入')
+                         or x.pay_mode in ('01', '06', '08', '09')
+                       then x.net_amount
+                       else 0
+                   end
+               ) as self_pay_amount,
+
+               sum(
+                   case
+                       when x.money_type in ('医保卡', '账户金')
+                         or x.money_type like '%个人账户%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as account_pay,
+
+               sum(
+                   case
+                       when x.money_type like '%医保统筹%'
+                         or x.money_type like '%统筹%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as tc_pay,
+
+               sum(
+                   case
+                       when x.money_type like '%公务员%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as gwy_pay,
+
+               sum(
+                   case
+                       when x.money_type like '%大病%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as db_pay,
+
+               sum(
+                   case
+                       when x.money_type like '%民政%'
+                         or x.money_type like '%救助%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as mzjz_pay,
+
+               sum(
+                   case
+                       when x.money_type like '%优抚%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as yfdx_pay,
+
+               sum(
+                   case
+                       when x.money_type not in ('现金', '预交金', '银联pos', '银行卡', '银行卡支付', '医保卡', '账户金', '舍入')
+                        and x.money_type not like '%医保统筹%'
+                        and x.money_type not like '%统筹%'
+                        and x.money_type not like '%公务员%'
+                        and x.money_type not like '%大病%'
+                        and x.money_type not like '%民政%'
+                        and x.money_type not like '%救助%'
+                        and x.money_type not like '%优抚%'
+                       then x.net_amount
+                       else 0
+                   end
+               ) as qt_pay,
+
+               max(x.pay_mode) keep (
+                   dense_rank last order by abs(x.net_amount), x.pay_mode
+               ) as pay_mode,
+
+               substr(
+                   max(x.pay_mode_name) keep (
+                       dense_rank last order by abs(x.net_amount), x.pay_mode
+                   ),
+                   1,
+                   26
+               ) as pay_mode_name
+
+          from (
+                select p.rcpt_no,
+                       p.money_type,
+                       nvl(p.payment_amount, 0) - nvl(p.refunded_amount, 0) as net_amount,
+
+                       case
+                           when p.money_type_code in ('01','02','03','04','05','06','07','08','09','10','11','99')
+                           then p.money_type_code
+                           when p.money_type in ('现金', '舍入') then '01'
+                           when p.money_type like '%支票%' then '02'
+                           when p.money_type like '%汇款%'
+                             or p.money_type like '%存款%'
+                             or p.money_type like '%转账汇款%' then '03'
+                           when p.money_type like '%内部转账%' then '04'
+                           when p.money_type like '%记账%'
+                             or p.money_type like '%单位记账%' then '05'
+                           when p.money_type in ('预交金', '账户金', '医保卡')
+                             or p.money_type like '%个人账户%' then '06'
+                           when p.money_type like '%统筹%' then '07'
+                           when p.money_type in ('银联pos', '银行卡', '银行卡支付', 'POS')
+                             or lower(p.money_type) like '%pos%' then '08'
+                           when p.money_type like '%微信%'
+                             or p.money_type like '%支付宝%'
+                             or p.money_type like '%扫码%'
+                             or p.money_type like '%电子支付%'
+                             or p.money_type like '%云闪付%' then '09'
+                           when p.money_type like '%数字人民币%'
+                             or p.money_type like '%数字化人民币%' then '10'
+                           when p.money_type like '%绿色通道%' then '11'
+                           else '99'
+                       end as pay_mode,
+
+                       case
+                           when p.money_type_code = '01' then '现金'
+                           when p.money_type_code = '02' then '支票'
+                           when p.money_type_code = '03' then '汇款存款'
+                           when p.money_type_code = '04' then '内部转账'
+                           when p.money_type_code = '05' then '单位记账'
+                           when p.money_type_code = '06' then '账户金'
+                           when p.money_type_code = '07' then '统筹金'
+                           when p.money_type_code = '08' then '银行卡'
+                           when p.money_type_code = '09' then '电子支付'
+                           when p.money_type_code = '10' then '数字化人民币'
+                           when p.money_type_code = '11' then '绿色通道'
+                           when p.money_type_code = '99' then '其他'
+                           when p.money_type in ('现金', '舍入') then '现金'
+                           when p.money_type like '%支票%' then '支票'
+                           when p.money_type like '%汇款%'
+                             or p.money_type like '%存款%'
+                             or p.money_type like '%转账汇款%' then '汇款存款'
+                           when p.money_type like '%内部转账%' then '内部转账'
+                           when p.money_type like '%记账%'
+                             or p.money_type like '%单位记账%' then '单位记账'
+                           when p.money_type in ('预交金', '账户金', '医保卡')
+                             or p.money_type like '%个人账户%' then '账户金'
+                           when p.money_type like '%统筹%' then '统筹金'
+                           when p.money_type in ('银联pos', '银行卡', '银行卡支付', 'POS')
+                             or lower(p.money_type) like '%pos%' then '银行卡'
+                           when p.money_type like '%微信%'
+                             or p.money_type like '%支付宝%'
+                             or p.money_type like '%扫码%'
+                             or p.money_type like '%电子支付%'
+                             or p.money_type like '%云闪付%' then '电子支付'
+                           when p.money_type like '%数字人民币%'
+                             or p.money_type like '%数字化人民币%' then '数字化人民币'
+                           when p.money_type like '%绿色通道%' then '绿色通道'
+                           else '其他'
+                       end as pay_mode_name
+
+                  from HIS.outp_payments_money p
+               ) x
+         group by x.rcpt_no
+       ) pay
+    on b.rcpt_no = pay.rcpt_no
+
+ where b.visit_date >= date '2020-01-01'
+ --  and b.visit_date <  date '2026-01-01'

@@ -1,0 +1,5 @@
+{
+ "ok": false,
+ "refused": "视图列覆盖不完整，拒绝冻结（--allow-view-gap 人工核因后强制并留痕）: EMR_DOC_ORDER_DRUG: 视图 V_EMR_DOC_ORDER_DRUG 未暴露 1 列（如 ['DRUG_FREQUENCY_CODE']）; EMR_OUT_FEE_INFO_MAIN: 视图 V_EMR_OUT_FEE_INFO_MAIN 未暴露 1 列（如 ['VISIT_DATE']）; EMR_IN_FEE_INFO_CHILD: 视图 V_EMR_IN_FEE_INFO_CHILD 未暴露 1 列（如 ['PROJ_DENO']）",
+ "exit_code": 3
+}

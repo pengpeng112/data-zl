@@ -1,0 +1,37 @@
+{
+ "doc": "批8（ODS二波10表·大表宽表+风险预案通道）扩表源绑定：源=ODS 10.10.8.216:1521/orcl（首组同款通道，dsn/credential_ref 照抄首组生产 bindings 的 ods_8_216 段）；对象 ODS.V_EMR_<表名> 显式全名，不拼不猜；组键 ods=B01 source_group（生成器按组键精确匹配）；view_by_table 供 ODS 视图列覆盖核验（08 快照 DDL 别名 + ods_views_bulk 定义哈希）。本包 EMR_ADMISSION_RECORD_EXAM 用派生 B01 去父输入（R01 verified:False 置空+留证，工单 T-B08-1）；预核（批678普查+2026-10-27 活源复核）：全表视图实存、无 LOB、DATETIME 全 DATE、活源列对齐 gap=NONE、无跨族类型错配（零列表达式预期 v1 即定版）；EMR_DOC_ORDER_DRUG.DRUG_FREQUENCY_CODE=生成器 as 正则盲区列（目标 NOT NULL，活源实存 gap=NONE，恒等投影），生成时核因后 --allow-view-gap 留痕。",
+ "as_of": "2026-10-26",
+ "sources": {
+  "ods": {
+   "dialect": "oracle",
+   "dsn": "10.10.8.216:1521/orcl",
+   "credential_ref": "container-credentials:ods_8_216",
+   "source_objects": {
+    "EMR_ANES_RECORD_MED": "ODS.V_EMR_ANES_RECORD_MED",
+    "EMR_ADMISSION_RECORD_EXAM": "ODS.V_EMR_ADMISSION_RECORD_EXAM",
+    "EMR_CONSUMABLES": "ODS.V_EMR_CONSUMABLES",
+    "EMR_OUTPATIENT_DIAG": "ODS.V_EMR_OUTPATIENT_DIAG",
+    "EMR_DOC_ORDER_DRUG": "ODS.V_EMR_DOC_ORDER_DRUG",
+    "EMR_OUT_FEE_INFO_MAIN": "ODS.V_EMR_OUT_FEE_INFO_MAIN",
+    "EMR_OUT_FEE_INFO_CHILD": "ODS.V_EMR_OUT_FEE_INFO_CHILD",
+    "EMR_IN_FEE_INFO_CHILD": "ODS.V_EMR_IN_FEE_INFO_CHILD",
+    "EMR_INFOR_OPERATION": "ODS.V_EMR_INFOR_OPERATION",
+    "EMR_INFOR_OTHERS": "ODS.V_EMR_INFOR_OTHERS"
+   },
+   "view_by_table": {
+    "EMR_ANES_RECORD_MED": "V_EMR_ANES_RECORD_MED",
+    "EMR_ADMISSION_RECORD_EXAM": "V_EMR_ADMISSION_RECORD_EXAM",
+    "EMR_CONSUMABLES": "V_EMR_CONSUMABLES",
+    "EMR_OUTPATIENT_DIAG": "V_EMR_OUTPATIENT_DIAG",
+    "EMR_DOC_ORDER_DRUG": "V_EMR_DOC_ORDER_DRUG",
+    "EMR_OUT_FEE_INFO_MAIN": "V_EMR_OUT_FEE_INFO_MAIN",
+    "EMR_OUT_FEE_INFO_CHILD": "V_EMR_OUT_FEE_INFO_CHILD",
+    "EMR_IN_FEE_INFO_CHILD": "V_EMR_IN_FEE_INFO_CHILD",
+    "EMR_INFOR_OPERATION": "V_EMR_INFOR_OPERATION",
+    "EMR_INFOR_OTHERS": "V_EMR_INFOR_OTHERS"
+   },
+   "evidence": "ods_views_bulk.json（2026-10-22 批量核验）+ 08 元数据快照 DDL；批678活源普查（批678预核证据_20261026/剩余33表活源普查_20261026.out：10表 view=True/无LOB/gap=NONE/零错配；INFOR_OPERATION/INFOR_OTHERS 窗COUNT 60s 超时预案）；2026-10-27 执行时活源复核（试点证据_20261027/扩表批8/生产实况复核与活源列对齐_20261027.out：10表 gap=NONE、DATETIME 全 DATE、SYSTEM_TIME 目标全 TIMESTAMP(6)）；窗计数（业务日2026-10-25 普查）：371/508/921/3672/5193/2614/8889/50043（IN_FEE_INFO_CHILD 跨页首例）/COUNT超时/COUNT超时"
+  }
+ },
+ "parents": {}
+}

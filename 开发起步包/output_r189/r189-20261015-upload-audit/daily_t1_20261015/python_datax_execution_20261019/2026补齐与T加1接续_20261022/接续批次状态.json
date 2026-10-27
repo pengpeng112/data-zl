@@ -535,6 +535,41 @@
       "est_volume": "~300万行级处理(NO_CHANGE/CAS复放为主,INSERT视差距普查),最大DOC_ORDER_CHECK≈140万",
       "discipline": "与批8并行零交集;CAS/隔离结束汇总呈报用户裁定不自行处理(2026-10-24裁定仅参照);字符型SYSTEM_TIME两表字符串回读",
       "awaiting_user": []
+    },
+    "batch8_pilot": {
+      "executed_by": "zcode-20261027-b8pilot-run",
+      "finished_on": "2026-10-27",
+      "status": "PILOT_DONE_8_RECONCILED_2_APPLIED_QUARANTINED_INFOR_OPERATION_TICKETED",
+      "report": "批8试点执行报告_20261027.md",
+      "evidence_dir": "试点证据_20261027/扩表批8/",
+      "freeze": "扩表冻结件_批8_ODS二波_v1_20261026.json（fingerprint=f09d6b0a…，v1即定版零列表达式与计划预期一致；视图覆盖缺口3处=预判1+新发现2均核因为隐式别名as正则盲区：DOC_ORDER_DRUG.DRUG_FREQUENCY_CODE/IN_FEE_INFO_CHILD.PROJ_DENO/OUT_FEE_INFO_MAIN.VISIT_DATE(双层=08快照DDL过期2026-10-20费用视图修改前旧版+活源隐式别名b.visit_date无as)，照批6范式活源DBMS_METADATA DDL注入出元数据快照补充_批8_20261027.json作生成输入+核因后allow-view-gap留痕；EXAM去父=派生B01输入(批8去父输入,R01 verified:False置空+version_note留证T-B08-1)；配置卷=/opt/data-asset/t1-config/freeze_batch8_v1.json+bindings_batch8.json(600,装载即验指纹一致)；bindings key_columns从runtime spec派生全['ID']规避批6笔误；三盲区列生产实捕成功=核因实证)",
+      "business_day": "2026-10-26",
+      "results": {
+        "EMR_ANES_RECORD_MED": "RECONCILED INSERT 710 六方一致（表总量+710、水位10-27）",
+        "EMR_ADMISSION_RECORD_EXAM": "RECONCILED INSERT 813 六方一致（RR01去父试点通过无父门禁拦截；水位10-27）",
+        "EMR_CONSUMABLES": "APPLIED 合法子集 1293/1456（163行缺DEPT_NAME源NOT NULL隔离OPEN留账T-B08-4；缺0差0；水位待工单收口续跑推进）",
+        "EMR_OUTPATIENT_DIAG": "APPLIED 合法子集 6549/6602（26组53行同键多行=DOCTOR_ID_NUM/DOCTOR_NAME差异源视图不去重,DUPLICATE_CONFLICT整组隔离OPEN留账T-B08-5；缺0差0；水位待工单收口）",
+        "EMR_DOC_ORDER_DRUG": "RECONCILED INSERT 7772 六方一致（DRUG_FREQUENCY_CODE盲区NOT NULL列恒等投影实捕成功零隔离；水位10-27）",
+        "EMR_OUT_FEE_INFO_MAIN": "RECONCILED INSERT 4554 六方一致（VISIT_DATE盲区列实捕成功=补充快照核因生产实证；水位10-27）",
+        "EMR_OUT_FEE_INFO_CHILD": "RECONCILED INSERT 16398 六方一致（水位10-27）",
+        "EMR_IN_FEE_INFO_CHILD": "RECONCILED INSERT 62849 六方一致（**生产T+1首例跨页全链成功**：窗62849超5万预算→keyset自动续捕,实测形态=page_size5000×13页聚合单chunk107MB<256MB字节预算,计划预判'2片(50000+43)'系把预算行数当页大小的形态预测偏差,守恒要求满足chunk=manifest=探查=INSERT=apply窗=版本账=回执keys全62849零卡死零漏片；apply4分44秒；1.01亿行目标回读SYSTEM_TIME窗计数120s超时600s补齐；水位10-27）",
+        "EMR_INFOR_OPERATION": "工单T-B08-2未跑：本次窗COUNT119行3秒成功(普查日超时)但43列全投影capture FETCH_TIMEOUT=批6 OPERA_RECORD COUNT快capture慢同族第三例；失败批批5 A4清理(RETRYABLE批次删留行数batches=1/attempts=0/无stage残留)",
+        "EMR_INFOR_OTHERS": "RECONCILED INSERT 280 六方一致（**COUNT超时≠capture必败生产实证**：窗COUNT双窗60s DPY-4024超时但capture 280行成功→T-B08-3免开；水位10-27）"
+      },
+      "receipts": "90→99（本批+9，序号91-99与执行序一致）",
+      "watermarks": "7表推进2026-10-27（CONSUMABLES/OUTPATIENT_DIAG按隔离组OPEN设计不推进；INFOR_OPERATION未跑）",
+      "insert_total": 101218,
+      "daily_run_dry": "10表skipped_missing_approval设计性跳过（管道不自批，批1/4/5/6/7先例一致）",
+      "local_gates": "pytest reporting_pipeline_unit 508 passed+2 skipped；ruff app/tests净；check_migrations_tracked 68环全绿(head=b8c9d0e1f2a3)",
+      "zero_code": "r212未重建零代码改动；首组/批1/2/4/5/6/7生产件未动(时间戳核验)；跨页行为只观察未改预算；三处视图覆盖缺口走证据文件级补充快照+核因留痕(配置级)",
+      "tickets": [
+        "T-B08-1 RR01 EXAM×ADMISSION_RECORD父子覆盖率核验(父表T-B05-3收口后可测)",
+        "T-B08-2 INFOR_OPERATION源视图重COUNT快capture慢(源端优化后同批号补跑)",
+        "T-B08-3 免开(INFOR_OTHERS capture成功=COUNT超时≠capture必败实证)",
+        "T-B08-4 CONSUMABLES 163行缺DEPT_NAME(源端补数后隔离组单批重放)",
+        "T-B08-5 OUTPATIENT_DIAG同键多行不去重26组53行(源端去重或业务裁定后单键重放)"
+      ],
+      "lessons": "①跨页分页语义实测澄清：max_rows_per_slice=5万是完整性探针上限(触发keyset模式),分页页大小=5000,超预算窗按页续捕聚合单chunk(字节预算256MB内不分片)——批9历史回补大月窗(DOC_ORDER_CHECK≈140万行)将走同一机制；②视图重表COUNT超时不构成capture判死依据一律直试(INFOR_OTHERS实证),但COUNT快也不保证capture能过(INFOR_OPERATION反向第三例)；③源绑定view_by_table公式=V_+表名(表名自带EMR_前缀勿再拼V_EMR_)"
     }
   }
 }

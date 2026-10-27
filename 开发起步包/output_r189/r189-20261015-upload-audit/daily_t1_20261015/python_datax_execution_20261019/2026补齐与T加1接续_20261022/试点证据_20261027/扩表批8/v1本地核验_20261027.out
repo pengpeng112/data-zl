@@ -1,0 +1,26 @@
+load OK: environment=production
+config fp: f09d6b0ae74c697acad3ba830b8adae3e886c5c7a40ae01d9c602581749035a0
+tables: ['EMR_ADMISSION_RECORD_EXAM', 'EMR_ANES_RECORD_MED', 'EMR_CONSUMABLES', 'EMR_DOC_ORDER_DRUG', 'EMR_INFOR_OPERATION', 'EMR_INFOR_OTHERS', 'EMR_IN_FEE_INFO_CHILD', 'EMR_OUTPATIENT_DIAG', 'EMR_OUT_FEE_INFO_CHILD', 'EMR_OUT_FEE_INFO_MAIN']
+EMR_ADMISSION_RECORD_EXAM: render OK | proj=16列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_ANES_RECORD_MED: render OK | proj=19列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_CONSUMABLES: render OK | proj=29列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_DOC_ORDER_DRUG: render OK | proj=68列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_INFOR_OPERATION: render OK | proj=43列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_INFOR_OTHERS: render OK | proj=30列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_IN_FEE_INFO_CHILD: render OK | proj=46列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUTPATIENT_DIAG: render OK | proj=26列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUT_FEE_INFO_CHILD: render OK | proj=49列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+EMR_OUT_FEE_INFO_MAIN: render OK | proj=62列零表达式 | 谓词=DATETIME >= :1 AND DATETIME < :2 | ORDER BY ID + ROWNUM<=:3 | params=[datetime.datetime(2026, 10, 25, 0, 0), datetime.datetime(2026, 10, 26, 0, 0), 50000]
+
+ALL OK: 10 tables, plain DATE anchor predicates, zero column expressions,
+projection == bindings write_columns (programmatic check).
+note: 三处视图覆盖缺口核因留痕（均=隐式别名 as 正则盲区，非真实缺口）：
+1) DOC_ORDER_DRUG.DRUG_FREQUENCY_CODE（计划预判内：视图头69列含列+正文裸引用
+   DRUG_FREQUENCY_CODE,--注释，活源 gap=NONE）
+2) OUT_FEE_INFO_MAIN.VISIT_DATE（计划外新发现：08快照DDL过期=2026-10-20费用视图
+   修改前旧版头62列无该列，已照批6范式活源DBMS_METADATA注入出补充快照（头64列含
+   VISIT_DATE/DATETIME）；现版正文暴露 b.visit_date , b.visit_date DATETIME 隐式别名
+   无as，as正则不可见；活源 gap=NONE + 10视图 live sha==views_bulk 全 MATCH）
+3) IN_FEE_INFO_CHILD.PROJ_DENO（计划外新发现：头47列含列+正文 nvl(...) PROJ_DENO,
+   隐式别名无as；活源 gap=NONE）
+核因后按生成器既定语义 --allow-view-gap 强制留痕（拒绝证据先落档）。

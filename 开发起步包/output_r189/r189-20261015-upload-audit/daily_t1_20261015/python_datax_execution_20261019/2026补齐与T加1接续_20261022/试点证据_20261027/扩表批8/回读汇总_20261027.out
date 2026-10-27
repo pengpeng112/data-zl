@@ -1,0 +1,106 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+########## EMR_ANES_RECORD_MED ##########
+applywin_rows/system_time_nonnull/min/max: (710, 710, datetime.datetime(2026, 10, 27, 18, 38, 57), datetime.datetime(2026, 10, 27, 18, 38, 57))
+table_total_rows: 1078633
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_ANES_RECORD_MED.T1.2026-10-26.a564fa864ffc-eba9f7a8def5', 'DBOPER.EMR_ANES_RECORD_MED.T1.2026-10-26.a564fa864ffc', 'eba9f7a8def5037a7bba59c5b5560328617293c24515aeb71deed7d8fc3ed5db', '10.10.8.74:1521/orcl.DBOPER.EMR_ANES_RECORD_MED', 'MERGE:keys=710', 710, '2026-10-27T18:38:57.798000+08:00', '2026-10-27T18:38:59.610000+08:00', datetime.datetime(2026, 10, 27, 18, 38, 59))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_ANES_RECORD_MED.T1.2026-10-26.a564fa864ffc', 'RECONCILED')]
+version_evidence: 710
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_ANES_RECORD_MED ==
+########## EMR_ADMISSION_RECORD_EXAM ##########
+applywin_rows/system_time_nonnull/min/max: (813, 813, datetime.datetime(2026, 10, 27, 18, 39, 56), datetime.datetime(2026, 10, 27, 18, 39, 56))
+table_total_rows: 662077
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_ADMISSION_RECORD_EXAM.T1.2026-10-26.bacb13806335-d81ed9b5ed20', 'DBOPER.EMR_ADMISSION_RECORD_EXAM.T1.2026-10-26.bacb13806335', 'd81ed9b5ed2009cb943d8db67cb2b2628d914cf59bff812c7bd05e3bf5a0115f', '10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_RECORD_EXAM', 'MERGE:keys=813', 813, '2026-10-27T18:39:56.164000+08:00', '2026-10-27T18:39:56.601000+08:00', datetime.datetime(2026, 10, 27, 18, 39, 56))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_ADMISSION_RECORD_EXAM.T1.2026-10-26.bacb13806335', 'RECONCILED')]
+version_evidence: 813
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_ADMISSION_RECORD_EXAM ==
+########## EMR_CONSUMABLES ##########
+applywin_rows/system_time_nonnull/min/max: (1293, 1293, datetime.datetime(2026, 10, 27, 18, 43, 22), datetime.datetime(2026, 10, 27, 18, 43, 22))
+table_total_rows: 8185214
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b-bee099a00f6e', 'DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b', 'bee099a00f6ee7e688bb34f290989b43eb0fcb29eddbc92e007a1978aebca531', '10.10.8.74:1521/orcl.DBOPER.EMR_CONSUMABLES', 'MERGE:keys=1293', 1293, '2026-10-27T18:43:22.301000+08:00', '2026-10-27T18:43:30.625000+08:00', datetime.datetime(2026, 10, 27, 18, 43, 30))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b', 'APPLIED')]
+version_evidence: 1293
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): []
+quarantine_groups(last_1d): [('quality-required-null', '目标 NOT NULL 列缺失（工单化；合法组继续装载）', 'QUALITY_REQUIRED_NULL', 163, 'OPEN')]
+== readback done: EMR_CONSUMABLES ==
+########## EMR_OUTPATIENT_DIAG ##########
+applywin_rows/system_time_nonnull/min/max: (6549, 6549, datetime.datetime(2026, 10, 27, 18, 47, 32), datetime.datetime(2026, 10, 27, 18, 47, 32))
+table_total_rows: 5955467
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a-9457d17e4996', 'DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a', '9457d17e4996e972bd86300cd67b85a401ce2ce54055aef04f827cf0aceedfb0', '10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_DIAG', 'MERGE:keys=6549', 6549, '2026-10-27T18:47:32.931000+08:00', '2026-10-27T18:47:33.293000+08:00', datetime.datetime(2026, 10, 27, 18, 47, 33))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a', 'APPLIED')]
+version_evidence: 6549
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): []
+quarantine_groups(last_1d): [('quality-required-null', '目标 NOT NULL 列缺失（工单化；合法组继续装载）', 'QUALITY_REQUIRED_NULL', 26, 'OPEN')]
+== readback done: EMR_OUTPATIENT_DIAG ==
+########## EMR_DOC_ORDER_DRUG ##########
+applywin_rows/system_time_nonnull/min/max: (7772, 7772, datetime.datetime(2026, 10, 27, 18, 50, 30), datetime.datetime(2026, 10, 27, 18, 50, 30))
+table_total_rows: 9247178
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1-5d400eebae25', 'DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1', '5d400eebae25b78819ae9dc1d03c023481944f60ef1014ae2436cd3ad1ff216d', '10.10.8.74:1521/orcl.DBOPER.EMR_DOC_ORDER_DRUG', 'MERGE:keys=7772', 7772, '2026-10-27T18:50:30.764000+08:00', '2026-10-27T18:50:33.544000+08:00', datetime.datetime(2026, 10, 27, 18, 50, 33))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_DOC_ORDER_DRUG.T1.2026-10-26.9985788d8dd1', 'RECONCILED')]
+version_evidence: 7772
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_DOC_ORDER_DRUG ==
+########## EMR_OUT_FEE_INFO_MAIN ##########
+applywin_rows/system_time_nonnull/min/max: (4554, 4554, datetime.datetime(2026, 10, 27, 18, 51, 51), datetime.datetime(2026, 10, 27, 18, 51, 51))
+table_total_rows: 5212175
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OUT_FEE_INFO_MAIN.T1.2026-10-26.3488cf656bbb-e220f9afe853', 'DBOPER.EMR_OUT_FEE_INFO_MAIN.T1.2026-10-26.3488cf656bbb', 'e220f9afe853f9d7cc7e0d1bd81fa187c4fa4fe478bf6e7901bbf8970acb8305', '10.10.8.74:1521/orcl.DBOPER.EMR_OUT_FEE_INFO_MAIN', 'MERGE:keys=4554', 4554, '2026-10-27T18:51:51.343000+08:00', '2026-10-27T18:52:30.658000+08:00', datetime.datetime(2026, 10, 27, 18, 52, 30))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_OUT_FEE_INFO_MAIN.T1.2026-10-26.3488cf656bbb', 'RECONCILED')]
+version_evidence: 4554
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_OUT_FEE_INFO_MAIN ==
+########## EMR_OUT_FEE_INFO_CHILD ##########
+applywin_rows/system_time_nonnull/min/max: (16398, 16398, datetime.datetime(2026, 10, 27, 18, 53, 31), datetime.datetime(2026, 10, 27, 18, 53, 31))
+table_total_rows: 15643630
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_OUT_FEE_INFO_CHILD.T1.2026-10-26.b38bda11f16a-bf8f373a79e0', 'DBOPER.EMR_OUT_FEE_INFO_CHILD.T1.2026-10-26.b38bda11f16a', 'bf8f373a79e0855fdbfb249d63c99ae13dfa2652d9c4fd78c1b257b180b52f47', '10.10.8.74:1521/orcl.DBOPER.EMR_OUT_FEE_INFO_CHILD', 'MERGE:keys=16398', 16398, '2026-10-27T18:53:31.454000+08:00', '2026-10-27T18:53:32.711000+08:00', datetime.datetime(2026, 10, 27, 18, 53, 32))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_OUT_FEE_INFO_CHILD.T1.2026-10-26.b38bda11f16a', 'RECONCILED')]
+version_evidence: 16398
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_OUT_FEE_INFO_CHILD ==
+########## EMR_IN_FEE_INFO_CHILD ##########
+Traceback (most recent call last):
+  File "/tmp/b8_readback.py", line 21, in <module>
+    cur.execute(
+  File "/usr/local/lib/python3.11/site-packages/oracledb/cursor.py", line 859, in execute
+    impl.execute(self)
+  File "src/oracledb/impl/thick/cursor.pyx", line 337, in oracledb.thick_impl.ThickCursorImpl.execute
+  File "src/oracledb/impl/thick/utils.pyx", line 486, in oracledb.thick_impl._raise_from_odpi
+  File "src/oracledb/impl/thick/utils.pyx", line 476, in oracledb.thick_impl._raise_from_info
+oracledb.exceptions.DatabaseError: DPY-4024: call timeout of 120000 ms exceeded
+DPI-1067: call timeout of 120000 ms exceeded with ORA-03156
+ORA-03156: Message 3156 not found;  product=RDBMS; facility=ORA
+########## EMR_INFOR_OTHERS ##########
+applywin_rows/system_time_nonnull/min/max: (280, 280, datetime.datetime(2026, 10, 27, 19, 13, 53), datetime.datetime(2026, 10, 27, 19, 13, 53))
+table_total_rows: 95404
+receipt_columns: ['OPERATION_ID', 'BATCH_ID', 'MANIFEST_HASH', 'TARGET_OBJECT', 'SCOPE_SUMMARY', 'ROWS_AFFECTED', 'SYSTEM_TIME', 'COMMITTED_AT', 'CREATED_AT']
+receipt: ('OPR-DBOPER.EMR_INFOR_OTHERS.T1.2026-10-26.c9d12519007e-460604fdbdc4', 'DBOPER.EMR_INFOR_OTHERS.T1.2026-10-26.c9d12519007e', '460604fdbdc40f59ae23a4e88b306783f58278bcdf53e96a07b9a083b2f53ca2', '10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_OTHERS', 'MERGE:keys=280', 280, '2026-10-27T19:13:53.506000+08:00', '2026-10-27T19:13:53.693000+08:00', datetime.datetime(2026, 10, 27, 19, 13, 53))
+receipt_total: 99
+batch_state: [('DBOPER.EMR_INFOR_OTHERS.T1.2026-10-26.c9d12519007e', 'RECONCILED')]
+version_evidence: 280
+watermarks(capture_h/apply_cursor/delivery_cursor/continuous_through): [(datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')), None, None, datetime.datetime(2026, 10, 27, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='Asia/Shanghai')))]
+quarantine_groups(last_1d): []
+== readback done: EMR_INFOR_OTHERS ==
+########## ALL READBACK DONE ##########

@@ -1,0 +1,65 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_OUTPATIENT_DIAG 业务日 2026-10-26 ===
+=== STEP1 approval-register ===
+2026-10-27 18:44:33
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B8-20261026:emr_outpatient_diag",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_DIAG",
+ "valid_from": "2026-10-27T10:44:34.972185+00:00",
+ "valid_until": "2026-10-28T10:44:34.972185+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批8并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B8-20261026:emr_outpatient_diag（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_DIAG，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-27 18:44:35
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a",
+ "attempt_id": "att001",
+ "rows": 6602,
+ "plan": {
+  "batch_id": "DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a",
+  "table": "EMR_OUTPATIENT_DIAG",
+  "business_day": "2026-10-26",
+  "mode": "T1",
+  "window": "win:2026-10-26T00:00:00+08:00/2026-10-27T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_OUTPATIENT_DIAG"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+CAPTURE_WINDOW=2026-10-27 18:44:35 2026-10-27 18:44:39
+BATCH_ID=DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a
+=== STEP3 verify ===
+2026-10-27 18:44:39
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_OUTPATIENT_DIAG.T1.2026-10-26.3d125309117a",
+ "state": "QUARANTINED",
+ "quality": {
+  "counts": {
+   "VALID": 6549,
+   "QUARANTINED": 53
+  },
+  "valid_groups": 6549,
+  "quarantined_groups": 26,
+  "ticket_hint": "人工工单候选：26 组隔离，规则见 issues",
+  "valid_rows": 6549
+ },
+ "rows": 6602,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证未全通过: QUARANTINED"
+}

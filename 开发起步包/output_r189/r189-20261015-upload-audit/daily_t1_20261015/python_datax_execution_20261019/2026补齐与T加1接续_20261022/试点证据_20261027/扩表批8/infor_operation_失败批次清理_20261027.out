@@ -1,0 +1,7 @@
+
+batches before: [('DBOPER.EMR_INFOR_OPERATION.T1.2026-10-26.b87fa22f6b72', 'EMR_INFOR_OPERATION', 'RETRYABLE')]
+  DBOPER.EMR_INFOR_OPERATION.T1.2026-10-26.b87fa22f6b72: attempts=0 quarantine_groups=0
+stage dirs: absent
+deleted: batches=1 attempts=0 quarantine_groups=0
+remaining batches for table: 0
+stage dir absent (capture 超时未落盘)

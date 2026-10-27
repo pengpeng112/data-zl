@@ -1,0 +1,65 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+Authorized users only. All activities may be monitored and reported.
+=== TABLE EMR_CONSUMABLES 业务日 2026-10-26 ===
+=== STEP1 approval-register ===
+2026-10-27 18:40:28
+{
+ "ok": true,
+ "approval_ref": "T1-EXPAND-B8-20261026:emr_consumables",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_CONSUMABLES",
+ "valid_from": "2026-10-27T10:40:30.040675+00:00",
+ "valid_until": "2026-10-28T10:40:30.040675+00:00",
+ "registered_by": "用户会话批准2026-10-26(扩表批8并行试点)",
+ "结论": "批准已登记: T1-EXPAND-B8-20261026:emr_consumables（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_CONSUMABLES，有效期 24 小时；管道装载时只读核验）"
+}
+=== STEP2 capture ===
+2026-10-27 18:40:30
+{
+ "ok": true,
+ "batch_id": "DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b",
+ "attempt_id": "att001",
+ "rows": 1456,
+ "plan": {
+  "batch_id": "DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b",
+  "table": "EMR_CONSUMABLES",
+  "business_day": "2026-10-26",
+  "mode": "T1",
+  "window": "win:2026-10-26T00:00:00+08:00/2026-10-27T00:00:00+08:00",
+  "target_binding": {
+   "target_instance": "10.10.8.74:1521/orcl",
+   "tenant": "DBOPER",
+   "table": "DBOPER.EMR_CONSUMABLES"
+  },
+  "engine": null,
+  "dry_run": false
+ },
+ "simulation": false,
+ "结论": "capture 完成"
+}
+CAPTURE_WINDOW=2026-10-27 18:40:30 2026-10-27 18:40:32
+BATCH_ID=DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b
+=== STEP3 verify ===
+2026-10-27 18:40:32
+{
+ "ok": false,
+ "batch_id": "DBOPER.EMR_CONSUMABLES.T1.2026-10-26.d1e64a5b6a3b",
+ "state": "QUARANTINED",
+ "quality": {
+  "counts": {
+   "VALID": 1293,
+   "QUARANTINED": 163
+  },
+  "valid_groups": 1293,
+  "quarantined_groups": 163,
+  "ticket_hint": "人工工单候选：163 组隔离，规则见 issues",
+  "valid_rows": 1293
+ },
+ "rows": 1456,
+ "record_state_before": "CAPTURED",
+ "simulation": false,
+ "结论": "质量验证未全通过: QUARANTINED"
+}
