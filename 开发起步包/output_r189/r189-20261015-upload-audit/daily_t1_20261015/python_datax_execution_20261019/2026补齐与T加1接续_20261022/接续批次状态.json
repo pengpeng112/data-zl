@@ -522,6 +522,19 @@
       "zero_code_change": true,
       "daily_run_dry": "三表识别正常；按日批准T1-DAILY-*未登记按设计跳过（批1同形态先例）",
       "backlog": "三表历史回补[2026-01-01,H)不在本批（体检19332vs源22017差额属历史窗）；10-25业务窗起按T1-DAILY-<日>:<表>逐日登记驱动；REPORT两时间列表达式零行窗未触发待首有行业务日验证；工单3张挂账（T-B02-1/2/3）"
+    },
+    "backfill_ods_b9": {
+      "planned_on": "2026-10-27",
+      "session": "zcode-20261027-b9plan",
+      "status": "PLAN_ISSUED_READY_FOR_DISPATCH",
+      "user_intent": "用户2026-10-27：'再给个任务 把剩余能同步的继续执行'——批5/6/7挂账的ODS历史回补[2026-01-01,H)集中执行",
+      "plan": "给执行者_批9ODS历史回补25表一次性执行计划_20261027.md",
+      "prefix": "T1-BACKFILL-B9-20261027:<小写表名>(72h一表一批准)",
+      "scope": "25表=批5(6,除ADMISSION_RECORD)+批6(10,除OPERA_RECORD)+批7(9,除DEAD_TF/DND)；月窗HISTORICAL 250窗(25表×2026-01..09+10P[10-01,10-26))；每表用各自批freeze/bindings配置对",
+      "basis": "首组回补先例(历史欠账补齐执行报告_20261024:40窗134万行/CAS+NO_CHANGE+隔离语义/月覆盖账)+r212月窗能力零代码",
+      "est_volume": "~300万行级处理(NO_CHANGE/CAS复放为主,INSERT视差距普查),最大DOC_ORDER_CHECK≈140万",
+      "discipline": "与批8并行零交集;CAS/隔离结束汇总呈报用户裁定不自行处理(2026-10-24裁定仅参照);字符型SYSTEM_TIME两表字符串回读",
+      "awaiting_user": []
     }
   }
 }
