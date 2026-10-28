@@ -1,0 +1,192 @@
+{
+ "2026-01": {
+  "rows": 291,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-01-01.5f12489067b4",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 181,
+   "insert": 181,
+   "update": 0,
+   "no_change": 110,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 252,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-02-01.defea7bda840",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 233,
+   "insert": 233,
+   "update": 0,
+   "no_change": 19,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 314,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-03-01.8d4c9ae83947",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 310,
+   "insert": 310,
+   "update": 0,
+   "no_change": 4,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 385,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-04-01.dbbeb6e0e5aa",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 385,
+   "insert": 385,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 303,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-05-01.a021e6005139",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 302,
+   "insert": 302,
+   "update": 0,
+   "no_change": 1,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 340,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-06-01.35bd6c490e71",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 340,
+   "insert": 340,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 288,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-07-01.976108a21246",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 288,
+   "insert": 288,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 283,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-08-01.3ad6780c759a",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 283,
+   "insert": 283,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 343,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-09-01.bbba9b8cedd5",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 343,
+   "insert": 343,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 229,
+  "batch_id": "DBOPER.EMR_INFOR_CRITICALLY_ILL.HISTORICAL.2026-10-01.2ef97b8d6c6d",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 221,
+   "insert": 220,
+   "update": 1,
+   "no_change": 8,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

@@ -1,0 +1,256 @@
+{
+ "2026-01": {
+  "rows": 1955,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-01-01.f457e3024257",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1955,
+   "insert": 1955,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 1636,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-02-01.60f4ca5eb8ea",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1636,
+   "insert": 1636,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 2271,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-03-01.2139cbcb7d95",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2271,
+   "insert": 2271,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 2229,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-04-01.ae5a8a57e428",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2229,
+   "insert": 2229,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 2148,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-05-01.cd74371d9d7a",
+  "verify_state": "QUARANTINED",
+  "verify": {
+   "state": "QUARANTINED",
+   "rows": 2148,
+   "quality": {
+    "counts": {
+     "VALID": 2144,
+     "QUARANTINED": 4
+    },
+    "valid_groups": 2144,
+    "quarantined_groups": 1,
+    "ticket_hint": "人工工单候选：1 组隔离，规则见 issues",
+    "valid_rows": 2144
+   }
+  },
+  "mopup": "legal_subset_apply",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2144,
+   "insert": 2144,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 4
+ },
+ "2026-06": {
+  "rows": 1971,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-06-01.effa1627cb2b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1971,
+   "insert": 1971,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 2431,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-07-01.f8c49f418698",
+  "verify_state": "QUARANTINED",
+  "verify": {
+   "state": "QUARANTINED",
+   "rows": 2431,
+   "quality": {
+    "counts": {
+     "VALID": 2387,
+     "QUARANTINED": 44
+    },
+    "valid_groups": 2387,
+    "quarantined_groups": 11,
+    "ticket_hint": "人工工单候选：11 组隔离，规则见 issues",
+    "valid_rows": 2387
+   }
+  },
+  "mopup": "legal_subset_apply",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2387,
+   "insert": 2387,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 44
+ },
+ "2026-08": {
+  "rows": 2433,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-08-01.a2449af7dd10",
+  "verify_state": "QUARANTINED",
+  "verify": {
+   "state": "QUARANTINED",
+   "rows": 2433,
+   "quality": {
+    "counts": {
+     "VALID": 2273,
+     "QUARANTINED": 160
+    },
+    "valid_groups": 2273,
+    "quarantined_groups": 40,
+    "ticket_hint": "人工工单候选：40 组隔离，规则见 issues",
+    "valid_rows": 2273
+   }
+  },
+  "mopup": "legal_subset_apply",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2273,
+   "insert": 2273,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 160
+ },
+ "2026-09": {
+  "rows": 2017,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-09-01.0611917105df",
+  "verify_state": "QUARANTINED",
+  "verify": {
+   "state": "QUARANTINED",
+   "rows": 2017,
+   "quality": {
+    "counts": {
+     "VALID": 1992,
+     "QUARANTINED": 25
+    },
+    "valid_groups": 1992,
+    "quarantined_groups": 5,
+    "ticket_hint": "人工工单候选：5 组隔离，规则见 issues",
+    "valid_rows": 1992
+   }
+  },
+  "mopup": "legal_subset_apply",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1992,
+   "insert": 1992,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 25
+ },
+ "2026-10P": {
+  "rows": 1691,
+  "batch_id": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-10-01.50ba140b63ec",
+  "verify_state": "QUARANTINED",
+  "verify": {
+   "state": "QUARANTINED",
+   "rows": 1691,
+   "quality": {
+    "counts": {
+     "VALID": 1687,
+     "QUARANTINED": 4
+    },
+    "valid_groups": 1679,
+    "quarantined_groups": 1,
+    "ticket_hint": "人工工单候选：1 组隔离，规则见 issues",
+    "valid_rows": 1687
+   }
+  },
+  "mopup": "legal_subset_apply",
+  "apply_ok": false,
+  "partition": null,
+  "apply_refused": "apply被拒：ContractViolation（详情仅在受控审计中查看）"
+ }
+}

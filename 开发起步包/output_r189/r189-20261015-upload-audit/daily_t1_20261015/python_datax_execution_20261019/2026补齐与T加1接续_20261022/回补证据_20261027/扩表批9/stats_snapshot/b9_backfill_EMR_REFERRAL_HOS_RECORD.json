@@ -1,0 +1,192 @@
+{
+ "2026-01": {
+  "rows": 6,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-01-01.9c99b7e5d7bb",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 6,
+   "insert": 6,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 1,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-02-01.37d1c3b963e3",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1,
+   "insert": 1,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 2,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-03-01.9ff2a6b480a7",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2,
+   "insert": 2,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 7,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-04-01.6b91add64ff0",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 7,
+   "insert": 7,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 4,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-05-01.cbe43f2cd930",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 4,
+   "insert": 4,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 2,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-06-01.fa24209fb39f",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2,
+   "insert": 2,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 1,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-07-01.38612d0e6b2a",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1,
+   "insert": 1,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 3,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-08-01.8ab2a467b244",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 3,
+   "insert": 3,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 6,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-09-01.4e99de908aba",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 6,
+   "insert": 6,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 3,
+  "batch_id": "DBOPER.EMR_REFERRAL_HOS_RECORD.HISTORICAL.2026-10-01.d754d94fff7f",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 3,
+   "insert": 3,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

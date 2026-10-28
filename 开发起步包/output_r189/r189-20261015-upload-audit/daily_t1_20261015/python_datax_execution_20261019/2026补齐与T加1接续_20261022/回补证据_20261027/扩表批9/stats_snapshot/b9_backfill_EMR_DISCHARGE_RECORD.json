@@ -1,0 +1,188 @@
+{
+ "2026-01": {
+  "rows": 5092,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-01-01.dbe36963ff68",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5092,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 4089,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-02-01.3dd1e82c6c44",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 4089,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 5440,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-03-01.96f459970730",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5440,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 5455,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-04-01.08af46978a97",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5455,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 5130,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-05-01.74c05a78e96f",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5130,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 4704,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-06-01.b6325d0aadf8",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 4704,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 5155,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-07-01.405deb96c6d3",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5155,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 5158,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-08-01.2291594e37da",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 5158,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 4701,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-09-01.9c5c8ff3dd5a",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 4701,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 4024,
+  "batch_id": "DBOPER.EMR_DISCHARGE_RECORD.HISTORICAL.2026-10-01.979bab9e3aa2",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 4023,
+   "cas_conflict": 1,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ }
+}

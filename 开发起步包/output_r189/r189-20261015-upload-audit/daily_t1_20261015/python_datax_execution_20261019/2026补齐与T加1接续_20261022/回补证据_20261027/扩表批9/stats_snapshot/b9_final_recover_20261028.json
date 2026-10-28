@@ -1,0 +1,102 @@
+{
+ "A_dupkey_retryable": [
+  {
+   "batch": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-05-01.cda9a51c01e5",
+   "state": "RETRYABLE"
+  },
+  {
+   "batch": "DBOPER.EMR_AFTER_OPERA_RECORD.HISTORICAL.2026-05-01.8a478d2cb148",
+   "state": "RETRYABLE"
+  },
+  {
+   "batch": "DBOPER.EMR_HOS_POSTOPER_RECORD.HISTORICAL.2026-10-01.50ba140b63ec",
+   "state": "RETRYABLE"
+  },
+  {
+   "batch": "DBOPER.EMR_HOS_PREOP_DISCUSS.HISTORICAL.2026-10-01.e91153e3db27",
+   "state": "RETRYABLE"
+  }
+ ],
+ "B_apply_reconcile": [
+  {
+   "batch": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-01-01.e6878dfe02c2",
+   "apply_ok": true,
+   "partition": {
+    "ok": 2,
+    "insert": 2,
+    "update": 0,
+    "no_change": 0,
+    "cas_conflict": 0,
+    "missing_parent": 0
+   },
+   "refused": null,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0
+  },
+  {
+   "batch": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-05-01.c695ae7fc4f8",
+   "apply_ok": true,
+   "partition": {
+    "ok": 0,
+    "insert": 0,
+    "update": 0,
+    "no_change": 0,
+    "cas_conflict": 0,
+    "missing_parent": 0
+   },
+   "refused": null,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0
+  },
+  {
+   "batch": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-08-01.3862f706bae8",
+   "apply_ok": true,
+   "partition": {
+    "ok": 0,
+    "insert": 0,
+    "update": 0,
+    "no_change": 0,
+    "cas_conflict": 0,
+    "missing_parent": 0
+   },
+   "refused": null,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0
+  }
+ ],
+ "C_reconcile_only": [
+  {
+   "batch": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-01-01.89e01f4a2133",
+   "rows_from_receipt": 210345,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0,
+   "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+  },
+  {
+   "batch": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-05-01.33ee276dca98",
+   "rows_from_receipt": 208028,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0,
+   "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+  },
+  {
+   "batch": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-09-01.5dff6480792c",
+   "rows_from_receipt": 199922,
+   "reconciled": true,
+   "missing": 0,
+   "diffs": 0,
+   "quarantined_pending": 0,
+   "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+  }
+ ]
+}

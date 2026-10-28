@@ -571,5 +571,28 @@
       ],
       "lessons": "①跨页分页语义实测澄清：max_rows_per_slice=5万是完整性探针上限(触发keyset模式),分页页大小=5000,超预算窗按页续捕聚合单chunk(字节预算256MB内不分片)——批9历史回补大月窗(DOC_ORDER_CHECK≈140万行)将走同一机制；②视图重表COUNT超时不构成capture判死依据一律直试(INFOR_OTHERS实证),但COUNT快也不保证capture能过(INFOR_OPERATION反向第三例)；③源绑定view_by_table公式=V_+表名(表名自带EMR_前缀勿再拼V_EMR_)"
     }
+  },
+  "backfill_ods_b9": {
+    "status": "CLOSED_WITH_TICKETS(2026-10-28 08:15 终态)",
+    "windows": "250 全执行：208 RECONCILED_CLOSED + 42 OPEN 留账",
+    "ledger": {
+      "rows": 4881190,
+      "insert": 4804887,
+      "no_change": 68063,
+      "update": 78,
+      "cas_conflict": 447
+    },
+    "month_coverage": "250 行 HISTORICAL_BACKLOG 已登记（b9_closeout）",
+    "approvals": "T1-BACKFILL-B9-20261027:<小写表名> ×25（72h，2026-10-27 19:30 登记）",
+    "tickets": [
+      "T-B09-1 同键双行 4 窗 6,727 行整窗未装（OPN/AFTER_OPERA 05、POSTOPER/PREOP 10P；源视图重复发出，批次已 RETRYABLE 留证）——裁定去重口径后同批号重放",
+      "T-B09-2 TRANS_BLOOD 428 行 CAS（SAP_RELATIONSHIP/DISEASE_CODE/科室床号三族漂移）",
+      "T-B09-3 六表 324 行质量隔离 NOT NULL 缺失（ADMISSION_DIAGNOSIS 79/PREOP 168/POSTOPER 58/BOFORE 8/AFTER_OPERA 7/DIFFIC 4）",
+      "T-B09-4 DISCHARGE 外部写者核实（10-27 重写 109,530 行 SEX_CODE 尾空格形态+10P 1 行 CAS）",
+      "T-B09-5 RECIPE_ITEM 18 键 CAS（diff_class 双 attempt 口径污染留证）"
+    ],
+    "evidence": "回补证据_20261027/扩表批9/（报告+stats_snapshot+全套 out/json）",
+    "engineering": "恶计划（外层显式列清单 723s vs SELECT* 0.7s）+双层超时链（600s DPY-4024）→工厂参数 1800s 零代码处置；逐表进程隔离；水位不动",
+    "recovery": "工单收口后：同批号重放（dup 窗源端去重后）/resolve_quarantine_group+新窗重载（CAS）；恢复入口=本节+批9执行报告§5"
   }
 }

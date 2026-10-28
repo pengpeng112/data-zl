@@ -1,0 +1,172 @@
+{
+ "2026-01": {
+  "rows": 374,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-01-01.be7f84757d8a",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 365,
+   "cas_conflict": 9,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ },
+ "2026-02": {
+  "rows": 277,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-02-01.ba88ff7d0ffa",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 255,
+   "cas_conflict": 22,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ },
+ "2026-03": {
+  "rows": 358,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-03-01.99f803befef5",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 306,
+   "cas_conflict": 52,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ },
+ "2026-04": {
+  "rows": 466,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-04-01.05adc856423b",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 401,
+   "cas_conflict": 65,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ },
+ "2026-05": {
+  "rows": 425,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-05-01.8f9a5dee384a",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 283,
+   "cas_conflict": 142,
+   "missing_parent": 0
+  },
+  "apply_refused": "全部行进隔离组（CAS 冲突/缺父）：留账待处置，不整批盲写"
+ },
+ "2026-06": {
+  "rows": 465,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-06-01.38fc331bc909",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 301,
+   "insert": 301,
+   "update": 0,
+   "no_change": 26,
+   "cas_conflict": 138,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 138
+ },
+ "2026-07": {
+  "rows": 61,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-07-01.d94f3fb45da9",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 61,
+   "insert": 61,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-08-01.a9c645e5a966",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-09-01.7e9e9d2b1d5c",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_INFOR_TRANS_BLOOD.HISTORICAL.2026-10-01.3412106b7f66",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

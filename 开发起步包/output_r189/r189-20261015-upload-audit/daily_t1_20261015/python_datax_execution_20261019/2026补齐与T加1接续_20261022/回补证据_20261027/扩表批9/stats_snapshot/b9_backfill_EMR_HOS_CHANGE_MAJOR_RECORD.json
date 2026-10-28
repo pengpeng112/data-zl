@@ -1,0 +1,188 @@
+{
+ "2026-01": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-01-01.0a03cf0eda0e",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-02-01.b91b35f92496",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-03-01.24f599d7c70c",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-04-01.3b068796533b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "batch": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-05-01.c695ae7fc4f8",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-06-01.a311fc3d2ec7",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-07-01.ccc7c4b2311c",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "batch": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-08-01.3862f706bae8",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-09-01.08fe698a3653",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD.HISTORICAL.2026-10-01.28065fa5b67e",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

@@ -1,0 +1,27 @@
+
+month_coverage registered: EMR_HOS_CHANGE_MAJOR_RECORD x10
+month_coverage registered: EMR_HOS_SUCCESSION_RECORD x10
+month_coverage registered: EMR_REFERRAL_HOS_RECORD x10
+month_coverage registered: EMR_HOS_DIFFIC_CASE_DISCUSS x10
+month_coverage registered: EMR_DEATH_RECORD x10
+month_coverage registered: EMR_ANES_RECORD_BLOOD x10
+month_coverage registered: EMR_INFOR_TRANS_BLOOD x10
+month_coverage registered: EMR_INFOR_CRITICALLY_ILL x10
+month_coverage registered: EMR_ICH_ALLERGIES x10
+month_coverage registered: EMR_OPERATION_NURSING x10
+month_coverage registered: EMR_BOFORE_OPERA_RECORD x10
+month_coverage registered: EMR_AFTER_OPERA_RECORD x10
+month_coverage registered: EMR_ANESTHESIA_RECORD x10
+month_coverage registered: EMR_INFOR_ANESTHESIA x10
+month_coverage registered: EMR_HOS_POSTOPER_RECORD x10
+month_coverage registered: EMR_HOS_PREOP_DISCUSS x10
+month_coverage registered: EMR_DISCHARGE_RECORD x10
+month_coverage registered: EMR_IN_FEE_INFO_MAIN x10
+month_coverage registered: EMR_HOS_CONSUL_RECORD x10
+month_coverage registered: EMR_ADMISSION_DIAGNOSIS x10
+month_coverage registered: EMR_OUTPATIENT_RECIPE x10
+month_coverage registered: EMR_OUTPATIENT_RECORD x10
+month_coverage registered: EMR_OUTPATIENT_REGISTER x10
+month_coverage registered: EMR_OUTPATIENT_RECIPE_ITEM x10
+month_coverage registered: EMR_DOC_ORDER_CHECK x10
+CLOSEOUT_DONE /opt/data-asset/t1-stage/b9_closeout_20261027.json

@@ -1,0 +1,192 @@
+{
+ "2026-01": {
+  "rows": 1660,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-01-01.9422ce57c445",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1660,
+   "insert": 1660,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 1514,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-02-01.faa255aeb6d0",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1514,
+   "insert": 1514,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 1950,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-03-01.d9d473638675",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1950,
+   "insert": 1950,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 1850,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-04-01.c2c1cff7f743",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1850,
+   "insert": 1850,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 1831,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-05-01.f9aee75bf69e",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1831,
+   "insert": 1831,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 1677,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-06-01.3270e689c479",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1677,
+   "insert": 1677,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 2074,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-07-01.a69fb17ace70",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2074,
+   "insert": 2074,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 2011,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-08-01.746ffea0a8bb",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2011,
+   "insert": 2011,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 1697,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-09-01.88dd3a3392fc",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1697,
+   "insert": 1697,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 1445,
+  "batch_id": "DBOPER.EMR_ANESTHESIA_RECORD.HISTORICAL.2026-10-01.922df4daf4b0",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1409,
+   "insert": 1409,
+   "update": 0,
+   "no_change": 36,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

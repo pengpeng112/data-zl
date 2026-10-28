@@ -1,0 +1,18 @@
+#!/bin/sh
+# 批9 逐表批准登记（approval-register CLI ×25，72h，target-scope 同 T+1 形态）
+# 运行：ssh 8.83 "docker exec -i data-asset-api sh" < b9_approval_register.sh（工作目录 /app）
+cd /app || exit 1
+TABLES="EMR_ADMISSION_DIAGNOSIS EMR_DEATH_RECORD EMR_ICH_ALLERGIES EMR_DISCHARGE_RECORD EMR_OUTPATIENT_RECORD EMR_OUTPATIENT_REGISTER EMR_INFOR_TRANS_BLOOD EMR_HOS_CHANGE_MAJOR_RECORD EMR_ANES_RECORD_BLOOD EMR_INFOR_CRITICALLY_ILL EMR_HOS_POSTOPER_RECORD EMR_BOFORE_OPERA_RECORD EMR_ANESTHESIA_RECORD EMR_IN_FEE_INFO_MAIN EMR_HOS_CONSUL_RECORD EMR_DOC_ORDER_CHECK EMR_REFERRAL_HOS_RECORD EMR_HOS_DIFFIC_CASE_DISCUSS EMR_HOS_SUCCESSION_RECORD EMR_OPERATION_NURSING EMR_HOS_PREOP_DISCUSS EMR_AFTER_OPERA_RECORD EMR_INFOR_ANESTHESIA EMR_OUTPATIENT_RECIPE EMR_OUTPATIENT_RECIPE_ITEM"
+for T in $TABLES; do
+  LOW=$(echo "$T" | tr 'A-Z' 'a-z')
+  echo "== $T -> T1-BACKFILL-B9-20261027:$LOW =="
+  python /app/scripts/reporting_ctl.py approval-register \
+    --state-db "$APP_DB_URL" \
+    --approval-ref "T1-BACKFILL-B9-20261027:$LOW" \
+    --executor-code sql-target-apply-1 \
+    --target-scope "10.10.8.74:1521/orcl.DBOPER.$T" \
+    --registered-by "用户会话批准2026-10-27(批9ODS历史回补25表派工)" \
+    --valid-hours 72 \
+    --note "批9历史回补[2026-01-01,2026-10-26)月窗；计划=给执行者_批9ODS历史回补25表一次性执行计划_20261027.md"
+done
+echo APPROVAL_REGISTER_DONE

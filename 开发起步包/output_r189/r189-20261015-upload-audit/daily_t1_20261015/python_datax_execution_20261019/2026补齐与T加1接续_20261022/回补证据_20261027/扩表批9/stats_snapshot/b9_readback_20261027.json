@@ -1,0 +1,2953 @@
+{
+ "conservation": {
+  "EMR_HOS_CHANGE_MAJOR_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": null,
+     "rows": null,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": null,
+     "rows": null,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 0,
+   "total_pipe_rows": 0,
+   "total_insert": 0,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_HOS_SUCCESSION_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 2,
+     "rows": null,
+     "insert": 2,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 4,
+     "rows": 4,
+     "insert": 4,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 6,
+   "total_pipe_rows": 4,
+   "total_insert": 6,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 2
+  },
+  "EMR_REFERRAL_HOS_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 6,
+     "rows": 6,
+     "insert": 6,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1,
+     "rows": 1,
+     "insert": 1,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 2,
+     "rows": 2,
+     "insert": 2,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 7,
+     "rows": 7,
+     "insert": 7,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 4,
+     "rows": 4,
+     "insert": 4,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 2,
+     "rows": 2,
+     "insert": 2,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 1,
+     "rows": 1,
+     "insert": 1,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 3,
+     "rows": 3,
+     "insert": 3,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 6,
+     "rows": 6,
+     "insert": 6,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 3,
+     "rows": 3,
+     "insert": 3,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 35,
+   "total_pipe_rows": 35,
+   "total_insert": 35,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_HOS_DIFFIC_CASE_DISCUSS": {
+   "months": {
+    "2026-01": {
+     "src": 23,
+     "rows": 23,
+     "insert": 23,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 14,
+     "rows": 14,
+     "insert": 14,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 36,
+     "rows": 36,
+     "insert": 36,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 30,
+     "rows": 30,
+     "insert": 30,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 30,
+     "rows": 30,
+     "insert": 30,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 26,
+     "rows": 26,
+     "insert": 26,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 22,
+     "rows": 22,
+     "insert": 22,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 36,
+     "rows": 36,
+     "insert": 32,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-09": {
+     "src": 21,
+     "rows": 21,
+     "insert": 21,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 19,
+     "rows": 19,
+     "insert": 19,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 257,
+   "total_pipe_rows": 257,
+   "total_insert": 253,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_DEATH_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 22,
+     "rows": 22,
+     "insert": 22,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 23,
+     "rows": 23,
+     "insert": 23,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 36,
+     "rows": 36,
+     "insert": 36,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 40,
+     "rows": 40,
+     "insert": 40,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 37,
+     "rows": 37,
+     "insert": 37,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 38,
+     "rows": 38,
+     "insert": 38,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 39,
+     "rows": 39,
+     "insert": 39,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 31,
+     "rows": 31,
+     "insert": 31,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 35,
+     "rows": 35,
+     "insert": 35,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 26,
+     "rows": 26,
+     "insert": 26,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 327,
+   "total_pipe_rows": 327,
+   "total_insert": 327,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_ANES_RECORD_BLOOD": {
+   "months": {
+    "2026-01": {
+     "src": 79,
+     "rows": 79,
+     "insert": 49,
+     "update": 0,
+     "no_change": 30,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 47,
+     "rows": 47,
+     "insert": 43,
+     "update": 0,
+     "no_change": 4,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 60,
+     "rows": 60,
+     "insert": 60,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 64,
+     "rows": 64,
+     "insert": 64,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 73,
+     "rows": 73,
+     "insert": 73,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 72,
+     "rows": 72,
+     "insert": 72,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 66,
+     "rows": 66,
+     "insert": 66,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 65,
+     "rows": 65,
+     "insert": 65,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 93,
+     "rows": 93,
+     "insert": 93,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 59,
+     "rows": 59,
+     "insert": 55,
+     "update": 0,
+     "no_change": 4,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 678,
+   "total_pipe_rows": 678,
+   "total_insert": 640,
+   "total_no_change": 38,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_INFOR_TRANS_BLOOD": {
+   "months": {
+    "2026-01": {
+     "src": 374,
+     "rows": 374,
+     "insert": 0,
+     "update": 0,
+     "no_change": 365,
+     "cas_conflict": 9,
+     "missing_parent": 0,
+     "reconciled": null
+    },
+    "2026-02": {
+     "src": 277,
+     "rows": 277,
+     "insert": 0,
+     "update": 0,
+     "no_change": 255,
+     "cas_conflict": 22,
+     "missing_parent": 0,
+     "reconciled": null
+    },
+    "2026-03": {
+     "src": 358,
+     "rows": 358,
+     "insert": 0,
+     "update": 0,
+     "no_change": 306,
+     "cas_conflict": 52,
+     "missing_parent": 0,
+     "reconciled": null
+    },
+    "2026-04": {
+     "src": 466,
+     "rows": 466,
+     "insert": 0,
+     "update": 0,
+     "no_change": 401,
+     "cas_conflict": 65,
+     "missing_parent": 0,
+     "reconciled": null
+    },
+    "2026-05": {
+     "src": 425,
+     "rows": 425,
+     "insert": 0,
+     "update": 0,
+     "no_change": 283,
+     "cas_conflict": 142,
+     "missing_parent": 0,
+     "reconciled": null
+    },
+    "2026-06": {
+     "src": 465,
+     "rows": 465,
+     "insert": 301,
+     "update": 0,
+     "no_change": 26,
+     "cas_conflict": 138,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-07": {
+     "src": 61,
+     "rows": 61,
+     "insert": 61,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": null,
+     "rows": 0,
+     "insert": 0,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 2426,
+   "total_pipe_rows": 2426,
+   "total_insert": 362,
+   "total_no_change": 1636,
+   "total_cas_conflict": 428,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_INFOR_CRITICALLY_ILL": {
+   "months": {
+    "2026-01": {
+     "src": 291,
+     "rows": 291,
+     "insert": 181,
+     "update": 0,
+     "no_change": 110,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 252,
+     "rows": 252,
+     "insert": 233,
+     "update": 0,
+     "no_change": 19,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 314,
+     "rows": 314,
+     "insert": 310,
+     "update": 0,
+     "no_change": 4,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 385,
+     "rows": 385,
+     "insert": 385,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 303,
+     "rows": 303,
+     "insert": 302,
+     "update": 0,
+     "no_change": 1,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 340,
+     "rows": 340,
+     "insert": 340,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 288,
+     "rows": 288,
+     "insert": 288,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 283,
+     "rows": 283,
+     "insert": 283,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 343,
+     "rows": 343,
+     "insert": 343,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 229,
+     "rows": 229,
+     "insert": 220,
+     "update": 1,
+     "no_change": 8,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 3028,
+   "total_pipe_rows": 3028,
+   "total_insert": 2885,
+   "total_no_change": 142,
+   "total_cas_conflict": 0,
+   "total_update": 1,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_ICH_ALLERGIES": {
+   "months": {
+    "2026-01": {
+     "src": 643,
+     "rows": 643,
+     "insert": 643,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 544,
+     "rows": 544,
+     "insert": 544,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 654,
+     "rows": 654,
+     "insert": 654,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 669,
+     "rows": 669,
+     "insert": 669,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 610,
+     "rows": 610,
+     "insert": 610,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 592,
+     "rows": 592,
+     "insert": 592,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 589,
+     "rows": 589,
+     "insert": 589,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 616,
+     "rows": 616,
+     "insert": 616,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 593,
+     "rows": 593,
+     "insert": 593,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 450,
+     "rows": 450,
+     "insert": 450,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 5960,
+   "total_pipe_rows": 5960,
+   "total_insert": 5960,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_OPERATION_NURSING": {
+   "months": {
+    "2026-01": {
+     "src": 1318,
+     "rows": 1318,
+     "insert": 1318,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1266,
+     "rows": 1266,
+     "insert": 1266,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 1486,
+     "rows": 1486,
+     "insert": 1486,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 1535,
+     "rows": 1535,
+     "insert": 1535,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 1499,
+     "rows": 1499,
+     "insert": null,
+     "update": null,
+     "no_change": null,
+     "cas_conflict": null,
+     "missing_parent": null,
+     "reconciled": null
+    },
+    "2026-06": {
+     "src": 1431,
+     "rows": 1431,
+     "insert": 1431,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 1814,
+     "rows": 1814,
+     "insert": 1814,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 1744,
+     "rows": 1744,
+     "insert": 1744,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 1469,
+     "rows": 1469,
+     "insert": 1469,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 1238,
+     "rows": 1238,
+     "insert": 1206,
+     "update": 2,
+     "no_change": 30,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 14800,
+   "total_pipe_rows": 14800,
+   "total_insert": 13269,
+   "total_no_change": 30,
+   "total_cas_conflict": 0,
+   "total_update": 2,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_BOFORE_OPERA_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 1358,
+     "rows": 1358,
+     "insert": 1358,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1117,
+     "rows": 1117,
+     "insert": 1116,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-03": {
+     "src": 1608,
+     "rows": 1608,
+     "insert": 1608,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 1584,
+     "rows": 1584,
+     "insert": 1583,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-05": {
+     "src": 1577,
+     "rows": 1577,
+     "insert": 1575,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-06": {
+     "src": 1465,
+     "rows": 1465,
+     "insert": 1465,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 1842,
+     "rows": 1842,
+     "insert": 1840,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-08": {
+     "src": 1764,
+     "rows": 1764,
+     "insert": 1762,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-09": {
+     "src": 1506,
+     "rows": 1506,
+     "insert": 1506,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 1300,
+     "rows": 1300,
+     "insert": 1264,
+     "update": 3,
+     "no_change": 33,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 15121,
+   "total_pipe_rows": 15121,
+   "total_insert": 15077,
+   "total_no_change": 33,
+   "total_cas_conflict": 0,
+   "total_update": 3,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_AFTER_OPERA_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 1589,
+     "rows": 1589,
+     "insert": 1589,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1458,
+     "rows": 1458,
+     "insert": 1457,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-03": {
+     "src": 1892,
+     "rows": 1892,
+     "insert": 1890,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-04": {
+     "src": 1814,
+     "rows": 1814,
+     "insert": 1814,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 1778,
+     "rows": 1778,
+     "insert": null,
+     "update": null,
+     "no_change": null,
+     "cas_conflict": null,
+     "missing_parent": null,
+     "reconciled": null
+    },
+    "2026-06": {
+     "src": 1643,
+     "rows": 1643,
+     "insert": 1642,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-07": {
+     "src": 2038,
+     "rows": 2038,
+     "insert": 2038,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 1967,
+     "rows": 1967,
+     "insert": 1967,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 1654,
+     "rows": 1654,
+     "insert": 1653,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-10P": {
+     "src": 1413,
+     "rows": 1413,
+     "insert": 1377,
+     "update": 2,
+     "no_change": 33,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    }
+   },
+   "total_src_window": 17246,
+   "total_pipe_rows": 17246,
+   "total_insert": 15427,
+   "total_no_change": 33,
+   "total_cas_conflict": 0,
+   "total_update": 2,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_ANESTHESIA_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 1660,
+     "rows": 1660,
+     "insert": 1660,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1514,
+     "rows": 1514,
+     "insert": 1514,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 1950,
+     "rows": 1950,
+     "insert": 1950,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 1850,
+     "rows": 1850,
+     "insert": 1850,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 1831,
+     "rows": 1831,
+     "insert": 1831,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 1677,
+     "rows": 1677,
+     "insert": 1677,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 2074,
+     "rows": 2074,
+     "insert": 2074,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 2011,
+     "rows": 2011,
+     "insert": 2011,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 1697,
+     "rows": 1697,
+     "insert": 1697,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 1445,
+     "rows": 1445,
+     "insert": 1409,
+     "update": 0,
+     "no_change": 36,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 17709,
+   "total_pipe_rows": 17709,
+   "total_insert": 17673,
+   "total_no_change": 36,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_INFOR_ANESTHESIA": {
+   "months": {
+    "2026-01": {
+     "src": 1846,
+     "rows": 1846,
+     "insert": 1575,
+     "update": 0,
+     "no_change": 271,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1680,
+     "rows": 1680,
+     "insert": 1649,
+     "update": 0,
+     "no_change": 31,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 2165,
+     "rows": 2165,
+     "insert": 2165,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 2085,
+     "rows": 2085,
+     "insert": 2085,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 2009,
+     "rows": 2009,
+     "insert": 2006,
+     "update": 0,
+     "no_change": 3,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 1880,
+     "rows": 1880,
+     "insert": 1879,
+     "update": 0,
+     "no_change": 1,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 2267,
+     "rows": 2267,
+     "insert": 2267,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 2257,
+     "rows": 2257,
+     "insert": 2257,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 1819,
+     "rows": 1819,
+     "insert": 1819,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 1532,
+     "rows": 1532,
+     "insert": 1495,
+     "update": 3,
+     "no_change": 34,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 19540,
+   "total_pipe_rows": 19540,
+   "total_insert": 19197,
+   "total_no_change": 340,
+   "total_cas_conflict": 0,
+   "total_update": 3,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_HOS_POSTOPER_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 1955,
+     "rows": 1955,
+     "insert": 1955,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1636,
+     "rows": 1636,
+     "insert": 1636,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 2271,
+     "rows": 2271,
+     "insert": 2271,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 2229,
+     "rows": 2229,
+     "insert": 2229,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 2148,
+     "rows": 2148,
+     "insert": 2144,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-06": {
+     "src": 1971,
+     "rows": 1971,
+     "insert": 1971,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 2431,
+     "rows": 2431,
+     "insert": 2387,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-08": {
+     "src": 2433,
+     "rows": 2433,
+     "insert": 2273,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-09": {
+     "src": 2017,
+     "rows": 2017,
+     "insert": 1992,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-10P": {
+     "src": 1691,
+     "rows": 1691,
+     "insert": null,
+     "update": null,
+     "no_change": null,
+     "cas_conflict": null,
+     "missing_parent": null,
+     "reconciled": null
+    }
+   },
+   "total_src_window": 20782,
+   "total_pipe_rows": 20782,
+   "total_insert": 18858,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_HOS_PREOP_DISCUSS": {
+   "months": {
+    "2026-01": {
+     "src": 1927,
+     "rows": 1927,
+     "insert": 1927,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 1659,
+     "rows": 1659,
+     "insert": 1659,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 2155,
+     "rows": 2155,
+     "insert": 2151,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-04": {
+     "src": 2165,
+     "rows": 2165,
+     "insert": 2165,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 2098,
+     "rows": 2098,
+     "insert": 2094,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-06": {
+     "src": 1951,
+     "rows": 1951,
+     "insert": 1951,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 2506,
+     "rows": 2506,
+     "insert": 2382,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-08": {
+     "src": 2773,
+     "rows": 2773,
+     "insert": 2269,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-09": {
+     "src": 2025,
+     "rows": 2025,
+     "insert": 2001,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-10P": {
+     "src": 1759,
+     "rows": 1759,
+     "insert": null,
+     "update": null,
+     "no_change": null,
+     "cas_conflict": null,
+     "missing_parent": null,
+     "reconciled": null
+    }
+   },
+   "total_src_window": 21018,
+   "total_pipe_rows": 21018,
+   "total_insert": 18599,
+   "total_no_change": 0,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_DISCHARGE_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 4927,
+     "rows": 5092,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5092,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 3900,
+     "rows": 4089,
+     "insert": 0,
+     "update": 0,
+     "no_change": 4089,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 5242,
+     "rows": 5440,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5440,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 5263,
+     "rows": 5455,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5455,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 4937,
+     "rows": 5130,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5130,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 4514,
+     "rows": 4704,
+     "insert": 0,
+     "update": 0,
+     "no_change": 4704,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 4908,
+     "rows": 5155,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5155,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 4887,
+     "rows": 5158,
+     "insert": 0,
+     "update": 0,
+     "no_change": 5158,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 4473,
+     "rows": 4701,
+     "insert": 0,
+     "update": 0,
+     "no_change": 4701,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 3844,
+     "rows": 4024,
+     "insert": 0,
+     "update": 0,
+     "no_change": 4023,
+     "cas_conflict": 1,
+     "missing_parent": 0,
+     "reconciled": null
+    }
+   },
+   "total_src_window": 46895,
+   "total_pipe_rows": 48948,
+   "total_insert": 0,
+   "total_no_change": 48947,
+   "total_cas_conflict": 1,
+   "total_update": 0,
+   "delta_src_minus_pipe": -2053
+  },
+  "EMR_IN_FEE_INFO_MAIN": {
+   "months": {
+    "2026-01": {
+     "src": 5248,
+     "rows": 5248,
+     "insert": 5248,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 4228,
+     "rows": 4228,
+     "insert": 4228,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 5648,
+     "rows": 5648,
+     "insert": 5648,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 5676,
+     "rows": 5676,
+     "insert": 5676,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 5310,
+     "rows": 5310,
+     "insert": 5310,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 4911,
+     "rows": 4911,
+     "insert": 4911,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 5422,
+     "rows": 5422,
+     "insert": 5422,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 5383,
+     "rows": 5383,
+     "insert": 5383,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 4874,
+     "rows": 4874,
+     "insert": 4874,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 4182,
+     "rows": 4182,
+     "insert": 4048,
+     "update": 0,
+     "no_change": 134,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 50882,
+   "total_pipe_rows": 50882,
+   "total_insert": 50748,
+   "total_no_change": 134,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_HOS_CONSUL_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 6041,
+     "rows": 6041,
+     "insert": 6041,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 4711,
+     "rows": 4711,
+     "insert": 4711,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 6477,
+     "rows": 6477,
+     "insert": 6477,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 6531,
+     "rows": 6531,
+     "insert": 6531,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 5807,
+     "rows": 5807,
+     "insert": 5807,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 5488,
+     "rows": 5488,
+     "insert": 5488,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 5975,
+     "rows": 5975,
+     "insert": 5975,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 6258,
+     "rows": 6258,
+     "insert": 6258,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 6075,
+     "rows": 6075,
+     "insert": 6075,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 4691,
+     "rows": 4691,
+     "insert": 4527,
+     "update": 0,
+     "no_change": 164,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 58054,
+   "total_pipe_rows": 58054,
+   "total_insert": 57890,
+   "total_no_change": 164,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_ADMISSION_DIAGNOSIS": {
+   "months": {
+    "2026-01": {
+     "src": 23324,
+     "rows": 23324,
+     "insert": 18826,
+     "update": 0,
+     "no_change": 4496,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-02": {
+     "src": 18782,
+     "rows": 18782,
+     "insert": 18400,
+     "update": 0,
+     "no_change": 379,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-03": {
+     "src": 24991,
+     "rows": 24991,
+     "insert": 24951,
+     "update": 0,
+     "no_change": 31,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-04": {
+     "src": 25059,
+     "rows": 25059,
+     "insert": 25042,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-05": {
+     "src": 23225,
+     "rows": 23225,
+     "insert": 23209,
+     "update": 0,
+     "no_change": 6,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-06": {
+     "src": 21494,
+     "rows": 21494,
+     "insert": 21483,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-07": {
+     "src": 22432,
+     "rows": 22432,
+     "insert": 22426,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-08": {
+     "src": 23061,
+     "rows": 23061,
+     "insert": 23051,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-09": {
+     "src": 22313,
+     "rows": 22313,
+     "insert": 22305,
+     "update": 0,
+     "no_change": 1,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-10P": {
+     "src": 18789,
+     "rows": 18790,
+     "insert": 18199,
+     "update": 24,
+     "no_change": 563,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": false
+    }
+   },
+   "total_src_window": 223470,
+   "total_pipe_rows": 223471,
+   "total_insert": 217892,
+   "total_no_change": 5476,
+   "total_cas_conflict": 0,
+   "total_update": 24,
+   "delta_src_minus_pipe": -1
+  },
+  "EMR_OUTPATIENT_RECIPE": {
+   "months": {
+    "2026-01": {
+     "src": 39299,
+     "rows": 39299,
+     "insert": 39299,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 33237,
+     "rows": 33237,
+     "insert": 33237,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 42157,
+     "rows": 42157,
+     "insert": 42157,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 42646,
+     "rows": 42646,
+     "insert": 42646,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 43724,
+     "rows": 43724,
+     "insert": 43724,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 44344,
+     "rows": 44344,
+     "insert": 44344,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 47083,
+     "rows": 47083,
+     "insert": 47083,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 48343,
+     "rows": 48343,
+     "insert": 48343,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 52792,
+     "rows": 52792,
+     "insert": 52792,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 41876,
+     "rows": 41876,
+     "insert": 40674,
+     "update": 0,
+     "no_change": 1202,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 435501,
+   "total_pipe_rows": 435501,
+   "total_insert": 434299,
+   "total_no_change": 1202,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_OUTPATIENT_RECORD": {
+   "months": {
+    "2026-01": {
+     "src": 49067,
+     "rows": 49067,
+     "insert": 49067,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 41621,
+     "rows": 41621,
+     "insert": 41621,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 54834,
+     "rows": 54834,
+     "insert": 54834,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 56113,
+     "rows": 56113,
+     "insert": 56113,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 53804,
+     "rows": 53804,
+     "insert": 53804,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 52106,
+     "rows": 52106,
+     "insert": 52106,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 55116,
+     "rows": 55116,
+     "insert": 55116,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 59072,
+     "rows": 59072,
+     "insert": 59072,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 57366,
+     "rows": 57366,
+     "insert": 57366,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 47027,
+     "rows": 47027,
+     "insert": 45563,
+     "update": 26,
+     "no_change": 1438,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 526126,
+   "total_pipe_rows": 526126,
+   "total_insert": 524662,
+   "total_no_change": 1438,
+   "total_cas_conflict": 0,
+   "total_update": 26,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_OUTPATIENT_REGISTER": {
+   "months": {
+    "2026-01": {
+     "src": 49893,
+     "rows": 49893,
+     "insert": 49893,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 42425,
+     "rows": 42425,
+     "insert": 42425,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 55900,
+     "rows": 55900,
+     "insert": 55900,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 57221,
+     "rows": 57221,
+     "insert": 57221,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 54853,
+     "rows": 54853,
+     "insert": 54853,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 53009,
+     "rows": 53009,
+     "insert": 53009,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 56128,
+     "rows": 56128,
+     "insert": 56128,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 60015,
+     "rows": 60015,
+     "insert": 60015,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 58311,
+     "rows": 58311,
+     "insert": 58311,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 47752,
+     "rows": 47752,
+     "insert": 46265,
+     "update": 17,
+     "no_change": 1470,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 535507,
+   "total_pipe_rows": 535507,
+   "total_insert": 534020,
+   "total_no_change": 1470,
+   "total_cas_conflict": 0,
+   "total_update": 17,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_OUTPATIENT_RECIPE_ITEM": {
+   "months": {
+    "2026-01": {
+     "src": 84070,
+     "rows": 84070,
+     "insert": 84052,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 18,
+     "missing_parent": 0,
+     "reconciled": false
+    },
+    "2026-02": {
+     "src": 66202,
+     "rows": 66202,
+     "insert": 66202,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 89579,
+     "rows": 89579,
+     "insert": 89579,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 89409,
+     "rows": 89409,
+     "insert": 89409,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 85410,
+     "rows": 85410,
+     "insert": 85410,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 84389,
+     "rows": 84389,
+     "insert": 84389,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 86771,
+     "rows": 86771,
+     "insert": 86771,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 87331,
+     "rows": 87331,
+     "insert": 87331,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 93330,
+     "rows": 93330,
+     "insert": 93330,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 71417,
+     "rows": 71417,
+     "insert": 69690,
+     "update": 0,
+     "no_change": 1727,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 837908,
+   "total_pipe_rows": 837908,
+   "total_insert": 836163,
+   "total_no_change": 1727,
+   "total_cas_conflict": 18,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  },
+  "EMR_DOC_ORDER_CHECK": {
+   "months": {
+    "2026-01": {
+     "src": 210345,
+     "rows": 210345,
+     "insert": 210345,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-02": {
+     "src": 169284,
+     "rows": 169284,
+     "insert": 169284,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-03": {
+     "src": 222280,
+     "rows": 222280,
+     "insert": 222280,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-04": {
+     "src": 229858,
+     "rows": 229858,
+     "insert": 229858,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-05": {
+     "src": 208028,
+     "rows": 208028,
+     "insert": 208028,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-06": {
+     "src": 195818,
+     "rows": 195818,
+     "insert": 195818,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-07": {
+     "src": 210149,
+     "rows": 210149,
+     "insert": 210149,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-08": {
+     "src": 217292,
+     "rows": 217292,
+     "insert": 217292,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-09": {
+     "src": 199922,
+     "rows": 199922,
+     "insert": 199922,
+     "update": 0,
+     "no_change": 0,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    },
+    "2026-10P": {
+     "src": 162886,
+     "rows": 162886,
+     "insert": 157669,
+     "update": 0,
+     "no_change": 5217,
+     "cas_conflict": 0,
+     "missing_parent": 0,
+     "reconciled": true
+    }
+   },
+   "total_src_window": 2025862,
+   "total_pipe_rows": 2025862,
+   "total_insert": 2020645,
+   "total_no_change": 5217,
+   "total_cas_conflict": 0,
+   "total_update": 0,
+   "delta_src_minus_pipe": 0
+  }
+ },
+ "target_readback": {
+  "receipt_total": 339,
+  "EMR_HOS_CHANGE_MAJOR_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 0
+  },
+  "EMR_HOS_SUCCESSION_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 6
+  },
+  "EMR_REFERRAL_HOS_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 35
+  },
+  "EMR_HOS_DIFFIC_CASE_DISCUSS": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 253
+  },
+  "EMR_DEATH_RECORD": {
+   "system_time_type": "VARCHAR2",
+   "nls_form_rows_run_window": 327,
+   "iso_form_rows_october": 0
+  },
+  "EMR_ANES_RECORD_BLOOD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 640
+  },
+  "EMR_INFOR_TRANS_BLOOD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 362
+  },
+  "EMR_INFOR_CRITICALLY_ILL": {
+   "system_time_type": "VARCHAR2",
+   "nls_form_rows_run_window": 2886,
+   "iso_form_rows_october": 10
+  },
+  "EMR_ICH_ALLERGIES": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 5960
+  },
+  "EMR_OPERATION_NURSING": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 13271
+  },
+  "EMR_BOFORE_OPERA_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 15080
+  },
+  "EMR_AFTER_OPERA_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 15429
+  },
+  "EMR_ANESTHESIA_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 17673
+  },
+  "EMR_INFOR_ANESTHESIA": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 19200
+  },
+  "EMR_HOS_POSTOPER_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 18858
+  },
+  "EMR_HOS_PREOP_DISCUSS": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 18599
+  },
+  "EMR_DISCHARGE_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 109530
+  },
+  "EMR_IN_FEE_INFO_MAIN": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 50748
+  },
+  "EMR_HOS_CONSUL_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 57890
+  },
+  "EMR_ADMISSION_DIAGNOSIS": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 217916
+  },
+  "EMR_OUTPATIENT_RECIPE": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 434299
+  },
+  "EMR_OUTPATIENT_RECORD": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 524688
+  },
+  "EMR_OUTPATIENT_REGISTER": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 534037
+  },
+  "EMR_OUTPATIENT_RECIPE_ITEM": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 836163
+  },
+  "EMR_DOC_ORDER_CHECK": {
+   "system_time_type": "TIMESTAMP",
+   "rows_ge_run_start": 2020645
+  }
+ },
+ "control": {
+  "watermarks": {
+   "EMR_ADMISSION_DIAGNOSIS": "2026-10-26 00:00:00+08:00",
+   "EMR_DEATH_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_ICH_ALLERGIES": "2026-10-26 00:00:00+08:00",
+   "EMR_DISCHARGE_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_OUTPATIENT_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_OUTPATIENT_REGISTER": "2026-10-26 00:00:00+08:00",
+   "EMR_INFOR_TRANS_BLOOD": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_CHANGE_MAJOR_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_ANES_RECORD_BLOOD": "2026-10-26 00:00:00+08:00",
+   "EMR_INFOR_CRITICALLY_ILL": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_POSTOPER_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_BOFORE_OPERA_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_ANESTHESIA_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_IN_FEE_INFO_MAIN": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_CONSUL_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_DOC_ORDER_CHECK": "2026-10-26 00:00:00+08:00",
+   "EMR_REFERRAL_HOS_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_DIFFIC_CASE_DISCUSS": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_SUCCESSION_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_OPERATION_NURSING": "2026-10-26 00:00:00+08:00",
+   "EMR_HOS_PREOP_DISCUSS": "2026-10-26 00:00:00+08:00",
+   "EMR_AFTER_OPERA_RECORD": "2026-10-26 00:00:00+08:00",
+   "EMR_INFOR_ANESTHESIA": "2026-10-26 00:00:00+08:00",
+   "EMR_OUTPATIENT_RECIPE": "2026-10-26 00:00:00+08:00",
+   "EMR_OUTPATIENT_RECIPE_ITEM": "2026-10-26 00:00:00+08:00"
+  },
+  "open_quarantine": {
+   "EMR_HOS_DIFFIC_CASE_DISCUSS": {
+    "groups": 1,
+    "rows": 1
+   },
+   "EMR_DISCHARGE_RECORD": {
+    "groups": 1,
+    "rows": 1
+   },
+   "EMR_HOS_PREOP_DISCUSS": {
+    "groups": 6,
+    "rows": 168
+   },
+   "EMR_OUTPATIENT_RECIPE_ITEM": {
+    "groups": 1,
+    "rows": 18
+   },
+   "EMR_HOS_POSTOPER_RECORD": {
+    "groups": 5,
+    "rows": 58
+   },
+   "EMR_INFOR_TRANS_BLOOD": {
+    "groups": 6,
+    "rows": 428
+   },
+   "EMR_ADMISSION_DIAGNOSIS": {
+    "groups": 10,
+    "rows": 79
+   },
+   "EMR_AFTER_OPERA_RECORD": {
+    "groups": 6,
+    "rows": 7
+   },
+   "EMR_BOFORE_OPERA_RECORD": {
+    "groups": 5,
+    "rows": 8
+   }
+  },
+  "historical_batches": 0,
+  "historical_batch_states": {}
+ }
+}

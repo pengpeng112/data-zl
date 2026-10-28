@@ -1,0 +1,192 @@
+{
+ "2026-01": {
+  "rows": 84070,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-01-01.493e588a1fd2",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 84052,
+   "insert": 84052,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 18,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": false,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 18
+ },
+ "2026-02": {
+  "rows": 66202,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-02-01.a813472a2004",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 66202,
+   "insert": 66202,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 89579,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-03-01.a94519313a2b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 89579,
+   "insert": 89579,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 89409,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-04-01.dff1f536ddd4",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 89409,
+   "insert": 89409,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 85410,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-05-01.83c809d6e63e",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 85410,
+   "insert": 85410,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 84389,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-06-01.c862b09f250d",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 84389,
+   "insert": 84389,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 86771,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-07-01.1aeed6a10deb",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 86771,
+   "insert": 86771,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 87331,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-08-01.ca070eab769b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 87331,
+   "insert": 87331,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 93330,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-09-01.f131df7de1d7",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 93330,
+   "insert": 93330,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 71417,
+  "batch_id": "DBOPER.EMR_OUTPATIENT_RECIPE_ITEM.HISTORICAL.2026-10-01.dd63370713d7",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 69690,
+   "insert": 69690,
+   "update": 0,
+   "no_change": 1727,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

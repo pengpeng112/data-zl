@@ -1,0 +1,190 @@
+{
+ "2026-01": {
+  "batch": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-01-01.e6878dfe02c2",
+  "apply_ok": true,
+  "partition": {
+   "ok": 2,
+   "insert": 2,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-02-01.8afa457218ee",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-03-01.a1d1553083e2",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-04-01.36f109aeb40f",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-05-01.4309d70cfb4b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-06": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-06-01.e881a14b123d",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-07-01.40acc67851cf",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 4,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-08-01.6c59a57d4167",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 4,
+   "insert": 4,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-09-01.61142f017682",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 0,
+  "batch_id": "DBOPER.EMR_HOS_SUCCESSION_RECORD.HISTORICAL.2026-10-01.1726594b0975",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 0,
+   "insert": 0,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

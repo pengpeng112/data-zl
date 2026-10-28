@@ -1,0 +1,189 @@
+{
+ "2026-01": {
+  "rows": 210345,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-01-01.89e01f4a2133",
+  "partition": {
+   "ok": 210345,
+   "insert": 210345,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_ok": true,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0,
+  "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+ },
+ "2026-02": {
+  "rows": 169284,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-02-01.b04dd83c5af9",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 169284,
+   "insert": 169284,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 222280,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-03-01.e8bd7bb26bb0",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 222280,
+   "insert": 222280,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 229858,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-04-01.69fc387f3236",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 229858,
+   "insert": 229858,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 208028,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-05-01.33ee276dca98",
+  "partition": {
+   "ok": 208028,
+   "insert": 208028,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_ok": true,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0,
+  "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+ },
+ "2026-06": {
+  "rows": 195818,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-06-01.09480c5e5b1c",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 195818,
+   "insert": 195818,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 210149,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-07-01.88e27b86d527",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 210149,
+   "insert": 210149,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 217292,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-08-01.c070952aaba9",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 217292,
+   "insert": 217292,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 199922,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-09-01.5dff6480792c",
+  "partition": {
+   "ok": 199922,
+   "insert": 199922,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_ok": true,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0,
+  "note": "主循环 apply 已提交（回执在案），reconcile 被瞬时 ORA-12541 打断，本轮补收口"
+ },
+ "2026-10P": {
+  "rows": 162886,
+  "batch_id": "DBOPER.EMR_DOC_ORDER_CHECK.HISTORICAL.2026-10-01.10c031a46a80",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 157669,
+   "insert": 157669,
+   "update": 0,
+   "no_change": 5217,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

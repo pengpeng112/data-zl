@@ -1,0 +1,170 @@
+{
+ "EMR_ADMISSION_DIAGNOSIS|QUALITY_REQUIRED_NULL": {
+  "batches": 10,
+  "groups": 10,
+  "rows_quarantined_declared": 79,
+  "group_keys": [
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null"
+  ],
+  "staged_rows": 246795,
+  "in_target": 246714,
+  "not_in_target": 81,
+  "rows_compared_with_target_diff": 0,
+  "column_distribution": {}
+ },
+ "EMR_AFTER_OPERA_RECORD|QUALITY_REQUIRED_NULL": {
+  "batches": 6,
+  "groups": 6,
+  "rows_quarantined_declared": 7,
+  "group_keys": [
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null"
+  ],
+  "staged_rows": 11295,
+  "in_target": 9511,
+  "not_in_target": 1784,
+  "rows_compared_with_target_diff": 0,
+  "column_distribution": {}
+ },
+ "EMR_BOFORE_OPERA_RECORD|QUALITY_REQUIRED_NULL": {
+  "batches": 5,
+  "groups": 5,
+  "rows_quarantined_declared": 8,
+  "group_keys": [
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null"
+  ],
+  "staged_rows": 9001,
+  "in_target": 8992,
+  "not_in_target": 9,
+  "rows_compared_with_target_diff": 0,
+  "column_distribution": {}
+ },
+ "EMR_DISCHARGE_RECORD|VERSION_CONFLICT": {
+  "batches": 1,
+  "groups": 1,
+  "rows_quarantined_declared": 1,
+  "group_keys": [
+   "cas-conflict"
+  ],
+  "staged_rows": 8048,
+  "in_target": 8048,
+  "not_in_target": 0,
+  "rows_compared_with_target_diff": 8048,
+  "column_distribution": {
+   "SEX_CODE": 8048,
+   "DISCHARGE_DIAGNOSIS": 2,
+   "DISCHARGE_DIAGNOSIS_CODE": 2
+  }
+ },
+ "EMR_HOS_DIFFIC_CASE_DISCUSS|QUALITY_REQUIRED_NULL": {
+  "batches": 1,
+  "groups": 1,
+  "rows_quarantined_declared": 1,
+  "group_keys": [
+   "quality-required-null"
+  ],
+  "staged_rows": 66,
+  "in_target": 64,
+  "not_in_target": 2,
+  "rows_compared_with_target_diff": 0,
+  "column_distribution": {}
+ },
+ "EMR_HOS_POSTOPER_RECORD|QUALITY_REQUIRED_NULL": {
+  "batches": 5,
+  "groups": 5,
+  "rows_quarantined_declared": 58,
+  "group_keys": [
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null"
+  ],
+  "staged_rows": 12678,
+  "in_target": 10975,
+  "not_in_target": 1703,
+  "rows_compared_with_target_diff": 0,
+  "column_distribution": {}
+ },
+ "EMR_HOS_PREOP_DISCUSS|QUALITY_REQUIRED_NULL": {
+  "batches": 6,
+  "groups": 6,
+  "rows_quarantined_declared": 168,
+  "group_keys": [
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null",
+   "quality-required-null"
+  ],
+  "staged_rows": 14964,
+  "in_target": 13087,
+  "not_in_target": 1877,
+  "rows_compared_with_target_diff": 2,
+  "column_distribution": {
+   "PERFORM_OPERATION_DATE": 2,
+   "SURGERY_NAME": 1
+  }
+ },
+ "EMR_INFOR_TRANS_BLOOD|VERSION_CONFLICT": {
+  "batches": 6,
+  "groups": 6,
+  "rows_quarantined_declared": 428,
+  "group_keys": [
+   "cas-conflict",
+   "cas-conflict",
+   "cas-conflict",
+   "cas-conflict",
+   "cas-conflict",
+   "cas-conflict"
+  ],
+  "staged_rows": 2739,
+  "in_target": 2739,
+  "not_in_target": 0,
+  "rows_compared_with_target_diff": 437,
+  "column_distribution": {
+   "DISEASE_CODE": 285,
+   "DISEASE_NAME": 285,
+   "SAP_RELATIONSHIP": 183,
+   "SAP_RELATIONSHIP_NAME": 183,
+   "AREA_NAME": 209,
+   "DEPT_CODE": 210,
+   "DEP_NAME": 210,
+   "SICKBED_NUM": 209
+  }
+ },
+ "EMR_OUTPATIENT_RECIPE_ITEM|VERSION_CONFLICT": {
+  "batches": 1,
+  "groups": 1,
+  "rows_quarantined_declared": 18,
+  "group_keys": [
+   "cas-conflict"
+  ],
+  "staged_rows": 168140,
+  "in_target": 168140,
+  "not_in_target": 0,
+  "rows_compared_with_target_diff": 168140,
+  "column_distribution": {
+   "ESSENTIL_GRADE": 168140,
+   "VISIT_DATE": 36
+  }
+ }
+}

@@ -1,0 +1,181 @@
+{
+ "2026-01": {
+  "rows": 1318,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-01-01.e3cb15a4028b",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1318,
+   "insert": 1318,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-02": {
+  "rows": 1266,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-02-01.584a91d921e3",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1266,
+   "insert": 1266,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-03": {
+  "rows": 1486,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-03-01.a64f855dd55f",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1486,
+   "insert": 1486,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-04": {
+  "rows": 1535,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-04-01.5469550ea0d1",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1535,
+   "insert": 1535,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-05": {
+  "rows": 1499,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-05-01.cda9a51c01e5",
+  "verify_state": "VALIDATED",
+  "apply_ok": false,
+  "partition": null,
+  "apply_refused": "apply被拒：ContractViolation（详情仅在受控审计中查看）"
+ },
+ "2026-06": {
+  "rows": 1431,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-06-01.20482c12983d",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1431,
+   "insert": 1431,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-07": {
+  "rows": 1814,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-07-01.40100ba53438",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1814,
+   "insert": 1814,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-08": {
+  "rows": 1744,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-08-01.d1011820ab99",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1744,
+   "insert": 1744,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-09": {
+  "rows": 1469,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-09-01.9218722ce32e",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1469,
+   "insert": 1469,
+   "update": 0,
+   "no_change": 0,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ },
+ "2026-10P": {
+  "rows": 1238,
+  "batch_id": "DBOPER.EMR_OPERATION_NURSING.HISTORICAL.2026-10-01.70476984cc70",
+  "verify_state": "VALIDATED",
+  "apply_ok": true,
+  "partition": {
+   "ok": 1208,
+   "insert": 1206,
+   "update": 2,
+   "no_change": 30,
+   "cas_conflict": 0,
+   "missing_parent": 0
+  },
+  "apply_refused": null,
+  "reconciled": true,
+  "missing": 0,
+  "diffs": 0,
+  "quarantined_pending": 0
+ }
+}

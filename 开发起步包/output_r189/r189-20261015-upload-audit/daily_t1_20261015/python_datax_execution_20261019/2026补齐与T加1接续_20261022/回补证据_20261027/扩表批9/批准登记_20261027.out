@@ -1,0 +1,277 @@
+
+== EMR_ADMISSION_DIAGNOSIS -> T1-BACKFILL-B9-20261027:emr_admission_diagnosis ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_admission_diagnosis",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_DIAGNOSIS",
+ "valid_from": "2026-10-27T11:08:58.333908+00:00",
+ "valid_until": "2026-10-30T11:08:58.333908+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_admission_diagnosis（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ADMISSION_DIAGNOSIS，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_DEATH_RECORD -> T1-BACKFILL-B9-20261027:emr_death_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_death_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_DEATH_RECORD",
+ "valid_from": "2026-10-27T11:08:59.555391+00:00",
+ "valid_until": "2026-10-30T11:08:59.555391+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_death_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_DEATH_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_ICH_ALLERGIES -> T1-BACKFILL-B9-20261027:emr_ich_allergies ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_ich_allergies",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_ICH_ALLERGIES",
+ "valid_from": "2026-10-27T11:09:00.761891+00:00",
+ "valid_until": "2026-10-30T11:09:00.761891+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_ich_allergies（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ICH_ALLERGIES，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_DISCHARGE_RECORD -> T1-BACKFILL-B9-20261027:emr_discharge_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_discharge_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_DISCHARGE_RECORD",
+ "valid_from": "2026-10-27T11:09:01.986657+00:00",
+ "valid_until": "2026-10-30T11:09:01.986657+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_discharge_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_DISCHARGE_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_OUTPATIENT_RECORD -> T1-BACKFILL-B9-20261027:emr_outpatient_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_outpatient_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECORD",
+ "valid_from": "2026-10-27T11:09:03.228964+00:00",
+ "valid_until": "2026-10-30T11:09:03.228964+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_outpatient_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_OUTPATIENT_REGISTER -> T1-BACKFILL-B9-20261027:emr_outpatient_register ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_outpatient_register",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_REGISTER",
+ "valid_from": "2026-10-27T11:09:04.459786+00:00",
+ "valid_until": "2026-10-30T11:09:04.459786+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_outpatient_register（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_REGISTER，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_INFOR_TRANS_BLOOD -> T1-BACKFILL-B9-20261027:emr_infor_trans_blood ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_infor_trans_blood",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_TRANS_BLOOD",
+ "valid_from": "2026-10-27T11:09:05.686399+00:00",
+ "valid_until": "2026-10-30T11:09:05.686399+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_infor_trans_blood（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_TRANS_BLOOD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_CHANGE_MAJOR_RECORD -> T1-BACKFILL-B9-20261027:emr_hos_change_major_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_change_major_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD",
+ "valid_from": "2026-10-27T11:09:06.919719+00:00",
+ "valid_until": "2026-10-30T11:09:06.919719+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_change_major_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_CHANGE_MAJOR_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_ANES_RECORD_BLOOD -> T1-BACKFILL-B9-20261027:emr_anes_record_blood ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_anes_record_blood",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_ANES_RECORD_BLOOD",
+ "valid_from": "2026-10-27T11:09:08.200183+00:00",
+ "valid_until": "2026-10-30T11:09:08.200183+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_anes_record_blood（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ANES_RECORD_BLOOD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_INFOR_CRITICALLY_ILL -> T1-BACKFILL-B9-20261027:emr_infor_critically_ill ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_infor_critically_ill",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_CRITICALLY_ILL",
+ "valid_from": "2026-10-27T11:09:09.465788+00:00",
+ "valid_until": "2026-10-30T11:09:09.465788+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_infor_critically_ill（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_CRITICALLY_ILL，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_POSTOPER_RECORD -> T1-BACKFILL-B9-20261027:emr_hos_postoper_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_postoper_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_POSTOPER_RECORD",
+ "valid_from": "2026-10-27T11:09:10.731300+00:00",
+ "valid_until": "2026-10-30T11:09:10.731300+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_postoper_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_POSTOPER_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_BOFORE_OPERA_RECORD -> T1-BACKFILL-B9-20261027:emr_bofore_opera_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_bofore_opera_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_BOFORE_OPERA_RECORD",
+ "valid_from": "2026-10-27T11:09:12.013044+00:00",
+ "valid_until": "2026-10-30T11:09:12.013044+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_bofore_opera_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_BOFORE_OPERA_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_ANESTHESIA_RECORD -> T1-BACKFILL-B9-20261027:emr_anesthesia_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_anesthesia_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_ANESTHESIA_RECORD",
+ "valid_from": "2026-10-27T11:09:13.274566+00:00",
+ "valid_until": "2026-10-30T11:09:13.274566+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_anesthesia_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_ANESTHESIA_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_IN_FEE_INFO_MAIN -> T1-BACKFILL-B9-20261027:emr_in_fee_info_main ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_in_fee_info_main",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_IN_FEE_INFO_MAIN",
+ "valid_from": "2026-10-27T11:09:14.564116+00:00",
+ "valid_until": "2026-10-30T11:09:14.564116+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_in_fee_info_main（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_IN_FEE_INFO_MAIN，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_CONSUL_RECORD -> T1-BACKFILL-B9-20261027:emr_hos_consul_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_consul_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_CONSUL_RECORD",
+ "valid_from": "2026-10-27T11:09:15.892752+00:00",
+ "valid_until": "2026-10-30T11:09:15.892752+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_consul_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_CONSUL_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_DOC_ORDER_CHECK -> T1-BACKFILL-B9-20261027:emr_doc_order_check ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_doc_order_check",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_DOC_ORDER_CHECK",
+ "valid_from": "2026-10-27T11:09:17.119485+00:00",
+ "valid_until": "2026-10-30T11:09:17.119485+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_doc_order_check（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_DOC_ORDER_CHECK，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_REFERRAL_HOS_RECORD -> T1-BACKFILL-B9-20261027:emr_referral_hos_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_referral_hos_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_REFERRAL_HOS_RECORD",
+ "valid_from": "2026-10-27T11:09:18.491069+00:00",
+ "valid_until": "2026-10-30T11:09:18.491069+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_referral_hos_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_REFERRAL_HOS_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_DIFFIC_CASE_DISCUSS -> T1-BACKFILL-B9-20261027:emr_hos_diffic_case_discuss ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_diffic_case_discuss",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS",
+ "valid_from": "2026-10-27T11:09:19.811587+00:00",
+ "valid_until": "2026-10-30T11:09:19.811587+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_diffic_case_discuss（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_DIFFIC_CASE_DISCUSS，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_SUCCESSION_RECORD -> T1-BACKFILL-B9-20261027:emr_hos_succession_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_succession_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_SUCCESSION_RECORD",
+ "valid_from": "2026-10-27T11:09:21.111726+00:00",
+ "valid_until": "2026-10-30T11:09:21.111726+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_succession_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_SUCCESSION_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_OPERATION_NURSING -> T1-BACKFILL-B9-20261027:emr_operation_nursing ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_operation_nursing",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OPERATION_NURSING",
+ "valid_from": "2026-10-27T11:09:22.725517+00:00",
+ "valid_until": "2026-10-30T11:09:22.725517+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_operation_nursing（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OPERATION_NURSING，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_HOS_PREOP_DISCUSS -> T1-BACKFILL-B9-20261027:emr_hos_preop_discuss ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_hos_preop_discuss",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PREOP_DISCUSS",
+ "valid_from": "2026-10-27T11:09:24.833513+00:00",
+ "valid_until": "2026-10-30T11:09:24.833513+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_hos_preop_discuss（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_HOS_PREOP_DISCUSS，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_AFTER_OPERA_RECORD -> T1-BACKFILL-B9-20261027:emr_after_opera_record ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_after_opera_record",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_AFTER_OPERA_RECORD",
+ "valid_from": "2026-10-27T11:09:26.130902+00:00",
+ "valid_until": "2026-10-30T11:09:26.130902+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_after_opera_record（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_AFTER_OPERA_RECORD，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_INFOR_ANESTHESIA -> T1-BACKFILL-B9-20261027:emr_infor_anesthesia ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_infor_anesthesia",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_ANESTHESIA",
+ "valid_from": "2026-10-27T11:09:27.409687+00:00",
+ "valid_until": "2026-10-30T11:09:27.409687+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_infor_anesthesia（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_INFOR_ANESTHESIA，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_OUTPATIENT_RECIPE -> T1-BACKFILL-B9-20261027:emr_outpatient_recipe ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_outpatient_recipe",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECIPE",
+ "valid_from": "2026-10-27T11:09:28.744868+00:00",
+ "valid_until": "2026-10-30T11:09:28.744868+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_outpatient_recipe（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECIPE，有效期 72 小时；管道装载时只读核验）"
+}
+== EMR_OUTPATIENT_RECIPE_ITEM -> T1-BACKFILL-B9-20261027:emr_outpatient_recipe_item ==
+{
+ "ok": true,
+ "approval_ref": "T1-BACKFILL-B9-20261027:emr_outpatient_recipe_item",
+ "executor_code": "sql-target-apply-1",
+ "target_scope": "10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECIPE_ITEM",
+ "valid_from": "2026-10-27T11:09:30.099268+00:00",
+ "valid_until": "2026-10-30T11:09:30.099268+00:00",
+ "registered_by": "用户会话批准2026-10-27(批9ODS历史回补25表派工)",
+ "结论": "批准已登记: T1-BACKFILL-B9-20261027:emr_outpatient_recipe_item（sql-target-apply-1 → 10.10.8.74:1521/orcl.DBOPER.EMR_OUTPATIENT_RECIPE_ITEM，有效期 72 小时；管道装载时只读核验）"
+}
+APPROVAL_REGISTER_DONE

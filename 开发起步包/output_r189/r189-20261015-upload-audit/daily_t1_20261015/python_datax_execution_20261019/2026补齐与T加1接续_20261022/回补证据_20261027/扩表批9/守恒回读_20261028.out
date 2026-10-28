@@ -1,0 +1,52 @@
+
+[conservation] EMR_HOS_CHANGE_MAJOR_RECORD: src=0 pipe=0 insert=0 no_change=0 cas=0 update=0
+[conservation] EMR_HOS_SUCCESSION_RECORD: src=6 pipe=4 insert=6 no_change=0 cas=0 update=0
+[conservation] EMR_REFERRAL_HOS_RECORD: src=35 pipe=35 insert=35 no_change=0 cas=0 update=0
+[conservation] EMR_HOS_DIFFIC_CASE_DISCUSS: src=257 pipe=257 insert=253 no_change=0 cas=0 update=0
+[conservation] EMR_DEATH_RECORD: src=327 pipe=327 insert=327 no_change=0 cas=0 update=0
+[conservation] EMR_ANES_RECORD_BLOOD: src=678 pipe=678 insert=640 no_change=38 cas=0 update=0
+[conservation] EMR_INFOR_TRANS_BLOOD: src=2426 pipe=2426 insert=362 no_change=1636 cas=428 update=0
+[conservation] EMR_INFOR_CRITICALLY_ILL: src=3028 pipe=3028 insert=2885 no_change=142 cas=0 update=1
+[conservation] EMR_ICH_ALLERGIES: src=5960 pipe=5960 insert=5960 no_change=0 cas=0 update=0
+[conservation] EMR_OPERATION_NURSING: src=14800 pipe=14800 insert=13269 no_change=30 cas=0 update=2
+[conservation] EMR_BOFORE_OPERA_RECORD: src=15121 pipe=15121 insert=15077 no_change=33 cas=0 update=3
+[conservation] EMR_AFTER_OPERA_RECORD: src=17246 pipe=17246 insert=15427 no_change=33 cas=0 update=2
+[conservation] EMR_ANESTHESIA_RECORD: src=17709 pipe=17709 insert=17673 no_change=36 cas=0 update=0
+[conservation] EMR_INFOR_ANESTHESIA: src=19540 pipe=19540 insert=19197 no_change=340 cas=0 update=3
+[conservation] EMR_HOS_POSTOPER_RECORD: src=20782 pipe=20782 insert=18858 no_change=0 cas=0 update=0
+[conservation] EMR_HOS_PREOP_DISCUSS: src=21018 pipe=21018 insert=18599 no_change=0 cas=0 update=0
+[conservation] EMR_DISCHARGE_RECORD: src=46895 pipe=48948 insert=0 no_change=48947 cas=1 update=0
+[conservation] EMR_IN_FEE_INFO_MAIN: src=50882 pipe=50882 insert=50748 no_change=134 cas=0 update=0
+[conservation] EMR_HOS_CONSUL_RECORD: src=58054 pipe=58054 insert=57890 no_change=164 cas=0 update=0
+[conservation] EMR_ADMISSION_DIAGNOSIS: src=223470 pipe=223471 insert=217892 no_change=5476 cas=0 update=24
+[conservation] EMR_OUTPATIENT_RECIPE: src=435501 pipe=435501 insert=434299 no_change=1202 cas=0 update=0
+[conservation] EMR_OUTPATIENT_RECORD: src=526126 pipe=526126 insert=524662 no_change=1438 cas=0 update=26
+[conservation] EMR_OUTPATIENT_REGISTER: src=535507 pipe=535507 insert=534020 no_change=1470 cas=0 update=17
+[conservation] EMR_OUTPATIENT_RECIPE_ITEM: src=837908 pipe=837908 insert=836163 no_change=1727 cas=18 update=0
+[conservation] EMR_DOC_ORDER_CHECK: src=2025862 pipe=2025862 insert=2020645 no_change=5217 cas=0 update=0
+[readback] EMR_HOS_CHANGE_MAJOR_RECORD: rows_ge_2026-10-27=0
+[readback] EMR_HOS_SUCCESSION_RECORD: rows_ge_2026-10-27=6
+[readback] EMR_REFERRAL_HOS_RECORD: rows_ge_2026-10-27=35
+[readback] EMR_HOS_DIFFIC_CASE_DISCUSS: rows_ge_2026-10-27=253
+[readback] EMR_DEATH_RECORD: VARCHAR2 nls_form=327 iso_oct=0
+[readback] EMR_ANES_RECORD_BLOOD: rows_ge_2026-10-27=640
+[readback] EMR_INFOR_TRANS_BLOOD: rows_ge_2026-10-27=362
+[readback] EMR_INFOR_CRITICALLY_ILL: VARCHAR2 nls_form=2886 iso_oct=10
+[readback] EMR_ICH_ALLERGIES: rows_ge_2026-10-27=5960
+[readback] EMR_OPERATION_NURSING: rows_ge_2026-10-27=13271
+[readback] EMR_BOFORE_OPERA_RECORD: rows_ge_2026-10-27=15080
+[readback] EMR_AFTER_OPERA_RECORD: rows_ge_2026-10-27=15429
+[readback] EMR_ANESTHESIA_RECORD: rows_ge_2026-10-27=17673
+[readback] EMR_INFOR_ANESTHESIA: rows_ge_2026-10-27=19200
+[readback] EMR_HOS_POSTOPER_RECORD: rows_ge_2026-10-27=18858
+[readback] EMR_HOS_PREOP_DISCUSS: rows_ge_2026-10-27=18599
+[readback] EMR_DISCHARGE_RECORD: rows_ge_2026-10-27=109530
+[readback] EMR_IN_FEE_INFO_MAIN: rows_ge_2026-10-27=50748
+[readback] EMR_HOS_CONSUL_RECORD: rows_ge_2026-10-27=57890
+[readback] EMR_ADMISSION_DIAGNOSIS: rows_ge_2026-10-27=217916
+[readback] EMR_OUTPATIENT_RECIPE: rows_ge_2026-10-27=434299
+[readback] EMR_OUTPATIENT_RECORD: rows_ge_2026-10-27=524688
+[readback] EMR_OUTPATIENT_REGISTER: rows_ge_2026-10-27=534037
+[readback] EMR_OUTPATIENT_RECIPE_ITEM: rows_ge_2026-10-27=836163
+[readback] EMR_DOC_ORDER_CHECK: rows_ge_2026-10-27=2020645
+READBACK_DONE /opt/data-asset/t1-stage/b9_readback_20261027.json
