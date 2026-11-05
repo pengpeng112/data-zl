@@ -42,6 +42,41 @@ CHUNK_PREFIX = "chunk-"
 CHUNK_SUFFIX = ".bin"
 _VALUE_TAG = "$reporting_pipeline_value_v1"
 _TYPED_ROW_PREFIX = "\x1eRPT1:"
+# LOB 暂存策略（069 会话 2026-11-05 修订）：目标列可为 CLOB/BLOB
+# （如 DBOPER.EMR_MEDICAL_RECORD_INFO.MED_NOTE 即 CLOB），故默认无损全量
+# 读取；安全阀仅在病态巨型 LOB 时截断并标记，防内存失控。
+# 源端 Oracle 视图含 CLOB 列时，oracledb 厚模式 fetch 返回 LOB 定位器；
+# 必须在连接关闭前完成读取。
+_LOB_SAFETY_CAP = 2_000_000
+
+
+def _encode_lob_value(value):
+    """Encode driver LOB locators (oracledb/cx_Oracle) for staging.
+
+    Returns None when the value is not a driver LOB (caller falls through to
+    the unsupported-type violation). Reads full content (lossless); only a
+    pathologically huge LOB beyond _LOB_SAFETY_CAP is truncated and flagged
+    (clob_trunc/blob_trunc).
+    """
+    module = type(value).__module__ or ""
+    if not (module.startswith("oracledb") or module.startswith("cx_Oracle")):
+        return None
+    data = value.read(_LOB_SAFETY_CAP + 1)
+    if isinstance(data, str):
+        truncated = len(data) > _LOB_SAFETY_CAP
+        return {
+            _VALUE_TAG: "clob_trunc" if truncated else "clob",
+            "value": data[:_LOB_SAFETY_CAP],
+        }
+    if isinstance(data, (bytes, bytearray)):
+        payload = bytes(data[:_LOB_SAFETY_CAP])
+        return {
+            _VALUE_TAG: "blob_trunc" if len(data) > _LOB_SAFETY_CAP else "blob",
+            "value": base64.b64encode(payload).decode("ascii"),
+        }
+    raise ContractViolation(
+        f"暂存 JSON 不支持的 LOB 载荷类型: {type(data).__name__}"
+    )
 
 
 def _mkdir_private(path: Path) -> None:
@@ -108,6 +143,9 @@ def _encode_json_value(value):
                 for key, item in value.items()
             ],
         }
+    lob = _encode_lob_value(value)
+    if lob is not None:
+        return lob
     raise ContractViolation(
         f"暂存 JSON 遇到不支持且不可无损编码的类型: {type(value).__name__}"
     )
@@ -128,6 +166,11 @@ def _decode_json_value(value):
         if kind == "decimal":
             return Decimal(raw)
         if kind == "bytes":
+            return base64.b64decode(raw, validate=True)
+        if kind in ("clob", "clob_trunc"):
+            # clob_trunc 回读返回已截断的字符串本身；截断事实留在暂存标记里。
+            return raw
+        if kind in ("blob", "blob_trunc"):
             return base64.b64decode(raw, validate=True)
         if kind == "list":
             return [_decode_json_value(item) for item in raw]

@@ -129,7 +129,11 @@ class ControlledConnectorRowSource:
         query_builder: Callable[[TimeWindow, KeysetCursor | None, int], tuple[str, Sequence]],
         row_transform: Callable[[tuple], tuple] | None = None,
         page_size: int = 5000,
-        fetch_timeout_seconds: float = 300.0,
+        # 069 会话 2026-11-05：必须大于 Oracle 源连接 call_timeout（600s），
+        # 让 OCI 原生超时先在调用线程内干净触发（DPY-4024）；看门狗跨线程
+        # cursor.close() 打断进行中的 OCI 调用会触发 thick 竞态 SIGSEGV
+        # （DEAD_TF/MEDICAL_RECORD_INFO 崩溃取证，T-B07-3 同族）。
+        fetch_timeout_seconds: float = 700.0,
         cancellation: CancellationToken | None = None,
     ) -> None:
         self.physical_source = physical_source

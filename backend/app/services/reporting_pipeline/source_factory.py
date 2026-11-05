@@ -437,6 +437,14 @@ def _ensure_oracle_thick() -> None:
         oracledb.init_oracle_client(lib_dir=lib_dir)
     except Exception:  # noqa: BLE001 - 已初始化（重复 init）继续连接
         pass
+    # LOB 列在 fetch 时由驱动直接物化为 str/bytes，不返回定位器。
+    # 管道 reader 在 fetch 后即关闭连接，定位器跨连接读取会 DPY-1001
+    # （与 8.53 mn_py 补丁5 修 CLOB 跨连接 ORA-64219 同坑同解）。
+    # 幂等设置；对非 LOB 列无影响。
+    try:
+        oracledb.defaults.fetch_lobs = False
+    except Exception:  # noqa: BLE001 - 老版本驱动无 defaults 时保持原行为
+        pass
 
 
 def build_oracle_connection_factory(

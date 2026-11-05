@@ -274,6 +274,12 @@ finally:
                 lib_dir,
                 type(exc).__name__,
             )
+        # LOB 列 fetch 时直接物化（不返回定位器）：连接关闭后定位器读取
+        # 会 DPY-1001/ORA-64219（069 会话，与 8.53 mn_py 补丁5 同解）。
+        try:
+            oracledb.defaults.fetch_lobs = False
+        except Exception:  # noqa: BLE001 - 老版本驱动无 defaults 时保持原行为
+            pass
         # Bound the TCP handshake as well as statement execution. Without this,
         # an unreachable business source can hang a read-only inventory run.
         dsn = oracledb.ConnectParams(
