@@ -11,7 +11,7 @@ description: 为山东省第二人民医院 Docare 手术麻醉独立源端（�
 
 ## 必读依据
 
-1. `AGENTS.md`、`开发起步包/README.md` 和 `55_系统未完成事项统一执行计划.md`。
+1. 按 `AGENTS.md`「启动阅读与时效」读取入口文件；本会话已读的不重复读。
 2. 本技能 [Docare 查询指南](references/docare-guide.md)。
 3. 需要连接或执行时读取 [连接指南](references/connection-guide.md)。
 4. 字段优先取 DOCARE 平台当前元数据；缺失或不可用时回退 `开发起步包/80_手麻Docare系统Oracle元数据快照.json` 并标注日期。
@@ -19,14 +19,12 @@ description: 为山东省第二人民医院 Docare 手术麻醉独立源端（�
 
 ## 请求与执行批准
 
-用户明确要求连接、查询或验证，已构成该目标和范围内的操作请求，无需重复询问是否开始；仍须满足所选通道的访问权限、草稿审批和时间窗口。仅对实际缺失的具体批准提问，普通请求不自动豁免白天 live 限制或授权批量探查。静态校验不新增人工审批，也不替代现有审批。
+以仓库 `AGENTS.md`「安全红线」（白天定向查询、批量探查定义、五要素任务级判断、通道与审批）和「自主执行、澄清与批准边界」为唯一规则源，本技能不另设审批。用户明确要求连接、查询或验证即构成该范围内的操作请求，无需再问是否开始。
 
 ## 字段值域硬规则（149 值域知识库，强制）
 
 - 涉及编码/状态/类型/阈值/字典类字段（如 手术/麻醉状态码、急诊标志、离院方式等（含跨系统镜像 `SM.MED_OPERATION_MASTER.OPER_STATUS` 口径））写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
-- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=DOCARE` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
-- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据时先纳入本次候选材料；用户明确要求摄取、登记，或当前任务已授权相应候选提交时，才提交平台 pending（AI 仅可提交，确认/裁决须人工）；否则报告建议，不因未提交阻塞原任务。
-- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+- 取值顺序、缺失处理（含“实测候选值域”补证）、离线 JSON 超龄处理和陷阱，统一按仓库 `AGENTS.md` 硬约束 6 执行（平台 `system_code=DOCARE`）；新值域证据仅在用户要求摄取/登记或任务已授权候选提交时提交平台 pending，确认/裁决须人工，不因未提交阻塞原任务。
 
 ## 标准流程
 
@@ -47,7 +45,7 @@ description: 为山东省第二人民医院 Docare 手术麻醉独立源端（�
 python .agents/skills/docare-anesthesia-readonly-sql/scripts/validate_docare_sql.py D:\temp\docare.sql
 ```
 
-默认只生成 SQL。只有用户明确要求连接、验证或查询，并且安全环境可用时，才按连接指南使用执行器。
+用户仅需 SQL 时到此交付；用户明确要求连接、查询或验证且环境可用时，直接按 `AGENTS.md` 与连接指南执行受控只读查询。
 
 ## 查询和导出
 

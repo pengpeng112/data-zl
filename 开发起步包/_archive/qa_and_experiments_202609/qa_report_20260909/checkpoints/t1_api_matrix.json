@@ -1,0 +1,119 @@
+{
+ "base": "http://127.0.0.1:8000",
+ "total": 431,
+ "no_auth": [
+  {
+   "m": "POST",
+   "p": "/api/v1/auth/login",
+   "code": 422,
+   "resp": "{\"code\":422,\"message\":\"参数校验失败\",\"data\":[\"body -> username: Field required\",\"body -> password: Field required\"],\"request_id\":\"7096fdc8972a414da3895611075fe90d\"}"
+  }
+ ],
+ "bad_token": [
+  {
+   "m": "POST",
+   "p": "/api/v1/auth/login",
+   "code": 422,
+   "resp": "{\"code\":422,\"message\":\"参数校验失败\",\"data\":[\"body -> username: Field required\",\"body -> password: Field required\"],\"request_id\":\"175c641c79a04534980efaf20a733c90\"}"
+  },
+  {
+   "m": "POST",
+   "p": "/api/v1/auth/refresh",
+   "code": 401,
+   "resp": "{\"detail\":\"缺少刷新凭证\"}"
+  },
+  {
+   "m": "GET",
+   "p": "/health/live",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"ok\",\"data\":{\"status\":\"alive\",\"checked_at\":\"2026-09-09T17:12:53.025344+00:00\",\"build_id\":\"dev-local\",\"git_sha\":\"\",\"frontend_build_id\":\"\"},\"r"
+  },
+  {
+   "m": "GET",
+   "p": "/health",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"ok\",\"data\":{\"status\":\"ok\",\"database\":\"connected\",\"checked_at\":\"2026-09-09T17:12:53.032902+00:00\",\"build_id\":\"dev-local\",\"git_sha\":\"\",\"front"
+  },
+  {
+   "m": "GET",
+   "p": "/api/v1/public/stats",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"success\",\"data\":{\"tables\":12702,\"columns\":178547,\"relations\":1329,\"confirmed_relations\":957},\"request_id\":\"\"}"
+  },
+  {
+   "m": "GET",
+   "p": "/api/v1/ai/tools",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"success\",\"data\":{\"platform\":\"医院数据资产平台\",\"tools\":[{\"name\":\"search_tables\",\"description\":\"按关键词或业务域搜索数据资产中的表\",\"method\":\"GET\",\"path\":\"/api/v1/ta"
+  },
+  {
+   "m": "GET",
+   "p": "/",
+   "code": 200,
+   "resp": "{\"name\":\"data-asset-platform\",\"docs\":\"/docs\"}"
+  },
+  {
+   "m": "GET",
+   "p": "/get-async-routes",
+   "code": 200,
+   "resp": "{\"success\":true,\"data\":[]}"
+  }
+ ],
+ "authed_get_5xx": [],
+ "fuzz_5xx": [],
+ "semantics": {
+  "unauth": {
+   "code": 401,
+   "resp": "{\"code\":401,\"message\":\"缺少 Authorization: Bearer <token>\",\"data\":null}"
+  },
+  "bad_token": {
+   "code": 403,
+   "resp": "{\"code\":403,\"message\":\"无效或已禁用的 API Token\",\"data\":null}"
+  },
+  "not_found": {
+   "code": 404,
+   "resp": "{\"detail\":\"Not Found\"}"
+  },
+  "bad_param": {
+   "code": 422
+  }
+ },
+ "public_ok": [
+  {
+   "m": "GET",
+   "p": "/health/live",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"ok\",\"data\":{\"status\":\"alive\",\"checked_at\":\"2026-09-09T17:12:48.999259+00:00\",\"build_id\":\"dev-local\",\"git_sha\":\"\",\"frontend_build_id\":\"\"},\"r"
+  },
+  {
+   "m": "GET",
+   "p": "/health",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"ok\",\"data\":{\"status\":\"ok\",\"database\":\"connected\",\"checked_at\":\"2026-09-09T17:12:49.021538+00:00\",\"build_id\":\"dev-local\",\"git_sha\":\"\",\"front"
+  },
+  {
+   "m": "GET",
+   "p": "/api/v1/public/stats",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"success\",\"data\":{\"tables\":12702,\"columns\":178547,\"relations\":1329,\"confirmed_relations\":957},\"request_id\":\"\"}"
+  },
+  {
+   "m": "GET",
+   "p": "/api/v1/ai/tools",
+   "code": 200,
+   "resp": "{\"code\":0,\"message\":\"success\",\"data\":{\"platform\":\"医院数据资产平台\",\"tools\":[{\"name\":\"search_tables\",\"description\":\"按关键词或业务域搜索数据资产中的表\",\"method\":\"GET\",\"path\":\"/api/v1/ta"
+  },
+  {
+   "m": "GET",
+   "p": "/",
+   "code": 200,
+   "resp": "{\"name\":\"data-asset-platform\",\"docs\":\"/docs\"}"
+  },
+  {
+   "m": "GET",
+   "p": "/get-async-routes",
+   "code": 200,
+   "resp": "{\"success\":true,\"data\":[]}"
+  }
+ ]
+}

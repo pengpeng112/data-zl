@@ -1,0 +1,369 @@
+{
+ "pages": [
+  {
+   "path": "/welcome",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 729,
+   "blank": false
+  },
+  {
+   "path": "/asset/overview",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 456,
+   "blank": false
+  },
+  {
+   "path": "/asset/system-map",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 987,
+   "blank": false
+  },
+  {
+   "path": "/asset/tables",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 9610,
+   "blank": false
+  },
+  {
+   "path": "/asset/graph",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 656,
+   "blank": false
+  },
+  {
+   "path": "/asset/lineage",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 489,
+   "blank": false
+  },
+  {
+   "path": "/asset/sources",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 3610,
+   "blank": false
+  },
+  {
+   "path": "/asset/relations",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 612,
+   "blank": false
+  },
+  {
+   "path": "/asset/candidates",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 4634,
+   "blank": false
+  },
+  {
+   "path": "/asset/relation-review",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 5879,
+   "blank": false
+  },
+  {
+   "path": "/asset/relation-recipes",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 382,
+   "blank": false
+  },
+  {
+   "path": "/asset/relation-rates",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 4000,
+   "blank": false
+  },
+  {
+   "path": "/asset/quality",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 515,
+   "blank": false
+  },
+  {
+   "path": "/asset/ai-quality",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 620,
+   "blank": false
+  },
+  {
+   "path": "/asset/ai-sql",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 570,
+   "blank": false
+  },
+  {
+   "path": "/asset/ai-tools",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 2187,
+   "blank": false
+  },
+  {
+   "path": "/asset/queries",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 487,
+   "blank": false
+  },
+  {
+   "path": "/asset/queries/accuracy",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 561,
+   "blank": false
+  },
+  {
+   "path": "/asset/admin",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 784,
+   "blank": false
+  },
+  {
+   "path": "/value-domains",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 3004,
+   "blank": false
+  },
+  {
+   "path": "/probe-findings",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 464,
+   "blank": false
+  },
+  {
+   "path": "/quality/issues",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 543,
+   "blank": false
+  },
+  {
+   "path": "/quality/controls",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 459,
+   "blank": false
+  },
+  {
+   "path": "/dict/medical",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 478,
+   "blank": false
+  },
+  {
+   "path": "/dict/general",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 451,
+   "blank": false
+  },
+  {
+   "path": "/dict/mappings",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 730,
+   "blank": false
+  },
+  {
+   "path": "/identity/persons",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 522,
+   "blank": false
+  },
+  {
+   "path": "/identity/accounts",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 531,
+   "blank": false
+  },
+  {
+   "path": "/identity/roles",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 2847,
+   "blank": false
+  },
+  {
+   "path": "/identity/permission-requests",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 589,
+   "blank": false
+  },
+  {
+   "path": "/metadata/changes",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 570,
+   "blank": false
+  },
+  {
+   "path": "/ops/runs",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 577,
+   "blank": false
+  },
+  {
+   "path": "/ops/audit",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 862,
+   "blank": false
+  },
+  {
+   "path": "/ops/sql-workbench",
+   "console_errors": [],
+   "net_4xx5xx": [],
+   "body_chars": 784,
+   "blank": false
+  }
+ ],
+ "viewport": [
+  {
+   "vp": "desktop",
+   "path": "/welcome",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/overview",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/system-map",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/tables",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/graph",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/quality",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "desktop",
+   "path": "/asset/queries",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/welcome",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/overview",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/system-map",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/tables",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/graph",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/quality",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "tablet",
+   "path": "/asset/queries",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/welcome",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/overview",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/system-map",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/tables",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/graph",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/quality",
+   "h_overflow_px": 0
+  },
+  {
+   "vp": "phone",
+   "path": "/asset/queries",
+   "h_overflow_px": 0
+  }
+ ],
+ "xss": {
+  "dialog_fired": [],
+  "script_in_dom": false,
+  "net": 1
+ },
+ "double_click": {
+  "requests_after_dblclick": 3,
+  "urls": [
+   "http://127.0.0.1:8849/api/v1/assets/tree",
+   "http://127.0.0.1:8849/api/v1/systems",
+   "http://127.0.0.1:8849/api/v1/tables"
+  ]
+ },
+ "expired": {
+  "url": "http://127.0.0.1:8849/#/login",
+  "has_login_ui": true
+ },
+ "backend_down": {
+  "error": "Page.evaluate: SyntaxError: Unexpected token ':'\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:311:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+ }
+}

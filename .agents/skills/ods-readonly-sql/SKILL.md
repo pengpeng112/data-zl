@@ -9,7 +9,7 @@ description: 为山东省第二人民医院数据中心（DATA_CENTER/ODS，Orac
 
 ## 目标
 
-根据当前仓库中的活库元数据、已验证关系、已有视图 SQL 和治理口径，为数据中心生成可审查的 Oracle 11g `SELECT`。默认只交付 SQL，不连接源库、不执行 SQL；只有用户明确要求查询或验证且环境允许时，才可通过平台的只读执行端点做限量验证。
+根据当前仓库中的活库元数据、已验证关系、已有视图 SQL 和治理口径，为数据中心生成可审查的 Oracle 11g `SELECT`。按用户任务要求交付只读 SQL，或在用户明确要求查询/验证时经受控只读通道执行限量 `SELECT`（规则见 `AGENTS.md`）。
 
 源业务数据库是医疗生产数据源。错误 JOIN 会造成重复、漏数或错误归属，大表全扫会影响生产，因此先核对资产和关系，再编写 SQL。
 
@@ -17,24 +17,20 @@ description: 为山东省第二人民医院数据中心（DATA_CENTER/ODS，Orac
 
 按顺序读取，并仅加载与本次主题有关的部分：
 
-1. `AGENTS.md`：安全红线、Oracle 11g 和大表限制。
-2. `开发起步包/README.md`：当前权威目录及资产状态。
-3. `开发起步包/55_系统未完成事项统一执行计划.md`：避免把未完成能力当成已完成。
-4. 本技能的 `references/ods-sql-guide.md`：ODS 专用表、关联键、方言和输出规则。
-5. 依据业务主题，从 `references/ods-sql-guide.md` 指向的权威资产中选读元数据、关系或视图 DDL。
+1. 按 `AGENTS.md`「启动阅读与时效」读取入口文件（含安全红线、Oracle 11g 和大表限制）；本会话已读的不重复读。
+2. 本技能的 `references/ods-sql-guide.md`：ODS 专用表、关联键、方言和输出规则。
+3. 依据业务主题，从 `references/ods-sql-guide.md` 指向的权威资产中选读元数据、关系或视图 DDL。
 
 不要把 `_archive/` 文档作为当前依据。文档与活元数据冲突时，优先以目标系统当前平台元数据为准；缺失或不可用时回退 `08_数据中心元数据快照.json` 并标注日期；关系是否可用于正式 SQL，则以已验证关系和治理口径为准。
 
 ## 请求与执行批准
 
-用户明确要求连接、查询或验证，已构成该目标和范围内的操作请求，无需重复询问是否开始；仍须满足所选通道的访问权限、草稿审批和时间窗口。仅对实际缺失的具体批准提问，普通请求不自动豁免白天 live 限制或授权批量探查。静态校验不新增人工审批，也不替代现有审批。
+以仓库 `AGENTS.md`「安全红线」（白天定向查询、批量探查定义、五要素任务级判断、通道与审批）和「自主执行、澄清与批准边界」为唯一规则源，本技能不另设审批。用户明确要求连接、查询或验证即构成该范围内的操作请求，无需再问是否开始。
 
 ## 字段值域硬规则（149 值域知识库，强制）
 
 - 涉及编码/状态/类型/阈值/字典类字段（如 `SM.MED_OPERATION_MASTER.OPER_STATUS`（>=35 完成口径、-80 取消须排除）、镜像 HIS 表的离院方式/急诊标志/诊断类别字段）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
-- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=DATA_CENTER` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
-- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据时先纳入本次候选材料；用户明确要求摄取、登记，或当前任务已授权相应候选提交时，才提交平台 pending（AI 仅可提交，确认/裁决须人工）；否则报告建议，不因未提交阻塞原任务。
-- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+- 取值顺序、缺失处理（含“实测候选值域”补证）、离线 JSON 超龄处理和陷阱，统一按仓库 `AGENTS.md` 硬约束 6 执行（平台 `system_code=DATA_CENTER`）；新值域证据仅在用户要求摄取/登记或任务已授权候选提交时提交平台 pending，确认/裁决须人工，不因未提交阻塞原任务。
 
 ## 工作流程
 
@@ -104,7 +100,7 @@ python .agents/skills/ods-readonly-sql/scripts/validate_readonly_sql.py path/to/
 
 检查不通过就修订。脚本仅做基础静态门禁，不能替代元数据核对、执行计划分析和人工复核。
 
-若平台接口可用，可再调用 `/api/v1/ai/sql-risk-scan`；被阻断时不得绕过。除非用户明确要求且具备只读验证条件，否则到此停止，不执行 SQL。
+若平台接口可用，可再调用 `/api/v1/ai/sql-risk-scan`；被阻断时不得绕过。未要求执行时交付静态核验后的 SQL；用户明确要求查询或验证时直接进入第 6 步受控只读执行。
 
 ### 6. 数据库连接与只读执行
 
@@ -158,6 +154,11 @@ python ..\.agents\skills\ods-readonly-sql\scripts\run_ods_readonly.py `
 
 对 DDL/DML 请求说明本技能只负责生成只读取数 SQL，不要改写成可执行写操作，也不要调用运维写通道。
 
+## 库位双轨警示（158 号新HIS 逆向实证）
+
+- `SYS_EMPLOYEE`：ODS 侧 = `COMM.SYS_EMPLOYEE`（平台元数据核验存在）；凡科新HIS 侧 = 其 masterdb 裸名同名表（两套并行数据）。跨系统对账/人员取数必须带 owner（ODS 用 COMM）并注明 source，禁止裸表名导致串库。
+- 同类双轨风险表：`PAT_VISIT`（ODS/HIS 源库 vs 新HIS HisRead 直连）——凡引用老 HIS 表的查询资产，标注来源 source_code（对应平台 table API 的 source_code 参数，146 E5）。
+
 ## 交付格式
 
 始终按以下结构输出：
@@ -171,11 +172,6 @@ python ..\.agents\skills\ods-readonly-sql\scripts\run_ods_readonly.py `
 - 数据库方言：Oracle 11g
 - 使用 Owner/对象：
 - 时间口径与过滤条件：
-
-## 库位双轨警示（158 号新HIS 逆向实证）
-
-- `SYS_EMPLOYEE`：ODS 侧 = `COMM.SYS_EMPLOYEE`（平台元数据核验存在）；凡科新HIS 侧 = 其 masterdb 裸名同名表（两套并行数据）。跨系统对账/人员取数必须带 owner（ODS 用 COMM）并注明 source，禁止裸表名导致串库。
-- 同类双轨风险表：`PAT_VISIT`（ODS/HIS 源库 vs 新HIS HisRead 直连）——凡引用老 HIS 表的查询资产，标注来源 source_code（对应平台 table API 的 source_code 参数，146 E5）。
 
 ## 表关系依据
 
@@ -209,7 +205,7 @@ WHERE ...;
 - 组合键完整：是/否/不涉及
 - 大表已由业务键或时间范围限制：是/否/不涉及
 - 敏感字段已排除或脱敏：是/否/不涉及
-- 是否执行 SQL：否（默认）
+- 是否执行 SQL：否 / 是（附连接方式、行数、耗时与脱敏情况）
 ```
 
 如果自检任一关键项为“否”，将结果标记为“候选草稿，不可直接使用”。

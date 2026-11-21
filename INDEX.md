@@ -1,93 +1,45 @@
 # INDEX.md —— 仓库路由地图（agent 第一跳）
 
-> **定性**：本文件是路由缓存，不是目录权威——登记与状态以 `开发起步包/README.md`（目录唯一权威）与 `开发起步包/55_系统未完成事项统一执行计划.md`（唯一未完成入口）为准；两者更新后本文件须同步一行。**新会话第一步：先读本文件，再按需分段读 README/55，禁止整读大文件。**
+> 路由缓存，不复制版本或进度数字。目录权威：`开发起步包/README.md`；未完成入口：`开发起步包/55_系统未完成事项统一执行计划.md`。按需切片读取，禁整读大文件。
 
-## 物理目录（后续 AI 先看这张）
+## 物理目录
 
-分类只说明去哪读，不表示完成状态。编号正文保持原路径，不因日期旧而搬家。机器清单用 `python tools/build_repo_manifest.py` 重生到 `tools/.cache/repo_manifest.json`（缓存，gitignore，不是状态总表）。目录登记用 `python tools/check_doc_index.py`。
-
-| 位置 | 角色 | 后续 AI 怎么用 |
+| 位置 | 角色 | 用途 |
 |---|---|---|
-| `INDEX.md`、`AGENTS.md`、`CLAUDE.md` | 启动 | 路由、规则、转发。CLAUDE 只转发 AGENTS |
-| `开发起步包/README.md` | 编号目录 | 唯一清单。按分组分段读，不要整读 |
-| `开发起步包/55_系统未完成事项统一执行计划.md` | 未完成入口 | 只读顶部当前批次。历史章节不是执行入口 |
-| `开发起步包/NN_*.md` 与同号 `_结果.json`、`_执行报告.md` | 专题 | 先在 README 找到编号，再读该号正文 |
-| `开发起步包/output_rNN/` | 运行证据 | 按计划和 run_id 找。不从目录名推断当前进度 |
-| `开发起步包/数据资产_*/` | 机器资产 | 平台不可用时的回退。先看该包 catalog 或 manifest，并记下快照日期 |
-| `开发起步包/系统表结构/`、`诊断与手术维护/` | 原始参考 | 背景材料。不覆盖平台当前元数据 |
-| `开发起步包/_archive/` | 历史 | 只追溯。不执行其中的旧授权 |
-| `开发起步包/HIS问题表映射.csv` | 运维映射 | 配合 `F:\python\Wx_ltjl\docs\知识库\HIS日常问题处理知识库.md` |
-| `开发起步包/梁志刚数据治理(1).pdf` | 外部案例 | 宣武医院数据集实践。不是本院口径 |
-| `开发起步包/output_domain_baseline.txt` | 工具输出 | `tools/dev_env.sh --domain-baseline` 的默认他人域哈希。不是文档 |
-| `backend/`、`frontend/`、`deploy/`、`drivers/` | 运行代码 | 后端看 `backend/AGENTS.md`；前端看 `frontend/AGENTS.md`；离线发布看 `deploy/offline/README.md` |
-| `backend/app/` | 平台实现 | `api/` 路由、`services/` 业务、`models/` 表、`core/` 配置与库门禁 |
-| `frontend/src/views/` | 页面 | `asset` 资产、`quality` 质量、`dict` 字典、`identity` 人员科室、`query-center` 查询、`datasets` 数据集、`ops` 运维 |
-| `.agents/skills/` | 仓库技能 | 取数、关系摄取、四源只读 SQL、运维、接手。触发条件见各 `SKILL.md` 首段 |
-| `tools/` | 维护脚本 | 先看本表和脚本文件头。`queryctl.py` 走查询治理；`register_doc.py` 负责取号登记 |
-| `取数/` | 本机取数 | 先读 `取数/START_HERE.md`。交付进 `取数/exports/序号、任务名/`。含患者材料，不进普通归档 |
-| `review/`、`verify/` | 评审证据 | 按 round 找。不把评审意见当成当前授权 |
-| `三仓库互通地图.md` | 跨仓库事实 | 本仓库 + `F:\python\Wx_ltjl` + 嘉和。L1 在 AGENTS，细节才读地图 |
-| `三仓库检查处理提示词-数据资产.md` | 跳转页 | 原文已归档，文件只留链接 |
-| `三仓库问题清单与评审提示词.md` | 历史评审 | 2026-08-27 线索。不恢复当时权限 |
-| `.ssh/`、`.zcode/`、`.v2c/`、`.video_agent/`、`.workbuddy/` | 工具私有 | 保持原位。不归档、不提交密钥 |
-| `_scratch/`、`artifacts/` | 临时与构建 | 先确认没有进程占用。不把调试脚本放回仓库根 |
-| `CacheDB.jar` | 未归类依赖 | 来源未核清。不要移动或删除 |
-
-`开发起步包/截图/` 已不在工作区。界面证据看 `开发起步包/output_r213/` 与 `开发起步包/output_r214/screenshots/`。
+| `INDEX.md`、`AGENTS.md`、`CLAUDE.md` | 启动 | 路由、统一规则、转发（`CLAUDE.md` 仅转发 `AGENTS.md`） |
+| `开发起步包/README.md` | 唯一目录 | 演进总览、活跃入口与编号文档登记 |
+| `开发起步包/55_系统未完成事项统一执行计划.md` | 未完成入口 | 只读顶部当前批次与工作线；历史章节文末留跳转 |
+| `开发起步包/NN_*.md` + 同号 JSON/报告 | 专题 | 先查 README 编号，再读正文 |
+| `开发起步包/output_rNN/` | 运行证据 | 按 `run_id` 定位；`output_r215/` 含 Day1–Fix3 隔离验收证据 |
+| `开发起步包/数据资产_*/` | 机器资产 | 平台不可用时离线回退，须注明快照日期 |
+| `开发起步包/_archive/` | 历史归档 | 历史计划、会话导出与 QA/实验纯文本见证，禁执行旧授权 |
+| `backend/`、`frontend/`、`deploy/`、`drivers/` | 代码与部署 | 看各自 `AGENTS.md` 与 `deploy/offline/README.md` |
+| `.agents/skills/`、`tools/` | 技能与工具 | 只读 SQL/治理/运维/接手技能；`ai_handoff.py` 与 `check_*` 脚本 |
+| `取数/` | 本机取数 | 先读 `取数/START_HERE.md`，交付归集 `取数/exports/序号、任务名/`（gitignored） |
+| `三仓库互通地图.md`、`review/`、`verify/` | 跨仓与评审 | 跨仓细节查地图；历史评审不作当前授权 |
+| `_scratch/`、`artifacts/`、`CacheDB.jar` | 临时与驱动 | 清理后仅留计划 205 快照与 2026-11 脚本；`CacheDB.jar` 保留勿删 |
 
 ## 想做 X → 读 Y
 
 | 想做什么 | 去哪里 |
 |---|---|
-| 查看按功能整理的人工待定项与剩余工作复核 | 先55当前批次，再读 `开发起步包/214_系统人工复核与未完成工作核查报告.md`（2026-10-06时点证据与建议） |
-| 前端界面核查与美化整改 | `开发起步包/213_前端界面布局核查与美化整改执行计划.md`。收口证据看 55 与 `开发起步包/output_r214/screenshots/`；`开发起步包/output_r213/screenshots-fixed/` 不再作为通过证据 |
-| 开始任何任务 | `AGENTS.md` → `开发起步包/README.md` 相关分组 → `开发起步包/55_系统未完成事项统一执行计划.md` 当前批次；只读任务所需内容 |
-| 核查历史要求、当前系统和任务偏离，并实施完善改进 | 先55→`开发起步包/211_系统需求任务偏离核查与架构完善改进执行计划.md`；最新要求裁决、全系统链路核查、整改及212候选交接 |
-| 整改后的前后端全栈与判断准确性独立验收 | `开发起步包/212_整改后前后端全栈与判断准确性详细测试执行计划.md`；承接211冻结候选，含独立真值、真实浏览器、权限与恢复测试 |
-| 数据资产安全分类分级、用途权限与导出闭环整改 | 先55→`开发起步包/210_数据资产安全分类分级功能核查与完善改进执行计划.md`；含平台只读核查、193缺口与一次性执行提示词 |
-| 修改后还有什么待确认、如何安排每日长任务 | `开发起步包/208_剩余事项人工决策与每日长任务修订计划.md`；实时状态仍从55进入 |
-| 追溯09-29前后端/数据/运维独立测试 | `开发起步包/209_前后端数据与运维全栈长任务测试计划.md`及其run；新一轮整改后验收用212，不按209旧待执行描述重跑 |
-| 文档分类、归档与启动维护 | 先看本文件物理目录，再读 `开发起步包/204_启动入口与文档分层整理及持续维护执行计划.md`。登记以 README 为准，自检用 `tools/check_doc_index.py` |
-| 跨仓库任务 | `三仓库互通地图.md`。检查提示词只是归档跳转，问题清单不恢复旧授权 |
-| ZCode/Codex/Claude/Grok与不同模型接力或并行 | 同一204的§8：统一启动、文件占用登记、交接格式及通用提示词；本机工具 `tools/ai_handoff.py` |
-| 为其他AI准备跨项目长任务执行提示词 | `开发起步包/206_跨项目长任务执行提示词与任务包契约.md`（参考模板；先指定项目映射和具体任务包） |
-| 全系统数据库只读再探索 | `开发起步包/205_全系统数据库只读再探索与差量分析长任务计划.md`；连库入口见AGENTS的sjzc路由 |
-| 接续系统治理与生产收口 | 先55→208修订编排；`开发起步包/203_系统真实剩余工作与长周期连续执行计划.md`保留专项细节与历史证据，避免重做 |
-| 人员角色、诊断手术下发 | `开发起步包/200_人员角色权限与诊断手术下发复核及一次性整改执行计划.md` |
-| 历史SQL治理 | `开发起步包/198_董哥SQL资产复核问题与一次性整改执行计划.md`；具体终态看55 |
-| 三甲历史结构关系治理 | `开发起步包/195_三甲历史表结构与视图关系再核验及平台入库执行计划.md` |
-| 患者纵向数据集 | `开发起步包/193_患者纵向高质量数据集分阶段开发执行计划.md` |
-| 三甲扩窗与JHEMR | `开发起步包/191_三甲复审2025扩窗与JHEMR视图交接.md`；目标和授权按55及189专项 |
-| 既有源探索历史 | `开发起步包/188_未探索业务数据库只读探索执行计划.md`；新一轮用205 |
-| 日常取数、查询资产 | `取数/START_HERE.md` + `.agents/skills/query-governance-intake/SKILL.md` |
-| 生产发布、夜跑、受控修复 | `.agents/skills/ops-runbook/SKILL.md` |
-| 跨会话接手 | `.agents/skills/project-task-resume/SKILL.md` |
-| 后端/前端开发 | `backend/AGENTS.md`、`frontend/AGENTS.md` |
-| 质量台账/质控清单、厂商督办与自动复测 | `开发起步包/207_质量治理台账与质控清单核查及两批闭环开发执行计划.md`；当前状态从55进入 |
-| 脚本用途 | `tools/build_repo_manifest.py` 生成本地缓存；勿执行未知脚本 |
-| 文档引用盘点与迁移候选证据 | `tools/audit_doc_references.py`；默认限量文本扫描，覆盖边界见产物，不能按零引用自动归档 |
-| 历史评审 | `review/`、`verify/` |
-| 构建及离线包 | `artifacts/` |
+| 开始任何开发、排查或文档任务 | 先读 `AGENTS.md`，再看 `开发起步包/README.md` 相关分组与 `开发起步包/55_系统未完成事项统一执行计划.md` |
+| 连库查表结构 / 日常只读查询 | 全局 `~/.zcode/skills/sjzc/SKILL.md` + `开发起步包/216_数据库连接说明_AI工具与项目通用.md` |
+| 日常取数、保存 SQL 与口径治理 | `取数/START_HERE.md` + `.agents/skills/query-governance-intake/SKILL.md` |
+| 历史 SQL 关系解析与图谱摄取 | `.agents/skills/sql-relation-intake/SKILL.md` |
+| 生产发布、夜跑核验与受控修复 | `.agents/skills/ops-runbook/SKILL.md` |
+| 跨会话断点续跑与任务接手 | `.agents/skills/project-task-resume/SKILL.md` |
+| Day1–Fix3 收官与工程治理基线 | `开发起步包/55_系统未完成事项统一执行计划.md`、`开发起步包/output_r215/fix3_zero_failure_and_scale_closure/总收官验收报告_DAY1至FIX3.md` |
+| 后端或前端修改与测试 | `backend/AGENTS.md`、`frontend/AGENTS.md` |
+| 多 AI 协作占用与文档规范 | `开发起步包/204_启动入口与文档分层整理及持续维护执行计划.md`（§8 + `tools/ai_handoff.py`） |
+| 全源只读再探索与差量分析 | `开发起步包/205_全系统数据库只读再探索与差量分析长任务计划.md` |
+| 三甲复审（88/189/191/195/218） | 已迁 E 盘独立工作区（见 `AGENTS.md`「三甲独立工作区」节，本仓仅提供受控连接器） |
+| 新 HIS 源码/安全分级/整改/UI 验收 | `开发起步包/219_新HIS源码hisuser库表结构关系值域分析报告.md`、`开发起步包/210_数据资产安全分类分级功能核查与完善改进执行计划.md`、`开发起步包/211_系统需求任务偏离核查与架构完善改进执行计划.md`、`开发起步包/212_整改后前后端全栈与判断准确性详细测试执行计划.md`、`开发起步包/213_前端界面布局核查与美化整改执行计划.md` |
+| 跨仓库联动与医院运维知识 | `三仓库互通地图.md`、HIS 日常故障排查见 `AGENTS.md` 技能路由表 |
 
-本路由不记录生产镜像、测试数量和完成百分比；这些易变化事实仅由55及专项证据维护。
+## 目录守护表 & 新文件规则
 
-## 目录守护表（CODEOWNERS 本地化；基线=tools/dev_env.sh `--domain-check`）
-
-| 目录 | 归属/约束 |
-|---|---|
-| `frontend/src/layout/`+`captureMode.ts` 等 8 文件、`tools/capture_*` 5 脚本 | 他人域（dev_env 13 文件基线，改动前跑 `--domain-check`） |
-| `开发起步包/181*`、`output_r181/`、`.agents/skills/*`（WIP）、`output_r186/` | 并行会话域（round-10 保护清单 `review/round-10-exec/protection_extra.json`） |
-| `backend/`、`frontend/` 其余 | 主开发域（改前看 git status，留他人改动） |
-| `取数/` | 本机工作区（gitignored；任务目录规则见 START_HERE；`_legacy/` 有危险门禁） |
-| `_scratch/`、`artifacts/` | 归拢区（gitignored；见下方产生规则） |
-| `review/`、`verify/` | 外部AI评审证据；任务接力使用原run目录交接，编辑范围登记见204 §8 |
-
-## 新文件产生规则（防回潮）
-
-- 根目录禁止新增 `_tmp_*`：调试脚本 → `_scratch/`
-- 日志/构建 tar/离线包 → `artifacts/`；frontend 日志不入工程根
-- 外部 AI 审查产物 → `review/` 目录（round-1…round-10 各轮子目录） 或 `review/adhoc/`（raw/err 默认忽略；round-N 为通配示例）
-- 编号文档：单一整合者经 `tools/register_doc.py` 取号→创建→登记一次完成
-- 共享文件（README/55/AGENTS/本文件）：并行会话产出交一方合并；全量 pytest 前清点在跑 pytest
-
-*建立：round-10 文件规范化（2026-09-11）；维护义务：改动被路由目标时同步本表。*
+- **13 个他人域保护文件**：`frontend/src/layout/` 等 8 件 + `tools/capture_*` 5 脚本，禁未授权修改（`tools/dev_env.sh --domain-check`）。
+- **主开发域（`backend/`、`frontend/` 其余）**：含 Day1–Fix3 未提交成果；编辑前必先 `python tools/ai_handoff.py status` 与 `git status --short`，`claim` 后改动、交付 `release`。
+- **新文件落点**：临时脚本放 `_scratch/`；构建日志/离线包放 `artifacts/`（根目录禁 `_tmp_*`）；取数交付放 `取数/exports/` 下新建序号中文子目录（见 `AGENTS.md`）；新编号文档先用 `tools/register_doc.py` 取号并在 `开发起步包/README.md` 登记。
+- **用户新建文书自动规范**：用户新放入的文书/需求/表格由接手 AI 顺带按 `AGENTS.md` §5 归位、取号补头并登记 `开发起步包/README.md`（原件保留不删，被替代旧版只迁 `开发起步包/_archive/`）。

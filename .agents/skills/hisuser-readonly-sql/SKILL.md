@@ -19,24 +19,21 @@ description: 为山东省第二人民医院 HIS 源端业务库（平台系统�
 
 按顺序完整或按主题读取：
 
-1. `AGENTS.md`。
-2. `开发起步包/README.md` 和 `55_系统未完成事项统一执行计划.md`。
-3. 本技能 `references/his-source-guide.md`。
-4. `开发起步包/数据资产_HIS源端资产包/` 中与需求相关的表、字段和关系。
-5. 关系复杂时读取 `16`、`19`、`21`、`22`、`23`、`25` 的对应报告或结果 JSON。
+1. 按 `AGENTS.md`「启动阅读与时效」读取入口文件；本会话已读的不重复读。
+2. 本技能 `references/his-source-guide.md`。
+3. `开发起步包/数据资产_HIS源端资产包/` 中与需求相关的表、字段和关系。
+4. 关系复杂时读取 `16`、`19`、`21`、`22`、`23`、`25` 的对应报告或结果 JSON。
 
 不要使用 `_archive/` 作为当前依据。表字段优先取目标系统的平台当前元数据；缺失或不可用时回退同系统 `16_hisuser业务库元数据快照.json` 并标注日期；统计行数只用于估算规模，不代表实时精确数量。
 
 ## 请求与执行批准
 
-用户明确要求连接、查询或验证，已构成该目标和范围内的操作请求，无需重复询问是否开始；仍须满足所选通道的访问权限、草稿审批和时间窗口。仅对实际缺失的具体批准提问，普通请求不自动豁免白天 live 限制或授权批量探查。静态校验不新增人工审批，也不替代现有审批。
+以仓库 `AGENTS.md`「安全红线」（白天定向查询、批量探查定义、五要素任务级判断、通道与审批）和「自主执行、澄清与批准边界」为唯一规则源，本技能不另设审批。用户明确要求连接、查询或验证即构成该范围内的操作请求，无需再问是否开始。
 
 ## 字段值域硬规则（149 值域知识库，强制）
 
 - 涉及编码/状态/类型/阈值/字典类字段（如 `MEDREC.PAT_VISIT.DISCHARGE_DISPOSITION`、`MEDREC.OPERATION.OPERATION_EMER_INDICATOR`、`MEDREC.DIAGNOSIS.DIAGNOSIS_TYPE`、`OUTPADM.CLINIC_MASTER.VISIT_TYPE/REGISTTYPE`、`INPBILL.INP_BILL_DETAIL.ITEM_NAME` 字面量）写 SQL/给口径前**必须先取值域，禁止凭字典表名、字段注释或惯例猜测**。
-- 获取顺序：① 平台 `GET /api/v1/ai/system-context?system_code=HIS_SOURCE` 或 `POST /api/v1/ai/context/resolve`（响应 `value_domains` 段=该系统全部 confirmed 值域+陷阱，逐条带 version_no）；② 平台不可达 → 离线 `开发起步包/数据资产_资产包/value_domains.json`（超过 max_age_days=7 天须提示用户重新导出）；③ 仍无 → `开发起步包/148_病案首页关键值域与离院方式口径字典.md`（平台导出视图，勿手改）。
-- 三处都查不到：SQL 写注释 `【值域待确认：OWNER.TABLE.COLUMN】` 并在交付说明中明示，**不得假设含义**；发现新证据时先纳入本次候选材料；用户明确要求摄取、登记，或当前任务已授权相应候选提交时，才提交平台 pending（AI 仅可提交，确认/裁决须人工）；否则报告建议，不因未提交阻塞原任务。
-- 陷阱（domain_kind=trap）同样强制：离院方式 **4=非医嘱离院、5=死亡**，勿用 `COMM.DISCHARGE_DISPOSITION_DICT`（那是治疗结果字典）；`PAT_VISIT.DEATH_DATE_TIME` 源端基本不填，不能识别死亡。
+- 取值顺序、缺失处理（含“实测候选值域”补证）、离线 JSON 超龄处理和陷阱，统一按仓库 `AGENTS.md` 硬约束 6 执行（平台 `system_code=HIS_SOURCE`）；新值域证据仅在用户要求摄取/登记或任务已授权候选提交时提交平台 pending，确认/裁决须人工，不因未提交阻塞原任务。
 
 ## 标准流程
 
@@ -94,7 +91,7 @@ python .agents/skills/hisuser-readonly-sql/scripts/validate_his_sql.py path/to/q
 
 ### 6. 可选连接与执行
 
-只有用户明确要求“连接/验证/查询”，且当前 AI 被授权访问医院内网时，才执行。连接前必须读取 `references/connection-guide.md`，按 Windows 跳板、服务器内网直连或平台 API 三种环境选择。优先使用平台 `/api/v1/ai` 只读执行流程；也可使用本技能封装的本地脚本：
+只有用户明确要求“连接/验证/查询”时才执行；`.ssh/config_ai` 与已登记密钥可用即视为具备内网访问条件。连接前必须读取 `references/connection-guide.md`，按 Windows 跳板、服务器内网直连或平台 API 三种环境选择。优先使用平台 `/api/v1/ai` 只读执行流程；也可使用本技能封装的本地脚本：
 
 ```powershell
 cd F:\python\数据资产\backend
@@ -154,6 +151,19 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" data-asset-83
 
 连接失败时只报告错误类型和脱敏摘要，不尝试扫描网络、搜索凭据或降低 SSH 主机校验。
 
+## 已知对象与双轨警示（158 号实证，活库已核验）
+
+- `FXHIS` owner 下感控/传染病域视图（字段含 PATIENT_ID + SERIAL_NUMBER/ADMISSION_DATE 等键，活库 2026-08-27 核验存在）：
+  - `V_EMR_PATIENT_INFO`（33 列，患者主档）
+  - `V_EMR_ADMISSION_INFO`（19 列，入院）
+  - `V_EMR_DISCHARGE_INFO`（18 列，出院）
+  - `V_EMR_ACTIVITY_INFO`（32 列，诊疗活动，含 ACTIVITY_TYPE_CODE/NAME）
+  - `V_EMR_VITAL_SIGNS_RECORD`（20 列，生命体征）
+  - `V_CRBREPORT`（传染病上报报告）
+  - 注意：以上视图各存在 `_copy1` 备份副本，取数一律用正名，勿用 `_copy1`。
+- `HISUSER.PLATE_EMR_PDF`（无纸化病案 PDF 路径表，活库核验存在）：病案 PDF 类取数优先此表。
+- 双轨表警示（158）：`SYS_EMPLOYEE` 在 ODS 为 `COMM.SYS_EMPLOYEE`，在凡科新HIS 侧为 masterdb 裸名 `SYS_EMPLOYEE`（hisuser 源库无此表，ORA-00942 实测）。写跨库对账 SQL 时必须显式 owner，禁止裸名。
+
 ## 阻塞范围与停止条件
 
 以下情况只停止依赖该条件的连接、SQL 生成或执行步骤；继续完成已授权的本地资产核对、候选说明、静态检查和其他独立工作。不得改用生产平台库、猜测字段、扫描凭据、降低 SSH 校验或扩大查询范围来绕过。
@@ -177,19 +187,6 @@ ssh -F "F:\python\数据资产\.ssh\config_ai" data-asset-83
 - 数据库：Oracle 11g，多 Owner
 - 使用对象：
 - 时间与业务过滤：
-
-## 感控视图族与专用表（158 号实证，活库已核验）
-
-- `FXHIS` owner 下感控/传染病域视图（字段含 PATIENT_ID + SERIAL_NUMBER/ADMISSION_DATE 等键，活库 2026-08-27 核验存在）：
-  - `V_EMR_PATIENT_INFO`（33 列，患者主档）
-  - `V_EMR_ADMISSION_INFO`（19 列，入院）
-  - `V_EMR_DISCHARGE_INFO`（18 列，出院）
-  - `V_EMR_ACTIVITY_INFO`（32 列，诊疗活动，含 ACTIVITY_TYPE_CODE/NAME）
-  - `V_EMR_VITAL_SIGNS_RECORD`（20 列，生命体征）
-  - `V_CRBREPORT`（传染病上报报告）
-  - 注意：以上视图各存在 `_copy1` 备份副本，取数一律用正名，勿用 `_copy1`。
-- `HISUSER.PLATE_EMR_PDF`（无纸化病案 PDF 路径表，活库核验存在）：病案 PDF 类取数优先此表。
-- 双轨表警示（158）：`SYS_EMPLOYEE` 在 ODS 为 `COMM.SYS_EMPLOYEE`，在凡科新HIS 侧为 masterdb 裸名 `SYS_EMPLOYEE`（hisuser 源库无此表，ORA-00942 实测）。写跨库对账 SQL 时必须显式 owner，禁止裸名。
 
 ## 表结构与系统对接
 
@@ -218,7 +215,7 @@ WHERE ...
 
 ## 执行结果
 
-- 默认：未执行，仅生成并静态检查。
+- 未要求执行时标注“未执行，已完成静态检查”；用户要求查询/验证时按受控通道执行并记录下方回执。
 - 若已执行：连接方式、返回行数、耗时、是否截断、脱敏情况；不得输出凭据。
 
 ## 风险与待确认

@@ -106,6 +106,9 @@ deploy/offline/SHA256SUMS
 /取数/_query_results/
 /取数/_query_context/
 /取数/.query_state/
+
+# 运维处置工单留档（HIS/门诊病历等改数 SQL 与核对记录，含业务标识，不进 Git）
+/运维处置/
 /2026高次次-病历首页数据表样*.xlsx
 /临床诊断字典与国标版本映射关系*.xlsx
 /**/*病历*.xlsx
@@ -188,4 +191,12 @@ backend/_r175_work/
 
 # 215 E1: 本机探查/工具私有产物（LIS Cache JDBC 探针 jar、ZCode 会话私有配置）
 /CacheDB.jar
-/.zcodeignore/
+/.zcodeignore
+/.v2c/
+/.video_agent/
+/.workbuddy/
+
+# 本地数据集导出单测产物与已清理旧发布压缩包（不入 Git）
+/ds_export_artifacts/
+/backend/ds_export_artifacts/
+/backend/var/*.tar.gz

@@ -1,0 +1,8 @@
+{
+ "body_chars": 0,
+ "has_error_ui": false,
+ "url": "http://127.0.0.1:8848/#/asset/tables",
+ "console_errors": [
+  "console.error:Failed to load resource: net::ERR_FAILED"
+ ]
+}
